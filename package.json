@@ -1,0 +1,31 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "description": "Assoc API",
+  "author": "philmod",
+  "main": "index.js",
+  "engines": {
+    "node": "0.10.36",
+    "npm": "2.5.1"
+  },
+  "dependencies": {
+    "async": "^0.9.0",
+    "config": "^1.12.0",
+    "express": "^4.12.2",
+    "pg": "^4.3.0",
+    "pg-hstore": "^2.3.1",
+    "sequelize": "^2.0.4"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "istanbul": "0.3.2",
+    "mocha": "*",
+    "sequelize-cli": "^1.4.0",
+    "sinon": "1.10.3",
+    "supertest": ""
+  },
+  "scripts": {
+    "start": "node ."
+  },
+  "license": "Copyright (c) 2015 Philmod"
+}
