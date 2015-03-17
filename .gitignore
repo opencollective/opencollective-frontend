@@ -1,0 +1,14 @@
+lib-cov
+*.DS_Store
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+node_modules
+coverage
+
+temp.js
