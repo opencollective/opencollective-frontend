@@ -1,5 +1,5 @@
 var fs = require('fs')
-  , status = require('../app/lib/status.js')
+  , status = require('../lib/status.js')
   ;
 
 module.exports = function(app) {

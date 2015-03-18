@@ -10,7 +10,7 @@ module.exports = function(req, res, next) {
     , errors = server.errors
     ;
 
-  if (req.param('info')) {
+  if (req.query.info) {
     var connections = {}
       , swap;
 

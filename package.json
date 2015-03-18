@@ -25,6 +25,7 @@
     "supertest": ""
   },
   "scripts": {
+    "test": "make test",
     "start": "node ."
   },
   "license": "Copyright (c) 2015 Philmod"

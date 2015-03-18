@@ -1,0 +1,11 @@
+{
+  "database": {
+    "database": "assoc_test",
+    "username": "philmod",
+    "password": "",
+    "options": {
+      "host":"127.0.0.1",
+      "dialect":"postgres"
+    }
+  }
+}
