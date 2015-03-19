@@ -48,15 +48,3 @@ function start() {
     console.log('Assoc API listening at http://%s:%s in %s environment.', host, port, app.set('env'));
   });
 }
-
-
-/*
-  var User = app.get('models').User;
-  User
-    .create({ first_name: "John", last_name: "Doe "})
-    .complete(function(err, user) {
-      console.log('err : ', err);
-      console.log(user.get('first_name'));
-    });
-
-*/

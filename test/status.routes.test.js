@@ -1,7 +1,7 @@
 var expect    = require('chai').expect
   , request   = require('supertest')
-  , utils     = require('../test/utils.js')()
   , app       = require('../index')
+  , utils     = require('../test/utils.js')(app)
   ;
 
 describe('GET /status', function() {

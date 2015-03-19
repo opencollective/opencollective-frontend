@@ -42,12 +42,14 @@ models.forEach(function(model) {
 
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
+  // this activity should have a userid too
   
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
 
   m.Transaction.belongsTo(m.Group);
   m.Group.hasMany(m.Transaction);
+  // this transaction should have a userid too
 })(module.exports);
 
 /**
