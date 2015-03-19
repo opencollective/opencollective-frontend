@@ -60,7 +60,13 @@ describe('User model', function() {
           expect(user).to.have.property('email', userData.email);
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('updatedAt');
-          done();
+
+          User.findAndCountAll({}).then(function(res) {
+            expect(res.count).to.equal(1);
+            expect(res.rows[0].email).to.equal(userData.email);
+            done();
+          });
+          
         });
 
     });
