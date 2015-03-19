@@ -1,8 +1,8 @@
 module.exports = function(Sequelize, DataTypes) {
   
-  var Card = Sequelize.define('Card', {
-    number: DataTypes.STRING,
-    token: DataTypes.STRING,
+  var UserGroup = Sequelize.define('UserGroup', {
+    role: DataTypes.STRING,
+    status: DataTypes.STRING,
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -13,5 +13,5 @@ module.exports = function(Sequelize, DataTypes) {
     }
   });
 
-  return Card;
+  return UserGroup;
 };

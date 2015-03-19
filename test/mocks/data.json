@@ -1,3 +1,10 @@
 {
+
+  "user1": {
+    "first_name": "Phil",
+    "last_name": "Mod",
+    "username": "philmod",
+    "email": "philmod@philmod.com"
+  }
   
 }

@@ -20,9 +20,11 @@ var sequelize = new Sequelize(
  */
 var models = [
   'Activity',
-  'Association',
   'Card',
-  'User'
+  'Group',
+  'Transaction',
+  'User',
+  'UserGroup'
 ];
 models.forEach(function(model) {
   module.exports[model] = sequelize.import(__dirname + '/' + model);
@@ -35,14 +37,17 @@ models.forEach(function(model) {
   m.Card.belongsToMany(m.User, {through: 'UserCard'});
   m.User.belongsToMany(m.Card, {through: 'UserCard'});
 
-  m.Association.belongsToMany(m.User, {through: 'UserAssociation'});
-  m.User.belongsToMany(m.Association, {through: 'UserAssociation'});
+  m.Group.belongsToMany(m.User, {through: m.UserGroup});
+  m.User.belongsToMany(m.Group, {through: m.UserGroup});
 
-  m.Activity.belongsTo(m.Association);
-  m.Association.hasMany(m.Activity);
+  m.Activity.belongsTo(m.Group);
+  m.Group.hasMany(m.Activity);
   
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
+
+  m.Transaction.belongsTo(m.Group);
+  m.Group.hasMany(m.Transaction);
 })(module.exports);
 
 /**

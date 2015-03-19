@@ -1,8 +1,10 @@
 module.exports = function(Sequelize, DataTypes) {
   
-  var Card = Sequelize.define('Card', {
-    number: DataTypes.STRING,
-    token: DataTypes.STRING,
+  var Group = Sequelize.define('Group', {
+    name: DataTypes.STRING,
+    description: DataTypes.STRING,
+    membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
+    membershipfee: DataTypes.FLOAT,
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -13,5 +15,5 @@ module.exports = function(Sequelize, DataTypes) {
     }
   });
 
-  return Card;
+  return Group;
 };
