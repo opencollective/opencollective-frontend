@@ -26,6 +26,8 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     }
+  }, {
+    paranoid: true,
   });
 
   return User;
