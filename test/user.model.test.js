@@ -27,6 +27,9 @@ describe('User model', function() {
     utils.cleanAllDb(done);
   });
 
+  /** 
+   * Create a user.
+   */
   describe('#create', function() {
 
     it('fails without email', function(done) {
@@ -60,15 +63,30 @@ describe('User model', function() {
           expect(user).to.have.property('email', userData.email);
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('updatedAt');
-
-          User.findAndCountAll({}).then(function(res) {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0].email).to.equal(userData.email);
-            done();
-          });
-          
+          done();
         });
 
+    });
+
+  });
+
+  /**
+   * Get a user.
+   */
+  describe('#get', function() {
+
+    beforeEach(function(done) {
+      User
+        .create(userData)
+        .done(done);
+    });
+
+    it('successfully get a user', function(done) {
+      User.findAndCountAll({}).then(function(res) {
+        expect(res.count).to.equal(1);
+        expect(res.rows[0].email).to.equal(userData.email);
+        done();
+      });
     });
 
   });
