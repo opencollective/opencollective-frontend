@@ -3,13 +3,14 @@
  */
 var async = require('async')
   , _ = require('underscore')
+  , app       = require('../index')
   , data  = require('./mocks/data.json')
   ;
 
 /**
  * Utils.
  */
-module.exports = function(app) {
+module.exports = function() {
 
   return {
 

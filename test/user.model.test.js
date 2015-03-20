@@ -4,7 +4,7 @@
 var expect    = require('chai').expect
   , request   = require('supertest')
   , app       = require('../index')
-  , utils     = require('../test/utils.js')(app)
+  , utils     = require('../test/utils.js')()
   ;
 
 /**
