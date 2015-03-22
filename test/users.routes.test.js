@@ -16,7 +16,7 @@ var userData = utils.data('user1');
 /**
  * Tests.
  */
-describe.only('users.routes.test.js', function() {
+describe('users.routes.test.js', function() {
 
   beforeEach(function(done) {
     utils.cleanAllDb(done);
@@ -54,7 +54,11 @@ describe.only('users.routes.test.js', function() {
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
+          console.log('res : ', res.body);
           expect(res.body).to.have.property('email', userData.email);
+          expect(res.body).to.not.have.property('_salt');
+          expect(res.body).to.not.have.property('password');
+          expect(res.body).to.not.have.property('password_hash');
           done();
         });
     });

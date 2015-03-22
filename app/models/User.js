@@ -1,9 +1,24 @@
+/**
+ * Dependencies.
+ */
+var bcrypt = require('bcrypt')
+  ;
+
+/**
+ * Constants.
+ */
+var SALT_WORK_FACTOR = 10;
+
+/**
+ * Model.
+ */
 module.exports = function(Sequelize, DataTypes) {
   
   var User = Sequelize.define('User', {
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
     username: DataTypes.STRING,
+
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -18,6 +33,26 @@ module.exports = function(Sequelize, DataTypes) {
         }
       }
     },
+
+    _salt: {
+      type: DataTypes.STRING,
+      defaultValue: bcrypt.genSaltSync(SALT_WORK_FACTOR)
+    },
+    password_hash: DataTypes.STRING,
+    password: {
+      type: DataTypes.VIRTUAL,
+      set: function (val) {
+        this.setDataValue('password', val);
+        this.setDataValue('password_hash', bcrypt.hashSync(val, this._salt));
+       },
+       validate: {
+        len: {
+          args: [6, 128],
+          msg: 'Password must be between 6 and 128 characters in length'
+        }
+      }
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -28,6 +63,18 @@ module.exports = function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
+    getterMethods: {
+      info: function() {
+        var info = {
+          first_name: this.first_name,
+          last_name: this.last_name,
+          email: this.email,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        };
+        return info;
+      }
+    }
   });
 
   return User;

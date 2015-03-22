@@ -12,7 +12,7 @@ module.exports = function(app) {
     User
       .create(req.required['user'])
       .success(function(user) {
-        res.send(user);
+        res.send(user.info);
       })
       .error(next);
   }
