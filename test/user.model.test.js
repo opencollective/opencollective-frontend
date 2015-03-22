@@ -15,7 +15,7 @@ var userData = utils.data('user1');
 /**
  * Tests.
  */
-describe('User model', function() {
+describe('user.models.test.js', function() {
 
   var User;
 

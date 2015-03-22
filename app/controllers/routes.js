@@ -4,6 +4,11 @@ var fs = require('fs')
 
 module.exports = function(app) {
 
+  var Controllers = app.set('controllers')
+    , mw = Controllers.middlewares
+    , users = Controllers.users
+    ;
+
   /** 
    * Status.
    */
@@ -14,14 +19,14 @@ module.exports = function(app) {
    * Fake temp response.
    */
   var fake = function(req, res, next) {
-    res.send('Not implemented yet.');
+    res.status(501).send('Not implemented yet.');
   };
 
 
   /**
    * Users.
    */
-  app.post('/users', fake); // Create a user.
+  app.post('/users', mw.required('api_key'), mw.apiKey, mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', fake); // Get a user.
   app.put('/users/:userid', fake); // Update a user.
   app.get('/users/:userid/email', fake); // Confirm a user's email.
@@ -92,7 +97,7 @@ module.exports = function(app) {
     if (!err.code) 
       err.code = err.status || 500;
     console.log('Error : ', err);
-    res.send(err.code, {error: err});
+    res.status(err.code).send({error: err});
   });
 
 };

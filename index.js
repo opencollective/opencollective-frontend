@@ -5,11 +5,19 @@ var express = require('express')
   , app = express()
   ;
 
+app.errors = require('./app/lib/errors');
+require('./app/lib/express')(app);
+
 /**
  * Models.
  */
 var models = require('./app/models');
 app.set('models', models);
+
+/**
+ * Controllers.
+ */
+app.set('controllers', require('./app/controllers')(app));
 
 /**
  * Config.
