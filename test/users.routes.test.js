@@ -13,6 +13,7 @@ var expect    = require('chai').expect
  * Variables.
  */
 var userData = utils.data('user1');
+var models = app.set('models');
 
 /**
  * Tests.
@@ -88,14 +89,7 @@ describe('users.routes.test.js', function() {
     describe('duplicate', function() {
 
       beforeEach(function(done) {
-        request(app)
-          .post('/users')
-          .send({
-              api_key: config.application.api_key
-            , user: userData
-          })
-          .expect(200)
-          .end(done);
+        models.User.create(userData).finally(done);
       });
 
       it('fails to create a user with the same email', function(done) {
