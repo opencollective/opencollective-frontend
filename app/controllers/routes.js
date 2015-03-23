@@ -1,4 +1,5 @@
 var fs = require('fs')
+  , _ = require('underscore')
   , status = require('../lib/status.js')
   ;
 
@@ -7,6 +8,7 @@ module.exports = function(app) {
   var Controllers = app.set('controllers')
     , mw = Controllers.middlewares
     , users = Controllers.users
+    , errors = app.errors
     ;
 
   /** 
@@ -94,9 +96,18 @@ module.exports = function(app) {
     if (err.name === 'UnauthorizedError') // because of jwt-express
       err.code = err.status;
     res.header('Cache-Control', 'no-cache');
+
+    // Validation error.
+    var e = err.name.toLowerCase();
+    if (e.indexOf('validation') !== -1)
+      err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), err.message);
+    else if (e.indexOf('uniqueconstraint') !== -1)
+      err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
+
     if (!err.code) 
       err.code = err.status || 500;
-    console.log('Error : ', err);
+    
+    // console.log('Error : ', err);
     res.status(err.code).send({error: err});
   });
 

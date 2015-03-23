@@ -11,10 +11,10 @@ module.exports = function(app) {
   create: function(req, res, next) {
     User
       .create(req.required['user'])
-      .success(function(user) {
+      .then(function(user) {
         res.send(user.info);
       })
-      .error(next);
+      .catch(next);
   }
 
   }
