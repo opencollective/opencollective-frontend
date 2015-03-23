@@ -1,21 +1,39 @@
 module.exports = function(app) {
 
-  var models = app.set('models');
-  var User = models.User;
-
-  return {
+  /**
+   * Internal Dependencies.
+   */
+  var models = app.set('models')
+    , User = models.User
+    , errors = app.errors
+    ;
 
   /**
-   * Create a user.
+   * Public methods.
    */
-  create: function(req, res, next) {
-    User
-      .create(req.required['user'])
-      .then(function(user) {
-        res.send(user.info);
-      })
-      .catch(next);
-  }
+  return {
+
+    /**
+     * Create a user.
+     */
+    create: function(req, res, next) {
+      User
+        .create(req.required['user'])
+        .then(function(user) {
+          res.send(user.info);
+        })
+        .catch(next);
+    },
+
+    /**
+     * Get token.
+     */
+    getToken: function(req, res, next) {
+      res.send({
+          access_token: req.user.jwt
+        , refresh_token: req.user.refresh_token
+      });
+    }
 
   }
 

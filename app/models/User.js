@@ -2,6 +2,9 @@
  * Dependencies.
  */
 var bcrypt = require('bcrypt')
+  , jwt    = require('jsonwebtoken')
+  , errors = require('../lib/errors')
+  , config = require('config')
   ;
 
 /**
@@ -15,14 +18,16 @@ var SALT_WORK_FACTOR = 10;
 module.exports = function(Sequelize, DataTypes) {
   
   var User = Sequelize.define('User', {
+
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
-
 
     username: {
       type: DataTypes.STRING,
       unique: true
     },
+
+    avatar: DataTypes.STRING,
 
     email: {
       type: DataTypes.STRING,
@@ -40,6 +45,10 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     _salt: {
+      type: DataTypes.STRING,
+      defaultValue: bcrypt.genSaltSync(SALT_WORK_FACTOR)
+    },
+    refresh_token: {
       type: DataTypes.STRING,
       defaultValue: bcrypt.genSaltSync(SALT_WORK_FACTOR)
     },
@@ -65,21 +74,71 @@ module.exports = function(Sequelize, DataTypes) {
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
-    }
+    },
+    seenAt: DataTypes.DATE,
+
   }, {
     paranoid: true,
+
     getterMethods: {
+      fullName: function() {
+        return this.first_name + ' ' + this.last_name;
+      },
       info: function() {
         var info = {
-          first_name: this.first_name,
-          last_name: this.last_name,
-          email: this.email,
-          createdAt: this.createdAt,
-          updatedAt: this.updatedAt
+            id: this.id
+          , first_name: this.first_name
+          , last_name: this.last_name
+          , email: this.email
+          , createdAt: this.createdAt
+          , updatedAt: this.updatedAt
         };
         return info;
+      },
+      minimal: function() {
+        var info = {
+            id: this.id
+          , username: this.username
+          , avatar: this.avatar
+          , name: this.fullName
+        }
+        return info;
+      },
+      jwt: function() {
+        var secret = config.keys.unionsq.secret;
+        var payload = this.minimal;
+        return jwt.sign(payload, secret, { 
+            expiresInMinutes: 60*24*30 // 1 month
+          , subject: this.id // user
+          , issuer: config.host.api
+          , audience: config.application.id // only 1 application for now
+        });
       }
-    }
+    },
+
+    classMethods: {
+      auth: function(usernameOrEmail, password, fn) {
+        var msg = 'Invalid username/email or password.';
+
+        User
+          .find({ where: ["username = ? OR email = ?", usernameOrEmail, usernameOrEmail] })
+          .then(function(user) {
+            if (!user) return fn(new errors.BadRequest(msg));
+
+            bcrypt.compare(password, user.password_hash, function(err, matched) {
+              if (!err && matched) {
+                user.updateAttributes({
+                  seenAt: new Date
+                }).done(fn);
+              } else {
+                fn(new errors.BadRequest(msg));
+              }
+            });
+          })
+          .catch(fn);
+      }
+    },
+
   });
 
   return User;

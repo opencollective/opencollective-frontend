@@ -10,6 +10,16 @@
     }
   },
   "application": {
+    "id": "b6cc54e9f41deece89fa8d660f93d396",
+    "appname": "webapp",
     "api_key": "637526ace0abe5ebc034e744d86d603a"
+  },
+  "keys": {
+    "unionsq": {
+      "secret": "282e58cebfee86af32bb1fac07db362f0d03ad4e"
+    }
+  },
+  "host": {
+    "api": "http://localhost:3050"
   }
 }

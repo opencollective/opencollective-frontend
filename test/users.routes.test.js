@@ -89,7 +89,7 @@ describe('users.routes.test.js', function() {
     describe('duplicate', function() {
 
       beforeEach(function(done) {
-        models.User.create(userData).finally(done);
+        models.User.create(userData).done(done);
       });
 
       it('fails to create a user with the same email', function(done) {

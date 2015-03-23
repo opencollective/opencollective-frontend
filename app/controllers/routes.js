@@ -5,9 +5,13 @@ var fs = require('fs')
 
 module.exports = function(app) {
 
+  /**
+   * Public methods.
+   */
   var Controllers = app.set('controllers')
     , mw = Controllers.middlewares
     , users = Controllers.users
+    , auth = Controllers.auth
     , errors = app.errors
     ;
 
@@ -37,7 +41,7 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.post('/authenticate', fake); // Authenticate user to get a token.
+  app.post('/authenticate', mw.required('api_key'), mw.apiKey, mw.required('password'), mw.authenticate, auth.byPassword, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', fake); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', fake); // Reset the refresh_token.
 

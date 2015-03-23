@@ -2,8 +2,14 @@ var config = require('config');
 
 module.exports = function(app) {
 
-  var errors = app.errors;
+  var models = app.set('models')
+    , User = models.User
+    , errors = app.errors
+    ;
 
+  /**
+   * Public methods.
+   */
   return {
 
     /**
@@ -50,6 +56,9 @@ module.exports = function(app) {
       if (key !== config.application.api_key)
         return next(new errors.Unauthorized('Invalid API key.'));
 
+      // Hard coded here for now.
+      req.application = config.application;
+
       next();
     },
 
@@ -57,21 +66,20 @@ module.exports = function(app) {
      * Authenticate.
      */
     authenticate: function(req, res, next) {
-      var username = req.params['username']
-        , phone    = req.params['phone']
-        , email    = req.params['email']
-        , password = req.params['password']
+      var username = (req.body && req.body.username) || req.params['username']
+        , email    = (req.body && req.body.email) || req.params['email']
+        , password = (req.body && req.body.password) || req.params['password']
         ;
 
       if (!req.application || !req.application.api_key) {
         return next();
       }
 
-      if ( !(username || phone || email) || !password ) {
+      if ( !(username || email) || !password ) {
         return next();
       }
 
-      User.auth(req.application.api_key, (username || email || phone), password, function(e, user) {
+      User.auth((username || email), password, function(e, user) {
         if (e) return next();
         req.remoteUser = user;
         next();
