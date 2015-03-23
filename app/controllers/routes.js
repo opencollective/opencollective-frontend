@@ -1,6 +1,8 @@
 var fs = require('fs')
   , _ = require('underscore')
+  , expressJwt = require('express-jwt')
   , status = require('../lib/status.js')
+  , config = require('config')
   ;
 
 module.exports = function(app) {
@@ -12,13 +14,30 @@ module.exports = function(app) {
     , mw = Controllers.middlewares
     , users = Controllers.users
     , auth = Controllers.auth
+    , params = Controllers.params
     , errors = app.errors
     ;
+
 
   /** 
    * Status.
    */
   app.get('/status', status);
+
+
+  /**
+   * Parameters.
+   */
+  app.param('userid', params.userid);
+
+
+  /**
+   * Authentication.
+   */
+  app.get('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
+  app.put('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.delete('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.post('/*?', expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
 
 
   /**
@@ -33,7 +52,7 @@ module.exports = function(app) {
    * Users.
    */
   app.post('/users', mw.required('api_key'), mw.apiKey, mw.required('user'), users.create); // Create a user.
-  app.get('/users/:userid', fake); // Get a user.
+  app.get('/users/:userid', mw.authorize, users.show); // Get a user.
   app.put('/users/:userid', fake); // Update a user.
   app.get('/users/:userid/email', fake); // Confirm a user's email.
 

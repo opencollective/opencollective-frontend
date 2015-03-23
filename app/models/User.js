@@ -81,29 +81,45 @@ module.exports = function(Sequelize, DataTypes) {
     paranoid: true,
 
     getterMethods: {
+      // Full name.
       fullName: function() {
         return this.first_name + ' ' + this.last_name;
       },
+      // Info (private).
       info: function() {
-        var info = {
+        return {
             id: this.id
           , first_name: this.first_name
           , last_name: this.last_name
+          , name: this.fullName
+          , username: this.username
           , email: this.email
           , createdAt: this.createdAt
           , updatedAt: this.updatedAt
         };
-        return info;
       },
+      // Show (to any other user).
+      show: function() {
+        return {
+            id: this.id
+          , first_name: this.first_name
+          , last_name: this.last_name
+          , name: this.fullName
+          , username: this.username
+          , createdAt: this.createdAt
+          , updatedAt: this.updatedAt
+        };
+      },
+      // Minimal (used to feed the jwt token)
       minimal: function() {
-        var info = {
+        return {
             id: this.id
           , username: this.username
           , avatar: this.avatar
           , name: this.fullName
-        }
-        return info;
+        };
       },
+      // JWT token.
       jwt: function() {
         var secret = config.keys.unionsq.secret;
         var payload = this.minimal;

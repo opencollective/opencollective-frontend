@@ -1,4 +1,5 @@
-var config = require('config');
+var config = require('config')
+  , async = require('async');
 
 module.exports = function(app) {
 
@@ -127,20 +128,20 @@ module.exports = function(app) {
 
       async.parallel([
         function(cb) {
-          User.findOne({_id: req.remoteUser._id}, function(e, user) {
-            if (e) return cb(e);
-            req.remoteUser = user;
-            cb();
-          });
+          User
+            .find(req.remoteUser.id)
+            .then(function(user) {
+              req.remoteUser = user;
+              cb();
+            })
+            .catch(cb);
         },
         function(cb) {
-          Application.findOne({_id: app_id}, function(e, application) {
-            if (e) return cb(e);
-            if (application && application.disabled)
-              return next(new errors.Forbidden('Invalid API key.'));
-            req.application = application;
-            cb();
-          });
+          if (app_id !== config.application.id)
+            return next(new errors.Unauthorized('Invalid API key.'));
+
+          req.application = config.application;
+          cb();
         }
       ], next);
 

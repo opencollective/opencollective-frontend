@@ -33,7 +33,17 @@ module.exports = function(app) {
           access_token: req.user.jwt
         , refresh_token: req.user.refresh_token
       });
-    }
+    },
+
+    /**
+     * Show.
+     */
+    show: function(req, res, next) {
+      if (req.remoteUser.id === req.user.id)
+        res.send(req.user.info);
+      else
+        res.send(req.user.show);
+    },
 
   }
 

@@ -24,6 +24,9 @@ describe('users.routes.test.js', function() {
     utils.cleanAllDb(done);
   });
 
+  /**
+   * Create.
+   */
   describe('#create', function() {
 
     it('fails if no api_key', function(done) {
@@ -118,6 +121,58 @@ describe('users.routes.test.js', function() {
           .end(done);
       });
 
+    });
+
+  });
+
+  /**
+   * Get.
+   */
+  describe('#get()', function() {
+
+    var user, user2;
+
+    beforeEach(function(done) {
+      models.User.create(utils.data('user1')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    beforeEach(function(done) {
+      models.User.create(utils.data('user2')).done(function(e, u) {
+        user2 = u;
+        done(e);
+      });
+    });
+
+    it('successfully get a user\'s information', function(done) {
+      request(app)
+        .get('/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user2.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          var u = res.body;
+          expect(u.username).to.equal(utils.data('user1').username);
+          expect(u).to.not.have.property('email');
+          done();
+        });
+    });
+
+    it('successfully get a user\'s information when he is authenticated', function(done) {
+      request(app)
+        .get('/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          var u = res.body;
+          expect(u.username).to.equal(utils.data('user1').username);
+          expect(u.email).to.equal(utils.data('user1').email);
+          done();
+        });
     });
 
   });

@@ -6,6 +6,14 @@
     "username": "philmod",
     "email": "philmod@philmod.com",
     "password": "passpass"
+  },
+
+  "user2": {
+    "first_name": "Anish",
+    "last_name": "Bas",
+    "username": "abas",
+    "email": "abas@email.com",
+    "password": "ssapssap"
   }
   
 }
