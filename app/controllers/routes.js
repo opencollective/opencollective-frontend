@@ -21,7 +21,7 @@ module.exports = function(app) {
    * Fake temp response.
    */
   var fake = function(req, res, next) {
-    res.status(501).send('Not implemented yet.');
+    return next(new errors.NotImplemented('Not implemented yet.'));
   };
 
 
