@@ -15,6 +15,7 @@ module.exports = function(app) {
     , users = Controllers.users
     , auth = Controllers.auth
     , params = Controllers.params
+    , groups = Controllers.groups
     , errors = app.errors
     ;
 
@@ -78,7 +79,7 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', fake); // Create a group.
+  app.post('/groups', mw.authorize, mw.required('group'), groups.create); // Create a group.
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 

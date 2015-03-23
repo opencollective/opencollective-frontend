@@ -6,6 +6,7 @@ module.exports = function(app) {
   var cs = {};
   var controllers = [
     'auth',
+    'groups',
     'middlewares',
     'params',
     'users'

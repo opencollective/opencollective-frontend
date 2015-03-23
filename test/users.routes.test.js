@@ -142,6 +142,7 @@ describe('users.routes.test.js', function() {
 
     beforeEach(function(done) {
       models.User.create(utils.data('user2')).done(function(e, u) {
+        expect(e).to.not.exist;
         user2 = u;
         done(e);
       });
