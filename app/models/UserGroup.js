@@ -1,8 +1,10 @@
 module.exports = function(Sequelize, DataTypes) {
   
   var UserGroup = Sequelize.define('UserGroup', {
-    role: DataTypes.STRING,
-    status: DataTypes.STRING,
+    // Role.
+    role: DataTypes.ENUM('admin', 'writer', 'viewer'),
+    
+    // Dates.
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW

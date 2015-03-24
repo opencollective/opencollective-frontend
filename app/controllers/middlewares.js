@@ -169,6 +169,23 @@ module.exports = function(app) {
       next();
     },
 
+    /**
+     * Authorize to get the group.
+     */
+    authorizeGroup: function(req, res, next) {
+      if (!req.group) {
+        return next(new errors.NotFound());
+      }
+      req.group.isMember(req.remoteUser.id, next);
+    },
+
+    /**
+     * Authorize for group's administrator.
+     */
+    authorizeGroupAdmin: function(req, res, next) {
+      req.group.isMember(req.remoteUser.id, 'admin', next);
+    },
+
   }
 
 };

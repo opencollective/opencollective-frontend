@@ -1,3 +1,11 @@
+/**
+ * Dependencies.
+ */
+var errors = require('../lib/errors');
+
+/**
+ * Model.
+ */
 module.exports = function(Sequelize, DataTypes) {
   
   var Group = Sequelize.define('Group', {
@@ -34,6 +42,27 @@ module.exports = function(Sequelize, DataTypes) {
           , createdAt: this.createdAt
           , updatedAt: this.updatedAt
         };
+      },
+    },
+
+    instanceMethods: {
+      isMember: function(user_id, roles, fn) {
+        if (!roles || typeof roles === 'function') {
+          fn = roles;
+          roles = null;
+        }
+        this
+          .getMembers({where: {id: user_id} })
+          .then(function(members) {
+            if (members.length === 0)
+              return fn(new errors.Forbidden('Unauthorized to access this group.'));
+            else {
+              if (roles && roles.indexOf(members[0].UserGroup.role) < 0 )
+                return fn(new errors.Forbidden('Unauthorized to manage this group.'));
+              fn();
+            }
+          })
+          .catch(fn);
       },
     }
   });

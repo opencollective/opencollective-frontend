@@ -37,8 +37,8 @@ models.forEach(function(model) {
   m.Card.belongsToMany(m.User, {through: 'UserCard'});
   m.User.belongsToMany(m.Card, {through: 'UserCard'});
 
-  m.Group.belongsToMany(m.User, {through: m.UserGroup});
-  m.User.belongsToMany(m.Group, {through: m.UserGroup});
+  m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
+  m.User.belongsToMany(m.Group, {through: m.UserGroup, as: 'groups'});
 
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
