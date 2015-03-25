@@ -48,7 +48,8 @@ models.forEach(function(model) {
 
   m.Transaction.belongsTo(m.Group);
   m.Group.hasMany(m.Transaction);
-  // this transaction should have a userid too
+  m.Transaction.belongsTo(m.User);
+  m.User.hasMany(m.Transaction);
 })(module.exports);
 
 /**
