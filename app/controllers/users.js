@@ -5,6 +5,7 @@ module.exports = function(app) {
    */
   var models = app.set('models')
     , User = models.User
+    , Activity = models.Activity
     , errors = app.errors
     ;
 
@@ -21,6 +22,12 @@ module.exports = function(app) {
         .create(req.required['user'])
         .then(function(user) {
           res.send(user.info);
+
+          Activity.create({
+              type: 'user.created'
+            , UserId: user.id
+            , data: {user: user.info}
+          });
         })
         .catch(next);
     },

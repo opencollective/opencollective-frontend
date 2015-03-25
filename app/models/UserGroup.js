@@ -15,6 +15,21 @@ module.exports = function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
+
+    getterMethods: {
+      // Info.
+      info: function() {
+        return {
+            role: this.role
+          , GroupId: this.GroupId
+          , UserId: this.UserId
+          , createdAt: this.createdAt
+          , updatedAt: this.updatedAt
+          , deletedAt: this.deletedAt
+        };
+      },
+    },
+    
   });
 
   return UserGroup;

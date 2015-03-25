@@ -163,7 +163,11 @@ describe('usergroup.routes.test.js', function() {
           user2.getGroups().then(function(groups) {
             expect(groups[0].id).to.equal(group.id);
             expect(groups[0].UserGroup.role).to.equal(role);
-            done();
+
+            models.Activity.findAndCountAll({}).then(function(res) {
+              expect(res.count).to.equal(2);
+              done();
+            });
           });
 
         });

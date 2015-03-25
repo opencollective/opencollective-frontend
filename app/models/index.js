@@ -42,7 +42,6 @@ models.forEach(function(model) {
 
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
-  // this activity should have a userid too
   
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
