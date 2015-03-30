@@ -2,7 +2,7 @@
  * Dependencies
  */
 var Url = require('url');
-var _ = require('underscore');
+var _ = require('lodash');
 
 
 /**

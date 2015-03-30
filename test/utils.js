@@ -2,7 +2,7 @@
  * Dependencies.
  */
 var async = require('async')
-  , _ = require('underscore')
+  , _ = require('lodash')
   , app       = require('../index')
   , data  = require('./mocks/data.json')
   ;

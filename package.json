@@ -19,8 +19,7 @@
     "lodash": "^3.6.0",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
-    "sequelize": "^2.0.4",
-    "underscore": "^1.8.2"
+    "sequelize": "^2.0.4"
   },
   "devDependencies": {
     "chai": "*",

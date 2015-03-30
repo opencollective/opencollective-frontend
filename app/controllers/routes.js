@@ -1,5 +1,5 @@
 var fs = require('fs')
-  , _ = require('underscore')
+  , _ = require('lodash')
   , expressJwt = require('express-jwt')
   , status = require('../lib/status.js')
   , config = require('config')

@@ -3,7 +3,7 @@
  */
 var expect    = require('chai').expect
   , request   = require('supertest')
-  , _         = require('underscore')
+  , _         = require('lodash')
   , jwt       = require('jsonwebtoken')
   , app       = require('../index')
   , utils     = require('../test/utils.js')()

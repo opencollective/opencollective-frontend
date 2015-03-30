@@ -3,7 +3,7 @@
  */
 var expect    = require('chai').expect
   , request   = require('supertest')
-  , _         = require('underscore')
+  , _         = require('lodash')
   , app       = require('../index')
   , utils     = require('../test/utils.js')()
   , config    = require('config')
