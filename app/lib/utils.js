@@ -67,8 +67,6 @@ var getLinks = function(url, options) {
  * Pagination: from (offset, limit) to (page, per_page).
  */
 var paginatePage = function(offset, limit) {
-  var offset = offset || 0;
-  var limit = limit || 20;
   return {
       page: Math.floor(offset/limit + 1)
     , per_page: limit
@@ -84,8 +82,6 @@ module.exports = {
    * Pagination offset: from (page,per_page) to (offset, limit).
    */
   paginateOffset: function(page, per_page) {
-    page = page || 1;
-    per_page = per_page || 20;
     return {
         offset: (page - 1) * per_page
       , limit: per_page

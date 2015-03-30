@@ -213,6 +213,28 @@ module.exports = function(app) {
       };
     },
 
+    /**
+     * Sorting.
+     */
+    sorting: function(options) {
+      options = options || {};
+      
+      options.key = (typeof options.key != 'undefined') ? options.key : 'createdAt';
+      options.dir = (typeof options.dir != 'undefined') ? options.dir : 'DESC';
+      
+      return function(req, res, next) {
+        var key = req.body.sort || req.query.sort
+          , dir = req.body.direction || req.query.direction;
+
+        req.sorting = {
+            key: key || options.key
+          , dir: (dir || options.dir).toUpperCase()
+        };
+        
+        next();
+      };
+    },
+
   }
 
 };

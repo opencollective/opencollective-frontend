@@ -108,7 +108,7 @@ module.exports = function(app) {
    *
    *  An activity is linked to a User (and potentially to a group).
    */
-  app.get('/groups/:groupid/activities', mw.authorize, mw.authorizeGroup, mw.paginate(), activities.group); // Get a group's activities.
+  app.get('/groups/:groupid/activities', mw.authorize, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
   app.get('/users/:userid/activities', fake); // Get a user's activities.
 
 

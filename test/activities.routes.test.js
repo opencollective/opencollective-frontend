@@ -144,6 +144,31 @@ describe.only('activities.routes.test.js', function() {
           });
       });
 
+    });
+
+  describe('Sorting', function() {
+
+      it('successfully get a group\'s activities with sorting', function(done) {
+        request(app)
+          .get('/groups/' + group.id + '/activities')
+          .send({
+            sort: 'createdAt',
+            direction: 'desc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt)
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var activities = res.body;
+            var last = new Date();
+            _.each(activities, function(a) {
+              expect((new Date(a.createdAt) <= new Date(last))).to.be.true;
+              last = a.createdAt;
+            });
+            done();
+          });
+      });
+
     })
 
   });

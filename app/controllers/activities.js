@@ -34,10 +34,9 @@ module.exports = function(app) {
       var query = _.extend({
         where: {
           GroupId: req.group.id
-        }
+        },
+        order: [ [req.sorting.key, req.sorting.dir] ]
       }, req.pagination);
-
-      console.log('query : ', query);
 
       Activity // req.group.getActivities doesn't support pagination yet. [https://github.com/sequelize/sequelize/issues/3404]
         .findAndCountAll(query)
