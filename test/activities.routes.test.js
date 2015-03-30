@@ -21,7 +21,7 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe.only('activities.routes.test.js', function() {
+describe('activities.routes.test.js', function() {
 
   var user, user2
     , group
@@ -78,7 +78,7 @@ describe.only('activities.routes.test.js', function() {
 
   // Create activities.
   beforeEach(function(done) {
-    async.each(activitiesData, function(a, cb) {
+    async.eachSeries(activitiesData, function(a, cb) {
       models.Activity.create(a).done(cb);
     }, done);
   });
@@ -116,18 +116,22 @@ describe.only('activities.routes.test.js', function() {
 
     describe('Pagination', function() {
 
+      var per_page = 3;
+
       it('successfully get a group\'s activities with per_page', function(done) {
-        var per_page = 3;
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
-            per_page: per_page
+            per_page: per_page,
+            sort: 'id',
+            direction: 'asc'
           })
           .set('Authorization', 'Bearer ' + user.jwt)
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
+            expect(res.body[0].id).to.equal(4);
             // Check pagination header.
             var headers = res.headers;
             expect(headers).to.have.property('link');
@@ -142,6 +146,58 @@ describe.only('activities.routes.test.js', function() {
 
             done();
           });
+      });
+
+      it('successfully get the second page of a group\'s activities', function(done) {
+        var page = 2;
+        request(app)
+          .get('/groups/' + group.id + '/activities')
+          .send({
+            per_page: per_page,
+            page: page,
+            sort: 'id',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt)
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            expect(res.body.length).to.equal(3);
+            expect(res.body[0].id).to.equal(7);
+            // Check pagination header.
+            var headers = res.headers;
+            expect(headers.link).to.contain('page=3');
+            expect(headers.link).to.contain('page=2');
+            done();
+          });
+      });
+
+      it('successfully get a group\'s activities using since_id', function(done) {
+        var since_id = 8;
+        
+        request(app)
+          .get('/groups/' + group.id + '/activities')
+          .send({
+            since_id: since_id,
+            sort: 'id',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt)
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var activities = res.body;
+            expect(activities[0].id > since_id).to.be.true;
+            var last = 0;
+            _.each(activities, function(a) {
+              expect(a.id >= last).to.be.true;
+            });
+            // Check pagination header.
+            var headers = res.headers;
+            expect(headers.link).to.be.empty;
+            done();
+          });
+
       });
 
     });

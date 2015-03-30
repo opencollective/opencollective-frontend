@@ -200,6 +200,19 @@ module.exports = function(app) {
       };
       
       return function(req, res, next) {
+
+        // Since ID.
+        var since_id = req.body.since_id || req.query.since_id;
+        if (since_id) {
+          req.pagination = {
+            where: {
+              id: {$gt: since_id}
+            }
+          };
+          return next();
+        }
+
+        // Page / Per_page.
         var per_page = (req.body.per_page || req.query.per_page) * 1 || options.default;
         var page = (req.body.page || req.query.page) * 1 || 1;
         
@@ -219,8 +232,8 @@ module.exports = function(app) {
     sorting: function(options) {
       options = options || {};
       
-      options.key = (typeof options.key != 'undefined') ? options.key : 'createdAt';
-      options.dir = (typeof options.dir != 'undefined') ? options.dir : 'DESC';
+      options.key = (typeof options.key != 'undefined') ? options.key : 'id';
+      options.dir = (typeof options.dir != 'undefined') ? options.dir : 'ASC';
       
       return function(req, res, next) {
         var key = req.body.sort || req.query.sort

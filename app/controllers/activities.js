@@ -2,7 +2,7 @@
  * Dependencies.
  */
 var utils = require('../lib/utils');
-var _ = require('underscore');
+var _ = require('lodash');
 
 /**
  * Controller.
@@ -26,19 +26,14 @@ module.exports = function(app) {
      */
     group: function(req, res, next) {
 
-      // var options = _.extend(pagination, 
-      //   {sort: req.query.sort},
-      //   {since_id: req.query.since_id}
-      // );
-
-      var query = _.extend({
+      var query = _.merge({
         where: {
           GroupId: req.group.id
         },
         order: [ [req.sorting.key, req.sorting.dir] ]
       }, req.pagination);
 
-      Activity // req.group.getActivities doesn't support pagination yet. [https://github.com/sequelize/sequelize/issues/3404]
+      Activity
         .findAndCountAll(query)
         .then(function(activities) {
 

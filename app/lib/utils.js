@@ -46,6 +46,10 @@ var addParameterUrl = function(url, parameters) {
 var getLinks = function(url, options) {
   var page = options.page || paginatePage(options.offset, options.limit).page;
   var per_page = options.per_page || paginatePage(options.offset, options.limit).per_page;
+
+  if (!page && !per_page)
+    return null;
+
   var links = {
       next: addParameterUrl(url, {page: page+1, per_page: per_page})
     , current: addParameterUrl(url, {page: page, per_page: per_page})
