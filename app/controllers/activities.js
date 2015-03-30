@@ -25,7 +25,6 @@ module.exports = function(app) {
      * Get group's activities.
      */
     group: function(req, res, next) {
-
       var query = _.merge({
         where: {
           GroupId: req.group.id
@@ -52,7 +51,26 @@ module.exports = function(app) {
      * Get user's activities.
      */
     user: function(req, res, next) {
+      var query = _.merge({
+        where: {
+          UserId: req.user.id
+        },
+        order: [ [req.sorting.key, req.sorting.dir] ]
+      }, req.pagination);
 
+      Activity
+        .findAndCountAll(query)
+        .then(function(activities) {
+
+          // Set headers for pagination.
+          req.pagination.total = activities.count;
+          res.set({
+            'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+          });
+
+          res.send(activities.rows);
+        })
+        .catch(next);
     }
 
   }

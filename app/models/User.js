@@ -19,6 +19,11 @@ module.exports = function(Sequelize, DataTypes) {
   
   var User = Sequelize.define('User', {
 
+    _access: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING,
 

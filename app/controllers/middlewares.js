@@ -163,8 +163,8 @@ module.exports = function(app) {
      * Authorize User: same user referenced that the authenticated user.
      */
     authorizeUser: function(req, res, next) {
-      if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access == 0)) {
-        return next(new errors.Unauthorized('Unauthorized'));
+      if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access === 0)) {
+        return next(new errors.Forbidden('Unauthorized'));
       }
       next();
     },

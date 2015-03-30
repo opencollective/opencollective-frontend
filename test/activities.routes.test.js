@@ -229,4 +229,37 @@ describe('activities.routes.test.js', function() {
 
   });
 
+  /**
+   * Get user's activities.
+   */
+  describe('#user', function() {
+
+    it('fails getting other user\'s activities', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/activities')
+        .set('Authorization', 'Bearer ' + user2.jwt)
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully get a user\'s activities', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/activities')
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+
+          var activities = res.body;
+          expect(activities.length).to.equal(6);
+          activities.forEach(function(a) {
+            expect(a.UserId).to.equal(user.id);
+          });
+          done();
+
+        });
+    });
+
+  });
+
 });
