@@ -55,6 +55,6 @@ Types:
       2* Userid: the deleted user + the caller
 
   - group.transaction.created
-      data: group, transaction, user (the caller), target (eventually)
+      data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
 */

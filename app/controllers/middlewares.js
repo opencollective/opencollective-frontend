@@ -1,12 +1,12 @@
-var config = require('config')
-  , async = require('async');
+var config = require('config');
+var async = require('async');
+var utils = require('../lib/utils');
 
 module.exports = function(app) {
 
-  var models = app.set('models')
-    , User = models.User
-    , errors = app.errors
-    ;
+  var models = app.set('models');
+  var User = models.User;
+  var errors = app.errors;
 
   /**
    * Public methods.
@@ -184,6 +184,33 @@ module.exports = function(app) {
      */
     authorizeGroupAdmin: function(req, res, next) {
       req.group.isMember(req.remoteUser.id, 'admin', next);
+    },
+
+    /**
+     * Paginate.
+     */
+    paginate: function(options) {
+      options = options || {};
+      
+      options = {
+          default: options.default || 20
+        , min: options.min || 1
+        , max: options.max || 50
+        , maxTotal: options.maxTotal || false
+      };
+      
+      return function(req, res, next) {
+        var per_page = (req.body.per_page || req.query.per_page) * 1 || options.default;
+        var page = (req.body.page || req.query.page) * 1 || 1;
+        
+        page = (page < 1) ? 1 : page;
+        per_page = (per_page < options.min) ? options.min : per_page;
+        per_page = (per_page > options.max) ? options.max : per_page;
+
+        req.pagination = utils.paginateOffset(page, per_page);
+
+        next();
+      };
     },
 
   }

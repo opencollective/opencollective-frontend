@@ -16,6 +16,7 @@ module.exports = function(app) {
     , auth = Controllers.auth
     , params = Controllers.params
     , groups = Controllers.groups
+    , activities = Controllers.activities
     , errors = app.errors
     ;
 
@@ -105,13 +106,10 @@ module.exports = function(app) {
   /**
    * Activities.
    *
-   *  A group activity can be anything from "a user has been added to the group" to a transaction itself.
-   *  For a user, we should define if a an activity is something that happens and is linked to 
-   *   him ("you have been added to a group"), or something he made (to keep track of what he did).
+   *  An activity is linked to a User (and potentially to a group).
    */
-  app.get('/groups/:groupid/activities', fake); // Get a group's activities.
+  app.get('/groups/:groupid/activities', mw.authorize, mw.authorizeGroup, mw.paginate(), activities.group); // Get a group's activities.
   app.get('/users/:userid/activities', fake); // Get a user's activities.
-
 
 
   /**
@@ -132,7 +130,8 @@ module.exports = function(app) {
     if (!err.code) 
       err.code = err.status || 500;
     
-    // console.log('Error : ', err);
+    // console.trace(err);
+    console.error('Error Express : ', err);
     res.status(err.code).send({error: err});
   });
 

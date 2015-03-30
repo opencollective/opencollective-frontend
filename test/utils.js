@@ -22,7 +22,7 @@ module.exports = function() {
      * Test data.
      */
     data: function(item) {
-      return _.omit(data[item]); // to avoid changing these data
+      return _.extend({}, data[item]); // to avoid changing these data
     }
 
   }

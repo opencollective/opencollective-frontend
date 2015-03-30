@@ -5,6 +5,7 @@ module.exports = function(app) {
    */
   var cs = {};
   var controllers = [
+    'activities',
     'auth',
     'groups',
     'middlewares',

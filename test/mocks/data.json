@@ -29,6 +29,23 @@
     "description": "Troupe Scoute Albert Schweitzer",
     "membership_type": "yearlyfee",
     "membershipfee": 10
+  },
+
+  "activities1": {
+    "activities": [
+      {"type": "user.created", "UserId": 1, "data": {}},
+      {"type": "user.created", "UserId": 2, "data": {}},
+      {"type": "user.created", "UserId": 3, "data": {}},
+      {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
+      {"type": "group.user.added", "UserId": 1, "GroupId": 1, "data": {}},
+      {"type": "group.user.added", "UserId": 3, "GroupId": 1, "data": {}},
+      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
+      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
+      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
+      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
+      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
+      {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}}
+    ]
   }
   
 }
