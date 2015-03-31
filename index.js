@@ -38,8 +38,8 @@ else {
    * Sync database.
    */
   models.sequelize.sync()
-    .success(start)
-    .error(function(err) {
+    .then(start)
+    .catch(function(err) {
       console.log('Error sync the db:', err);
       process.exit(1);
     });
@@ -49,7 +49,7 @@ else {
  * Start server.
  */
 function start() {
-  var port = app.set('port') || 3050;
+  var port = app.set('port') || 3060;
   var server = app.listen(port, function () {
     var host = server.address().address;
     var port = server.address().port;
