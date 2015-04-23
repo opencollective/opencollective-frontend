@@ -18,6 +18,7 @@
     "express-jwt": "^2.1.0",
     "jsonwebtoken": "^4.2.1",
     "lodash": "^3.6.0",
+    "multer": "^0.1.8",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
     "sequelize": "^2.0.4"
