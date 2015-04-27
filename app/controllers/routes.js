@@ -91,6 +91,7 @@ module.exports = function(app) {
    *
    *  Routes to deal with the relations between a group and a user.
    */
+  app.get('/users/:userid/groups', mw.authorize, mw.authorizeUser, users.getGroups); // Get user's groups.
   app.post('/groups/:groupid/users/:userid', mw.authorize, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember) // Add a user to a group.
   app.put('/groups/:groupid/users/:userid', fake); // Update a user's role in a group.
   app.delete('/groups/:groupid/users/:userid', fake); // Remove a user from a group.

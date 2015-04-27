@@ -1,3 +1,12 @@
+/**
+ * Dependencies.
+ */
+var utils = require('../lib/utils');
+var _ = require('lodash');
+
+/**
+ * Controller.
+ */
 module.exports = function(app) {
 
   /**
@@ -50,6 +59,18 @@ module.exports = function(app) {
         res.send(req.user.info);
       else
         res.send(req.user.show);
+    },
+
+    /**
+     * Get a user's groups.
+     */
+    getGroups: function(req, res, next) {
+      req.user
+        .getGroups()
+        .then(function(groups) {
+          res.send(_.map(groups, function(g) { return g.info; }));
+        })
+        .catch(next);
     },
 
   }

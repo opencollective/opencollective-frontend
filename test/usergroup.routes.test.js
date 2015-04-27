@@ -175,4 +175,57 @@ describe('usergroup.routes.test.js', function() {
 
   });
 
+  /**
+   * Get user's groups.
+   */
+  describe('#getUserGroups', function() {
+
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .expect(200)
+        .end(done);
+    });
+
+    it('fails getting another user\'s groups', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/groups')
+        .set('Authorization', 'Bearer ' + user2.jwt)
+        .expect(403)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          done();
+        });
+    });
+
+    it('successfully get a user\'s groups bis', function(done) {
+      request(app)
+        .get('/users/' + user2.id + '/groups')
+        .set('Authorization', 'Bearer ' + user2.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.length(0);
+          done();
+        });
+    });
+
+    it('successfully get a user\'s groups bis', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/groups')
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.length(1);
+          expect(res.body[0]).to.have.property('id');
+          expect(res.body[0]).to.have.property('name');
+          expect(res.body[0]).to.have.property('description');
+          done();
+        });
+    });
+
+  });
+
 });

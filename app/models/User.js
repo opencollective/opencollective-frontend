@@ -122,6 +122,7 @@ module.exports = function(Sequelize, DataTypes) {
           , username: this.username
           , avatar: this.avatar
           , name: this.fullName
+          , email: this.email
         };
       },
       // JWT token.
