@@ -199,7 +199,7 @@ describe('usergroup.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s groups bis', function(done) {
+    it('successfully get a user\'s groups', function(done) {
       request(app)
         .get('/users/' + user2.id + '/groups')
         .set('Authorization', 'Bearer ' + user2.jwt)
@@ -222,6 +222,24 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('id');
           expect(res.body[0]).to.have.property('name');
           expect(res.body[0]).to.have.property('description');
+          expect(res.body[0]).to.not.have.property('activities');
+          done();
+        });
+    });
+
+    it('successfully get a user\'s groups with activities', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/groups?activities=true')
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.length(1);
+          expect(res.body[0]).to.have.property('id');
+          expect(res.body[0]).to.have.property('name');
+          expect(res.body[0]).to.have.property('description');
+          expect(res.body[0]).to.have.property('activities');
+          expect(res.body[0].activities).to.have.length.above(0);
           done();
         });
     });

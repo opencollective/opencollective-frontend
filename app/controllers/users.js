@@ -19,6 +19,32 @@ module.exports = function(app) {
     ;
 
   /**
+   * Private methods.
+   */
+  var getGroupActivities = function() {
+    var query = _.merge({
+      where: {
+        GroupId: req.group.id
+      },
+      order: [ [req.sorting.key, req.sorting.dir] ]
+    }, req.pagination);
+
+    Activity
+      .findAndCountAll(query)
+      .then(function(activities) {
+
+        // Set headers for pagination.
+        req.pagination.total = activities.count;
+        res.set({
+          'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+        });
+
+        res.send(activities.rows);
+      })
+      .catch(next);
+  }
+
+  /**
    * Public methods.
    */
   return {
@@ -65,10 +91,22 @@ module.exports = function(app) {
      * Get a user's groups.
      */
     getGroups: function(req, res, next) {
+      var options = {
+        include: []
+      };
+
+      if (req.query.activities)
+        options.include.push({ model: Activity });
+
       req.user
-        .getGroups()
+        .getGroups(options)
         .then(function(groups) {
-          res.send(_.map(groups, function(g) { return g.info; }));
+          var out = _.map(groups, function(g) {
+            var group = g.info;
+            group.activities = g.Activities;
+            return group;
+          })
+          res.send(out);
         })
         .catch(next);
     },
