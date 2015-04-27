@@ -81,7 +81,7 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', mw.authorize, mw.required('group'), groups.create); // Create a group.
+  app.post('/groups', mw.authorize, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 

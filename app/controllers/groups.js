@@ -18,6 +18,32 @@ module.exports = function(app) {
     ;
 
   /**
+   * Private methods.
+   */
+  var addGroupMember = function(group, user, options, callback) {
+    group
+      .addMember(user, {role: options.role})
+      .then(function(usergroup) {
+        callback();
+        
+        // Create activities.
+        var activity = {
+            type: 'group.user.added'
+          , GroupId: group.id
+          , data: {
+                group: group.info
+              , user: options.remoteUser.info
+              , target: user.info
+              , usergroup: usergroup.info
+            }
+        };
+        Activity.create(_.extend({UserId: options.remoteUser.id}, activity));
+        Activity.create(_.extend({UserId: user.id}, activity));
+      })
+      .catch(callback);
+  }
+
+  /**
    * Public methods.
    */
   return {
@@ -29,7 +55,6 @@ module.exports = function(app) {
       Group
         .create(req.required['group'])
         .then(function(group) {
-          res.send(group.info);
 
           // Create activity.
           Activity.create({
@@ -41,6 +66,21 @@ module.exports = function(app) {
                 , user: req.remoteUser.info
               }
           });
+
+          // Add caller to the group if `role` specified.
+          var role = req.body.role;
+          if (role) {
+            var options = {
+              role: role,
+              remoteUser: req.remoteUser
+            }
+            addGroupMember(group, req.remoteUser, options, function(e) {
+              if (e) return next(e);
+              else res.send(group.info);
+            });
+          } else {
+            res.send(group.info);
+          }
         })
         .catch(next);
     },
@@ -49,28 +89,14 @@ module.exports = function(app) {
      * Add a user to a group.
      */
     addMember: function(req, res, next) {
-      var role = req.body.role || 'viewer';
-      
-      req.group
-        .addMember(req.user, {role: role})
-        .then(function(usergroup) {
-          res.send({success: true});
-          
-          // Create activities.
-          var activity = {
-              type: 'group.user.added'
-            , GroupId: req.group.id
-            , data: {
-                  group: req.group.info
-                , user: req.remoteUser.info
-                , target: req.user.info
-                , usergroup: usergroup.info
-              }
-          };
-          Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
-          Activity.create(_.extend({UserId: req.user.id}, activity));
-        })
-        .catch(next);
+      var options = {
+        role: req.body.role || 'viewer',
+        remoteUser: req.remoteUser
+      }
+      addGroupMember(req.group, req.user, options, function(e) {
+        if (e) return next(e);
+        else res.send({success: true});
+      });
     }
 
   }

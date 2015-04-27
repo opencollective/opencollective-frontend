@@ -86,7 +86,7 @@ describe('groups.routes.test.js', function() {
         
     });
 
-    it('successfully create a group', function(done) {
+    it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt)
@@ -103,7 +103,40 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          done();
+
+          user.getGroups().then(function(groups) {
+            expect(groups).to.have.length(0);
+            done();
+          });
+        });
+        
+    });
+
+    it('successfully create a group assigning the caller as admin', function(done) {
+      var role = 'admin';
+
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt)
+        .send({
+          group: groupData,
+          role: role
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id');
+          expect(res.body).to.have.property('name');
+          expect(res.body).to.have.property('description');
+          expect(res.body).to.have.property('membership_type');
+          expect(res.body).to.have.property('membershipfee');
+          expect(res.body).to.have.property('createdAt');
+          expect(res.body).to.have.property('updatedAt');
+
+          user.getGroups().then(function(groups) {
+            expect(groups).to.have.length(1);
+            done();
+          });
         });
         
     });
