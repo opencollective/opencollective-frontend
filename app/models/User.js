@@ -99,6 +99,7 @@ module.exports = function(Sequelize, DataTypes) {
           , name: this.fullName
           , username: this.username
           , email: this.email
+          , avatar: this.avatar
           , createdAt: this.createdAt
           , updatedAt: this.updatedAt
         };
@@ -111,6 +112,7 @@ module.exports = function(Sequelize, DataTypes) {
           , last_name: this.last_name
           , name: this.fullName
           , username: this.username
+          , avatar: this.avatar
           , createdAt: this.createdAt
           , updatedAt: this.updatedAt
         };
