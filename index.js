@@ -1,9 +1,9 @@
 /**
  * Dependencies.
  */
-var express = require('express')
-  , app = express()
-  ;
+var newrelic = require('newrelic');
+var express = require('express');
+var app = express();
 
 app.errors = require('./app/lib/errors');
 require('./app/lib/express')(app);
