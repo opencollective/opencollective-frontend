@@ -129,7 +129,7 @@ module.exports = function(Sequelize, DataTypes) {
       },
       // JWT token.
       jwt: function() {
-        var secret = config.keys.unionsq.secret;
+        var secret = config.keys.opencollective.secret;
         var payload = this.minimal;
         return jwt.sign(payload, secret, { 
             expiresInMinutes: 60*24*30 // 1 month

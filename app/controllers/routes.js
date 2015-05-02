@@ -21,7 +21,7 @@ module.exports = function(app) {
     ;
 
 
-  /** 
+  /**
    * Status.
    */
   app.get('/status', status);
@@ -37,10 +37,10 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.get('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
-  app.put('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.delete('/*?',  expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.post('/*?', expressJwt({secret: config.keys.unionsq.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
+  app.get('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
+  app.put('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.delete('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.post('/*?', expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
 
 
   /**
@@ -128,9 +128,9 @@ module.exports = function(app) {
     else if (e.indexOf('uniqueconstraint') !== -1)
       err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
 
-    if (!err.code) 
+    if (!err.code)
       err.code = err.status || 500;
-    
+
     // console.trace(err);
     console.error('Error Express : ', err);
     res.status(err.code).send({error: err});
