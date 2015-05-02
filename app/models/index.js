@@ -1,11 +1,8 @@
 /**
  * Dependencies.
  */
-var Sequelize = require('sequelize')
-  , config = require('config').database
-  ;
-
-console.log('config : ', config);
+var Sequelize = require('sequelize');
+var config = require('config').database;
 
 /**
  * Database connection.
