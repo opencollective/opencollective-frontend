@@ -6,8 +6,8 @@
     "options": {
       "host": "postgres://yzpzinemtlckty:ES8llgy-9G2PBl29qIssmrJTeb@ec2-184-73-165-195.compute-1.amazonaws.com:5432/d8m9jl5us2t2g2",
       "dialect": "postgres",
-      "logging": true,
-      "native": true
+      "protocol": "postgres",
+      "logging": true
     }
   },
   "application": {
