@@ -5,6 +5,8 @@ var Sequelize = require('sequelize')
   , config = require('config').database
   ;
 
+console.log('config : ', config);
+
 /**
  * Database connection.
  */
@@ -42,7 +44,7 @@ models.forEach(function(model) {
 
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
-  
+
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
 
