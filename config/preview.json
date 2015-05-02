@@ -1,9 +1,8 @@
 {
   "database": {
-    "database": "opencollective_preview",
+    "database": "d8m9jl5us2t2g2",
     "username": "yzpzinemtlckty",
     "password": "ES8llgy-9G2PBl29qIssmrJTeb",
-    "base": "d8m9jl5us2t2g2",
     "options": {
       "host": "ec2-184-73-165-195.compute-1.amazonaws.com",
       "port": 5432,
