@@ -37,10 +37,10 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.get('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
-  app.put('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.delete('/*?',  expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.post('/*?', expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
+  app.get('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
+  app.put('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.delete('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
+  app.post('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
 
 
   /**
@@ -54,7 +54,7 @@ module.exports = function(app) {
   /**
    * Users.
    */
-  app.post('/users', mw.required('api_key'), mw.apiKey, mw.required('user'), users.create); // Create a user.
+  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', mw.authorize, users.show); // Get a user.
   app.put('/users/:userid', fake); // Update a user.
   app.get('/users/:userid/email', fake); // Confirm a user's email.
@@ -63,7 +63,7 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.post('/authenticate', mw.required('api_key'), mw.apiKey, mw.required('password'), mw.authenticate, auth.byPassword, users.getToken); // Authenticate user to get a token.
+  app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, auth.byPassword, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', fake); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', fake); // Reset the refresh_token.
 

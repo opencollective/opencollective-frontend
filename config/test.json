@@ -9,11 +9,6 @@
       "logging": false
     }
   },
-  "application": {
-    "id": "b6cc54e9f41deece89fa8d660f93d396",
-    "appname": "webapp",
-    "api_key": "0ac43519edcf4421d80342403fb5985d"
-  },
   "keys": {
     "opencollective": {
       "secret": "8f047749ba6ad8e62b53b18b4c30295f45d849c1"

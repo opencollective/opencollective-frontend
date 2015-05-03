@@ -23,12 +23,16 @@ var models = app.set('models');
  */
 describe('activities.routes.test.js', function() {
 
-  var user, user2
+  var application
+    , user, user2
     , group
     ;
 
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
   // Create users.
@@ -91,7 +95,7 @@ describe('activities.routes.test.js', function() {
     it('fails getting activities if not member of the group', function(done) {
       request(app)
         .get('/groups/' + group.id + '/activities')
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(done);
     });
@@ -99,7 +103,7 @@ describe('activities.routes.test.js', function() {
     it('successfully get a group\'s activities', function(done) {
       request(app)
         .get('/groups/' + group.id + '/activities')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -126,7 +130,7 @@ describe('activities.routes.test.js', function() {
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', 'Bearer ' + user.jwt)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
@@ -158,7 +162,7 @@ describe('activities.routes.test.js', function() {
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', 'Bearer ' + user.jwt)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
@@ -174,7 +178,7 @@ describe('activities.routes.test.js', function() {
 
       it('successfully get a group\'s activities using since_id', function(done) {
         var since_id = 8;
-        
+
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
@@ -182,7 +186,7 @@ describe('activities.routes.test.js', function() {
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', 'Bearer ' + user.jwt)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
@@ -211,7 +215,7 @@ describe('activities.routes.test.js', function() {
             sort: 'createdAt',
             direction: 'desc'
           })
-          .set('Authorization', 'Bearer ' + user.jwt)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
@@ -237,7 +241,7 @@ describe('activities.routes.test.js', function() {
     it('fails getting other user\'s activities', function(done) {
       request(app)
         .get('/users/' + user.id + '/activities')
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(done);
     });
@@ -245,7 +249,7 @@ describe('activities.routes.test.js', function() {
     it('successfully get a user\'s activities', function(done) {
       request(app)
         .get('/users/' + user.id + '/activities')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;

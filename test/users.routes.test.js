@@ -20,8 +20,13 @@ var models = app.set('models');
  */
 describe('users.routes.test.js', function() {
 
+  var application;
+
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
   /**
@@ -43,7 +48,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: config.application.api_key
+            api_key: application.api_key
         })
         .expect(400)
         .end(done);
@@ -53,7 +58,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: config.application.api_key
+            api_key: application.api_key
           , user: _.omit(userData, 'email')
         })
         .expect(400)
@@ -64,7 +69,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: config.application.api_key
+            api_key: application.api_key
           , user: _.extend({}, userData, {email: 'abcdefg'})
         })
         .expect(400)
@@ -75,7 +80,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: config.application.api_key
+            api_key: application.api_key
           , user: userData
         })
         .expect(200)
@@ -99,7 +104,7 @@ describe('users.routes.test.js', function() {
         request(app)
           .post('/users')
           .send({
-              api_key: config.application.api_key
+              api_key: application.api_key
             , user: _.pick(userData, 'email')
           })
           .expect(400)
@@ -114,7 +119,7 @@ describe('users.routes.test.js', function() {
         request(app)
           .post('/users')
           .send({
-              api_key: config.application.api_key
+              api_key: application.api_key
             , user: u
           })
           .expect(400)
@@ -151,7 +156,7 @@ describe('users.routes.test.js', function() {
     it('successfully get a user\'s information', function(done) {
       request(app)
         .get('/users/' + user.id)
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -165,7 +170,7 @@ describe('users.routes.test.js', function() {
     it('successfully get a user\'s information when he is authenticated', function(done) {
       request(app)
         .get('/users/' + user.id)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;

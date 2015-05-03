@@ -17,17 +17,20 @@ var userData = utils.data('user1');
  */
 describe('user.models.test.js', function() {
 
-  var User;
+  var application, User;
 
   beforeEach(function() {
     User = app.get('models').User;
   })
 
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
-  /** 
+  /**
    * Create a user.
    */
   describe('#create', function() {

@@ -5,7 +5,10 @@ module.exports = function(Sequelize, DataTypes) {
     name: DataTypes.STRING,
     href: DataTypes.STRING,
     description: DataTypes.STRING,
-    disabled: DataTypes.BOOLEAN,
+    disabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     _access: {
       type: DataTypes.INTEGER,
       defaultValue: 0
@@ -18,6 +21,19 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     }
+  }, {
+    classMethods: {
+      findByKey: function(key, fn) {
+        Application
+          .findOne({where: {
+            api_key: key
+          }})
+          .then(function(application) {
+            return fn(null, application);
+          })
+          .catch(fn);
+      }
+    },
   });
 
   return Application;

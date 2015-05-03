@@ -16,7 +16,7 @@ var SALT_WORK_FACTOR = 10;
  * Model.
  */
 module.exports = function(Sequelize, DataTypes) {
-  
+
   var User = Sequelize.define('User', {
 
     _access: {
@@ -127,15 +127,18 @@ module.exports = function(Sequelize, DataTypes) {
           , email: this.email
         };
       },
+    },
+
+    instanceMethods: {
       // JWT token.
-      jwt: function() {
+      jwt: function(application) {
         var secret = config.keys.opencollective.secret;
         var payload = this.minimal;
-        return jwt.sign(payload, secret, { 
+        return jwt.sign(payload, secret, {
             expiresInMinutes: 60*24*30 // 1 month
           , subject: this.id // user
           , issuer: config.host.api
-          , audience: config.application.id // only 1 application for now
+          , audience: application.id
         });
       }
     },

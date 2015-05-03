@@ -5,6 +5,7 @@ var utils = require('../lib/utils');
 module.exports = function(app) {
 
   var models = app.set('models');
+  var Application = models.Application;
   var User = models.User;
   var errors = app.errors;
 
@@ -29,7 +30,7 @@ module.exports = function(app) {
             value = req.headers[prop];
           if (!value && value !== false)
             value = req.body[prop];
-          
+
           if ( (!value || value === 'null') && value !== false ) {
             missing[prop] = 'Required field ' + prop + ' missing';
           } else {
@@ -39,11 +40,11 @@ module.exports = function(app) {
             req.required[prop] = value;
           }
         });
-        
+
         if (Object.keys(missing).length) {
           return next(new errors.ValidationFailed('missing_required', missing));
         }
-        
+
         next();
       };
     },
@@ -52,15 +53,19 @@ module.exports = function(app) {
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
-      var key = req.required['api_key'];
+      var key = req.params['api_key'] || req.body['api_key'];
 
-      if (key !== config.application.api_key)
-        return next(new errors.Unauthorized('Invalid API key.'));
+      if (!key) return next();
 
-      // Hard coded here for now.
-      req.application = config.application;
-
-      next();
+      Application.findByKey(key, function(e, application) {
+        if (!e && application) {
+          if (application.disabled) {
+            return next(new errors.Forbidden('Invalid API key.'));
+          }
+          req.application = application;
+        }
+        next();
+      });
     },
 
     /**
@@ -102,7 +107,7 @@ module.exports = function(app) {
 
         var decoded = jwt.decode(accessToken);
         User.findOne({_id: decoded.sub}, function(e, user) {
-          if (e) 
+          if (e)
             return next(e);
           else if (!user || user.tokens.refresh_token !== refreshToken) // Check the refresh_token from the user data.
             return next(new errors.Unauthorized('Invalid Refresh Token'));
@@ -137,15 +142,31 @@ module.exports = function(app) {
             .catch(cb);
         },
         function(cb) {
-          if (app_id !== config.application.id)
-            return next(new errors.Unauthorized('Invalid API key.'));
+          // Check the validity of the application in the token.
+          Application
+            .find(parseInt(app_id))
+            .then(function(application) {
+              if (!application || application.disabled)
+                return cb(new errors.Unauthorized('Invalid API key.'));
 
-          req.application = config.application;
-          cb();
+              req.application = application;
+              cb();
+            })
+            .catch(next);
         }
       ], next);
 
-      
+
+    },
+
+    /**
+     * Authorize application.
+     */
+     authorizeApp: function(req, res, next) {
+      if (!req.application) {
+        return next(new errors.Unauthorized('Unauthorized application.'));
+      }
+      next();
     },
 
 
@@ -191,14 +212,14 @@ module.exports = function(app) {
      */
     paginate: function(options) {
       options = options || {};
-      
+
       options = {
           default: options.default || 20
         , min: options.min || 1
         , max: options.max || 50
         , maxTotal: options.maxTotal || false
       };
-      
+
       return function(req, res, next) {
 
         // Since ID.
@@ -215,7 +236,7 @@ module.exports = function(app) {
         // Page / Per_page.
         var per_page = (req.body.per_page || req.query.per_page) * 1 || options.default;
         var page = (req.body.page || req.query.page) * 1 || 1;
-        
+
         page = (page < 1) ? 1 : page;
         per_page = (per_page < options.min) ? options.min : per_page;
         per_page = (per_page > options.max) ? options.max : per_page;
@@ -231,10 +252,10 @@ module.exports = function(app) {
      */
     sorting: function(options) {
       options = options || {};
-      
+
       options.key = (typeof options.key != 'undefined') ? options.key : 'id';
       options.dir = (typeof options.dir != 'undefined') ? options.dir : 'ASC';
-      
+
       return function(req, res, next) {
         var key = req.body.sort || req.query.sort
           , dir = req.body.direction || req.query.direction;
@@ -243,7 +264,7 @@ module.exports = function(app) {
             key: key || options.key
           , dir: (dir || options.dir).toUpperCase()
         };
-        
+
         next();
       };
     },

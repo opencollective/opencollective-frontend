@@ -21,10 +21,13 @@ var models = app.set('models');
  */
 describe('groups.routes.test.js', function() {
 
-  var user;
+  var application, user;
 
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
   beforeEach(function(done) {
@@ -56,7 +59,7 @@ describe('groups.routes.test.js', function() {
     it('fails creating a group without data', function(done) {
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(400)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -69,9 +72,9 @@ describe('groups.routes.test.js', function() {
 
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: group 
+          group: group
         })
         .expect(400)
         .end(function(e, res) {
@@ -83,15 +86,15 @@ describe('groups.routes.test.js', function() {
           expect(res.body.error.fields).to.contain('name');
           done();
         });
-        
+
     });
 
     it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData 
+          group: groupData
         })
         .expect(200)
         .end(function(e, res) {
@@ -109,7 +112,7 @@ describe('groups.routes.test.js', function() {
             done();
           });
         });
-        
+
     });
 
     it('successfully create a group assigning the caller as admin', function(done) {
@@ -117,7 +120,7 @@ describe('groups.routes.test.js', function() {
 
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
           role: role
@@ -138,7 +141,7 @@ describe('groups.routes.test.js', function() {
             done();
           });
         });
-        
+
     });
 
   });

@@ -8,6 +8,17 @@ var async = require('async')
   ;
 
 /**
+ * Private methods.
+ */
+var getData = function(item) {
+  return _.extend({}, data[item]); // to avoid changing these data
+};
+
+var createSuperApplication = function(callback) {
+  app.set('models').Application.create(getData('applicationSuper')).done(callback);
+};
+
+/**
  * Utils.
  */
 module.exports = function() {
@@ -15,15 +26,15 @@ module.exports = function() {
   return {
 
     cleanAllDb: function(callback) {
-      app.set('models').sequelize.sync({force: true}).done(callback);
+      app.set('models').sequelize.sync({force: true}).done(function(e) {
+        createSuperApplication(callback);
+      });
     },
 
     /**
      * Test data.
      */
-    data: function(item) {
-      return _.extend({}, data[item]); // to avoid changing these data
-    }
+    data: getData
 
   }
 

@@ -21,8 +21,13 @@ var models = app.set('models');
  */
 describe('auth.routes.test.js', function() {
 
+  var application;
+
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
   beforeEach(function(done) {
@@ -35,10 +40,25 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : config.application.api_key
+            api_key : application.api_key
           , username: userData.username
         })
         .expect(400)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          done();
+        });
+    });
+
+    it('fails authenticate if bad application', function(done) {
+      request(app)
+        .post('/authenticate')
+        .send({
+            api_key : 'bla'
+          , username: userData.username
+          , password: userData.password
+        })
+        .expect(401)
         .end(function(e, res) {
           expect(e).to.not.exist;
           done();
@@ -49,7 +69,7 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : config.application.api_key
+            api_key : application.api_key
           , username: userData.username
           , password: 'bad'
         })
@@ -64,7 +84,7 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : config.application.api_key
+            api_key : application.api_key
           , username: userData.username
           , password: userData.password
         })
@@ -90,7 +110,7 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : config.application.api_key
+            api_key : application.api_key
           , email: userData.email
           , password: userData.password
         })

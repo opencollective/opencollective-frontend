@@ -1,5 +1,11 @@
 {
 
+  "applicationSuper": {
+    "name": "webapp",
+    "api_key": "0ac43519edcf4421d80342403fb5985d",
+    "_access": 1
+  },
+
   "user1": {
     "first_name": "Phil",
     "last_name": "Mod",
@@ -47,5 +53,5 @@
       {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}}
     ]
   }
-  
+
 }

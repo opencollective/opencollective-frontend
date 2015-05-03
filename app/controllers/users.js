@@ -72,7 +72,7 @@ module.exports = function(app) {
      */
     getToken: function(req, res, next) {
       res.send({
-          access_token: req.user.jwt
+          access_token: req.user.jwt(req.application)
         , refresh_token: req.user.refresh_token
       });
     },

@@ -21,12 +21,16 @@ var models = app.set('models');
  */
 describe('usergroup.routes.test.js', function() {
 
-  var user, user2
+  var application
+    , user, user2
     , group
     ;
 
   beforeEach(function(done) {
-    utils.cleanAllDb(done);
+    utils.cleanAllDb(function(e, app) {
+      application = app;
+      done();
+    });
   });
 
   // Create users.
@@ -82,7 +86,7 @@ describe('usergroup.routes.test.js', function() {
     it('fails adding a non-existing user to a group', function(done) {
       request(app)
         .post('/groups/' + group.id + '/users/' + 98765)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(404)
         .end(done);
     });
@@ -90,7 +94,7 @@ describe('usergroup.routes.test.js', function() {
     it('fails adding a user to a non-existing group', function(done) {
       request(app)
         .post('/groups/' + 98765 + '/users/' + user2.id)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(404)
         .end(done);
     });
@@ -101,7 +105,7 @@ describe('usergroup.routes.test.js', function() {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(400)
         .end(done);
     });
@@ -112,7 +116,7 @@ describe('usergroup.routes.test.js', function() {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(done);
     });
@@ -123,7 +127,7 @@ describe('usergroup.routes.test.js', function() {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', 'Bearer ' + user3.jwt)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
         .expect(403)
         .end(done);
     });
@@ -131,7 +135,7 @@ describe('usergroup.routes.test.js', function() {
     it('successfully add a user to a group', function(done) {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -151,7 +155,7 @@ describe('usergroup.routes.test.js', function() {
 
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           role: role
         })
@@ -183,7 +187,7 @@ describe('usergroup.routes.test.js', function() {
     beforeEach(function(done) {
       request(app)
         .post('/groups/' + group.id + '/users/' + user.id)
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(done);
     });
@@ -191,7 +195,7 @@ describe('usergroup.routes.test.js', function() {
     it('fails getting another user\'s groups', function(done) {
       request(app)
         .get('/users/' + user.id + '/groups')
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -202,7 +206,7 @@ describe('usergroup.routes.test.js', function() {
     it('successfully get a user\'s groups', function(done) {
       request(app)
         .get('/users/' + user2.id + '/groups')
-        .set('Authorization', 'Bearer ' + user2.jwt)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -214,7 +218,7 @@ describe('usergroup.routes.test.js', function() {
     it('successfully get a user\'s groups bis', function(done) {
       request(app)
         .get('/users/' + user.id + '/groups')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -230,7 +234,7 @@ describe('usergroup.routes.test.js', function() {
     it('successfully get a user\'s groups with activities', function(done) {
       request(app)
         .get('/users/' + user.id + '/groups?activities=true')
-        .set('Authorization', 'Bearer ' + user.jwt)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
