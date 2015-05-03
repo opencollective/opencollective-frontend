@@ -78,7 +78,8 @@
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
-        "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo"
+        "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo",
+        "createdAt": "2015-01-23T08:00:00.000Z"
       },
       {
         "beneficiary": "@xdamman",
@@ -88,7 +89,52 @@
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
-        "link": "https://www.dropbox.com/s/2egws2rq0kvreei/2015-04-06%2016.04.50.jpg?dl=0"
+        "link": "https://www.dropbox.com/s/2egws2rq0kvreei/2015-04-06%2016.04.50.jpg?dl=0",
+        "createdAt": "2015-02-22T08:00:00.000Z"
+      },
+      {
+        "beneficiary": "@xdamman",
+        "description": "Byword",
+        "tags": ["software"],
+        "amount": 11.99,
+        "paidby": "@xdamman",
+        "status": "paid back on 4/17/15",
+        "comment": "",
+        "link": "http://cl.ly/image/39212o302x2c",
+        "createdAt": "2015-03-04T08:00:00.000Z"
+      },
+      {
+        "beneficiary": "OrangeWebsite",
+        "description": "Tipbox.is domain + dedicated server",
+        "tags": ["hosting"],
+        "amount": 588.61,
+        "paidby": "@xdamman",
+        "status": "paid back on 4/17/15",
+        "comment": "",
+        "link": "http://cl.ly/image/1B25353p221L",
+        "createdAt": "2015-04-06T07:00:00.000Z"
+      },
+      {
+        "beneficiary": "@mdp @xdamman",
+        "description": "Working lunch with @mdp",
+        "tags": ["food"],
+        "amount": 36.00,
+        "paidby": "@xdamman",
+        "status": "paid back on 4/17/15",
+        "comment": "",
+        "link": "https://www.dropbox.com/s/pxoi887e71923z9/2015-04-07%2012.59.10.jpg?dl=0",
+        "createdAt": "2015-04-07T07:00:00.000Z"
+      },
+      {
+        "beneficiary": "@evilrabbit_",
+        "description": "Homepage design end",
+        "tags": ["consultancy"],
+        "amount": 300.00,
+        "paidby": "@xdamman",
+        "status": "waiting for KF reimbursement",
+        "comment": "",
+        "link": "",
+        "createdAt": "2015-04-28T07:00:00.000Z"
       },
       {
         "beneficiary": "@montogeek",
@@ -98,7 +144,8 @@
         "paidby": "@xdamman",
         "status": "waiting for KF reimbursement",
         "comment": "",
-        "link": ""
+        "link": "",
+        "createdAt": "2015-04-29T07:00:00.000Z"
       }
     ]
   }
