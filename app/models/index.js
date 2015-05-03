@@ -47,7 +47,7 @@ models.forEach(function(model) {
 
   m.Transaction.belongsTo(m.Group);
   m.Group.hasMany(m.Transaction);
-  m.Transaction.belongsTo(m.User);
+  m.Transaction.belongsTo(m.User, {as: 'payer'});
   m.User.hasMany(m.Transaction);
 })(module.exports);
 
