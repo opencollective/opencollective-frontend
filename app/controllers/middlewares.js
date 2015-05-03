@@ -247,6 +247,22 @@ module.exports = function(app) {
     },
 
     /**
+     * Authorize transaction.
+     */
+    authorizeTransaction: function(req, res, next) {
+      if (!req.transaction) {
+        return next(new errors.NotFound());
+      }
+      if (!req.group) {
+        return next(new errors.NotFound('Cannot authorize a transaction without a specified group.'));
+      }
+      if (req.transaction.GroupId !== req.group.id) {
+        return next(new errors.Forbidden('This group does not have access to this transaction.'));
+      }
+      next();
+    },
+
+    /**
      * Paginate.
      */
     paginate: function(options) {

@@ -47,6 +47,10 @@
     "membershipfee": 10
   },
 
+  "group2": {
+    "name": "Women who code"
+  },
+
   "activities1": {
     "activities": [
       {"type": "user.created", "UserId": 1, "data": {}},

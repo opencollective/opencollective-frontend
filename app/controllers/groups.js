@@ -154,6 +154,7 @@ module.exports = function(app) {
               type: 'group.transaction.created'
             , UserId: user.id
             , GroupId: group.id
+            , TransactionId: transaction.id
             , data: {
                   group: group.info
                 , transaction: transaction
@@ -169,6 +170,19 @@ module.exports = function(app) {
       });
 
     },
+
+    /**
+     * Delete a transaction.
+     */
+     deleteTransaction: function(req, res, next) {
+       req.transaction
+         .destroy()
+         .then(function() {
+           res.send({success: true});
+         })
+         .catch(next);
+     },
+
 
   }
 

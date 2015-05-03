@@ -6,6 +6,7 @@ module.exports = function(app) {
   var models = app.set('models')
     , User = models.User
     , Group = models.Group
+    , Transaction = models.Transaction
     , errors = app.errors
     ;
 
@@ -42,6 +43,23 @@ module.exports = function(app) {
             return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
           } else {
             req.group = group;
+            next();
+          }
+        })
+        .catch(next);
+    },
+
+    /**
+     * Transactionid.
+     */
+    transactionid: function(req, res, next, transactionid) {
+      Transaction
+        .find(parseInt(transactionid))
+        .then(function(transaction) {
+          if (!transaction) {
+            return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
+          } else {
+            req.transaction = transaction;
             next();
           }
         })

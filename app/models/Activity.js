@@ -58,4 +58,5 @@ Types:
       data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
       GroupId:
+      TransactionId: 
 */

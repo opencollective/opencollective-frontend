@@ -32,6 +32,7 @@ module.exports = function(app) {
    */
   app.param('userid', params.userid);
   app.param('groupid', params.groupid);
+  app.param('transactionId', params.transactionid)
 
 
   /**
@@ -100,6 +101,7 @@ module.exports = function(app) {
    */
   app.get('/groups/:groupid/transactions', fake); // Get a group's transactions.
   app.post('/groups/:groupid/transactions', mw.authorizeUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
+  app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
 
 
   /**

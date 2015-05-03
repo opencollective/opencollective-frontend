@@ -34,23 +34,30 @@ models.forEach(function(model) {
  * Relationships.
  */
 (function(m) {
+  // Card.
   m.Card.belongsToMany(m.User, {through: 'UserCard'});
   m.User.belongsToMany(m.Card, {through: 'UserCard'});
 
+  // Group.
   m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
   m.User.belongsToMany(m.Group, {through: m.UserGroup, as: 'groups'});
 
+  // Activity.
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
 
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
 
+  m.Activity.belongsTo(m.Transaction, {onDelete: 'cascade'});
+
+  // Transaction.
   m.Transaction.belongsTo(m.Group);
   m.Group.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User);
   m.User.hasMany(m.Transaction);
 
+  // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 })(module.exports);
