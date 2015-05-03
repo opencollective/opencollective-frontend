@@ -20,11 +20,20 @@ var models = app.set('models');
  */
 describe('users.routes.test.js', function() {
 
-  var application;
+  var application, application2;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
+      done();
+    });
+  });
+
+  // Create a normal application
+  beforeEach(function(done) {
+    models.Application.create(utils.data('application2')).done(function(e, a) {
+      expect(e).to.not.exist;
+      application2 = a;
       done();
     });
   });
@@ -41,6 +50,17 @@ describe('users.routes.test.js', function() {
             user: userData
         })
         .expect(400)
+        .end(done);
+    });
+
+    it('fails if no api_key', function(done) {
+      request(app)
+        .post('/users')
+        .send({
+            api_key: application2.api_key
+          , user: userData
+        })
+        .expect(403)
         .end(done);
     });
 

@@ -171,6 +171,18 @@ module.exports = function(app) {
 
 
     /**
+     * Authorize super-applications only.
+     */
+    internal: function(req, res, next) {
+      if (req.application._access < 1) {
+        next(new errors.Forbidden('Unauthorized'));
+      } else {
+        next();
+      }
+    },
+
+
+    /**
      * Authorize: the user has to be authenticated.
      */
     authorize: function(req, res, next) {

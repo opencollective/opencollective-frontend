@@ -51,7 +51,7 @@ module.exports = function(app) {
   /**
    * Users.
    */
-  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.required('user'), users.create); // Create a user.
+  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.internal, mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', mw.authorize, users.show); // Get a user.
   app.put('/users/:userid', fake); // Update a user.
   app.get('/users/:userid/email', fake); // Confirm a user's email.
