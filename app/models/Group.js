@@ -16,6 +16,10 @@ module.exports = function(Sequelize, DataTypes) {
     description: DataTypes.STRING,
 
     budget: DataTypes.FLOAT,
+    currency: {
+      type: DataTypes.STRING,
+      defaultValue: 'USD'
+    },
 
     membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
     membershipfee: DataTypes.FLOAT,
