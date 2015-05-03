@@ -22,7 +22,7 @@
     "newrelic": "^1.18.5",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
-    "sequelize": "^2.0.4",
+    "sequelize": "2.0.4",
     "stripe": "^3.3.4"
   },
   "devDependencies": {

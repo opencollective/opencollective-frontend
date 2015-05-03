@@ -99,7 +99,7 @@ module.exports = function(app) {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', fake); // Get a group's transactions.
-  app.post('/groups/:groupid/transactions', fake); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', mw.authorizeUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
 
 
   /**

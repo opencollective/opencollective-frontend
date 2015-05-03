@@ -1,6 +1,6 @@
 {
   "database": {
-    "database": "assoc_localhost",
+    "database": "opencollective_localhost",
     "username": "philmod",
     "password": "",
     "options": {

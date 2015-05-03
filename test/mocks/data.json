@@ -62,6 +62,41 @@
       {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
       {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}}
     ]
+  },
+
+  "transactions1": {
+    "transactions": [
+      {
+        "beneficiary": "@evilrabbit_",
+        "description": "Homepage design",
+        "tags": ["consultancy"],
+        "amount": 200.00,
+        "paidby": "@xdamman",
+        "status": "paid back on 4/17/15",
+        "comment": "",
+        "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo"
+      },
+      {
+        "beneficiary": "@xdamman",
+        "description": "Flight SFO-BRU",
+        "tags": ["travel"],
+        "amount": 918.59,
+        "paidby": "@xdamman",
+        "status": "paid back on 4/17/15",
+        "comment": "",
+        "link": "https://www.dropbox.com/s/2egws2rq0kvreei/2015-04-06%2016.04.50.jpg?dl=0"
+      },
+      {
+        "beneficiary": "@montogeek",
+        "description": "Homepage frontend code",
+        "tags": ["consultancy"],
+        "amount": 300.00,
+        "paidby": "@xdamman",
+        "status": "waiting for KF reimbursement",
+        "comment": "",
+        "link": ""
+      }
+    ]
   }
 
 }

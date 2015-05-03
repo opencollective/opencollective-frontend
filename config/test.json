@@ -1,6 +1,6 @@
 {
   "database": {
-    "database": "assoc_test",
+    "database": "opencollective_test",
     "username": "philmod",
     "password": "",
     "options": {

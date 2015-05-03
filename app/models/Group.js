@@ -7,13 +7,15 @@ var errors = require('../lib/errors');
  * Model.
  */
 module.exports = function(Sequelize, DataTypes) {
-  
+
   var Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
       allowNull: false
     },
     description: DataTypes.STRING,
+
+    budget: DataTypes.FLOAT,
 
     membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
     membershipfee: DataTypes.FLOAT,

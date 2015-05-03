@@ -27,6 +27,7 @@ module.exports = function() {
 
     cleanAllDb: function(callback) {
       app.set('models').sequelize.sync({force: true}).done(function(e) {
+        if (e) return callback(e);
         createSuperApplication(callback);
       });
     },

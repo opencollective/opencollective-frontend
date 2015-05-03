@@ -1,10 +1,10 @@
 module.exports = function(Sequelize, DataTypes) {
-  
+
   var Activity = Sequelize.define('Activity', {
     type: DataTypes.STRING,
 
     data: DataTypes.JSON,
-    
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -17,7 +17,7 @@ module.exports = function(Sequelize, DataTypes) {
 };
 
 /*
-Types: 
+Types:
   + user.created
       data: user.info
       UserId: the one created
@@ -57,4 +57,5 @@ Types:
   - group.transaction.created
       data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
+      GroupId:
 */
