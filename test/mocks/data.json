@@ -6,6 +6,16 @@
     "_access": 1
   },
 
+  "application2": {
+    "name": "tipbox_app",
+    "api_key": "920cb291778adad8a563f488239968b4"
+  },
+
+  "application3": {
+    "name": "scouts_app",
+    "api_key": "1c96ce6b1119bec18e4a4680d25883da"
+  },
+
   "user1": {
     "first_name": "Phil",
     "last_name": "Mod",

@@ -162,7 +162,7 @@ module.exports = function(app) {
     /**
      * Authorize application.
      */
-     authorizeApp: function(req, res, next) {
+    authorizeApp: function(req, res, next) {
       if (!req.application) {
         return next(new errors.Unauthorized('Unauthorized application.'));
       }
@@ -181,6 +181,16 @@ module.exports = function(app) {
     },
 
     /**
+     * Or a user or an Application has to be authenticated.
+     */
+     authorizeUserOrApp: function(req, res, next) {
+       if (!req.remoteUser && !req.application) {
+         return next(new errors.Unauthorized('Unauthorized'));
+       }
+       next();
+     },
+
+    /**
      * Authorize User: same user referenced that the authenticated user.
      */
     authorizeUser: function(req, res, next) {
@@ -197,7 +207,24 @@ module.exports = function(app) {
       if (!req.group) {
         return next(new errors.NotFound());
       }
-      req.group.isMember(req.remoteUser.id, next);
+
+      if (req.remoteUser) { // If authenticated user, does he have access?
+        req.group.isMember(req.remoteUser.id, next);
+      }
+      else if (req.application) { // If authenticated application, does it have access?
+        req.group
+          .hasApplication(req.application)
+          .then(function(bool) {
+            if (bool)
+              next();
+            else
+            return next(new errors.Forbidden('Unauthorized'));
+          })
+          .catch(next);
+      }
+      else {
+        return next(new errors.Forbidden('Unauthorized'));
+      }
     },
 
     /**

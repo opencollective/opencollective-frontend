@@ -37,10 +37,7 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.get('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: [/\/users\/\w*\/email/i, /\/users\/\w*\/unsubscribe/i]}), mw.identifyFromToken);
-  app.put('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.delete('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}), mw.identifyFromToken);
-  app.post('/*?', mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser'}).unless({path: ['/users', '/authenticate', '/authenticate/refresh']}), mw.identifyFromToken);
+  app.use(mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser', credentialsRequired: false}), mw.identifyFromToken);
 
 
   /**
@@ -82,6 +79,7 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', mw.authorize, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.get('/groups/:groupid', mw.authorizeUserOrApp, mw.authorizeGroup, groups.get);
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 

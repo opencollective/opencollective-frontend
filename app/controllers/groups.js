@@ -25,7 +25,7 @@ module.exports = function(app) {
       .addMember(user, {role: options.role})
       .then(function(usergroup) {
         callback();
-        
+
         // Create activities.
         var activity = {
             type: 'group.user.added'
@@ -83,6 +83,13 @@ module.exports = function(app) {
           }
         })
         .catch(next);
+    },
+
+    /**
+     * Get group content.
+     */
+    get: function(req, res, next) {
+      res.send(req.group.info);
     },
 
     /**

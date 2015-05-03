@@ -146,4 +146,106 @@ describe('groups.routes.test.js', function() {
 
   });
 
+  /**
+   * Get.
+   */
+  describe('#get', function() {
+
+    var group, user2, application2, application3;
+
+    // Create the group.
+    beforeEach(function(done) {
+      models.Group.create(groupData).done(function(e, g) {
+        expect(e).to.not.exist;
+        group = g;
+        done();
+      });
+    });
+
+    // Add a user to the group.
+    beforeEach(function(done) {
+      group
+        .addMember(user, {role: 'admin'})
+        .done(done);
+    });
+
+    // Create another user.
+    beforeEach(function(done) {
+      models.User.create(utils.data('user2')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user2 = u;
+        done();
+      });
+    });
+
+    // Create an application which has only access to `group`
+    beforeEach(function(done) {
+      models.Application.create(utils.data('application2')).done(function(e, a) {
+        expect(e).to.not.exist;
+        application2 = a;
+        application2.addGroup(group).done(done);
+      });
+    });
+
+    // Create an application which doesn't have access to any group
+    beforeEach(function(done) {
+      models.Application.create(utils.data('application3')).done(function(e, a) {
+        expect(e).to.not.exist;
+        application3 = a;
+        done();
+      });
+    });
+
+
+    it('fails getting a group if not authenticated', function(done) {
+      request(app)
+        .get('/groups/' + group.id)
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails getting a group if the user authenticated has no access', function(done) {
+      request(app)
+        .get('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully get a group if authenticated as a user', function(done) {
+      request(app)
+        .get('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', group.id);
+          expect(res.body).to.have.property('name', group.name);
+          expect(res.body).to.have.property('description', group.description);
+          done();
+        });
+    });
+
+    it('fails getting a group if the application authenticated has no access', function(done) {
+      request(app)
+        .get('/groups/' + group.id)
+        .send({
+          api_key: application3.api_key
+        })
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully get a group if authenticated as a group', function(done) {
+      request(app)
+        .get('/groups/' + group.id)
+        .send({
+          api_key: application2.api_key
+        })
+        .expect(200)
+        .end(done);
+    });
+
+  });
+
 });
