@@ -19,6 +19,7 @@ var sequelize = new Sequelize(
  */
 var models = [
   'Activity',
+  'Application',
   'Card',
   'Group',
   'Transaction',
@@ -49,6 +50,9 @@ models.forEach(function(model) {
   m.Group.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User, {as: 'payer'});
   m.User.hasMany(m.Transaction);
+
+  m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
+  m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 })(module.exports);
 
 /**
