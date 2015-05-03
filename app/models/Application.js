@@ -1,6 +1,6 @@
 module.exports = function(Sequelize, DataTypes) {
 
-  var Application = Sequelize.define('Card', {
+  var Application = Sequelize.define('Application', {
     api_key: DataTypes.STRING,
     name: DataTypes.STRING,
     href: DataTypes.STRING,
