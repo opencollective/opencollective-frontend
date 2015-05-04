@@ -25,7 +25,7 @@ module.exports = function(app) {
         req.required = {};
 
         properties.forEach(function(prop) {
-          var value = req.params[prop];
+          var value = req.query[prop];
           if (!value && value !== false)
             value = req.headers[prop];
           if (!value && value !== false)
@@ -53,11 +53,12 @@ module.exports = function(app) {
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
-      var key = req.params['api_key'] || req.body['api_key'];
+      var key = req.query['api_key'] || req.body['api_key'];
 
       if (!key) return next();
 
       Application.findByKey(key, function(e, application) {
+        // console.log('apiKey 2 : ', e, application);
         if (!e && application) {
           if (application.disabled) {
             return next(new errors.Forbidden('Invalid API key.'));
@@ -72,9 +73,9 @@ module.exports = function(app) {
      * Authenticate.
      */
     authenticate: function(req, res, next) {
-      var username = (req.body && req.body.username) || req.params['username']
-        , email    = (req.body && req.body.email) || req.params['email']
-        , password = (req.body && req.body.password) || req.params['password']
+      var username = (req.body && req.body.username) || req.query['username']
+        , email    = (req.body && req.body.email) || req.query['email']
+        , password = (req.body && req.body.password) || req.query['password']
         ;
 
       if (!req.application || !req.application.api_key) {

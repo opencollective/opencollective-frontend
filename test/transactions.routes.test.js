@@ -199,7 +199,7 @@ describe('transactions.routes.test.js', function() {
   /**
    * Delete.
    */
-  describe.only('#delete', function() {
+  describe('#delete', function() {
 
     var transactions = [];
 
