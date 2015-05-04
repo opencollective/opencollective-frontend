@@ -92,22 +92,57 @@ module.exports = function(app) {
      * Get group content.
      */
     get: function(req, res, next) {
+
+      async.auto({
+
+        getTotalTransactions: function(cb) {
+          Transaction
+            .find({
+              attributes: [
+                [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+              ],
+              where: {
+                GroupId: req.group.id
+              }
+            })
+            .then(function(result) {
+              cb(null, result.toJSON().total);
+            })
+            .catch(cb);
+        },
+
+        getActivities: function(cb) {
+          if (!req.query.activities && !req.body.activities)
+            return cb();
+
+          var query = {
+            where: {
+              GroupId: req.group.id
+            },
+            order: [ ['createdAt', 'DESC'] ],
+            offset: 0,
+            limit: 20, // [TODO] I need to put this default value as a global parameter. Using mw.paginate?
+          };
+
+          Activity
+            .findAndCountAll(query)
+            .then(function(activities) {
+              cb(null, activities.rows);
+            })
+            .catch(cb);
+        },
+
+      }, function(e, results) {
+
+        var group = req.group.info;
+        group.budgetLeft = group.budget + results.getTotalTransactions;
+        if (results.getActivities)
+          group.activities = results.getActivities;
+        res.send(group);
+
+      })
       // Get total transactions.
-      Transaction
-        .find({
-          attributes: [
-            [sequelize.fn('SUM', sequelize.col('amount')), 'total']
-          ],
-          where: {
-            GroupId: req.group.id
-          }
-        })
-        .then(function(result) {
-          var group = req.group.info;
-          group.budgetLeft = group.budget + result.toJSON().total;
-          res.send(group);
-        })
-        .catch(next);
+
     },
 
     /**

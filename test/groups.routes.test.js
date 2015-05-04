@@ -250,7 +250,7 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
-    describe.only('Budget', function() {
+    describe.only('Transactions/Activities/Budget', function() {
 
       var group2;
       var transactions = [];
@@ -310,6 +310,25 @@ describe('groups.routes.test.js', function() {
             var group = res.body;
             expect(group).to.have.property('budget', group.budget);
             expect(group).to.have.property('budgetLeft', (group.budget + totTransactions));
+            expect(group).to.not.have.property('activities');
+            done();
+          });
+      });
+
+      it('successfully get a group with activities', function(done) {
+        request(app)
+          .get('/groups/' + group.id)
+          .send({
+            api_key: application2.api_key,
+            activities: true
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var group = res.body;
+            console.log('yo : ', group);
+            expect(group).to.have.property('activities');
+            expect(group.activities).to.have.length.above(0);
             done();
           });
       });
