@@ -186,7 +186,7 @@ module.exports = function(app) {
     /**
      * Authorize: the user has to be authenticated.
      */
-    authorize: function(req, res, next) {
+    authorizeAuthUser: function(req, res, next) {
       if (!req.remoteUser) {
         return next(new errors.Unauthorized('Unauthorized'));
       }
@@ -196,7 +196,7 @@ module.exports = function(app) {
     /**
      * Or a user or an Application has to be authenticated.
      */
-     authorizeUserOrApp: function(req, res, next) {
+     authorizeAuthUserOrApp: function(req, res, next) {
        if (!req.remoteUser && !req.application) {
          return next(new errors.Unauthorized('Unauthorized'));
        }

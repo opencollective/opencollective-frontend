@@ -53,7 +53,7 @@ module.exports = function(app) {
    * Users.
    */
   app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.internal, mw.required('user'), users.create); // Create a user.
-  app.get('/users/:userid', mw.authorize, users.show); // Get a user.
+  app.get('/users/:userid', mw.authorizeAuthUser, users.show); // Get a user.
   app.put('/users/:userid', fake); // Update a user.
   app.get('/users/:userid/email', fake); // Confirm a user's email.
 
@@ -79,8 +79,8 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', mw.authorize, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-  app.get('/groups/:groupid', mw.authorizeUserOrApp, mw.authorizeGroup, groups.get);
+  app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.get('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 
@@ -90,8 +90,8 @@ module.exports = function(app) {
    *
    *  Routes to deal with the relations between a group and a user.
    */
-  app.get('/users/:userid/groups', mw.authorize, mw.authorizeUser, users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', mw.authorize, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember) // Add a user to a group.
+  app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
+  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember) // Add a user to a group.
   app.put('/groups/:groupid/users/:userid', fake); // Update a user's role in a group.
   app.delete('/groups/:groupid/users/:userid', fake); // Remove a user from a group.
 
@@ -100,8 +100,8 @@ module.exports = function(app) {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', fake); // Get a group's transactions.
-  app.post('/groups/:groupid/transactions', mw.authorizeUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
-  app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
+  app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
+  app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
 
 
   /**
@@ -109,8 +109,8 @@ module.exports = function(app) {
    *
    *  An activity is linked to a User (and potentially to a group).
    */
-  app.get('/groups/:groupid/activities', mw.authorize, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
-  app.get('/users/:userid/activities', mw.authorize, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+  app.get('/groups/:groupid/activities', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
+  app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
 
 
   /**
