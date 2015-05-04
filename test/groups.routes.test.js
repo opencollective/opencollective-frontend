@@ -4,6 +4,7 @@
 var expect    = require('chai').expect
   , request   = require('supertest')
   , _         = require('lodash')
+  , async     = require('async')
   , app       = require('../index')
   , utils     = require('../test/utils.js')()
   , config    = require('config')
@@ -14,6 +15,7 @@ var expect    = require('chai').expect
  */
 var userData = utils.data('user1');
 var groupData = utils.data('group1');
+var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
 
 /**
@@ -102,6 +104,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name');
           expect(res.body).to.have.property('description');
+          expect(res.body).to.have.property('budget', groupData.budget);
+          expect(res.body).to.have.property('currency', 'USD');
           expect(res.body).to.have.property('membership_type');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
@@ -244,6 +248,72 @@ describe('groups.routes.test.js', function() {
         })
         .expect(200)
         .end(done);
+    });
+
+    describe.only('Budget', function() {
+
+      var group2;
+      var transactions = [];
+      var totTransactions = 0;
+
+      // Create group2.
+      beforeEach(function(done) {
+        models.Group.create(utils.data('group2')).done(function(e, g) {
+          expect(e).to.not.exist;
+          group2 = g;
+          group2
+            .addMember(user, {role: 'admin'})
+            .done(done);
+        });
+      });
+
+      // Create transactions for group1.
+      beforeEach(function(done) {
+        async.each(transactionsData, function(transaction, cb) {
+          totTransactions += transaction.amount;
+          request(app)
+            .post('/groups/' + group.id + '/transactions')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .send({
+              transaction: transaction
+            })
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              transactions.push(res.body);
+              cb();
+            });
+        }, done);
+      });
+
+      // Create a transaction for group2.
+      beforeEach(function(done) {
+        request(app)
+          .post('/groups/' + group2.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transactionsData[0]
+          })
+          .expect(200)
+          .end(done);
+      });
+
+      it('successfully get a group with remaining budget', function(done) {
+        request(app)
+          .get('/groups/' + group.id)
+          .send({
+            api_key: application2.api_key
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var group = res.body;
+            expect(group).to.have.property('budget', group.budget);
+            expect(group).to.have.property('budgetLeft', (group.budget + totTransactions));
+            done();
+          });
+      });
+
     });
 
   });

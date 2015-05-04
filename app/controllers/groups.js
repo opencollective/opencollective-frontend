@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var async = require('async');
+var sequelize = require('sequelize');
 
 /**
  * Controller.
@@ -91,7 +92,22 @@ module.exports = function(app) {
      * Get group content.
      */
     get: function(req, res, next) {
-      res.send(req.group.info);
+      // Get total transactions.
+      Transaction
+        .find({
+          attributes: [
+            [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+          ],
+          where: {
+            GroupId: req.group.id
+          }
+        })
+        .then(function(result) {
+          var group = req.group.info;
+          group.budgetLeft = group.budget + result.toJSON().total;
+          res.send(group);
+        })
+        .catch(next);
     },
 
     /**

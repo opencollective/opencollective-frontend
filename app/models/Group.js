@@ -43,6 +43,8 @@ module.exports = function(Sequelize, DataTypes) {
             id: this.id
           , name: this.name
           , description: this.description
+          , budget: this.budget
+          , currency: this.currency
           , membership_type: this.membership_type
           , membershipfee: this.membershipfee
           , createdAt: this.createdAt
