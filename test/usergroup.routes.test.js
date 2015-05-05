@@ -168,10 +168,12 @@ describe('usergroup.routes.test.js', function() {
             expect(groups[0].id).to.equal(group.id);
             expect(groups[0].UserGroup.role).to.equal(role);
 
-            models.Activity.findAndCountAll({}).then(function(res) {
-              expect(res.count).to.equal(2);
-              done();
-            });
+            setTimeout(function() {
+              models.Activity.findAndCountAll({}).then(function(res) {
+                expect(res.count).to.equal(2);
+                done();
+              });
+            }, 50);
           });
 
         });
@@ -242,7 +244,7 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('id');
           expect(res.body[0]).to.have.property('name');
           expect(res.body[0]).to.have.property('description');
-          expect(res.body[0]).to.have.property('Activities');
+          expect(res.body[0]).to.have.property('activities');
           expect(res.body[0].activities).to.have.length.above(0);
           done();
         });

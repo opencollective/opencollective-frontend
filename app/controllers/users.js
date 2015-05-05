@@ -103,7 +103,7 @@ module.exports = function(app) {
         .then(function(groups) {
           var out = _.map(groups, function(g) {
             var group = g.info;
-            group.Activities = g.Activities;
+            group.activities = g.Activities;
             return group;
           })
           res.send(out);
