@@ -232,12 +232,36 @@ module.exports = function(app) {
      * Delete a transaction.
      */
      deleteTransaction: function(req, res, next) {
-       req.transaction
-         .destroy()
-         .then(function() {
-           res.send({success: true});
-         })
-         .catch(next);
+       var transaction = req.transaction;
+       var group = req.group;
+       var user = req.remoteUser || {};
+
+       async.auto({
+
+         deleteTransaction: function(cb) {
+           transaction
+             .destroy()
+             .done(cb);
+         },
+
+         createActivity: ['deleteTransaction', function(cb, results) {
+           Activity.create({
+               type: 'group.transaction.deleted'
+             , UserId: user.id
+             , GroupId: group.id
+             , data: {
+                   group: group.info
+                 , transaction: transaction
+                 , user: user.info
+               }
+           }).done(cb);
+         }],
+
+       }, function(e, results) {
+         if (e) return next(e);
+         res.send({success: true});
+       });
+
      },
 
 

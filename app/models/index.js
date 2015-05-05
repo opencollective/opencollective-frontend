@@ -49,7 +49,7 @@ models.forEach(function(model) {
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
 
-  m.Activity.belongsTo(m.Transaction, {onDelete: 'cascade'});
+  m.Activity.belongsTo(m.Transaction);
 
   // Transaction.
   m.Transaction.belongsTo(m.Group);

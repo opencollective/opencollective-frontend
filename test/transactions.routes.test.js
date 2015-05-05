@@ -262,8 +262,8 @@ describe('transactions.routes.test.js', function() {
               });
             },
             function(cb) {
-              models.Activity.findAndCountAll({where: {TransactionId: transactions[0].id} }).then(function(res) {
-                expect(res.count).to.equal(0);
+              models.Activity.findAndCountAll({where: {type: 'group.transaction.deleted'} }).then(function(res) {
+                expect(res.count).to.equal(1);
                 cb();
               });
             }

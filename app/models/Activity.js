@@ -58,5 +58,10 @@ Types:
       data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
       GroupId:
-      TransactionId: 
+      TransactionId:
+  - group.transaction.deleted
+      data: group, transaction, user (the caller)
+      UserId: the one who initiate the delete
+      GroupId:
+      TransactionId:
 */
