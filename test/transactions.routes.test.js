@@ -101,7 +101,7 @@ describe('transactions.routes.test.js', function() {
   });
 
   /**
-   * Get.
+   * Create.
    */
   describe('#create', function() {
 
@@ -286,6 +286,168 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+  });
+
+  /**
+   * Get.
+   */
+  describe('#get', function() {
+
+    // Create transactions for group1.
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            cb();
+          });
+      }, done);
+    });
+
+    it('fails getting transactions for a not authorized group', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully get a group\'s transactions', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+
+          var transactions = res.body;
+          expect(transactions).to.have.length(transactionsData.length);
+          transactions.forEach(function(t) {
+            expect(t.GroupId).to.equal(group.id);
+          });
+          done();
+
+        });
+    });
+
+    describe('Pagination', function() {
+
+      var per_page = 3;
+
+      it('successfully get a group\'s transactions with per_page', function(done) {
+        request(app)
+          .get('/groups/' + group.id + '/transactions')
+          .send({
+            per_page: per_page,
+            sort: 'id',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            expect(res.body.length).to.equal(per_page);
+            expect(res.body[0].id).to.equal(1);
+            // Check pagination header.
+            var headers = res.headers;
+            expect(headers).to.have.property('link');
+            expect(headers.link).to.contain('next');
+            expect(headers.link).to.contain('page=2');
+            expect(headers.link).to.contain('current');
+            expect(headers.link).to.contain('page=1');
+            expect(headers.link).to.contain('per_page=' + per_page);
+            expect(headers.link).to.contain('/groups/' + group.id + '/transactions');
+            var tot = transactionsData.length;
+            expect(headers.link).to.contain('/groups/' + group.id + '/transactions?page=' + Math.ceil(tot/per_page) + '&per_page=' + per_page + '>; rel="last"');
+
+            done();
+          });
+      });
+
+      it('successfully get the second page of a group\'s transactions', function(done) {
+        var page = 2;
+        request(app)
+          .get('/groups/' + group.id + '/transactions')
+          .send({
+            per_page: per_page,
+            page: page,
+            sort: 'id',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            expect(res.body.length).to.equal(per_page);
+            expect(res.body[0].id).to.equal(per_page + 1);
+            // Check pagination header.
+            var headers = res.headers;
+            expect(headers.link).to.contain('page=3');
+            expect(headers.link).to.contain('page=2');
+            done();
+          });
+      });
+
+      it('successfully get a group\'s transactions using since_id', function(done) {
+        var since_id = 5;
+
+        request(app)
+          .get('/groups/' + group.id + '/transactions')
+          .send({
+            since_id: since_id,
+            sort: 'id',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var transactions = res.body;
+            expect(transactions[0].id > since_id).to.be.true;
+            var last = 0;
+            _.each(transactions, function(t) {
+              expect(t.id >= last).to.be.true;
+            });
+            // Check pagination header.
+            var headers = res.headers;
+            expect(headers.link).to.be.empty;
+            done();
+          });
+
+      });
+
+    });
+
+    describe('Sorting', function() {
+
+      it('successfully get a group\'s transactions with sorting', function(done) {
+        request(app)
+          .get('/groups/' + group.id + '/transactions')
+          .send({
+            sort: 'createdAt',
+            direction: 'asc'
+          })
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var transactions = res.body;
+            var last = new Date(transactions[0].createdAt);
+            _.each(transactions, function(a) {
+              expect((new Date(a.createdAt) >= new Date(last))).to.be.true;
+              last = a.createdAt;
+            });
+            done();
+          });
+      });
+
+    });
 
   });
 

@@ -321,7 +321,7 @@ describe('groups.routes.test.js', function() {
           });
       });
 
-      it.only('successfully get a group with activities', function(done) {
+      it('successfully get a group with activities', function(done) {
         request(app)
           .get('/groups/' + group.id)
           .send({

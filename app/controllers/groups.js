@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var async = require('async');
 var sequelize = require('sequelize');
+var utils = require('../lib/utils');
 
 /**
  * Controller.
@@ -90,6 +91,7 @@ module.exports = function(app) {
         .catch(next);
     },
 
+
     /**
      * Get group content.
      */
@@ -146,6 +148,7 @@ module.exports = function(app) {
 
     },
 
+
     /**
      * Add a user to a group.
      */
@@ -159,6 +162,7 @@ module.exports = function(app) {
         else res.send({success: true});
       });
     },
+
 
     /**
      * Create a transaction and add it to a group.
@@ -223,6 +227,7 @@ module.exports = function(app) {
 
     },
 
+
     /**
      * Delete a transaction.
      */
@@ -234,6 +239,33 @@ module.exports = function(app) {
          })
          .catch(next);
      },
+
+
+     /**
+      * Get group's transactions.
+      */
+      getTransactions: function(req, res, next) {
+        var query = _.merge({
+          where: {
+            GroupId: req.group.id
+          },
+          order: [ [req.sorting.key, req.sorting.dir] ]
+        }, req.pagination);
+
+        Transaction
+          .findAndCountAll(query)
+          .then(function(transactions) {
+
+            // Set headers for pagination.
+            req.pagination.total = transactions.count;
+            res.set({
+              'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+            });
+
+            res.send(transactions.rows);
+          })
+          .catch(next);
+      },
 
 
   }

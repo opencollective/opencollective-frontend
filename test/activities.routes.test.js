@@ -206,7 +206,7 @@ describe('activities.routes.test.js', function() {
 
     });
 
-  describe('Sorting', function() {
+    describe('Sorting', function() {
 
       it('successfully get a group\'s activities with sorting', function(done) {
         request(app)
@@ -229,7 +229,7 @@ describe('activities.routes.test.js', function() {
           });
       });
 
-    })
+    });
 
   });
 

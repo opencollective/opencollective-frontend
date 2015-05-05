@@ -99,7 +99,7 @@ module.exports = function(app) {
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', fake); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
   app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
   app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
 
