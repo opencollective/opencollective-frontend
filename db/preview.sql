@@ -7,3 +7,7 @@ INSERT INTO "ApplicationGroup" ("GroupId","ApplicationId","updatedAt","createdAt
 /* Delete a group.
 DELETE FROM "Groups" WHERE id = 1;
 */
+/*
+UPDATE "Groups" SET budget=35000.00 WHERE id = 2;
+SELECT * FROM "Groups";
+*/

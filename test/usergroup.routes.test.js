@@ -226,7 +226,7 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('id');
           expect(res.body[0]).to.have.property('name');
           expect(res.body[0]).to.have.property('description');
-          expect(res.body[0]).to.not.have.property('activities');
+          expect(res.body[0]).to.not.have.property('Activities');
           done();
         });
     });
@@ -242,7 +242,7 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('id');
           expect(res.body[0]).to.have.property('name');
           expect(res.body[0]).to.have.property('description');
-          expect(res.body[0]).to.have.property('activities');
+          expect(res.body[0]).to.have.property('Activities');
           expect(res.body[0].activities).to.have.length.above(0);
           done();
         });

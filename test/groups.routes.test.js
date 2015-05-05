@@ -157,20 +157,26 @@ describe('groups.routes.test.js', function() {
 
     var group, user2, application2, application3;
 
-    // Create the group.
+    // Create the group with user.
     beforeEach(function(done) {
-      models.Group.create(groupData).done(function(e, g) {
-        expect(e).to.not.exist;
-        group = g;
-        done();
-      });
-    });
-
-    // Add a user to the group.
-    beforeEach(function(done) {
-      group
-        .addMember(user, {role: 'admin'})
-        .done(done);
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: groupData,
+          role: 'admin'
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.Group
+            .find(parseInt(res.body.id))
+            .then(function(g) {
+              group = g;
+              done();
+            })
+            .catch(done);
+        });
     });
 
     // Create another user.
@@ -250,7 +256,7 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
-    describe.only('Transactions/Activities/Budget', function() {
+    describe('Transactions/Activities/Budget', function() {
 
       var group2;
       var transactions = [];
@@ -315,7 +321,7 @@ describe('groups.routes.test.js', function() {
           });
       });
 
-      it('successfully get a group with activities', function(done) {
+      it.only('successfully get a group with activities', function(done) {
         request(app)
           .get('/groups/' + group.id)
           .send({
@@ -326,9 +332,19 @@ describe('groups.routes.test.js', function() {
           .end(function(e, res) {
             expect(e).to.not.exist;
             var group = res.body;
-            console.log('yo : ', group);
             expect(group).to.have.property('activities');
-            expect(group.activities).to.have.length.above(0);
+            expect(group.activities).to.have.length(transactionsData.length + 1 + 1); // + group.created + group.user.added
+
+            // Check data content.
+            group.activities.forEach(function(a) {
+              if (a.GroupId)
+                expect(a.data).to.have.property('group');
+              if (a.UserId)
+                expect(a.data).to.have.property('user');
+              if (a.TransactionId)
+                expect(a.data).to.have.property('transaction');
+            });
+
             done();
           });
       });

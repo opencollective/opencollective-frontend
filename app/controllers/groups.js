@@ -14,6 +14,7 @@ module.exports = function(app) {
    * Internal Dependencies.
    */
   var models = app.set('models')
+    , User = models.User
     , Group = models.Group
     , Activity = models.Activity
     , Transaction = models.Transaction
@@ -41,7 +42,8 @@ module.exports = function(app) {
             }
         };
         Activity.create(_.extend({UserId: options.remoteUser.id}, activity));
-        Activity.create(_.extend({UserId: user.id}, activity));
+        if (user.id !== options.remoteUser.id)
+          Activity.create(_.extend({UserId: user.id}, activity));
       })
       .catch(callback);
   }
@@ -140,8 +142,7 @@ module.exports = function(app) {
           group.activities = results.getActivities;
         res.send(group);
 
-      })
-      // Get total transactions.
+      });
 
     },
 
