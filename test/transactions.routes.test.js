@@ -451,4 +451,148 @@ describe('transactions.routes.test.js', function() {
 
   });
 
+  /**
+   * Approve.
+   */
+  describe.only('#approve', function() {
+
+    var transaction, transaction2;
+
+    // Create a transaction for group1.
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: transactionsData[0]
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.Transaction
+            .find(parseInt(res.body.id))
+            .then(function(t) {
+              transaction = t;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    // Create a transaction for group2.
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups/' + group2.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: transactionsData[1]
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.Transaction
+            .find(parseInt(res.body.id))
+            .then(function(t) {
+              transaction2 = t;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('fails approving a non-existing transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + 123 + '/approve')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('fails approving a transaction that the user does not have access to', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/approve')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails approving a transaction that is not part of the group', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction2.id + '/approve')
+        .send({
+          approved: true
+        })
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully approve a transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/approve')
+        .send({
+          approved: true
+        })
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+          models.Transaction
+            .find(parseInt(transaction.id))
+            .then(function(t) {
+              expect(t.approved).to.be.true;
+              expect(t.approvedAt).not.to.be.null;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('successfully disapprove a transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/approve')
+        .send({
+          approved: false
+        })
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+          models.Transaction
+            .find(parseInt(transaction.id))
+            .then(function(t) {
+              expect(t.approved).to.be.false;
+              expect(t.approvedAt).not.to.be.null;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('successfully approve a transaction with an app', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/approve')
+        .send({
+          api_key: application2.api_key,
+          approved: true
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+          models.Transaction
+            .find(parseInt(transaction.id))
+            .then(function(t) {
+              expect(t.approved).to.be.true;
+              expect(t.approvedAt).not.to.be.null;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+  });
+
 });

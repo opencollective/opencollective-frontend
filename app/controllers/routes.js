@@ -17,6 +17,7 @@ module.exports = function(app) {
     , params = Controllers.params
     , groups = Controllers.groups
     , activities = Controllers.activities
+    , transactions = Controllers.transactions
     , errors = app.errors
     ;
 
@@ -88,7 +89,7 @@ module.exports = function(app) {
   /**
    * UserGroup.
    *
-   *  Routes to deal with the relations between a group and a user.
+   *  Relations between a group and a user.
    */
   app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
   app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember) // Add a user to a group.
@@ -102,12 +103,13 @@ module.exports = function(app) {
   app.get('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
   app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
   app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
+  app.post('/groups/:groupid/transactions/:transactionId/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
 
 
   /**
    * Activities.
    *
-   *  An activity is linked to a User (and potentially to a group).
+   *  An activity is any action linked to a User or a Group.
    */
   app.get('/groups/:groupid/activities', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
   app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.

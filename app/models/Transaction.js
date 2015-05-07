@@ -4,7 +4,6 @@ module.exports = function(Sequelize, DataTypes) {
     type: DataTypes.STRING,
     description: DataTypes.STRING,
     amount: DataTypes.FLOAT,
-    currency: DataTypes.STRING,
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD'
@@ -15,10 +14,18 @@ module.exports = function(Sequelize, DataTypes) {
     status: DataTypes.STRING,
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
+
+    approved: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
-    }
+    },
+    approvedAt: DataTypes.DATE,
+    reimbursedAt: DataTypes.DATE,
   });
 
   return Transaction;
