@@ -454,7 +454,7 @@ describe('transactions.routes.test.js', function() {
   /**
    * Approve.
    */
-  describe.only('#approve', function() {
+  describe('#approve', function() {
 
     var transaction, transaction2;
 

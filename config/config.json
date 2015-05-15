@@ -1,0 +1,22 @@
+{
+  "development": {
+    "username": "philmod",
+    "password": null,
+    "database": "opencollective_localhost",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": true
+  },
+  "preview": {
+    "database": "d8m9jl5us2t2g2",
+    "username": "yzpzinemtlckty",
+    "password": "ES8llgy-9G2PBl29qIssmrJTeb",
+    "host": "ec2-184-73-165-195.compute-1.amazonaws.com",
+    "port": 5432,
+    "dialect": "postgres",
+    "protocol": "postgres",
+    "dialectOptions": {
+      "ssl": true
+    }
+  }
+}

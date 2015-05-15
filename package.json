@@ -23,6 +23,7 @@
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
     "sequelize": "2.0.4",
+    "sequelize-cli": "^1.7.0",
     "stripe": "^3.3.4"
   },
   "devDependencies": {
