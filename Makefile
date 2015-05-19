@@ -3,8 +3,8 @@ default: test
 build:
 	npm install
 
-DB_NAME=assoc_localhost
-DB_TEST_NAME=assoc_test
+DB_NAME=opencollective_localhost
+DB_TEST_NAME=opencollective_test
 database:
 	# $(eval("psql -t -c \"SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('$(DB_NAME)');\""))
 	createdb $(DB_NAME)

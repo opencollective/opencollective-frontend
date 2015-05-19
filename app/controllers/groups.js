@@ -91,7 +91,6 @@ module.exports = function(app) {
               app.stripe.accounts.create({
                 managed: true
               }, function(e, account) {
-                console.log('hello here in controllers : ', e, account);
                 if (e) return cb(e);
                 StripeManagedAccount
                   .create({
@@ -159,12 +158,20 @@ module.exports = function(app) {
             .catch(cb);
         },
 
+        getStripeManagedAccount: function(cb) {
+          req.group.getStripeManagedAccount()
+            .done(cb);
+        }
+
       }, function(e, results) {
 
         var group = req.group.info;
         group.budgetLeft = group.budget + results.getTotalTransactions;
         if (results.getActivities)
           group.activities = results.getActivities;
+        if (results.getStripeManagedAccount)
+          group.stripeManagedAccount = _.pick(results.getStripeManagedAccount, 'stripeKey');
+
         res.send(group);
 
       });

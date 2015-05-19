@@ -273,6 +273,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', group.id);
           expect(res.body).to.have.property('name', group.name);
           expect(res.body).to.have.property('description', group.description);
+          expect(res.body).to.have.property('stripeManagedAccount');
+          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
