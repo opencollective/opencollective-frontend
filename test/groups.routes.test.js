@@ -5,6 +5,7 @@ var expect    = require('chai').expect
   , request   = require('supertest')
   , _         = require('lodash')
   , async     = require('async')
+  , sinon     = require('sinon')
   , app       = require('../index')
   , utils     = require('../test/utils.js')()
   , config    = require('config')
@@ -17,6 +18,7 @@ var userData = utils.data('user1');
 var groupData = utils.data('group1');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
+var stripeMock = require('./mocks/stripe')
 
 /**
  * Tests.
@@ -39,6 +41,17 @@ describe('groups.routes.test.js', function() {
       done();
     });
   });
+
+  // Stripe stub.
+  var stub;
+  beforeEach(function() {
+    var stub = sinon.stub(app.stripe.accounts, 'create');
+    stub.yields(null, stripeMock.accounts.create);
+  });
+  afterEach(function() {
+    app.stripe.accounts.create.restore();
+  });
+
 
   /**
    * Create.
@@ -144,6 +157,34 @@ describe('groups.routes.test.js', function() {
             expect(groups).to.have.length(1);
             done();
           });
+        });
+
+    });
+
+    it('successfully create a group and create a managed account on Stripe', function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: groupData
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+
+          models.Group
+            .find(parseInt(res.body.id))
+            .then(function(group) {
+              group.getStripeManagedAccount()
+                .then(function(account) {
+                  expect(account).to.have.property('stripeId', stripeMock.accounts.create.id);
+                  expect(account).to.have.property('stripeSecret', stripeMock.accounts.create.keys.secret);
+                  expect(account).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+                  done();
+                })
+                .catch(done);
+            })
+            .catch(done);
         });
 
     });

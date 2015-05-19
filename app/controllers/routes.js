@@ -85,6 +85,8 @@ module.exports = function(app) {
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 
+  app.post('/groups/:groupid/payment', fake);
+
 
   /**
    * UserGroup.

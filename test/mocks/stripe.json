@@ -1,0 +1,15 @@
+{
+
+  "accounts": {
+
+    "create": {
+      "id": "stripeid",
+      "keys": {
+          "secret": "stripesecret",
+          "publishable": "stripepublishable"
+      }
+    }
+
+  }
+
+}

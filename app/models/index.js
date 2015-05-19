@@ -22,6 +22,7 @@ var models = [
   'Application',
   'Card',
   'Group',
+  'StripeManagedAccount',
   'Transaction',
   'User',
   'UserGroup'
@@ -60,6 +61,11 @@ models.forEach(function(model) {
   // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
+
+  // Stripe Managed Account.
+  m.StripeManagedAccount.hasMany(m.Group);
+  m.Group.belongsTo(m.StripeManagedAccount);
+
 })(module.exports);
 
 /**

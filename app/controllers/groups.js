@@ -5,6 +5,7 @@ var _ = require('lodash');
 var async = require('async');
 var sequelize = require('sequelize');
 var utils = require('../lib/utils');
+var config = require('config');
 
 /**
  * Controller.
@@ -19,6 +20,7 @@ module.exports = function(app) {
     , Group = models.Group
     , Activity = models.Activity
     , Transaction = models.Transaction
+    , StripeManagedAccount = models.StripeManagedAccount
     , errors = app.errors
     ;
 
@@ -73,20 +75,41 @@ module.exports = function(app) {
               }
           });
 
-          // Add caller to the group if `role` specified.
-          var role = req.body.role;
-          if (role) {
-            var options = {
-              role: role,
-              remoteUser: req.remoteUser
-            }
-            addGroupMember(group, req.remoteUser, options, function(e) {
-              if (e) return next(e);
-              else res.send(group.info);
-            });
-          } else {
+          async.series({
+            addMember: function(cb) {
+              // Add caller to the group if `role` specified.
+              var role = req.body.role;
+              if (!role)
+                return cb();
+              var options = {
+                role: role,
+                remoteUser: req.remoteUser
+              }
+              addGroupMember(group, req.remoteUser, options, cb);
+            },
+            createStripeManagedAccount: function(cb) {
+              app.stripe.accounts.create({
+                managed: true
+              }, function(e, account) {
+                console.log('hello here in controllers : ', e, account);
+                if (e) return cb(e);
+                StripeManagedAccount
+                  .create({
+                    stripeId: account.id,
+                    stripeSecret: account.keys.secret,
+                    stripeKey: account.keys.publishable
+                  })
+                  .then(function(account) {
+                    account.addGroup(group.id).done(cb);
+                  })
+                  .catch(cb);
+              })
+            },
+          }, function(e) {
+            if (e) return next(e);
             res.send(group.info);
-          }
+          });
+
         })
         .catch(next);
     },

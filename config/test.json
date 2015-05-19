@@ -16,5 +16,9 @@
   },
   "host": {
     "api": "http://localhost:3050"
+  },
+  "stripe": {
+    "secret": "sk_test_3",
+    "key": "pk_test_5"
   }
 }
