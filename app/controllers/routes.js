@@ -18,6 +18,7 @@ module.exports = function(app) {
     , groups = Controllers.groups
     , activities = Controllers.activities
     , transactions = Controllers.transactions
+    , payments = Controllers.payments
     , errors = app.errors
     ;
 
@@ -85,7 +86,7 @@ module.exports = function(app) {
   app.put('/groups/:groupid', fake); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 
-  app.post('/groups/:groupid/payment', fake);
+  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
 
 
   /**

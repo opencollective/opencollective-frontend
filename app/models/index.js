@@ -36,8 +36,8 @@ models.forEach(function(model) {
  */
 (function(m) {
   // Card.
-  m.Card.belongsToMany(m.User, {through: 'UserCard'});
-  m.User.belongsToMany(m.Card, {through: 'UserCard'});
+  m.Card.belongsTo(m.User);
+  m.Card.belongsTo(m.Group);
 
   // Group.
   m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
@@ -57,6 +57,8 @@ models.forEach(function(model) {
   m.Group.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User);
   m.User.hasMany(m.Transaction);
+  m.Transaction.belongsTo(m.Card);
+  m.Card.hasMany(m.Transaction);
 
   // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});

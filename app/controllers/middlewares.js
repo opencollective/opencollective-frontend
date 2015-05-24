@@ -221,7 +221,6 @@ module.exports = function(app) {
       if (!req.group) {
         return next(new errors.NotFound());
       }
-      var authorized = false;
 
       async.parallel([
         function(cb) { // If authenticated user, does he have access?
@@ -238,7 +237,9 @@ module.exports = function(app) {
 
           req.group
             .hasApplication(req.application)
-            .then(cb)
+            .then(function(bool) {
+              return cb(null, bool);
+            })
             .catch(cb);
         }
       ], function(e, results) {
