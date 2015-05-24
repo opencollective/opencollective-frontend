@@ -63,11 +63,11 @@ module.exports = function(Sequelize, DataTypes) {
           .getMembers({where: {id: user_id} })
           .then(function(members) {
             if (members.length === 0)
-              return fn(new errors.Forbidden('Unauthorized to access this group.'));
+              return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
             else {
               if (roles && roles.indexOf(members[0].UserGroup.role) < 0 )
-                return fn(new errors.Forbidden('Unauthorized to manage this group.'));
-              fn();
+                return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
+              fn(null, true);
             }
           })
           .catch(fn);
