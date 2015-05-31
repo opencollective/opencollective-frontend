@@ -4,6 +4,7 @@ module.exports = function(app) {
    * Internal Dependencies.
    */
   var models = app.set('models');
+  var errors = app.errors;
 
   /**
    * Public methods.
