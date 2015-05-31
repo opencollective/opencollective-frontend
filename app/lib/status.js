@@ -1,18 +1,16 @@
-var os         = require('os')
-  , exec       = require('child_process').exec
-  , async      = require('async')
-  , started_at = new Date()
-  ;
+var os         = require('os');
+var exec       = require('child_process').exec;
+var async      = require('async');
+var started_at = new Date();
 
 module.exports = function(req, res, next) {
 
-  var server = req.app
-    , errors = server.errors
-    ;
+  var server = req.app;
+  var errors = server.errors;
 
   if (req.query.info) {
-    var connections = {}
-      , swap;
+    var connections = {};
+    var swap;
 
     async.parallel([
       function(done) {
@@ -35,14 +33,14 @@ module.exports = function(req, res, next) {
       }], function(e) {
         res.send({
           status     : 'up',
-          version    : server.set('version'), 
-          // sha        : server.set('git sha'), 
-          started_at : started_at, 
+          version    : server.set('version'),
+          // sha        : server.set('git sha'),
+          started_at : started_at,
           node       : {
             version    : process.version,
             memoryUsage: Math.round(process.memoryUsage().rss / 1024 / 1024)+"M",
-            uptime     : process.uptime() 
-          }, 
+            uptime     : process.uptime()
+          },
           system    : {
             loadavg    : os.loadavg(),
             freeMemory : Math.round(os.freemem()/1024/1024)+"M"

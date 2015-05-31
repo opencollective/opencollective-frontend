@@ -38,13 +38,13 @@ module.exports = {
     });
   },
 
-  down: function (queryInterface, DataTypes) {
+  down: function (queryInterface) {
     return queryInterface.removeColumn('Cards', 'service')
       .then(function() {
-        return queryInterface.removeColumn('Cards', 'UserId')
+        return queryInterface.removeColumn('Cards', 'UserId');
       })
       .then(function () {
-        return queryInterface.removeColumn('Cards', 'GroupId')
+        return queryInterface.removeColumn('Cards', 'GroupId');
       });
   }
 };

@@ -14,7 +14,6 @@ module.exports = function(app) {
    */
   var models = app.set('models');
   var Activity = models.Activity;
-  var errors = app.errors;
 
   /**
    * Public methods.
@@ -39,7 +38,8 @@ module.exports = function(app) {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+            'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+                                        req.pagination)
           });
 
           res.send(activities.rows);
@@ -65,7 +65,8 @@ module.exports = function(app) {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+            'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+                                        req.pagination)
           });
 
           res.send(activities.rows);
@@ -73,6 +74,6 @@ module.exports = function(app) {
         .catch(next);
     }
 
-  }
+  };
 
 };

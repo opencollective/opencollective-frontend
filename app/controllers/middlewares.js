@@ -1,6 +1,7 @@
-var config = require('config');
-var async = require('async');
 var _ = require('lodash');
+var async = require('async');
+var config = require('config');
+var jwt = require('jsonwebtoken');
 var utils = require('../lib/utils');
 
 module.exports = function(app) {
@@ -54,7 +55,7 @@ module.exports = function(app) {
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
-      var key = req.query['api_key'] || req.body['api_key'];
+      var key = req.query.api_key || req.body.api_key;
 
       if (!key) return next();
 
@@ -74,10 +75,9 @@ module.exports = function(app) {
      * Authenticate.
      */
     authenticate: function(req, res, next) {
-      var username = (req.body && req.body.username) || req.query['username']
-        , email    = (req.body && req.body.email) || req.query['email']
-        , password = (req.body && req.body.password) || req.query['password']
-        ;
+      var username = (req.body && req.body.username) || req.query.username;
+      var email = (req.body && req.body.email) || req.query.email;
+      var password = (req.body && req.body.password) || req.query.password;
 
       if (!req.application || !req.application.api_key) {
         return next();
@@ -98,9 +98,8 @@ module.exports = function(app) {
      * Authenticate with a refresh token.
      */
     authenticateRefreshToken: function(req, res, next) {
-      var accessToken = req.required.access_token
-        , refreshToken = req.required.refresh_token
-        ;
+      var accessToken = req.required.access_token;
+      var refreshToken = req.required.refresh_token;
 
       // Decode access token to identify the user.
       jwt.verify(accessToken, secret, function(e) {
@@ -109,10 +108,13 @@ module.exports = function(app) {
 
         var decoded = jwt.decode(accessToken);
         User.findOne({_id: decoded.sub}, function(e, user) {
-          if (e)
+          if (e) {
             return next(e);
-          else if (!user || user.tokens.refresh_token !== refreshToken) // Check the refresh_token from the user data.
+          }
+          else if (!user || user.tokens.refresh_token !== refreshToken) {
+            // Check the refresh_token from the user data.
             return next(new errors.Unauthorized('Invalid Refresh Token'));
+          }
           else {
             req.remoteUser = user;
             next();
@@ -124,8 +126,10 @@ module.exports = function(app) {
     /**
      * Identify User and Application from the jwtoken.
      *
-     *  Use the req.remoteUser._id (from the access_token) to get the full user's model
-     *  Use the req.remoteUser.audience (from the access_token) to get the full application's model
+     *  Use the req.remoteUser._id (from the access_token) to get the
+     *    full user's model
+     *  Use the req.remoteUser.audience (from the access_token) to get the
+     *    full application's model
      */
     identifyFromToken: function(req, res, next) {
       if (!req.remoteUser)
@@ -284,10 +288,10 @@ module.exports = function(app) {
       options = options || {};
 
       options = {
-          default: options.default || 20
-        , min: options.min || 1
-        , max: options.max || 50
-        , maxTotal: options.maxTotal || false
+        default: options.default || 20,
+        min: options.min || 1,
+        max: options.max || 50,
+        maxTotal: options.maxTotal || false
       };
 
       return function(req, res, next) {
@@ -304,7 +308,8 @@ module.exports = function(app) {
         }
 
         // Page / Per_page.
-        var per_page = (req.body.per_page || req.query.per_page) * 1 || options.default;
+        var per_page = (req.body.per_page || req.query.per_page);
+        per_page = per_page * 1 || options.default;
         var page = (req.body.page || req.query.page) * 1 || 1;
 
         page = (page < 1) ? 1 : page;
@@ -323,12 +328,12 @@ module.exports = function(app) {
     sorting: function(options) {
       options = options || {};
 
-      options.key = (typeof options.key != 'undefined') ? options.key : 'id';
-      options.dir = (typeof options.dir != 'undefined') ? options.dir : 'ASC';
+      options.key = (typeof options.key !== 'undefined') ? options.key : 'id';
+      options.dir = (typeof options.dir !== 'undefined') ? options.dir : 'ASC';
 
       return function(req, res, next) {
-        var key = req.body.sort || req.query.sort
-          , dir = req.body.direction || req.query.direction;
+        var key = req.body.sort || req.query.sort;
+        var dir = req.body.direction || req.query.direction;
 
         req.sorting = {
             key: key || options.key
@@ -339,6 +344,6 @@ module.exports = function(app) {
       };
     },
 
-  }
+  };
 
 };

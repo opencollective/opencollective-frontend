@@ -1,11 +1,10 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , request   = require('supertest')
-  , app       = require('../index')
-  , utils     = require('../test/utils.js')()
-  ;
+var app = require('../index');
+var expect = require('chai').expect;
+var request = require('supertest');
+var utils = require('../test/utils.js')();
 
 /**
  * Variable.

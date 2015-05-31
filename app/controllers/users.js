@@ -12,11 +12,10 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models')
-    , User = models.User
-    , Activity = models.Activity
-    , errors = app.errors
-    ;
+  var models = app.set('models');
+  var User = models.User;
+  var Activity = models.Activity;
+  var errors = app.errors;
 
   /**
    * Private methods.

@@ -1,14 +1,14 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , request   = require('supertest')
-  , _         = require('lodash')
-  , jwt       = require('jsonwebtoken')
-  , app       = require('../index')
-  , utils     = require('../test/utils.js')()
-  , config    = require('config')
-  ;
+var _ = require('lodash');
+var app = require('../index');
+var async = require('async');
+var config = require('config');
+var expect = require('chai').expect;
+var jwt = require('jsonwebtoken');
+var request = require('supertest');
+var utils = require('../test/utils.js')();
 
 /**
  * Variables.

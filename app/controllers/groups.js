@@ -5,7 +5,6 @@ var _ = require('lodash');
 var async = require('async');
 var sequelize = require('sequelize');
 var utils = require('../lib/utils');
-var config = require('config');
 
 /**
  * Controller.
@@ -15,15 +14,12 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models')
-    , User = models.User
-    , Group = models.Group
-    , Activity = models.Activity
-    , Transaction = models.Transaction
-    , StripeManagedAccount = models.StripeManagedAccount
-    , errors = app.errors
-    , transactions = require('../controllers/transactions')(app)
-    ;
+  var models = app.set('models');
+  var Group = models.Group;
+  var Activity = models.Activity;
+  var Transaction = models.Transaction;
+  var StripeManagedAccount = models.StripeManagedAccount;
+  var transactions = require('../controllers/transactions')(app);
 
   /**
    * Private methods.
@@ -36,21 +32,21 @@ module.exports = function(app) {
 
         // Create activities.
         var activity = {
-            type: 'group.user.added'
-          , GroupId: group.id
-          , data: {
-                group: group.info
-              , user: options.remoteUser.info
-              , target: user.info
-              , usergroup: usergroup.info
-            }
+          type: 'group.user.added',
+          GroupId: group.id,
+          data: {
+            group: group.info,
+            user: options.remoteUser.info,
+            target: user.info,
+            usergroup: usergroup.info
+          }
         };
         Activity.create(_.extend({UserId: options.remoteUser.id}, activity));
         if (user.id !== options.remoteUser.id)
           Activity.create(_.extend({UserId: user.id}, activity));
       })
       .catch(callback);
-  }
+  };
 
   /**
    * Public methods.
@@ -62,18 +58,18 @@ module.exports = function(app) {
      */
     create: function(req, res, next) {
       Group
-        .create(req.required['group'])
+        .create(req.required.group)
         .then(function(group) {
 
           // Create activity.
           Activity.create({
-              type: 'group.created'
-            , UserId: req.remoteUser.id
-            , GroupId: group.id
-            , data: {
-                  group: group.info
-                , user: req.remoteUser.info
-              }
+            type: 'group.created',
+            UserId: req.remoteUser.id,
+            GroupId: group.id,
+            data: {
+              group: group.info,
+              user: req.remoteUser.info
+            }
           });
 
           async.series({
@@ -85,7 +81,7 @@ module.exports = function(app) {
               var options = {
                 role: role,
                 remoteUser: req.remoteUser
-              }
+              };
               addGroupMember(group, req.remoteUser, options, cb);
             },
             createStripeManagedAccount: function(cb) {
@@ -103,7 +99,7 @@ module.exports = function(app) {
                     account.addGroup(group.id).done(cb);
                   })
                   .catch(cb);
-              })
+              });
             },
           }, function(e) {
             if (e) return next(e);
@@ -148,7 +144,8 @@ module.exports = function(app) {
             },
             order: [ ['createdAt', 'DESC'] ],
             offset: 0,
-            limit: 20, // [TODO] I need to put this default value as a global parameter. Using mw.paginate?
+            limit: 20 // [TODO] I need to put this default value
+                      // as a global parameter. Using mw.paginate?
           };
 
           Activity
@@ -168,13 +165,14 @@ module.exports = function(app) {
 
         var group = req.group.info;
         group.budgetLeft = group.budget + results.getTotalTransactions;
-        if (results.getActivities)
+        if (results.getActivities) {
           group.activities = results.getActivities;
-        if (results.getStripeManagedAccount)
-          group.stripeManagedAccount = _.pick(results.getStripeManagedAccount, 'stripeKey');
-
+        }
+        if (results.getStripeManagedAccount) {
+          group.stripeManagedAccount = _.pick(results.getStripeManagedAccount,
+                                              'stripeKey');
+        }
         res.send(group);
-
       });
 
     },
@@ -187,7 +185,7 @@ module.exports = function(app) {
       var options = {
         role: req.body.role || 'viewer',
         remoteUser: req.remoteUser
-      }
+      };
       addGroupMember(req.group, req.user, options, function(e) {
         if (e) return next(e);
         else res.send({success: true});
@@ -199,13 +197,17 @@ module.exports = function(app) {
      * Create a transaction and add it to a group.
      */
     createTransaction: function(req, res, next) {
-      var transaction = req.required['transaction'];
+      var transaction = req.required.transaction;
       var group = req.group;
 
       // Caller.
       var user = req.remoteUser || transaction.user || {};
 
-      transactions._create({transaction: transaction, group: group, user: user}, function(e, transactionCreated) {
+      var t = {
+        transaction: transaction,
+        group: group, user: user
+      };
+      transactions._create(t, function(e, transactionCreated) {
         if (e) return next(e);
         res.send(transactionCreated);
       });
@@ -229,20 +231,20 @@ module.exports = function(app) {
              .done(cb);
          },
 
-         createActivity: ['deleteTransaction', function(cb, results) {
+         createActivity: ['deleteTransaction', function(cb) {
            Activity.create({
-               type: 'group.transaction.deleted'
-             , UserId: user.id
-             , GroupId: group.id
-             , data: {
-                   group: group.info
-                 , transaction: transaction
-                 , user: user.info
-               }
+             type: 'group.transaction.deleted',
+             UserId: user.id,
+             GroupId: group.id,
+             data: {
+               group: group.info,
+               transaction: transaction,
+               user: user.info
+             }
            }).done(cb);
          }],
 
-       }, function(e, results) {
+       }, function(e) {
          if (e) return next(e);
          res.send({success: true});
        });
@@ -268,7 +270,8 @@ module.exports = function(app) {
             // Set headers for pagination.
             req.pagination.total = transactions.count;
             res.set({
-              'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+              'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+                                          req.pagination)
             });
 
             res.send(transactions.rows);
@@ -277,6 +280,6 @@ module.exports = function(app) {
       },
 
 
-  }
+  };
 
 };

@@ -1,15 +1,15 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect;
-var request   = require('supertest');
-var _         = require('lodash');
-var async     = require('async');
-var sinon     = require('sinon');
-var nock      = require('nock');
-var app       = require('../index');
-var utils     = require('../test/utils.js')();
-var config    = require('config');
+var _ = require('lodash');
+var app = require('../index');
+var async = require('async');
+var config = require('config');
+var expect = require('chai').expect;
+var request = require('supertest');
+var utils = require('../test/utils.js')();
+var sinon = require('sinon');
+var nock = require('nock');
 
 /**
  * Variables.
