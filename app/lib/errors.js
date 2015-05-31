@@ -88,10 +88,10 @@ Object.keys(module.exports).forEach(function(error) {
 
 Error.prototype.info = function() {
   var result = {
-    type    : this.type,
-    message : this.message || '',
-    fields  : this.fields,
-    data    : this.data
+    type: this.type,
+    message: this.message || '',
+    fields: this.fields,
+    data: this.data
   };
 
   if (!this.code || this.code >= 500) {

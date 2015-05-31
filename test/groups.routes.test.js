@@ -51,7 +51,6 @@ describe('groups.routes.test.js', function() {
     app.stripe.accounts.create.restore();
   });
 
-
   /**
    * Create.
    */
@@ -245,7 +244,6 @@ describe('groups.routes.test.js', function() {
         done();
       });
     });
-
 
     it('fails getting a group if not authenticated', function(done) {
       request(app)

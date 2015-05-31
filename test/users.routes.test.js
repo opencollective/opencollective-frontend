@@ -46,7 +46,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            user: userData
+          user: userData
         })
         .expect(400)
         .end(done);
@@ -56,8 +56,8 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: application2.api_key
-          , user: userData
+          api_key: application2.api_key,
+          user: userData
         })
         .expect(403)
         .end(done);
@@ -67,7 +67,7 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: application.api_key
+          api_key: application.api_key
         })
         .expect(400)
         .end(done);
@@ -77,8 +77,8 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: application.api_key
-          , user: _.omit(userData, 'email')
+          api_key: application.api_key,
+          user: _.omit(userData, 'email')
         })
         .expect(400)
         .end(done);
@@ -88,8 +88,8 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: application.api_key
-          , user: _.extend({}, userData, {email: 'abcdefg'})
+          api_key: application.api_key,
+          user: _.extend({}, userData, {email: 'abcdefg'})
         })
         .expect(400)
         .end(done);
@@ -99,8 +99,8 @@ describe('users.routes.test.js', function() {
       request(app)
         .post('/users')
         .send({
-            api_key: application.api_key
-          , user: userData
+          api_key: application.api_key,
+          user: userData
         })
         .expect(200)
         .end(function(e, res) {
@@ -123,8 +123,8 @@ describe('users.routes.test.js', function() {
         request(app)
           .post('/users')
           .send({
-              api_key: application.api_key
-            , user: _.pick(userData, 'email')
+            api_key: application.api_key,
+            user: _.pick(userData, 'email')
           })
           .expect(400)
           .end(done);
@@ -132,14 +132,13 @@ describe('users.routes.test.js', function() {
 
       it('fails to create a user with the same username', function(done) {
         var u = {
-            email: 'newemail@email.com'
-          , username: userData.username
+          email: 'newemail@email.com', username: userData.username
         }
         request(app)
           .post('/users')
           .send({
-              api_key: application.api_key
-            , user: u
+            api_key: application.api_key,
+            user: u
           })
           .expect(400)
           .end(done);

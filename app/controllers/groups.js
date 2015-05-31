@@ -110,7 +110,6 @@ module.exports = function(app) {
         .catch(next);
     },
 
-
     /**
      * Get group content.
      */
@@ -142,10 +141,10 @@ module.exports = function(app) {
             where: {
               GroupId: req.group.id
             },
-            order: [ ['createdAt', 'DESC'] ],
+            order: [['createdAt', 'DESC']],
             offset: 0,
             limit: 20 // [TODO] I need to put this default value
-                      // as a global parameter. Using mw.paginate?
+            // as a global parameter. Using mw.paginate?
           };
 
           Activity
@@ -168,15 +167,16 @@ module.exports = function(app) {
         if (results.getActivities) {
           group.activities = results.getActivities;
         }
+
         if (results.getStripeManagedAccount) {
           group.stripeManagedAccount = _.pick(results.getStripeManagedAccount,
                                               'stripeKey');
         }
+
         res.send(group);
       });
 
     },
-
 
     /**
      * Add a user to a group.
@@ -191,7 +191,6 @@ module.exports = function(app) {
         else res.send({success: true});
       });
     },
-
 
     /**
      * Create a transaction and add it to a group.
@@ -214,11 +213,10 @@ module.exports = function(app) {
 
     },
 
-
     /**
      * Delete a transaction.
      */
-     deleteTransaction: function(req, res, next) {
+    deleteTransaction: function(req, res, next) {
        var transaction = req.transaction;
        var group = req.group;
        var user = req.remoteUser || {};
@@ -251,16 +249,15 @@ module.exports = function(app) {
 
      },
 
-
-     /**
-      * Get group's transactions.
-      */
-      getTransactions: function(req, res, next) {
+    /**
+     * Get group's transactions.
+     */
+    getTransactions: function(req, res, next) {
         var query = _.merge({
           where: {
             GroupId: req.group.id
           },
-          order: [ [req.sorting.key, req.sorting.dir] ]
+          order: [[req.sorting.key, req.sorting.dir]]
         }, req.pagination);
 
         Transaction
@@ -278,7 +275,6 @@ module.exports = function(app) {
           })
           .catch(next);
       },
-
 
   };
 

@@ -25,7 +25,7 @@ module.exports = function(app) {
       where: {
         GroupId: req.group.id
       },
-      order: [ [req.sorting.key, req.sorting.dir] ]
+      order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
 
     Activity
@@ -58,9 +58,9 @@ module.exports = function(app) {
           res.send(user.info);
 
           Activity.create({
-              type: 'user.created'
-            , UserId: user.id
-            , data: {user: user.info}
+            type: 'user.created',
+            UserId: user.id,
+            data: {user: user.info}
           });
         })
         .catch(next);
@@ -71,8 +71,8 @@ module.exports = function(app) {
      */
     getToken: function(req, res, next) {
       res.send({
-          access_token: req.user.jwt(req.application)
-        , refresh_token: req.user.refresh_token
+        access_token: req.user.jwt(req.application),
+        refresh_token: req.user.refresh_token
       });
     },
 

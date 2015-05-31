@@ -4,7 +4,6 @@
 var Url = require('url');
 var _ = require('lodash');
 
-
 /**
  * Private methods.
  */
@@ -23,9 +22,10 @@ var addParameterUrl = function(url, parameters) {
   var parsedUrl  = Url.parse(url, true);
 
   function removeTrailingChar(str, char) {
-    if(str.substr(-1) === char) {
+    if (str.substr(-1) === char) {
       return str.substr(0, str.length - 1);
     }
+
     return str;
   }
 
@@ -36,7 +36,7 @@ var addParameterUrl = function(url, parameters) {
     var param = parameters[p];
     parsedUrl.query[p] = param;
   }
-  
+
   return Url.format(parsedUrl);
 };
 
@@ -51,19 +51,21 @@ var getLinks = function(url, options) {
     return null;
 
   var links = {
-      next: addParameterUrl(url, {page: page+1, per_page: per_page})
-    , current: addParameterUrl(url, {page: page, per_page: per_page})
+    next: addParameterUrl(url, {page: page + 1, per_page: per_page}),
+    current: addParameterUrl(url, {page: page, per_page: per_page})
   };
   if (page > 1) {
-    links.prev = addParameterUrl(url, {page: page-1, per_page: per_page});
+    links.prev = addParameterUrl(url, {page: page - 1, per_page: per_page});
     links.first = addParameterUrl(url, {page: 1, per_page: per_page});
   }
+
   if (options.total) {
     var lastPage = Math.ceil(options.total / per_page);
     links.last = addParameterUrl(url, {page: lastPage, per_page: per_page});
-    if (page >=lastPage)
+    if (page >= lastPage)
       delete links.next;
   }
+
   return links;
 };
 
@@ -72,8 +74,7 @@ var getLinks = function(url, options) {
  */
 var paginatePage = function(offset, limit) {
   return {
-      page: Math.floor(offset/limit + 1)
-    , per_page: limit
+    page: Math.floor(offset / limit + 1), per_page: limit
   }
 };
 
@@ -87,8 +88,8 @@ module.exports = {
    */
   paginateOffset: function(page, per_page) {
     return {
-        offset: (page - 1) * per_page
-      , limit: per_page
+      offset: (page - 1) * per_page,
+      limit: per_page
     }
   },
 
@@ -102,13 +103,12 @@ module.exports = {
    * Get headers for pagination.
    */
   getLinkHeader: function(url, options) {
-    var links = getLinks(url, options)
-      , header = ''
-      , k = 0;
+    var links = getLinks(url, options), header = '', k = 0;
     for (var i in links) {
-      header += ( (k!==0) ? ', ' : '' ) + '<' + links[i] + '>; rel="' + i + '"';
+      header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"';
       k += 1;
     }
+
     return header;
   },
 

@@ -40,8 +40,8 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : application.api_key
-          , username: userData.username
+          api_key: application.api_key,
+          username: userData.username
         })
         .expect(400)
         .end(function(e, res) {
@@ -54,9 +54,9 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : 'bla'
-          , username: userData.username
-          , password: userData.password
+          api_key: 'bla',
+          username: userData.username,
+          password: userData.password
         })
         .expect(401)
         .end(function(e, res) {
@@ -69,9 +69,9 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : application.api_key
-          , username: userData.username
-          , password: 'bad'
+          api_key: application.api_key,
+          username: userData.username,
+          password: 'bad'
         })
         .expect(400)
         .end(function(e, res) {
@@ -84,9 +84,9 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : application.api_key
-          , username: userData.username
-          , password: userData.password
+          api_key: application.api_key,
+          username: userData.username,
+          password: userData.password
         })
         .expect(200)
         .end(function(e, res) {
@@ -110,9 +110,7 @@ describe('auth.routes.test.js', function() {
       request(app)
         .post('/authenticate')
         .send({
-            api_key : application.api_key
-          , email: userData.email
-          , password: userData.password
+          api_key: application.api_key, email: userData.email, password: userData.password
         })
         .expect(200)
         .end(function(e, res) {

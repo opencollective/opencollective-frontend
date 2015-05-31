@@ -28,7 +28,7 @@ module.exports = function(app) {
         where: {
           GroupId: req.group.id
         },
-        order: [ [req.sorting.key, req.sorting.dir] ]
+        order: [[req.sorting.key, req.sorting.dir]]
       }, req.pagination);
 
       Activity
@@ -55,7 +55,7 @@ module.exports = function(app) {
         where: {
           UserId: req.user.id
         },
-        order: [ [req.sorting.key, req.sorting.dir] ]
+        order: [[req.sorting.key, req.sorting.dir]]
       }, req.pagination);
 
       Activity

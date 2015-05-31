@@ -64,10 +64,11 @@ describe('payments.routes.test.js', function() {
       .post('/v1/customers')
       .reply(200, stripeMock.customers.create);
   });
+
   // Nock for charges.create.
   beforeEach(function() {
     nocks['charges.create'] = nock(STRIPE_URL)
-      .post('/v1/charges', 'amount=' + CHARGE*100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
+      .post('/v1/charges', 'amount=' + CHARGE * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
       .reply(200, stripeMock.charges.create);
   });
   afterEach(function() {
@@ -125,7 +126,6 @@ describe('payments.routes.test.js', function() {
       application2.addGroup(group2).done(done);
     });
   });
-
 
   /**
    * Post a payment.
@@ -192,7 +192,6 @@ describe('payments.routes.test.js', function() {
 
     });
 
-
     describe('Next payment success with a same stripe token', function() {
 
       var CHARGE2 = 1.99;
@@ -218,10 +217,11 @@ describe('payments.routes.test.js', function() {
           .post('/v1/customers')
           .reply(200, stripeMock.customers.create);
       });
+
       // New nock for charges.create.
       beforeEach(function() {
         nocks['charges.create2'] = nock(STRIPE_URL)
-          .post('/v1/charges', 'amount=' + CHARGE2*100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
+          .post('/v1/charges', 'amount=' + CHARGE2 * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
           .reply(200, stripeMock.charges.create);
       });
 
@@ -271,7 +271,6 @@ describe('payments.routes.test.js', function() {
 
     });
 
-
     describe('Payment success by a user that is not part of the group yet', function() {
 
       beforeEach(function(done) {
@@ -301,7 +300,6 @@ describe('payments.routes.test.js', function() {
       });
 
     });
-
 
     describe('Payment success by anonymous user', function() {
 
@@ -357,7 +355,6 @@ describe('payments.routes.test.js', function() {
       });
 
     });
-
 
     describe.skip('Recurrent payment success', function() {
       // There are 2 options:

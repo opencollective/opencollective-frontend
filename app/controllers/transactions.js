@@ -21,7 +21,7 @@ module.exports = function(app) {
   /**
    * Create a transaction and add it to a group/user/card.
    */
-   var create = function(args, callback) {
+  var create = function(args, callback) {
      var transaction = args.transaction;
      var user = args.user || {};
      var group = args.group || {};
@@ -62,9 +62,9 @@ module.exports = function(app) {
            card
              .addTransaction(transaction)
              .done(cb);
-          } else {
-            cb();
-          }
+         } else {
+           cb();
+         }
        }],
 
        createActivity: ['createTransaction', function(cb, results) {
@@ -72,17 +72,17 @@ module.exports = function(app) {
 
          // Create activity.
          Activity.create({
-             type: 'group.transaction.created'
-           , UserId: user.id
-           , GroupId: group.id
-           , TransactionId: transaction.id
-           , data: {
-                 group: group.info
-               , transaction: transaction
-               , user: user.info
-               , target: transaction.beneficiary
-               , card: card.info
-             }
+           type: 'group.transaction.created',
+           UserId: user.id,
+           GroupId: group.id,
+           TransactionId: transaction.id,
+           data: {
+             group: group.info,
+             transaction: transaction,
+             user: user.info,
+             target: transaction.beneficiary,
+             card: card.info
+           }
          }).done(cb);
        }],
 
@@ -91,7 +91,6 @@ module.exports = function(app) {
        else callback(null, results.createTransaction);
      });
    }
-
 
   /**
    * Public methods.

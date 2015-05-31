@@ -20,10 +20,7 @@ var models = app.set('models');
  */
 describe('usergroup.routes.test.js', function() {
 
-  var application
-    , user, user2
-    , group
-    ;
+  var application, user, user2, group;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -70,6 +67,7 @@ describe('usergroup.routes.test.js', function() {
       .addMember(user, {role: 'admin'})
       .done(done);
   });
+
   // Add an viewer to the group.
   beforeEach(function(done) {
     group

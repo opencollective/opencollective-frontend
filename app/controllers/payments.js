@@ -34,6 +34,7 @@ module.exports = function(app) {
       if (!payment.stripeToken) {
         return next(new errors.BadRequest('Stripe Token missing.'));
       }
+
       if (!payment.amount) {
         return next(new errors.BadRequest('Payment Amount missing.'));
       }
@@ -100,7 +101,7 @@ module.exports = function(app) {
 
           stripe.charges
             .create({
-              amount: payment.amount*100,
+              amount: payment.amount * 100,
               currency: payment.currency || 'USD',
               customer: card.serviceId
             }, cb);

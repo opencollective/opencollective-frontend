@@ -266,6 +266,7 @@ describe('transactions.routes.test.js', function() {
                 cb();
               });
             }
+
           ], done);
 
         });
@@ -353,6 +354,7 @@ describe('transactions.routes.test.js', function() {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(per_page);
             expect(res.body[0].id).to.equal(1);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers).to.have.property('link');
@@ -363,7 +365,7 @@ describe('transactions.routes.test.js', function() {
             expect(headers.link).to.contain('per_page=' + per_page);
             expect(headers.link).to.contain('/groups/' + group.id + '/transactions');
             var tot = transactionsData.length;
-            expect(headers.link).to.contain('/groups/' + group.id + '/transactions?page=' + Math.ceil(tot/per_page) + '&per_page=' + per_page + '>; rel="last"');
+            expect(headers.link).to.contain('/groups/' + group.id + '/transactions?page=' + Math.ceil(tot / per_page) + '&per_page=' + per_page + '>; rel="last"');
 
             done();
           });
@@ -385,6 +387,7 @@ describe('transactions.routes.test.js', function() {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(per_page);
             expect(res.body[0].id).to.equal(per_page + 1);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.contain('page=3');
@@ -413,6 +416,7 @@ describe('transactions.routes.test.js', function() {
             _.each(transactions, function(t) {
               expect(t.id >= last).to.be.true;
             });
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.be.empty;

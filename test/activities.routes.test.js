@@ -69,6 +69,7 @@ describe('activities.routes.test.js', function() {
       .addMember(user, {role: 'admin'})
       .done(done);
   });
+
   // Add an viewer to the group.
   beforeEach(function(done) {
     group
@@ -132,6 +133,7 @@ describe('activities.routes.test.js', function() {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
             expect(res.body[0].id).to.equal(4);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers).to.have.property('link');
@@ -141,8 +143,8 @@ describe('activities.routes.test.js', function() {
             expect(headers.link).to.contain('page=1');
             expect(headers.link).to.contain('per_page=' + per_page);
             expect(headers.link).to.contain('/groups/' + group.id + '/activities');
-            var tot = _.reduce(activitiesData, function(memo, el){ return memo + ( (el.GroupId === group.id) ? 1 : 0 ); }, 0);
-            expect(headers.link).to.contain('/groups/1/activities?page=' + Math.ceil(tot/per_page) + '&per_page=' + per_page + '>; rel="last"');
+            var tot = _.reduce(activitiesData, function(memo, el) { return memo + ((el.GroupId === group.id) ? 1 : 0); }, 0);
+            expect(headers.link).to.contain('/groups/1/activities?page=' + Math.ceil(tot / per_page) + '&per_page=' + per_page + '>; rel="last"');
 
             done();
           });
@@ -164,6 +166,7 @@ describe('activities.routes.test.js', function() {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
             expect(res.body[0].id).to.equal(7);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.contain('page=3');
@@ -192,6 +195,7 @@ describe('activities.routes.test.js', function() {
             _.each(activities, function(a) {
               expect(a.id >= last).to.be.true;
             });
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.be.empty;

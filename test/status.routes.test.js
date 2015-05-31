@@ -7,22 +7,22 @@ describe('status.routes.test.js', function() {
 
   describe('GET /status', function() {
 
-    it('responds with status', function(done){
+    it('responds with status', function(done) {
       request(app)
         .get('/status')
         .expect(200)
-        .end(function(e,res) {
+        .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body.status).to.equal('up');
           done();
         });
     });
 
-    it('responds with status information', function(done){
+    it('responds with status information', function(done) {
       request(app)
         .get('/status?info=1')
         .expect(200)
-        .end(function(e,res) {
+        .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body.status).to.equal('up');
           expect(res.body.env).to.equal('test');

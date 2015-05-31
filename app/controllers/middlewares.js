@@ -33,12 +33,13 @@ module.exports = function(app) {
           if (!value && value !== false)
             value = req.body[prop];
 
-          if ( (!value || value === 'null') && value !== false ) {
+          if ((!value || value === 'null') && value !== false) {
             missing[prop] = 'Required field ' + prop + ' missing';
           } else {
             try { // Try to parse if JSON
               value = JSON.parse(value);
-            } catch(e) {}
+            } catch (e) {}
+
             req.required[prop] = value;
           }
         });
@@ -65,8 +66,10 @@ module.exports = function(app) {
           if (application.disabled) {
             return next(new errors.Forbidden('Invalid API key.'));
           }
+
           req.application = application;
         }
+
         next();
       });
     },
@@ -83,7 +86,7 @@ module.exports = function(app) {
         return next();
       }
 
-      if ( !(username || email) || !password ) {
+      if (!(username || email) || !password) {
         return next();
       }
 
@@ -160,8 +163,8 @@ module.exports = function(app) {
             })
             .catch(next);
         }
-      ], next);
 
+      ], next);
 
     },
 
@@ -172,9 +175,9 @@ module.exports = function(app) {
       if (!req.application) {
         return next(new errors.Unauthorized('Unauthorized application.'));
       }
+
       next();
     },
-
 
     /**
      * Authorize super-applications only.
@@ -187,7 +190,6 @@ module.exports = function(app) {
       }
     },
 
-
     /**
      * Authorize: the user has to be authenticated.
      */
@@ -195,16 +197,18 @@ module.exports = function(app) {
       if (!req.remoteUser) {
         return next(new errors.Unauthorized('Unauthorized'));
       }
+
       next();
     },
 
     /**
      * Or a user or an Application has to be authenticated.
      */
-     authorizeAuthUserOrApp: function(req, res, next) {
+    authorizeAuthUserOrApp: function(req, res, next) {
        if (!req.remoteUser && !req.application) {
          return next(new errors.Unauthorized('Unauthorized'));
        }
+
        next();
      },
 
@@ -215,6 +219,7 @@ module.exports = function(app) {
       if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access === 0)) {
         return next(new errors.Forbidden('Unauthorized'));
       }
+
       next();
     },
 
@@ -246,6 +251,7 @@ module.exports = function(app) {
             })
             .catch(cb);
         }
+
       ], function(e, results) {
         if (e) return next();
 
@@ -272,12 +278,15 @@ module.exports = function(app) {
       if (!req.transaction) {
         return next(new errors.NotFound());
       }
+
       if (!req.group) {
         return next(new errors.NotFound('Cannot authorize a transaction without a specified group.'));
       }
+
       if (req.transaction.GroupId !== req.group.id) {
         return next(new errors.Forbidden('This group does not have access to this transaction.'));
       }
+
       next();
     },
 
@@ -336,8 +345,8 @@ module.exports = function(app) {
         var dir = req.body.direction || req.query.direction;
 
         req.sorting = {
-            key: key || options.key
-          , dir: (dir || options.dir).toUpperCase()
+          key: key || options.key,
+          dir: (dir || options.dir).toUpperCase()
         };
 
         next();
