@@ -1,5 +1,6 @@
 var config = require('config');
 var async = require('async');
+var _ = require('lodash');
 var utils = require('../lib/utils');
 
 module.exports = function(app) {
@@ -221,23 +222,36 @@ module.exports = function(app) {
         return next(new errors.NotFound());
       }
 
-      if (req.remoteUser) { // If authenticated user, does he have access?
-        req.group.isMember(req.remoteUser.id, next);
-      }
-      else if (req.application) { // If authenticated application, does it have access?
-        req.group
-          .hasApplication(req.application)
-          .then(function(bool) {
-            if (bool)
-              next();
-            else
-            return next(new errors.Forbidden('Unauthorized'));
-          })
-          .catch(next);
-      }
-      else {
-        return next(new errors.Forbidden('Unauthorized'));
-      }
+      async.parallel([
+        function(cb) { // If authenticated user, does he have access?
+          if (!req.remoteUser)
+            return cb();
+
+          req.group.isMember(req.remoteUser.id, function(e, bool) {
+            cb(null, bool);
+          });
+        },
+        function(cb) { // If authenticated application, does it have access?
+          if (!req.application)
+            return cb();
+
+          req.group
+            .hasApplication(req.application)
+            .then(function(bool) {
+              return cb(null, bool);
+            })
+            .catch(cb);
+        }
+      ], function(e, results) {
+        if (e) return next();
+
+        if (_.some(results)) {
+          return next();
+        }
+        else {
+          return next(new errors.Forbidden('Unauthorized'));
+        }
+      });
     },
 
     /**

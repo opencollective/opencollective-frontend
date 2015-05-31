@@ -10,6 +10,7 @@ module.exports = function(app) {
     'groups',
     'middlewares',
     'params',
+    'payments',
     'transactions',
     'users'
   ];

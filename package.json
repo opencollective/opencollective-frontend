@@ -30,6 +30,7 @@
     "chai": "*",
     "istanbul": "0.3.2",
     "mocha": "*",
+    "nock": "^2.2.0",
     "sequelize-cli": "^1.4.0",
     "sinon": "1.10.3",
     "supertest": ""

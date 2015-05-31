@@ -22,6 +22,7 @@ module.exports = function(app) {
     , Transaction = models.Transaction
     , StripeManagedAccount = models.StripeManagedAccount
     , errors = app.errors
+    , transactions = require('../controllers/transactions')(app)
     ;
 
   /**
@@ -204,55 +205,9 @@ module.exports = function(app) {
       // Caller.
       var user = req.remoteUser || transaction.user || {};
 
-      async.auto({
-
-        createTransaction: function(cb) {
-          Transaction
-            .create(transaction)
-            .done(cb);
-        },
-
-        addTransactionToUser: ['createTransaction', function(cb, results) {
-          var transaction = results.createTransaction;
-
-          if (user && user.addTransaction) {
-            user
-              .addTransaction(transaction)
-              .done(cb);
-          } else {
-            cb();
-          }
-        }],
-
-        addTransactionToGroup: ['createTransaction', function(cb, results) {
-          var transaction = results.createTransaction;
-
-          group
-            .addTransaction(transaction)
-            .done(cb);
-        }],
-
-        createActivity: ['createTransaction', function(cb, results) {
-          var transaction = results.createTransaction;
-
-          // Create activity.
-          Activity.create({
-              type: 'group.transaction.created'
-            , UserId: user.id
-            , GroupId: group.id
-            , TransactionId: transaction.id
-            , data: {
-                  group: group.info
-                , transaction: transaction
-                , user: user.info
-                , target: transaction.beneficiary
-              }
-          }).done(cb);
-        }],
-
-      }, function(e, results) {
+      transactions._create({transaction: transaction, group: group, user: user}, function(e, transactionCreated) {
         if (e) return next(e);
-        res.send(results.createTransaction);
+        res.send(transactionCreated);
       });
 
     },

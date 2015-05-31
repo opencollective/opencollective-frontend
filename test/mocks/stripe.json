@@ -10,6 +10,61 @@
       }
     }
 
+  },
+
+  "customers": {
+
+    "create": {
+      "object": "customer",
+      "created": 1432412123,
+      "id": "cus_6IJf9vLMFVsKzX",
+      "livemode": false,
+      "description": "Customer for test@example.com",
+      "email": "philippe.modard+customer@gmail.com",
+      "delinquent": false,
+      "metadata": {
+        "accountId": "stripeid"
+      },
+      "subscriptions": {},
+      "discount": null,
+      "account_balance": 0,
+      "currency": null,
+      "sources": {},
+      "default_source": "card_165j1jIqnMN1wWwOzm6Cjmea"
+    }
+
+  },
+
+  "charges": {
+
+    "create": {
+      "id": "ch_165j8nIqnMN1wWwOw9BcxMMR",
+      "object": "charge",
+      "created": 1432412561,
+      "livemode": false,
+      "paid": true,
+      "status": "succeeded",
+      "amount": 1230,
+      "currency": "usd",
+      "refunded": false,
+      "source": {
+        "id": "card_165j1jIqnMN1wWwOzm6Cjmea",
+        "object": "card",
+        "last4": "4242",
+        "brand": "Visa",
+        "funding": "credit",
+        "exp_month": 8,
+        "exp_year": 2016,
+        "fingerprint": "QgShyKJhtqpJa9D7",
+        "country": "US",
+        "customer": "cus_6IJf9vLMFVsKzX"
+      },
+      "captured": true,
+      "balance_transaction": "txn_165j8oIqnMN1wWwOKlPn1D4y",
+      "customer": "cus_6IJf9vLMFVsKzX",
+      "metadata": {}
+    }
+
   }
 
 }
