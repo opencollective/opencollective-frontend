@@ -38,7 +38,7 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "make test",
+    "test": "npm run hint && make test",
     "start": "node .",
     "hint": "./node_modules/.bin/jscs app/**/*.js test/*.js --config=.jscsrc"
   },
