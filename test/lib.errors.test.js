@@ -1,13 +1,12 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , utils     = require('../test/utils.js')()
-  , server    = require('../index')
-  , errors    = server.errors
-  ;
+var app = require('../index');
+var errors = app.errors;
+var expect = require('chai').expect;
+var utils = require('../test/utils.js')();
 
-/** 
+/**
  * Tests.
  */
 describe('lib.errors.test.js', function() {

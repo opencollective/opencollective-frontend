@@ -1,11 +1,10 @@
 /**
  * Dependencies.
  */
-var async = require('async')
-  , _ = require('lodash')
-  , app       = require('../index')
-  , data  = require('./mocks/data.json')
-  ;
+var async = require('async');
+var _ = require('lodash');
+var app = require('../index');
+var data  = require('./mocks/data.json');
 
 /**
  * Private methods.

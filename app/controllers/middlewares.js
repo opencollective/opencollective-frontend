@@ -1,6 +1,7 @@
-var config = require('config');
-var async = require('async');
 var _ = require('lodash');
+var async = require('async');
+var config = require('config');
+var jwt = require('jsonwebtoken');
 var utils = require('../lib/utils');
 
 module.exports = function(app) {
@@ -32,12 +33,13 @@ module.exports = function(app) {
           if (!value && value !== false)
             value = req.body[prop];
 
-          if ( (!value || value === 'null') && value !== false ) {
+          if ((!value || value === 'null') && value !== false) {
             missing[prop] = 'Required field ' + prop + ' missing';
           } else {
             try { // Try to parse if JSON
               value = JSON.parse(value);
-            } catch(e) {}
+            } catch (e) {}
+
             req.required[prop] = value;
           }
         });
@@ -54,7 +56,7 @@ module.exports = function(app) {
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
-      var key = req.query['api_key'] || req.body['api_key'];
+      var key = req.query.api_key || req.body.api_key;
 
       if (!key) return next();
 
@@ -64,8 +66,10 @@ module.exports = function(app) {
           if (application.disabled) {
             return next(new errors.Forbidden('Invalid API key.'));
           }
+
           req.application = application;
         }
+
         next();
       });
     },
@@ -74,16 +78,15 @@ module.exports = function(app) {
      * Authenticate.
      */
     authenticate: function(req, res, next) {
-      var username = (req.body && req.body.username) || req.query['username']
-        , email    = (req.body && req.body.email) || req.query['email']
-        , password = (req.body && req.body.password) || req.query['password']
-        ;
+      var username = (req.body && req.body.username) || req.query.username;
+      var email = (req.body && req.body.email) || req.query.email;
+      var password = (req.body && req.body.password) || req.query.password;
 
       if (!req.application || !req.application.api_key) {
         return next();
       }
 
-      if ( !(username || email) || !password ) {
+      if (!(username || email) || !password) {
         return next();
       }
 
@@ -98,9 +101,8 @@ module.exports = function(app) {
      * Authenticate with a refresh token.
      */
     authenticateRefreshToken: function(req, res, next) {
-      var accessToken = req.required.access_token
-        , refreshToken = req.required.refresh_token
-        ;
+      var accessToken = req.required.access_token;
+      var refreshToken = req.required.refresh_token;
 
       // Decode access token to identify the user.
       jwt.verify(accessToken, secret, function(e) {
@@ -109,10 +111,13 @@ module.exports = function(app) {
 
         var decoded = jwt.decode(accessToken);
         User.findOne({_id: decoded.sub}, function(e, user) {
-          if (e)
+          if (e) {
             return next(e);
-          else if (!user || user.tokens.refresh_token !== refreshToken) // Check the refresh_token from the user data.
+          }
+          else if (!user || user.tokens.refresh_token !== refreshToken) {
+            // Check the refresh_token from the user data.
             return next(new errors.Unauthorized('Invalid Refresh Token'));
+          }
           else {
             req.remoteUser = user;
             next();
@@ -124,14 +129,16 @@ module.exports = function(app) {
     /**
      * Identify User and Application from the jwtoken.
      *
-     *  Use the req.remoteUser._id (from the access_token) to get the full user's model
-     *  Use the req.remoteUser.audience (from the access_token) to get the full application's model
+     *  Use the req.remoteUser._id (from the access_token) to get the
+     *    full user's model
+     *  Use the req.remoteUser.audience (from the access_token) to get the
+     *    full application's model
      */
     identifyFromToken: function(req, res, next) {
       if (!req.remoteUser)
         return next();
 
-      var app_id = req.remoteUser.aud;
+      var appId = req.remoteUser.aud;
 
       async.parallel([
         function(cb) {
@@ -146,7 +153,7 @@ module.exports = function(app) {
         function(cb) {
           // Check the validity of the application in the token.
           Application
-            .find(parseInt(app_id))
+            .find(parseInt(appId))
             .then(function(application) {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));
@@ -156,8 +163,8 @@ module.exports = function(app) {
             })
             .catch(next);
         }
-      ], next);
 
+      ], next);
 
     },
 
@@ -168,9 +175,9 @@ module.exports = function(app) {
       if (!req.application) {
         return next(new errors.Unauthorized('Unauthorized application.'));
       }
+
       next();
     },
-
 
     /**
      * Authorize super-applications only.
@@ -183,7 +190,6 @@ module.exports = function(app) {
       }
     },
 
-
     /**
      * Authorize: the user has to be authenticated.
      */
@@ -191,16 +197,18 @@ module.exports = function(app) {
       if (!req.remoteUser) {
         return next(new errors.Unauthorized('Unauthorized'));
       }
+
       next();
     },
 
     /**
      * Or a user or an Application has to be authenticated.
      */
-     authorizeAuthUserOrApp: function(req, res, next) {
+    authorizeAuthUserOrApp: function(req, res, next) {
        if (!req.remoteUser && !req.application) {
          return next(new errors.Unauthorized('Unauthorized'));
        }
+
        next();
      },
 
@@ -211,6 +219,7 @@ module.exports = function(app) {
       if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access === 0)) {
         return next(new errors.Forbidden('Unauthorized'));
       }
+
       next();
     },
 
@@ -242,6 +251,7 @@ module.exports = function(app) {
             })
             .catch(cb);
         }
+
       ], function(e, results) {
         if (e) return next();
 
@@ -268,12 +278,15 @@ module.exports = function(app) {
       if (!req.transaction) {
         return next(new errors.NotFound());
       }
+
       if (!req.group) {
         return next(new errors.NotFound('Cannot authorize a transaction without a specified group.'));
       }
+
       if (req.transaction.GroupId !== req.group.id) {
         return next(new errors.Forbidden('This group does not have access to this transaction.'));
       }
+
       next();
     },
 
@@ -284,34 +297,35 @@ module.exports = function(app) {
       options = options || {};
 
       options = {
-          default: options.default || 20
-        , min: options.min || 1
-        , max: options.max || 50
-        , maxTotal: options.maxTotal || false
+        default: options.default || 20,
+        min: options.min || 1,
+        max: options.max || 50,
+        maxTotal: options.maxTotal || false
       };
 
       return function(req, res, next) {
 
         // Since ID.
-        var since_id = req.body.since_id || req.query.since_id;
-        if (since_id) {
+        var sinceId = req.body.since_id || req.query.since_id;
+        if (sinceId) {
           req.pagination = {
             where: {
-              id: {$gt: since_id}
+              id: {$gt: sinceId}
             }
           };
           return next();
         }
 
         // Page / Per_page.
-        var per_page = (req.body.per_page || req.query.per_page) * 1 || options.default;
+        var perPage = (req.body.per_page || req.query.per_page);
+        perPage = perPage * 1 || options.default;
         var page = (req.body.page || req.query.page) * 1 || 1;
 
         page = (page < 1) ? 1 : page;
-        per_page = (per_page < options.min) ? options.min : per_page;
-        per_page = (per_page > options.max) ? options.max : per_page;
+        perPage = (perPage < options.min) ? options.min : perPage;
+        perPage = (perPage > options.max) ? options.max : perPage;
 
-        req.pagination = utils.paginateOffset(page, per_page);
+        req.pagination = utils.paginateOffset(page, perPage);
 
         next();
       };
@@ -323,22 +337,22 @@ module.exports = function(app) {
     sorting: function(options) {
       options = options || {};
 
-      options.key = (typeof options.key != 'undefined') ? options.key : 'id';
-      options.dir = (typeof options.dir != 'undefined') ? options.dir : 'ASC';
+      options.key = (typeof options.key !== 'undefined') ? options.key : 'id';
+      options.dir = (typeof options.dir !== 'undefined') ? options.dir : 'ASC';
 
       return function(req, res, next) {
-        var key = req.body.sort || req.query.sort
-          , dir = req.body.direction || req.query.direction;
+        var key = req.body.sort || req.query.sort;
+        var dir = req.body.direction || req.query.direction;
 
         req.sorting = {
-            key: key || options.key
-          , dir: (dir || options.dir).toUpperCase()
+          key: key || options.key,
+          dir: (dir || options.dir).toUpperCase()
         };
 
         next();
       };
-    },
+    }
 
-  }
+  };
 
 };

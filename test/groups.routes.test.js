@@ -1,15 +1,14 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , request   = require('supertest')
-  , _         = require('lodash')
-  , async     = require('async')
-  , sinon     = require('sinon')
-  , app       = require('../index')
-  , utils     = require('../test/utils.js')()
-  , config    = require('config')
-  ;
+var _ = require('lodash');
+var app = require('../index');
+var async = require('async');
+var config = require('config');
+var expect = require('chai').expect;
+var request = require('supertest');
+var utils = require('../test/utils.js')();
+var sinon = require('sinon');
 
 /**
  * Variables.
@@ -25,7 +24,8 @@ var stripeMock = require('./mocks/stripe')
  */
 describe('groups.routes.test.js', function() {
 
-  var application, user;
+  var application;
+  var user;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -51,7 +51,6 @@ describe('groups.routes.test.js', function() {
   afterEach(function() {
     app.stripe.accounts.create.restore();
   });
-
 
   /**
    * Create.
@@ -196,7 +195,10 @@ describe('groups.routes.test.js', function() {
    */
   describe('#get', function() {
 
-    var group, user2, application2, application3;
+    var group;
+    var user2;
+    var application2;
+    var application3;
 
     // Create the group with user.
     beforeEach(function(done) {
@@ -246,7 +248,6 @@ describe('groups.routes.test.js', function() {
         done();
       });
     });
-
 
     it('fails getting a group if not authenticated', function(done) {
       request(app)

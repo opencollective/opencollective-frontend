@@ -40,38 +40,39 @@ module.exports = function(Sequelize, DataTypes) {
       // Info.
       info: function() {
         return {
-            id: this.id
-          , name: this.name
-          , description: this.description
-          , budget: this.budget
-          , currency: this.currency
-          , membership_type: this.membership_type
-          , membershipfee: this.membershipfee
-          , createdAt: this.createdAt
-          , updatedAt: this.updatedAt
+          id: this.id,
+          name: this.name,
+          description: this.description,
+          budget: this.budget,
+          currency: this.currency,
+          membership_type: this.membership_type,
+          membershipfee: this.membershipfee,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
         };
-      },
+      }
     },
 
     instanceMethods: {
-      isMember: function(user_id, roles, fn) {
+      isMember: function(userId, roles, fn) {
         if (!roles || typeof roles === 'function') {
           fn = roles;
           roles = null;
         }
+
         this
-          .getMembers({where: {id: user_id} })
+          .getMembers({where: {id: userId} })
           .then(function(members) {
             if (members.length === 0)
               return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
             else {
-              if (roles && roles.indexOf(members[0].UserGroup.role) < 0 )
+              if (roles && roles.indexOf(members[0].UserGroup.role) < 0)
                 return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
               fn(null, true);
             }
           })
           .catch(fn);
-      },
+      }
     }
   });
 

@@ -29,6 +29,8 @@
   "devDependencies": {
     "chai": "*",
     "istanbul": "0.3.2",
+    "jscs": "^1.13.1",
+    "jsxhint": "^0.15.1",
     "mocha": "*",
     "nock": "^2.2.0",
     "sequelize-cli": "^1.4.0",
@@ -36,8 +38,9 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "make test",
-    "start": "node ."
+    "test": "npm run hint && make test",
+    "start": "node .",
+    "hint": "./node_modules/.bin/jscs app/**/*.js test/*.js --config=.jscsrc"
   },
   "license": "Copyright (c) 2015 Philmod"
 }

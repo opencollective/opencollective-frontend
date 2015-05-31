@@ -1,14 +1,13 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , request   = require('supertest')
-  , _         = require('lodash')
-  , async     = require('async')
-  , app       = require('../index')
-  , utils     = require('../test/utils.js')()
-  , config    = require('config')
-  ;
+var _ = require('lodash');
+var app = require('../index');
+var async = require('async');
+var config = require('config');
+var expect = require('chai').expect;
+var request = require('supertest');
+var utils = require('../test/utils.js')();
 
 /**
  * Variables.
@@ -23,7 +22,13 @@ var transactionsData = utils.data('transactions1').transactions;
  */
 describe('transactions.routes.test.js', function() {
 
-  var group, group2, user, user2, application, application2, application3;
+  var group;
+  var group2;
+  var user;
+  var user2;
+  var application;
+  var application2;
+  var application3;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -267,6 +272,7 @@ describe('transactions.routes.test.js', function() {
                 cb();
               });
             }
+
           ], done);
 
         });
@@ -331,6 +337,7 @@ describe('transactions.routes.test.js', function() {
           transactions.forEach(function(t) {
             expect(t.GroupId).to.equal(group.id);
           });
+
           done();
 
         });
@@ -338,13 +345,13 @@ describe('transactions.routes.test.js', function() {
 
     describe('Pagination', function() {
 
-      var per_page = 3;
+      var perPage = 3;
 
       it('successfully get a group\'s transactions with per_page', function(done) {
         request(app)
           .get('/groups/' + group.id + '/transactions')
           .send({
-            per_page: per_page,
+            per_page: perPage,
             sort: 'id',
             direction: 'asc'
           })
@@ -352,8 +359,9 @@ describe('transactions.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
-            expect(res.body.length).to.equal(per_page);
+            expect(res.body.length).to.equal(perPage);
             expect(res.body[0].id).to.equal(1);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers).to.have.property('link');
@@ -361,10 +369,10 @@ describe('transactions.routes.test.js', function() {
             expect(headers.link).to.contain('page=2');
             expect(headers.link).to.contain('current');
             expect(headers.link).to.contain('page=1');
-            expect(headers.link).to.contain('per_page=' + per_page);
+            expect(headers.link).to.contain('per_page=' + perPage);
             expect(headers.link).to.contain('/groups/' + group.id + '/transactions');
             var tot = transactionsData.length;
-            expect(headers.link).to.contain('/groups/' + group.id + '/transactions?page=' + Math.ceil(tot/per_page) + '&per_page=' + per_page + '>; rel="last"');
+            expect(headers.link).to.contain('/groups/' + group.id + '/transactions?page=' + Math.ceil(tot / perPage) + '&per_page=' + perPage + '>; rel="last"');
 
             done();
           });
@@ -375,7 +383,7 @@ describe('transactions.routes.test.js', function() {
         request(app)
           .get('/groups/' + group.id + '/transactions')
           .send({
-            per_page: per_page,
+            per_page: perPage,
             page: page,
             sort: 'id',
             direction: 'asc'
@@ -384,8 +392,9 @@ describe('transactions.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
-            expect(res.body.length).to.equal(per_page);
-            expect(res.body[0].id).to.equal(per_page + 1);
+            expect(res.body.length).to.equal(perPage);
+            expect(res.body[0].id).to.equal(perPage + 1);
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.contain('page=3');
@@ -395,12 +404,12 @@ describe('transactions.routes.test.js', function() {
       });
 
       it('successfully get a group\'s transactions using since_id', function(done) {
-        var since_id = 5;
+        var sinceId = 5;
 
         request(app)
           .get('/groups/' + group.id + '/transactions')
           .send({
-            since_id: since_id,
+            since_id: sinceId,
             sort: 'id',
             direction: 'asc'
           })
@@ -409,11 +418,12 @@ describe('transactions.routes.test.js', function() {
           .end(function(e, res) {
             expect(e).to.not.exist;
             var transactions = res.body;
-            expect(transactions[0].id > since_id).to.be.true;
+            expect(transactions[0].id > sinceId).to.be.true;
             var last = 0;
             _.each(transactions, function(t) {
               expect(t.id >= last).to.be.true;
             });
+
             // Check pagination header.
             var headers = res.headers;
             expect(headers.link).to.be.empty;
@@ -443,6 +453,7 @@ describe('transactions.routes.test.js', function() {
               expect((new Date(a.createdAt) >= new Date(last))).to.be.true;
               last = a.createdAt;
             });
+
             done();
           });
       });
@@ -456,7 +467,8 @@ describe('transactions.routes.test.js', function() {
    */
   describe('#approve', function() {
 
-    var transaction, transaction2;
+    var transaction;
+    var transaction2;
 
     // Create a transaction for group1.
     beforeEach(function(done) {

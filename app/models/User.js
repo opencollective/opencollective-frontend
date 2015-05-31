@@ -1,11 +1,10 @@
 /**
  * Dependencies.
  */
-var bcrypt = require('bcrypt')
-  , jwt    = require('jsonwebtoken')
-  , errors = require('../lib/errors')
-  , config = require('config')
-  ;
+var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+var errors = require('../lib/errors');
+var config = require('config');
 
 /**
  * Constants.
@@ -41,10 +40,10 @@ module.exports = function(Sequelize, DataTypes) {
       validate: {
         len: {
           args: [6, 128],
-          msg: "Email must be between 6 and 128 characters in length"
+          msg: 'Email must be between 6 and 128 characters in length'
         },
         isEmail: {
-          msg: "Email must be valid"
+          msg: 'Email must be valid'
         }
       }
     },
@@ -60,11 +59,11 @@ module.exports = function(Sequelize, DataTypes) {
     password_hash: DataTypes.STRING,
     password: {
       type: DataTypes.VIRTUAL,
-      set: function (val) {
+      set: function(val) {
         this.setDataValue('password', val);
         this.setDataValue('password_hash', bcrypt.hashSync(val, this._salt));
-       },
-       validate: {
+      },
+      validate: {
         len: {
           args: [6, 128],
           msg: 'Password must be between 6 and 128 characters in length'
@@ -80,7 +79,7 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    seenAt: DataTypes.DATE,
+    seenAt: DataTypes.DATE
 
   }, {
     paranoid: true,
@@ -90,43 +89,46 @@ module.exports = function(Sequelize, DataTypes) {
       fullName: function() {
         return this.first_name + ' ' + this.last_name;
       },
+
       // Info (private).
       info: function() {
         return {
-            id: this.id
-          , first_name: this.first_name
-          , last_name: this.last_name
-          , name: this.fullName
-          , username: this.username
-          , email: this.email
-          , avatar: this.avatar
-          , createdAt: this.createdAt
-          , updatedAt: this.updatedAt
+          id: this.id,
+          first_name: this.first_name,
+          last_name: this.last_name,
+          name: this.fullName,
+          username: this.username,
+          email: this.email,
+          avatar: this.avatar,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
         };
       },
+
       // Show (to any other user).
       show: function() {
         return {
-            id: this.id
-          , first_name: this.first_name
-          , last_name: this.last_name
-          , name: this.fullName
-          , username: this.username
-          , avatar: this.avatar
-          , createdAt: this.createdAt
-          , updatedAt: this.updatedAt
+          id: this.id,
+          first_name: this.first_name,
+          last_name: this.last_name,
+          name: this.fullName,
+          username: this.username,
+          avatar: this.avatar,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
         };
       },
+
       // Minimal (used to feed the jwt token)
       minimal: function() {
         return {
-            id: this.id
-          , username: this.username
-          , avatar: this.avatar
-          , name: this.fullName
-          , email: this.email
+          id: this.id,
+          username: this.username,
+          avatar: this.avatar,
+          name: this.fullName,
+          email: this.email
         };
-      },
+      }
     },
 
     instanceMethods: {
@@ -135,10 +137,10 @@ module.exports = function(Sequelize, DataTypes) {
         var secret = config.keys.opencollective.secret;
         var payload = this.minimal;
         return jwt.sign(payload, secret, {
-            expiresInMinutes: 60*24*30 // 1 month
-          , subject: this.id // user
-          , issuer: config.host.api
-          , audience: application.id
+          expiresInMinutes: 60 * 24 * 30, // 1 month
+          subject: this.id, // user
+          issuer: config.host.api,
+          audience: application.id
         });
       }
     },
@@ -148,7 +150,7 @@ module.exports = function(Sequelize, DataTypes) {
         var msg = 'Invalid username/email or password.';
 
         User
-          .find({ where: ["username = ? OR email = ?", usernameOrEmail, usernameOrEmail] })
+          .find({ where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail] })
           .then(function(user) {
             if (!user) return fn(new errors.BadRequest(msg));
 
@@ -164,7 +166,7 @@ module.exports = function(Sequelize, DataTypes) {
           })
           .catch(fn);
       }
-    },
+    }
 
   });
 

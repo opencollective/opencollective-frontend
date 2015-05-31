@@ -21,7 +21,7 @@ module.exports = function(app) {
   /**
    * Create a transaction and add it to a group/user/card.
    */
-   var create = function(args, callback) {
+  var create = function(args, callback) {
      var transaction = args.transaction;
      var user = args.user || {};
      var group = args.group || {};
@@ -62,9 +62,9 @@ module.exports = function(app) {
            card
              .addTransaction(transaction)
              .done(cb);
-          } else {
-            cb();
-          }
+         } else {
+           cb();
+         }
        }],
 
        createActivity: ['createTransaction', function(cb, results) {
@@ -72,26 +72,25 @@ module.exports = function(app) {
 
          // Create activity.
          Activity.create({
-             type: 'group.transaction.created'
-           , UserId: user.id
-           , GroupId: group.id
-           , TransactionId: transaction.id
-           , data: {
-                 group: group.info
-               , transaction: transaction
-               , user: user.info
-               , target: transaction.beneficiary
-               , card: card.info
-             }
+           type: 'group.transaction.created',
+           UserId: user.id,
+           GroupId: group.id,
+           TransactionId: transaction.id,
+           data: {
+             group: group.info,
+             transaction: transaction,
+             user: user.info,
+             target: transaction.beneficiary,
+             card: card.info
+           }
          }).done(cb);
-       }],
+       }]
 
      }, function(e, results) {
        if (e) return callback(e);
        else callback(null, results.createTransaction);
      });
    }
-
 
   /**
    * Public methods.
@@ -102,7 +101,7 @@ module.exports = function(app) {
      * (Dis)approve a transaction.
      */
     approve: function(req, res, next) {
-      req.transaction.approved = req.required['approved'];
+      req.transaction.approved = req.required.approved;
       req.transaction.approvedAt = new Date();
 
       req.transaction
@@ -113,7 +112,7 @@ module.exports = function(app) {
         .catch(next);
     },
 
-    _create: create,
+    _create: create
 
   }
 

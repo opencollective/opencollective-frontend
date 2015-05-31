@@ -33,7 +33,7 @@ module.exports = function(Sequelize, DataTypes) {
           })
           .catch(fn);
       }
-    },
+    }
   });
 
   return Application;

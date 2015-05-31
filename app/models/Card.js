@@ -21,14 +21,14 @@ module.exports = function(Sequelize, DataTypes) {
       // Info.
       info: function() {
         return {
-            id: this.id
-          , number: this.number
-          , service: this.service
-          , createdAt: this.createdAt
-          , updatedAt: this.updatedAt
+          id: this.id,
+          number: this.number,
+          service: this.service,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
         };
-      },
-    },
+      }
+    }
   });
 
   return Card;

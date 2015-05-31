@@ -12,11 +12,10 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models')
-    , User = models.User
-    , Activity = models.Activity
-    , errors = app.errors
-    ;
+  var models = app.set('models');
+  var User = models.User;
+  var Activity = models.Activity;
+  var errors = app.errors;
 
   /**
    * Private methods.
@@ -26,7 +25,7 @@ module.exports = function(app) {
       where: {
         GroupId: req.group.id
       },
-      order: [ [req.sorting.key, req.sorting.dir] ]
+      order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
 
     Activity
@@ -36,7 +35,7 @@ module.exports = function(app) {
         // Set headers for pagination.
         req.pagination.total = activities.count;
         res.set({
-          'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+          Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
         });
 
         res.send(activities.rows);
@@ -54,14 +53,14 @@ module.exports = function(app) {
      */
     create: function(req, res, next) {
       User
-        .create(req.required['user'])
+        .create(req.required.user)
         .then(function(user) {
           res.send(user.info);
 
           Activity.create({
-              type: 'user.created'
-            , UserId: user.id
-            , data: {user: user.info}
+            type: 'user.created',
+            UserId: user.id,
+            data: {user: user.info}
           });
         })
         .catch(next);
@@ -72,8 +71,8 @@ module.exports = function(app) {
      */
     getToken: function(req, res, next) {
       res.send({
-          access_token: req.user.jwt(req.application)
-        , refresh_token: req.user.refresh_token
+        access_token: req.user.jwt(req.application),
+        refresh_token: req.user.refresh_token
       });
     },
 
@@ -109,7 +108,7 @@ module.exports = function(app) {
           res.send(out);
         })
         .catch(next);
-    },
+    }
 
   }
 

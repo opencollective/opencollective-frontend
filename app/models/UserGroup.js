@@ -1,9 +1,9 @@
 module.exports = function(Sequelize, DataTypes) {
-  
+
   var UserGroup = Sequelize.define('UserGroup', {
     // Role.
     role: DataTypes.ENUM('admin', 'writer', 'viewer'),
-    
+
     // Dates.
     createdAt: {
       type: DataTypes.DATE,
@@ -20,16 +20,16 @@ module.exports = function(Sequelize, DataTypes) {
       // Info.
       info: function() {
         return {
-            role: this.role
-          , GroupId: this.GroupId
-          , UserId: this.UserId
-          , createdAt: this.createdAt
-          , updatedAt: this.updatedAt
-          , deletedAt: this.deletedAt
+          role: this.role,
+          GroupId: this.GroupId,
+          UserId: this.UserId,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt,
+          deletedAt: this.deletedAt
         };
-      },
-    },
-    
+      }
+    }
+
   });
 
   return UserGroup;

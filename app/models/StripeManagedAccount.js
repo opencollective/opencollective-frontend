@@ -28,12 +28,12 @@ module.exports = function(Sequelize, DataTypes) {
     getterMethods: {
       info: function() {
         return {
-            id: this.id
-          , stripeId: this.stripeId
-          , stripeKey: this.stripeKey
+          id: this.id,
+          stripeId: this.stripeId,
+          stripeKey: this.stripeKey
         };
-      },
-    },
+      }
+    }
 
   });
 

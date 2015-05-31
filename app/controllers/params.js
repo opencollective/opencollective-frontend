@@ -3,12 +3,11 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models')
-    , User = models.User
-    , Group = models.Group
-    , Transaction = models.Transaction
-    , errors = app.errors
-    ;
+  var models = app.set('models');
+  var User = models.User;
+  var Group = models.Group;
+  var Transaction = models.Transaction;
+  var errors = app.errors;
 
   /**
    * Public methods.
@@ -64,7 +63,7 @@ module.exports = function(app) {
           }
         })
         .catch(next);
-    },
+    }
 
   }
 

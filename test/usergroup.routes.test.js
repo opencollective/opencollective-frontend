@@ -1,13 +1,12 @@
 /**
  * Dependencies.
  */
-var expect    = require('chai').expect
-  , request   = require('supertest')
-  , _         = require('lodash')
-  , app       = require('../index')
-  , utils     = require('../test/utils.js')()
-  , config    = require('config')
-  ;
+var _ = require('lodash');
+var app = require('../index');
+var config = require('config');
+var expect = require('chai').expect;
+var request = require('supertest');
+var utils = require('../test/utils.js')();
 
 /**
  * Variables.
@@ -21,10 +20,10 @@ var models = app.set('models');
  */
 describe('usergroup.routes.test.js', function() {
 
-  var application
-    , user, user2
-    , group
-    ;
+  var application;
+  var user;
+  var user2;
+  var group;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -41,6 +40,7 @@ describe('usergroup.routes.test.js', function() {
       done();
     });
   });
+
   beforeEach(function(done) {
     models.User.create(utils.data('user2')).done(function(e, u) {
       expect(e).to.not.exist;
@@ -48,6 +48,7 @@ describe('usergroup.routes.test.js', function() {
       done();
     });
   });
+
   beforeEach(function(done) {
     models.User.create(utils.data('user3')).done(function(e, u) {
       expect(e).to.not.exist;
@@ -71,6 +72,7 @@ describe('usergroup.routes.test.js', function() {
       .addMember(user, {role: 'admin'})
       .done(done);
   });
+
   // Add an viewer to the group.
   beforeEach(function(done) {
     group
