@@ -74,7 +74,8 @@ var getLinks = function(url, options) {
  */
 var paginatePage = function(offset, limit) {
   return {
-    page: Math.floor(offset / limit + 1), per_page: limit
+    page: Math.floor(offset / limit + 1),
+    perPage: limit
   }
 };
 
