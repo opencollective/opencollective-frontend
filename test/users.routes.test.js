@@ -154,7 +154,8 @@ describe('users.routes.test.js', function() {
    */
   describe('#get()', function() {
 
-    var user, user2;
+    var user;
+    var user2;
 
     beforeEach(function(done) {
       models.User.create(utils.data('user1')).done(function(e, u) {

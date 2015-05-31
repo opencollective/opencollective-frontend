@@ -40,7 +40,7 @@
   "scripts": {
     "test": "make test",
     "start": "node .",
-    "hint": "./node_modules/.bin/jscs app/**/*.js test/*.js --preset=airbnb"
+    "hint": "./node_modules/.bin/jscs app/**/*.js test/*.js --config=.jscsrc"
   },
   "license": "Copyright (c) 2015 Philmod"
 }
