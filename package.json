@@ -29,6 +29,7 @@
   "devDependencies": {
     "chai": "*",
     "istanbul": "0.3.2",
+    "jsxhint": "^0.15.1",
     "mocha": "*",
     "nock": "^2.2.0",
     "sequelize-cli": "^1.4.0",
@@ -37,7 +38,8 @@
   },
   "scripts": {
     "test": "make test",
-    "start": "node ."
+    "start": "node .",
+    "hint": "./node_modules/.bin/jsxhint **/*.js -c .jshintrc"
   },
   "license": "Copyright (c) 2015 Philmod"
 }
