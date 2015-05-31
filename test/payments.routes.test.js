@@ -29,7 +29,11 @@ var stripeMock = require('./mocks/stripe');
  */
 describe('payments.routes.test.js', function() {
 
-  var application, application2, user, group, group2;
+  var application;
+  var application2;
+  var user;
+  var group;
+  var group2;
   var nocks = {};
 
   beforeEach(function(done) {

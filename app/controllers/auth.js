@@ -22,7 +22,7 @@ module.exports = function(app) {
 
       req.user = req.remoteUser;
       next();
-    },
+    }
 
   };
 

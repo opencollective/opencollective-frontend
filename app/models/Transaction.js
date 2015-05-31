@@ -25,7 +25,7 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     },
     approvedAt: DataTypes.DATE,
-    reimbursedAt: DataTypes.DATE,
+    reimbursedAt: DataTypes.DATE
   });
 
   return Transaction;

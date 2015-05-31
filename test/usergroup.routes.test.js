@@ -20,7 +20,10 @@ var models = app.set('models');
  */
 describe('usergroup.routes.test.js', function() {
 
-  var application, user, user2, group;
+  var application;
+  var user;
+  var user2;
+  var group;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -37,6 +40,7 @@ describe('usergroup.routes.test.js', function() {
       done();
     });
   });
+
   beforeEach(function(done) {
     models.User.create(utils.data('user2')).done(function(e, u) {
       expect(e).to.not.exist;
@@ -44,6 +48,7 @@ describe('usergroup.routes.test.js', function() {
       done();
     });
   });
+
   beforeEach(function(done) {
     models.User.create(utils.data('user3')).done(function(e, u) {
       expect(e).to.not.exist;

@@ -24,7 +24,8 @@ var stripeMock = require('./mocks/stripe')
  */
 describe('groups.routes.test.js', function() {
 
-  var application, user;
+  var application;
+  var user;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -194,7 +195,10 @@ describe('groups.routes.test.js', function() {
    */
   describe('#get', function() {
 
-    var group, user2, application2, application3;
+    var group;
+    var user2;
+    var application2;
+    var application3;
 
     // Create the group with user.
     beforeEach(function(done) {

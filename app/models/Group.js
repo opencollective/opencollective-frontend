@@ -50,18 +50,18 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
-      },
+      }
     },
 
     instanceMethods: {
-      isMember: function(user_id, roles, fn) {
+      isMember: function(userId, roles, fn) {
         if (!roles || typeof roles === 'function') {
           fn = roles;
           roles = null;
         }
 
         this
-          .getMembers({where: {id: user_id} })
+          .getMembers({where: {id: userId} })
           .then(function(members) {
             if (members.length === 0)
               return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
@@ -72,7 +72,7 @@ module.exports = function(Sequelize, DataTypes) {
             }
           })
           .catch(fn);
-      },
+      }
     }
   });
 

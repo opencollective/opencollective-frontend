@@ -38,7 +38,7 @@ module.exports = function(app) {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+            Link: utils.getLinkHeader(utils.getRequestedUrl(req),
                                         req.pagination)
           });
 
@@ -65,7 +65,7 @@ module.exports = function(app) {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+            Link: utils.getLinkHeader(utils.getRequestedUrl(req),
                                         req.pagination)
           });
 

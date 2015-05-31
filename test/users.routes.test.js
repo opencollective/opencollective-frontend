@@ -19,7 +19,8 @@ var models = app.set('models');
  */
 describe('users.routes.test.js', function() {
 
-  var application, application2;
+  var application;
+  var application2;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {

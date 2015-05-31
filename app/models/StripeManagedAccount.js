@@ -32,8 +32,8 @@ module.exports = function(Sequelize, DataTypes) {
           stripeId: this.stripeId,
           stripeKey: this.stripeKey
         };
-      },
-    },
+      }
+    }
 
   });
 

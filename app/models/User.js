@@ -40,10 +40,10 @@ module.exports = function(Sequelize, DataTypes) {
       validate: {
         len: {
           args: [6, 128],
-          msg: "Email must be between 6 and 128 characters in length"
+          msg: 'Email must be between 6 and 128 characters in length'
         },
         isEmail: {
-          msg: "Email must be valid"
+          msg: 'Email must be valid'
         }
       }
     },
@@ -79,7 +79,7 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    seenAt: DataTypes.DATE,
+    seenAt: DataTypes.DATE
 
   }, {
     paranoid: true,
@@ -128,7 +128,7 @@ module.exports = function(Sequelize, DataTypes) {
           name: this.fullName,
           email: this.email
         };
-      },
+      }
     },
 
     instanceMethods: {
@@ -150,7 +150,7 @@ module.exports = function(Sequelize, DataTypes) {
         var msg = 'Invalid username/email or password.';
 
         User
-          .find({ where: ["username = ? OR email = ?", usernameOrEmail, usernameOrEmail] })
+          .find({ where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail] })
           .then(function(user) {
             if (!user) return fn(new errors.BadRequest(msg));
 
@@ -166,7 +166,7 @@ module.exports = function(Sequelize, DataTypes) {
           })
           .catch(fn);
       }
-    },
+    }
 
   });
 

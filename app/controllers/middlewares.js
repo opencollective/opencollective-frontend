@@ -138,7 +138,7 @@ module.exports = function(app) {
       if (!req.remoteUser)
         return next();
 
-      var app_id = req.remoteUser.aud;
+      var appId = req.remoteUser.aud;
 
       async.parallel([
         function(cb) {
@@ -153,7 +153,7 @@ module.exports = function(app) {
         function(cb) {
           // Check the validity of the application in the token.
           Application
-            .find(parseInt(app_id))
+            .find(parseInt(appId))
             .then(function(application) {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));
@@ -306,26 +306,26 @@ module.exports = function(app) {
       return function(req, res, next) {
 
         // Since ID.
-        var since_id = req.body.since_id || req.query.since_id;
-        if (since_id) {
+        var sinceId = req.body.since_id || req.query.since_id;
+        if (sinceId) {
           req.pagination = {
             where: {
-              id: {$gt: since_id}
+              id: {$gt: sinceId}
             }
           };
           return next();
         }
 
         // Page / Per_page.
-        var per_page = (req.body.per_page || req.query.per_page);
-        per_page = per_page * 1 || options.default;
+        var perPage = (req.body.per_page || req.query.per_page);
+        perPage = perPage * 1 || options.default;
         var page = (req.body.page || req.query.page) * 1 || 1;
 
         page = (page < 1) ? 1 : page;
-        per_page = (per_page < options.min) ? options.min : per_page;
-        per_page = (per_page > options.max) ? options.max : per_page;
+        perPage = (perPage < options.min) ? options.min : perPage;
+        perPage = (perPage > options.max) ? options.max : perPage;
 
-        req.pagination = utils.paginateOffset(page, per_page);
+        req.pagination = utils.paginateOffset(page, perPage);
 
         next();
       };
@@ -351,7 +351,7 @@ module.exports = function(app) {
 
         next();
       };
-    },
+    }
 
   };
 

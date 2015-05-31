@@ -1,7 +1,10 @@
-var os         = require('os');
-var exec       = require('child_process').exec;
-var async      = require('async');
-var started_at = new Date();
+/**
+ * Dependencies.
+ */
+var os = require('os');
+var exec = require('child_process').exec;
+var async = require('async');
+var startedAt = new Date();
 
 module.exports = function(req, res, next) {
 
@@ -36,15 +39,15 @@ module.exports = function(req, res, next) {
           version: server.set('version'),
 
           // sha        : server.set('git sha'),
-          started_at: started_at,
+          started_at: startedAt,
           node: {
             version: process.version,
-            memoryUsage: Math.round(process.memoryUsage().rss / 1024 / 1024) + "M",
+            memoryUsage: Math.round(process.memoryUsage().rss / 1024 / 1024) + 'M',
             uptime: process.uptime()
           },
           system: {
             loadavg: os.loadavg(),
-            freeMemory: Math.round(os.freemem() / 1024 / 1024) + "M"
+            freeMemory: Math.round(os.freemem() / 1024 / 1024) + 'M'
           },
           env: process.env.NODE_ENV,
           hostname: os.hostname(),

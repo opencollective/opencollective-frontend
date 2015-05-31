@@ -22,7 +22,10 @@ var models = app.set('models');
  */
 describe('activities.routes.test.js', function() {
 
-  var application, user, user2, group;
+  var application;
+  var user;
+  var user2;
+  var group;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -117,13 +120,13 @@ describe('activities.routes.test.js', function() {
 
     describe('Pagination', function() {
 
-      var per_page = 3;
+      var perPage = 3;
 
       it('successfully get a group\'s activities with per_page', function(done) {
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
-            per_page: per_page,
+            per_page: perPage,
             sort: 'id',
             direction: 'asc'
           })
@@ -141,10 +144,10 @@ describe('activities.routes.test.js', function() {
             expect(headers.link).to.contain('page=2');
             expect(headers.link).to.contain('current');
             expect(headers.link).to.contain('page=1');
-            expect(headers.link).to.contain('per_page=' + per_page);
+            expect(headers.link).to.contain('per_page=' + perPage);
             expect(headers.link).to.contain('/groups/' + group.id + '/activities');
             var tot = _.reduce(activitiesData, function(memo, el) { return memo + ((el.GroupId === group.id) ? 1 : 0); }, 0);
-            expect(headers.link).to.contain('/groups/1/activities?page=' + Math.ceil(tot / per_page) + '&per_page=' + per_page + '>; rel="last"');
+            expect(headers.link).to.contain('/groups/1/activities?page=' + Math.ceil(tot / perPage) + '&per_page=' + perPage + '>; rel="last"');
 
             done();
           });
@@ -155,7 +158,7 @@ describe('activities.routes.test.js', function() {
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
-            per_page: per_page,
+            per_page: perPage,
             page: page,
             sort: 'id',
             direction: 'asc'
@@ -176,12 +179,12 @@ describe('activities.routes.test.js', function() {
       });
 
       it('successfully get a group\'s activities using since_id', function(done) {
-        var since_id = 8;
+        var sinceId = 8;
 
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
-            since_id: since_id,
+            since_id: sinceId,
             sort: 'id',
             direction: 'asc'
           })
@@ -190,7 +193,7 @@ describe('activities.routes.test.js', function() {
           .end(function(e, res) {
             expect(e).to.not.exist;
             var activities = res.body;
-            expect(activities[0].id > since_id).to.be.true;
+            expect(activities[0].id > sinceId).to.be.true;
             var last = 0;
             _.each(activities, function(a) {
               expect(a.id >= last).to.be.true;

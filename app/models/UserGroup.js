@@ -27,8 +27,8 @@ module.exports = function(Sequelize, DataTypes) {
           updatedAt: this.updatedAt,
           deletedAt: this.deletedAt
         };
-      },
-    },
+      }
+    }
 
   });
 

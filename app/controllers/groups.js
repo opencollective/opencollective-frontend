@@ -100,7 +100,7 @@ module.exports = function(app) {
                   })
                   .catch(cb);
               });
-            },
+            }
           }, function(e) {
             if (e) return next(e);
             res.send(group.info);
@@ -240,7 +240,7 @@ module.exports = function(app) {
                user: user.info
              }
            }).done(cb);
-         }],
+         }]
 
        }, function(e) {
          if (e) return next(e);
@@ -267,14 +267,14 @@ module.exports = function(app) {
             // Set headers for pagination.
             req.pagination.total = transactions.count;
             res.set({
-              'Link': utils.getLinkHeader(utils.getRequestedUrl(req),
+              Link: utils.getLinkHeader(utils.getRequestedUrl(req),
                                           req.pagination)
             });
 
             res.send(transactions.rows);
           })
           .catch(next);
-      },
+      }
 
   };
 

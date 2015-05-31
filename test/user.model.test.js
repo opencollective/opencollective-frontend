@@ -16,7 +16,8 @@ var userData = utils.data('user1');
  */
 describe('user.models.test.js', function() {
 
-  var application, User;
+  var application;
+  var User;
 
   beforeEach(function() {
     User = app.get('models').User;

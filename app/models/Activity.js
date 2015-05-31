@@ -10,7 +10,7 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     }
   }, {
-    updatedAt: false,
+    updatedAt: false
   });
 
   return Activity;

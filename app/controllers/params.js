@@ -63,7 +63,7 @@ module.exports = function(app) {
           }
         })
         .catch(next);
-    },
+    }
 
   }
 

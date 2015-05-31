@@ -35,7 +35,7 @@ module.exports = function(app) {
         // Set headers for pagination.
         req.pagination.total = activities.count;
         res.set({
-          'Link': utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+          Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
         });
 
         res.send(activities.rows);
@@ -53,7 +53,7 @@ module.exports = function(app) {
      */
     create: function(req, res, next) {
       User
-        .create(req.required['user'])
+        .create(req.required.user)
         .then(function(user) {
           res.send(user.info);
 
@@ -108,7 +108,7 @@ module.exports = function(app) {
           res.send(out);
         })
         .catch(next);
-    },
+    }
 
   }
 

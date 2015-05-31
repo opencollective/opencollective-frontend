@@ -1,5 +1,5 @@
 module.exports = {
-  
+
   BadRequest: function(msg, err) {
     err = err || {};
     this.code = 400;
@@ -7,14 +7,14 @@ module.exports = {
     this.message = msg;
     Error.call(this, msg);
   },
-  
+
   ValidationFailed: function(type, fields, msg) {
     this.code = 400;
     this.type = type || 'validation_failed';
     this.message = msg || 'Missing required fields';
     this.fields = fields;
   },
-  
+
   Unauthorized: function(msg) {
     this.code = 401;
     this.type = 'unauthorized';
@@ -35,7 +35,7 @@ module.exports = {
     this.message = msg;
     Error.call(this, msg);
   },
-  
+
   NotFound: function(msg) {
     this.code = 404;
     this.type = 'not_found';
@@ -49,7 +49,7 @@ module.exports = {
     this.message = msg;
     Error.call(this, msg);
   },
-  
+
   Timeout: function(url, ms) {
     this.code = 408;
     this.timeout = ms;
@@ -98,6 +98,6 @@ Error.prototype.info = function() {
     result.type = 'internal_error';
     result.message += ' Something went wrong.';
   }
-  
+
   return result;
-}
+};

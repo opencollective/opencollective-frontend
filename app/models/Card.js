@@ -27,8 +27,8 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
-      },
-    },
+      }
+    }
   });
 
   return Card;

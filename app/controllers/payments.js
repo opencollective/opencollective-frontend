@@ -140,14 +140,14 @@ module.exports = function(app) {
               }
             })
             .catch(cb);
-        }],
+        }]
 
       }, function(e, results) {
         if (e) return next(e);
         res.send({success: true});
       });
 
-    },
+    }
 
   }
 

@@ -84,7 +84,7 @@ module.exports = function(app) {
              card: card.info
            }
          }).done(cb);
-       }],
+       }]
 
      }, function(e, results) {
        if (e) return callback(e);
@@ -101,7 +101,7 @@ module.exports = function(app) {
      * (Dis)approve a transaction.
      */
     approve: function(req, res, next) {
-      req.transaction.approved = req.required['approved'];
+      req.transaction.approved = req.required.approved;
       req.transaction.approvedAt = new Date();
 
       req.transaction
@@ -112,7 +112,7 @@ module.exports = function(app) {
         .catch(next);
     },
 
-    _create: create,
+    _create: create
 
   }
 
