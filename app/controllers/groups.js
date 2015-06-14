@@ -111,6 +111,24 @@ module.exports = function(app) {
     },
 
     /**
+     * Update.
+     */
+    update: function(req, res, next) {
+      ['name', 'description', 'budget', 'currency', 'membership_type', 'membershipfee'].forEach(function(prop) {
+        if (req.required.group[prop])
+          req.group[prop] = req.required.group[prop];
+      });
+      req.group.updatedAt = new Date();
+
+      req.group
+        .save()
+        .then(function(group) {
+          res.send(group.info);
+        })
+        .catch(next);
+    },
+
+    /**
      * Get group content.
      */
     get: function(req, res, next) {
