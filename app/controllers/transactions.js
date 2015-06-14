@@ -112,7 +112,11 @@ module.exports = function(app) {
         .catch(next);
     },
 
-    _create: create
+    _create: create,
+
+    getPayKey: function(req, res, next) {
+      console.log('getPayKey: ', req.transaction.id);
+    }
 
   }
 
