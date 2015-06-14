@@ -268,6 +268,8 @@ module.exports = function(app) {
      * Authorize for group's administrator.
      */
     authorizeGroupAdmin: function(req, res, next) {
+      if (!req.remoteUser && req.application) // called with an api_key without user
+        return next();
       req.group.isMember(req.remoteUser.id, 'admin', next);
     },
 
