@@ -397,4 +397,149 @@ describe('groups.routes.test.js', function() {
 
   });
 
+  /**
+   * Update.
+   */
+  describe('#update', function() {
+
+    var group;
+    var user2;
+    var user3;
+    var application2;
+    var groupNew = {
+      name: 'newname',
+      description: 'newdesc',
+      budget: 11111.99,
+      membership_type: 'donation',
+      membershipfee: 11,
+      otherprop: 'value'
+    };
+
+    // Create the group with user.
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: groupData,
+          role: 'admin'
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.Group
+            .find(parseInt(res.body.id))
+            .then(function(g) {
+              group = g;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    // Create another user.
+    beforeEach(function(done) {
+      models.User.create(utils.data('user2')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user2 = u;
+        done();
+      });
+    });
+
+    // Create another user that is a viewer.
+    beforeEach(function(done) {
+      models.User.create(utils.data('user3')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user3 = u;
+        group
+          .addMember(user3, {role: 'viewer'})
+          .done(done);
+      });
+    });
+
+    // Create an application which has only access to `group`
+    beforeEach(function(done) {
+      models.Application.create(utils.data('application2')).done(function(e, a) {
+        expect(e).to.not.exist;
+        application2 = a;
+        application2.addGroup(group).done(done);
+      });
+    });
+
+    it('fails updating a group if not authenticated', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .send({
+          group: groupNew
+        })
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails updating a group if the user authenticated has no access', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .send({
+          group: groupNew
+        })
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a group if the user authenticated is a viewer', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
+        .send({
+          group: groupNew
+        })
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a group if no data passed', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(400)
+        .end(done);
+    });
+
+    it('successfully udpates a group if authenticated as a user', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: groupNew
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', group.id);
+          expect(res.body).to.have.property('name', groupNew.name);
+          expect(res.body).to.have.property('description', groupNew.description);
+          expect(res.body).to.have.property('budget', groupNew.budget);
+          expect(res.body).to.have.property('membership_type', groupNew.membership_type);
+          expect(res.body).to.have.property('membershipfee', groupNew.membershipfee);
+          expect(res.body).to.not.have.property('otherprop');
+          expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
+          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());
+          done();
+        });
+    });
+
+    it('successfully updates a group if authenticated as a group', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .send({
+          api_key: application2.api_key,
+          group: groupNew
+        })
+        .expect(200)
+        .end(done);
+    });
+
+  });
+
 });

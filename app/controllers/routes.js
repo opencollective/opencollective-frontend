@@ -73,7 +73,7 @@ module.exports = function(app) {
    */
   app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
-  app.put('/groups/:groupid', fake); // Update a group.
+  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupAdmin, mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', fake); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
@@ -123,7 +123,6 @@ module.exports = function(app) {
     if (!err.code)
       err.code = err.status || 500;
 
-    // console.trace(err);
     console.error('Error Express : ', err);
     res.status(err.code).send({error: err});
   });
