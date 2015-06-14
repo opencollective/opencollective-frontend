@@ -38,9 +38,9 @@ module.exports = function(app) {
   app.use(mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser', credentialsRequired: false}), mw.identifyFromToken);
 
   /**
-   * Fake temp response.
+   * NotImplemented response.
    */
-  var fake = function(req, res, next) {
+  var NotImplemented = function(req, res, next) {
     return next(new errors.NotImplemented('Not implemented yet.'));
   };
 
@@ -49,24 +49,24 @@ module.exports = function(app) {
    */
   app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.internal, mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', mw.authorizeAuthUser, users.show); // Get a user.
-  app.put('/users/:userid', fake); // Update a user.
-  app.get('/users/:userid/email', fake); // Confirm a user's email.
+  app.put('/users/:userid', NotImplemented); // Update a user.
+  app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   /**
    * Authentication.
    */
   app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, auth.byPassword, users.getToken); // Authenticate user to get a token.
-  app.post('/authenticate/refresh', fake); // Refresh the token (using a valid token OR a expired token + refresh_token).
-  app.post('/authenticate/reset', fake); // Reset the refresh_token.
+  app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
+  app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
 
   /**
    * Credit card.
    *
    *  Let's assume for now a card is linked to a user.
    */
-  app.post('/users/:userid/cards', fake); // Create a user's card.
-  app.put('/users/:userid/cards/:cardid', fake); // Update a user's card.
-  app.delete('/users/:userid/cards/:cardid', fake); // Delete a user's card.
+  app.post('/users/:userid/cards', NotImplemented); // Create a user's card.
+  app.put('/users/:userid/cards/:cardid', NotImplemented); // Update a user's card.
+  app.delete('/users/:userid/cards/:cardid', NotImplemented); // Delete a user's card.
 
   /**
    * Groups.
@@ -74,7 +74,7 @@ module.exports = function(app) {
   app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
   app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupAdmin, mw.required('group'), groups.update); // Update a group.
-  app.delete('/groups/:groupid', fake); // Delete a group.
+  app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
 
@@ -85,8 +85,8 @@ module.exports = function(app) {
    */
   app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
   app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', fake); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', fake); // Remove a user from a group.
+  app.put('/groups/:groupid/users/:userid', NotImplemented); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', NotImplemented); // Remove a user from a group.
 
   /**
    * Transactions (financial).
