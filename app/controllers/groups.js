@@ -14,6 +14,7 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
+  var errors = app.errors;
   var models = app.set('models');
   var Group = models.Group;
   var Activity = models.Activity;
@@ -208,6 +209,62 @@ module.exports = function(app) {
         if (e) return next(e);
         else res.send({success: true});
       });
+    },
+
+    /**
+     * Update a member.
+     */
+    updateMember: function(req, res, next) {
+      var query = {
+        where: {
+          GroupId: req.group.id,
+          UserId: req.user.id
+        }
+      };
+
+      models
+        .UserGroup
+        .findOne(query)
+        .then(function(usergroup) {
+          if (!usergroup) {
+            throw (new errors.NotFound('The user is not part of the group yet.'));
+          }
+
+          return usergroup;
+        })
+        .then(function(usergroup) {
+          ['role'].forEach(function(prop) {
+            if (req.body[prop])
+              usergroup[prop] = req.body[prop];
+          });
+          usergroup.updatedAt = new Date();
+
+          return usergroup
+            .save();
+        })
+        .then(function(usergroup) {
+          // Create activities.
+          var remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+          var activity = {
+            type: 'group.user.updated',
+            GroupId: req.group.id,
+            data: {
+              group: req.group.info,
+              user: remoteUser,
+              target: req.user.info,
+              usergroup: usergroup.info
+            }
+          };
+          Activity.create(_.extend({UserId: req.user.id}, activity));
+          if (req.remoteUser && req.user.id !== req.remoteUser.id)
+            Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
+
+          return usergroup;
+        })
+        .then(function(usergroup) {
+          res.send(usergroup);
+        })
+        .catch(next);
     },
 
     /**
