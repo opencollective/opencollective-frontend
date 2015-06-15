@@ -86,7 +86,7 @@ module.exports = function(app) {
   app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
   app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember); // Add a user to a group.
   app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.updateMember); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', NotImplemented); // Remove a user from a group.
+  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.deleteMember); // Remove a user from a group.
 
   /**
    * Transactions (financial).
