@@ -307,16 +307,25 @@ describe('payments.routes.test.js', function() {
 
     describe('Payment success by anonymous user', function() {
 
+      var data = {
+        stripeToken: STRIPE_TOKEN,
+        amount: CHARGE,
+        currency: CURRENCY,
+        description: 'super description',
+        beneficiary: '@beneficiary',
+        paidby: '@paidby',
+        tags: ['tag1', 'tag2'],
+        status: 'super status',
+        link: 'www.opencollective.com',
+        comment: 'super comment'
+      };
+
       beforeEach('successfully makes a anonymous payment', function(done) {
         request(app)
           .post('/groups/' + group2.id + '/payments')
           .send({
             api_key: application2.api_key,
-            payment: {
-              stripeToken: STRIPE_TOKEN,
-              amount: CHARGE,
-              currency: CURRENCY
-            }
+            payment: data
           })
           .expect(200)
           .end(function(e, res) {
@@ -353,6 +362,13 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', null);
             expect(res.rows[0]).to.have.property('CardId', 1);
+            expect(res.rows[0]).to.have.property('currency', CURRENCY.toLowerCase());
+            expect(res.rows[0]).to.have.property('tags');
+            expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
+            expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
+            ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
+              expect(res.rows[0]).to.have.property(prop, data[prop]);
+            });
             done();
           })
           .catch(done);

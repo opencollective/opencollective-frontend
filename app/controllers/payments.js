@@ -110,14 +110,21 @@ module.exports = function(app) {
         createTransaction: ['createCard', 'createCharge', function(cb, results) {
           var charge = results.createCharge;
 
+          var transaction = {
+            type: 'payment',
+            amount: payment.amount,
+            currency: charge.currency,
+            paidby: user && user.id,
+            approved: true
+          };
+
+          ['description', 'beneficiary', 'paidby', 'tags', 'status', 'link', 'comment'].forEach(function(prop) {
+            if (payment[prop])
+              transaction[prop] = payment[prop];
+          });
+
           transactions._create({
-            transaction: {
-              type: 'payment',
-              amount: payment.amount,
-              currency: charge.currency,
-              paidby: user && user.id,
-              approved: true
-            },
+            transaction: transaction,
             user: user,
             group: group,
             card: results.createCard
