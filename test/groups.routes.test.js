@@ -305,6 +305,7 @@ describe('groups.routes.test.js', function() {
       var group2;
       var transactions = [];
       var totTransactions = 0;
+      var totDonations = 0;
 
       // Create group2.
       beforeEach(function(done) {
@@ -320,7 +321,11 @@ describe('groups.routes.test.js', function() {
       // Create transactions for group1.
       beforeEach(function(done) {
         async.each(transactionsData, function(transaction, cb) {
-          totTransactions += transaction.amount;
+          if (transaction.amount < 0)
+            totTransactions += transaction.amount;
+          else
+            totDonations += transaction.amount;
+
           request(app)
             .post('/groups/' + group.id + '/transactions')
             .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -357,10 +362,10 @@ describe('groups.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
-            var group = res.body;
-            expect(group).to.have.property('budget', group.budget);
-            expect(group).to.have.property('budgetLeft', (group.budget + totTransactions));
-            expect(group).to.not.have.property('activities');
+            var g = res.body;
+            expect(g).to.have.property('budget', group.budget + totDonations);
+            expect(g).to.have.property('budgetLeft', (group.budget + totDonations + totTransactions));
+            expect(g).to.not.have.property('activities');
             done();
           });
       });
