@@ -25,8 +25,8 @@
     "rest": {
       "account": "philippe.modard+us-facilitator@gmail.com",
       "endpoint": "api.sandbox.paypal.com",
-      "clientId": "AdXWEaJavH1AxcLVsvD9SqT8EZYYhnyidQBTj4QJ-ZqMcp1majkeGA-IZOQkFOkrm3MTFoJcvls4i3WL",
-      "secret": "ECtaZIp0WkfvABCmhcUShdVQioL9wZBfEPw5mXxclCIsJwE2gYn0SwujT0vWrJx8chhVWGFxMFSYfrRO"
+      "clientId": "",
+      "secret": ""
     },
     "classic": {
       "appId": "APP-80W284485P519543T"
