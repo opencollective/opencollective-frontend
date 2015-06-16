@@ -136,14 +136,32 @@ module.exports = function(app) {
 
       async.auto({
 
-        getTotalTransactions: function(cb) {
+        getPositivesTransactions: function(cb) {
           Transaction
             .find({
               attributes: [
                 [sequelize.fn('SUM', sequelize.col('amount')), 'total']
               ],
               where: {
-                GroupId: req.group.id
+                GroupId: req.group.id,
+                amount: {$gt: 0}
+              }
+            })
+            .then(function(result) {
+              cb(null, result.toJSON().total);
+            })
+            .catch(cb);
+        },
+
+        getNegativesTransactions: function(cb) {
+          Transaction
+            .find({
+              attributes: [
+                [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+              ],
+              where: {
+                GroupId: req.group.id,
+                amount: {$lt: 0}
               }
             })
             .then(function(result) {
@@ -180,9 +198,11 @@ module.exports = function(app) {
         }
 
       }, function(e, results) {
+        if (e) return next(e);
 
         var group = req.group.info;
-        group.budgetLeft = group.budget + results.getTotalTransactions;
+        group.budget = group.budget + results.getPositivesTransactions;
+        group.budgetLeft = group.budget + results.getNegativesTransactions;
         if (results.getActivities) {
           group.activities = results.getActivities;
         }
