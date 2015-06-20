@@ -14,6 +14,7 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
+  var errors = app.errors;
   var models = app.set('models');
   var Group = models.Group;
   var Activity = models.Activity;
@@ -135,14 +136,32 @@ module.exports = function(app) {
 
       async.auto({
 
-        getTotalTransactions: function(cb) {
+        getPositivesTransactions: function(cb) {
           Transaction
             .find({
               attributes: [
                 [sequelize.fn('SUM', sequelize.col('amount')), 'total']
               ],
               where: {
-                GroupId: req.group.id
+                GroupId: req.group.id,
+                amount: {$gt: 0}
+              }
+            })
+            .then(function(result) {
+              cb(null, result.toJSON().total);
+            })
+            .catch(cb);
+        },
+
+        getNegativesTransactions: function(cb) {
+          Transaction
+            .find({
+              attributes: [
+                [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+              ],
+              where: {
+                GroupId: req.group.id,
+                amount: {$lt: 0}
               }
             })
             .then(function(result) {
@@ -179,9 +198,11 @@ module.exports = function(app) {
         }
 
       }, function(e, results) {
+        if (e) return next(e);
 
         var group = req.group.info;
-        group.budgetLeft = group.budget + results.getTotalTransactions;
+        group.budget = group.budget + results.getPositivesTransactions;
+        group.budgetLeft = group.budget + results.getNegativesTransactions;
         if (results.getActivities) {
           group.activities = results.getActivities;
         }
@@ -208,6 +229,109 @@ module.exports = function(app) {
         if (e) return next(e);
         else res.send({success: true});
       });
+    },
+
+    /**
+     * Update a member.
+     */
+    updateMember: function(req, res, next) {
+      var query = {
+        where: {
+          GroupId: req.group.id,
+          UserId: req.user.id
+        }
+      };
+
+      models
+        .UserGroup
+        .findOne(query)
+        .then(function(usergroup) {
+          if (!usergroup) {
+            throw (new errors.NotFound('The user is not part of the group yet.'));
+          }
+
+          return usergroup;
+        })
+        .then(function(usergroup) {
+          ['role'].forEach(function(prop) {
+            if (req.body[prop])
+              usergroup[prop] = req.body[prop];
+          });
+          usergroup.updatedAt = new Date();
+
+          return usergroup
+            .save();
+        })
+        .then(function(usergroup) {
+          // Create activities.
+          var remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+          var activity = {
+            type: 'group.user.updated',
+            GroupId: req.group.id,
+            data: {
+              group: req.group.info,
+              user: remoteUser,
+              target: req.user.info,
+              usergroup: usergroup.info
+            }
+          };
+          Activity.create(_.extend({UserId: req.user.id}, activity));
+          if (req.remoteUser && req.user.id !== req.remoteUser.id)
+            Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
+
+          return usergroup;
+        })
+        .then(function(usergroup) {
+          res.send(usergroup);
+        })
+        .catch(next);
+    },
+
+    /**
+     * Delete a member.
+     */
+    deleteMember: function(req, res, next) {
+      var query = {
+        where: {
+          GroupId: req.group.id,
+          UserId: req.user.id
+        }
+      };
+
+      models
+        .UserGroup
+        .findOne(query)
+        .then(function(usergroup) {
+          if (!usergroup) {
+            throw (new errors.NotFound('The user is not part of the group yet.'));
+          }
+
+          return usergroup;
+        })
+        .then(function(usergroup) {
+          return usergroup.destroy();
+        })
+        .then(function() {
+          // Create activities.
+          var remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+          var activity = {
+            type: 'group.user.deleted',
+            GroupId: req.group.id,
+            data: {
+              group: req.group.info,
+              user: remoteUser,
+              target: req.user.info
+            }
+          };
+          Activity.create(_.extend({UserId: req.user.id}, activity));
+          if (req.remoteUser && req.user.id !== req.remoteUser.id)
+            Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
+          return;
+        })
+        .then(function() {
+          res.send({success: true});
+        })
+        .catch(next);
     },
 
     /**

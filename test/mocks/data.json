@@ -147,6 +147,16 @@
         "comment": "",
         "link": "",
         "createdAt": "2015-04-29T07:00:00.000Z"
+      },
+      {
+        "beneficiary": "@montogeek",
+        "description": "Donation to that great project",
+        "tags": ["donation"],
+        "amount": 299.99,
+        "paidby": "@philmod",
+        "comment": "",
+        "link": "",
+        "createdAt": "2015-05-29T07:00:00.000Z"
       }
     ]
   }

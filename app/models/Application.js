@@ -33,6 +33,23 @@ module.exports = function(Sequelize, DataTypes) {
           })
           .catch(fn);
       }
+    },
+
+    getterMethods: {
+      // Info.
+      info: function() {
+        return {
+          id: this.id,
+          name: this.name,
+          description: this.description,
+          href: this.href,
+          disabled: this.disabled,
+          _access: this._access,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        };
+      }
+
     }
   });
 

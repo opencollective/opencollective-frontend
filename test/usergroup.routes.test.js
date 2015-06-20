@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var app = require('../index');
+var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
@@ -249,6 +250,125 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('activities');
           expect(res.body[0].activities).to.have.length.above(0);
           done();
+        });
+    });
+
+  });
+
+  /**
+   * Update a user-group relation.
+   */
+  describe('#updateUserGroup', function() {
+
+    it('fails if no access to the group', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if no admin', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if the user is not part of the group yet', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/users/' + user2.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('successfully update a user-group relation', function(done) {
+      var role = 'writer';
+      request(app)
+        .put('/groups/' + group.id + '/users/' + user3.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          role: role
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('role', role);
+
+          // Check activities.
+          models.Activity.findAndCountAll({where: {type: 'group.user.updated'} }).then(function(res) {
+            expect(res.count).to.equal(2);
+            done();
+          });
+        });
+    });
+
+  });
+
+  /**
+   * Delete a user-group relation.
+   */
+  describe('#deleteUserGroup', function() {
+
+    it('fails if no access to the group', function(done) {
+      request(app)
+        .del('/groups/' + group.id + '/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if no admin', function(done) {
+      request(app)
+        .del('/groups/' + group.id + '/users/' + user.id)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if the user is not part of the group yet', function(done) {
+      request(app)
+        .del('/groups/' + group.id + '/users/' + user2.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('successfully update a user-group relation', function(done) {
+      var role = 'writer';
+      request(app)
+        .del('/groups/' + group.id + '/users/' + user3.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+
+          async.parallel([
+            function(cb) {
+              // Check usergroup.
+              var query = {
+                where: {
+                  GroupId: group.id,
+                  UserId: user3.id
+                }
+              };
+              models.UserGroup.findAndCountAll(query).then(function(res) {
+                expect(res.count).to.equal(0);
+                cb();
+              });
+            },
+            function(cb) {
+              // Check activities.
+              models.Activity.findAndCountAll({where: {type: 'group.user.deleted'} }).then(function(res) {
+                expect(res.count).to.equal(2);
+                cb();
+              });
+            }
+          ], done);
+
         });
     });
 
