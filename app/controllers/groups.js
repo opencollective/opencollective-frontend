@@ -346,7 +346,8 @@ module.exports = function(app) {
 
       var t = {
         transaction: transaction,
-        group: group, user: user
+        group: group,
+        user: user
       };
       transactions._create(t, function(e, transactionCreated) {
         if (e) return next(e);

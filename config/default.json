@@ -15,7 +15,8 @@
     }
   },
   "host": {
-    "api": "http://localhost:3050"
+    "api": "http://localhost:3050",
+    "webapp": "http://localhost:8000"
   },
   "stripe": {
     "secret": "sk_test_3jGhCKe3e1KiN8gHrdDqqHg4",
@@ -29,7 +30,12 @@
       "secret": ""
     },
     "classic": {
-      "appId": "APP-80W284485P519543T"
-    }
+      "email": "xdamman+opencollective-facilitator@gmail.com",
+      "appId": "APP-80W284485P519543T",
+      "userId": "xdamman+opencollective-facilitator_api1.gmail.com",
+      "password": "UYRFFTDG3TYML68L",
+      "signature": "AknyGVnC4ahUBjab.T2H-YVkWGCqAW-ZI2s7gMVZKRdZpFO7kWEOorjv"
+    },
+    "feeOC": 5
   }
 }

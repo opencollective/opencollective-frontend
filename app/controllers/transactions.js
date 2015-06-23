@@ -1,9 +1,11 @@
 /**
  * Dependencies.
  */
-var utils = require('../lib/utils');
 var _ = require('lodash');
 var async = require('async');
+var config = require('config');
+var utils = require('../lib/utils');
+var uuid = require('node-uuid');
 
 /**
  * Controller.
@@ -16,6 +18,8 @@ module.exports = function(app) {
   var models = app.set('models');
   var Transaction = models.Transaction;
   var Activity = models.Activity;
+  var Paykey = models.Paykey;
+  var User = models.User;
   var errors = app.errors;
 
   /**
@@ -90,7 +94,108 @@ module.exports = function(app) {
        if (e) return callback(e);
        else callback(null, results.createTransaction);
      });
-   }
+  };
+
+  /**
+   * Get a Paypal pay key.
+   */
+  var getPayKey = function(req, res, next) {
+    console.log('getPayKey: ', req.transaction.id, req.url);
+    var uri = '/groups/' + req.group.id + '/transactions/' + req.transaction.id;
+
+    // Check if a user is attached to the transaction.
+    var userId = req.transaction.UserId;
+    if (!userId) {
+      return next(new errors.BadRequest('A user has to be attached to the transaction to be reimburse. The URI ' + uri + '/attribution/:userid' + ' can be used to link a user to the transaction.'));
+    }
+
+    // Parameters.
+    var amount = req.required.amount;
+    var baseUrl = config.host.webapp + uri;
+    var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
+    var returnUrl = req.query.returnUrl || (baseUrl + '/success');
+
+    // Calculate OpenCollective fee.
+    function calculateOCfee(amount, feeOC) {
+      return Math.round(amount*feeOC)/100;
+    }
+
+    async.auto({
+
+      getUser: function(cb) {
+        User
+          .find(parseInt(userId))
+          .then(function(user) {
+            if (!user) {
+              return cb(new errors.NotFound('User ' + userid + ' not found'));
+            } else {
+              cb(null, user);
+            }
+          })
+          .catch(cb);
+      },
+
+      createPaykeyEntry: function(cb) {
+        Paykey.create({}).done(cb);
+      },
+
+      createPayload: ['getUser', 'createPaykeyEntry', function(cb, results) {
+        var payload = {
+          requestEnvelope: {
+            errorLanguage: 'en_US',
+            detailLevel: 'ReturnAll'
+          },
+          actionType: 'PAY',
+          currencyCode: req.transaction.currency.toUpperCase() || 'USD',
+          feesPayer: 'SENDER',
+          memo: 'Reimbursement transaction ' + req.transaction.id + ': ' + req.transaction.description,
+          cancelUrl: cancelUrl,
+          returnUrl: returnUrl,
+          trackingId: [uuid.v1(), results.createPaykeyEntry.id].join(':'),
+          receiverList: {
+            receiver: [
+              {
+                email: results.getUser.email,
+                amount: amount,
+                paymentType: 'PERSONAL'
+              },
+              {
+                email: config.paypal.classic.email,
+                amount: calculateOCfee(amount, config.paypal.feeOC),
+                paymentType: 'PERSONAL'
+              }
+            ]
+          }
+        };
+        return cb(null, payload);
+      }],
+
+      callPaypal: ['createPayload', function(cb, results) {
+        app.paypalAdaptive.pay(results.createPayload, cb);
+      }],
+
+      updatePaykeyEntry: ['createPaykeyEntry', 'createPayload', 'callPaypal', function(cb, results) {
+        var paykey = results.createPaykeyEntry;
+        paykey.trackingId = results.createPayload.trackingId;
+        paykey.paykey = results.callPaypal.payKey;
+        paykey.status = results.callPaypal.paymentExecStatus;
+        paykey.payload = results.createPayload;
+        paykey.data = results.callPaypal;
+        paykey.save().done(cb);
+      }],
+
+      linkPaykeyTransaction: ['callPaypal', 'updatePaykeyEntry', function(cb, results) {
+        req.transaction
+          .addPaykey(results.updatePaykeyEntry)
+          .done(cb);
+      }],
+
+    }, function(e, results) {
+      if (e) return next(e);
+      res.send(results.callPaypal);
+    });
+
+  };
 
   /**
    * Public methods.
@@ -113,10 +218,7 @@ module.exports = function(app) {
     },
 
     _create: create,
-
-    getPayKey: function(req, res, next) {
-      console.log('getPayKey: ', req.transaction.id);
-    }
+    getPayKey: getPayKey
 
   }
 
