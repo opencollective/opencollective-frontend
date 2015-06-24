@@ -26,81 +26,80 @@ module.exports = function(app) {
    * Create a transaction and add it to a group/user/card.
    */
   var create = function(args, callback) {
-     var transaction = args.transaction;
-     var user = args.user || {};
-     var group = args.group || {};
-     var card = args.card || {};
+    var transaction = args.transaction;
+    var user = args.user || {};
+    var group = args.group || {};
+    var card = args.card || {};
 
-     async.auto({
+    async.auto({
 
-       createTransaction: function(cb) {
-         Transaction
-           .create(transaction)
-           .done(cb);
-       },
+      createTransaction: function(cb) {
+        Transaction
+          .create(transaction)
+          .done(cb);
+      },
 
-       addTransactionToUser: ['createTransaction', function(cb, results) {
-         var transaction = results.createTransaction;
+      addTransactionToUser: ['createTransaction', function(cb, results) {
+        var transaction = results.createTransaction;
 
-         if (user && user.addTransaction) {
-           user
-             .addTransaction(transaction)
-             .done(cb);
-         } else {
-           cb();
-         }
-       }],
+        if (user && user.addTransaction) {
+          user
+            .addTransaction(transaction)
+            .done(cb);
+        } else {
+          cb();
+        }
+      }],
 
-       addTransactionToGroup: ['createTransaction', function(cb, results) {
-         var transaction = results.createTransaction;
+      addTransactionToGroup: ['createTransaction', function(cb, results) {
+        var transaction = results.createTransaction;
 
-         group
-           .addTransaction(transaction)
-           .done(cb);
-       }],
+        group
+          .addTransaction(transaction)
+          .done(cb);
+      }],
 
-       addTransactionToCard: ['createTransaction', function(cb, results) {
-         var transaction = results.createTransaction;
+      addTransactionToCard: ['createTransaction', function(cb, results) {
+        var transaction = results.createTransaction;
 
-         if (card && card.addTransaction) {
-           card
-             .addTransaction(transaction)
-             .done(cb);
-         } else {
-           cb();
-         }
-       }],
+        if (card && card.addTransaction) {
+          card
+            .addTransaction(transaction)
+            .done(cb);
+        } else {
+          cb();
+        }
+      }],
 
-       createActivity: ['createTransaction', function(cb, results) {
-         var transaction = results.createTransaction;
+      createActivity: ['createTransaction', function(cb, results) {
+        var transaction = results.createTransaction;
 
-         // Create activity.
-         Activity.create({
-           type: 'group.transaction.created',
-           UserId: user.id,
-           GroupId: group.id,
-           TransactionId: transaction.id,
-           data: {
-             group: group.info,
-             transaction: transaction,
-             user: user.info,
-             target: transaction.beneficiary,
-             card: card.info
-           }
-         }).done(cb);
-       }]
+        // Create activity.
+        Activity.create({
+          type: 'group.transaction.created',
+          UserId: user.id,
+          GroupId: group.id,
+          TransactionId: transaction.id,
+          data: {
+            group: group.info,
+            transaction: transaction,
+            user: user.info,
+            target: transaction.beneficiary,
+            card: card.info
+          }
+        }).done(cb);
+      }]
 
-     }, function(e, results) {
-       if (e) return callback(e);
-       else callback(null, results.createTransaction);
-     });
+    }, function(e, results) {
+      if (e) return callback(e);
+      else callback(null, results.createTransaction);
+    });
   };
 
   /**
    * Get a Paypal pay key.
    */
   var getPayKey = function(req, res, next) {
-    console.log('getPayKey: ', req.transaction.id, req.url);
     var uri = '/groups/' + req.group.id + '/transactions/' + req.transaction.id;
 
     // Check if a user is attached to the transaction.
@@ -117,7 +116,7 @@ module.exports = function(app) {
 
     // Calculate OpenCollective fee.
     function calculateOCfee(amount, feeOC) {
-      return Math.round(amount*feeOC)/100;
+      return Math.round(amount * feeOC) / 100;
     }
 
     async.auto({
@@ -188,7 +187,7 @@ module.exports = function(app) {
         req.transaction
           .addPaykey(results.updatePaykeyEntry)
           .done(cb);
-      }],
+      }]
 
     }, function(e, results) {
       if (e) return next(e);

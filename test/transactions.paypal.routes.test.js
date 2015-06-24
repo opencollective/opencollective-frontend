@@ -86,7 +86,7 @@ describe('transactions.paypal.routes.test.js', function() {
         var t = utils.data('transactions1').transactions[1];
         t.GroupId = results.createGroupA.id;
         models.Transaction.create(t).done(cb);
-      }],
+      }]
     }, function(e, results) {
       expect(e).to.not.exist;
       application = results.cleanAndCreateApplication;
