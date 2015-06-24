@@ -24,6 +24,7 @@ describe('transactions.paypal.routes.test.js', function() {
 
   var application;
   var application2;
+  var application3;
   var user;
   var user2;
   var group;
@@ -51,6 +52,9 @@ describe('transactions.paypal.routes.test.js', function() {
       createApplicationB: ['cleanAndCreateApplication', function(cb) {
         models.Application.create(utils.data('application2')).done(cb);
       }],
+      createApplicationC: ['cleanAndCreateApplication', function(cb) {
+        models.Application.create(utils.data('application3')).done(cb);
+      }],
       createUserA: ['cleanAndCreateApplication', function(cb) {
         models.User.create(utils.data('user1')).done(cb);
       }],
@@ -68,6 +72,11 @@ describe('transactions.paypal.routes.test.js', function() {
       addUserBGroupA: ['createUserB', 'createGroupA', function(cb, results) {
         results.createGroupA
           .addMember(results.createUserB, {role: 'writer'})
+          .done(cb);
+      }],
+      addApplicationCGroupA: ['createApplicationC', 'createGroupA', function(cb, results) {
+        results.createGroupA
+          .addApplication(results.createApplicationC)
           .done(cb);
       }],
       createTransactionA: ['cleanAndCreateApplication', 'createGroupA', 'createUserA', 'addUserAGroupA', function(cb, results) {
@@ -91,6 +100,7 @@ describe('transactions.paypal.routes.test.js', function() {
       expect(e).to.not.exist;
       application = results.cleanAndCreateApplication;
       application2 = results.createApplicationB;
+      application3 = results.createApplicationC;
       user = results.createUserA;
       user2 = results.createUserB;
       group = results.createGroupA;
@@ -118,6 +128,17 @@ describe('transactions.paypal.routes.test.js', function() {
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
+          amount: 10.99
+        })
+        .expect(403)
+        .end(done);
+    });
+
+    it('should fail if the application does not have access to the group', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+        .send({
+          api_key: application2.api_key,
           amount: 10.99
         })
         .expect(403)
@@ -169,6 +190,17 @@ describe('transactions.paypal.routes.test.js', function() {
             })
             .catch(done);
         });
+    });
+
+    it('should get a transaction\'s pay key with a api_key that has access to the group', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+        .send({
+          api_key: application3.api_key,
+          amount: 10.99
+        })
+        .expect(200)
+        .end(done);
     });
 
   });

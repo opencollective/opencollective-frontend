@@ -61,7 +61,6 @@ module.exports = function(app) {
       if (!key) return next();
 
       Application.findByKey(key, function(e, application) {
-        // console.log('apiKey 2 : ', e, application);
         if (!e && application) {
           if (application.disabled) {
             return next(new errors.Forbidden('Invalid API key.'));
