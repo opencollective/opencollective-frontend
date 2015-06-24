@@ -265,12 +265,16 @@ module.exports = function(app) {
     },
 
     /**
-     * Authorize for group's administrator.
+     * Authorize for group with specific role(s).
      */
-    authorizeGroupAdmin: function(req, res, next) {
-      if (!req.remoteUser && req.application) // called with an api_key without user
-        return next();
-      req.group.isMember(req.remoteUser.id, 'admin', next);
+    authorizeGroupRoles: function(roles) {
+      var roles = _.isArray(roles) ? roles : [roles];
+
+      return function(req, res, next) {
+        if (!req.remoteUser && req.application) // called with an api_key without user
+          return next();
+        req.group.isMember(req.remoteUser.id, roles, next);
+      }
     },
 
     /**

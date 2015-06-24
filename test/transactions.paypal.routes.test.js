@@ -113,6 +113,17 @@ describe('transactions.paypal.routes.test.js', function() {
         .end(done);
     });
 
+    it('should fail if the user is a viewer', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          amount: 10.99
+        })
+        .expect(403)
+        .end(done);
+    });
+
     it('should fail if the transaction does not have a user linked', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction2.id + '/paykey')
