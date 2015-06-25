@@ -52,8 +52,11 @@ module.exports = function(app) {
      * Create a user.
      */
     create: function(req, res, next) {
+      var user = req.required.user;
+      user.ApplicationId = req.application.id;
+
       User
-        .create(req.required.user)
+        .create(user)
         .then(function(user) {
           res.send(user.info);
 

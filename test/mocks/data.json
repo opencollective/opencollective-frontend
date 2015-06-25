@@ -13,7 +13,8 @@
 
   "application3": {
     "name": "scouts_app",
-    "api_key": "1c96ce6b1119bec18e4a4680d25883da"
+    "api_key": "1c96ce6b1119bec18e4a4680d25883da",
+    "_access": 0.5
   },
 
   "user1": {

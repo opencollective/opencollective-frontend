@@ -10,8 +10,8 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
     _access: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
+      type: DataTypes.FLOAT,
+      defaultValue: 0 // 1: all access, 0.5: can create users
     },
     createdAt: {
       type: DataTypes.DATE,
