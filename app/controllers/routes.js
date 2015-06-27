@@ -96,6 +96,7 @@ module.exports = function(app) {
   app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
   app.post('/groups/:groupid/transactions/:transactionId/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
   app.get('/groups/:groupid/transactions/:transactionId/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, mw.required('amount'), transactions.getPayKey); // Get a transaction's pay key.
+  app.post('/groups/:groupid/transactions/:transactionId/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles(['admin', 'writer']), transactions.attributeUser); // Attribute a transaction to a user.
 
   /**
    * Activities.

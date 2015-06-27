@@ -607,4 +607,162 @@ describe('transactions.routes.test.js', function() {
 
   });
 
+  /**
+   * Attribution.
+   */
+  describe('#attribution', function() {
+
+    var transaction;
+    var transaction2;
+    var user3; // part of Group1 as a writer
+    var user4; // part of Group1 as a viewer
+
+    beforeEach(function(done) {
+      async.auto({
+        createTransactionA: function(cb) {
+          request(app)
+            .post('/groups/' + group.id + '/transactions')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .send({
+              transaction: transactionsData[0]
+            })
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              models.Transaction
+                .find(parseInt(res.body.id))
+                .done(cb);
+            });
+        },
+        createTransactionB: function(cb) {
+          request(app)
+            .post('/groups/' + group2.id + '/transactions')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .send({
+              transaction: transactionsData[1]
+            })
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              models.Transaction
+                .find(parseInt(res.body.id))
+                .done(cb);
+            });
+        },
+        createUserC: function(cb) {
+          models.User.create(utils.data('user3')).done(cb);
+        },
+        createUserD: function(cb) {
+          models.User.create(utils.data('user4')).done(cb);
+        },
+        addUserCGroupA: ['createUserC', function(cb, results) {
+          group
+            .addMember(results.createUserC, {role: 'writer'})
+            .done(cb);
+        }],
+        addUserDGroupA: ['createUserD', function(cb, results) {
+          group
+            .addMember(results.createUserD, {role: 'viewer'})
+            .done(cb);
+        }]
+      }, function(e, results) {
+        expect(e).to.not.exist;
+        transaction = results.createTransactionA;
+        transaction2 = results.createTransactionB;
+        user3 = results.createUserC;
+        user4 = results.createUserD;
+        done();
+      });
+    });
+
+    it('fails attributing a non-existing transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + 123 + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('fails attributing a transaction that is not part of the group', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction2.id + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails attributing a transaction that the user does not have access to [viewer of the group]', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user4.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails attributing a transaction that the user does not have access to [not part of the group]', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully attribute another user\'s transaction if writer', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
+        .expect(200)
+        .end(done);
+    });
+
+    it('successfully attribute a transaction [admin]', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+          models.Transaction
+            .find(parseInt(transaction.id))
+            .then(function(t) {
+              expect(t.UserId).to.equal(user4.id);
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('successfully attribute a transaction with an app', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .send({
+          api_key: application2.api_key
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+          models.Transaction
+            .find(parseInt(transaction.id))
+            .then(function(t) {
+              expect(t.UserId).to.equal(user4.id);
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('fails attributing a transaction with a non authorized app', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
+        .send({
+          api_key: application3.api_key
+        })
+        .expect(403)
+        .end(done);
+    });
+
+  });
+
 });

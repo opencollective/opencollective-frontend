@@ -40,6 +40,14 @@
     "password": "passssap"
   },
 
+  "user4": {
+    "first_name": "Bo",
+    "last_name": "Ki",
+    "username": "boki",
+    "email": "boki@email.com",
+    "password": "passssas"
+  },
+
   "group1": {
     "name": "Scouts d'Arlon",
     "description": "Troupe Scoute Albert Schweitzer",

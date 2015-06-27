@@ -197,6 +197,18 @@ module.exports = function(app) {
   };
 
   /**
+   * Attribute a transaction to a user.
+   */
+  var attributeUser = function(req, res, next) {
+    req.transaction
+      .setUser(req.user)
+      .then(function(t) {
+        res.send({success: true});
+      })
+      .catch(next);
+  }
+
+  /**
    * Public methods.
    */
   return {
@@ -217,7 +229,8 @@ module.exports = function(app) {
     },
 
     _create: create,
-    getPayKey: getPayKey
+    getPayKey: getPayKey,
+    attributeUser: attributeUser
 
   }
 
