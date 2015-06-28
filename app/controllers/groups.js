@@ -396,28 +396,36 @@ module.exports = function(app) {
      * Get group's transactions.
      */
     getTransactions: function(req, res, next) {
-        var query = _.merge({
-          where: {
-            GroupId: req.group.id
-          },
-          order: [[req.sorting.key, req.sorting.dir]]
-        }, req.pagination);
+      var query = _.merge({
+        where: {
+          GroupId: req.group.id
+        },
+        order: [[req.sorting.key, req.sorting.dir]]
+      }, req.pagination);
 
-        Transaction
-          .findAndCountAll(query)
-          .then(function(transactions) {
+      Transaction
+        .findAndCountAll(query)
+        .then(function(transactions) {
 
-            // Set headers for pagination.
-            req.pagination.total = transactions.count;
-            res.set({
-              Link: utils.getLinkHeader(utils.getRequestedUrl(req),
-                                          req.pagination)
-            });
+          // Set headers for pagination.
+          req.pagination.total = transactions.count;
+          res.set({
+            Link: utils.getLinkHeader(utils.getRequestedUrl(req),
+                                        req.pagination)
+          });
 
-            res.send(transactions.rows);
-          })
-          .catch(next);
-      }
+          res.send(transactions.rows);
+        })
+        .catch(next);
+    },
+
+    /**
+     * Get a group's transaction.
+     */
+    getTransaction: function(req, res, next) {
+      console.log('getTransaction : ', req.transaction.info);
+      res.json(req.transaction.info);
+    }
 
   };
 
