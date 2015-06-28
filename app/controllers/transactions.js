@@ -109,7 +109,7 @@ module.exports = function(app) {
     }
 
     // Parameters.
-    var amount = req.required.amount;
+    var amount = req.transaction.amount;
     var baseUrl = config.host.webapp + uri;
     var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
     var returnUrl = req.query.returnUrl || (baseUrl + '/success');

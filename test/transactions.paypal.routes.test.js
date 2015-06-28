@@ -115,21 +115,10 @@ describe('transactions.paypal.routes.test.js', function() {
    */
   describe('#getPayKey', function() {
 
-    it('should fail without amount', function(done) {
-      request(app)
-        .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
-        .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(400)
-        .end(done);
-    });
-
     it('should fail if the user is a viewer', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .set('Authorization', 'Bearer ' + user.jwt(application))
-        .send({
-          amount: 10.99
-        })
         .expect(403)
         .end(done);
     });
@@ -138,8 +127,7 @@ describe('transactions.paypal.routes.test.js', function() {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .send({
-          api_key: application2.api_key,
-          amount: 10.99
+          api_key: application2.api_key
         })
         .expect(403)
         .end(done);
@@ -149,9 +137,6 @@ describe('transactions.paypal.routes.test.js', function() {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction2.id + '/paykey')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .send({
-          amount: 10.99
-        })
         .expect(400)
         .end(function(err, res) {
           var err = JSON.parse(res.error.text).error.message;
@@ -164,9 +149,6 @@ describe('transactions.paypal.routes.test.js', function() {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .send({
-          amount: 10.99
-        })
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
@@ -196,8 +178,7 @@ describe('transactions.paypal.routes.test.js', function() {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .send({
-          api_key: application3.api_key,
-          amount: 10.99
+          api_key: application3.api_key
         })
         .expect(200)
         .end(done);
