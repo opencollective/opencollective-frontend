@@ -191,7 +191,9 @@ module.exports = function(app) {
 
     }, function(e, results) {
       if (e) return next(e);
-      res.send(results.callPaypal);
+      var response = results.callPaypal;
+      response.transactionId = req.transaction.id;
+      res.json(response);
     });
 
   };

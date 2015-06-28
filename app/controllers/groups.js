@@ -423,7 +423,6 @@ module.exports = function(app) {
      * Get a group's transaction.
      */
     getTransaction: function(req, res, next) {
-      console.log('getTransaction : ', req.transaction.info);
       res.json(req.transaction.info);
     }
 

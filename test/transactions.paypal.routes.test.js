@@ -153,6 +153,7 @@ describe('transactions.paypal.routes.test.js', function() {
         .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('payKey', paypalMock.payKey);
+          expect(res.body).to.have.property('transactionId', transaction.id);
 
           models.Paykey
             .findAndCountAll({})
