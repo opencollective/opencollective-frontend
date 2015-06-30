@@ -30,7 +30,7 @@ module.exports = function(app) {
    */
   app.param('userid', params.userid);
   app.param('groupid', params.groupid);
-  app.param('transactionId', params.transactionid);
+  app.param('transactionid', params.transactionid);
 
   /**
    * Authentication.
@@ -47,7 +47,7 @@ module.exports = function(app) {
   /**
    * Users.
    */
-  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.internal, mw.required('user'), users.create); // Create a user.
+  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', mw.authorizeAuthUser, users.show); // Get a user.
   app.put('/users/:userid', NotImplemented); // Update a user.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
@@ -93,10 +93,11 @@ module.exports = function(app) {
    */
   app.get('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
   app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
-  app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
-  app.post('/groups/:groupid/transactions/:transactionId/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
-  app.get('/groups/:groupid/transactions/:transactionId/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, mw.required('amount'), transactions.getPayKey); // Get a transaction's pay key.
-  app.post('/groups/:groupid/transactions/:transactionId/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles(['admin', 'writer']), transactions.attributeUser); // Attribute a transaction to a user.
+  app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
+  app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
+  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles(['admin', 'writer']), transactions.attributeUser); // Attribute a transaction to a user.
 
   /**
    * Activities.

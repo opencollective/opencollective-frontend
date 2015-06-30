@@ -179,14 +179,18 @@ module.exports = function(app) {
     },
 
     /**
-     * Authorize super-applications only.
+     * Authorize applications with level.
      */
-    internal: function(req, res, next) {
-      if (req.application._access < 1) {
-        next(new errors.Forbidden('Unauthorized'));
-      } else {
-        next();
+    appAccess: function(level) {
+
+      return function(req, res, next) {
+        if (req.application._access < level) {
+          next(new errors.Forbidden('Unauthorized'));
+        } else {
+          next();
+        }
       }
+
     },
 
     /**

@@ -44,6 +44,10 @@ models.forEach(function(model) {
   m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
   m.User.belongsToMany(m.Group, {through: m.UserGroup, as: 'groups'});
 
+  // Application - User.
+  m.User.belongsTo(m.Application);
+  m.Application.hasMany(m.User);
+
   // Activity.
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
