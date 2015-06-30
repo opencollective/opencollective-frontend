@@ -21,6 +21,7 @@ describe('users.routes.test.js', function() {
 
   var application;
   var application2;
+  var application3;
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -29,11 +30,20 @@ describe('users.routes.test.js', function() {
     });
   });
 
-  // Create a normal application
+  // Create a normal application.
   beforeEach(function(done) {
     models.Application.create(utils.data('application2')).done(function(e, a) {
       expect(e).to.not.exist;
       application2 = a;
+      done();
+    });
+  });
+
+  // Create an application with user creation access.
+  beforeEach(function(done) {
+    models.Application.create(utils.data('application3')).done(function(e, a) {
+      expect(e).to.not.exist;
+      application3 = a;
       done();
     });
   });
@@ -110,7 +120,33 @@ describe('users.routes.test.js', function() {
           expect(res.body).to.not.have.property('_salt');
           expect(res.body).to.not.have.property('password');
           expect(res.body).to.not.have.property('password_hash');
-          done();
+          models.User
+            .find(parseInt(res.body.id))
+            .then(function(user) {
+              expect(user).to.have.property('ApplicationId', application.id);
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    it('successfully create a user with an application that has access [0.5]', function(done) {
+      request(app)
+        .post('/users')
+        .send({
+          api_key: application3.api_key,
+          user: userData
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.User
+            .find(parseInt(res.body.id))
+            .then(function(user) {
+              expect(user).to.have.property('ApplicationId', application3.id);
+              done();
+            })
+            .catch(done);
         });
     });
 
