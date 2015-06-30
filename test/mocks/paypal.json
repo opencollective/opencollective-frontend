@@ -1,0 +1,16 @@
+{
+  "adaptive": {
+    "pay": {
+      "responseEnvelope": {
+        "timestamp": "2015-06-21T17:44:37.487-07:00",
+        "ack": "Success",
+        "correlationId": "c388ecaf49b1b",
+        "build": "15743565"
+      },
+      "payKey": "AP-791807008W699005A",
+      "paymentExecStatus": "CREATED",
+      "httpStatusCode": 200,
+      "paymentApprovalUrl": "https:\/\/www.sandbox.paypal.com\/cgi-bin\/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A"
+    }
+  }
+}

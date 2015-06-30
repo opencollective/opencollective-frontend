@@ -20,6 +20,8 @@
     "lodash": "^3.6.0",
     "multer": "^0.1.8",
     "newrelic": "^1.18.5",
+    "node-uuid": "^1.4.3",
+    "paypal-adaptive": "^0.4.2",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
     "sequelize": "2.0.4",

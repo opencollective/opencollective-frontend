@@ -22,6 +22,7 @@ var models = [
   'Application',
   'Card',
   'Group',
+  'Paykey',
   'StripeManagedAccount',
   'Transaction',
   'User',
@@ -71,6 +72,10 @@ models.forEach(function(model) {
   // Stripe Managed Account.
   m.StripeManagedAccount.hasMany(m.Group);
   m.Group.belongsTo(m.StripeManagedAccount);
+
+  // Paypal Pay key.
+  m.Paykey.belongsTo(m.Transaction);
+  m.Transaction.hasMany(m.Paykey);
 
 })(module.exports);
 

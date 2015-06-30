@@ -61,7 +61,6 @@ module.exports = function(app) {
       if (!key) return next();
 
       Application.findByKey(key, function(e, application) {
-        // console.log('apiKey 2 : ', e, application);
         if (!e && application) {
           if (application.disabled) {
             return next(new errors.Forbidden('Invalid API key.'));
@@ -269,12 +268,16 @@ module.exports = function(app) {
     },
 
     /**
-     * Authorize for group's administrator.
+     * Authorize for group with specific role(s).
      */
-    authorizeGroupAdmin: function(req, res, next) {
-      if (!req.remoteUser && req.application) // called with an api_key without user
-        return next();
-      req.group.isMember(req.remoteUser.id, 'admin', next);
+    authorizeGroupRoles: function(roles) {
+      var roles = _.isArray(roles) ? roles : [roles];
+
+      return function(req, res, next) {
+        if (!req.remoteUser && req.application) // called with an api_key without user
+          return next();
+        req.group.isMember(req.remoteUser.id, roles, next);
+      }
     },
 
     /**

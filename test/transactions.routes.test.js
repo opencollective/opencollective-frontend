@@ -295,7 +295,84 @@ describe('transactions.routes.test.js', function() {
   });
 
   /**
-   * Get.
+   * Get one.
+   */
+  describe('#getOne', function() {
+
+    var transactions = [];
+
+    // Create transactions.
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            transactions.push(res.body);
+            cb();
+          });
+      }, done);
+    });
+
+    it('fails getting a non-existing transaction', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + 987123)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('fails getting a transaction which does not belong to the group', function(done) {
+      request(app)
+        .get('/groups/' + group2.id + '/transactions/' + transactions[0].id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails getting a transaction if user has no access to the group', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transactions[0].id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('successfully get a transaction', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transactions[0].id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', transactions[0].id);
+          done();
+        });
+    });
+
+    it('successfully get a transaction with an authorized application', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transactions[0].id)
+        .send({
+          api_key: application2.api_key
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', transactions[0].id);
+          done();
+        });
+    });
+
+  });
+
+  /**
+   * Get group's transactions.
    */
   describe('#get', function() {
 

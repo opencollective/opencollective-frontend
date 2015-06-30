@@ -30,7 +30,7 @@ module.exports = function(app) {
    */
   app.param('userid', params.userid);
   app.param('groupid', params.groupid);
-  app.param('transactionId', params.transactionid);
+  app.param('transactionid', params.transactionid);
 
   /**
    * Authentication.
@@ -73,7 +73,7 @@ module.exports = function(app) {
    */
   app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
-  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupAdmin, mw.required('group'), groups.update); // Update a group.
+  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
@@ -84,17 +84,19 @@ module.exports = function(app) {
    *  Relations between a group and a user.
    */
   app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.addMember); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.updateMember); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupAdmin, groups.deleteMember); // Remove a user from a group.
+  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.addMember); // Add a user to a group.
+  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.updateMember); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.deleteMember); // Remove a user from a group.
 
   /**
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
   app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
-  app.delete('/groups/:groupid/transactions/:transactionId', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
-  app.post('/groups/:groupid/transactions/:transactionId/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
+  app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // approve a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
 
   /**
    * Activities.
@@ -122,7 +124,7 @@ module.exports = function(app) {
     if (!err.code)
       err.code = err.status || 500;
 
-    console.error('Error Express : ', err);
+    console.error('Error Express : ', err); // console.trace(err);
     res.status(err.code).send({error: err});
   });
 
