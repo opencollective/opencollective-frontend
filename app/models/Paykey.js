@@ -3,7 +3,10 @@ module.exports = function(Sequelize, DataTypes) {
   var Paykey = Sequelize.define('Paykey', {
     trackingId: DataTypes.STRING,
 
-    paykey: DataTypes.STRING,
+    paykey: {
+      type: DataTypes.STRING,
+      unique: true
+    },
 
     status: DataTypes.STRING,
 
