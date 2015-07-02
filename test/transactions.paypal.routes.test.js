@@ -333,7 +333,7 @@ describe('transactions.paypal.routes.test.js', function() {
     describe('Paykeys clean up', function() {
 
       beforeEach(function(done) {
-        async.eachSeries(['AP-791807008W699005B', 'AP-791807008W699005C'], function(pk, cb){
+        async.eachSeries(['AP-791807008W699005B', 'AP-791807008W699005C'], function(pk, cb) {
           var response = _.clone(paypalMock.adaptive.pay);
           response.payKey = pk;
 

@@ -150,7 +150,7 @@ module.exports = function(app) {
           memo: 'Reimbursement transaction ' + req.transaction.id + ': ' + req.transaction.description,
           cancelUrl: cancelUrl,
           returnUrl: returnUrl,
-          trackingId: [uuid.v1().substr(0,8), results.createPaykeyEntry.id].join(':'),
+          trackingId: [uuid.v1().substr(0, 8), results.createPaykeyEntry.id].join(':'),
           receiverList: {
             receiver: [
               {
@@ -206,13 +206,15 @@ module.exports = function(app) {
     async.auto({
 
       callPaypal: [function(cb) {
-        app.paypalAdaptive.paymentDetails({payKey: req.params.paykey}, function (err, response) {
+        app.paypalAdaptive.paymentDetails({payKey: req.params.paykey}, function(err, response) {
           if (err) {
-              return cb(new errors.BadRequest(response.error[0].message));
+            return cb(new errors.BadRequest(response.error[0].message));
           }
+
           if (response.status !== 'COMPLETED') {
             return cb(new errors.BadRequest('This transaction is not paid yet.'));
           }
+
           cb(null, response);
         });
       }],
