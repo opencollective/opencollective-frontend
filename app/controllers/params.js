@@ -7,6 +7,7 @@ module.exports = function(app) {
   var User = models.User;
   var Group = models.Group;
   var Transaction = models.Transaction;
+  var Paykey = models.Paykey;
   var errors = app.errors;
 
   /**
@@ -59,6 +60,27 @@ module.exports = function(app) {
             return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
           } else {
             req.transaction = transaction;
+            next();
+          }
+        })
+        .catch(next);
+    },
+
+    /**
+     * Paykey.
+     */
+    paykey: function(req, res, next, paykey) {
+      Paykey
+        .find({
+          where: {
+            paykey: paykey
+          }
+        })
+        .then(function(pk) {
+          if (!pk) {
+            return next(new errors.NotFound('Paykey \'' + paykey + '\' not found'));
+          } else {
+            req.paykey = pk;
             next();
           }
         })

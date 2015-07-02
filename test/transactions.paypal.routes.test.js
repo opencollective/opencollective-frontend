@@ -15,7 +15,7 @@ var nock = require('nock');
  * Variables.
  */
 var models = app.set('models');
-var paypalMock = require('./mocks/paypal').adaptive.pay;
+var paypalMock = require('./mocks/paypal');
 
 /**
  * Tests.
@@ -36,7 +36,7 @@ describe('transactions.paypal.routes.test.js', function() {
 
   beforeEach(function() {
     var stub = sinon.stub(app.paypalAdaptive, 'pay');
-    stub.yields(null, paypalMock);
+    stub.yields(null, paypalMock.adaptive.pay);
   });
 
   afterEach(function() {
@@ -152,7 +152,7 @@ describe('transactions.paypal.routes.test.js', function() {
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('payKey', paypalMock.payKey);
+          expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
           expect(res.body).to.have.property('transactionId', transaction.id);
 
           models.Paykey
@@ -162,7 +162,7 @@ describe('transactions.paypal.routes.test.js', function() {
               var paykey = res.rows[0];
               expect(paykey).to.have.property('id');
               expect(paykey).to.have.property('trackingId');
-              expect(paykey).to.have.property('paykey', paypalMock.payKey);
+              expect(paykey).to.have.property('paykey', paypalMock.adaptive.pay.payKey);
               expect(paykey).to.have.property('status', 'CREATED');
               expect(paykey).to.have.property('payload');
               expect(paykey.payload.trackingId).to.equal(paykey.trackingId);
@@ -183,6 +183,199 @@ describe('transactions.paypal.routes.test.js', function() {
         })
         .expect(200)
         .end(done);
+    });
+
+  });
+
+  /**
+   * Confirm a paypal transaction.
+   */
+  describe('#confirmPayment', function() {
+
+    var paykey = paypalMock.adaptive.pay.payKey;
+
+    beforeEach(function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(200)
+        .end(done);
+    });
+
+    describe('Details from Paypal COMPLETED', function() {
+
+      beforeEach(function() {
+        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        stub.yields(null, paypalMock.adaptive.paymentDetails.completed);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.paymentDetails.restore();
+      });
+
+      it('should fail if the user is a viewer', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(403)
+          .end(done);
+      });
+
+      it('should fail if the application does not have access to the group', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .send({
+            api_key: application2.api_key
+          })
+          .expect(403)
+          .end(done);
+      });
+
+      it('should fail with an unknown paykey', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + 'abc')
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(404)
+          .end(done);
+      });
+
+      it('should confirm the payment of a transaction', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            expect(res.body.id).to.equal(transaction.id);
+            expect(res.body.status).to.equal('COMPLETED');
+
+            async.auto({
+              checkPaykey: function(cb) {
+                models.Paykey.findAndCountAll({where: {paykey: paykey} }).then(function(res) {
+                  expect(res.count).to.equal(1);
+                  expect(res.rows[0].status).to.equal('COMPLETED');
+                  cb();
+                });
+              },
+              checkTransaction: function(cb) {
+                models.Transaction.findAndCountAll({where: {id: transaction.id} }).then(function(res) {
+                  expect(res.count).to.equal(1);
+                  expect(res.rows[0].status).to.equal('COMPLETED');
+                  expect(res.rows[0].reimbursedAt).not.to.be.null;
+                  cb();
+                });
+              },
+              checkActivity: function(cb) {
+                models.Activity.findAndCountAll({where: {type: 'group.transaction.paid'} }).then(function(res) {
+                  expect(res.count).to.equal(1);
+                  cb();
+                });
+              }
+            }, done);
+
+          });
+      });
+
+      it('should confirm the payment with a api_key that has access to the group', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .send({
+            api_key: application3.api_key
+          })
+          .expect(200)
+          .end(done);
+      });
+
+    });
+
+    describe('Details from Paypal CREATED', function() {
+
+      beforeEach(function() {
+        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        stub.yields(null, paypalMock.adaptive.paymentDetails.created);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.paymentDetails.restore();
+      });
+
+      it('should return an error if the payment is not completed', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(400)
+          .end(done);
+      });
+
+    });
+
+    describe('Details from Paypal ERROR', function() {
+
+      beforeEach(function() {
+        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        stub.yields(null, paypalMock.adaptive.paymentDetails.error);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.paymentDetails.restore();
+      });
+
+      it('should return an error if paypal returns one', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(400)
+          .end(done);
+      });
+
+    });
+
+    describe('Paykeys clean up', function() {
+
+      beforeEach(function(done) {
+        async.eachSeries(['AP-791807008W699005B', 'AP-791807008W699005C'], function(pk, cb) {
+          var response = _.clone(paypalMock.adaptive.pay);
+          response.payKey = pk;
+
+          app.paypalAdaptive.pay.restore();
+          var stub = sinon.stub(app.paypalAdaptive, 'pay');
+          stub.yields(null, response);
+
+          request(app)
+            .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+            .set('Authorization', 'Bearer ' + user2.jwt(application))
+            .expect(200)
+            .end(function(e) {
+              expect(e).to.not.exist;
+              cb();
+            });
+        }, done);
+      });
+
+      beforeEach(function() {
+        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        stub.yields(null, paypalMock.adaptive.paymentDetails.completed);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.paymentDetails.restore();
+      });
+
+      it('should delete all other paykey entries in the database to clean up', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            models.Paykey.findAndCountAll({where: {TransactionId: transaction.id} }).then(function(res) {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0].status).to.equal('COMPLETED');
+              done();
+            });
+          });
+      });
+
     });
 
   });
