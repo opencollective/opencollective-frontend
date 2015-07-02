@@ -150,7 +150,7 @@ module.exports = function(app) {
           memo: 'Reimbursement transaction ' + req.transaction.id + ': ' + req.transaction.description,
           cancelUrl: cancelUrl,
           returnUrl: returnUrl,
-          trackingId: [uuid.v1(), results.createPaykeyEntry.id].join(':'),
+          trackingId: [uuid.v1().substr(0,8), results.createPaykeyEntry.id].join(':'),
           receiverList: {
             receiver: [
               {
@@ -199,6 +199,61 @@ module.exports = function(app) {
   };
 
   /**
+   * Confirm a transaction payment.
+   */
+  var confirmPayment = function(req, res, next) {
+    console.log('confirmPayment : ', req.transaction.id, req.paykey.id);
+
+    async.auto({
+
+      callPaypal: [function(cb) {
+        app.paypalAdaptive.paymentDetails({payKey: req.params.paykey}, function (err, response) {
+          if (err) {
+              return cb(new errors.BadRequest(response.error[0].message));
+          }
+          if (response.status !== 'COMPLETED') {
+            return cb(new errors.BadRequest('This transaction is not paid yet.'));
+          }
+          cb(null, response);
+        });
+      }],
+
+      updatePaykey: ['callPaypal', function(cb, results) {
+        req.paykey.data = results.callPaypal;
+        req.paykey.status = results.callPaypal.status;
+        req.paykey.save().done(cb);
+      }],
+
+      updateTransaction: ['callPaypal', function(cb, results) {
+        req.transaction.status = results.callPaypal.status;
+        req.transaction.reimbursedAt = new Date();
+        req.transaction.save().done(cb);
+      }],
+
+      createActivity: ['callPaypal', 'updatePaykey', 'updateTransaction', function(cb, results) {
+        var user = req.remoteUser || {};
+        Activity.create({
+          type: 'group.transaction.paid',
+          UserId: user.id,
+          GroupId: req.group.id,
+          TransactionId: req.transaction.id,
+          data: {
+            group: req.group.info,
+            transaction: req.transaction.info,
+            user: user.info,
+            pay: results.callPaypal
+          }
+        }).done(cb);
+      }]
+
+    }, function(err, results) {
+      if (err) return next(err);
+      else res.send(results.updateTransaction.info)
+    });
+
+  };
+
+  /**
    * Attribute a transaction to a user.
    */
   var attributeUser = function(req, res, next) {
@@ -208,7 +263,7 @@ module.exports = function(app) {
         res.send({success: true});
       })
       .catch(next);
-  }
+  };
 
   /**
    * Public methods.
@@ -232,6 +287,7 @@ module.exports = function(app) {
 
     _create: create,
     getPayKey: getPayKey,
+    confirmPayment: confirmPayment,
     attributeUser: attributeUser
 
   }

@@ -11,6 +11,102 @@
       "paymentExecStatus": "CREATED",
       "httpStatusCode": 200,
       "paymentApprovalUrl": "https:\/\/www.sandbox.paypal.com\/cgi-bin\/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A"
+    },
+
+    "paymentDetails": {
+
+      "created": {
+        "responseEnvelope": {
+          "timestamp": "2015-07-01T21:25:44.983-07:00",
+          "ack": "Success",
+          "correlationId": "49f5b1753e0df",
+          "build": "15743565"
+        },
+        "cancelUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/cancel",
+        "currencyCode": "USD",
+        "memo": "Reimbursement transaction 1: Homepage design",
+        "paymentInfoList": {
+          "paymentInfo": [
+            [
+              null
+            ],
+            [
+              null
+            ]
+          ]
+        },
+        "returnUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/success",
+        "status": "CREATED",
+        "trackingId": "f56ca700:27",
+        "payKey": "AP-791807008W699005A",
+        "actionType": "PAY",
+        "feesPayer": "SENDER",
+        "reverseAllParallelPaymentsOnError": "false",
+        "sender": {
+          "useCredentials": "false"
+        },
+        "httpStatusCode": 200
+      },
+
+      "completed": {
+        "responseEnvelope": {
+          "timestamp": "2015-07-01T21:27:37.687-07:00",
+          "ack": "Success",
+          "correlationId": "e0d6da2659ff9",
+          "build": "15743565"
+        },
+        "cancelUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/cancel",
+        "currencyCode": "USD",
+        "memo": "Reimbursement transaction 1: Homepage design",
+        "paymentInfoList": {
+          "paymentInfo": [
+            [
+              null
+            ],
+            [
+              null
+            ]
+          ]
+        },
+        "returnUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/success",
+        "senderEmail": "philippe.modard+paypalsandbox@gmail.com",
+        "status": "COMPLETED",
+        "trackingId": "f56ca700:27",
+        "payKey": "AP-791807008W699005A",
+        "actionType": "PAY",
+        "feesPayer": "SENDER",
+        "reverseAllParallelPaymentsOnError": "false",
+        "sender": {
+          "email": "philippe.modard+paypalsandbox@gmail.com",
+          "accountId": "UA4WZRN8UFEAU",
+          "useCredentials": "false"
+        },
+        "httpStatusCode": 200
+      },
+
+      "error": {
+        "responseEnvelope": {
+          "timestamp": "2015-07-01T21:30:34.416-07:00",
+          "ack": "Failure",
+          "correlationId": "4bba3cee78340",
+          "build": "15743565"
+        },
+        "error": [
+          {
+            "errorId": "580022",
+            "domain": "PLATFORM",
+            "subdomain": "Application",
+            "severity": "Error",
+            "category": "Application",
+            "message": "Invalid request parameter: payKey with value AP-7AR83715KM669105N",
+            "parameter": [
+              null
+            ]
+          }
+        ],
+        "httpStatusCode": 200
+      }
+
     }
   }
 }
