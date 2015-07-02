@@ -202,7 +202,6 @@ module.exports = function(app) {
    * Confirm a transaction payment.
    */
   var confirmPayment = function(req, res, next) {
-    console.log('confirmPayment : ', req.transaction.id, req.paykey.id);
 
     async.auto({
 
@@ -228,6 +227,17 @@ module.exports = function(app) {
         req.transaction.status = results.callPaypal.status;
         req.transaction.reimbursedAt = new Date();
         req.transaction.save().done(cb);
+      }],
+
+      cleanPaykeys: ['updatePaykey', function(cb, results) {
+        Paykey
+          .destroy({
+            where: {
+              TransactionId: req.transaction.id,
+              paykey: {$ne: req.paykey.paykey}
+            }
+          })
+          .done(cb);
       }],
 
       createActivity: ['callPaypal', 'updatePaykey', 'updateTransaction', function(cb, results) {

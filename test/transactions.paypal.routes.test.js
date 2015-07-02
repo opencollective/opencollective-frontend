@@ -330,6 +330,54 @@ describe('transactions.paypal.routes.test.js', function() {
 
     });
 
+    describe('Paykeys clean up', function() {
+
+      beforeEach(function(done) {
+        async.eachSeries(['AP-791807008W699005B', 'AP-791807008W699005C'], function(pk, cb){
+          var response = _.clone(paypalMock.adaptive.pay);
+          response.payKey = pk;
+
+          app.paypalAdaptive.pay.restore();
+          var stub = sinon.stub(app.paypalAdaptive, 'pay');
+          stub.yields(null, response);
+
+          request(app)
+            .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+            .set('Authorization', 'Bearer ' + user2.jwt(application))
+            .expect(200)
+            .end(function(e) {
+              expect(e).to.not.exist;
+              cb();
+            });
+        }, done);
+      });
+
+      beforeEach(function() {
+        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        stub.yields(null, paypalMock.adaptive.paymentDetails.completed);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.paymentDetails.restore();
+      });
+
+      it('should delete all other paykey entries in the database to clean up', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey/' + paykey)
+          .set('Authorization', 'Bearer ' + user2.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            models.Paykey.findAndCountAll({where: {TransactionId: transaction.id} }).then(function(res) {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0].status).to.equal('COMPLETED');
+              done();
+            });
+          });
+      });
+
+    });
+
   });
 
 });
