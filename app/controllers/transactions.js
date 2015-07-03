@@ -134,9 +134,9 @@ module.exports = function(app) {
           .catch(cb);
       },
 
-      createPaykeyEntry: function(cb) {
+      createPaykeyEntry: [function(cb) {
         Paykey.create({}).done(cb);
-      },
+      }],
 
       createPayload: ['getUser', 'createPaykeyEntry', function(cb, results) {
         var payload = {
@@ -199,6 +199,68 @@ module.exports = function(app) {
   };
 
   /**
+   * Confirm the payment in the database:
+   *  - update paykey
+   *  - update transaction
+   *  - clean not used paykeys
+   *  - create an activity
+   *  Returns the transaction.
+   */
+  var _confirmPaymentDatabase = function(args, callback) {
+    var paykey = args.paykey; // model
+    var transaction = args.transaction; // model
+    var group = args.group; // model
+    var paypalResponse = args.paypalResponse; // response from paypal paymentDetails
+    var user = args.user || {};
+
+    async.auto({
+
+      updatePaykey: [function(cb, results) {
+        paykey.data = paypalResponse;
+        paykey.status = paypalResponse.status;
+        paykey.save().done(cb);
+      }],
+
+      updateTransaction: [function(cb, results) {
+        transaction.status = paypalResponse.status;
+        transaction.reimbursedAt = new Date();
+        transaction.save().done(cb);
+      }],
+
+      cleanPaykeys: ['updatePaykey', function(cb, results) {
+        Paykey
+          .destroy({
+            where: {
+              TransactionId: transaction.id,
+              paykey: {$ne: paykey.paykey}
+            }
+          })
+          .done(cb);
+      }],
+
+      createActivity: ['updatePaykey', 'updateTransaction', function(cb, results) {
+        Activity.create({
+          type: 'group.transaction.paid',
+          UserId: user.id,
+          GroupId: group.id,
+          TransactionId: transaction.id,
+          data: {
+            group: group.info,
+            transaction: transaction.info,
+            user: user.info,
+            pay: paypalResponse
+          }
+        }).done(cb);
+      }]
+
+    }, function(err, results) {
+      if (err) return callback(err);
+      else callback(null, results.updateTransaction);
+    });
+
+  };
+
+  /**
    * Confirm a transaction payment.
    */
   var confirmPayment = function(req, res, next) {
@@ -219,48 +281,19 @@ module.exports = function(app) {
         });
       }],
 
-      updatePaykey: ['callPaypal', function(cb, results) {
-        req.paykey.data = results.callPaypal;
-        req.paykey.status = results.callPaypal.status;
-        req.paykey.save().done(cb);
-      }],
-
-      updateTransaction: ['callPaypal', function(cb, results) {
-        req.transaction.status = results.callPaypal.status;
-        req.transaction.reimbursedAt = new Date();
-        req.transaction.save().done(cb);
-      }],
-
-      cleanPaykeys: ['updatePaykey', function(cb, results) {
-        Paykey
-          .destroy({
-            where: {
-              TransactionId: req.transaction.id,
-              paykey: {$ne: req.paykey.paykey}
-            }
-          })
-          .done(cb);
-      }],
-
-      createActivity: ['callPaypal', 'updatePaykey', 'updateTransaction', function(cb, results) {
-        var user = req.remoteUser || {};
-        Activity.create({
-          type: 'group.transaction.paid',
-          UserId: user.id,
-          GroupId: req.group.id,
-          TransactionId: req.transaction.id,
-          data: {
-            group: req.group.info,
-            transaction: req.transaction.info,
-            user: user.info,
-            pay: results.callPaypal
-          }
-        }).done(cb);
+      confirmPaymentDatabase: ['callPaypal', function(cb, results) {
+        _confirmPaymentDatabase({
+          paykey: req.paykey,
+          transaction: req.transaction,
+          group: req.group,
+          paypalResponse: results.callPaypal,
+          user: req.remoteUser
+        }, cb);
       }]
 
     }, function(err, results) {
       if (err) return next(err);
-      else res.send(results.updateTransaction.info)
+      else res.send(results.confirmPaymentDatabase.info)
     });
 
   };
