@@ -100,7 +100,7 @@ module.exports = function(app) {
    * Get a Paypal pay key.
    */
   var getPayKey = function(req, res, next) {
-    var uri = '/groups/' + req.group.id + '/transactions/' + req.transaction.id;
+    var uri = '/groups/' + req.group.id + '/transactions/' + req.transaction.id + '/paykey/${payKey}';
 
     // Check if a user is attached to the transaction.
     var userId = req.transaction.UserId;
