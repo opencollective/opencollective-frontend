@@ -148,7 +148,7 @@ module.exports = function(app) {
         async.each(results.getExistingPaykeys.rows, function(pk, cbEach) {
           app.paypalAdaptive.paymentDetails({payKey: pk.paykey}, function(err, response) {
             if (err || response.status === 'CREATED') {
-              pk.destroy().done(cb);
+              pk.destroy().done(cbEach);
             } else if (response.status === 'COMPLETED') {
               _confirmPaymentDatabase({
                 paykey: pk,
@@ -157,11 +157,11 @@ module.exports = function(app) {
                 paypalResponse: response,
                 user: req.remoteUser
               }, function(e, transaction) {
-                if (e) return cb(e);
-                else return cb(new errors.BadRequest('This transaction has been paid already.'));
+                if (e) return cbEach(e);
+                else return cbEach(new errors.BadRequest('This transaction has been paid already.'));
               });
             } else {
-              cb();
+              cbEach();
             }
           });
         }, cb);
