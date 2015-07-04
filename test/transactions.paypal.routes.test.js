@@ -222,10 +222,6 @@ describe('transactions.paypal.routes.test.js', function() {
           stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
         });
 
-        afterEach(function() {
-          app.paypalAdaptive.paymentDetails.restore();
-        });
-
         beforeEach(function(done) {
           async.eachSeries(pks, function(pk, cb) {
 
@@ -240,7 +236,11 @@ describe('transactions.paypal.routes.test.js', function() {
               TransactionId: transaction.id
             }).done(cb);
           }, done);
-        })
+        });
+
+        afterEach(function() {
+          app.paypalAdaptive.paymentDetails.restore();
+        });
 
         it('should delete the old paykeys not completed and returns a new one', function(done) {
           request(app)
@@ -281,6 +281,10 @@ describe('transactions.paypal.routes.test.js', function() {
             status: 'COMPLETED',
             TransactionId: transaction.id
           }).done(done);
+        });
+
+        afterEach(function() {
+          app.paypalAdaptive.paymentDetails.restore();
         });
 
         it('should returns an error if one paykey has been completed', function(done) {
