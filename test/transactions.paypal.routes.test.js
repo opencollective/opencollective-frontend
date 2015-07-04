@@ -185,6 +185,143 @@ describe('transactions.paypal.routes.test.js', function() {
         .end(done);
     });
 
+    describe('Check existing paykey', function() {
+
+      describe('no existing paykeys', function() {
+
+        beforeEach(function() {
+          var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+          stub.withArgs({paykey: paypalMock.adaptive.paymentDetails.created.payKey});
+          stub.yields(null, paypalMock.adaptive.paymentDetails.created);
+        });
+
+        afterEach(function() {
+          app.paypalAdaptive.paymentDetails.restore();
+        });
+
+        it('should returns a new paykey if none are completed', function(done) {
+          request(app)
+            .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+            .set('Authorization', 'Bearer ' + user2.jwt(application))
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
+              done();
+            });
+        });
+
+      });
+
+      describe('existing CREATED paykeys in the database', function() {
+
+        var pks = ['pk1', 'pk2'];
+        var stub;
+
+        beforeEach(function() {
+          stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        });
+
+        afterEach(function() {
+          app.paypalAdaptive.paymentDetails.restore();
+        });
+
+        beforeEach(function(done) {
+          async.eachSeries(pks, function(pk, cb) {
+
+            // Create stub for that paykey.
+            stub.withArgs({paykey: pk});
+            stub.yields(null, paypalMock.adaptive.paymentDetails.created);
+
+            // Create the paykey in the database.
+            models.Paykey.create({
+              paykey: pk,
+              status: 'CREATED',
+              TransactionId: transaction.id
+            }).done(cb);
+          }, done);
+        })
+
+        it('should delete the old paykeys not completed and returns a new one', function(done) {
+          request(app)
+            .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+            .set('Authorization', 'Bearer ' + user2.jwt(application))
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
+
+              models.Paykey
+                .findAndCountAll({})
+                .then(function(res) {
+                  expect(res.count).to.equal(1);
+                  done();
+                })
+                .catch(done);
+            });
+        });
+
+      });
+
+      describe('existing COMPLETED paykeys in the database', function() {
+
+        var pk = 'pk1';
+        var stub;
+
+        beforeEach(function() {
+          stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        });
+
+        beforeEach(function(done) {
+          stub.withArgs({paykey: pk})
+          stub.yields(null, paypalMock.adaptive.paymentDetails.completed);
+
+          models.Paykey.create({
+            paykey: pk,
+            status: 'COMPLETED',
+            TransactionId: transaction.id
+          }).done(done);
+        });
+
+        it('should returns an error if one paykey has been completed', function(done) {
+          request(app)
+            .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+            .set('Authorization', 'Bearer ' + user2.jwt(application))
+            .expect(400)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              expect(res.text).to.contain('This transaction has been paid already.');
+
+              async.auto({
+                checkPaykey: function(cb) {
+                  models.Paykey.findAndCountAll({where: {paykey: pk} }).then(function(res) {
+                    expect(res.count).to.equal(1);
+                    expect(res.rows[0].status).to.equal('COMPLETED');
+                    cb();
+                  });
+                },
+                checkTransaction: function(cb) {
+                  models.Transaction.findAndCountAll({where: {id: transaction.id} }).then(function(res) {
+                    expect(res.count).to.equal(1);
+                    expect(res.rows[0].status).to.equal('COMPLETED');
+                    expect(res.rows[0].reimbursedAt).not.to.be.null;
+                    cb();
+                  });
+                },
+                checkActivity: function(cb) {
+                  models.Activity.findAndCountAll({where: {type: 'group.transaction.paid'} }).then(function(res) {
+                    expect(res.count).to.equal(1);
+                    cb();
+                  });
+                }
+              }, done);
+            });
+        });
+
+      });
+
+    });
+
   });
 
   /**

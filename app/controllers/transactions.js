@@ -134,7 +134,40 @@ module.exports = function(app) {
           .catch(cb);
       },
 
-      createPaykeyEntry: [function(cb) {
+      getExistingPaykeys: ['getUser', function(cb) {
+        Paykey
+          .findAndCountAll({
+            where: {
+              TransactionId: req.transaction.id
+            }
+          })
+          .done(cb);
+      }],
+
+      checkExistingPaykeys: ['getExistingPaykeys', function(cb, results) {
+        async.each(results.getExistingPaykeys.rows, function(pk, cbEach) {
+          app.paypalAdaptive.paymentDetails({payKey: pk.paykey}, function(err, response) {
+            if (err || response.status === 'CREATED') {
+              pk.destroy().done(cb);
+            } else if (response.status === 'COMPLETED') {
+              _confirmPaymentDatabase({
+                paykey: pk,
+                transaction: req.transaction,
+                group: req.group,
+                paypalResponse: response,
+                user: req.remoteUser
+              }, function(e, transaction) {
+                if (e) return cb(e);
+                else return cb(new errors.BadRequest('This transaction has been paid already.'));
+              });
+            } else {
+              cb();
+            }
+          });
+        }, cb);
+      }],
+
+      createPaykeyEntry: ['checkExistingPaykeys', function(cb) {
         Paykey.create({}).done(cb);
       }],
 
