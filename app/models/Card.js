@@ -15,6 +15,9 @@ module.exports = function(Sequelize, DataTypes) {
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
+    },
+    confirmedAt: {
+      type: DataTypes.DATE
     }
   }, {
     getterMethods: {

@@ -18,6 +18,7 @@ module.exports = function(app) {
   var activities = Controllers.activities;
   var transactions = Controllers.transactions;
   var payments = Controllers.payments;
+  var paypal = Controllers.paypal;
   var errors = app.errors;
 
   /**
@@ -68,6 +69,12 @@ module.exports = function(app) {
   app.post('/users/:userid/cards', NotImplemented); // Create a user's card.
   app.put('/users/:userid/cards/:cardid', NotImplemented); // Update a user's card.
   app.delete('/users/:userid/cards/:cardid', NotImplemented); // Delete a user's card.
+
+  /**
+   * Paypal Preapproval.
+   */
+  app.get('/users/:userid/paypal/preapproval', mw.authorizeAuthUser, mw.authorizeUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
+  app.post('/users/:userid/paypal/preapproval', mw.authorizeAuthUser, mw.authorizeUser, paypal.confirmPreapproval); // Confirm a preapproval key.
 
   /**
    * Groups.

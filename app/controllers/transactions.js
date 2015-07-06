@@ -199,6 +199,10 @@ module.exports = function(app) {
             ]
           }
         };
+
+        // Add the user preapproval key if it has one.
+        // payload.preapprovalKey = results.getUser.preapprovalKey;
+
         return cb(null, payload);
       }],
 
