@@ -1,0 +1,29 @@
+{
+  "database": {
+    "database": "dept2698uk7ghp",
+    "username": "ejpoxkbwfpbnsg",
+    "password": "Rx_-jijcP8dG8xX-YauM3dqOx2",
+    "options": {
+      "host": "ec2-54-204-26-8.compute-1.amazonaws.com",
+      "port": 5432,
+      "dialect": "postgres",
+      "protocol": "postgres",
+      "logging": true,
+      "dialectOptions": {
+        "ssl": true
+      }
+    }
+  },
+  "keys": {
+    "opencollective": {
+      "secret": "282e58cebfee86af32bb1fac07db362f0d03ad4e"
+    }
+  },
+  "host": {
+    "api": "https://opencollective.herokuapp.com"
+  },
+  "stripe": {
+    "secret": "sk_test_3jGhCKe3e1KiN8gHrdDqqHg4",
+    "key": "pk_test_5olkhgG5FgJDHcGpJllmCj6z"
+  }
+}
