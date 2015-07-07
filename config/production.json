@@ -16,14 +16,14 @@
   },
   "keys": {
     "opencollective": {
-      "secret": "282e58cebfee86af32bb1fac07db362f0d03ad4e"
+      "secret": "c9182457722e6c2281f1a7d4a72a1f97"
     }
   },
   "host": {
-    "api": "https://opencollective.herokuapp.com"
+    "api": "https://opencollective-prod.herokuapp.com"
   },
   "stripe": {
-    "secret": "sk_test_3jGhCKe3e1KiN8gHrdDqqHg4",
-    "key": "pk_test_5olkhgG5FgJDHcGpJllmCj6z"
+    "secret": "sk_live_xP47bLCfFfRw8LBDdDhbS1Ej",
+    "key": "pk_live_qZ0OnX69UlIL6pRODicRzsZy"
   }
 }
