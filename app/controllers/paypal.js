@@ -108,7 +108,7 @@ module.exports = function(app) {
       }]
 
     }, function(err, results) {
-      if (err) return next(e);
+      if (err) return next(err);
       var response = results.callPaypal;
       res.json(response);
     });
