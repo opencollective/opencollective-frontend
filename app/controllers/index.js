@@ -11,6 +11,7 @@ module.exports = function(app) {
     'middlewares',
     'params',
     'payments',
+    'paypal',
     'transactions',
     'users'
   ];
