@@ -44,7 +44,7 @@ module.exports = function(app) {
     var baseUrl = config.host.webapp + uri;
     var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
     var returnUrl = req.query.returnUrl || (baseUrl + '/success');
-    var endingDate = req.query.endingDate || moment().add(1, 'years').toISOString();
+    var endingDate = (req.query.endingDate && (new Date(req.query.endingDate)).toISOString()) || moment().add(1, 'years').toISOString();
     var maxTotalAmountOfAllPayments = req.query.maxTotalAmountOfAllPayments || 2000; // 2000 is the maximum: https://developer.paypal.com/docs/classic/api/adaptive-payments/Preapproval_API_Operation/
 
     async.auto({
@@ -62,6 +62,9 @@ module.exports = function(app) {
 
       checkExistingCard: ['getExistingCard', function(cb, results) {
         async.each(results.getExistingCard.rows, function(card, cbEach) {
+          if (!card.token) {
+            return card.destroy().done(cbEach);
+          }
           getPreapprovalDetails(card.token, function(err, response) {
             if (err) return cbEach(err);
             if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {
