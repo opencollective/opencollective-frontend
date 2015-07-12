@@ -20,7 +20,15 @@ module.exports = function(app) {
   var Activity = models.Activity;
   var Paykey = models.Paykey;
   var User = models.User;
+  var Card = models.Card;
   var errors = app.errors;
+
+  /**
+   * Calculate OpenCollective fee.
+   */
+  function calculateOCfee(amount, feeOC) {
+    return Math.round(amount * feeOC) / 100;
+  }
 
   /**
    * Create a transaction and add it to a group/user/card.
@@ -113,11 +121,6 @@ module.exports = function(app) {
     var baseUrl = config.host.webapp + uri;
     var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
     var returnUrl = req.query.returnUrl || (baseUrl + '/success');
-
-    // Calculate OpenCollective fee.
-    function calculateOCfee(amount, feeOC) {
-      return Math.round(amount * feeOC) / 100;
-    }
 
     async.auto({
 
@@ -336,6 +339,150 @@ module.exports = function(app) {
   };
 
   /**
+   * Specific method for paying with services.
+   */
+  var payServices = {
+
+    paypal: function(data, callback) {
+      var uri = '/groups/' + data.group.id + '/transactions/' + data.transaction.id + '/paykey/${payKey}';
+      var baseUrl = config.host.webapp + uri;
+      var amount = data.transaction.amount;
+
+      var payload = {
+        requestEnvelope: {
+          errorLanguage: 'en_US',
+          detailLevel: 'ReturnAll'
+        },
+        actionType: 'PAY',
+        currencyCode: data.transaction.currency.toUpperCase() || 'USD',
+        feesPayer: 'SENDER',
+        memo: 'Reimbursement transaction ' + data.transaction.id + ': ' + data.transaction.description,
+        trackingId: [uuid.v1().substr(0, 8), data.transaction.id].join(':'),
+        preapprovalKey: data.cardToken,
+        returnUrl: baseUrl + '/success',
+        cancelUrl: baseUrl + '/cancel',
+        receiverList: {
+          receiver: [
+            {
+              email: data.beneficiary.email,
+              amount: amount,
+              paymentType: 'PERSONAL'
+            },
+            {
+              email: config.paypal.classic.email,
+              amount: calculateOCfee(amount, config.paypal.feeOC),
+              paymentType: 'PERSONAL'
+            }
+          ]
+        }
+      };
+      
+      app.paypalAdaptive.pay(payload, callback);
+    }
+
+  }
+
+  /**
+   * Pay a transaction.
+   */
+  var pay = function(req, res, next) {
+    var service = req.required.service;
+    var user = req.remoteUser;
+    var group = req.group;
+    var transaction = req.transaction;
+
+    async.auto({
+
+      checkTransaction: [function(cb, results) {
+        if (transaction.reimbursedAt) {
+          return cb(new errors.BadRequest('This transaction has been paid already.'));
+        }
+
+        if (!transaction.approved) {
+          return cb(new errors.BadRequest('This transaction has not been approved yet.'));
+        }
+
+        cb();
+      }],
+
+      getCard: [function(cb, results) {
+        Card
+          .findAndCountAll({
+            where: {
+              service: service,
+              UserId: user.id,
+              confirmedAt: {$ne: null}
+            },
+            order: [['confirmedAt', 'DESC']],
+          })
+          .done(cb);
+      }],
+
+      checkCard: ['getCard', function(cb, results) {
+        if (results.getCard.count === 0) {
+          return cb(new errors.BadRequest('This user has no confirmed card linked with this service.'));
+        } else {
+          return cb(null, results.getCard.rows[0]); // Use first card.
+        }
+      }],
+
+      getBeneficiary: [function(cb, results) {
+        User
+          .find(parseInt(transaction.UserId))
+          .then(function(user) {
+            if (!user) {
+              return cb(new errors.NotFound('Beneficiary ' + userid + ' not found'));
+            } else {
+              cb(null, user);
+            }
+          })
+          .catch(cb);
+      }],
+
+      callService: ['checkTransaction', 'checkCard', 'getBeneficiary', function(cb, results) {
+        if (!payServices[service]) {
+          return cb(new errors.NotImplemented('This service is not implemented yet for payment.'));
+        }
+
+        payServices[service]({
+          card: results.checkCard,
+          group: group,
+          transaction: transaction,
+          beneficiary: results.getBeneficiary,
+          cardToken: results.checkCard.token
+        }, cb);
+      }],
+
+      updateTransaction: ['checkCard', 'callService', function(cb, results) {
+        transaction.status = 'REIMBURSED';
+        transaction.reimbursedAt = new Date();
+        transaction.CardId = results.checkCard.id;
+        transaction.save().done(cb);
+      }],
+
+      createActivity: ['callService', 'updateTransaction', function(cb, results) {
+        Activity.create({
+          type: 'group.transaction.paid',
+          UserId: user.id,
+          GroupId: group.id,
+          TransactionId: results.updateTransaction.id,
+          data: {
+            group: group.info,
+            transaction: results.updateTransaction.info,
+            user: user.info,
+            pay: results.callService
+          }
+        }).done(cb);
+      }]
+
+    }, function(err, results) {
+      if (err) return next(err);
+      else res.json(results.updateTransaction);
+    });
+
+  };
+
+  /**
    * Attribute a transaction to a user.
    */
   var attributeUser = function(req, res, next) {
@@ -370,6 +517,7 @@ module.exports = function(app) {
     _create: create,
     getPayKey: getPayKey,
     confirmPayment: confirmPayment,
+    pay: pay,
     attributeUser: attributeUser
 
   }

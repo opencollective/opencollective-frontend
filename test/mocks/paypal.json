@@ -13,6 +13,92 @@
       "paymentApprovalUrl": "https:\/\/www.sandbox.paypal.com\/cgi-bin\/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A"
     },
 
+    "pay": {
+
+      "payload": {
+        "requestEnvelope": {
+          "errorLanguage": "en_US",
+          "detailLevel": "ReturnAll"
+        },
+        "actionType": "PAY",
+        "currencyCode": "USD",
+        "feesPayer": "SENDER",
+        "memo": "Reimbursement transaction 6: Homepage design",
+        "trackingId": "551d3790:6",
+        "preapprovalKey": "PA-5SG794959W4769124",
+        "returnUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/6\/paykey\/${payKey}\/success",
+        "cancelUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/6\/paykey\/${payKey}\/cancel",
+        "receiverList": {
+          "receiver": [
+            {
+              "email": "philippe.modard@gmail.com",
+              "amount": 1.19,
+              "paymentType": "PERSONAL"
+            },
+            {
+              "email": "xdamman+opencollective-facilitator@gmail.com",
+              "amount": 0.06,
+              "paymentType": "PERSONAL"
+            }
+          ]
+        }
+      },
+
+      "success": {
+        "responseEnvelope": {
+          "timestamp": "2015-07-12T15:52:32.827-07:00",
+          "ack": "Success",
+          "correlationId": "2abc79e90b8d5",
+          "build": "17325060"
+        },
+        "payKey": "AP-8HL44700YF673952M",
+        "paymentExecStatus": "COMPLETED",
+        "paymentInfoList": {
+          "paymentInfo": [
+            {
+              "transactionId": "0528697854474760J",
+              "transactionStatus": "COMPLETED",
+              "receiver": {
+                "amount": "0.06",
+                "email": "xdamman+opencollective-facilitator@gmail.com",
+                "primary": "false",
+                "paymentType": "PERSONAL",
+                "accountId": "65UKEQB77G54S"
+              },
+              "pendingRefund": "false",
+              "senderTransactionId": "9C5976178Y8425353",
+              "senderTransactionStatus": "COMPLETED"
+            }
+          ]
+        },
+        "sender": {
+          "accountId": "UA4WZRN8UFEAU"
+        },
+        "httpStatusCode": 200
+      },
+
+      "totalAmountExceeded": {
+        "responseEnvelope": {
+          "timestamp": "2015-07-12T15:34:03.855-07:00",
+          "ack": "Failure",
+          "correlationId": "8e2c6dbffb062",
+          "build": "17325060"
+        },
+        "error": [
+          {
+            "errorId": "579031",
+            "domain": "PLATFORM",
+            "subdomain": "Application",
+            "severity": "Error",
+            "category": "Application",
+            "message": "The total amount of all payments exceeds the maximum total amount for all payments"
+          }
+        ],
+        "httpStatusCode": 200
+      }
+
+    }
+
     "paymentDetails": {
 
       "created": {
