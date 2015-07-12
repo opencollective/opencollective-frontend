@@ -91,6 +91,7 @@ module.exports = function(app) {
           returnUrl: returnUrl,
           cancelUrl: cancelUrl,
           displayMaxTotalAmount: true,
+          feesPayer: 'SENDER',
           maxTotalAmountOfAllPayments: maxTotalAmountOfAllPayments,
           requestEnvelope: {
             errorLanguage:  'en_US'
