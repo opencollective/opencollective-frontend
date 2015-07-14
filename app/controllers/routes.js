@@ -128,7 +128,7 @@ module.exports = function(app) {
     if (!err.code)
       err.code = err.status || 500;
 
-    console.error('Error Express : ', err); //console.trace(err);
+    console.error('Error Express : ', err); // console.trace(err);
     res.status(err.code).send({error: err});
   });
 
