@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function(app) {
 
   /**
@@ -11,6 +13,18 @@ module.exports = function(app) {
   var errors = app.errors;
 
   /**
+   * Parse id.
+   */
+  var parseId = function(id, callback) {
+    var id = parseInt(id);
+    if (_.isNaN(id)) {
+      return callback(new errors.BadRequest('This is not a correct id.'));
+    } else {
+      callback(null, id);
+    }
+  }
+
+  /**
    * Public methods.
    */
   return {
@@ -19,51 +33,60 @@ module.exports = function(app) {
      * Userid.
      */
     userid: function(req, res, next, userid) {
-      User
-        .find(parseInt(userid))
-        .then(function(user) {
-          if (!user) {
-            return next(new errors.NotFound('User \'' + userid + '\' not found'));
-          } else {
-            req.user = user;
-            next();
-          }
-        })
-        .catch(next);
+      parseId(userid, function(e, userid) {
+        if (e) return next(e);
+        User
+          .find(userid)
+          .then(function(user) {
+            if (!user) {
+              return next(new errors.NotFound('User \'' + userid + '\' not found'));
+            } else {
+              req.user = user;
+              next();
+            }
+          })
+          .catch(next);
+      });
     },
 
     /**
      * Groupid.
      */
     groupid: function(req, res, next, groupid) {
-      Group
-        .find(parseInt(groupid))
-        .then(function(group) {
-          if (!group) {
-            return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
-          } else {
-            req.group = group;
-            next();
-          }
-        })
-        .catch(next);
+      parseId(groupid, function(e, groupid) {
+        if (e) return next(e);
+        Group
+          .find(groupid)
+          .then(function(group) {
+            if (!group) {
+              return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
+            } else {
+              req.group = group;
+              next();
+            }
+          })
+          .catch(next);
+      });
     },
 
     /**
      * Transactionid.
      */
     transactionid: function(req, res, next, transactionid) {
-      Transaction
-        .find(parseInt(transactionid))
-        .then(function(transaction) {
-          if (!transaction) {
-            return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
-          } else {
-            req.transaction = transaction;
-            next();
-          }
-        })
-        .catch(next);
+      parseId(transactionid, function(e, transactionid) {
+        if (e) return next(e);
+        Transaction
+          .find(transactionid)
+          .then(function(transaction) {
+            if (!transaction) {
+              return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
+            } else {
+              req.transaction = transaction;
+              next();
+            }
+          })
+          .catch(next);
+      });
     },
 
     /**
