@@ -43,7 +43,7 @@
   },
   "scripts": {
     "test": "npm run hint && make test",
-    "start": "node .",
+    "start": "npm run hint && node .",
     "hint": "./node_modules/.bin/jscs app/**/*.js test/*.js --config=.jscsrc"
   },
   "license": "Copyright (c) 2015 Philmod"
