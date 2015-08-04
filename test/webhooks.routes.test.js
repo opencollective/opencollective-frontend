@@ -257,7 +257,7 @@ describe('webhooks.routes.test.js', function() {
         .send({
           id: id
         })
-        .expect(500)
+        .expect(400)
         .end(done);
     });
 

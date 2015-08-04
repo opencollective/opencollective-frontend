@@ -32,6 +32,15 @@
       "currency": null,
       "sources": {},
       "default_source": "card_165j1jIqnMN1wWwOzm6Cjmea"
+    },
+
+    "createError": {
+      "type": "StripeCardError",
+      "rawType": "card_error",
+      "code": "card_declined",
+      "message": "Your card was declined",
+      "detail": {},
+      "raw": {}
     }
 
   },

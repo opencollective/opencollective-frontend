@@ -158,8 +158,10 @@ module.exports = function(app) {
     else if (e.indexOf('uniqueconstraint') !== -1)
       err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
 
-    if (!err.code)
-      err.code = err.status || 500;
+    if (!err.code) {
+      var code = (err.type.indexOf('Stripe') > -1) ? 400 : 500;
+      err.code = err.status || 400;
+    }
 
     console.error('Error Express : ', err); // console.trace(err);
     res.status(err.code).send({error: err});

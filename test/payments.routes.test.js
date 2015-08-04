@@ -540,6 +540,32 @@ describe('payments.routes.test.js', function() {
 
     });
 
+    describe('Payment errors', function() {
+
+      beforeEach(function() {
+        nock.cleanAll();
+        nocks['customers.create'] = nock(STRIPE_URL)
+          .post('/v1/customers')
+          .replyWithError(stripeMock.customers.createError);
+      });
+
+      it('fails paying because of a card declined', function(done) {
+        request(app)
+          .post('/groups/' + group.id + '/payments')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            payment: {
+              stripeToken: STRIPE_TOKEN,
+              amount: CHARGE,
+              currency: CURRENCY
+            }
+          })
+          .expect(400)
+          .end(done);
+      });
+
+    });
+
   });
 
 });
