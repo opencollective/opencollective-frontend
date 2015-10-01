@@ -8,6 +8,7 @@ module.exports = function(app) {
     'activities',
     'auth',
     'groups',
+    'images',
     'middlewares',
     'params',
     'payments',

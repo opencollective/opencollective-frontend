@@ -3,6 +3,7 @@
  */
 var config = require('config');
 var Paypal = require('paypal-adaptive');
+var knox = require('knox');
 
 /**
  * Module.
@@ -26,4 +27,12 @@ module.exports = function(app) {
     sandbox: (env === 'development' || env === 'test')
   });
 
-}
+  // S3 bucket
+  app.knox = knox.createClient({
+    key: process.env.AWS_KEY,
+    secret: process.env.AWS_SECRET,
+    bucket: 'opencollective-dev',
+    region: 'us-west-1'
+  });
+
+};

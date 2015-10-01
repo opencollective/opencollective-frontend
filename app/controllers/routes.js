@@ -18,6 +18,7 @@ module.exports = function(app) {
   var activities = Controllers.activities;
   var transactions = Controllers.transactions;
   var payments = Controllers.payments;
+  var images = Controllers.images;
   var errors = app.errors;
 
   /**
@@ -109,6 +110,12 @@ module.exports = function(app) {
    */
   app.get('/groups/:groupid/activities', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
   app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+
+  /**
+   * Separate route for uploading images to S3
+   * TODO: Add permissions
+   */
+  app.post('/images', images.upload);
 
   /**
    * Error handler.
