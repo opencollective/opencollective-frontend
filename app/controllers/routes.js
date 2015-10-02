@@ -115,7 +115,7 @@ module.exports = function(app) {
    * Separate route for uploading images to S3
    * TODO: Add permissions
    */
-  app.post('/images', images.upload);
+  app.post('/images', mw.authorizeAuthUser, images.upload);
 
   /**
    * Error handler.

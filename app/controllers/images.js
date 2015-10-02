@@ -4,7 +4,6 @@
 
 var fs = require('fs');
 
-
 /**
  * Controller.
  */
