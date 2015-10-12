@@ -145,15 +145,16 @@ describe('transactions.paypal.routes.test.js', function() {
         });
     });
 
-    it('should get a transaction\'s pay key', function(done) {
+    it.only('should get a transaction\'s pay key', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
         .end(function(e, res) {
+          var body = res.body;
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
-          expect(res.body).to.have.property('transactionId', transaction.id);
+          expect(body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
+          expect(body).to.have.property('transactionId', transaction.id);
 
           models.Paykey
             .findAndCountAll({})
@@ -162,13 +163,15 @@ describe('transactions.paypal.routes.test.js', function() {
               var paykey = res.rows[0];
               expect(paykey).to.have.property('id');
               expect(paykey).to.have.property('trackingId');
-              expect(paykey).to.have.property('paykey', paypalMock.adaptive.pay.payKey);
-              expect(paykey).to.have.property('status', 'CREATED');
+              expect(paykey).to.have.property('paykey', paypalMock.adaptive.pay.success.payKey);
+              expect(paykey).to.have.property('status', 'COMPLETED');
               expect(paykey).to.have.property('payload');
               expect(paykey.payload.trackingId).to.equal(paykey.trackingId);
               expect(paykey).to.have.property('error');
-              expect(paykey).to.have.property('data', JSON.stringify(res.body));
               expect(paykey).to.have.property('TransactionId', transaction.id);
+              expect(paykey.data.payload).to.deep.equal(body.payload);
+              expect(paykey.data.success).to.deep.equal(body.success);
+              expect(paykey.data.totalAmountExceeded).to.deep.equal(body.totalAmountExceeded);
               done();
             })
             .catch(done);
@@ -206,7 +209,7 @@ describe('transactions.paypal.routes.test.js', function() {
             .expect(200)
             .end(function(e, res) {
               expect(e).to.not.exist;
-              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
+              expect(res.body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
               done();
             });
         });
@@ -249,7 +252,7 @@ describe('transactions.paypal.routes.test.js', function() {
             .expect(200)
             .end(function(e, res) {
               expect(e).to.not.exist;
-              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
+              expect(res.body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
 
               models.Paykey
                 .findAndCountAll({})
@@ -333,7 +336,7 @@ describe('transactions.paypal.routes.test.js', function() {
    */
   describe('#confirmPayment', function() {
 
-    var paykey = paypalMock.adaptive.pay.payKey;
+    var paykey = paypalMock.adaptive.pay.success.payKey;
 
     beforeEach(function(done) {
       request(app)
@@ -433,6 +436,7 @@ describe('transactions.paypal.routes.test.js', function() {
 
       beforeEach(function() {
         var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
+        console.log('asaaa', paypalMock.adaptive.paymentDetails.created);
         stub.yields(null, paypalMock.adaptive.paymentDetails.created);
       });
 
@@ -499,7 +503,7 @@ describe('transactions.paypal.routes.test.js', function() {
       });
 
       afterEach(function() {
-        app.paypalAdaptive.paymentDetails.restore();
+        // app.paypalAdaptive.paymentDetails.restore();
       });
 
       it('should delete all other paykey entries in the database to clean up', function(done) {

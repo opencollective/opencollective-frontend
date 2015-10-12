@@ -20,7 +20,7 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe.only('paypal.preapproval.routes.test.js', function() {
+describe('paypal.preapproval.routes.test.js', function() {
 
   var application;
   var user;

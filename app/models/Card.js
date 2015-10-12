@@ -19,6 +19,9 @@ module.exports = function(Sequelize, DataTypes) {
     },
     confirmedAt: {
       type: DataTypes.DATE
+    },
+    deletedAt: {
+      type: DataTypes.DATE
     }
   }, {
     paranoid: true,

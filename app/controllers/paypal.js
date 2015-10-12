@@ -65,6 +65,7 @@ module.exports = function(app) {
           if (!card.token) {
             return card.destroy().done(cbEach);
           }
+
           getPreapprovalDetails(card.token, function(err, response) {
             if (err) return cbEach(err);
             if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {

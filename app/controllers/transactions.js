@@ -148,6 +148,7 @@ module.exports = function(app) {
       }],
 
       checkExistingPaykeys: ['getExistingPaykeys', function(cb, results) {
+        console.log('checkExistingPaykeys', results.getExistingPaykeys);
         async.each(results.getExistingPaykeys.rows, function(pk, cbEach) {
           app.paypalAdaptive.paymentDetails({payKey: pk.paykey}, function(err, response) {
             if (err || response.status === 'CREATED') {
@@ -175,6 +176,7 @@ module.exports = function(app) {
       }],
 
       createPayload: ['getUser', 'createPaykeyEntry', function(cb, results) {
+        console.log('createPayload', results.createPaykeyEntry.id);
         var payload = {
           requestEnvelope: {
             errorLanguage: 'en_US',
@@ -210,20 +212,23 @@ module.exports = function(app) {
       }],
 
       callPaypal: ['createPayload', function(cb, results) {
+        console.log('callPaypal', results.createPayload);
         app.paypalAdaptive.pay(results.createPayload, cb);
       }],
 
       updatePaykeyEntry: ['createPaykeyEntry', 'createPayload', 'callPaypal', function(cb, results) {
+        console.log('updatePaykeyEntry', JSON.stringify(results.callPaypal, null, 4));
         var paykey = results.createPaykeyEntry;
         paykey.trackingId = results.createPayload.trackingId;
-        paykey.paykey = results.callPaypal.payKey;
-        paykey.status = results.callPaypal.paymentExecStatus;
+        paykey.paykey = results.callPaypal.success.payKey;
+        paykey.status = results.callPaypal.success.paymentExecStatus;
         paykey.payload = results.createPayload;
         paykey.data = results.callPaypal;
         paykey.save().done(cb);
       }],
 
       linkPaykeyTransaction: ['callPaypal', 'updatePaykeyEntry', function(cb, results) {
+        // console.log('linkPaykeyTransaction', results.updatePaykeyEntry);
         req.transaction
           .addPaykey(results.updatePaykeyEntry)
           .done(cb);
@@ -376,11 +381,11 @@ module.exports = function(app) {
           ]
         }
       };
-      
+
       app.paypalAdaptive.pay(payload, callback);
     }
 
-  }
+  };
 
   /**
    * Pay a transaction.
@@ -413,7 +418,7 @@ module.exports = function(app) {
               UserId: user.id,
               confirmedAt: {$ne: null}
             },
-            order: [['confirmedAt', 'DESC']],
+            order: [['confirmedAt', 'DESC']]
           })
           .done(cb);
       }],
