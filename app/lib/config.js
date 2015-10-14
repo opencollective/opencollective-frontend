@@ -2,6 +2,7 @@
  * Dependencies.
  */
 var config = require('config');
+var _ = require('lodash');
 var Paypal = require('paypal-adaptive');
 var knox = require('knox');
 
@@ -9,6 +10,14 @@ var knox = require('knox');
  * Module.
  */
 module.exports = function(app) {
+
+  /**
+   * Load .env file
+   */
+
+  if (_.contains(['test', 'development'], process.env.NODE_ENV)) {
+    require('dotenv').load();
+  }
 
   // Environment.
   var env = process.env.NODE_ENV || 'development';
@@ -31,7 +40,7 @@ module.exports = function(app) {
   app.knox = knox.createClient({
     key: process.env.AWS_KEY,
     secret: process.env.AWS_SECRET,
-    bucket: 'opencollective-dev',
+    bucket: config.aws.s3.bucket,
     region: 'us-west-1'
   });
 

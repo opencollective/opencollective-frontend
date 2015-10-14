@@ -25,5 +25,10 @@
   "stripe": {
     "secret": "sk_live_xP47bLCfFfRw8LBDdDhbS1Ej",
     "key": "pk_live_qZ0OnX69UlIL6pRODicRzsZy"
+  },
+  "aws": {
+    "s3": {
+      "bucket": "opencollective-production"
+    }
   }
 }

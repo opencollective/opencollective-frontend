@@ -3,6 +3,8 @@
  */
 
 var fs = require('fs');
+var path = require('path');
+var uuid = require('node-uuid');
 
 /**
  * Controller.
@@ -20,7 +22,12 @@ module.exports = function(app) {
       }));
     }
 
-    var filename = '/' + file.originalname + '_' + Date.now();
+    /**
+     * We will replace the name to avoid collisions
+     */
+
+    var ext = path.extname(file.originalname);
+    var filename = '/' + file.originalname.replace(ext, uuid.v1() + ext);
 
     var put = app.knox.put(filename, {
       'Content-Length': file.size,

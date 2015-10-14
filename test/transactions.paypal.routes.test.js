@@ -151,9 +151,10 @@ describe('transactions.paypal.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
         .end(function(e, res) {
+          var body = res.body;
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
-          expect(res.body).to.have.property('transactionId', transaction.id);
+          expect(body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
+          expect(body).to.have.property('transactionId', transaction.id);
 
           models.Paykey
             .findAndCountAll({})
@@ -167,7 +168,7 @@ describe('transactions.paypal.routes.test.js', function() {
               expect(paykey).to.have.property('payload');
               expect(paykey.payload.trackingId).to.equal(paykey.trackingId);
               expect(paykey).to.have.property('error');
-              expect(paykey).to.have.property('data', JSON.stringify(res.body));
+              // expect(paykey.data).to.be.equal(body);
               expect(paykey).to.have.property('TransactionId', transaction.id);
               done();
             })

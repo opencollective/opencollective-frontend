@@ -13,3 +13,5 @@ coverage
 
 temp.js
 tempStripe.js
+
+.env
