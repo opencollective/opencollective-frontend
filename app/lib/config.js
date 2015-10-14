@@ -11,6 +11,11 @@ var knox = require('knox');
  */
 module.exports = function(app) {
 
+  // Environment.
+  var env = process.env.NODE_ENV || 'development';
+  process.env.NODE_ENV = env;
+  app.set('env', env);
+
   /**
    * Load .env file
    */
@@ -18,11 +23,6 @@ module.exports = function(app) {
   if (_.contains(['test', 'development'], process.env.NODE_ENV)) {
     require('dotenv').load();
   }
-
-  // Environment.
-  var env = process.env.NODE_ENV || 'development';
-  process.env.NODE_ENV = env;
-  app.set('env', env);
 
   // Stripe.
   app.stripe = require('stripe')(config.stripe.secret);

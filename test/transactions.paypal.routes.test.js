@@ -168,6 +168,7 @@ describe('transactions.paypal.routes.test.js', function() {
               expect(paykey).to.have.property('payload');
               expect(paykey.payload.trackingId).to.equal(paykey.trackingId);
               expect(paykey).to.have.property('error');
+
               // expect(paykey.data).to.be.equal(body);
               expect(paykey).to.have.property('TransactionId', transaction.id);
               done();
