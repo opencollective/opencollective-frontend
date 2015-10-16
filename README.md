@@ -12,11 +12,11 @@ It will look something like `/Library/PostgreSQL/9.3/data`. We'll call this the 
 edit `pg_hba.conf` to `trust` local socket connections and local IP connections. Restart `postgres` - on Mac OS X, there may be
 restart scripts already in place with `brew`, if not use `pg_ctl -D $POSTGRES_DATADIR restart`.
 
-Now, assuming the postgres superuser is `postgres`, let's create the databases.
+Now, assuming the postgres database superuser is `postgres`, let's create the databases.
 ```
-createdb opencollective_localhost
-createdb opencollective_test
-createuser philmod
+createdb -U postgres opencollective_localhost
+createdb -U postgres opencollective_test
+createuser -U postgres philmod
 psql -U postgres
 > GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO philmod
 > GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO philmod
