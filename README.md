@@ -1,15 +1,38 @@
 # opencollective-api
 OpenCollective's API
 
-## Prerequisite
-- Install PostGres
-- Create 2 databases: `opencollective_localhost` and `opencollective_test`
+## How to get started
 
-## Configuration and secrets
+### Database
+Install Postgres 9.x. Start the database server, if necessary.
+
+For development, ensure that local connections do not require a password. Locate your `pg_hba.conf` file by
+running `ps aux | grep postgres` and note the directory in the `postgres` or `postmaster` process, specified with `-D`.
+It will look something like `/Library/PostgreSQL/9.3/data`. We'll call this the `$POSTGRES_DATADIR`. `cd` to `$POSTGRES_DATADIR`, and
+edit `pg_hba.conf` to `trust` local socket connections and local IP connections. Restart `postgres` - on Mac OS X, there may be
+restart scripts already in place with `brew`, if not use `pg_ctl -D $POSTGRES_DATADIR restart`.
+
+Now, assuming the postgres superuser is `postgres`, let's create the databases.
+```
+createdb opencollective_localhost
+createdb opencollective_test
+createuser philmod
+psql -U postgres
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO philmod
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO philmod
+```
+
+### Configuration and secrets
 - From the OpenCollective DropBox: `cp $DROPBOX/Engineering/config/DOTenv .env`
+- There are other config files there, but for now they seem to be duplicated in `config`
 
-## Install
+### Node and npm
+
 `npm install`
+
+If you haven't already: `export PATH=./node_modules/bin:$PATH`. You probably want to add
+that to your shell profile.
+
 
 ## Tests
 `npm test`
