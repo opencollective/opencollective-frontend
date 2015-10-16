@@ -5,6 +5,9 @@ OpenCollective's API
 - Install PostGres
 - Create 2 databases: `opencollective_localhost` and `opencollective_test`
 
+## Configuration and secrets
+- From the OpenCollective DropBox: `cp $DROPBOX/Engineering/config/DOTenv .env`
+
 ## Install
 `npm install`
 
