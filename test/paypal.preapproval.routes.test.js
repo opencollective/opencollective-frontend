@@ -265,7 +265,7 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe.only('Details from Paypal ERROR', function(done) {
+    describe('Details from Paypal ERROR', function(done) {
 
       beforeEach(function() {
         var mock = paypalMock.adaptive.preapprovalDetails.error;
@@ -279,18 +279,33 @@ describe('paypal.preapproval.routes.test.js', function() {
 
       it('should return an error if paypal returns one', function(done) {
         request(app)
-        .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(500)
-        .end(done);
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(500)
+          .end(done);
       });
 
     });
 
     describe('Cards clean up', function() {
 
-      it('should delete all other cards entries in the database to clean up');
-
+      it('should delete all other cards entries in the database to clean up', function(done) {
+        request(app)
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            models.Card.findAndCountAll({where: {token: preapprovalkey} })
+            .then(function(res) {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0].confirmedAt).not.to.be.null;
+              expect(res.rows[0].service).to.equal('paypal');
+              expect(res.rows[0].UserId).to.equal(user.id);
+              done();
+            });
+          });
+        });
     });
 
   });
