@@ -265,18 +265,25 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe('Details from Paypal ERROR', function() {
+    describe.only('Details from Paypal ERROR', function(done) {
 
       beforeEach(function() {
-        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
-        stub.yields(null, paypalMock.adaptive.paymentDetails.error);
+        var mock = paypalMock.adaptive.preapprovalDetails.error;
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(mock.error, mock);
       });
 
       afterEach(function() {
-        app.paypalAdaptive.paymentDetails.restore();
+        app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if paypal returns one');
+      it('should return an error if paypal returns one', function(done) {
+        request(app)
+        .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(500)
+        .end(done);
+      });
 
     });
 

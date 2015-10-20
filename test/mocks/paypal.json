@@ -267,8 +267,26 @@
           "accountId": "UA4WZRN8UFEAU"
         },
         "httpStatusCode": 200
-      }
+      },
 
+      "error": {
+        "responseEnvelope":  {
+          "timestamp": "2015-10-20T03:21:33.373-07:00",
+          "ack": "Failure",
+          "correlationId": "efb2c427728cc",
+          "build": "17820627"
+        },
+        "error":  [
+           {
+            "errorId": "520003",
+            "domain": "PLATFORM",
+            "subdomain": "Application",
+            "severity": "Error",
+            "category": "Application",
+            "message": "Authentication failed. API credentials are incorrect."
+          }
+        ]
+      }
     }
 
   }
