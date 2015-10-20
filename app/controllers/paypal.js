@@ -127,7 +127,7 @@ module.exports = function(app) {
 
     async.auto({
 
-      getCard: [function(cb, results) {
+      getCard: [function(cb) {
         Card
           .findAndCountAll({
             where: {
@@ -168,7 +168,7 @@ module.exports = function(app) {
         card.save().done(cb);
       }],
 
-      cleanOldCards: ['updateCard', function(cb, results) {
+      cleanOldCards: ['updateCard', function(cb) {
         Card
           .findAndCountAll({
             where: {

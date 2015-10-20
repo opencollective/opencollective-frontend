@@ -253,15 +253,21 @@ describe('paypal.preapproval.routes.test.js', function() {
     describe('Details from Paypal CREATED', function() {
 
       beforeEach(function() {
-        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
-        stub.yields(null, paypalMock.adaptive.paymentDetails.created);
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       });
 
       afterEach(function() {
-        app.paypalAdaptive.paymentDetails.restore();
+        app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if the preapproval is not completed');
+      it('should return an error if the preapproval is not completed', function(done) {
+        request(app)
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(400)
+          .end(done);
+      });
 
     });
 
@@ -288,7 +294,6 @@ describe('paypal.preapproval.routes.test.js', function() {
     });
 
     describe('Cards clean up', function() {
-
       it('should delete all other cards entries in the database to clean up', function(done) {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
@@ -305,7 +310,7 @@ describe('paypal.preapproval.routes.test.js', function() {
               done();
             });
           });
-        });
+      });
     });
 
   });
