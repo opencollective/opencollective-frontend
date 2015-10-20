@@ -93,9 +93,13 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
     });
 
-    describe.only('Check existing cards', function() {
+    describe('Check existing cards', function() {
 
-      beforeEach(function() {
+      afterEach(function() {
+        app.paypalAdaptive.preapprovalDetails.restore();
+      });
+
+      var beforePastDate = function() {
         var date = new Date();
         date.setDate(date.getDate() - 1); // yesterday
 
@@ -106,13 +110,11 @@ describe('paypal.preapproval.routes.test.js', function() {
 
         var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, mock);
-      });
-
-      afterEach(function() {
-        app.paypalAdaptive.preapprovalDetails.restore();
-      });
+      };
 
       it('should delete if the date is past', function(done) {
+        beforePastDate();
+
         var token = 'abc';
         var card = {
           service: 'paypal',
@@ -137,10 +139,41 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
       });
 
-      it('should delete if not approved yet');
+      var beforeNotApproved = function() {
+        var mock = paypalMock.adaptive.preapprovalDetails.created;
+        expect(mock.approved).to.be.equal('false');
 
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
+      };
+
+      it('should delete if not approved yet', function(done) {
+        beforeNotApproved();
+
+        var token = 'def';
+        var card = {
+          service: 'paypal',
+          UserId: user.id,
+          token: token
+        };
+
+        models.Card.create(card)
+        .done(function checkIfCardIsCreated(err, res) {
+          expect(res.token).to.equal(token);
+          request(app)
+          .get('/users/' + user.id + '/paypal/preapproval')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function() {
+            models.Card.findAndCountAll({where: {token: token} })
+            .then(function checkIfCardIsDestroyed(res) {
+              expect(res.count).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
     });
-
   });
 
   /**
