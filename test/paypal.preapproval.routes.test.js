@@ -93,9 +93,50 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
     });
 
-    describe('Check existing cards', function() {
+    describe.only('Check existing cards', function() {
 
-      it('should delete if the date is past');
+      beforeEach(function() {
+        var date = new Date();
+        date.setDate(date.getDate() - 1); // yesterday
+
+        var completed = paypalMock.adaptive.preapprovalDetails.completed;
+        var mock = _.extend(completed, {
+          endingDate: date.toString()
+        });
+
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, mock);
+      });
+
+      afterEach(function() {
+        app.paypalAdaptive.preapprovalDetails.restore();
+      });
+
+      it('should delete if the date is past', function(done) {
+        var token = 'abc';
+        var card = {
+          service: 'paypal',
+          UserId: user.id,
+          token: token
+        };
+
+        models.Card.create(card)
+        .done(function checkIfCardIsCreated(err, res) {
+          expect(res.token).to.equal(token);
+          request(app)
+          .get('/users/' + user.id + '/paypal/preapproval')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function() {
+            models.Card.findAndCountAll({where: {token: token} })
+            .then(function checkIfCardIsDestroyed(res) {
+              expect(res.count).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
+
       it('should delete if not approved yet');
 
     });
