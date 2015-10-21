@@ -216,8 +216,8 @@ module.exports = function(app) {
       updatePaykeyEntry: ['createPaykeyEntry', 'createPayload', 'callPaypal', function(cb, results) {
         var paykey = results.createPaykeyEntry;
         paykey.trackingId = results.createPayload.trackingId;
-        paykey.paykey = results.callPaypal.success.payKey;
-        paykey.status = results.callPaypal.success.paymentExecStatus;
+        paykey.paykey = results.callPaypal.payKey;
+        paykey.status = results.callPaypal.paymentExecStatus;
         paykey.payload = results.createPayload;
         paykey.data = results.callPaypal;
         paykey.save().done(cb);

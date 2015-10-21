@@ -153,7 +153,7 @@ describe('transactions.paypal.routes.test.js', function() {
         .end(function(e, res) {
           var body = res.body;
           expect(e).to.not.exist;
-          expect(body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
+          expect(body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
           expect(body).to.have.property('transactionId', transaction.id);
 
           models.Paykey
@@ -163,16 +163,13 @@ describe('transactions.paypal.routes.test.js', function() {
               var paykey = res.rows[0];
               expect(paykey).to.have.property('id');
               expect(paykey).to.have.property('trackingId');
-              expect(paykey).to.have.property('paykey', paypalMock.adaptive.pay.success.payKey);
-              expect(paykey).to.have.property('status', 'COMPLETED');
+              expect(paykey).to.have.property('paykey', paypalMock.adaptive.pay.payKey);
+              expect(paykey).to.have.property('status', paypalMock.adaptive.pay.paymentExecStatus);
               expect(paykey).to.have.property('payload');
               expect(paykey.payload.trackingId).to.equal(paykey.trackingId);
               expect(paykey).to.have.property('error');
-
-              // expect(paykey.data).to.be.equal(body);
               expect(paykey).to.have.property('TransactionId', transaction.id);
               expect(paykey.data.payload).to.deep.equal(body.payload);
-              expect(paykey.data.success).to.deep.equal(body.success);
               expect(paykey.data.totalAmountExceeded).to.deep.equal(body.totalAmountExceeded);
               done();
             })
@@ -211,7 +208,7 @@ describe('transactions.paypal.routes.test.js', function() {
             .expect(200)
             .end(function(e, res) {
               expect(e).to.not.exist;
-              expect(res.body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
+              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
               done();
             });
         });
@@ -254,7 +251,7 @@ describe('transactions.paypal.routes.test.js', function() {
             .expect(200)
             .end(function(e, res) {
               expect(e).to.not.exist;
-              expect(res.body.success).to.have.property('payKey', paypalMock.adaptive.pay.success.payKey);
+              expect(res.body).to.have.property('payKey', paypalMock.adaptive.pay.payKey);
 
               models.Paykey
                 .findAndCountAll({})
@@ -338,7 +335,7 @@ describe('transactions.paypal.routes.test.js', function() {
    */
   describe('#confirmPayment', function() {
 
-    var paykey = paypalMock.adaptive.pay.success.payKey;
+    var paykey = paypalMock.adaptive.pay.payKey;
 
     beforeEach(function(done) {
       request(app)
@@ -476,7 +473,7 @@ describe('transactions.paypal.routes.test.js', function() {
 
     });
 
-    describe.skip('Paykeys clean up', function() {
+    describe('Paykeys clean up', function() {
 
       beforeEach(function(done) {
         async.eachSeries(['AP-791807008W699005B', 'AP-791807008W699005C'], function(pk, cb) {
