@@ -264,6 +264,14 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails getting an undefined group', function(done) {
+      request(app)
+        .get('/groups/undefined')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(400)
+        .end(done);
+    });
+
     it('successfully get a group if authenticated as a user', function(done) {
       request(app)
         .get('/groups/' + group.id)
