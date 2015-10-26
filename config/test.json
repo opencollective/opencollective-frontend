@@ -23,12 +23,6 @@
     "key": "pk_test_5"
   },
   "paypal": {
-    "rest": {
-      "account": "philippe.modard+us-facilitator@gmail.com",
-      "endpoint": "api.sandbox.paypal.com",
-      "clientId": "",
-      "secret": ""
-    },
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",
       "appId": "APP-80W284485P519543T",

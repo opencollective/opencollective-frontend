@@ -5,8 +5,21 @@ var _ = require('lodash');
 var express = require('express');
 var app = express();
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
+
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  require('./app/lib/load-dot-env')();
+}
+
 app.errors = require('./app/lib/errors');
 require('./app/lib/express')(app);
+
+/**
+ * Config.
+ */
+require('./app/lib/config')(app);
 
 /**
  * Models.
@@ -20,19 +33,13 @@ app.set('models', models);
 app.set('controllers', require('./app/controllers')(app));
 
 /**
- * Config.
- */
-require('./app/lib/config')(app);
-
-/**
  * Routes.
  */
 require('./app/controllers/routes')(app);
 
 if (_.contains(['test', 'circleci'], app.set('env'))) {
   return module.exports = app;
-}
-else {
+} else {
   /**
    * Sync database.
    */

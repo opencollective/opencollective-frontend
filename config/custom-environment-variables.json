@@ -1,0 +1,27 @@
+{
+  "env": "NODE_ENV",
+  "database": {
+    "database": "PG_DATABASE",
+    "username": "PG_USERNAME",
+    "password": "PG_PASSWORD",
+    "options": {
+      "host": "PG_HOST"
+    }
+  },
+  "keys": {
+    "opencollective": {
+      "secret": "JWT_SECRET"
+    }
+  },
+  "stripe": {
+    "secret": "STRIPE_SECRET",
+    "key": "STRIPE_KEY"
+  },
+  "aws": {
+    "s3": {
+      "key": "AWS_KEY",
+      "secret": "AWS_SECRET",
+      "bucket": "AWS_S3_BUCKET"
+    }
+  }
+}

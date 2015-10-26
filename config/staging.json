@@ -11,6 +11,6 @@
     }
   },
   "host": {
-    "api": "https://opencollective-prod.herokuapp.com"
+    "api": "https://opencollective-staging-api.herokuapp.com"
   }
 }
