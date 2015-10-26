@@ -5,7 +5,7 @@
     "database": "opencollective_localhost",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "logging": true
+    "logging": false
   },
   "preview": {
     "database": "d8m9jl5us2t2g2",
