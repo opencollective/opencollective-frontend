@@ -1,0 +1,21 @@
+{
+  "database": {
+    "options": {
+      "port": 5432,
+      "dialect": "postgres",
+      "protocol": "postgres",
+      "logging": true,
+      "dialectOptions": {
+        "ssl": true
+      }
+    }
+  },
+  "host": {
+    "api": "https://opencollective-staging-api.herokuapp.com"
+  },
+  "aws": {
+    "s3": {
+      "bucket": "opencollective-staging"
+    }
+  }
+}

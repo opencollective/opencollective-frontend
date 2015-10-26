@@ -18,10 +18,6 @@
     "api": "http://localhost:3050",
     "webapp": "http://localhost:8000"
   },
-  "stripe": {
-    "secret": "sk_test_3jGhCKe3e1KiN8gHrdDqqHg4",
-    "key": "pk_test_5olkhgG5FgJDHcGpJllmCj6z"
-  },
   "paypal": {
     "rest": {
       "account": "philippe.modard+us-facilitator@gmail.com",
@@ -40,7 +36,7 @@
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-dev"
+      "bucket": "S3_BUCKET"
     }
   }
 }
