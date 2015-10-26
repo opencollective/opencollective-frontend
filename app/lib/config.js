@@ -20,7 +20,7 @@ module.exports = function(app) {
     password: config.paypal.classic.password,
     signature: config.paypal.classic.signature,
     appId: config.paypal.classic.appId,
-    sandbox: (env === 'development' || env === 'test' || env === 'circleci')
+    sandbox: env !== 'production'
   });
 
   // S3 bucket
