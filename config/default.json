@@ -37,5 +37,10 @@
       "signature": "AknyGVnC4ahUBjab.T2H-YVkWGCqAW-ZI2s7gMVZKRdZpFO7kWEOorjv"
     },
     "feeOC": 5
+  },
+  "aws": {
+    "s3": {
+      "bucket": "opencollective-dev"
+    }
   }
 }

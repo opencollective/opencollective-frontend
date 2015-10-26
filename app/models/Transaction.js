@@ -45,7 +45,8 @@ module.exports = function(Sequelize, DataTypes) {
           approved: this.approved,
           createdAt: this.createdAt,
           approvedAt: this.approvedAt,
-          reimbursedAt: this.reimbursedAt
+          reimbursedAt: this.reimbursedAt,
+          UserId: this.UserId
         };
       }
     }

@@ -20,7 +20,7 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe.only('paypal.preapproval.routes.test.js', function() {
+describe('paypal.preapproval.routes.test.js', function() {
 
   var application;
   var user;
@@ -95,11 +95,85 @@ describe.only('paypal.preapproval.routes.test.js', function() {
 
     describe('Check existing cards', function() {
 
-      it('should delete if the date is past');
-      it('should delete if not approved yet');
+      afterEach(function() {
+        app.paypalAdaptive.preapprovalDetails.restore();
+      });
 
+      var beforePastDate = function() {
+        var date = new Date();
+        date.setDate(date.getDate() - 1); // yesterday
+
+        var completed = paypalMock.adaptive.preapprovalDetails.completed;
+        var mock = _.extend(completed, {
+          endingDate: date.toString()
+        });
+
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, mock);
+      };
+
+      it('should delete if the date is past', function(done) {
+        beforePastDate();
+
+        var token = 'abc';
+        var card = {
+          service: 'paypal',
+          UserId: user.id,
+          token: token
+        };
+
+        models.Card.create(card)
+        .done(function checkIfCardIsCreated(err, res) {
+          expect(res.token).to.equal(token);
+          request(app)
+          .get('/users/' + user.id + '/paypal/preapproval')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function() {
+            models.Card.findAndCountAll({where: {token: token} })
+            .then(function checkIfCardIsDestroyed(res) {
+              expect(res.count).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
+
+      var beforeNotApproved = function() {
+        var mock = paypalMock.adaptive.preapprovalDetails.created;
+        expect(mock.approved).to.be.equal('false');
+
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
+      };
+
+      it('should delete if not approved yet', function(done) {
+        beforeNotApproved();
+
+        var token = 'def';
+        var card = {
+          service: 'paypal',
+          UserId: user.id,
+          token: token
+        };
+
+        models.Card.create(card)
+        .done(function checkIfCardIsCreated(err, res) {
+          expect(res.token).to.equal(token);
+          request(app)
+          .get('/users/' + user.id + '/paypal/preapproval')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function() {
+            models.Card.findAndCountAll({where: {token: token} })
+            .then(function checkIfCardIsDestroyed(res) {
+              expect(res.count).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
     });
-
   });
 
   /**
@@ -179,37 +253,64 @@ describe.only('paypal.preapproval.routes.test.js', function() {
     describe('Details from Paypal CREATED', function() {
 
       beforeEach(function() {
-        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
-        stub.yields(null, paypalMock.adaptive.paymentDetails.created);
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       });
 
       afterEach(function() {
-        app.paypalAdaptive.paymentDetails.restore();
+        app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if the preapproval is not completed');
+      it('should return an error if the preapproval is not completed', function(done) {
+        request(app)
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(400)
+          .end(done);
+      });
 
     });
 
-    describe('Details from Paypal ERROR', function() {
+    describe('Details from Paypal ERROR', function(done) {
 
       beforeEach(function() {
-        var stub = sinon.stub(app.paypalAdaptive, 'paymentDetails');
-        stub.yields(null, paypalMock.adaptive.paymentDetails.error);
+        var mock = paypalMock.adaptive.preapprovalDetails.error;
+        var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        stub.yields(mock.error, mock);
       });
 
       afterEach(function() {
-        app.paypalAdaptive.paymentDetails.restore();
+        app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if paypal returns one');
+      it('should return an error if paypal returns one', function(done) {
+        request(app)
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(500)
+          .end(done);
+      });
 
     });
 
     describe('Cards clean up', function() {
-
-      it('should delete all other cards entries in the database to clean up');
-
+      it('should delete all other cards entries in the database to clean up', function(done) {
+        request(app)
+          .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            models.Card.findAndCountAll({where: {token: preapprovalkey} })
+            .then(function(res) {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0].confirmedAt).not.to.be.null;
+              expect(res.rows[0].service).to.equal('paypal');
+              expect(res.rows[0].UserId).to.equal(user.id);
+              done();
+            });
+          });
+      });
     });
 
   });

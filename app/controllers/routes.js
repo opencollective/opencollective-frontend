@@ -19,6 +19,7 @@ module.exports = function(app) {
   var transactions = Controllers.transactions;
   var payments = Controllers.payments;
   var paypal = Controllers.paypal;
+  var images = Controllers.images;
   var errors = app.errors;
 
   /**
@@ -119,6 +120,11 @@ module.exports = function(app) {
   app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
 
   /**
+   * Separate route for uploading images to S3
+   */
+  app.post('/images', mw.authorizeAuthUser, images.upload);
+
+  /**
    * Error handler.
    */
   app.use(function(err, req, res, next) {
@@ -136,7 +142,7 @@ module.exports = function(app) {
     if (!err.code)
       err.code = err.status || 500;
 
-    console.error('Error Express : ', err); //console.trace(err);
+    console.error('Error Express : ', err); // console.trace(err);
     res.status(err.code).send({error: err});
   });
 

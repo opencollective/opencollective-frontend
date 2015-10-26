@@ -376,11 +376,11 @@ module.exports = function(app) {
           ]
         }
       };
-      
+
       app.paypalAdaptive.pay(payload, callback);
     }
 
-  }
+  };
 
   /**
    * Pay a transaction.
@@ -413,7 +413,7 @@ module.exports = function(app) {
               UserId: user.id,
               confirmedAt: {$ne: null}
             },
-            order: [['confirmedAt', 'DESC']],
+            order: [['confirmedAt', 'DESC']]
           })
           .done(cb);
       }],
