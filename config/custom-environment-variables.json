@@ -15,5 +15,12 @@
   "stripe": {
     "secret": "STRIPE_SECRET",
     "key": "STRIPE_KEY"
+  },
+  "aws": {
+    "s3": {
+      "key": "AWS_KEY",
+      "secret": "AWS_SECRET",
+      "bucket": "AWS_S3_BUCKET"
+    }
   }
 }

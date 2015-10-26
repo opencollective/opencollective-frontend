@@ -40,7 +40,7 @@
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-test"
+      "bucket": "opencollective-testing"
     }
   }
 }

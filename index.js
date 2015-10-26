@@ -9,6 +9,11 @@ app.errors = require('./app/lib/errors');
 require('./app/lib/express')(app);
 
 /**
+ * Load env from .env file for development and test
+ */
+require('./app/lib/load-env')();
+
+/**
  * Models.
  */
 var models = require('./app/models');
@@ -31,8 +36,7 @@ require('./app/controllers/routes')(app);
 
 if (_.contains(['test', 'circleci'], app.set('env'))) {
   return module.exports = app;
-}
-else {
+} else {
   /**
    * Sync database.
    */

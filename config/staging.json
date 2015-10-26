@@ -12,10 +12,5 @@
   },
   "host": {
     "api": "https://opencollective-staging-api.herokuapp.com"
-  },
-  "aws": {
-    "s3": {
-      "bucket": "opencollective-staging"
-    }
   }
 }

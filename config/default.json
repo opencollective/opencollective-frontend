@@ -9,22 +9,11 @@
       "logging": false
     }
   },
-  "keys": {
-    "opencollective": {
-      "secret": "282e58cebfee86af32bb1fac07db362f0d03ad4e"
-    }
-  },
   "host": {
     "api": "http://localhost:3050",
     "webapp": "http://localhost:8000"
   },
   "paypal": {
-    "rest": {
-      "account": "philippe.modard+us-facilitator@gmail.com",
-      "endpoint": "api.sandbox.paypal.com",
-      "clientId": "",
-      "secret": ""
-    },
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",
       "appId": "APP-80W284485P519543T",
@@ -33,10 +22,5 @@
       "signature": "AknyGVnC4ahUBjab.T2H-YVkWGCqAW-ZI2s7gMVZKRdZpFO7kWEOorjv"
     },
     "feeOC": 5
-  },
-  "aws": {
-    "s3": {
-      "bucket": "S3_BUCKET"
-    }
   }
 }

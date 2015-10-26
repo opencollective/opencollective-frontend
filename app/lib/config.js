@@ -2,7 +2,6 @@
  * Dependencies.
  */
 var config = require('config');
-var _ = require('lodash');
 var Paypal = require('paypal-adaptive');
 var knox = require('knox');
 
@@ -15,14 +14,6 @@ module.exports = function(app) {
   var env = process.env.NODE_ENV || 'development';
   process.env.NODE_ENV = env;
   app.set('env', env);
-
-  /**
-   * Load .env file
-   */
-
-  if (_.contains(['test', 'development'], process.env.NODE_ENV)) {
-    require('dotenv').load();
-  }
 
   // Stripe.
   app.stripe = require('stripe')(config.stripe.secret);
@@ -38,8 +29,8 @@ module.exports = function(app) {
 
   // S3 bucket
   app.knox = knox.createClient({
-    key: process.env.AWS_KEY,
-    secret: process.env.AWS_SECRET,
+    key: config.aws.s3.key,
+    secret: config.aws.s3.secret,
     bucket: config.aws.s3.bucket,
     region: 'us-west-1'
   });
