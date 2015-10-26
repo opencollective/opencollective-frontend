@@ -1,19 +1,15 @@
 /**
  * Dependencies.
  */
-var config = require('config');
 var Paypal = require('paypal-adaptive');
 var knox = require('knox');
+var config = require('config');
 
 /**
  * Module.
  */
 module.exports = function(app) {
-
-  // Environment.
-  var env = process.env.NODE_ENV || 'development';
-  process.env.NODE_ENV = env;
-  app.set('env', env);
+  var env = config.env;
 
   // Stripe.
   app.stripe = require('stripe')(config.stripe.secret);

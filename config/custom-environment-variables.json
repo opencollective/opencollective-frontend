@@ -1,4 +1,5 @@
 {
+  "env": "NODE_ENV",
   "database": {
     "database": "PG_DATABASE",
     "username": "PG_USERNAME",
