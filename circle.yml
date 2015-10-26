@@ -1,0 +1,12 @@
+machine:
+  post:
+    - npm install npm@2.5.1 -g
+    - npm install jscs@1.13.1 -g
+    - npm install mocha@1.20.1 -g
+  node:
+    version: 0.10.36
+  services:
+    - postgresql
+test:
+  override:
+    - npm run circleci

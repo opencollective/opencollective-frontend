@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var newrelic = require('newrelic');
+var _ = require('lodash');
 var express = require('express');
 var app = express();
 
@@ -29,8 +29,7 @@ require('./app/lib/config')(app);
  */
 require('./app/controllers/routes')(app);
 
-
-if (app.set('env') === 'test') {
+if (_.contains(['test', 'circleci'], app.set('env'))) {
   return module.exports = app;
 }
 else {
