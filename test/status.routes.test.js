@@ -25,7 +25,7 @@ describe('status.routes.test.js', function() {
         .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body.status).to.equal('up');
-          expect(res.body.env).to.equal('test');
+          expect(res.body.env).to.equal(app.set('env'));
           expect(res.body).to.have.property('started_at');
           expect(res.body).to.have.property('node');
           expect(res.body).to.have.property('system');

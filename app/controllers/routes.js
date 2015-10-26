@@ -128,12 +128,14 @@ module.exports = function(app) {
    * Error handler.
    */
   app.use(function(err, req, res, next) {
-    if (err.name === 'UnauthorizedError') // because of jwt-express
+    var name = err.name;
+
+    if (name === 'UnauthorizedError') // because of jwt-express
       err.code = err.status;
     res.header('Cache-Control', 'no-cache');
 
     // Validation error.
-    var e = err.name.toLowerCase();
+    var e = name && name.toLowerCase ? name.toLowerCase() : '';
     if (e.indexOf('validation') !== -1)
       err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), err.message);
     else if (e.indexOf('uniqueconstraint') !== -1)

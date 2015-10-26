@@ -5,6 +5,7 @@ build:
 
 DB_NAME=opencollective_localhost
 DB_TEST_NAME=opencollective_test
+
 database:
 	# $(eval("psql -t -c \"SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('$(DB_NAME)');\""))
 	createdb $(DB_NAME)
@@ -12,8 +13,13 @@ database:
 
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
-    --timeout 5000 \
-    --reporter spec \
+	--timeout 5000 \
+	--reporter spec \
+
+circleci:
+	@NODE_ENV=circleci mocha \
+	--timeout 5000 \
+	--reporter spec \
 
 coverage:
 	@NODE_ENV=test ./node_modules/istanbul/lib/cli.js cover \
