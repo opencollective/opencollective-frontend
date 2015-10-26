@@ -34,7 +34,7 @@
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-testing"
+      "bucket": "opencollective-test"
     }
   }
 }
