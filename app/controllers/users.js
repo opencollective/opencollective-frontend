@@ -1,8 +1,9 @@
 /**
  * Dependencies.
  */
-var utils = require('../lib/utils');
 var _ = require('lodash');
+var Bluebird = require('bluebird');
+var utils = require('../lib/utils');
 
 /**
  * Controller.
@@ -15,33 +16,52 @@ module.exports = function(app) {
   var models = app.set('models');
   var User = models.User;
   var Activity = models.Activity;
-  var errors = app.errors;
+  var UserGroup = models.UserGroup;
 
   /**
    * Private methods.
    */
-  var getGroupActivities = function() {
-    var query = _.merge({
+
+  var getUserGroups = function(userId) {
+    return UserGroup.findAll({
       where: {
-        GroupId: req.group.id
-      },
-      order: [[req.sorting.key, req.sorting.dir]]
-    }, req.pagination);
+        UserId: userId
+      }
+    })
+    .then(function(userGroups) {
+      return _.pluck(userGroups, 'info');
+    });
+  };
 
-    Activity
-      .findAndCountAll(query)
-      .then(function(activities) {
+  var getGroupsFromUser = function(req, options) {
+    return req.user
+      .getGroups(options)
+      .map(function(group) { // sequelize uses bluebird
+        return _.extend(group.info, { activities: group.Activities });
+      });
+  };
 
-        // Set headers for pagination.
-        req.pagination.total = activities.count;
-        res.set({
-          Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
-        });
+  var getGroupsFromUserWithRoles = function(req, options) {
 
-        res.send(activities.rows);
-      })
-      .catch(next);
-  }
+    /**
+     * This isn't the best way to get the user role but I couldn't find a
+     * clean way to do it with sequelize. If you find it, please refactor.
+     */
+
+    return Bluebird.props({
+      usergroups: getUserGroups(req.user.id),
+      groups: getGroupsFromUser(req, options)
+    })
+    .then(function(props) {
+      var usergroups = props.usergroups || [];
+      var groups = props.groups || [];
+
+      return groups.map(function(group) {
+        var usergroup = _.find(usergroups, { GroupId: group.id }) || {};
+        return _.extend(group, { role: usergroup.role });
+      });
+    });
+  };
 
   /**
    * Public methods.
@@ -82,7 +102,7 @@ module.exports = function(app) {
     /**
      * Show.
      */
-    show: function(req, res, next) {
+    show: function(req, res) {
       if (req.remoteUser.id === req.user.id)
         res.send(req.user.info);
       else
@@ -93,26 +113,27 @@ module.exports = function(app) {
      * Get a user's groups.
      */
     getGroups: function(req, res, next) {
+      // Follows json api spec http://jsonapi.org/format/#fetching-includes
+      var include = req.query.include;
+      var withRoles = _.contains(include, 'usergroup.role');
       var options = {
         include: []
       };
 
-      if (req.query.activities)
+      if (_.contains(include, 'activities')) {
         options.include.push({ model: Activity });
+      }
 
-      req.user
-        .getGroups(options)
-        .then(function(groups) {
-          var out = _.map(groups, function(g) {
-            var group = g.info;
-            group.activities = g.Activities;
-            return group;
-          })
-          res.send(out);
-        })
-        .catch(next);
+      var promise = withRoles ?
+        getGroupsFromUserWithRoles(req, options) :
+        getGroupsFromUser(req, options);
+
+      promise.then(function(out) {
+        res.send(out);
+      })
+      .catch(next);
     }
 
-  }
+  };
 
 };

@@ -157,7 +157,7 @@ module.exports = function(Sequelize, DataTypes) {
             bcrypt.compare(password, user.password_hash, function(err, matched) {
               if (!err && matched) {
                 user.updateAttributes({
-                  seenAt: new Date
+                  seenAt: new Date()
                 }).done(fn);
               } else {
                 fn(new errors.BadRequest(msg));
