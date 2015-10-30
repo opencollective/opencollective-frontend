@@ -48,6 +48,20 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    paypalEmail: {
+      type: DataTypes.STRING,
+      unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password
+      validate: {
+        len: {
+          args: [6, 128],
+          msg: 'Email must be between 6 and 128 characters in length'
+        },
+        isEmail: {
+          msg: 'Email must be valid'
+        }
+      }
+    },
+
     _salt: {
       type: DataTypes.STRING,
       defaultValue: bcrypt.genSaltSync(SALT_WORK_FACTOR)
