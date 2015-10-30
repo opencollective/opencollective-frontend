@@ -113,14 +113,18 @@ module.exports = function(app) {
      * Get a user's groups.
      */
     getGroups: function(req, res, next) {
+      // Follows json api spec http://jsonapi.org/format/#fetching-includes
+      var include = req.query.include;
+      var withRoles = _.contains(include, 'usergroup.role');
       var options = {
         include: []
       };
 
-      if (req.query.activities)
+      if (_.contains(include, 'activities')) {
         options.include.push({ model: Activity });
+      }
 
-      var promise = req.query.userrole ?
+      var promise = withRoles ?
         getGroupsFromUserWithRoles(req, options) :
         getGroupsFromUser(req, options);
 

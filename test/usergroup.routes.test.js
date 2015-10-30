@@ -238,7 +238,7 @@ describe('usergroup.routes.test.js', function() {
 
     it('successfully get a user\'s groups with activities', function(done) {
       request(app)
-        .get('/users/' + user.id + '/groups?activities=true')
+        .get('/users/' + user.id + '/groups?include=activities')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
@@ -249,6 +249,22 @@ describe('usergroup.routes.test.js', function() {
           expect(res.body[0]).to.have.property('description');
           expect(res.body[0]).to.have.property('activities');
           expect(res.body[0].activities).to.have.length.above(0);
+          done();
+        });
+    });
+
+    it('successfully get a user\'s groups with the role', function(done) {
+      request(app)
+        .get('/users/' + user.id + '/groups?include=usergroup.role')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.length(1);
+          expect(res.body[0]).to.have.property('id');
+          expect(res.body[0]).to.have.property('name');
+          expect(res.body[0]).to.have.property('description');
+          expect(res.body[0]).to.have.property('role');
           done();
         });
     });
