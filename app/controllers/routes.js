@@ -53,6 +53,7 @@ module.exports = function(app) {
   app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', mw.authorizeAuthUser, users.show); // Get a user.
   app.put('/users/:userid', NotImplemented); // Update a user.
+  app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   /**

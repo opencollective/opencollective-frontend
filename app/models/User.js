@@ -115,7 +115,8 @@ module.exports = function(Sequelize, DataTypes) {
           email: this.email,
           avatar: this.avatar,
           createdAt: this.createdAt,
-          updatedAt: this.updatedAt
+          updatedAt: this.updatedAt,
+          paypalEmail: this.paypalEmail
         };
       },
 
@@ -140,7 +141,8 @@ module.exports = function(Sequelize, DataTypes) {
           username: this.username,
           avatar: this.avatar,
           name: this.fullName,
-          email: this.email
+          email: this.email,
+          paypalEmail: this.paypalEmail
         };
       }
     },
