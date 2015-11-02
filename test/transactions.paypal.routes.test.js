@@ -187,6 +187,29 @@ describe('transactions.paypal.routes.test.js', function() {
         .end(done);
     });
 
+    it('should get a transaction\'s pay key and use the paypal email instead of the email', function(done) {
+      request(app)
+      .get('/groups/' + group.id + '/transactions/' + transaction.id + '/paykey')
+      .send({
+        api_key: application3.api_key
+      })
+      .expect(200)
+      .end(function(err, res) {
+        models.Paykey
+          .findAndCountAll({})
+          .then(function(res) {
+            expect(res.count).to.equal(1);
+            var paykey = res.rows[0];
+            expect(paykey).to.have.property('payload');
+
+            var receiver = paykey.payload.receiverList.receiver;
+            expect(receiver[0]).have.property('email', utils.data('user1').paypalEmail);
+            done();
+          })
+          .catch(done);
+      });
+    });
+
     describe('Check existing paykey', function() {
 
       describe('no existing paykeys', function() {

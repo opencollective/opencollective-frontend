@@ -2,12 +2,12 @@
 
 module.exports = {
   up: function (queryInterface, DataTypes) {
-    return queryInterface.addColumn('User', 'paypalEmail', {
+    return queryInterface.addColumn('Users', 'paypalEmail', {
       type: DataTypes.STRING
     });
   },
 
   down: function (queryInterface) {
-    return queryInterface.removeColumn('User', 'paypalEmail');
+    return queryInterface.removeColumn('Users', 'paypalEmail');
   }
 };
