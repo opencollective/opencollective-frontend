@@ -2,18 +2,27 @@
 
 module.exports = {
   up: function (queryInterface, DataTypes) {
-    return queryInterface.createTable('Paykeys', {
+    return queryInterface.createTable('Groups', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
-      trackingId: DataTypes.STRING,
-      paykey: DataTypes.STRING,
-      status: DataTypes.STRING,
-      payload: DataTypes.JSON,
-      data: DataTypes.JSON,
-      error: DataTypes.JSON,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      description: DataTypes.STRING,
+
+      budget: DataTypes.FLOAT,
+      currency: {
+        type: DataTypes.STRING,
+        defaultValue: 'USD'
+      },
+
+      membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
+      membershipfee: DataTypes.FLOAT,
+
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
@@ -25,16 +34,17 @@ module.exports = {
       deletedAt: {
         type: DataTypes.DATE
       },
-      TransactionId: {
+      StripeManagedAccountId: {
         type: DataTypes.INTEGER,
-        references: 'Transactions',
+        references: 'StripeManagedAccounts',
         referencesKey: 'id',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       }
     });
   },
+
   down: function (queryInterface) {
-    return queryInterface.dropTable('Paykeys');
+    return queryInterface.dropTable('Groups');
   }
 };
