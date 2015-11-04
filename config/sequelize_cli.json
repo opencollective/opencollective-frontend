@@ -1,0 +1,15 @@
+{
+  "development": {
+    "database": "opencollective_localhost",
+    "username": "philmod",
+    "password": "",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "staging": {
+    "use_env_variable": "PG_URL"
+  },
+  "production": {
+    "use_env_variable": "PG_URL"
+  }
+}

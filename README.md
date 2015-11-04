@@ -53,11 +53,10 @@ For localhost or other environments, the migrations has to be run manually.
 `sequelize migration:create`
 
 ### Apply migrations locally
-`sequelize db:migrate --config config/default.json --models-path app/models`
+`SEQUELIZE_ENV=development npm run db:migrate`
 
 ### Apply migrations on other environments
-Here for preview:
-`sequelize db:migrate --config config/default.json --models-path app/models --env preview`
+`SEQUELIZE_ENV` is set in heroku.
 
-### Undo a migration
-`sequelize db:migrate:undo --config config/default.json --models-path app/models`
+`npm run db:migrate`
+
