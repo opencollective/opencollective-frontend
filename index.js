@@ -41,21 +41,9 @@ if (_.contains(['test', 'circleci'], app.set('env'))) {
   return module.exports = app;
 } else {
   /**
-   * Sync database.
+   * Start server
    */
-  models.sequelize.sync()
-    .then(start)
-    .catch(function(err) {
-      console.log('Error sync the db:', err);
-      process.exit(1);
-    });
-}
-
-/**
- * Start server.
- */
-function start() {
-  var port = process.env.PORT || 3060;
+ var port = process.env.PORT || 3060;
   var server = app.listen(port, function () {
     var host = server.address().address;
     var port = server.address().port;
