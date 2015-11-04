@@ -63,6 +63,18 @@ module.exports = function(app) {
     });
   };
 
+  var updatePaypalEmail = function(req, res, next) {
+    var required = req.required || {};
+
+    req.user.paypalEmail = required.paypalEmail;
+
+    req.user.save()
+    .then(function(user) {
+      res.send(user.info);
+    })
+    .catch(next);
+  };
+
   /**
    * Public methods.
    */
@@ -132,8 +144,9 @@ module.exports = function(app) {
         res.send(out);
       })
       .catch(next);
-    }
+    },
 
+    updatePaypalEmail: updatePaypalEmail
   };
 
 };

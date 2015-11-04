@@ -239,4 +239,54 @@ describe('users.routes.test.js', function() {
 
   });
 
+  describe('#update paypal email', function() {
+    var user;
+
+    beforeEach(function(done) {
+      models.User.create(utils.data('user1')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it('should update the paypal email', function(done) {
+      var email = 'test+paypal@email.com';
+      request(app)
+        .put('/users/' + user.id + '/paypalemail')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          paypalEmail: email
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.paypalEmail).to.equal(email);
+          done();
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      var email = 'test+paypal@email.com';
+      request(app)
+        .put('/users/' + user.id + '/paypalemail')
+        .send({
+          paypalEmail: email
+        })
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails if the email is not valid', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/paypalemail')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          paypalEmail: 'abc'
+        })
+        .expect(400)
+        .end(done);
+    });
+  });
+
 });

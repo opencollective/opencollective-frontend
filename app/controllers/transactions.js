@@ -190,7 +190,7 @@ module.exports = function(app) {
           receiverList: {
             receiver: [
               {
-                email: results.getUser.email,
+                email: results.getUser.paypalEmail || results.getUser.email,
                 amount: amount,
                 paymentType: 'PERSONAL'
               },
