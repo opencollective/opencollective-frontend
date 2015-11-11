@@ -80,8 +80,7 @@ module.exports = function(app) {
       createCardEntry: ['checkExistingCard', function(cb, results) {
         Card.create({
           service: 'paypal',
-          UserId: req.remoteUser.id,
-          confirmedAt: Date.now()
+          UserId: req.remoteUser.id
         }).done(cb);
       }],
 

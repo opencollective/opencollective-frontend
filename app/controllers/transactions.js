@@ -347,7 +347,6 @@ module.exports = function(app) {
       var uri = '/groups/' + data.group.id + '/transactions/' + data.transaction.id + '/paykey/${payKey}';
       var baseUrl = config.host.webapp + uri;
       var amount = data.transaction.amount;
-
       var payload = {
         requestEnvelope: {
           errorLanguage: 'en_US',
@@ -393,13 +392,17 @@ module.exports = function(app) {
 
     async.auto({
 
-      checkTransaction: [function(cb, results) {
+      checkTransaction: [function(cb) {
         if (transaction.reimbursedAt) {
           return cb(new errors.BadRequest('This transaction has been paid already.'));
         }
 
         if (!transaction.approved) {
           return cb(new errors.BadRequest('This transaction has not been approved yet.'));
+        }
+
+        if (transaction.amount >= 0) {
+          return cb(new errors.BadRequest('This transaction doesn\'t need to get payed, it is a donation.'));
         }
 
         cb();
@@ -444,10 +447,14 @@ module.exports = function(app) {
           return cb(new errors.NotImplemented('This service is not implemented yet for payment.'));
         }
 
+        /**
+         * Expenses are stored with negative values in the backend but paypal
+         * wants positive values in the API, we will change the sign of the amount
+         */
         payServices[service]({
           card: results.checkCard,
           group: group,
-          transaction: transaction,
+          transaction: _.extend({}, transaction.toJSON(), { amount: -transaction.amount }),
           beneficiary: results.getBeneficiary,
           cardToken: results.checkCard.token
         }, cb);
