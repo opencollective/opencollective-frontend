@@ -371,8 +371,7 @@ describe('groups.routes.test.js', function() {
           .end(function(e, res) {
             expect(e).to.not.exist;
             var g = res.body;
-            expect(g).to.have.property('budget', group.budget + totDonations);
-            expect(g).to.have.property('budgetLeft', (group.budget + totDonations + totTransactions));
+            expect(g).to.have.property('balance', totDonations + totTransactions);
             expect(g).to.not.have.property('activities');
             done();
           });

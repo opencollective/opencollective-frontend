@@ -49,6 +49,22 @@ module.exports = function(app) {
       .catch(callback);
   };
 
+  var getBalance = function(id, cb) {
+    Transaction
+      .find({
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+        ],
+        where: {
+          GroupId: id
+        }
+      })
+      .then(function(result) {
+        cb(null, result.toJSON().total);
+      })
+      .catch(cb);
+  };
+
   /**
    * Public methods.
    */
@@ -136,39 +152,7 @@ module.exports = function(app) {
 
       async.auto({
 
-        getPositivesTransactions: function(cb) {
-          Transaction
-            .find({
-              attributes: [
-                [sequelize.fn('SUM', sequelize.col('amount')), 'total']
-              ],
-              where: {
-                GroupId: req.group.id,
-                amount: {$gt: 0}
-              }
-            })
-            .then(function(result) {
-              cb(null, result.toJSON().total);
-            })
-            .catch(cb);
-        },
-
-        getNegativesTransactions: function(cb) {
-          Transaction
-            .find({
-              attributes: [
-                [sequelize.fn('SUM', sequelize.col('amount')), 'total']
-              ],
-              where: {
-                GroupId: req.group.id,
-                amount: {$lt: 0}
-              }
-            })
-            .then(function(result) {
-              cb(null, result.toJSON().total);
-            })
-            .catch(cb);
-        },
+        getBalance: getBalance.bind(this, req.group.id),
 
         getActivities: function(cb) {
           if (!req.query.activities && !req.body.activities)
@@ -201,8 +185,8 @@ module.exports = function(app) {
         if (e) return next(e);
 
         var group = req.group.info;
-        group.budget = group.budget + results.getPositivesTransactions;
-        group.budgetLeft = group.budget + results.getNegativesTransactions;
+        group.balance = results.getBalance;
+
         if (results.getActivities) {
           group.activities = results.getActivities;
         }
@@ -424,8 +408,13 @@ module.exports = function(app) {
      */
     getTransaction: function(req, res, next) {
       res.json(req.transaction.info);
-    }
+    },
 
+    /**
+     * Get the balance of a group
+     * Also used in users controller
+     */
+    getBalance: getBalance
   };
 
 };

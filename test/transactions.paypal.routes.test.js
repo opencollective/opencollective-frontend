@@ -31,6 +31,7 @@ describe('transactions.paypal.routes.test.js', function() {
   var group2;
   var transaction;
   var transaction2;
+  var transactionApproved;
 
   var stub;
 
@@ -95,6 +96,21 @@ describe('transactions.paypal.routes.test.js', function() {
         var t = utils.data('transactions1').transactions[1];
         t.GroupId = results.createGroupA.id;
         models.Transaction.create(t).done(cb);
+      }],
+      createTransactionC: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+        var t = utils.data('transactions1').transactions[2];
+        t.GroupId = results.createGroupA.id;
+        t.approvedAt = Date.now();
+        t.approved = true;
+        t.UserId = results.createUserB.id;
+        models.Transaction.create(t).done(cb);
+      }],
+      createCardUserB: ['cleanAndCreateApplication', 'createUserB', function(cb, results) {
+        models.Card.create({
+          service: 'paypal',
+          UserId: results.createUserB.id,
+          confirmedAt: Date.now()
+        }).done(cb);
       }]
     }, function(e, results) {
       expect(e).to.not.exist;
@@ -106,6 +122,7 @@ describe('transactions.paypal.routes.test.js', function() {
       group = results.createGroupA;
       transaction = results.createTransactionA;
       transaction2 = results.createTransactionB;
+      transactionApproved = results.createTransactionC;
       done();
     });
   });
@@ -351,6 +368,26 @@ describe('transactions.paypal.routes.test.js', function() {
 
     });
 
+  });
+
+  /**
+   * Pay a transaction
+   */
+  describe('#pay', function() {
+    var paykey = paypalMock.adaptive.pay.payKey;
+
+    it('should pay a transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transactionApproved.id + '/pay/')
+        .field('service', 'paypal')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(200)
+        .end(function(err, res) {
+          var transaction = res.body;
+          expect(transaction.status).to.equal('REIMBURSED');
+          done();
+        });
+    });
   });
 
   /**
