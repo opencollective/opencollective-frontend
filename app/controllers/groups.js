@@ -201,9 +201,7 @@ module.exports = function(app) {
         if (e) return next(e);
 
         var group = req.group.info;
-
-        // hack for YC demo, to remove
-        group.budget = group.budget - results.getPositivesTransactions;
+        group.budget = group.budget + results.getPositivesTransactions;
         group.budgetLeft = group.budget + results.getNegativesTransactions;
         if (results.getActivities) {
           group.activities = results.getActivities;
