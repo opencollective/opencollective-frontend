@@ -31,6 +31,8 @@ describe('transactions.paypal.routes.test.js', function() {
   var group2;
   var transaction;
   var transaction2;
+  var transactionApproved;
+  var transactionPositive;
 
   var stub;
 
@@ -95,6 +97,30 @@ describe('transactions.paypal.routes.test.js', function() {
         var t = utils.data('transactions1').transactions[1];
         t.GroupId = results.createGroupA.id;
         models.Transaction.create(t).done(cb);
+      }],
+      createTransactionC: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+        var t = utils.data('transactions1').transactions[2];
+        t.GroupId = results.createGroupA.id;
+        t.approvedAt = Date.now();
+        t.approved = true;
+        t.UserId = results.createUserB.id;
+        models.Transaction.create(t).done(cb);
+      }],
+      createTransactionD: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+        var t = utils.data('transactions1').transactions[3  ];
+        t.GroupId = results.createGroupA.id;
+        t.approvedAt = Date.now();
+        t.approved = true;
+        t.UserId = results.createUserB.id;
+        t.amount = 10;
+        models.Transaction.create(t).done(cb);
+      }],
+      createCardUserB: ['cleanAndCreateApplication', 'createUserB', function(cb, results) {
+        models.Card.create({
+          service: 'paypal',
+          UserId: results.createUserB.id,
+          confirmedAt: Date.now()
+        }).done(cb);
       }]
     }, function(e, results) {
       expect(e).to.not.exist;
@@ -106,6 +132,8 @@ describe('transactions.paypal.routes.test.js', function() {
       group = results.createGroupA;
       transaction = results.createTransactionA;
       transaction2 = results.createTransactionB;
+      transactionApproved = results.createTransactionC;
+      transactionPositive = results.createTransactionD;
       done();
     });
   });
@@ -349,6 +377,37 @@ describe('transactions.paypal.routes.test.js', function() {
 
       });
 
+    });
+
+  });
+
+  /**
+   * Pay a transaction
+   */
+  describe('#pay', function() {
+    it('should pay a transaction', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transactionApproved.id + '/pay/')
+        .field('service', 'paypal')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(200)
+        .end(function(err, res) {
+          var transaction = res.body;
+          expect(transaction.status).to.equal('REIMBURSED');
+          expect(transaction.amount).to.equal(transactionApproved.amount);
+          done();
+        });
+    });
+
+    it('should fail if the transaction has a positive amount', function(done) {
+      expect(transactionPositive.amount).to.be.greaterThan(0);
+
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transactionPositive.id + '/pay/')
+        .field('service', 'paypal')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(400)
+        .end(done);
     });
 
   });

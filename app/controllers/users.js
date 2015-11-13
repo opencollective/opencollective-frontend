@@ -3,7 +3,6 @@
  */
 var _ = require('lodash');
 var Bluebird = require('bluebird');
-var utils = require('../lib/utils');
 
 /**
  * Controller.
@@ -17,6 +16,7 @@ module.exports = function(app) {
   var User = models.User;
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
+  var groups = require('../controllers/groups')(app);
 
   /**
    * Private methods.
@@ -73,6 +73,14 @@ module.exports = function(app) {
       res.send(user.info);
     })
     .catch(next);
+  };
+
+  var getBalancePromise = function(GroupId) {
+    return new Bluebird(function(resolve, reject) {
+      groups.getBalance(GroupId, function(err, balance) {
+        return err ? reject(err) : resolve(balance);
+      });
+    });
   };
 
   /**
@@ -140,7 +148,13 @@ module.exports = function(app) {
         getGroupsFromUserWithRoles(req, options) :
         getGroupsFromUser(req, options);
 
-      promise.then(function(out) {
+      promise.map(function(group) {
+        return getBalancePromise(group.id)
+        .then(function(balance) {
+          return _.extend(group, { balance: balance });
+        });
+      })
+      .then(function(out) {
         res.send(out);
       })
       .catch(next);
