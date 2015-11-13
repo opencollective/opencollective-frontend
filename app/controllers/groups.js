@@ -56,7 +56,8 @@ module.exports = function(app) {
           [sequelize.fn('SUM', sequelize.col('amount')), 'total']
         ],
         where: {
-          GroupId: id
+          GroupId: id,
+          approved: true
         }
       })
       .then(function(result) {

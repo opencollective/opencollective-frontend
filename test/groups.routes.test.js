@@ -338,7 +338,7 @@ describe('groups.routes.test.js', function() {
             .post('/groups/' + group.id + '/transactions')
             .set('Authorization', 'Bearer ' + user.jwt(application))
             .send({
-              transaction: transaction
+              transaction: _.extend({}, transaction, { approved: true })
             })
             .expect(200)
             .end(function(e, res) {
