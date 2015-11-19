@@ -23,5 +23,10 @@
       "secret": "AWS_SECRET",
       "bucket": "AWS_S3_BUCKET"
     }
+  },
+  "paypal": {
+    "classic": {
+      "appId": "PAYPAL_APP_ID"
+    }
   }
 }
