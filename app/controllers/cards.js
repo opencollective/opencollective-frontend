@@ -20,7 +20,8 @@ module.exports = function(app) {
     return models.Card.findAll({ where: query })
     .then(function(response) {
       res.send(_.pluck(response, 'info'));
-    });
+    })
+    .catch(next);
   };
 
   /**
