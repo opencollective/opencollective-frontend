@@ -51,7 +51,8 @@
     "start": "npm run hint && node .",
     "hint": "jscs app/**/*.js test/*.js --config=.jscsrc",
     "circleci": "npm run hint && make circleci",
-    "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV"
+    "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
+    "postinstall": "npm rebuild"
   },
   "license": "Copyright (c) 2015 Philmod"
 }
