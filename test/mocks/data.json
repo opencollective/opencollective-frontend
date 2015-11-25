@@ -62,6 +62,16 @@
     "name": "Women who code"
   },
 
+  "card1": {
+    "token": "PA-1B0110758V169653C",
+    "service": "paypal"
+  },
+
+  "card2": {
+    "token": "stripetoken123",
+    "service": "stripe"
+  },
+
   "activities1": {
     "activities": [
       {"type": "user.created", "UserId": 1, "data": {}},

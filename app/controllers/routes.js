@@ -20,6 +20,7 @@ module.exports = function(app) {
   var payments = Controllers.payments;
   var paypal = Controllers.paypal;
   var images = Controllers.images;
+  var cards = Controllers.cards;
   var errors = app.errors;
 
   /**
@@ -68,6 +69,7 @@ module.exports = function(app) {
    *
    *  Let's assume for now a card is linked to a user.
    */
+  app.get('/users/:userid/cards', mw.authorizeAuthUser, mw.authorizeUser, cards.getCards); // Get a user's cards.
   app.post('/users/:userid/cards', NotImplemented); // Create a user's card.
   app.put('/users/:userid/cards/:cardid', NotImplemented); // Update a user's card.
   app.delete('/users/:userid/cards/:cardid', NotImplemented); // Delete a user's card.
