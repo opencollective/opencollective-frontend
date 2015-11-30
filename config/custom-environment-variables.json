@@ -26,6 +26,7 @@
   },
   "paypal": {
     "classic": {
+      "email": "PAYPAL_EMAIL",
       "appId": "PAYPAL_APP_ID",
       "userId": "PAYPAL_USER_ID",
       "password": "PAYPAL_PASSWORD",
