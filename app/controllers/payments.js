@@ -57,8 +57,10 @@ module.exports = function(app) {
         getExistingCard: ['getGroupStripeAccount', function(cb, results) {
           models.Card
             .findOne({
-              token: payment.stripeToken,
-              service: 'stripe'
+              where: {
+                token: payment.stripeToken,
+                service: 'stripe'
+              }
             })
             .then(function(card) {
               cb(null, card);
