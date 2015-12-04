@@ -189,6 +189,9 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('amount', CHARGE);
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
             expect(res.rows[0]).to.have.property('approved', true);
+            expect(res.rows[0].tags[0]).to.be.equal('Donation');
+            expect(res.rows[0]).to.have.property('description',
+              'Donation from ' + user.email + ' to ' + group.name);
             done();
           })
           .catch(done);

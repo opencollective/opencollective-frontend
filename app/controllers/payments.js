@@ -111,12 +111,15 @@ module.exports = function(app) {
 
         createTransaction: ['createCard', 'createCharge', function(cb, results) {
           var charge = results.createCharge;
+          var description = ['Donation from', user && user.email, 'to', group && group.name].join(' ');
 
           var transaction = {
             type: 'payment',
             amount: payment.amount,
             currency: charge.currency,
             paidby: user && user.id,
+            description: description,
+            tags: ['Donation'],
             approved: true
           };
 
