@@ -473,6 +473,10 @@ module.exports = function(app) {
       }]
 
     }, function(err, results) {
+      if (err && results.callService) {
+        console.error('PayPal error', JSON.stringify(results.callService));
+      }
+
       if (err) return next(err);
       else res.json(results.updateTransaction);
     });
