@@ -44,7 +44,8 @@ module.exports = function(Sequelize, DataTypes) {
         return {
           id: this.id,
           stripeId: this.stripeId,
-          stripeKey: this.stripeKey
+          stripeKey: this.stripeKey,
+          stripeEmail: this.stripeEmail
         };
       }
     }
