@@ -196,6 +196,7 @@ describe('groups.routes.test.js', function() {
   describe('#get', function() {
 
     var group;
+    var publicGroup;
     var user2;
     var application2;
     var application3;
@@ -216,6 +217,31 @@ describe('groups.routes.test.js', function() {
             .find(parseInt(res.body.id))
             .then(function(g) {
               group = g;
+              done();
+            })
+            .catch(done);
+        });
+    });
+
+    // Create the public group with user.
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: {
+            name: 'group 2',
+            isPublic: true
+          },
+          role: 'admin'
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.Group
+            .find(parseInt(res.body.id))
+            .then(function(g) {
+              publicGroup = g;
               done();
             })
             .catch(done);
@@ -282,6 +308,21 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', group.id);
           expect(res.body).to.have.property('name', group.name);
           expect(res.body).to.have.property('description', group.description);
+          expect(res.body).to.have.property('stripeManagedAccount');
+          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          done();
+        });
+    });
+
+    it('successfully get a group if it is public', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.id)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', publicGroup.id);
+          expect(res.body).to.have.property('name', publicGroup.name);
+          expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
           expect(res.body).to.have.property('stripeManagedAccount');
           expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
           done();
