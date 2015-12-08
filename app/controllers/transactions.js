@@ -192,7 +192,7 @@ module.exports = function(app) {
               {
                 email: results.getUser.paypalEmail || results.getUser.email,
                 amount: amount,
-                paymentType: 'CASHADVANCE'
+                paymentType: 'SERVICE'
               }
             ]
           }
@@ -360,7 +360,7 @@ module.exports = function(app) {
             {
               email: data.beneficiary.email,
               amount: amount,
-              paymentType: 'CASHADVANCE'
+              paymentType: 'SERVICE'
             }
           ]
         }
