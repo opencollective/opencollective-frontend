@@ -47,6 +47,6 @@ if (_.contains(['test', 'circleci'], app.set('env'))) {
   var server = app.listen(port, function () {
     var host = server.address().address;
     var port = server.address().port;
-    console.log('Assoc API listening at http://%s:%s in %s environment.', host, port, app.set('env'));
+    console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, port, app.set('env'));
   });
 }
