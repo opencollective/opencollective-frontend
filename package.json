@@ -1,8 +1,8 @@
 {
-  "name": "api",
+  "name": "opencollective-api",
   "version": "0.0.5",
-  "description": "Assoc API",
-  "author": "philmod",
+  "description": "OpenCollective API",
+  "author": "@philmod @arnaudbenard @xdamman",
   "main": "index.js",
   "engines": {
     "node": "5.1.0",
@@ -54,5 +54,5 @@
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "postinstall": "npm rebuild"
   },
-  "license": "Copyright (c) 2015 Philmod"
+  "license": "Copyright (c) 2015 OpenCollective, Inc."
 }
