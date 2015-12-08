@@ -358,7 +358,7 @@ module.exports = function(app) {
         receiverList: {
           receiver: [
             {
-              email: data.beneficiary.email,
+              email: data.beneficiary.paypalEmail || data.beneficiary.email,
               amount: amount,
               paymentType: 'SERVICE'
             }
