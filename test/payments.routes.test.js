@@ -10,6 +10,7 @@ var request = require('supertest');
 var utils = require('../test/utils.js')();
 var sinon = require('sinon');
 var nock = require('nock');
+var chance = require('chance').Chance();
 
 /**
  * Variables.
@@ -35,6 +36,16 @@ describe('payments.routes.test.js', function() {
   var group;
   var group2;
   var nocks = {};
+  var stripeEmail;
+
+  var stubStripe = function() {
+    var mock = stripeMock.accounts.create;
+    mock.email = chance.email();
+    stripeEmail = mock.email;
+
+    var stub = sinon.stub(app.stripe.accounts, 'create');
+    stub.yields(null, mock);
+  };
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -50,16 +61,6 @@ describe('payments.routes.test.js', function() {
       user = u;
       done();
     });
-  });
-
-  // Stripe stub.
-  var stubAccountsCreate;
-  beforeEach(function() {
-    stubAccountsCreate = sinon.stub(app.stripe.accounts, 'create');
-    stubAccountsCreate.yields(null, stripeMock.accounts.create);
-  });
-  afterEach(function() {
-    app.stripe.accounts.create.restore();
   });
 
   // Nock for customers.create.
@@ -79,6 +80,10 @@ describe('payments.routes.test.js', function() {
     nock.cleanAll();
   });
 
+  beforeEach(function() {
+    stubStripe();
+  });
+
   // Create a group.
   beforeEach(function(done) {
     request(app)
@@ -86,7 +91,8 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin'
+        role: 'admin',
+        stripeEmail: stripeEmail
       })
       .expect(200)
       .end(function(e, res) {
@@ -101,13 +107,19 @@ describe('payments.routes.test.js', function() {
       });
   });
 
+  beforeEach(function() {
+    app.stripe.accounts.create.restore();
+    stubStripe();
+  });
+
   // Create a second group.
   beforeEach(function(done) {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
-        group: utils.data('group2')
+        group: utils.data('group2'),
+        stripeEmail: stripeEmail
       })
       .expect(200)
       .end(function(e, res) {
@@ -120,6 +132,10 @@ describe('payments.routes.test.js', function() {
           })
           .catch(done);
       });
+  });
+
+  beforeEach(function() {
+    app.stripe.accounts.create.restore();
   });
 
   // Create an application which has only access to `group`

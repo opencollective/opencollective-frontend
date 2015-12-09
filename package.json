@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "chai": "*",
+    "chance": "^0.8.0",
     "istanbul": "0.3.2",
     "jscs": "^1.13.1",
     "jsxhint": "^0.15.1",

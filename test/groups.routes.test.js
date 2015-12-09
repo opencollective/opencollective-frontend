@@ -7,6 +7,7 @@ var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
+var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var sinon = require('sinon');
 
@@ -18,6 +19,7 @@ var groupData = utils.data('group1');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
 var stripeMock = require('./mocks/stripe')
+var stripeEmail = stripeMock.accounts.create.email;
 
 /**
  * Tests.
@@ -61,7 +63,8 @@ describe('groups.routes.test.js', function() {
       request(app)
         .post('/groups')
         .send({
-          group: groupData
+          group: groupData,
+          stripeEmail: stripeEmail
         })
         .expect(401)
         .end(function(e, res) {
@@ -81,6 +84,23 @@ describe('groups.routes.test.js', function() {
         });
     });
 
+    it('fails creating a group without stripeEmail', function(done) {
+      request(app)
+        .post('/groups')
+        .send({
+          group: groupData
+        })
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(400)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.have.property('message', 'Missing required fields');
+          done();
+        });
+    });
+
     it('fails creating a group without name', function(done) {
       var group = _.omit(groupData, 'name');
 
@@ -88,7 +108,8 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: group
+          group: group,
+          stripeEmail: stripeEmail
         })
         .expect(400)
         .end(function(e, res) {
@@ -100,7 +121,6 @@ describe('groups.routes.test.js', function() {
           expect(res.body.error.fields).to.contain('name');
           done();
         });
-
     });
 
     it('successfully create a group without assigning a member', function(done) {
@@ -108,7 +128,8 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData
+          group: groupData,
+          stripeEmail: stripeEmail
         })
         .expect(200)
         .end(function(e, res) {
@@ -139,7 +160,8 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: role
+          role: role,
+          stripeEmail: stripeEmail
         })
         .expect(200)
         .end(function(e, res) {
@@ -165,7 +187,8 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData
+          group: groupData,
+          stripeEmail: stripeEmail
         })
         .expect(200)
         .end(function(e, res) {
@@ -179,6 +202,7 @@ describe('groups.routes.test.js', function() {
                   expect(account).to.have.property('stripeId', stripeMock.accounts.create.id);
                   expect(account).to.have.property('stripeSecret', stripeMock.accounts.create.keys.secret);
                   expect(account).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+                  expect(account).to.have.property('stripeEmail', stripeMock.accounts.create.email);
                   done();
                 })
                 .catch(done);
@@ -200,6 +224,20 @@ describe('groups.routes.test.js', function() {
     var user2;
     var application2;
     var application3;
+    var stripeEmail;
+
+    var stubStripe = function() {
+      var stub = sinon.stub(app.stripe.accounts, 'create');
+      var mock = stripeMock.accounts.create;
+      mock.email = chance.email();
+      stripeEmail = mock.email;
+      stub.yields(null, mock);
+    };
+
+    beforeEach(function() {
+      app.stripe.accounts.create.restore();
+      stubStripe();
+    });
 
     // Create the group with user.
     beforeEach(function(done) {
@@ -208,7 +246,8 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin'
+          role: 'admin',
+          stripeEmail: stripeEmail
         })
         .expect(200)
         .end(function(e, res) {
@@ -223,6 +262,11 @@ describe('groups.routes.test.js', function() {
         });
     });
 
+    beforeEach(function() {
+      app.stripe.accounts.create.restore();
+      stubStripe();
+    });
+
     // Create the public group with user.
     beforeEach(function(done) {
       request(app)
@@ -233,7 +277,8 @@ describe('groups.routes.test.js', function() {
             name: 'group 2',
             isPublic: true
           },
-          role: 'admin'
+          role: 'admin',
+          stripeEmail: stripeEmail
         })
         .expect(200)
         .end(function(e, res) {
@@ -475,7 +520,8 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin'
+          role: 'admin',
+          stripeEmail: chance.email()
         })
         .expect(200)
         .end(function(e, res) {
