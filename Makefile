@@ -6,6 +6,10 @@ build:
 DB_NAME=opencollective_localhost
 DB_TEST_NAME=opencollective_test
 
+dropdb:
+	dropdb $(DB_NAME)
+	dropdb $(DB_TEST_NAME)
+
 database:
 	# $(eval("psql -t -c \"SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('$(DB_NAME)');\""))
 	createdb $(DB_NAME)
