@@ -4,6 +4,7 @@
 
     "create": {
       "id": "stripeid",
+      "email": "philippe.modard+customer@gmail.com",
       "keys": {
           "secret": "stripesecret",
           "publishable": "stripepublishable"

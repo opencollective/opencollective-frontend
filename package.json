@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "chai": "*",
+    "chance": "^0.8.0",
     "istanbul": "0.3.2",
     "jscs": "^1.13.1",
     "jsxhint": "^0.15.1",
@@ -56,6 +57,7 @@
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
     "db:reset": "NODE_ENV=development node scripts/reset",
+    "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "npm rebuild"
   },
   "license": "Copyright (c) 2015 OpenCollective, Inc."

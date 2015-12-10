@@ -104,14 +104,16 @@ module.exports = function(app) {
             },
             createStripeManagedAccount: function(cb) {
               app.stripe.accounts.create({
-                managed: true
+                email: req.required.stripeEmail
               }, function(e, account) {
                 if (e) return cb(e);
+
                 StripeManagedAccount
                   .create({
                     stripeId: account.id,
                     stripeSecret: account.keys.secret,
-                    stripeKey: account.keys.publishable
+                    stripeKey: account.keys.publishable,
+                    stripeEmail: account.email
                   })
                   .then(function(account) {
                     account.addGroup(group.id).done(cb);

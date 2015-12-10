@@ -31,6 +31,11 @@ module.exports = function(Sequelize, DataTypes) {
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
+    },
+
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
 
   }, {
@@ -48,7 +53,8 @@ module.exports = function(Sequelize, DataTypes) {
           membership_type: this.membership_type,
           membershipfee: this.membershipfee,
           createdAt: this.createdAt,
-          updatedAt: this.updatedAt
+          updatedAt: this.updatedAt,
+          isPublic: this.isPublic
         };
       }
     },

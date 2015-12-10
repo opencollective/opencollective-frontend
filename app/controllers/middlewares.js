@@ -268,6 +268,17 @@ module.exports = function(app) {
     },
 
     /**
+     * Authorize if group is public
+     */
+    authorizeIfGroupPublic: function(req, res, next) {
+      if (req.group && req.group.isPublic) {
+        return next('route'); // bypass the callbacks
+      }
+
+      return next();
+    },
+
+    /**
      * Authorize for group with specific role(s).
      */
     authorizeGroupRoles: function(roles) {
