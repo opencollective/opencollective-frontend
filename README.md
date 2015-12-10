@@ -41,6 +41,19 @@ All the calls to 3th party services are stubbed using either `sinon` or `nock`.
 ## Start server
 `npm run start`
 
+## Reset db with fixtures
+
+Run the server on the side:
+`npm run start`
+
+Run the script afterwards:
+`npm run db:reset`
+
+You can now login on development with `ops@opencollective.com` and `password`.
+You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
+
+Feel free to modify `scripts/create_user_and_group.js` to create your own user/group
+
 ## Documentation
 http://docs.opencollective.apiary.io/
 
