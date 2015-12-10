@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 var user = {
-  email: 'user@example.com',
+  email: 'ops@opencollective.com',
   password: 'password'
 };
 

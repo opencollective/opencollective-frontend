@@ -49,7 +49,8 @@ Run the server on the side:
 Run the script afterwards:
 `npm run db:reset`
 
-You can now login on development with `user@example.com` and `password`
+You can now login on development with `ops@opencollective.com` and `password`.
+You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
 
 Feel free to modify `scripts/create_user_and_group.js` to create your own user/group
 
