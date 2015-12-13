@@ -1,6 +1,6 @@
 {
   "database": {
-    "database": "opencollective_prod",
+    "database": "opencollective_prod_snapshot",
     "username": "opencollective",
     "password": "",
     "options": {

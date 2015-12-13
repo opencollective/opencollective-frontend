@@ -10,8 +10,10 @@ lib-cov
 
 node_modules
 coverage
+dbdumps
 
 temp.js
 tempStripe.js
 
 .env
+.vscode
