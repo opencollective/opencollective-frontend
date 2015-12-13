@@ -1,9 +1,11 @@
 #!/bin/bash
 # This shell scripts copies the production database to the local database
 
-DBDUMPS_DIR="dbdumps/"
+LOCALDBUSER="opencollective"
 LOCALDBNAME="opencollective_prod_snapshot"
 PG_URL=`heroku config:get PG_URL`
+DBDUMPS_DIR="dbdumps/"
+
 FILENAME=`date +"%Y-%m-%d"`-prod.pgsql
 
 if [ ! -d $DBDUMPS_DIR ]; then
@@ -31,6 +33,7 @@ pg_restore -n public -O -c -d $LOCALDBNAME $DBDUMPS_DIR$FILENAME
 
 echo "DB restored to postgres://localhost/$LOCALDBNAME"
 
-# We make sure the user "opencollective" has access
-psql $LOCALDBNAME -c 'CREATE ROLE opencollective WITH login;'
-psql $LOCALDBNAME -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO opencollective;'
+# We make sure the user $LOCALDBUSER has access
+psql $LOCALDBNAME -c 'CREATE ROLE $LOCALDBUSER WITH login;'
+psql $LOCALDBNAME -c 'alter database $LOCALDBNAME owner to $LOCALDBUSER;'
+psql $LOCALDBNAME -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $LOCALDBUSER;'
