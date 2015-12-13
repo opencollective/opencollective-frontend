@@ -12,7 +12,7 @@ fi
 
 if ! psql ${LOCALDBNAME} -c '\q' 2>&1; then
   echo "Creating $LOCALDBNAME"
-  psql -c "CREATE DATABASE $LOCALDBNAME" 
+  psql -c "CREATE DATABASE $LOCALDBNAME"
 fi
 
 
@@ -23,6 +23,10 @@ fi
 
 echo "DB dump saved in $DBDUMPS_DIR$FILENAME"
 
-pg_restore -n public -O -c -d opencollective_prod $DBDUMPS_DIR$FILENAME
+# The first time we run it, we will trigger FK constraints errors
+pg_restore -n public -O -c -d $LOCALDBNAME $DBDUMPS_DIR$FILENAME 2>/dev/null
+
+# So we run it twice :-)
+pg_restore -n public -O -c -d $LOCALDBNAME $DBDUMPS_DIR$FILENAME
 
 echo "DB restored to postgres://localhost/$LOCALDBNAME"
