@@ -1,7 +1,7 @@
 {
   "database": {
-    "database": "opencollective_localhost",
-    "username": "philmod",
+    "database": "opencollective_prod",
+    "username": "opencollective",
     "password": "",
     "options": {
       "host": "127.0.0.1",

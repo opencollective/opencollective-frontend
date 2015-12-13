@@ -61,13 +61,15 @@ module.exports = function(app) {
       if (!key) return next();
 
       Application.findByKey(key, function(e, application) {
-        if (!e && application) {
-          if (application.disabled) {
-            return next(new errors.Forbidden('Invalid API key.'));
-          }
-
-          req.application = application;
+        if (e) {
+          return next(e);
         }
+
+        if (!application || application.disabled) {
+          return next(new errors.Forbidden('Invalid API key: '+key));
+        }
+
+        req.application = application;
 
         next();
       });

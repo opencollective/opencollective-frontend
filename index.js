@@ -45,7 +45,7 @@ if (_.contains(['test', 'circleci'], app.set('env'))) {
    */
  var port = process.env.PORT || 3060;
   var server = app.listen(port, function () {
-    var host = server.address().address;
+    var host = require('os').hostname();
     var port = server.address().port;
     console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, port, app.set('env'));
   });
