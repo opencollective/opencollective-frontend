@@ -34,6 +34,16 @@ pg_restore -n public -O -c -d $LOCALDBNAME $DBDUMPS_DIR$FILENAME
 echo "DB restored to postgres://localhost/$LOCALDBNAME"
 
 # We make sure the user $LOCALDBUSER has access
-psql $LOCALDBNAME -c 'CREATE ROLE $LOCALDBUSER WITH login;'
-psql $LOCALDBNAME -c 'alter database $LOCALDBNAME owner to $LOCALDBUSER;'
-psql $LOCALDBNAME -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $LOCALDBUSER;'
+psql $LOCALDBNAME -c "CREATE ROLE $LOCALDBUSER WITH login;"
+
+# Change ownership of all tables
+tables=`psql -qAt -c "select tablename from pg_tables where schemaname = 'public';" $LOCALDBNAME`
+
+for tbl in $tables ; do
+  psql $LOCALDBNAME -c "alter table \"$tbl\" owner to $LOCALDBUSER";
+done
+
+# Change ownership of the database
+psql $LOCALDBNAME -c "alter database $LOCALDBNAME owner to $LOCALDBUSER;"
+
+psql $LOCALDBNAME -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $LOCALDBUSER;"
