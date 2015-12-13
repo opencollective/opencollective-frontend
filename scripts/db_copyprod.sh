@@ -1,0 +1,28 @@
+#!/bin/bash
+# This shell scripts copies the production database to the local database
+
+DBDUMPS_DIR="dbdumps/"
+LOCALDBNAME="opencollective_prod"
+PG_URL=`heroku config:get PG_URL`
+FILENAME=`date +"%Y-%m-%d"`-prod.pgsql
+
+if [ ! -d $DBDUMPS_DIR ]; then
+  mkdir $DBDUMPS_DIR
+fi
+
+if ! psql ${LOCALDBNAME} -c '\q' 2>&1; then
+  echo "Creating $LOCALDBNAME"
+  psql -c "CREATE DATABASE $LOCALDBNAME" 
+fi
+
+
+if [ ! -f "$DBDUMPS_DIR$FILENAME" ]; then
+  echo "Dumping $PG_URL"
+  pg_dump -O -F t $PG_URL > $DBDUMPS_DIR$FILENAME
+fi
+
+echo "DB dump saved in $DBDUMPS_DIR$FILENAME"
+
+pg_restore -n public -O -c -d opencollective_prod $DBDUMPS_DIR$FILENAME
+
+echo "DB restored to postgres://localhost/$LOCALDBNAME"
