@@ -7,6 +7,8 @@ var config = require('config').database;
 /**
  * Database connection.
  */
+console.log("Connecting to postgres://" + config.options.host+"/"+config.database);
+
 var sequelize = new Sequelize(
   config.database,
   config.username,
