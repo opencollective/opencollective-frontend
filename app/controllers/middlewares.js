@@ -68,8 +68,8 @@ module.exports = function(app) {
         if (!application) {
           return next(new errors.Unauthorized('Invalid API key: ' + key));
         }
-        
-        if(application.disabled) {
+
+        if (application.disabled) {
           return next(new errors.Forbidden('Application disabled'));
         }
 
