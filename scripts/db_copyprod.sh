@@ -1,9 +1,13 @@
 #!/bin/bash
 # This shell scripts copies the production database to the local database
+# Usage: npm run db:copyprod (from the root of the opencollective-api repo)
+#
+# To run the API with the local version of the production database, run:
+# PG_DATABASE=opencollective_prod_snapshot npm start
 
 LOCALDBUSER="opencollective"
 LOCALDBNAME="opencollective_prod_snapshot"
-PG_URL=`heroku config:get PG_URL`
+PG_URL=`heroku config:get PG_URL -a opencollective-prod-api`
 DBDUMPS_DIR="dbdumps/"
 
 FILENAME=`date +"%Y-%m-%d"`-prod.pgsql
