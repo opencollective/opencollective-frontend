@@ -51,3 +51,6 @@ done
 psql $LOCALDBNAME -c "alter database $LOCALDBNAME owner to $LOCALDBUSER;"
 
 psql $LOCALDBNAME -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $LOCALDBUSER;"
+
+# Insert the local development api_key
+psql $LOCALDBNAME -c "INSERT INTO \"Applications\" (api_key, name) VALUES ('0ac43519edcf4421d80342403fb5985d','opencollective-mobileapp-dev');"
