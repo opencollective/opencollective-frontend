@@ -65,8 +65,12 @@ module.exports = function(app) {
           return next(e);
         }
 
-        if (!application || application.disabled) {
-          return next(new errors.Forbidden('Invalid API key: ' + key));
+        if (!application) {
+          return next(new errors.Unauthorized('Invalid API key: ' + key));
+        }
+        
+        if(application.disabled) {
+          return next(new errors.Forbidden('Application disabled'));
         }
 
         req.application = application;
