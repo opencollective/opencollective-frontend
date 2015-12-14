@@ -1,6 +1,6 @@
 {
   "development": {
-    "database": "opencollective_prod_snapshot",
+    "database": "opencollective_localhost",
     "username": "opencollective",
     "password": "",
     "host": "127.0.0.1",

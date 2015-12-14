@@ -1,6 +1,6 @@
 {
   "database": {
-    "database": "opencollective_prod_snapshot",
+    "database": "opencollective_localhost",
     "username": "opencollective",
     "password": "",
     "options": {
