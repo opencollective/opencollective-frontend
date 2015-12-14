@@ -219,6 +219,7 @@ describe('paypal.preapproval.routes.test.js', function() {
       });
 
       it('should confirm the payment of a transaction', function(done) {
+        var mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -233,6 +234,7 @@ describe('paypal.preapproval.routes.test.js', function() {
                   expect(res.count).to.equal(1);
                   expect(res.rows[0].confirmedAt).not.to.be.null;
                   expect(res.rows[0].service).to.equal('paypal');
+                  expect(res.rows[0].number).to.equal(mock.completed.senderEmail);
                   expect(res.rows[0].UserId).to.equal(user.id);
                   cb();
                 });
