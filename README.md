@@ -16,10 +16,10 @@ Now, assuming the postgres database superuser is `postgres`, let's create the da
 ```
 createdb -U postgres opencollective_localhost
 createdb -U postgres opencollective_test
-createuser -U postgres philmod
+createuser -U postgres opencollective
 psql -U postgres
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO philmod
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO philmod
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO opencollective
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective
 ```
 
 ### Configuration and secrets
@@ -36,7 +36,7 @@ that to your shell profile.
 
 ## Tests
 `npm test`
-All the calls to 3th party services are stubbed using either `sinon` or `nock`.
+All the calls to 3rd party services are stubbed using either `sinon` or `nock`.
 
 ## Start server
 `npm run start`
@@ -52,13 +52,13 @@ Run the script afterwards:
 You can now login on development with `ops@opencollective.com` and `password`.
 You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
 
-Feel free to modify `scripts/create_user_and_group.js` to create your own user/group
+Feel free to modify `scripts/create_user_and_group.js` to create your own user/group.
 
 ## Documentation
 http://docs.opencollective.apiary.io/
 
 ## Databases migrations
-The tests delete all the database's tables and re-create them with the latest models.
+The tests delete all the `opencollective_test` database's tables and re-create them with the latest models.
 
 For localhost or other environments, the migrations has to be run manually.
 
