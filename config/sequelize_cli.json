@@ -1,7 +1,7 @@
 {
   "development": {
     "database": "opencollective_localhost",
-    "username": "philmod",
+    "username": "opencollective",
     "password": "",
     "host": "127.0.0.1",
     "dialect": "postgres"
