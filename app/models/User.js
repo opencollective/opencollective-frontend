@@ -101,7 +101,11 @@ module.exports = function(Sequelize, DataTypes) {
     getterMethods: {
       // Full name.
       fullName: function() {
-        return this.first_name + ' ' + this.last_name;
+        if (this.first_name && this.last_name) {
+          return this.first_name + ' ' + this.last_name;
+        }
+
+        return '';
       },
 
       // Info (private).

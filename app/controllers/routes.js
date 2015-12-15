@@ -79,6 +79,7 @@ module.exports = function(app) {
    */
   app.get('/users/:userid/paypal/preapproval', mw.authorizeAuthUser, mw.authorizeUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
   app.post('/users/:userid/paypal/preapproval/:preapprovalkey', mw.authorizeAuthUser, mw.authorizeUser, paypal.confirmPreapproval); // Confirm a preapproval key.
+  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', mw.authorizeAuthUser, mw.authorizeUser, paypal.getDetails); // Get a preapproval key details.
 
   /**
    * Groups.
