@@ -311,6 +311,14 @@ describe('paypal.preapproval.routes.test.js', function() {
           .expect(200)
           .end(done);
       });
+
+      it('should not be able to check another user preapproval details', function(done) {
+        request(app)
+          .get('/users/' + user2.id + '/paypal/preapproval/' + preapprovalkey)
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .expect(403)
+          .end(done);
+      });
     });
 
     describe('Cards clean up', function() {
