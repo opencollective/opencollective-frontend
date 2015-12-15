@@ -18,8 +18,8 @@ createdb -U postgres opencollective_localhost
 createdb -U postgres opencollective_test
 createuser -U postgres opencollective
 psql -U postgres
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO opencollective
-> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO opencollective;
+> GRANT ALL PRIVILEGES ON DATABASE opencollective_test TO opencollective;
 ```
 
 ### Configuration and secrets
