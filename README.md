@@ -57,19 +57,41 @@ Feel free to modify `scripts/create_user_and_group.js` to create your own user/g
 ## Documentation
 http://docs.opencollective.apiary.io/
 
+## Deployment
+
+If you want to deploy the app on Heroku, you need to add the remotes:
+
+```
+git remote add heroku-staging https://git.heroku.com/opencollective-staging-api.git
+git remote add heroku-production https://git.heroku.com/opencollective-prod-api.git
+```
+
+Then you can run:
+
+```
+git push heroku-staging master
+git push heroku-staging branch:master
+```
+
 ## Databases migrations
+
 The tests delete all the `opencollective_test` database's tables and re-create them with the latest models.
 
 For localhost or other environments, the migrations has to be run manually.
 
 ### Create a new migration file
+
 `sequelize migration:create`
 
 ### Apply migrations locally
+
 `SEQUELIZE_ENV=development npm run db:migrate`
 
-### Apply migrations on other environments
-`SEQUELIZE_ENV` is set in heroku.
+### Apply migrations on Heroku
 
-`npm run db:migrate`
+The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`.
+
+1) Push application with migration scripts to Heroku
+2) `heroku run bash -a opencollective-staging-api`
+3) `npm run db:migrate`
 
