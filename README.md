@@ -92,6 +92,8 @@ For localhost or other environments, the migrations has to be run manually.
 The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`.
 
 1) Push application with migration scripts to Heroku
+
 2) `heroku run bash -a opencollective-staging-api`
+
 3) `npm run db:migrate`
 
