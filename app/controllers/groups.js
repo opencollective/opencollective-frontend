@@ -428,7 +428,7 @@ module.exports = function(app) {
                                         req.pagination)
           });
 
-          res.send(transactions.rows);
+          res.send(_.pluck(transactions.rows, 'info'));
         })
         .catch(next);
     },

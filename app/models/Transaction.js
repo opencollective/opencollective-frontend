@@ -46,7 +46,8 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           approvedAt: this.approvedAt,
           reimbursedAt: this.reimbursedAt,
-          UserId: this.UserId
+          UserId: this.UserId,
+          GroupId: this.GroupId
         };
       }
     }
