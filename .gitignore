@@ -16,4 +16,7 @@ temp.js
 tempStripe.js
 
 .env
+
 .vscode
+jsconfig.json
+typings
