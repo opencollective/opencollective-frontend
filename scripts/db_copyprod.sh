@@ -54,3 +54,10 @@ psql $LOCALDBNAME -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $LO
 
 # Insert the local development api_key
 psql $LOCALDBNAME -c "INSERT INTO \"Applications\" (api_key, name) VALUES ('0ac43519edcf4421d80342403fb5985d','opencollective-mobileapp-dev');"
+
+echo ""
+
+echo " All done"
+echo ""
+echo "To run the OpenCollective API with the local version of the production database, run: "
+echo "PG_DATABASE=$LOCALDBNAME npm start"
