@@ -1,7 +1,7 @@
 {
   "database": {
     "database": "opencollective_test",
-    "username": "xdamman",
+    "username": "opencollective",
     "password": "",
     "options": {
       "host": "127.0.0.1",

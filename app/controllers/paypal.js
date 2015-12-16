@@ -37,6 +37,18 @@ module.exports = function(app) {
   };
 
   /**
+   * Get preapproval details route
+   */
+  var getDetails = function(req, res, next) {
+    var preapprovalKey = req.params.preapprovalkey;
+
+    getPreapprovalDetails(preapprovalKey, function(err, response) {
+      if (err) return next(err);
+      res.json(response);
+    });
+  };
+
+  /**
    * Get a preapproval key for a user.
    */
   var getPreapprovalKey = function(req, res, next) {
@@ -207,10 +219,9 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
-
     getPreapprovalKey: getPreapprovalKey,
-    confirmPreapproval: confirmPreapproval
-
-  }
+    confirmPreapproval: confirmPreapproval,
+    getDetails: getDetails
+  };
 
 };
