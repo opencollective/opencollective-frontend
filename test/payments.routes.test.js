@@ -396,7 +396,7 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe.only('Recurrent payment success', function() {
+    describe('Recurrent payment success', function() {
 
       var data = {
         stripeToken: STRIPE_TOKEN,
@@ -412,71 +412,106 @@ describe('payments.routes.test.js', function() {
         comment: 'super comment'
       };
 
-      // https://api.stripe.com/v1/customers/cus_6IJf9vLMFVsKzX/subscriptions plan=month-1000
+      var customerId = stripeMock.customers.create.id;
+      var planId = data.interval + '-' + data.amount * 100;
 
-      it('should create a plan if it doesn\'t exist', function (done) {
-        var customerId = stripeMock.customers.create.id;
-        var planId = data.interval + '-' + data.amount * 100;
+      var plan = _.extend({}, stripeMock.plans.create, {
+        amount: data.amount,
+        interval: data.interval,
+        name: planId,
+        id: planId
+      })
 
-        var stripePlan = _.extend({}, stripeMock.plans.create, {
-          amount: data.amount,
-          interval: data.interval,
-          name: planId,
-          id: planId
-        })
-
-        nocks['plans.retrieve'] = nock(STRIPE_URL)
-          .get('/v1/plans/' + planId)
-          .reply(200, {
-            error: stripeMock.plans.create_not_found
-          });
-
+      beforeEach(function() {
         nocks['plans.create'] = nock(STRIPE_URL)
           .post('/v1/plans')
-          .reply(200, stripePlan);
+          .reply(200, plan);
 
         nocks['subscriptions.create'] = nock(STRIPE_URL)
           .post('/v1/customers/' + customerId + '/subscriptions', 'plan=' + planId)
           .reply(200, stripeMock.subscriptions.create);
-
-        request(app)
-          .post('/groups/' + group2.id + '/payments')
-          .send({
-            api_key: application2.api_key,
-            payment: data
-          })
-          .expect(200)
-          .end(function(e, res) {
-            expect(e).to.not.exist;
-
-
-            done();
-          });
       });
-      // beforeEach('successfully makes a anonymous recurrent payment', function(done) {
-      //   request(app)
-      //     .post('/groups/' + group2.id + '/payments')
-      //     .send({
-      //       api_key: application2.api_key,
-      //       payment: data
-      //     })
-      //     .expect(200)
-      //     .end(function(e, res) {
-      //       expect(e).to.not.exist;
-      //       done();
-      //     });
-      // });
 
-       // Nock for plans.create.
-      // beforeEach(function() {
-      //   nocks['plans.create'] = nock(STRIPE_URL)
-      //     .post('/v1/plans')
-      //     .reply(200, stripeMock.plans.create);
-      // });
+      describe('plan does not exist', function() {
+        beforeEach(function(done) {
 
-      // it('successfully creates a Stripe customer', function() {
-      //   expect(nocks['customers.create'].isDone()).to.be.true;
-      // });
+          nocks['plans.retrieve'] = nock(STRIPE_URL)
+            .get('/v1/plans/' + planId)
+            .reply(200, {
+              error: stripeMock.plans.create_not_found
+            });
+
+          request(app)
+            .post('/groups/' + group2.id + '/payments')
+            .send({
+              api_key: application2.api_key,
+              payment: data
+            })
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              done();
+            });
+        });
+
+        it('creates a plan if it doesn\'t exist', function() {
+          expect(nocks['plans.retrieve'].isDone()).to.be.true;
+          expect(nocks['plans.create'].isDone()).to.be.true;
+        });
+      });
+
+      describe('plan exists', function() {
+
+        beforeEach(function(done) {
+
+          nocks['plans.retrieve'] = nock(STRIPE_URL)
+            .get('/v1/plans/' + planId)
+            .reply(200, plan);
+
+          request(app)
+            .post('/groups/' + group2.id + '/payments')
+            .send({
+              api_key: application2.api_key,
+              payment: data
+            })
+            .expect(200)
+            .end(function(e, res) {
+              expect(e).to.not.exist;
+              done();
+            });
+        });
+
+        it('uses the existing plan', function() {
+          expect(nocks['plans.create'].isDone()).to.be.false;
+          expect(nocks['plans.retrieve'].isDone()).to.be.true;
+        });
+
+        it('creates a subscription', function() {
+          expect(nocks['subscriptions.create'].isDone()).to.be.true;
+        });
+
+        it('creates a transaction', function(done) {
+          models.Transaction
+            .findAndCountAll({})
+            .then(function(res) {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0]).to.have.property('GroupId', group2.id);
+              expect(res.rows[0]).to.have.property('UserId', null);
+              expect(res.rows[0]).to.have.property('CardId', 1);
+              expect(res.rows[0]).to.have.property('currency', CURRENCY);
+              expect(res.rows[0]).to.have.property('tags');
+              expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
+              expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
+              ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
+                expect(res.rows[0]).to.have.property(prop, data[prop]);
+              });
+              done();
+            })
+            .catch(done);
+        });
+
+      });
+
     });
 
   });
