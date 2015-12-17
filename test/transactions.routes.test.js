@@ -24,6 +24,7 @@ describe('transactions.routes.test.js', function() {
 
   var group;
   var group2;
+  var publicGroup;
   var user;
   var user2;
   var application;
@@ -73,6 +74,18 @@ describe('transactions.routes.test.js', function() {
     });
   });
 
+  // Create the publicGroup.
+  beforeEach(function(done) {
+    models.Group.create({
+      name: 'public group',
+      isPublic: true
+    }).done(function(e, g) {
+      expect(e).to.not.exist;
+      publicGroup = g;
+      done();
+    });
+  });
+
   // Add user to the group.
   beforeEach(function(done) {
     group
@@ -83,6 +96,13 @@ describe('transactions.routes.test.js', function() {
   // Add user to the group2.
   beforeEach(function(done) {
     group2
+      .addMember(user, {role: 'admin'})
+      .done(done);
+  });
+
+  // Add user to the publicGroup.
+  beforeEach(function(done) {
+    publicGroup
       .addMember(user, {role: 'admin'})
       .done(done);
   });
@@ -393,6 +413,23 @@ describe('transactions.routes.test.js', function() {
       }, done);
     });
 
+    // Create transactions for publicGroup.
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + publicGroup.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            cb();
+          });
+      }, done);
+    });
+
     it('fails getting transactions for a not authorized group', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions')
@@ -417,6 +454,23 @@ describe('transactions.routes.test.js', function() {
 
           done();
 
+        });
+    });
+
+    it('successfully get a group\'s transactions if it is public', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.id + '/transactions')
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+
+          var transactions = res.body;
+          expect(transactions).to.have.length(transactionsData.length);
+          transactions.forEach(function(t) {
+            expect(t.GroupId).to.equal(publicGroup.id);
+          });
+
+          done();
         });
     });
 
