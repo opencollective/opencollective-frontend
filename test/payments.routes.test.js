@@ -76,6 +76,7 @@ describe('payments.routes.test.js', function() {
       .post('/v1/charges', 'amount=' + CHARGE * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
       .reply(200, stripeMock.charges.create);
   });
+
   afterEach(function() {
     nock.cleanAll();
   });
@@ -395,10 +396,87 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe.skip('Recurrent payment success', function() {
-      // There are 2 options:
-      //   - The API itself creates charge every X
-      //   - We use Stripe subscriptions
+    describe.only('Recurrent payment success', function() {
+
+      var data = {
+        stripeToken: STRIPE_TOKEN,
+        amount: 10,
+        currency: CURRENCY,
+        interval: 'month',
+        description: 'super description',
+        beneficiary: '@beneficiary',
+        paidby: '@paidby',
+        tags: ['tag1', 'tag2'],
+        status: 'super status',
+        link: 'www.opencollective.com',
+        comment: 'super comment'
+      };
+
+      // https://api.stripe.com/v1/customers/cus_6IJf9vLMFVsKzX/subscriptions plan=month-1000
+
+      it('should create a plan if it doesn\'t exist', function (done) {
+        var customerId = stripeMock.customers.create.id;
+        var planId = data.interval + '-' + data.amount * 100;
+
+        var stripePlan = _.extend({}, stripeMock.plans.create, {
+          amount: data.amount,
+          interval: data.interval,
+          name: planId,
+          id: planId
+        })
+
+        nocks['plans.retrieve'] = nock(STRIPE_URL)
+          .get('/v1/plans/' + planId)
+          .reply(200, {
+            error: stripeMock.plans.create_not_found
+          });
+
+        nocks['plans.create'] = nock(STRIPE_URL)
+          .post('/v1/plans')
+          .reply(200, stripePlan);
+
+        nocks['subscriptions.create'] = nock(STRIPE_URL)
+          .post('/v1/customers/' + customerId + '/subscriptions', 'plan=' + planId)
+          .reply(200, stripeMock.subscriptions.create);
+
+        request(app)
+          .post('/groups/' + group2.id + '/payments')
+          .send({
+            api_key: application2.api_key,
+            payment: data
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+
+
+            done();
+          });
+      });
+      // beforeEach('successfully makes a anonymous recurrent payment', function(done) {
+      //   request(app)
+      //     .post('/groups/' + group2.id + '/payments')
+      //     .send({
+      //       api_key: application2.api_key,
+      //       payment: data
+      //     })
+      //     .expect(200)
+      //     .end(function(e, res) {
+      //       expect(e).to.not.exist;
+      //       done();
+      //     });
+      // });
+
+       // Nock for plans.create.
+      // beforeEach(function() {
+      //   nocks['plans.create'] = nock(STRIPE_URL)
+      //     .post('/v1/plans')
+      //     .reply(200, stripeMock.plans.create);
+      // });
+
+      // it('successfully creates a Stripe customer', function() {
+      //   expect(nocks['customers.create'].isDone()).to.be.true;
+      // });
     });
 
   });

@@ -18,10 +18,32 @@ module.exports = function(app) {
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
 
+  var getOrCreatePlan = function(params, cb) {
+    var stripe = params.stripe;
+    var plan = params.plan;
+
+    stripe.plans.retrieve(plan.id, function(err, result) {
+      var type = err && err.type;
+      var message = err && err.message;
+
+      if (type === 'StripeInvalidRequest' && _.contains(message, 'No such plan')) {
+        stripe.plans.create(plan, cb);
+      } else {
+        cb(err, result);
+      }
+    });
+  };
+
   /**
    * Public methods.
    */
   return {
+
+    /**
+     * Return a plan or creates a new one
+     * Exposed for testing
+     */
+    getOrCreatePlan: getOrCreatePlan,
 
     /**
      * Post a payment.
@@ -30,6 +52,8 @@ module.exports = function(app) {
       var payment = req.required.payment;
       var user = req.remoteUser;
       var group = req.group;
+      var interval = payment.interval;
+      var isSubscription = _.contains(['month', 'year'], interval);
 
       if (!payment.stripeToken) {
         return next(new errors.BadRequest('Stripe Token missing.'));
@@ -70,6 +94,7 @@ module.exports = function(app) {
 
         createCustomer: ['getGroupStripeAccount', 'getExistingCard', function(cb, results) {
           var stripe = results.getGroupStripeAccount;
+          var email = user && user.email;
 
           if (results.getExistingCard)
             return cb(null, results.getExistingCard);
@@ -77,8 +102,8 @@ module.exports = function(app) {
           stripe.customers
             .create({
               source: payment.stripeToken,
-              description: 'payinguser@example.com',
-              email: user && user.email
+              description:  'Paying ' + email + ' to ' + group.name,
+              email: email
             }, cb);
         }],
 
@@ -97,22 +122,55 @@ module.exports = function(app) {
             .done(cb);
         }],
 
+        /**
+         * For one-time donation
+         */
+
         createCharge: ['getGroupStripeAccount', 'createCard', function(cb, results) {
           var stripe = results.getGroupStripeAccount;
           var card = results.createCard;
+          var amount = payment.amount * 100;
+          var currency = payment.currency || 'USD';
 
-          stripe.charges
-            .create({
-              amount: payment.amount * 100,
-              currency: payment.currency || 'USD',
-              customer: card.serviceId
-            }, cb);
+          /**
+           * Subscription
+           */
+          if (isSubscription) {
+            var id = interval + '-' + amount; // ie: 'month-1000'
+
+            getOrCreatePlan({
+              plan: {
+                id: id,
+                interval: interval,
+                amount: amount,
+                name: id,
+                currency: currency
+              },
+              stripe: stripe
+            }, function(err, plan) {
+              if (err) return cb(err);
+              stripe.customers
+                .createSubscription(card.serviceId, {plan: plan.id }, cb);
+            });
+
+          } else {
+
+            /**
+             * For one-time donation
+             */
+            stripe.charges
+              .create({
+                amount: amount,
+                currency: currency,
+                customer: card.serviceId
+              }, cb);
+          }
         }],
 
         createTransaction: ['createCard', 'createCharge', function(cb, results) {
           var charge = results.createCharge;
-          var description = ['Donation from', user && user.email, 'to', group && group.name].join(' ');
 
+          var description = ['Donation from', user && user.email, 'to', group && group.name].join(' ');
           var transaction = {
             type: 'payment',
             amount: payment.amount,
@@ -122,6 +180,10 @@ module.exports = function(app) {
             tags: ['Donation'],
             approved: true
           };
+
+          if (isSubscription) {
+            transaction.interval = charge.plan.interval;
+          }
 
           ['description', 'beneficiary', 'paidby', 'tags', 'status', 'link', 'comment'].forEach(function(prop) {
             if (payment[prop])

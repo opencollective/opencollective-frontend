@@ -66,6 +66,69 @@
       "metadata": {}
     }
 
+  },
+
+  "plans": {
+    "create": {
+      "id": "test",
+      "object": "plan",
+      "amount": 1233,
+      "created": 1450088389,
+      "currency": "usd",
+      "interval": "month",
+      "interval_count": 1,
+      "livemode": false,
+      "metadata": {
+      },
+      "name": "test",
+      "statement_descriptor": null,
+      "trial_period_days": null
+    },
+
+    "create_not_found": {
+      "type": "invalid_request_error",
+      "message": "No such plan: month-5000",
+      "param": "id",
+      "requestId": "req_7Y8TeQytYKcs1k"
+    }
+  },
+
+  "subscriptions": {
+    "create": {
+      "id": "sub_7Y8hSfCDvJ4TnD",
+      "object": "subscription",
+      "application_fee_percent": null,
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "current_period_end": 1453039696,
+      "current_period_start": 1450361296,
+      "customer": "cus_7Y8htG0P2iod3U",
+      "discount": null,
+      "ended_at": null,
+      "metadata": {
+      },
+      "plan": {
+        "id": "gold21323",
+        "object": "plan",
+        "amount": 2000,
+        "created": 1386247539,
+        "currency": "usd",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "metadata": {
+        },
+        "name": "New plan name",
+        "statement_descriptor": null,
+        "trial_period_days": null
+      },
+      "quantity": 1,
+      "start": 1450361296,
+      "status": "active",
+      "tax_percent": null,
+      "trial_end": null,
+      "trial_start": null
+    }
   }
 
 }
