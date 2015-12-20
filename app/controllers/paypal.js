@@ -177,6 +177,7 @@ module.exports = function(app) {
         var card = results.getCard.rows[0];
         card.confirmedAt = new Date();
         card.data = results.callPaypal;
+        card.number = results.callPaypal.senderEmail;
         card.save().done(cb);
       }],
 
