@@ -131,7 +131,7 @@ module.exports = function(app) {
             },
             createStripeManagedAccount: function(cb) {
               app.stripe.accounts.create({
-                email: req.required.stripeEmail
+                email: req.required.group.stripeEmail || req.remoteUser.email
               }, function(e, account) {
                 if (e) return cb(e);
 
