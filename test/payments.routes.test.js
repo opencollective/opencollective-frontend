@@ -433,7 +433,8 @@ describe('payments.routes.test.js', function() {
           .reply(200, plan);
 
         nocks['subscriptions.create'] = nock(STRIPE_URL)
-          .post('/v1/customers/' + customerId + '/subscriptions', 'plan=' + planId)
+          .post('/v1/customers/' + customerId + '/subscriptions',
+            'plan=' + planId + '&application_fee_percent=5')
           .reply(200, stripeMock.subscriptions.create);
       });
 
@@ -515,6 +516,24 @@ describe('payments.routes.test.js', function() {
               done();
             })
             .catch(done);
+        });
+
+        it('fails if the interval is not month or year', function(done) {
+
+          request(app)
+            .post('/groups/' + group2.id + '/payments')
+            .send({
+              api_key: application2.api_key,
+              payment: _.extend({}, data, {interval: 'something'})
+            })
+            .expect(400, {
+              error: {
+                code: 400,
+                type: 'bad_request',
+                message: 'Interval should be month or year.'
+              }
+            })
+            .end(done);
         });
 
       });

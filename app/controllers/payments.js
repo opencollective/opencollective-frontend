@@ -57,6 +57,10 @@ module.exports = function(app) {
       var interval = payment.interval;
       var isSubscription = _.contains(['month', 'year'], interval);
 
+      if (interval && !isSubscription) {
+        return next(new errors.BadRequest('Interval should be month or year.'));
+      }
+
       if (!payment.stripeToken) {
         return next(new errors.BadRequest('Stripe Token missing.'));
       }
@@ -157,7 +161,8 @@ module.exports = function(app) {
               if (err) return cb(err);
               stripe.customers
                 .createSubscription(card.serviceId, {
-                  plan: plan.id
+                  plan: plan.id,
+                  application_fee_percent: OC_FEE_PERCENT
                 }, cb);
             });
 
@@ -170,8 +175,7 @@ module.exports = function(app) {
               .create({
                 amount: amount,
                 currency: currency,
-                customer: card.serviceId,
-                application_fee: OC_FEE_PERCENT
+                customer: card.serviceId
               }, cb);
           }
         }],
