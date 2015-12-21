@@ -21,6 +21,7 @@ module.exports = function(app) {
   var paypal = Controllers.paypal;
   var images = Controllers.images;
   var cards = Controllers.cards;
+  var webhooks = Controllers.webhooks;
   var errors = app.errors;
 
   /**
@@ -134,6 +135,11 @@ module.exports = function(app) {
    * Separate route for uploading images to S3
    */
   app.post('/images', mw.authorizeAuthUser, images.upload);
+
+  /**
+   * Separate route for uploading images to S3
+   */
+  app.post('/webhooks/stripe', webhooks.stripe);
 
   /**
    * Error handler.
