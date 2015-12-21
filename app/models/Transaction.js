@@ -15,6 +15,8 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
+    stripeSubscriptionId: DataTypes.STRING,
+
     approved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false

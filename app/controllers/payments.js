@@ -6,6 +6,8 @@ var _ = require('lodash');
 var async = require('async');
 var Stripe = require('stripe');
 
+var OC_FEE_PERCENT = 5;
+
 /**
  * Controller.
  */
@@ -136,7 +138,11 @@ module.exports = function(app) {
            * Subscription
            */
           if (isSubscription) {
-            var id = interval + '-' + amount; // ie: 'month-1000'
+            var id = utils.planId({
+              currency: currency,
+              interval: interval,
+              amount: amount
+            });
 
             getOrCreatePlan({
               plan: {
@@ -150,7 +156,9 @@ module.exports = function(app) {
             }, function(err, plan) {
               if (err) return cb(err);
               stripe.customers
-                .createSubscription(card.serviceId, {plan: plan.id }, cb);
+                .createSubscription(card.serviceId, {
+                  plan: plan.id
+                }, cb);
             });
 
           } else {
@@ -162,7 +170,8 @@ module.exports = function(app) {
               .create({
                 amount: amount,
                 currency: currency,
-                customer: card.serviceId
+                customer: card.serviceId,
+                application_fee: OC_FEE_PERCENT
               }, cb);
           }
         }],
@@ -182,7 +191,7 @@ module.exports = function(app) {
           };
 
           if (isSubscription) {
-            transaction.interval = charge.plan.interval;
+            transaction.stripeSubscriptionId = charge.id;
           }
 
           ['description', 'beneficiary', 'paidby', 'tags', 'status', 'link', 'comment'].forEach(function(prop) {

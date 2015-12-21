@@ -8,6 +8,7 @@ var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
+var generatePlanId = require('../app/lib/utils.js').planId;
 var sinon = require('sinon');
 var nock = require('nock');
 var chance = require('chance').Chance();
@@ -413,7 +414,11 @@ describe('payments.routes.test.js', function() {
       };
 
       var customerId = stripeMock.customers.create.id;
-      var planId = data.interval + '-' + data.amount * 100;
+      var planId = generatePlanId({
+        currency: CURRENCY,
+        interval: data.interval,
+        amount: data.amount * 100
+      });
 
       var plan = _.extend({}, stripeMock.plans.create, {
         amount: data.amount,
@@ -496,6 +501,8 @@ describe('payments.routes.test.js', function() {
             .then(function(res) {
               expect(res.count).to.equal(1);
               expect(res.rows[0]).to.have.property('GroupId', group2.id);
+              expect(res.rows[0]).to.have
+                .property('stripeSubscriptionId', stripeMock.subscriptions.create.id);
               expect(res.rows[0]).to.have.property('UserId', null);
               expect(res.rows[0]).to.have.property('CardId', 1);
               expect(res.rows[0]).to.have.property('currency', CURRENCY);
