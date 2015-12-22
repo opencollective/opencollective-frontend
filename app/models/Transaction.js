@@ -8,7 +8,9 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: 'USD',
       set: function(val) {
-        this.setDataValue('currency', val.toUpperCase());
+        if (val && val.toUpperCase) {
+          this.setDataValue('currency', val.toUpperCase());
+        }
       }
     },
     beneficiary: DataTypes.STRING,

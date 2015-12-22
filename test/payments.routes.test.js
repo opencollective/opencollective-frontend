@@ -202,7 +202,7 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('CardId', 1);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY.toLowerCase());
+            expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', 'payment');
             expect(res.rows[0]).to.have.property('amount', CHARGE);
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
@@ -383,7 +383,7 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', null);
             expect(res.rows[0]).to.have.property('CardId', 1);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY.toLowerCase());
+            expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
             expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
             expect(res.rows[0].tags[1]).to.equal(data.tags[1]);

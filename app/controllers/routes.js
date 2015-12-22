@@ -137,7 +137,7 @@ module.exports = function(app) {
   app.post('/images', mw.authorizeAuthUser, images.upload);
 
   /**
-   * Separate route for uploading images to S3
+   * Webhook for stripe when it gets a new subscription invoice
    */
   app.post('/webhooks/stripe', webhooks.stripe);
 
