@@ -6,7 +6,10 @@ module.exports = function(Sequelize, DataTypes) {
     amount: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
-      defaultValue: 'USD'
+      defaultValue: 'USD',
+      set: function(val) {
+        this.setDataValue('currency', val.toUpperCase());
+      }
     },
     beneficiary: DataTypes.STRING,
     paidby: DataTypes.STRING,

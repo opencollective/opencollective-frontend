@@ -425,7 +425,7 @@ describe('payments.routes.test.js', function() {
         interval: data.interval,
         name: planId,
         id: planId
-      })
+      });
 
       beforeEach(function() {
         nocks['plans.create'] = nock(STRIPE_URL)

@@ -96,7 +96,7 @@ module.exports = function(app) {
   app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
-  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.post); // Make a payment/donation.
 
   /**
    * UserGroup.

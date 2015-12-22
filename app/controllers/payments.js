@@ -159,6 +159,7 @@ module.exports = function(app) {
               stripe: stripe
             }, function(err, plan) {
               if (err) return cb(err);
+
               stripe.customers
                 .createSubscription(card.serviceId, {
                   plan: plan.id,
@@ -231,6 +232,7 @@ module.exports = function(app) {
 
       }, function(e, results) {
         if (e) return next(e);
+
         res.send({success: true});
       });
 

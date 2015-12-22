@@ -27,19 +27,28 @@ module.exports = function(app) {
   var stripe = function(req, res, next) {
     var event = req.body;
 
-    if (event.type !== 'invoice.payment_succeeded') {
-      return next(new errors.BadRequest('Wrong event received'));
-    }
-
-    var invoice = event.data.object;
-    var subscription = invoice.lines.data[0];
-
     async.auto({
       fetchEvent: function(cb) {
-        app.stripe.events.retrieve(event.id, cb);
+
+        /**
+         * We check the event on stripe to be sure we don't get a fake event from
+         * someone else
+         */
+        app.stripe.events.retrieve(event.id, function(err, ev) {
+          if (err) return next(err);
+
+          if (ev.type !== 'invoice.payment_succeeded') {
+            return next(new errors.BadRequest('Wrong event type received'));
+          }
+
+          cb(err, ev);
+        });
       },
 
       fetchTransaction: ['fetchEvent', function(cb, results) {
+        var invoice = event.data.object;
+        var subscription = invoice.lines.data[0];
+
         Transaction.findOne({
           where: {
             stripeSubscriptionId: subscription.id
@@ -49,13 +58,22 @@ module.exports = function(app) {
             { model: User },
             { model: Card }
           ]
-        }, cb);
+        })
+        .then(function(transaction) {
+          return cb(null, {
+            transaction: transaction,
+            subscription: subscription
+          });
+        })
+        .catch(cb)
       }],
 
       createTransaction: ['fetchTransaction', function(cb, results) {
-        var user = results.fetchTransaction.User;
-        var group = results.fetchTransaction.Group;
-        var card = results.fetchTransaction.Card;
+        var transaction = results.fetchTransaction.transaction;
+        var subscription = results.fetchTransaction.subscription;
+        var user = transaction.User || {};
+        var group = transaction.Group || {};
+        var card = transaction.Card || {};
 
         var transaction = {
             type: 'payment',
@@ -72,7 +90,7 @@ module.exports = function(app) {
           transaction: transaction,
           group: group,
           user: user,
-          card: cCard
+          card: card
         }, cb);
       }]
 
@@ -82,7 +100,7 @@ module.exports = function(app) {
       /**
        * We need to return a 200 to tell stripe to not retry the webhook.
        */
-      res.send(200);
+      res.sendStatus(200);
     });
 
   };
