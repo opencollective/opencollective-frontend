@@ -46,7 +46,7 @@ module.exports = function(app) {
       },
 
       fetchTransaction: ['fetchEvent', function(cb, results) {
-        var invoice = event.data.object;
+        var invoice = results.fetchEvent.data.object;
         var subscription = invoice.lines.data[0];
 
         Transaction.findOne({
