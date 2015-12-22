@@ -339,6 +339,24 @@ describe('transactions.routes.test.js', function() {
       }, done);
     });
 
+    // Create transactions for public group
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + publicGroup.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            transactions.push(res.body);
+            cb();
+          });
+      }, done);
+    });
+
     it('fails getting a non-existing transaction', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + 987123)
@@ -389,6 +407,17 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+    it('successfully get a transaction if the group is public', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.id + '/transactions/' + transactions[0].id)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', transactions[0].id);
+          done();
+        });
+    });
+
   });
 
   /**
@@ -425,6 +454,7 @@ describe('transactions.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
+
             cb();
           });
       }, done);
