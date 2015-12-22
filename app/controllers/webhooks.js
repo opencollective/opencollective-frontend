@@ -3,6 +3,7 @@
  */
 
 var async = require('async');
+var _ = require('lodash');
 
 /**
  * Controller.
@@ -41,17 +42,22 @@ module.exports = function(app) {
             return next(new errors.BadRequest('Wrong event type received'));
           }
 
-          cb(err, ev);
+          var invoice = ev.data.object;
+          var invoiceLineItems = invoice.lines.data;
+          var subscription = _.find(invoiceLineItems, { type: 'subscription' });
+
+          cb(err, {
+            event: ev,
+            subscription: subscription
+          });
         });
       },
 
       fetchTransaction: ['fetchEvent', function(cb, results) {
-        var invoice = results.fetchEvent.data.object;
-        var subscription = invoice.lines.data[0];
 
         Transaction.findOne({
           where: {
-            stripeSubscriptionId: subscription.id
+            stripeSubscriptionId: results.fetchEvent.subscription.id
           },
           include: [
             { model: Group },
@@ -60,17 +66,15 @@ module.exports = function(app) {
           ]
         })
         .then(function(transaction) {
-          return cb(null, {
-            transaction: transaction,
-            subscription: subscription
-          });
+          return cb(null, transaction);
         })
         .catch(cb)
       }],
 
       createTransaction: ['fetchTransaction', function(cb, results) {
-        var transaction = results.fetchTransaction.transaction;
-        var subscription = results.fetchTransaction.subscription;
+        var transaction = results.fetchTransaction;
+        var subscription = results.fetchEvent.subscription;
+        var plan = subscription.plan;
         var user = transaction.User || {};
         var group = transaction.Group || {};
         var card = transaction.Card || {};
