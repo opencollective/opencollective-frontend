@@ -81,6 +81,18 @@ module.exports = function(app) {
     .catch(next);
   };
 
+  var updateAvatar = function(req, res, next) {
+    var required = req.required || {};
+
+    req.user.avatar = required.avatar;
+
+    req.user.save()
+    .then(function(user) {
+      res.send(user.info);
+    })
+    .catch(next);
+  };
+
   var getBalancePromise = function(GroupId) {
     return new Bluebird(function(resolve, reject) {
       groups.getBalance(GroupId, function(err, balance) {
@@ -170,7 +182,8 @@ module.exports = function(app) {
       .catch(next);
     },
 
-    updatePaypalEmail: updatePaypalEmail
+    updatePaypalEmail: updatePaypalEmail,
+    updateAvatar: updateAvatar
   };
 
 };
