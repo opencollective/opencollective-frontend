@@ -289,4 +289,43 @@ describe('users.routes.test.js', function() {
     });
   });
 
+  describe('#update avatar', function() {
+    var user;
+
+    beforeEach(function(done) {
+      models.User.create(utils.data('user1')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it('should update avatar', function(done) {
+      var link = 'http://opencollective.com/assets/icon2.svg';
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          avatar: link
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.avatar).to.equal(link);
+          done();
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      var link = 'http://opencollective.com/assets/icon2.svg';
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({
+          avatar: link
+        })
+        .expect(401)
+        .end(done);
+    });
+
+  });
 });
