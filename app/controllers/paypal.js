@@ -103,7 +103,7 @@ module.exports = function(app) {
           endingDate: endingDate,
           returnUrl: returnUrl,
           cancelUrl: cancelUrl,
-          displayMaxTotalAmount: true,
+          displayMaxTotalAmount: false,
           feesPayer: 'SENDER',
           maxTotalAmountOfAllPayments: maxTotalAmountOfAllPayments,
           requestEnvelope: {
