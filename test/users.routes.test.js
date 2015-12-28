@@ -327,5 +327,13 @@ describe('users.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails if the avatar key is missing from the payload', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({})
+        .expect(400)
+        .end(done);
+    });
+
   });
 });
