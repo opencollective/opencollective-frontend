@@ -213,6 +213,22 @@ describe('webhooks.routes.test.js', function() {
         })
         .catch(done);
     });
+
+    it('creates an activity', function(done) {
+      models.Activity
+        .findAndCountAll({
+          where: {
+            type: 'webhook.stripe.received'
+          }
+        })
+        .then(function(res) {
+          var e = res.rows[0].data.event;
+          expect(res.count).to.equal(1);
+          expect(e.id).to.be.equal(webhookEvent.id);
+          done();
+        })
+        .catch(done);
+    });
   });
 
   describe('errors', function() {

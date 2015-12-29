@@ -21,6 +21,7 @@ module.exports = function(app) {
   var Card = models.Card;
   var User = models.User;
   var Transaction = models.Transaction;
+  var Activity = models.Activity;
   var Group = models.Group;
 
   var transactions = require('./transactions')(app);
@@ -55,7 +56,17 @@ module.exports = function(app) {
         });
       },
 
-      fetchTransaction: ['fetchEvent', function(cb, results) {
+      createActivity: ['fetchEvent', function(cb, results) {
+        // Only save activity when the event is valid
+        Activity.create({
+          type: 'webhook.stripe.received',
+          data: {
+            event: results.fetchEvent.event
+          }
+        }).done(cb);
+      }],
+
+      fetchTransaction: ['createActivity', function(cb, results) {
 
         Transaction.findOne({
           where: {
