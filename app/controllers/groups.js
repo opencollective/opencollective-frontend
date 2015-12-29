@@ -3,7 +3,6 @@
  */
 var _ = require('lodash');
 var async = require('async');
-var sequelize = require('sequelize');
 var utils = require('../lib/utils');
 
 /**
@@ -16,9 +15,12 @@ module.exports = function(app) {
    */
   var errors = app.errors;
   var models = app.set('models');
+  var sequelize = models.sequelize;
   var Group = models.Group;
   var Activity = models.Activity;
+  var User = models.User;
   var Transaction = models.Transaction;
+  var UserGroup = models.UserGroup;
   var StripeManagedAccount = models.StripeManagedAccount;
   var transactions = require('../controllers/transactions')(app);
 
@@ -64,6 +66,31 @@ module.exports = function(app) {
         cb(null, result.toJSON().total);
       })
       .catch(cb);
+  };
+
+  var getUsers = function(req, res, next) {
+
+    /**
+     * Doing this in SQL because could not find how to do it with sequelize
+     */
+    var sql = 'SELECT * FROM "UserGroups" ' +
+              'LEFT JOIN "Users" ' +
+              'ON "UserId" = "id" ' +
+              'WHERE "GroupId" = :GroupId';
+
+    sequelize.query(sql, {
+      replacements: {
+        GroupId: req.group.id
+      },
+
+      // we could pass the model but it only works with sequelize >= 3.0.0
+      type: sequelize.QueryTypes.SELECT
+    })
+    .map(function createUserInstance(userData) {
+      return User.build(userData).public; // only return public data
+    })
+    .then(res.send.bind(res))
+    .catch(next);
   };
 
   /**
@@ -401,7 +428,7 @@ module.exports = function(app) {
                                         req.pagination)
           });
 
-          res.send(transactions.rows);
+          res.send(_.pluck(transactions.rows, 'info'));
         })
         .catch(next);
     },
@@ -417,7 +444,12 @@ module.exports = function(app) {
      * Get the balance of a group
      * Also used in users controller
      */
-    getBalance: getBalance
+    getBalance: getBalance,
+
+    /**
+     * Get users of a group
+     */
+    getUsers: getUsers
   };
 
 };

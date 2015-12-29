@@ -69,4 +69,7 @@ Types:
       UserId:
       GroupId:
       TransactionId:
+
+  + webhook.stripe.received
+    data: event (from Stripe)
 */

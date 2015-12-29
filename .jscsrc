@@ -3,5 +3,6 @@
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "requirePaddingNewLinesAfterBlocks": {
     "allExcept": ["inCallExpressions", "inArrayExpressions", "inProperties"]
-  }
+  },
+  "validateQuoteMarks": { "mark": "'", "escape": true }
 }

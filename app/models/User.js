@@ -148,6 +148,15 @@ module.exports = function(Sequelize, DataTypes) {
           email: this.email,
           paypalEmail: this.paypalEmail
         };
+      },
+
+      // Used for the public group
+      public: function() {
+        return {
+          id: this.id,
+          avatar: this.avatar,
+          name: this.fullName
+        };
       }
     },
 

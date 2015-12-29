@@ -15,7 +15,8 @@ module.exports = function(app) {
     'payments',
     'paypal',
     'transactions',
-    'users'
+    'users',
+    'webhooks'
   ];
 
   /**

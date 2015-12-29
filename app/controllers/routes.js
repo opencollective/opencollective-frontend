@@ -21,6 +21,7 @@ module.exports = function(app) {
   var paypal = Controllers.paypal;
   var images = Controllers.images;
   var cards = Controllers.cards;
+  var webhooks = Controllers.webhooks;
   var errors = app.errors;
 
   /**
@@ -86,12 +87,17 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', mw.authorizeAuthUser, mw.required('group', 'stripeEmail'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+
   app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
   app.get('/groups/:groupid', groups.get); // skipped route for public
+
+  app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users', groups.getUsers);
+
   app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
-  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('payment'), payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.post); // Make a payment/donation.
 
   /**
    * UserGroup.
@@ -106,10 +112,14 @@ module.exports = function(app) {
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+
   app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
 
-  app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid', groups.getTransaction); // Get a transaction.
+
   app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // Approve a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, mw.required('service'), transactions.pay); // Pay a transaction.
@@ -131,6 +141,11 @@ module.exports = function(app) {
   app.post('/images', mw.authorizeAuthUser, images.upload);
 
   /**
+   * Webhook for stripe when it gets a new subscription invoice
+   */
+  app.post('/webhooks/stripe', webhooks.stripe);
+
+  /**
    * Error handler.
    */
   app.use(function(err, req, res, next) {
@@ -147,8 +162,10 @@ module.exports = function(app) {
     else if (e.indexOf('uniqueconstraint') !== -1)
       err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
 
-    if (!err.code)
-      err.code = err.status || 500;
+    if (!err.code) {
+      var code = (err.type.indexOf('Stripe') > -1) ? 400 : 500;
+      err.code = err.status || 400;
+    }
 
     console.error('Error Express : ', err); // console.trace(err);
     res.status(err.code).send({error: err});

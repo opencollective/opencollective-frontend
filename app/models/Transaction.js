@@ -6,7 +6,12 @@ module.exports = function(Sequelize, DataTypes) {
     amount: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
-      defaultValue: 'USD'
+      defaultValue: 'USD',
+      set: function(val) {
+        if (val && val.toUpperCase) {
+          this.setDataValue('currency', val.toUpperCase());
+        }
+      }
     },
     beneficiary: DataTypes.STRING,
     paidby: DataTypes.STRING,
@@ -14,6 +19,8 @@ module.exports = function(Sequelize, DataTypes) {
     status: DataTypes.STRING,
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
+
+    stripeSubscriptionId: DataTypes.STRING,
 
     approved: {
       type: DataTypes.BOOLEAN,
@@ -46,7 +53,8 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           approvedAt: this.approvedAt,
           reimbursedAt: this.reimbursedAt,
-          UserId: this.UserId
+          UserId: this.UserId,
+          GroupId: this.GroupId
         };
       }
     }

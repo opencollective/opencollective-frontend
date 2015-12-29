@@ -491,6 +491,20 @@ describe('groups.routes.test.js', function() {
           });
       });
 
+      it('successfully get a group\'s users if it is public', function(done) {
+        request(app)
+          .get('/groups/' + publicGroup.id + '/users/')
+          .send({
+            api_key: application2.api_key
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            expect(JSON.stringify(res.body[0])).to.equal(JSON.stringify(user.public));
+            done();
+          });
+      });
+
     });
 
   });
