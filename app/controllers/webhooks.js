@@ -35,7 +35,9 @@ module.exports = function(app) {
          * We check the event on stripe to be sure we don't get a fake event from
          * someone else
          */
-        app.stripe.events.retrieve(event.id, function(err, ev) {
+        app.stripe.events.retrieve(event.id, {
+          stripe_account: event.user_id
+        }, function(err, ev) {
           if (err) return next(err);
 
           if (ev.type !== 'invoice.payment_succeeded') {
@@ -66,6 +68,10 @@ module.exports = function(app) {
           ]
         })
         .then(function(transaction) {
+          if (!transaction) {
+            return cb(new errors.BadRequest('Transaction not found: unknown subscription id'));
+          }
+
           return cb(null, transaction);
         })
         .catch(cb)

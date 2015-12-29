@@ -261,6 +261,28 @@ describe('webhooks.routes.test.js', function() {
         .end(done);
     });
 
+    it('returns an error if the subscription id does not appear in an exisiting transaction', function(done) {
+      var e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
+      e.data.object.lines.data[0].id = 'abc';
+
+      nocks['events.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/events/' + webhookEvent.id)
+        .reply(200, e);
+
+      request(app)
+        .post('/webhooks/stripe')
+        .send(e)
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'Transaction not found: unknown subscription id'
+          }
+        })
+        .end(done);
+
+    });
+
   });
 
 });
