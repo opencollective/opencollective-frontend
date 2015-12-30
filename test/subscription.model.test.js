@@ -68,12 +68,12 @@ describe(require('path').basename(__filename), function() {
           type: 'group.transaction.approved'
         }})
         .then(function(res) {
-          expect(res.count).to.equal(0);
+          expect(res.count).to.equal(1);
         }).done(done);
       })
   });
 
-  it('unsubscribes for the group.transaction.approved email notification', function(done) {
+  it('unsubscribes for the ' + subscriptionData.type + ' email notification', function(done) {
     request(app)
       .post('/groups/' + group.id + '/activities/' + subscriptionData.type + '/unsubscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
