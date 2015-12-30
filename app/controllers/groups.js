@@ -170,7 +170,7 @@ module.exports = function(app) {
        'video',
        'image',
        'expensePolicy',
-       'membership_type',
+       'membershipType',
        'membershipfee',
        'isPublic'].forEach(function(prop) {
         if (req.required.group[prop])

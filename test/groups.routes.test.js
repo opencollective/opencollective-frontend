@@ -145,7 +145,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('video');
           expect(res.body).to.have.property('image');
           expect(res.body).to.have.property('expensePolicy');
-          expect(res.body).to.have.property('membership_type');
+          expect(res.body).to.have.property('membershipType');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
@@ -181,7 +181,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('video');
           expect(res.body).to.have.property('image');
           expect(res.body).to.have.property('expensePolicy');
-          expect(res.body).to.have.property('membership_type');
+          expect(res.body).to.have.property('membershipType');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
@@ -535,7 +535,7 @@ describe('groups.routes.test.js', function() {
       name: 'newname',
       description: 'newdesc',
       budget: 11111.99,
-      membership_type: 'donation',
+      membershipType: 'donation',
       membershipfee: 11,
       longDescription: 'long description',
       logo: 'http://opencollective.com/assets/icon.svg',
@@ -652,7 +652,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('name', groupNew.name);
           expect(res.body).to.have.property('description', groupNew.description);
           expect(res.body).to.have.property('budget', groupNew.budget);
-          expect(res.body).to.have.property('membership_type', groupNew.membership_type);
+          expect(res.body).to.have.property('membershipType', groupNew.membershipType);
           expect(res.body).to.have.property('membershipfee', groupNew.membershipfee);
           expect(res.body).to.have.property('longDescription', groupNew.longDescription);
           expect(res.body).to.have.property('logo', groupNew.logo);

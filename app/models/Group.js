@@ -36,7 +36,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     expensePolicy: DataTypes.STRING,
 
-    membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
+    membershipType: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
     membershipfee: DataTypes.FLOAT,
 
     createdAt: {
@@ -74,7 +74,7 @@ module.exports = function(Sequelize, DataTypes) {
           video: this.video,
           image: this.image,
           expensePolicy: this.expensePolicy,
-          membership_type: this.membership_type,
+          membershipType: this.membershipType,
           membershipfee: this.membershipfee,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
