@@ -11,6 +11,7 @@
     }
   },
   "host": {
-    "api": "https://opencollective-prod.herokuapp.com"
+    "api": "https://api.opencollective.com",
+    "webapp": "https://app.opencollective.com"
   }
 }

@@ -32,5 +32,9 @@
       "password": "PAYPAL_PASSWORD",
       "signature": "PAYPAL_SIGNATURE"
     }
+  },
+  "mailgun": {
+    "user": "MAILGUN_USER",
+    "password": "MAILGUN_PASSWORD"
   }
 }

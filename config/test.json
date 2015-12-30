@@ -36,5 +36,9 @@
     "s3": {
       "bucket": "opencollective-test"
     }
+  },
+  "mailgun": {
+    "user": "",
+    "password": ""
   }
 }
