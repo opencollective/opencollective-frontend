@@ -52,6 +52,87 @@ describe(require('path').basename(__filename), function() {
     }).done(done);
   });
 
+  it('subscribes for the group.transaction.approved email notification', function(done) {
+    request(app)
+      .post('/groups/' + group.id + '/activities/group.transaction.approved/subscribe')
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .send()
+      .expect(200)
+      .end(function(e, res) {
+        expect(e).to.not.exist;
+        expect(res.body.active).to.be.true;
+
+        Subscription.findAndCountAll({where: {
+          UserId: user.id,
+          GroupId: group.id,
+          type: 'group.transaction.approved'
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(0);
+        }).done(done);
+      })
+  });
+
+  it('unsubscribes for the group.transaction.approved email notification', function(done) {
+    request(app)
+      .post('/groups/' + group.id + '/activities/' + subscriptionData.type + '/unsubscribe')
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .send()
+      .expect(200)
+      .end(function(e, res) {
+        expect(e).to.not.exist;
+
+        Subscription.findAndCountAll({where: {
+          UserId: user.id,
+          GroupId: group.id,
+          type: subscriptionData.type
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(0);
+        }).done(done);
+      })
+  });
+
+  it('fails to subscribe if already subscribed', function(done) {
+    request(app)
+      .post('/groups/' + group.id + '/activities/' + subscriptionData.type + '/subscribe')
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .send()
+      .expect(400)
+      .end(function(e, res) {
+        expect(e).to.not.exist;
+        expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
+        Subscription.findAndCountAll({where: {
+          UserId: user.id,
+          GroupId: group.id,
+          type: subscriptionData.type
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(1);
+        }).done(done);
+      })
+  });
+
+  it('fails to unsubscribe if not subscribed', function(done) {
+    request(app)
+      .post('/groups/' + group.id + '/activities/group.transaction.approved/unsubscribe')
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .send()
+      .expect(400)
+      .end(function(e, res) {
+        expect(e).to.not.exist;
+        expect(res.body.error.message).to.equal('You were not subscribed to this type of activity');
+        Subscription.findAndCountAll({where: {
+          UserId: user.id,
+          GroupId: group.id,
+          type: subscriptionData.type
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(1);
+        }).done(done);
+      })
+  });
+
   it('sends a new group.transaction.created email notification', function(done) {
 
     var templateData = {

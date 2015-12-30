@@ -16,6 +16,10 @@
   "email": {
     "from": "info@opencollective.com"
   },
+  "mailgun": {
+    "user": "",
+    "password": ""
+  },
   "paypal": {
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",

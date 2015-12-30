@@ -16,6 +16,7 @@ module.exports = function(app) {
   var params = Controllers.params;
   var groups = Controllers.groups;
   var activities = Controllers.activities;
+  var subscriptions = Controllers.subscriptions;
   var transactions = Controllers.transactions;
   var payments = Controllers.payments;
   var paypal = Controllers.paypal;
@@ -123,6 +124,14 @@ module.exports = function(app) {
    */
   app.get('/groups/:groupid/activities', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
   app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+
+  /**
+   * Subscriptions.
+   *
+   *  A user can subscribe by email to any type of activity of a Group.
+   */
+  app.post('/groups/:groupid/activities/:activityType/subscribe', mw.authorizeAuthUser, mw.authorizeGroup, subscriptions.subscribe); // Subscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/unsubscribe', mw.authorizeAuthUser, mw.authorizeGroup, subscriptions.unsubscribe); // Unsubscribe to a group's activities
 
   /**
    * Separate route for uploading images to S3

@@ -30,7 +30,8 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     indexes: [{
-      fields: ['type', 'GroupId']
+      fields: ['type', 'GroupId', 'UserId'],
+      type: 'unique'
     }]
 
   });
