@@ -144,7 +144,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('slug', slug(groupData.name));
+          expect(res.body).to.have.property('slug', slug(groupData.name, {lower: true}));
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(0);
@@ -175,7 +175,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('slug', slug(groupData.name));
+          expect(res.body).to.have.property('slug', slug(groupData.name, {lower: true}));
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(1);
