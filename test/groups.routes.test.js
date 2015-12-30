@@ -140,6 +140,11 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('description');
           expect(res.body).to.have.property('budget', groupData.budget);
           expect(res.body).to.have.property('currency', 'USD');
+          expect(res.body).to.have.property('longDescription');
+          expect(res.body).to.have.property('logo');
+          expect(res.body).to.have.property('video');
+          expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('expensePolicy');
           expect(res.body).to.have.property('membership_type');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
@@ -171,6 +176,11 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name');
           expect(res.body).to.have.property('description');
+          expect(res.body).to.have.property('longDescription');
+          expect(res.body).to.have.property('logo');
+          expect(res.body).to.have.property('video');
+          expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('expensePolicy');
           expect(res.body).to.have.property('membership_type');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
@@ -527,6 +537,12 @@ describe('groups.routes.test.js', function() {
       budget: 11111.99,
       membership_type: 'donation',
       membershipfee: 11,
+      longDescription: 'long description',
+      logo: 'http://opencollective.com/assets/icon.svg',
+      video: 'http://opencollective.com/assets/icon.svg',
+      image: 'http://opencollective.com/assets/icon.svg',
+      expensePolicy: 'expense policy',
+      isPublic: true,
       otherprop: 'value'
     };
 
@@ -638,6 +654,12 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('budget', groupNew.budget);
           expect(res.body).to.have.property('membership_type', groupNew.membership_type);
           expect(res.body).to.have.property('membershipfee', groupNew.membershipfee);
+          expect(res.body).to.have.property('longDescription', groupNew.longDescription);
+          expect(res.body).to.have.property('logo', groupNew.logo);
+          expect(res.body).to.have.property('video', groupNew.video);
+          expect(res.body).to.have.property('image', groupNew.image);
+          expect(res.body).to.have.property('expensePolicy', groupNew.expensePolicy);
+          expect(res.body).to.have.property('isPublic', groupNew.isPublic);
           expect(res.body).to.not.have.property('otherprop');
           expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
           expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());

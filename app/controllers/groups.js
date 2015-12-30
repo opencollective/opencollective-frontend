@@ -161,7 +161,18 @@ module.exports = function(app) {
      * Update.
      */
     update: function(req, res, next) {
-      ['name', 'description', 'budget', 'currency', 'membership_type', 'membershipfee'].forEach(function(prop) {
+      ['name',
+       'description',
+       'budget',
+       'currency',
+       'longDescription',
+       'logo',
+       'video',
+       'image',
+       'expensePolicy',
+       'membership_type',
+       'membershipfee',
+       'isPublic'].forEach(function(prop) {
         if (req.required.group[prop])
           req.group[prop] = req.required.group[prop];
       });

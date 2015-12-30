@@ -18,13 +18,23 @@ module.exports = function(Sequelize, DataTypes) {
         this.setDataValue('slug', slug(val, {lower: true}));
       }
     },
-    description: DataTypes.STRING,
+    description: DataTypes.STRING, // max 95 characters
 
     budget: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD'
     },
+
+    longDescription: DataTypes.STRING,
+
+    logo: DataTypes.STRING,
+
+    video: DataTypes.STRING,
+
+    image: DataTypes.STRING,
+
+    expensePolicy: DataTypes.STRING,
 
     membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
     membershipfee: DataTypes.FLOAT,
@@ -59,6 +69,11 @@ module.exports = function(Sequelize, DataTypes) {
           description: this.description,
           budget: this.budget,
           currency: this.currency,
+          longDescription: this.longDescription,
+          logo: this.logo,
+          video: this.video,
+          image: this.image,
+          expensePolicy: this.expensePolicy,
           membership_type: this.membership_type,
           membershipfee: this.membershipfee,
           createdAt: this.createdAt,
