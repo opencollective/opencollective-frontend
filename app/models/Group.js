@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+var slug = require('slug');
 var errors = require('../lib/errors');
 
 /**
@@ -11,7 +12,11 @@ module.exports = function(Sequelize, DataTypes) {
   var Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      set: function(val) {
+        this.setDataValue('name', val);
+        this.setDataValue('slug', slug(val, {lower: true}));
+      }
     },
     description: DataTypes.STRING,
 
@@ -36,6 +41,10 @@ module.exports = function(Sequelize, DataTypes) {
     isPublic: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+
+    slug: {
+      type: DataTypes.STRING
     }
 
   }, {
@@ -54,7 +63,8 @@ module.exports = function(Sequelize, DataTypes) {
           membershipfee: this.membershipfee,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
-          isPublic: this.isPublic
+          isPublic: this.isPublic,
+          slug: this.slug
         };
       }
     },

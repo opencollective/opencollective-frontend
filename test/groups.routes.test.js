@@ -10,6 +10,7 @@ var request = require('supertest');
 var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var sinon = require('sinon');
+var slug = require('slug');
 
 /**
  * Variables.
@@ -143,6 +144,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('slug', slug(groupData.name, {lower: true}));
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(0);
@@ -173,6 +175,7 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('slug', slug(groupData.name, {lower: true}));
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(1);
