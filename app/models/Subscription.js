@@ -1,6 +1,3 @@
-var User = require('./User');
-var Group = require('./Group');
-
 /*
  * Create a subscription to receive notifications for a certain type of events
  *
