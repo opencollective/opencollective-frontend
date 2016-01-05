@@ -98,11 +98,8 @@ models.forEach(function(model) {
 //   m.UserGroup.hook('afterCreate', function(userGroup) {
 //     // When a user is added to a group as an admin, we subscribe him
 //     // to receive the `group.transaction.created` notifications
-    
 //     console.log("userGroup: ", userGroup);
-    
 //     if (userGroup.role != 'admin') return;
-    
 //     return m.Subscription.create({
 //       UserId: userGroup.UserId,
 //       GroupId: userGroup.GroupId,

@@ -43,7 +43,7 @@ describe(require('path').basename(__filename), function() {
       })
       .done(done);
   });
-  
+
   it.only('automatically subscribe the admin user to the `group.transaction.created` notifications', function(done) {
     var verifyUserSuscribedToGroup = function(userGroup) {
       return Subscription
@@ -54,13 +54,12 @@ describe(require('path').basename(__filename), function() {
         }})
         .then(function(subscription) {
           expect(subscription).to.exist;
-        }) 
+        });
     };
-    
+
     group
       .addMember(user, {role: 'admin'})
-      //.then(verifyUserSuscribedToGroup)
+      .then(verifyUserSuscribedToGroup)
       .done(done);
   });
-  
 });

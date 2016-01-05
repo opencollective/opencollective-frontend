@@ -1,8 +1,7 @@
-
 module.exports = function(Sequelize, DataTypes) {
-  
+
   var Subscription = require('./Subscription')(Sequelize, DataTypes);
-  
+
   var UserGroup = Sequelize.define('UserGroup', {
     // Role.
     role: DataTypes.ENUM('admin', 'writer', 'viewer'),
@@ -32,7 +31,6 @@ module.exports = function(Sequelize, DataTypes) {
         };
       }
     }
-    
   });
 
   return UserGroup;
