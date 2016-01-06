@@ -100,7 +100,8 @@
         "status": "paid back on 4/17/15",
         "comment": "",
         "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo",
-        "createdAt": "2015-01-23T08:00:00.000Z"
+        "createdAt": "2015-01-23T08:00:00.000Z",
+        "paymentMethod": "paypal"
       },
       {
         "beneficiary": "@xdamman",
