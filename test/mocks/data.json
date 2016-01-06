@@ -54,7 +54,7 @@
     "name": "Scouts d'Arlon",
     "description": "Troupe Scoute Albert Schweitzer",
     "budget": 10000.00,
-    "membership_type": "yearlyfee",
+    "membershipType": "yearlyfee",
     "membershipfee": 10
   },
 
