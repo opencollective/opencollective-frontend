@@ -20,6 +20,7 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
+    paymentMethod: DataTypes.STRING,
     stripeSubscriptionId: DataTypes.STRING,
 
     approved: {
@@ -54,7 +55,8 @@ module.exports = function(Sequelize, DataTypes) {
           approvedAt: this.approvedAt,
           reimbursedAt: this.reimbursedAt,
           UserId: this.UserId,
-          GroupId: this.GroupId
+          GroupId: this.GroupId,
+          paymentMethod: this.paymentMethod
         };
       }
     }

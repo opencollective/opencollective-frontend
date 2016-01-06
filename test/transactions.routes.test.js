@@ -188,6 +188,7 @@ describe('transactions.routes.test.js', function() {
           expect(t).to.have.property('beneficiary', transactionsData[0].beneficiary);
           expect(t).to.have.property('GroupId', group.id);
           expect(t).to.have.property('UserId', null); // ...
+          expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);
 
           models.Activity.findAndCountAll({}).then(function(res) {
             expect(res.rows[0]).to.have.property('TransactionId', t.id);
