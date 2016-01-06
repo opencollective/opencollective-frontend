@@ -15,7 +15,6 @@ module.exports = function(Sequelize, DataTypes) {
       allowNull: false,
       set: function(val) {
         this.setDataValue('name', val);
-        this.setDataValue('slug', slug(val, {lower: true}));
       }
     },
     description: DataTypes.STRING, // max 95 characters
