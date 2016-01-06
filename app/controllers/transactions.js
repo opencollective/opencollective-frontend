@@ -379,6 +379,7 @@ module.exports = function(app) {
     var user = req.remoteUser;
     var group = req.group;
     var transaction = req.transaction;
+    var isManual = transaction.paymentMethod === 'manual';
 
     async.auto({
 
@@ -399,6 +400,10 @@ module.exports = function(app) {
       }],
 
       getCard: [function(cb, results) {
+        if (isManual) {
+          return cb(null, {});
+        }
+
         Card
           .findAndCountAll({
             where: {
@@ -412,7 +417,9 @@ module.exports = function(app) {
       }],
 
       checkCard: ['getCard', function(cb, results) {
-        if (results.getCard.count === 0) {
+        if (isManual) {
+          return cb(null, {});
+        } else if (results.getCard.count === 0) {
           return cb(new errors.BadRequest('This user has no confirmed card linked with this service.'));
         } else {
           return cb(null, results.getCard.rows[0]); // Use first card.
@@ -433,6 +440,10 @@ module.exports = function(app) {
       }],
 
       callService: ['checkTransaction', 'checkCard', 'getBeneficiary', function(cb, results) {
+        if (isManual) {
+          return cb(null, {});
+        }
+
         if (!payServices[service]) {
           return cb(new errors.NotImplemented('This service is not implemented yet for payment.'));
         }
@@ -451,9 +462,12 @@ module.exports = function(app) {
       }],
 
       updateTransaction: ['checkCard', 'callService', function(cb, results) {
+        if (!isManual) {
+          transaction.CardId = results.checkCard.id;
+        }
+
         transaction.status = 'REIMBURSED';
         transaction.reimbursedAt = new Date();
-        transaction.CardId = results.checkCard.id;
         transaction.save().done(cb);
       }],
 
@@ -476,7 +490,7 @@ module.exports = function(app) {
       if (err && results.callService) {
         console.error('PayPal error', JSON.stringify(results.callService));
         if (results.callService.error instanceof Array) {
-          const message = results.callService.error[0].message;
+          var message = results.callService.error[0].message;
           return next(new errors.BadRequest(message));
         }
       }
