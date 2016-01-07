@@ -63,8 +63,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .post('/groups')
         .send({
-          group: groupData,
-          stripeEmail: stripeEmail
+          group: groupData
         })
         .expect(401)
         .end(function(e, res) {
@@ -84,23 +83,6 @@ describe('groups.routes.test.js', function() {
         });
     });
 
-    it('fails creating a group without stripeEmail', function(done) {
-      request(app)
-        .post('/groups')
-        .send({
-          group: groupData
-        })
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(400)
-        .end(function(e, res) {
-          expect(e).to.not.exist;
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('error');
-          expect(res.body.error).to.have.property('message', 'Missing required fields');
-          done();
-        });
-    });
-
     it('fails creating a group without name', function(done) {
       var group = _.omit(groupData, 'name');
 
@@ -108,8 +90,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: group,
-          stripeEmail: stripeEmail
+          group: group
         })
         .expect(400)
         .end(function(e, res) {
@@ -128,8 +109,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
-          stripeEmail: stripeEmail
+          group: groupData
         })
         .expect(200)
         .end(function(e, res) {
@@ -165,8 +145,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: role,
-          stripeEmail: stripeEmail
+          role: role
         })
         .expect(200)
         .end(function(e, res) {
@@ -197,8 +176,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
-          stripeEmail: stripeEmail
+          group: _.extend({}, groupData, { stripeEmail: stripeEmail })
         })
         .expect(200)
         .end(function(e, res) {
@@ -256,8 +234,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin',
-          stripeEmail: stripeEmail
+          role: 'admin'
         })
         .expect(200)
         .end(function(e, res) {
@@ -287,8 +264,7 @@ describe('groups.routes.test.js', function() {
             name: 'group 2',
             isPublic: true
           },
-          role: 'admin',
-          stripeEmail: stripeEmail
+          role: 'admin'
         })
         .expect(200)
         .end(function(e, res) {
@@ -550,8 +526,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin',
-          stripeEmail: chance.email()
+          role: 'admin'
         })
         .expect(200)
         .end(function(e, res) {
