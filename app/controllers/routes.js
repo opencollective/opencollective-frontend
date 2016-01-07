@@ -86,8 +86,7 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', mw.authorizeAuthUser, mw.required('group', 'stripeEmail'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-
+  app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
   app.get('/groups/:groupid', groups.get); // skipped route for public
 
