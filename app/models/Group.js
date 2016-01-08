@@ -25,7 +25,7 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: 'USD'
     },
 
-    longDescription: DataTypes.STRING,
+    longDescription: DataTypes.TEXT('long'),
 
     logo: DataTypes.STRING,
 
