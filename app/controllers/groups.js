@@ -450,10 +450,22 @@ module.exports = function(app) {
      * Get group's transactions.
      */
     getTransactions: function(req, res, next) {
+      var where = {
+        GroupId: req.group.id
+      };
+
+      if (req.query.donation) {
+        where.amount = {
+          $gt: 0
+        };
+      } else if (req.query.expense) {
+        where.amount = {
+          $lt: 0
+        };
+      }
+
       var query = _.merge({
-        where: {
-          GroupId: req.group.id
-        },
+        where: where,
         order: [[req.sorting.key, req.sorting.dir]]
       }, req.pagination);
 
