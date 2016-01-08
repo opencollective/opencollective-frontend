@@ -37,7 +37,7 @@ describe('user.models.test.js', function() {
 
     it('fails without email', function(done) {
       User
-        .create({ first_name: userData.first_name, last_name: userData.last_name})
+        .create({ name: userData.name})
         .done(function(err, user) {
           expect(err).to.exist;
           done();
@@ -47,7 +47,7 @@ describe('user.models.test.js', function() {
 
     it('fails if invalid email', function(done) {
       User
-        .create({ first_name: userData.first_name, last_name: userData.last_name, email: 'johndoe'})
+        .create({ name: userData.name, email: 'johndoe'})
         .done(function(err, user) {
           expect(err).to.exist;
           done();
@@ -58,11 +58,10 @@ describe('user.models.test.js', function() {
     it('successfully creates a user', function(done) {
       var email = 'john.doe@doe.com';
       User
-        .create({ first_name: userData.first_name, last_name: userData.last_name, email: userData.email})
+        .create({ name: userData.name, email: userData.email})
         .done(function(err, user) {
           expect(err).to.not.exist;
-          expect(user).to.have.property('first_name', userData.first_name);
-          expect(user).to.have.property('last_name', userData.last_name);
+          expect(user).to.have.property('name', userData.name);
           expect(user).to.have.property('email', userData.email);
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('updatedAt');

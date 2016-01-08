@@ -40,7 +40,7 @@ models.forEach(function(model) {
 (function(m) {
   // Card.
   m.Card.belongsTo(m.User);
-  m.Card.belongsTo(m.Group);
+  m.Card.belongsTo(m.Group); // Not currently used
 
   // Group.
   m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
@@ -72,7 +72,7 @@ models.forEach(function(model) {
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 
   // Stripe Managed Account.
-  m.StripeManagedAccount.hasMany(m.Group);
+  m.StripeManagedAccount.hasMany(m.Group); // currently only using 1 stripemanagedaccount per group
   m.Group.belongsTo(m.StripeManagedAccount);
 
   // Paypal Pay key.

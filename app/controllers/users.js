@@ -93,6 +93,31 @@ module.exports = function(app) {
     .catch(next);
   };
 
+  /**
+   * Update.
+   */
+  var update = function(req, res, next) {
+    ['name',
+     'username',
+     'avatar',
+     'email',
+     'twitterHandle',
+     'website',
+     'paypalEmail'
+     ].forEach(function(prop) {
+      if (req.required.user[prop])
+        req.user[prop] = req.required.user[prop];
+    });
+    req.user.updatedAt = new Date();
+
+    req.user
+      .save()
+      .then(function(user) {
+        res.send(user.info);
+      })
+      .catch(next);
+  }
+
   var getBalancePromise = function(GroupId) {
     return new Bluebird(function(resolve, reject) {
       groups.getBalance(GroupId, function(err, balance) {
@@ -183,7 +208,8 @@ module.exports = function(app) {
     },
 
     updatePaypalEmail: updatePaypalEmail,
-    updateAvatar: updateAvatar
+    updateAvatar: updateAvatar,
+    update: update
   };
 
 };
