@@ -85,11 +85,11 @@ For localhost or other environments, the migrations has to be run manually.
 
 ### Apply migrations locally
 
-`SEQUELIZE_ENV=development npm run db:migrate`
+`npm run db:migrate:dev`
 
 ### Apply migrations on Heroku
 
-The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`.
+The migration script uses `NODE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`.
 
 1) Push application with migration scripts to Heroku
 

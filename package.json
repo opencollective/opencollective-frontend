@@ -55,12 +55,13 @@
     "start": "npm run hint && node .",
     "hint": "jscs app/**/*.js test/*.js --config=.jscsrc",
     "circleci": "npm run hint && make circleci",
-    "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
-    "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
+    "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $NODE_ENV",
+    "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
+    "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $NODE_ENV",
     "db:copyprod": "./scripts/db_copyprod.sh",
     "db:reset": "NODE_ENV=development node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "npm rebuild"
   },
-  "license": "Copyright (c) 2015 OpenCollective, Inc."
+  "license": "Copyright (c) 2016 OpenCollective, Inc."
 }
