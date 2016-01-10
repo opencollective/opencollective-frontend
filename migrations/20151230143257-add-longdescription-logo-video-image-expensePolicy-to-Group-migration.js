@@ -6,22 +6,22 @@ module.exports = {
       type: DataTypes.STRING
     })
     .then(function() {
-      queryInterface.addColumn('Groups', 'logo', {
+      return queryInterface.addColumn('Groups', 'logo', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Groups', 'video', {
+      return queryInterface.addColumn('Groups', 'video', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Groups', 'image', {
+      return queryInterface.addColumn('Groups', 'image', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Groups', 'expensePolicy', {
+      return queryInterface.addColumn('Groups', 'expensePolicy', {
         type: DataTypes.STRING
       })
     });

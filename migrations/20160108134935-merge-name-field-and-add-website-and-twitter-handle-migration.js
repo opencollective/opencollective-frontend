@@ -6,22 +6,22 @@ module.exports = {
       type: DataTypes.STRING
     })
     .then(function() {
-      queryInterface.addColumn('Users', 'website', {
+      return queryInterface.addColumn('Users', 'website', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Users', 'twitterHandle', {
+      return queryInterface.addColumn('Users', 'twitterHandle', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.removeColumn('Users', 'first_name', {
+      return queryInterface.removeColumn('Users', 'first_name', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.removeColumn('Users', 'last_name', {
+      return queryInterface.removeColumn('Users', 'last_name', {
         type: DataTypes.STRING
       })
     });
@@ -32,22 +32,22 @@ module.exports = {
       type: DataTypes.STRING
     })
     .then(function() {
-      queryInterface.removeColumn('Users', 'website', {
+      return queryInterface.removeColumn('Users', 'website', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.removeColumn('Users', 'twitterHandle', {
+      return queryInterface.removeColumn('Users', 'twitterHandle', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Users', 'first_name', {
+      return queryInterface.addColumn('Users', 'first_name', {
         type: DataTypes.STRING
       })
     })
     .then(function() {
-      queryInterface.addColumn('Users', 'last_name', {
+      return queryInterface.addColumn('Users', 'last_name', {
         type: DataTypes.STRING
       })
     })
