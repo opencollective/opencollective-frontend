@@ -199,7 +199,7 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
-    it.only('successfully create a transaction with a user', function(done) {
+    it('successfully create a transaction with a user', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions')
         .set('Authorization', 'Bearer ' + user.jwt(application))
