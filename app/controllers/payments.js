@@ -5,6 +5,7 @@ var utils = require('../lib/utils');
 var _ = require('lodash');
 var async = require('async');
 var Stripe = require('stripe');
+var users = require('../controllers/users');
 
 var OC_FEE_PERCENT = 5;
 
@@ -179,6 +180,15 @@ module.exports = function(app) {
                 customer: card.serviceId
               }, cb);
           }
+        }],
+
+        /*
+         *  Creates a user in our system to associate with this transaction
+         */
+
+        createUser: ['createCharge', function(cb, results) {
+          user = {email: req.payment.email}
+          users._create(user, cb);
         }],
 
         createTransaction: ['createCard', 'createCharge', function(cb, results) {

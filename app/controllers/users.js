@@ -138,20 +138,27 @@ module.exports = function(app) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
 
+      this._create(user, function(err, user) {
+        if (err) return next(err);
+        res.send(user.info);
+      });
+    },
+
+    _create: function(user, cb){
       User
         .create(user)
         .then(function(user) {
-          res.send(user.info);
-
           Activity.create({
             type: 'user.created',
             UserId: user.id,
             data: {user: user.info}
+          }, function(err) {
+            if (err) return cb(err);
+            cb(null, user);
           });
         })
-        .catch(next);
+        .catch(cb);
     },
-
     /**
      * Get token.
      */
