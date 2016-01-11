@@ -52,6 +52,11 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
+    isHost: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
     slug: {
       type: DataTypes.STRING
     }
@@ -78,6 +83,7 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
+          isHost: this.isHost,
           slug: this.slug
         };
       }
