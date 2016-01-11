@@ -4,6 +4,7 @@ module.exports = function(Sequelize, DataTypes) {
     type: DataTypes.STRING,
     description: DataTypes.STRING,
     amount: DataTypes.FLOAT,
+    vat: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -43,6 +44,7 @@ module.exports = function(Sequelize, DataTypes) {
           type: this.type,
           description: this.description,
           amount: this.amount,
+          vat: this.vat,
           currency: this.currency,
           beneficiary: this.beneficiary,
           paidby: this.paidby,
