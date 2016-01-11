@@ -18,33 +18,30 @@
   },
 
   "user1": {
-    "first_name": "Phil",
-    "last_name": "Mod",
+    "name": "Phil Mod",
     "username": "philmod",
     "email": "philmod@email.com",
     "paypalEmail": "philmod+paypal@email.com",
-    "password": "passpass"
+    "password": "passpass",
+    "twitterHandle": "blahblah"
   },
 
   "user2": {
-    "first_name": "Anish",
-    "last_name": "Bas",
+    "name": "Anish Bas",
     "username": "abas",
     "email": "abas@email.com",
     "password": "ssapssap"
   },
 
   "user3": {
-    "first_name": "Xavier",
-    "last_name": "Dam",
+    "name": "Xavier Damman",
     "username": "xdam",
     "email": "xdam@email.com",
     "password": "passssap"
   },
 
   "user4": {
-    "first_name": "Bo",
-    "last_name": "Ki",
+    "name": "Bo Ki",
     "username": "boki",
     "email": "boki@email.com",
     "password": "passssas"

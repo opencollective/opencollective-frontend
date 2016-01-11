@@ -23,8 +23,7 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: 0
     },
 
-    first_name: DataTypes.STRING,
-    last_name: DataTypes.STRING,
+    name: DataTypes.STRING,
 
     username: {
       type: DataTypes.STRING,
@@ -47,6 +46,18 @@ module.exports = function(Sequelize, DataTypes) {
         }
       }
     },
+
+    twitterHandle: {
+      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
+      validate: {
+        notContains: {
+          args: '@',
+          msg: 'twitterHandle must be without @ symbol'
+        }
+      }
+    },
+
+    website: DataTypes.STRING,
 
     paypalEmail: {
       type: DataTypes.STRING,
@@ -99,25 +110,17 @@ module.exports = function(Sequelize, DataTypes) {
     paranoid: true,
 
     getterMethods: {
-      // Full name.
-      fullName: function() {
-        if (this.first_name && this.last_name) {
-          return this.first_name + ' ' + this.last_name;
-        }
-
-        return '';
-      },
 
       // Info (private).
       info: function() {
         return {
           id: this.id,
-          first_name: this.first_name,
-          last_name: this.last_name,
-          name: this.fullName,
+          name: this.name,
           username: this.username,
           email: this.email,
           avatar: this.avatar,
+          twitterHandle: this.twitterHandle,
+          website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           paypalEmail: this.paypalEmail
@@ -128,11 +131,11 @@ module.exports = function(Sequelize, DataTypes) {
       show: function() {
         return {
           id: this.id,
-          first_name: this.first_name,
-          last_name: this.last_name,
-          name: this.fullName,
+          name: this.name,
           username: this.username,
           avatar: this.avatar,
+          twitterHandle: this.twitterHandle,
+          website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
@@ -144,9 +147,8 @@ module.exports = function(Sequelize, DataTypes) {
           id: this.id,
           username: this.username,
           avatar: this.avatar,
-          name: this.fullName,
-          email: this.email,
-          paypalEmail: this.paypalEmail
+          name: this.name,
+          email: this.email
         };
       },
 
@@ -155,7 +157,7 @@ module.exports = function(Sequelize, DataTypes) {
         return {
           id: this.id,
           avatar: this.avatar,
-          name: this.fullName
+          name: this.name
         };
       }
     },
