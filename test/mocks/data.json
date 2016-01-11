@@ -22,7 +22,8 @@
     "username": "philmod",
     "email": "philmod@email.com",
     "paypalEmail": "philmod+paypal@email.com",
-    "password": "passpass"
+    "password": "passpass",
+    "twitterHandle": "blahblah"
   },
 
   "user2": {

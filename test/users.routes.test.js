@@ -106,6 +106,17 @@ describe('users.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails if @ symbol in twitterHandle', function(done) {
+      request(app)
+        .post('/users')
+        .send({
+          api_key: application.api_key,
+          user: _.extend({}, userData, {twitterHandle: '@asood123'})
+        })
+        .expect(400)
+        .end(done);
+    });
+
     it('successfully create a user', function(done) {
       request(app)
         .post('/users')

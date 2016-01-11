@@ -47,7 +47,15 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    twitterHandle: DataTypes.STRING,
+    twitterHandle: {
+      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
+      validate: {
+        notContains: {
+          args: '@',
+          msg: 'twitterHandle must be without @ symbol'
+        }
+      }
+    },
 
     website: DataTypes.STRING,
 
