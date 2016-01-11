@@ -68,6 +68,32 @@ module.exports = function(app) {
       .catch(cb);
   };
 
+  var getPublicPageInfo = function(id, cb) {
+    Transaction
+      .find({
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('amount')), 'donationTotal'],
+          [sequelize.fn('COUNT', sequelize.col('UserId')), 'backersCount']
+        ],
+        where: {
+          GroupId: id,
+          approved: true,
+          amount: {
+            $gt: 0
+          }
+        }
+      })
+      .then(function(result) {
+        var json = result.toJSON();
+
+        cb(null, {
+          donationTotal: Number(json.donationTotal),
+          backersCount: Number(json.backersCount)
+        });
+      })
+      .catch(cb);
+  };
+
   var getUsers = function(req, res, next) {
 
     /**
@@ -212,6 +238,7 @@ module.exports = function(app) {
       async.auto({
 
         getBalance: getBalance.bind(this, req.group.id),
+        getPublicPageInfo: getPublicPageInfo.bind(this, req.group.id),
 
         getActivities: function(cb) {
           if (!req.query.activities && !req.body.activities)
@@ -245,6 +272,8 @@ module.exports = function(app) {
 
         var group = req.group.info;
         group.balance = results.getBalance;
+        group.backersCount = results.getPublicPageInfo.backersCount;
+        group.donationTotal = results.getPublicPageInfo.donationTotal;
 
         if (results.getActivities) {
           group.activities = results.getActivities;
@@ -439,10 +468,22 @@ module.exports = function(app) {
      * Get group's transactions.
      */
     getTransactions: function(req, res, next) {
+      var where = {
+        GroupId: req.group.id
+      };
+
+      if (req.query.donation) {
+        where.amount = {
+          $gt: 0
+        };
+      } else if (req.query.expense) {
+        where.amount = {
+          $lt: 0
+        };
+      }
+
       var query = _.merge({
-        where: {
-          GroupId: req.group.id
-        },
+        where: where,
         order: [[req.sorting.key, req.sorting.dir]]
       }, req.pagination);
 
