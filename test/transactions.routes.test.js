@@ -220,6 +220,7 @@ describe('transactions.routes.test.js', function() {
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
+          expect(res.body).to.have.property('vat', transactionsData[0].vat);
           expect(res.body).to.have.property('GroupId', group.id);
           expect(res.body).to.have.property('UserId', user.id); // ...
 
