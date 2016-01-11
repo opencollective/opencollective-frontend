@@ -93,6 +93,24 @@ module.exports = function(app) {
     .catch(next);
   };
 
+  var updateTransaction = function(req, res, next) {
+
+    ['paymentMethod', 'tags'].forEach(function(prop) {
+      if (req.required.transaction[prop]) {
+        req.transaction[prop] = req.required.transaction[prop];
+      }
+    });
+
+    req.transaction.updatedAt = new Date();
+
+    req.transaction
+      .save()
+      .then(function(transaction) {
+        res.send(transaction.info);
+      })
+      .catch(next);
+  };
+
   /**
    * Public methods.
    */
@@ -460,7 +478,12 @@ module.exports = function(app) {
     /**
      * Get users of a group
      */
-    getUsers: getUsers
+    getUsers: getUsers,
+
+    /**
+     * Update transaction
+     */
+    updateTransaction: updateTransaction
   };
 
 };

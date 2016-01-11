@@ -20,7 +20,17 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
-    paymentMethod: DataTypes.STRING,
+    paymentMethod: {
+      type: DataTypes.STRING,
+      defaultValue: 'paypal',
+      validate: {
+        isIn: {
+          args: [['paypal', 'manual']],
+          msg: 'Must be paypal or manual'
+        }
+      }
+    },
+
     stripeSubscriptionId: DataTypes.STRING,
 
     approved: {
