@@ -172,6 +172,17 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails creating a transaction with wrong paymentMethod', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: _.extend({}, transactionsData[0], {paymentMethod:'lalala'})
+        })
+        .expect(400)
+        .end(done);
+    });
+
     it('successfully create a transaction with an application', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions')
@@ -209,6 +220,7 @@ describe('transactions.routes.test.js', function() {
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
+          expect(res.body).to.have.property('vat', transactionsData[0].vat);
           expect(res.body).to.have.property('GroupId', group.id);
           expect(res.body).to.have.property('UserId', user.id); // ...
 
@@ -220,6 +232,88 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+  });
+
+  /**
+   * Update
+   */
+  describe('#update', function() {
+    var toUpdate;
+
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions')
+        .send({
+          api_key: application2.api_key,
+          transaction: transactionsData[0]
+        })
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.not.exist;
+          toUpdate = res.body;
+          done();
+        });
+    });
+
+    it('fails updating a non-existing transaction', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + 987123)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('fails updating a transaction which does not belong to the group', function(done) {
+      request(app)
+        .put('/groups/' + group2.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a transaction if user has no access to the group', function(done) {
+      request(app)
+      .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a transaction if transaction is not included', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({})
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'missing_required',
+            message: 'Missing required fields',
+            fields: { transaction: 'Required field transaction missing' }
+          }
+        })
+        .end(done);
+    });
+
+    it('successfully updates a transaction', function(done) {
+      var paymentMethod = 'manual';
+
+      expect(toUpdate.paymentMethod).to.not.be.equal(paymentMethod);
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: {
+            paymentMethod: paymentMethod
+          }
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('paymentMethod', paymentMethod);
+          done();
+        });
+    });
   });
 
   /**

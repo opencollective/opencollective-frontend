@@ -33,7 +33,7 @@ describe('transactions.paypal.routes.test.js', function() {
   var transaction2;
   var transactionApproved;
   var transactionPositive;
-
+  var transactionManual;
   var stub;
 
   beforeEach(function() {
@@ -115,6 +115,15 @@ describe('transactions.paypal.routes.test.js', function() {
         t.amount = 10;
         models.Transaction.create(t).done(cb);
       }],
+      createTransactionManual: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+        var t = utils.data('transactions1').transactions[2];
+        t.GroupId = results.createGroupA.id;
+        t.approvedAt = Date.now();
+        t.approved = true;
+        t.UserId = results.createUserB.id;
+        t.paymentMethod = 'manual';
+        models.Transaction.create(t).done(cb);
+      }],
       createCardUserB: ['cleanAndCreateApplication', 'createUserB', function(cb, results) {
         models.Card.create({
           service: 'paypal',
@@ -134,6 +143,7 @@ describe('transactions.paypal.routes.test.js', function() {
       transaction2 = results.createTransactionB;
       transactionApproved = results.createTransactionC;
       transactionPositive = results.createTransactionD;
+      transactionManual = results.createTransactionManual;
       done();
     });
   });
@@ -395,6 +405,23 @@ describe('transactions.paypal.routes.test.js', function() {
           var transaction = res.body;
           expect(transaction.status).to.equal('REIMBURSED');
           expect(transaction.amount).to.equal(transactionApproved.amount);
+          done();
+        });
+    });
+
+    it('should pay a transaction manually', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions/' + transactionManual.id + '/pay/')
+        .field('service', 'paypal')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(200)
+        .end(function(err, res) {
+          var transaction = res.body;
+          expect(transaction.status).to.equal('REIMBURSED');
+          expect(transaction.amount).to.equal(transactionManual.amount);
+          expect(transaction.paymentMethod).to.equal(transactionManual.paymentMethod);
+          expect(transaction.reimbursedAt).to.be.ok;
+          expect(transaction.CardId).to.equal(null);
           done();
         });
     });

@@ -4,6 +4,7 @@ module.exports = function(Sequelize, DataTypes) {
     type: DataTypes.STRING,
     description: DataTypes.STRING,
     amount: DataTypes.FLOAT,
+    vat: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -20,7 +21,17 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
-    paymentMethod: DataTypes.STRING,
+    paymentMethod: {
+      type: DataTypes.STRING,
+      defaultValue: 'paypal',
+      validate: {
+        isIn: {
+          args: [['paypal', 'manual']],
+          msg: 'Must be paypal or manual'
+        }
+      }
+    },
+
     stripeSubscriptionId: DataTypes.STRING,
 
     approved: {
@@ -43,6 +54,7 @@ module.exports = function(Sequelize, DataTypes) {
           type: this.type,
           description: this.description,
           amount: this.amount,
+          vat: this.vat,
           currency: this.currency,
           beneficiary: this.beneficiary,
           paidby: this.paidby,
