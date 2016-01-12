@@ -52,11 +52,6 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
-    isHost: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
     slug: {
       type: DataTypes.STRING
     }

@@ -139,6 +139,22 @@ module.exports = function(app) {
       .catch(next);
   };
 
+  var getStripeAccount = function(GroupId, cb) {
+    User.find({
+      through: {
+        where: {
+          role: 'admin',
+          GroupId: GroupId
+        }
+      },
+      include: [models.StripeAccount]
+    })
+    .done(function(err, user) {
+      if (err) return cb(err);
+      cb(null, user.StripeAccount);
+    });
+  };
+
   /**
    * Public methods.
    */
@@ -247,10 +263,7 @@ module.exports = function(app) {
             .catch(cb);
         },
 
-        getStripeAccount: function(cb) {
-          req.group.getStripeAccount()
-            .done(cb);
-        }
+        getStripeAccount: getStripeAccount.bind(this, req.group.id)
 
       }, function(e, results) {
         if (e) return next(e);
@@ -266,7 +279,7 @@ module.exports = function(app) {
 
         if (results.getStripeAccount) {
           group.stripeAccount = _.pick(results.getStripeAccount,
-                                              'stripeKey');
+                                              'stripePublishableKey');
         }
 
         res.send(group);
@@ -509,7 +522,12 @@ module.exports = function(app) {
     /**
      * Update transaction
      */
-    updateTransaction: updateTransaction
+    updateTransaction: updateTransaction,
+
+    /**
+     * Get stripe account based on the user admin
+     */
+    getStripeAccount: getStripeAccount
   };
 
 };

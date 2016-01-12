@@ -94,8 +94,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin',
-        stripeEmail: stripeEmail
+        role: 'admin'
       })
       .expect(200)
       .end(function(e, res) {
@@ -122,7 +121,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group2'),
-        stripeEmail: stripeEmail
+        role: 'admin'
       })
       .expect(200)
       .end(function(e, res) {
@@ -139,6 +138,20 @@ describe('payments.routes.test.js', function() {
 
   beforeEach(function() {
     app.stripe.accounts.create.restore();
+  });
+
+  beforeEach(function(done) {
+    models.StripeAccount.create({
+      accessToken: 'abc'
+    })
+    .then(function(account) {
+      return user.setStripeAccount(account);
+    })
+    .then(function() {
+      done();
+    })
+    .catch(done);
+
   });
 
   // Create an application which has only access to `group`

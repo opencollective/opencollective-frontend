@@ -72,8 +72,7 @@ models.forEach(function(model) {
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 
   // Stripe Account.
-  m.StripeAccount.hasOne(m.Group); // currently only using 1 StripeAccount per group
-  m.Group.belongsTo(m.StripeAccount);
+  m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
 
   // Paypal Pay key.
   m.Paykey.belongsTo(m.Transaction);

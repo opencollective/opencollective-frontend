@@ -20,6 +20,9 @@ module.exports = function(app) {
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
   var users = require('../controllers/users')(app);
+  var groups = require('../controllers/groups')(app);
+
+  var getStripeAccount = groups.getStripeAccount;
 
   var getOrCreatePlan = function(params, cb) {
     var stripe = params.stripe;
@@ -71,19 +74,20 @@ module.exports = function(app) {
         return next(new errors.BadRequest('Payment Amount missing.'));
       }
 
-      // How to deal with recurrent charge?
-      //   - By ourselves?
-      //   - With Stripe subscription? https://stripe.com/docs/subscriptions
-      //     In this case, we need to implement: 1. plans for each Managed Account, 2. Webhood to create transactions
-
       async.auto({
 
         getGroupStripeAccount: function(cb) {
-          req.group.getStripeAccount()
-            .then(function(stripeAccount) {
-              return cb(null, Stripe(stripeAccount.stripeSecret));
-            })
-            .catch(cb);
+
+          // Find the stripe account of the group admin
+          getStripeAccount(req.group.id, function(err, stripeAccount) {
+            if (err) {
+              return cb(err);
+            } else if (!stripeAccount || !stripeAccount.accessToken) {
+              return cb(new errors.BadRequest('Group Stripe account is not setup'));
+            }
+
+            cb(null, Stripe(stripeAccount.accessToken));
+          })
         },
 
         getExistingCard: ['getGroupStripeAccount', function(cb, results) {
@@ -103,8 +107,9 @@ module.exports = function(app) {
         createCustomer: ['getGroupStripeAccount', 'getExistingCard', function(cb, results) {
           var stripe = results.getGroupStripeAccount;
 
-          if (results.getExistingCard)
+          if (results.getExistingCard) {
             return cb(null, results.getExistingCard);
+          }
 
           stripe.customers
             .create({
@@ -115,8 +120,9 @@ module.exports = function(app) {
         }],
 
         createCard: ['createCustomer', 'getExistingCard', function(cb, results) {
-          if (results.getExistingCard)
+          if (results.getExistingCard) {
             return cb(null, results.getExistingCard);
+          }
 
           models.Card
             .create({
