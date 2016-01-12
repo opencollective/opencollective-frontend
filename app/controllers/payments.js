@@ -184,7 +184,7 @@ module.exports = function(app) {
         createTransaction: ['createCard', 'createCharge', function(cb, results) {
           var charge = results.createCharge;
 
-          var description = ['Donation from', user && user.email, 'to', group && group.name].join(' ');
+          var description = ['Donation to', group && group.name].join(' ');
           var transaction = {
             type: 'payment',
             amount: payment.amount,
