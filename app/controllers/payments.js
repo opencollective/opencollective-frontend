@@ -79,7 +79,7 @@ module.exports = function(app) {
       async.auto({
 
         getGroupStripeAccount: function(cb) {
-          req.group.getStripeManagedAccount()
+          req.group.getStripeAccount()
             .then(function(stripeAccount) {
               return cb(null, Stripe(stripeAccount.stripeSecret));
             })

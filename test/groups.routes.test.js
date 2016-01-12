@@ -189,7 +189,7 @@ describe('groups.routes.test.js', function() {
           models.Group
             .find(parseInt(res.body.id))
             .then(function(group) {
-              group.getStripeManagedAccount()
+              group.getStripeAccount()
                 .then(function(account) {
                   expect(account).to.have.property('stripeId', stripeMock.accounts.create.id);
                   expect(account).to.have.property('stripeSecret', stripeMock.accounts.create.keys.secret);
@@ -343,8 +343,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', group.id);
           expect(res.body).to.have.property('name', group.name);
           expect(res.body).to.have.property('description', group.description);
-          expect(res.body).to.have.property('stripeManagedAccount');
-          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.stripeAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
@@ -358,8 +358,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', publicGroup.id);
           expect(res.body).to.have.property('name', publicGroup.name);
           expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
-          expect(res.body).to.have.property('stripeManagedAccount');
-          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.stripeAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });

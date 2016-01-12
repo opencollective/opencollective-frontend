@@ -15,7 +15,8 @@
   },
   "stripe": {
     "secret": "STRIPE_SECRET",
-    "key": "STRIPE_KEY"
+    "key": "STRIPE_KEY",
+    "clientId": "STRIPE_CLIENT_ID"
   },
   "aws": {
     "s3": {

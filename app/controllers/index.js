@@ -14,6 +14,7 @@ module.exports = function(app) {
     'params',
     'payments',
     'paypal',
+    'stripe',
     'transactions',
     'users',
     'webhooks'

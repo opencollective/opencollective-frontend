@@ -16,7 +16,7 @@ module.exports = function(app) {
   var User = models.User;
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
-  var StripeManagedAccount = models.StripeManagedAccount;
+  var StripeAccount = models.StripeAccount;
   var groups = require('../controllers/groups')(app);
 
   /**
@@ -38,11 +38,11 @@ module.exports = function(app) {
     return req.user
       .getGroups(options)
       .map(function(group) { // sequelize uses bluebird
-        var account = group.StripeManagedAccount;
+        var account = group.StripeAccount;
 
         return _.extend(group.info, {
           activities: group.Activities,
-          stripeManagedAccount: account ? account.info : undefined
+          stripeAccount: account ? account.info : undefined
         });
       });
   };
@@ -197,7 +197,7 @@ module.exports = function(app) {
       }
 
       if (_.contains(include, 'stripemanagedaccount')) {
-        options.include.push({ model: StripeManagedAccount });
+        options.include.push({ model: StripeAccount });
       }
 
       var promise = withRoles ?

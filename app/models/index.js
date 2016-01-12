@@ -25,7 +25,7 @@ var models = [
   'Card',
   'Group',
   'Paykey',
-  'StripeManagedAccount',
+  'StripeAccount',
   'Transaction',
   'User',
   'UserGroup'
@@ -71,9 +71,9 @@ models.forEach(function(model) {
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 
-  // Stripe Managed Account.
-  m.StripeManagedAccount.hasMany(m.Group); // currently only using 1 stripemanagedaccount per group
-  m.Group.belongsTo(m.StripeManagedAccount);
+  // Stripe Account.
+  m.StripeAccount.hasOne(m.Group); // currently only using 1 StripeAccount per group
+  m.Group.belongsTo(m.StripeAccount);
 
   // Paypal Pay key.
   m.Paykey.belongsTo(m.Transaction);

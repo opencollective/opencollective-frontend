@@ -12,5 +12,8 @@
   },
   "host": {
     "api": "https://opencollective-prod.herokuapp.com"
+  },
+  "stripe": {
+    "redirectUri": "https://opencollective-prod-api.herokuapp.com/stripe/oauth/callback"
   }
 }
