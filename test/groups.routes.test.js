@@ -486,7 +486,9 @@ describe('groups.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
-            expect(JSON.stringify(res.body[0])).to.equal(JSON.stringify(user.public));
+            var userData = res.body[0];
+            expect(userData.name).to.equal(user.public.name);
+            expect(userData.role).to.equal('admin');
             done();
           });
       });
