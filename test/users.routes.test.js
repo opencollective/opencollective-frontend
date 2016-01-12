@@ -388,7 +388,6 @@ describe('users.routes.test.js', function() {
         })
         .expect(200)
         .end(function(e, res) {
-          console.log(res.body);
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', user.id);
           expect(res.body).to.have.property('name', newUser.name);

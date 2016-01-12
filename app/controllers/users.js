@@ -126,6 +126,22 @@ module.exports = function(app) {
     });
   };
 
+  var _create = function(user, cb) {
+    User
+      .create(user)
+      .tap(function(dbUser) {
+        Activity.create({
+          type: 'user.created',
+          UserId: dbUser.id,
+          data: {user: dbUser.info}
+        });
+      })
+      .then(function(dbUser) {
+        cb(null, dbUser);
+      })
+      .catch(cb);
+  };
+
   /**
    * Public methods.
    */
@@ -137,28 +153,14 @@ module.exports = function(app) {
     create: function(req, res, next) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
-
-      this._create(user, function(err, user) {
+      _create(user, function(err, user) {
         if (err) return next(err);
         res.send(user.info);
       });
     },
 
-    _create: function(user, cb){
-      User
-        .create(user)
-        .then(function(user) {
-          Activity.create({
-            type: 'user.created',
-            UserId: user.id,
-            data: {user: user.info}
-          }, function(err) {
-            if (err) return cb(err);
-            cb(null, user);
-          });
-        })
-        .catch(cb);
-    },
+    _create: _create,
+
     /**
      * Get token.
      */

@@ -20,6 +20,7 @@ var STRIPE_URL = 'https://api.stripe.com:443';
 var CHARGE = 10.99;
 var CURRENCY = 'USD';
 var STRIPE_TOKEN = 'superStripeToken';
+var EMAIL = 'paypal@email.com';
 var userData = utils.data('user1');
 var groupData = utils.data('group1');
 var transactionsData = utils.data('transactions1').transactions;
@@ -164,7 +165,8 @@ describe('payments.routes.test.js', function() {
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
-              currency: CURRENCY
+              currency: CURRENCY,
+              email: user.email
             }
           })
           .expect(200)
@@ -229,7 +231,8 @@ describe('payments.routes.test.js', function() {
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
-              currency: CURRENCY
+              currency: CURRENCY,
+              email: user.email
             }
           })
           .expect(200)
@@ -258,7 +261,8 @@ describe('payments.routes.test.js', function() {
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE2,
-              currency: CURRENCY
+              currency: CURRENCY,
+              email: user.email
             }
           })
           .expect(200)
@@ -306,7 +310,8 @@ describe('payments.routes.test.js', function() {
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
-              currency: CURRENCY
+              currency: CURRENCY,
+              email: EMAIL
             }
           })
           .expect(200)
@@ -338,7 +343,8 @@ describe('payments.routes.test.js', function() {
         tags: ['tag1', 'tag2'],
         status: 'super status',
         link: 'www.opencollective.com',
-        comment: 'super comment'
+        comment: 'super comment',
+        email: EMAIL
       };
 
       beforeEach('successfully makes a anonymous payment', function(done) {
@@ -375,13 +381,28 @@ describe('payments.routes.test.js', function() {
         expect(nocks['charges.create'].isDone()).to.be.true;
       });
 
+      it('successfully creates a user', function(done) {
+
+        models.User.findAndCountAll({
+          where: {
+              email: EMAIL
+            }
+        })
+        .then(function(res) {
+          expect(res.count).to.equal(1);
+          expect(res.rows[0]).to.have.property('email', EMAIL);
+          done();
+        })
+        .catch(done)
+      })
+
       it('successfully creates a transaction in the database', function(done) {
         models.Transaction
           .findAndCountAll({})
           .then(function(res) {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('UserId', null);
+            expect(res.rows[0]).to.have.property('UserId', 2);
             expect(res.rows[0]).to.have.property('CardId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
@@ -410,7 +431,8 @@ describe('payments.routes.test.js', function() {
         tags: ['tag1', 'tag2'],
         status: 'super status',
         link: 'www.opencollective.com',
-        comment: 'super comment'
+        comment: 'super comment',
+        email: EMAIL
       };
 
       var customerId = stripeMock.customers.create.id;
@@ -504,7 +526,7 @@ describe('payments.routes.test.js', function() {
               expect(res.rows[0]).to.have.property('GroupId', group2.id);
               expect(res.rows[0]).to.have
                 .property('stripeSubscriptionId', stripeMock.subscriptions.create.id);
-              expect(res.rows[0]).to.have.property('UserId', null);
+              expect(res.rows[0]).to.have.property('UserId', 2);
               expect(res.rows[0]).to.have.property('CardId', 1);
               expect(res.rows[0]).to.have.property('currency', CURRENCY);
               expect(res.rows[0]).to.have.property('tags');

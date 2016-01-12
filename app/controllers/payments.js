@@ -5,7 +5,6 @@ var utils = require('../lib/utils');
 var _ = require('lodash');
 var async = require('async');
 var Stripe = require('stripe');
-var users = require('../controllers/users');
 
 var OC_FEE_PERCENT = 5;
 
@@ -20,6 +19,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
+  var users = require('../controllers/users')(app);
 
   var getOrCreatePlan = function(params, cb) {
     var stripe = params.stripe;
@@ -54,6 +54,7 @@ module.exports = function(app) {
     post: function(req, res, next) {
       var payment = req.required.payment;
       var user = req.remoteUser;
+      var email = payment.email;
       var group = req.group;
       var interval = payment.interval;
       var isSubscription = _.contains(['month', 'year'], interval);
@@ -101,7 +102,6 @@ module.exports = function(app) {
 
         createCustomer: ['getGroupStripeAccount', 'getExistingCard', function(cb, results) {
           var stripe = results.getGroupStripeAccount;
-          var email = user && user.email;
 
           if (results.getExistingCard)
             return cb(null, results.getExistingCard);
@@ -186,13 +186,27 @@ module.exports = function(app) {
          *  Creates a user in our system to associate with this transaction
          */
 
-        createUser: ['createCharge', function(cb, results) {
-          user = {email: req.payment.email}
-          users._create(user, cb);
+        getOrCreateUser: ['createCharge', function(cb, results) {
+          return models.User.findOne({
+            where: {
+              email: email
+            }
+          })
+          .then(function(user) {
+            if (user) {
+              cb(null, user);
+            } else {
+              users._create({
+                email: email
+              }, cb);
+            }
+          })
+          .catch(cb);
         }],
 
-        createTransaction: ['createCard', 'createCharge', function(cb, results) {
+        createTransaction: ['getOrCreateUser', 'createCard', 'createCharge', function(cb, results) {
           var charge = results.createCharge;
+          var user = results.getOrCreateUser;
 
           var description = ['Donation to', group && group.name].join(' ');
           var transaction = {
@@ -223,8 +237,7 @@ module.exports = function(app) {
         }],
 
         addUserToGroup: ['createTransaction', function(cb, results) {
-          if (!user)
-            return cb();
+          user = results.getOrCreateUser;
 
           group
             .hasMember(user)

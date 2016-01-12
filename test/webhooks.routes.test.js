@@ -144,7 +144,8 @@ describe('webhooks.routes.test.js', function() {
         stripeToken: STRIPE_TOKEN,
         amount: webhookSubscription.amount / 100,
         currency: CURRENCY,
-        interval: INTERVAL
+        interval: INTERVAL,
+        email: stripeEmail
       };
 
       request(app)
@@ -202,7 +203,7 @@ describe('webhooks.routes.test.js', function() {
           res.rows.forEach(function(transaction) {
             expect(transaction.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
             expect(transaction.GroupId).to.be.equal(group.id);
-            expect(transaction.UserId).to.be.equal(null);
+            expect(transaction.UserId).to.be.equal(2);
             expect(transaction.CardId).to.be.equal(card.id);
             expect(transaction.approved).to.be.true;
             expect(transaction.currency).to.be.equal(CURRENCY);
