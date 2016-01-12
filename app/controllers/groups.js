@@ -113,7 +113,9 @@ module.exports = function(app) {
       type: sequelize.QueryTypes.SELECT
     })
     .map(function createUserInstance(userData) {
-      return User.build(userData).public; // only return public data
+      var userPublicInfo = User.build(userData).public; // only return public data
+      userPublicInfo.role = userData.role;
+      return userPublicInfo;
     })
     .then(res.send.bind(res))
     .catch(next);
