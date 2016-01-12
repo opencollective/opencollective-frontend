@@ -149,10 +149,10 @@ module.exports = function(app) {
       },
       include: [models.StripeAccount]
     })
-    .done(function(err, user) {
-      if (err) return cb(err);
+    .then(function(user) {
       cb(null, user.StripeAccount);
-    });
+    })
+    .catch(cb)
   };
 
   /**
@@ -278,8 +278,7 @@ module.exports = function(app) {
         }
 
         if (results.getStripeAccount) {
-          group.stripeAccount = _.pick(results.getStripeAccount,
-                                              'stripePublishableKey');
+          group.stripeAccount = _.pick(results.getStripeAccount, 'stripePublishableKey');
         }
 
         res.send(group);

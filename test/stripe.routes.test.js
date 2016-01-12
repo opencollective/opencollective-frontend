@@ -29,7 +29,6 @@ describe('stripe.routes.test.js', function() {
   var user;
   var card;
   var group;
-  var host;
   var application;
 
   beforeEach(function(done) {
@@ -60,21 +59,8 @@ describe('stripe.routes.test.js', function() {
       .expect(200)
       .end(function(e, res) {
         expect(e).to.not.exist;
-        host = res.body;
-
-        request(app)
-          .post('/groups')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
-          .send({
-            group: _.extend({}, groupData, {isHost: false}),
-            role: 'admin'
-          })
-          .expect(200)
-          .end(function(e, res) {
-            expect(e).to.not.exist;
-            group = res.body;
-            done();
-          });
+        group = res.body;
+        done();
       });
   });
 
@@ -91,24 +77,11 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail is the group is not a host', function(done) {
-      request(app)
-        .get('/groups/' + group.id + '/stripe/authorize')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .send()
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'Group is not a host.'
-          }
-        })
-        .end(done);
-    });
+    it('should fail is the group does not have an admin');
 
     it('should redirect to stripe', function(done) {
       request(app)
-        .get('/groups/' + host.id + '/stripe/authorize')
+        .get('/groups/' + group.id + '/stripe/authorize')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(302) // redirect
         .end(function(e, res) {
@@ -116,7 +89,7 @@ describe('stripe.routes.test.js', function() {
 
           var redirectUrl = res.headers.location;
           expect(redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(redirectUrl).to.contain('state=' + host.id)
+          expect(redirectUrl).to.contain('state=' + group.id)
           done();
         });
     });
@@ -161,14 +134,14 @@ describe('stripe.routes.test.js', function() {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'Group does not exist'
+            message: 'This group has no admin'
           }
         })
         .end(done);
     });
 
     it('should set a stripeAccount', function(done) {
-      var url = '/stripe/oauth/callback?state=' + host.id + '&code=abc';
+      var url = '/stripe/oauth/callback?state=' + group.id + '&code=abc';
 
       async.auto({
         request: function(cb) {
@@ -194,8 +167,8 @@ describe('stripe.routes.test.js', function() {
             });
         }],
 
-        checkGroup: ['checkStripeAccount', function(cb, results) {
-          models.Group.findAndCountAll({
+        checkUser: ['checkStripeAccount', function(cb, results) {
+          models.User.findAndCountAll({
             where: {
               StripeAccountId: results.checkStripeAccount.id
             }
@@ -203,8 +176,7 @@ describe('stripe.routes.test.js', function() {
           .done(function(e, res) {
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
-            var group = res.rows[0];
-            expect(group.id).to.be.equal(host.id);
+            expect(res.rows[0].id).to.be.equal(user.id);
             cb();
           });
         }]

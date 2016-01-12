@@ -335,8 +335,9 @@ describe('payments.routes.test.js', function() {
         group2
           .getMembers()
           .then(function(users) {
-            expect(users).to.have.length(1);
-            expect(users[0].UserGroup.role).to.equal('viewer');
+            expect(users).to.have.length(2);
+            var viewer = _.find(users, {email: EMAIL});
+            expect(viewer.UserGroup.role).to.equal('viewer');
             done();
           })
           .catch(done);

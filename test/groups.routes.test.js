@@ -24,7 +24,7 @@ var stripeEmail = stripeMock.accounts.create.email;
 /**
  * Tests.
  */
-describe.only('groups.routes.test.js', function() {
+describe('groups.routes.test.js', function() {
 
   var application;
   var user;
@@ -128,7 +128,6 @@ describe.only('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('isHost', false);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
@@ -164,42 +163,12 @@ describe.only('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('isHost', false);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(1);
             done();
           });
-        });
-
-    });
-
-    it('successfully create a group and create a managed account on Stripe', function(done) {
-      request(app)
-        .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .send({
-          group: _.extend({}, groupData, { stripeEmail: stripeEmail })
-        })
-        .expect(200)
-        .end(function(e, res) {
-          expect(e).to.not.exist;
-
-          models.Group
-            .find(parseInt(res.body.id))
-            .then(function(group) {
-              group.getStripeAccount()
-                .then(function(account) {
-                  expect(account).to.have.property('stripeId', stripeMock.accounts.create.id);
-                  expect(account).to.have.property('stripeSecret', stripeMock.accounts.create.keys.secret);
-                  expect(account).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
-                  expect(account).to.have.property('stripeEmail', stripeMock.accounts.create.email);
-                  done();
-                })
-                .catch(done);
-            })
-            .catch(done);
         });
 
     });
@@ -283,6 +252,19 @@ describe.only('groups.routes.test.js', function() {
         });
     });
 
+    beforeEach(function(done) {
+      models.StripeAccount.create({
+        stripePublishableKey: stripeMock.accounts.create.keys.publishable
+      })
+      .then(function(account) {
+        return user.setStripeAccount(account);
+      })
+      .then(function() {
+        done();
+      })
+      .catch(done);
+    });
+
     // Create another user.
     beforeEach(function(done) {
       models.User.create(utils.data('user2')).done(function(e, u) {
@@ -344,7 +326,7 @@ describe.only('groups.routes.test.js', function() {
           expect(res.body).to.have.property('name', group.name);
           expect(res.body).to.have.property('description', group.description);
           expect(res.body).to.have.property('stripeAccount');
-          expect(res.body.stripeAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
@@ -359,7 +341,7 @@ describe.only('groups.routes.test.js', function() {
           expect(res.body).to.have.property('name', publicGroup.name);
           expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
           expect(res.body).to.have.property('stripeAccount');
-          expect(res.body.stripeAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
