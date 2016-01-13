@@ -112,7 +112,10 @@ module.exports = function(Sequelize, DataTypes) {
         return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
-            role: 'admin'
+            role: 'admin',
+            StripeAccountId: {
+              $ne: null
+            }
           }
         })
         .then(function(userGroup) {
