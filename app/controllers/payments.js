@@ -20,9 +20,6 @@ module.exports = function(app) {
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
   var users = require('../controllers/users')(app);
-  var groups = require('../controllers/groups')(app);
-
-  var getStripeAccount = groups.getStripeAccount;
 
   var getOrCreatePlan = function(params, cb) {
     var stripe = params.stripe;
