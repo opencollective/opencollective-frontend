@@ -47,6 +47,12 @@
     "password": "passssas"
   },
 
+  "user5": {
+    "name": "Bo Ki",
+    "username": "boki",
+    "email": "boki@email.com"
+  },
+
   "group1": {
     "name": "Scouts d'Arlon",
     "description": "Troupe Scoute Albert Schweitzer",

@@ -93,6 +93,29 @@ module.exports = function(app) {
     .catch(next);
   };
 
+  /*
+   * End point to update user info from the public donation page
+   * Only works if password is null, as an extra precaution
+   */
+  var updateUserWithoutLoggedIn = function(req, res, next) {
+    ['name',
+     'twitterHandle',
+     'website'
+     ].forEach(function(prop) {
+      if (req.required.user[prop]) {
+        req.user[prop] = req.required.user[prop];
+      }
+    });
+    req.user.updatedAt = new Date();
+
+    req.user
+      .save()
+      .then(function(user) {
+        res.send(user.info);
+      })
+      .catch(next);
+  }
+
   /**
    * Update.
    */
@@ -126,6 +149,22 @@ module.exports = function(app) {
     });
   };
 
+  var _create = function(user, cb) {
+    User
+      .create(user)
+      .tap(function(dbUser) {
+        Activity.create({
+          type: 'user.created',
+          UserId: dbUser.id,
+          data: {user: dbUser.info}
+        });
+      })
+      .then(function(dbUser) {
+        cb(null, dbUser);
+      })
+      .catch(cb);
+  };
+
   /**
    * Public methods.
    */
@@ -137,20 +176,13 @@ module.exports = function(app) {
     create: function(req, res, next) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
-
-      User
-        .create(user)
-        .then(function(user) {
-          res.send(user.info);
-
-          Activity.create({
-            type: 'user.created',
-            UserId: user.id,
-            data: {user: user.info}
-          });
-        })
-        .catch(next);
+      _create(user, function(err, user) {
+        if (err) return next(err);
+        res.send(user.info);
+      });
     },
+
+    _create: _create,
 
     /**
      * Get token.
@@ -209,7 +241,7 @@ module.exports = function(app) {
 
     updatePaypalEmail: updatePaypalEmail,
     updateAvatar: updateAvatar,
-    update: update
+    update: update,
+    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn
   };
-
 };

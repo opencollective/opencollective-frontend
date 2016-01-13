@@ -348,7 +348,11 @@ describe('users.routes.test.js', function() {
 
   });
 
-  describe('#update user', function() {
+  /*
+   * Update user (without authentication)
+   */
+
+  describe('#update user from public donation page', function() {
     var user;
 
     var newUser = {
@@ -362,21 +366,11 @@ describe('users.routes.test.js', function() {
     }
 
     beforeEach(function(done) {
-      models.User.create(utils.data('user1')).done(function(e, u) {
+      models.User.create(utils.data('user5')).done(function(e, u) {
         expect(e).to.not.exist;
         user = u;
         done();
       });
-    });
-
-    it('fails updating a user if not authenticated', function(done) {
-      request(app)
-        .put('/users/' + user.id)
-        .send({
-          user: newUser
-        })
-        .expect(401)
-        .end(done);
     });
 
     it('successfully updates a user if authenticated as a user', function(done) {
@@ -388,16 +382,15 @@ describe('users.routes.test.js', function() {
         })
         .expect(200)
         .end(function(e, res) {
-          console.log(res.body);
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', user.id);
           expect(res.body).to.have.property('name', newUser.name);
-          expect(res.body).to.have.property('username', newUser.username);
-          expect(res.body).to.have.property('avatar', newUser.avatar);
-          expect(res.body).to.have.property('email', newUser.email);
+          expect(res.body).to.have.property('username', user.username); // old item
+          expect(res.body).to.have.property('avatar', user.avatar);
+          expect(res.body).to.have.property('email', user.email); // old item
           expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
           expect(res.body).to.have.property('website', newUser.website);
-          expect(res.body).to.have.property('paypalEmail', newUser.paypalEmail);
+          expect(res.body).to.have.property('paypalEmail', user.paypalEmail);
           expect(res.body).to.not.have.property('otherprop');
           expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(user.createdAt).getTime());
           expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(user.updatedAt).getTime());
