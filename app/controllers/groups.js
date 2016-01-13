@@ -21,7 +21,7 @@ module.exports = function(app) {
   var User = models.User;
   var Transaction = models.Transaction;
   var UserGroup = models.UserGroup;
-  var StripeManagedAccount = models.StripeManagedAccount;
+  var StripeAccount = models.StripeAccount;
   var transactions = require('../controllers/transactions')(app);
 
   /**
@@ -96,29 +96,14 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
-    /**
-     * Doing this in SQL because could not find how to do it with sequelize
-     */
-    var sql = 'SELECT * FROM "UserGroups" ' +
-              'LEFT JOIN "Users" ' +
-              'ON "UserId" = "id" ' +
-              'WHERE "GroupId" = :GroupId';
-
-    sequelize.query(sql, {
-      replacements: {
-        GroupId: req.group.id
-      },
-
-      // we could pass the model but it only works with sequelize >= 3.0.0
-      type: sequelize.QueryTypes.SELECT
-    })
-    .map(function createUserInstance(userData) {
-      var userPublicInfo = User.build(userData).public; // only return public data
-      userPublicInfo.role = userData.role;
-      return userPublicInfo;
-    })
-    .then(res.send.bind(res))
-    .catch(next);
+    req.group.getMembers({})
+      .map(function(user) {
+        return _.extend({}, user.public, { role: user.UserGroup.role });
+      })
+      .then(function(users) {
+        res.send(users);
+      })
+      .catch(next);
   };
 
   var updateTransaction = function(req, res, next) {
@@ -152,18 +137,20 @@ module.exports = function(app) {
         .create(req.required.group)
         .then(function(group) {
 
-          // Create activity.
-          Activity.create({
-            type: 'group.created',
-            UserId: req.remoteUser.id,
-            GroupId: group.id,
-            data: {
-              group: group.info,
-              user: req.remoteUser.info
-            }
-          });
-
           async.series({
+
+            createActivity: function(cb) {
+              Activity.create({
+                type: 'group.created',
+                UserId: req.remoteUser.id,
+                GroupId: group.id,
+                data: {
+                  group: group.info,
+                  user: req.remoteUser.info
+                }
+              }).done(cb);
+            },
+
             addMember: function(cb) {
               // Add caller to the group if `role` specified.
               var role = req.body.role;
@@ -174,25 +161,6 @@ module.exports = function(app) {
                 remoteUser: req.remoteUser
               };
               addGroupMember(group, req.remoteUser, options, cb);
-            },
-            createStripeManagedAccount: function(cb) {
-              app.stripe.accounts.create({
-                email: req.required.group.stripeEmail || req.remoteUser.email
-              }, function(e, account) {
-                if (e) return cb(e);
-
-                StripeManagedAccount
-                  .create({
-                    stripeId: account.id,
-                    stripeSecret: account.keys.secret,
-                    stripeKey: account.keys.publishable,
-                    stripeEmail: account.email
-                  })
-                  .then(function(account) {
-                    account.addGroup(group.id).done(cb);
-                  })
-                  .catch(cb);
-              });
             }
           }, function(e) {
             if (e) return next(e);
@@ -264,9 +232,12 @@ module.exports = function(app) {
             .catch(cb);
         },
 
-        getStripeManagedAccount: function(cb) {
-          req.group.getStripeManagedAccount()
-            .done(cb);
+        getStripeAccount: function(cb) {
+          req.group.getStripeAccount()
+            .then(function(account) {
+              cb(null, account);
+            })
+            .catch(cb);
         }
 
       }, function(e, results) {
@@ -281,9 +252,8 @@ module.exports = function(app) {
           group.activities = results.getActivities;
         }
 
-        if (results.getStripeManagedAccount) {
-          group.stripeManagedAccount = _.pick(results.getStripeManagedAccount,
-                                              'stripeKey');
+        if (results.getStripeAccount) {
+          group.stripeAccount = _.pick(results.getStripeAccount, 'stripePublishableKey');
         }
 
         res.send(group);

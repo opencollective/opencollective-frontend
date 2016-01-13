@@ -22,6 +22,7 @@ module.exports = function(app) {
   var images = Controllers.images;
   var cards = Controllers.cards;
   var webhooks = Controllers.webhooks;
+  var stripe = Controllers.stripe;
   var errors = app.errors;
 
   /**
@@ -146,6 +147,13 @@ module.exports = function(app) {
   app.post('/webhooks/stripe', webhooks.stripe);
 
   /**
+   * Stripe oAuth
+   */
+
+  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, mw.authorizeGroupRoles('admin'), stripe.authorize);
+  app.get('/stripe/oauth/callback', stripe.callback);
+
+  /**
    * Error handler.
    */
   app.use(function(err, req, res, next) {
@@ -163,11 +171,11 @@ module.exports = function(app) {
       err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
 
     if (!err.code) {
-      var code = (err.type.indexOf('Stripe') > -1) ? 400 : 500;
-      err.code = err.status || 400;
+      var code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
+      err.code = err.status || code;
     }
 
-    console.error('Error Express : ', err); // console.trace(err);
+    console.error('Error Express : ', err); // console.log(err.stack);
     res.status(err.code).send({error: err});
   });
 

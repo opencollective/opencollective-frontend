@@ -71,17 +71,16 @@ module.exports = function(app) {
         return next(new errors.BadRequest('Payment Amount missing.'));
       }
 
-      // How to deal with recurrent charge?
-      //   - By ourselves?
-      //   - With Stripe subscription? https://stripe.com/docs/subscriptions
-      //     In this case, we need to implement: 1. plans for each Managed Account, 2. Webhood to create transactions
-
       async.auto({
 
         getGroupStripeAccount: function(cb) {
-          req.group.getStripeManagedAccount()
+          req.group.getStripeAccount()
             .then(function(stripeAccount) {
-              return cb(null, Stripe(stripeAccount.stripeSecret));
+              if (!stripeAccount || !stripeAccount.accessToken) {
+                return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
+              }
+
+              cb(null, Stripe(stripeAccount.accessToken));
             })
             .catch(cb);
         },
@@ -103,8 +102,9 @@ module.exports = function(app) {
         createCustomer: ['getGroupStripeAccount', 'getExistingCard', function(cb, results) {
           var stripe = results.getGroupStripeAccount;
 
-          if (results.getExistingCard)
+          if (results.getExistingCard) {
             return cb(null, results.getExistingCard);
+          }
 
           stripe.customers
             .create({
@@ -115,8 +115,9 @@ module.exports = function(app) {
         }],
 
         createCard: ['createCustomer', 'getExistingCard', function(cb, results) {
-          if (results.getExistingCard)
+          if (results.getExistingCard) {
             return cb(null, results.getExistingCard);
+          }
 
           models.Card
             .create({

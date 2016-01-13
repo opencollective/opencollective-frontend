@@ -22,5 +22,8 @@
       "signature": "AknyGVnC4ahUBjab.T2H-YVkWGCqAW-ZI2s7gMVZKRdZpFO7kWEOorjv"
     },
     "feeOC": 5
+  },
+  "stripe": {
+    "redirectUri": "http://localhost:3000/api/stripe/oauth/callback"
   }
 }

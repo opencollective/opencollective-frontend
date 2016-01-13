@@ -91,6 +91,19 @@ describe('webhooks.routes.test.js', function() {
       });
   });
 
+  beforeEach(function(done) {
+    models.StripeAccount.create({
+      accessToken: 'abc'
+    })
+    .then(function(account) {
+      return user.setGroupStripeAccount(account, group);
+    })
+    .then(function() {
+      done();
+    })
+    .catch(done);
+  })
+
   afterEach(function() {
     nock.cleanAll();
   });

@@ -94,8 +94,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin',
-        stripeEmail: stripeEmail
+        role: 'admin'
       })
       .expect(200)
       .end(function(e, res) {
@@ -122,7 +121,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group2'),
-        stripeEmail: stripeEmail
+        role: 'admin'
       })
       .expect(200)
       .end(function(e, res) {
@@ -139,6 +138,22 @@ describe('payments.routes.test.js', function() {
 
   beforeEach(function() {
     app.stripe.accounts.create.restore();
+  });
+
+  beforeEach(function(done) {
+    models.StripeAccount.create({
+      accessToken: 'abc'
+    })
+    .tap(function(account) {
+      return user.setGroupStripeAccount(account, group);
+    })
+    .tap(function(account) {
+      return user.setGroupStripeAccount(account, group2);
+    })
+    .then(function() {
+      done();
+    })
+    .catch(done);
   });
 
   // Create an application which has only access to `group`
@@ -322,8 +337,9 @@ describe('payments.routes.test.js', function() {
         group2
           .getMembers()
           .then(function(users) {
-            expect(users).to.have.length(1);
-            expect(users[0].UserGroup.role).to.equal('viewer');
+            expect(users).to.have.length(2);
+            var viewer = _.find(users, {email: EMAIL});
+            expect(viewer.UserGroup.role).to.equal('viewer');
             done();
           })
           .catch(done);

@@ -29,7 +29,7 @@ exec('make dropdb && make database')
   });
 })
 .then(function() {
-  console.log('Please login on development with `ops@opencollective.com` and `password`');
+  console.log('Please login on development with `devuser@opencollective.com` and `password`');
   console.log('Script successful');
   process.exit();
 })
