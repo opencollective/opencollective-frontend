@@ -256,7 +256,7 @@ module.exports = function(app) {
       }, function(e, results) {
         if (e) return next(e);
 
-        res.send({success: true});
+        res.send({success: true, user: user});
       });
 
     }

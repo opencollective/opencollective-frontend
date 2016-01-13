@@ -93,6 +93,29 @@ module.exports = function(app) {
     .catch(next);
   };
 
+  /*
+   * End point to update user info from the public donation page
+   * Only works if password is null, as an extra precaution
+   */
+  var updateUserWithoutLoggedIn = function(req, res, next) {
+    ['name',
+     'twitterHandle',
+     'website'
+     ].forEach(function(prop) {
+      if (req.required.user[prop]) {
+        req.user[prop] = req.required.user[prop];
+      }
+    });
+    req.user.updatedAt = new Date();
+
+    req.user
+      .save()
+      .then(function(user) {
+        res.send(user.info);
+      })
+      .catch(next);
+  }
+
   /**
    * Update.
    */
@@ -218,7 +241,7 @@ module.exports = function(app) {
 
     updatePaypalEmail: updatePaypalEmail,
     updateAvatar: updateAvatar,
-    update: update
+    update: update,
+    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn
   };
-
 };
