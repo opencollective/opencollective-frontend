@@ -71,9 +71,6 @@ models.forEach(function(model) {
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 
-  // Stripe Account.
-  m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
-
   // Paypal Pay key.
   m.Paykey.belongsTo(m.Transaction);
   m.Transaction.hasMany(m.Paykey);

@@ -77,17 +77,15 @@ module.exports = function(app) {
       async.auto({
 
         getGroupStripeAccount: function(cb) {
+          req.group.getStripeAccount()
+            .then(function(stripeAccount) {
+              if (!stripeAccount || !stripeAccount.accessToken) {
+                return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
+              }
 
-          // Find the stripe account of the group admin
-          getStripeAccount(req.group.id, function(err, stripeAccount) {
-            if (err) {
-              return cb(err);
-            } else if (!stripeAccount || !stripeAccount.accessToken) {
-              return cb(new errors.BadRequest('Group Stripe account is not setup'));
-            }
-
-            cb(null, Stripe(stripeAccount.accessToken));
-          })
+              cb(null, Stripe(stripeAccount.accessToken));
+            })
+            .catch(cb);
         },
 
         getExistingCard: ['getGroupStripeAccount', function(cb, results) {

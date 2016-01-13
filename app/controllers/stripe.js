@@ -26,51 +26,20 @@ module.exports = function(app) {
   var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
   var AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 
-  var getAdmin = function(GroupId, cb) {
-
-    var sql = 'SELECT * FROM "UserGroups" ' +
-          'LEFT JOIN "Users" ' +
-          'ON "UserId" = "id" ' +
-          'WHERE "GroupId" = :GroupId ' +
-          'AND "role" = :role';
-
-    sequelize.query(sql, {
-      replacements: {
-        GroupId: GroupId,
-        role: 'admin'
-      },
-
-      // we could pass the model but it only works with sequelize >= 3.0.0
-      type: sequelize.QueryTypes.SELECT
-    })
-    .then(function(users) {
-      if (!users || users.length === 0 || !_.isObject(users[0])) {
-        return cb(new errors.BadRequest('This group has no admin'));
-      }
-
-      cb(null,  User.build(users[0], { isNewRecord: false }));
-    })
-    .catch(cb);
-  };
-
   /**
    * Ask stripe for authorization OAuth
    */
 
   var authorize = function(req, res, next) {
-    getAdmin(req.group.id, function(err, user) {
-      if (err) return next(err);
-
-      var params = qs.stringify({
-        response_type: 'code',
-        scope: 'read_write',
-        client_id: config.stripe.clientId,
-        redirect_uri: config.stripe.redirectUri,
-        state: req.group.id
-      });
-
-      res.redirect(AUTHORIZE_URI + '?' + params);
+    var params = qs.stringify({
+      response_type: 'code',
+      scope: 'read_write',
+      client_id: config.stripe.clientId,
+      redirect_uri: config.stripe.redirectUri,
+      state: req.group.id
     });
+
+    res.redirect(AUTHORIZE_URI + '?' + params);
   };
 
   /**
@@ -80,21 +49,31 @@ module.exports = function(app) {
   var callback = function(req, res, next) {
     var code = req.query.code;
     var GroupId = req.query.state;
+
     if (!GroupId) {
       return next(new errors.BadRequest('No state in the callback'));
     }
 
     async.auto({
 
-      findAdmin: function(cb) {
-        getAdmin(GroupId, function(err, user) {
-          if (err) return cb(err);
+      findUserGroup: function(cb) {
+        models.UserGroup.find({
+          where: {
+            GroupId: GroupId,
+            role: 'admin'
+          }
+        })
+        .then(function(userGroup) {
+          if (!userGroup) {
+            return cb(new errors.BadRequest('No UserGroup found with the admin role'));
+          }
 
-          cb(null, user);
-        });
+          cb(null, userGroup);
+        })
+        .catch(cb);
       },
 
-      getToken: ['findAdmin', function(cb, results) {
+      getToken: ['findUserGroup', function(cb, results) {
         axios
           .post(TOKEN_URI, {
             grant_type: 'authorization_code',
@@ -105,7 +84,7 @@ module.exports = function(app) {
           .then(function(response) {
             cb(null, response.data)
           })
-          .catch(next);
+          .catch(cb);
       }],
 
       createStripeAccount: ['getToken', function(cb, results) {
@@ -122,17 +101,21 @@ module.exports = function(app) {
         .done(cb);
       }],
 
-      saveStripeCredentials: ['findAdmin', 'createStripeAccount', function(cb, results) {
-        var admin = results.findAdmin;
+      linkStripeAccountToGroup: ['findUserGroup', 'createStripeAccount', function(cb, results) {
+        var userGroup = results.findUserGroup;
+        var StripeAccount = results.createStripeAccount;
 
-        admin
-          .setStripeAccount(results.createStripeAccount)
-          .done(cb);
+        userGroup.update({
+          StripeAccountId: StripeAccount.id
+        })
+        .then(function() {
+          cb();
+        })
+        .catch(cb);
       }]
 
     }, function(err, results) {
       if (err) return next(err);
-
       res.send({ success: true });
     });
   };

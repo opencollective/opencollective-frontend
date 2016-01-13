@@ -96,29 +96,14 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
-    /**
-     * Doing this in SQL because could not find how to do it with sequelize
-     */
-    var sql = 'SELECT * FROM "UserGroups" ' +
-              'LEFT JOIN "Users" ' +
-              'ON "UserId" = "id" ' +
-              'WHERE "GroupId" = :GroupId';
-
-    sequelize.query(sql, {
-      replacements: {
-        GroupId: req.group.id
-      },
-
-      // we could pass the model but it only works with sequelize >= 3.0.0
-      type: sequelize.QueryTypes.SELECT
-    })
-    .map(function createUserInstance(userData) {
-      var userPublicInfo = User.build(userData).public; // only return public data
-      userPublicInfo.role = userData.role;
-      return userPublicInfo;
-    })
-    .then(res.send.bind(res))
-    .catch(next);
+    req.group.getMembers({})
+      .map(function(user) {
+        return _.extend({}, user.public, { role: user.UserGroup.role });
+      })
+      .then(function(users) {
+        res.send(users);
+      })
+      .catch(next);
   };
 
   var updateTransaction = function(req, res, next) {
@@ -137,22 +122,6 @@ module.exports = function(app) {
         res.send(transaction.info);
       })
       .catch(next);
-  };
-
-  var getStripeAccount = function(GroupId, cb) {
-    User.find({
-      through: {
-        where: {
-          role: 'admin',
-          GroupId: GroupId
-        }
-      },
-      include: [models.StripeAccount]
-    })
-    .then(function(user) {
-      cb(null, user.StripeAccount);
-    })
-    .catch(cb)
   };
 
   /**
@@ -263,7 +232,13 @@ module.exports = function(app) {
             .catch(cb);
         },
 
-        getStripeAccount: getStripeAccount.bind(this, req.group.id)
+        getStripeAccount: function(cb) {
+          req.group.getStripeAccount()
+            .then(function(account) {
+              cb(null, account);
+            })
+            .catch(cb);
+        }
 
       }, function(e, results) {
         if (e) return next(e);
@@ -521,12 +496,7 @@ module.exports = function(app) {
     /**
      * Update transaction
      */
-    updateTransaction: updateTransaction,
-
-    /**
-     * Get stripe account based on the user admin
-     */
-    getStripeAccount: getStripeAccount
+    updateTransaction: updateTransaction
   };
 
 };

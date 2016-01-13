@@ -20,13 +20,12 @@ var models = app.set('models');
  */
 
 var stripeMock = require('./mocks/stripe');
-var userData = utils.data('user1');
-var groupData = utils.data('group1');
 
 describe('stripe.routes.test.js', function() {
   var nocks = {};
 
   var user;
+  var user2;
   var card;
   var group;
   var application;
@@ -40,9 +39,18 @@ describe('stripe.routes.test.js', function() {
 
   // Create a user.
   beforeEach(function(done) {
-    models.User.create(userData).done(function(e, u) {
+    models.User.create(utils.data('user1')).done(function(e, u) {
       expect(e).to.not.exist;
       user = u;
+      done();
+    });
+  });
+
+  // Create a user.
+  beforeEach(function(done) {
+    models.User.create(utils.data('user2')).done(function(e, u) {
+      expect(e).to.not.exist;
+      user2 = u;
       done();
     });
   });
@@ -53,13 +61,25 @@ describe('stripe.routes.test.js', function() {
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
-        group: _.extend({}, groupData, {isHost: true}),
+        group: utils.data('group1'),
         role: 'admin'
       })
       .expect(200)
       .end(function(e, res) {
         expect(e).to.not.exist;
         group = res.body;
+        done();
+      });
+  });
+
+  // Add user2 as viewer to group.
+  beforeEach(function(done) {
+    request(app)
+      .post('/groups/' + group.id + '/users/' + user2.id)
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .expect(200)
+      .end(function(e, res) {
+        expect(e).to.not.exist;
         done();
       });
   });
@@ -72,12 +92,23 @@ describe('stripe.routes.test.js', function() {
     it('should return an error if the user is not logged in', function(done) {
       request(app)
         .get('/groups/' + group.id + '/stripe/authorize')
-        .send()
         .expect(401)
         .end(done);
     });
 
-    it('should fail is the group does not have an admin');
+    it('should fail is the group does not have an admin', function(done) {
+      request(app)
+        .get('/groups/' + group.id + '/stripe/authorize')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403, {
+          error: {
+            code: 403,
+            type: 'forbidden',
+            message: 'Unauthorized to manage this group.'
+          }
+        })
+        .end(done);
+    });
 
     it('should redirect to stripe', function(done) {
       request(app)
@@ -134,7 +165,7 @@ describe('stripe.routes.test.js', function() {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'This group has no admin'
+            message: 'No UserGroup found with the admin role'
           }
         })
         .end(done);
@@ -168,15 +199,18 @@ describe('stripe.routes.test.js', function() {
         }],
 
         checkUser: ['checkStripeAccount', function(cb, results) {
-          models.User.findAndCountAll({
+          models.UserGroup.findAndCountAll({
             where: {
               StripeAccountId: results.checkStripeAccount.id
             }
           })
           .done(function(e, res) {
+            var count = res.count;
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
-            expect(res.rows[0].id).to.be.equal(user.id);
+            expect(res.rows[0].UserId).to.be.equal(user.id);
+            expect(res.rows[0].GroupId).to.be.equal(group.id);
+            expect(res.rows[0].role).to.be.equal('admin');
             cb();
           });
         }]

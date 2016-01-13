@@ -256,8 +256,11 @@ describe('groups.routes.test.js', function() {
       models.StripeAccount.create({
         stripePublishableKey: stripeMock.accounts.create.keys.publishable
       })
-      .then(function(account) {
-        return user.setStripeAccount(account);
+      .tap(function(account) {
+        return user.setGroupStripeAccount(account, group);
+      })
+      .tap(function(account) {
+        return user.setGroupStripeAccount(account, publicGroup);
       })
       .then(function() {
         done();

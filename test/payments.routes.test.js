@@ -144,14 +144,16 @@ describe('payments.routes.test.js', function() {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then(function(account) {
-      return user.setStripeAccount(account);
+    .tap(function(account) {
+      return user.setGroupStripeAccount(account, group);
+    })
+    .tap(function(account) {
+      return user.setGroupStripeAccount(account, group2);
     })
     .then(function() {
       done();
     })
     .catch(done);
-
   });
 
   // Create an application which has only access to `group`

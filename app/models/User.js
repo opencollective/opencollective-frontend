@@ -173,6 +173,22 @@ module.exports = function(Sequelize, DataTypes) {
           issuer: config.host.api,
           audience: application.id
         });
+      },
+
+      setGroupStripeAccount: function(stripeAccount, group) {
+        return Sequelize.models.UserGroup.find({
+          where: {
+            UserId: this.id,
+            GroupId: group.id,
+            role: 'admin'
+          }
+        })
+        .then(function(userGroup) {
+
+          return userGroup.update({
+            StripeAccountId: stripeAccount.id
+          });
+        });
       }
     },
 

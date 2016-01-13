@@ -96,7 +96,7 @@ describe('webhooks.routes.test.js', function() {
       accessToken: 'abc'
     })
     .then(function(account) {
-      return user.setStripeAccount(account);
+      return user.setGroupStripeAccount(account, group);
     })
     .then(function() {
       done();

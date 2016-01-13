@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-var slug = require('slug');
 var errors = require('../lib/errors');
 
 /**
@@ -78,7 +77,6 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
-          isHost: this.isHost,
           slug: this.slug
         };
       }
@@ -103,6 +101,31 @@ module.exports = function(Sequelize, DataTypes) {
             }
           })
           .catch(fn);
+      },
+
+      /**
+       * I decided to make the query clear over writing raw sql
+       * When we need to optimize this query, we can refactor it into a simple join
+       * sequelize makes it hard to make joins for manual relationship
+       */
+      getStripeAccount: function() {
+        return Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: 'admin'
+          }
+        })
+        .then(function(userGroup) {
+          if (!userGroup) {
+            return {};
+          }
+
+          return Sequelize.models.StripeAccount.find({
+            where: {
+              id: userGroup.StripeAccountId
+            }
+          });
+        });
       }
     }
   });

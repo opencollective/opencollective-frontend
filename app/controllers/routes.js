@@ -150,8 +150,8 @@ module.exports = function(app) {
    * Stripe oAuth
    */
 
-  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, stripe.authorize)
-  app.get('/stripe/oauth/callback', stripe.callback)
+  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, mw.authorizeGroupRoles('admin'), stripe.authorize);
+  app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
    * Error handler.
@@ -175,7 +175,7 @@ module.exports = function(app) {
       err.code = err.status || code;
     }
 
-    console.error('Error Express : ', err); // console.trace(err);
+    console.error('Error Express : ', err); // console.log(err.stack);
     res.status(err.code).send({error: err});
   });
 
