@@ -90,12 +90,12 @@ module.exports = function(Sequelize, DataTypes) {
         }
 
         this
-          .getMembers({where: {id: userId} })
-          .then(function(members) {
-            if (members.length === 0)
+          .getUsers({where: {id: userId} })
+          .then(function(users) {
+            if (users.length === 0)
               return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
             else {
-              if (roles && roles.indexOf(members[0].UserGroup.role) < 0)
+              if (roles && roles.indexOf(users[0].UserGroup.role) < 0)
                 return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
               fn(null, true);
             }

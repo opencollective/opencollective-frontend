@@ -46,7 +46,7 @@ var stubStripe = function() {
   stub.yields(null, mock);
 };
 
-describe('webhooks.routes.test.js', function() {
+describe.skip('webhooks.routes.test.js', function() {
   var nocks = {};
 
   var user;

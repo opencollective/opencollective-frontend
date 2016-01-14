@@ -68,12 +68,12 @@ describe('transactions.paypal.routes.test.js', function() {
       }],
       addUserAGroupA: ['createUserA', 'createGroupA', function(cb, results) {
         results.createGroupA
-          .addMember(results.createUserA, {role: 'viewer'})
+          .addUser(results.createUserA, {role: 'backer'})
           .done(cb);
       }],
       addUserBGroupA: ['createUserB', 'createGroupA', function(cb, results) {
         results.createGroupA
-          .addMember(results.createUserB, {role: 'writer'})
+          .addUser(results.createUserB, {role: 'member'})
           .done(cb);
       }],
       addApplicationCGroupA: ['createApplicationC', 'createGroupA', function(cb, results) {

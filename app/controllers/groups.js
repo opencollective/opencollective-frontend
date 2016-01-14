@@ -29,7 +29,7 @@ module.exports = function(app) {
    */
   var addGroupMember = function(group, user, options, callback) {
     group
-      .addMember(user, {role: options.role})
+      .addUser(user, {role: options.role})
       .then(function(usergroup) {
         callback();
 
@@ -96,7 +96,7 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
-    req.group.getMembers({})
+    req.group.getUsers({})
       .map(function(user) {
         return _.extend({}, user.public, { role: user.UserGroup.role });
       })
@@ -266,7 +266,7 @@ module.exports = function(app) {
      */
     addMember: function(req, res, next) {
       var options = {
-        role: req.body.role || 'viewer',
+        role: req.body.role || 'backer',
         remoteUser: req.remoteUser
       };
       addGroupMember(req.group, req.user, options, function(e) {

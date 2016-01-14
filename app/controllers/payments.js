@@ -74,7 +74,7 @@ module.exports = function(app) {
       async.auto({
 
         getGroupStripeAccount: function(cb) {
-          req.group.getStripeAccount()
+          getStripeAccount(group.id)
             .then(function(stripeAccount) {
               if (!stripeAccount || !stripeAccount.accessToken) {
                 return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
@@ -247,7 +247,7 @@ module.exports = function(app) {
                 return cb();
               else {
                 group
-                  .addMember(user, {role: 'viewer'})
+                  .addUser(user, {role: 'backer'})
                   .done(cb);
               }
             })

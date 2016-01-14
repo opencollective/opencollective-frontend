@@ -94,7 +94,7 @@ module.exports = function(app) {
   app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
   app.get('/groups/:groupid/users', groups.getUsers);
 
-  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), mw.required('group'), groups.update); // Update a group.
+  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles('host'), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.post); // Make a payment/donation.
@@ -105,9 +105,9 @@ module.exports = function(app) {
    *  Relations between a group and a user.
    */
   app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.addMember); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.updateMember); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('admin'), groups.deleteMember); // Remove a user from a group.
+  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('host'), groups.addMember); // Add a user to a group.
+  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('host'), groups.updateMember); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles('host'), groups.deleteMember); // Remove a user from a group.
 
   /**
    * Transactions (financial).
@@ -123,10 +123,10 @@ module.exports = function(app) {
   app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
 
   app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // Approve a transaction.
-  app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, mw.required('service'), transactions.pay); // Pay a transaction.
-  app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
-  app.post('/groups/:groupid/transactions/:transactionid/paykey/:paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['admin', 'writer']), mw.authorizeTransaction, transactions.confirmPayment); // Confirm a transaction's payment.
-  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles(['admin', 'writer']), transactions.attributeUser); // Attribute a transaction to a user.
+  app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(['host', 'member']), mw.authorizeTransaction, mw.required('service'), transactions.pay); // Pay a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['host', 'member']), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
+  app.post('/groups/:groupid/transactions/:transactionid/paykey/:paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(['host', 'member']), mw.authorizeTransaction, transactions.confirmPayment); // Confirm a transaction's payment.
+  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles(['host', 'member']), transactions.attributeUser); // Attribute a transaction to a user.
 
   /**
    * Activities.
@@ -150,7 +150,7 @@ module.exports = function(app) {
    * Stripe oAuth
    */
 
-  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, mw.authorizeGroupRoles('admin'), stripe.authorize);
+  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, mw.authorizeGroupRoles('host'), stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**

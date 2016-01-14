@@ -66,17 +66,17 @@ describe('activities.routes.test.js', function() {
     });
   });
 
-  // Add an admin to the group.
+  // Add an host to the group.
   beforeEach(function(done) {
     group
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: 'host'})
       .done(done);
   });
 
-  // Add an viewer to the group.
+  // Add an backer to the group.
   beforeEach(function(done) {
     group
-      .addMember(user3, {role: 'viewer'})
+      .addUser(user3, {role: 'backer'})
       .done(done);
   });
 
