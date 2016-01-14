@@ -173,7 +173,7 @@ module.exports = function(Sequelize, DataTypes) {
           issuer: config.host.api,
           audience: application.id
         });
-      },
+      }
     },
 
     classMethods: {

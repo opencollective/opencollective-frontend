@@ -75,7 +75,7 @@ module.exports = function(app) {
 
         getGroupStripeAccount: function(cb) {
           req.group.getStripeAccount(function(err, stripeAccount) {
-            if(err) return cb(err);
+            if (err) return cb(err);
             if (!stripeAccount || !stripeAccount.accessToken) {
               return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
             }
