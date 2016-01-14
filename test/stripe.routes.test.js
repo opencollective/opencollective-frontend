@@ -73,7 +73,7 @@ describe('stripe.routes.test.js', function() {
       });
   });
 
-  // Add user2 as viewer to group.
+  // Add user2 as backer to group.
   beforeEach(function(done) {
     request(app)
       .post('/groups/' + group.id + '/users/' + user2.id)
@@ -159,21 +159,34 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail if the group does not exist', function(done) {
+    it('should fail if the user does not exist', function(done) {
       request(app)
         .get('/stripe/oauth/callback?state=123412312')
         .expect(400, {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'Host not found 123412312'
+            message: 'User is not a host 123412312'
+          }
+        })
+        .end(done);
+    });
+
+    it('should fail if the user is not a host', function(done) {
+      request(app)
+        .get('/stripe/oauth/callback?state=' + user2.id)
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'User is not a host ' + user2.id
           }
         })
         .end(done);
     });
 
     it('should set a stripeAccount', function(done) {
-      var url = '/stripe/oauth/callback?state=' + group.id + '&code=abc';
+      var url = '/stripe/oauth/callback?state=' + user.id + '&code=abc';
 
       async.auto({
         request: function(cb) {

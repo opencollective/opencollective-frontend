@@ -136,6 +136,23 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails adding a host if the group already has one', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/users/' + user2.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'Group already has a host'
+          }
+        })
+        .send({
+          role: roles.HOST
+        })
+        .end(done)
+    });
+
     it('successfully add a user to a group', function(done) {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
@@ -155,7 +172,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully add a user to a group with a role', function(done) {
-      var role = roles.HOST;
+      var role = roles.MEMBER;
 
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)

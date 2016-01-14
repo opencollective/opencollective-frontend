@@ -176,7 +176,8 @@ module.exports = function(app) {
       err.code = err.status || code;
     }
 
-    console.error('Error Express : ', err); console.log(err.stack);
+    console.error('Error Express : ', err);
+    if (err.stack) console.log(err.stack);
     res.status(err.code).send({error: err});
   });
 

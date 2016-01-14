@@ -8,6 +8,8 @@ var _ = require('lodash');
 var qs = require('querystring');
 var config = require('config');
 
+var roles = require('../constants/roles');
+
 /**
  * Controller.
  */
@@ -31,6 +33,7 @@ module.exports = function(app) {
    */
 
   var authorize = function(req, res, next) {
+    var redirectUri = config.host.webapp + '/groups/' + req.group.id + '/stripe/oauth/callback';
     var params = qs.stringify({
       response_type: 'code',
       scope: 'read_write',
@@ -48,23 +51,33 @@ module.exports = function(app) {
 
   var callback = function(req, res, next) {
     var code = req.query.code;
-    var HostId = req.query.state;
+    var UserId = req.query.state;
 
-    if (!HostId) {
+    if (!UserId) {
       return next(new errors.BadRequest('No state in the callback'));
     }
 
     async.auto({
 
-      findHost: function(cb) {
-        models.User.find(HostId)
-          .done(function(err, host) {
-            if (err) return cb(err);
-            if (!host) return next(new errors.BadRequest('Host not found ' + HostId));
+      checkIfUserIsHost: function(cb) {
+        models.UserGroup.find({
+          where: {
+            UserId: UserId,
+            role: roles.HOST
+          }
+        })
+        .done(function(err, userGroup) {
+          if (err) return cb(err)
+          if (!userGroup) return next(new errors.BadRequest('User is not a host ' + UserId));
 
-            cb(null, host);
-          });
+          return cb();
+        });
       },
+
+      findHost: ['checkIfUserIsHost', function(cb) {
+        models.User.find(UserId)
+          .done(cb);
+      }],
 
       getToken: ['findHost', function(cb, results) {
         axios

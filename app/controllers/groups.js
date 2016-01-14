@@ -34,7 +34,7 @@ module.exports = function(app) {
       checkIfGroupHasHost: function(cb) {
         if (options.role !== roles.HOST) return cb();
 
-        group.hasHost(function(hasHost) {
+        group.hasHost(function(err, hasHost) {
           if (hasHost) {
             cb(new errors.BadRequest('Group already has a host'));
           }
