@@ -452,6 +452,12 @@ module.exports = function(app) {
         where.amount = {
           $lt: 0
         };
+      } else if (req.query.pending) {
+        where = _.extend({}, where, {
+          amount: { $lt: 0 },
+          approved: false,
+          approvedAt: null
+        });
       }
 
       var query = _.merge({
