@@ -16,15 +16,6 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    // Manually adding foreign key reference without constraints
-    StripeAccountId: {
-      type: DataTypes.INTEGER,
-      references: 'StripeAccounts',
-      referencesKey: 'id',
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    },
-
     // Dates.
     createdAt: {
       type: DataTypes.DATE,

@@ -48,7 +48,7 @@ module.exports = function(app) {
   };
 
   var getGroupsFromUserWithRoles = function(req, options) {
-
+    console.log('get with role', options);
     /**
      * This isn't the best way to get the user role but I couldn't find a
      * clean way to do it with sequelize. If you find it, please refactor.
