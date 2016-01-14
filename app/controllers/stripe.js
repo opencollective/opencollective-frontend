@@ -23,8 +23,8 @@ module.exports = function(app) {
   var sequelize = models.sequelize;
   var User = models.User;
 
-  var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
   var AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
+  var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
 
   /**
    * Ask stripe for authorization OAuth
@@ -36,7 +36,7 @@ module.exports = function(app) {
       scope: 'read_write',
       client_id: config.stripe.clientId,
       redirect_uri: config.stripe.redirectUri,
-      state: req.group.id
+      state: req.remoteUser.id
     });
 
     res.redirect(AUTHORIZE_URI + '?' + params);
@@ -48,32 +48,25 @@ module.exports = function(app) {
 
   var callback = function(req, res, next) {
     var code = req.query.code;
-    var GroupId = req.query.state;
+    var HostId = req.query.state;
 
-    if (!GroupId) {
+    if (!HostId) {
       return next(new errors.BadRequest('No state in the callback'));
     }
 
     async.auto({
 
-      findUserGroup: function(cb) {
-        models.UserGroup.find({
-          where: {
-            GroupId: GroupId,
-            role: 'admin'
-          }
-        })
-        .then(function(userGroup) {
-          if (!userGroup) {
-            return cb(new errors.BadRequest('No UserGroup found with the admin role'));
-          }
+      findHost: function(cb) {
+        models.User.find(HostId)
+          .done(function(err, host) {
+            if (err) return cb(err);
+            if (!host) return next(new errors.BadRequest('Host not found ' + HostId));
 
-          cb(null, userGroup);
-        })
-        .catch(cb);
+            cb(null, host);
+          });
       },
 
-      getToken: ['findUserGroup', function(cb, results) {
+      getToken: ['findHost', function(cb, results) {
         axios
           .post(TOKEN_URI, {
             grant_type: 'authorization_code',
@@ -101,17 +94,15 @@ module.exports = function(app) {
         .done(cb);
       }],
 
-      linkStripeAccountToGroup: ['findUserGroup', 'createStripeAccount', function(cb, results) {
-        var userGroup = results.findUserGroup;
+      linkStripeAccountToGroup: ['findHost', 'createStripeAccount', function(cb, results) {
+        var host = results.findHost;
         var StripeAccount = results.createStripeAccount;
 
-        userGroup.update({
-          StripeAccountId: StripeAccount.id
-        })
-        .then(function() {
-          cb();
-        })
-        .catch(cb);
+        host.setStripeAccount(results.createStripeAccount)
+          .then(function() {
+            cb();
+          })
+          .catch(cb);
       }]
 
     }, function(err, results) {

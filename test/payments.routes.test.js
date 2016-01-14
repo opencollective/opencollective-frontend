@@ -30,7 +30,7 @@ var stripeMock = require('./mocks/stripe');
 /**
  * Tests.
  */
-describe.skip('payments.routes.test.js', function() {
+describe('payments.routes.test.js', function() {
 
   var application;
   var application2;

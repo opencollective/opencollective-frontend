@@ -21,7 +21,7 @@ var models = app.set('models');
 
 var stripeMock = require('./mocks/stripe');
 
-describe.skip('stripe.routes.test.js', function() {
+describe('stripe.routes.test.js', function() {
   var nocks = {};
 
   var user;
@@ -62,7 +62,7 @@ describe.skip('stripe.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group1'),
-        role: 'admin'
+        role: 'host'
       })
       .expect(200)
       .end(function(e, res) {
@@ -96,7 +96,7 @@ describe.skip('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail is the group does not have an admin', function(done) {
+    it('should fail is the group does not have an host', function(done) {
       request(app)
         .get('/groups/' + group.id + '/stripe/authorize')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -165,7 +165,7 @@ describe.skip('stripe.routes.test.js', function() {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'No UserGroup found with the admin role'
+            message: 'Host not found 123412312'
           }
         })
         .end(done);
@@ -199,7 +199,7 @@ describe.skip('stripe.routes.test.js', function() {
         }],
 
         checkUser: ['checkStripeAccount', function(cb, results) {
-          models.UserGroup.findAndCountAll({
+          models.User.findAndCountAll({
             where: {
               StripeAccountId: results.checkStripeAccount.id
             }
@@ -208,9 +208,7 @@ describe.skip('stripe.routes.test.js', function() {
             var count = res.count;
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
-            expect(res.rows[0].UserId).to.be.equal(user.id);
-            expect(res.rows[0].GroupId).to.be.equal(group.id);
-            expect(res.rows[0].role).to.be.equal('admin');
+            expect(res.rows[0].id).to.be.equal(user.id);
             cb();
           });
         }]

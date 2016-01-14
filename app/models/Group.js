@@ -103,33 +103,29 @@ module.exports = function(Sequelize, DataTypes) {
           .catch(fn);
       },
 
-      /**
-       * I decided to make the query clear over writing raw sql
-       * When we need to optimize this query, we can refactor it into a simple join
-       * sequelize makes it hard to make joins for manual relationship
-       */
-      getStripeAccount: function() {
-        return Sequelize.models.UserGroup.find({
+      getStripeAccount: function(cb) {
+        Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
-            role: 'admin',
-            StripeAccountId: {
-              $ne: null
-            }
+            role: 'host'
           }
         })
         .then(function(userGroup) {
-          if (!userGroup) {
-            return {};
-          }
-
-          return Sequelize.models.StripeAccount.find({
+          return Sequelize.models.User.find({
             where: {
-              id: userGroup.StripeAccountId
-            }
+              id: userGroup.UserId
+            },
+            include: [{
+              model: Sequelize.models.StripeAccount
+            }]
           });
-        });
+        })
+        .then(function(user) {
+          cb(null, user.StripeAccount);
+        })
+        .catch(cb);
       }
+
     }
   });
 

@@ -46,7 +46,7 @@ var stubStripe = function() {
   stub.yields(null, mock);
 };
 
-describe.skip('webhooks.routes.test.js', function() {
+describe('webhooks.routes.test.js', function() {
   var nocks = {};
 
   var user;
@@ -79,7 +79,7 @@ describe.skip('webhooks.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin',
+        role: 'host',
         stripeEmail: stripeEmail
       })
       .expect(200)
@@ -96,7 +96,7 @@ describe.skip('webhooks.routes.test.js', function() {
       accessToken: 'abc'
     })
     .then(function(account) {
-      return user.setGroupStripeAccount(account, group);
+      return user.setStripeAccount(account);
     })
     .then(function() {
       done();

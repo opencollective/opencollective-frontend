@@ -233,11 +233,7 @@ module.exports = function(app) {
         },
 
         getStripeAccount: function(cb) {
-          req.group.getStripeAccount()
-            .then(function(account) {
-              cb(null, account);
-            })
-            .catch(cb);
+          req.group.getStripeAccount(cb);
         }
 
       }, function(e, results) {

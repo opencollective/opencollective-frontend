@@ -178,7 +178,7 @@ describe('groups.routes.test.js', function() {
   /**
    * Get.
    */
-  describe.skip('#get', function() {
+  describe('#get', function() {
 
     var group;
     var publicGroup;
@@ -257,10 +257,10 @@ describe('groups.routes.test.js', function() {
         stripePublishableKey: stripeMock.accounts.create.keys.publishable
       })
       .tap(function(account) {
-        return user.setGroupStripeAccount(account, group);
+        return user.setStripeAccount(account);
       })
       .tap(function(account) {
-        return user.setGroupStripeAccount(account, publicGroup);
+        return user.setStripeAccount(account);
       })
       .then(function() {
         done();
@@ -382,7 +382,7 @@ describe('groups.routes.test.js', function() {
           expect(e).to.not.exist;
           group2 = g;
           group2
-            .addMember(user, {role: 'host'})
+            .addUser(user, {role: 'host'})
             .done(done);
         });
       });
