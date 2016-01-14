@@ -14,6 +14,7 @@ var sinon = require('sinon');
 var app = require('../index');
 var utils = require('../test/utils.js')();
 var models = app.set('models');
+var roles = require('../app/constants/roles');
 
 /**
  * Mock data
@@ -62,7 +63,7 @@ describe('stripe.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group1'),
-        role: 'admin'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -72,7 +73,7 @@ describe('stripe.routes.test.js', function() {
       });
   });
 
-  // Add user2 as viewer to group.
+  // Add user2 as backer to group.
   beforeEach(function(done) {
     request(app)
       .post('/groups/' + group.id + '/users/' + user2.id)
@@ -96,7 +97,7 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail is the group does not have an admin', function(done) {
+    it('should fail is the group does not have an host', function(done) {
       request(app)
         .get('/groups/' + group.id + '/stripe/authorize')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -104,7 +105,7 @@ describe('stripe.routes.test.js', function() {
           error: {
             code: 403,
             type: 'forbidden',
-            message: 'Unauthorized to manage this group.'
+            message: 'Unauthorized'
           }
         })
         .end(done);
@@ -158,21 +159,34 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail if the group does not exist', function(done) {
+    it('should fail if the user does not exist', function(done) {
       request(app)
         .get('/stripe/oauth/callback?state=123412312')
         .expect(400, {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'No UserGroup found with the admin role'
+            message: 'User is not a host 123412312'
+          }
+        })
+        .end(done);
+    });
+
+    it('should fail if the user is not a host', function(done) {
+      request(app)
+        .get('/stripe/oauth/callback?state=' + user2.id)
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'User is not a host ' + user2.id
           }
         })
         .end(done);
     });
 
     it('should set a stripeAccount', function(done) {
-      var url = '/stripe/oauth/callback?state=' + group.id + '&code=abc';
+      var url = '/stripe/oauth/callback?state=' + user.id + '&code=abc';
 
       async.auto({
         request: function(cb) {
@@ -199,7 +213,7 @@ describe('stripe.routes.test.js', function() {
         }],
 
         checkUser: ['checkStripeAccount', function(cb, results) {
-          models.UserGroup.findAndCountAll({
+          models.User.findAndCountAll({
             where: {
               StripeAccountId: results.checkStripeAccount.id
             }
@@ -208,9 +222,7 @@ describe('stripe.routes.test.js', function() {
             var count = res.count;
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
-            expect(res.rows[0].UserId).to.be.equal(user.id);
-            expect(res.rows[0].GroupId).to.be.equal(group.id);
-            expect(res.rows[0].role).to.be.equal('admin');
+            expect(res.rows[0].id).to.be.equal(user.id);
             cb();
           });
         }]

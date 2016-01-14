@@ -2,6 +2,7 @@
  * Dependencies.
  */
 var utils = require('../lib/utils');
+var roles = require('../constants/roles');
 var _ = require('lodash');
 var async = require('async');
 var Stripe = require('stripe');
@@ -74,15 +75,14 @@ module.exports = function(app) {
       async.auto({
 
         getGroupStripeAccount: function(cb) {
-          req.group.getStripeAccount()
-            .then(function(stripeAccount) {
-              if (!stripeAccount || !stripeAccount.accessToken) {
-                return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
-              }
+          req.group.getStripeAccount(function(err, stripeAccount) {
+            if (err) return cb(err);
+            if (!stripeAccount || !stripeAccount.accessToken) {
+              return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
+            }
 
-              cb(null, Stripe(stripeAccount.accessToken));
-            })
-            .catch(cb);
+            cb(null, Stripe(stripeAccount.accessToken));
+          });
         },
 
         getExistingCard: ['getGroupStripeAccount', function(cb, results) {
@@ -241,13 +241,13 @@ module.exports = function(app) {
           user = results.getOrCreateUser;
 
           group
-            .hasMember(user)
+            .hasUser(user)
             .then(function(isMember) {
               if (isMember)
                 return cb();
               else {
                 group
-                  .addMember(user, {role: 'viewer'})
+                  .addUser(user, {role: roles.BACKER})
                   .done(cb);
               }
             })

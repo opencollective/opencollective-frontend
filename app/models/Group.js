@@ -1,7 +1,9 @@
 /**
  * Dependencies.
  */
+var _ = require('lodash');
 var errors = require('../lib/errors');
+var roles = require('../constants/roles');
 
 /**
  * Model.
@@ -11,10 +13,7 @@ module.exports = function(Sequelize, DataTypes) {
   var Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      set: function(val) {
-        this.setDataValue('name', val);
-      }
+      allowNull: false
     },
     description: DataTypes.STRING, // max 95 characters
 
@@ -83,53 +82,61 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      isMember: function(userId, roles, fn) {
-        if (!roles || typeof roles === 'function') {
-          fn = roles;
-          roles = null;
-        }
-
+      hasUserWithRole: function(userId, roles, cb) {
         this
-          .getMembers({where: {id: userId} })
-          .then(function(members) {
-            if (members.length === 0)
-              return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
-            else {
-              if (roles && roles.indexOf(members[0].UserGroup.role) < 0)
-                return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
-              fn(null, true);
+          .getUsers({
+            where: {
+              id: userId
             }
           })
-          .catch(fn);
+          .then(function(users) {
+            if (users.length === 0) {
+              return cb(null, false);
+            } else if (!_.contains(roles, users[0].UserGroup.role)) {
+              return cb(null, false);
+            }
+
+            cb(null, true);
+          })
+          .catch(cb);
       },
 
-      /**
-       * I decided to make the query clear over writing raw sql
-       * When we need to optimize this query, we can refactor it into a simple join
-       * sequelize makes it hard to make joins for manual relationship
-       */
-      getStripeAccount: function() {
-        return Sequelize.models.UserGroup.find({
+      getStripeAccount: function(cb) {
+        Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
-            role: 'admin',
-            StripeAccountId: {
-              $ne: null
-            }
+            role: roles.HOST
           }
         })
         .then(function(userGroup) {
-          if (!userGroup) {
-            return {};
-          }
-
-          return Sequelize.models.StripeAccount.find({
+          return Sequelize.models.User.find({
             where: {
-              id: userGroup.StripeAccountId
-            }
+              id: userGroup.UserId
+            },
+            include: [{
+              model: Sequelize.models.StripeAccount
+            }]
           });
-        });
+        })
+        .then(function(user) {
+          cb(null, user.StripeAccount);
+        })
+        .catch(cb);
+      },
+
+      hasHost: function(cb) {
+        Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then(function(userGroup) {
+          return cb(null, !!userGroup);
+        })
+        .catch(cb);
       }
+
     }
   });
 

@@ -16,6 +16,7 @@ var userData = utils.data('user1');
 var groupData = utils.data('group1');
 var models = app.set('models');
 var transactionsData = utils.data('transactions1').transactions;
+var roles = require('../app/constants/roles');
 
 /**
  * Tests.
@@ -89,21 +90,21 @@ describe('transactions.routes.test.js', function() {
   // Add user to the group.
   beforeEach(function(done) {
     group
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
   // Add user to the group2.
   beforeEach(function(done) {
     group2
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
   // Add user to the publicGroup.
   beforeEach(function(done) {
     publicGroup
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
@@ -870,8 +871,8 @@ describe('transactions.routes.test.js', function() {
 
     var transaction;
     var transaction2;
-    var user3; // part of Group1 as a writer
-    var user4; // part of Group1 as a viewer
+    var user3; // part of Group1 as a member
+    var user4; // part of Group1 as a backer
 
     beforeEach(function(done) {
       async.auto({
@@ -913,12 +914,12 @@ describe('transactions.routes.test.js', function() {
         },
         addUserCGroupA: ['createUserC', function(cb, results) {
           group
-            .addMember(results.createUserC, {role: 'writer'})
+            .addUser(results.createUserC, {role: roles.MEMBER})
             .done(cb);
         }],
         addUserDGroupA: ['createUserD', function(cb, results) {
           group
-            .addMember(results.createUserD, {role: 'viewer'})
+            .addUser(results.createUserD, {role: roles.BACKER})
             .done(cb);
         }]
       }, function(e, results) {
@@ -947,7 +948,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails attributing a transaction that the user does not have access to [viewer of the group]', function(done) {
+    it('fails attributing a transaction that the user does not have access to [backer of the group]', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user4.jwt(application))
@@ -963,7 +964,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully attribute another user\'s transaction if writer', function(done) {
+    it('successfully attribute another user\'s transaction if member', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -971,7 +972,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully attribute a transaction [admin]', function(done) {
+    it('successfully attribute a transaction [host]', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))

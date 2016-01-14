@@ -23,17 +23,34 @@ module.exports = function(app) {
   var UserGroup = models.UserGroup;
   var StripeAccount = models.StripeAccount;
   var transactions = require('../controllers/transactions')(app);
+  var roles = require('../constants/roles');
 
   /**
    * Private methods.
    */
-  var addGroupMember = function(group, user, options, callback) {
-    group
-      .addMember(user, {role: options.role})
-      .then(function(usergroup) {
-        callback();
+  var addUserToGroup = function(group, user, options, callback) {
 
-        // Create activities.
+    async.auto({
+      checkIfGroupHasHost: function(cb) {
+        if (options.role !== roles.HOST) return cb();
+
+        group.hasHost(function(err, hasHost) {
+          if (err) return cb(err);
+          if (hasHost) {
+            cb(new errors.BadRequest('Group already has a host'));
+          }
+
+          cb();
+        });
+
+      },
+
+      addUserToGroup: ['checkIfGroupHasHost', function(cb) {
+        group.addUser(user, {role: options.role})
+          .done(cb);
+      }],
+
+      createActivity: ['addUserToGroup', function(cb) {
         var activity = {
           type: 'group.user.added',
           GroupId: group.id,
@@ -41,14 +58,18 @@ module.exports = function(app) {
             group: group.info,
             user: options.remoteUser.info,
             target: user.info,
-            usergroup: usergroup.info
+            role: options.role
           }
         };
-        Activity.create(_.extend({UserId: options.remoteUser.id}, activity));
-        if (user.id !== options.remoteUser.id)
-          Activity.create(_.extend({UserId: user.id}, activity));
-      })
-      .catch(callback);
+
+        Activity.create(activity)
+          .done(cb);
+
+      }]
+    }, function(err, results) {
+      if (err) return callback(err);
+      callback();
+    });
   };
 
   var getBalance = function(id, cb) {
@@ -96,7 +117,7 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
-    req.group.getMembers({})
+    req.group.getUsers({})
       .map(function(user) {
         return _.extend({}, user.public, { role: user.UserGroup.role });
       })
@@ -151,7 +172,7 @@ module.exports = function(app) {
               }).done(cb);
             },
 
-            addMember: function(cb) {
+            addUser: function(cb) {
               // Add caller to the group if `role` specified.
               var role = req.body.role;
               if (!role)
@@ -160,7 +181,7 @@ module.exports = function(app) {
                 role: role,
                 remoteUser: req.remoteUser
               };
-              addGroupMember(group, req.remoteUser, options, cb);
+              addUserToGroup(group, req.remoteUser, options, cb);
             }
           }, function(e) {
             if (e) return next(e);
@@ -233,11 +254,7 @@ module.exports = function(app) {
         },
 
         getStripeAccount: function(cb) {
-          req.group.getStripeAccount()
-            .then(function(account) {
-              cb(null, account);
-            })
-            .catch(cb);
+          req.group.getStripeAccount(cb);
         }
 
       }, function(e, results) {
@@ -264,21 +281,22 @@ module.exports = function(app) {
     /**
      * Add a user to a group.
      */
-    addMember: function(req, res, next) {
+    addUser: function(req, res, next) {
       var options = {
-        role: req.body.role || 'viewer',
+        role: req.body.role || roles.BACKER,
         remoteUser: req.remoteUser
       };
-      addGroupMember(req.group, req.user, options, function(e) {
+
+      addUserToGroup(req.group, req.user, options, function(e) {
         if (e) return next(e);
         else res.send({success: true});
       });
     },
 
     /**
-     * Update a member.
+     * Update a user.
      */
-    updateMember: function(req, res, next) {
+    updateUser: function(req, res, next) {
       var query = {
         where: {
           GroupId: req.group.id,
@@ -334,7 +352,7 @@ module.exports = function(app) {
     /**
      * Delete a member.
      */
-    deleteMember: function(req, res, next) {
+    deleteUser: function(req, res, next) {
       var query = {
         where: {
           GroupId: req.group.id,
