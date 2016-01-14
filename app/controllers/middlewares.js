@@ -100,7 +100,7 @@ module.exports = function(app) {
         var errorMsg = 'Invalid username/email or password';
 
         if (e) {
-          if (e.code == 400) {
+          if (e.code === 400) {
             return next(new errors.BadRequest(errorMsg));
           }
           else {
@@ -108,12 +108,12 @@ module.exports = function(app) {
           }
         }
 
-        req.remoteUser = user;
-        req.user = req.remoteUser;
-
         if (!user) {
           return next(new errors.BadRequest(errorMsg));
         }
+
+        req.remoteUser = user;
+        req.user = req.remoteUser;
 
         next();
       });
