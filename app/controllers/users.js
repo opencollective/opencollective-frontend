@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var Bluebird = require('bluebird');
+var userlib = require('../lib/userlib');
 
 /**
  * Controller.
@@ -176,10 +177,14 @@ module.exports = function(app) {
     create: function(req, res, next) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
-      _create(user, function(err, user) {
-        if (err) return next(err);
-        res.send(user.info);
+      
+      userlib.fetchAvatar(user, function(err, user) {
+        _create(user, function(err, user) {
+          if (err) return next(err);
+          res.send(user.info);
+        });
       });
+      
     },
 
     _create: _create,
