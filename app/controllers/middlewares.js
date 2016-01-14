@@ -96,8 +96,25 @@ module.exports = function(app) {
       }
 
       User.auth((username || email), password, function(e, user) {
-        if (e) return next();
+
+        var errorMsg = 'Invalid username/email or password';
+
+        if (e) {
+          if (e.code === 400) {
+            return next(new errors.BadRequest(errorMsg));
+          }
+          else {
+            return next(new errors.ServerError(e.message));
+          }
+        }
+
+        if (!user) {
+          return next(new errors.BadRequest(errorMsg));
+        }
+
         req.remoteUser = user;
+        req.user = req.remoteUser;
+
         next();
       });
     },

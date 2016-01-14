@@ -63,7 +63,7 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, auth.byPassword, users.getToken); // Authenticate user to get a token.
+  app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
 
