@@ -46,6 +46,9 @@ models.forEach(function(model) {
   m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'members'});
   m.User.belongsToMany(m.Group, {through: m.UserGroup, as: 'groups'});
 
+  // StripeAccount
+  m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
+
   // Application - User.
   m.User.belongsTo(m.Application);
   m.Application.hasMany(m.User);

@@ -2,7 +2,17 @@ module.exports = function(Sequelize, DataTypes) {
 
   var UserGroup = Sequelize.define('UserGroup', {
     // Role.
-    role: DataTypes.ENUM('admin', 'writer', 'viewer'),
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'member',
+      validate: {
+        isIn: {
+          args: [['host', 'member', 'backer']],
+          msg: 'Must be host, member or backer'
+        }
+      }
+    },
 
     // Manually adding foreign key reference without constraints
     StripeAccountId: {
