@@ -21,7 +21,7 @@ var roles = require('../app/constants/roles');
 /**
  * Tests.
  */
-describe.skip('transactions.routes.test.js', function() {
+describe('transactions.routes.test.js', function() {
 
   var group;
   var group2;

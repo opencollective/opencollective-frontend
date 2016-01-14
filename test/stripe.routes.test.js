@@ -105,7 +105,7 @@ describe('stripe.routes.test.js', function() {
           error: {
             code: 403,
             type: 'forbidden',
-            message: 'Unauthorized to manage this group.'
+            message: 'Unauthorized'
           }
         })
         .end(done);
@@ -172,7 +172,7 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it.only('should set a stripeAccount', function(done) {
+    it('should set a stripeAccount', function(done) {
       var url = '/stripe/oauth/callback?state=' + group.id + '&code=abc';
 
       async.auto({

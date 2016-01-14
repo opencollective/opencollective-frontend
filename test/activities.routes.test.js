@@ -21,7 +21,7 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe.skip('activities.routes.test.js', function() {
+describe('activities.routes.test.js', function() {
 
   var application;
   var user;

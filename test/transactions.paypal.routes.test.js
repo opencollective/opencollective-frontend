@@ -21,7 +21,7 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe.skip('transactions.paypal.routes.test.js', function() {
+describe('transactions.paypal.routes.test.js', function() {
 
   var application;
   var application2;
