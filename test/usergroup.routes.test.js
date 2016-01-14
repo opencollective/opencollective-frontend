@@ -8,6 +8,7 @@ var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
+var roles = require('../app/constants/roles');
 
 /**
  * Variables.
@@ -70,14 +71,14 @@ describe('usergroup.routes.test.js', function() {
   // Add an host to the group.
   beforeEach(function(done) {
     group
-      .addUser(user, {role: 'host'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
   // Add an backer to the group.
   beforeEach(function(done) {
     group
-      .addUser(user3, {role: 'backer'})
+      .addUser(user3, {role: roles.BACKER})
       .done(done);
   });
 
@@ -146,7 +147,7 @@ describe('usergroup.routes.test.js', function() {
 
           user2.getGroups().then(function(groups) {
             expect(groups[0].id).to.equal(group.id);
-            expect(groups[0].UserGroup.role).to.equal('backer');
+            expect(groups[0].UserGroup.role).to.equal(roles.BACKER);
             done();
           });
 
@@ -154,7 +155,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully add a user to a group with a role', function(done) {
-      var role = 'host';
+      var role = roles.HOST;
 
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
@@ -173,7 +174,7 @@ describe('usergroup.routes.test.js', function() {
 
             setTimeout(function() {
               models.Activity.findAndCountAll({}).then(function(res) {
-                expect(res.count).to.equal(2);
+                expect(res.count).to.equal(1);
                 done();
               });
             }, 50);
@@ -301,7 +302,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully update a user-group relation', function(done) {
-      var role = 'member';
+      var role = roles.MEMBER;
       request(app)
         .put('/groups/' + group.id + '/users/' + user3.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))

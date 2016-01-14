@@ -1,3 +1,5 @@
+var roles = require('../constants/roles');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var UserGroup = Sequelize.define('UserGroup', {
@@ -8,7 +10,7 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: 'member',
       validate: {
         isIn: {
-          args: [['host', 'member', 'backer']],
+          args: [[roles.HOST, roles.MEMBER, roles.BACKER]],
           msg: 'Must be host, member or backer'
         }
       }

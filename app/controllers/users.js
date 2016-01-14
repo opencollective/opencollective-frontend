@@ -114,7 +114,7 @@ module.exports = function(app) {
         res.send(user.info);
       })
       .catch(next);
-  }
+  };
 
   /**
    * Update.
@@ -139,7 +139,7 @@ module.exports = function(app) {
         res.send(user.info);
       })
       .catch(next);
-  }
+  };
 
   var getBalancePromise = function(GroupId) {
     return new Bluebird(function(resolve, reject) {

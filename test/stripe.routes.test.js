@@ -14,6 +14,7 @@ var sinon = require('sinon');
 var app = require('../index');
 var utils = require('../test/utils.js')();
 var models = app.set('models');
+var roles = require('../app/constants/roles');
 
 /**
  * Mock data
@@ -62,7 +63,7 @@ describe('stripe.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group1'),
-        role: 'host'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -171,7 +172,7 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should set a stripeAccount', function(done) {
+    it.only('should set a stripeAccount', function(done) {
       var url = '/stripe/oauth/callback?state=' + group.id + '&code=abc';
 
       async.auto({

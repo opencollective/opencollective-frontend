@@ -10,6 +10,7 @@ var request = require('supertest');
 var utils = require('../test/utils.js')();
 var sinon = require('sinon');
 var nock = require('nock');
+var roles = require('../app/constants/roles');
 
 /**
  * Variables.
@@ -20,7 +21,7 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe('transactions.paypal.routes.test.js', function() {
+describe.skip('transactions.paypal.routes.test.js', function() {
 
   var application;
   var application2;
@@ -68,12 +69,12 @@ describe('transactions.paypal.routes.test.js', function() {
       }],
       addUserAGroupA: ['createUserA', 'createGroupA', function(cb, results) {
         results.createGroupA
-          .addUser(results.createUserA, {role: 'backer'})
+          .addUser(results.createUserA, {role: roles.BACKER})
           .done(cb);
       }],
       addUserBGroupA: ['createUserB', 'createGroupA', function(cb, results) {
         results.createGroupA
-          .addUser(results.createUserB, {role: 'member'})
+          .addUser(results.createUserB, {role: roles.MEMBER})
           .done(cb);
       }],
       addApplicationCGroupA: ['createApplicationC', 'createGroupA', function(cb, results) {

@@ -2,6 +2,7 @@
  * Dependencies.
  */
 var utils = require('../lib/utils');
+var roles = require('../constants/roles');
 var _ = require('lodash');
 var async = require('async');
 var Stripe = require('stripe');
@@ -246,7 +247,7 @@ module.exports = function(app) {
                 return cb();
               else {
                 group
-                  .addUser(user, {role: 'backer'})
+                  .addUser(user, {role: roles.BACKER})
                   .done(cb);
               }
             })

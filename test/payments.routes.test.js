@@ -12,6 +12,7 @@ var generatePlanId = require('../app/lib/utils.js').planId;
 var sinon = require('sinon');
 var nock = require('nock');
 var chance = require('chance').Chance();
+var roles = require('../app/constants/roles');
 
 /**
  * Variables.
@@ -94,7 +95,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'host'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -121,7 +122,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group2'),
-        role: 'host'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -339,7 +340,7 @@ describe('payments.routes.test.js', function() {
           .then(function(users) {
             expect(users).to.have.length(2);
             var backer = _.find(users, {email: EMAIL});
-            expect(backer.UserGroup.role).to.equal('backer');
+            expect(backer.UserGroup.role).to.equal(roles.BACKER);
             done();
           })
           .catch(done);

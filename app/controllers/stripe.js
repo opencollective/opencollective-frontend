@@ -75,7 +75,7 @@ module.exports = function(app) {
             client_secret: config.stripe.secret
           })
           .then(function(response) {
-            cb(null, response.data)
+            cb(null, response.data);
           })
           .catch(cb);
       }],

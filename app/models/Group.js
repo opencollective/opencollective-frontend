@@ -1,7 +1,9 @@
 /**
  * Dependencies.
  */
+var _ = require('lodash');
 var errors = require('../lib/errors');
+var roles = require('../constants/roles');
 
 /**
  * Model.
@@ -11,10 +13,7 @@ module.exports = function(Sequelize, DataTypes) {
   var Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      set: function(val) {
-        this.setDataValue('name', val);
-      }
+      allowNull: false
     },
     description: DataTypes.STRING, // max 95 characters
 
@@ -83,31 +82,30 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      isMember: function(userId, roles, fn) {
-        if (!roles || typeof roles === 'function') {
-          fn = roles;
-          roles = null;
-        }
-
+      hasUserWithRole: function(userId, roles, cb) {
         this
-          .getUsers({where: {id: userId} })
-          .then(function(users) {
-            if (users.length === 0)
-              return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
-            else {
-              if (roles && roles.indexOf(users[0].UserGroup.role) < 0)
-                return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
-              fn(null, true);
+          .getUsers({
+            where: {
+              id: userId
             }
           })
-          .catch(fn);
+          .then(function(users) {
+            if (users.length === 0) {
+              return cb(null, false);
+            } else if (!_.contains(roles, users[0].UserGroup.role)) {
+              return cb(null, false);
+            }
+
+            cb(null, true);
+          })
+          .catch(cb);
       },
 
       getStripeAccount: function(cb) {
         Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
-            role: 'host'
+            role: roles.HOST
           }
         })
         .then(function(userGroup) {
@@ -122,6 +120,19 @@ module.exports = function(Sequelize, DataTypes) {
         })
         .then(function(user) {
           cb(null, user.StripeAccount);
+        })
+        .catch(cb);
+      },
+
+      hasHost: function(cb) {
+        Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then(function(userGroup) {
+          return cb(null, !!userGroup);
         })
         .catch(cb);
       }
