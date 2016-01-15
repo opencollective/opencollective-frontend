@@ -65,7 +65,7 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    website: DataTypes.STRING
+    website: DataTypes.STRING,
 
     publicUrl: {
       type: new DataTypes.VIRTUAL(DataTypes.STRING, ['slug']),
@@ -97,12 +97,9 @@ module.exports = function(Sequelize, DataTypes) {
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
           slug: this.slug,
-<<<<<<< 8520cbe90cf9e45d4438c01423a745a938380cd6
           website: this.website,
-          twitterHandle: this.twitterHandle
-=======
+          twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl
->>>>>>> fetch group by slug and use eslint to keep in sync with client
         };
       }
     },
