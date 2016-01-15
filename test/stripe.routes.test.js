@@ -92,20 +92,20 @@ describe('stripe.routes.test.js', function() {
   describe('authorize', function() {
     it('should return an error if the user is not logged in', function(done) {
       request(app)
-        .get('/groups/' + group.id + '/stripe/authorize')
+        .get('/stripe/authorize')
         .expect(401)
         .end(done);
     });
 
     it('should fail is the group does not have an host', function(done) {
       request(app)
-        .get('/groups/' + group.id + '/stripe/authorize')
+        .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(403, {
+        .expect(400, {
           error: {
-            code: 403,
-            type: 'forbidden',
-            message: 'Unauthorized'
+            code: 400,
+            type: 'bad_request',
+            message: 'User is not a host 2'
           }
         })
         .end(done);
@@ -113,7 +113,7 @@ describe('stripe.routes.test.js', function() {
 
     it('should redirect to stripe', function(done) {
       request(app)
-        .get('/groups/' + group.id + '/stripe/authorize')
+        .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(302) // redirect
         .end(function(e, res) {

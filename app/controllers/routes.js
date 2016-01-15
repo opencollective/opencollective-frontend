@@ -151,7 +151,7 @@ module.exports = function(app) {
    * Stripe oAuth
    */
 
-  app.get('/groups/:groupid/stripe/authorize', mw.authorizeAuthUser, mw.authorizeGroupRoles(roles.HOST), stripe.authorize);
+  app.get('/stripe/authorize', mw.authorizeAuthUser, stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
