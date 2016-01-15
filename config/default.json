@@ -10,8 +10,8 @@
     }
   },
   "host": {
-    "api": "http://localhost:3050",
-    "webapp": "http://localhost:8000"
+    "api": "http://localhost:3060",
+    "webapp": "http://localhost:3000"
   },
   "paypal": {
     "classic": {
@@ -24,6 +24,6 @@
     "feeOC": 5
   },
   "stripe": {
-    "redirectUri": "http://localhost:3000/api/stripe/oauth/callback"
+    "redirectUri": "http://localhost:3060/stripe/oauth/callback"
   }
 }

@@ -28,21 +28,41 @@ module.exports = function(app) {
   var AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
   var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
 
+  var checkIfUserIsHost = function(UserId, cb) {
+    models.UserGroup.find({
+      where: {
+        UserId: UserId,
+        role: roles.HOST
+      }
+    })
+    .done(function(err, userGroup) {
+      if (err) return cb(err)
+      if (!userGroup) return cb(new errors.BadRequest('User is not a host ' + UserId));
+
+      return cb();
+    });
+  };
+
   /**
    * Ask stripe for authorization OAuth
    */
 
   var authorize = function(req, res, next) {
-    var redirectUri = config.host.webapp + '/groups/' + req.group.id + '/stripe/oauth/callback';
-    var params = qs.stringify({
-      response_type: 'code',
-      scope: 'read_write',
-      client_id: config.stripe.clientId,
-      redirect_uri: config.stripe.redirectUri,
-      state: req.remoteUser.id
-    });
+    checkIfUserIsHost(req.remoteUser.id, function(err) {
+      if (err) return next(err);
 
-    res.redirect(AUTHORIZE_URI + '?' + params);
+      var params = qs.stringify({
+        response_type: 'code',
+        scope: 'read_write',
+        client_id: config.stripe.clientId,
+        redirect_uri: config.stripe.redirectUri,
+        state: req.remoteUser.id
+      });
+
+      res.send({
+        redirectUrl: AUTHORIZE_URI + '?' + params
+      });
+    })
   };
 
   /**
@@ -60,18 +80,7 @@ module.exports = function(app) {
     async.auto({
 
       checkIfUserIsHost: function(cb) {
-        models.UserGroup.find({
-          where: {
-            UserId: UserId,
-            role: roles.HOST
-          }
-        })
-        .done(function(err, userGroup) {
-          if (err) return cb(err)
-          if (!userGroup) return next(new errors.BadRequest('User is not a host ' + UserId));
-
-          return cb();
-        });
+        checkIfUserIsHost(UserId, cb);
       },
 
       findHost: ['checkIfUserIsHost', function(cb) {
@@ -120,7 +129,7 @@ module.exports = function(app) {
 
     }, function(err, results) {
       if (err) return next(err);
-      res.send({ success: true });
+      res.redirect(config.host.webapp + '?stripeStatus=success');
     });
   };
 

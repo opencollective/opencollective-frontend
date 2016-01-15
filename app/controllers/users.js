@@ -38,17 +38,13 @@ module.exports = function(app) {
     return req.user
       .getGroups(options)
       .map(function(group) { // sequelize uses bluebird
-        var account = group.StripeAccount;
-
         return _.extend(group.info, {
-          activities: group.Activities,
-          stripeAccount: account ? account.info : undefined
+          activities: group.Activities
         });
       });
   };
 
   var getGroupsFromUserWithRoles = function(req, options) {
-    console.log('get with role', options);
     /**
      * This isn't the best way to get the user role but I couldn't find a
      * clean way to do it with sequelize. If you find it, please refactor.
@@ -197,11 +193,18 @@ module.exports = function(app) {
     /**
      * Show.
      */
-    show: function(req, res) {
-      if (req.remoteUser.id === req.user.id)
-        res.send(req.user.info);
-      else
+    show: function(req, res, next) {
+      if (req.remoteUser.id === req.user.id) {
+        req.user.getStripeAccount()
+          .then(function(account) {
+            var response = _.extend({}, req.user.info, { stripeAccount: account });
+
+            res.send(response);
+          })
+          .catch(next);
+      } else {
         res.send(req.user.show);
+      }
     },
 
     /**
@@ -217,10 +220,6 @@ module.exports = function(app) {
 
       if (_.contains(include, 'activities')) {
         options.include.push({ model: Activity });
-      }
-
-      if (_.contains(include, 'stripemanagedaccount')) {
-        options.include.push({ model: StripeAccount });
       }
 
       var promise = withRoles ?
