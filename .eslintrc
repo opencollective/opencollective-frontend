@@ -1,0 +1,9 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-unused-vars": [2, {"vars": "all"}]
+  }
+}

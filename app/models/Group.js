@@ -2,6 +2,7 @@
  * Dependencies.
  */
 var _ = require('lodash');
+var config = require('config');
 var errors = require('../lib/errors');
 var roles = require('../constants/roles');
 
@@ -64,7 +65,14 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    website: DataTypes.STRING
+    website: DataTypes.STRING,
+
+    publicUrl: {
+      type: new DataTypes.VIRTUAL(DataTypes.STRING, ['slug']),
+      get() {
+        return `${config.host.webapp}/${this.get('slug')}`;
+      }
+    }
 
   }, {
     paranoid: true,
@@ -90,7 +98,8 @@ module.exports = function(Sequelize, DataTypes) {
           isPublic: this.isPublic,
           slug: this.slug,
           website: this.website,
-          twitterHandle: this.twitterHandle
+          twitterHandle: this.twitterHandle,
+          publicUrl: this.publicUrl
         };
       }
     },

@@ -40,10 +40,11 @@
     "stripe": "^3.3.4"
   },
   "devDependencies": {
+    "babel-eslint": "^4.1.6",
     "chai": "*",
     "chance": "^0.8.0",
+    "eslint": "^1.9.0",
     "istanbul": "0.3.2",
-    "jscs": "^1.13.1",
     "jsxhint": "^0.15.1",
     "mocha": "*",
     "nock": "^2.2.0",
@@ -54,7 +55,7 @@
   "scripts": {
     "test": "npm run hint && make test",
     "start": "npm run hint && node .",
-    "hint": "jscs app/**/*.js test/*.js --config=.jscsrc",
+    "hint": "eslint **/*.js",
     "circleci": "npm run hint && make circleci",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",

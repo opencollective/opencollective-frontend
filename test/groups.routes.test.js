@@ -337,7 +337,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .get('/groups/undefined')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(400)
+        .expect(404)
         .end(done);
     });
 
