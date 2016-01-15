@@ -115,13 +115,12 @@ describe('stripe.routes.test.js', function() {
       request(app)
         .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(302) // redirect
+        .expect(200) // redirect
         .end(function(e, res) {
           expect(e).to.not.exist;
 
-          var redirectUrl = res.headers.location;
-          expect(redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(redirectUrl).to.contain('state=' + group.id)
+          expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
+          expect(res.body.redirectUrl).to.contain('state=' + group.id)
           done();
         });
     });
@@ -192,7 +191,7 @@ describe('stripe.routes.test.js', function() {
         request: function(cb) {
           request(app)
             .get(url)
-            .expect(200)
+            .expect(302)
             .end(cb);
         },
 

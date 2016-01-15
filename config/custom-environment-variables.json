@@ -33,5 +33,9 @@
       "password": "PAYPAL_PASSWORD",
       "signature": "PAYPAL_SIGNATURE"
     }
+  },
+  "host": {
+    "api": "API_URL",
+    "webapp": "WEBAPP_URL"
   }
 }

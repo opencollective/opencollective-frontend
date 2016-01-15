@@ -129,7 +129,7 @@ module.exports = function(app) {
 
     }, function(err, results) {
       if (err) return next(err);
-      res.send({ success: true });
+      res.redirect(config.host.webapp + '?stripeStatus=success');
     });
   };
 
