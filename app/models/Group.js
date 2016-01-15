@@ -52,7 +52,19 @@ module.exports = function(Sequelize, DataTypes) {
 
     slug: {
       type: DataTypes.STRING
-    }
+    },
+
+    twitterHandle: {
+      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
+      validate: {
+        notContains: {
+          args: '@',
+          msg: 'twitterHandle must be without @ symbol'
+        }
+      }
+    },
+
+    website: DataTypes.STRING
 
   }, {
     paranoid: true,
@@ -76,7 +88,9 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
-          slug: this.slug
+          slug: this.slug,
+          website: this.website,
+          twitterHandle: this.twitterHandle
         };
       }
     },

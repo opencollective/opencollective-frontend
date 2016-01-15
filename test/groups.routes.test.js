@@ -105,6 +105,24 @@ describe('groups.routes.test.js', function() {
         });
     });
 
+    it('fails if @ symbol in twitterHandle', function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: _.extend({}, groupData, {twitterHandle: '@asood123'})
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'validation_failed',
+            message: 'Validation error: twitterHandle must be without @ symbol',
+            fields: ['twitterHandle']
+          }
+        })
+        .end(done);
+    });
+
     it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
@@ -129,6 +147,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
@@ -164,6 +184,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
