@@ -109,6 +109,10 @@ module.exports = function(Sequelize, DataTypes) {
           }
         })
         .then(function(userGroup) {
+          if (!userGroup) {
+            return { stripeAccount: null };
+          }
+
           return Sequelize.models.User.find({
             where: {
               id: userGroup.UserId
