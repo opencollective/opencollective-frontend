@@ -300,6 +300,58 @@ describe('users.routes.test.js', function() {
     });
   });
 
+  describe('#update password', () => {
+    var user;
+
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it.only('should update password', (done) => {
+      const newPassword = 'aaa123';
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.success).to.equal(true);
+          models.User.auth(user.email, newPassword, e => {
+            expect(e).to.not.exist;
+            done();
+          });
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      var link = 'http://opencollective.com/assets/icon2.svg';
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({
+          avatar: link
+        })
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails if the avatar key is missing from the payload', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({})
+        .expect(400)
+        .end(done);
+    });
+
+  });
+
   describe('#update avatar', function() {
     var user;
 
