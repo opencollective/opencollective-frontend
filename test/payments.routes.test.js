@@ -423,6 +423,7 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('CardId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
+            expect(res.rows[0]).to.have.property('paymentMethod', null);
             expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
             expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
             ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
