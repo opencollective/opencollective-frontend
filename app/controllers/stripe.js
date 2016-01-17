@@ -8,6 +8,8 @@ var _ = require('lodash');
 var qs = require('querystring');
 var config = require('config');
 
+var roles = require('../constants/roles');
+
 /**
  * Controller.
  */
@@ -23,23 +25,44 @@ module.exports = function(app) {
   var sequelize = models.sequelize;
   var User = models.User;
 
-  var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
   var AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
+  var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
+
+  var checkIfUserIsHost = function(UserId, cb) {
+    models.UserGroup.find({
+      where: {
+        UserId: UserId,
+        role: roles.HOST
+      }
+    })
+    .done(function(err, userGroup) {
+      if (err) return cb(err)
+      if (!userGroup) return cb(new errors.BadRequest('User is not a host ' + UserId));
+
+      return cb();
+    });
+  };
 
   /**
    * Ask stripe for authorization OAuth
    */
 
   var authorize = function(req, res, next) {
-    var params = qs.stringify({
-      response_type: 'code',
-      scope: 'read_write',
-      client_id: config.stripe.clientId,
-      redirect_uri: config.stripe.redirectUri,
-      state: req.group.id
-    });
+    checkIfUserIsHost(req.remoteUser.id, function(err) {
+      if (err) return next(err);
 
-    res.redirect(AUTHORIZE_URI + '?' + params);
+      var params = qs.stringify({
+        response_type: 'code',
+        scope: 'read_write',
+        client_id: config.stripe.clientId,
+        redirect_uri: config.stripe.redirectUri,
+        state: req.remoteUser.id
+      });
+
+      res.send({
+        redirectUrl: AUTHORIZE_URI + '?' + params
+      });
+    })
   };
 
   /**
@@ -48,32 +71,24 @@ module.exports = function(app) {
 
   var callback = function(req, res, next) {
     var code = req.query.code;
-    var GroupId = req.query.state;
+    var UserId = req.query.state;
 
-    if (!GroupId) {
+    if (!UserId) {
       return next(new errors.BadRequest('No state in the callback'));
     }
 
     async.auto({
 
-      findUserGroup: function(cb) {
-        models.UserGroup.find({
-          where: {
-            GroupId: GroupId,
-            role: 'admin'
-          }
-        })
-        .then(function(userGroup) {
-          if (!userGroup) {
-            return cb(new errors.BadRequest('No UserGroup found with the admin role'));
-          }
-
-          cb(null, userGroup);
-        })
-        .catch(cb);
+      checkIfUserIsHost: function(cb) {
+        checkIfUserIsHost(UserId, cb);
       },
 
-      getToken: ['findUserGroup', function(cb, results) {
+      findHost: ['checkIfUserIsHost', function(cb) {
+        models.User.find(UserId)
+          .done(cb);
+      }],
+
+      getToken: ['findHost', function(cb, results) {
         axios
           .post(TOKEN_URI, {
             grant_type: 'authorization_code',
@@ -82,7 +97,7 @@ module.exports = function(app) {
             client_secret: config.stripe.secret
           })
           .then(function(response) {
-            cb(null, response.data)
+            cb(null, response.data);
           })
           .catch(cb);
       }],
@@ -101,22 +116,20 @@ module.exports = function(app) {
         .done(cb);
       }],
 
-      linkStripeAccountToGroup: ['findUserGroup', 'createStripeAccount', function(cb, results) {
-        var userGroup = results.findUserGroup;
+      linkStripeAccountToGroup: ['findHost', 'createStripeAccount', function(cb, results) {
+        var host = results.findHost;
         var StripeAccount = results.createStripeAccount;
 
-        userGroup.update({
-          StripeAccountId: StripeAccount.id
-        })
-        .then(function() {
-          cb();
-        })
-        .catch(cb);
+        host.setStripeAccount(results.createStripeAccount)
+          .then(function() {
+            cb();
+          })
+          .catch(cb);
       }]
 
     }, function(err, results) {
       if (err) return next(err);
-      res.send({ success: true });
+      res.redirect(config.host.webapp + '?stripeStatus=success');
     });
   };
 

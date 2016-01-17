@@ -52,21 +52,31 @@ module.exports = function(app) {
     /**
      * Groupid.
      */
-    groupid: function(req, res, next, groupid) {
-      parseId(groupid, function(e, groupid) {
-        if (e) return next(e);
+    groupid: (req, res, next, groupid) => {
+      const callback = group => {
+        if (!group) {
+          return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
+        } else {
+          req.group = group;
+          next();
+        }
+      };
+
+      if (isNaN(groupid)) { // slug
         Group
-          .find(groupid)
-          .then(function(group) {
-            if (!group) {
-              return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
-            } else {
-              req.group = group;
-              next();
+          .find({
+            where: {
+              slug: groupid
             }
           })
+          .then(callback)
+          .catch(next)
+      } else {
+        Group
+          .find(groupid)
+          .then(callback)
           .catch(next);
-      });
+      }
     },
 
     /**

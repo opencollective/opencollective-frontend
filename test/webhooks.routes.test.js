@@ -10,6 +10,7 @@ var chance = require('chance').Chance();
 var sinon = require('sinon');
 
 var app = require('../index');
+var roles = require('../app/constants/roles');
 var utils = require('../test/utils.js')();
 var generatePlanId = require('../app/lib/utils.js').planId;
 
@@ -79,7 +80,7 @@ describe('webhooks.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin',
+        role: roles.HOST,
         stripeEmail: stripeEmail
       })
       .expect(200)
@@ -96,7 +97,7 @@ describe('webhooks.routes.test.js', function() {
       accessToken: 'abc'
     })
     .then(function(account) {
-      return user.setGroupStripeAccount(account, group);
+      return user.setStripeAccount(account);
     })
     .then(function() {
       done();

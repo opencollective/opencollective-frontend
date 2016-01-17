@@ -1,16 +1,19 @@
+var roles = require('../constants/roles');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var UserGroup = Sequelize.define('UserGroup', {
     // Role.
-    role: DataTypes.ENUM('admin', 'writer', 'viewer'),
-
-    // Manually adding foreign key reference without constraints
-    StripeAccountId: {
-      type: DataTypes.INTEGER,
-      references: 'StripeAccounts',
-      referencesKey: 'id',
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'member',
+      validate: {
+        isIn: {
+          args: [[roles.HOST, roles.MEMBER, roles.BACKER]],
+          msg: 'Must be host, member or backer'
+        }
+      }
     },
 
     // Dates.

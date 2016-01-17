@@ -58,7 +58,9 @@
     "description": "Troupe Scoute Albert Schweitzer",
     "budget": 10000.00,
     "membershipType": "yearlyfee",
-    "membershipfee": 10
+    "membershipfee": 10,
+    "twitterHandle": "scouts",
+    "website": "http://scouts.org.uk/home/"
   },
 
   "group2": {

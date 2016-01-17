@@ -9,6 +9,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
+var roles = require('../app/constants/roles');
 var sinon = require('sinon');
 
 /**
@@ -104,6 +105,24 @@ describe('groups.routes.test.js', function() {
         });
     });
 
+    it('fails if @ symbol in twitterHandle', function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: _.extend({}, groupData, {twitterHandle: '@asood123'})
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'validation_failed',
+            message: 'Validation error: twitterHandle must be without @ symbol',
+            fields: ['twitterHandle']
+          }
+        })
+        .end(done);
+    });
+
     it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
@@ -128,6 +147,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
@@ -138,8 +159,8 @@ describe('groups.routes.test.js', function() {
 
     });
 
-    it('successfully create a group assigning the caller as admin', function(done) {
-      var role = 'admin';
+    it('successfully create a group assigning the caller as host', function(done) {
+      var role = roles.HOST;
 
       request(app)
         .post('/groups')
@@ -163,6 +184,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
@@ -207,7 +230,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin'
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -237,7 +260,7 @@ describe('groups.routes.test.js', function() {
             name: 'group 2',
             isPublic: true
           },
-          role: 'admin'
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -257,10 +280,10 @@ describe('groups.routes.test.js', function() {
         stripePublishableKey: stripeMock.accounts.create.keys.publishable
       })
       .tap(function(account) {
-        return user.setGroupStripeAccount(account, group);
+        return user.setStripeAccount(account);
       })
       .tap(function(account) {
-        return user.setGroupStripeAccount(account, publicGroup);
+        return user.setStripeAccount(account);
       })
       .then(function() {
         done();
@@ -314,7 +337,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .get('/groups/undefined')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(400)
+        .expect(404)
         .end(done);
     });
 
@@ -382,7 +405,7 @@ describe('groups.routes.test.js', function() {
           expect(e).to.not.exist;
           group2 = g;
           group2
-            .addMember(user, {role: 'admin'})
+            .addUser(user, {role: roles.HOST})
             .done(done);
         });
       });
@@ -477,7 +500,7 @@ describe('groups.routes.test.js', function() {
             expect(e).to.not.exist;
             var userData = res.body[0];
             expect(userData.name).to.equal(user.public.name);
-            expect(userData.role).to.equal('admin');
+            expect(userData.role).to.equal(roles.HOST);
             done();
           });
       });
@@ -517,7 +540,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin'
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -547,7 +570,7 @@ describe('groups.routes.test.js', function() {
         expect(e).to.not.exist;
         user3 = u;
         group
-          .addMember(user3, {role: 'viewer'})
+          .addUser(user3, {role: roles.BACKER})
           .done(done);
       });
     });

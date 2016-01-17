@@ -23,7 +23,6 @@ module.exports = function(Sequelize, DataTypes) {
 
     paymentMethod: {
       type: DataTypes.STRING,
-      defaultValue: 'paypal',
       validate: {
         isIn: {
           args: [['paypal', 'manual']],

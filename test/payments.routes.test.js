@@ -12,6 +12,7 @@ var generatePlanId = require('../app/lib/utils.js').planId;
 var sinon = require('sinon');
 var nock = require('nock');
 var chance = require('chance').Chance();
+var roles = require('../app/constants/roles');
 
 /**
  * Variables.
@@ -94,7 +95,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: groupData,
-        role: 'admin'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -121,7 +122,7 @@ describe('payments.routes.test.js', function() {
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         group: utils.data('group2'),
-        role: 'admin'
+        role: roles.HOST
       })
       .expect(200)
       .end(function(e, res) {
@@ -145,10 +146,10 @@ describe('payments.routes.test.js', function() {
       accessToken: 'abc'
     })
     .tap(function(account) {
-      return user.setGroupStripeAccount(account, group);
+      return user.setStripeAccount(account);
     })
     .tap(function(account) {
-      return user.setGroupStripeAccount(account, group2);
+      return user.setStripeAccount(account);
     })
     .then(function() {
       done();
@@ -333,13 +334,13 @@ describe('payments.routes.test.js', function() {
           .end(done);
       });
 
-      it('successfully adds the user to the group as a viewer', function(done) {
+      it('successfully adds the user to the group as a backer', function(done) {
         group2
-          .getMembers()
+          .getUsers()
           .then(function(users) {
             expect(users).to.have.length(2);
-            var viewer = _.find(users, {email: EMAIL});
-            expect(viewer.UserGroup.role).to.equal('viewer');
+            var backer = _.find(users, {email: EMAIL});
+            expect(backer.UserGroup.role).to.equal(roles.BACKER);
             done();
           })
           .catch(done);
@@ -422,6 +423,7 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('CardId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
+            expect(res.rows[0]).to.have.property('paymentMethod', null);
             expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
             expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
             ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
