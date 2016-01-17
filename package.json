@@ -65,7 +65,8 @@
     "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh",
     "db:reset": "NODE_ENV=development node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
-    "postinstall": "npm rebuild"
+    "postinstall": "npm rebuild",
+    "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."
 }

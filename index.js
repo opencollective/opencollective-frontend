@@ -3,7 +3,6 @@
  */
 var _ = require('lodash');
 var express = require('express');
-var serverStatus = require('express-server-status');
 var app = express();
 
 if (!process.env.NODE_ENV) {
@@ -21,11 +20,6 @@ require('./app/lib/express')(app);
  * Config.
  */
 require('./app/lib/config')(app);
-
-/**
- * Server status.
- */
-app.use('/status', serverStatus(app));
 
 /**
  * Models.
