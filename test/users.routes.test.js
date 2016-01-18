@@ -454,7 +454,7 @@ describe('users.routes.test.js', function() {
 
     beforeEach((done) => {
       models.User.create({
-        email: 'nopassword@example.com'
+        email: 'xdamman@gmail.com' // will have twitter avatar
       })
       .done(function(e, u) {
         expect(e).to.not.exist;
@@ -494,9 +494,11 @@ describe('users.routes.test.js', function() {
           expect(res.body).to.have.property('name', newUser.name);
           expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
           expect(res.body).to.have.property('website', newUser.website);
+          expect(res.body).to.have.property('avatar').to.contain('cloudfront');
           done();
         });
     });
 
   });
+
 });
