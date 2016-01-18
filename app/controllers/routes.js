@@ -1,7 +1,7 @@
 var fs = require('fs');
 var _ = require('lodash');
+var serverStatus = require('express-server-status');
 var expressJwt = require('express-jwt');
-var status = require('../lib/status.js');
 var roles = require('../constants/roles');
 var config = require('config');
 
@@ -29,7 +29,7 @@ module.exports = function(app) {
   /**
    * Status.
    */
-  app.get('/status', status);
+  app.use('/status', serverStatus(app));
 
   /**
    * Parameters.
