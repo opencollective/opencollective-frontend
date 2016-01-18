@@ -46,7 +46,7 @@ describe("userlib", function() {
       expect(stub.callCount).to.equal(1);
       expect(user).to.deep.equal(userData1);
       done();
-    });    
+    });
   });
 
   it("only calls clearbit server once for an email not found", function(done) {
@@ -70,16 +70,16 @@ describe("userlib", function() {
       done();
     });
   });
-  
+
   it("doesn't fetch the avatar if one has already been provided", function(done) {
     userData3.avatar = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764';
     var currentCallCount = stub.callCount;
     userlib.fetchAvatar(userData3, function(err, user) {
       expect(stub.callCount).to.equal(currentCallCount);
       expect(user).to.deep.equal(userData3);
-      done();  
+      done();
     });
   });
-  
-  
+
+
 });
