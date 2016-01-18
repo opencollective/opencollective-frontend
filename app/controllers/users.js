@@ -167,7 +167,7 @@ module.exports = function(app) {
     const passwordConfirmation = req.required.passwordConfirmation;
 
     if (password !== passwordConfirmation) {
-      return next(new errors.BadRequest('Password and passwordConfirmation don\'t match'));
+      return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
     }
 
     req.user.password = password;

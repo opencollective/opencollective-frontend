@@ -302,6 +302,7 @@ describe('users.routes.test.js', function() {
 
   describe('#update password', () => {
     var user;
+    var user2;
 
     beforeEach((done) => {
       models.User.create(utils.data('user1')).done((e, u) => {
@@ -311,8 +312,17 @@ describe('users.routes.test.js', function() {
       });
     });
 
-    it.only('should update password', (done) => {
+    beforeEach((done) => {
+      models.User.create(utils.data('user2')).done((e, u) => {
+        expect(e).to.not.exist;
+        user2 = u;
+        done();
+      });
+    });
+
+    it('should update password', (done) => {
       const newPassword = 'aaa123';
+
       request(app)
         .put('/users/' + user.id + '/password')
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -332,21 +342,37 @@ describe('users.routes.test.js', function() {
     });
 
     it('fails if the user is not logged in', function(done) {
-      var link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
-        .put('/users/' + user.id + '/avatar')
-        .send({
-          avatar: link
-        })
+        .put('/users/' + user.id + '/password')
         .expect(401)
         .end(done);
     });
 
-    it('fails if the avatar key is missing from the payload', function(done) {
+    it('fails if wrong user is logged in', function(done) {
       request(app)
-        .put('/users/' + user.id + '/avatar')
-        .send({})
-        .expect(400)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if the passwords don\'t match', function(done) {
+      const newPassword = 'aaa123';
+
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword + 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'password and passwordConfirmation don\'t match'
+          }
+        })
         .end(done);
     });
 
