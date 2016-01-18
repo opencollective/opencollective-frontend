@@ -57,7 +57,7 @@
   "scripts": {
     "test": "npm run hint && make test",
     "start": "npm run hint && node .",
-    "hint": "eslint **/*.js",
+    "hint": "eslint **/*.js --quiet",
     "circleci": "npm run hint && make circleci",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
