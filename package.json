@@ -15,6 +15,7 @@
     "bluebird": "^3.0.1",
     "body-parser": "^1.12.2",
     "child-process-promise": "^1.1.0",
+    "clearbit": "^1.2.1",
     "config": "^1.16.0",
     "cors": "^2.5.3",
     "dotenv": "^1.2.0",
