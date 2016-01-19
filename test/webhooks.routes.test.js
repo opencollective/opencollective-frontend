@@ -246,7 +246,33 @@ describe('webhooks.routes.test.js', function() {
     });
   });
 
+  it('returns 200 if the event is not livemode in production', function(done) {
+    var event = _.extend({}, webhookEvent, {
+      livemode: false
+    });
+
+    var env = app.set('env');
+
+    app.set('env', 'production');
+
+    nocks['events.retrieve'] = nock(STRIPE_URL)
+      .get('/v1/events/' + event.id)
+      .reply(200, event);
+
+    request(app)
+      .post('/webhooks/stripe')
+      .send(event)
+      .expect(200)
+      .end((err) => {
+        expect(err).to.not.exist;
+        app.set('env', env);
+        expect(nocks['events.retrieve'].isDone()).to.be.false;
+        done();
+      });
+  });
+
   describe('errors', function() {
+
     it('returns an error if the event is not `invoice.payment_succeeded`', function(done) {
       var event = _.extend({}, webhookEvent, {
         type: 'application_fee.created'
