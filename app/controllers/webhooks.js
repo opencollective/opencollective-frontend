@@ -3,6 +3,7 @@
  */
 
 var async = require('async');
+var config = require('config');
 var _ = require('lodash');
 
 /**
@@ -28,6 +29,12 @@ module.exports = function(app) {
 
   var stripe = function(req, res, next) {
     var event = req.body;
+
+    // Stripe send test events to productions as well
+    // don't do anything if the event is not livemode
+    if (app.set('env') === 'production' && !event.livemode) {
+      return res.sendStatus(200);
+    }
 
     async.auto({
       fetchEvent: function(cb) {
