@@ -19,6 +19,7 @@ module.exports = function(app) {
   var UserGroup = models.UserGroup;
   var StripeAccount = models.StripeAccount;
   var groups = require('../controllers/groups')(app);
+  var errors = app.errors;
 
   /**
    * Private methods.
@@ -162,6 +163,21 @@ module.exports = function(app) {
       .catch(cb);
   };
 
+  const updatePassword = (req, res, next) => {
+    const password= req.required.password;
+    const passwordConfirmation = req.required.passwordConfirmation;
+
+    if (password !== passwordConfirmation) {
+      return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
+    }
+
+    req.user.password = password;
+
+    req.user.save()
+      .then(() => res.send({success: true}))
+      .catch(next);
+  };
+
   /**
    * Public methods.
    */
@@ -246,6 +262,7 @@ module.exports = function(app) {
     updatePaypalEmail: updatePaypalEmail,
     updateAvatar: updateAvatar,
     update: update,
-    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn
+    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn,
+    updatePassword: updatePassword
   };
 };

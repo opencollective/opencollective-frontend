@@ -87,7 +87,6 @@ module.exports = function(app) {
       var username = (req.body && req.body.username) || req.query.username;
       var email = (req.body && req.body.email) || req.query.email;
       var password = (req.body && req.body.password) || req.query.password;
-
       if (!req.application || !req.application.api_key) {
         return next();
       }

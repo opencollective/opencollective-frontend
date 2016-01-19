@@ -300,6 +300,84 @@ describe('users.routes.test.js', function() {
     });
   });
 
+  describe('#update password', () => {
+    var user;
+    var user2;
+
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    beforeEach((done) => {
+      models.User.create(utils.data('user2')).done((e, u) => {
+        expect(e).to.not.exist;
+        user2 = u;
+        done();
+      });
+    });
+
+    it('should update password', (done) => {
+      const newPassword = 'aaa123';
+
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.success).to.equal(true);
+          models.User.auth(user.email, newPassword, e => {
+            expect(e).to.not.exist;
+            done();
+          });
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails if wrong user is logged in', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if the passwords don\'t match', function(done) {
+      const newPassword = 'aaa123';
+
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword + 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'password and passwordConfirmation don\'t match'
+          }
+        })
+        .end(done);
+    });
+
+  });
+
   describe('#update avatar', function() {
     var user;
 
