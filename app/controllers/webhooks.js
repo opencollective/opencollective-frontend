@@ -10,71 +10,79 @@ var _ = require('lodash');
  * Controller.
  */
 
-module.exports = function(app) {
+module.exports = (app) => {
 
   /**
    * Internal Dependencies.
    */
 
-  var errors = app.errors;
+  const errors = app.errors;
 
-  var models = app.set('models');
-  var Card = models.Card;
-  var User = models.User;
-  var Transaction = models.Transaction;
-  var Activity = models.Activity;
-  var Group = models.Group;
+  const models = app.set('models');
+  const Card = models.Card;
+  const User = models.User;
+  const Transaction = models.Transaction;
+  const Activity = models.Activity;
+  const Group = models.Group;
 
-  var transactions = require('./transactions')(app);
+  const transactions = require('./transactions')(app);
 
-  var stripe = function(req, res, next) {
-    var event = req.body;
+  const stripe = (req, res, next) => {
+    const body = req.body;
 
-    // Stripe send test events to productions as well
+
+    // Stripe send test events to production as well
     // don't do anything if the event is not livemode
-    if (app.set('env') === 'production' && !event.livemode) {
+    if (app.set('env') === 'production' && !body.livemode) {
       return res.sendStatus(200);
     }
 
     async.auto({
-      fetchEvent: function(cb) {
+      fetchEvent: (cb) => {
 
         /**
          * We check the event on stripe to be sure we don't get a fake event from
          * someone else
          */
-        app.stripe.events.retrieve(event.id, {
-          stripe_account: event.user_id
-        }, function(err, ev) {
-          if (err) return next(err);
-
-          if (ev.type !== 'invoice.payment_succeeded') {
-            return next(new errors.BadRequest('Wrong event type received'));
+        app.stripe.events.retrieve(body.id, {
+          stripe_account: body.user_id
+        })
+        .then(event => {
+          if (event.type !== 'invoice.payment_succeeded') {
+            return cb(new errors.BadRequest('Wrong event type received'));
           }
 
-          var invoice = ev.data.object;
-          var invoiceLineItems = invoice.lines.data;
-          var subscription = _.find(invoiceLineItems, { type: 'subscription' });
+          const invoice = event.data.object;
+          const invoiceLineItems = invoice.lines.data;
+          const subscription = _.find(invoiceLineItems, { type: 'subscription' });
 
-          cb(err, {
-            event: ev,
-            subscription: subscription
-          });
-        });
+          cb(null, { event, subscription });
+        })
+        .catch(cb);
       },
 
-      createActivity: ['fetchEvent', function(cb, results) {
+      createActivity: ['fetchEvent', (cb, results) => {
         // Only save activity when the event is valid
         Activity.create({
           type: 'webhook.stripe.received',
           data: {
             event: results.fetchEvent.event
           }
-        }).done(cb);
+        })
+        .done(cb);
       }],
 
-      fetchTransaction: ['createActivity', function(cb, results) {
+      fetchPendingTransaction: ['createActivity', (cb, results) => {
+        Transaction.findOne({
+          where: {
+            stripeSubscriptionId: results.fetchEvent.subscription.id,
+            isWaitingFirstInvoice: true
+          }
+        })
+        .done(cb);
+      }],
 
+      fetchTransaction: ['createActivity', (cb, results) => {
         Transaction.findOne({
           where: {
             stripeSubscriptionId: results.fetchEvent.subscription.id
@@ -85,7 +93,7 @@ module.exports = function(app) {
             { model: Card }
           ]
         })
-        .then(function(transaction) {
+        .then((transaction) => {
           if (!transaction) {
             return cb(new errors.BadRequest('Transaction not found: unknown subscription id'));
           }
@@ -95,15 +103,25 @@ module.exports = function(app) {
         .catch(cb)
       }],
 
-      createTransaction: ['fetchTransaction', function(cb, results) {
-        var transaction = results.fetchTransaction;
-        var subscription = results.fetchEvent.subscription;
-        var plan = subscription.plan;
-        var user = transaction.User || {};
-        var group = transaction.Group || {};
-        var card = transaction.Card || {};
+      createOrUpdateTransaction: ['fetchTransaction', 'fetchPendingTransaction', (cb, results) => {
+        const pendingTransaction = results.fetchPendingTransaction;
 
-        var transaction = {
+        // If the transaction is pending, we will just update it
+        // We only use pending transactions for the first subscription invoice
+        if (pendingTransaction && pendingTransaction.isWaitingFirstInvoice) {
+          pendingTransaction.isWaitingFirstInvoice = false;
+
+          return pendingTransaction.save()
+            .done(cb);
+        }
+
+        const transaction = results.fetchTransaction;
+        const subscription = results.fetchEvent.subscription;
+        const user = transaction.User || {};
+        const group = transaction.Group || {};
+        const card = transaction.Card || {};
+
+        const newTransaction = {
             type: 'payment',
             amount: subscription.amount / 100,
             currency: subscription.currency,
@@ -115,14 +133,14 @@ module.exports = function(app) {
           };
 
         transactions._create({
-          transaction: transaction,
-          group: group,
-          user: user,
-          card: card
+          transaction: newTransaction,
+          user,
+          group,
+          card
         }, cb);
       }]
 
-    }, function(err, results) {
+    }, (err, results) => {
       if (err) return next(err);
 
       /**
@@ -134,7 +152,7 @@ module.exports = function(app) {
   };
 
   return {
-    stripe: stripe
+    stripe
   };
 
 };

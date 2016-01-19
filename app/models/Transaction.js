@@ -38,6 +38,11 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
+    isWaitingFirstInvoice: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
