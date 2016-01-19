@@ -222,6 +222,11 @@ module.exports = function(app) {
 
           if (isSubscription) {
             transaction.stripeSubscriptionId = charge.id;
+
+            // We will put this transaction on pending until we get the first invoice
+            // from the webhook. This needs to be refactored when we have a separation
+            // between transactions and payments.
+            transaction.isWaitingFirstInvoice = true;
           }
 
           ['description', 'beneficiary', 'paidby', 'tags', 'status', 'link', 'comment'].forEach(function(prop) {
