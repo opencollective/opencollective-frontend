@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+var _ = require('lodash');
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 var errors = require('../lib/errors');
@@ -173,6 +174,10 @@ module.exports = function(Sequelize, DataTypes) {
           issuer: config.host.api,
           audience: application.id
         });
+      },
+
+      hasPassword() {
+        return _.isString(this.password_hash);
       }
     },
 

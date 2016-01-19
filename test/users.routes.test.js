@@ -430,48 +430,70 @@ describe('users.routes.test.js', function() {
    * Update user (without authentication)
    */
 
-  describe('#update user from public donation page', function() {
-    var user;
+  describe('#update user from public donation page', () => {
+    var userWithPassword;
+    var userWithoutPassword;
 
     var newUser = {
       name: 'newname',
-      username: 'userName',
-      avatar: 'avatar',
-      email: 'test@test.com',
       twitterHandle: 'twitter.com/asood123',
-      website: 'opencollective.com',
-      paypalEmail: 'newppemail@test.com'
-    }
+      website: 'opencollective.com'
+    };
 
-    beforeEach(function(done) {
-      models.User.create(utils.data('user5')).done(function(e, u) {
+    beforeEach((done) => {
+      models.User.create({
+        email: 'withpassword@example.com',
+        password: 'password'
+      })
+      .done((e, u) => {
         expect(e).to.not.exist;
-        user = u;
+        userWithPassword = u;
         done();
       });
     });
 
-    it('successfully updates a user if authenticated as a user', function(done) {
+    beforeEach((done) => {
+      models.User.create({
+        email: 'nopassword@example.com'
+      })
+      .done(function(e, u) {
+        expect(e).to.not.exist;
+        userWithoutPassword = u;
+        done();
+      });
+    });
+
+    it('fails if the user already has a password', done => {
       request(app)
-        .put('/users/' + user.id)
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put('/users/' + userWithPassword.id)
         .send({
-          user: newUser
+          user: newUser,
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'Can\'t update user with password from this route'
+          }
+        })
+        .end(done);
+    });
+
+    it('successfully updates a user without a password', done => {
+      request(app)
+        .put('/users/' + userWithoutPassword.id)
+        .send({
+          user: newUser,
+          api_key: application.api_key
         })
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', user.id);
+          expect(res.body).to.have.property('id', userWithoutPassword.id);
           expect(res.body).to.have.property('name', newUser.name);
-          expect(res.body).to.have.property('username', user.username); // old item
-          expect(res.body).to.have.property('avatar', user.avatar);
-          expect(res.body).to.have.property('email', user.email); // old item
           expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
           expect(res.body).to.have.property('website', newUser.website);
-          expect(res.body).to.have.property('paypalEmail', user.paypalEmail);
-          expect(res.body).to.not.have.property('otherprop');
-          expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(user.createdAt).getTime());
-          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(user.updatedAt).getTime());
           done();
         });
     });

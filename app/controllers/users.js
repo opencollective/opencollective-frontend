@@ -96,6 +96,10 @@ module.exports = function(app) {
    * Only works if password is null, as an extra precaution
    */
   var updateUserWithoutLoggedIn = function(req, res, next) {
+    if (req.user.hasPassword()) {
+      return next(new errors.BadRequest('Can\'t update user with password from this route'));
+    }
+
     ['name',
      'twitterHandle',
      'website'
@@ -189,14 +193,14 @@ module.exports = function(app) {
     create: function(req, res, next) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
-      
+
       userlib.fetchAvatar(user, function(err, user) {
         _create(user, function(err, user) {
           if (err) return next(err);
           res.send(user.info);
         });
       });
-      
+
     },
 
     _create: _create,
