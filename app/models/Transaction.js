@@ -4,9 +4,15 @@ module.exports = function(Sequelize, DataTypes) {
     type: DataTypes.STRING,
     description: DataTypes.STRING,
     amount: DataTypes.FLOAT,
+    vat: DataTypes.FLOAT,
     currency: {
       type: DataTypes.STRING,
-      defaultValue: 'USD'
+      defaultValue: 'USD',
+      set: function(val) {
+        if (val && val.toUpperCase) {
+          this.setDataValue('currency', val.toUpperCase());
+        }
+      }
     },
     beneficiary: DataTypes.STRING,
     paidby: DataTypes.STRING,
@@ -15,7 +21,24 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
+    paymentMethod: {
+      type: DataTypes.STRING,
+      validate: {
+        isIn: {
+          args: [['paypal', 'manual']],
+          msg: 'Must be paypal or manual'
+        }
+      }
+    },
+
+    stripeSubscriptionId: DataTypes.STRING,
+
     approved: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
+    isWaitingFirstInvoice: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
@@ -35,6 +58,7 @@ module.exports = function(Sequelize, DataTypes) {
           type: this.type,
           description: this.description,
           amount: this.amount,
+          vat: this.vat,
           currency: this.currency,
           beneficiary: this.beneficiary,
           paidby: this.paidby,
@@ -46,7 +70,9 @@ module.exports = function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           approvedAt: this.approvedAt,
           reimbursedAt: this.reimbursedAt,
-          UserId: this.UserId
+          UserId: this.UserId,
+          GroupId: this.GroupId,
+          paymentMethod: this.paymentMethod
         };
       }
     }

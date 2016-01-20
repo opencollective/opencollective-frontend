@@ -9,6 +9,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
+var roles = require('../app/constants/roles');
 var sinon = require('sinon');
 
 /**
@@ -63,8 +64,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .post('/groups')
         .send({
-          group: groupData,
-          stripeEmail: stripeEmail
+          group: groupData
         })
         .expect(401)
         .end(function(e, res) {
@@ -84,23 +84,6 @@ describe('groups.routes.test.js', function() {
         });
     });
 
-    it('fails creating a group without stripeEmail', function(done) {
-      request(app)
-        .post('/groups')
-        .send({
-          group: groupData
-        })
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(400)
-        .end(function(e, res) {
-          expect(e).to.not.exist;
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('error');
-          expect(res.body.error).to.have.property('message', 'Missing required fields');
-          done();
-        });
-    });
-
     it('fails creating a group without name', function(done) {
       var group = _.omit(groupData, 'name');
 
@@ -108,8 +91,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: group,
-          stripeEmail: stripeEmail
+          group: group
         })
         .expect(400)
         .end(function(e, res) {
@@ -123,13 +105,30 @@ describe('groups.routes.test.js', function() {
         });
     });
 
+    it('fails if @ symbol in twitterHandle', function(done) {
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: _.extend({}, groupData, {twitterHandle: '@asood123'})
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'validation_failed',
+            message: 'Validation error: twitterHandle must be without @ symbol',
+            fields: ['twitterHandle']
+          }
+        })
+        .end(done);
+    });
+
     it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
-          stripeEmail: stripeEmail
+          group: groupData
         })
         .expect(200)
         .end(function(e, res) {
@@ -139,10 +138,18 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('description');
           expect(res.body).to.have.property('budget', groupData.budget);
           expect(res.body).to.have.property('currency', 'USD');
-          expect(res.body).to.have.property('membership_type');
+          expect(res.body).to.have.property('longDescription');
+          expect(res.body).to.have.property('logo');
+          expect(res.body).to.have.property('video');
+          expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('expensePolicy');
+          expect(res.body).to.have.property('membershipType');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
+          expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(0);
@@ -152,16 +159,15 @@ describe('groups.routes.test.js', function() {
 
     });
 
-    it('successfully create a group assigning the caller as admin', function(done) {
-      var role = 'admin';
+    it('successfully create a group assigning the caller as host', function(done) {
+      var role = roles.HOST;
 
       request(app)
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: role,
-          stripeEmail: stripeEmail
+          role: role
         })
         .expect(200)
         .end(function(e, res) {
@@ -169,45 +175,23 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name');
           expect(res.body).to.have.property('description');
-          expect(res.body).to.have.property('membership_type');
+          expect(res.body).to.have.property('longDescription');
+          expect(res.body).to.have.property('logo');
+          expect(res.body).to.have.property('video');
+          expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('expensePolicy');
+          expect(res.body).to.have.property('membershipType');
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
+          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
+          expect(res.body).to.have.property('website', groupData.website);
+          expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(1);
             done();
           });
-        });
-
-    });
-
-    it('successfully create a group and create a managed account on Stripe', function(done) {
-      request(app)
-        .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .send({
-          group: groupData,
-          stripeEmail: stripeEmail
-        })
-        .expect(200)
-        .end(function(e, res) {
-          expect(e).to.not.exist;
-
-          models.Group
-            .find(parseInt(res.body.id))
-            .then(function(group) {
-              group.getStripeManagedAccount()
-                .then(function(account) {
-                  expect(account).to.have.property('stripeId', stripeMock.accounts.create.id);
-                  expect(account).to.have.property('stripeSecret', stripeMock.accounts.create.keys.secret);
-                  expect(account).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
-                  expect(account).to.have.property('stripeEmail', stripeMock.accounts.create.email);
-                  done();
-                })
-                .catch(done);
-            })
-            .catch(done);
         });
 
     });
@@ -246,8 +230,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin',
-          stripeEmail: stripeEmail
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -277,8 +260,7 @@ describe('groups.routes.test.js', function() {
             name: 'group 2',
             isPublic: true
           },
-          role: 'admin',
-          stripeEmail: stripeEmail
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -291,6 +273,22 @@ describe('groups.routes.test.js', function() {
             })
             .catch(done);
         });
+    });
+
+    beforeEach(function(done) {
+      models.StripeAccount.create({
+        stripePublishableKey: stripeMock.accounts.create.keys.publishable
+      })
+      .tap(function(account) {
+        return user.setStripeAccount(account);
+      })
+      .tap(function(account) {
+        return user.setStripeAccount(account);
+      })
+      .then(function() {
+        done();
+      })
+      .catch(done);
     });
 
     // Create another user.
@@ -339,7 +337,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .get('/groups/undefined')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(400)
+        .expect(404)
         .end(done);
     });
 
@@ -353,8 +351,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', group.id);
           expect(res.body).to.have.property('name', group.name);
           expect(res.body).to.have.property('description', group.description);
-          expect(res.body).to.have.property('stripeManagedAccount');
-          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
@@ -368,8 +366,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id', publicGroup.id);
           expect(res.body).to.have.property('name', publicGroup.name);
           expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
-          expect(res.body).to.have.property('stripeManagedAccount');
-          expect(res.body.stripeManagedAccount).to.have.property('stripeKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
@@ -407,7 +405,7 @@ describe('groups.routes.test.js', function() {
           expect(e).to.not.exist;
           group2 = g;
           group2
-            .addMember(user, {role: 'admin'})
+            .addUser(user, {role: roles.HOST})
             .done(done);
         });
       });
@@ -491,6 +489,22 @@ describe('groups.routes.test.js', function() {
           });
       });
 
+      it('successfully get a group\'s users if it is public', function(done) {
+        request(app)
+          .get('/groups/' + publicGroup.id + '/users/')
+          .send({
+            api_key: application2.api_key
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            var userData = res.body[0];
+            expect(userData.name).to.equal(user.public.name);
+            expect(userData.role).to.equal(roles.HOST);
+            done();
+          });
+      });
+
     });
 
   });
@@ -508,8 +522,14 @@ describe('groups.routes.test.js', function() {
       name: 'newname',
       description: 'newdesc',
       budget: 11111.99,
-      membership_type: 'donation',
+      membershipType: 'donation',
       membershipfee: 11,
+      longDescription: 'long description',
+      logo: 'http://opencollective.com/assets/icon.svg',
+      video: 'http://opencollective.com/assets/icon.svg',
+      image: 'http://opencollective.com/assets/icon.svg',
+      expensePolicy: 'expense policy',
+      isPublic: true,
       otherprop: 'value'
     };
 
@@ -520,8 +540,7 @@ describe('groups.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: groupData,
-          role: 'admin',
-          stripeEmail: chance.email()
+          role: roles.HOST
         })
         .expect(200)
         .end(function(e, res) {
@@ -551,7 +570,7 @@ describe('groups.routes.test.js', function() {
         expect(e).to.not.exist;
         user3 = u;
         group
-          .addMember(user3, {role: 'viewer'})
+          .addUser(user3, {role: roles.BACKER})
           .done(done);
       });
     });
@@ -619,8 +638,14 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('name', groupNew.name);
           expect(res.body).to.have.property('description', groupNew.description);
           expect(res.body).to.have.property('budget', groupNew.budget);
-          expect(res.body).to.have.property('membership_type', groupNew.membership_type);
+          expect(res.body).to.have.property('membershipType', groupNew.membershipType);
           expect(res.body).to.have.property('membershipfee', groupNew.membershipfee);
+          expect(res.body).to.have.property('longDescription', groupNew.longDescription);
+          expect(res.body).to.have.property('logo', groupNew.logo);
+          expect(res.body).to.have.property('video', groupNew.video);
+          expect(res.body).to.have.property('image', groupNew.image);
+          expect(res.body).to.have.property('expensePolicy', groupNew.expensePolicy);
+          expect(res.body).to.have.property('isPublic', groupNew.isPublic);
           expect(res.body).to.not.have.property('otherprop');
           expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
           expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());

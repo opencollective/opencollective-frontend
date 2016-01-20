@@ -15,12 +15,14 @@
     "bluebird": "^3.0.1",
     "body-parser": "^1.12.2",
     "child-process-promise": "^1.1.0",
+    "clearbit": "^1.2.1",
     "config": "^1.16.0",
     "cors": "^2.5.3",
     "dotenv": "^1.2.0",
     "errorhandler": "^1.4.0",
     "express": "^4.12.2",
     "express-jwt": "^2.1.0",
+    "express-server-status": "*",
     "form-data": "^0.2.0",
     "handlebars": "^4.0.5",
     "jsonwebtoken": "^4.2.1",
@@ -35,15 +37,18 @@
     "paypal-adaptive": "^0.4.2",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
+    "querystring": "^0.2.0",
     "sequelize": "2.0.4",
     "sequelize-cli": "^1.7.0",
+    "slug": "^0.9.1",
     "stripe": "^3.3.4"
   },
   "devDependencies": {
+    "babel-eslint": "^4.1.6",
     "chai": "*",
     "chance": "^0.8.0",
+    "eslint": "^1.9.0",
     "istanbul": "0.3.2",
-    "jscs": "^1.13.1",
     "jsxhint": "^0.15.1",
     "mocha": "*",
     "nock": "^2.2.0",
@@ -54,14 +59,17 @@
   "scripts": {
     "test": "npm run hint && make test",
     "start": "npm run hint && node .",
-    "hint": "jscs app/**/*.js test/*.js --config=.jscsrc",
+    "hint": "eslint **/*.js --quiet",
     "circleci": "npm run hint && make circleci",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
+    "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
-    "db:copyprod": "./scripts/db_copyprod.sh",
+    "db:copyprod": "./scripts/db_copy_prod_to_localhost.sh",
+    "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh",
     "db:reset": "NODE_ENV=development node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
-    "postinstall": "npm rebuild"
+    "postinstall": "npm rebuild",
+    "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d"
   },
-  "license": "Copyright (c) 2015 OpenCollective, Inc."
+  "license": "Copyright (c) 2016 OpenCollective, Inc."
 }

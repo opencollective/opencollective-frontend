@@ -18,44 +18,49 @@
   },
 
   "user1": {
-    "first_name": "Phil",
-    "last_name": "Mod",
+    "name": "Phil Mod",
     "username": "philmod",
     "email": "philmod@email.com",
     "paypalEmail": "philmod+paypal@email.com",
-    "password": "passpass"
+    "password": "passpass",
+    "twitterHandle": "blahblah"
   },
 
   "user2": {
-    "first_name": "Anish",
-    "last_name": "Bas",
+    "name": "Anish Bas",
     "username": "abas",
-    "email": "abas@email.com",
+    "email": "xdam@email.com",
     "password": "ssapssap"
   },
 
   "user3": {
-    "first_name": "Xavier",
-    "last_name": "Dam",
+    "name": "Xavier Damman",
     "username": "xdam",
-    "email": "xdam@email.com",
+    "email": "xdamman@gmail.com",
     "password": "passssap"
   },
 
   "user4": {
-    "first_name": "Bo",
-    "last_name": "Ki",
+    "name": "Bo Ki",
     "username": "boki",
     "email": "boki@email.com",
     "password": "passssas"
+  },
+
+  "user5": {
+    "name": "Bo Ki",
+    "username": "boki",
+    "email": "boki@email.com"
   },
 
   "group1": {
     "name": "Scouts d'Arlon",
     "description": "Troupe Scoute Albert Schweitzer",
     "budget": 10000.00,
-    "membership_type": "yearlyfee",
-    "membershipfee": 10
+    "membershipType": "yearlyfee",
+    "membershipfee": 10,
+    "twitterHandle": "scouts",
+    "website": "http://scouts.org.uk/home/"
   },
 
   "group2": {
@@ -96,12 +101,17 @@
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -200.00,
+<<<<<<< HEAD
         "currency": "USD",
+=======
+        "vat": 0.20,
+>>>>>>> f24fc98b03a060234b643f42a1c585bea78057b2
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
         "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo",
-        "createdAt": "2015-01-23T08:00:00.000Z"
+        "createdAt": "2015-01-23T08:00:00.000Z",
+        "paymentMethod": "paypal"
       },
       {
         "beneficiary": "@xdamman",

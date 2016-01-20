@@ -1,4 +1,6 @@
 var axios = require('axios');
+var roles = require('../app/constants/roles');
+
 var URL = 'http://localhost:3060';
 
 if (process.env.NODE_ENV !== 'development') {
@@ -6,7 +8,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 var user = {
-  email: 'ops@opencollective.com',
+  email: 'devuser@opencollective.com',
   password: 'password'
 };
 
@@ -37,7 +39,7 @@ module.exports = function() {
         description: 'OpenCollective Demo group',
       },
       stripeEmail: user.email,
-      role: 'admin'
+      role: roles.HOST
     };
 
     return axios.post(URL + '/groups', data, {

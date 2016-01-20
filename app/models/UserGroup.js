@@ -1,10 +1,22 @@
+var roles = require('../constants/roles');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Subscription = require('./Subscription')(Sequelize, DataTypes);
 
   var UserGroup = Sequelize.define('UserGroup', {
     // Role.
-    role: DataTypes.ENUM('admin', 'writer', 'viewer'),
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'member',
+      validate: {
+        isIn: {
+          args: [[roles.HOST, roles.MEMBER, roles.BACKER]],
+          msg: 'Must be host, member or backer'
+        }
+      }
+    },
 
     // Dates.
     createdAt: {

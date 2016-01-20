@@ -10,8 +10,8 @@
     }
   },
   "host": {
-    "api": "http://localhost:3050",
-    "webapp": "http://localhost:8000"
+    "api": "http://localhost:3060",
+    "webapp": "http://localhost:3000"
   },
   "email": {
     "from": "info@opencollective.com"
@@ -29,5 +29,9 @@
       "signature": "AknyGVnC4ahUBjab.T2H-YVkWGCqAW-ZI2s7gMVZKRdZpFO7kWEOorjv"
     },
     "feeOC": 5
-  }
+  },
+  "stripe": {
+    "redirectUri": "http://localhost:3060/stripe/oauth/callback"
+  },
+  "clearbit": "93890266fd5110a2f35ea61d31f484f7"
 }

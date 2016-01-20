@@ -3,6 +3,7 @@ var async = require('async');
 var config = require('config');
 var jwt = require('jsonwebtoken');
 var utils = require('../lib/utils');
+var roles = require('../constants/roles');
 
 module.exports = function(app) {
 
@@ -86,7 +87,6 @@ module.exports = function(app) {
       var username = (req.body && req.body.username) || req.query.username;
       var email = (req.body && req.body.email) || req.query.email;
       var password = (req.body && req.body.password) || req.query.password;
-
       if (!req.application || !req.application.api_key) {
         return next();
       }
@@ -96,8 +96,25 @@ module.exports = function(app) {
       }
 
       User.auth((username || email), password, function(e, user) {
-        if (e) return next();
+
+        var errorMsg = 'Invalid username/email or password';
+
+        if (e) {
+          if (e.code === 400) {
+            return next(new errors.BadRequest(errorMsg));
+          }
+          else {
+            return next(new errors.ServerError(e.message));
+          }
+        }
+
+        if (!user) {
+          return next(new errors.BadRequest(errorMsg));
+        }
+
         req.remoteUser = user;
+        req.user = req.remoteUser;
+
         next();
       });
     },
@@ -195,8 +212,7 @@ module.exports = function(app) {
         } else {
           next();
         }
-      }
-
+      };
     },
 
     /**
@@ -242,16 +258,20 @@ module.exports = function(app) {
 
       async.parallel([
         function(cb) { // If authenticated user, does he have access?
-          if (!req.remoteUser)
+          if (!req.remoteUser) {
             return cb();
+          }
 
-          req.group.isMember(req.remoteUser.id, function(e, bool) {
-            cb(null, bool);
-          });
+          req.group.hasUser(req.remoteUser.id)
+            .then(function(hasUser) {
+              cb(null, hasUser);
+            })
+            .catch(cb);
         },
         function(cb) { // If authenticated application, does it have access?
-          if (!req.application)
+          if (!req.application) {
             return cb();
+          }
 
           req.group
             .hasApplication(req.application)
@@ -262,12 +282,11 @@ module.exports = function(app) {
         }
 
       ], function(e, results) {
-        if (e) return next();
-
-        if (_.some(results)) {
+        if (e) {
+          return next(e);
+        } else if (_.some(results)) {
           return next();
-        }
-        else {
+        } else {
           return next(new errors.Forbidden('Unauthorized'));
         }
       });
@@ -293,8 +312,14 @@ module.exports = function(app) {
       return function(req, res, next) {
         if (!req.remoteUser && req.application) // called with an api_key without user
           return next();
-        req.group.isMember(req.remoteUser.id, roles, next);
-      }
+
+        req.group.hasUserWithRole(req.remoteUser.id, roles, function(err, hasUser) {
+          if (err) return next(err);
+          if (!hasUser) return next(new errors.Forbidden('Unauthorized'));
+
+          return next();
+        });
+      };
     },
 
     /**

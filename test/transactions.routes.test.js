@@ -16,6 +16,7 @@ var userData = utils.data('user1');
 var groupData = utils.data('group1');
 var models = app.set('models');
 var transactionsData = utils.data('transactions1').transactions;
+var roles = require('../app/constants/roles');
 
 /**
  * Tests.
@@ -24,6 +25,7 @@ describe('transactions.routes.test.js', function() {
 
   var group;
   var group2;
+  var publicGroup;
   var user;
   var user2;
   var application;
@@ -73,17 +75,36 @@ describe('transactions.routes.test.js', function() {
     });
   });
 
+  // Create the publicGroup.
+  beforeEach(function(done) {
+    models.Group.create({
+      name: 'public group',
+      isPublic: true
+    }).done(function(e, g) {
+      expect(e).to.not.exist;
+      publicGroup = g;
+      done();
+    });
+  });
+
   // Add user to the group.
   beforeEach(function(done) {
     group
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
   // Add user to the group2.
   beforeEach(function(done) {
     group2
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
+      .done(done);
+  });
+
+  // Add user to the publicGroup.
+  beforeEach(function(done) {
+    publicGroup
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
@@ -152,6 +173,17 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails creating a transaction with wrong paymentMethod', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: _.extend({}, transactionsData[0], {paymentMethod:'lalala'})
+        })
+        .expect(400)
+        .end(done);
+    });
+
     it('successfully create a transaction with an application', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions')
@@ -168,6 +200,7 @@ describe('transactions.routes.test.js', function() {
           expect(t).to.have.property('beneficiary', transactionsData[0].beneficiary);
           expect(t).to.have.property('GroupId', group.id);
           expect(t).to.have.property('UserId', null); // ...
+          expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);
 
           models.Activity.findAndCountAll({}).then(function(res) {
             expect(res.rows[0]).to.have.property('TransactionId', t.id);
@@ -188,6 +221,7 @@ describe('transactions.routes.test.js', function() {
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
+          expect(res.body).to.have.property('vat', transactionsData[0].vat);
           expect(res.body).to.have.property('GroupId', group.id);
           expect(res.body).to.have.property('UserId', user.id); // ...
 
@@ -199,6 +233,88 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+  });
+
+  /**
+   * Update
+   */
+  describe('#update', function() {
+    var toUpdate;
+
+    beforeEach(function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/transactions')
+        .send({
+          api_key: application2.api_key,
+          transaction: transactionsData[0]
+        })
+        .expect(200)
+        .end(function(err, res) {
+          expect(err).to.not.exist;
+          toUpdate = res.body;
+          done();
+        });
+    });
+
+    it('fails updating a non-existing transaction', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + 987123)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(404)
+        .end(done);
+    });
+
+    it('fails updating a transaction which does not belong to the group', function(done) {
+      request(app)
+        .put('/groups/' + group2.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a transaction if user has no access to the group', function(done) {
+      request(app)
+      .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails updating a transaction if transaction is not included', function(done) {
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({})
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'missing_required',
+            message: 'Missing required fields',
+            fields: { transaction: 'Required field transaction missing' }
+          }
+        })
+        .end(done);
+    });
+
+    it('successfully updates a transaction', function(done) {
+      var paymentMethod = 'manual';
+
+      expect(toUpdate.paymentMethod).to.not.be.equal(paymentMethod);
+      request(app)
+        .put('/groups/' + group.id + '/transactions/' + toUpdate.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: {
+            paymentMethod: paymentMethod
+          }
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('paymentMethod', paymentMethod);
+          done();
+        });
+    });
   });
 
   /**
@@ -319,6 +435,24 @@ describe('transactions.routes.test.js', function() {
       }, done);
     });
 
+    // Create transactions for public group
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + publicGroup.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+            transactions.push(res.body);
+            cb();
+          });
+      }, done);
+    });
+
     it('fails getting a non-existing transaction', function(done) {
       request(app)
         .get('/groups/' + group.id + '/transactions/' + 987123)
@@ -369,6 +503,17 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+    it('successfully get a transaction if the group is public', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.id + '/transactions/' + transactions[0].id)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', transactions[0].id);
+          done();
+        });
+    });
+
   });
 
   /**
@@ -388,6 +533,24 @@ describe('transactions.routes.test.js', function() {
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
+            cb();
+          });
+      }, done);
+    });
+
+    // Create transactions for publicGroup.
+    beforeEach(function(done) {
+      async.each(transactionsData, function(transaction, cb) {
+        request(app)
+          .post('/groups/' + publicGroup.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: transaction
+          })
+          .expect(200)
+          .end(function(e, res) {
+            expect(e).to.not.exist;
+
             cb();
           });
       }, done);
@@ -417,6 +580,23 @@ describe('transactions.routes.test.js', function() {
 
           done();
 
+        });
+    });
+
+    it('successfully get a group\'s transactions if it is public', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.id + '/transactions')
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+
+          var transactions = res.body;
+          expect(transactions).to.have.length(transactionsData.length);
+          transactions.forEach(function(t) {
+            expect(t.GroupId).to.equal(publicGroup.id);
+          });
+
+          done();
         });
     });
 
@@ -691,8 +871,8 @@ describe('transactions.routes.test.js', function() {
 
     var transaction;
     var transaction2;
-    var user3; // part of Group1 as a writer
-    var user4; // part of Group1 as a viewer
+    var user3; // part of Group1 as a member
+    var user4; // part of Group1 as a backer
 
     beforeEach(function(done) {
       async.auto({
@@ -734,12 +914,12 @@ describe('transactions.routes.test.js', function() {
         },
         addUserCGroupA: ['createUserC', function(cb, results) {
           group
-            .addMember(results.createUserC, {role: 'writer'})
+            .addUser(results.createUserC, {role: roles.MEMBER})
             .done(cb);
         }],
         addUserDGroupA: ['createUserD', function(cb, results) {
           group
-            .addMember(results.createUserD, {role: 'viewer'})
+            .addUser(results.createUserD, {role: roles.BACKER})
             .done(cb);
         }]
       }, function(e, results) {
@@ -768,7 +948,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails attributing a transaction that the user does not have access to [viewer of the group]', function(done) {
+    it('fails attributing a transaction that the user does not have access to [backer of the group]', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user4.jwt(application))
@@ -784,7 +964,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully attribute another user\'s transaction if writer', function(done) {
+    it('successfully attribute another user\'s transaction if member', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -792,7 +972,7 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully attribute a transaction [admin]', function(done) {
+    it('successfully attribute a transaction [host]', function(done) {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transaction.id + '/attribution/' + user4.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))

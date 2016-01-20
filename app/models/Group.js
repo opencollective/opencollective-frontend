@@ -1,7 +1,10 @@
 /**
  * Dependencies.
  */
+var _ = require('lodash');
+var config = require('config');
 var errors = require('../lib/errors');
+var roles = require('../constants/roles');
 
 /**
  * Model.
@@ -13,7 +16,7 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    description: DataTypes.STRING,
+    description: DataTypes.STRING, // max 95 characters
 
     budget: DataTypes.FLOAT,
     currency: {
@@ -21,7 +24,17 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: 'USD'
     },
 
-    membership_type: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
+    longDescription: DataTypes.TEXT('long'),
+
+    logo: DataTypes.STRING,
+
+    video: DataTypes.STRING,
+
+    image: DataTypes.STRING,
+
+    expensePolicy: DataTypes.STRING,
+
+    membershipType: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
     membershipfee: DataTypes.FLOAT,
 
     createdAt: {
@@ -36,6 +49,29 @@ module.exports = function(Sequelize, DataTypes) {
     isPublic: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+
+    slug: {
+      type: DataTypes.STRING
+    },
+
+    twitterHandle: {
+      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
+      validate: {
+        notContains: {
+          args: '@',
+          msg: 'twitterHandle must be without @ symbol'
+        }
+      }
+    },
+
+    website: DataTypes.STRING,
+
+    publicUrl: {
+      type: new DataTypes.VIRTUAL(DataTypes.STRING, ['slug']),
+      get() {
+        return `${config.host.webapp}/${this.get('slug')}`;
+      }
     }
 
   }, {
@@ -50,35 +86,84 @@ module.exports = function(Sequelize, DataTypes) {
           description: this.description,
           budget: this.budget,
           currency: this.currency,
-          membership_type: this.membership_type,
+          longDescription: this.longDescription,
+          logo: this.logo,
+          video: this.video,
+          image: this.image,
+          expensePolicy: this.expensePolicy,
+          membershipType: this.membershipType,
           membershipfee: this.membershipfee,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
-          isPublic: this.isPublic
+          isPublic: this.isPublic,
+          slug: this.slug,
+          website: this.website,
+          twitterHandle: this.twitterHandle,
+          publicUrl: this.publicUrl
         };
       }
     },
 
     instanceMethods: {
-      isMember: function(userId, roles, fn) {
-        if (!roles || typeof roles === 'function') {
-          fn = roles;
-          roles = null;
-        }
-
+      hasUserWithRole: function(userId, roles, cb) {
         this
-          .getMembers({where: {id: userId} })
-          .then(function(members) {
-            if (members.length === 0)
-              return fn(new errors.Forbidden('Unauthorized to access this group.'), false);
-            else {
-              if (roles && roles.indexOf(members[0].UserGroup.role) < 0)
-                return fn(new errors.Forbidden('Unauthorized to manage this group.'), false);
-              fn(null, true);
+          .getUsers({
+            where: {
+              id: userId
             }
           })
-          .catch(fn);
+          .then(function(users) {
+            if (users.length === 0) {
+              return cb(null, false);
+            } else if (!_.contains(roles, users[0].UserGroup.role)) {
+              return cb(null, false);
+            }
+
+            cb(null, true);
+          })
+          .catch(cb);
+      },
+
+      getStripeAccount: function(cb) {
+        Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then(function(userGroup) {
+          if (!userGroup) {
+            return { stripeAccount: null };
+          }
+
+          return Sequelize.models.User.find({
+            where: {
+              id: userGroup.UserId
+            },
+            include: [{
+              model: Sequelize.models.StripeAccount
+            }]
+          });
+        })
+        .then(function(user) {
+          cb(null, user.StripeAccount);
+        })
+        .catch(cb);
+      },
+
+      hasHost: function(cb) {
+        Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then(function(userGroup) {
+          return cb(null, !!userGroup);
+        })
+        .catch(cb);
       }
+
     }
   });
 

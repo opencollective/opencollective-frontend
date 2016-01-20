@@ -3,7 +3,6 @@
  */
 var _ = require('lodash');
 var async = require('async');
-var sequelize = require('sequelize');
 var utils = require('../lib/utils');
 
 /**
@@ -16,22 +15,42 @@ module.exports = function(app) {
    */
   var errors = app.errors;
   var models = app.set('models');
+  var sequelize = models.sequelize;
   var Group = models.Group;
   var Activity = models.Activity;
+  var User = models.User;
   var Transaction = models.Transaction;
-  var StripeManagedAccount = models.StripeManagedAccount;
+  var UserGroup = models.UserGroup;
+  var StripeAccount = models.StripeAccount;
   var transactions = require('../controllers/transactions')(app);
+  var roles = require('../constants/roles');
 
   /**
    * Private methods.
    */
-  var addGroupMember = function(group, user, options, callback) {
-    group
-      .addMember(user, {role: options.role})
-      .then(function(usergroup) {
-        callback();
+  var addUserToGroup = function(group, user, options, callback) {
 
-        // Create activities.
+    async.auto({
+      checkIfGroupHasHost: function(cb) {
+        if (options.role !== roles.HOST) return cb();
+
+        group.hasHost(function(err, hasHost) {
+          if (err) return cb(err);
+          if (hasHost) {
+            cb(new errors.BadRequest('Group already has a host'));
+          }
+
+          cb();
+        });
+
+      },
+
+      addUserToGroup: ['checkIfGroupHasHost', function(cb) {
+        group.addUser(user, {role: options.role})
+          .done(cb);
+      }],
+
+      createActivity: ['addUserToGroup', function(cb) {
         var activity = {
           type: 'group.user.added',
           GroupId: group.id,
@@ -39,14 +58,18 @@ module.exports = function(app) {
             group: group.info,
             user: options.remoteUser.info,
             target: user.info,
-            usergroup: usergroup.info
+            role: options.role
           }
         };
-        Activity.create(_.extend({UserId: options.remoteUser.id}, activity));
-        if (user.id !== options.remoteUser.id)
-          Activity.create(_.extend({UserId: user.id}, activity));
-      })
-      .catch(callback);
+
+        Activity.create(activity)
+          .done(cb);
+
+      }]
+    }, function(err, results) {
+      if (err) return callback(err);
+      callback();
+    });
   };
 
   var getBalance = function(id, cb) {
@@ -66,6 +89,62 @@ module.exports = function(app) {
       .catch(cb);
   };
 
+  var getPublicPageInfo = function(id, cb) {
+    Transaction
+      .find({
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('amount')), 'donationTotal'],
+          [sequelize.fn('COUNT', sequelize.col('UserId')), 'backersCount']
+        ],
+        where: {
+          GroupId: id,
+          approved: true,
+          amount: {
+            $gt: 0
+          }
+        }
+      })
+      .then(function(result) {
+        var json = result.toJSON();
+
+        cb(null, {
+          donationTotal: Number(json.donationTotal),
+          backersCount: Number(json.backersCount)
+        });
+      })
+      .catch(cb);
+  };
+
+  var getUsers = function(req, res, next) {
+
+    req.group.getUsers({})
+      .map(function(user) {
+        return _.extend({}, user.public, { role: user.UserGroup.role });
+      })
+      .then(function(users) {
+        res.send(users);
+      })
+      .catch(next);
+  };
+
+  var updateTransaction = function(req, res, next) {
+
+    ['paymentMethod', 'tags'].forEach(function(prop) {
+      if (req.required.transaction[prop]) {
+        req.transaction[prop] = req.required.transaction[prop];
+      }
+    });
+
+    req.transaction.updatedAt = new Date();
+
+    req.transaction
+      .save()
+      .then(function(transaction) {
+        res.send(transaction.info);
+      })
+      .catch(next);
+  };
+
   /**
    * Public methods.
    */
@@ -79,19 +158,21 @@ module.exports = function(app) {
         .create(req.required.group)
         .then(function(group) {
 
-          // Create activity.
-          Activity.create({
-            type: 'group.created',
-            UserId: req.remoteUser.id,
-            GroupId: group.id,
-            data: {
-              group: group.info,
-              user: req.remoteUser.info
-            }
-          });
-
           async.series({
-            addMember: function(cb) {
+
+            createActivity: function(cb) {
+              Activity.create({
+                type: 'group.created',
+                UserId: req.remoteUser.id,
+                GroupId: group.id,
+                data: {
+                  group: group.info,
+                  user: req.remoteUser.info
+                }
+              }).done(cb);
+            },
+
+            addUser: function(cb) {
               // Add caller to the group if `role` specified.
               var role = req.body.role;
               if (!role)
@@ -100,26 +181,7 @@ module.exports = function(app) {
                 role: role,
                 remoteUser: req.remoteUser
               };
-              addGroupMember(group, req.remoteUser, options, cb);
-            },
-            createStripeManagedAccount: function(cb) {
-              app.stripe.accounts.create({
-                email: req.required.stripeEmail
-              }, function(e, account) {
-                if (e) return cb(e);
-
-                StripeManagedAccount
-                  .create({
-                    stripeId: account.id,
-                    stripeSecret: account.keys.secret,
-                    stripeKey: account.keys.publishable,
-                    stripeEmail: account.email
-                  })
-                  .then(function(account) {
-                    account.addGroup(group.id).done(cb);
-                  })
-                  .catch(cb);
-              });
+              addUserToGroup(group, req.remoteUser, options, cb);
             }
           }, function(e) {
             if (e) return next(e);
@@ -134,7 +196,18 @@ module.exports = function(app) {
      * Update.
      */
     update: function(req, res, next) {
-      ['name', 'description', 'budget', 'currency', 'membership_type', 'membershipfee'].forEach(function(prop) {
+      ['name',
+       'description',
+       'budget',
+       'currency',
+       'longDescription',
+       'logo',
+       'video',
+       'image',
+       'expensePolicy',
+       'membershipType',
+       'membershipfee',
+       'isPublic'].forEach(function(prop) {
         if (req.required.group[prop])
           req.group[prop] = req.required.group[prop];
       });
@@ -156,6 +229,7 @@ module.exports = function(app) {
       async.auto({
 
         getBalance: getBalance.bind(this, req.group.id),
+        getPublicPageInfo: getPublicPageInfo.bind(this, req.group.id),
 
         getActivities: function(cb) {
           if (!req.query.activities && !req.body.activities)
@@ -179,9 +253,8 @@ module.exports = function(app) {
             .catch(cb);
         },
 
-        getStripeManagedAccount: function(cb) {
-          req.group.getStripeManagedAccount()
-            .done(cb);
+        getStripeAccount: function(cb) {
+          req.group.getStripeAccount(cb);
         }
 
       }, function(e, results) {
@@ -189,14 +262,15 @@ module.exports = function(app) {
 
         var group = req.group.info;
         group.balance = results.getBalance;
+        group.backersCount = results.getPublicPageInfo.backersCount;
+        group.donationTotal = results.getPublicPageInfo.donationTotal;
 
         if (results.getActivities) {
           group.activities = results.getActivities;
         }
 
-        if (results.getStripeManagedAccount) {
-          group.stripeManagedAccount = _.pick(results.getStripeManagedAccount,
-                                              'stripeKey');
+        if (results.getStripeAccount) {
+          group.stripeAccount = _.pick(results.getStripeAccount, 'stripePublishableKey');
         }
 
         res.send(group);
@@ -207,21 +281,22 @@ module.exports = function(app) {
     /**
      * Add a user to a group.
      */
-    addMember: function(req, res, next) {
+    addUser: function(req, res, next) {
       var options = {
-        role: req.body.role || 'viewer',
+        role: req.body.role || roles.BACKER,
         remoteUser: req.remoteUser
       };
-      addGroupMember(req.group, req.user, options, function(e) {
+
+      addUserToGroup(req.group, req.user, options, function(e) {
         if (e) return next(e);
         else res.send({success: true});
       });
     },
 
     /**
-     * Update a member.
+     * Update a user.
      */
-    updateMember: function(req, res, next) {
+    updateUser: function(req, res, next) {
       var query = {
         where: {
           GroupId: req.group.id,
@@ -277,7 +352,7 @@ module.exports = function(app) {
     /**
      * Delete a member.
      */
-    deleteMember: function(req, res, next) {
+    deleteUser: function(req, res, next) {
       var query = {
         where: {
           GroupId: req.group.id,
@@ -383,10 +458,28 @@ module.exports = function(app) {
      * Get group's transactions.
      */
     getTransactions: function(req, res, next) {
+      var where = {
+        GroupId: req.group.id
+      };
+
+      if (req.query.donation) {
+        where.amount = {
+          $gt: 0
+        };
+      } else if (req.query.expense) {
+        where.amount = {
+          $lt: 0
+        };
+      } else if (req.query.pending) {
+        where = _.extend({}, where, {
+          amount: { $lt: 0 },
+          approved: false,
+          approvedAt: null
+        });
+      }
+
       var query = _.merge({
-        where: {
-          GroupId: req.group.id
-        },
+        where: where,
         order: [[req.sorting.key, req.sorting.dir]]
       }, req.pagination);
 
@@ -401,7 +494,7 @@ module.exports = function(app) {
                                         req.pagination)
           });
 
-          res.send(transactions.rows);
+          res.send(_.pluck(transactions.rows, 'info'));
         })
         .catch(next);
     },
@@ -417,7 +510,17 @@ module.exports = function(app) {
      * Get the balance of a group
      * Also used in users controller
      */
-    getBalance: getBalance
+    getBalance: getBalance,
+
+    /**
+     * Get users of a group
+     */
+    getUsers: getUsers,
+
+    /**
+     * Update transaction
+     */
+    updateTransaction: updateTransaction
   };
 
 };

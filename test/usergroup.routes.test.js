@@ -8,6 +8,7 @@ var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
+var roles = require('../app/constants/roles');
 
 /**
  * Variables.
@@ -67,24 +68,24 @@ describe('usergroup.routes.test.js', function() {
     });
   });
 
-  // Add an admin to the group.
+  // Add an host to the group.
   beforeEach(function(done) {
     group
-      .addMember(user, {role: 'admin'})
+      .addUser(user, {role: roles.HOST})
       .done(done);
   });
 
-  // Add an viewer to the group.
+  // Add an backer to the group.
   beforeEach(function(done) {
     group
-      .addMember(user3, {role: 'viewer'})
+      .addUser(user3, {role: roles.BACKER})
       .done(done);
   });
 
   /**
    * Add user to a group.
    */
-  describe('#addMember', function() {
+  describe('#addUser', function() {
 
     it('fails adding a non-existing user to a group', function(done) {
       request(app)
@@ -124,7 +125,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a user to a group if no admin', function(done) {
+    it('fails adding a user to a group if no host', function(done) {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .send({
@@ -133,6 +134,23 @@ describe('usergroup.routes.test.js', function() {
         .set('Authorization', 'Bearer ' + user3.jwt(application))
         .expect(403)
         .end(done);
+    });
+
+    it('fails adding a host if the group already has one', function(done) {
+      request(app)
+        .post('/groups/' + group.id + '/users/' + user2.id)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'Group already has a host'
+          }
+        })
+        .send({
+          role: roles.HOST
+        })
+        .end(done)
     });
 
     it('successfully add a user to a group', function(done) {
@@ -146,7 +164,7 @@ describe('usergroup.routes.test.js', function() {
 
           user2.getGroups().then(function(groups) {
             expect(groups[0].id).to.equal(group.id);
-            expect(groups[0].UserGroup.role).to.equal('viewer');
+            expect(groups[0].UserGroup.role).to.equal(roles.BACKER);
             done();
           });
 
@@ -154,7 +172,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully add a user to a group with a role', function(done) {
-      var role = 'admin';
+      var role = roles.MEMBER;
 
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
@@ -173,7 +191,7 @@ describe('usergroup.routes.test.js', function() {
 
             setTimeout(function() {
               models.Activity.findAndCountAll({}).then(function(res) {
-                expect(res.count).to.equal(2);
+                expect(res.count).to.equal(1);
                 done();
               });
             }, 50);
@@ -284,7 +302,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if no admin', function(done) {
+    it('fails if no host', function(done) {
       request(app)
         .put('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -301,7 +319,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully update a user-group relation', function(done) {
-      var role = 'writer';
+      var role = roles.MEMBER;
       request(app)
         .put('/groups/' + group.id + '/users/' + user3.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -336,7 +354,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if no admin', function(done) {
+    it('fails if no host', function(done) {
       request(app)
         .del('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -353,7 +371,7 @@ describe('usergroup.routes.test.js', function() {
     });
 
     it('successfully update a user-group relation', function(done) {
-      var role = 'writer';
+      var role = 'member';
       request(app)
         .del('/groups/' + group.id + '/users/' + user3.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))

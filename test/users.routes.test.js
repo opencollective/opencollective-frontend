@@ -106,6 +106,17 @@ describe('users.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails if @ symbol in twitterHandle', function(done) {
+      request(app)
+        .post('/users')
+        .send({
+          api_key: application.api_key,
+          user: _.extend({}, userData, {twitterHandle: '@asood123'})
+        })
+        .expect(400)
+        .end(done);
+    });
+
     it('successfully create a user', function(done) {
       request(app)
         .post('/users')
@@ -289,4 +300,203 @@ describe('users.routes.test.js', function() {
     });
   });
 
+  describe('#update password', () => {
+    var user;
+    var user2;
+
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    beforeEach((done) => {
+      models.User.create(utils.data('user2')).done((e, u) => {
+        expect(e).to.not.exist;
+        user2 = u;
+        done();
+      });
+    });
+
+    it('should update password', (done) => {
+      const newPassword = 'aaa123';
+
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.success).to.equal(true);
+          models.User.auth(user.email, newPassword, e => {
+            expect(e).to.not.exist;
+            done();
+          });
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails if wrong user is logged in', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .expect(403)
+        .end(done);
+    });
+
+    it('fails if the passwords don\'t match', function(done) {
+      const newPassword = 'aaa123';
+
+      request(app)
+        .put('/users/' + user.id + '/password')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          password: newPassword,
+          passwordConfirmation: newPassword + 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'password and passwordConfirmation don\'t match'
+          }
+        })
+        .end(done);
+    });
+
+  });
+
+  describe('#update avatar', function() {
+    var user;
+
+    beforeEach(function(done) {
+      models.User.create(utils.data('user1')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it('should update avatar', function(done) {
+      var link = 'http://opencollective.com/assets/icon2.svg';
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          avatar: link
+        })
+        .expect(200)
+        .end(function(err, res) {
+          var body = res.body;
+          expect(body.avatar).to.equal(link);
+          done();
+        });
+    });
+
+    it('fails if the user is not logged in', function(done) {
+      var link = 'http://opencollective.com/assets/icon2.svg';
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({
+          avatar: link
+        })
+        .expect(401)
+        .end(done);
+    });
+
+    it('fails if the avatar key is missing from the payload', function(done) {
+      request(app)
+        .put('/users/' + user.id + '/avatar')
+        .send({})
+        .expect(400)
+        .end(done);
+    });
+
+  });
+
+  /*
+   * Update user (without authentication)
+   */
+
+  describe('#update user from public donation page', () => {
+    var userWithPassword;
+    var userWithoutPassword;
+
+    var newUser = {
+      name: 'newname',
+      twitterHandle: 'twitter.com/asood123',
+      website: 'opencollective.com'
+    };
+
+    beforeEach((done) => {
+      models.User.create({
+        email: 'withpassword@example.com',
+        password: 'password'
+      })
+      .done((e, u) => {
+        expect(e).to.not.exist;
+        userWithPassword = u;
+        done();
+      });
+    });
+
+    beforeEach((done) => {
+      models.User.create({
+        email: 'nopassword@example.com'
+      })
+      .done(function(e, u) {
+        expect(e).to.not.exist;
+        userWithoutPassword = u;
+        done();
+      });
+    });
+
+    it('fails if the user already has a password', done => {
+      request(app)
+        .put('/users/' + userWithPassword.id)
+        .send({
+          user: newUser,
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'Can\'t update user with password from this route'
+          }
+        })
+        .end(done);
+    });
+
+    it('successfully updates a user without a password', done => {
+      request(app)
+        .put('/users/' + userWithoutPassword.id)
+        .send({
+          user: newUser,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', userWithoutPassword.id);
+          expect(res.body).to.have.property('name', newUser.name);
+          expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
+          expect(res.body).to.have.property('website', newUser.website);
+          done();
+        });
+    });
+
+  });
 });

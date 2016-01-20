@@ -15,7 +15,8 @@
   },
   "stripe": {
     "secret": "STRIPE_SECRET",
-    "key": "STRIPE_KEY"
+    "key": "STRIPE_KEY",
+    "clientId": "STRIPE_CLIENT_ID"
   },
   "aws": {
     "s3": {
@@ -33,8 +34,14 @@
       "signature": "PAYPAL_SIGNATURE"
     }
   },
+<<<<<<< HEAD
   "mailgun": {
     "user": "MAILGUN_USER",
     "password": "MAILGUN_PASSWORD"
+=======
+  "host": {
+    "api": "API_URL",
+    "webapp": "WEBAPP_URL"
+>>>>>>> f24fc98b03a060234b643f42a1c585bea78057b2
   }
 }
