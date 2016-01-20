@@ -158,7 +158,9 @@ module.exports = function(Sequelize, DataTypes) {
         return {
           id: this.id,
           avatar: this.avatar,
-          name: this.name
+          name: this.name,
+          website: this.website,
+          twitterHandle: this.twitterHandle
         };
       }
     },

@@ -83,10 +83,15 @@ describe('user.models.test.js', function() {
         .done(done);
     });
 
-    it('successfully get a user', function(done) {
-      User.findAndCountAll({}).then(function(res) {
-        expect(res.count).to.equal(1);
-        expect(res.rows[0].email).to.equal(userData.email);
+    it.only('successfully get a user, user.info and user.public return correct information', function(done) {
+      User.findOne({}).then(function(user) {
+        expect(user.info).to.have.property('email');
+        expect(user.info).to.have.property('paypalEmail');
+        expect(user.public).to.not.have.property('email');
+        expect(user.public).to.not.have.property('paypalEmail');
+        expect(user.public).to.have.property('website');
+        expect(user.public).to.have.property('twitterHandle');
+        expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
         done();
       });
     });
