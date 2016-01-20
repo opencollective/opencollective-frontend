@@ -83,7 +83,7 @@ describe('user.models.test.js', function() {
         .done(done);
     });
 
-    it.only('successfully get a user, user.info and user.public return correct information', function(done) {
+    it('successfully get a user, user.info and user.public return correct information', function(done) {
       User.findOne({}).then(function(user) {
         expect(user.info).to.have.property('email');
         expect(user.info).to.have.property('paypalEmail');
