@@ -35,8 +35,8 @@
   "aws": {
     "s3": {
       "bucket": "opencollective-test",
-      "secret": "ewqqewQ",
-      "key": "iwewqe"
+      "secret": "unknown",
+      "key": "unknown"
     }
   },
   "mailgun": {

@@ -38,7 +38,9 @@
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-test"
+      "bucket": "opencollective-test",
+      "secret": "unknown",
+      "key": "unknown"
     }
   }
 }
