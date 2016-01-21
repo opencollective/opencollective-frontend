@@ -3,7 +3,6 @@
  */
 
 var async = require('async');
-var config = require('config');
 var _ = require('lodash');
 
 /**
@@ -140,7 +139,7 @@ module.exports = (app) => {
         }, cb);
       }]
 
-    }, (err, results) => {
+    }, (err) => {
       if (err) return next(err);
 
       /**

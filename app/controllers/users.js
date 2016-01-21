@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var Bluebird = require('bluebird');
+var async = require('async');
 var userlib = require('../lib/userlib');
 
 /**
@@ -17,7 +18,6 @@ module.exports = function(app) {
   var User = models.User;
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
-  var StripeAccount = models.StripeAccount;
   var groups = require('../controllers/groups')(app);
   var errors = app.errors;
 
@@ -95,52 +95,45 @@ module.exports = function(app) {
    * End point to update user info from the public donation page
    * Only works if password is null, as an extra precaution
    */
-  var updateUserWithoutLoggedIn = function(req, res, next) {
+
+  const updateUserWithoutLoggedIn = (req, res, next) => {
     if (req.user.hasPassword()) {
       return next(new errors.BadRequest('Can\'t update user with password from this route'));
     }
 
-    ['name',
-     'twitterHandle',
-     'website'
-     ].forEach(function(prop) {
-      if (req.required.user[prop]) {
-        req.user[prop] = req.required.user[prop];
-      }
+    async.auto({
+      updateFields: (cb) => {
+        ['name',
+         'twitterHandle',
+         'website'
+         ].forEach((prop) => {
+          if (req.required.user[prop]) {
+            req.user[prop] = req.required.user[prop];
+          }
+        });
+
+        cb(null, req.user);
+      },
+
+      fetchUserAvatar: ['updateFields', (cb, results) => {
+        userlib.fetchAvatar(results.updateFields, (err, user) => {
+          cb(null, user);
+        });
+      }],
+
+      update: ['fetchUserAvatar', (cb, results) => {
+        var user = results.fetchUserAvatar;
+
+        user.updatedAt = new Date();
+        user
+          .save()
+          .then(u => cb(null, u.info))
+          .catch(cb);
+      }]
+    }, (err, results) => {
+      if (err) return next(err);
+      res.send(results.update);
     });
-    req.user.updatedAt = new Date();
-
-    req.user
-      .save()
-      .then(function(user) {
-        res.send(user.info);
-      })
-      .catch(next);
-  };
-
-  /**
-   * Update.
-   */
-  var update = function(req, res, next) {
-    ['name',
-     'username',
-     'avatar',
-     'email',
-     'twitterHandle',
-     'website',
-     'paypalEmail'
-     ].forEach(function(prop) {
-      if (req.required.user[prop])
-        req.user[prop] = req.required.user[prop];
-    });
-    req.user.updatedAt = new Date();
-
-    req.user
-      .save()
-      .then(function(user) {
-        res.send(user.info);
-      })
-      .catch(next);
   };
 
   var getBalancePromise = function(GroupId) {
@@ -194,13 +187,10 @@ module.exports = function(app) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
 
-      userlib.fetchAvatar(user, function(err, user) {
-        _create(user, function(err, user) {
-          if (err) return next(err);
-          res.send(user.info);
-        });
+      _create(user, function(err, user) {
+        if (err) return next(err);
+        res.send(user.info);
       });
-
     },
 
     _create: _create,
@@ -208,7 +198,7 @@ module.exports = function(app) {
     /**
      * Get token.
      */
-    getToken: function(req, res, next) {
+    getToken: function(req, res) {
       res.send({
         access_token: req.user.jwt(req.application),
         refresh_token: req.user.refresh_token
@@ -265,7 +255,6 @@ module.exports = function(app) {
 
     updatePaypalEmail: updatePaypalEmail,
     updateAvatar: updateAvatar,
-    update: update,
     updateUserWithoutLoggedIn: updateUserWithoutLoggedIn,
     updatePassword: updatePassword
   };

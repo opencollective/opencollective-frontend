@@ -1,12 +1,9 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
 var async = require('async');
 var config = require('config');
 var moment = require('moment');
-var utils = require('../lib/utils');
-var uuid = require('node-uuid');
 
 /**
  * Controller.
@@ -19,7 +16,6 @@ module.exports = function(app) {
   var models = app.set('models');
   var Activity = models.Activity;
   var Card = models.Card;
-  var User = models.User;
   var errors = app.errors;
 
   /**
@@ -89,7 +85,7 @@ module.exports = function(app) {
         }, cb);
       }],
 
-      createCardEntry: ['checkExistingCard', function(cb, results) {
+      createCardEntry: ['checkExistingCard', function(cb) {
         Card.create({
           service: 'paypal',
           UserId: req.remoteUser.id

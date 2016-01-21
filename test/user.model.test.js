@@ -1,10 +1,10 @@
 /**
  * Dependencies.
  */
-var app = require('../index');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const app = require('../index');
+const expect = require('chai').expect;
+const request = require('supertest');
+const utils = require('../test/utils.js')();
 
 /**
  * Variable.
@@ -14,17 +14,17 @@ var userData = utils.data('user1');
 /**
  * Tests.
  */
-describe('user.models.test.js', function() {
+describe('user.models.test.js', () => {
 
   var application;
   var User;
 
-  beforeEach(function() {
+  beforeEach(() => {
     User = app.get('models').User;
   })
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -33,33 +33,33 @@ describe('user.models.test.js', function() {
   /**
    * Create a user.
    */
-  describe('#create', function() {
+  describe('#create', () => {
 
-    it('fails without email', function(done) {
+    it('fails without email', (done) => {
       User
         .create({ name: userData.name})
-        .done(function(err, user) {
+        .done((err, user) => {
           expect(err).to.exist;
           done();
         });
 
     });
 
-    it('fails if invalid email', function(done) {
+    it('fails if invalid email', (done) => {
       User
         .create({ name: userData.name, email: 'johndoe'})
-        .done(function(err, user) {
+        .done((err, user) => {
           expect(err).to.exist;
           done();
         });
 
     });
 
-    it('successfully creates a user', function(done) {
+    it('successfully creates a user', (done) => {
       var email = 'john.doe@doe.com';
       User
         .create({ name: userData.name, email: userData.email})
-        .done(function(err, user) {
+        .done((err, user) => {
           expect(err).to.not.exist;
           expect(user).to.have.property('name', userData.name);
           expect(user).to.have.property('email', userData.email);
@@ -70,23 +70,66 @@ describe('user.models.test.js', function() {
 
     });
 
+
+    it('successfully creates a user with a password that is a number', (done) => {
+      const email = 'john.doe@doe.com';
+
+      User
+        .create({
+          email: email,
+          password: 123456
+        })
+        .done((err, user) => {
+          expect(err).to.not.exist;
+          expect(user).to.have.property('email', email);
+          expect(user).to.have.property('createdAt');
+          expect(user).to.have.property('password_hash');
+          expect(user).to.have.property('updatedAt');
+          done();
+        });
+    });
+
+    it('successfully creates a user with a password that is a string', (done) => {
+      const email = 'john.doe@doe.com';
+
+      User
+        .create({
+          email: email,
+          password: '123456'
+        })
+        .done((err, user) => {
+          expect(err).to.not.exist;
+          expect(user).to.have.property('email', email);
+          expect(user).to.have.property('createdAt');
+          expect(user).to.have.property('password_hash');
+          expect(user).to.have.property('updatedAt');
+          done();
+        });
+    });
+
   });
 
   /**
    * Get a user.
    */
-  describe('#get', function() {
+  describe('#get', () => {
 
-    beforeEach(function(done) {
+    beforeEach((done) => {
       User
         .create(userData)
         .done(done);
     });
 
-    it('successfully get a user', function(done) {
-      User.findAndCountAll({}).then(function(res) {
-        expect(res.count).to.equal(1);
-        expect(res.rows[0].email).to.equal(userData.email);
+
+    it('successfully get a user, user.info and user.public return correct information', (done) => {
+      User.findOne({}).then((user) => {
+        expect(user.info).to.have.property('email');
+        expect(user.info).to.have.property('paypalEmail');
+        expect(user.public).to.not.have.property('email');
+        expect(user.public).to.not.have.property('paypalEmail');
+        expect(user.public).to.have.property('website');
+        expect(user.public).to.have.property('twitterHandle');
+        expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
         done();
       });
     });

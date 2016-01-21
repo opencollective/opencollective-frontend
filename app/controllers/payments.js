@@ -85,7 +85,7 @@ module.exports = function(app) {
           });
         },
 
-        getExistingCard: ['getGroupStripeAccount', function(cb, results) {
+        getExistingCard: ['getGroupStripeAccount', function(cb) {
           models.Card
             .findOne({
               where: {
@@ -187,7 +187,7 @@ module.exports = function(app) {
          *  Creates a user in our system to associate with this transaction
          */
 
-        getOrCreateUser: ['createCharge', function(cb, results) {
+        getOrCreateUser: ['createCharge', function(cb) {
           return models.User.findOne({
             where: {
               email: email
@@ -259,10 +259,10 @@ module.exports = function(app) {
             .catch(cb);
         }]
 
-      }, function(e, results) {
+      }, function(e) {
         if (e) return next(e);
 
-        res.send({success: true, user: user});
+        res.send({success: true, user: user.info});
       });
 
     }

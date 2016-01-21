@@ -37,9 +37,7 @@ app.set('controllers', require('./app/controllers')(app));
  */
 require('./app/controllers/routes')(app);
 
-if (_.contains(['test', 'circleci'], app.set('env'))) {
-  return module.exports = app;
-} else {
+if (!_.contains(['test', 'circleci'], app.set('env'))) {
   /**
    * Start server
    */
@@ -50,3 +48,5 @@ if (_.contains(['test', 'circleci'], app.set('env'))) {
     console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, port, app.set('env'));
   });
 }
+
+module.exports = app;

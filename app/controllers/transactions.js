@@ -4,7 +4,6 @@
 var _ = require('lodash');
 var async = require('async');
 var config = require('config');
-var utils = require('../lib/utils');
 var uuid = require('node-uuid');
 
 /**
@@ -24,13 +23,6 @@ module.exports = function(app) {
   var Card = models.Card;
   var errors = app.errors;
   var emailLib = require('../lib/email')(app);
-
-  /**
-   * Calculate OpenCollective fee.
-   */
-  function calculateOCfee(amount, feeOC) {
-    return Math.round(amount * feeOC) / 100;
-  }
 
   /**
    * Create a transaction and add it to a group/user/card.
@@ -183,7 +175,7 @@ module.exports = function(app) {
                 group: req.group,
                 paypalResponse: response,
                 user: req.remoteUser
-              }, function(e, transaction) {
+              }, function(e) {
                 if (e) return cbEach(e);
                 else return cbEach(new errors.BadRequest('This transaction has been paid already.'));
               });
@@ -274,19 +266,19 @@ module.exports = function(app) {
 
     async.auto({
 
-      updatePaykey: [function(cb, results) {
+      updatePaykey: [function(cb) {
         paykey.data = paypalResponse;
         paykey.status = paypalResponse.status;
         paykey.save().done(cb);
       }],
 
-      updateTransaction: [function(cb, results) {
+      updateTransaction: [function(cb) {
         transaction.status = paypalResponse.status;
         transaction.reimbursedAt = new Date();
         transaction.save().done(cb);
       }],
 
-      cleanPaykeys: ['updatePaykey', function(cb, results) {
+      cleanPaykeys: ['updatePaykey', function(cb) {
         Paykey
           .destroy({
             where: {
@@ -297,7 +289,7 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      createActivity: ['updatePaykey', 'updateTransaction', function(cb, results) {
+      createActivity: ['updatePaykey', 'updateTransaction', function(cb) {
         Activity.create({
           type: 'group.transaction.paid',
           UserId: user.id,
@@ -423,7 +415,7 @@ module.exports = function(app) {
         cb();
       }],
 
-      getCard: [function(cb, results) {
+      getCard: [function(cb) {
         if (isManual) {
           return cb(null, {});
         }
@@ -450,7 +442,7 @@ module.exports = function(app) {
         }
       }],
 
-      getBeneficiary: [function(cb, results) {
+      getBeneficiary: [function(cb) {
         User
           .find(parseInt(transaction.UserId))
           .then(function(user) {
@@ -531,7 +523,7 @@ module.exports = function(app) {
   var attributeUser = function(req, res, next) {
     req.transaction
       .setUser(req.user)
-      .then(function(t) {
+      .then(function() {
         res.send({success: true});
       })
       .catch(next);
@@ -551,7 +543,7 @@ module.exports = function(app) {
 
       req.transaction
         .save()
-        .then(function(transaction) {
+        .then(function() {
           res.send({success: true});
         })
         .catch(next);

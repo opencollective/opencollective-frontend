@@ -1,4 +1,3 @@
-var fs = require('fs');
 var _ = require('lodash');
 var serverStatus = require('express-server-status');
 var expressJwt = require('express-jwt');
@@ -13,7 +12,6 @@ module.exports = function(app) {
   var Controllers = app.set('controllers');
   var mw = Controllers.middlewares;
   var users = Controllers.users;
-  var auth = Controllers.auth;
   var params = Controllers.params;
   var groups = Controllers.groups;
   var activities = Controllers.activities;
@@ -168,6 +166,11 @@ module.exports = function(app) {
    * Error handler.
    */
   app.use(function(err, req, res, next) {
+
+    if (res.headersSent) {
+      return next(err);
+    }
+
     var name = err.name;
 
     if (name === 'UnauthorizedError') // because of jwt-express

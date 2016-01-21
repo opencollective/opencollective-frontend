@@ -66,7 +66,7 @@ module.exports = {
     Error.call(this, msg);
   },
 
-  NotImplemented: function(msg, data) {
+  NotImplemented: function(msg) {
     this.code    = 501;
     this.type    = 'not_implemented';
     this.message = msg || 'This is not implemented.';
