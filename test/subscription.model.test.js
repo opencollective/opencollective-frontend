@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+var _ = require('lodash');
 var app = require('../index');
 var config = require('config');
 var expect = require('chai').expect;
@@ -43,7 +44,7 @@ describe(require('path').basename(__filename), function() {
   var user2;
   var group;
   var group2;
-  
+
   beforeEach(function(done) {
     var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
     Promise.all(promises).then((results) => {
@@ -140,7 +141,7 @@ describe(require('path').basename(__filename), function() {
         }).done(done);
       })
   });
-  
+
   it('fails to subscribe if not a member of the group', function(done) {
     request(app)
       .post('/groups/' + group2.id + '/activities/group.transaction.approved/subscribe')
@@ -158,7 +159,7 @@ describe(require('path').basename(__filename), function() {
         }).done(done);
       })
   });
-  
+
   it('automatically subscribe a new host to `group.transaction.created` events', function(done) {
     request(app)
       .post('/groups')
@@ -180,7 +181,7 @@ describe(require('path').basename(__filename), function() {
   it('sends a new `group.transaction.created` email notification', function(done) {
 
     var templateData = {
-      transaction: transactionsData[0],
+      transaction: _.extend({}, transactionsData[0]),
       user: user,
       group: group,
       config: config
