@@ -3,7 +3,6 @@
  */
 var _ = require('lodash');
 var config = require('config');
-var errors = require('../lib/errors');
 var roles = require('../constants/roles');
 
 /**

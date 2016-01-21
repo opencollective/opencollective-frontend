@@ -1,9 +1,7 @@
 var _ = require('lodash');
 var async = require('async');
-var config = require('config');
 var jwt = require('jsonwebtoken');
 var utils = require('../lib/utils');
-var roles = require('../constants/roles');
 
 module.exports = function(app) {
 

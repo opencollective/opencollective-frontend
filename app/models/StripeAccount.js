@@ -1,11 +1,7 @@
 /**
- * Dependencies.
- */
-var errors = require('../lib/errors');
-
-/**
  * Model.
  */
+
 module.exports = function(Sequelize, DataTypes) {
 
   var StripeAccount = Sequelize.define('StripeAccount', {
