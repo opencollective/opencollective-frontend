@@ -12,7 +12,10 @@ var emailLib = require('../app/lib/email')(app);
  * Variable.
  */
 var userData = utils.data('user1');
+var user2Data = utils.data('user2');
 var groupData = utils.data('group1');
+var group2Data = utils.data('group2');
+var group3Data = utils.data('group3');
 var transactionsData = utils.data('transactions1').transactions;
 var subscriptionData = { type: 'group.transaction.created' };
 
@@ -37,22 +40,27 @@ describe(require('path').basename(__filename), function() {
   });
 
   var user;
+  var user2;
   var group;
+  var group2;
+  
   beforeEach(function(done) {
-    User.create(userData).then(function(u) {
-      user = u;
-      return Group.create(groupData);
-    }).then(function(g) {
-      group = g;
-      return group.addUser(user, {role: 'host'})
-    }).then(function() {
+    var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
+    Promise.all(promises).then((results) => {
+      user = results[0];
+      user2 = results[1];
+      group = results[2];
+      group2 = results[3];
+      return group.addUser(user, {role: 'HOST'} )
+    })
+    .then(() => {
       subscriptionData.UserId = user.id;
       subscriptionData.GroupId = group.id;
-      return Subscription.create(subscriptionData);
-    }).done(done);
+      return Subscription.create(subscriptionData).done(done);
+    });
   });
 
-  it('subscribes for the group.transaction.approved email notification', function(done) {
+  it('subscribes for the `group.transaction.approved` email notification', function(done) {
     request(app)
       .post('/groups/' + group.id + '/activities/group.transaction.approved/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -132,8 +140,44 @@ describe(require('path').basename(__filename), function() {
         }).done(done);
       })
   });
+  
+  it('fails to subscribe if not a member of the group', function(done) {
+    request(app)
+      .post('/groups/' + group2.id + '/activities/group.transaction.approved/subscribe')
+      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .send()
+      .expect(403)
+      .end(function() {
+        Subscription.findAndCountAll({where: {
+          UserId: user.id,
+          GroupId: group2.id,
+          type: subscriptionData.type
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(0);
+        }).done(done);
+      })
+  });
+  
+  it('automatically subscribe a new host to `group.transaction.created` events', function(done) {
+    request(app)
+      .post('/groups')
+      .set('Authorization', 'Bearer ' + user2.jwt(application))
+      .send({group: group3Data, role: 'HOST'})
+      .expect(200)
+      .end(function(e, res) {
+        Subscription.findAndCountAll({where: {
+          UserId: user2.id,
+          GroupId: res.body.id,
+          type: 'group.transaction.created'
+        }})
+        .then(function(res) {
+          expect(res.count).to.equal(0);
+        }).done(done);
+      })
+  });
 
-  it('sends a new group.transaction.created email notification', function(done) {
+  it('sends a new `group.transaction.created` email notification', function(done) {
 
     var templateData = {
       transaction: transactionsData[0],

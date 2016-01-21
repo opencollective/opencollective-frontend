@@ -184,7 +184,7 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should set a stripeAccount', function(done) {
+    it.only('should set a stripeAccount', function(done) {
       var url = '/stripe/oauth/callback?state=' + user.id + '&code=abc';
 
       async.auto({
@@ -192,7 +192,11 @@ describe('stripe.routes.test.js', function() {
           request(app)
             .get(url)
             .expect(302)
-            .end(cb);
+            .end(function(e, r) {
+              console.log("error: ", e);
+              console.log("response: ", r.body);
+              cb();
+            });
         },
 
         checkStripeAccount: ['request', function(cb) {

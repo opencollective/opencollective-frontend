@@ -106,7 +106,7 @@ module.exports = function(app) {
           }
         }).then(function(subscribers) {
           subscribers.forEach(function(s) {
-            var email = emailLib.send(activity.type, s.User.email, activity.data);
+            emailLib.send(activity.type, s.User.email, activity.data);
           });
           cb();
         }).catch(function(err) {

@@ -66,6 +66,10 @@
   "group2": {
     "name": "Women who code"
   },
+  
+  "group3": {
+    "name": "Yeoman"
+  },
 
   "card1": {
     "token": "PA-1B0110758V169653C",

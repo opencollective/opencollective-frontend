@@ -3,7 +3,6 @@ var errors = require('../lib/errors');
 module.exports = function(app) {
 
   var models = app.set('models');
-  var Activity = models.Activity;
   var Subscription = models.Subscription;
 
   return {

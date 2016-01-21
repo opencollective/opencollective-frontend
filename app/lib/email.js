@@ -33,7 +33,7 @@ var EmailLib = function(app) {
       to: recipient,
       subject: subject,
       html: body
-    }, function(err, response) {
+    }, function(err) {
       if (err) console.error(err);
       if (cb) cb();
     });
