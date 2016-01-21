@@ -44,7 +44,7 @@ describe(require('path').basename(__filename), function() {
       return Group.create(groupData);
     }).then(function(g) {
       group = g;
-      return group.addMember(user, {role: 'admin'})
+      return group.addUser(user, {role: 'host'})
     }).then(function() {
       subscriptionData.UserId = user.id;
       subscriptionData.GroupId = group.id;

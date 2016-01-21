@@ -17,6 +17,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var sequelize = models.sequelize;
   var Activity = models.Activity;
+  var Subscription = models.Subscription;
   var Group = models.Group;
   var Transaction = models.Transaction;
   var transactions = require('../controllers/transactions')(app);
@@ -25,6 +26,15 @@ module.exports = function(app) {
   /**
    * Private methods.
    */
+  var subscribeUserToGroupEvents = function(user, group, role) {
+    if(role !== roles.HOST) return;
+    Subscription.create({
+      UserId: user.id,
+      GroupId: group.id,
+      type: 'group.transaction.created'
+    });
+  }
+
   var addUserToGroup = function(group, user, options, callback) {
 
     async.auto({
@@ -286,10 +296,11 @@ module.exports = function(app) {
 
       addUserToGroup(req.group, req.user, options, function(e) {
         if (e) return next(e);
-        else res.send({success: true});
+        subscribeUserToGroupEvents(req.user, req.group, options.role);
+        res.send({success: true});
       });
     },
-
+    
     /**
      * Update a user.
      */

@@ -89,25 +89,6 @@ models.forEach(function(model) {
 })(module.exports);
 
 /**
- * Hooks
- */
-
-// (function(m) {
-//   console.log("typeof: " + typeof m.UserGroup.addHook);
-//   m.UserGroup.hook('afterCreate', function(userGroup) {
-//     // When a user is added to a group as an admin, we subscribe him
-//     // to receive the `group.transaction.created` notifications
-//     console.log("userGroup: ", userGroup);
-//     if (userGroup.role != 'admin') return;
-//     return m.Subscription.create({
-//       UserId: userGroup.UserId,
-//       GroupId: userGroup.GroupId,
-//       type: 'group.transaction.created'
-//     });
-//   });
-// })(module.exports);
-
-/**
  * Exports.
  */
 module.exports.sequelize = sequelize;
