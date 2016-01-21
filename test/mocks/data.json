@@ -101,11 +101,8 @@
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -200.00,
-<<<<<<< HEAD
         "currency": "USD",
-=======
         "vat": 0.20,
->>>>>>> f24fc98b03a060234b643f42a1c585bea78057b2
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
