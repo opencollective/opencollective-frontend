@@ -16,12 +16,9 @@ module.exports = function(app) {
   var errors = app.errors;
   var models = app.set('models');
   var sequelize = models.sequelize;
-  var Group = models.Group;
   var Activity = models.Activity;
-  var User = models.User;
+  var Group = models.Group;
   var Transaction = models.Transaction;
-  var UserGroup = models.UserGroup;
-  var StripeAccount = models.StripeAccount;
   var transactions = require('../controllers/transactions')(app);
   var roles = require('../constants/roles');
 
@@ -66,7 +63,7 @@ module.exports = function(app) {
           .done(cb);
 
       }]
-    }, function(err, results) {
+    }, function(err) {
       if (err) return callback(err);
       callback();
     });
@@ -502,7 +499,7 @@ module.exports = function(app) {
     /**
      * Get a group's transaction.
      */
-    getTransaction: function(req, res, next) {
+    getTransaction: function(req, res) {
       res.json(req.transaction.info);
     },
 

@@ -23,7 +23,7 @@ module.exports = {
         this.memory[user.email] = user.avatar;
         return cb(null, user);
       })
-      .catch(clearbit.Enrichment.NotFoundError, (err) => {
+      .catch(clearbit.Enrichment.NotFoundError, () => {
         this.memory[user.email] = null;
         return cb(new clearbit.Enrichment.NotFoundError(), user);
       })

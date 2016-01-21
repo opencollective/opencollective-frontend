@@ -2,7 +2,6 @@
  * Dependencies
  */
 var Url = require('url');
-var _ = require('lodash');
 
 /**
  * Private methods.

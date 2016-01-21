@@ -4,7 +4,6 @@
 
 var async = require('async');
 var axios = require('axios');
-var _ = require('lodash');
 var qs = require('querystring');
 var config = require('config');
 
@@ -22,8 +21,6 @@ module.exports = function(app) {
 
   var errors = app.errors;
   var models = app.set('models');
-  var sequelize = models.sequelize;
-  var User = models.User;
 
   var AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
   var TOKEN_URI = 'https://connect.stripe.com/oauth/token';
@@ -88,7 +85,7 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      getToken: ['findHost', function(cb, results) {
+      getToken: ['findHost', function(cb) {
         axios
           .post(TOKEN_URI, {
             grant_type: 'authorization_code',
@@ -118,7 +115,6 @@ module.exports = function(app) {
 
       linkStripeAccountToGroup: ['findHost', 'createStripeAccount', function(cb, results) {
         var host = results.findHost;
-        var StripeAccount = results.createStripeAccount;
 
         host.setStripeAccount(results.createStripeAccount)
           .then(function() {
@@ -127,7 +123,7 @@ module.exports = function(app) {
           .catch(cb);
       }]
 
-    }, function(err, results) {
+    }, function(err) {
       if (err) return next(err);
       res.redirect(config.host.webapp + '?stripeStatus=success');
     });

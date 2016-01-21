@@ -17,7 +17,6 @@ module.exports = function(app) {
   var User = models.User;
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
-  var StripeAccount = models.StripeAccount;
   var groups = require('../controllers/groups')(app);
   var errors = app.errors;
 
@@ -208,7 +207,7 @@ module.exports = function(app) {
     /**
      * Get token.
      */
-    getToken: function(req, res, next) {
+    getToken: function(req, res) {
       res.send({
         access_token: req.user.jwt(req.application),
         refresh_token: req.user.refresh_token
