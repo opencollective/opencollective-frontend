@@ -50,7 +50,7 @@ module.exports = {
     
      })
      .then(() => {
-       queryInterface.addIndex('Subscriptions', ['type', 'GroupId', 'UserId'], { indicesType: 'UNIQUE' } );
+       return queryInterface.addIndex('Subscriptions', ['type', 'GroupId', 'UserId'], { indicesType: 'UNIQUE' } );
      });
   },
 
