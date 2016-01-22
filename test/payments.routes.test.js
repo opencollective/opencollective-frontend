@@ -31,7 +31,7 @@ var stripeMock = require('./mocks/stripe');
 /**
  * Tests.
  */
-describe('payments.routes.test.js', function() {
+describe('payments.routes.test.js', () => {
 
   var application;
   var application2;
@@ -41,7 +41,7 @@ describe('payments.routes.test.js', function() {
   var nocks = {};
   var stripeEmail;
 
-  var stubStripe = function() {
+  var stubStripe = () => {
     var mock = stripeMock.accounts.create;
     mock.email = chance.email();
     stripeEmail = mock.email;
@@ -50,16 +50,16 @@ describe('payments.routes.test.js', function() {
     stub.yields(null, mock);
   };
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
   });
 
   // Create a user.
-  beforeEach(function(done) {
-    models.User.create(userData).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(userData).done((e, u) => {
       expect(e).to.not.exist;
       user = u;
       done();
@@ -67,29 +67,20 @@ describe('payments.routes.test.js', function() {
   });
 
   // Nock for customers.create.
-  beforeEach(function() {
+  beforeEach(() => {
     nocks['customers.create'] = nock(STRIPE_URL)
       .post('/v1/customers')
       .reply(200, stripeMock.customers.create);
   });
 
-  // Nock for charges.create.
-  beforeEach(function() {
-    nocks['charges.create'] = nock(STRIPE_URL)
-      .post('/v1/charges', 'amount=' + CHARGE * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
-      .reply(200, stripeMock.charges.create);
-  });
 
-  afterEach(function() {
-    nock.cleanAll();
-  });
 
-  beforeEach(function() {
+  beforeEach(() => {
     stubStripe();
   });
 
   // Create a group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -98,11 +89,11 @@ describe('payments.routes.test.js', function() {
         role: roles.HOST
       })
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         models.Group
           .find(parseInt(res.body.id))
-          .then(function(g) {
+          .then((g) => {
             group = g;
             done();
           })
@@ -110,13 +101,13 @@ describe('payments.routes.test.js', function() {
       });
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     app.stripe.accounts.create.restore();
     stubStripe();
   });
 
   // Create a second group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -125,11 +116,11 @@ describe('payments.routes.test.js', function() {
         role: roles.HOST
       })
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         models.Group
           .find(parseInt(res.body.id))
-          .then(function(g) {
+          .then((g) => {
             group2 = g;
             done();
           })
@@ -137,43 +128,58 @@ describe('payments.routes.test.js', function() {
       });
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     app.stripe.accounts.create.restore();
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .tap(function(account) {
-      return user.setStripeAccount(account);
-    })
-    .tap(function(account) {
-      return user.setStripeAccount(account);
-    })
-    .then(function() {
-      done();
-    })
+    .then((account) => user.setStripeAccount(account))
+    .then(() => done())
     .catch(done);
   });
 
   // Create an application which has only access to `group`
-  beforeEach(function(done) {
-    models.Application.create(utils.data('application2')).done(function(e, a) {
+  beforeEach((done) => {
+    models.Application.create(utils.data('application2')).done((e, a) => {
       expect(e).to.not.exist;
       application2 = a;
       application2.addGroup(group2).done(done);
     });
   });
 
+  // Nock for charges.create.
+  beforeEach(() => {
+    var params = [
+      'amount=' + CHARGE * 100,
+      'currency=' + CURRENCY,
+      'customer=' + stripeMock.customers.create.id,
+      'description=' + encodeURIComponent('One time donation to ' + group.name),
+      encodeURIComponent('metadata[groupId]') + '=' + group.id,
+      encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
+      encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
+      encodeURIComponent('metadata[cardId]') + '=1'
+    ].join('&');
+
+    nocks['charges.create'] = nock(STRIPE_URL)
+      .post('/v1/charges', params)
+      .reply(200, stripeMock.charges.create);
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
   /**
    * Post a payment.
    */
-  describe('#postPayments', function() {
+  describe('#postPayments', () => {
 
-    describe('Payment success by a group\'s user', function() {
+    describe('Payment success by a group\'s user', () => {
 
-      beforeEach(function(done) {
+      beforeEach((done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -189,14 +195,14 @@ describe('payments.routes.test.js', function() {
           .end(done);
       });
 
-      it('successfully creates a Stripe customer', function() {
+      it('successfully creates a Stripe customer', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a card with the UserId and the GroupId', function(done) {
+      it('successfully creates a card with the UserId and the GroupId', (done) => {
         models.Card
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
@@ -208,14 +214,14 @@ describe('payments.routes.test.js', function() {
           .catch(done);
       });
 
-      it('successfully makes a Stripe charge', function() {
+      it('successfully makes a Stripe charge', () => {
         expect(nocks['charges.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a transaction in the database', function(done) {
+      it('successfully creates a transaction in the database', (done) => {
         models.Transaction
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
@@ -235,11 +241,11 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe('Next payment success with a same stripe token', function() {
+    describe('Next payment success with a same stripe token', () => {
 
       var CHARGE2 = 1.99;
 
-      beforeEach(function(done) {
+      beforeEach((done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -256,20 +262,31 @@ describe('payments.routes.test.js', function() {
       });
 
       // New nock for customers.create.
-      beforeEach(function() {
+      beforeEach(() => {
         nocks['customers.create2'] = nock(STRIPE_URL)
           .post('/v1/customers')
           .reply(200, stripeMock.customers.create);
       });
 
-      // New nock for charges.create.
-      beforeEach(function() {
+      // Nock for charges.create.
+      beforeEach(() => {
+        var params = [
+          'amount=' + CHARGE2 * 100,
+          'currency=' + CURRENCY,
+          'customer=' + stripeMock.customers.create.id,
+          'description=' + encodeURIComponent('One time donation to ' + group.name),
+          encodeURIComponent('metadata[groupId]') + '=' + group.id,
+          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group.name),
+          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
+          encodeURIComponent('metadata[cardId]') + '=1'
+        ].join('&');
+
         nocks['charges.create2'] = nock(STRIPE_URL)
-          .post('/v1/charges', 'amount=' + CHARGE2 * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
+          .post('/v1/charges', params)
           .reply(200, stripeMock.charges.create);
       });
 
-      beforeEach(function(done) {
+      beforeEach((done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -285,28 +302,28 @@ describe('payments.routes.test.js', function() {
           .end(done);
       });
 
-      it('does not re-create a Stripe Customer with a same token', function() {
+      it('does not re-create a Stripe Customer with a same token', () => {
         expect(nocks['customers.create2'].isDone()).to.be.false;
       });
 
-      it('does not re-create a card', function(done) {
+      it('does not re-create a card', (done) => {
         models.Card
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(1);
             done();
           })
           .catch(done);
       });
 
-      it('successfully makes a new Stripe charge', function() {
+      it('successfully makes a new Stripe charge', () => {
         expect(nocks['charges.create2'].isDone()).to.be.true;
       });
 
-      it('successfully creates a new transaction', function(done) {
+      it('successfully creates a new transaction', (done) => {
         models.Transaction
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(2);
             expect(res.rows[1]).to.have.property('amount', CHARGE2);
             done();
@@ -316,9 +333,27 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe('Payment success by a user that is not part of the group yet', function() {
+    describe('Payment success by a user that is not part of the group yet', () => {
 
-      beforeEach(function(done) {
+      // Nock for charges.create.
+      beforeEach(() => {
+        var params = [
+          'amount=' + CHARGE * 100,
+          'currency=' + CURRENCY,
+          'customer=' + stripeMock.customers.create.id,
+          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          encodeURIComponent('metadata[groupId]') + '=' + group2.id,
+          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
+          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(EMAIL),
+          encodeURIComponent('metadata[cardId]') + '=1'
+        ].join('&');
+
+        nocks['charges.create'] = nock(STRIPE_URL)
+          .post('/v1/charges', params)
+          .reply(200, stripeMock.charges.create);
+      });
+
+      beforeEach((done) => {
         request(app)
           .post('/groups/' + group2.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application2))
@@ -334,10 +369,10 @@ describe('payments.routes.test.js', function() {
           .end(done);
       });
 
-      it('successfully adds the user to the group as a backer', function(done) {
+      it('successfully adds the user to the group as a backer', (done) => {
         group2
           .getUsers()
-          .then(function(users) {
+          .then((users) => {
             expect(users).to.have.length(2);
             var backer = _.find(users, {email: EMAIL});
             expect(backer.UserGroup.role).to.equal(roles.BACKER);
@@ -348,7 +383,7 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe('Payment success by anonymous user', function() {
+    describe('Payment success by anonymous user', () => {
 
       var data = {
         stripeToken: STRIPE_TOKEN,
@@ -364,7 +399,25 @@ describe('payments.routes.test.js', function() {
         email: EMAIL
       };
 
-      beforeEach('successfully makes a anonymous payment', function(done) {
+      // Nock for charges.create.
+      beforeEach(() => {
+        var params = [
+          'amount=' + CHARGE * 100,
+          'currency=' + CURRENCY,
+          'customer=' + stripeMock.customers.create.id,
+          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          encodeURIComponent('metadata[groupId]') + '=' + group2.id,
+          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
+          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(EMAIL),
+          encodeURIComponent('metadata[cardId]') + '=1'
+        ].join('&');
+
+        nocks['charges.create'] = nock(STRIPE_URL)
+          .post('/v1/charges', params)
+          .reply(200, stripeMock.charges.create);
+      });
+
+      beforeEach('successfully makes a anonymous payment', (done) => {
         request(app)
           .post('/groups/' + group2.id + '/payments')
           .send({
@@ -372,20 +425,20 @@ describe('payments.routes.test.js', function() {
             payment: data
           })
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             done();
           });
       });
 
-      it('successfully creates a Stripe customer', function() {
+      it('successfully creates a Stripe customer', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a card with the GroupId', function(done) {
+      it('successfully creates a card with the GroupId', (done) => {
         models.Card
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', null);
@@ -394,18 +447,18 @@ describe('payments.routes.test.js', function() {
           .catch(done);
       });
 
-      it('successfully makes a Stripe charge', function() {
+      it('successfully makes a Stripe charge', () => {
         expect(nocks['charges.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a user', function(done) {
+      it('successfully creates a user', (done) => {
 
         models.User.findAndCountAll({
           where: {
               email: EMAIL
             }
         })
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(1);
           expect(res.rows[0]).to.have.property('email', EMAIL);
           done();
@@ -413,10 +466,10 @@ describe('payments.routes.test.js', function() {
         .catch(done)
       })
 
-      it('successfully creates a transaction in the database', function(done) {
+      it('successfully creates a transaction in the database', (done) => {
         models.Transaction
           .findAndCountAll({})
-          .then(function(res) {
+          .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', 2);
@@ -427,7 +480,7 @@ describe('payments.routes.test.js', function() {
             expect(res.rows[0]).to.have.property('isWaitingFirstInvoice', false);
             expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
             expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-            ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
+            ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
               expect(res.rows[0]).to.have.property(prop, data[prop]);
             });
             done();
@@ -437,7 +490,7 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe('Recurring payment success', function() {
+    describe('Recurring payment success', () => {
 
       var data = {
         stripeToken: STRIPE_TOKEN,
@@ -468,7 +521,7 @@ describe('payments.routes.test.js', function() {
         id: planId
       });
 
-      beforeEach(function() {
+      beforeEach(() => {
         nocks['plans.create'] = nock(STRIPE_URL)
           .post('/v1/plans')
           .reply(200, plan);
@@ -479,8 +532,8 @@ describe('payments.routes.test.js', function() {
           .reply(200, stripeMock.subscriptions.create);
       });
 
-      describe('plan does not exist', function() {
-        beforeEach(function(done) {
+      describe('plan does not exist', () => {
+        beforeEach((done) => {
 
           nocks['plans.retrieve'] = nock(STRIPE_URL)
             .get('/v1/plans/' + planId)
@@ -495,21 +548,21 @@ describe('payments.routes.test.js', function() {
               payment: data
             })
             .expect(200)
-            .end(function(e, res) {
+            .end((e, res) => {
               expect(e).to.not.exist;
               done();
             });
         });
 
-        it('creates a plan if it doesn\'t exist', function() {
+        it('creates a plan if it doesn\'t exist', () => {
           expect(nocks['plans.retrieve'].isDone()).to.be.true;
           expect(nocks['plans.create'].isDone()).to.be.true;
         });
       });
 
-      describe('plan exists', function() {
+      describe('plan exists', () => {
 
-        beforeEach(function(done) {
+        beforeEach((done) => {
 
           nocks['plans.retrieve'] = nock(STRIPE_URL)
             .get('/v1/plans/' + planId)
@@ -522,25 +575,25 @@ describe('payments.routes.test.js', function() {
               payment: data
             })
             .expect(200)
-            .end(function(e, res) {
+            .end((e, res) => {
               expect(e).to.not.exist;
               done();
             });
         });
 
-        it('uses the existing plan', function() {
+        it('uses the existing plan', () => {
           expect(nocks['plans.create'].isDone()).to.be.false;
           expect(nocks['plans.retrieve'].isDone()).to.be.true;
         });
 
-        it('creates a subscription', function() {
+        it('creates a subscription', () => {
           expect(nocks['subscriptions.create'].isDone()).to.be.true;
         });
 
-        it('creates a transaction', function(done) {
+        it('creates a transaction', (done) => {
           models.Transaction
             .findAndCountAll({})
-            .then(function(res) {
+            .then((res) => {
               expect(res.count).to.equal(1);
               expect(res.rows[0]).to.have.property('GroupId', group2.id);
               expect(res.rows[0]).to.have
@@ -552,7 +605,7 @@ describe('payments.routes.test.js', function() {
               expect(res.rows[0]).to.have.property('tags');
               expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
               expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-              ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach(function(prop) {
+              ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
                 expect(res.rows[0]).to.have.property(prop, data[prop]);
               });
               done();
@@ -560,7 +613,7 @@ describe('payments.routes.test.js', function() {
             .catch(done);
         });
 
-        it('fails if the interval is not month or year', function(done) {
+        it('fails if the interval is not month or year', (done) => {
 
           request(app)
             .post('/groups/' + group2.id + '/payments')
@@ -582,16 +635,16 @@ describe('payments.routes.test.js', function() {
 
     });
 
-    describe('Payment errors', function() {
+    describe('Payment errors', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         nock.cleanAll();
         nocks['customers.create'] = nock(STRIPE_URL)
           .post('/v1/customers')
           .replyWithError(stripeMock.customers.createError);
       });
 
-      it('fails paying because of a card declined', function(done) {
+      it('fails paying because of a card declined', (done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application))

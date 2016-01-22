@@ -178,7 +178,14 @@ module.exports = function(app) {
               .create({
                 amount: amount,
                 currency: currency,
-                customer: card.serviceId
+                customer: card.serviceId,
+                description: 'One time donation to ' + group.name,
+                metadata: {
+                  groupId: group.id,
+                  groupName: group.name,
+                  customerEmail: email,
+                  cardId: card.id
+                }
               }, cb);
           }
         }],
