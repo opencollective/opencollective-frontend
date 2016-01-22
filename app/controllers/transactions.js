@@ -106,6 +106,14 @@ module.exports = function(app) {
           }
         }).then(function(subscribers) {
           subscribers.forEach(function(s) {
+            var transaction = results.createTransaction;
+
+            if(transaction.link.match(/\.pdf$/))
+              transaction.preview = {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};            
+            else
+              transaction.preview = {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + transaction.link, width: '100%'};
+
+            activity.data.transaction = transaction;
             emailLib.send(activity.type, s.User.email, activity.data);
           });
           cb();

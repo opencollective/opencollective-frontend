@@ -11,7 +11,7 @@
   },
   "host": {
     "api": "http://localhost:3060",
-    "webapp": "http://localhost:3000"
+    "webapp": "http://localhost:3000/app"
   },
   "email": {
     "from": "info@opencollective.com"
