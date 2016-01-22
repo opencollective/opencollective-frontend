@@ -11,7 +11,7 @@ module.exports = function(Sequelize, DataTypes) {
 
   var Subscription = Sequelize.define('Subscription', {
 
-    channel: { defaultValue: 'email', type: DataTypes.ENUM('email') }, // in the future: iPhone, Android, etc.
+    channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
 
     type: DataTypes.STRING,
 

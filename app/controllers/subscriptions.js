@@ -12,16 +12,16 @@ module.exports = function(app) {
         GroupId: req.group.id,
         type: req.params.activityType
       })
-      .catch(function(err) {
-        if (err.name == 'SequelizeUniqueConstraintError')
-          next(new errors.BadRequest('Already subscribed to this type of activity'));
-
-        next(err);
-      })
       .then(function(subscription) {
         if (subscription) {
           res.send(subscription.get({plain:true}));
         }
+      })
+      .catch(function(err) {
+        if (err.name == 'SequelizeUniqueConstraintError')
+          return next(new errors.BadRequest('Already subscribed to this type of activity'));
+
+        next(err);
       });
     },
 
@@ -38,9 +38,9 @@ module.exports = function(app) {
         next(err);
       })
       .then(function(deletedRows) {
-        if (deletedRows == 0)
+        if (deletedRows === 0)
           return next(new errors.BadRequest('You were not subscribed to this type of activity'));
-        if (deletedRows == 1)
+        if (deletedRows === 1)
           return res.sendStatus(200);
       });
     }

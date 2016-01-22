@@ -3,9 +3,14 @@ var handlebars = require('handlebars');
 var templatesList = ['group.transaction.created'];
 var config = require('config');
 
+/*** 
+ * Loading Handlebars templates for the HTML emails
+ */
 var templates = {};
+handlebars.registerPartial('header', fs.readFileSync(__dirname + '/../../templates/partials/header.hbs.html', 'utf8'));
+handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/../../templates/partials/footer.hbs.html', 'utf8'));
 templatesList.forEach(function(template) {
-  var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template + '.html.hbs', 'utf8');
+  var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template + '.hbs.html', 'utf8');
   templates[template] = handlebars.compile(source);
 });
 
@@ -21,6 +26,7 @@ var EmailLib = function(app) {
 
   send = function(template, recipient, data, cb) {
 
+    cb = cb || function() {};
     data.config = config;
 
     var templateString = templates[template](data);
@@ -34,8 +40,11 @@ var EmailLib = function(app) {
       subject: subject,
       html: body
     }, function(err) {
-      if (err) console.error(err);
-      if (cb) cb();
+      if (err) {
+        console.error(err);
+        cb(err);
+      }
+      cb();
     });
   }
 
