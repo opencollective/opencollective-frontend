@@ -25,6 +25,7 @@ var models = [
   'Card',
   'Group',
   'Paykey',
+  'Subscription',
   'StripeAccount',
   'Transaction',
   'User',
@@ -61,6 +62,13 @@ models.forEach(function(model) {
   m.User.hasMany(m.Activity);
 
   m.Activity.belongsTo(m.Transaction);
+
+  // Subscription.
+  m.User.hasMany(m.Subscription);
+  m.Subscription.belongsTo(m.User);
+
+  m.Subscription.belongsTo(m.Group);
+  m.Group.hasMany(m.Subscription);
 
   // Transaction.
   m.Transaction.belongsTo(m.Group);

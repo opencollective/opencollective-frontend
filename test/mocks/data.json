@@ -66,6 +66,10 @@
   "group2": {
     "name": "Women who code"
   },
+  
+  "group3": {
+    "name": "Yeoman"
+  },
 
   "card1": {
     "token": "PA-1B0110758V169653C",
@@ -101,10 +105,11 @@
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -200.00,
+        "currency": "USD",
         "vat": 0.20,
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
-        "comment": "",
+        "comment": "this is the reason why I bought this",
         "link": "https://blockchain.info/en/address/136jvgFtTCUddfpSitsErQnLafEZyP4iUo",
         "createdAt": "2015-01-23T08:00:00.000Z",
         "paymentMethod": "paypal"
@@ -114,6 +119,7 @@
         "description": "Flight SFO-BRU",
         "tags": ["travel"],
         "amount": -918.59,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
@@ -125,6 +131,7 @@
         "description": "Byword",
         "tags": ["software"],
         "amount": -11.99,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
@@ -136,6 +143,7 @@
         "description": "Tipbox.is domain + dedicated server",
         "tags": ["hosting"],
         "amount": -588.61,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
@@ -147,6 +155,7 @@
         "description": "Working lunch with @mdp",
         "tags": ["food"],
         "amount": -36.00,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "paid back on 4/17/15",
         "comment": "",
@@ -158,6 +167,7 @@
         "description": "Homepage design end",
         "tags": ["consultancy"],
         "amount": -300.00,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "waiting for KF reimbursement",
         "comment": "",
@@ -169,6 +179,7 @@
         "description": "Homepage frontend code",
         "tags": ["consultancy"],
         "amount": -300.00,
+        "currency": "USD",
         "paidby": "@xdamman",
         "status": "waiting for KF reimbursement",
         "comment": "",
@@ -180,6 +191,7 @@
         "description": "Donation to that great project",
         "tags": ["donation"],
         "amount": 299.99,
+        "currency": "USD",
         "paidby": "@philmod",
         "comment": "",
         "link": "",

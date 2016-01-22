@@ -4,6 +4,7 @@
 var Paypal = require('paypal-adaptive');
 var knox = require('knox');
 var config = require('config');
+var nodemailer = require('nodemailer');
 
 /**
  * Module.
@@ -29,6 +30,15 @@ module.exports = function(app) {
     secret: config.aws.s3.secret,
     bucket: config.aws.s3.bucket,
     region: 'us-west-1'
+  });
+
+  // Mailgun.
+  app.mailgun = nodemailer.createTransport({
+    service: 'Mailgun',
+    auth: {
+      user: config.mailgun.user,
+      pass: config.mailgun.password
+    }
   });
 
 };

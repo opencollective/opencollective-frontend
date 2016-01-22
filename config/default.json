@@ -13,6 +13,13 @@
     "api": "http://localhost:3060",
     "webapp": "http://localhost:3000"
   },
+  "email": {
+    "from": "info@opencollective.com"
+  },
+  "mailgun": {
+    "user": "",
+    "password": ""
+  },
   "paypal": {
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",

@@ -17,10 +17,12 @@ module.exports = function(app) {
   var models = app.set('models');
   var Transaction = models.Transaction;
   var Activity = models.Activity;
+  var Subscription = models.Subscription;
   var Paykey = models.Paykey;
   var User = models.User;
   var Card = models.Card;
   var errors = app.errors;
+  var emailLib = require('../lib/email')(app);
 
   /**
    * Create a transaction and add it to a group/user/card.
@@ -88,6 +90,28 @@ module.exports = function(app) {
             card: card.info
           }
         }).done(cb);
+      }],
+
+      notifySubscribers: ['createActivity', function(cb, results) {
+        var activity = results.createActivity;
+
+        Subscription.findAll({
+          include:{
+            model: User,
+            attributes: ['email']
+          },
+          where: {
+            type: activity.type,
+            GroupId: activity.GroupId
+          }
+        }).then(function(subscribers) {
+          subscribers.forEach(function(s) {
+            emailLib.send(activity.type, s.User.email, activity.data);
+          });
+          cb();
+        }).catch(function(err) {
+          console.error('Unable to fetch subscribers of ' + activity.type + ' for group ' + activity.GroupId, err);
+        });
       }]
 
     }, function(e, results) {

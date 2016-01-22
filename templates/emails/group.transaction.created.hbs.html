@@ -1,0 +1,19 @@
+Subject: {{group.name}}: {{transaction.amount}} {{transaction.currency}} for {{transaction.description}} by {{user.username}}
+
+{{> header}}
+
+<center>
+  <h1>{{transaction.amount}} {{transaction.currency}}</h1>
+  <div>{{transaction.description}}</div>
+  <p><font color="#999">{{transaction.comment}}</font></p>
+
+  <a href="{{config.host.webapp}}/groups/{{group.id}}/transactions/{{transaction.id}}" style="color:#7fadf2">
+    <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640/{{transaction.link}}" width="100%" />
+  </a>
+
+  <br /><br />
+  <a href="{{config.host.webapp}}/groups/{{group.id}}/transactions/{{transaction.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on OpenCollective to approve or reject it</a>
+
+</center>
+
+{{> footer}}

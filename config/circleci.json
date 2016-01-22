@@ -19,6 +19,13 @@
     "secret": "sk_test_3",
     "key": "pk_test_5"
   },
+  "email": {
+    "from": "info@opencollective.com"
+  },
+  "mailgun": {
+    "user": "",
+    "password": ""
+  },
   "paypal": {
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",
@@ -31,7 +38,9 @@
   },
   "aws": {
     "s3": {
-      "bucket": "opencollective-test"
+      "bucket": "opencollective-test",
+      "secret": "unknown",
+      "key": "unknown"
     }
   }
 }

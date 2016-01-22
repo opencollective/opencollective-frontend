@@ -192,7 +192,11 @@ describe('stripe.routes.test.js', function() {
           request(app)
             .get(url)
             .expect(302)
-            .end(cb);
+            .end(function(e, r) {
+              console.log("error: ", e);
+              console.log("response: ", r.body);
+              cb();
+            });
         },
 
         checkStripeAccount: ['request', function(cb) {
@@ -218,7 +222,6 @@ describe('stripe.routes.test.js', function() {
             }
           })
           .done(function(e, res) {
-            var count = res.count;
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
             expect(res.rows[0].id).to.be.equal(user.id);
