@@ -1,10 +1,32 @@
 const async = require('async');
 const axios = require('axios');
 const config = require('config');
+var Sequelize = require('sequelize');
+const setupModels = require('../app/models').setupModels;
+
+/**
+ * Hard code to avoid resetting the production db by mistake
+ */
+var sequelize = new Sequelize(
+  'dd7n9gp6tr4u36',
+  'oshthceeahwmdn',
+  'JalG9GcCdddujhfRVlBV5TJRm3', {
+    host: 'ec2-54-83-194-117.compute-1.amazonaws.com',
+    "port": 5432,
+    "dialect": "postgres",
+    "protocol": "postgres",
+    "logging": true,
+    "dialectOptions": {
+      "ssl": true
+    }
+});
+
+/**
+ * Copy app/models/index.js logic to get the sequelize models;
+ */
+const models = setupModels(sequelize);
 
 const apiKey = '0ac43519edcf4421d80342403fb5985d';
-const app = require('../index');
-const models = app.set('models');
 const roles = require('../app/constants/roles');
 
 const testUser = {
@@ -12,9 +34,14 @@ const testUser = {
   password: 'password'
 };
 
+if (config.env !== 'test_server') {
+  console.log('wrong env', config.env);
+  return;
+}
+
 async.auto({
   resetDb: (cb) => {
-    app.set('models').sequelize.sync({force: true})
+    sequelize.sync({force: true})
       .done(cb);
   },
 
