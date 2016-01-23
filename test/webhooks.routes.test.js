@@ -119,13 +119,6 @@ describe('webhooks.routes.test.js', () => {
         .reply(200, stripeMock.customers.create);
     });
 
-    // Nock for charges.create.
-    beforeEach(() => {
-      nocks['charges.create'] = nock(STRIPE_URL)
-        .post('/v1/charges', 'amount=' + CHARGE * 100 + '&currency=' + CURRENCY + '&customer=' + stripeMock.customers.create.id)
-        .reply(200, stripeMock.charges.create);
-    });
-
     // Nock for plans.retrieve.
     beforeEach(() => {
 
