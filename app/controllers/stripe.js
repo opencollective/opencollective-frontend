@@ -125,7 +125,7 @@ module.exports = function(app) {
 
     }, function(err) {
       if (err) return next(err);
-      res.redirect(config.host.webapp + '?stripeStatus=success');
+      res.redirect(config.host.webapp + '/?stripeStatus=success');
     });
   };
 
