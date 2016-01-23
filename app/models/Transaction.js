@@ -51,6 +51,16 @@ module.exports = function(Sequelize, DataTypes) {
     reimbursedAt: DataTypes.DATE
   }, {
     getterMethods: {
+      
+      preview: function() {
+        if(!this.link) return {}
+        
+        if(this.link.match(/\.pdf$/))
+          return {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};            
+        else
+          return {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + this.link, width: '100%'};          
+      },
+      
       // Info.
       info: function() {
         return {
