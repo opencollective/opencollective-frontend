@@ -7,13 +7,19 @@ const setupModels = require('../models').setupModels;
  * This resets the test-api database (and only the test-api database)
  */
 
-module.exports = function() {
+module.exports = function(app) {
 
+  var errors = app.errors;
   var resetTestDatabase = function(req, res, next) {
 
-  /**
-   * Hard code to avoid resetting the production db by mistake
-   */
+    // Check to make sure this is the test_server
+    if (config.env !== 'test_server') {
+      return next(new errors.BadRequest('Must only be run on test server'));
+    }
+
+    /**
+     * Hard code to avoid resetting the production db by mistake
+     */
     const sequelize = new Sequelize(
       'dd7n9gp6tr4u36',
       'oshthceeahwmdn',
@@ -37,12 +43,6 @@ module.exports = function() {
       email: 'testuser@opencollective.com',
       password: 'password'
     };
-
-
-    if (config.env !== 'test_server') {
-      console.log('wrong env', config.env);
-      return;
-    }
 
     async.auto({
       resetDb: (cb) => {
