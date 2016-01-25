@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
 var express = require('express');
 var app = express();
 
@@ -37,7 +36,7 @@ app.set('controllers', require('./app/controllers')(app));
  */
 require('./app/controllers/routes')(app);
 
-if (!_.contains(['test', 'circleci'], app.set('env'))) {
+if (app.set('env') !== 'test' && app.set('env') !== 'circleci') {
   /**
    * Start server
    */

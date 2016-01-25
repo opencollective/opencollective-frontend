@@ -1,44 +1,52 @@
 /**
  * Dependencies.
  */
-var Sequelize = require('sequelize');
-var config = require('config').database;
+const Sequelize = require('sequelize');
+const config = require('config').database;
 
 /**
  * Database connection.
  */
 console.log('Connecting to postgres://' + config.options.host + '/' + config.database);
 
-var sequelize = new Sequelize(
+const sequelize = new Sequelize(
   config.database,
   config.username,
   config.password,
   config.options
 );
 
-/**
- * Models.
- */
-var models = [
-  'Activity',
-  'Application',
-  'Card',
-  'Group',
-  'Paykey',
-  'Subscription',
-  'StripeAccount',
-  'Transaction',
-  'User',
-  'UserGroup'
-];
-models.forEach(function(model) {
-  module.exports[model] = sequelize.import(__dirname + '/' + model);
-});
+const models = setupModels(sequelize);
 
 /**
- * Relationships.
+ * Separate function to be able to use in scripts
  */
-(function(m) {
+function setupModels(client) {
+  var m = {}; // models
+
+  /**
+   * Models.
+   */
+
+  [
+    'Activity',
+    'Application',
+    'Card',
+    'Group',
+    'Paykey',
+    'StripeAccount',
+    'Subscription',
+    'Transaction',
+    'User',
+    'UserGroup'
+  ].forEach((model) => {
+    m[model] = client.import(__dirname + '/' + model);
+  });
+
+  /**
+   * Relationships
+   */
+
   // Card.
   m.Card.belongsTo(m.User);
   m.Card.belongsTo(m.Group); // Not currently used
@@ -86,9 +94,12 @@ models.forEach(function(model) {
   m.Paykey.belongsTo(m.Transaction);
   m.Transaction.hasMany(m.Paykey);
 
-})(module.exports);
+  return m;
+};
 
 /**
  * Exports.
  */
+module.exports = models;
 module.exports.sequelize = sequelize;
+module.exports.setupModels = setupModels;
