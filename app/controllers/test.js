@@ -1,11 +1,11 @@
-/**
- * This resets the test-api database (and only the test-api database)
- */
-
 const async = require('async');
 const config = require('config');
 const Sequelize = require('sequelize');
 const setupModels = require('../models').setupModels;
+
+/**
+ * This resets the test-api database (and only the test-api database)
+ */
 
 module.exports = function() {
 
