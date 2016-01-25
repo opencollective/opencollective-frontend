@@ -188,6 +188,12 @@ describe(require('path').basename(__filename), function() {
     };
 
     templateData.transaction.id = 1;
+
+    if(templateData.transaction.link.match(/\.pdf$/))
+      templateData.transaction.preview = {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};
+    else
+      templateData.transaction.preview = {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + templateData.transaction.link, width: '100%'};
+
     var template = emailLib.templates['group.transaction.created'](templateData);
 
     var subject = emailLib.getSubject(template);
