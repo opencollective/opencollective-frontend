@@ -349,13 +349,16 @@ describe('webhooks.routes.test.js', () => {
         .end(done);
     });
 
-    it('returns an error if the subscription id does not appear in an exisiting transaction', (done) => {
+    it('returns an error if the subscription id does not appear in an exisiting transaction in production', (done) => {
       var e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get('/v1/events/' + webhookEvent.id)
         .reply(200, e);
+
+      var env = app.set('env');
+      app.set('env', 'production');
 
       request(app)
         .post('/webhooks/stripe')
@@ -367,6 +370,25 @@ describe('webhooks.routes.test.js', () => {
             message: 'Transaction not found: unknown subscription id'
           }
         })
+        .end(() => {
+          app.set('env', env);
+          done();
+        });
+
+    });
+
+    it('returns 200 if the subscription id does not appear in an exisiting transaction in NON-production', (done) => {
+      var e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
+      e.data.object.lines.data[0].id = 'abc';
+
+      nocks['events.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/events/' + webhookEvent.id)
+        .reply(200, e);
+
+      request(app)
+        .post('/webhooks/stripe')
+        .send(e)
+        .expect(200)
         .end(done);
 
     });

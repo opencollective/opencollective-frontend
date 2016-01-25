@@ -28,11 +28,11 @@ module.exports = (app) => {
 
   const stripe = (req, res, next) => {
     const body = req.body;
-
+    const isProduction = app.set('env') === 'production';
 
     // Stripe send test events to production as well
     // don't do anything if the event is not livemode
-    if (app.set('env') === 'production' && !body.livemode) {
+    if (isProduction && !body.livemode) {
       return res.sendStatus(200);
     }
 
@@ -93,6 +93,19 @@ module.exports = (app) => {
           ]
         })
         .then((transaction) => {
+
+          /**
+           * Stripe doesn't make a difference between development, test, staging
+           * environments. If we get a webhook from another env, `transaction.stripeSubscriptionId`
+           * will not be found and throw an error. Stripe will retry to send the webhook
+           * if it doesn't get a 2XX status code.
+           * For non-production environments, we will simply return 200 to avoid
+           * the retry on Stripe side (and the email from Stripe support).
+           */
+          if (!transaction && !isProduction) {
+            return res.sendStatus(200);
+          }
+
           if (!transaction) {
             return cb(new errors.BadRequest('Transaction not found: unknown subscription id'));
           }
