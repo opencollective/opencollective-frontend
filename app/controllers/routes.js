@@ -23,7 +23,9 @@ module.exports = function(app) {
   var cards = Controllers.cards;
   var webhooks = Controllers.webhooks;
   var stripe = Controllers.stripe;
+  var test = Controllers.test;
   var errors = app.errors;
+
 
   /**
    * Status.
@@ -161,6 +163,11 @@ module.exports = function(app) {
 
   app.get('/stripe/authorize', mw.authorizeAuthUser, stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
+
+  /**
+   * Reset test-api database
+   */
+  app.get('/database/reset', test.reset_test_database);
 
   /**
    * Error handler.
