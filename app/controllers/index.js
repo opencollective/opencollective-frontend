@@ -16,7 +16,8 @@ module.exports = function(app) {
     'stripe',
     'transactions',
     'users',
-    'webhooks'
+    'webhooks',
+    'test'
   ];
 
   /**
