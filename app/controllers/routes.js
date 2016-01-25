@@ -167,7 +167,7 @@ module.exports = function(app) {
   /**
    * Reset test-api database
    */
-  app.get('/database/reset', test.reset_test_database);
+  app.get('/database/reset', test.resetTestDatabase);
 
   /**
    * Error handler.

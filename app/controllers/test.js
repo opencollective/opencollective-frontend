@@ -9,7 +9,7 @@ const setupModels = require('../models').setupModels;
 
 module.exports = function() {
 
-  var reset_test_database = function(req, res, next) {
+  var resetTestDatabase = function(req, res, next) {
 
   /**
    * Hard code to avoid resetting the production db by mistake
@@ -80,7 +80,7 @@ module.exports = function() {
         return next(err);
       } else {
         res.send({
-          result: 'SUCCEEDED'
+          success: true
         });
       }
     });
@@ -91,7 +91,7 @@ module.exports = function() {
    */
 
   return {
-    reset_test_database: reset_test_database
+    resetTestDatabase: resetTestDatabase
   };
 
 };

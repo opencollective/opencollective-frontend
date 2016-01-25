@@ -35,6 +35,7 @@ function setupModels(client) {
     'Group',
     'Paykey',
     'StripeAccount',
+    'Subscription',
     'Transaction',
     'User',
     'UserGroup'
