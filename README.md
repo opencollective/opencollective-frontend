@@ -38,18 +38,27 @@ that to your shell profile.
 `npm test`
 All the calls to 3rd party services are stubbed using either `sinon` or `nock`.
 
+If you get an error at the first test, you might have forgotten to run postgres in the background. I (Arnaud) keep the followign commands in my shell profile to start/stop postgres.
+
+```
+export PGDATA='/usr/local/var/postgres'
+alias pgstart='pg_ctl -l $PGDATA/server.log start'
+alias pgstop='pg_ctl stop -m fast'
+```
+
+
 ## Start server
 `npm run start`
 
 ## Reset db with fixtures
 
-Run the server on the side:
+Run the server on the side (in parallel because the reset scripts hits directly the api):
 `npm run start`
 
 Run the script afterwards:
 `npm run db:reset`
 
-You can now login on development with `ops@opencollective.com` and `password`.
+You can now login on development with `devuser@opencollective.com` and `password`.
 You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
 
 Feel free to modify `scripts/create_user_and_group.js` to create your own user/group.
@@ -59,18 +68,20 @@ http://docs.opencollective.apiary.io/
 
 ## Deployment
 
-If you want to deploy the app on Heroku, you need to add the remotes:
+If you want to deploy to staging, you need to push your code to the `staging` branch. CircleCI will run the tests on this branch and push to Heroku for you if successful.
+
+### Manually
+
+If you want to deploy the app on Heroku manually (only for production), you need to add the remotes:
 
 ```
-git remote add heroku-staging https://git.heroku.com/opencollective-staging-api.git
 git remote add heroku-production https://git.heroku.com/opencollective-prod-api.git
 ```
 
 Then you can run:
 
 ```
-git push heroku-staging master
-git push heroku-staging branch:master
+git push heroku-production master
 ```
 
 ## Databases migrations
@@ -89,11 +100,13 @@ For localhost or other environments, the migrations has to be run manually.
 
 ### Apply migrations on Heroku
 
-The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`.
+The migrations are run automatically for `staging`.
+
+The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take (check `sequelize_cli.json`). On staging and production, it will use `PG_URL`. We don't use `NODE_ENV` because heroku overrides the variable during the build process.
 
 1) Push application with migration scripts to Heroku
 
-2) `heroku run bash -a opencollective-staging-api`
+2) `heroku run bash -a opencollective-production-api`
 
 3) `npm run db:migrate`
 
