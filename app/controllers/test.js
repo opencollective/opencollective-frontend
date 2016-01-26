@@ -82,7 +82,7 @@ module.exports = function(app) {
         models.Group.create({
           name: 'OpenCollective Test Group',
           description: 'OpenCollective test group on the test server',
-          slug: 'Testcollective',
+          slug: 'testcollective',
           isPublic: true
         })
         .then(group => {
