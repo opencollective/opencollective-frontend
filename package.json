@@ -57,10 +57,10 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "npm run hint && make test",
+    "test": "NODE_ENV=test npm run hint && mocha test",
+    "circleci": "NODE_ENV=circleci npm run hint && mocha test",
     "start": "npm run hint && node .",
     "hint": "eslint '**/*.js' --quiet",
-    "circleci": "npm run hint && make circleci",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
@@ -68,7 +68,7 @@
     "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh",
     "db:reset": "NODE_ENV=development node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
-    "postinstall": "npm rebuild",
+    "postinstall": "sh ./scripts/postinstall.sh",
     "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."

@@ -13,3 +13,8 @@ machine:
 test:
   override:
     - npm run circleci
+deployment:
+  staging:
+    branch: staging
+    heroku:
+      appname: opencollective-staging-api
