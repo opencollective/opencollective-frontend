@@ -28,6 +28,7 @@ describe('transactions.routes.test.js', function() {
   var publicGroup;
   var user;
   var user2;
+  var user3;
   var application;
   var application2;
   var application3;
@@ -53,6 +54,15 @@ describe('transactions.routes.test.js', function() {
     models.User.create(utils.data('user2')).done(function(e, u) {
       expect(e).to.not.exist;
       user2 = u;
+      done();
+    });
+  });
+
+  // Create user3.
+  beforeEach(function(done) {
+    models.User.create(utils.data('user3')).done(function(e, u) {
+      expect(e).to.not.exist;
+      user3 = u;
       done();
     });
   });
@@ -93,6 +103,14 @@ describe('transactions.routes.test.js', function() {
       .addUser(user, {role: roles.HOST})
       .done(done);
   });
+
+  // Add user3 to the group.
+  beforeEach(function(done) {
+    group
+      .addUser(user3, {role: roles.MEMBER})
+      .done(done);
+  });
+
 
   // Add user to the group2.
   beforeEach(function(done) {
@@ -363,6 +381,20 @@ describe('transactions.routes.test.js', function() {
       .delete('/groups/' + group.id + '/transactions/' + transactions[0].id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
+        .end(done);
+    });
+
+    it('fails deleting a transaction if user is not a host', function(done) {
+      request(app)
+        .delete('/groups/' + group2.id + '/transactions/' + transactions[0].id)
+        .set('Authorization', 'Bearer ' + user3.jwt(application))
+        .expect(403, {
+          error: {
+            code: 403,
+            type: 'forbidden',
+            message: 'Unauthorized'
+          }
+        })
         .end(done);
     });
 
@@ -871,7 +903,6 @@ describe('transactions.routes.test.js', function() {
 
     var transaction;
     var transaction2;
-    var user3; // part of Group1 as a member
     var user4; // part of Group1 as a backer
 
     beforeEach(function(done) {
@@ -906,17 +937,9 @@ describe('transactions.routes.test.js', function() {
                 .done(cb);
             });
         },
-        createUserC: function(cb) {
-          models.User.create(utils.data('user3')).done(cb);
-        },
         createUserD: function(cb) {
           models.User.create(utils.data('user4')).done(cb);
         },
-        addUserCGroupA: ['createUserC', function(cb, results) {
-          group
-            .addUser(results.createUserC, {role: roles.MEMBER})
-            .done(cb);
-        }],
         addUserDGroupA: ['createUserD', function(cb, results) {
           group
             .addUser(results.createUserD, {role: roles.BACKER})
@@ -926,7 +949,6 @@ describe('transactions.routes.test.js', function() {
         expect(e).to.not.exist;
         transaction = results.createTransactionA;
         transaction2 = results.createTransactionB;
-        user3 = results.createUserC;
         user4 = results.createUserD;
         done();
       });
