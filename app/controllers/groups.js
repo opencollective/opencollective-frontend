@@ -136,7 +136,16 @@ module.exports = function(app) {
 
   var updateTransaction = function(req, res, next) {
 
-    ['paymentMethod', 'tags'].forEach(function(prop) {
+    [
+      'description',
+      'link',
+      'amount',
+      'tags',
+      'createdAt',
+      'paymentMethod',
+      'comment',
+      'vat'
+    ].forEach(function(prop) {
       if (req.required.transaction[prop]) {
         req.transaction[prop] = req.required.transaction[prop];
       }
@@ -300,7 +309,7 @@ module.exports = function(app) {
         res.send({success: true});
       });
     },
-    
+
     /**
      * Update a user.
      */
