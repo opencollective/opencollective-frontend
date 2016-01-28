@@ -4,7 +4,9 @@
 var _ = require('lodash');
 var Bluebird = require('bluebird');
 var async = require('async');
+var config = require('config');
 var userlib = require('../lib/userlib');
+var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
 
 /**
  * Controller.
@@ -19,6 +21,7 @@ module.exports = function(app) {
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
   var groups = require('../controllers/groups')(app);
+  var sendEmail = require('../lib/email')(app).send;
   var errors = app.errors;
 
   /**
@@ -175,6 +178,55 @@ module.exports = function(app) {
       .catch(next);
   };
 
+  const forgotPassword = (req, res, next) => {
+    const email = req.required.email;
+
+    async.auto({
+      getUser: (cb) => {
+        User.findOne({
+          where: { email }
+        })
+        .then(user => {
+          if (!user) {
+            return next(new errors.BadRequest(`User with email ${email} doesn't exist`));
+          }
+
+          cb(null, user);
+        })
+        .catch(cb);
+      },
+
+      generateToken: ['getUser', (cb, results) => {
+        const user = results.getUser;
+        const token = generateURLSafeToken(20);
+
+        user.resetPasswordToken = token; // only place where we have token in plaintext
+        user.resetPasswordSentAt = new Date();
+
+        user.save()
+        .then(() => cb(null, token))
+        .catch(cb);
+      }],
+
+      sendEmailToUser: ['generateToken', (cb, results) => {
+        const email = results.getUser.email;
+        const token = results.generateToken;
+        const resetUrl = `${config.host.webapp}/reset/${token}/`;
+
+        sendEmail('user.forgot.password', email, { resetUrl }, (err) => {
+          if (err) return cb(err);
+
+          cb();
+        });
+      }]
+    }, (err) => {
+      if (err) return next(err);
+
+      return res.send({ success: true });
+    });
+  };
+
+
   /**
    * Public methods.
    */
@@ -256,6 +308,7 @@ module.exports = function(app) {
     updatePaypalEmail: updatePaypalEmail,
     updateAvatar: updateAvatar,
     updateUserWithoutLoggedIn: updateUserWithoutLoggedIn,
-    updatePassword: updatePassword
+    updatePassword: updatePassword,
+    forgotPassword: forgotPassword
   };
 };

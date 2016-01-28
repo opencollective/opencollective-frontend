@@ -501,4 +501,87 @@ describe('users.routes.test.js', function() {
 
   });
 
+  describe('forgot password', () => {
+    var user;
+
+    beforeEach((done) => {
+      models.User.create(userData)
+      .done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it('fails if the email is missing', done => {
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            fields: {
+              email: 'Required field email missing'
+            },
+            message: 'Missing required fields',
+            type: 'missing_required'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the user does not exist', done => {
+      const email = 'idonotexist@void.null';
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email,
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: `User with email ${email} doesn't exist`
+          }
+        })
+        .end(done);
+
+    });
+
+    it('sends an email to the user with a reset url', done => {
+      app.mailgun.sendMail = (options, cb) => {
+        expect(options.html).to.contain('/app/reset/');
+        expect(options.to).to.equal(user.email);
+        cb();
+      };
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(e => {
+          expect(e).to.not.exist;
+
+          models.User.find(user.id)
+          .then(u => {
+            const today = (new Date()).toString().substring(0, 15);
+
+            expect(u.resetPasswordTokenHash).to.be.ok;
+            expect(u.resetPasswordSentAt.toString()).to.contain(today);
+            done();
+          })
+          .catch(done);
+        });
+    });
+
+  });
+
+
 });

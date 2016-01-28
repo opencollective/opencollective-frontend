@@ -1,9 +1,12 @@
-var fs = require('fs');
-var handlebars = require('handlebars');
-var templatesList = ['group.transaction.created'];
-var config = require('config');
+const fs = require('fs');
+const handlebars = require('handlebars');
+const config = require('config');
+const templatesList = [
+  'group.transaction.created',
+  'user.forgot.password'
+];
 
-/*** 
+/***
  * Loading Handlebars templates for the HTML emails
  */
 var templates = {};

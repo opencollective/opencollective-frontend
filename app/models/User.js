@@ -98,6 +98,18 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    resetPasswordTokenHash: DataTypes.STRING,
+    // hash the token to avoid someone with access to the db to generate passwords
+    resetPasswordToken: {
+      type: DataTypes.VIRTUAL,
+      set: function(val) {
+        this.setDataValue('resetPasswordToken', val);
+        this.setDataValue('resetPasswordTokenHash', bcrypt.hashSync(val, this._salt));
+      }
+    },
+
+    resetPasswordSentAt: DataTypes.DATE,
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
