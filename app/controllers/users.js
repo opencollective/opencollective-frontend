@@ -145,19 +145,21 @@ module.exports = function(app) {
   };
 
   var _create = function(user, cb) {
-    User
-      .create(user)
-      .tap(function(dbUser) {
-        Activity.create({
-          type: 'user.created',
-          UserId: dbUser.id,
-          data: {user: dbUser.info}
-        });
-      })
-      .then(function(dbUser) {
-        cb(null, dbUser);
-      })
-      .catch(cb);
+    userlib.fetchInfo(user, (err, user) => {
+      User
+        .create(user)
+        .tap(function(dbUser) {
+          Activity.create({
+            type: 'user.created',
+            UserId: dbUser.id,
+            data: {user: dbUser.info}
+          });
+        })
+        .then(function(dbUser) {
+          cb(null, dbUser);
+        })
+        .catch(cb);
+    });
   };
 
   const updatePassword = (req, res, next) => {

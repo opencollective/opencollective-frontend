@@ -54,7 +54,7 @@ describe("userlib", function() {
     userlib.fetchAvatar(userData1, function(err, user) {
       expect(stub.callCount).to.equal(currentCallCount);
       expect(err).to.be.null;
-      expect(user.avatar).to.be.null;
+      expect(user.avatar).to.be.undefined;
       expect(user).to.deep.equal(userData1);
       done();
     });
