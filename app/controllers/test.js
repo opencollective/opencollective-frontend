@@ -64,14 +64,36 @@ module.exports = function(app) {
         .done(cb);
       }],
 
+      createStripeAccount: ['createTestUser', (cb, results) => {
+        models.StripeAccount.create({
+          accessToken: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
+          refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
+          stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
+          stripeUserId: 'acct_17TL97HrqFRlDDP2',
+          scope: 'read_write'
+        })
+        .then(stripeAccount => {
+          return results.createTestUser.setStripeAccount(stripeAccount);
+        })
+        .done(cb);
+      }],
+
       createGroupAndAddUser: ['createTestUser', (cb, results) => {
         models.Group.create({
           name: 'OpenCollective Test Group',
-          description: 'OpenCollective test group',
+          description: 'OpenCollective test group on the test server',
+          slug: 'testcollective',
+          isPublic: true
         })
         .then(group => {
           return group.addUser(results.createTestUser, {role: roles.HOST})
         })
+        .then(() => cb())
+        .catch(cb);
+      }],
+
+      createPaypalCard: ['createTestUser', (cb, results) => {
+        models.Card.create({ service: 'paypal', UserId: results.createTestUser.id})
         .then(() => cb())
         .catch(cb);
       }]
