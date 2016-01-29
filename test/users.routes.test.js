@@ -140,6 +140,27 @@ describe('users.routes.test.js', function() {
             .catch(done);
         });
     });
+    
+    it('successfully create a user with just an email and auto prefills name, twitter, avatar', function(done) {
+      request(app)
+        .post('/users')
+        .send({
+          api_key: application.api_key,
+          user: { email: "xdamman@gmail.com" }
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          models.User
+            .find(parseInt(res.body.id))
+            .then(function(user) {
+              expect(user.name).to.equal("Xavier Damman");
+              expect(user.twitterHandle).to.equal("xdamman");
+              done();
+            })
+            .catch(done);
+        });
+    });
 
     it('successfully create a user with an application that has access [0.5]', function(done) {
       request(app)
