@@ -12,22 +12,31 @@ var userData1 = utils.data('user1');
 var userData3 = utils.data('user3');
 
 var mock = require('./mocks/clearbit.json');
-var stub = sinon.stub(userlib.clearbit.Enrichment, 'find', function(opts) {
-  return new Bluebird(function(resolve, reject) {
-    switch(opts.email) {
-      case userData1.email:
-        var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
-        reject(NotFound);
-        break;
-      case userData3.email:
-        return resolve(mock);
-      default:
-        return reject(new Error());
-    }
-  });
-});
 
 describe("userlib", function() {
+  
+  var sandbox, stub;
+  beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', function(opts) {
+      return new Bluebird(function(resolve, reject) {
+        switch(opts.email) {
+          case userData1.email:
+            var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
+            reject(NotFound);
+            break;
+          case userData3.email:
+            return resolve(mock);
+          default:
+            return reject(new Error());
+        }
+      });
+    });
+  });
+
+  afterEach(function () {
+    sandbox.restore();
+  });
 
   it("doesn't call clearbit if email invalid", function(done) {
     userlib.fetchAvatar({email: "email.com"}, function(err, user) {
