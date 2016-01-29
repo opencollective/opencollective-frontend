@@ -86,6 +86,10 @@ module.exports = function(Sequelize, DataTypes) {
         return this.paymentMethod === 'manual';
       },
 
+      isReimbursed() {
+        return !!this.reimbursedAt;
+      },
+
       // Info.
       info() {
         return {
@@ -111,7 +115,8 @@ module.exports = function(Sequelize, DataTypes) {
           isExpense: this.isExpense,
           isRejected: this.isRejected,
           isDonation: this.isDonation,
-          isManual: this.isManual
+          isManual: this.isManual,
+          isReimbursed: this.isReimbursed
         };
       }
     }
