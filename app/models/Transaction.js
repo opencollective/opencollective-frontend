@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Transaction = Sequelize.define('Transaction', {
@@ -51,18 +53,41 @@ module.exports = function(Sequelize, DataTypes) {
     reimbursedAt: DataTypes.DATE
   }, {
     getterMethods: {
-      
-      preview: function() {
-        if(!this.link) return {}
-        
-        if(this.link.match(/\.pdf$/))
-          return {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};            
-        else
-          return {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + this.link, width: '100%'};          
+
+      preview() {
+        if (!this.link) return {};
+
+        if (this.link.match(/\.pdf$/)) {
+          return {
+            src: 'https://opencollective.com/static/images/mime-pdf.png',
+            width: '100px'
+          };
+        } else {
+          return {
+            src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + this.link,
+            width: '100%'
+          };
+        }
       },
-      
+
+      isRejected() {
+        return !!this.approvedAt && !this.approved;
+      },
+
+      isDonation() {
+        return _.contains(this.tags, 'Donation');
+      },
+
+      isExpense() {
+        return this.amount < 0;
+      },
+
+      isManual() {
+        return this.paymentMethod === 'manual';
+      },
+
       // Info.
-      info: function() {
+      info() {
         return {
           id: this.id,
           type: this.type,
@@ -82,7 +107,11 @@ module.exports = function(Sequelize, DataTypes) {
           reimbursedAt: this.reimbursedAt,
           UserId: this.UserId,
           GroupId: this.GroupId,
-          paymentMethod: this.paymentMethod
+          paymentMethod: this.paymentMethod,
+          isExpense: this.isExpense,
+          isRejected: this.isRejected,
+          isDonation: this.isDonation,
+          isManual: this.isManual
         };
       }
     }
