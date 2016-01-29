@@ -6,30 +6,49 @@ module.exports = {
   memory: {},
 
   clearbit: clearbit,
-
+  
+  fetchInfo(user, cb) {
+    this.getUserData(user.email, (err, userData) => {
+      if(userData) {
+        user.name = user.name || userData.name.fullName;
+        user.avatar = user.avatar || userData.avatar;
+        user.twitterHandle = user.twitterHandle || userData.twitter.handle;
+        user.website = user.website || userData.site;
+      }
+      cb(err, user);
+    });
+  },
+  
   fetchAvatar(user, cb) {
-    if(!user || !user.email || !user.email.match(/@/)) {
-      return cb(new Error("Invalid email"), user);
+    this.getUserData(user.email, (err, userData) => {
+      if(userData) {
+        user.avatar = userData.avatar;
+      }
+      cb(err, user);
+    });
+  },
+
+  getUserData(email, cb) {
+    if(!email || !email.match(/@/)) {
+      return cb(new Error("Invalid email"));
     }
 
-    if(this.memory[user.email] !== undefined) {
-      user.avatar = this.memory[user.email];
-      return cb(null, user);
+    if(this.memory[email] !== undefined) {
+      return cb(null, this.memory[email]);
     }
 
-    this.clearbit.Enrichment.find({email: user.email, stream: true})
+    this.clearbit.Enrichment.find({email: email, stream: true})
       .then((res) => {
-        user.avatar = res.person.avatar;
-        this.memory[user.email] = user.avatar;
-        return cb(null, user);
+        this.memory[email] = res.person;
+        return cb(null, res.person);
       })
       .catch(clearbit.Enrichment.NotFoundError, () => {
-        this.memory[user.email] = null;
-        return cb(new clearbit.Enrichment.NotFoundError(), user);
+        this.memory[email] = null;
+        return cb(new clearbit.Enrichment.NotFoundError());
       })
       .catch((err) => {
         console.error('Clearbit error', err);
-        return cb(err, user);
+        return cb(err);
       });
   }
 }
