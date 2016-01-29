@@ -1,63 +1,82 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
 const config = require('config');
-const templatesList = [
+
+const templatesNames = [
   'group.transaction.created',
   'user.forgot.password'
 ];
+var templates = {};
 
 /***
  * Loading Handlebars templates for the HTML emails
  */
-var templates = {};
-handlebars.registerPartial('header', fs.readFileSync(__dirname + '/../../templates/partials/header.hbs.html', 'utf8'));
-handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/../../templates/partials/footer.hbs.html', 'utf8'));
-templatesList.forEach(function(template) {
-  var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template + '.hbs.html', 'utf8');
-  templates[template] = handlebars.compile(source);
-});
 
-var EmailLib = function(app) {
+loadTemplates();
 
-  var getSubject = function(templateString) {
-    return templateString.split('\n')[0].replace(/^Subject: ?/i, '');
-  };
+/**
+ * Helpers
+ */
 
-  var getBody = function(templateString) {
-    return templateString.split('\n').slice(2).join('\n');
-  };
+const getSubject = str => str.split('\n')[0].replace(/^Subject: ?/i, '');
 
-  var send = function(template, recipient, data, cb) {
+const getBody = str => str.split('\n').slice(2).join('\n');
 
-    cb = cb || function() {};
-    data.config = config;
+const render = (name, data, config) => {
+  data.config = config;
+  return templates[name](data);
+};
 
-    var templateString = templates[template](data);
+/**
+ * Mailgun wrapper
+ */
 
-    var subject = getSubject(templateString);
-    var body = getBody(templateString);
+const EmailLib = (app) => {
 
-    app.mailgun.sendMail({
-      from: config.email.from,
-      to: recipient,
-      subject: subject,
-      html: body
-    }, function(err) {
-      if (err) {
-        console.error(err);
-        cb(err);
-      }
-      cb();
+  const send = (template, recipient, data) => {
+
+    const templateString = render(template, data, config);
+
+    return new Promise((resolve, reject) => {
+      app.mailgun.sendMail({
+        from: config.email.from,
+        to: recipient,
+        subject: getSubject(templateString),
+        html: getBody(templateString)
+      }, err => {
+        if (err) {
+          console.error(err);
+          return reject(err);
+        }
+
+        resolve();
+      });
     });
-  }
+  };
 
   return {
-    send: send,
-    templates: templates,
-    getBody: getBody,
-    getSubject: getSubject
+    send,
+    templates,
+    getBody,
+    getSubject
   };
 
 }
+
+function loadTemplates() {
+  const templatesPath = __dirname + '/../../templates';
+
+  // Register partials
+  const header = fs.readFileSync(`${templatesPath}/partials/header.hbs.html`, 'utf8');
+  const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs.html`, 'utf8');
+
+  handlebars.registerPartial('header', header);
+  handlebars.registerPartial('footer', footer);
+
+  templatesNames.forEach((template) => {
+    var source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs.html`, 'utf8');
+    templates[template] = handlebars.compile(source);
+  });
+};
 
 module.exports = EmailLib;

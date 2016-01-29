@@ -216,11 +216,9 @@ module.exports = function(app) {
         sendEmail('user.forgot.password', email, {
           resetUrl,
           resetToken
-        }, (err) => {
-          if (err) return cb(err);
-
-          cb();
-        });
+        })
+        .then(() => cb())
+        .catch(cb);
       }]
     }, (err) => {
       if (err) return next(err);
