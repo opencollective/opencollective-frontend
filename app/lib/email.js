@@ -19,15 +19,15 @@ templatesList.forEach(function(template) {
 
 var EmailLib = function(app) {
 
-  getSubject = function(templateString) {
+  var getSubject = function(templateString) {
     return templateString.split('\n')[0].replace(/^Subject: ?/i, '');
   };
 
-  getBody = function(templateString) {
+  var getBody = function(templateString) {
     return templateString.split('\n').slice(2).join('\n');
   };
 
-  send = function(template, recipient, data, cb) {
+  var send = function(template, recipient, data, cb) {
 
     cb = cb || function() {};
     data.config = config;

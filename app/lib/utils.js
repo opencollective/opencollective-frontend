@@ -2,12 +2,33 @@
  * Dependencies
  */
 const Url = require('url');
+const config = require('config');
 const crypto = require('crypto');
 const base64url = require('base64url');
 
 /**
  * Private methods.
  */
+
+/**
+ * Encrypt with secret
+ */
+const encrypt = (text) => {
+  var cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.secret)
+  var crypted = cipher.update(text, 'utf8', 'hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+
+/**
+ * Descript wih secret
+ */
+const decrypt = (text) => {
+  var decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.secret)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 
 /**
  * Generate a secured token that works inside URLs
@@ -132,5 +153,7 @@ module.exports = {
   getLinks,
   generateURLSafeToken,
   getLinkHeader,
-  planId
+  planId,
+  encrypt,
+  decrypt
 }

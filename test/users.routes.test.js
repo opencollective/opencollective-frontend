@@ -2,11 +2,13 @@
  * Dependencies.
  */
 var _ = require('lodash');
+var cheerio = require('cheerio');
 var app = require('../index');
 var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
+var encrypt = require('../app/lib/utils').encrypt;
 
 /**
  * Variables.
@@ -578,6 +580,164 @@ describe('users.routes.test.js', function() {
             done();
           })
           .catch(done);
+        });
+    });
+
+  });
+
+  describe('reset password', () => {
+    var user;
+    var resetUrl;
+    var mailOptions;
+    var resetToken;
+    var encId;
+
+    beforeEach((done) => {
+      models.User.create(userData)
+      .done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        encId = user.encryptId();
+        done();
+      });
+    });
+
+    beforeEach((done) => {
+      app.mailgun.sendMail = (options, cb) => {
+        mailOptions = options;
+        const $ = cheerio.load(mailOptions.html);
+        token = $('a').data('token');
+        cb();
+      };
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(done);
+    })
+
+    it('fails if user is not found', done => {
+      const encId = encrypt('1234');
+
+      request(app)
+        .post(`/users/password/reset/${encId}/abc'`)
+        .send({
+          api_key: application.api_key,
+          password: 'a',
+          passwordConfirmation: 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'User with id 1234 not found'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset token is invalid', done => {
+      const encId = user.encryptId();
+
+      request(app)
+        .post(`/users/password/reset/${encId}/abc'`)
+        .send({
+          api_key: application.api_key,
+          password: 'a',
+          passwordConfirmation: 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'The reset token is invalid'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset passwords don\'t match', done => {
+      const encId = user.encryptId();
+      const $ = cheerio.load(mailOptions.html);
+      const token = $('a').data('token');
+
+      request(app)
+        .post(`/users/password/reset/${encId}/${token}`)
+        .send({
+          api_key: application.api_key,
+          password: 'abc1234',
+          passwordConfirmation: 'def5678'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: "password and passwordConfirmation don't match"
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset token is too old', done => {
+      const password = 'abc1234';
+
+      var d = new Date();
+      d.setFullYear(d.getFullYear() - 1); // last year
+
+      user.resetPasswordSentAt = d;
+
+      user.save()
+      .then(() => {
+        request(app)
+          .post(`/users/password/reset/${encId}/${token}`)
+          .send({
+            api_key: application.api_key,
+            password: password,
+            passwordConfirmation: password
+          })
+          .expect(400, {
+            error: {
+              code: 400,
+              type: 'bad_request',
+              message: 'The reset token has expired'
+            }
+          })
+          .end(done);
+      })
+      .catch(done);
+
+    });
+
+    it('cleans up the token after reset', done => {
+      const password = 'abc1234';
+
+      request(app)
+        .post(`/users/password/reset/${encId}/${token}`)
+        .send({
+          api_key: application.api_key,
+          password: password,
+          passwordConfirmation: password
+        })
+        .expect(200)
+        .end( e => {
+          expect(e).to.not.exist;
+
+          models.User.auth(user.email, password, (err) => {
+            expect(err).to.not.exist;
+
+            models.User.find(user.id)
+            .then(u => {
+              expect(u.resetPasswordTokenHash).to.be.equal(null);
+              expect(u.resetPasswordSentAt).to.be.equal(null);
+              done();
+            })
+            .catch(done);
+          });
+
         });
     });
 

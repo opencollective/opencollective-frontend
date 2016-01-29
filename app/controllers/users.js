@@ -4,7 +4,6 @@
 var _ = require('lodash');
 var Bluebird = require('bluebird');
 var async = require('async');
-var config = require('config');
 var userlib = require('../lib/userlib');
 var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
 
@@ -209,11 +208,15 @@ module.exports = function(app) {
       }],
 
       sendEmailToUser: ['generateToken', (cb, results) => {
+        const user = results.getUser;
         const email = results.getUser.email;
-        const token = results.generateToken;
-        const resetUrl = `${config.host.webapp}/reset/${token}/`;
+        const resetToken = results.generateToken;
+        const resetUrl = user.generateResetUrl(resetToken);
 
-        sendEmail('user.forgot.password', email, { resetUrl }, (err) => {
+        sendEmail('user.forgot.password', email, {
+          resetUrl,
+          resetToken
+        }, (err) => {
           if (err) return cb(err);
 
           cb();
@@ -226,6 +229,51 @@ module.exports = function(app) {
     });
   };
 
+  const resetPassword = (req, res, next) => {
+    const resetToken = req.params.reset_token;
+    const id = User.decryptId(req.params.userid_enc);
+    const password= req.required.password;
+    const passwordConfirmation = req.required.passwordConfirmation;
+
+    if (password !== passwordConfirmation) {
+      return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
+    }
+
+    async.auto({
+      getUser: cb => {
+        User.find(id)
+        .then(user => {
+          if (!user) {
+            return next(new errors.BadRequest(`User with id ${id} not found`));
+          }
+
+          cb(null, user);
+        })
+        .catch(cb);
+      },
+
+      checkResetToken: ['getUser', (cb, results) => {
+        const user = results.getUser;
+        user.checkResetToken(resetToken, cb);
+      }],
+
+      updateUser: ['checkResetToken', (cb, results) => {
+        var user = results.getUser;
+
+        user.resetPasswordTokenHash = null;
+        user.resetPasswordSentAt = null;
+        user.password = password;
+
+        user.save()
+          .done(cb);
+      }]
+
+    }, err => {
+      if (err) return next(err);
+
+      return res.send({ success: true });
+    });
+  };
 
   /**
    * Public methods.
@@ -305,10 +353,11 @@ module.exports = function(app) {
       .catch(next);
     },
 
-    updatePaypalEmail: updatePaypalEmail,
-    updateAvatar: updateAvatar,
-    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn,
-    updatePassword: updatePassword,
-    forgotPassword: forgotPassword
+    updatePaypalEmail,
+    updateAvatar,
+    updateUserWithoutLoggedIn,
+    updatePassword,
+    forgotPassword,
+    resetPassword
   };
 };
