@@ -9,12 +9,16 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var encrypt = require('../app/lib/utils').encrypt;
+var userlib = require('../app/lib/userlib');
+var sinon = require('sinon');
+var Bluebird = require('bluebird');
 
 /**
  * Variables.
  */
 var userData = utils.data('user1');
 var models = app.set('models');
+var mock = require('./mocks/clearbit.json');
 
 /**
  * Tests.
@@ -24,6 +28,25 @@ describe('users.routes.test.js', function() {
   var application;
   var application2;
   var application3;
+
+  var sandbox, stub;
+  beforeEach(() => {
+    sandbox = sinon.sandbox.create();
+    userlib.memory = {};
+    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
+      return new Bluebird((resolve, reject) => {
+        if(opts.email == "xdamman@gmail.com") {
+          return resolve(mock);
+        }
+        else {
+          var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
+          reject(NotFound);
+        }
+      });
+    });
+  });
+
+  afterEach(() => sandbox.restore() );
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
