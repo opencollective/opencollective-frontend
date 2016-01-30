@@ -457,12 +457,12 @@ describe('payments.routes.test.js', () => {
 
         models.User.findAndCountAll({
           where: {
-              email: EMAIL
+              email: userData.email
             }
         })
         .then((res) => {
           expect(res.count).to.equal(1);
-          expect(res.rows[0]).to.have.property('email', EMAIL);
+          expect(res.rows[0]).to.have.property('email', userData.email);
           done();
         })
         .catch(done)
@@ -474,7 +474,7 @@ describe('payments.routes.test.js', () => {
           .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('UserId', 2);
+            expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('CardId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
