@@ -1,18 +1,42 @@
 var fs = require('fs');
 var handlebars = require('handlebars');
-var templatesList = ['group.transaction.created'];
+var templatesList = fs.readdirSync(__dirname + '/../../templates/emails/');
 var config = require('config');
+var moment = require('moment');
 
 /*** 
  * Loading Handlebars templates for the HTML emails
  */
 var templates = {};
-handlebars.registerPartial('header', fs.readFileSync(__dirname + '/../../templates/partials/header.hbs.html', 'utf8'));
-handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/../../templates/partials/footer.hbs.html', 'utf8'));
-templatesList.forEach(function(template) {
-  var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template + '.hbs.html', 'utf8');
-  templates[template] = handlebars.compile(source);
-});
+loadTemplates = function() {
+  handlebars.registerPartial('header', fs.readFileSync(__dirname + '/../../templates/partials/header.hbs', 'utf8'));
+  handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/../../templates/partials/footer.hbs', 'utf8'));
+  handlebars.registerHelper('moment', function(value) {
+    return moment(value).format('MMMM Do YYYY');
+  });
+  handlebars.registerHelper('currency', function(value, props) {
+    const currency = props.hash.currency;
+    switch(currency) {
+      case 'USD':
+        return '$' + value;
+      case 'EUR':
+        return '€' + value;
+      case 'GBP':
+        return '£' + value;
+      case 'SEK':
+        return 'kr ' + value;
+      default:
+        return value + ' ' + currency;
+    }
+  });
+
+  templatesList.forEach(function(template) {
+    var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template, 'utf8');
+    templates[template.replace('.hbs','')] = handlebars.compile(source);
+  });
+}
+
+loadTemplates();
 
 var EmailLib = function(app) {
 
@@ -28,6 +52,8 @@ var EmailLib = function(app) {
 
     cb = cb || function() {};
     data.config = config;
+
+   if(!templates[template]) return cb(new Error("Invalid email template"));
 
     var templateString = templates[template](data);
 
@@ -52,6 +78,7 @@ var EmailLib = function(app) {
     send: send,
     templates: templates,
     getBody: getBody,
+    reload: loadTemplates,
     getSubject: getSubject
   };
 

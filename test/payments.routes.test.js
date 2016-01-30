@@ -50,6 +50,8 @@ describe('payments.routes.test.js', () => {
     stub.yields(null, mock);
   };
 
+  var mailgunStub = sinon.stub(app.mailgun, 'sendMail');
+
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
       application = app;
@@ -486,6 +488,11 @@ describe('payments.routes.test.js', () => {
             done();
           })
           .catch(done);
+      });
+
+      it('successfully send a thank you email', (done) => {
+        expect(mailgunStub.lastCall.args[0].to).to.equal(EMAIL);
+        done();
       });
 
     });

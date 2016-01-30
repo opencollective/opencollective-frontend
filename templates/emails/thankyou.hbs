@@ -1,0 +1,23 @@
+Subject: Thank you for your {{{currency transaction.amount currency=transaction.currency}}} donation to {{group.name}}
+
+{{> header}}
+
+<center>
+  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{group.logo}}" style="border-radius: 50%;" width="80" height="80" />
+</center>
+
+<p>Dear {{user.name}},</p>
+
+<p>We would like to thank you for your donation of {{{currency transaction.amount currency=transaction.currency}}} on {{{moment transaction.createdAt}}}. 
+  Your gift will help us continue our activities.</p>
+
+<p>You can follow our future activities and how we will be spending the money on our open collective page: 
+  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+
+<p>Warmly,</p>
+
+<p>
+  – The {{group.name}} open collective
+</p>
+
+{{> footer}}
