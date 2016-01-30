@@ -17,6 +17,7 @@ describe("userlib", () => {
   
   var sandbox, stub;
   beforeEach(() => {
+    userlib.memory = {};
     sandbox = sinon.sandbox.create();
     stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
       return new Bluebird((resolve, reject) => {
@@ -57,13 +58,14 @@ describe("userlib", () => {
   });
 
   it("only calls clearbit server once for an email not found", (done) => {
-    var currentCallCount = stub.callCount;
     userlib.fetchAvatar(userData1, (err, user) => {
-      expect(stub.callCount).to.equal(currentCallCount);
-      expect(err).to.be.null;
-      expect(user.avatar).to.be.undefined;
-      expect(user).to.deep.equal(userData1);
-      done();
+      userlib.fetchAvatar(userData1, (err, user) => {
+        expect(stub.callCount).to.equal(1);
+        expect(err).to.be.null;
+        expect(user.avatar).to.be.undefined;
+        expect(user).to.deep.equal(userData1);
+        done();
+      });
     });
   });
 
