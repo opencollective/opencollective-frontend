@@ -22,7 +22,7 @@ var CHARGE = 10.99;
 var CURRENCY = 'USD';
 var STRIPE_TOKEN = 'superStripeToken';
 var EMAIL = 'paypal@email.com';
-var userData = utils.data('user1');
+var userData = utils.data('user3');
 var groupData = utils.data('group1');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
@@ -398,7 +398,7 @@ describe('payments.routes.test.js', () => {
         status: 'super status',
         link: 'www.opencollective.com',
         comment: 'super comment',
-        email: EMAIL
+        email: userData.email
       };
 
       // Nock for charges.create.
@@ -410,7 +410,7 @@ describe('payments.routes.test.js', () => {
           'description=' + encodeURIComponent('One time donation to ' + group2.name),
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
-          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(EMAIL),
+          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(userData.email),
           encodeURIComponent('metadata[cardId]') + '=1'
         ].join('&');
 
@@ -491,7 +491,7 @@ describe('payments.routes.test.js', () => {
       });
 
       it('successfully send a thank you email', (done) => {
-        expect(mailgunStub.lastCall.args[0].to).to.equal(EMAIL);
+        expect(mailgunStub.lastCall.args[0].to).to.equal(userData.email);
         done();
       });
 

@@ -14,7 +14,7 @@
     "webapp": "http://localhost:3000/app"
   },
   "email": {
-    "from": "info@opencollective.com"
+    "from": "OpenCollective <info@opencollective.com>"
   },
   "mailgun": {
     "user": "",
