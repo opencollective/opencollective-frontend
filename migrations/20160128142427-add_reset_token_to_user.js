@@ -2,20 +2,20 @@
 
 module.exports = {
   up: function (queryInterface, DataTypes) {
-    return queryInterface.addColumn('Groups', 'resetPasswordTokenHash', {
+    return queryInterface.addColumn('Users', 'resetPasswordTokenHash', {
       type: DataTypes.STRING
     })
     .then(function() {
-      return queryInterface.addColumn('Groups', 'resetPasswordSentAt', {
+      return queryInterface.addColumn('Users', 'resetPasswordSentAt', {
         type: DataTypes.DATE
       });
     })
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('Groups', 'resetPasswordTokenHash')
+    return queryInterface.removeColumn('Users', 'resetPasswordTokenHash')
     .then(function() {
-      return queryInterface.removeColumn('Groups', 'resetPasswordSentAt');
+      return queryInterface.removeColumn('Users', 'resetPasswordSentAt');
     })
   }
 };

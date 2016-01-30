@@ -215,6 +215,10 @@ module.exports = function(Sequelize, DataTypes) {
           return cb(new errors.BadRequest('The reset token has expired'));
         }
 
+        if (!this.resetPasswordTokenHash) {
+          return cb(new errors.BadRequest('The reset token does not exist'))
+        }
+
         bcrypt.compare(token, this.resetPasswordTokenHash, (err, matched) => {
           if (err) return cb(err);
           if (!matched) return cb(new errors.BadRequest('The reset token is invalid'));
