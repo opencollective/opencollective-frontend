@@ -1,11 +1,13 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var bcrypt = require('bcrypt');
-var jwt = require('jsonwebtoken');
-var errors = require('../lib/errors');
-var config = require('config');
+const _ = require('lodash');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const errors = require('../lib/errors');
+const utils = require('../lib/utils');
+const config = require('config');
+const moment = require('moment');
 
 /**
  * Constants.
@@ -98,6 +100,18 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    resetPasswordTokenHash: DataTypes.STRING,
+    // hash the token to avoid someone with access to the db to generate passwords
+    resetPasswordToken: {
+      type: DataTypes.VIRTUAL,
+      set: function(val) {
+        this.setDataValue('resetPasswordToken', val);
+        this.setDataValue('resetPasswordTokenHash', bcrypt.hashSync(val, this._salt));
+      }
+    },
+
+    resetPasswordSentAt: DataTypes.DATE,
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -181,7 +195,38 @@ module.exports = function(Sequelize, DataTypes) {
 
       hasPassword() {
         return _.isString(this.password_hash);
-      }
+      },
+
+      encryptId() {
+        return utils.encrypt(String(this.id));
+      },
+
+      generateResetUrl(plainToken) {
+        const encId = this.encryptId();
+        return `${config.host.webapp}/reset/${encId}/${plainToken}/`;
+      },
+
+      checkResetToken(token, cb) {
+        const today = moment();
+        const resetPasswordSentAt = moment(this.resetPasswordSentAt);
+        const daysDifference = today.diff(resetPasswordSentAt, 'days');
+
+        if (daysDifference > 0) {
+          return cb(new errors.BadRequest('The reset token has expired'));
+        }
+
+        if (!this.resetPasswordTokenHash) {
+          return cb(new errors.BadRequest('The reset token does not exist'))
+        }
+
+        bcrypt.compare(token, this.resetPasswordTokenHash, (err, matched) => {
+          if (err) return cb(err);
+          if (!matched) return cb(new errors.BadRequest('The reset token is invalid'));
+
+          cb();
+        });
+      },
+
     },
 
     classMethods: {
@@ -204,6 +249,10 @@ module.exports = function(Sequelize, DataTypes) {
             });
           })
           .catch(fn);
+      },
+
+      decryptId(encrypted) {
+        return utils.decrypt(encrypted);
       }
     }
 

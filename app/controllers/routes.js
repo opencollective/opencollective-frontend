@@ -64,6 +64,12 @@ module.exports = function(app) {
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   /**
+   * User reset password flow
+   */
+  app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+
+  /**
    * Authentication.
    */
   app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, users.getToken); // Authenticate user to get a token.

@@ -27,7 +27,7 @@ module.exports = function(app) {
   /**
    * Create a transaction and add it to a group/user/card.
    */
-  var create = function(args, callback) {
+  var create = (args, callback) => {
     var transaction = args.transaction;
     var user = args.user || {};
     var group = args.group || {};
@@ -35,13 +35,13 @@ module.exports = function(app) {
 
     async.auto({
 
-      createTransaction: function(cb) {
+      createTransaction: (cb) => {
         Transaction
           .create(transaction)
           .done(cb);
       },
 
-      addTransactionToUser: ['createTransaction', function(cb, results) {
+      addTransactionToUser: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
         if (user && user.addTransaction) {
@@ -53,7 +53,7 @@ module.exports = function(app) {
         }
       }],
 
-      addTransactionToGroup: ['createTransaction', function(cb, results) {
+      addTransactionToGroup: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
         group
@@ -61,7 +61,7 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      addTransactionToCard: ['createTransaction', function(cb, results) {
+      addTransactionToCard: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
         if (card && card.addTransaction) {
@@ -73,7 +73,7 @@ module.exports = function(app) {
         }
       }],
 
-      createActivity: ['createTransaction', function(cb, results) {
+      createActivity: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
         // Create activity.
@@ -92,7 +92,7 @@ module.exports = function(app) {
         }).done(cb);
       }],
 
-      notifySubscribers: ['createActivity', function(cb, results) {
+      notifySubscribers: ['createActivity', (cb, results) => {
         var activity = results.createActivity;
 
         Subscription.findAll({
@@ -104,17 +104,16 @@ module.exports = function(app) {
             type: activity.type,
             GroupId: activity.GroupId
           }
-        }).then(function(subscribers) {
-          subscribers.forEach(function(s) {
-            emailLib.send(activity.type, s.User.email, activity.data);
-          });
-          cb();
-        }).catch(function(err) {
+        }).then((subscriptions) => {
+          return subscriptions.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
+        })
+        .then(() => cb())
+        .catch((err) => {
           console.error('Unable to fetch subscribers of ' + activity.type + ' for group ' + activity.GroupId, err);
         });
       }]
 
-    }, function(e, results) {
+    }, (e, results) => {
       if (e) return callback(e);
       else callback(null, results.createTransaction);
     });

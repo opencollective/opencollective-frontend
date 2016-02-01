@@ -5,6 +5,7 @@ var _ = require('lodash');
 var Bluebird = require('bluebird');
 var async = require('async');
 var userlib = require('../lib/userlib');
+var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
 
 /**
  * Controller.
@@ -19,6 +20,7 @@ module.exports = function(app) {
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
   var groups = require('../controllers/groups')(app);
+  var sendEmail = require('../lib/email')(app).send;
   var errors = app.errors;
 
   /**
@@ -177,6 +179,102 @@ module.exports = function(app) {
       .catch(next);
   };
 
+  const forgotPassword = (req, res, next) => {
+    const email = req.required.email;
+
+    async.auto({
+      getUser: (cb) => {
+        User.findOne({
+          where: { email }
+        })
+        .then(user => {
+          if (!user) {
+            return next(new errors.BadRequest(`User with email ${email} doesn't exist`));
+          }
+
+          cb(null, user);
+        })
+        .catch(cb);
+      },
+
+      generateToken: ['getUser', (cb, results) => {
+        const user = results.getUser;
+        const token = generateURLSafeToken(20);
+
+        user.resetPasswordToken = token; // only place where we have token in plaintext
+        user.resetPasswordSentAt = new Date();
+
+        user.save()
+        .then(() => cb(null, token))
+        .catch(cb);
+      }],
+
+      sendEmailToUser: ['generateToken', (cb, results) => {
+        const user = results.getUser;
+        const email = results.getUser.email;
+        const resetToken = results.generateToken;
+        const resetUrl = user.generateResetUrl(resetToken);
+
+        sendEmail('user.forgot.password', email, {
+          resetUrl,
+          resetToken
+        })
+        .then(() => cb())
+        .catch(cb);
+      }]
+    }, (err) => {
+      if (err) return next(err);
+
+      return res.send({ success: true });
+    });
+  };
+
+  const resetPassword = (req, res, next) => {
+    const resetToken = req.params.reset_token;
+    const id = User.decryptId(req.params.userid_enc);
+    const password= req.required.password;
+    const passwordConfirmation = req.required.passwordConfirmation;
+
+    if (password !== passwordConfirmation) {
+      return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
+    }
+
+    async.auto({
+      getUser: cb => {
+        User.find(id)
+        .then(user => {
+          if (!user) {
+            return next(new errors.BadRequest(`User with id ${id} not found`));
+          }
+
+          cb(null, user);
+        })
+        .catch(cb);
+      },
+
+      checkResetToken: ['getUser', (cb, results) => {
+        const user = results.getUser;
+        user.checkResetToken(resetToken, cb);
+      }],
+
+      updateUser: ['checkResetToken', (cb, results) => {
+        var user = results.getUser;
+
+        user.resetPasswordTokenHash = null;
+        user.resetPasswordSentAt = null;
+        user.password = password;
+
+        user.save()
+          .done(cb);
+      }]
+
+    }, err => {
+      if (err) return next(err);
+
+      return res.send({ success: true });
+    });
+  };
+
   /**
    * Public methods.
    */
@@ -255,9 +353,11 @@ module.exports = function(app) {
       .catch(next);
     },
 
-    updatePaypalEmail: updatePaypalEmail,
-    updateAvatar: updateAvatar,
-    updateUserWithoutLoggedIn: updateUserWithoutLoggedIn,
-    updatePassword: updatePassword
+    updatePaypalEmail,
+    updateAvatar,
+    updateUserWithoutLoggedIn,
+    updatePassword,
+    forgotPassword,
+    resetPassword
   };
 };
