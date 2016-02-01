@@ -11,20 +11,20 @@ const base64url = require('base64url');
  */
 
 /**
- * Encrypt with secret
+ * Encrypt with resetPasswordSecret
  */
 const encrypt = (text) => {
-  var cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.secret)
+  var cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   var crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
   return crypted;
 }
 
 /**
- * Descript wih secret
+ * Descript wih resetPasswordSecret
  */
 const decrypt = (text) => {
-  var decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.secret)
+  var decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   var dec = decipher.update(text,'hex','utf8')
   dec += decipher.final('utf8');
   return dec;

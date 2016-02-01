@@ -10,7 +10,8 @@
   },
   "keys": {
     "opencollective": {
-      "secret": "JWT_SECRET"
+      "secret": "JWT_SECRET",
+      "resetPasswordSecret": "RESET_PASSWORD_SECRET"
     }
   },
   "stripe": {
