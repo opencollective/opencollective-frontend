@@ -21,6 +21,7 @@ module.exports = function(app) {
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
   var users = require('../controllers/users')(app);
+  var emailLib = require('../lib/email')(app);
 
   var getOrCreatePlan = function(params, cb) {
     var stripe = params.stripe;
@@ -247,6 +248,22 @@ module.exports = function(app) {
             group: group,
             card: results.createCard
           }, cb);
+        }],
+
+        sendThankYouEmail: ['createTransaction', function(cb, results) {
+          const user = results.getOrCreateUser;
+          const transaction = results.createTransaction;
+          const data = {
+            transaction: transaction.info,
+            user: user.info,
+            group: group.info
+          }
+          var template = 'thankyou';
+          if(group.name.match(/WWCode/i))
+            template += '.wwcode';
+
+          emailLib.send(template, user.email, data);
+          cb();
         }],
 
         addUserToGroup: ['createTransaction', function(cb, results) {
