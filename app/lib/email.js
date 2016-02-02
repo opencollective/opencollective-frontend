@@ -37,6 +37,7 @@ function loadTemplates() {
   handlebars.registerHelper('moment', function(value) {
     return moment(value).format('MMMM Do YYYY');
   });
+
   handlebars.registerHelper('currency', function(value, props) {
     const currency = props.hash.currency;
     switch(currency) {
