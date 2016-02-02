@@ -201,7 +201,6 @@ describe(require('path').basename(__filename), function() {
 
     var previousSendMail = app.mailgun.sendMail;
     app.mailgun.sendMail = function(options) {
-      console.log("sendMail: options: ", options.to);
       expect(options.to).to.equal(user.email);
       expect(options.subject).to.equal(subject);
       expect(options.html).to.equal(body);
