@@ -20,6 +20,8 @@ module.exports = {
   },
   
   fetchAvatar(user, cb) {
+    if(user.avatar) return cb(null, user);
+
     this.getUserData(user.email, (err, userData) => {
       if(userData) {
         user.avatar = userData.avatar;
@@ -29,7 +31,7 @@ module.exports = {
   },
 
   getUserData(email, cb) {
-    if(!email || !email.match(/@/)) {
+    if(!email || !email.match(/.+@.+\..+/)) {
       return cb(new Error("Invalid email"));
     }
 
