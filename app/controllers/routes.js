@@ -53,6 +53,18 @@ module.exports = function(app) {
   };
 
   /**
+   * For testing the email templates
+   */
+  var emailLib = require('../lib/email')(app);
+  app.get('/email/:template', function(req, res) {
+    var data = {"transaction":{"id":1,"type":"payment","description":"Donation to Scouts d'Arlon","amount":10.99,"vat":null,"currency":"USD","beneficiary":null,"paidby":"1","tags":["Donation"],"status":null,"comment":null,"link":null,"approved":true,"createdAt":"2016-01-30T07:31:37.965Z","approvedAt":null,"reimbursedAt":null,"UserId":1,"GroupId":1,"paymentMethod":null,"isExpense":false,"isRejected":false,"isDonation":true,"isManual":false,"isReimbursed":false},"user":{"id":1,"name":"Phil Mod","username":"philmod","email":"philmod@email.com","avatar":null,"twitterHandle":"blahblah","website":"http://startupmanifesto.be","createdAt":"2016-01-30T07:31:37.747Z","updatedAt":"2016-01-30T07:31:37.889Z","paypalEmail":"philmod+paypal@email.com"},"group":{"id":1,"name":"Scouts d'Arlon","description":"Troupe Scoute Albert Schweitzer","budget":10000,"currency":"USD","longDescription":null,"logo":"http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg","video":null,"image":null,"expensePolicy":null,"membershipType":"yearlyfee","membershipfee":10,"createdAt":"2016-01-30T07:31:37.802Z","updatedAt":"2016-01-30T07:31:37.802Z","isPublic":false,"slug":"WWCodeAtl","website":"http://scouts.org.uk/home/","twitterHandle":"scouts","publicUrl":"http://localhost:3000/app/null"}};
+    var html = emailLib.templates[req.params.template](data);
+    console.log("data:", data);
+    res.send(html);
+    emailLib.reload();
+  });
+
+  /**
    * Users.
    */
   app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
@@ -62,6 +74,12 @@ module.exports = function(app) {
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
+
+  /**
+   * User reset password flow
+   */
+  app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
   /**
    * Authentication.

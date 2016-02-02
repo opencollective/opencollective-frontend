@@ -2,17 +2,23 @@
  * Dependencies.
  */
 var _ = require('lodash');
+var cheerio = require('cheerio');
 var app = require('../index');
 var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
+var encrypt = require('../app/lib/utils').encrypt;
+var userlib = require('../app/lib/userlib');
+var sinon = require('sinon');
+var Bluebird = require('bluebird');
 
 /**
  * Variables.
  */
 var userData = utils.data('user1');
 var models = app.set('models');
+var mock = require('./mocks/clearbit.json');
 
 /**
  * Tests.
@@ -22,6 +28,25 @@ describe('users.routes.test.js', function() {
   var application;
   var application2;
   var application3;
+
+  var sandbox, stub;
+  beforeEach(() => {
+    sandbox = sinon.sandbox.create();
+    userlib.memory = {};
+    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
+      return new Bluebird((resolve, reject) => {
+        if(opts.email == "xdamman@gmail.com") {
+          return resolve(mock);
+        }
+        else {
+          var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
+          reject(NotFound);
+        }
+      });
+    });
+  });
+
+  afterEach(() => sandbox.restore() );
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
@@ -59,8 +84,11 @@ describe('users.routes.test.js', function() {
         .send({
           user: userData
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('missing_required');
+          done();
+        });
     });
 
     it('fails if no api_key', function(done) {
@@ -70,8 +98,11 @@ describe('users.routes.test.js', function() {
           api_key: application2.api_key,
           user: userData
         })
-        .expect(403)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(403);
+          expect(res.body.error.type).to.equal('forbidden');
+          done();
+        });
     });
 
     it('fails if no user object', function(done) {
@@ -80,8 +111,11 @@ describe('users.routes.test.js', function() {
         .send({
           api_key: application.api_key
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('missing_required');
+          done();
+        });
     });
 
     it('fails if no email', function(done) {
@@ -91,8 +125,11 @@ describe('users.routes.test.js', function() {
           api_key: application.api_key,
           user: _.omit(userData, 'email')
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('validation_failed');
+          done();
+        });
     });
 
     it('fails if bad email', function(done) {
@@ -102,8 +139,11 @@ describe('users.routes.test.js', function() {
           api_key: application.api_key,
           user: _.extend({}, userData, {email: 'abcdefg'})
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('validation_failed');
+          done();
+        });
     });
 
     it('fails if @ symbol in twitterHandle', function(done) {
@@ -113,8 +153,11 @@ describe('users.routes.test.js', function() {
           api_key: application.api_key,
           user: _.extend({}, userData, {twitterHandle: '@asood123'})
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('validation_failed');
+          done();
+        });
     });
 
     it('successfully create a user', function(done) {
@@ -124,7 +167,6 @@ describe('users.routes.test.js', function() {
           api_key: application.api_key,
           user: userData
         })
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('email', userData.email);
@@ -148,7 +190,6 @@ describe('users.routes.test.js', function() {
           api_key: application.api_key,
           user: { email: "xdamman@gmail.com" }
         })
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           models.User
@@ -169,7 +210,6 @@ describe('users.routes.test.js', function() {
           api_key: application3.api_key,
           user: userData
         })
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           models.User
@@ -195,8 +235,11 @@ describe('users.routes.test.js', function() {
             api_key: application.api_key,
             user: _.pick(userData, 'email')
           })
-          .expect(400)
-          .end(done);
+          .end((e,res) => {
+            expect(res.statusCode).to.equal(400);
+            expect(res.body.error.type).to.equal('validation_failed');
+            done();
+          });
       });
 
       it('fails to create a user with the same username', function(done) {
@@ -209,8 +252,11 @@ describe('users.routes.test.js', function() {
             api_key: application.api_key,
             user: u
           })
-          .expect(400)
-          .end(done);
+          .end((e,res) => {
+            expect(res.statusCode).to.equal(400);
+            expect(res.body.error.type).to.equal('validation_failed');
+            done();
+          });
       });
 
     });
@@ -245,7 +291,6 @@ describe('users.routes.test.js', function() {
       request(app)
         .get('/users/' + user.id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           var u = res.body;
@@ -259,7 +304,6 @@ describe('users.routes.test.js', function() {
       request(app)
         .get('/users/' + user.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           var u = res.body;
@@ -290,7 +334,6 @@ describe('users.routes.test.js', function() {
         .send({
           paypalEmail: email
         })
-        .expect(200)
         .end(function(err, res) {
           var body = res.body;
           expect(body.paypalEmail).to.equal(email);
@@ -305,8 +348,11 @@ describe('users.routes.test.js', function() {
         .send({
           paypalEmail: email
         })
-        .expect(401)
-        .end(done);
+          .end((e,res) => {
+            expect(res.statusCode).to.equal(401);
+            expect(res.body.error.type).to.equal('unauthorized');
+            done();
+          });
     });
 
     it('fails if the email is not valid', function(done) {
@@ -316,8 +362,11 @@ describe('users.routes.test.js', function() {
         .send({
           paypalEmail: 'abc'
         })
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('validation_failed');
+          done();
+        });
     });
   });
 
@@ -351,7 +400,6 @@ describe('users.routes.test.js', function() {
           password: newPassword,
           passwordConfirmation: newPassword
         })
-        .expect(200)
         .end(function(err, res) {
           var body = res.body;
           expect(body.success).to.equal(true);
@@ -365,16 +413,22 @@ describe('users.routes.test.js', function() {
     it('fails if the user is not logged in', function(done) {
       request(app)
         .put('/users/' + user.id + '/password')
-        .expect(401)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(401);
+          expect(res.body.error.type).to.equal('unauthorized');
+          done();
+        });
     });
 
     it('fails if wrong user is logged in', function(done) {
       request(app)
         .put('/users/' + user.id + '/password')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(403)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(403);
+          expect(res.body.error.type).to.equal('forbidden');
+          done();
+        });
     });
 
     it('fails if the passwords don\'t match', function(done) {
@@ -387,14 +441,12 @@ describe('users.routes.test.js', function() {
           password: newPassword,
           passwordConfirmation: newPassword + 'a'
         })
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'password and passwordConfirmation don\'t match'
-          }
-        })
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('bad_request');
+          expect(res.body.error.message).to.equal('password and passwordConfirmation don\'t match');
+          done();
+        });
     });
 
   });
@@ -418,7 +470,6 @@ describe('users.routes.test.js', function() {
         .send({
           avatar: link
         })
-        .expect(200)
         .end(function(err, res) {
           var body = res.body;
           expect(body.avatar).to.equal(link);
@@ -433,16 +484,22 @@ describe('users.routes.test.js', function() {
         .send({
           avatar: link
         })
-        .expect(401)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(401);
+          expect(res.body.error.type).to.equal('unauthorized');
+          done();
+        });
     });
 
     it('fails if the avatar key is missing from the payload', function(done) {
       request(app)
         .put('/users/' + user.id + '/avatar')
         .send({})
-        .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('missing_required');
+          done();
+        });
     });
 
   });
@@ -491,14 +548,12 @@ describe('users.routes.test.js', function() {
           user: newUser,
           api_key: application.api_key
         })
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'Can\'t update user with password from this route'
-          }
-        })
-        .end(done);
+        .end((e,res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.type).to.equal('bad_request');
+          expect(res.body.error.message).to.equal('Can\'t update user with password from this route');
+          done();
+        });
     });
 
     it('successfully updates a user without a password', done => {
@@ -508,7 +563,6 @@ describe('users.routes.test.js', function() {
           user: newUser,
           api_key: application.api_key
         })
-        .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', userWithoutPassword.id);
@@ -517,6 +571,246 @@ describe('users.routes.test.js', function() {
           expect(res.body).to.have.property('website', newUser.website);
           expect(res.body).to.have.property('avatar').to.contain('cloudfront');
           done();
+        });
+    });
+
+  });
+
+  describe('forgot password', () => {
+    var user;
+
+    beforeEach((done) => {
+      models.User.create(userData)
+      .done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        done();
+      });
+    });
+
+    it('fails if the email is missing', done => {
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            fields: {
+              email: 'Required field email missing'
+            },
+            message: 'Missing required fields',
+            type: 'missing_required'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the user does not exist', done => {
+      const email = 'idonotexist@void.null';
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email,
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: `User with email ${email} doesn't exist`
+          }
+        })
+        .end(done);
+
+    });
+
+    it('sends an email to the user with a reset url', done => {
+      app.mailgun.sendMail = (options, cb) => {
+        expect(options.html).to.contain('/app/reset/');
+        expect(options.to).to.equal(user.email);
+        cb();
+      };
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(e => {
+          expect(e).to.not.exist;
+
+          models.User.find(user.id)
+          .then(u => {
+            const today = (new Date()).toString().substring(0, 15);
+
+            expect(u.resetPasswordTokenHash).to.be.ok;
+            expect(u.resetPasswordSentAt.toString()).to.contain(today);
+            done();
+          })
+          .catch(done);
+        });
+    });
+
+  });
+
+  describe('reset password', () => {
+    var user;
+    var resetUrl;
+    var mailOptions;
+    var resetToken;
+    var encId;
+
+    beforeEach((done) => {
+      models.User.create(userData)
+      .done((e, u) => {
+        expect(e).to.not.exist;
+        user = u;
+        encId = user.encryptId();
+        done();
+      });
+    });
+
+    beforeEach((done) => {
+      app.mailgun.sendMail = (options, cb) => {
+        mailOptions = options;
+        const $ = cheerio.load(mailOptions.html);
+        token = $('a').data('token');
+        cb();
+      };
+
+      request(app)
+        .post('/users/password/forgot')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(done);
+    })
+
+    it('fails if user is not found', done => {
+      const encId = encrypt('1234');
+
+      request(app)
+        .post(`/users/password/reset/${encId}/abc'`)
+        .send({
+          api_key: application.api_key,
+          password: 'a',
+          passwordConfirmation: 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'User with id 1234 not found'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset token is invalid', done => {
+      const encId = user.encryptId();
+
+      request(app)
+        .post(`/users/password/reset/${encId}/abc'`)
+        .send({
+          api_key: application.api_key,
+          password: 'a',
+          passwordConfirmation: 'a'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'The reset token is invalid'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset passwords don\'t match', done => {
+      const encId = user.encryptId();
+      const $ = cheerio.load(mailOptions.html);
+      const token = $('a').data('token');
+
+      request(app)
+        .post(`/users/password/reset/${encId}/${token}`)
+        .send({
+          api_key: application.api_key,
+          password: 'abc1234',
+          passwordConfirmation: 'def5678'
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: "password and passwordConfirmation don't match"
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the reset token is too old', done => {
+      const password = 'abc1234';
+
+      var d = new Date();
+      d.setFullYear(d.getFullYear() - 1); // last year
+
+      user.resetPasswordSentAt = d;
+
+      user.save()
+      .then(() => {
+        request(app)
+          .post(`/users/password/reset/${encId}/${token}`)
+          .send({
+            api_key: application.api_key,
+            password: password,
+            passwordConfirmation: password
+          })
+          .expect(400, {
+            error: {
+              code: 400,
+              type: 'bad_request',
+              message: 'The reset token has expired'
+            }
+          })
+          .end(done);
+      })
+      .catch(done);
+
+    });
+
+    it('cleans up the token after reset', done => {
+      const password = 'abc1234';
+
+      request(app)
+        .post(`/users/password/reset/${encId}/${token}`)
+        .send({
+          api_key: application.api_key,
+          password: password,
+          passwordConfirmation: password
+        })
+        .expect(200)
+        .end( e => {
+          expect(e).to.not.exist;
+
+          models.User.auth(user.email, password, (err) => {
+            expect(err).to.not.exist;
+
+            models.User.find(user.id)
+            .then(u => {
+              expect(u.resetPasswordTokenHash).to.be.equal(null);
+              expect(u.resetPasswordSentAt).to.be.equal(null);
+              done();
+            })
+            .catch(done);
+          });
+
         });
     });
 

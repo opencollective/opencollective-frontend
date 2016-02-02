@@ -1,23 +1,52 @@
 /**
  * Dependencies
  */
-var Url = require('url');
+const Url = require('url');
+const config = require('config');
+const crypto = require('crypto');
+const base64url = require('base64url');
 
 /**
  * Private methods.
  */
 
 /**
+ * Encrypt with resetPasswordSecret
+ */
+const encrypt = (text) => {
+  var cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
+  var crypted = cipher.update(text, 'utf8', 'hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+
+/**
+ * Descript wih resetPasswordSecret
+ */
+const decrypt = (text) => {
+  var decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
+
+/**
+ * Generate a secured token that works inside URLs
+ * http://stackoverflow.com/a/25690754
+ */
+const generateURLSafeToken = size => base64url(crypto.randomBytes(size));
+
+/**
  * Get current Url.
  */
-var getRequestedUrl = function(req) {
+const getRequestedUrl = (req) => {
   return req.protocol + '://' + req.get('Host') + req.url;
 };
 
 /**
  * Add parameters to an url.
  */
-var addParameterUrl = function(url, parameters) {
+const addParameterUrl = (url, parameters) => {
   var parsedUrl  = Url.parse(url, true);
 
   function removeTrailingChar(str, char) {
@@ -40,9 +69,19 @@ var addParameterUrl = function(url, parameters) {
 };
 
 /**
+ * Pagination: from (offset, limit) to (page, per_page).
+ */
+const paginatePage = (offset, limit) => {
+  return {
+    page: Math.floor(offset / limit + 1),
+    perPage: limit
+  }
+};
+
+/**
  * Get links for pagination.
  */
-var getLinks = function(url, options) {
+const getLinks = (url, options) => {
   var page = options.page || paginatePage(options.offset, options.limit).page;
   var perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
 
@@ -69,60 +108,52 @@ var getLinks = function(url, options) {
 };
 
 /**
- * Pagination: from (offset, limit) to (page, per_page).
+ * Get headers for pagination.
  */
-var paginatePage = function(offset, limit) {
+const getLinkHeader = (url, options) => {
+  var links = getLinks(url, options);
+  var header = '';
+  var k = 0;
+  for (var i in links) {
+    header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"';
+    k += 1;
+  }
+
+  return header;
+};
+
+/**
+ * We can generate our own plan ids with stripe, we will use a simple one for
+ * now until we decide to make more complex plans. We will only take into account
+ * the currency, interval and amount. It will have the following format
+ *
+ * 'USD-MONTH-1000'
+ */
+const planId = (plan) =>  {
+  return [plan.currency, plan.interval, plan.amount].join('-').toUpperCase();
+};
+
+/**
+ * Pagination offset: from (page,per_page) to (offset, limit).
+ */
+const paginateOffset = (page, perPage) => {
   return {
-    page: Math.floor(offset / limit + 1),
-    perPage: limit
+    offset: (page - 1) * perPage,
+    limit: perPage
   }
 };
 
 /**
- * Public methods.
+ * Export public methods.
  */
 module.exports = {
-
-  /**
-   * Pagination offset: from (page,per_page) to (offset, limit).
-   */
-  paginateOffset: function(page, perPage) {
-    return {
-      offset: (page - 1) * perPage,
-      limit: perPage
-    }
-  },
-
-  getRequestedUrl: getRequestedUrl,
-
-  addParameterUrl: addParameterUrl,
-
-  getLinks: getLinks,
-
-  /**
-   * Get headers for pagination.
-   */
-  getLinkHeader: function(url, options) {
-    var links = getLinks(url, options);
-    var header = '';
-    var k = 0;
-    for (var i in links) {
-      header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"';
-      k += 1;
-    }
-
-    return header;
-  },
-
-  planId: function(plan) {
-    /**
-     * We can generate our own plan ids with stripe, we will use a simple one for
-     * now until we decide to make more complex plans. We will only take into account
-     * the currency, interval and amount. It will have the following format
-     *
-     * 'USD-MONTH-1000'
-     */
-    return [plan.currency, plan.interval, plan.amount].join('-').toUpperCase();
-  }
-
+  paginateOffset,
+  getRequestedUrl,
+  addParameterUrl,
+  getLinks,
+  generateURLSafeToken,
+  getLinkHeader,
+  planId,
+  encrypt,
+  decrypt
 }

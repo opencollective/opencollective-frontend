@@ -35,7 +35,7 @@
 
   "user3": {
     "name": "Xavier Damman",
-    "username": "xdam",
+    "username": "xdamman",
     "email": "xdamman@gmail.com",
     "password": "passssap"
   },
@@ -64,7 +64,8 @@
   },
 
   "group2": {
-    "name": "Women who code"
+    "name": "WWCode Austin",
+    "website": "http://womenwhocode.com"
   },
   
   "group3": {

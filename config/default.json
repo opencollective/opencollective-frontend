@@ -9,12 +9,17 @@
       "logging": false
     }
   },
+  "keys": {
+    "opencollective": {
+      "resetPasswordSecret": "O4ExDVzM7OviRzQBhRSV0Z2P1w4impwH"
+    }
+  },
   "host": {
     "api": "http://localhost:3060",
     "webapp": "http://localhost:3000/app"
   },
   "email": {
-    "from": "info@opencollective.com"
+    "from": "OpenCollective <info@opencollective.com>"
   },
   "mailgun": {
     "user": "",

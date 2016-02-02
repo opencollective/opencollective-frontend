@@ -1,58 +1,102 @@
-var fs = require('fs');
-var handlebars = require('handlebars');
-var templatesList = ['group.transaction.created'];
-var config = require('config');
+const fs = require('fs');
+const handlebars = require('handlebars');
+const config = require('config');
+const moment = require('moment');
 
-/*** 
+const templatesNames = [
+  'group.transaction.created',
+  'thankyou',
+  'thankyou.wwcode',
+  'user.forgot.password'
+];
+
+/**
+ * Helpers
+ */
+const getSubject = str => str.split('\n')[0].replace(/^Subject: ?/i, '');
+const getBody = str => str.split('\n').slice(2).join('\n');
+const render = (name, data, config) => {
+  data.config = config;
+  return templates[name](data);
+};
+
+/***
  * Loading Handlebars templates for the HTML emails
  */
 var templates = {};
-handlebars.registerPartial('header', fs.readFileSync(__dirname + '/../../templates/partials/header.hbs.html', 'utf8'));
-handlebars.registerPartial('footer', fs.readFileSync(__dirname + '/../../templates/partials/footer.hbs.html', 'utf8'));
-templatesList.forEach(function(template) {
-  var source = fs.readFileSync(__dirname + '/../../templates/emails/' + template + '.hbs.html', 'utf8');
-  templates[template] = handlebars.compile(source);
-});
+function loadTemplates() {
+  const templatesPath = __dirname + '/../../templates';
 
-var EmailLib = function(app) {
+  // Register partials
+  const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
+  const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
 
-  getSubject = function(templateString) {
-    return templateString.split('\n')[0].replace(/^Subject: ?/i, '');
-  };
+  handlebars.registerPartial('header', header);
+  handlebars.registerPartial('footer', footer);
 
-  getBody = function(templateString) {
-    return templateString.split('\n').slice(2).join('\n');
-  };
+  handlebars.registerHelper('moment', function(value) {
+    return moment(value).format('MMMM Do YYYY');
+  });
 
-  send = function(template, recipient, data, cb) {
+  handlebars.registerHelper('currency', function(value, props) {
+    const currency = props.hash.currency;
+    switch(currency) {
+      case 'USD':
+        return '$' + value;
+      case 'EUR':
+        return '€' + value;
+      case 'GBP':
+        return '£' + value;
+      case 'SEK':
+        return 'kr ' + value;
+      default:
+        return value + ' ' + currency;
+    }
+  });
 
-    cb = cb || function() {};
-    data.config = config;
+  templatesNames.forEach((template) => {
+    var source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
+    templates[template] = handlebars.compile(source);
+  });
+};
 
-    var templateString = templates[template](data);
+loadTemplates();
 
-    var subject = getSubject(templateString);
-    var body = getBody(templateString);
+/**
+ * Mailgun wrapper
+ */
+const EmailLib = (app) => {
 
-    app.mailgun.sendMail({
-      from: config.email.from,
-      to: recipient,
-      subject: subject,
-      html: body
-    }, function(err) {
-      if (err) {
-        console.error(err);
-        cb(err);
-      }
-      cb();
+  const send = (template, recipient, data) => {
+
+    const templateString = render(template, data, config);
+
+    return new Promise((resolve, reject) => {
+
+      if(!templates[template]) return reject(new Error("Invalid email template"));
+
+      app.mailgun.sendMail({
+        from: config.email.from,
+        to: recipient,
+        subject: getSubject(templateString),
+        html: getBody(templateString)
+      }, err => {
+        if (err) {
+          console.error(err);
+          return reject(err);
+        }
+
+        resolve();
+      });
     });
-  }
+  };
 
   return {
-    send: send,
-    templates: templates,
-    getBody: getBody,
-    getSubject: getSubject
+    send,
+    templates,
+    getBody,
+    getSubject,
+    reload: loadTemplates
   };
 
 }
