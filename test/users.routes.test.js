@@ -576,7 +576,6 @@ describe('users.routes.test.js', function() {
 
   });
 
-<<<<<<< eed65a7a35e228eb13ba38a58a07a3409a20bd60
   describe('forgot password', () => {
     var user;
 
