@@ -2,14 +2,14 @@ const async = require('async');
 const config = require('config');
 const Sequelize = require('sequelize');
 const setupModels = require('../models').setupModels;
-
-/**
- * This resets the test-api database (and only the test-api database)
- */
+//const utils = require('../../test/utils.js')();
 
 module.exports = function(app) {
 
   var errors = app.errors;
+  /**
+   * This resets the test-api database (and only the test-api database)
+   */
   var resetTestDatabase = function(req, res, next) {
 
     // Check to make sure this is the test_server
@@ -108,12 +108,22 @@ module.exports = function(app) {
     });
   }
 
+  var generateTestEmail = function(req, res) {
+    var emailLib = require('../lib/email')(app);
+    // TODO: figure out why test.utils doesn't work here.
+    data = require('../../test/mocks/data.json')['emailData'];
+    const html = emailLib.templates[req.params.template](data);
+    res.send(html);
+    emailLib.reload();
+  }
+
   /**
    * Public methods.
    */
 
   return {
-    resetTestDatabase: resetTestDatabase
+    resetTestDatabase: resetTestDatabase,
+    generateTestEmail: generateTestEmail
   };
 
 };

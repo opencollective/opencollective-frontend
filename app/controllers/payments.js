@@ -60,6 +60,7 @@ module.exports = function(app) {
       var group = req.group;
       var interval = payment.interval;
       var isSubscription = _.contains(['month', 'year'], interval);
+      var hasFullAccount = false; // Used to specify if a user has a real account
 
       if (interval && !isSubscription) {
         return next(new errors.BadRequest('Interval should be month or year.'));
@@ -203,6 +204,7 @@ module.exports = function(app) {
           })
           .then(function(user) {
             if (user) {
+              hasFullAccount = (user.password ? true : false);
               cb(null, user);
             } else {
               users._create({
@@ -286,11 +288,10 @@ module.exports = function(app) {
       }, function(e) {
         if (e) return next(e);
 
-        res.send({success: true, user: user.info});
+        res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});
       });
 
     }
 
   }
-
 };
