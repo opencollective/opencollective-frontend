@@ -564,13 +564,24 @@ describe('groups.routes.test.js', function() {
       });
     });
 
-    // Create another user that is a viewer.
+    // Create another user that is a backer.
     beforeEach(function(done) {
       models.User.create(utils.data('user3')).done(function(e, u) {
         expect(e).to.not.exist;
         user3 = u;
         group
           .addUser(user3, {role: roles.BACKER})
+          .done(done);
+      });
+    });
+
+    // Create another user that is a member.
+    beforeEach(function(done) {
+      models.User.create(utils.data('user4')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user4 = u;
+        group
+          .addUser(user4, {role: roles.MEMBER})
           .done(done);
       });
     });
@@ -621,6 +632,17 @@ describe('groups.routes.test.js', function() {
         .put('/groups/' + group.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(400)
+        .end(done);
+    });
+
+    it('successfully updates a group if authenticated as a MEMBER', function(done) {
+      request(app)
+        .put('/groups/' + group.id)
+        .set('Authorization', 'Bearer ' + user4.jwt(application))
+        .send({
+          group: groupNew
+        })
+        .expect(200)
         .end(done);
     });
 
