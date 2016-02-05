@@ -60,14 +60,12 @@
     "membershipfee": 10,
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
-    "isPublic": true,
     "slug": "scouts"
   },
 
   "group2": {
     "name": "WWCode Austin",
     "website": "http://womenwhocode.com",
-    "isPublic": true,
     "slug": "wwcode-austin"
   },
 
