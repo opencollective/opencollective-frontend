@@ -66,7 +66,7 @@ module.exports = function(app) {
         Group
           .find({
             where: {
-              slug: groupid
+              slug: groupid.toLowerCase()
             }
           })
           .then(callback)

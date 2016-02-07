@@ -258,6 +258,7 @@ describe('groups.routes.test.js', function() {
         .send({
           group: {
             name: 'group 2',
+            slug: 'groupSlug',
             isPublic: true
           },
           role: roles.HOST
@@ -360,6 +361,21 @@ describe('groups.routes.test.js', function() {
     it('successfully get a group if it is public', function(done) {
       request(app)
         .get('/groups/' + publicGroup.id)
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id', publicGroup.id);
+          expect(res.body).to.have.property('name', publicGroup.name);
+          expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
+          expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
+          done();
+        });
+    });
+
+    it('successfully get a group by its slug (case insensitive)', function(done) {
+      request(app)
+        .get('/groups/' + publicGroup.slug.toUpperCase())
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
