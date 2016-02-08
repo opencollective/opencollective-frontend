@@ -1,10 +1,11 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var async = require('async');
-var config = require('config');
-var uuid = require('node-uuid');
+const _ = require('lodash');
+const async = require('async');
+const config = require('config');
+const uuid = require('node-uuid');
+const activities = require('../constants/activities');
 
 /**
  * Controller.
@@ -78,7 +79,7 @@ module.exports = function(app) {
 
         // Create activity.
         Activity.create({
-          type: 'group.transaction.created',
+          type: activities.GROUP_TRANSANCTION_CREATED,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -86,7 +87,6 @@ module.exports = function(app) {
             group: group.info,
             transaction: transaction,
             user: user.info,
-            target: transaction.beneficiary,
             card: card.info
           }
         }).done(cb);
@@ -290,7 +290,7 @@ module.exports = function(app) {
 
       createActivity: ['updatePaykey', 'updateTransaction', function(cb) {
         Activity.create({
-          type: 'group.transaction.paid',
+          type: activities.GROUP_TRANSANCTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -488,7 +488,7 @@ module.exports = function(app) {
 
       createActivity: ['callService', 'updateTransaction', function(cb, results) {
         Activity.create({
-          type: 'group.transaction.paid',
+          type: activities.GROUP_TRANSANCTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: results.updateTransaction.id,

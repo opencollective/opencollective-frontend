@@ -11,6 +11,7 @@ const sinon = require('sinon');
 
 const app = require('../index');
 const roles = require('../app/constants/roles');
+const activities = require('../app/constants/activities');
 const utils = require('../test/utils.js')();
 const generatePlanId = require('../app/lib/utils.js').planId;
 
@@ -227,7 +228,7 @@ describe('webhooks.routes.test.js', () => {
       models.Activity
         .findAndCountAll({
           where: {
-            type: 'webhook.stripe.received'
+            type: activities.WEBHOOK_STRIPE_RECEIVED
           }
         })
         .then((res) => {

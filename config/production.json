@@ -12,9 +12,14 @@
   },
   "host": {
     "api": "https://api.opencollective.com",
-    "webapp": "https://app.opencollective.com"
+    "webapp": "https://app.opencollective.com",
+    "publicpage": "https://www.opencollective.com"
   },
   "stripe": {
     "redirectUri": "https://opencollective-prod-api.herokuapp.com/stripe/oauth/callback"
+  },
+  "slack": {
+    "hookUrl": "https://hooks.slack.com/services/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",
+    "activityChannel": "#activity"
   }
 }

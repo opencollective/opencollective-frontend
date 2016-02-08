@@ -8,6 +8,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var emailLib = require('../app/lib/email')(app);
+var activities = require('../app/constants/activities');
 
 /**
  * Variable.
@@ -18,7 +19,7 @@ var groupData = utils.data('group1');
 var group2Data = utils.data('group2');
 var group3Data = utils.data('group3');
 var transactionsData = utils.data('transactions1').transactions;
-var subscriptionData = { type: 'group.transaction.created' };
+var subscriptionData = { type: activities.GROUP_TRANSANCTION_CREATED };
 
 var models = app.get('models');
 
@@ -170,7 +171,7 @@ describe(require('path').basename(__filename), function() {
         Subscription.findAndCountAll({where: {
           UserId: user2.id,
           GroupId: res.body.id,
-          type: 'group.transaction.created'
+          type: activities.GROUP_TRANSACTION_CREATED
         }})
         .then(function(res) {
           expect(res.count).to.equal(0);

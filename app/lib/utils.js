@@ -144,6 +144,20 @@ const paginateOffset = (page, perPage) => {
 };
 
 /**
+ * Generates a url for Slack
+ */
+const linkifyForSlack = (link, text) => {
+  if (link && !text) {
+    text = link;
+  } else if (!link && text) {
+    return '';
+  } else if (!link && !text){
+    return '';
+  }
+  return `<${link}|${text}>`;
+}
+
+/**
  * Export public methods.
  */
 module.exports = {
@@ -155,5 +169,6 @@ module.exports = {
   getLinkHeader,
   planId,
   encrypt,
-  decrypt
+  decrypt,
+  linkifyForSlack
 }

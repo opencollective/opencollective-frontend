@@ -22,6 +22,7 @@ module.exports = function(app) {
   var Transaction = models.Transaction;
   var transactions = require('../controllers/transactions')(app);
   var roles = require('../constants/roles');
+  var activities = require('../constants/activities');
 
   /**
    * Private methods.
@@ -31,7 +32,7 @@ module.exports = function(app) {
     Subscription.create({
       UserId: user.id,
       GroupId: group.id,
-      type: 'group.transaction.created'
+      type: activities.GROUP_TRANSANCTION_CREATED
     });
   }
 

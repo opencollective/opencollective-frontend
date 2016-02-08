@@ -1,3 +1,5 @@
+const slack = require('../lib/slack');
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Activity = Sequelize.define('Activity', {
@@ -10,11 +12,26 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     }
   }, {
-    updatedAt: false
+    updatedAt: false,
+
+    instanceMethods: {
+      // stringifies an activity
+
+    },
+
+    hooks: {
+      afterCreate: function(activity) {
+        // TODO: Any error here currently sends it to frontend. How do we avoid that?
+        if (process.env.NODE_ENV === 'production') {
+          slack.postActivity(activity);
+        }
+      }
+    }
   });
 
   return Activity;
 };
+
 
 /*
 Types:
@@ -54,7 +71,7 @@ Types:
       data: group, user (caller), target (the deleted user)
       2* Userid: the deleted user + the caller
 
-  - group.transaction.created
+  - constants.GROUP_TRANSANCTION_CREATED
       data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
       GroupId:
@@ -64,12 +81,12 @@ Types:
       UserId: the one who initiate the delete
       GroupId:
       TransactionId:
-  - group.transaction.paid
+  - constants.GROUP_TRANSANCTION_PAID
       data: group, transaction, user (the caller), pay (paypal payload)
       UserId:
       GroupId:
       TransactionId:
 
-  + webhook.stripe.received
+  + constants.WEBHOOK_STRIPE_RECEIVED
     data: event (from Stripe)
 */

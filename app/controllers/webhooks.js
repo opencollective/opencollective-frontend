@@ -4,6 +4,7 @@
 
 var async = require('async');
 var _ = require('lodash');
+var activities = require('../constants/activities');
 
 /**
  * Controller.
@@ -63,7 +64,7 @@ module.exports = (app) => {
       createActivity: ['fetchEvent', (cb, results) => {
         // Only save activity when the event is valid
         Activity.create({
-          type: 'webhook.stripe.received',
+          type: activities.WEBHOOK_STRIPE_RECEIVED,
           data: {
             event: results.fetchEvent.event
           }
