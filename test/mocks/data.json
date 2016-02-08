@@ -1,5 +1,4 @@
 {
-
   "applicationSuper": {
     "name": "webapp",
     "api_key": "0ac43519edcf4421d80342403fb5985d",
@@ -60,14 +59,16 @@
     "membershipType": "yearlyfee",
     "membershipfee": 10,
     "twitterHandle": "scouts",
-    "website": "http://scouts.org.uk/home/"
+    "website": "http://scouts.org.uk/home/",
+    "slug": "scouts"
   },
 
   "group2": {
     "name": "WWCode Austin",
-    "website": "http://womenwhocode.com"
+    "website": "http://womenwhocode.com",
+    "slug": "wwcode-austin"
   },
-  
+
   "group3": {
     "name": "Yeoman"
   },
@@ -199,6 +200,68 @@
         "createdAt": "2015-05-29T07:00:00.000Z"
       }
     ]
-  }
+  },
 
+  "emailData": {
+    "transaction": {
+      "id": 1,
+      "type": "payment",
+      "description": "Donation to Scouts d'Arlon",
+      "amount": 10.99,
+      "vat": null,
+      "currency": "USD",
+      "beneficiary": null,
+      "paidby": "1",
+      "tags": ["Donation"],
+      "status": null,
+      "comment":null,
+      "link": null,
+      "approved": true,
+      "createdAt": "2016-01-30T07:31:37.965Z",
+      "approvedAt": null,
+      "reimbursedAt": null,
+      "UserId": 1,
+      "GroupId": 1,
+      "paymentMethod": null,
+      "isExpense": false,
+      "isRejected": false,
+      "isDonation": true,
+      "isManual": false,
+      "isReimbursed": false
+    },
+
+    "user": {
+      "id":1,
+      "name":"Phil Mod",
+      "username":"philmod",
+      "email":"philmod@email.com",
+      "avatar":null,
+      "twitterHandle":"blahblah",
+      "website":"http://startupmanifesto.be",
+      "createdAt":"2016-01-30T07:31:37.747Z",
+      "updatedAt":"2016-01-30T07:31:37.889Z",
+      "paypalEmail":"philmod+paypal@email.com"
+    },
+
+    "group": {
+      "id": 1,
+      "name": "Scouts d'Arlon",
+      "description": "Troupe Scoute Albert Schweitzer",
+      "budget": 10000,
+      "currency": "USD",
+      "longDescription": null,
+      "logo": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
+      "video": null,
+      "image": null,
+      "expensePolicy": null,
+      "membershipType": "yearlyfee",
+      "membershipfee": 10,
+      "createdAt": "2016-01-30T07:31:37.802Z",
+      "updatedAt": "2016-01-30T07:31:37.802Z",
+      "isPublic": false,
+      "slug": "WWCodeAtl",
+      "website": "http://scouts.org.uk/home/",
+      "twitterHandle": "scouts"
+    }
+  }
 }

@@ -51,7 +51,10 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     slug: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      set(slug) {
+        this.setDataValue('slug', slug.toLowerCase())
+      }
     },
 
     twitterHandle: {
