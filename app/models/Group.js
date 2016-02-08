@@ -54,7 +54,7 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       set(slug) {
         if (slug && slug.toLowerCase) {
-          this.setDataValue('slug', slug.toLowerCase())
+          this.setDataValue('slug', slug.toLowerCase());
         }
       }
     },
