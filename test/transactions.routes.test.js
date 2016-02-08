@@ -4,7 +4,6 @@
 var _ = require('lodash');
 var app = require('../index');
 var async = require('async');
-var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
@@ -12,7 +11,6 @@ var utils = require('../test/utils.js')();
 /**
  * Variables.
  */
-var userData = utils.data('user1');
 var groupData = utils.data('group1');
 var models = app.set('models');
 var transactionsData = utils.data('transactions1').transactions;
