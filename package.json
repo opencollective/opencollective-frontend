@@ -59,7 +59,7 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "NODE_ENV=test npm run hint && mocha test",
+    "test": "NODE_ENV=test npm run hint && NODE_ENV=test mocha test",
     "circleci": "NODE_ENV=circleci npm run hint && mocha test",
     "start": "npm run hint && node .",
     "hint": "eslint '**/*.js' --quiet",
