@@ -10,6 +10,18 @@ const linkifyForSlack = require('../lib/utils').linkifyForSlack;
 
 module.exports = {
 
+  /*
+   * Post a given activity to Slack
+   */
+
+  postActivity: function(activity) {
+    this.postMessage(this.formatActivity(activity));
+  },
+
+  /*
+   * Formats an activity based on the type to show in Slack
+   */
+
 	formatActivity: function(activity) {
 
     var returnVal = '';
@@ -93,17 +105,14 @@ module.exports = {
   postMessage: function(msg, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 
-    channel = channel !== undefined ? chanenl : '#activity';
-
     slack.send({
       text: msg,
-      channel: channel,
+      channel: channel || '#activity',
       username: 'ActivityBot',
       icon_emoji: ':raising_hand:'
+    })
+    .catch((err)=>{
+      console.error(err);
     });
-  },
-
-  postActivity: function(activity) {
-    postMessage(formatActivity(activity));
   }
 }
