@@ -106,11 +106,13 @@ describe('auth.routes.test.js', function() {
         });
     });
 
-    it('successfully authenticate with email', function(done) {
+    it('successfully authenticate with email (case insensitive)', function(done) {
       request(app)
         .post('/authenticate')
         .send({
-          api_key: application.api_key, email: userData.email, password: userData.password
+          api_key: application.api_key,
+          email: userData.email.toUpperCase(),
+          password: userData.password
         })
         .expect(200)
         .end(function(e, res) {

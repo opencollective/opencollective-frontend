@@ -55,14 +55,14 @@ describe('user.models.test.js', () => {
 
     });
 
-    it('successfully creates a user', (done) => {
-      var email = 'john.doe@doe.com';
+    it('successfully creates a user and lowercase email', (done) => {
+      var email = 'john.Doe@doe.com';
       User
         .create({ name: userData.name, email: userData.email})
         .done((err, user) => {
           expect(err).to.not.exist;
           expect(user).to.have.property('name', userData.name);
-          expect(user).to.have.property('email', userData.email);
+          expect(user).to.have.property('email', userData.email.toLowerCase());
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('updatedAt');
           done();

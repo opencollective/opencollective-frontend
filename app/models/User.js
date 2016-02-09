@@ -30,7 +30,12 @@ module.exports = function(Sequelize, DataTypes) {
 
     username: {
       type: DataTypes.STRING,
-      unique: true
+      unique: true,
+      set(val) {
+        if (val && val.toLowerCase) {
+          this.setDataValue('username', val.toLowerCase());
+        }
+      }
     },
 
     avatar: DataTypes.STRING,
@@ -39,6 +44,11 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password
+      set(val) {
+        if (val && val.toLowerCase) {
+          this.setDataValue('email', val.toLowerCase());
+        }
+      },
       validate: {
         len: {
           args: [6, 128],
@@ -232,6 +242,7 @@ module.exports = function(Sequelize, DataTypes) {
     classMethods: {
       auth: function(usernameOrEmail, password, fn) {
         var msg = 'Invalid username/email or password.';
+        usernameOrEmail = usernameOrEmail.toLowerCase();
 
         User
           .find({ where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail] })
