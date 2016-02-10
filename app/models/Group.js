@@ -74,7 +74,7 @@ module.exports = function(Sequelize, DataTypes) {
     publicUrl: {
       type: new DataTypes.VIRTUAL(DataTypes.STRING, ['slug']),
       get() {
-        return `${config.host.webapp}/${this.get('slug')}`;
+        return `${config.host.website}/${this.get('slug')}`;
       }
     }
 

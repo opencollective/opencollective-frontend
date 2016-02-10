@@ -16,7 +16,8 @@
   },
   "host": {
     "api": "http://localhost:3060",
-    "webapp": "http://localhost:3000/app"
+    "webapp": "http://localhost:3000/app",
+    "website": "http://localhost:3000"
   },
   "email": {
     "from": "OpenCollective <info@opencollective.com>"
@@ -38,5 +39,9 @@
   "stripe": {
     "redirectUri": "http://localhost:3060/stripe/oauth/callback"
   },
-  "clearbit": "93890266fd5110a2f35ea61d31f484f7"
+  "clearbit": "93890266fd5110a2f35ea61d31f484f7",
+  "slack": {
+    "hookUrl": "https://hooks.slack.com/services/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",
+    "activityChannel": "#activity"
+  }
 }

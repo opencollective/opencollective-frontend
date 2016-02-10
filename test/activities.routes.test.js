@@ -108,7 +108,7 @@ describe('activities.routes.test.js', function() {
           expect(e).to.not.exist;
 
           var activities = res.body;
-          expect(activities.length).to.equal(9);
+          expect(activities.length).to.equal(12);
           activities.forEach(function(a) {
             expect(a.GroupId).to.equal(group.id);
           });

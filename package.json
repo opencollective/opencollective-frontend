@@ -33,6 +33,7 @@
     "morgan": "^1.6.0",
     "multer": "^0.1.8",
     "newrelic": "^1.18.5",
+    "node-slack": "0.0.7",
     "node-uuid": "^1.4.3",
     "nodemailer": "^1.11.0",
     "paypal-adaptive": "^0.4.2",

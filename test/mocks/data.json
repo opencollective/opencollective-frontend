@@ -85,8 +85,8 @@
 
   "activities1": {
     "activities": [
-      {"type": "user.created", "UserId": 1, "data": {}},
-      {"type": "user.created", "UserId": 2, "data": {}},
+      {"type": "user.created", "UserId": 1, "data": {"user": {"username": "john doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
+      {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
       {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
       {"type": "group.user.added", "UserId": 1, "GroupId": 1, "data": {}},
@@ -96,7 +96,65 @@
       {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
       {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
       {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}}
+      {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}},
+      {
+        "type": "group.transaction.created",
+        "userId": 3,
+        "GroupId": 1,
+        "data": {
+          "user": {
+            "email":"john@doe.com"
+            },
+          "transaction": {
+            "isDonation": true,
+            "amount":10.42,
+            "currency": "USD"
+            },
+          "group": {
+            "name": "Pub quiz",
+            "publicUrl": "pubquiz.com"
+          }
+        }
+      },
+      {
+        "type": "group.transaction.created",
+        "userId": 3,
+        "GroupId": 1,
+        "data": {
+          "user":{
+            "email":"john@doe.com"
+            },
+          "transaction": {
+            "isExpense": true,
+            "amount":-12.98,
+            "currency": "USD",
+            "description": "pizza"
+            },
+          "group": {
+            "name": "Pub quiz"
+          }
+        }
+      },
+      {
+        "type": "group.transaction.paid",
+        "userId": 3,
+        "GroupId": 1,
+        "data": {
+          "user":{
+            "email":"john@doe.com"
+            },
+          "transaction": {
+            "isExpense": true,
+            "amount":-12.98,
+            "currency": "USD",
+            "description": "pizza"
+            },
+          "group": {
+            "name": "Pub quiz"
+          }
+        }
+      },
+      {"type": "webhook.stripe.received", "data":{}}
     ]
   },
 

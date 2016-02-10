@@ -41,6 +41,7 @@
   },
   "host": {
     "api": "API_URL",
-    "webapp": "WEBAPP_URL"
+    "webapp": "WEBAPP_URL",
+    "website": "WEBSITE_URL"
   }
 }
