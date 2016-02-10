@@ -1,4 +1,4 @@
-const slack = require('../lib/slack');
+const slackLib = require('../lib/slack');
 
 module.exports = function(Sequelize, DataTypes) {
 
@@ -14,16 +14,10 @@ module.exports = function(Sequelize, DataTypes) {
   }, {
     updatedAt: false,
 
-    instanceMethods: {
-      // stringifies an activity
-
-    },
-
     hooks: {
       afterCreate: function(activity) {
-        // TODO: Any error here currently sends it to frontend. How do we avoid that?
         if (process.env.NODE_ENV === 'production') {
-          slack.postActivity(activity);
+          slackLib.postActivity(activity);
         }
       }
     }

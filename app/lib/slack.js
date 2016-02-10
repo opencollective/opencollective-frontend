@@ -6,8 +6,6 @@ const Slack = require('node-slack');
 const config = require('config');
 const activities = require('../constants/activities');
 
-const linkifyForSlack = require('../lib/utils').linkifyForSlack;
-
 module.exports = {
 
   /*
@@ -22,7 +20,7 @@ module.exports = {
    * Formats an activity based on the type to show in Slack
    */
 
-	formatActivity: function(activity) {
+  formatActivity: function(activity) {
 
     var returnVal = '';
 
@@ -44,8 +42,8 @@ module.exports = {
       userString = userName ? userName + ' (' + userEmail + ')' : userEmail;
 
       const twitterHandle = activity.data.user.twitterHandle;
-      linkifyTwitter = linkifyForSlack('http://www.twitter.com/'+twitterHandle, '@'+twitterHandle);
-      linkifyWebsite = linkifyForSlack(activity.data.user.websiteUrl, null);
+      linkifyTwitter = this.linkifyForSlack('http://www.twitter.com/'+twitterHandle, '@'+twitterHandle);
+      linkifyWebsite = this.linkifyForSlack(activity.data.user.websiteUrl, null);
     }
 
     // get group data
@@ -58,7 +56,7 @@ module.exports = {
     if (activity.data.transaction) {
         amount = activity.data.transaction.amount;
         currency = activity.data.transaction.currency;
-        tags = activity.data.transaction.tags;
+        tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
     }
 
@@ -70,17 +68,17 @@ module.exports = {
 
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
-          returnVal += `Woohoo! ${userString} gave ${currency} ${amount}/month to ${linkifyForSlack(publicUrl, groupName)}!`;
+          returnVal += `Woohoo! ${userString} gave ${currency} ${amount}/month to ${this.linkifyForSlack(publicUrl, groupName)}!`;
 
         } else if (activity.data.transaction.isExpense) {
           // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
-          returnVal += `Hurray! ${userString} submitted a ${tags[0]} expense to ${linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for ${description}!`
+          returnVal += `Hurray! ${userString} submitted a ${tags} expense to ${this.linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for ${description}!`
         }
         break;
 
       case activities.GROUP_TRANSANCTION_PAID:
         // Ex: Jon approved a transaction for WWCode-Seattle: USD 12.57 for 'pizza';
-        returnVal += `Expense approved on ${linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for '${description}'`;
+        returnVal += `Expense approved on ${this.linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for '${description}'`;
         break;
 
       case activities.USER_CREATED:
@@ -114,5 +112,19 @@ module.exports = {
     .catch((err)=>{
       console.error(err);
     });
+  },
+
+  /**
+   * Generates a url for Slack
+   */
+  linkifyForSlack: function(link, text){
+    if (link && !text) {
+      text = link;
+    } else if (!link && text) {
+      return text;
+    } else if (!link && !text){
+      return '';
+    }
+    return `<${link}|${text}>`;
   }
 }

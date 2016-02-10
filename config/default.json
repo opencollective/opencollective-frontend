@@ -17,7 +17,7 @@
   "host": {
     "api": "http://localhost:3060",
     "webapp": "http://localhost:3000/app",
-    "publicpage": "http://localhost:3000"
+    "website": "http://localhost:3000"
   },
   "email": {
     "from": "OpenCollective <info@opencollective.com>"

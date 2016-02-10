@@ -42,6 +42,6 @@
   "host": {
     "api": "API_URL",
     "webapp": "WEBAPP_URL",
-    "publicpage": "PUBLIC_PAGE"
+    "website": "WEBSITE_URL"
   }
 }

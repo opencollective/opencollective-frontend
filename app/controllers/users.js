@@ -6,7 +6,7 @@ var Bluebird = require('bluebird');
 var async = require('async');
 var userlib = require('../lib/userlib');
 var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
-var activities = require('../constants/activities');
+var constants = require('../constants/activities');
 
 /**
  * Controller.
@@ -153,7 +153,7 @@ module.exports = function(app) {
         .create(user)
         .tap(function(dbUser) {
           Activity.create({
-            type: activities.USER_CREATED,
+            type: constants.USER_CREATED,
             UserId: dbUser.id,
             data: {user: dbUser.info}
           });

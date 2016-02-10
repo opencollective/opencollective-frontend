@@ -182,7 +182,7 @@ describe('users.routes.test.js', function() {
             .catch(done);
         });
     });
-    
+
     it('successfully create a user with just an email and auto prefills name, twitter, avatar', function(done) {
       request(app)
         .post('/users')

@@ -17,7 +17,7 @@
   "host": {
     "api": "http://localhost:3050",
     "webapp": "http://localhost:8000",
-    "publicpage": "http://localhost:3000"
+    "website": "http://localhost:3000"
   },
   "stripe": {
     "secret": "sk_test_3",
