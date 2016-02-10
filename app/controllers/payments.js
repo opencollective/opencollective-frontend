@@ -204,7 +204,7 @@ module.exports = function(app) {
           })
           .then(function(user) {
             if (user) {
-              hasFullAccount = (user.password ? true : false);
+              hasFullAccount = (user.password_hash ? true : false);
               cb(null, user);
             } else {
               users._create({
