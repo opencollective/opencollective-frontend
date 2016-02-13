@@ -33,12 +33,18 @@ module.exports = function(app) {
   });
 
   // Mailgun.
-  app.mailgun = nodemailer.createTransport({
-    service: 'Mailgun',
-    auth: {
-      user: config.mailgun.user,
-      pass: config.mailgun.password
-    }
-  });
+  if(config.mailgun.user) {
+    app.mailgun = nodemailer.createTransport({
+      service: 'Mailgun',
+      auth: {
+        user: config.mailgun.user,
+        pass: config.mailgun.password
+      }
+    });
+  }
+  else {
+    console.warn("Mailgun is not configured");
+    app.mailgun = { sendMail: (data, cb) => { if(cb) cb(); } };
+  }
 
 };
