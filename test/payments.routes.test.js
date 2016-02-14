@@ -19,11 +19,11 @@ var roles = require('../app/constants/roles');
  */
 var STRIPE_URL = 'https://api.stripe.com:443';
 var CHARGE = 10.99;
-var CURRENCY = 'USD';
+var CURRENCY = 'EUR';
 var STRIPE_TOKEN = 'superStripeToken';
 var EMAIL = 'paypal@email.com';
 var userData = utils.data('user3');
-var groupData = utils.data('group1');
+var groupData = utils.data('group2');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
 var stripeMock = require('./mocks/stripe');

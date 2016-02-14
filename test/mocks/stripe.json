@@ -55,7 +55,7 @@
       "paid": true,
       "status": "succeeded",
       "amount": 1230,
-      "currency": "usd",
+      "currency": "EUR",
       "refunded": false,
       "source": {
         "id": "card_165j1jIqnMN1wWwOzm6Cjmea",
@@ -121,7 +121,7 @@
         "object": "plan",
         "amount": 2000,
         "created": 1386247539,
-        "currency": "usd",
+        "currency": "EUR",
         "interval": "month",
         "interval_count": 1,
         "livemode": false,

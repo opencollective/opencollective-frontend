@@ -223,7 +223,7 @@ module.exports = function(app) {
           var transaction = {
             type: 'payment',
             amount: payment.amount,
-            currency: charge.currency,
+            currency: charge.currency || charge.plan.currency,
             paidby: user && user.id,
             description: description,
             tags: ['Donation'],
