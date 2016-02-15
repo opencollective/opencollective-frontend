@@ -629,7 +629,7 @@ describe('users.routes.test.js', function() {
 
     it('sends an email to the user with a reset url', done => {
       app.mailgun.sendMail = (options, cb) => {
-        expect(options.html).to.contain('/app/reset/');
+        expect(options.html).to.contain(`${config.host.webapp}/reset/`);
         expect(options.to).to.equal(user.email);
         cb();
       };
