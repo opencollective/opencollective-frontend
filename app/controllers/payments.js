@@ -140,7 +140,7 @@ module.exports = function(app) {
           var stripe = results.getGroupStripeAccount;
           var card = results.createCard;
           var amount = payment.amount * 100;
-          var currency = payment.currency || 'USD';
+          var currency = payment.currency || group.currency;
 
           /**
            * Subscription
