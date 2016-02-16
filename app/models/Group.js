@@ -123,6 +123,7 @@ module.exports = function(Sequelize, DataTypes) {
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
           slug: this.slug,
+          tiers: this.tiers,
           website: this.website,
           twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl
