@@ -141,7 +141,7 @@ describe('groups.routes.test.js', function() {
           error: {
             code: 400,
             type: 'validation_failed',
-            message: 'Validation error: \"interval\" is required',
+            message: 'Validation error: \"button\" is required',
             fields: ['tiers']
           }
         })
