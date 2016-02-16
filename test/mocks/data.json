@@ -60,7 +60,18 @@
     "membershipfee": 10,
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
-    "slug": "scouts"
+    "slug": "scouts",
+    "tiers": [{
+      "name": "One time",
+      "description": "One time tier",
+      "range": [0, 100],
+      "interval": "one-time"
+    }, {
+      "name": "Monthly",
+      "description": "Monthly tier",
+      "range": [0, 100],
+      "interval": "monthly"
+    }]
   },
 
   "group2": {
@@ -68,7 +79,18 @@
     "website": "http://womenwhocode.com",
     "slug": "wwcode-austin",
     "currency": "EUR",
-    "budget": 10000.00
+    "budget": 10000.00,
+    "tiers": [{
+      "name": "One time",
+      "description": "One time tier",
+      "range": [0, 100],
+      "interval": "one-time"
+    }, {
+      "name": "Monthly",
+      "description": "Monthly tier",
+      "range": [0, 100],
+      "interval": "monthly"
+    }]
   },
 
   "group3": {
