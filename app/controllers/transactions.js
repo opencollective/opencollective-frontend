@@ -24,6 +24,7 @@ module.exports = function(app) {
   var Card = models.Card;
   var errors = app.errors;
   var emailLib = require('../lib/email')(app);
+  var paypal = require('./paypal')(app);
 
   /**
    * Create a transaction and add it to a group/user/card.
@@ -528,32 +529,68 @@ module.exports = function(app) {
       .catch(next);
   };
 
-  /**
-   * Public methods.
-   */
-  return {
+  const approve = (req, res, next) => {
 
-    /**
-     * (Dis)approve a transaction.
-     */
-    approve: function(req, res, next) {
+    if (req.required.approved === false) {
       req.transaction.approved = req.required.approved;
       req.transaction.approvedAt = new Date();
 
       req.transaction
         .save()
-        .then(function() {
-          res.send({success: true});
-        })
+        .then(() => res.send({success: true}))
         .catch(next);
-    },
+    }
 
+    // We need to check the funds before approving a transaction
+    async.auto({
+      fetchCards: (cb) => {
+        models.Cards.findAll({
+          where: {
+            service: 'paypal',
+            UserId: req.remoteUser.id
+          }
+        })
+        .done(cb);
+      },
+
+      getPreapprovalDetails: ['fetchCards', (cb, results) => {
+        const card = results.fetchCards[0];
+
+        paypal.getPreapprovalDetails(card.token, cb);
+      }],
+
+      checkIfEnoughFunds: ['getPreapprovalDetails', (cb) => {
+        const maxAmount = results.getPreapprovalDetails.maxTotalAmountOfAllPayments;
+
+        if (req.transaction > maxAmount) {
+          return cb(new errors.BadRequest(`Not enough funds (${maxAmount} left) to approve transactions.`));
+        }
+
+      }]
+    }, (err) => {
+      if (err) return next(err);
+
+      req.transaction.approved = true;
+      req.transaction.approvedAt = new Date();
+
+      req.transaction
+        .save()
+        .then(() => res.send({success: true}))
+        .catch(next);
+
+    });
+  };
+
+  /**
+   * Public methods.
+   */
+  return {
+    approve,
     _create: create,
-    getPayKey: getPayKey,
-    confirmPayment: confirmPayment,
-    pay: pay,
-    attributeUser: attributeUser
-
+    getPayKey,
+    confirmPayment,
+    pay,
+    attributeUser
   }
 
 };

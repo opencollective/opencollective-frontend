@@ -752,7 +752,7 @@ describe('transactions.routes.test.js', function() {
   /**
    * Approve.
    */
-  describe('#approve', function() {
+  describe.only('#approve', function() {
 
     var transaction;
     var transaction2;
