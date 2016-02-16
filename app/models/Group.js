@@ -10,7 +10,7 @@ const roles = require('../constants/roles');
 const tier = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
-  range: Joi.array().items(Joi.number().integer()).length(2),
+  range: Joi.array().items(Joi.number().integer()).length(2).required(),
   interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required()
 });
 
@@ -52,7 +52,7 @@ module.exports = function(Sequelize, DataTypes) {
       validate: {
         schema: (value) => {
           Joi.validate(value, tiers, (err) => {
-            if (err) throw new Error(err.message);
+            if (err) throw new Error(err.details[0].message);
           })
         }
       }
