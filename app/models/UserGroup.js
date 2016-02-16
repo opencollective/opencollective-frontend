@@ -27,6 +27,14 @@ module.exports = function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
+    indexes: [
+       {
+          unique: true,
+          fields: ['UserId', 'GroupId', 'role'],
+          name: 'UserGroups_3way',
+          constraints: true
+      }
+    ],
 
     getterMethods: {
       // Info.

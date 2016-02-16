@@ -701,7 +701,7 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
+    it.only('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
       models.User.create(utils.data('user3')).done(function(e, u) {
         expect(e).to.not.exist;
         user3 = u;
