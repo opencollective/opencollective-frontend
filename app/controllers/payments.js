@@ -274,6 +274,7 @@ module.exports = function(app) {
           models.UserGroup.findOne({
             where: {
               GroupId: group.id,
+              UserId: user.id,
               role: roles.BACKER
             }
           })

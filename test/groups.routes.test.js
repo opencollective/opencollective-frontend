@@ -193,7 +193,6 @@ describe('groups.routes.test.js', function() {
             done();
           });
         });
-
     });
 
   });
@@ -700,6 +699,20 @@ describe('groups.routes.test.js', function() {
         })
         .expect(200)
         .end(done);
+    });
+
+    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
+      models.User.create(utils.data('user3')).done(function(e, u) {
+        expect(e).to.not.exist;
+        user3 = u;
+        group
+          .addUser(user3, {role: roles.BACKER})
+          .done();
+        group
+          .addUser(user3, {role: roles.MEMBER})
+          .done(done);
+      });
+
     });
 
   });

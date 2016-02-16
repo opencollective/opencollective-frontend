@@ -385,7 +385,7 @@ describe('payments.routes.test.js', () => {
 
     });
 
-    describe.only('Payment success by a user who is a MEMBER of the group and should become BACKER', () => {
+    describe('Payment success by a user who is a MEMBER of the group and should become BACKER', () => {
 
       // Add a user as a MEMBER
       beforeEach((done) => {
@@ -394,8 +394,7 @@ describe('payments.routes.test.js', () => {
           user4 = u;
           group2
             .addUser(user4, {role: roles.MEMBER})
-            .done();
-
+            .done(done);
         });
       });
 
@@ -437,7 +436,7 @@ describe('payments.routes.test.js', () => {
         group2
           .getUsers()
           .then((users) => {
-            expect(users).to.have.length(2);
+            expect(users).to.have.length(3);
             var backer = _.find(users, {email: user4.email});
             expect(backer.UserGroup.role).to.equal(roles.BACKER);
             done();
