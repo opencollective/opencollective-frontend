@@ -61,28 +61,21 @@ module.exports = (app) => {
         .catch(cb);
       },
 
-      createActivity: ['fetchEvent', (cb, results) => {
-        // Only save activity when the event is valid
-        Activity.create({
-          type: activities.WEBHOOK_STRIPE_RECEIVED,
-          data: {
-            event: results.fetchEvent.event
-          }
-        })
-        .done(cb);
-      }],
-
-      fetchPendingTransaction: ['createActivity', (cb, results) => {
+      fetchPendingTransaction: ['fetchEvent', (cb, results) => {
         Transaction.findOne({
           where: {
             stripeSubscriptionId: results.fetchEvent.subscription.id,
             isWaitingFirstInvoice: true
-          }
+          },
+          include: [
+            { model: Group },
+            { model: User }
+          ]
         })
         .done(cb);
       }],
 
-      fetchTransaction: ['createActivity', (cb, results) => {
+      fetchTransaction: ['fetchEvent', (cb, results) => {
         Transaction.findOne({
           where: {
             stripeSubscriptionId: results.fetchEvent.subscription.id
@@ -151,6 +144,21 @@ module.exports = (app) => {
           group,
           card
         }, cb);
+      }],
+
+      createActivity: ['fetchPendingTransaction', 'createOrUpdateTransaction', (cb, results) => {
+        const pendingTransaction = results.fetchPendingTransaction;
+        // Only save activity when the event is valid
+        Activity.create({
+            type: activities.WEBHOOK_STRIPE_RECEIVED,
+            data: {
+              event: results.fetchEvent.event,
+              group: pendingTransaction.Group,
+              user: pendingTransaction.User,
+              transaction: pendingTransaction
+            }
+          })
+          .done(cb);
       }]
 
     }, (err) => {

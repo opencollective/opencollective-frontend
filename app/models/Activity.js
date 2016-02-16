@@ -16,9 +16,9 @@ module.exports = function(Sequelize, DataTypes) {
 
     hooks: {
       afterCreate: function(activity) {
-        if (process.env.NODE_ENV === 'production') {
+        //if (process.env.NODE_ENV === 'production') {
           slackLib.postActivity(activity);
-        }
+        //}
       }
     }
   });

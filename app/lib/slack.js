@@ -87,7 +87,8 @@ module.exports = {
         break;
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
-        returnVal += `New webhook.stripe.received`;
+        // Ex: WWCode-Seattle received 1 USD/month from Aseem
+        returnVal += `Yay! ${this.linkifyForSlack(publicUrl, groupName)} received ${currency} ${amount}/month from ${userString}!`;
         break;
 
       default:
@@ -105,7 +106,7 @@ module.exports = {
 
     slack.send({
       text: msg,
-      channel: channel || '#activity',
+      channel: channel || '#activity_test',
       username: 'ActivityBot',
       icon_emoji: ':raising_hand:'
     })
