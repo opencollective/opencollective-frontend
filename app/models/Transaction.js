@@ -33,6 +33,10 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    interval: {
+      type: DataTypes.STRING
+    },
+
     stripeSubscriptionId: DataTypes.STRING,
 
     approved: {

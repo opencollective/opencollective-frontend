@@ -147,20 +147,20 @@ module.exports = function(app) {
            */
           if (isSubscription) {
             var id = utils.planId({
-              currency: currency,
-              interval: interval,
-              amount: amount
+              currency,
+              interval,
+              amount
             });
 
             getOrCreatePlan({
               plan: {
-                id: id,
-                interval: interval,
-                amount: amount,
+                id,
+                interval,
+                amount,
                 name: id,
-                currency: currency
+                currency
               },
-              stripe: stripe
+              stripe
             }, function(err, plan) {
               if (err) return cb(err);
 
@@ -225,9 +225,10 @@ module.exports = function(app) {
             amount: payment.amount,
             currency: charge.currency || charge.plan.currency,
             paidby: user && user.id,
-            description: description,
+            description,
             tags: ['Donation'],
-            approved: true
+            approved: true,
+            interval
           };
 
           if (isSubscription) {
@@ -239,15 +240,24 @@ module.exports = function(app) {
             transaction.isWaitingFirstInvoice = true;
           }
 
-          ['description', 'beneficiary', 'paidby', 'tags', 'status', 'link', 'comment'].forEach(function(prop) {
+          [
+            'description',
+            'beneficiary',
+            'paidby',
+            'tags',
+            'status',
+            'link',
+            'comment',
+            'interval'
+          ].forEach((prop) => {
             if (payment[prop])
               transaction[prop] = payment[prop];
           });
 
           transactions._create({
-            transaction: transaction,
-            user: user,
-            group: group,
+            transaction,
+            user,
+            group,
             card: results.createCard
           }, cb);
         }],
