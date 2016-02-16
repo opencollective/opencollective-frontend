@@ -65,12 +65,14 @@
       "name": "One time",
       "description": "One time tier",
       "range": [0, 100],
+      "button": "Become a sponsor",
       "interval": "one-time"
     }, {
       "name": "Monthly",
       "description": "Monthly tier",
       "range": [0, 100],
-      "interval": "monthly"
+      "interval": "monthly",
+      "button": "Become a member"
     }]
   },
 
@@ -84,12 +86,14 @@
       "name": "One time",
       "description": "One time tier",
       "range": [0, 100],
-      "interval": "one-time"
+      "interval": "one-time",
+      "button": "Become a sponsor"
     }, {
       "name": "Monthly",
       "description": "Monthly tier",
       "range": [0, 100],
-      "interval": "monthly"
+      "interval": "monthly",
+      "button": "Become a member"
     }]
   },
 

@@ -10,6 +10,7 @@ const roles = require('../constants/roles');
 const tier = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
+  button: Joi.string().required(),
   range: Joi.array().items(Joi.number().integer()).length(2).required(),
   interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required()
 });
