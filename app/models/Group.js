@@ -10,6 +10,7 @@ const roles = require('../constants/roles');
 const tier = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
+  button: Joi.string().required(),
   range: Joi.array().items(Joi.number().integer()).length(2).required(),
   interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required()
 });
@@ -123,6 +124,7 @@ module.exports = function(Sequelize, DataTypes) {
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
           slug: this.slug,
+          tiers: this.tiers,
           website: this.website,
           twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl
