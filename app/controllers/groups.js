@@ -33,9 +33,9 @@ module.exports = function(app) {
       SELECT
         "UserId" as id,
         SUM (amount) as total,
-        max(u.email) as email,
+        max(u."twitterHandle") as "twitterHandle",
         max(u.avatar) as avatar,
-        max(u.name) as name
+        max(u.website) as website
       FROM "Transactions"
       LEFT JOIN "Users" u ON u.id = "UserId"
       WHERE "amount" > 0 and "GroupId" = :GroupId
