@@ -33,6 +33,10 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    interval: {
+      type: DataTypes.STRING
+    },
+
     stripeSubscriptionId: DataTypes.STRING,
 
     approved: {
@@ -116,7 +120,8 @@ module.exports = function(Sequelize, DataTypes) {
           isRejected: this.isRejected,
           isDonation: this.isDonation,
           isManual: this.isManual,
-          isReimbursed: this.isReimbursed
+          isReimbursed: this.isReimbursed,
+          interval: this.interval
         };
       }
     }
