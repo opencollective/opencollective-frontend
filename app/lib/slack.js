@@ -106,7 +106,7 @@ module.exports = {
 
     slack.send({
       text: msg,
-      channel: channel || '#activity_test',
+      channel: channel || '#activity',
       username: 'ActivityBot',
       icon_emoji: ':raising_hand:'
     })
