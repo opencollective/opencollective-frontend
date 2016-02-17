@@ -701,18 +701,25 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
-    it.only('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
-      models.User.create(utils.data('user3')).done(function(e, u) {
+    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
+      /* TODO: this works but we'll need to do a lot refactoring.
+       * Need to find a way to call this with one line: like group.addUser()
+       */
+      models.UserGroup.create({
+        UserId: user3.id,
+        GroupId: group.id,
+        role: roles.MEMBER
+      })
+      .done(function(e) {
         expect(e).to.not.exist;
-        user3 = u;
-        group
-          .addUser(user3, {role: roles.BACKER})
-          .done();
-        group
-          .addUser(user3, {role: roles.MEMBER})
-          .done(done);
+        models.UserGroup
+            .findAll()
+            .then(function(rows) {
+              expect(rows.length).to.equal(4);
+              done();
+            })
+            .catch(done);
       });
-
     });
 
   });
