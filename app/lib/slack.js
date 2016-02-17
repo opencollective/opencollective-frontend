@@ -103,10 +103,11 @@ module.exports = {
 
   postMessage: function(msg, channel){
     const slack = new Slack(config.slack.hookUrl,{});
+    const defaultChannel = process.env.NODE_ENV === 'production' ? '#activity' : '#activity_test';
 
     slack.send({
       text: msg,
-      channel: channel || '#activity',
+      channel: channel || defaultChannel,
       username: 'ActivityBot',
       icon_emoji: ':raising_hand:'
     })
