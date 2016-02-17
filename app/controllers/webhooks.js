@@ -146,7 +146,7 @@ module.exports = (app) => {
         }, cb);
       }],
 
-      createActivity: ['fetchTransaction', 'createOrUpdateTransaction', (cb, results) => {
+      createActivity: ['createOrUpdateTransaction', (cb, results) => {
         const transaction = results.fetchTransaction;
         // Only save activity when the event is valid
         Activity.create({
