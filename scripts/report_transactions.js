@@ -3,6 +3,7 @@ const models = app.set('models');
 const moment = require('moment-timezone');
 const async = require('async');
 const activities = require('../app/constants/activities');
+const slackLib = require('../app/lib/slack');
 
 var thisWeekRaw = moment()
     .tz('America/New_York')
@@ -55,7 +56,7 @@ async.auto({
         .catch(cb);
   },
 
-  donationAmounts: cb => {
+  donationAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', {
           plain: false,
@@ -63,6 +64,7 @@ async.auto({
           attributes: ['currency'],
           where: donationClause
         })
+        .map(row => ' ' + row.SUM + ' ' + row.currency)
         .then(currencies => cb(null, currencies))
         .catch(cb);
   },
@@ -75,6 +77,7 @@ async.auto({
           attributes: ['currency'],
           where: expenseClause
         })
+        .map(row => ' ' + -row.SUM + ' ' + row.currency)
         .then(currencies => cb(null, currencies))
         .catch(cb);
   }
@@ -82,7 +85,17 @@ async.auto({
   if (err) {
     console.log('err', err);
   } else {
-    console.log('Result: ' + JSON.stringify(results));
+    slackLib.postMessage(transactionReportString(results));
   }
   process.exit();
 });
+
+function transactionReportString(results) {
+  return `Summary:\n` +
+      `- ${results.donationCount} donations received\n` +
+      `- ${results.expenseCount} expenses filed\n` +
+      `- ${results.stripeReceivedCount} payments received from Stripe\n` +
+      `Details:\n` +
+      `- total amount collected:${results.donationAmount}\n` +
+      `- total expenses approved:${results.expenseAmount}\n`;
+}
