@@ -146,16 +146,16 @@ module.exports = (app) => {
         }, cb);
       }],
 
-      createActivity: ['fetchPendingTransaction', 'createOrUpdateTransaction', (cb, results) => {
-        const pendingTransaction = results.fetchPendingTransaction;
+      createActivity: ['fetchTransaction', 'createOrUpdateTransaction', (cb, results) => {
+        const transaction = results.fetchTransaction;
         // Only save activity when the event is valid
         Activity.create({
             type: activities.WEBHOOK_STRIPE_RECEIVED,
             data: {
               event: results.fetchEvent.event,
-              group: pendingTransaction.Group,
-              user: pendingTransaction.User,
-              transaction: pendingTransaction
+              group: transaction.Group,
+              user: transaction.User,
+              transaction: transaction
             }
           })
           .done(cb);
