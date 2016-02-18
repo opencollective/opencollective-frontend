@@ -40,8 +40,13 @@ module.exports = function(app) {
   };
 
   var getGroupsFromUser = function(req, options) {
+    // UserGroup has multiple entries for a user and group because
+    // of the multiple roles. We will get the unique groups in-memory for now
+    // because of the small number of groups.
+    // Distinct queries are not supported by sequelize yet.
     return req.user
       .getGroups(options)
+      .then(groups => _.uniq(groups, 'id'))
       .map(function(group) { // sequelize uses bluebird
         return _.extend(group.info, {
           activities: group.Activities
