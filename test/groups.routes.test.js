@@ -123,6 +123,32 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
+    it('fails if the tier has missing data', function(done) {
+      var g = _.extend({}, groupData);
+      g.tiers = [{ // interval missing
+        name: 'Silver',
+        description: 'Silver',
+        range: [100, 200]
+      }];
+
+      request(app)
+        .post('/groups')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: g
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'validation_failed',
+            message: 'Validation error: \"button\" is required',
+            fields: ['tiers']
+          }
+        })
+        .end(done);
+    });
+
+
     it('successfully create a group without assigning a member', function(done) {
       request(app)
         .post('/groups')
@@ -426,6 +452,7 @@ describe('groups.routes.test.js', function() {
         });
       });
 
+
       // Create transactions for group1.
       beforeEach(function(done) {
         async.each(transactionsData, function(transaction, cb) {
@@ -520,6 +547,24 @@ describe('groups.routes.test.js', function() {
             done();
           });
       });
+
+    it('successfully get the backers of a group', (done) => {
+      request(app)
+        .get(`/groups/${group.id}/users?backers=true`)
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.length(1);
+          expect(res.body[0]).to.have.property('id', user.id);
+          expect(res.body[0]).to.have.property('website', user.website);
+          expect(res.body[0]).to.have.property('twitterHandle', user.twitterHandle);
+          expect(res.body[0]).to.have.property('avatar', user.avatar);
+          expect(res.body[0]).to.have.property('total');
+          done();
+        });
+    });
+
 
     });
 

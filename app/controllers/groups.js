@@ -27,6 +27,25 @@ module.exports = function(app) {
   /**
    * Private methods.
    */
+
+  const getBackers = (GroupId) => {
+    return sequelize.query(`
+      SELECT
+        "UserId" as id,
+        SUM (amount) as total,
+        max(u."twitterHandle") as "twitterHandle",
+        max(u.avatar) as avatar,
+        max(u.website) as website
+      FROM "Transactions"
+      LEFT JOIN "Users" u ON u.id = "UserId"
+      WHERE "amount" > 0 and "GroupId" = :GroupId
+      GROUP BY "UserId"
+    `, {
+      replacements: { GroupId },
+      type: sequelize.QueryTypes.SELECT
+    });
+  };
+
   var subscribeUserToGroupEvents = function(user, group, role) {
     if(role !== roles.HOST) return;
     Subscription.create({
@@ -125,13 +144,15 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
+    if (req.query.backers) {
+      return getBackers(req.group.id)
+        .then(backers => res.send(backers))
+        .catch(next);
+    }
+
     req.group.getUsers({})
-      .map(function(user) {
-        return _.extend({}, user.public, { role: user.UserGroup.role });
-      })
-      .then(function(users) {
-        res.send(users);
-      })
+      .map((user) => _.extend({}, user.public, { role: user.UserGroup.role }))
+      .then((users) => res.send(users))
       .catch(next);
   };
 
