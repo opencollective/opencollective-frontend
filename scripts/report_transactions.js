@@ -5,6 +5,16 @@ const async = require('async');
 const activities = require('../app/constants/activities');
 const slackLib = require('../app/lib/slack');
 
+const today = new Date();
+
+// Heroku scheduler only has daily or hourly cron jobs, we only want to run
+// this script once per week on Monday (1). If the day is not Monday on production
+// we won't execute the script
+if (process.env.NODE_ENV === 'production' && today.getDay() !== 1) {
+  console.log('NODE_ENV is production and day is not Monday, script aborted!');
+  process.exit();
+}
+
 var thisWeekRaw = moment()
     .tz('America/New_York')
     .startOf('isoWeek')
@@ -94,7 +104,7 @@ async.auto({
 });
 
 function transactionReportString(results) {
-  return `Summary:
+  return `Weekly transactions summary:
 - ${results.donationCount} donations received
 - ${results.expenseCount} expenses filed
 - ${results.stripeReceivedCount} payments received from Stripe
