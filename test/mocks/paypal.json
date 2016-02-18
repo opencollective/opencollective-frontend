@@ -179,7 +179,7 @@
         "dayOfWeek": "NO_DAY_SPECIFIED",
         "endingDate": "2020-01-01T00:00:00.000Z",
         "maxNumberOfPayments": "11",
-        "maxTotalAmountOfAllPayments": "123.00",
+        "maxTotalAmountOfAllPayments": "2000.00",
         "paymentPeriod": "NO_PERIOD_SPECIFIED",
         "pinType": "NOT_REQUIRED",
         "returnUrl": "http:\/\/your-website.com",

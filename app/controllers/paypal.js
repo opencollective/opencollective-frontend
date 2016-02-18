@@ -216,9 +216,10 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
-    getPreapprovalKey: getPreapprovalKey,
-    confirmPreapproval: confirmPreapproval,
-    getDetails: getDetails
+    getPreapprovalKey,
+    confirmPreapproval,
+    getDetails,
+    getPreapprovalDetails
   };
 
 };
