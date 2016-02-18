@@ -52,8 +52,8 @@ function setupModels(client) {
   m.Card.belongsTo(m.Group); // Not currently used
 
   // Group.
-  m.Group.belongsToMany(m.User, {through: m.UserGroup, as: 'users'});
-  m.User.belongsToMany(m.Group, {through: m.UserGroup, as: 'groups'});
+  m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
+  m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
