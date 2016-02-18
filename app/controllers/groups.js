@@ -47,6 +47,7 @@ module.exports = function(app) {
       LEFT JOIN "Transactions" t ON t."UserId" = ug."UserId" AND t."GroupId" = :GroupId
       WHERE ug."GroupId" = :GroupId AND (t.amount > 0 OR t.amount IS NULL)
       GROUP BY t."UserId"
+      ORDER BY "totalDonations" DESC
     `, {
       replacements: { GroupId },
       type: sequelize.QueryTypes.SELECT
