@@ -3,8 +3,8 @@ const expect = require('chai').expect;
 const libutils = require('../app/lib/utils');
 
 const group = require('./mocks/data.json').group1;
-const backer = { total: 5 };
-const sponsor = { total: 500 };
+const backer = { totalDonations: 5 };
+const sponsor = { totalDonations: 500 };
 
 describe("utils", () => {
   

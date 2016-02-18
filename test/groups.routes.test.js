@@ -16,7 +16,8 @@ var sinon = require('sinon');
  * Variables.
  */
 var userData = utils.data('user1');
-var groupData = utils.data('group1');
+var publicGroupData = utils.data('group1');
+var privateGroupData = utils.data('group2');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
 var stripeMock = require('./mocks/stripe')
@@ -64,7 +65,7 @@ describe('groups.routes.test.js', function() {
       request(app)
         .post('/groups')
         .send({
-          group: groupData
+          group: privateGroupData
         })
         .expect(401)
         .end(function(e, res) {
@@ -85,7 +86,7 @@ describe('groups.routes.test.js', function() {
     });
 
     it('fails creating a group without name', function(done) {
-      var group = _.omit(groupData, 'name');
+      var group = _.omit(privateGroupData, 'name');
 
       request(app)
         .post('/groups')
@@ -110,7 +111,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: _.extend({}, groupData, {twitterHandle: '@asood123'})
+          group: _.extend({}, privateGroupData, {twitterHandle: '@asood123'})
         })
         .expect(400, {
           error: {
@@ -124,7 +125,7 @@ describe('groups.routes.test.js', function() {
     });
 
     it('fails if the tier has missing data', function(done) {
-      var g = _.extend({}, groupData);
+      var g = _.extend({}, privateGroupData);
       g.tiers = [{ // interval missing
         name: 'Silver',
         description: 'Silver',
@@ -154,7 +155,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData
+          group: privateGroupData
         })
         .expect(200)
         .end(function(e, res) {
@@ -162,8 +163,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name');
           expect(res.body).to.have.property('description');
-          expect(res.body).to.have.property('budget', groupData.budget);
-          expect(res.body).to.have.property('currency', 'USD');
+          expect(res.body).to.have.property('budget', privateGroupData.budget);
+          expect(res.body).to.have.property('currency', privateGroupData.currency);
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('logo');
           expect(res.body).to.have.property('video');
@@ -173,8 +174,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
-          expect(res.body).to.have.property('website', groupData.website);
+          expect(res.body).to.have.property('twitterHandle');
+          expect(res.body).to.have.property('website');
           expect(res.body).to.have.property('isPublic', false);
 
           user.getGroups().then(function(groups) {
@@ -192,7 +193,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
+          group: privateGroupData,
           role: role
         })
         .expect(200)
@@ -210,9 +211,8 @@ describe('groups.routes.test.js', function() {
           expect(res.body).to.have.property('membershipfee');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('twitterHandle', groupData.twitterHandle);
-          expect(res.body).to.have.property('website', groupData.website);
-          expect(res.body).to.have.property('isPublic', false);
+          expect(res.body).to.have.property('twitterHandle');
+          expect(res.body).to.have.property('website');
 
           user.getGroups().then(function(groups) {
             expect(groups).to.have.length(1);
@@ -255,7 +255,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
+          group: privateGroupData,
           role: roles.HOST
         })
         .expect(200)
@@ -264,7 +264,7 @@ describe('groups.routes.test.js', function() {
           models.Group
             .find(parseInt(res.body.id))
             .then(function(g) {
-              group = g;
+              privateGroup = g;
               done();
             })
             .catch(done);
@@ -282,11 +282,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: {
-            name: 'group 2',
-            slug: 'groupSlug',
-            isPublic: true
-          },
+          group: publicGroupData,
           role: roles.HOST
         })
         .expect(200)
@@ -327,12 +323,12 @@ describe('groups.routes.test.js', function() {
       });
     });
 
-    // Create an application which has only access to `group`
+    // Create an application which has only access to `privateGroup`
     beforeEach(function(done) {
       models.Application.create(utils.data('application2')).done(function(e, a) {
         expect(e).to.not.exist;
         application2 = a;
-        application2.addGroup(group).done(done);
+        application2.addGroup(privateGroup).done(done);
       });
     });
 
@@ -347,14 +343,14 @@ describe('groups.routes.test.js', function() {
 
     it('fails getting a group if not authenticated', function(done) {
       request(app)
-        .get('/groups/' + group.id)
+        .get('/groups/' + privateGroup.id)
         .expect(401)
         .end(done);
     });
 
     it('fails getting a group if the user authenticated has no access', function(done) {
       request(app)
-        .get('/groups/' + group.id)
+        .get('/groups/' + privateGroup.id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(done);
@@ -370,14 +366,14 @@ describe('groups.routes.test.js', function() {
 
     it('successfully get a group if authenticated as a user', function(done) {
       request(app)
-        .get('/groups/' + group.id)
+        .get('/groups/' + privateGroup.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', group.id);
-          expect(res.body).to.have.property('name', group.name);
-          expect(res.body).to.have.property('description', group.description);
+          expect(res.body).to.have.property('id', privateGroup.id);
+          expect(res.body).to.have.property('name', privateGroup.name);
+          expect(res.body).to.have.property('description', privateGroup.description);
           expect(res.body).to.have.property('stripeAccount');
           expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
@@ -416,7 +412,7 @@ describe('groups.routes.test.js', function() {
 
     it('fails getting a group if the application authenticated has no access', function(done) {
       request(app)
-        .get('/groups/' + group.id)
+        .get('/groups/' + privateGroup.id)
         .send({
           api_key: application3.api_key
         })
@@ -426,7 +422,7 @@ describe('groups.routes.test.js', function() {
 
     it('successfully get a group if authenticated as a group', function(done) {
       request(app)
-        .get('/groups/' + group.id)
+        .get('/groups/' + privateGroup.id)
         .send({
           api_key: application2.api_key
         })
@@ -453,7 +449,7 @@ describe('groups.routes.test.js', function() {
       });
 
 
-      // Create transactions for group1.
+      // Create transactions for publicGroup.
       beforeEach(function(done) {
         async.each(transactionsData, function(transaction, cb) {
           if (transaction.amount < 0)
@@ -462,7 +458,7 @@ describe('groups.routes.test.js', function() {
             totDonations += transaction.amount;
 
           request(app)
-            .post('/groups/' + group.id + '/transactions')
+            .post('/groups/' + publicGroup.id + '/transactions')
             .set('Authorization', 'Bearer ' + user.jwt(application))
             .send({
               transaction: _.extend({}, transaction, { approved: true })
@@ -490,7 +486,7 @@ describe('groups.routes.test.js', function() {
 
       it('successfully get a group with remaining budget', function(done) {
         request(app)
-          .get('/groups/' + group.id)
+          .get('/groups/' + publicGroup.id)
           .send({
             api_key: application2.api_key
           })
@@ -506,7 +502,7 @@ describe('groups.routes.test.js', function() {
 
       it('successfully get a group with activities', function(done) {
         request(app)
-          .get('/groups/' + group.id)
+          .get('/groups/' + publicGroup.id)
           .send({
             api_key: application2.api_key,
             activities: true
@@ -534,7 +530,7 @@ describe('groups.routes.test.js', function() {
 
       it('successfully get a group\'s users if it is public', function(done) {
         request(app)
-          .get('/groups/' + publicGroup.id + '/users/')
+          .get('/groups/' + publicGroup.id + '/users')
           .send({
             api_key: application2.api_key
           })
@@ -544,27 +540,10 @@ describe('groups.routes.test.js', function() {
             var userData = res.body[0];
             expect(userData.name).to.equal(user.public.name);
             expect(userData.role).to.equal(roles.HOST);
+            expect(userData.tier).to.equal(publicGroup.tiers[1].name);
             done();
           });
       });
-
-    it('successfully get the backers of a group', (done) => {
-      request(app)
-        .get(`/groups/${group.id}/users?backers=true`)
-        .set('Authorization', 'Bearer ' + user.jwt(application))
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.length(1);
-          expect(res.body[0]).to.have.property('id', user.id);
-          expect(res.body[0]).to.have.property('website', user.website);
-          expect(res.body[0]).to.have.property('twitterHandle', user.twitterHandle);
-          expect(res.body[0]).to.have.property('avatar', user.avatar);
-          expect(res.body[0]).to.have.property('total');
-          done();
-        });
-    });
-
 
     });
 
@@ -600,7 +579,7 @@ describe('groups.routes.test.js', function() {
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          group: groupData,
+          group: publicGroupData,
           role: roles.HOST
         })
         .expect(200)

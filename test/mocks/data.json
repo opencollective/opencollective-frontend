@@ -61,6 +61,7 @@
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
     "slug": "scouts",
+    "isPublic": true,
     "tiers": [{
       "name": "backer",
       "description": "One time tier",
@@ -82,6 +83,7 @@
     "slug": "wwcode-austin",
     "currency": "EUR",
     "budget": 10000.00,
+    "isPublic": false,
     "tiers": [{
       "name": "One time",
       "description": "One time tier",

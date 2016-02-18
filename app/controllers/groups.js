@@ -28,19 +28,25 @@ module.exports = function(app) {
    * Private methods.
    */
 
-  const getBackers = (GroupId) => {
+  /**
+   * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
+   */
+  const getUsersQuery = (GroupId) => {
     return sequelize.query(`
       SELECT
-        "UserId" as id,
-        SUM (amount) as total,
+        t."UserId" as id,
+        SUM (amount) as "totalDonations",
         max(u."twitterHandle") as "twitterHandle",
         max(u.name) as name,
         max(u.avatar) as avatar,
-        max(u.website) as website
-      FROM "Transactions"
-      LEFT JOIN "Users" u ON u.id = "UserId"
-      WHERE "amount" > 0 and "GroupId" = :GroupId
-      GROUP BY "UserId"
+        max(u.website) as website,
+        max(ug.role) as role,
+        max(ug."createdAt") as "createdAt"
+      FROM "UserGroups" ug
+      LEFT JOIN "Users" u ON u.id = ug."UserId"
+      LEFT JOIN "Transactions" t ON t."UserId" = ug."UserId" AND t."GroupId" = :GroupId
+      WHERE ug."GroupId" = :GroupId AND (t.amount > 0 OR t.amount IS NULL)
+      GROUP BY t."UserId"
     `, {
       replacements: { GroupId },
       type: sequelize.QueryTypes.SELECT
@@ -153,16 +159,9 @@ module.exports = function(app) {
       return backers;
     }
 
-    if (req.query.backers) {
-      return getBackers(req.group.id)
-        .then(appendTier)
-        .then(backers => res.send(backers))
-        .catch(next);
-    }
-
-    req.group.getUsers({})
-      .map((user) => _.extend({}, user.public, { role: user.UserGroup.role }))
-      .then((users) => res.send(users))
+    return getUsersQuery(req.group.id)
+      .then(appendTier)
+      .then(backers => res.send(backers))
       .catch(next);
   };
 
