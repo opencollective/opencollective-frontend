@@ -544,7 +544,7 @@ module.exports = function(app) {
     // We need to check the funds before approving a transaction
     async.auto({
       fetchCards: (cb) => {
-        models.Cards.findAll({
+        Card.findAll({
           where: {
             service: 'paypal',
             UserId: req.remoteUser.id
@@ -556,16 +556,22 @@ module.exports = function(app) {
       getPreapprovalDetails: ['fetchCards', (cb, results) => {
         const card = results.fetchCards[0];
 
+        if (!card || !card.token) {
+          return cb(new errors.BadRequest('You can\'t approve a transaction without linking your PayPal account'));
+        }
+
         paypal.getPreapprovalDetails(card.token, cb);
       }],
 
-      checkIfEnoughFunds: ['getPreapprovalDetails', (cb) => {
-        const maxAmount = results.getPreapprovalDetails.maxTotalAmountOfAllPayments;
+      checkIfEnoughFunds: ['getPreapprovalDetails', (cb, results) => {
+        const maxAmount = Number(results.getPreapprovalDetails.maxTotalAmountOfAllPayments);
+        const currency = results.getPreapprovalDetails.currencyCode;
 
-        if (req.transaction > maxAmount) {
-          return cb(new errors.BadRequest(`Not enough funds (${maxAmount} left) to approve transactions.`));
+        if (Math.abs(req.transaction.amount) > maxAmount) {
+          return cb(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve transaction.`));
         }
 
+        cb();
       }]
     }, (err) => {
       if (err) return next(err);
