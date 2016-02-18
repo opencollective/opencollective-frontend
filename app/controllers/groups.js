@@ -34,6 +34,7 @@ module.exports = function(app) {
         "UserId" as id,
         SUM (amount) as total,
         max(u."twitterHandle") as "twitterHandle",
+        max(u.name) as name,
         max(u.avatar) as avatar,
         max(u.website) as website
       FROM "Transactions"
@@ -144,8 +145,17 @@ module.exports = function(app) {
 
   var getUsers = function(req, res, next) {
 
+    var appendTier = (backers) => {
+      backers = backers.map((backer) => {
+        backer.tier = utils.getTier(backer, req.group.tiers);
+        return backer;
+      });
+      return backers;
+    }
+
     if (req.query.backers) {
       return getBackers(req.group.id)
+        .then(appendTier)
         .then(backers => res.send(backers))
         .catch(next);
     }

@@ -144,6 +144,22 @@ const paginateOffset = (page, perPage) => {
 };
 
 /**
+ * Try to find in which tier a backer falls into based on the tiers definition
+ */
+const getTier = (backer, tiers) => {
+
+  // We order the tiers by start range DESC
+  tiers.sort((a,b) => { return a.range[0] < b.range[0]; });
+
+  for (var i=0;i<tiers.length;i++) {
+    if(backer.total >= tiers[i].range[0]) return tiers[i].name;
+  }
+
+  return null;
+
+};
+
+/**
  * Export public methods.
  */
 module.exports = {
@@ -155,5 +171,6 @@ module.exports = {
   getLinkHeader,
   planId,
   encrypt,
+  getTier,
   decrypt
 }
