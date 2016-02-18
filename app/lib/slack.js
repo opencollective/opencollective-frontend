@@ -121,7 +121,7 @@ module.exports = {
       channel: channel || config.slack.activityChannel,
       username: 'ActivityBot',
       icon_emoji: ':raising_hand:',
-      attachmentArray: attachmentArray || []
+      attachments: attachmentArray || []
     })
     .catch((err)=>{
       console.error(err);
