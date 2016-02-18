@@ -393,7 +393,7 @@ describe('payments.routes.test.js', () => {
           expect(e).to.not.exist;
           user4 = u;
           group2
-            .addUser(user4, {role: roles.MEMBER})
+            .addUserWithRole(user4, roles.MEMBER)
             .done(done);
         });
       });

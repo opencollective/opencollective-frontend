@@ -54,7 +54,7 @@ module.exports = function(app) {
       },
 
       addUserToGroup: ['checkIfGroupHasHost', function(cb) {
-        group.addUser(user, {role: options.role})
+        group.addUserWithRole(user, options.role)
           .done(cb);
       }],
 

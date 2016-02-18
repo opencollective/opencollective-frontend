@@ -420,7 +420,7 @@ describe('groups.routes.test.js', function() {
           expect(e).to.not.exist;
           group2 = g;
           group2
-            .addUser(user, {role: roles.HOST})
+            .addUserWithRole(user, roles.HOST)
             .done(done);
         });
       });
@@ -585,7 +585,7 @@ describe('groups.routes.test.js', function() {
         expect(e).to.not.exist;
         user3 = u;
         group
-          .addUser(user3, {role: roles.BACKER})
+          .addUserWithRole(user3, roles.BACKER)
           .done(done);
       });
     });
@@ -596,7 +596,7 @@ describe('groups.routes.test.js', function() {
         expect(e).to.not.exist;
         user4 = u;
         group
-          .addUser(user4, {role: roles.MEMBER})
+          .addUserWithRole(user4, roles.MEMBER)
           .done(done);
       });
     });

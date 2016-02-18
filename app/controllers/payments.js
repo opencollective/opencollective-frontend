@@ -281,7 +281,7 @@ module.exports = function(app) {
           .then(function(userGroup) {
             if (!userGroup)
               group
-                .addUser(user, {role: roles.BACKER})
+                .addUserWithRole(user, roles.BACKER)
                 .done(cb);
             else {
               return cb();
