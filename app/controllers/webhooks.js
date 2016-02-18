@@ -64,12 +64,15 @@ module.exports = (app) => {
       createActivity: ['fetchEvent', (cb, results) => {
         // Only save activity when the event is valid
         Activity.create({
-              type: activities.WEBHOOK_STRIPE_RECEIVED,
-              data: {
-                event: results.fetchEvent.event
-              }
-            })
-            .done(cb);
+          type: activities.WEBHOOK_STRIPE_RECEIVED,
+          data: {
+            event: results.fetchEvent.event,
+            stripeAccount: body.user_id,
+            eventId: body.id,
+            dashboardUrl: `https://dashboard.stripe.com/${body.user_id}/events/${body.id}`
+          }
+        })
+        .done(cb);
       }],
 
       fetchPendingTransaction: ['createActivity', (cb, results) => {
