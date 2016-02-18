@@ -103,7 +103,7 @@ module.exports = {
   postMessage: function(msg, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 
-    slack.send({
+    return slack.send({
       text: msg,
       channel: channel || '#activity',
       username: 'ActivityBot',

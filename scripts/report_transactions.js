@@ -79,10 +79,18 @@ async.auto({
 }, (err, results) => {
   if (err) {
     console.log('err', err);
+    process.exit();
   } else {
-    slackLib.postMessage(transactionReportString(results));
+    const report = transactionReportString(results);
+
+    console.log(report);
+
+    slackLib.postMessage(report)
+    .then(() => {
+      console.log('Reporting done!');
+      process.exit();
+    });
   }
-  process.exit();
 });
 
 function transactionReportString(results) {
