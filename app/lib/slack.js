@@ -13,7 +13,8 @@ module.exports = {
    */
 
   postActivity: function(activity) {
-    this.postMessage(this.formatActivity(activity));
+    obj = this.formatActivity(activity);
+    this.postMessage(obj.msg, obj.attachmentArray);
   },
 
   /*
@@ -23,6 +24,7 @@ module.exports = {
   formatActivity: function(activity) {
 
     var returnVal = '';
+    var attachmentArray = [];
 
     // declare common variables used across multiple activity types
     var userString = '';
@@ -34,6 +36,7 @@ module.exports = {
     var description = '';
     var linkifyTwitter = '';
     var linkifyWebsite = '';
+    var eventType = '';
 
     // get user data
     if (activity.data.user) {
@@ -58,6 +61,11 @@ module.exports = {
         currency = activity.data.transaction.currency;
         tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
+    }
+
+    // get event data
+    if (activity.data.event) {
+      eventType = activity.data.event.type;
     }
 
 
@@ -87,27 +95,33 @@ module.exports = {
         break;
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
-        returnVal += `New webhook.stripe.received`;
+        returnVal += `Stripe event received: ${eventType}`;
+        attachmentArray.push({title: 'Data', text: activity.data});
+        break;
+
+      case activities.SUBSCRIPTION_CONFIRMED:
+        returnVal += `Yay! Confirmed subscription of ${currency} ${amount}/month from ${userString} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
         break;
 
       default:
         returnVal += `Oops... I got an unknown activity type: ${activity.type}`;
     }
-    return returnVal;
+    return {msg: returnVal, attachmentArray: attachmentArray};
   },
 
   /*
    * Posts a message on slack
    */
 
-  postMessage: function(msg, channel){
+  postMessage: function(msg, attachmentArray, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 
-    slack.send({
+    return slack.send({
       text: msg,
-      channel: channel || '#activity',
+      channel: channel || config.slack.activityChannel,
       username: 'ActivityBot',
-      icon_emoji: ':raising_hand:'
+      icon_emoji: ':raising_hand:',
+      attachmentArray: attachmentArray || []
     })
     .catch((err)=>{
       console.error(err);

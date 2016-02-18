@@ -128,7 +128,19 @@ module.exports = (app) => {
           pendingTransaction.isWaitingFirstInvoice = false;
 
           return pendingTransaction.save()
-            .done(cb);
+            .tap(transaction => {
+              return Activity.create({
+                    type: activities.SUBSCRIPTION_CONFIRMED,
+                    data: {
+                      event: results.fetchEvent.event,
+                      group: results.fetchTransaction.Group,
+                      user: results.fetchTransaction.User,
+                      transaction: transaction
+                    }
+                  });
+            })
+            .then(transaction => cb(null, transaction))
+            .catch(cb);
         }
 
         const transaction = results.fetchTransaction;
