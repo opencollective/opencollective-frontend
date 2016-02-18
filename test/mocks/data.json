@@ -182,7 +182,14 @@
           }
         }
       },
-      {"type": "webhook.stripe.received", "data":{}},
+      {
+        "type": "webhook.stripe.received",
+        "data": {
+          "event": {
+            "type": "invoice.payment_succeeded"
+          }
+        }
+      },
       {
         "type": "subscription.confirmed",
         "data": {
