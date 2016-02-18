@@ -104,7 +104,7 @@ async.auto({
 });
 
 function transactionReportString(results) {
-  return `Summary:
+  return `Weekly transactions summary:
 - ${results.donationCount} donations received
 - ${results.expenseCount} expenses filed
 - ${results.stripeReceivedCount} payments received from Stripe
