@@ -33,15 +33,13 @@ async.auto({
   donationCount: cb => {
     models.Transaction
         .count({ where: donationClause })
-        .then(donationCount => cb(null, donationCount))
-        .catch(cb);
+        .done(cb);
   },
 
   expenseCount: cb => {
     models.Transaction
         .count({ where: expenseClause })
-        .then(expenseCount => cb(null, expenseCount))
-        .catch(cb);
+        .done(cb);
   },
 
   stripeReceivedCount: cb => {
@@ -52,8 +50,7 @@ async.auto({
             type: activities.WEBHOOK_STRIPE_RECEIVED
           }
         })
-        .then(stripeReceivedCount => cb(null, stripeReceivedCount))
-        .catch(cb);
+        .done(cb);
   },
 
   donationAmount: cb => {
@@ -65,8 +62,7 @@ async.auto({
           where: donationClause
         })
         .map(row => ' ' + row.SUM + ' ' + row.currency)
-        .then(currencies => cb(null, currencies))
-        .catch(cb);
+        .done(cb);
   },
 
   expenseAmount: cb => {
@@ -78,8 +74,7 @@ async.auto({
           where: expenseClause
         })
         .map(row => ' ' + -row.SUM + ' ' + row.currency)
-        .then(currencies => cb(null, currencies))
-        .catch(cb);
+        .done(cb);
   }
 }, (err, results) => {
   if (err) {
@@ -91,11 +86,11 @@ async.auto({
 });
 
 function transactionReportString(results) {
-  return `Summary:\n` +
-      `- ${results.donationCount} donations received\n` +
-      `- ${results.expenseCount} expenses filed\n` +
-      `- ${results.stripeReceivedCount} payments received from Stripe\n` +
-      `Details:\n` +
-      `- total amount collected:${results.donationAmount}\n` +
-      `- total expenses approved:${results.expenseAmount}\n`;
+  return `Summary:
+- ${results.donationCount} donations received
+- ${results.expenseCount} expenses filed
+- ${results.stripeReceivedCount} payments received from Stripe
+Details:
+- total amount collected:${results.donationAmount}
+- total expenses approved:${results.expenseAmount}`;
 }
