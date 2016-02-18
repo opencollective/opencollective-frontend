@@ -182,8 +182,9 @@
           }
         }
       },
+      {"type": "webhook.stripe.received", "data":{}},
       {
-        "type": "webhook.stripe.received",
+        "type": "subscription.confirmed",
         "data": {
           "user": {
             "email":"jussi@kuohujoki.fi"

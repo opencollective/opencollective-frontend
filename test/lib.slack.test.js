@@ -33,7 +33,11 @@ describe('lib.slack.test.js', function() {
   });
 
   it (`formatActivity: ${constants.WEBHOOK_STRIPE_RECEIVED}`, function(){
-    expect(slackLib.formatActivity(activitiesData[15])).to.equal('Yay! <blah.com|Blah> received EUR 12.34/month from jussi@kuohujoki.fi!');
+    expect(slackLib.formatActivity(activitiesData[15])).to.equal('New webhook.stripe.received');
+  });
+
+  it (`formatActivity: ${constants.SUBSCRIPTION_CONFIRMED}`, function(){
+    expect(slackLib.formatActivity(activitiesData[16])).to.equal('Yay! Confirmed subscription of EUR 12.34/month from jussi@kuohujoki.fi to <blah.com|Blah>!');
   });
 
 });

@@ -61,21 +61,28 @@ module.exports = (app) => {
         .catch(cb);
       },
 
-      fetchPendingTransaction: ['fetchEvent', (cb, results) => {
+      createActivity: ['fetchEvent', (cb, results) => {
+        // Only save activity when the event is valid
+        Activity.create({
+              type: activities.WEBHOOK_STRIPE_RECEIVED,
+              data: {
+                event: results.fetchEvent.event
+              }
+            })
+            .done(cb);
+      }],
+
+      fetchPendingTransaction: ['createActivity', (cb, results) => {
         Transaction.findOne({
           where: {
             stripeSubscriptionId: results.fetchEvent.subscription.id,
             isWaitingFirstInvoice: true
-          },
-          include: [
-            { model: Group },
-            { model: User }
-          ]
+          }
         })
         .done(cb);
       }],
 
-      fetchTransaction: ['fetchEvent', (cb, results) => {
+      fetchTransaction: ['createActivity', (cb, results) => {
         Transaction.findOne({
           where: {
             stripeSubscriptionId: results.fetchEvent.subscription.id
@@ -118,6 +125,17 @@ module.exports = (app) => {
           pendingTransaction.isWaitingFirstInvoice = false;
 
           return pendingTransaction.save()
+            .then(transaction => {
+              Activity.create({
+                    type: activities.SUBSCRIPTION_CONFIRMED,
+                    data: {
+                      event: results.fetchEvent.event,
+                      group: results.fetchTransaction.Group,
+                      user: results.fetchTransaction.User,
+                      transaction: transaction
+                    }
+                  });
+            })
             .done(cb);
         }
 
@@ -144,21 +162,6 @@ module.exports = (app) => {
           group,
           card
         }, cb);
-      }],
-
-      createActivity: ['createOrUpdateTransaction', (cb, results) => {
-        const transaction = results.fetchTransaction;
-        // Only save activity when the event is valid
-        Activity.create({
-            type: activities.WEBHOOK_STRIPE_RECEIVED,
-            data: {
-              event: results.fetchEvent.event,
-              group: transaction.Group,
-              user: transaction.User,
-              transaction: transaction
-            }
-          })
-          .done(cb);
       }]
 
     }, (err) => {

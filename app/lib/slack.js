@@ -88,7 +88,11 @@ module.exports = {
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
         // Ex: WWCode-Seattle received 1 USD/month from Aseem
-        returnVal += `Yay! ${this.linkifyForSlack(publicUrl, groupName)} received ${currency} ${amount}/month from ${userString}!`;
+        returnVal += `New webhook.stripe.received`;
+        break;
+
+      case activities.SUBSCRIPTION_CONFIRMED:
+        returnVal += `Yay! Confirmed subscription of ${currency} ${amount}/month from ${userString} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
         break;
 
       default:
