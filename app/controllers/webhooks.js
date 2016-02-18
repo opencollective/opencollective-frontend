@@ -64,12 +64,12 @@ module.exports = (app) => {
       createActivity: ['fetchEvent', (cb, results) => {
         // Only save activity when the event is valid
         Activity.create({
-          type: activities.WEBHOOK_STRIPE_RECEIVED,
-          data: {
-            event: results.fetchEvent.event
-          }
-        })
-        .done(cb);
+              type: activities.WEBHOOK_STRIPE_RECEIVED,
+              data: {
+                event: results.fetchEvent.event
+              }
+            })
+            .done(cb);
       }],
 
       fetchPendingTransaction: ['createActivity', (cb, results) => {
@@ -125,7 +125,19 @@ module.exports = (app) => {
           pendingTransaction.isWaitingFirstInvoice = false;
 
           return pendingTransaction.save()
-            .done(cb);
+            .tap(transaction => {
+              return Activity.create({
+                    type: activities.SUBSCRIPTION_CONFIRMED,
+                    data: {
+                      event: results.fetchEvent.event,
+                      group: results.fetchTransaction.Group,
+                      user: results.fetchTransaction.User,
+                      transaction: transaction
+                    }
+                  });
+            })
+            .then(transaction => cb(null, transaction))
+            .catch(cb);
         }
 
         const transaction = results.fetchTransaction;
