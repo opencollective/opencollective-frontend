@@ -65,6 +65,7 @@
     "test": "NODE_ENV=test npm run hint && NODE_ENV=test mocha test",
     "circleci": "NODE_ENV=circleci npm run hint && mocha test",
     "start": "npm run hint && node .",
+    "dev": "nodemon -e js,hbs -w app",
     "hint": "eslint '**/*.js' --quiet",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
