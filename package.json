@@ -67,6 +67,7 @@
     "start": "npm run hint && node .",
     "hint": "eslint '**/*.js' --quiet",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
+    "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
     "db:copyprod": "./scripts/db_copy_prod_to_localhost.sh",

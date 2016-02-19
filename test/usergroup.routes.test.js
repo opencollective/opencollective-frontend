@@ -205,8 +205,7 @@ describe('usergroup.routes.test.js', function() {
   /**
    * Get user's groups.
    */
-  // TODO: unskip when sync issue on tests is fixed
-  describe.skip('#getUserGroups', function() {
+  describe('#getUserGroups', function() {
 
     beforeEach(function(done) {
       request(app)
