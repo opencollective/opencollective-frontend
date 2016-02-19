@@ -714,6 +714,32 @@ describe('payments.routes.test.js', () => {
           .replyWithError(stripeMock.customers.createError);
       });
 
+      it('fails if the accessToken contains live', (done) => {
+        models.StripeAccount.create({ accessToken: 'sk_live_abc'})
+        .then((account) => user.setStripeAccount(account))
+        .then(() => {
+          request(app)
+            .post('/groups/' + group.id + '/payments')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .send({
+              payment: {
+                stripeToken: STRIPE_TOKEN,
+                amount: CHARGE,
+                currency: CURRENCY
+              }
+            })
+            .expect(400, {
+              error: {
+                code: 400,
+                type: 'bad_request',
+                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
+              }
+            })
+            .end(done);
+        })
+
+      });
+
       it('fails paying because of a card declined', (done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
