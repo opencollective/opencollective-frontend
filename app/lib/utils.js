@@ -149,6 +149,7 @@ const paginateOffset = (page, perPage) => {
 const getTier = (backer, tiers) => {
 
   if(!backer.totalDonations) return null;
+  if(!tiers) return null;
 
   // We order the tiers by start range DESC
   tiers.sort((a,b) => { return a.range[0] < b.range[0]; });
