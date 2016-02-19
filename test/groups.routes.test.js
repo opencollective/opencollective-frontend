@@ -746,8 +746,7 @@ describe('groups.routes.test.js', function() {
         .end(done);
     });
 
-    // TODO: unskip when sync issue on tests is fixed
-    it.skip('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
+    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', function(done) {
       /* TODO: this works but we'll need to do a lot refactoring.
        * Need to find a way to call this with one line: like group.addUser()
        */
