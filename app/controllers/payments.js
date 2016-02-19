@@ -83,6 +83,10 @@ module.exports = function(app) {
               return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
             }
 
+            if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+              return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+            }
+
             cb(null, Stripe(stripeAccount.accessToken));
           });
         },
@@ -281,18 +285,23 @@ module.exports = function(app) {
         addUserToGroup: ['createTransaction', function(cb, results) {
           user = results.getOrCreateUser;
 
-          group
-            .hasUser(user)
-            .then(function(isMember) {
-              if (isMember)
-                return cb();
-              else {
-                group
-                  .addUser(user, {role: roles.BACKER})
-                  .done(cb);
-              }
-            })
-            .catch(cb);
+          models.UserGroup.findOne({
+            where: {
+              GroupId: group.id,
+              UserId: user.id,
+              role: roles.BACKER
+            }
+          })
+          .then(function(userGroup) {
+            if (!userGroup)
+              group
+                .addUserWithRole(user, roles.BACKER)
+                .done(cb);
+            else {
+              return cb();
+            }
+          })
+          .catch(cb);
         }]
 
       }, function(e) {

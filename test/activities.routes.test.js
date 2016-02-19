@@ -68,14 +68,14 @@ describe('activities.routes.test.js', function() {
   // Add an host to the group.
   beforeEach(function(done) {
     group
-      .addUser(user, {role: roles.HOST})
+      .addUserWithRole(user, roles.HOST)
       .done(done);
   });
 
   // Add an backer to the group.
   beforeEach(function(done) {
     group
-      .addUser(user3, {role: roles.BACKER})
+      .addUserWithRole(user3, roles.BACKER)
       .done(done);
   });
 

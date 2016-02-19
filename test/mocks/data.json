@@ -184,7 +184,30 @@
           }
         }
       },
-      {"type": "webhook.stripe.received", "data":{}}
+      {
+        "type": "webhook.stripe.received",
+        "data": {
+          "event": {
+            "type": "invoice.payment_succeeded"
+          }
+        }
+      },
+      {
+        "type": "subscription.confirmed",
+        "data": {
+          "user": {
+            "email":"jussi@kuohujoki.fi"
+          },
+          "transaction": {
+            "amount": 12.34,
+            "currency": "EUR"
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          }
+        }
+      }
     ]
   },
 

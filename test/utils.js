@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-var async = require('async');
 var _ = require('lodash');
 var app = require('../index');
 var data  = require('./mocks/data.json');

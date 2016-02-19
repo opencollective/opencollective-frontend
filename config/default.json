@@ -42,6 +42,6 @@
   "clearbit": "93890266fd5110a2f35ea61d31f484f7",
   "slack": {
     "hookUrl": "https://hooks.slack.com/services/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",
-    "activityChannel": "#activity"
+    "activityChannel": "#activity_test"
   }
 }

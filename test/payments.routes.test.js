@@ -385,6 +385,67 @@ describe('payments.routes.test.js', () => {
 
     });
 
+    describe('Payment success by a user who is a MEMBER of the group and should become BACKER', () => {
+
+      // Add a user as a MEMBER
+      beforeEach((done) => {
+        models.User.create(utils.data('user4')).done(function(e, u) {
+          expect(e).to.not.exist;
+          user4 = u;
+          group2
+            .addUserWithRole(user4, roles.MEMBER)
+            .done(done);
+        });
+      });
+
+      // Nock for charges.create.
+      beforeEach(() => {
+        var params = [
+          'amount=' + CHARGE * 100,
+          'currency=' + CURRENCY,
+          'customer=' + stripeMock.customers.create.id,
+          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          encodeURIComponent('metadata[groupId]') + '=' + group2.id,
+          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
+          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user4.email),
+          encodeURIComponent('metadata[cardId]') + '=1'
+        ].join('&');
+
+        nocks['charges.create'] = nock(STRIPE_URL)
+          .post('/v1/charges', params)
+          .reply(200, stripeMock.charges.create);
+      });
+
+      beforeEach((done) => {
+        request(app)
+          .post('/groups/' + group2.id + '/payments')
+          .set('Authorization', 'Bearer ' + user.jwt(application2))
+          .send({
+            payment: {
+              stripeToken: STRIPE_TOKEN,
+              amount: CHARGE,
+              currency: CURRENCY,
+              email: user4.email
+            }
+          })
+          .expect(200)
+          .end(done);
+      });
+
+      it('successfully adds the user to the group as a backer', (done) => {
+        group2
+          .getUsers()
+          .then((users) => {
+            expect(users).to.have.length(3);
+            var backer = _.find(users, {email: user4.email});
+            expect(backer.UserGroup.role).to.equal(roles.BACKER);
+            done();
+          })
+          .catch(done);
+      });
+
+    });
+
     describe('Payment success by anonymous user', () => {
 
       var data = {
@@ -651,6 +712,32 @@ describe('payments.routes.test.js', () => {
         nocks['customers.create'] = nock(STRIPE_URL)
           .post('/v1/customers')
           .replyWithError(stripeMock.customers.createError);
+      });
+
+      it('fails if the accessToken contains live', (done) => {
+        models.StripeAccount.create({ accessToken: 'sk_live_abc'})
+        .then((account) => user.setStripeAccount(account))
+        .then(() => {
+          request(app)
+            .post('/groups/' + group.id + '/payments')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .send({
+              payment: {
+                stripeToken: STRIPE_TOKEN,
+                amount: CHARGE,
+                currency: CURRENCY
+              }
+            })
+            .expect(400, {
+              error: {
+                code: 400,
+                type: 'bad_request',
+                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
+              }
+            })
+            .end(done);
+        })
+
       });
 
       it('fails paying because of a card declined', (done) => {

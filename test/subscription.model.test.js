@@ -53,7 +53,7 @@ describe(require('path').basename(__filename), function() {
       user2 = results[1];
       group = results[2];
       group2 = results[3];
-      return group.addUser(user, {role: 'HOST'} )
+      return group.addUserWithRole(user, 'HOST')
     })
     .then(() => {
       subscriptionData.UserId = user.id;
