@@ -64,12 +64,14 @@
     "isPublic": true,
     "tiers": [{
       "name": "backer",
+      "title": "Backers",
       "description": "One time tier",
       "range": [0, 100],
       "button": "Become a sponsor",
       "interval": "one-time"
     }, {
       "name": "sponsor",
+      "title":" Sponsors",
       "description": "Monthly tier",
       "range": [50, 10000],
       "interval": "monthly",
@@ -85,13 +87,15 @@
     "budget": 10000.00,
     "isPublic": false,
     "tiers": [{
-      "name": "One time",
+      "name": "donor",
+      "title": "Donors",
       "description": "One time tier",
       "range": [0, 100],
       "interval": "one-time",
       "button": "Become a sponsor"
     }, {
-      "name": "Monthly",
+      "name": "sponsor",
+      "title": "Sponsors",
       "description": "Monthly tier",
       "range": [0, 100],
       "interval": "monthly",

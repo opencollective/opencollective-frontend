@@ -33,20 +33,27 @@ module.exports = function(app) {
    */
   const getUsersQuery = (GroupId) => {
     return sequelize.query(`
+      WITH total_donations AS (
+        SELECT
+          max("UserId") as "UserId",
+          SUM(amount) as amount
+        FROM "Transactions" t
+        WHERE t."GroupId" = :GroupId AND t.amount >= 0
+        GROUP BY "UserId"
+      )
       SELECT
-        t."UserId" as id,
-        SUM (amount) as "totalDonations",
-        max(u."twitterHandle") as "twitterHandle",
-        max(u.name) as name,
-        max(u.avatar) as avatar,
-        max(u.website) as website,
-        max(ug.role) as role,
-        max(ug."createdAt") as "createdAt"
+        ug."UserId" as id,
+        ug."createdAt" as "createdAt",
+        u.name as name,
+        ug.role as role,
+        u.avatar as avatar,
+        u.website as website,
+        u."twitterHandle" as "twitterHandle",
+        d.amount as "totalDonations"
       FROM "UserGroups" ug
       LEFT JOIN "Users" u ON u.id = ug."UserId"
-      LEFT JOIN "Transactions" t ON t."UserId" = ug."UserId" AND t."GroupId" = :GroupId
-      WHERE ug."GroupId" = :GroupId AND (t.amount > 0 OR t.amount IS NULL)
-      GROUP BY t."UserId"
+      LEFT JOIN total_donations d ON d."UserId" = ug."UserId"
+      WHERE ug."GroupId" = :GroupId
       ORDER BY "totalDonations" DESC
     `, {
       replacements: { GroupId },

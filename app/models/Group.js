@@ -8,10 +8,12 @@ const config = require('config');
 const roles = require('../constants/roles');
 
 const tier = Joi.object().keys({
-  name: Joi.string().required(),
-  description: Joi.string().required(),
-  button: Joi.string().required(),
-  range: Joi.array().items(Joi.number().integer()).length(2).required(),
+  name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
+  title: Joi.string().required(), // e.g. "Sponsors"
+  description: Joi.string().required(), // what do people get as a member of this tier?
+  button: Joi.string().required(), // Call To Action, e.g. "Become a sponsor"
+  range: Joi.array().items(Joi.number().integer()).length(2).required(), // e.g. [100, 10000000]: Need to donate at least $100/interval to be a sponsor
+  presets: Joi.array().items(Joi.number().integer()), // e.g. [1, 5, 20] for presets of $1, $5 and $20
   interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required()
 });
 
@@ -50,6 +52,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     tiers: {
       type: DataTypes.JSON,
+      allowNull: true,
       validate: {
         schema: (value) => {
           Joi.validate(value, tiers, (err) => {
