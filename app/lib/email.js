@@ -7,6 +7,7 @@ const templatesNames = [
   'group.transaction.created',
   'thankyou',
   'thankyou.wwcode',
+  'thankyou.ispcwa',
   'user.forgot.password'
 ];
 
