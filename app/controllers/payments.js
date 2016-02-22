@@ -277,6 +277,8 @@ module.exports = function(app) {
           var template = 'thankyou';
           if(group.name.match(/WWCode/i))
             template += '.wwcode';
+          if(group.name.match(/ispcwa/i))
+            template += '.ispcwa';
 
           emailLib.send(template, user.email, data);
           cb();
