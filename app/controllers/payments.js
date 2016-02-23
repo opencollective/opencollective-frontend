@@ -307,7 +307,11 @@ module.exports = function(app) {
         }]
 
       }, function(e) {
-        if (e) return next(e);
+
+        if (e) {
+          e.payload = req.body;
+          return next(e);
+        }
 
         res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});
       });
