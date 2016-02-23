@@ -31,6 +31,7 @@ module.exports = {
     var groupName = '';
     var publicUrl = '';
     var amount = null;
+    var recurringAmount = null;
     var currency = '';
     var tags = [];
     var description = '';
@@ -58,6 +59,8 @@ module.exports = {
     // get transaction data
     if (activity.data.transaction) {
         amount = activity.data.transaction.amount;
+        var interval = activity.data.transaction.interval;
+        recurringAmount = amount + (interval !== null ? '/' + interval : '');
         currency = activity.data.transaction.currency;
         tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
@@ -76,7 +79,7 @@ module.exports = {
 
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
-          returnVal += `Woohoo! ${userString} gave ${currency} ${amount}/month to ${this.linkifyForSlack(publicUrl, groupName)}!`;
+          returnVal += `Woohoo! ${userString} gave ${currency} ${recurringAmount} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
 
         } else if (activity.data.transaction.isExpense) {
           // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
@@ -100,8 +103,9 @@ module.exports = {
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:
-        returnVal += `Yay! Confirmed subscription of ${currency} ${amount}/month from ${userString} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
-        break;
+        // Ex: Confirmed subscription of 1 USD/month from Aseem to WWCode-Seattle!
+        returnVal += `Yay! Confirmed subscription of ${currency} ${recurringAmount} from ${userString} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
+      break;
 
       default:
         returnVal += `Oops... I got an unknown activity type: ${activity.type}`;
