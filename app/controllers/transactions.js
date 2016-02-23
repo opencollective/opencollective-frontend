@@ -595,6 +595,20 @@ module.exports = function(app) {
   };
 
   /**
+   * Get subscriptions of a user
+   */
+  const getSubscriptions = (req, res, next) => {
+    models.Transaction.findAll({
+      where: {
+        UserId: req.remoteUser.id,
+        stripeSubscriptionId: {$ne: null}
+      }
+    })
+    .then(transactions => res.send(transactions))
+    .catch(next)
+  };
+
+  /**
    * Public methods.
    */
   return {
@@ -603,7 +617,8 @@ module.exports = function(app) {
     getPayKey,
     confirmPayment,
     pay,
-    attributeUser
+    attributeUser,
+    getSubscriptions
   }
 
 };

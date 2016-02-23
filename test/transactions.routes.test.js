@@ -1,13 +1,15 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var app = require('../index');
-var async = require('async');
-var sinon = require('sinon');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const _ = require('lodash');
+const app = require('../index');
+const async = require('async');
+const sinon = require('sinon');
+const jwt = require('jsonwebtoken');
+const expect = require('chai').expect;
+const request = require('supertest');
+const config = require('config');
+const utils = require('../test/utils.js')();
 
 /**
  * Variables.
@@ -747,6 +749,84 @@ describe('transactions.routes.test.js', function() {
 
     });
 
+  });
+
+  /**
+   * Get the subscriptions of a user
+   */
+  describe('#get subscriptions', () => {
+    const stripeSubscriptionId = 'sub_test';
+
+    // Create transactions for group1.
+    beforeEach((done) => {
+      async.each(transactionsData, (transaction, cb) => {
+        request(app)
+          .post('/groups/' + privateGroup.id + '/transactions')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            transaction: _.extend({}, transaction, { stripeSubscriptionId })
+          })
+          .expect(200)
+          .end((e) => {
+            expect(e).to.not.exist;
+            cb();
+          });
+      }, done);
+    });
+
+    it('fails if the payload does not have the scope', (done) => {
+      request(app)
+        .get('/transactions/subscriptions')
+        .set('Authorization', 'Bearer ' + user.jwt(application, {
+          scope: ''
+        }))
+        .expect(401, {
+          error: {
+            code: 401,
+            type: 'unauthorized',
+            message: 'User does not have the scope'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the token expired', (done) => {
+      const expiredToken = jwt.sign({
+        user,
+        scope: 'subscriptions'
+      }, config.keys.opencollective.secret, {
+        expiresInSeconds: -1,
+        subject: user.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      request(app)
+        .get('/transactions/subscriptions')
+        .set('Authorization', 'Bearer ' + expiredToken)
+        .end((err, res) => {
+          expect(res.body.error.code).to.be.equal(401);
+          expect(res.body.error.message).to.be.equal('jwt expired');
+          done();
+        });
+    });
+
+    it('successfully has access to the subscriptions', (done) => {
+      request(app)
+        .get('/transactions/subscriptions')
+        .set('Authorization', 'Bearer ' + user.jwt(application, {
+          scope: 'subscriptions'
+        }))
+        .expect(200)
+        .end((err, res) => {
+          expect(err).to.not.exist;
+          expect(res.body.length).to.be.equal(transactionsData.length);
+          res.body.forEach(t => {
+            expect(t.stripeSubscriptionId).to.be.equal(stripeSubscriptionId)
+          });
+          done();
+        });
+    });
   });
 
   /**

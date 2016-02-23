@@ -192,10 +192,10 @@ module.exports = function(Sequelize, DataTypes) {
 
     instanceMethods: {
       // JWT token.
-      jwt: function(application) {
-        var secret = config.keys.opencollective.secret;
-        var payload = this.minimal;
-        return jwt.sign(payload, secret, {
+      jwt: function(application, payload) {
+        const secret = config.keys.opencollective.secret;
+
+        return jwt.sign(payload || {}, secret, {
           expiresInMinutes: 60 * 24 * 30, // 1 month
           subject: this.id, // user
           issuer: config.host.api,

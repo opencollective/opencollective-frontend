@@ -1,8 +1,7 @@
 var _ = require('lodash');
 var serverStatus = require('express-server-status');
-var expressJwt = require('express-jwt');
 var roles = require('../constants/roles');
-var config = require('config');
+var jwt = require('../middlewares/jwt');
 
 module.exports = function(app) {
 
@@ -43,7 +42,16 @@ module.exports = function(app) {
   /**
    * Authentication.
    */
-  app.use(mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser', credentialsRequired: false}), mw.identifyFromToken);
+  app.use(
+    mw.apiKey,
+    jwt,
+    // expressJwt({
+    //   secret: config.keys.opencollective.secret,
+    //   requestProperty: 'jwtPayload',
+    //   credentialsRequired: true
+    // }),
+    mw.identifyFromToken
+  );
 
   /**
    * NotImplemented response.
@@ -179,6 +187,11 @@ module.exports = function(app) {
    * Reset test-api database
    */
   app.get('/database/reset', test.resetTestDatabase);
+
+  /**
+   * Get the subscriptions of a user
+   */
+  app.get('/transactions/subscriptions', mw.jwtScope('subscriptions'), transactions.getSubscriptions);
 
   /**
    * Error handler.
