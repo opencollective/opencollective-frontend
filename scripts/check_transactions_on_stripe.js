@@ -69,8 +69,10 @@ models.Transaction.findAll({
 })
 .then(() => {
   const str = message.join('\n');
-  console.log(str);
-  return slackLib.postMessage(str);
+
+  if (str.length > 0) {
+    return slackLib.postMessage(str, [], '#critical');
+  }
 })
 .then(() => done())
 .catch(done)
