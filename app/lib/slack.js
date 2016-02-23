@@ -60,7 +60,7 @@ module.exports = {
     if (activity.data.transaction) {
         amount = activity.data.transaction.amount;
         var interval = activity.data.transaction.interval;
-        recurringAmount = amount + (interval !== null ? '/' + interval : '');
+        recurringAmount = amount + (typeof interval !== 'undefined' ? '/' + interval : '');
         currency = activity.data.transaction.currency;
         tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
