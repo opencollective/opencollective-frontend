@@ -715,24 +715,25 @@ describe('payments.routes.test.js', () => {
       });
 
       it('fails if the accessToken contains live', (done) => {
+        const payment = {
+          stripeToken: STRIPE_TOKEN,
+          amount: CHARGE,
+          currency: CURRENCY
+        };
+
         models.StripeAccount.create({ accessToken: 'sk_live_abc'})
         .then((account) => user.setStripeAccount(account))
         .then(() => {
           request(app)
             .post('/groups/' + group.id + '/payments')
             .set('Authorization', 'Bearer ' + user.jwt(application))
-            .send({
-              payment: {
-                stripeToken: STRIPE_TOKEN,
-                amount: CHARGE,
-                currency: CURRENCY
-              }
-            })
+            .send({ payment })
             .expect(400, {
               error: {
                 code: 400,
                 type: 'bad_request',
-                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
+                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`,
+                payload: { payment }
               }
             })
             .end(done);
