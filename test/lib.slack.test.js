@@ -55,4 +55,9 @@ describe('lib.slack.test.js', function() {
     expect(obj.msg).to.equal('Yay! Confirmed subscription of EUR 12.34 from jussi@kuohujoki.fi to <blah.com|Blah>!');
   });
 
+  it (`formatActivity: ${constants.SUBSCRIPTION_CONFIRMED} with month interval`, function(){
+    obj = slackLib.formatActivity(activitiesData[17]);
+    expect(obj.msg).to.equal('Yay! Confirmed subscription of EUR 12.34/month from jussi@kuohujoki.fi to <blah.com|Blah>!');
+  });
+
 });
