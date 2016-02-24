@@ -754,7 +754,7 @@ describe('payments.routes.test.js', () => {
           })
           .expect(400)
           .then(res => {
-            expect(res.body.error.detail.code).to.be.equal('card_declined');
+            expect(res.body.error.detail).to.deep.equal(stripeMock.customers.createError);
             done();
           });
       });
