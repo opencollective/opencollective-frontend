@@ -754,7 +754,6 @@ describe('payments.routes.test.js', () => {
           })
           .expect(400)
           .then(res => {
-            console.log("res.body: ", require('util').inspect(res.body));
             expect(res.body.error.detail.code).to.be.equal('card_declined');
             done();
           });
