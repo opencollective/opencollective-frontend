@@ -753,7 +753,10 @@ describe('payments.routes.test.js', () => {
             }
           })
           .expect(400)
-          .end(done);
+          .then(res => {
+            expect(res.body.error.detail).to.deep.equal(stripeMock.customers.createError);
+            done();
+          });
       });
 
     });
