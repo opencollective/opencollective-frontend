@@ -211,6 +211,23 @@
             "publicUrl": "blah.com"
           }
         }
+      },
+      {
+        "type": "subscription.confirmed",
+        "data": {
+          "user": {
+            "email":"jussi@kuohujoki.fi"
+          },
+          "transaction": {
+            "amount": 12.34,
+            "currency": "EUR",
+            "interval": "month"
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          }
+        }
       }
     ]
   },
