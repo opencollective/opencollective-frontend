@@ -157,7 +157,8 @@ module.exports = (app) => {
             description: 'Recurring subscription',
             tags: ['Donation'],
             approved: true,
-            stripeSubscriptionId: subscription.id
+            stripeSubscriptionId: subscription.id,
+            interval: transaction.interval
           };
 
         transactions._create({

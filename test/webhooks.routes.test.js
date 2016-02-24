@@ -268,6 +268,7 @@ describe('webhooks.routes.test.js', () => {
                 expect(transaction.currency).to.be.equal(CURRENCY);
                 expect(transaction.type).to.be.equal('payment');
                 expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+                expect(transaction.interval).to.be.equal('month');
               });
 
               done();
