@@ -17,7 +17,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var sequelize = models.sequelize;
   var Activity = models.Activity;
-  var Subscription = models.Subscription;
+  var Notification = models.Notification;
   var Group = models.Group;
   var Transaction = models.Transaction;
   var transactions = require('../controllers/transactions')(app);
@@ -63,7 +63,7 @@ module.exports = function(app) {
 
   var subscribeUserToGroupEvents = function(user, group, role) {
     if(role !== roles.HOST) return;
-    Subscription.create({
+    Notification.create({
       UserId: user.id,
       GroupId: group.id,
       type: activities.GROUP_TRANSANCTION_CREATED

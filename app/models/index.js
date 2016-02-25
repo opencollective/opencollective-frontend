@@ -35,7 +35,7 @@ function setupModels(client) {
     'Group',
     'Paykey',
     'StripeAccount',
-    'Subscription',
+    'Notification',
     'Transaction',
     'User',
     'UserGroup'
@@ -71,12 +71,12 @@ function setupModels(client) {
 
   m.Activity.belongsTo(m.Transaction);
 
-  // Subscription.
-  m.User.hasMany(m.Subscription);
-  m.Subscription.belongsTo(m.User);
+  // Notification.
+  m.User.hasMany(m.Notification);
+  m.Notification.belongsTo(m.User);
 
-  m.Subscription.belongsTo(m.Group);
-  m.Group.hasMany(m.Subscription);
+  m.Notification.belongsTo(m.Group);
+  m.Group.hasMany(m.Notification);
 
   // Transaction.
   m.Transaction.belongsTo(m.Group);

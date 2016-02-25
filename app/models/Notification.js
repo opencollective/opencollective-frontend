@@ -1,15 +1,15 @@
 /*
- * Create a subscription to receive notifications for a certain type of events
+ * Create a notification to receive certain type of events
  *
- * Subscription.create({
+ * Notification.create({
  *  UserId, GroupId, type = 'group.transaction.created', channel='email'
  * })
- * Subscription.unsubscribe(); // To disable a subscription
+ * Notification.unsubscribe(); // To disable a notification
  */
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Subscription = Sequelize.define('Subscription', {
+  var Notification = Sequelize.define('Notification', {
 
     channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
 
@@ -33,7 +33,7 @@ module.exports = function(Sequelize, DataTypes) {
 
   });
 
-  return Subscription;
+  return Notification;
 };
 
 /*
