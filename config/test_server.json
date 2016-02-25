@@ -1,19 +1,5 @@
 {
   "database": {
-    "options": {
-      "port": 5432,
-      "dialect": "postgres",
-      "protocol": "postgres",
-      "logging": true,
-      "dialectOptions": {
-        "ssl": true
-      }
-    }
-  },
-  "host": {
-    "api": "https://opencollective-test-api.herokuapp.com"
-  },
-  "stripe": {
-    "redirectUri": "https://opencollective-test-api.herokuapp.com/stripe/oauth/callback"
+    "database": "opencollective_testserver"
   }
 }

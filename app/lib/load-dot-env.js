@@ -5,7 +5,7 @@ module.exports = function() {
   /**
    * Load .env file
    */
-  if (_.contains(['test', 'development'], process.env.NODE_ENV)) {
+  if (_.contains(['test', 'development', 'test_server'], process.env.NODE_ENV)) {
     require('dotenv').load();
   }
 };
