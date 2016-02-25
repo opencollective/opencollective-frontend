@@ -19,14 +19,13 @@ var groupData = utils.data('group1');
 var group2Data = utils.data('group2');
 var group3Data = utils.data('group3');
 var transactionsData = utils.data('transactions1').transactions;
-var subscriptionData = { type: constants.GROUP_TRANSANCTION_CREATED };
+var notificationData = { type: constants.GROUP_TRANSANCTION_CREATED };
 
 var models = app.get('models');
 
 var User = models.User;
 var Group = models.Group;
-var Transaction = models.Transaction;
-var Subscription = models.Subscription;
+var Notification = models.Notification;
 
 /**
  * Tests.
@@ -56,13 +55,13 @@ describe(require('path').basename(__filename), function() {
       return group.addUserWithRole(user, 'HOST')
     })
     .then(() => {
-      subscriptionData.UserId = user.id;
-      subscriptionData.GroupId = group.id;
-      return Subscription.create(subscriptionData).done(done);
+      notificationData.UserId = user.id;
+      notificationData.GroupId = group.id;
+      return Notification.create(notificationData).done(done);
     });
   });
 
-  it('subscribes for the `group.transaction.approved` email notification', function(done) {
+  it('notifies for the `group.transaction.approved` email', function(done) {
     request(app)
       .post('/groups/' + group.id + '/activities/group.transaction.approved/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -72,7 +71,7 @@ describe(require('path').basename(__filename), function() {
         expect(e).to.not.exist;
         expect(res.body.active).to.be.true;
 
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group.id,
           type: 'group.transaction.approved'
@@ -83,19 +82,19 @@ describe(require('path').basename(__filename), function() {
       })
   });
 
-  it('unsubscribes for the ' + subscriptionData.type + ' email notification', function(done) {
+  it('disables notification for the ' + notificationData.type + ' email', function(done) {
     request(app)
-      .post('/groups/' + group.id + '/activities/' + subscriptionData.type + '/unsubscribe')
+      .post('/groups/' + group.id + '/activities/' + notificationData.type + '/unsubscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(200)
       .end(function(e, res) {
         expect(e).to.not.exist;
 
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group.id,
-          type: subscriptionData.type
+          type: notificationData.type
         }})
         .then(function(res) {
           expect(res.count).to.equal(0);
@@ -103,19 +102,19 @@ describe(require('path').basename(__filename), function() {
       })
   });
 
-  it('fails to subscribe if already subscribed', function(done) {
+  it('fails to add another notification if one exists', function(done) {
     request(app)
-      .post('/groups/' + group.id + '/activities/' + subscriptionData.type + '/subscribe')
+      .post('/groups/' + group.id + '/activities/' + notificationData.type + '/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(400)
       .end(function(e, res) {
         expect(e).to.not.exist;
         expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group.id,
-          type: subscriptionData.type
+          type: notificationData.type
         }})
         .then(function(res) {
           expect(res.count).to.equal(1);
@@ -123,7 +122,7 @@ describe(require('path').basename(__filename), function() {
       })
   });
 
-  it('fails to unsubscribe if not subscribed', function(done) {
+  it('fails to remove notification if it does not exist', function(done) {
     request(app)
       .post('/groups/' + group.id + '/activities/group.transaction.approved/unsubscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -132,10 +131,10 @@ describe(require('path').basename(__filename), function() {
       .end(function(e, res) {
         expect(e).to.not.exist;
         expect(res.body.error.message).to.equal('You were not subscribed to this type of activity');
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group.id,
-          type: subscriptionData.type
+          type: notificationData.type
         }})
         .then(function(res) {
           expect(res.count).to.equal(1);
@@ -143,17 +142,17 @@ describe(require('path').basename(__filename), function() {
       })
   });
 
-  it('fails to subscribe if not a member of the group', function(done) {
+  it('fails to add a notification if not a member of the group', function(done) {
     request(app)
       .post('/groups/' + group2.id + '/activities/group.transaction.approved/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(403)
       .end(function() {
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group2.id,
-          type: subscriptionData.type
+          type: notificationData.type
         }})
         .then(function(res) {
           expect(res.count).to.equal(0);
@@ -161,14 +160,14 @@ describe(require('path').basename(__filename), function() {
       })
   });
 
-  it('automatically subscribe a new host to `group.transaction.created` events', function(done) {
+  it('automatically add a notification for a new host to `group.transaction.created` events', function(done) {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user2.jwt(application))
       .send({group: group3Data, role: 'HOST'})
       .expect(200)
       .end(function(e, res) {
-        Subscription.findAndCountAll({where: {
+        Notification.findAndCountAll({where: {
           UserId: user2.id,
           GroupId: res.body.id,
           type: constants.GROUP_TRANSACTION_CREATED

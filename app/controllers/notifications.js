@@ -3,18 +3,18 @@ var errors = require('../lib/errors');
 module.exports = function(app) {
 
   var models = app.set('models');
-  var Subscription = models.Subscription;
+  var Notification = models.Notification;
 
   return {
     subscribe: function(req, res, next) {
-      Subscription.create({
+      Notification.create({
         UserId: req.remoteUser.id,
         GroupId: req.group.id,
         type: req.params.activityType
       })
-      .then(function(subscription) {
-        if (subscription) {
-          res.send(subscription.get({plain:true}));
+      .then(function(notification) {
+        if (notification) {
+          res.send(notification.get({plain:true}));
         }
       })
       .catch(function(err) {
@@ -26,7 +26,7 @@ module.exports = function(app) {
     },
 
     unsubscribe: function(req, res, next) {
-      Subscription.destroy({
+      Notification.destroy({
         where: {
           UserId: req.remoteUser.id,
           GroupId: req.group.id,
@@ -34,7 +34,7 @@ module.exports = function(app) {
         }
       })
       .catch(function(err) {
-        console.error('Error when deleting a subscription', err);
+        console.error('Error when deleting a notification', err);
         next(err);
       })
       .then(function(deletedRows) {

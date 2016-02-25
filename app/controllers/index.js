@@ -13,7 +13,7 @@ module.exports = function(app) {
     'params',
     'payments',
     'paypal',
-    'subscriptions',
+    'notifications',
     'stripe',
     'transactions',
     'users',

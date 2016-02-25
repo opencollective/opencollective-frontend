@@ -18,7 +18,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var Transaction = models.Transaction;
   var Activity = models.Activity;
-  var Subscription = models.Subscription;
+  var Notification = models.Notification;
   var Paykey = models.Paykey;
   var User = models.User;
   var Card = models.Card;
@@ -96,7 +96,7 @@ module.exports = function(app) {
       notifySubscribers: ['createActivity', (cb, results) => {
         var activity = results.createActivity;
 
-        Subscription.findAll({
+        Notification.findAll({
           include:{
             model: User,
             attributes: ['email']
@@ -105,8 +105,8 @@ module.exports = function(app) {
             type: activity.type,
             GroupId: activity.GroupId
           }
-        }).then((subscriptions) => {
-          return subscriptions.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
+        }).then((notifications) => {
+          return notifications.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
         })
         .then(() => cb())
         .catch((err) => {
