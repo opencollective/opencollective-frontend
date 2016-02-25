@@ -78,6 +78,7 @@
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "sh ./scripts/postinstall.sh",
     "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d",
+    "testserver": "NODE_ENV=test_server npm start",
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
     "report:tx": "node scripts/report_transactions",
