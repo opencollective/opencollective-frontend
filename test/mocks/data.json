@@ -235,7 +235,7 @@
   "transactions1": {
     "transactions": [
       {
-        "beneficiary": "@evilrabbit_",
+        "vendor": "@evilrabbit_",
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -200.00,
@@ -249,7 +249,7 @@
         "paymentMethod": "paypal"
       },
       {
-        "beneficiary": "@xdamman",
+        "vendor": "@xdamman",
         "description": "Flight SFO-BRU",
         "tags": ["travel"],
         "amount": -918.59,
@@ -261,7 +261,7 @@
         "createdAt": "2015-02-22T08:00:00.000Z"
       },
       {
-        "beneficiary": "@xdamman",
+        "vendor": "@xdamman",
         "description": "Byword",
         "tags": ["software"],
         "amount": -11.99,
@@ -273,7 +273,7 @@
         "createdAt": "2015-03-04T08:00:00.000Z"
       },
       {
-        "beneficiary": "OrangeWebsite",
+        "vendor": "OrangeWebsite",
         "description": "Tipbox.is domain + dedicated server",
         "tags": ["hosting"],
         "amount": -588.61,
@@ -285,7 +285,7 @@
         "createdAt": "2015-04-06T07:00:00.000Z"
       },
       {
-        "beneficiary": "@mdp @xdamman",
+        "vendor": "@mdp @xdamman",
         "description": "Working lunch with @mdp",
         "tags": ["food"],
         "amount": -36.00,
@@ -297,7 +297,7 @@
         "createdAt": "2015-04-07T07:00:00.000Z"
       },
       {
-        "beneficiary": "@evilrabbit_",
+        "vendor": "@evilrabbit_",
         "description": "Homepage design end",
         "tags": ["consultancy"],
         "amount": -300.00,
@@ -309,7 +309,7 @@
         "createdAt": "2015-04-28T07:00:00.000Z"
       },
       {
-        "beneficiary": "@montogeek",
+        "vendor": "@montogeek",
         "description": "Homepage frontend code",
         "tags": ["consultancy"],
         "amount": -300.00,
@@ -321,7 +321,7 @@
         "createdAt": "2015-04-29T07:00:00.000Z"
       },
       {
-        "beneficiary": "@montogeek",
+        "vendor": "@montogeek",
         "description": "Donation to that great project",
         "tags": ["donation"],
         "amount": 299.99,
@@ -342,7 +342,7 @@
       "amount": 10.99,
       "vat": null,
       "currency": "USD",
-      "beneficiary": null,
+      "vendor": null,
       "paidby": "1",
       "tags": ["Donation"],
       "status": null,

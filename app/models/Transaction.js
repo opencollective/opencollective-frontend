@@ -16,7 +16,7 @@ module.exports = function(Sequelize, DataTypes) {
         }
       }
     },
-    beneficiary: DataTypes.STRING,
+    vendor: DataTypes.STRING,
     paidby: DataTypes.STRING,
     tags: DataTypes.ARRAY(DataTypes.STRING),
     status: DataTypes.STRING,
@@ -103,7 +103,7 @@ module.exports = function(Sequelize, DataTypes) {
           amount: this.amount,
           vat: this.vat,
           currency: this.currency,
-          beneficiary: this.beneficiary,
+          vendor: this.vendor,
           paidby: this.paidby,
           tags: this.tags,
           status: this.status,
