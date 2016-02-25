@@ -246,7 +246,7 @@ module.exports = function(app) {
 
           [
             'description',
-            'beneficiary',
+            'vendor',
             'paidby',
             'tags',
             'status',

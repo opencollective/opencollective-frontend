@@ -213,7 +213,7 @@ describe('transactions.routes.test.js', function() {
           var t = res.body;
           expect(t).to.have.property('id');
           expect(t).to.have.property('currency', 'USD');
-          expect(t).to.have.property('beneficiary', transactionsData[0].beneficiary);
+          expect(t).to.have.property('vendor', transactionsData[0].vendor);
           expect(t).to.have.property('GroupId', privateGroup.id);
           expect(t).to.have.property('UserId', null); // ...
           expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);

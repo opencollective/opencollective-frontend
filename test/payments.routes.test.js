@@ -453,7 +453,7 @@ describe('payments.routes.test.js', () => {
         amount: CHARGE,
         currency: CURRENCY,
         description: 'super description',
-        beneficiary: '@beneficiary',
+        vendor: '@vendor',
         paidby: '@paidby',
         tags: ['tag1', 'tag2'],
         status: 'super status',
@@ -543,7 +543,7 @@ describe('payments.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('isWaitingFirstInvoice', false);
             expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
             expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-            ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
+            ['amount', 'description', 'vendor', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
               expect(res.rows[0]).to.have.property(prop, data[prop]);
             });
             done();
@@ -566,7 +566,7 @@ describe('payments.routes.test.js', () => {
         currency: CURRENCY,
         interval: 'month',
         description: 'super description',
-        beneficiary: '@beneficiary',
+        vendor: '@vendor',
         paidby: '@paidby',
         tags: ['tag1', 'tag2'],
         status: 'super status',
@@ -675,7 +675,7 @@ describe('payments.routes.test.js', () => {
               expect(res.rows[0]).to.have.property('interval', plan.interval);
               expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
               expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-              ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
+              ['amount', 'description', 'vendor', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
                 expect(res.rows[0]).to.have.property(prop, data[prop]);
               });
               done();
