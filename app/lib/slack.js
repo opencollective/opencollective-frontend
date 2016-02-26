@@ -116,7 +116,6 @@ module.exports = {
   /*
    * Posts a message on slack
    */
-  
   postMessage: function(msg, attachmentArray, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 
