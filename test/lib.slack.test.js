@@ -12,17 +12,17 @@ const slackLib = require('../app/lib/slack');
  */
 describe('lib.slack.test.js', function() {
 
-  it (`formatActivity: ${constants.GROUP_TRANSANCTION_CREATED} donation`, function(){
+  it (`formatActivity: ${constants.GROUP_TRANSACTION_CREATED} donation`, function(){
     obj = slackLib.formatActivity(activitiesData[12]);
     expect(obj.msg).to.equal('Woohoo! john@doe.com gave USD 10.42 to <pubquiz.com|Pub quiz>!');
   });
 
-  it (`formatActivity: ${constants.GROUP_TRANSANCTION_CREATED} expense`, function(){
+  it (`formatActivity: ${constants.GROUP_TRANSACTION_CREATED} expense`, function(){
     obj = slackLib.formatActivity(activitiesData[13]);
     expect(obj.msg).to.equal('Hurray! john@doe.com submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
   });
 
-  it (`formatActivity: ${constants.GROUP_TRANSANCTION_PAID} expense paid`, function(){
+  it (`formatActivity: ${constants.GROUP_TRANSACTION_PAID} expense paid`, function(){
     obj = slackLib.formatActivity(activitiesData[14]);
     expect(obj.msg).to.equal('Expense approved on Pub quiz: USD -12.98 for \'pizza\'');
   });

@@ -31,6 +31,7 @@ module.exports = function(app) {
    */
   var create = (args, callback) => {
     var transaction = args.transaction;
+    const subscription = args.subscription;
     var user = args.user || {};
     var group = args.group || {};
     var card = args.card || {};
@@ -40,7 +41,13 @@ module.exports = function(app) {
       createTransaction: (cb) => {
         Transaction
           .create(transaction)
-          .done(cb);
+          .then(t => {
+            if (!subscription) return cb(null, t);
+
+            return t.createSubscription(subscription)
+              .then(() => cb(null, t));
+          })
+          .catch(cb)
       },
 
       addTransactionToUser: ['createTransaction', (cb, results) => {
@@ -80,7 +87,7 @@ module.exports = function(app) {
 
         // Create activity.
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_CREATED,
+          type: activities.GROUP_TRANSACTION_CREATED,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -291,7 +298,7 @@ module.exports = function(app) {
 
       createActivity: ['updatePaykey', 'updateTransaction', function(cb) {
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_PAID,
+          type: activities.GROUP_TRANSACTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -489,7 +496,7 @@ module.exports = function(app) {
 
       createActivity: ['callService', 'updateTransaction', function(cb, results) {
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_PAID,
+          type: activities.GROUP_TRANSACTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: results.updateTransaction.id,

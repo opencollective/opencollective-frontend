@@ -66,7 +66,7 @@ module.exports = function(app) {
     Notification.create({
       UserId: user.id,
       GroupId: group.id,
-      type: activities.GROUP_TRANSANCTION_CREATED
+      type: activities.GROUP_TRANSACTION_CREATED
     });
   }
 

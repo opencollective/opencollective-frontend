@@ -37,14 +37,7 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING
     },
 
-    stripeSubscriptionId: DataTypes.STRING,
-
     approved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
-    isWaitingFirstInvoice: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },

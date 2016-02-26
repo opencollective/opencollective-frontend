@@ -23,6 +23,7 @@ module.exports = (app) => {
   const User = models.User;
   const Transaction = models.Transaction;
   const Activity = models.Activity;
+  const Subscription = models.Subscription;
   const Group = models.Group;
 
   const transactions = require('./transactions')(app);
@@ -54,9 +55,12 @@ module.exports = (app) => {
 
           const invoice = event.data.object;
           const invoiceLineItems = invoice.lines.data;
-          const subscription = _.find(invoiceLineItems, { type: 'subscription' });
+          const stripeSubscription = _.find(invoiceLineItems, { type: 'subscription' });
 
-          cb(null, { event, subscription });
+          cb(null, {
+            event,
+            stripeSubscription
+          });
         })
         .catch(cb);
       },
@@ -75,29 +79,18 @@ module.exports = (app) => {
         .done(cb);
       }],
 
-      fetchPendingTransaction: ['createActivity', (cb, results) => {
-        Transaction.findOne({
-          where: {
-            stripeSubscriptionId: results.fetchEvent.subscription.id,
-            isWaitingFirstInvoice: true
-          }
-        })
-        .done(cb);
-      }],
-
       fetchTransaction: ['createActivity', (cb, results) => {
+        const stripeSubscriptionId = results.fetchEvent.stripeSubscription.id;
+
         Transaction.findOne({
-          where: {
-            stripeSubscriptionId: results.fetchEvent.subscription.id
-          },
           include: [
             { model: Group },
             { model: User },
-            { model: Card }
+            { model: Card },
+            { model: Subscription, where: { stripeSubscriptionId } }
           ]
         })
         .then((transaction) => {
-
           /**
            * Stripe doesn't make a difference between development, test, staging
            * environments. If we get a webhook from another env, `transaction.stripeSubscriptionId`
@@ -119,47 +112,49 @@ module.exports = (app) => {
         .catch(cb)
       }],
 
-      createOrUpdateTransaction: ['fetchTransaction', 'fetchPendingTransaction', (cb, results) => {
-        const pendingTransaction = results.fetchPendingTransaction;
-
-        // If the transaction is pending, we will just update it
-        // We only use pending transactions for the first subscription invoice
-        if (pendingTransaction && pendingTransaction.isWaitingFirstInvoice) {
-          pendingTransaction.isWaitingFirstInvoice = false;
-
-          return pendingTransaction.save()
-            .tap(transaction => {
-              return Activity.create({
-                    type: activities.SUBSCRIPTION_CONFIRMED,
-                    data: {
-                      event: results.fetchEvent.event,
-                      group: results.fetchTransaction.Group,
-                      user: results.fetchTransaction.User,
-                      transaction: transaction
-                    }
-                  });
-            })
-            .then(transaction => cb(null, transaction))
-            .catch(cb);
-        }
-
+      createOrUpdateTransaction: ['fetchTransaction', (cb, results) => {
         const transaction = results.fetchTransaction;
-        const subscription = results.fetchEvent.subscription;
+        const subscription = transaction.Subscription;
+        const stripeSubscription = results.fetchEvent.stripeSubscription;
         const user = transaction.User || {};
         const group = transaction.Group || {};
         const card = transaction.Card || {};
 
+        // If the subscription is not active, we will just update the already existing one
+        // We only use pending subscriptions for the first subscription invoice
+        if (!subscription.isActive) {
+          subscription.isActive = true;
+          subscription.activatedAt = new Date();
+
+          return subscription.save()
+            .then(subscription => {
+              return Activity.create({
+                type: activities.SUBSCRIPTION_CONFIRMED,
+                data: {
+                  event: results.fetchEvent.event,
+                  group: results.fetchTransaction.Group,
+                  user: results.fetchTransaction.User,
+                  transaction: results.fetchTransaction,
+                  subscription
+                }
+              });
+            })
+            .then(() => cb())
+            .catch(cb);
+        }
+
+
         const newTransaction = {
-            type: 'payment',
-            amount: subscription.amount / 100,
-            currency: subscription.currency,
-            paidby: user && user.id,
-            description: 'Recurring subscription',
-            tags: ['Donation'],
-            approved: true,
-            stripeSubscriptionId: subscription.id,
-            interval: transaction.interval
-          };
+          type: 'payment',
+          amount: stripeSubscription.amount / 100,
+          currency: stripeSubscription.currency,
+          paidby: user && user.id,
+          description: 'Recurring subscription',
+          tags: ['Donation'],
+          approved: true,
+          interval: transaction.interval,
+          SubscriptionId: subscription.id
+        };
 
         transactions._create({
           transaction: newTransaction,

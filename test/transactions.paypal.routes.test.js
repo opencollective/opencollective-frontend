@@ -378,7 +378,7 @@ describe('transactions.paypal.routes.test.js', function() {
                   });
                 },
                 checkActivity: function(cb) {
-                  models.Activity.findAndCountAll({where: {type: activities.GROUP_TRANSANCTION_PAID} }).then(function(res) {
+                  models.Activity.findAndCountAll({where: {type: activities.GROUP_TRANSACTION_PAID} }).then(function(res) {
                     expect(res.count).to.equal(1);
                     cb();
                   });
@@ -520,7 +520,7 @@ describe('transactions.paypal.routes.test.js', function() {
                 });
               },
               checkActivity: function(cb) {
-                models.Activity.findAndCountAll({where: {type: activities.GROUP_TRANSANCTION_PAID} }).then(function(res) {
+                models.Activity.findAndCountAll({where: {type: activities.GROUP_TRANSACTION_PAID} }).then(function(res) {
                   expect(res.count).to.equal(1);
                   cb();
                 });

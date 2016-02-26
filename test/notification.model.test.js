@@ -19,7 +19,7 @@ var groupData = utils.data('group1');
 var group2Data = utils.data('group2');
 var group3Data = utils.data('group3');
 var transactionsData = utils.data('transactions1').transactions;
-var notificationData = { type: constants.GROUP_TRANSANCTION_CREATED };
+var notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
 
 var models = app.get('models');
 
