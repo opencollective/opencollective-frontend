@@ -97,6 +97,7 @@ function setupModels(client) {
 
   // Subscription
   m.Transaction.belongsTo(m.Subscription);
+  m.Subscription.hasMany(m.Transaction);
 
   return m;
 };
