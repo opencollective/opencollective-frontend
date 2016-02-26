@@ -59,8 +59,8 @@ module.exports = {
     // get transaction data
     if (activity.data.transaction) {
         amount = activity.data.transaction.amount;
-        var interval = activity.data.transaction.interval;
-        recurringAmount = amount + (typeof interval !== 'undefined' ? '/' + interval : '');
+        const interval = activity.data.transaction.interval;
+        recurringAmount = amount + (interval ? '/' + interval : '');
         currency = activity.data.transaction.currency;
         tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
@@ -116,7 +116,7 @@ module.exports = {
   /*
    * Posts a message on slack
    */
-
+  
   postMessage: function(msg, attachmentArray, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 
