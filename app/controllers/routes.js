@@ -23,6 +23,7 @@ module.exports = function(app) {
   var webhooks = Controllers.webhooks;
   var stripe = Controllers.stripe;
   var test = Controllers.test;
+  var subscriptions = Controllers.subscriptions;
   var errors = app.errors;
 
 
@@ -45,11 +46,6 @@ module.exports = function(app) {
   app.use(
     mw.apiKey,
     jwt,
-    // expressJwt({
-    //   secret: config.keys.opencollective.secret,
-    //   requestProperty: 'jwtPayload',
-    //   credentialsRequired: true
-    // }),
     mw.identifyFromToken
   );
 
@@ -75,6 +71,7 @@ module.exports = function(app) {
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
+  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
 
   /**
    * User reset password flow
@@ -191,7 +188,8 @@ module.exports = function(app) {
   /**
    * Get the subscriptions of a user
    */
-  app.get('/transactions/subscriptions', mw.jwtScope('subscriptions'), transactions.getSubscriptions);
+  app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
+  app.post('/subscriptions/token', subscriptions.sendTokenByEmail);
 
   /**
    * Error handler.

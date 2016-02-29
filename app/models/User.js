@@ -195,7 +195,15 @@ module.exports = function(Sequelize, DataTypes) {
       jwt: function(application, payload) {
         const secret = config.keys.opencollective.secret;
 
-        return jwt.sign(payload || {}, secret, {
+        // We are sending too much data (large jwt) but the app and website
+        // need the id and email. We will refactor that progressively to have
+        // a smaller token.
+        const data = _.extend({}, payload, {
+          id: this.id,
+          email: this.email
+        });
+
+        return jwt.sign(data, secret, {
           expiresInMinutes: 60 * 24 * 30, // 1 month
           subject: this.id, // user
           issuer: config.host.api,
