@@ -10,6 +10,7 @@ const expect = require('chai').expect;
 const request = require('supertest');
 const config = require('config');
 const utils = require('../test/utils.js')();
+const createTransaction = require('../app/controllers/transactions')(app)._create;
 
 /**
  * Variables.
@@ -755,22 +756,15 @@ describe('transactions.routes.test.js', function() {
    * Get the subscriptions of a user
    */
   describe('#get subscriptions', () => {
-    const stripeSubscriptionId = 'sub_test';
-
     // Create transactions for group1.
     beforeEach((done) => {
-      async.each(transactionsData, (transaction, cb) => {
-        request(app)
-          .post('/groups/' + privateGroup.id + '/transactions')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
-          .send({
-            transaction: _.extend({}, transaction, { stripeSubscriptionId })
-          })
-          .expect(200)
-          .end((e) => {
-            expect(e).to.not.exist;
-            cb();
-          });
+      async.map(transactionsData, (transaction, cb) => {
+        createTransaction({
+          transaction,
+          user,
+          group: privateGroup,
+          subscription: utils.data('subscription1')
+        }, cb);
       }, done);
     });
 
@@ -821,8 +815,10 @@ describe('transactions.routes.test.js', function() {
         .end((err, res) => {
           expect(err).to.not.exist;
           expect(res.body.length).to.be.equal(transactionsData.length);
-          res.body.forEach(t => {
-            expect(t.stripeSubscriptionId).to.be.equal(stripeSubscriptionId)
+          res.body.forEach(sub => {
+            expect(sub).to.be.have.property('stripeSubscriptionId')
+            expect(sub).to.be.have.property('Transactions')
+            expect(sub.Transactions[0]).to.be.have.property('Group')
           });
           done();
         });

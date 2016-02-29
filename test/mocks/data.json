@@ -395,5 +395,11 @@
       "website": "http://scouts.org.uk/home/",
       "twitterHandle": "scouts"
     }
+  },
+  "subscription1": {
+    "amount": 20,
+    "currency": "EUR",
+    "interval": "month",
+    "stripeSubscriptionId": "sub_tokentest"
   }
 }

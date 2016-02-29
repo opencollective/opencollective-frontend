@@ -598,13 +598,18 @@ module.exports = function(app) {
    * Get subscriptions of a user
    */
   const getSubscriptions = (req, res, next) => {
-    models.Transaction.findAll({
-      where: {
-        UserId: req.remoteUser.id,
-        stripeSubscriptionId: {$ne: null}
-      }
+    models.Subscription.findAll({
+      include: [
+        {
+          model: models.Transaction,
+          where: {
+            UserId: req.remoteUser.id
+          },
+          include: [{ model: models.Group }]
+        },
+      ]
     })
-    .then(transactions => res.send(transactions))
+    .then((subscriptions) => res.send(subscriptions))
     .catch(next)
   };
 
