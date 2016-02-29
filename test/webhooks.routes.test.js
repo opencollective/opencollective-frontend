@@ -137,9 +137,16 @@ describe('webhooks.routes.test.js', () => {
 
     // Nock for subscriptions.create.
     beforeEach(() => {
+      var params = [
+        `plan=${planId}`,
+        'application_fee_percent=5',
+        encodeURIComponent('metadata[groupId]') + '=' + group.id,
+        encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
+        encodeURIComponent('metadata[cardId]') + '=1'
+      ].join('&');
+
       nocks['subscriptions.create'] = nock(STRIPE_URL)
-        .post('/v1/customers/' + customerId + '/subscriptions',
-          'plan=' + planId + '&application_fee_percent=5')
+        .post(`/v1/customers/${customerId}/subscriptions`, params)
         .reply(200, webhookSubscription);
     });
 
@@ -160,17 +167,20 @@ describe('webhooks.routes.test.js', () => {
         })
         .expect(200)
         .end((err, res) => {
+          expect(err).to.not.exist;
           expect(res.body.success).to.be.true;
           done();
         });
     });
 
     beforeEach((done) => {
-      models.Transaction
-        .findAndCountAll({
-          where: {
-            stripeSubscriptionId: webhookSubscription.id
-          }
+      models.Transaction.findAndCountAll({
+          include: [
+            {
+              model: models.Subscription,
+              where: { stripeSubscriptionId: webhookSubscription.id }
+            }
+          ]
         })
         .then((res) => {
           firstPayment = res.rows[0];
@@ -200,28 +210,32 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('updates the first transaction', (done) => {
-      models.Transaction
-        .findAndCountAll({
-          where: {
-            stripeSubscriptionId: webhookSubscription.id
+      models.Transaction.findAndCountAll({
+        include: [
+          {
+            model: models.Subscription,
+            where: { stripeSubscriptionId: webhookSubscription.id }
           }
-        })
-        .then((res) => {
-          expect(res.count).to.equal(1);
-          res.rows.forEach((transaction) => {
-            expect(transaction.id).to.be.equal(firstPayment.id);
-            expect(transaction.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
-            expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
-            expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-            expect(transaction.CardId).to.be.equal(firstPayment.CardId);
-            expect(transaction.approved).to.be.true;
-            expect(transaction.currency).to.be.equal(CURRENCY);
-            expect(transaction.type).to.be.equal('payment');
-            expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
-          });
-          done();
-        })
-        .catch(done);
+        ]
+      })
+      .then((res) => {
+        expect(res.count).to.equal(1);
+        res.rows.forEach((transaction) => {
+          expect(transaction.id).to.be.equal(firstPayment.id);
+          expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
+          expect(transaction.UserId).to.be.equal(firstPayment.UserId);
+          expect(transaction.CardId).to.be.equal(firstPayment.CardId);
+          expect(transaction.approved).to.be.true;
+          expect(transaction.currency).to.be.equal(CURRENCY);
+          expect(transaction.type).to.be.equal('payment');
+          expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+          expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
+          expect(transaction.Subscription.isActive).to.be.equal(true);
+          expect(transaction.Subscription).to.have.property('activatedAt');
+        });
+        done();
+      })
+      .catch(done);
     });
 
     it('creates an activity', (done) => {
@@ -256,24 +270,31 @@ describe('webhooks.routes.test.js', () => {
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
-          models.Transaction.findAndCountAll()
-            .then(res => {
-              expect(res.count).to.be.equal(2); // second transaction
-              res.rows.forEach((transaction) => {
-                expect(transaction.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
-                expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
-                expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-                expect(transaction.CardId).to.be.equal(firstPayment.CardId);
-                expect(transaction.approved).to.be.true;
-                expect(transaction.currency).to.be.equal(CURRENCY);
-                expect(transaction.type).to.be.equal('payment');
-                expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
-                expect(transaction.interval).to.be.equal('month');
-              });
+          models.Transaction.findAndCountAll({
+            include: [
+              { model: models.Subscription }
+            ]
+          })
+          .then(res => {
+            expect(res.count).to.be.equal(2); // second transaction
+            res.rows.forEach((transaction) => {
+              expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
+              expect(transaction.UserId).to.be.equal(firstPayment.UserId);
+              expect(transaction.CardId).to.be.equal(firstPayment.CardId);
+              expect(transaction.approved).to.be.true;
+              expect(transaction.currency).to.be.equal(CURRENCY);
+              expect(transaction.type).to.be.equal('payment');
+              expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+              expect(transaction.interval).to.be.equal('month');
 
-              done();
-            })
-            .catch(done);
+              expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
+              expect(transaction.Subscription.isActive).to.be.equal(true);
+              expect(transaction.Subscription).to.have.property('activatedAt');
+            });
+
+            done();
+          })
+          .catch(done);
 
         });
     });

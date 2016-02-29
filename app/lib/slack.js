@@ -75,7 +75,7 @@ module.exports = {
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSANCTION_CREATED:
+      case activities.GROUP_TRANSACTION_CREATED:
 
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
@@ -87,7 +87,7 @@ module.exports = {
         }
         break;
 
-      case activities.GROUP_TRANSANCTION_PAID:
+      case activities.GROUP_TRANSACTION_PAID:
         // Ex: Jon approved a transaction for WWCode-Seattle: USD 12.57 for 'pizza';
         returnVal += `Expense approved on ${this.linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for '${description}'`;
         break;

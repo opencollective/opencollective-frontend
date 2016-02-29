@@ -33,18 +33,13 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    stripeSubscriptionId: DataTypes.STRING, // to keep until migration is done so we don't lose data
+
     interval: {
       type: DataTypes.STRING
     },
 
-    stripeSubscriptionId: DataTypes.STRING,
-
     approved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
-    isWaitingFirstInvoice: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
