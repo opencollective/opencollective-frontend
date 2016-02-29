@@ -8,7 +8,8 @@ const templatesNames = [
   'thankyou',
   'thankyou.wwcode',
   'thankyou.ispcwa',
-  'user.forgot.password'
+  'user.forgot.password',
+  'user.new.token'
 ];
 
 /**
@@ -75,7 +76,6 @@ const EmailLib = (app) => {
     return new Promise((resolve, reject) => {
 
       if(!templates[template]) return reject(new Error("Invalid email template"));
-
       app.mailgun.sendMail({
         from: config.email.from,
         to: recipient,

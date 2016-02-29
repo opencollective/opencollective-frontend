@@ -245,6 +245,12 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
+      generateSubscriptionsLink(application) {
+        const token = this.jwt(application, { scope: 'subscriptions' });
+
+        return `${config.host.website}/subscriptions/${token}`;
+      }
+
     },
 
     classMethods: {

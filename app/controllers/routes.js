@@ -41,12 +41,24 @@ module.exports = function(app) {
   app.param('paykey', params.paykey);
 
   /**
-   * Authentication.
+   * Check api key.
    */
   app.use(
     mw.apiKey,
     jwt,
     mw.identifyFromToken
+  );
+
+  /**
+   * Routes without expiration validation
+   */
+  app.post('/subscriptions/token', subscriptions.sendTokenByEmail);
+
+  /**
+   * Check if the token is expired
+   */
+  app.use(
+    mw.checkJWTExpiration
   );
 
   /**
@@ -189,7 +201,6 @@ module.exports = function(app) {
    * Get the subscriptions of a user
    */
   app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
-  app.post('/subscriptions/token', subscriptions.sendTokenByEmail);
 
   /**
    * Error handler.

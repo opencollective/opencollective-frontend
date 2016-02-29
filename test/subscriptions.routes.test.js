@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+const cheerio = require('cheerio');
 const _ = require('lodash');
 const app = require('../index');
 const async = require('async');
@@ -134,4 +135,67 @@ describe('subscriptions.routes.test.js', () => {
     });
   });
 
+  /**
+   * Send a new link to the user for the subscription page
+   */
+
+  describe('#sendTokenByEmail', () => {
+
+    it('fails if there is no auth', (done) => {
+      request(app)
+        .post('/subscriptions/token')
+        .expect(401, {
+          error: {
+            code: 401,
+            message: "Invalid payload",
+            type: 'unauthorized'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the user does not exist', (done) => {
+      const fakeUser = { id: 12312312 };
+      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
+        expiresInSeconds: 100,
+        subject: fakeUser.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      request(app)
+        .post('/subscriptions/token')
+        .expect(401, {
+          error: {
+            code: 401,
+            message: "Invalid payload",
+            type: 'unauthorized'
+          }
+        })
+        .end(done);
+    });
+
+    it('sends an email with the new valid token', (done) => {
+      const secret = config.keys.opencollective.secret;
+      const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
+        expiresInSeconds: -1,
+        subject: user.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      app.mailgun.sendMail = (options) => {
+        const $ = cheerio.load(options.html);
+        const token = $('a').attr('href').replace('http://localhost:3000/subscriptions/', '');
+        jwt.verify(token, secret, done);
+      };
+
+      request(app)
+        .post('/subscriptions/token/')
+        .set('Authorization', `Bearer ${expiredToken}`)
+        .expect(200)
+        .end(done);
+    });
+
+  });
 });

@@ -5,7 +5,6 @@ var utils = require('../lib/utils');
 var roles = require('../constants/roles');
 var _ = require('lodash');
 var async = require('async');
-var config = require('config');
 var Stripe = require('stripe');
 
 var OC_FEE_PERCENT = 5;
@@ -263,23 +262,14 @@ module.exports = function(app) {
           transactions._create(payload, cb);
         }],
 
-        generateSubscriptionsLink: ['createTransaction', (cb, results) => {
-          const user = results.getOrCreateUser;
-          const token = user.jwt(req.application, {
-            scope: 'subscriptions'
-          });
-
-          cb(null, `${config.host.website}/subscriptions/${token}`);
-        }],
-
-        sendThankYouEmail: ['generateSubscriptionsLink', function(cb, results) {
+        sendThankYouEmail: ['createTransaction', function(cb, results) {
           const user = results.getOrCreateUser;
           const transaction = results.createTransaction;
           const data = {
             transaction: transaction.info,
             user: user.info,
             group: group.info,
-            subscriptionsLink: results.generateSubscriptionsLink
+            subscriptionsLink: user.generateSubscriptionsLink(req.application)
           }
 
           var template = 'thankyou';

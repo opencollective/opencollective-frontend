@@ -412,6 +412,14 @@ module.exports = function(app) {
 
         return next(new errors.Unauthorized('User does not have the scope'));
       }
+    },
+
+    checkJWTExpiration: (req, res, next) => {
+      if (req.jwtExpired) {
+        return next(new errors.Unauthorized('jwt expired'));
+      }
+
+      return next();
     }
 
   };

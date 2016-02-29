@@ -22,9 +22,16 @@ module.exports = (req, res, next) => {
     }
 
     jwt.verify(token, secret, (err, decoded) => {
-      if (err) return next(new Unauthorized(err.message));
+      // JWT library either returns an error or the decoded version
+      if (err && err.name === 'TokenExpiredError') {
+        req.jwtExpired = true;
+        req.jwtPayload = jwt.decode(token, secret); // we need to decode again
+      } else if (err) {
+        return next(new Unauthorized(err.message));
+      } else {
+        req.jwtPayload = decoded;
+      }
 
-      req.jwtPayload = decoded;
       return next();
     });
   } else {

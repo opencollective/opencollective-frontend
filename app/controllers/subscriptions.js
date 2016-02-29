@@ -3,13 +3,26 @@
  */
 module.exports = function(app) {
 
-  const  models = app.set('models');
+  const email = require('../lib/email')(app);
+  const models = app.set('models');
+  const errors = app.errors;
+  const Unauthorized = errors.Unauthorized;
 
   /**
    * Send an email with the new token
    */
-  const sendTokenByEmail = (req, res) => {
-    res.send(200);
+  const sendTokenByEmail = (req, res, next) => {
+    if (!req.jwtPayload || !req.remoteUser) {
+      return next(new Unauthorized('Invalid payload'));
+    }
+
+    const user = req.remoteUser;
+
+    email.send('user.new.token', req.remoteUser.email, {
+      subscriptionsLink: user.generateSubscriptionsLink(req.application)
+    })
+    .then(() => res.send(200))
+    .catch(next);
   };
 
   /**
