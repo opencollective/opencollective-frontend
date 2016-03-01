@@ -59,8 +59,8 @@ module.exports = {
     // get transaction data
     if (activity.data.transaction) {
         amount = activity.data.transaction.amount;
-        var interval = activity.data.transaction.interval;
-        recurringAmount = amount + (typeof interval !== 'undefined' ? '/' + interval : '');
+        const interval = activity.data.transaction.interval;
+        recurringAmount = amount + (interval ? '/' + interval : '');
         currency = activity.data.transaction.currency;
         tags = JSON.stringify(activity.data.transaction.tags);
         description = activity.data.transaction.description;
@@ -75,7 +75,7 @@ module.exports = {
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSANCTION_CREATED:
+      case activities.GROUP_TRANSACTION_CREATED:
 
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
@@ -87,7 +87,7 @@ module.exports = {
         }
         break;
 
-      case activities.GROUP_TRANSANCTION_PAID:
+      case activities.GROUP_TRANSACTION_PAID:
         // Ex: Jon approved a transaction for WWCode-Seattle: USD 12.57 for 'pizza';
         returnVal += `Expense approved on ${this.linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for '${description}'`;
         break;
@@ -116,7 +116,6 @@ module.exports = {
   /*
    * Posts a message on slack
    */
-
   postMessage: function(msg, attachmentArray, channel){
     const slack = new Slack(config.slack.hookUrl,{});
 

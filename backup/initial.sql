@@ -322,7 +322,7 @@ CREATE TABLE "Transactions" (
     description character varying(255),
     amount double precision,
     currency character varying(255) DEFAULT 'USD'::character varying,
-    beneficiary character varying(255),
+    vendor character varying(255),
     paidby character varying(255),
     tags character varying(255)[],
     status character varying(255),
@@ -582,7 +582,7 @@ SELECT pg_catalog.setval('"StripeManagedAccounts_id_seq"', 1, false);
 -- Data for Name: Transactions; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Transactions" (id, type, description, amount, currency, beneficiary, paidby, tags, status, comment, link, approved, "createdAt", "approvedAt", "reimbursedAt", "updatedAt", "GroupId", "UserId", "CardId") FROM stdin;
+COPY "Transactions" (id, type, description, amount, currency, vendor, paidby, tags, status, comment, link, approved, "createdAt", "approvedAt", "reimbursedAt", "updatedAt", "GroupId", "UserId", "CardId") FROM stdin;
 \.
 
 

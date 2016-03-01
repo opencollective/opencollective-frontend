@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "0.0.23",
+  "version": "0.0.25",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman",
   "main": "index.js",
@@ -69,7 +69,7 @@
     "hint": "eslint '**/*.js' --quiet",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
-    "db:migrate:dev": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  development",
+    "db:migrate:dev": "sequelize db:migrate --models-path app/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
     "db:copyprod": "./scripts/db_copy_prod_to_localhost.sh",
     "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh && npm run db:sanitize",

@@ -35,6 +35,7 @@ function setupModels(client) {
     'Group',
     'Paykey',
     'StripeAccount',
+    'Notification',
     'Subscription',
     'Transaction',
     'User',
@@ -71,12 +72,12 @@ function setupModels(client) {
 
   m.Activity.belongsTo(m.Transaction);
 
-  // Subscription.
-  m.User.hasMany(m.Subscription);
-  m.Subscription.belongsTo(m.User);
+  // Notification.
+  m.User.hasMany(m.Notification);
+  m.Notification.belongsTo(m.User);
 
-  m.Subscription.belongsTo(m.Group);
-  m.Group.hasMany(m.Subscription);
+  m.Notification.belongsTo(m.Group);
+  m.Group.hasMany(m.Notification);
 
   // Transaction.
   m.Transaction.belongsTo(m.Group);
@@ -93,6 +94,10 @@ function setupModels(client) {
   // Paypal Pay key.
   m.Paykey.belongsTo(m.Transaction);
   m.Transaction.hasMany(m.Paykey);
+
+  // Subscription
+  m.Transaction.belongsTo(m.Subscription);
+  m.Subscription.hasMany(m.Transaction);
 
   return m;
 };

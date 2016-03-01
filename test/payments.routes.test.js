@@ -1,32 +1,33 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var app = require('../index');
-var async = require('async');
-var config = require('config');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
-var generatePlanId = require('../app/lib/utils.js').planId;
-var sinon = require('sinon');
-var nock = require('nock');
-var chance = require('chance').Chance();
-var roles = require('../app/constants/roles');
+const _ = require('lodash');
+const app = require('../index');
+const async = require('async');
+const config = require('config');
+const expect = require('chai').expect;
+const request = require('supertest');
+const sinon = require('sinon');
+const nock = require('nock');
+const chance = require('chance').Chance();
+
+const utils = require('../test/utils.js')();
+const generatePlanId = require('../app/lib/utils.js').planId;
+const roles = require('../app/constants/roles');
 
 /**
  * Variables.
  */
-var STRIPE_URL = 'https://api.stripe.com:443';
-var CHARGE = 10.99;
-var CURRENCY = 'EUR';
-var STRIPE_TOKEN = 'superStripeToken';
-var EMAIL = 'paypal@email.com';
-var userData = utils.data('user3');
-var groupData = utils.data('group2');
-var transactionsData = utils.data('transactions1').transactions;
-var models = app.set('models');
-var stripeMock = require('./mocks/stripe');
+const STRIPE_URL = 'https://api.stripe.com:443';
+const CHARGE = 10.99;
+const CURRENCY = 'EUR';
+const STRIPE_TOKEN = 'superStripeToken';
+const EMAIL = 'paypal@email.com';
+const userData = utils.data('user3');
+const groupData = utils.data('group2');
+const transactionsData = utils.data('transactions1').transactions;
+const models = app.set('models');
+const stripeMock = require('./mocks/stripe');
 
 /**
  * Tests.
@@ -453,7 +454,7 @@ describe('payments.routes.test.js', () => {
         amount: CHARGE,
         currency: CURRENCY,
         description: 'super description',
-        beneficiary: '@beneficiary',
+        vendor: '@vendor',
         paidby: '@paidby',
         tags: ['tag1', 'tag2'],
         status: 'super status',
@@ -540,12 +541,8 @@ describe('payments.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
             expect(res.rows[0]).to.have.property('paymentMethod', null);
-            expect(res.rows[0]).to.have.property('isWaitingFirstInvoice', false);
-            expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
-            expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-            ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
-              expect(res.rows[0]).to.have.property(prop, data[prop]);
-            });
+            expect(res.rows[0]).to.have.property('amount', data.amount);
+            expect(res.rows[0]).to.have.property('paidby', String(user.id));
             done();
           })
           .catch(done);
@@ -566,7 +563,7 @@ describe('payments.routes.test.js', () => {
         currency: CURRENCY,
         interval: 'month',
         description: 'super description',
-        beneficiary: '@beneficiary',
+        vendor: '@vendor',
         paidby: '@paidby',
         tags: ['tag1', 'tag2'],
         status: 'super status',
@@ -593,11 +590,17 @@ describe('payments.routes.test.js', () => {
         nocks['plans.create'] = nock(STRIPE_URL)
           .post('/v1/plans')
           .reply(200, plan);
+        var params = [
+          `plan=${planId}`,
+          'application_fee_percent=5',
+          encodeURIComponent('metadata[groupId]') + '=' + group2.id,
+          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
+          encodeURIComponent('metadata[cardId]') + '=1'
+        ].join('&');
 
-        nocks['subscriptions.create'] = nock(STRIPE_URL)
-          .post('/v1/customers/' + customerId + '/subscriptions',
-            'plan=' + planId + '&application_fee_percent=5')
-          .reply(200, stripeMock.subscriptions.create);
+      nocks['subscriptions.create'] = nock(STRIPE_URL)
+        .post(`/v1/customers/${customerId}/subscriptions`, params)
+        .reply(200, stripeMock.subscriptions.create);
       });
 
       describe('plan does not exist', () => {
@@ -617,6 +620,7 @@ describe('payments.routes.test.js', () => {
             })
             .expect(200)
             .end((e, res) => {
+              console.log('e', e);
               expect(e).to.not.exist;
               done();
             });
@@ -665,19 +669,33 @@ describe('payments.routes.test.js', () => {
             .then((res) => {
               expect(res.count).to.equal(1);
               expect(res.rows[0]).to.have.property('GroupId', group2.id);
-              expect(res.rows[0]).to.have
-                .property('stripeSubscriptionId', stripeMock.subscriptions.create.id);
-              expect(res.rows[0]).to.have.property('isWaitingFirstInvoice', true);
               expect(res.rows[0]).to.have.property('UserId', 2);
               expect(res.rows[0]).to.have.property('CardId', 1);
               expect(res.rows[0]).to.have.property('currency', CURRENCY);
               expect(res.rows[0]).to.have.property('tags');
               expect(res.rows[0]).to.have.property('interval', plan.interval);
-              expect(res.rows[0].tags[0]).to.equal(data.tags[0]);
-              expect(res.rows[0].tags[1]).to.equal(data.tags[1]);
-              ['amount', 'description', 'beneficiary', 'paidby', 'status', 'link', 'comment'].forEach((prop) => {
-                expect(res.rows[0]).to.have.property(prop, data[prop]);
-              });
+              expect(res.rows[0]).to.have.property('SubscriptionId');
+              expect(res.rows[0]).to.have.property('amount', data.amount);
+              expect(res.rows[0]).to.have.property('paidby', '2');
+              done();
+            })
+            .catch(done);
+        });
+
+
+        it('creates a Subscription model', (done) => {
+          models.Subscription
+            .findAndCountAll({})
+            .then((res) => {
+              const subscription = res.rows[0];
+
+              expect(res.count).to.equal(1);
+              expect(subscription).to.have.property('amount', data.amount);
+              expect(subscription).to.have.property('interval', plan.interval);
+              expect(subscription).to.have.property('stripeSubscriptionId', stripeMock.subscriptions.create.id);
+              expect(subscription).to.have.property('data');
+              expect(subscription).to.have.property('isActive', false);
+              expect(subscription).to.have.property('currency', CURRENCY);
               done();
             })
             .catch(done);

@@ -16,7 +16,7 @@ module.exports = function(Sequelize, DataTypes) {
         }
       }
     },
-    beneficiary: DataTypes.STRING,
+    vendor: DataTypes.STRING,
     paidby: DataTypes.STRING,
     tags: DataTypes.ARRAY(DataTypes.STRING),
     status: DataTypes.STRING,
@@ -33,18 +33,13 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    stripeSubscriptionId: DataTypes.STRING, // to keep until migration is done so we don't lose data
+
     interval: {
       type: DataTypes.STRING
     },
 
-    stripeSubscriptionId: DataTypes.STRING,
-
     approved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
-    isWaitingFirstInvoice: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
@@ -103,7 +98,7 @@ module.exports = function(Sequelize, DataTypes) {
           amount: this.amount,
           vat: this.vat,
           currency: this.currency,
-          beneficiary: this.beneficiary,
+          vendor: this.vendor,
           paidby: this.paidby,
           tags: this.tags,
           status: this.status,

@@ -23,11 +23,11 @@ module.exports = function(app) {
   var users = require('../controllers/users')(app);
   var emailLib = require('../lib/email')(app);
 
-  var getOrCreatePlan = function(params, cb) {
+  const getOrCreatePlan = (params, cb) => {
     var stripe = params.stripe;
     var plan = params.plan;
 
-    stripe.plans.retrieve(plan.id, function(err, result) {
+    stripe.plans.retrieve(plan.id, (err, result) => {
       var type = err && err.type;
       var message = err && err.message;
 
@@ -150,6 +150,7 @@ module.exports = function(app) {
            * Subscription
            */
           if (isSubscription) {
+
             var id = utils.planId({
               currency,
               interval,
@@ -165,13 +166,18 @@ module.exports = function(app) {
                 currency
               },
               stripe
-            }, function(err, plan) {
+            }, (err, plan) => {
               if (err) return cb(err);
 
               stripe.customers
                 .createSubscription(card.serviceId, {
                   plan: plan.id,
-                  application_fee_percent: OC_FEE_PERCENT
+                  application_fee_percent: OC_FEE_PERCENT,
+                  metadata: {
+                    groupId: group.id,
+                    groupName: group.name,
+                    cardId: card.id
+                  }
                 }, cb);
             });
 
@@ -220,50 +226,40 @@ module.exports = function(app) {
         }],
 
         createTransaction: ['getOrCreateUser', 'createCard', 'createCharge', function(cb, results) {
-          var charge = results.createCharge;
-          var user = results.getOrCreateUser;
+          const charge = results.createCharge;
+          const user = results.getOrCreateUser;
+          const card = results.createCard;
+          const currency = charge.currency || charge.plan.currency;
+          const amount = payment.amount;
 
-          var description = ['Donation to', group && group.name].join(' ');
-          var transaction = {
+          var payload = {
+            user,
+            group,
+            card
+          };
+
+          payload.transaction = {
             type: 'payment',
-            amount: payment.amount,
-            currency: charge.currency || charge.plan.currency,
+            amount,
+            currency,
             paidby: user && user.id,
-            description,
+            description: `Donation to ${group.name}`,
             tags: ['Donation'],
             approved: true,
             interval
           };
 
           if (isSubscription) {
-            transaction.stripeSubscriptionId = charge.id;
-
-            // We will put this transaction on pending until we get the first invoice
-            // from the webhook. This needs to be refactored when we have a separation
-            // between transactions and payments.
-            transaction.isWaitingFirstInvoice = true;
+            payload.subscription = {
+              amount,
+              currency,
+              interval,
+              stripeSubscriptionId: charge.id,
+              data: results.createCharge
+            };
           }
 
-          [
-            'description',
-            'beneficiary',
-            'paidby',
-            'tags',
-            'status',
-            'link',
-            'comment',
-            'interval'
-          ].forEach((prop) => {
-            if (payment[prop])
-              transaction[prop] = payment[prop];
-          });
-
-          transactions._create({
-            transaction,
-            user,
-            group,
-            card: results.createCard
-          }, cb);
+          transactions._create(payload, cb);
         }],
 
         sendThankYouEmail: ['createTransaction', function(cb, results) {

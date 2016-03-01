@@ -1,35 +1,44 @@
-const slackLib = require('../lib/slack');
+/*
+ * Create a notification to receive certain type of events
+ *
+ * Notification.create({
+ *  UserId, GroupId, type = 'group.transaction.created', channel='email'
+ * })
+ * Notification.unsubscribe(); // To disable a notification
+ */
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Activity = Sequelize.define('Activity', {
+  var Notification = Sequelize.define('Notification', {
+
+    channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
+
     type: DataTypes.STRING,
 
-    data: DataTypes.JSON,
+    active: { defaultValue: true, type: DataTypes.BOOLEAN },
 
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     }
   }, {
-    updatedAt: false,
+    defaultScope: {
+      where: { active: true }
+    },
 
-    hooks: {
-      afterCreate: function(activity) {
-        if (process.env.NODE_ENV === 'production') {
-          slackLib.postActivity(activity);
-        }
-      }
-    }
+    indexes: [{
+      fields: ['type', 'GroupId', 'UserId'],
+      type: 'unique'
+    }]
+
   });
 
-  return Activity;
+  return Notification;
 };
-
 
 /*
 Types:
-  + user.created
+  + activities.USER_CREATED
       data: user.info
       UserId: the one created
   - user.updated
@@ -65,7 +74,7 @@ Types:
       data: group, user (caller), target (the deleted user)
       2* Userid: the deleted user + the caller
 
-  - constants.GROUP_TRANSACTION_CREATED
+  - activities.GROUP_TRANSACTION_CREATED
       data: group, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
       GroupId:
@@ -75,12 +84,9 @@ Types:
       UserId: the one who initiate the delete
       GroupId:
       TransactionId:
-  - constants.GROUP_TRANSACTION_PAID
+  - activities.GROUP_TRANSACTION_PAID
       data: group, transaction, user (the caller), pay (paypal payload)
       UserId:
       GroupId:
       TransactionId:
-
-  + constants.WEBHOOK_STRIPE_RECEIVED
-    data: event (from Stripe)
 */

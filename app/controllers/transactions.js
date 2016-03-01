@@ -18,7 +18,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var Transaction = models.Transaction;
   var Activity = models.Activity;
-  var Subscription = models.Subscription;
+  var Notification = models.Notification;
   var Paykey = models.Paykey;
   var User = models.User;
   var Card = models.Card;
@@ -31,6 +31,7 @@ module.exports = function(app) {
    */
   var create = (args, callback) => {
     var transaction = args.transaction;
+    const subscription = args.subscription;
     var user = args.user || {};
     var group = args.group || {};
     var card = args.card || {};
@@ -40,7 +41,13 @@ module.exports = function(app) {
       createTransaction: (cb) => {
         Transaction
           .create(transaction)
-          .done(cb);
+          .then(t => {
+            if (!subscription) return cb(null, t);
+
+            return t.createSubscription(subscription)
+              .then(() => cb(null, t));
+          })
+          .catch(cb)
       },
 
       addTransactionToUser: ['createTransaction', (cb, results) => {
@@ -80,7 +87,7 @@ module.exports = function(app) {
 
         // Create activity.
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_CREATED,
+          type: activities.GROUP_TRANSACTION_CREATED,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -96,7 +103,7 @@ module.exports = function(app) {
       notifySubscribers: ['createActivity', (cb, results) => {
         var activity = results.createActivity;
 
-        Subscription.findAll({
+        Notification.findAll({
           include:{
             model: User,
             attributes: ['email']
@@ -105,8 +112,8 @@ module.exports = function(app) {
             type: activity.type,
             GroupId: activity.GroupId
           }
-        }).then((subscriptions) => {
-          return subscriptions.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
+        }).then((notifications) => {
+          return notifications.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
         })
         .then(() => cb())
         .catch((err) => {
@@ -291,7 +298,7 @@ module.exports = function(app) {
 
       createActivity: ['updatePaykey', 'updateTransaction', function(cb) {
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_PAID,
+          type: activities.GROUP_TRANSACTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: transaction.id,
@@ -489,7 +496,7 @@ module.exports = function(app) {
 
       createActivity: ['callService', 'updateTransaction', function(cb, results) {
         Activity.create({
-          type: activities.GROUP_TRANSANCTION_PAID,
+          type: activities.GROUP_TRANSACTION_PAID,
           UserId: user.id,
           GroupId: group.id,
           TransactionId: results.updateTransaction.id,
