@@ -6,7 +6,7 @@ const setupModels = require('../app/models').setupModels;
 
 // Hard code to avoid resetting the production db by mistake    
 const databaseName = config.env === 'test_server' 
-    ? 'opencollective_testserver'
+    ? 'opencollective_test'
     : 'dd7n9gp6tr4u36';
 
 var sequelize = new Sequelize(
