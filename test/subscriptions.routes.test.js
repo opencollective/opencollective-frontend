@@ -2,6 +2,7 @@
  * Dependencies.
  */
 const cheerio = require('cheerio');
+const nock = require('nock');
 const _ = require('lodash');
 const app = require('../index');
 const async = require('async');
@@ -12,10 +13,12 @@ const request = require('supertest');
 const config = require('config');
 const utils = require('../test/utils.js')();
 const createTransaction = require('../app/controllers/transactions')(app)._create;
+const stripeMock = require('./mocks/stripe');
 
 /**
  * Variables.
  */
+const STRIPE_URL = 'https://api.stripe.com:443';
 var models = app.set('models');
 var transactionsData = utils.data('transactions1').transactions;
 var roles = require('../app/constants/roles');
@@ -28,9 +31,11 @@ describe('subscriptions.routes.test.js', () => {
   var group;
   var user;
   var application;
+  var card;
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
+      expect(e).to.not.exist;
       application = app;
       done();
     });
@@ -54,12 +59,30 @@ describe('subscriptions.routes.test.js', () => {
     });
   });
 
-
   // Add user to the group.
   beforeEach((done) => {
     group
       .addUserWithRole(user, roles.HOST)
       .done(done);
+  });
+
+  // create stripe account
+  beforeEach((done) => {
+    models.StripeAccount.create({
+      accessToken: 'sktest_123'
+    })
+    .then((account) => user.setStripeAccount(account))
+    .then(() => done())
+    .catch(done);
+  });
+
+  // Create a card.
+  beforeEach((done) => {
+    models.Card.create(utils.data('card2')).done((e, c) => {
+      expect(e).to.not.exist;
+      card = c;
+      done();
+    });
   });
 
   /**
@@ -72,7 +95,7 @@ describe('subscriptions.routes.test.js', () => {
         createTransaction({
           transaction,
           user,
-          group: group,
+          group,
           subscription: utils.data('subscription1')
         }, cb);
       }, done);
@@ -197,5 +220,112 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
+  });
+
+  /**
+   * Cancel subscription
+   */
+  describe('#cancel', () => {
+
+    const subscription = utils.data('subscription1');
+    var transaction;
+    var nocks = {};
+
+    beforeEach((done) => {
+      createTransaction({
+        transaction: transactionsData[0],
+        user,
+        group,
+        subscription,
+        card
+      }, (err, t) => {
+        transaction = t;
+        done(err);
+      });
+    });
+
+    beforeEach(() => {
+      nocks['subscriptions.delete'] = nock(STRIPE_URL)
+        .delete(`/v1/customers/${card.serviceId}/subscriptions/${subscription.stripeSubscriptionId}`)
+        .reply(200, stripeMock.subscriptions.create);
+    });
+
+    afterEach(() => nock.cleanAll());
+
+    it('fails if the scope is not subscriptions', (done) => {
+      request(app)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
+        .set('Authorization', 'Bearer ' + user.jwt(application, {
+          scope: ''
+        }))
+        .expect(401, {
+          error: {
+            code: 401,
+            type: 'unauthorized',
+            message: 'User does not have the scope'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the token expired', (done) => {
+      const expiredToken = jwt.sign({
+        user,
+        scope: 'subscriptions'
+      }, config.keys.opencollective.secret, {
+        expiresInSeconds: -1,
+        subject: user.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      request(app)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
+        .set('Authorization', 'Bearer ' + expiredToken)
+        .end((err, res) => {
+          expect(res.body.error.code).to.be.equal(401);
+          expect(res.body.error.message).to.be.equal('jwt expired');
+          done();
+        });
+    });
+
+    it('fails if the subscription does not exist', (done) => {
+      request(app)
+        .post('/subscriptions/12345/cancel')
+        .set('Authorization', 'Bearer ' + user.jwt(application, {
+          scope: 'subscriptions'
+        }))
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'No subscription found with id 12345'
+          }
+        })
+        .end(done);
+    });
+
+    it('cancels the transaction', (done) => {
+       request(app)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
+        .set('Authorization', 'Bearer ' + user.jwt(application, {
+          scope: 'subscriptions'
+        }))
+        .expect(200)
+        .end((err, res) => {
+          expect(err).to.not.exist;
+          expect(res.body.success).to.be.true;
+          expect(nocks['subscriptions.delete'].isDone()).to.be.true;
+
+          models.Subscription.findAll({})
+            .then(subscriptions => {
+              const sub = subscriptions[0];
+              expect(sub.isActive).to.be.false;
+              expect(sub.deactivatedAt).to.be.ok;
+              done();
+            })
+            .catch(done);
+        });
+    });
   });
 });
