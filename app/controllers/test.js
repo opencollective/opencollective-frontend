@@ -96,32 +96,56 @@ module.exports = function(app) {
         .catch(cb);
       }],
       
-      addTransaction1: ['createGroup', (cb, results) => {
-        var t1 = {
-          "description": "Saving the world",
-          "amount": 100,
+      addDonation1: ['createGroup', (cb, results) => {
+        models.Transaction.create({
+          "description": "Donation 1",
+          "amount": 1,
           "currency": "EUR",
           "paidby": "@semdubois",
           "createdAt": "2016-02-29T08:00:00.000Z"
-        };
-        t1.GroupId = results.createGroup.id;
-        models.Transaction.create(t1)
-          .then(() => cb())
-          .catch(cb);
+        })
+        .then(t => t.setGroup(results.createGroup))
+        .then(() => cb())
+        .catch(cb);
       }],
       
-      addTransaction2: ['createGroup', (cb, results) => {
-        var t2 = {
-          "description": "Having a break",
-          "amount": -10,
+      addDonation2: ['createGroup', (cb, results) => {
+        models.Transaction.create({
+          "description": "Donation 2",
+          "amount": 2,
           "currency": "EUR",
           "paidby": "@semdubois",
           "createdAt": "2016-03-01T08:00:00.000Z"
-        };
-        t2.GroupId = results.createGroup.id;
-        models.Transaction.create(t2)
-          .then(() => cb())
-          .catch(cb);
+        })
+        .then(t => t.setGroup(results.createGroup))
+        .then(() => cb())
+        .catch(cb);
+      }],
+      
+      addExpense1: ['createGroup', (cb, results) => {
+        models.Transaction.create({
+          "description": "Expense 1",
+          "amount": -1,
+          "currency": "EUR",
+          "paidby": "@semdubois",
+          "createdAt": "2016-02-29T08:00:00.000Z"
+        })
+        .then(t => t.setGroup(results.createGroup))
+        .then(() => cb())
+        .catch(cb);
+      }],
+      
+      addExpense2: ['createGroup', (cb, results) => {
+        models.Transaction.create({
+          "description": "Expense 2",
+          "amount": -2,
+          "currency": "EUR",
+          "paidby": "@semdubois",
+          "createdAt": "2016-03-01T08:00:00.000Z"
+        })
+        .then(t => t.setGroup(results.createGroup))
+        .then(() => cb())
+        .catch(cb);
       }]
     }, (err) => {
       if (err) {
