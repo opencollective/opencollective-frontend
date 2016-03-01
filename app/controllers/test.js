@@ -73,24 +73,55 @@ module.exports = function(app) {
         .done(cb);
       }],
 
-      createGroupAndAddUser: ['createTestUser', (cb, results) => {
+      createGroup: ['createTestUser', (cb) => {
         models.Group.create({
           name: 'OpenCollective Test Group',
           description: 'OpenCollective test group on the test server',
           slug: 'testcollective',
           isPublic: true
         })
-        .then(group => {
-          return group.addUserWithRole(results.createTestUser, roles.HOST)
-        })
-        .then(() => cb())
-        .catch(cb);
+        .done(cb);
+      }],
+      
+      addUserToGroup: ['createGroup', (cb, results) => {
+        const group = results.createGroup;
+        group.addUserWithRole(results.createTestUser, roles.HOST)
+          .then(() => cb())
+          .catch(cb)
       }],
 
       createPaypalCard: ['createTestUser', (cb, results) => {
         models.Card.create({ service: 'paypal', UserId: results.createTestUser.id})
         .then(() => cb())
         .catch(cb);
+      }],
+      
+      addTransaction1: ['createGroup', (cb, results) => {
+        var t1 = {
+          "description": "Saving the world",
+          "amount": 100,
+          "currency": "EUR",
+          "paidby": "@semdubois",
+          "createdAt": "2016-02-29T08:00:00.000Z"
+        };
+        t1.GroupId = results.createGroup.id;
+        models.Transaction.create(t1)
+          .then(() => cb())
+          .catch(cb);
+      }],
+      
+      addTransaction2: ['createGroup', (cb, results) => {
+        var t2 = {
+          "description": "Having a break",
+          "amount": -10,
+          "currency": "EUR",
+          "paidby": "@semdubois",
+          "createdAt": "2016-03-01T08:00:00.000Z"
+        };
+        t2.GroupId = results.createGroup.id;
+        models.Transaction.create(t2)
+          .then(() => cb())
+          .catch(cb);
       }]
     }, (err) => {
       if (err) {
