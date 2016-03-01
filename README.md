@@ -16,6 +16,7 @@ Now, assuming the postgres database superuser is `postgres`, let's create the da
 ```
 createdb -U postgres opencollective_localhost
 createdb -U postgres opencollective_test
+createdb -U postgres opencollective_testserver
 createuser -U postgres opencollective
 psql -U postgres
 > GRANT ALL PRIVILEGES ON DATABASE opencollective_localhost TO opencollective;
