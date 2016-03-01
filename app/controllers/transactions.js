@@ -595,6 +595,25 @@ module.exports = function(app) {
   };
 
   /**
+   * Get subscriptions of a user
+   */
+  const getSubscriptions = (req, res, next) => {
+    models.Subscription.findAll({
+      include: [
+        {
+          model: models.Transaction,
+          where: {
+            UserId: req.remoteUser.id
+          },
+          include: [{ model: models.Group }]
+        },
+      ]
+    })
+    .then((subscriptions) => res.send(subscriptions))
+    .catch(next)
+  };
+
+  /**
    * Public methods.
    */
   return {
@@ -603,7 +622,8 @@ module.exports = function(app) {
     getPayKey,
     confirmPayment,
     pay,
-    attributeUser
+    attributeUser,
+    getSubscriptions
   }
 
 };

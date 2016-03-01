@@ -1,8 +1,7 @@
 var _ = require('lodash');
 var serverStatus = require('express-server-status');
-var expressJwt = require('express-jwt');
 var roles = require('../constants/roles');
-var config = require('config');
+var jwt = require('../middlewares/jwt');
 
 module.exports = function(app) {
 
@@ -24,6 +23,7 @@ module.exports = function(app) {
   var webhooks = Controllers.webhooks;
   var stripe = Controllers.stripe;
   var test = Controllers.test;
+  var subscriptions = Controllers.subscriptions;
   var errors = app.errors;
 
 
@@ -41,9 +41,25 @@ module.exports = function(app) {
   app.param('paykey', params.paykey);
 
   /**
-   * Authentication.
+   * Check api key.
    */
-  app.use(mw.apiKey, expressJwt({secret: config.keys.opencollective.secret, userProperty: 'remoteUser', credentialsRequired: false}), mw.identifyFromToken);
+  app.use(
+    mw.apiKey,
+    jwt,
+    mw.identifyFromToken
+  );
+
+  /**
+   * Routes without expiration validation
+   */
+  app.post('/subscriptions/token', subscriptions.sendTokenByEmail);
+
+  /**
+   * Check if the token is expired
+   */
+  app.use(
+    mw.checkJWTExpiration
+  );
 
   /**
    * NotImplemented response.
@@ -67,6 +83,7 @@ module.exports = function(app) {
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
+  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
 
   /**
    * User reset password flow
@@ -179,6 +196,11 @@ module.exports = function(app) {
    * Reset test-api database
    */
   app.get('/database/reset', test.resetTestDatabase);
+
+  /**
+   * Get the subscriptions of a user
+   */
+  app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
 
   /**
    * Error handler.

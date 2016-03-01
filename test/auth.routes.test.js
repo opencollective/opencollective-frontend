@@ -94,9 +94,6 @@ describe('auth.routes.test.js', function() {
           expect(res.body).to.have.property('access_token');
           expect(res.body).to.have.property('refresh_token');
           var data = jwt.decode(res.body.access_token);
-          expect(data).to.have.property('id');
-          expect(data).to.have.property('username');
-          expect(data).to.have.property('name');
           expect(data).to.have.property('iat');
           expect(data).to.have.property('exp');
           expect(data).to.have.property('aud');

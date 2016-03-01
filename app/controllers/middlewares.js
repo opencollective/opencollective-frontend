@@ -155,15 +155,13 @@ module.exports = function(app) {
      *    full application's model
      */
     identifyFromToken: function(req, res, next) {
-      if (!req.remoteUser)
+      if (!req.jwtPayload || !req.jwtPayload.sub) {
         return next();
-
-      var appId = req.remoteUser.aud;
-
+      }
       async.parallel([
         function(cb) {
           User
-            .find(req.remoteUser.id)
+            .find(req.jwtPayload.sub)
             .then(function(user) {
               req.remoteUser = user;
               cb();
@@ -171,9 +169,11 @@ module.exports = function(app) {
             .catch(cb);
         },
         function(cb) {
+          const appId = parseInt(req.jwtPayload.aud);
+
           // Check the validity of the application in the token.
           Application
-            .find(parseInt(appId))
+            .find(appId)
             .then(function(application) {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));
@@ -400,6 +400,26 @@ module.exports = function(app) {
 
         next();
       };
+    },
+
+    jwtScope: (scope) => {
+      return (req, res, next) => {
+        const userScope = req.jwtPayload.scope;
+
+        if (scope === userScope) {
+          return next();
+        }
+
+        return next(new errors.Unauthorized('User does not have the scope'));
+      }
+    },
+
+    checkJWTExpiration: (req, res, next) => {
+      if (req.jwtExpired) {
+        return next(new errors.CustomError(401, 'jwt_expired', 'jwt expired'));
+      }
+
+      return next();
     }
 
   };

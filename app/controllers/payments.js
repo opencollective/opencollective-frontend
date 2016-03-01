@@ -268,8 +268,10 @@ module.exports = function(app) {
           const data = {
             transaction: transaction.info,
             user: user.info,
-            group: group.info
+            group: group.info,
+            subscriptionsLink: user.generateSubscriptionsLink(req.application)
           }
+
           var template = 'thankyou';
           if(group.name.match(/WWCode/i))
             template += '.wwcode';

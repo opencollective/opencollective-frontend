@@ -37,8 +37,9 @@ module.exports = function() {
       group: {
         name: 'OpenCollective Demo',
         description: 'OpenCollective Demo group',
+        isPublic: true,
+        slug: 'opencollective'
       },
-      stripeEmail: user.email,
       role: roles.HOST
     };
 

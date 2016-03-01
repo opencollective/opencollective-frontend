@@ -1,13 +1,16 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var app = require('../index');
-var async = require('async');
-var sinon = require('sinon');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const _ = require('lodash');
+const app = require('../index');
+const async = require('async');
+const sinon = require('sinon');
+const jwt = require('jsonwebtoken');
+const expect = require('chai').expect;
+const request = require('supertest');
+const config = require('config');
+const utils = require('../test/utils.js')();
+const createTransaction = require('../app/controllers/transactions')(app)._create;
 
 /**
  * Variables.
