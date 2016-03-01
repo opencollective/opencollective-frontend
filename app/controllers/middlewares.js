@@ -416,7 +416,7 @@ module.exports = function(app) {
 
     checkJWTExpiration: (req, res, next) => {
       if (req.jwtExpired) {
-        return next(new errors.Unauthorized('jwt expired'));
+        return next(new errors.CustomError(401, 'jwt_expired', 'jwt expired'));
       }
 
       return next();

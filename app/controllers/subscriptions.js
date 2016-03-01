@@ -21,7 +21,7 @@ module.exports = function(app) {
     email.send('user.new.token', req.remoteUser.email, {
       subscriptionsLink: user.generateSubscriptionsLink(req.application)
     })
-    .then(() => res.send(200))
+    .then(() => res.send({ success: true }))
     .catch(next);
   };
 
