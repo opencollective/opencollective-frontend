@@ -4,22 +4,17 @@ const config = require('config');
 var Sequelize = require('sequelize');
 const setupModels = require('../app/models').setupModels;
 
-/**
- * Hard code to avoid resetting the production db by mistake
- */
+// Hard code to avoid resetting the production db by mistake    
+const databaseName = config.env === 'test_server' 
+    ? 'opencollective_testserver'
+    : 'dd7n9gp6tr4u36';
+
 var sequelize = new Sequelize(
-  'dd7n9gp6tr4u36',
-  'oshthceeahwmdn',
-  'JalG9GcCdddujhfRVlBV5TJRm3', {
-    host: 'ec2-54-83-194-117.compute-1.amazonaws.com',
-    "port": 5432,
-    "dialect": "postgres",
-    "protocol": "postgres",
-    "logging": true,
-    "dialectOptions": {
-      "ssl": true
-    }
-});
+  databaseName,
+  config.database.username,
+  config.database.password,
+  config.database.options
+);
 
 /**
  * Copy app/models/index.js logic to get the sequelize models;
@@ -34,7 +29,7 @@ const testUser = {
   password: 'password'
 };
 
-if (config.env !== 'test_server') {
+if (config.env !== 'test_server' && config.env !== 'circleci_test_server') {
   console.log('wrong env', config.env);
   return;
 }
@@ -60,9 +55,13 @@ async.auto({
   }],
 
   createGroupAndAddUser: ['createTestUser', (cb, results) => {
+    console.log("createGroupAndAddUser!");
+      
     models.Group.create({
       name: 'OpenCollective Test Group',
       description: 'OpenCollective test group',
+      isPublic: true,
+      slug: 'testcollective'
     })
     .then(group => {
       return group.addUser(results.createTestUser, {role: roles.HOST})

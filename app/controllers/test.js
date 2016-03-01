@@ -13,26 +13,21 @@ module.exports = function(app) {
   var resetTestDatabase = function(req, res, next) {
 
     // Check to make sure this is the test_server
-    if (config.env !== 'test_server') {
+    if (config.env !== 'test_server' && config.env !== 'circleci_test_server') {
       return next(new errors.BadRequest('Must only be run on test server'));
     }
 
-    /**
-     * Hard code to avoid resetting the production db by mistake
-     */
+    // Hard code to avoid resetting the production db by mistake    
+    const databaseName = config.env === 'test_server' 
+      ? 'opencollective_testserver'
+      : 'dd7n9gp6tr4u36';
+
     const sequelize = new Sequelize(
-      'dd7n9gp6tr4u36',
-      'oshthceeahwmdn',
-      'JalG9GcCdddujhfRVlBV5TJRm3', {
-        host: 'ec2-54-83-194-117.compute-1.amazonaws.com',
-        "port": 5432,
-        "dialect": "postgres",
-        "protocol": "postgres",
-        "logging": true,
-        "dialectOptions": {
-          "ssl": true
-        }
-    });
+      databaseName,
+      config.database.username,
+      config.database.password,
+      config.database.options
+    );
 
     const models = setupModels(sequelize);
 

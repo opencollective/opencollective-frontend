@@ -1,0 +1,16 @@
+{
+  "database": {
+    "database": "opencollective_testserver",
+    "username": "oshthceeahwmdn",
+    "password": "JalG9GcCdddujhfRVlBV5TJRm3", 
+    "options": {
+      "host": "ec2-54-83-194-117.compute-1.amazonaws.com",
+      "port": 5432,
+      "protocol": "postgres", 
+      "logging": true,
+      "dialectOptions": {
+        "ssl": true
+      }
+    }   
+  }
+}

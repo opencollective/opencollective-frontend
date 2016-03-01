@@ -3,12 +3,14 @@
  */
 var express = require('express');
 var app = express();
+var _ = require('lodash');
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'development';
 }
 
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+if (_.contains(['test', 'development', 'test_server', 'circleci_test_server'],
+               process.env.NODE_ENV)) {
   require('./app/lib/load-dot-env')();
 }
 
