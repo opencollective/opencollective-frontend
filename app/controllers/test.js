@@ -19,7 +19,7 @@ module.exports = function(app) {
 
     // Hard code to avoid resetting the production db by mistake    
     const databaseName = config.env === 'test_server' 
-      ? 'opencollective_testserver'
+      ? 'opencollective_test'
       : 'dd7n9gp6tr4u36';
 
     const sequelize = new Sequelize(
