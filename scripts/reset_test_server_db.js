@@ -4,9 +4,13 @@ const config = require('config');
 var Sequelize = require('sequelize');
 const setupModels = require('../app/models').setupModels;
 
+// Hard code to avoid resetting the production db by mistake    
+const databaseName = config.env === 'test_server' 
+    ? 'opencollective_testserver'
+    : 'dd7n9gp6tr4u36';
+
 var sequelize = new Sequelize(
-  // Hard code to avoid resetting the production db by mistake
-  'opencollective_testserver',
+  databaseName,
   config.database.username,
   config.database.password,
   config.database.options
@@ -25,7 +29,7 @@ const testUser = {
   password: 'password'
 };
 
-if (config.env !== 'test_server') {
+if (config.env !== 'test_server' && config.env !== 'circleci_test_server') {
   console.log('wrong env', config.env);
   return;
 }
