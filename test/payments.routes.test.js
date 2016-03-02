@@ -548,7 +548,8 @@ describe('payments.routes.test.js', () => {
           .catch(done);
       });
 
-      it('successfully send a thank you email', (done) => {
+      // TODO: Add when subscription email is brought back
+      it.skip('successfully send a thank you email', (done) => {
         expect(mailgunStub.lastCall.args[0].to).to.equal(userData.email);
         done();
       });

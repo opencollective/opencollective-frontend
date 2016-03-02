@@ -21,7 +21,8 @@ module.exports = function(app) {
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
   var users = require('../controllers/users')(app);
-  var emailLib = require('../lib/email')(app);
+  // TODO: reenable when subscriptions email is reenabled
+  // var emailLib = require('../lib/email')(app);
 
   const getOrCreatePlan = (params, cb) => {
     var stripe = params.stripe;
@@ -262,6 +263,8 @@ module.exports = function(app) {
           transactions._create(payload, cb);
         }],
 
+        // TODO: reenable after subscriptions is more stable
+        /*
         sendThankYouEmail: ['createTransaction', function(cb, results) {
           const user = results.getOrCreateUser;
           const transaction = results.createTransaction;
@@ -278,9 +281,10 @@ module.exports = function(app) {
           if(group.name.match(/ispcwa/i))
             template += '.ispcwa';
 
-          emailLib.send(template, user.email, data);
+          // emailLib.send(template, user.email, data);
           cb();
         }],
+        */
 
         addUserToGroup: ['createTransaction', function(cb, results) {
           user = results.getOrCreateUser;
