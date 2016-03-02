@@ -41,12 +41,14 @@ describe('lib.slack.test.js', function() {
     obj = slackLib.formatActivity(activitiesData[15]);
     expect(obj.msg).to.equal('Stripe event received: invoice.payment_succeeded')
     expect(obj.attachmentArray).to.deep.equal(
-      [{"text": {
-          "event": {
-            "type": "invoice.payment_succeeded"
-          },
-        },
-        "title": "Data"
+      [{"fields": [
+          {
+            "title": "event.type",
+            "value": "invoice.payment_succeeded"
+          }
+        ],
+        "title": "Data",
+        "color": "good"
       }]);
   });
 
