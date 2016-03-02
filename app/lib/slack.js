@@ -5,6 +5,7 @@
 const Slack = require('node-slack');
 const config = require('config');
 const activities = require('../constants/activities');
+const flatten = require('flat');
 
 module.exports = {
 
@@ -13,7 +14,7 @@ module.exports = {
    */
 
   postActivity: function(activity) {
-    obj = this.formatActivity(activity);
+    const obj = this.formatActivity(activity);
     this.postMessage(obj.msg, obj.attachmentArray);
   },
 
@@ -80,7 +81,7 @@ module.exports = {
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
           returnVal += `Woohoo! ${userString} gave ${currency} ${recurringAmount} to ${this.linkifyForSlack(publicUrl, groupName)}!`;
-
+          
         } else if (activity.data.transaction.isExpense) {
           // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
           returnVal += `Hurray! ${userString} submitted a ${tags} expense to ${this.linkifyForSlack(publicUrl, groupName)}: ${currency} ${amount} for ${description}!`
@@ -99,7 +100,7 @@ module.exports = {
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
         returnVal += `Stripe event received: ${eventType}`;
-        attachmentArray.push({title: 'Data', text: activity.data});
+        attachmentArray.push(formatAttachment(activity.data));
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:
@@ -118,7 +119,7 @@ module.exports = {
    */
   postMessage: function(msg, attachmentArray, channel){
     const slack = new Slack(config.slack.hookUrl,{});
-
+    
     return slack.send({
       text: msg,
       channel: channel || config.slack.activityChannel,
@@ -144,4 +145,19 @@ module.exports = {
     }
     return `<${link}|${text}>`;
   }
+}
+
+function formatAttachment(json) {
+  const flattenedData = flatten(json);
+  const fields = Object.keys(flattenedData).map(key => { 
+    return {
+      title: key,
+      value: flattenedData[key]
+    }
+  });
+  return {
+    title: 'Data',
+    color: 'good',
+    fields
+  };
 }
