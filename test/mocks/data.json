@@ -114,7 +114,8 @@
 
   "card2": {
     "token": "stripetoken123",
-    "service": "stripe"
+    "service": "stripe",
+    "serviceId": "cus_123"
   },
 
   "activities1": {

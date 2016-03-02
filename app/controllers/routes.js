@@ -198,9 +198,10 @@ module.exports = function(app) {
   app.get('/database/reset', test.resetTestDatabase);
 
   /**
-   * Get the subscriptions of a user
+   * Stripe subscriptions (recurring payments)
    */
   app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
+  app.post('/subscriptions/:subscriptionid/cancel', mw.jwtScope('subscriptions'), subscriptions.cancel);
 
   /**
    * Error handler.
