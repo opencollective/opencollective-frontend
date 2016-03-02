@@ -15,11 +15,12 @@ models.Transaction.findAll({
    include: [
     { model: models.Group },
     { model: models.User },
-    { model: models.Card }
+    { model: models.Card },
+    { model: models.Subscription }
   ]
 })
 .map((transaction) => {
-  if (!transaction.stripeSubscriptionId) {
+  if (!transaction.Subscription) {
     return Promise.resolve();
   }
 
@@ -35,7 +36,7 @@ models.Transaction.findAll({
   .then(stripe => {
     return stripe.customers.retrieveSubscription(
       transaction.Card.serviceId, // cus_
-      transaction.stripeSubscriptionId // sub_
+      transaction.Subscription.stripeSubscriptionId // sub_
     )
     .catch((err) => {
       if (err.type === 'StripeInvalidRequest') {
@@ -45,12 +46,12 @@ models.Transaction.findAll({
       return Promise.reject(err);
     });
   })
-  .then(subscription => {
-    if (!subscription) return ;
+  .then(stripeSubscription => {
+    if (!stripeSubscription) return ;
 
-    const currency = subscription.plan.currency.toUpperCase();
-    const amount = subscription.plan.amount / 100;
-    const url = `https://dashboard.stripe.com/${accountId}/plans/${subscription.plan.id}`;
+    const currency = stripeSubscription.plan.currency.toUpperCase();
+    const amount = stripeSubscription.plan.amount / 100;
+    const url = `https://dashboard.stripe.com/${accountId}/plans/${stripeSubscription.plan.id}`;
 
     if (amount !== transaction.amount) {
       message.push(`Missmatched amount: ${transaction.id}, url: ${url}`);
@@ -58,7 +59,7 @@ models.Transaction.findAll({
 
     if (!transaction.interval) {
       message.push(`Interval missing: ${transaction.id}, url: ${url}`);
-    } else if (transaction.interval !== subscription.plan.interval) {
+    } else if (transaction.interval !== stripeSubscription.plan.interval) {
       message.push(`Missmatched interval: ${transaction.id}, url: ${url}`);
     }
 
