@@ -79,6 +79,7 @@ const EmailLib = (app) => {
       app.mailgun.sendMail({
         from: config.email.from,
         to: recipient,
+        bcc: 'ops@opencollective.com',
         subject: getSubject(templateString),
         html: getBody(templateString)
       }, err => {
