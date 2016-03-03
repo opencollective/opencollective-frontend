@@ -15,7 +15,13 @@ const templatesNames = [
 /**
  * Helpers
  */
-const getSubject = str => str.split('\n')[0].replace(/^Subject: ?/i, '');
+const getSubject = str => {
+  var subj = '';
+  if (process.env.NODE_ENV !== 'production') {
+    subj += '[NOT PROD] ';
+  }
+  subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
+}
 const getBody = str => str.split('\n').slice(2).join('\n');
 const render = (name, data, config) => {
   data.config = config;
