@@ -43,11 +43,19 @@ module.exports = function(app) {
   /**
    * Check api key.
    */
-  app.use(
-    mw.apiKey,
-    jwt,
-    mw.identifyFromToken
-  );
+  app.use(mw.apiKey);
+
+  /**
+   * User reset password flow (no jwt verification)
+   */
+  app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+
+
+  /**
+   * Verify JWT and identify user
+   */
+  app.use(jwt, mw.identifyFromToken);
 
   /**
    * Routes without expiration validation
@@ -57,9 +65,7 @@ module.exports = function(app) {
   /**
    * Check if the token is expired
    */
-  app.use(
-    mw.checkJWTExpiration
-  );
+  app.use(mw.checkJWTExpiration);
 
   /**
    * NotImplemented response.
@@ -84,12 +90,6 @@ module.exports = function(app) {
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
   app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
-
-  /**
-   * User reset password flow
-   */
-  app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
   /**
    * Authentication.
