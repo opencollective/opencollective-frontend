@@ -16,13 +16,13 @@ models.StripeAccount.findAll({})
   .then(invoices => invoices.data.map(invoice => invoice.subscription))
   .map(stripeSubscriptionId => {
     return models.Transaction.findAll({
-      where: {
-        stripeSubscriptionId
-      }
+      include: [
+        { model: models.Subscription, where: { stripeSubscriptionId } }
+      ]
     })
     .then(transactions => {
       if (transactions.length === 0) {
-        console.log(`missing transaction with subscription id ${stripeSubscriptionId} and account ${stripeAccount.stripeUserId}`);
+        console.log(`missing transaction with Stripe subscription id ${stripeSubscriptionId} and account ${stripeAccount.stripeUserId}`);
       }
 
       return;
