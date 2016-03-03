@@ -100,6 +100,7 @@ module.exports = function(app) {
         models.Transaction.create({
           "description": "Donation 1",
           "amount": 1,
+          "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
           "createdAt": "2016-02-29T08:00:00.000Z"
@@ -113,6 +114,7 @@ module.exports = function(app) {
         models.Transaction.create({
           "description": "Donation 2",
           "amount": 2,
+          "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
           "createdAt": "2016-03-01T08:00:00.000Z"
