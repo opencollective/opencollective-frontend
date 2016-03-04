@@ -21,6 +21,7 @@ const getSubject = str => {
     subj += '[NOT PROD] ';
   }
   subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
+  return subj;
 }
 const getBody = str => str.split('\n').slice(2).join('\n');
 const render = (name, data, config) => {

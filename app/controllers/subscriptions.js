@@ -13,9 +13,9 @@ module.exports = function(app) {
   const Unauthorized = errors.Unauthorized;
 
   /**
-   * Send an email with the new token
+   * Send an email with refreshed token
    */
-  const sendTokenByEmail = (req, res, next) => {
+  const refreshTokenByEmail = (req, res, next) => {
     if (!req.jwtPayload || !req.remoteUser) {
       return next(new Unauthorized('Invalid payload'));
     }
@@ -26,6 +26,24 @@ module.exports = function(app) {
       subscriptionsLink: user.generateSubscriptionsLink(req.application)
     })
     .then(() => res.send({ success: true }))
+    .catch(next);
+  };
+
+  /**
+   * Send an email with the new token
+   */
+  const sendNewTokenByEmail = (req, res, next) => {
+  if (!req.application || !req.required.email) {
+    return next(new Unauthorized('Unauthorized'))
+  }
+
+    models.User.findOne({
+      email: req.required.email
+    })
+    .then((user) => email.send('user.new.token', req.body.email, {
+      subscriptionsLink: user.generateSubscriptionsLink(req.application)
+    }))
+    .then(()=>res.send({ success: true }))
     .catch(next);
   };
 
@@ -121,7 +139,8 @@ module.exports = function(app) {
 
   return {
     getAll,
-    sendTokenByEmail,
+    refreshTokenByEmail,
+    sendNewTokenByEmail,
     cancel
   };
 };
