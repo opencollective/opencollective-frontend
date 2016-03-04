@@ -40,9 +40,15 @@ module.exports = function(app) {
     models.User.findOne({
       email: req.required.email
     })
-    .then((user) => email.send('user.new.token', req.body.email, {
-      subscriptionsLink: user.generateSubscriptionsLink(req.application)
-    }))
+    .then((user) => {
+      // If you don't find a user, proceed without error
+      // Otherwise, we can leak email addresses
+      if (user) {
+        email.send('user.new.token', req.body.email, {
+          subscriptionsLink: user.generateSubscriptionsLink(req.application)
+        })
+      }
+    })
     .then(()=>res.send({ success: true }))
     .catch(next);
   };

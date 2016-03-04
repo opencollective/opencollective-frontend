@@ -162,11 +162,11 @@ describe('subscriptions.routes.test.js', () => {
    * Send a new link to the user for the subscription page
    */
 
-  describe('#sendTokenByEmail', () => {
+  describe('#refreshTokenByEmail', () => {
 
     it('fails if there is no auth', (done) => {
       request(app)
-        .post('/subscriptions/token')
+        .post('/subscriptions/refresh_token')
         .expect(401, {
           error: {
             code: 401,
@@ -187,7 +187,7 @@ describe('subscriptions.routes.test.js', () => {
       });
 
       request(app)
-        .post('/subscriptions/token')
+        .post('/subscriptions/refresh_token')
         .expect(401, {
           error: {
             code: 401,
@@ -215,12 +215,66 @@ describe('subscriptions.routes.test.js', () => {
       };
 
       request(app)
-        .post('/subscriptions/token/')
+        .post('/subscriptions/refresh_token')
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(200)
         .end(done);
     });
 
+  });
+
+  /**
+   * Send a new link to the user for the subscription page
+   */
+
+  describe('#sendNewTokenByEmail', () => {
+
+    it('fails if there is no email', (done) => {
+      request(app)
+        .post('/subscriptions/new_token')
+        .expect(400, {
+          error: {
+            code: 400,
+            "fields": {
+              "email": "Required field email missing"
+            },
+            message: "Missing required fields",
+            type: 'missing_required'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails silently if the user does not exist', done => {
+      const email = 'idonotexist@void.null';
+
+      request(app)
+        .post('/subscriptions/new_token')
+        .send({
+          email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(done);
+
+    });
+
+    it('sends an email to the user with the new token', done => {
+      app.mailgun.sendMail = (options, cb) => {
+        expect(options.html).to.contain(`${config.host.webapp}/subscriptions/`);
+        expect(options.to).to.equal(user.email);
+        cb();
+      };
+
+      request(app)
+        .post('/subscriptions/new_token')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(done);
+    });
   });
 
   /**
