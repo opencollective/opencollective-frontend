@@ -24,6 +24,7 @@
     "express": "^4.12.2",
     "express-jwt": "^2.1.0",
     "express-server-status": "*",
+    "flat": "^2.0.0",
     "form-data": "^0.2.0",
     "handlebars": "^4.0.5",
     "joi": "^7.3.0",

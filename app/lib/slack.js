@@ -5,6 +5,7 @@
 const Slack = require('node-slack');
 const config = require('config');
 const activities = require('../constants/activities');
+const flatten = require('flat');
 
 module.exports = {
 
@@ -13,7 +14,7 @@ module.exports = {
    */
 
   postActivity: function(activity) {
-    obj = this.formatActivity(activity);
+    const obj = this.formatActivity(activity);
     this.postMessage(obj.msg, obj.attachmentArray);
   },
 
@@ -99,7 +100,7 @@ module.exports = {
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
         returnVal += `Stripe event received: ${eventType}`;
-        attachmentArray.push({title: 'Data', text: activity.data});
+        attachmentArray.push(formatAttachment(activity.data));
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:
@@ -144,4 +145,16 @@ module.exports = {
     }
     return `<${link}|${text}>`;
   }
+}
+
+function formatAttachment(json) {
+  const flattenedData = flatten(json);
+  const rows = Object.keys(flattenedData)
+    .filter(key => flattenedData[key])
+    .map(key => `${key}: ${flattenedData[key]}`);
+  return {
+    title: 'Data',
+    color: 'good',
+    text: rows.join("\n")
+  };
 }
