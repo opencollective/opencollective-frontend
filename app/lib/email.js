@@ -38,9 +38,11 @@ function loadTemplates() {
   // Register partials
   const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
   const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
+  const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.hbs`, 'utf8');
 
   handlebars.registerPartial('header', header);
   handlebars.registerPartial('footer', footer);
+  handlebars.registerPartial('subscriptions', subscriptions);
 
   handlebars.registerHelper('moment', function(value) {
     return moment(value).format('MMMM Do YYYY');
