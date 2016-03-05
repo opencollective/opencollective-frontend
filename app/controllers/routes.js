@@ -51,7 +51,7 @@ module.exports = function(app) {
   app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
   app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-
+  app.post('/subscriptions/new_token', mw.required('email'), subscriptions.sendNewTokenByEmail);
   /**
    * Verify JWT and identify user
    */
@@ -60,7 +60,7 @@ module.exports = function(app) {
   /**
    * Routes without expiration validation
    */
-  app.post('/subscriptions/token', subscriptions.sendTokenByEmail);
+  app.post('/subscriptions/refresh_token', subscriptions.refreshTokenByEmail);
 
   /**
    * Check if the token is expired
