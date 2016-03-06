@@ -17,8 +17,10 @@ const templatesNames = [
  */
 const getSubject = str => {
   var subj = '';
-  if (process.env.NODE_ENV !== 'production') {
-    subj += '[NOT PROD] ';
+  if (process.env.NODE_ENV === 'staging') {
+    subj += '[STAGING] ';
+  } else if (process.env.NODE_ENV !== 'production'){
+    subj += '[TESTING] ';
   }
   subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
   return subj;
