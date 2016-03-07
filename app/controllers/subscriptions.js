@@ -33,12 +33,13 @@ module.exports = function(app) {
    * Send an email with the new token
    */
   const sendNewTokenByEmail = (req, res, next) => {
-  if (!req.application || !req.required.email) {
-    return next(new Unauthorized('Unauthorized'))
-  }
-
+    if (!req.application || !req.required.email) {
+      return next(new Unauthorized('Unauthorized'))
+    }
     models.User.findOne({
-      email: req.required.email
+      where: {
+        email: req.required.email
+      }
     })
     .then((user) => {
       // If you don't find a user, proceed without error
@@ -46,7 +47,7 @@ module.exports = function(app) {
       if (user) {
         email.send('user.new.token', req.body.email, {
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
-        })
+        });
       }
     })
     .then(()=>res.send({ success: true }))
