@@ -204,6 +204,11 @@ module.exports = function(app) {
   app.post('/subscriptions/:subscriptionid/cancel', mw.jwtScope('subscriptions'), subscriptions.cancel);
 
   /**
+   * Leaderboard
+   */
+  app.get('/leaderboard', mw.required('api_key'), mw.authorizeApp, groups.getLeaderboard); // Create a user.
+
+  /**
    * Error handler.
    */
   app.use(function(err, req, res, next) {

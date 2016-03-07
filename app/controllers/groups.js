@@ -544,6 +544,33 @@ module.exports = function(app) {
   };
 
   /**
+   * Get leaderboard of collectives
+   */
+  const getLeaderboard = (req, res, next) => {
+    return sequelize.query(`
+      SELECT
+        MAX(g.name) as name,
+        COUNT(t.id) as "donationsCount",
+        SUM(amount) as "totalAmount",
+        MAX(g.currency) as currency,
+        to_char(MAX(t."createdAt"), 'Month DD') as "latestDonation"
+      FROM "Transactions" t
+      LEFT JOIN "Groups" g ON g.id = t."GroupId"
+      WHERE t."createdAt" > current_date - INTERVAL '30' day
+        AND t.amount > 0
+        AND t."UserId" > 10
+        AND t."UserId"
+        NOT IN (10, 30, 40,39,41,43,45,46,41,80)
+      GROUP BY t."GroupId"
+      ORDER BY "latestDonation" DESC`,
+    {
+      type: sequelize.QueryTypes.SELECT
+    })
+    .then(groups => res.send(groups))
+    .catch(next);
+  };
+
+  /**
    * Public methods.
    */
   return {
@@ -559,7 +586,8 @@ module.exports = function(app) {
     getTransactions,
     getBalance,
     getUsers,
-    updateTransaction
+    updateTransaction,
+    getLeaderboard
   };
 
 };
