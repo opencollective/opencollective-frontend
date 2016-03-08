@@ -65,7 +65,8 @@ module.exports = function(app) {
           where: {
             UserId: req.remoteUser.id
           },
-          include: [{ model: models.Group }]
+          include: [{ model: models.Group },
+                    { model: models.User }]
         },
       ]
     })
