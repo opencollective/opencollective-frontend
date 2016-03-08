@@ -198,8 +198,7 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
-    // TODO Add back when subscription email is brought back
-    it.skip('sends an email with the new valid token', (done) => {
+    it('sends an email with the new valid token', (done) => {
       const secret = config.keys.opencollective.secret;
       const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
         expiresInSeconds: -1,
