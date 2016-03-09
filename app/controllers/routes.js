@@ -119,8 +119,8 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-  app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.get);
-  app.get('/groups/:groupid', groups.get); // skipped route for public
+  app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
+  app.get('/groups/:groupid', groups.getOne); // skipped route for public
 
   app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
   app.get('/groups/:groupid/users', groups.getUsers);
@@ -202,6 +202,11 @@ module.exports = function(app) {
    */
   app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
   app.post('/subscriptions/:subscriptionid/cancel', mw.jwtScope('subscriptions'), subscriptions.cancel);
+
+  /**
+   * Leaderboard
+   */
+  app.get('/leaderboard', mw.required('api_key'), mw.authorizeApp, groups.getLeaderboard); // Create a user.
 
   /**
    * Error handler.
