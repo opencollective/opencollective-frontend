@@ -146,6 +146,18 @@ describe('payments.routes.test.js', () => {
     .catch(done);
   });
 
+  beforeEach((done) => {
+    models.ConnectedAccount.create({
+      provider: 'paypal',
+      // Sandbox api keys
+      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+    })
+    .then((account) => user.setConnectedAccount(account))
+    .then(() => done())
+    .catch(done);
+  });
+
   // Create an application which has only access to `group`
   beforeEach((done) => {
     models.Application.create(utils.data('application2')).done((e, a) => {
@@ -727,6 +739,41 @@ describe('payments.routes.test.js', () => {
 
       });
 
+    });
+
+    describe.only('Paypal recurring payment', () => {
+      var links;
+
+      beforeEach('Make a donation', (done) => {
+        // `before` statement get executed before `beforeEach`. With `before`, `group` would be undefined
+        if (links) return done();
+
+        request(app)
+          .post(`/groups/${group.id}/payments/paypal`)
+          .send({
+            payment: {
+              amount: 10,
+              currency: 'USD'
+            },
+            api_key: application2.api_key
+          })
+          .expect(200)
+          .end((err, res) => {
+            expect(err).to.not.exist;
+            links = res.body.links;
+            done();
+          });
+      });
+
+      it('has links to the approval_url and execute', () => {
+        expect(links[0]).to.have.property('method', 'REDIRECT');
+        expect(links[0]).to.have.property('rel', 'approval_url');
+        expect(links[0]).to.have.property('href');
+
+        expect(links[1]).to.have.property('method', 'POST');
+        expect(links[1]).to.have.property('rel', 'execute');
+        expect(links[1]).to.have.property('href');
+      });
     });
 
     describe('Payment errors', () => {

@@ -129,6 +129,8 @@ module.exports = function(app) {
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.paypal); // Make a payment/donation.
+  app.get('/groups/:groupid/payments/paypal/callback', payments.paypallCallback); // Make a payment/donation.
 
   /**
    * UserGroup.

@@ -190,6 +190,30 @@ module.exports = function(Sequelize, DataTypes) {
         .catch(cb);
       },
 
+      getConnectedAccount: function(cb) {
+        const models = Sequelize.models;
+
+        models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then((userGroup) => {
+
+          return models.User.find({
+            where: {
+              id: userGroup.UserId
+            },
+            include: [{
+              model: models.ConnectedAccount
+            }]
+          });
+        })
+        .then((user) => cb(null, user.ConnectedAccount))
+        .catch(cb);
+      },
+
       hasHost: function(cb) {
         Sequelize.models.UserGroup.find({
           where: {
@@ -200,6 +224,18 @@ module.exports = function(Sequelize, DataTypes) {
         .then(function(userGroup) {
           return cb(null, !!userGroup);
         })
+        .catch(cb);
+      },
+
+      getPaypalAccount: function(cb) {
+        Sequelize.models.UserGroup.find({
+          where: {
+            GroupId: this.id,
+            role: roles.HOST
+          },
+          include: [{ model: Sequelize.models.PaypalAccount }]
+        })
+        .then((userGroup) => cb(null, userGroup))
         .catch(cb);
       }
 

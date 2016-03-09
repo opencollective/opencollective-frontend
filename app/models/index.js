@@ -34,6 +34,7 @@ function setupModels(client) {
     'Card',
     'Group',
     'Paykey',
+    'ConnectedAccount',
     'StripeAccount',
     'Notification',
     'Subscription',
@@ -58,6 +59,9 @@ function setupModels(client) {
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
+
+  // ConnectedAccount
+  m.User.belongsTo(m.ConnectedAccount); // Add a ConnectedAccountId to User
 
   // Application - User.
   m.User.belongsTo(m.Application);
