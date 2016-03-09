@@ -546,6 +546,34 @@ describe('groups.routes.test.js', function() {
 
     });
 
+    describe('Leaderboard', () => {
+
+      it('fails if the app is not authorized', done => {
+        request(app)
+          .get('/leaderboard')
+          .expect(400, {
+            error: {
+              code: 400,
+              type: 'missing_required',
+              message: 'Missing required fields',
+              fields: { api_key: 'Required field api_key missing' }
+            }
+          })
+          .end(done);
+      });
+
+      it('returns the leaderboard', done => {
+        request(app)
+          .get('/leaderboard')
+          .send({
+            api_key: application2.api_key,
+          })
+          .expect(200)
+          .end(done);
+      });
+
+    });
+
   });
 
   /**
