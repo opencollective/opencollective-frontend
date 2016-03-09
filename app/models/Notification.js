@@ -20,6 +20,10 @@ module.exports = function(Sequelize, DataTypes) {
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
+    },
+
+    webhookUrl: {
+      type: DataTypes.STRING
     }
   }, {
     defaultScope: {

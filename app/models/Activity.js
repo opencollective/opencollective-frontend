@@ -1,4 +1,5 @@
 const slackLib = require('../lib/slack');
+const notify = require('../lib/notifications');
 
 module.exports = function(Sequelize, DataTypes) {
 
@@ -19,6 +20,7 @@ module.exports = function(Sequelize, DataTypes) {
         if (process.env.NODE_ENV === 'production') {
           slackLib.postActivity(activity);
         }
+        notify(Sequelize, activity);
       }
     }
   });
