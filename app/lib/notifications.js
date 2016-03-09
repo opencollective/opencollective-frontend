@@ -4,7 +4,6 @@ const activitiesLib = require('../lib/activities');
 const ACTIVITY_ALL = 'all';
 
 module.exports = (Sequelize, activity) => {
-  console.log("Publishing notifications", Sequelize.models.Notification, activity);
   Sequelize.models.Notification.findAll({
     where: {
       type: [
@@ -29,7 +28,6 @@ module.exports = (Sequelize, activity) => {
 };
 
 function publishToGitter(activity, notifConfig) {
-  console.log("Publising to gitter", notifConfig.webhookUrl, activitiesLib.formatMessage(activity, false));
   return axios
     .post(notifConfig.webhookUrl, {
       message: activitiesLib.formatMessage(activity, false)
