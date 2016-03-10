@@ -190,17 +190,16 @@ module.exports = function(Sequelize, DataTypes) {
         .catch(cb);
       },
 
-      getConnectedAccount: function(cb) {
+      getConnectedAccount() {
         const models = Sequelize.models;
 
-        models.UserGroup.find({
+        return models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
           }
         })
         .then((userGroup) => {
-
           return models.User.find({
             where: {
               id: userGroup.UserId
@@ -210,8 +209,7 @@ module.exports = function(Sequelize, DataTypes) {
             }]
           });
         })
-        .then((user) => cb(null, user.ConnectedAccount))
-        .catch(cb);
+        .then(user => user.ConnectedAccount);
       },
 
       hasHost: function(cb) {

@@ -4,8 +4,10 @@
 const utils = require('../lib/utils');
 const roles = require('../constants/roles');
 const _ = require('lodash');
+const config = require('config');
 const async = require('async');
 const Stripe = require('stripe');
+const paypal = require('paypal-rest-sdk');
 
 const OC_FEE_PERCENT = 5;
 
@@ -301,83 +303,107 @@ module.exports = function(app) {
   };
 
   const paypalDonation = (req, res, next) => {
-    const paypal = require('paypal-rest-sdk');
-
     const group = req.group;
     const payment = req.required.payment;
     const currency = payment.currency || group.currency;
-    const plan = {
-      amount: payment.amount,
-      currency,
-      frequency_interval: 1
-    };
+    const amount = payment.amount;
 
     async.auto({
 
-      getConnectedAccount: (cb) => {
-        req.group.getConnectedAccount((err, connectedAccount) => {
-          if (err) return cb(err);
+      getPaypalConfig: (cb) => {
+        group.getConnectedAccount()
+          .then((connectedAccount) => {
 
-          paypal.configure({
-            'mode': 'sandbox', //sandbox or live
-            'client_id': connectedAccount.clientId,
-            'client_secret': connectedAccount.secret
-          });
-
-          cb();
-        });
+            // We will pass the config in all the subsequent calls to be sure we don't
+            // overwrite the configuration of the global sdk
+            // Example: https://github.com/paypal/PayPal-node-SDK/blob/master/samples/configuration/multiple_config.js
+            cb(null, {
+              mode: config.paypal.rest.mode,
+              client_id: connectedAccount.clientId,
+              client_secret: connectedAccount.secret
+            });
+          })
+          .catch(cb);
       },
 
-      createPlan: ['getConnectedAccount', (cb) => {
-        const callbackUrl = `http://localhost:3060/groups/${group.id}/payments/paypal/execute`;
+      // We create the transaction beforehand to have the id in the return url when
+      // the user logs on the PayPal website
+      createTransaction: ['getPaypalConfig', (cb) => {
+        const transaction = {
+          type: 'payment',
+          amount,
+          currency,
+          description: `Donation to ${group.name}`,
+          tags: ['Donation'],
+          approved: true,
+          interval: 'month'
+        };
 
-        paypal.billingPlan.create({
+        const subscription = {
+          amount,
+          currency,
+          interval: 'month'
+        };
+
+        transactions._create({
+          transaction,
+          subscription,
+          group
+        }, cb);
+      }],
+
+      createPlan: ['createTransaction', (cb, results) => {
+        const transactionId = results.createTransaction.id;
+        const callbackUrl = `http://localhost:3060/groups/${group.id}/transactions/${transactionId}/callback`;
+        const billingPlan = {
           description: `Plan for donation to ${group.name}`,
           name: `Plan ${group.name}`,
           merchant_preferences: {
             cancel_url: callbackUrl,
             return_url: callbackUrl
           },
-          payment_definitions: [
-            {
-              amount: {
-                currency: plan.currency,
-                value: plan.amount
-              },
-              cycles: "0",
-              frequency: "MONTH", // plan.frequency
-              frequency_interval: "1",
-              name: "Regular 1",
-              type: "REGULAR"
-            }
-          ],
-          "type": "INFINITE"
-        }, cb);
+          payment_definitions: [{
+            amount: {
+              currency,
+              value: amount
+            },
+            cycles: '0',
+            frequency: 'MONTH',
+            frequency_interval: '1',
+            name: `Regular payment`,
+            type: 'REGULAR' // or TRIAL
+          }],
+          type: 'INFINITE' // or FIXED
+        };
+
+        paypal.billingPlan.create(billingPlan, results.getPaypalConfig, cb);
       }],
 
       activatePlan: ['createPlan', (cb, results) => {
-        paypal.billingPlan.activate(results.createPlan.id, cb);
+        paypal.billingPlan.activate(results.createPlan.id, results.getPaypalConfig, cb);
       }],
 
       createBillingAgreement: ['activatePlan', (cb, results) => {
-
         // From paypal example, fails with moment js, TO REFACTOR
         var isoDate = new Date();
         isoDate.setSeconds(isoDate.getSeconds() + 4);
         isoDate.toISOString().slice(0, 19) + 'Z';
 
-        paypal.billingAgreement.create({
-          name: "Fast Speed Agreement",
-          description: "Agreement for Fast Speed Plan",
+        const billingAgreement = {
+          name: `Agreement for donation to ${group.name}`,
+          description: `Agreement for donation to ${group.name}`,
           start_date: isoDate,
           plan: {
             id: results.createPlan.id
           },
           payer: {
-            payment_method: "paypal"
+            payment_method: 'paypal'
           }
-        }, cb);
+        };
+
+        paypal.billingAgreement.create(billingAgreement, results.getPaypalConfig, cb);
       }]
+
     }, (e, results) => {
       if (e) {
         e.payload = req.body;
@@ -392,24 +418,51 @@ module.exports = function(app) {
 
   };
 
-  const paypallCallback = (req, res, next) => {
-    const paypal = require('paypal-rest-sdk');
+  const paypalCallback = (req, res, next) => {
+    const transaction = req.transaction;
+    const token = req.query.token;
 
-    req.group.getConnectedAccount((err, connectedAccount) => {
+    if (!token) {
+      return next(new errors.BadRequest('Token to execute agreement is missing'));
+    }
+
+    async.auto({
+      getPaypalConfig: (cb) => {
+        req.group.getConnectedAccount()
+          .then(connectedAccount => {
+            return cb(null, {
+              mode: config.paypal.rest.mode, //sandbox or live
+              client_id: connectedAccount.clientId,
+              client_secret: connectedAccount.secret
+            });
+          })
+          .catch(cb);
+      },
+
+      executeBillingAgreement: ['getPaypalConfig', (cb, results) => {
+        paypal.billingAgreement.execute(token, results.getPaypalConfig, cb);
+      }],
+
+      updateTransaction: ['executeBillingAgreement', (cb, results) => {
+        transaction.billingAgreementId = results.executeBillingAgreement.id;
+
+        transaction.save()
+          .then(() => cb())
+          .catch(cb);
+      }],
+
+      activateSubscription: ['executeBillingAgreement', (cb) => {
+        transaction.getSubscription()
+          .then(subscription => subscription.activate())
+          .then(() => cb())
+          .catch(cb);
+      }],
+    }, (err) => {
       if (err) return next(err);
 
-      paypal.configure({
-        'mode': 'sandbox', //sandbox or live
-        'client_id': connectedAccount.clientId,
-        'client_secret': connectedAccount.secret
-      });
-
-      paypal.billingAgreement.execute(req.query.token, (err) => {
-        if (err) return next(err);
-
-        return res.send(200);
-      });
+      res.sendStatus(200);
     });
+
   };
 
   /**
@@ -419,6 +472,6 @@ module.exports = function(app) {
     getOrCreatePlan, // Exposed for testing
     post,
     paypal: paypalDonation,
-    paypallCallback
+    paypalCallback
   }
 };

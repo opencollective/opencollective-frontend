@@ -36,11 +36,26 @@ module.exports = (Sequelize, DataTypes) => {
     // show 10$ as 1000 USD. In our db we save 10$ as 10 USD.
     data: DataTypes.JSON,
 
+    // Need to merge those two values into one
     stripeSubscriptionId: DataTypes.STRING,
+    billingAgreementId: DataTypes.STRING,
+
+    planId: DataTypes.STRING,
 
     activatedAt: DataTypes.DATE,
 
     deactivatedAt: DataTypes.DATE
+  }, {
+    paranoid: true,
+
+    instanceMethods: {
+      activate() {
+        this.isActive = true;
+        this.activatedAt = new Date();
+
+        return this.save();
+      }
+    }
   });
 
   return Subscription;

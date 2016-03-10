@@ -741,13 +741,11 @@ describe('payments.routes.test.js', () => {
 
     });
 
+
     describe.only('Paypal recurring payment', () => {
-      var links;
 
-      beforeEach('Make a donation', (done) => {
-        // `before` statement get executed before `beforeEach`. With `before`, `group` would be undefined
-        if (links) return done();
-
+      // PayPal is slow, we will make one big test
+      it('creates a transaction and returns the links', (done) => {
         request(app)
           .post(`/groups/${group.id}/payments/paypal`)
           .send({
@@ -760,20 +758,44 @@ describe('payments.routes.test.js', () => {
           .expect(200)
           .end((err, res) => {
             expect(err).to.not.exist;
-            links = res.body.links;
-            done();
+
+            const links = res.body.links;
+
+            expect(links[0]).to.have.property('method', 'REDIRECT');
+            expect(links[0]).to.have.property('rel', 'approval_url');
+            expect(links[0]).to.have.property('href');
+
+            expect(links[1]).to.have.property('method', 'POST');
+            expect(links[1]).to.have.property('rel', 'execute');
+            expect(links[1]).to.have.property('href');
+
+            models.Transaction.findAndCountAll({
+              include: [{
+                model: models.Subscription
+              }]
+            })
+            .then((res) => {
+              expect(res.count).to.equal(1);
+              const transaction = res.rows[0];
+              const subscription = transaction.Subscription;
+
+              expect(transaction).to.have.property('GroupId', group.id);
+              expect(transaction).to.have.property('currency', 'USD');
+              expect(transaction).to.have.property('tags');
+              expect(transaction).to.have.property('interval', 'month');
+              expect(transaction).to.have.property('amount', 10);
+
+              expect(subscription).to.have.property('billingAgreementId');
+              expect(subscription).to.have.property('planId');
+              expect(subscription).to.have.property('interval', 'month');
+              expect(subscription).to.have.property('amount', 10);
+
+              done();
+            })
+            .catch(done);
           });
       });
 
-      it('has links to the approval_url and execute', () => {
-        expect(links[0]).to.have.property('method', 'REDIRECT');
-        expect(links[0]).to.have.property('rel', 'approval_url');
-        expect(links[0]).to.have.property('href');
-
-        expect(links[1]).to.have.property('method', 'POST');
-        expect(links[1]).to.have.property('rel', 'execute');
-        expect(links[1]).to.have.property('href');
-      });
     });
 
     describe('Payment errors', () => {
