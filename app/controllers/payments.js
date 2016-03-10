@@ -402,6 +402,19 @@ module.exports = function(app) {
         };
 
         paypal.billingAgreement.create(billingAgreement, results.getPaypalConfig, cb);
+      }],
+
+      updateSubscription: ['createBillingAgreement', (cb, results) => {
+        const transaction = results.createTransaction;
+
+        transaction.getSubscription()
+          .then((subscription) => {
+            subscription.data = results.createBillingAgreement;
+
+            return subscription.save();
+          })
+          .then(() => cb())
+          .catch(cb);
       }]
 
     }, (e, results) => {
@@ -440,27 +453,30 @@ module.exports = function(app) {
       },
 
       executeBillingAgreement: ['getPaypalConfig', (cb, results) => {
-        paypal.billingAgreement.execute(token, results.getPaypalConfig, cb);
+        paypal.billingAgreement.execute(token, {}, results.getPaypalConfig, cb);
       }],
 
-      updateTransaction: ['executeBillingAgreement', (cb, results) => {
-        transaction.billingAgreementId = results.executeBillingAgreement.id;
-
-        transaction.save()
-          .then(() => cb())
-          .catch(cb);
-      }],
-
-      activateSubscription: ['executeBillingAgreement', (cb) => {
+      activateSubscription: ['executeBillingAgreement', (cb, results) => {
         transaction.getSubscription()
-          .then(subscription => subscription.activate())
+          .then(subscription => {
+            const data = _.extend({}, subscription.data, {
+              billingAgreementId: results.executeBillingAgreement.id
+            });
+
+            // JSON with sequelize is a bag of fun :D https://github.com/sequelize/sequelize/issues/2862
+            subscription.data = data;
+            subscription.isActive = true;
+            subscription.activatedAt = new Date();
+
+            return subscription.save();
+          })
           .then(() => cb())
           .catch(cb);
       }],
     }, (err) => {
       if (err) return next(err);
 
-      res.sendStatus(200);
+      res.send({ success: true });
     });
 
   };

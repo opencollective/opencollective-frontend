@@ -36,9 +36,7 @@ module.exports = (Sequelize, DataTypes) => {
     // show 10$ as 1000 USD. In our db we save 10$ as 10 USD.
     data: DataTypes.JSON,
 
-    // Need to merge those two values into one
     stripeSubscriptionId: DataTypes.STRING,
-    billingAgreementId: DataTypes.STRING,
 
     planId: DataTypes.STRING,
 

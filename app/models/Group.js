@@ -223,18 +223,6 @@ module.exports = function(Sequelize, DataTypes) {
           return cb(null, !!userGroup);
         })
         .catch(cb);
-      },
-
-      getPaypalAccount: function(cb) {
-        Sequelize.models.UserGroup.find({
-          where: {
-            GroupId: this.id,
-            role: roles.HOST
-          },
-          include: [{ model: Sequelize.models.PaypalAccount }]
-        })
-        .then((userGroup) => cb(null, userGroup))
-        .catch(cb);
       }
 
     }
