@@ -509,7 +509,7 @@ module.exports = function(app) {
         }, cb);
       }],
 
-      updateTransaction: ['activateSubscription', (cb, results) => {
+      updateTransaction: ['getOrCreateUser', (cb, results) => {
         transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
           .then(() => transaction.setUser(results.getOrCreateUser))
           .then(() => cb())
