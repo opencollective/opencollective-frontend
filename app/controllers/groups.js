@@ -553,16 +553,17 @@ module.exports = function(app) {
         COUNT(t.id) as "donationsCount",
         SUM(amount) as "totalAmount",
         MAX(g.currency) as currency,
-        to_char(MAX(t."createdAt"), 'Month DD') as "latestDonation"
+        to_char(MAX(t."createdAt"), 'Month DD') as "latestDonation",
+        MAX(g.slug) as slug,
+        MAX(g.logo) as logo
       FROM "Transactions" t
       LEFT JOIN "Groups" g ON g.id = t."GroupId"
       WHERE t."createdAt" > current_date - INTERVAL '30' day
         AND t.amount > 0
-        AND t."UserId" > 10
         AND t."UserId"
-        NOT IN (10, 30, 40,39,41,43,45,46,41,80)
+        NOT IN (10,39,40,43,45,46)
       GROUP BY t."GroupId"
-      ORDER BY "latestDonation" DESC`,
+      ORDER BY "totalAmount" DESC`,
     {
       type: sequelize.QueryTypes.SELECT
     })
