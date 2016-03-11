@@ -30,6 +30,12 @@ module.exports = function(app) {
      */
     getOrCreateUser: (req, res, next) => {
 
+      // If already logged in, proceed
+      if(req.remoteUser) {
+        req.user = req.remoteUser;
+        return next();
+      }
+
       var email, paypalEmail, password;
 
       if(req.body.transaction) {
