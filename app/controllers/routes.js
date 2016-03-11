@@ -38,6 +38,7 @@ module.exports = function(app) {
   app.param('userid', params.userid);
   app.param('groupid', params.groupid);
   app.param('transactionid', params.transactionid);
+  app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('paykey', params.paykey);
 
   /**
@@ -163,7 +164,7 @@ module.exports = function(app) {
   app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
   app.post('/groups/:groupid/transactions/:transactionid/paykey/:paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.confirmPayment); // Confirm a transaction's payment.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), transactions.attributeUser); // Attribute a transaction to a user.
-  app.get('/groups/:groupid/transactions/:transactionid/callback', payments.paypalCallback); // Callback after a payment
+  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
 
   /**
    * Activities.

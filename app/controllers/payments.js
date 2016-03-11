@@ -40,6 +40,22 @@ module.exports = function(app) {
     });
   };
 
+  const getOrCreateUser = (attributes, cb) => {
+     return models.User.findOne({
+        where: {
+          email: attributes.email
+        }
+      })
+      .then((user) => {
+        if (user) {
+          return cb(null, user);
+        }
+
+        users._create(attributes, cb);
+      })
+      .catch(cb);
+  };
+
   const post = (req, res, next) => {
     var payment = req.required.payment;
     var user = req.remoteUser;
@@ -47,7 +63,6 @@ module.exports = function(app) {
     var group = req.group;
     var interval = payment.interval;
     var isSubscription = _.contains(['month', 'year'], interval);
-    var hasFullAccount = false; // Used to specify if a user has a real account
 
     if (interval && !isSubscription) {
       return next(new errors.BadRequest('Interval should be month or year.'));
@@ -192,6 +207,7 @@ module.exports = function(app) {
       /*
        *  Creates a user in our system to associate with this transaction
        */
+<<<<<<< 947225aa8f9b817dedc74ff200dfedd10431073c
       getOrCreateUser: ['createCharge', function(cb) {
         return models.User.findOne({
           where: {
@@ -210,6 +226,10 @@ module.exports = function(app) {
         })
         .catch(cb);
       }],
+=======
+
+      getOrCreateUser: ['createCharge', (cb) => getOrCreateUser({ email }, cb)],
+>>>>>>> add paranoid mode to transactions and add user logic
 
       createTransaction: ['getOrCreateUser', 'createCard', 'createCharge', function(cb, results) {
         const charge = results.createCharge;
@@ -256,7 +276,7 @@ module.exports = function(app) {
           user: user.info,
           group: group.info,
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
-        }
+        };
 
         var template = 'thankyou';
         if(group.name.match(/WWCode/i))
@@ -297,7 +317,10 @@ module.exports = function(app) {
         return next(e);
       }
 
-      res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});
+      res.send({
+        success: true,
+        user: user.info
+      });
     });
 
   };
@@ -336,7 +359,11 @@ module.exports = function(app) {
           description: `Donation to ${group.name}`,
           tags: ['Donation'],
           approved: true,
-          interval: 'month'
+          interval: 'month',
+          // In paranoid mode, the deleted transactions are not visible
+          // We will create that temporary transaction that will only be visible once
+          // the user executes the paypal token
+          deletedAt: new Date()
         };
 
         const subscription = {
@@ -432,7 +459,7 @@ module.exports = function(app) {
   };
 
   const paypalCallback = (req, res, next) => {
-    const transaction = req.transaction;
+    const transaction = req.paranoidtransaction;
     const token = req.query.token;
 
     if (!token) {
@@ -473,10 +500,26 @@ module.exports = function(app) {
           .then(() => cb())
           .catch(cb);
       }],
-    }, (err) => {
-      if (err) return next(err);
 
-      res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success`);
+      getOrCreateUser: ['activateSubscription', (cb, results) => {
+        const email = results.executeBillingAgreement.payer.payer_info.email;
+
+        getOrCreateUser({
+          email
+        }, cb);
+      }],
+
+      updateTransaction: ['activateSubscription', (cb, results) => {
+        transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
+          .then(() => transaction.setUser(results.getOrCreateUser))
+          .then(() => cb())
+          .catch(cb);
+      }]
+    }, (err, results) => {
+      if (err) return next(err);
+      const user = results.getOrCreateUser;
+
+      res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${user.hasFullAccount}`);
     });
 
   };

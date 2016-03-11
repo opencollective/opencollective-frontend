@@ -100,6 +100,29 @@ module.exports = function(app) {
     },
 
     /**
+     * Transactionid for a paranoid (deleted) ressource
+     */
+    paranoidtransactionid: (req, res, next, id) => {
+      parseId(id, (e, id) => {
+        if (e) return next(e);
+        Transaction
+          .findOne({
+            where: { id },
+            paranoid: false
+          })
+          .then((transaction) => {
+            if (!transaction) {
+              return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
+            } else {
+              req.paranoidtransaction = transaction;
+              next();
+            }
+          })
+          .catch(next);
+      });
+    },
+
+    /**
      * Paykey.
      */
     paykey: function(req, res, next, paykey) {
