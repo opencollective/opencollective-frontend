@@ -93,7 +93,7 @@ module.exports = (app) => {
         .then((transaction) => {
           /**
            * Stripe doesn't make a difference between development, test, staging
-           * environments. If we get a webhook from another env, 
+           * environments. If we get a webhook from another env,
            * `transaction.Subscription.stripeSubscriptionId`
            * will not be found and throw an error. Stripe will retry to send the webhook
            * if it doesn't get a 2XX status code.

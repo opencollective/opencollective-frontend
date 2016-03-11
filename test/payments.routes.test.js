@@ -489,7 +489,7 @@ describe('payments.routes.test.js', () => {
             payment: data
           })
           .expect(200)
-          .end((e, res) => {
+          .end((e) => {
             expect(e).to.not.exist;
             done();
           });
@@ -505,7 +505,7 @@ describe('payments.routes.test.js', () => {
           .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('UserId', null);
+            expect(res.rows[0]).to.have.property('UserId', 1);
             done();
           })
           .catch(done);

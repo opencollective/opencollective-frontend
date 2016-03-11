@@ -4,6 +4,7 @@
     "node": true
   },
   "rules": {
-    "no-unused-vars": [2, {"vars": "all"}]
+    "no-unused-vars": [2, {"vars": "all"}],
+    "no-trailing-spaces": 2
   }
 }

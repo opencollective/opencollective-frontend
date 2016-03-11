@@ -149,6 +149,7 @@ module.exports = function(Sequelize, DataTypes) {
           website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
+          hasFullAccount: this.hasPassword,
           paypalEmail: this.paypalEmail
         };
       },

@@ -20,7 +20,6 @@ module.exports = function(app) {
   var models = app.set('models');
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
-  var users = require('../controllers/users')(app);
   var emailLib = require('../lib/email')(app);
 
   const getOrCreatePlan = (params, cb) => {
@@ -55,7 +54,7 @@ module.exports = function(app) {
      */
     post: function(req, res, next) {
       var payment = req.required.payment;
-      var user = req.remoteUser;
+      var user = req.user;
       var email = payment.email;
       var group = req.group;
       var interval = payment.interval;
@@ -202,32 +201,9 @@ module.exports = function(app) {
           }
         }],
 
-        /*
-         *  Creates a user in our system to associate with this transaction
-         */
-
-        getOrCreateUser: ['createCharge', function(cb) {
-          return models.User.findOne({
-            where: {
-              email: email
-            }
-          })
-          .then(function(user) {
-            if (user) {
-              hasFullAccount = (user.password_hash ? true : false);
-              cb(null, user);
-            } else {
-              users._create({
-                email: email
-              }, cb);
-            }
-          })
-          .catch(cb);
-        }],
-
-        createTransaction: ['getOrCreateUser', 'createCard', 'createCharge', function(cb, results) {
+        createTransaction: ['createCard', 'createCharge', function(cb, results) {
+          const user = req.user;
           const charge = results.createCharge;
-          const user = results.getOrCreateUser;
           const card = results.createCard;
           const currency = charge.currency || charge.plan.currency;
           const amount = payment.amount;
@@ -263,7 +239,7 @@ module.exports = function(app) {
         }],
 
         sendThankYouEmail: ['createTransaction', function(cb, results) {
-          const user = results.getOrCreateUser;
+          const user = req.user;
           const transaction = results.createTransaction;
           const data = {
             transaction: transaction.info,
@@ -282,9 +258,8 @@ module.exports = function(app) {
           cb();
         }],
 
-        addUserToGroup: ['createTransaction', function(cb, results) {
-          user = results.getOrCreateUser;
-
+        addUserToGroup: ['createTransaction', function(cb) {
+          const user = req.user;
           models.UserGroup.findOne({
             where: {
               GroupId: group.id,
@@ -304,7 +279,7 @@ module.exports = function(app) {
           .catch(cb);
         }]
 
-      }, function(e) {
+    }, function(e) {
 
         if (e) {
           e.payload = req.body;

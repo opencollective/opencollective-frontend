@@ -327,7 +327,7 @@
         "tags": ["donation"],
         "amount": 299.99,
         "currency": "USD",
-        "paidby": "@philmod",
+        "paypalEmail": "userpaypal@gmail.com",
         "comment": "",
         "link": "",
         "createdAt": "2015-05-29T07:00:00.000Z"
