@@ -38,8 +38,6 @@ module.exports = (Sequelize, DataTypes) => {
 
     stripeSubscriptionId: DataTypes.STRING,
 
-    planId: DataTypes.STRING,
-
     activatedAt: DataTypes.DATE,
 
     deactivatedAt: DataTypes.DATE

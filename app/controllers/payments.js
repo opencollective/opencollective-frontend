@@ -476,7 +476,7 @@ module.exports = function(app) {
     }, (err) => {
       if (err) return next(err);
 
-      res.send({ success: true });
+      res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success`);
     });
 
   };
