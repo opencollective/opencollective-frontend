@@ -43,7 +43,7 @@ module.exports = function(app) {
       password = req.body.password || req.query.password;
 
       if(!email && !paypalEmail) {
-        return next();
+        return next(new errors.ValidationFailed("Email or paypalEmail required"));
       }
 
       if (password) {
