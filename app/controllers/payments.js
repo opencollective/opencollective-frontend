@@ -336,7 +336,6 @@ module.exports = function(app) {
       getPaypalConfig: (cb) => {
         group.getConnectedAccount()
           .then((connectedAccount) => {
-
             // We will pass the config in all the subsequent calls to be sure we don't
             // overwrite the configuration of the global sdk
             // Example: https://github.com/paypal/PayPal-node-SDK/blob/master/samples/configuration/multiple_config.js

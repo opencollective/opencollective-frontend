@@ -200,16 +200,12 @@ module.exports = function(Sequelize, DataTypes) {
           }
         })
         .then((userGroup) => {
-          return models.User.find({
+          return models.ConnectedAccount.find({
             where: {
-              id: userGroup.UserId
-            },
-            include: [{
-              model: models.ConnectedAccount
-            }]
+              UserId: userGroup.UserId
+            }
           });
-        })
-        .then(user => user.ConnectedAccount);
+        });
       },
 
       hasHost: function(cb) {

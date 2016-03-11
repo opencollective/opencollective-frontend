@@ -35,9 +35,9 @@ module.exports = {
       }
      })
      .then(() => {
-      return queryInterface.addColumn('Users', 'ConnectedAccountId', {
+      return queryInterface.addColumn('ConnectedAccounts', 'UserId', {
         type: DataTypes.INTEGER,
-        references: 'ConnectedAccounts',
+        references: 'Users',
         referencesKey: 'id',
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
@@ -46,7 +46,7 @@ module.exports = {
   },
 
   down: function (queryInterface, DataTypes) {
-    return queryInterface.removeColumn('Users', 'ConnectedAccountId')
+    return queryInterface.removeColumn('ConnectedAccounts', 'UserId')
       .then(() => queryInterface.dropTable('ConnectedAccounts'));
   }
 };

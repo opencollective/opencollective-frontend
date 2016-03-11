@@ -61,7 +61,8 @@ function setupModels(client) {
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
 
   // ConnectedAccount
-  m.User.belongsTo(m.ConnectedAccount); // Add a ConnectedAccountId to User
+  m.User.hasMany(m.ConnectedAccount);
+  m.ConnectedAccount.belongsTo(m.User);
 
   // Application - User.
   m.User.belongsTo(m.Application);

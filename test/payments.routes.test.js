@@ -153,7 +153,7 @@ describe('payments.routes.test.js', () => {
       clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
       secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
     })
-    .then((account) => user.setConnectedAccount(account))
+    .then((account) => account.setUser(user))
     .then(() => done())
     .catch(done);
   });
