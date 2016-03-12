@@ -206,6 +206,7 @@ describe('transactions.routes.test.js', function() {
     it('successfully create a transaction with an application', function(done) {
       request(app)
         .post('/groups/' + privateGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application2))
         .send({
           api_key: application2.api_key,
           transaction: transactionsData[0]
@@ -218,7 +219,7 @@ describe('transactions.routes.test.js', function() {
           expect(t).to.have.property('currency', 'USD');
           expect(t).to.have.property('vendor', transactionsData[0].vendor);
           expect(t).to.have.property('GroupId', privateGroup.id);
-          expect(t).to.have.property('UserId', null); // ...
+          expect(t).to.have.property('UserId', user.id); // ...
           expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);
 
           models.Activity.findAndCountAll({}).then(function(res) {
@@ -349,6 +350,7 @@ describe('transactions.routes.test.js', function() {
     beforeEach(function(done) {
       request(app)
         .post('/groups/' + privateGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application2))
         .send({
           api_key: application2.api_key,
           transaction: transactionsData[0]
