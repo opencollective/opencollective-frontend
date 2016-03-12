@@ -19,8 +19,8 @@
   "user1": {
     "name": "Phil Mod",
     "username": "philmod",
-    "email": "philmod@email.com",
-    "paypalEmail": "philmod+PayPal@email.com",
+    "email": "user1@email.com",
+    "paypalEmail": "user1+paypal@email.com",
     "password": "passpass",
     "twitterHandle": "blahblah"
   },
@@ -35,21 +35,21 @@
   "user3": {
     "name": "Xavier Damman",
     "username": "xdamman",
-    "email": "xdamman@gmail.com",
+    "email": "user3@email.com",
     "password": "passssap"
   },
 
   "user4": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "boki@email.com",
+    "email": "user4@email.com",
     "password": "passssas"
   },
 
   "user5": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "boki@email.com"
+    "email": "user5@email.com"
   },
 
   "group1": {
