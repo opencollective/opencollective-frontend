@@ -6,6 +6,7 @@ var app = require('../index');
 var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var roles = require('../app/constants/roles');
@@ -21,17 +22,23 @@ var models = app.set('models');
  * Tests.
  */
 describe('usergroup.routes.test.js', function() {
-
   var application;
   var user;
   var user2;
   var group;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create users.
@@ -80,6 +87,10 @@ describe('usergroup.routes.test.js', function() {
     group
       .addUserWithRole(user3, roles.BACKER)
       .done(done);
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**
