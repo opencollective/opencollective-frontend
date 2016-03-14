@@ -23,6 +23,7 @@ var roles = require('../app/constants/roles');
 var stripeMock = require('./mocks/stripe');
 
 describe('stripe.routes.test.js', function() {
+
   var nocks = {};
 
   var user;
@@ -30,12 +31,19 @@ describe('stripe.routes.test.js', function() {
   var card;
   var group;
   var application;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create a user.
@@ -87,6 +95,10 @@ describe('stripe.routes.test.js', function() {
 
   afterEach(function() {
     nock.cleanAll();
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   describe('authorize', function() {

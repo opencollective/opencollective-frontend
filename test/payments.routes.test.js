@@ -41,6 +41,7 @@ describe('payments.routes.test.js', () => {
   var group2;
   var nocks = {};
   var stripeEmail;
+  var sandbox = sinon.sandbox.create();
 
   var stubStripe = () => {
     var mock = stripeMock.accounts.create;
@@ -60,6 +61,12 @@ describe('payments.routes.test.js', () => {
     });
   });
 
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
+  });
+
   // Create a user.
   beforeEach((done) => {
     models.User.create(userData).done((e, u) => {
@@ -75,8 +82,6 @@ describe('payments.routes.test.js', () => {
       .post('/v1/customers')
       .reply(200, stripeMock.customers.create);
   });
-
-
 
   beforeEach(() => {
     stubStripe();
@@ -173,6 +178,10 @@ describe('payments.routes.test.js', () => {
 
   afterEach(() => {
     nock.cleanAll();
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**

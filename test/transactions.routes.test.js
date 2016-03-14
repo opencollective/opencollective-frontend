@@ -36,12 +36,19 @@ describe('transactions.routes.test.js', function() {
   var application;
   var application2;
   var application3;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create user.
@@ -143,6 +150,10 @@ describe('transactions.routes.test.js', function() {
       application3 = a;
       done();
     });
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**
