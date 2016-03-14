@@ -48,20 +48,27 @@ var stubStripe = () => {
   stub.yields(null, mock);
 };
 
+
 describe('webhooks.routes.test.js', () => {
   var nocks = {};
-
   var user;
   var card;
   var group;
   var application;
   var firstPayment;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create a user.
@@ -104,6 +111,10 @@ describe('webhooks.routes.test.js', () => {
 
   afterEach(() => {
     nock.cleanAll();
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   describe('success', () => {

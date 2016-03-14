@@ -27,11 +27,11 @@ var roles = require('../app/constants/roles');
  * Tests.
  */
 describe('subscriptions.routes.test.js', () => {
-
   var group;
   var user;
   var application;
   var card;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
@@ -39,6 +39,12 @@ describe('subscriptions.routes.test.js', () => {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create user.
@@ -83,6 +89,10 @@ describe('subscriptions.routes.test.js', () => {
       card = c;
       done();
     });
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**
