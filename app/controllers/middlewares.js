@@ -9,11 +9,80 @@ module.exports = function(app) {
   var Application = models.Application;
   var User = models.User;
   var errors = app.errors;
+  var users = require('../controllers/users')(app);
 
   /**
    * Public methods.
    */
   return {
+
+    cache: (maxAge) => {
+      maxAge = maxAge || 5;
+      return (req, res, next) => {
+        res.setHeader('Cache-Control', `public, max-age=${maxAge}`);
+        next();
+      }
+    },
+
+    /**
+     * Get the user based on its email or paypalEmail. If not found, creates one.
+     * Used for creating a transaction from a new/returning donor or an expense from a new/returning user.
+     */
+    getOrCreateUser: (req, res, next) => {
+
+      // If already logged in, proceed
+      if(req.remoteUser) {
+        req.user = req.remoteUser;
+        return next();
+      }
+
+      var email, paypalEmail, password;
+
+      if(req.body.transaction) {
+        email = req.body.transaction.email;
+        paypalEmail = req.body.transaction.paypalEmail;
+      }
+      else if(req.body.payment) {
+        email = req.body.payment.email;
+      }
+
+      password = req.body.password || req.query.password;
+
+      if(!email && !paypalEmail) {
+        return next(new errors.ValidationFailed("Email or paypalEmail required"));
+      }
+
+      if (password) {
+        return this.authenticate(req, res, next);
+      }
+
+      const cb = (err, user) => {
+        if(user) req.user = user;
+        return next();
+      }
+
+      models.User.findOne({
+        where: {
+          $or: {
+            email,
+            paypalEmail
+          }
+        }
+      })
+      .then(function(user) {
+        if (user) {
+          cb(null, user);
+        } else {
+          const userData = {
+            email: email || paypalEmail,
+            paypalEmail
+          };
+          users._create(userData, cb);
+        }
+      })
+      .catch(cb);
+
+    },
 
     /**
      *  Parameters required for a route.

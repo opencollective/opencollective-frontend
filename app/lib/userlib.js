@@ -6,7 +6,7 @@ module.exports = {
   memory: {},
 
   clearbit: clearbit,
-  
+
   fetchInfo(user, cb) {
     this.getUserData(user.email, (err, userData) => {
       if(userData) {
@@ -18,7 +18,7 @@ module.exports = {
       cb(err, user);
     });
   },
-  
+
   fetchAvatar(user, cb) {
     if(user.avatar) return cb(null, user);
 

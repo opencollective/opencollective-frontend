@@ -217,6 +217,7 @@ describe('transactions.routes.test.js', function() {
     it('successfully create a transaction with an application', function(done) {
       request(app)
         .post('/groups/' + privateGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application2))
         .send({
           api_key: application2.api_key,
           transaction: transactionsData[0]
@@ -229,7 +230,7 @@ describe('transactions.routes.test.js', function() {
           expect(t).to.have.property('currency', 'USD');
           expect(t).to.have.property('vendor', transactionsData[0].vendor);
           expect(t).to.have.property('GroupId', privateGroup.id);
-          expect(t).to.have.property('UserId', null); // ...
+          expect(t).to.have.property('UserId', user.id); // ...
           expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);
 
           models.Activity.findAndCountAll({}).then(function(res) {
@@ -263,6 +264,92 @@ describe('transactions.routes.test.js', function() {
         });
     });
 
+    it('successfully creates a transaction without a user', function(done) {
+      request(app)
+        .post('/groups/' + publicGroup.id + '/transactions')
+        .send({
+          api_key: application.api_key,
+          transaction: transactionsData[7]
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body.UserId > 0).to.be.true;
+          expect(res.body).to.have.property('GroupId', publicGroup.id);
+
+          models.Activity.findAndCountAll({}).then(function(res) {
+            // 2 activities: `user.created` and `group.transaction.created`
+            expect(res.count).to.equal(2);
+            done();
+          });
+        });
+    });
+
+    it('successfully creates a transaction with a logged out user', function(done) {
+      const transaction = _.merge({}, transactionsData[7]);
+      transaction.email = user.email;
+      transaction.paypalEmail = null;
+
+      request(app)
+        .post('/groups/' + publicGroup.id + '/transactions')
+        .send({
+          api_key: application.api_key,
+          transaction: transaction
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body.UserId).to.equal(user.id);
+          expect(res.body).to.have.property('GroupId', publicGroup.id);
+
+          models.Activity.findAndCountAll({}).then(function(res) {
+            // 1 activity: `group.transaction.created`
+            expect(res.count).to.equal(1);
+            done();
+          });
+        });
+    });
+
+    it('successfully creates a transaction with a logged out user with its paypalEmail', function(done) {
+      const transaction = _.merge({}, transactionsData[7]);
+      transaction.email = null;
+      transaction.paypalEmail = user.paypalEmail;
+
+      request(app)
+        .post('/groups/' + publicGroup.id + '/transactions')
+        .send({
+          api_key: application.api_key,
+          transaction: transaction
+        })
+        .expect(200)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body.UserId).to.equal(user.id);
+          expect(res.body).to.have.property('GroupId', publicGroup.id);
+
+          models.Activity.findAndCountAll({}).then(function(res) {
+            // 1 activity: `group.transaction.created`
+            expect(res.count).to.equal(1);
+            done();
+          });
+        });
+    });
+
+    it('fails to create a transaction without a user if group is private', function(done) {
+      request(app)
+        .post('/groups/' + privateGroup.id + '/transactions')
+        .send({
+          api_key: application.api_key,
+          transaction: transactionsData[7]
+        })
+        .expect(403)
+        .end(function(e, res) {
+          expect(e).to.not.exist;
+          expect(res.body.error.type).to.equal('forbidden');
+          console.log("res: ", res.body);
+          done();
+        });
+    });
   });
 
   /**
@@ -274,6 +361,7 @@ describe('transactions.routes.test.js', function() {
     beforeEach(function(done) {
       request(app)
         .post('/groups/' + privateGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application2))
         .send({
           api_key: application2.api_key,
           transaction: transactionsData[0]
