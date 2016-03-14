@@ -112,7 +112,7 @@ module.exports = function(app) {
           })
           .then((transaction) => {
             if (!transaction) {
-              return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
+              return next(new errors.NotFound(`Transaction ${id} not found`));
             } else {
               req.paranoidtransaction = transaction;
               next();

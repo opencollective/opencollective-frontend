@@ -330,6 +330,15 @@ module.exports = function(app) {
     const payment = req.required.payment;
     const currency = payment.currency || group.currency;
     const amount = payment.amount;
+    const interval = payment.interval;
+
+    if (!_.contains(['month', 'year'], interval)) {
+      return next(new errors.BadRequest('Interval should be month or year.'));
+    }
+
+    if (!payment.amount) {
+      return next(new errors.BadRequest('Payment Amount missing.'));
+    }
 
     async.auto({
 
@@ -355,10 +364,10 @@ module.exports = function(app) {
           type: 'payment',
           amount,
           currency,
+          interval,
           description: `Donation to ${group.name}`,
           tags: ['Donation'],
           approved: true,
-          interval: 'month',
           // In paranoid mode, the deleted transactions are not visible
           // We will create that temporary transaction that will only be visible once
           // the user executes the paypal token
@@ -380,7 +389,7 @@ module.exports = function(app) {
 
       createPlan: ['createTransaction', (cb, results) => {
         const transactionId = results.createTransaction.id;
-        const callbackUrl = `http://localhost:3060/groups/${group.id}/transactions/${transactionId}/callback`;
+        const callbackUrl = `${config.host.api}/groups/${group.id}/transactions/${transactionId}/callback`;
         const billingPlan = {
           description: `Plan for donation to ${group.name}`,
           name: `Plan ${group.name}`,
@@ -394,7 +403,7 @@ module.exports = function(app) {
               value: amount
             },
             cycles: '0',
-            frequency: 'MONTH',
+            frequency: interval.toUpperCase(),
             frequency_interval: '1',
             name: `Regular payment`,
             type: 'REGULAR' // or TRIAL
