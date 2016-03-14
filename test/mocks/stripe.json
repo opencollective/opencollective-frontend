@@ -220,7 +220,7 @@
                 "end": 1456064576
               },
               "plan": {
-                "id": "test",
+                "id": "USD-MONTH-1000",
                 "object": "plan",
                 "amount": 1000,
                 "created": 1450088389,
