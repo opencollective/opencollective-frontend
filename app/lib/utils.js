@@ -165,6 +165,31 @@ const getTier = (backer, tiers) => {
 
 };
 
+/*
+ * Hacky way to do currency conversion on Leaderboard
+ */
+
+const generateFXConversionSQL = () => {
+
+  // All data as of 3/11/16
+  const fxConversion = [
+    ['USD', 1.0],
+    ['EUR', 0.90],
+    ['GBP', 0.71],
+    ['MXN', 17.70],
+    ['SEK', 8.34],
+    ['AUD', 1.32],
+    ['INR', 66.97],
+    ['CAD', 1.3]
+  ];
+
+  var sql = 'CASE ';
+  sql += fxConversion.map(currency => `WHEN MAX(g.currency) = '${currency[0]}' THEN SUM(amount) / ${currency[1]}`).join('\n');
+  sql += 'ELSE 0 END AS "amountInUSD"';
+
+  return sql;
+};
+
 /**
  * Export public methods.
  */
@@ -178,5 +203,6 @@ module.exports = {
   planId,
   encrypt,
   getTier,
-  decrypt
+  decrypt,
+  generateFXConversionSQL
 }
