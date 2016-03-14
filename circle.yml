@@ -1,3 +1,8 @@
+general:
+  branches:
+    ignore:
+      - staging
+      - production
 machine:
   post:
     - npm install jscs@1.13.1 -g
