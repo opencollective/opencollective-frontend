@@ -468,6 +468,7 @@ module.exports = function(app) {
 
   const paypalCallback = (req, res, next) => {
     const transaction = req.paranoidtransaction;
+    const group = req.group;
     const token = req.query.token;
 
     if (!token) {
@@ -517,7 +518,29 @@ module.exports = function(app) {
         }, cb);
       }],
 
-      updateTransaction: ['getOrCreateUser', (cb, results) => {
+      addUserToGroup: ['getOrCreateUser', (cb, results) => {
+        const user = results.getOrCreateUser;
+
+        models.UserGroup.findOne({
+          where: {
+            GroupId: group.id,
+            UserId: user.id,
+            role: roles.BACKER
+          }
+        })
+        .then((userGroup) => {
+          if (!userGroup)
+            group
+              .addUserWithRole(user, roles.BACKER)
+              .done(cb);
+          else {
+            return cb();
+          }
+        })
+        .catch(cb);
+      }],
+
+      updateTransaction: ['addUserToGroup', (cb, results) => {
         transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
           .then(() => transaction.setUser(results.getOrCreateUser))
           .then(() => cb())

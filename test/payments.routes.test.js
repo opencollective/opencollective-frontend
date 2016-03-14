@@ -848,6 +848,12 @@ describe('payments.routes.test.js', () => {
                 expect(text).to.contain(`userid=${user.id}`)
                 expect(text).to.contain('has_full_account=false')
                 expect(text).to.contain('status=payment_success')
+
+                return group.getUsers();
+              })
+              .then((users) => {
+                const backer = _.find(users, {email: email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
