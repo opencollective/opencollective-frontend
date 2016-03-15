@@ -12,30 +12,35 @@ module.exports = {
   /*
    * Post a given activity to Slack
    */
-  postActivity: function(activity) {
+  postActivity: function(activity, options) {
     var message = activitiesLib.formatMessage(activity, true);
-    var attachment = formatAttachment(activity);
-    this.postMessage(message, attachment);
+    options.attachments = formatAttachment(activity);
+    this.postMessage(message, options);
   },
 
   /*
-   * Posts a message on internal OpenCollective slack
+   * Posts a message to a slack webhook
    */
-  postMessage: function(msg, attachmentArray, channel){
-    const slack = new Slack(config.slack.hookUrl,{});
-
-    return slack.send({
+  postMessage: function(msg, options) {
+    var slackOptions = {
       text: msg,
-      channel: channel || config.slack.activityChannel,
-      username: 'ActivityBot',
-      icon_emoji: ':raising_hand:',
-      attachments: attachmentArray || []
-    })
+      username: 'OpenCollective Activity Bot',
+      icon_url: 'https://opencollective.com/favicon.ico',
+      attachments: options.attachments || []
+    };
+
+    if (!options.hasOwnProperty('channel')) {
+      slackOptions.channel = config.slack.activityChannel;
+    } else if (options.channel) {
+      slackOptions.channel = options.channel;
+    }
+
+    return new Slack(options.webhookUrl || config.slack.hookUrl, {}).send(slackOptions)
     .catch((err)=>{
       console.error(err);
     });
   }
-}
+};
 
 function formatAttachment(activity) {
   if (activity.type === constants.WEBHOOK_STRIPE_RECEIVED) {
