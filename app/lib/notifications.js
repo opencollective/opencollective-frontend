@@ -1,5 +1,6 @@
 const axios = require('axios');
 const activitiesLib = require('../lib/activities');
+const slackLib = require('./slack');
 
 const ACTIVITY_ALL = 'all';
 
@@ -11,14 +12,16 @@ module.exports = (Sequelize, activity) => {
         activity.type
       ],
       GroupId: activity.GroupId,
-      // for now, only handle gitter webhook in this lib
-      // TODO sdubois: move email + slack channels to this lib
-      channel: 'gitter'
+      // for now, only handle gitter and slack webhooks in this lib
+      // TODO sdubois: move email + internal slack channels to this lib
+      channel: ['gitter', 'slack']
     }
-  }).then(notifications => {
-    return notifications.map(notif => {
-      if (notif.channel === 'gitter') {
-        return publishToGitter(activity, notif);
+  }).then(notifConfigs => {
+    return notifConfigs.map(notifConfig => {
+      if (notifConfig.channel === 'gitter') {
+        return publishToGitter(activity, notifConfig);
+      } else if (notifConfig.channel === 'slack') {
+        return publishToSlack(activity, notifConfig);
       }
     })
   })
@@ -32,4 +35,11 @@ function publishToGitter(activity, notifConfig) {
     .post(notifConfig.webhookUrl, {
       message: activitiesLib.formatMessage(activity, false)
     });
+}
+
+function publishToSlack(activity, notifConfig) {
+  return slackLib.postActivity(activity, {
+    webhookUrl: notifConfig.webhookUrl,
+    channel: undefined
+  });
 }
