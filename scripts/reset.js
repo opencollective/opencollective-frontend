@@ -1,31 +1,53 @@
-var exec = require('child-process-promise').exec;
+const exec = require('child-process-promise').exec;
 
-var seed = require('./create_user_and_group');
+const app = require('../index');
+const models = app.set('models');
+const roles = require('../app/constants/roles');
+
+var data = {};
 
 if (process.env.NODE_ENV !== 'development') {
   return console.error('Only run reset script in development');
 }
 
 exec('make dropdb && make database')
-.then(function(result) {
+.then((result) => {
   console.log('output', result.stdout);
 
   return exec('SEQUELIZE_ENV=development npm run db:migrate')
 })
-.then(function(result) {
+.then((result) => {
   console.log('output', result.stdout);
 
-  return exec('SEQUELIZE_ENV=development npm run db:seed')
-})
-.then(function(result) {
-  console.log('output', result.stdout);
-
-  return seed()
-  .catch(function(err) {
-    console.error('Script error');
-    console.log('error', err);
-    console.log('stack', err.stack);
-    process.exit();
+  return models.Application.create({
+    api_key: '0ac43519edcf4421d80342403fb5985d',
+    name: 'webapp',
+    _access: 1
+  })
+  .then(() => {
+    return models.User.create({
+      email: 'devuser@opencollective.com',
+      password: 'password'
+    })
+    .then((user) => data.user = user);
+  })
+  .then(() => {
+    return models.Group.create({
+      name: 'OpenCollective Demo',
+      description: 'OpenCollective Demo group',
+      isPublic: true,
+      slug: 'opencollective'
+    })
+    .then((group) => group.addUserWithRole(data.user, roles.HOST))
+  })
+  .then(() => {
+    return models.ConnectedAccount.create({
+      provider: 'paypal',
+      // Sandbox api keys
+      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+    })
+    .then((connectedAccount) => connectedAccount.setUser(data.user));
   });
 })
 .then(function() {

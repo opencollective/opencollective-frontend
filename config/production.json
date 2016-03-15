@@ -21,5 +21,10 @@
   "slack": {
     "hookUrl": "https://hooks.slack.com/services/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",
     "activityChannel": "#activity"
+  },
+  "paypal": {
+    "rest": {
+      "mode": "live"
+    }
   }
 }

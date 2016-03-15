@@ -40,6 +40,7 @@
     "node-uuid": "^1.4.3",
     "nodemailer": "^1.11.0",
     "paypal-adaptive": "^0.4.2",
+    "paypal-rest-sdk": "^1.6.8",
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
     "querystring": "^0.2.0",

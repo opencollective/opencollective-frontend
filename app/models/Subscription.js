@@ -41,6 +41,17 @@ module.exports = (Sequelize, DataTypes) => {
     activatedAt: DataTypes.DATE,
 
     deactivatedAt: DataTypes.DATE
+  }, {
+    paranoid: true,
+
+    instanceMethods: {
+      activate() {
+        this.isActive = true;
+        this.activatedAt = new Date();
+
+        return this.save();
+      }
+    }
   });
 
   return Subscription;

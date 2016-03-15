@@ -146,6 +146,18 @@ describe('payments.routes.test.js', () => {
     .catch(done);
   });
 
+  beforeEach((done) => {
+    models.ConnectedAccount.create({
+      provider: 'paypal',
+      // Sandbox api keys
+      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+    })
+    .then((account) => account.setUser(user))
+    .then(() => done())
+    .catch(done);
+  });
+
   // Create an application which has only access to `group`
   beforeEach((done) => {
     models.Application.create(utils.data('application2')).done((e, a) => {
@@ -727,6 +739,170 @@ describe('payments.routes.test.js', () => {
 
       });
 
+    });
+
+    describe('Paypal recurring payment', () => {
+      describe('success', () => {
+        var links;
+        const token = 'EC-123';
+
+        beforeEach((done) => {
+          request(app)
+            .post(`/groups/${group.id}/payments/paypal`)
+            .send({
+              payment: {
+                amount: 10,
+                currency: 'USD',
+                interval: 'month'
+              },
+              api_key: application2.api_key
+            })
+            .end((err, res) => {
+              expect(err).to.not.exist;
+              links = res.body.links;
+              done();
+            });
+        });
+
+        it('creates a transaction and returns the links', (done) => {
+          expect(links[0]).to.have.property('method', 'REDIRECT');
+          expect(links[0]).to.have.property('rel', 'approval_url');
+          expect(links[0]).to.have.property('href');
+
+          expect(links[1]).to.have.property('method', 'POST');
+          expect(links[1]).to.have.property('rel', 'execute');
+          expect(links[1]).to.have.property('href');
+
+          models.Transaction.findAndCountAll({
+            include: [{
+              model: models.Subscription
+            }],
+            paranoid: false
+          })
+          .then((res) => {
+            expect(res.count).to.equal(1);
+            const transaction = res.rows[0];
+            const subscription = transaction.Subscription;
+
+            expect(transaction).to.have.property('GroupId', group.id);
+            expect(transaction).to.have.property('currency', 'USD');
+            expect(transaction).to.have.property('tags');
+            expect(transaction).to.have.property('interval', 'month');
+            expect(transaction).to.have.property('amount', 10);
+
+            expect(subscription).to.have.property('data');
+            expect(subscription).to.have.property('interval', 'month');
+            expect(subscription).to.have.property('amount', 10);
+
+            done();
+          })
+          .catch(done);
+        });
+
+        it('executes the billing agreement', (done) => {
+          const email = 'testemail@test.com';
+
+          // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
+          nock('https://api.sandbox.paypal.com:443')
+            .post('/v1/oauth2/token', "grant_type=client_credentials")
+            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-card/.* https://api.paypal.com/v1/vault/credit-card\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
+
+          const executeRequest = nock('https://api.sandbox.paypal.com:443')
+            .post(`/v1/payments/billing-agreements/${token}/agreement-execute`)
+            .reply(200, {
+              id: 'I-123',
+              payer: {
+                payment_method: 'paypal',
+                status: 'verified',
+                payer_info: {
+                  email
+                }
+              }
+            });
+
+          request(app)
+            .get(`/groups/${group.id}/transactions/1/callback?token=${token}`) // hardcode transaction id
+            .end((err, res) => {
+              expect(err).to.not.exist;
+              expect(executeRequest.isDone()).to.be.true;
+              const text = res.text;
+
+              models.Transaction.findAndCountAll({
+                include: [
+                  { model: models.Subscription },
+                  { model: models.User }
+                ]
+              })
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                const transaction = res.rows[0];
+                const subscription = transaction.Subscription;
+                const user = transaction.User;
+
+                expect(subscription).to.have.property('data');
+                expect(subscription.data).to.have.property('billingAgreementId');
+                expect(subscription.data).to.have.property('plan');
+
+                expect(user).to.have.property('email', email);
+
+                expect(text).to.contain(`userid=${user.id}`)
+                expect(text).to.contain('has_full_account=false')
+                expect(text).to.contain('status=payment_success')
+
+                return group.getUsers();
+              })
+              .then((users) => {
+                const backer = _.find(users, {email: email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+            });
+        });
+      });
+
+      describe('errors', () => {
+        it('fails if the interval is wrong', (done) => {
+          request(app)
+            .post(`/groups/${group.id}/payments/paypal`)
+            .send({
+              payment: {
+                amount: 10,
+                currency: 'USD',
+                interval: 'abc'
+              },
+              api_key: application2.api_key
+            })
+            .expect(400, {
+              error: {
+                code: 400,
+                type: 'bad_request',
+                message: 'Interval should be month or year.'
+              }
+            })
+            .end(done);
+        });
+
+        it('fails if it has no amount', (done) => {
+          request(app)
+            .post(`/groups/${group.id}/payments/paypal`)
+            .send({
+              payment: {
+                currency: 'USD',
+                interval: 'month'
+              },
+              api_key: application2.api_key
+            })
+            .expect(400, {
+              error: {
+                code: 400,
+                type: 'bad_request',
+                message: 'Payment Amount missing.'
+              }
+            })
+            .end(done);
+        });
+      });
     });
 
     describe('Payment errors', () => {

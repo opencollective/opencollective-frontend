@@ -51,6 +51,8 @@ module.exports = function(Sequelize, DataTypes) {
     approvedAt: DataTypes.DATE,
     reimbursedAt: DataTypes.DATE
   }, {
+    paranoid: true,
+
     getterMethods: {
 
       preview() {

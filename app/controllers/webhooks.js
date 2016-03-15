@@ -137,10 +137,7 @@ module.exports = (app) => {
         // If the subscription is not active, we will just update the already existing one
         // We only use pending subscriptions for the first subscription invoice
         if (!subscription.isActive) {
-          subscription.isActive = true;
-          subscription.activatedAt = new Date();
-
-          return subscription.save()
+          return subscription.activate()
             .then(subscription => {
               return Activity.create({
                 type: activities.SUBSCRIPTION_CONFIRMED,

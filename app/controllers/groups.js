@@ -450,7 +450,12 @@ module.exports = function(app) {
           .catch(cb);
       },
 
-      getStripeAccount: (cb) =>  req.group.getStripeAccount(cb)
+      getStripeAccount: (cb) =>  req.group.getStripeAccount(cb),
+      getConnectedAccount: (cb) => {
+        req.group.getConnectedAccount()
+          .then((account) => cb(null, account))
+          .catch(cb);
+      }
 
     }, (e, results) => {
       if (e) return next(e);
@@ -467,6 +472,10 @@ module.exports = function(app) {
 
       if (results.getStripeAccount) {
         group.stripeAccount = _.pick(results.getStripeAccount, 'stripePublishableKey');
+      }
+
+      if (_.get(results, 'getConnectedAccount.provider') === 'paypal') {
+        group.hasPaypal = true; // hack for the prototype, to refactor
       }
 
       res.send(group);
