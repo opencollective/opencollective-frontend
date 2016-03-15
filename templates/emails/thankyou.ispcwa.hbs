@@ -6,7 +6,11 @@ Subject: Thank you for your {{{currency transaction.amount currency=transaction.
   <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{group.logo}}" style="border-radius: 50%;" width="80" height="80" />
 </center>
 
+{{#if user.name}}
 <p>Dear {{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
 
 <p>We would like to thank you for your donation of {{{currency transaction.amount currency=transaction.currency}}} on {{{moment transaction.createdAt}}}.
   Your gift will help us continue our activities.</p>
