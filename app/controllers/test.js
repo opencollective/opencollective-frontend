@@ -73,6 +73,18 @@ module.exports = function(app) {
         .done(cb);
       }],
 
+      createConnectedAccount: ['createTestUser', (cb, results) => {
+        models.ConnectedAccount.create({
+          provider: 'paypal',
+          // Sandbox api keys
+          clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+          secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+        })
+        .then((connectedAccount) => connectedAccount.setUser(results.createTestUser))
+        .then(() => cb())
+        .catch(cb);
+      }],
+
       createGroup: ['createTestUser', (cb) => {
         models.Group.create({
           name: 'OpenCollective Test Group',

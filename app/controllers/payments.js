@@ -377,7 +377,7 @@ module.exports = function(app) {
         const subscription = {
           amount,
           currency,
-          interval: 'month'
+          interval
         };
 
         transactions._create({
@@ -391,7 +391,7 @@ module.exports = function(app) {
         const transactionId = results.createTransaction.id;
         const callbackUrl = `${config.host.api}/groups/${group.id}/transactions/${transactionId}/callback`;
         const billingPlan = {
-          description: `Plan for donation to ${group.name}`,
+          description: `Plan for donation to ${group.name} (${currency} ${amount} / ${interval})`,
           name: `Plan ${group.name}`,
           merchant_preferences: {
             cancel_url: callbackUrl,
