@@ -3,8 +3,6 @@
  */
 const _ = require('lodash');
 const app = require('../index');
-const async = require('async');
-const config = require('config');
 const expect = require('chai').expect;
 const request = require('supertest');
 const sinon = require('sinon');
@@ -25,7 +23,6 @@ const STRIPE_TOKEN = 'superStripeToken';
 const EMAIL = 'paypal@email.com';
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
-const transactionsData = utils.data('transactions1').transactions;
 const models = app.set('models');
 const stripeMock = require('./mocks/stripe');
 
@@ -41,6 +38,7 @@ describe('payments.routes.test.js', () => {
   var group2;
   var nocks = {};
   var stripeEmail;
+  var sandbox = sinon.sandbox.create();
 
   var stubStripe = () => {
     var mock = stripeMock.accounts.create;
@@ -60,6 +58,12 @@ describe('payments.routes.test.js', () => {
     });
   });
 
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
+  });
+
   // Create a user.
   beforeEach((done) => {
     models.User.create(userData).done((e, u) => {
@@ -75,8 +79,6 @@ describe('payments.routes.test.js', () => {
       .post('/v1/customers')
       .reply(200, stripeMock.customers.create);
   });
-
-
 
   beforeEach(() => {
     stubStripe();
@@ -173,6 +175,10 @@ describe('payments.routes.test.js', () => {
 
   afterEach(() => {
     nock.cleanAll();
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**
@@ -359,8 +365,8 @@ describe('payments.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post('/groups/' + group2.id + '/payments')
-          .set('Authorization', 'Bearer ' + user.jwt(application2))
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
@@ -420,7 +426,7 @@ describe('payments.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post('/groups/' + group2.id + '/payments')
-          .set('Authorization', 'Bearer ' + user.jwt(application2))
+          .set('Authorization', 'Bearer ' + user4.jwt(application2))
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -489,7 +495,7 @@ describe('payments.routes.test.js', () => {
             payment: data
           })
           .expect(200)
-          .end((e, res) => {
+          .end((e) => {
             expect(e).to.not.exist;
             done();
           });
@@ -505,7 +511,7 @@ describe('payments.routes.test.js', () => {
           .then((res) => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('UserId', null);
+            expect(res.rows[0]).to.have.property('UserId', 1);
             done();
           })
           .catch(done);

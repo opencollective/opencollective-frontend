@@ -43,5 +43,6 @@
   "mailgun": {
     "user": "",
     "password": ""
-  }
+  },
+  "clearbit": "test"
 }

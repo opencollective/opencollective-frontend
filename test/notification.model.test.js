@@ -5,6 +5,7 @@ var _ = require('lodash');
 var app = require('../index');
 var config = require('config');
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var emailLib = require('../app/lib/email')(app);
@@ -33,6 +34,12 @@ var Notification = models.Notification;
 describe(require('path').basename(__filename), function() {
 
   var application;
+  var user;
+  var user2;
+  var group;
+  var group2;
+  var sandbox = sinon.sandbox.create();
+
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
@@ -40,10 +47,11 @@ describe(require('path').basename(__filename), function() {
     });
   });
 
-  var user;
-  var user2;
-  var group;
-  var group2;
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
+  });
 
   beforeEach(function(done) {
     var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
@@ -59,6 +67,10 @@ describe(require('path').basename(__filename), function() {
       notificationData.GroupId = group.id;
       return Notification.create(notificationData).done(done);
     });
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   it('notifies for the `group.transaction.approved` email', function(done) {

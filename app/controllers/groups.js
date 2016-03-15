@@ -284,7 +284,7 @@ module.exports = function(app) {
     var group = req.group;
 
     // Caller.
-    var user = req.remoteUser || transaction.user || {};
+    var user = req.remoteUser || req.user || transaction.user || {};
 
     transactions._create({
       transaction,
@@ -547,22 +547,25 @@ module.exports = function(app) {
    * Get leaderboard of collectives
    */
   const getLeaderboard = (req, res, next) => {
+
     return sequelize.query(`
       SELECT
         MAX(g.name) as name,
         COUNT(t.id) as "donationsCount",
         SUM(amount) as "totalAmount",
         MAX(g.currency) as currency,
-        to_char(MAX(t."createdAt"), 'Month DD') as "latestDonation"
+        to_char(MAX(t."createdAt"), 'Month DD') as "latestDonation",
+        MAX(g.slug) as slug,
+        MAX(g.logo) as logo,
+        ${utils.generateFXConversionSQL()}
       FROM "Transactions" t
       LEFT JOIN "Groups" g ON g.id = t."GroupId"
       WHERE t."createdAt" > current_date - INTERVAL '30' day
         AND t.amount > 0
-        AND t."UserId" > 10
         AND t."UserId"
-        NOT IN (10, 30, 40,39,41,43,45,46,41,80)
+        NOT IN (10,39,40,43,45,46)
       GROUP BY t."GroupId"
-      ORDER BY "latestDonation" DESC`,
+      ORDER BY "amountInUSD" DESC`,
     {
       type: sequelize.QueryTypes.SELECT
     })

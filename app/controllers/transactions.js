@@ -402,7 +402,7 @@ module.exports = function(app) {
     var user = req.remoteUser;
     var group = req.group;
     var transaction = req.transaction;
-    var isManual = transaction.paymentMethod === 'manual';
+    var isManual = transaction.paymentMethod !== 'paypal';
 
     async.auto({
 

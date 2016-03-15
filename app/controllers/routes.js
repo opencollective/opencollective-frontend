@@ -123,12 +123,12 @@ module.exports = function(app) {
   app.get('/groups/:groupid', groups.getOne); // skipped route for public
 
   app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users', groups.getUsers);
+  app.get('/groups/:groupid/users', mw.cache(60), groups.getUsers);
 
   app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
-  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
 
   /**
    * UserGroup.
@@ -146,7 +146,11 @@ module.exports = function(app) {
   app.get('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
   app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
-  app.post('/groups/:groupid/transactions', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), groups.createTransaction); // Create a transaction for a group.
+  // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
+  // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
+  // We should refactor this.
+  app.post('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
   app.get('/groups/:groupid/transactions/:transactionid', groups.getTransaction); // Get a transaction.

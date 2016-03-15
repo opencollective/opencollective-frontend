@@ -6,6 +6,7 @@ var app = require('../index');
 var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 
@@ -26,12 +27,20 @@ describe('cards.routes.test.js', function() {
   var user;
   var user2;
   var card1;
+  var sandbox = sinon.sandbox.create();
+
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create users.
@@ -68,6 +77,10 @@ describe('cards.routes.test.js', function() {
       card2 = c;
       done();
     });
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**

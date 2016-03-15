@@ -48,20 +48,27 @@ var stubStripe = () => {
   stub.yields(null, mock);
 };
 
+
 describe('webhooks.routes.test.js', () => {
   var nocks = {};
-
   var user;
   var card;
   var group;
   var application;
   var firstPayment;
+  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create a user.
@@ -104,6 +111,10 @@ describe('webhooks.routes.test.js', () => {
 
   afterEach(() => {
     nock.cleanAll();
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   describe('success', () => {
@@ -415,6 +426,37 @@ describe('webhooks.routes.test.js', () => {
         .end(done);
 
     });
+
+    it('returns 200 if the plan id is not valid', (done) => {
+      const e = _.extend({}, webhookEvent);
+      e.data.object.lines.data[0].plan.id = 'abc';
+
+      nocks['events.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/events/' + e.id)
+        .reply(200, e);
+
+      request(app)
+        .post('/webhooks/stripe')
+        .send(e)
+        .expect(200)
+        .end((err) => {
+          expect(err).to.not.exist;
+
+          models.Activity
+            .findAndCountAll({
+              where: {
+                type: activities.WEBHOOK_STRIPE_RECEIVED
+              }
+            })
+            .then((res) => {
+              expect(res.count).to.equal(0); // nothing is created
+              done();
+            })
+            .catch(done);
+        });
+
+    });
+
 
   });
 

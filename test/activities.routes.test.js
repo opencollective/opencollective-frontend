@@ -5,6 +5,7 @@ var _ = require('lodash');
 var app = require('../index');
 var async = require('async');
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var roles = require('../app/constants/roles');
@@ -25,12 +26,20 @@ describe('activities.routes.test.js', function() {
   var user;
   var user2;
   var group;
+  var sandbox = sinon.sandbox.create();
+
 
   beforeEach(function(done) {
     utils.cleanAllDb(function(e, app) {
       application = app;
       done();
     });
+  });
+
+  // Create a stub for clearbit
+  beforeEach((done) => {
+    utils.clearbitStubBeforeEach(sandbox);
+    done();
   });
 
   // Create users.
@@ -84,6 +93,10 @@ describe('activities.routes.test.js', function() {
     async.eachSeries(activitiesData, function(a, cb) {
       models.Activity.create(a).done(cb);
     }, done);
+  });
+
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**

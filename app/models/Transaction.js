@@ -27,8 +27,8 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       validate: {
         isIn: {
-          args: [['paypal', 'manual']],
-          msg: 'Must be paypal or manual'
+          args: [['paypal', 'manual', 'other']],
+          msg: 'Must be paypal, manual or other'
         }
       }
     },

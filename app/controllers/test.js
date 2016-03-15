@@ -17,8 +17,8 @@ module.exports = function(app) {
       return next(new errors.BadRequest('Must only be run on test server'));
     }
 
-    // Hard code to avoid resetting the production db by mistake    
-    const databaseName = config.env === 'test_server' 
+    // Hard code to avoid resetting the production db by mistake
+    const databaseName = config.env === 'test_server'
       ? 'opencollective_test'
       : 'dd7n9gp6tr4u36';
 
@@ -78,11 +78,12 @@ module.exports = function(app) {
           name: 'OpenCollective Test Group',
           description: 'OpenCollective test group on the test server',
           slug: 'testcollective',
+          currency: 'EUR',
           isPublic: true
         })
         .done(cb);
       }],
-      
+
       addUserToGroup: ['createGroup', (cb, results) => {
         const group = results.createGroup;
         group.addUserWithRole(results.createTestUser, roles.HOST)
@@ -95,7 +96,7 @@ module.exports = function(app) {
         .then(() => cb())
         .catch(cb);
       }],
-      
+
       addDonation1: ['createGroup', (cb, results) => {
         models.Transaction.create({
           "description": "Donation 1",
@@ -103,13 +104,14 @@ module.exports = function(app) {
           "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
-          "createdAt": "2016-02-29T08:00:00.000Z"
+          "createdAt": "2016-02-29T08:00:00.000Z",
+          "UserId": 1
         })
         .then(t => t.setGroup(results.createGroup))
         .then(() => cb())
         .catch(cb);
       }],
-      
+
       addDonation2: ['createGroup', (cb, results) => {
         models.Transaction.create({
           "description": "Donation 2",
@@ -117,13 +119,14 @@ module.exports = function(app) {
           "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
-          "createdAt": "2016-03-01T08:00:00.000Z"
+          "createdAt": "2016-03-01T08:00:00.000Z",
+          "UserId": 1
         })
         .then(t => t.setGroup(results.createGroup))
         .then(() => cb())
         .catch(cb);
       }],
-      
+
       addExpense1: ['createGroup', (cb, results) => {
         models.Transaction.create({
           "description": "Expense 1",
@@ -136,7 +139,7 @@ module.exports = function(app) {
         .then(() => cb())
         .catch(cb);
       }],
-      
+
       addExpense2: ['createGroup', (cb, results) => {
         models.Transaction.create({
           "description": "Expense 2",
