@@ -22,6 +22,7 @@ module.exports = function(app) {
   var models = app.set('models');
   var errors = app.errors;
   var transactions = require('../controllers/transactions')(app);
+  var users = require('../controllers/users')(app);
   var emailLib = require('../lib/email')(app);
 
   const getOrCreatePlan = (params, cb) => {
@@ -58,11 +59,12 @@ module.exports = function(app) {
 
   const post = (req, res, next) => {
     var payment = req.required.payment;
-    var user = req.remoteUser;
+    var user = req.user;
     var email = payment.email;
     var group = req.group;
     var interval = payment.interval;
     var isSubscription = _.contains(['month', 'year'], interval);
+    var hasFullAccount = false; // Used to specify if a user has a real account
 
     if (interval && !isSubscription) {
       return next(new errors.BadRequest('Interval should be month or year.'));
@@ -204,36 +206,9 @@ module.exports = function(app) {
         }
       }],
 
-      /*
-       *  Creates a user in our system to associate with this transaction
-       */
-<<<<<<< 947225aa8f9b817dedc74ff200dfedd10431073c
-      getOrCreateUser: ['createCharge', function(cb) {
-        return models.User.findOne({
-          where: {
-            email: email
-          }
-        })
-        .then(function(user) {
-          if (user) {
-            hasFullAccount = (user.password_hash ? true : false);
-            cb(null, user);
-          } else {
-            users._create({
-              email: email
-            }, cb);
-          }
-        })
-        .catch(cb);
-      }],
-=======
-
-      getOrCreateUser: ['createCharge', (cb) => getOrCreateUser({ email }, cb)],
->>>>>>> add paranoid mode to transactions and add user logic
-
-      createTransaction: ['getOrCreateUser', 'createCard', 'createCharge', function(cb, results) {
+      createTransaction: ['createCard', 'createCharge', function(cb, results) {
+        const user = req.user;
         const charge = results.createCharge;
-        const user = results.getOrCreateUser;
         const card = results.createCard;
         const currency = charge.currency || charge.plan.currency;
         const amount = payment.amount;
@@ -269,14 +244,14 @@ module.exports = function(app) {
       }],
 
       sendThankYouEmail: ['createTransaction', function(cb, results) {
-        const user = results.getOrCreateUser;
+        const user = req.user;
         const transaction = results.createTransaction;
         const data = {
           transaction: transaction.info,
           user: user.info,
           group: group.info,
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
-        };
+        }
 
         var template = 'thankyou';
         if(group.name.match(/WWCode/i))
@@ -288,9 +263,8 @@ module.exports = function(app) {
         cb();
       }],
 
-      addUserToGroup: ['createTransaction', function(cb, results) {
-        user = results.getOrCreateUser;
-
+      addUserToGroup: ['createTransaction', function(cb) {
+        const user = req.user;
         models.UserGroup.findOne({
           where: {
             GroupId: group.id,
@@ -317,10 +291,7 @@ module.exports = function(app) {
         return next(e);
       }
 
-      res.send({
-        success: true,
-        user: user.info
-      });
+      res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});
     });
 
   };
@@ -550,7 +521,7 @@ module.exports = function(app) {
       if (err) return next(err);
       const user = results.getOrCreateUser;
 
-      res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${user.hasFullAccount}`);
+      res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${user.info.hasFullAccount}`);
     });
 
   };
