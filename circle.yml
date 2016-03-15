@@ -1,6 +1,7 @@
 general:
   branches:
     ignore:
+      - test-server
       - staging
       - production
 machine:
