@@ -7,8 +7,11 @@ Subject: Thank you for your {{{currency transaction.amount currency=transaction.
   <h3 style="margin-top:0;">{{group.name}}</h3>
 </center>
 
+{{#if user.name}}
 <p>{{user.name}},</p>
-
+{{else}}
+<p>Hi,</p>
+{{/if}}
 <p>I would like to thank you for your donation of {{{currency transaction.amount currency=transaction.currency}}} on {{{moment transaction.createdAt}}}. Your generous gift exponentially impacts the programs we offer to empower women to pursue careers in the technology sector.</p>
 
 <p>With your support, we are able to provide a free professional community for women in tech which aides and supports their success. In addition, your donation positively fuels our growth, development, and goal of connecting one million in technology careers.</p>
