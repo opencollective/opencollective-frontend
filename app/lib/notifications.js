@@ -38,7 +38,6 @@ function publishToGitter(activity, notifConfig) {
 }
 
 function publishToSlack(activity, notifConfig) {
-  console.log("Posting to slack", activity, notifConfig);
   return slackLib.postActivity(activity, {
     webhookUrl: notifConfig.webhookUrl,
     channel: undefined
