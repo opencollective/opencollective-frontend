@@ -741,7 +741,7 @@ describe('payments.routes.test.js', () => {
 
     });
 
-    describe('Paypal recurring payment', () => {
+    describe.only('Paypal recurring payment', () => {
       describe('success', () => {
         var links;
         const token = 'EC-123';
