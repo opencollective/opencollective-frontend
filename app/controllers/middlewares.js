@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var async = require('async');
-var jwt = require('jsonwebtoken');
 var utils = require('../lib/utils');
 
 module.exports = function(app) {
@@ -183,35 +182,6 @@ module.exports = function(app) {
         req.user = req.remoteUser;
 
         next();
-      });
-    },
-
-    /**
-     * Authenticate with a refresh token.
-     */
-    authenticateRefreshToken: function(req, res, next) {
-      var accessToken = req.required.access_token;
-      var refreshToken = req.required.refresh_token;
-
-      // Decode access token to identify the user.
-      jwt.verify(accessToken, secret, function(e) {
-        if (e && e.name !== 'TokenExpiredError') // Ok if a old token.
-          return next(new errors.Unauthorized('Invalid Token'));
-
-        var decoded = jwt.decode(accessToken);
-        User.findOne({_id: decoded.sub}, function(e, user) {
-          if (e) {
-            return next(e);
-          }
-          else if (!user || user.tokens.refresh_token !== refreshToken) {
-            // Check the refresh_token from the user data.
-            return next(new errors.Unauthorized('Invalid Refresh Token'));
-          }
-          else {
-            req.remoteUser = user;
-            next();
-          }
-        });
       });
     },
 
