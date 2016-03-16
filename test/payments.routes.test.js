@@ -741,7 +741,7 @@ describe('payments.routes.test.js', () => {
 
     });
 
-    describe.only('Paypal recurring payment', () => {
+    describe('Paypal recurring donation', () => {
       describe('success', () => {
         var links;
         const token = 'EC-123';
@@ -842,6 +842,112 @@ describe('payments.routes.test.js', () => {
                 expect(subscription).to.have.property('data');
                 expect(subscription.data).to.have.property('billingAgreementId');
                 expect(subscription.data).to.have.property('plan');
+
+                expect(user).to.have.property('email', email);
+
+                expect(text).to.contain(`userid=${user.id}`)
+                expect(text).to.contain('has_full_account=false')
+                expect(text).to.contain('status=payment_success')
+
+                return group.getUsers();
+              })
+              .then((users) => {
+                const backer = _.find(users, {email: email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+            });
+        });
+      });
+    });
+
+    describe('Paypal single donation', () => {
+      describe('success', () => {
+        var links;
+        const token = 'EC-123';
+        const paymentId = 'PAY-123';
+        const PayerID = 'ABC123';
+
+        beforeEach((done) => {
+          request(app)
+            .post(`/groups/${group.id}/payments/paypal`)
+            .send({
+              payment: {
+                amount: 10,
+                currency: 'USD'
+              },
+              api_key: application2.api_key
+            })
+            .end((err, res) => {
+              expect(err).to.not.exist;
+              links = res.body.links;
+              done();
+            });
+        });
+
+        it('creates a transaction and returns the links', (done) => {
+          const redirect = _.find(links, { method: 'REDIRECT' });
+
+          expect(redirect).to.have.property('method', 'REDIRECT');
+          expect(redirect).to.have.property('rel', 'approval_url');
+          expect(redirect).to.have.property('href');
+
+          models.Transaction.findAndCountAll({ paranoid: false })
+          .then((res) => {
+            expect(res.count).to.equal(1);
+            const transaction = res.rows[0];
+
+            expect(transaction).to.have.property('GroupId', group.id);
+            expect(transaction).to.have.property('currency', 'USD');
+            expect(transaction).to.have.property('tags');
+            expect(transaction).to.have.property('interval', null);
+            expect(transaction).to.have.property('SubscriptionId', null);
+            expect(transaction).to.have.property('amount', 10);
+
+            done();
+          })
+          .catch(done);
+        });
+
+        it('executes the billing agreement', (done) => {
+          const email = 'testemail@test.com';
+
+          // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
+          nock('https://api.sandbox.paypal.com:443')
+            .post('/v1/oauth2/token', "grant_type=client_credentials")
+            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-card/.* https://api.paypal.com/v1/vault/credit-card\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
+
+          const executeRequest = nock('https://api.sandbox.paypal.com')
+            .post(`/v1/payments/payment/${paymentId}/execute`, { payer_id: PayerID})
+            .reply(200, {
+              id: 'I-123',
+              payer: {
+                payment_method: 'paypal',
+                status: 'verified',
+                payer_info: {
+                  email
+                }
+              }
+            });
+
+          request(app)
+            .get(`/groups/${group.id}/transactions/1/callback?token=${token}&paymentId=${paymentId}&PayerID=${PayerID}`) // hardcode transaction id
+            .end((err, res) => {
+              expect(err).to.not.exist;
+              expect(executeRequest.isDone()).to.be.true;
+              const text = res.text;
+
+              models.Transaction.findAndCountAll({
+                include: [
+                  { model: models.Subscription },
+                  { model: models.User }
+                ]
+              })
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                const transaction = res.rows[0];
+                const user = transaction.User;
 
                 expect(user).to.have.property('email', email);
 

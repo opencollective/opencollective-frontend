@@ -7,7 +7,6 @@ const _ = require('lodash');
 const config = require('config');
 const async = require('async');
 const Stripe = require('stripe');
-const paypal = require('paypal-rest-sdk');
 const gateways = require('../gateways');
 
 const OC_FEE_PERCENT = 5;
@@ -352,24 +351,33 @@ module.exports = function(app) {
         transactions._create(payload, cb);
       }],
 
-      createSubscription: ['createTransaction', (cb, results) => {
-        if (!isSubscription) return cb();
+      callPaypal: ['createTransaction', (cb, results) => {
+        const connectedAccount = results.getConnectedAccount;
+        const transaction = results.createTransaction;
 
-        gateways.paypal.createSubscription({
-          connectedAccount: results.getConnectedAccount,
-          transaction: results.createTransaction,
-          group
-        }, cb);
+        if (isSubscription) {
+          gateways.paypal.createSubscription(
+            connectedAccount,
+            group,
+            transaction
+          , cb);
+        } else {
+          gateways.paypal.createPayment(
+            connectedAccount,
+            group,
+            transaction
+          , cb);
+        }
       }],
 
-      updateSubscription: ['createSubscription', (cb, results) => {
+      updateSubscription: ['callPaypal', (cb, results) => {
         if (!isSubscription) return cb();
 
         const transaction = results.createTransaction;
 
         transaction.getSubscription()
           .then((subscription) => {
-            subscription.data = results.createSubscription.billingAgreement;
+            subscription.data = results.callPaypal.billingAgreement;
 
             return subscription.save();
           })
@@ -383,9 +391,13 @@ module.exports = function(app) {
         return next(e);
       }
 
+      const links = isSubscription
+        ? results.callPaypal.billingAgreement.links
+        : results.callPaypal.links
+
       res.send({
         success: true,
-        links: results.createSubscription.billingAgreement.links
+        links
       });
     });
 
@@ -396,32 +408,38 @@ module.exports = function(app) {
     const group = req.group;
     const token = req.query.token;
 
+    // For single payments
+    const paymentId = req.query.paymentId;
+    const PayerID = req.query.PayerID;
+
+    const isSubscription = !paymentId || !PayerID;
+
     if (!token) {
       return next(new errors.BadRequest('Token to execute agreement is missing'));
     }
 
     async.auto({
-      getPaypalConfig: (cb) => {
+      getConnectedAccount: (cb) => {
         req.group.getConnectedAccount()
-          .then(connectedAccount => {
-            return cb(null, {
-              mode: config.paypal.rest.mode, //sandbox or live
-              client_id: connectedAccount.clientId,
-              client_secret: connectedAccount.secret
-            });
-          })
+          .then(connectedAccount => cb(null, connectedAccount))
           .catch(cb);
       },
 
-      executeBillingAgreement: ['getPaypalConfig', (cb, results) => {
-        paypal.billingAgreement.execute(token, {}, results.getPaypalConfig, cb);
+      execute: ['getConnectedAccount', (cb, results) => {
+        gateways.paypal.execute(
+          results.getConnectedAccount,
+          req.query.token,
+          req.query.paymentId,
+          req.query.PayerID
+        , cb)
       }],
 
-      activateSubscription: ['executeBillingAgreement', (cb, results) => {
+      activateSubscription: ['execute', (cb, results) => {
+        if (!isSubscription) return cb();
+
         transaction.getSubscription()
           .then(subscription => {
             const billingAgreementId = results.executeBillingAgreement.id;
-
             subscription.data = _.extend({}, subscription.data, { billingAgreementId });
 
             return subscription.save();

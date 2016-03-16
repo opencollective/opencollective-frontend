@@ -2,13 +2,27 @@ const paypal = require('paypal-rest-sdk');
 const async = require('async');
 const config = require('config');
 
-const createBillingPlan = (transaction, group, paypalConfig, cb) => {
-  const callbackUrl = `${config.host.api}/groups/${group.id}/transactions/${transaction.id}/callback`;
+/**
+ * We will pass the config in all the subsequent calls to be sure we don't
+ * overwrite the configuration of the global sdk
+ * Example: https://github.com/paypal/PayPal-node-SDK/blob/master/samples/configuration/multiple_config.js
+ */
+const getConfig = (connectedAccount) => ({
+  mode: config.paypal.rest.mode,
+  client_id: connectedAccount.clientId,
+  client_secret: connectedAccount.secret
+});
 
-  // Paypal frequency is uppercase: 'MONTH'
+const getCallbackUrl = (group, transaction) => `${config.host.api}/groups/${group.id}/transactions/${transaction.id}/callback`;
+
+const createBillingPlan = (group, transaction, paypalConfig, cb) => {
+  const callbackUrl = getCallbackUrl(group, transaction);
+
   const amount = transaction.amount;
   const currency = transaction.currency;
   const interval = transaction.interval;
+
+  // Paypal frequency is uppercase: 'MONTH'
   const frequency = interval.toUpperCase();
 
   const billingPlan = {
@@ -59,25 +73,14 @@ const createBillingAgreement = (group, planId, paypalConfig, cb) => {
 /**
  * Create a subscription payment and return the links to the paypal approval
  */
-const createSubscription = (args, callback) => {
-  const connectedAccount = args.connectedAccount;
-  const transaction = args.transaction;
-  const group = args.group;
-
-  // We will pass the config in all the subsequent calls to be sure we don't
-  // overwrite the configuration of the global sdk
-  // Example: https://github.com/paypal/PayPal-node-SDK/blob/master/samples/configuration/multiple_config.js
-  const paypalConfig = {
-    mode: config.paypal.rest.mode,
-    client_id: connectedAccount.clientId,
-    client_secret: connectedAccount.secret
-  };
+const createSubscription = (connectedAccount, group, transaction, callback) => {
+  const paypalConfig = getConfig(connectedAccount);
 
   async.auto({
     createBillingPlan: (cb) => {
       createBillingPlan(
-        transaction,
         group,
+        transaction,
         paypalConfig,
         cb
       );
@@ -108,7 +111,58 @@ const createSubscription = (args, callback) => {
       billingAgreement: results.createBillingAgreement
     })
   });
-
 };
 
-module.exports.createSubscription = createSubscription;
+/**
+ * Create a single payment
+ * https://developer.paypal.com/docs/rest/api/payments/#payment.create
+ */
+const createPayment = (connectedAccount, group, transaction, callback) => {
+  const currency = transaction.currency;
+  const amount = transaction.amount;
+  const callbackUrl = getCallbackUrl(group, transaction);
+  const paypalConfig = getConfig(connectedAccount);
+
+  const payment = {
+    intent: 'sale',
+    payer: {
+      payment_method: 'paypal'
+    },
+    redirect_urls: {
+        return_url: callbackUrl,
+        cancel_url: callbackUrl
+    },
+    transactions: [{
+      amount: {
+        currency,
+        total: amount
+      },
+      description: `Donation to ${group.name} (${currency} ${amount})`
+    }]
+  };
+
+  paypal.payment.create(payment, paypalConfig, callback);
+};
+
+/**
+ * Execute a payment
+ * https://developer.paypal.com/docs/rest/api/payments/#payment.execute
+ */
+
+const execute = (connectedAccount, token, paymentId, PayerID, cb) => {
+  const paypalConfig = getConfig(connectedAccount);
+
+  // Single payment
+  if (paymentId && PayerID) {
+    paypal.payment.execute(paymentId, { payer_id: PayerID }, paypalConfig, cb);
+  } else {
+    paypal.billingAgreement.execute(token, {}, paypalConfig, cb);
+  }
+
+}
+
+module.exports = {
+  createSubscription,
+  createPayment,
+  execute
+};
