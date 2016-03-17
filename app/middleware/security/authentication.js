@@ -67,7 +67,6 @@ module.exports = function (app) {
     },
 
     checkJwtExpiry: (req, res, next) => {
-      console.log("checkJwtExpiry");
       if (req.jwtExpired) {
         return next(new errors.CustomError(401, 'jwt_expired', 'jwt expired'));
       }
@@ -76,7 +75,6 @@ module.exports = function (app) {
     },
 
     _authenticateAppByJwt: (req, res, next) => {
-      console.log("_authenticateAppByJwt");
       const appId = parseInt(req.jwtPayload.aud);
 
       Application
@@ -91,16 +89,8 @@ module.exports = function (app) {
         .catch(next);
     },
 
-    //authenticateAppByJwt: [
-    //  this.parseJwtNoExpiryCheck,
-    //  this.checkJwtExpiry,
-    //  this._authenticateAppByJwt
-    //],
-
     authenticateAppByApiKey: (req, res, next) => {
-      console.log("authenticateAppByApiKey");
       mw.required('api_key')(req, res, () => {
-        console.log("authenticateAppByApiKey level 2");
         const appApiKey = req.query.api_key || req.body.api_key;
 
         // TODO simplify with promises
@@ -141,7 +131,6 @@ module.exports = function (app) {
      * Authenticate user by username/email/password.
      */
     authenticateUserByName: (req, res, next) => {
-      console.log("authenticateUserByName");
       const username = (req.body && req.body.username) || req.query.username;
       const email = (req.body && req.body.email) || req.query.email;
       const password = (req.body && req.body.password) || req.query.password;

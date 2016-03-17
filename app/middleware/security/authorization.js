@@ -1,8 +1,10 @@
-import _ from 'lodash';
-import { Forbidden, NotFound, Unauthorized } from '../../lib/errors';
-import {
-  authenticateUser
-} from './authentication';
+var _ = require('lodash');
+var errors = require('../../lib/errors');
+var authenticateUser = require('./authentication').authenticateUser;
+
+const Forbidden = errors.Forbidden;
+const NotFound = errors.NotFound;
+const Unauthorized = errors.Unauthorized;
 
 /**
  * Middleware related to authorization.
