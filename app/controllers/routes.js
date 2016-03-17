@@ -2,8 +2,11 @@ var _ = require('lodash');
 var serverStatus = require('express-server-status');
 var roles = require('../constants/roles');
 var jwt = require('../middlewares/jwt');
+//var aZ = require('../middleware/security/authorization');
 
 module.exports = function(app) {
+
+  var aN = require('../middleware/security/authentication')(app);
 
   /**
    * Public methods.
@@ -42,15 +45,15 @@ module.exports = function(app) {
   app.param('paykey', params.paykey);
 
   /**
+   * User reset password flow (no jwt verification)
+   */
+  app.post('/users/password/forgot', aN.authenticateAppByApiKey, mw.required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+
+  /**
    * Check api key.
    */
   app.use(mw.apiKey);
-
-  /**
-   * User reset password flow (no jwt verification)
-   */
-  app.post('/users/password/forgot', mw.required('api_key'), mw.authorizeApp, mw.required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', mw.required('api_key'), mw.authorizeApp, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
   app.post('/subscriptions/new_token', mw.required('email'), subscriptions.sendNewTokenByEmail);
   /**
