@@ -39,32 +39,31 @@ module.exports = function (app) {
      */
     parseJwtNoExpiryCheck: (req, res, next) => {
       console.log("parseJwtNoExpiryCheck");
-      if (req.headers && req.headers.authorization) {
-        const parts = req.headers.authorization.split(' ');
+      if (!req.headers || !req.headers.authorization) {
+        return next(new Unauthorized('Missing authorization header'));
+      }
+      const parts = req.headers.authorization.split(' ');
 
-        const scheme = parts[0];
-        const token = parts[1];
+      const scheme = parts[0];
+      const token = parts[1];
 
-        if (!/^Bearer$/i.test(scheme) || !token) {
-          return next(new Unauthorized('Format is Authorization: Bearer [token]'));
+      if (!/^Bearer$/i.test(scheme) || !token) {
+        return next(new Unauthorized('Format is Authorization: Bearer [token]'));
+      }
+
+      jwt.verify(token, secret, (err, decoded) => {
+        // JWT library either returns an error or the decoded version
+        if (err && err.name === 'TokenExpiredError') {
+          req.jwtExpired = true;
+          req.jwtPayload = jwt.decode(token, secret); // we need to decode again
+        } else if (err) {
+          return next(new Unauthorized(err.message));
+        } else {
+          req.jwtPayload = decoded;
         }
 
-        jwt.verify(token, secret, (err, decoded) => {
-          // JWT library either returns an error or the decoded version
-          if (err && err.name === 'TokenExpiredError') {
-            req.jwtExpired = true;
-            req.jwtPayload = jwt.decode(token, secret); // we need to decode again
-          } else if (err) {
-            return next(new Unauthorized(err.message));
-          } else {
-            req.jwtPayload = decoded;
-          }
-
-          return next();
-        });
-      } else {
         return next();
-      }
+      });
     },
 
     checkJwtExpiry: (req, res, next) => {
