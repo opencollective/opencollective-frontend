@@ -241,6 +241,9 @@ describe('subscriptions.routes.test.js', () => {
     it('fails if there is no email', (done) => {
       request(app)
         .post('/subscriptions/new_token')
+        .send({
+          api_key: application.api_key
+        })
         .expect(400, {
           error: {
             code: 400,
