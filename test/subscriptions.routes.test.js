@@ -132,7 +132,7 @@ describe('subscriptions.routes.test.js', () => {
         user,
         scope: 'subscriptions'
       }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
@@ -190,7 +190,7 @@ describe('subscriptions.routes.test.js', () => {
     it('fails if the user does not exist', (done) => {
       const fakeUser = { id: 12312312 };
       const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
-        expiresInSeconds: 100,
+        expiresIn: 100,
         subject: fakeUser.id,
         issuer: config.host.api,
         audience: application.id
@@ -211,7 +211,7 @@ describe('subscriptions.routes.test.js', () => {
     it('sends an email with the new valid token', (done) => {
       const secret = config.keys.opencollective.secret;
       const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
@@ -340,7 +340,7 @@ describe('subscriptions.routes.test.js', () => {
         user,
         scope: 'subscriptions'
       }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
