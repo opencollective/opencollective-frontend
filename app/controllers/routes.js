@@ -57,16 +57,14 @@ module.exports = function(app) {
    */
   app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppNoExpiry(), subscriptions.refreshTokenByEmail);
 
-  app.use(mw.apiKey);
-  app.use(jwt, mw.identifyFromToken);
-  app.use(mw.checkJWTExpiration);
-
   /**
    * NotImplemented response.
    */
   var NotImplemented = function(req, res, next) {
     return next(new errors.NotImplemented('Not implemented yet.'));
   };
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   /**
    * For testing the email templates
