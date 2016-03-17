@@ -205,7 +205,7 @@ module.exports = function(Sequelize, DataTypes) {
         });
 
         return jwt.sign(data, secret, {
-          expiresInMinutes: 60 * 24 * 30, // 1 month
+          expiresIn: 60 * 60 * 24 * 30, // 1 month
           subject: this.id, // user
           issuer: config.host.api,
           audience: application.id
