@@ -56,7 +56,8 @@
     "eslint": "^1.9.0",
     "istanbul": "0.3.2",
     "jsxhint": "^0.15.1",
-    "mocha": "*",
+    "mocha": "^2.4.5",
+    "mocha-circleci-reporter": "0.0.1",
     "nock": "^2.2.0",
     "sequelize-cli": "^1.4.0",
     "sinon": "1.10.3",
@@ -64,7 +65,7 @@
   },
   "scripts": {
     "test": "NODE_ENV=test npm run hint && NODE_ENV=test mocha test",
-    "circleci": "NODE_ENV=circleci npm run hint && mocha test",
+    "circleci": "NODE_ENV=circleci npm run hint && mocha --reporter mocha-circleci-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/junit.xml test",
     "start": "npm run hint && node .",
     "dev": "nodemon -e js,hbs -w app",
     "hint": "eslint '**/*.js' --quiet",
