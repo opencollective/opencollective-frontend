@@ -56,7 +56,7 @@
     "eslint": "^1.9.0",
     "istanbul": "0.3.2",
     "jsxhint": "^0.15.1",
-    "mocha": "*",
+    "mocha": "^2.4.5",
     "mocha-circleci-reporter": "0.0.1",
     "nock": "^2.2.0",
     "sequelize-cli": "^1.4.0",
