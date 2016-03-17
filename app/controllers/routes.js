@@ -55,7 +55,7 @@ module.exports = function(app) {
   /**
    * Routes without expiration validation
    */
-  app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppNoExpiry(), subscriptions.refreshTokenByEmail);
+  app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppByJwtNoExpiry(), subscriptions.refreshTokenByEmail);
 
   /**
    * NotImplemented response.

@@ -123,12 +123,18 @@ module.exports = function (app) {
       });
     },
 
-    authenticateUserAndAppNoExpiry() {
+    authenticateUserAndAppByJwtNoExpiry() {
       return [
         this.parseJwtNoExpiryCheck,
         this._authenticateAppByJwt,
         this._authenticateUserByJwt
       ]
+    },
+
+    authenticateUserAndAppByJwt() {
+      var mws = this.authenticateUserAndAppByJwtNoExpiry();
+      mws.push(this.checkJwtExpiry);
+      return mws;
     },
 
     /**
