@@ -50,15 +50,9 @@ module.exports = function(app) {
   app.post('/users/password/forgot', aN.authenticateAppByApiKey, mw.required('email'), users.forgotPassword); // Send forgot password email
   app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-  /**
-   * Check api key.
-   */
-  app.use(mw.apiKey);
-
   app.post('/subscriptions/new_token', mw.required('email'), subscriptions.sendNewTokenByEmail);
-  /**
-   * Verify JWT and identify user
-   */
+
+  app.use(mw.apiKey);
   app.use(jwt, mw.identifyFromToken);
 
   /**
