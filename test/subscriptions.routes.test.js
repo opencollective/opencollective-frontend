@@ -180,7 +180,7 @@ describe('subscriptions.routes.test.js', () => {
         .expect(401, {
           error: {
             code: 401,
-            message: "Invalid payload",
+            message: "Missing authorization header",
             type: 'unauthorized'
           }
         })
@@ -198,6 +198,7 @@ describe('subscriptions.routes.test.js', () => {
 
       request(app)
         .post('/subscriptions/refresh_token')
+        .set('Authorization', `Bearer ${expiredToken}`)
         .expect(401, {
           error: {
             code: 401,

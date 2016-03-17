@@ -123,6 +123,14 @@ module.exports = function (app) {
       });
     },
 
+    authenticateUserAndAppNoExpiry() {
+      return [
+        this.parseJwtNoExpiryCheck,
+        this._authenticateAppByJwt,
+        this._authenticateUserByJwt
+      ]
+    },
+
     /**
      * Authenticate user by username/email/password.
      */
@@ -182,5 +190,5 @@ module.exports = function (app) {
       this.checkJwtExpiry,
       this._authenticateUserByJwt
     ]
-  }
+  };
 };

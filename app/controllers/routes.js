@@ -52,17 +52,13 @@ module.exports = function(app) {
 
   app.post('/subscriptions/new_token', aN.authenticateAppByApiKey, mw.required('email'), subscriptions.sendNewTokenByEmail);
 
-  app.use(mw.apiKey);
-  app.use(jwt, mw.identifyFromToken);
-
   /**
    * Routes without expiration validation
    */
-  app.post('/subscriptions/refresh_token', subscriptions.refreshTokenByEmail);
+  app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppNoExpiry(), subscriptions.refreshTokenByEmail);
 
-  /**
-   * Check if the token is expired
-   */
+  app.use(mw.apiKey);
+  app.use(jwt, mw.identifyFromToken);
   app.use(mw.checkJWTExpiration);
 
   /**
