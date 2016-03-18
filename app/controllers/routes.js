@@ -79,6 +79,7 @@ module.exports = function(app) {
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
+  // TODO why is this route duplicated?
   app.post('/users', aN.authenticateAppByApiKey, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
 
   /**
@@ -88,14 +89,12 @@ module.exports = function(app) {
   app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   /**
    * Credit card.
    *
    *  Let's assume for now a card is linked to a user.
    */
-  app.get('/users/:userid/cards', mw.authorizeAuthUser, mw.authorizeUser, cards.getCards); // Get a user's cards.
+  app.get('/users/:userid/cards', aZ.authorizeUserToAccessUser(), cards.getCards); // Get a user's cards.
   app.post('/users/:userid/cards', NotImplemented); // Create a user's card.
   app.put('/users/:userid/cards/:cardid', NotImplemented); // Update a user's card.
   app.delete('/users/:userid/cards/:cardid', NotImplemented); // Delete a user's card.
@@ -103,14 +102,16 @@ module.exports = function(app) {
   /**
    * Paypal Preapproval.
    */
-  app.get('/users/:userid/paypal/preapproval', mw.authorizeAuthUser, mw.authorizeUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
-  app.post('/users/:userid/paypal/preapproval/:preapprovalkey', mw.authorizeAuthUser, mw.authorizeUser, paypal.confirmPreapproval); // Confirm a preapproval key.
-  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', mw.authorizeAuthUser, mw.authorizeUser, paypal.getDetails); // Get a preapproval key details.
+  app.get('/users/:userid/paypal/preapproval', aZ.authorizeUserToAccessUser(), paypal.getPreapprovalKey); // Get a user's preapproval key.
+  app.post('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.confirmPreapproval); // Confirm a preapproval key.
+  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.getDetails); // Get a preapproval key details.
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   /**
    * Groups.
    */
-  app.post('/groups', mw.authorizeAuthUser, mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.post('/groups', aN.authenticateUser(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
   app.get('/groups/:groupid', groups.getOne); // skipped route for public
 
