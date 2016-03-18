@@ -91,7 +91,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if no api_key', function(done) {
+    it('fails if invalid api_key', function(done) {
       request(app)
         .post('/users')
         .send({
