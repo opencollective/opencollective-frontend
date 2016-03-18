@@ -64,12 +64,12 @@ module.exports = function(app) {
     return next(new errors.NotImplemented('Not implemented yet.'));
   };
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   /**
    * For testing the email templates
    */
   app.get('/email/:template', test.generateTestEmail);
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   /**
    * Users.
