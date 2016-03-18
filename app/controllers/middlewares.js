@@ -239,20 +239,6 @@ module.exports = function(app) {
     },
 
     /**
-     * Authorize applications with level.
-     */
-    appAccess: function(level) {
-
-      return function(req, res, next) {
-        if (req.application._access < level) {
-          next(new errors.Forbidden('Unauthorized'));
-        } else {
-          next();
-        }
-      };
-    },
-
-    /**
      * Authorize: the user has to be authenticated.
      */
     authorizeAuthUser: function(req, res, next) {

@@ -132,7 +132,7 @@ describe('subscriptions.routes.test.js', () => {
         user,
         scope: 'subscriptions'
       }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
@@ -180,7 +180,7 @@ describe('subscriptions.routes.test.js', () => {
         .expect(401, {
           error: {
             code: 401,
-            message: "Invalid payload",
+            message: "Missing authorization header",
             type: 'unauthorized'
           }
         })
@@ -190,7 +190,7 @@ describe('subscriptions.routes.test.js', () => {
     it('fails if the user does not exist', (done) => {
       const fakeUser = { id: 12312312 };
       const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
-        expiresInSeconds: 100,
+        expiresIn: 100,
         subject: fakeUser.id,
         issuer: config.host.api,
         audience: application.id
@@ -198,6 +198,7 @@ describe('subscriptions.routes.test.js', () => {
 
       request(app)
         .post('/subscriptions/refresh_token')
+        .set('Authorization', `Bearer ${expiredToken}`)
         .expect(401, {
           error: {
             code: 401,
@@ -211,7 +212,7 @@ describe('subscriptions.routes.test.js', () => {
     it('sends an email with the new valid token', (done) => {
       const secret = config.keys.opencollective.secret;
       const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
@@ -241,6 +242,9 @@ describe('subscriptions.routes.test.js', () => {
     it('fails if there is no email', (done) => {
       request(app)
         .post('/subscriptions/new_token')
+        .send({
+          api_key: application.api_key
+        })
         .expect(400, {
           error: {
             code: 400,
@@ -337,7 +341,7 @@ describe('subscriptions.routes.test.js', () => {
         user,
         scope: 'subscriptions'
       }, config.keys.opencollective.secret, {
-        expiresInSeconds: -1,
+        expiresIn: -1,
         subject: user.id,
         issuer: config.host.api,
         audience: application.id
