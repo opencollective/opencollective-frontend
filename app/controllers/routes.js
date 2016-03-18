@@ -2,7 +2,7 @@ var _ = require('lodash');
 var serverStatus = require('express-server-status');
 var roles = require('../constants/roles');
 var jwt = require('../middlewares/jwt');
-//var aZ = require('../middleware/security/authorization');
+var aZ = require('../middleware/security/authorization');
 
 module.exports = function(app) {
 
@@ -72,7 +72,7 @@ module.exports = function(app) {
   /**
    * Users.
    */
-  app.post('/users', aN.authenticateAppByApiKey, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUser, users.show); // Get a user.
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
   app.put('/users/:userid', mw.authorizeApp, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
