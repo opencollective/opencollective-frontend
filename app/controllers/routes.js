@@ -74,8 +74,8 @@ module.exports = function(app) {
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUser, users.show); // Get a user.
+  app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-  app.put('/users/:userid', mw.authorizeApp, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.put('/users/:userid/password', mw.authorizeAuthUser, mw.authorizeUser, mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar

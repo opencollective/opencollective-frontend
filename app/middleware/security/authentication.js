@@ -1,6 +1,5 @@
 var config = require('config');
 var jwt = require('jsonwebtoken');
-var flow = require('middleware-flow');
 var errors = require('../../lib/errors');
 
 const Forbidden = errors.Forbidden;
@@ -90,6 +89,7 @@ module.exports = function (app) {
     },
 
     authenticateAppByApiKey: (req, res, next) => {
+      console.log("authenticateAppByApiKey");
       mw.required('api_key')(req, res, (e) => {
         if (e) {
           return next(e);
@@ -161,16 +161,6 @@ module.exports = function (app) {
           next();
         });
     },
-
-    authenticateApp:
-      flow
-        .mwIf(this.authenticateAppByApiKey)
-        .else(
-          this.parseJwtNoExpiryCheck,
-          this.checkJwtExpiry,
-          this._authenticateAppByJwt
-        )
-    ,
 
     _authenticateUserByJwt: (req, res, next) => {
       console.log("_authenticateUserByJwt");
