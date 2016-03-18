@@ -106,12 +106,11 @@ module.exports = function(app) {
   app.post('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.confirmPreapproval); // Confirm a preapproval key.
   app.get('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.getDetails); // Get a preapproval key details.
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   /**
    * Groups.
    */
   app.post('/groups', aN.authenticateUser(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
   app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
   app.get('/groups/:groupid', groups.getOne); // skipped route for public
 
