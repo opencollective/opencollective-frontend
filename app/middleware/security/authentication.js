@@ -131,33 +131,39 @@ module.exports = function (app) {
     /**
      * Authenticate user by username/email/password.
      */
-    authenticateUserByName: (req, res, next) => {
-      const username = (req.body && req.body.username) || req.query.username;
-      const email = (req.body && req.body.email) || req.query.email;
-      const password = (req.body && req.body.password) || req.query.password;
+    authenticateUserByPassword: (req, res, next) => {
+      mw.required('password')(req, res, (e) => {
+        if (e) {
+          return next(e);
+        }
 
-      User
-        .auth((username || email), password, (e, user) => {
-          var errorMsg = 'Invalid username/email or password';
+        const username = (req.body && req.body.username) || req.query.username;
+        const email = (req.body && req.body.email) || req.query.email;
+        const password = (req.body && req.body.password) || req.query.password;
 
-          if (e) {
-            if (e.code === 400) {
+        User
+          .auth((username || email), password, (e, user) => {
+            var errorMsg = 'Invalid username/email or password';
+
+            if (e) {
+              if (e.code === 400) {
+                return next(new errors.BadRequest(errorMsg));
+              }
+              else {
+                return next(new errors.ServerError(e.message));
+              }
+            }
+
+            if (!user) {
               return next(new errors.BadRequest(errorMsg));
             }
-            else {
-              return next(new errors.ServerError(e.message));
-            }
-          }
 
-          if (!user) {
-            return next(new errors.BadRequest(errorMsg));
-          }
+            req.remoteUser = user;
+            req.user = req.remoteUser;
 
-          req.remoteUser = user;
-          req.user = req.remoteUser;
-
-          next();
-        });
+            next();
+          });
+      });
     },
 
     _authenticateUserByJwt: (req, res, next) => {

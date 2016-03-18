@@ -76,18 +76,19 @@ module.exports = function(app) {
   app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-  app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
+  app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
+  app.put('/users/:userid/avatar', mw.required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
-  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.post('/users', aN.authenticateAppByApiKey, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
 
   /**
    * Authentication.
    */
-  app.post('/authenticate', mw.required('api_key'), mw.authorizeApp, mw.required('password'), mw.authenticate, users.getToken); // Authenticate user to get a token.
+  app.post('/authenticate', aN.authenticateAppByApiKey, aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   /**
    * Credit card.
