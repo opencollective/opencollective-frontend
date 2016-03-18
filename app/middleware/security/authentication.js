@@ -90,7 +90,10 @@ module.exports = function (app) {
     },
 
     authenticateAppByApiKey: (req, res, next) => {
-      mw.required('api_key')(req, res, () => {
+      mw.required('api_key')(req, res, (e) => {
+        if (e) {
+          return next(e);
+        }
         const appApiKey = req.query.api_key || req.body.api_key;
 
         // TODO simplify with promises
@@ -180,10 +183,12 @@ module.exports = function (app) {
         .catch(next);
     },
 
-    authenticateUser: [
-      this.parseJwtNoExpiryCheck,
-      this.checkJwtExpiry,
-      this._authenticateUserByJwt
-    ]
+    authenticateUser() {
+      return [
+        this.parseJwtNoExpiryCheck,
+        this.checkJwtExpiry,
+        this._authenticateUserByJwt
+      ];
+    }
   };
 };

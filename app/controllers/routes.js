@@ -69,13 +69,12 @@ module.exports = function(app) {
    */
   app.get('/email/:template', test.generateTestEmail);
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   /**
    * Users.
    */
-  app.post('/users', mw.required('api_key'), mw.authorizeApp, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
-  app.get('/users/:userid', mw.authorizeAuthUser, users.show); // Get a user.
+  app.post('/users', aN.authenticateAppByApiKey, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.get('/users/:userid', aN.authenticateUser, users.show); // Get a user.
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
   app.put('/users/:userid', mw.authorizeApp, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.put('/users/:userid/password', mw.authorizeAuthUser, mw.authorizeUser, mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
