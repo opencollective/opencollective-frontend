@@ -73,7 +73,7 @@ module.exports = function(app) {
    * Users.
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
-  app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
+  app.get('/users/:userid', aN.authenticateUserByJwt(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
@@ -109,7 +109,7 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', aN.authenticateUser(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
   app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
   app.get('/groups/:groupid', groups.getOne); // skipped route for public

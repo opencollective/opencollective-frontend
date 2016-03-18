@@ -176,7 +176,7 @@ module.exports = function (app) {
         .catch(next);
     },
 
-    authenticateUser() {
+    authenticateUserByJwt() {
       return [
         this.parseJwtNoExpiryCheck,
         this.checkJwtExpiry,
