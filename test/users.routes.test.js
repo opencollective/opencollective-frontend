@@ -23,7 +23,7 @@ var mock = require('./mocks/clearbit.json');
 /**
  * Tests.
  */
-describe.only('users.routes.test.js', function() {
+describe('users.routes.test.js', function() {
 
   var application;
   var application2;
