@@ -73,7 +73,7 @@ module.exports = function(app) {
    * Users.
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
-  app.get('/users/:userid', aN.authenticateUser, users.show); // Get a user.
+  app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
   app.put('/users/:userid/password', mw.authorizeAuthUser, mw.authorizeUser, mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
