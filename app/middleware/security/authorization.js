@@ -46,64 +46,62 @@ module.exports = function (app) {
       ];
     },
 
-    /**
-     * Authorize access to group, either as application, or as user
-     */
-    authorizeGroup: function (req, res, next) {
-      // TODO shouldn't expose "not found" prior to authentication check
-      if (!req.group) {
-        return next(new NotFound());
+    authorizeAccessToPublicGroup: (req, res, next) => {
+      if (!req.group.isPublic) {
+        return next(new Forbidden("Group is not public"));
       }
-      if (req.group.isPublic) {
-        return next();
-      }
+      next();
+    },
 
-      async.parallel([
-        function (cb) { // If authenticated user, does he have access?
-          if (!req.remoteUser) {
-            return cb();
-          }
-
-          req.group
-            .hasUser(req.remoteUser.id)
-            .then(hasUser => {
-              cb(null, hasUser);
-            })
-            .catch(cb);
-        },
-        function (cb) { // If authenticated application, does it have access?
-          if (!req.application) {
-            return cb();
-          }
-
-          req.group
-            .hasApplication(req.application)
-            .then(hasApplication => {
-              return cb(null, hasApplication);
-            })
-            .catch(cb);
-        }
-
-      ], function (e, results) {
+    authorizeAppAccessToGroup: (req, res, next) => {
+      aN.authenticateApp()(req, res, (e) => {
         if (e) {
           return next(e);
-        } else if (_.some(results)) {
-          return next();
-        } else {
-          return next(new Forbidden('Unauthorized'));
         }
+        req.group
+          .hasApplication(req.application)
+          .then(hasApplication => {
+            if (hasApplication) {
+              return next();
+            }
+            next(new Forbidden('Forbidden'));
+          })
+          .catch(next);
       });
     },
 
-    /**
-     * Authorize if group is public
-     */
-    authorizeIfGroupPublic: function (req, res, next) {
-      if (req.group && req.group.isPublic) {
-        return next('route'); // bypass the callbacks
-      }
+    authorizeUserAccessToGroup: (req, res, next) => {
+      aN.authenticateUserByJwt()(req, res, (e) => {
+        if (e) {
+          return next(e);
+        }
+        req.group
+          .hasUser(req.remoteUser.id)
+          .then(hasUser => {
+            if (hasUser) {
+              return next();
+            }
+            next(new Forbidden('Forbidden'));
+          })
+          .catch(next);
+      });
+    },
 
-      return next();
+    // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
+    authorizeAccessToGroup() {
+      return (req, res, next) => {
+        this.authorizeAccessToPublicGroup(req, res, (e) => {
+          if (!e) {
+            return next();
+          }
+          this.authorizeUserAccessToGroup(req, res, (e) => {
+            if (!e) {
+              return next();
+            }
+            this.authorizeAppAccessToGroup(req, res, next);
+          });
+        });
+      }
     },
 
     /**
@@ -118,7 +116,7 @@ module.exports = function (app) {
 
         req.group.hasUserWithRole(req.remoteUser.id, roles, function (err, hasUser) {
           if (err) return next(err);
-          if (!hasUser) return next(new Forbidden('Unauthorized'));
+          if (!hasUser) return next(new Forbidden('Forbidden'));
 
           return next();
         });

@@ -110,9 +110,9 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.get('/groups/:groupid', aZ.authorizeAccessToGroup(), groups.getOne);
+
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-  app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
-  app.get('/groups/:groupid', groups.getOne); // skipped route for public
 
   app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
   app.get('/groups/:groupid/users', mw.cache(60), groups.getUsers);
