@@ -2,11 +2,11 @@ var _ = require('lodash');
 var serverStatus = require('express-server-status');
 var roles = require('../constants/roles');
 var jwt = require('../middlewares/jwt');
-var aZ = require('../middleware/security/authorization');
 
 module.exports = function(app) {
 
   var aN = require('../middleware/security/authentication')(app);
+  var aZ = require('../middleware/security/authorization')(app);
 
   /**
    * Public methods.
@@ -75,8 +75,8 @@ module.exports = function(app) {
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
+  app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-  app.put('/users/:userid/password', mw.authorizeAuthUser, mw.authorizeUser, mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), mw.authorizeAuthUser, mw.authorizeUser, users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', mw.required('avatar'), mw.authorizeAuthUser, mw.authorizeUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.

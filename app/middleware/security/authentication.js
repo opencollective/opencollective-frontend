@@ -37,7 +37,6 @@ module.exports = function (app) {
      * decodes the token (expected behaviour).
      */
     parseJwtNoExpiryCheck: (req, res, next) => {
-      console.log("parseJwtNoExpiryCheck");
       if (!req.headers || !req.headers.authorization) {
         return next(new Unauthorized('Missing authorization header'));
       }
@@ -89,7 +88,6 @@ module.exports = function (app) {
     },
 
     authenticateAppByApiKey: (req, res, next) => {
-      console.log("authenticateAppByApiKey");
       mw.required('api_key')(req, res, (e) => {
         if (e) {
           return next(e);
@@ -163,7 +161,6 @@ module.exports = function (app) {
     },
 
     _authenticateUserByJwt: (req, res, next) => {
-      console.log("_authenticateUserByJwt");
       User
         .find(req.jwtPayload.sub)
         .then(user => {
