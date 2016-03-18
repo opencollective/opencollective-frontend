@@ -80,7 +80,7 @@ module.exports = function(app) {
   app.put('/users/:userid/avatar', mw.required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
   // TODO why is this route duplicated?
-  app.post('/users', aN.authenticateAppByApiKey, mw.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
 
   /**
    * Authentication.
