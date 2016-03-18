@@ -111,11 +111,9 @@ module.exports = function(app) {
    */
   app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup(), groups.getOne);
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup(),  mw.cache(60), groups.getUsers); // Get group users
 
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
-  app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users', mw.cache(60), groups.getUsers);
 
   app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
