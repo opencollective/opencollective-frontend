@@ -23,7 +23,7 @@ var mock = require('./mocks/clearbit.json');
 /**
  * Tests.
  */
-describe('users.routes.test.js', function() {
+describe.only('users.routes.test.js', function() {
 
   var application;
   var application2;
@@ -91,7 +91,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if no api_key', function(done) {
+    it('fails if invalid api_key', function(done) {
       request(app)
         .post('/users')
         .send({
