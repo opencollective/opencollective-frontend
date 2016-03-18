@@ -26,7 +26,7 @@ var stripeEmail = stripeMock.accounts.create.email;
 /**
  * Tests.
  */
-describe.only('groups.routes.test.js', function() {
+describe('groups.routes.test.js', function() {
 
   var application;
   var user;
