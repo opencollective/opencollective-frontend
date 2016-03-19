@@ -1,5 +1,4 @@
 var errors = require('../../lib/errors');
-var roles = require('../../constants/roles');
 
 const Forbidden = errors.Forbidden;
 const NotFound = errors.NotFound;
@@ -87,31 +86,6 @@ module.exports = function (app) {
       });
     },
 
-    // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
-    authorizeAccessToGroup(authorizeIfPublic) {
-      return (req, res, next) => {
-        var _authorizeAccessToGroup = (req, res, next) => {
-          this.authorizeUserAccessToGroup(req, res, (e) => {
-            if (!e) {
-              return next();
-            }
-            this.authorizeAppAccessToGroup(req, res, next);
-          })
-        };
-
-        if (authorizeIfPublic) {
-          this.authorizeAccessToPublicGroup(req, res, (e) => {
-            if (!e) {
-              return next();
-            }
-            _authorizeAccessToGroup(req, res, next);
-          });
-        } else {
-          _authorizeAccessToGroup(req, res, next);
-        }
-      }
-    },
-
     /**
      * Authorize for group with specific role(s).
      */
@@ -132,12 +106,41 @@ module.exports = function (app) {
       };
     },
 
-    authorizeHost() {
-      return this._authorizeGroupRoles([roles.HOST]);
-    },
+    // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
+    authorizeAccessToGroup(options) {
+      return (req, res, next) => {
+        var _authorizeGroupRoles = () => {
+          if (!options.roles) {
+            return next();
+          }
+          this._authorizeGroupRoles(options.roles)(req, res, next);
+        };
 
-    authorizeHostOrMember() {
-      return this._authorizeGroupRoles([roles.HOST, roles.MEMBER]);
+        var _authorizeAccessToGroup = () => {
+          this.authorizeUserAccessToGroup(req, res, (e) => {
+            if (!e) {
+              return _authorizeGroupRoles();
+            }
+            this.authorizeAppAccessToGroup(req, res, (e) => {
+              if (e) {
+                return next(e);
+              }
+              _authorizeGroupRoles();
+            });
+          })
+        };
+
+        if (options.authIfPublic) {
+          this.authorizeAccessToPublicGroup(req, res, (e) => {
+            if (!e) {
+              return next();
+            }
+            _authorizeAccessToGroup();
+          });
+        } else {
+          _authorizeAccessToGroup();
+        }
+      }
     },
 
     /**
