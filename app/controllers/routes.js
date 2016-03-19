@@ -110,13 +110,12 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-  app.get('/groups/:groupid', aZ.authorizeAccessToGroup(), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup(),  mw.cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid', aZ.authorizeAccessToGroup(true), groups.getOne);
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup(true),  mw.cache(60), groups.getUsers); // Get group users
+  app.put('/groups/:groupid', aZ.authorizeAccessToGroup(false), aZ.authorizeHostOrMember(), mw.required('group'), groups.update); // Update a group.
+  app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
-  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.required('group'), groups.update); // Update a group.
-  app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
   app.post('/groups/:groupid/payments/paypal', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.paypal); // Make a payment/donation.

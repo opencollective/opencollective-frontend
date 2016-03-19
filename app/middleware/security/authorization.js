@@ -1,5 +1,5 @@
-var _ = require('lodash');
 var errors = require('../../lib/errors');
+var roles = require('../../constants/roles');
 
 const Forbidden = errors.Forbidden;
 const NotFound = errors.NotFound;
@@ -88,39 +88,56 @@ module.exports = function (app) {
     },
 
     // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
-    authorizeAccessToGroup() {
+    authorizeAccessToGroup(authorizeIfPublic) {
       return (req, res, next) => {
-        this.authorizeAccessToPublicGroup(req, res, (e) => {
-          if (!e) {
-            return next();
-          }
+        var _authorizeAccessToGroup = (req, res, next) => {
           this.authorizeUserAccessToGroup(req, res, (e) => {
             if (!e) {
               return next();
             }
             this.authorizeAppAccessToGroup(req, res, next);
+          })
+        };
+
+        if (authorizeIfPublic) {
+          this.authorizeAccessToPublicGroup(req, res, (e) => {
+            if (!e) {
+              return next();
+            }
+            _authorizeAccessToGroup(req, res, next);
           });
-        });
+        } else {
+          _authorizeAccessToGroup(req, res, next);
+        }
       }
     },
 
     /**
      * Authorize for group with specific role(s).
      */
-    authorizeGroupRoles: function (roles) {
-      var roles = _.isArray(roles) ? roles : [roles];
-
-      return function (req, res, next) {
-        if (!req.remoteUser && req.application) // called with an api_key without user
+    _authorizeGroupRoles: function (roles) {
+      return (req, res, next) => {
+        if (!req.remoteUser && req.application) { // called with an api_key without user
           return next();
-
-        req.group.hasUserWithRole(req.remoteUser.id, roles, function (err, hasUser) {
-          if (err) return next(err);
-          if (!hasUser) return next(new Forbidden('Forbidden'));
-
-          return next();
+        }
+        req.group.hasUserWithRole(req.remoteUser.id, roles, (e, hasUser) => {
+          if (e) {
+            return next(e);
+          }
+          if (!hasUser) {
+            return next(new Forbidden('Forbidden'));
+          }
+          next();
         });
       };
+    },
+
+    authorizeHost() {
+      return this._authorizeGroupRoles([roles.HOST]);
+    },
+
+    authorizeHostOrMember() {
+      return this._authorizeGroupRoles([roles.HOST, roles.MEMBER]);
     },
 
     /**
