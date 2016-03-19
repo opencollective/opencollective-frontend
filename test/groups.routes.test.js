@@ -753,7 +753,7 @@ describe('groups.routes.test.js', function() {
         });
     });
 
-    it('successfully updates a group if authenticated as a group', function(done) {
+    it('successfully updates a group if authenticated as an application', function(done) {
       request(app)
         .put('/groups/' + group.id)
         .send({
