@@ -87,8 +87,8 @@ module.exports = function (app) {
     },
 
     /**
-     * Authorize only users with the specified roles. 
-     * 
+     * Authorize only users with the specified roles.
+     *
      * Is bypassed if authenticated as an application without user authentication.
      * TODO remove bypass. Only authenticated users should trigger this middleware.
      */
