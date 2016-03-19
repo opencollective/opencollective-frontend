@@ -142,9 +142,14 @@ module.exports = function (app) {
     },
 
     authenticateUserAndAppByJwt() {
-      var mws = this.authenticateUserAndAppByJwtNoExpiry();
-      mws.push(this.checkJwtExpiry);
-      return mws;
+      return (req, res, next) => {
+        this.authenticateUserByJwt()(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this._authenticateAppByJwt(req, res, next);
+        });
+      };
     },
 
     /**
@@ -209,6 +214,17 @@ module.exports = function (app) {
           });
         });
       }
+    },
+
+    authenticateUserOrApp() {
+      return (req, res, next) => {
+        this.authenticateUserAndAppByJwt()(req, res, (e) => {
+          if (!e) {
+            return next();
+          }
+          this.authenticateAppByApiKey(req, res, next);
+        });
+      };
     }
   };
 };

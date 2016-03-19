@@ -116,11 +116,11 @@ module.exports = function(app) {
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}),  mw.cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
+  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), mw.required('payment'), payments.paypal); // Make a payment/donation.
 
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
-  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.paypal); // Make a payment/donation.
 
   /**
    * UserGroup.
