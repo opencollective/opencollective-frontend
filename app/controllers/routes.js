@@ -133,7 +133,7 @@ module.exports = function(app) {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
-  app.post('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup({authIfPublic: true}), mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
