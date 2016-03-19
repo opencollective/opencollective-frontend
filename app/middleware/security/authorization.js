@@ -88,16 +88,16 @@ module.exports = function (app) {
 
     /**
      * Authorize only users with the specified roles.
-     *
-     * Is bypassed if authenticated as an application without user authentication.
-     * TODO remove bypass. Only authenticated users should trigger this middleware.
      */
-    _authorizeUserRoles: function (roles) {
+    _authorizeUserRoles: function (options) {
       return (req, res, next) => {
-        if (!req.remoteUser && req.application) { // called with an api_key without user
+        if (!options.userRoles) {
           return next();
         }
-        req.group.hasUserWithRole(req.remoteUser.id, roles, (e, hasUser) => {
+        if (options.bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser && !req.remoteUser && req.application) { // called with an api_key without user
+          return next();
+        }
+        req.group.hasUserWithRole(req.remoteUser.id, options.userRoles, (e, hasUser) => {
           if (e) {
             return next(e);
           }
@@ -112,23 +112,16 @@ module.exports = function (app) {
     // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
     authorizeAccessToGroup(options) {
       return (req, res, next) => {
-        var _authorizeUserRoles = () => {
-          if (!options.userRoles) {
-            return next();
-          }
-          this._authorizeUserRoles(options.userRoles)(req, res, next);
-        };
-
         var _authorizeAccessToGroup = () => {
           this.authorizeUserAccessToGroup(req, res, (e) => {
             if (!e) {
-              return _authorizeUserRoles();
+              return this._authorizeUserRoles(options)(req, res, next);
             }
             this.authorizeAppAccessToGroup(req, res, (e) => {
               if (e) {
                 return next(e);
               }
-              _authorizeUserRoles();
+              this._authorizeUserRoles(options)(req, res, next)
             });
           })
         };
