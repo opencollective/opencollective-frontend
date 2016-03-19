@@ -133,9 +133,14 @@ module.exports = function(app) {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
-  app.post('/groups/:groupid/transactions', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup({authIfPublic: true}), mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
+
+  // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
+  // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
+  // We should refactor this.
+  app.post('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
   app.get('/groups/:groupid/transactions/:transactionid', groups.getTransaction); // Get a transaction.
