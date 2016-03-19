@@ -119,17 +119,17 @@ module.exports = function(app) {
   app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
   app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), mw.required('payment'), payments.paypal); // Make a payment/donation.
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   /**
    * UserGroup.
    *
    *  Relations between a group and a user.
    */
-  app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.addUser); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.updateUser); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.deleteUser); // Remove a user from a group.
+  app.get('/users/:userid/groups', aZ.authorizeUserToAccessUser(), users.getGroups); // Get user's groups.
+  app.post('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.addUser); // Add a user to a group.
+  app.put('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.updateUser); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.deleteUser); // Remove a user from a group.
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   /**
    * Transactions (financial).

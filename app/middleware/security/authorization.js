@@ -139,22 +139,17 @@ module.exports = function (app) {
       }
     },
 
-    /**
-     * Authorize transaction.
-     */
-    authorizeTransaction: function (req, res, next) {
+    authorizeGroupAccessToTransaction: function (req, res, next) {
+      // TODO shouldn't return NotFound before authorization check
       if (!req.transaction) {
         return next(new NotFound());
       }
-
       if (!req.group) {
         return next(new NotFound('Cannot authorize a transaction without a specified group.'));
       }
-
       if (req.transaction.GroupId !== req.group.id) {
         return next(new Forbidden('This group does not have access to this transaction.'));
       }
-
       next();
     },
 
