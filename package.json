@@ -84,7 +84,8 @@
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
     "report:tx": "node scripts/report_transactions",
-    "checktransactions": "node scripts/check_transactions_on_stripe"
+    "checktransactions": "node scripts/check_transactions_on_stripe",
+    "script": "node scripts/execute"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."
 }

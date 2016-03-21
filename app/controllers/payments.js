@@ -466,14 +466,9 @@ module.exports = function(app) {
       activateSubscription: ['executeBillingAgreement', (cb, results) => {
         transaction.getSubscription()
           .then(subscription => {
-            const data = _.extend({}, subscription.data, {
-              billingAgreementId: results.executeBillingAgreement.id
-            });
+            const billingAgreementId = results.executeBillingAgreement.id;
 
-            // JSON with sequelize is a bag of fun :D https://github.com/sequelize/sequelize/issues/2862
-            subscription.data = data;
-            subscription.isActive = true;
-            subscription.activatedAt = new Date();
+            subscription.data = _.extend({}, subscription.data, { billingAgreementId });
 
             return subscription.save();
           })
@@ -484,9 +479,7 @@ module.exports = function(app) {
       getOrCreateUser: ['activateSubscription', (cb, results) => {
         const email = results.executeBillingAgreement.payer.payer_info.email;
 
-        getOrCreateUser({
-          email
-        }, cb);
+        getOrCreateUser({ email }, cb);
       }],
 
       addUserToGroup: ['getOrCreateUser', (cb, results) => {

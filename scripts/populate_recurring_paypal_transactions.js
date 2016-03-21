@@ -21,10 +21,10 @@ const app = require('../index');
 const models = app.set('models');
 const transactionsController = require('../app/controllers/transactions')(app);
 
-// Check last 3 days
-const startDate = moment().subtract(3, 'day').format('YYYY-MM-DD');
+const startDate = '2016-03-01'; // date that we started paypal payments
 const endDate = moment().format('YYYY-MM-DD');
 
+// Promisify the paypal-rest-sdk
 const searchTransactions = (billingAgreementId, paypalConfig) => {
   return new Promise((resolve, reject) => {
     paypal.billingAgreement.searchTransactions(
@@ -40,12 +40,17 @@ const searchTransactions = (billingAgreementId, paypalConfig) => {
   })
 };
 
-const updateTransactions = (subscription, group, user, paypalTransactions) => {
-
-  // Find the missing transactions in our db and create them
-  const missingPaypalTransactions = paypalTransactions.map((pt) => {
-    return !_.find(subscription.Transactions, (t) => data.transaction_id === pt.transaction_id); // TODO: schema to build
+const findUnregisteredTransaction = (transactions, paypalTransactions) => {
+  return paypalTransactions.filter((pt) => {
+    return !_.find(transactions, (t) => {
+      return t.data && (t.data.transaction_id === pt.transaction_id);
+    });
   });
+}
+
+const updateTransactions = (subscription, group, user, paypalTransactions) => {
+  // Find the missing transactions in our db and create them
+  const missingPaypalTransactions = findUnregisteredTransaction(subscription.Transactions, paypalTransactions);
 
   return Bluebird.map(missingPaypalTransactions, (pt) => {
     const transaction = {
@@ -57,86 +62,126 @@ const updateTransactions = (subscription, group, user, paypalTransactions) => {
       tags: ['Donation'],
       approved: true,
       interval: subscription.interval,
-      SubscriptionId: subscription.id
+      SubscriptionId: subscription.id,
+      data: pt
     };
 
-    return transactionsController._create({
-      transaction,
-      group,
-      user
+    return new Bluebird((resolve, reject) => {
+      transactionsController._create({
+        transaction,
+        group,
+        user
+      }, (err, res) => err ? reject(err) : resolve(res));
     });
   });
 };
 
-const done = (err) => {
-  if (err) console.log('err', err);
-  console.log('done');
-  process.exit();
-}
+const updateFirstTransaction = (transaction, subscription, paypalTransaction) => {
+  const updateTransaction = () => {
+    transaction.data = paypalTransaction;
+    return transaction.save();
+  };
 
-models.Subscription.findAll({
-  where: {
-    stripeSubscriptionId: null
-  },
-  include: [{
-    model: models.Transaction,
-    include: [
-      { model: models.Group },
-      { model: models.User }
-    ]
-  }]
-})
-.map((subscription) => {
+  return Bluebird.props({ // for testing
+    transaction: updateTransaction(),
+    subscription: subscription.activate()
+  });
+};
+
+const findSubscriptions = () => {
+  return models.Subscription.findAll({
+    where: {
+      stripeSubscriptionId: null
+    },
+    include: [{
+      model: models.Transaction,
+      include: [
+        { model: models.Group },
+        { model: models.User }
+      ]
+    }]
+  });
+};
+
+const log = (message) => {
+  console.log(message);
+  return message; // for testing
+};
+
+const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
+  const group = transaction.Group;
+  const user = transaction.User;
+  const completedList = _.filter(paypalTransactions, { status: 'Completed'});
+  const created = _.find(paypalTransactions, { status: 'Created'});
+
+  if (!created) {
+    return log(`No Created event, invalid ${billingAgreementId}`);
+  }
+
+  // Unactive subscription
+  if (!subscription.isActive) {
+
+    // No completed events, it takes up to one day for paypal to process the subscription,
+    // so we will just pass
+    if (completedList.length === 0) {
+      return log(`Billing agreement not processed yet ${billingAgreementId}, no completed event`);
+
+    // Only one completed item means that it is the first payment, no
+    // need to create a new Transaction. We just need to activate the subscription
+    // and save the paypalTransaction in our transaction.
+    } else if (completedList.length === 1) {
+      return updateFirstTransaction(transaction, subscription, completedList[0]);
+    } else {
+      return log(`Invalid subscription ${subscription.id} with billingAgreement ${billingAgreementId}, it should be activated already`);
+    }
+
+  // Active subscription
+  } else {
+
+    if (completedList.length === 0) {
+      return log(`Subscription should not be active ${subscription.id} ${billingAgreementId}`);
+    } else {
+      return updateTransactions(subscription, group, user, completedList);
+    }
+  }
+
+};
+
+const populateTransactions = (subscription) => {
   const billingAgreementId = subscription.data.billingAgreementId;
   const transaction = subscription.Transactions[0] || {};
   const group = transaction.Group;
   const user = transaction.User;
 
-  if (!billingAgreementId) return;
-  if (!group) return;
+  if (!billingAgreementId) {
+    return log('No billingAgreementId');
+  }
+
+  if (!user) {
+    return log('No user')
+  }
+
+  if (!group) {
+    return log('No group');
+  }
 
   return group.getConnectedAccount()
-  .then(connectedAccount => searchTransactions(billingAgreementId, connectedAccount.paypalConfig))
-  .then((paypalTransactions) => {
-    const completedList = _.filter(paypalTransactions, { status: 'Completed'});
-    const created = _.find(paypalTransactions, { status: 'Created'});
+    .then(connectedAccount => searchTransactions(billingAgreementId, connectedAccount.paypalConfig))
+    .then((paypalTransactions) => {
+      return handlePaypalTransactions(
+        paypalTransactions,
+        transaction,
+        subscription,
+        billingAgreementId
+      );
+    });
+};
 
-    if (!created) {
-      console.log(`No Created event, invalid ${billingAgreementId}`);
-      return;
-    }
+const run = () => findSubscriptions().map(populateTransactions);
 
-    // Unactive subscription
-    if (!subscription.isActive) {
-
-      // No completed events, it takes up to one day for paypal to process the subscription,
-      // so we will just pass
-      if (completedList.length === 0) {
-        console.log(`Billing agreement not processed yet ${billingAgreementId}`);
-        return;
-
-      // Only one completed item means that it is the first payment, no
-      // need to create a new Transaction. We just need to activate the subscription.
-      } else if (completedList.length === 1) {
-        // TODO: Add transaction_id to Transaction.data
-        return subscription.activate();
-      } else {
-        console.log(`Invalid subscription ${subscription.id} with billingAgreement ${billingAgreementId}, it should be activated already `);
-        return;
-      }
-
-    // Active subscription
-    } else {
-
-      if (completedList.length === 0 || completedList.length === 1) {
-        console.log(`Subscription should not be active ${subscription.id} ${billingAgreementId}`);
-        return;
-      } else {
-        return updateTransactions(subscription, group, user, completedList);
-      }
-
-    }
-  });
-})
-.then(() => done())
-.catch(done);
+module.exports = {
+  handlePaypalTransactions,
+  populateTransactions,
+  run,
+  findSubscriptions
+};
