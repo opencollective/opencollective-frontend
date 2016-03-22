@@ -1,3 +1,5 @@
+const config = require('config');
+
 /**
  * Model.
  */
@@ -33,6 +35,17 @@ module.exports = (Sequelize, DataTypes) => {
     }
 
   }, {
-    paranoid: true
+    paranoid: true,
+
+    getterMethods: {
+      paypalConfig() {
+        return {
+          client_id: this.clientId,
+          client_secret: this.secret,
+          mode: config.paypal.rest.mode
+        }
+      }
+    }
+
   });
 };

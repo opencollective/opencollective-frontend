@@ -44,6 +44,8 @@ module.exports = function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
+    data: DataTypes.JSON,
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
