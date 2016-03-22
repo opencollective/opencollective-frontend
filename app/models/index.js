@@ -33,7 +33,6 @@ function setupModels(client) {
     'Application',
     'Card',
     'Group',
-    'Paykey',
     'ConnectedAccount',
     'StripeAccount',
     'Notification',
@@ -95,10 +94,6 @@ function setupModels(client) {
   // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
   m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
-
-  // Paypal Pay key.
-  m.Paykey.belongsTo(m.Transaction);
-  m.Transaction.hasMany(m.Paykey);
 
   // Subscription
   m.Transaction.belongsTo(m.Subscription);

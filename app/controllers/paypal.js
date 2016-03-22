@@ -48,7 +48,8 @@ module.exports = function(app) {
    * Get a preapproval key for a user.
    */
   var getPreapprovalKey = function(req, res, next) {
-    var uri = '/users/' + req.remoteUser.id + '/preapproval/paykey/${preapprovalKey}';
+    // TODO: This return and cancel URL doesn't work - no routes right now.
+    var uri = `/users/${req.remoteUser.id}/paypal/preapproval/`;
     var baseUrl = config.host.webapp + uri;
     var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
     var returnUrl = req.query.returnUrl || (baseUrl + '/success');

@@ -210,7 +210,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           .end(done);
       });
 
-      it('should fail with an unknown paykey', function(done) {
+      it('should fail with an unknown preapproval key', function(done) {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + 'abc')
           .set('Authorization', 'Bearer ' + user.jwt(application))
