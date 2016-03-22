@@ -439,7 +439,7 @@ module.exports = function(app) {
 
         transaction.getSubscription()
           .then(subscription => {
-            const billingAgreementId = results.executeBillingAgreement.id;
+            const billingAgreementId = results.execute.id;
             subscription.data = _.extend({}, subscription.data, { billingAgreementId });
 
             return subscription.save();
@@ -449,7 +449,7 @@ module.exports = function(app) {
       }],
 
       getOrCreateUser: ['activateSubscription', (cb, results) => {
-        const email = results.executeBillingAgreement.payer.payer_info.email;
+        const email = results.execute.payer.payer_info.email;
 
         getOrCreateUser({ email }, cb);
       }],
