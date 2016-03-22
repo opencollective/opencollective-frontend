@@ -87,6 +87,17 @@ module.exports = function (app) {
         .catch(next);
     },
 
+    authenticateAppByJwt() {
+      return (req, res, next) => {
+        this.parseJwtNoExpiryCheck(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this._authenticateAppByJwt(req, res, next);
+        });
+      }
+    },
+
     authenticateAppByApiKey: (req, res, next) => {
       mw.required('api_key')(req, res, (e) => {
         if (e) {
@@ -95,23 +106,31 @@ module.exports = function (app) {
         const appApiKey = req.query.api_key || req.body.api_key;
 
         // TODO simplify with promises
-        Application.findByKey(appApiKey, function(e, application) {
+        Application.findByKey(appApiKey, (e, application) => {
           if (e) {
             return next(e);
           }
-
           if (!application) {
             return next(new Unauthorized('Invalid API key: ' + appApiKey));
           }
-
           if (application.disabled) {
             return next(new Forbidden('Application disabled'));
           }
-
           req.application = application;
           next();
         });
       });
+    },
+
+    authenticateApp() {
+      return (req, res, next) => {
+        this.authenticateAppByApiKey(req, res, (e) => {
+          if (e) {
+            this.authenticateAppByJwt()(req, res, next);
+          }
+          next();
+        });
+      }
     },
 
     authenticateUserAndAppByJwtNoExpiry() {
@@ -123,9 +142,14 @@ module.exports = function (app) {
     },
 
     authenticateUserAndAppByJwt() {
-      var mws = this.authenticateUserAndAppByJwtNoExpiry();
-      mws.push(this.checkJwtExpiry);
-      return mws;
+      return (req, res, next) => {
+        this.authenticateUserByJwt()(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this._authenticateAppByJwt(req, res, next);
+        });
+      };
     },
 
     /**
@@ -177,11 +201,30 @@ module.exports = function (app) {
     },
 
     authenticateUserByJwt() {
-      return [
-        this.parseJwtNoExpiryCheck,
-        this.checkJwtExpiry,
-        this._authenticateUserByJwt
-      ];
+      return (req, res, next) => {
+        this.parseJwtNoExpiryCheck(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this.checkJwtExpiry(req, res, (e) => {
+            if (e) {
+              return next(e);
+            }
+            this._authenticateUserByJwt(req, res, next);
+          });
+        });
+      }
+    },
+
+    authenticateUserOrApp() {
+      return (req, res, next) => {
+        this.authenticateUserAndAppByJwt()(req, res, (e) => {
+          if (!e) {
+            return next();
+          }
+          this.authenticateAppByApiKey(req, res, next);
+        });
+      };
     }
   };
 };

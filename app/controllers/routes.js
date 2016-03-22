@@ -29,6 +29,8 @@ module.exports = function(app) {
   var subscriptions = Controllers.subscriptions;
   var errors = app.errors;
 
+  const HOST = roles.HOST;
+  const MEMBER = roles.MEMBER;
 
   /**
    * Status.
@@ -110,34 +112,29 @@ module.exports = function(app) {
    * Groups.
    */
   app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-  app.get('/groups/:groupid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getOne);
-  app.get('/groups/:groupid', groups.getOne); // skipped route for public
-
-  app.get('/groups/:groupid/users', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users', mw.cache(60), groups.getUsers);
-
-  app.put('/groups/:groupid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.required('group'), groups.update); // Update a group.
+  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}),  mw.cache(60), groups.getUsers); // Get group users
+  app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), mw.required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
-
-  app.post('/groups/:groupid/payments', mw.authorizeAuthUserOrApp, mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', mw.authorizeAuthUserOrApp, mw.required('payment'), payments.paypal); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), mw.required('payment'), payments.paypal); // Make a payment/donation.
 
   /**
    * UserGroup.
    *
    *  Relations between a group and a user.
    */
-  app.get('/users/:userid/groups', mw.authorizeAuthUser, mw.authorizeUser, users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.addUser); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.updateUser); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), groups.deleteUser); // Remove a user from a group.
+  app.get('/users/:userid/groups', aZ.authorizeUserToAccessUser(), users.getGroups); // Get user's groups.
+  app.post('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.addUser); // Add a user to a group.
+  app.put('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.updateUser); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.deleteUser); // Remove a user from a group.
 
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
-  app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+
+  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
 
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')

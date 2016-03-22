@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var errors = require('../../lib/errors');
 
 const Forbidden = errors.Forbidden;
@@ -46,101 +45,111 @@ module.exports = function (app) {
       ];
     },
 
-    /**
-     * Authorize access to group, either as application, or as user
-     */
-    authorizeGroup: function (req, res, next) {
-      // TODO shouldn't expose "not found" prior to authentication check
-      if (!req.group) {
-        return next(new NotFound());
+    authorizeAccessToPublicGroup: (req, res, next) => {
+      if (!req.group.isPublic) {
+        return next(new Forbidden("Group is not public"));
       }
-      if (req.group.isPublic) {
-        return next();
-      }
+      next();
+    },
 
-      async.parallel([
-        function (cb) { // If authenticated user, does he have access?
-          if (!req.remoteUser) {
-            return cb();
-          }
-
-          req.group
-            .hasUser(req.remoteUser.id)
-            .then(hasUser => {
-              cb(null, hasUser);
-            })
-            .catch(cb);
-        },
-        function (cb) { // If authenticated application, does it have access?
-          if (!req.application) {
-            return cb();
-          }
-
-          req.group
-            .hasApplication(req.application)
-            .then(hasApplication => {
-              return cb(null, hasApplication);
-            })
-            .catch(cb);
-        }
-
-      ], function (e, results) {
+    authorizeAppAccessToGroup: (req, res, next) => {
+      aN.authenticateApp()(req, res, (e) => {
         if (e) {
           return next(e);
-        } else if (_.some(results)) {
-          return next();
-        } else {
-          return next(new Forbidden('Unauthorized'));
         }
+        req.group
+          .hasApplication(req.application)
+          .then(hasApplication => {
+            if (hasApplication) {
+              return next();
+            }
+            next(new Forbidden('Forbidden'));
+          })
+          .catch(next);
+      });
+    },
+
+    authorizeUserAccessToGroup: (req, res, next) => {
+      aN.authenticateUserByJwt()(req, res, (e) => {
+        if (e) {
+          return next(e);
+        }
+        req.group
+          .hasUser(req.remoteUser.id)
+          .then(hasUser => {
+            if (hasUser) {
+              return next();
+            }
+            next(new Forbidden('Forbidden'));
+          })
+          .catch(next);
       });
     },
 
     /**
-     * Authorize if group is public
+     * Authorize only users with the specified roles.
      */
-    authorizeIfGroupPublic: function (req, res, next) {
-      if (req.group && req.group.isPublic) {
-        return next('route'); // bypass the callbacks
-      }
-
-      return next();
-    },
-
-    /**
-     * Authorize for group with specific role(s).
-     */
-    authorizeGroupRoles: function (roles) {
-      var roles = _.isArray(roles) ? roles : [roles];
-
-      return function (req, res, next) {
-        if (!req.remoteUser && req.application) // called with an api_key without user
+    _authorizeUserRoles: function (options) {
+      return (req, res, next) => {
+        if (!options.userRoles) {
           return next();
-
-        req.group.hasUserWithRole(req.remoteUser.id, roles, function (err, hasUser) {
-          if (err) return next(err);
-          if (!hasUser) return next(new Forbidden('Unauthorized'));
-
+        }
+        if (options.bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser && !req.remoteUser && req.application) { // called with an api_key without user
           return next();
+        }
+        req.group.hasUserWithRole(req.remoteUser.id, options.userRoles, (e, hasUser) => {
+          if (e) {
+            return next(e);
+          }
+          if (!hasUser) {
+            return next(new Forbidden('Forbidden'));
+          }
+          next();
         });
       };
     },
 
-    /**
-     * Authorize transaction.
-     */
-    authorizeTransaction: function (req, res, next) {
+    // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
+    authorizeAccessToGroup(options) {
+      return (req, res, next) => {
+        var _authorizeAccessToGroup = () => {
+          this.authorizeUserAccessToGroup(req, res, (e) => {
+            if (!e) {
+              return this._authorizeUserRoles(options)(req, res, next);
+            }
+            this.authorizeAppAccessToGroup(req, res, (e) => {
+              if (e) {
+                return next(e);
+              }
+              this._authorizeUserRoles(options)(req, res, next)
+            });
+          })
+        };
+
+        if (options.authIfPublic) {
+          this.authorizeAccessToPublicGroup(req, res, (e) => {
+            if (!e) {
+              return next();
+            }
+            _authorizeAccessToGroup();
+          });
+        } else {
+          _authorizeAccessToGroup();
+        }
+      }
+    },
+
+    authorizeGroupAccessToTransaction: function (req, res, next) {
+      // TODO shouldn't return NotFound before authorization check
       if (!req.transaction) {
         return next(new NotFound());
       }
-
       if (!req.group) {
         return next(new NotFound('Cannot authorize a transaction without a specified group.'));
       }
-
       if (req.transaction.GroupId !== req.group.id) {
         return next(new Forbidden('This group does not have access to this transaction.'));
       }
-
       next();
     },
 
