@@ -22,6 +22,9 @@ module.exports = {
    * Posts a message to a slack webhook
    */
   postMessage: function(msg, options) {
+    if(!options) {
+      options = {};
+    }
     var slackOptions = {
       text: msg,
       username: 'OpenCollective Activity Bot',

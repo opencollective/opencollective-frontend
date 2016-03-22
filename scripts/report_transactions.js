@@ -28,9 +28,7 @@ const createdAtClause = {
 };
 const donationClause = {
   createdAt: createdAtClause,
-  tags: {
-    $contains: ['Donation']
-  }
+  amount: { $gt: 0 }
 };
 const expenseClause = {
   $lt: 0
