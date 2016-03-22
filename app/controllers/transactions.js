@@ -132,7 +132,7 @@ module.exports = function(app) {
     var user = req.remoteUser;
     var group = req.group;
     var transaction = req.transaction;
-    var isManual = transaction.paymentMethod !== 'paypal';
+    var isManual = transaction.payoutMethod !== 'paypal';
 
     async.auto({
 

@@ -122,7 +122,7 @@ describe('transactions.paypal.routes.test.js', function() {
         t.approvedAt = Date.now();
         t.approved = true;
         t.UserId = results.createUserB.id;
-        t.paymentMethod = 'manual';
+        t.payoutMethod = 'manual';
         models.Transaction.create(t).done(cb);
       }],
       createCardUserB: ['cleanAndCreateApplication', 'createUserB', function(cb, results) {
@@ -177,7 +177,7 @@ describe('transactions.paypal.routes.test.js', function() {
           var transaction = res.body;
           expect(transaction.status).to.equal('REIMBURSED');
           expect(transaction.amount).to.equal(transactionManual.amount);
-          expect(transaction.paymentMethod).to.equal(transactionManual.paymentMethod);
+          expect(transaction.payoutMethod).to.equal(transactionManual.payoutMethod);
           expect(transaction.reimbursedAt).to.be.ok;
           expect(transaction.CardId).to.equal(null);
           done();

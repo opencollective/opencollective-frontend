@@ -558,7 +558,7 @@ describe('payments.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('CardId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
-            expect(res.rows[0]).to.have.property('paymentMethod', null);
+            expect(res.rows[0]).to.have.property('payoutMethod', null);
             expect(res.rows[0]).to.have.property('amount', data.amount);
             expect(res.rows[0]).to.have.property('paidby', String(user.id));
             done();

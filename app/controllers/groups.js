@@ -173,7 +173,7 @@ module.exports = function(app) {
       'amount',
       'tags',
       'createdAt',
-      'paymentMethod',
+      'payoutMethod',
       'comment',
       'vat'
     ];
