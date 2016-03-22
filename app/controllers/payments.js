@@ -7,7 +7,7 @@ const _ = require('lodash');
 const config = require('config');
 const async = require('async');
 const Stripe = require('stripe');
-const paypal = require('paypal-rest-sdk');
+const gateways = require('../gateways');
 
 const OC_FEE_PERCENT = 5;
 
@@ -302,8 +302,9 @@ module.exports = function(app) {
     const currency = payment.currency || group.currency;
     const amount = payment.amount;
     const interval = payment.interval;
+    const isSubscription = _.contains(['month', 'year'], interval);
 
-    if (!_.contains(['month', 'year'], interval)) {
+    if (interval && !isSubscription) {
       return next(new errors.BadRequest('Interval should be month or year.'));
     }
 
@@ -313,109 +314,70 @@ module.exports = function(app) {
 
     async.auto({
 
-      getPaypalConfig: (cb) => {
+      getConnectedAccount: (cb) => {
         group.getConnectedAccount()
-          .then((connectedAccount) => {
-            // We will pass the config in all the subsequent calls to be sure we don't
-            // overwrite the configuration of the global sdk
-            // Example: https://github.com/paypal/PayPal-node-SDK/blob/master/samples/configuration/multiple_config.js
-            cb(null, {
-              mode: config.paypal.rest.mode,
-              client_id: connectedAccount.clientId,
-              client_secret: connectedAccount.secret
-            });
-          })
+          .then((connectedAccount) => cb(null, connectedAccount))
           .catch(cb);
       },
 
       // We create the transaction beforehand to have the id in the return url when
       // the user logs on the PayPal website
-      createTransaction: ['getPaypalConfig', (cb) => {
-        const transaction = {
-          type: 'payment',
-          amount,
-          currency,
-          interval,
-          description: `Donation to ${group.name}`,
-          tags: ['Donation'],
-          approved: true,
-          // In paranoid mode, the deleted transactions are not visible
-          // We will create that temporary transaction that will only be visible once
-          // the user executes the paypal token
-          deletedAt: new Date()
-        };
-
-        const subscription = {
-          amount,
-          currency,
-          interval
-        };
-
-        transactions._create({
-          transaction,
-          subscription,
-          group
-        }, cb);
-      }],
-
-      createPlan: ['createTransaction', (cb, results) => {
-        const transactionId = results.createTransaction.id;
-        const callbackUrl = `${config.host.api}/groups/${group.id}/transactions/${transactionId}/callback`;
-        const billingPlan = {
-          description: `Plan for donation to ${group.name} (${currency} ${amount} / ${interval})`,
-          name: `Plan ${group.name}`,
-          merchant_preferences: {
-            cancel_url: callbackUrl,
-            return_url: callbackUrl
-          },
-          payment_definitions: [{
-            amount: {
-              currency,
-              value: amount
-            },
-            cycles: '0',
-            frequency: interval.toUpperCase(),
-            frequency_interval: '1',
-            name: `Regular payment`,
-            type: 'REGULAR' // or TRIAL
-          }],
-          type: 'INFINITE' // or FIXED
-        };
-
-        paypal.billingPlan.create(billingPlan, results.getPaypalConfig, cb);
-      }],
-
-      activatePlan: ['createPlan', (cb, results) => {
-        paypal.billingPlan.activate(results.createPlan.id, results.getPaypalConfig, cb);
-      }],
-
-      createBillingAgreement: ['activatePlan', (cb, results) => {
-        // From paypal example, fails with moment js, TO REFACTOR
-        var isoDate = new Date();
-        isoDate.setSeconds(isoDate.getSeconds() + 4);
-        isoDate.toISOString().slice(0, 19) + 'Z';
-
-        const billingAgreement = {
-          name: `Agreement for donation to ${group.name}`,
-          description: `Agreement for donation to ${group.name}`,
-          start_date: isoDate,
-          plan: {
-            id: results.createPlan.id
-          },
-          payer: {
-            payment_method: 'paypal'
+      createTransaction: ['getConnectedAccount', (cb) => {
+        const payload = {
+          group,
+          transaction: {
+            type: 'payment',
+            amount,
+            currency,
+            description: `Donation to ${group.name}`,
+            tags: ['Donation'],
+            approved: true,
+            // In paranoid mode, the deleted transactions are not visible
+            // We will create that temporary transaction that will only be visible once
+            // the user executes the paypal token
+            deletedAt: new Date()
           }
         };
 
-        paypal.billingAgreement.create(billingAgreement, results.getPaypalConfig, cb);
+       if (isSubscription) {
+          payload.transaction.interval = interval;
+          payload.subscription = {
+            amount,
+            currency,
+            interval
+          };
+        }
+
+        transactions._create(payload, cb);
       }],
 
-      updateSubscription: ['createBillingAgreement', (cb, results) => {
+      callPaypal: ['createTransaction', (cb, results) => {
+        const connectedAccount = results.getConnectedAccount;
+        const transaction = results.createTransaction;
+
+        if (isSubscription) {
+          gateways.paypal.createSubscription(
+            connectedAccount,
+            group,
+            transaction
+          , cb);
+        } else {
+          gateways.paypal.createPayment(
+            connectedAccount,
+            group,
+            transaction
+          , cb);
+        }
+      }],
+
+      updateSubscription: ['callPaypal', (cb, results) => {
+        if (!isSubscription) return cb();
+
         const transaction = results.createTransaction;
 
         transaction.getSubscription()
           .then((subscription) => {
-            subscription.data = results.createBillingAgreement;
+            subscription.data = results.callPaypal.billingAgreement;
 
             return subscription.save();
           })
@@ -429,9 +391,13 @@ module.exports = function(app) {
         return next(e);
       }
 
+      const links = isSubscription
+        ? results.callPaypal.billingAgreement.links
+        : results.callPaypal.links
+
       res.send({
         success: true,
-        links: results.createBillingAgreement.links
+        links
       });
     });
 
@@ -442,32 +408,38 @@ module.exports = function(app) {
     const group = req.group;
     const token = req.query.token;
 
+    // For single payments
+    const paymentId = req.query.paymentId;
+    const PayerID = req.query.PayerID;
+
+    const isSubscription = !paymentId || !PayerID;
+
     if (!token) {
       return next(new errors.BadRequest('Token to execute agreement is missing'));
     }
 
     async.auto({
-      getPaypalConfig: (cb) => {
+      getConnectedAccount: (cb) => {
         req.group.getConnectedAccount()
-          .then(connectedAccount => {
-            return cb(null, {
-              mode: config.paypal.rest.mode, //sandbox or live
-              client_id: connectedAccount.clientId,
-              client_secret: connectedAccount.secret
-            });
-          })
+          .then(connectedAccount => cb(null, connectedAccount))
           .catch(cb);
       },
 
-      executeBillingAgreement: ['getPaypalConfig', (cb, results) => {
-        paypal.billingAgreement.execute(token, {}, results.getPaypalConfig, cb);
+      execute: ['getConnectedAccount', (cb, results) => {
+        gateways.paypal.execute(
+          results.getConnectedAccount,
+          req.query.token,
+          req.query.paymentId,
+          req.query.PayerID
+        , cb)
       }],
 
-      activateSubscription: ['executeBillingAgreement', (cb, results) => {
+      activateSubscription: ['execute', (cb, results) => {
+        if (!isSubscription) return cb();
+
         transaction.getSubscription()
           .then(subscription => {
-            const billingAgreementId = results.executeBillingAgreement.id;
-
+            const billingAgreementId = results.execute.id;
             subscription.data = _.extend({}, subscription.data, { billingAgreementId });
 
             return subscription.save();
@@ -477,7 +449,7 @@ module.exports = function(app) {
       }],
 
       getOrCreateUser: ['activateSubscription', (cb, results) => {
-        const email = results.executeBillingAgreement.payer.payer_info.email;
+        const email = results.execute.payer.payer_info.email;
 
         getOrCreateUser({ email }, cb);
       }],
