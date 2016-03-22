@@ -1,3 +1,5 @@
+const slack = require('../app/lib/slack');
+
 /**
  * Executes a script by name
  * `npm run script populate_recurring_paypal_transactions`
@@ -22,6 +24,10 @@ script.run()
     process.exit();
   })
   .catch((err) => {
+    if (process.env.NODE_ENV === 'production') {
+      slack.postMessage(err.message, { channel: '#critical' });
+    }
+
     console.log(err);
     process.exit();
   });

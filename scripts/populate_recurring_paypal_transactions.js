@@ -20,6 +20,7 @@ const _ = require('lodash');
 const app = require('../index');
 const models = app.set('models');
 const transactionsController = require('../app/controllers/transactions')(app);
+const slack = require('../app/lib/slack');
 
 const startDate = '2016-03-01'; // date that we started paypal payments
 const endDate = moment().format('YYYY-MM-DD');
@@ -105,6 +106,11 @@ const findSubscriptions = () => {
 
 const log = (message) => {
   console.log(message);
+
+  if (process.env.NODE_ENV === 'production') {
+    slack.postMessage(message, { channel: '#critical' });
+  }
+
   return message; // for testing
 };
 
@@ -115,7 +121,7 @@ const handlePaypalTransactions = (paypalTransactions, transaction, subscription,
   const created = _.find(paypalTransactions, { status: 'Created'});
 
   if (!created) {
-    return log(`No Created event, invalid ${billingAgreementId}`);
+    return log(`No Created event, invalid: ${billingAgreementId}`);
   }
 
   // Unactive subscription
@@ -124,7 +130,7 @@ const handlePaypalTransactions = (paypalTransactions, transaction, subscription,
     // No completed events, it takes up to one day for paypal to process the subscription,
     // so we will just pass
     if (completedList.length === 0) {
-      return log(`Billing agreement not processed yet ${billingAgreementId}, no completed event`);
+      return log(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
 
     // Only one completed item means that it is the first payment, no
     // need to create a new Transaction. We just need to activate the subscription
@@ -139,7 +145,7 @@ const handlePaypalTransactions = (paypalTransactions, transaction, subscription,
   } else {
 
     if (completedList.length === 0) {
-      return log(`Subscription should not be active ${subscription.id} ${billingAgreementId}`);
+      return log(`Subscription should not be active, subscription.id: ${subscription.id}, billingAgreementId: ${billingAgreementId}`);
     } else {
       return updateTransactions(subscription, group, user, completedList);
     }
@@ -154,15 +160,15 @@ const populateTransactions = (subscription) => {
   const user = transaction.User;
 
   if (!billingAgreementId) {
-    return log('No billingAgreementId');
+    return log(`No billingAgreementId, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
   if (!user) {
-    return log('No user')
+    return log(`No user, subscription.id ${subscription.id}, transaction.id ${transaction.id}`)
   }
 
   if (!group) {
-    return log('No group');
+    return log(`No group, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
   return group.getConnectedAccount()

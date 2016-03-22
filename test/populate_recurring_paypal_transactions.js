@@ -214,7 +214,7 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
   it('ignores if it does not have a created event', (done) => {
     runScript([])
       .then(message => {
-        expect(message).to.be.equal(`No Created event, invalid ${billingAgreementId}`);
+        expect(message).to.be.equal(`No Created event, invalid: ${billingAgreementId}`);
         done();
       })
       .catch(done);
@@ -223,7 +223,7 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
   it('fails if it does not have a completed event', (done) => {
     runScript([paypalTransaction.created])
       .then(message => {
-        expect(message).to.be.equal(`Billing agreement not processed yet ${billingAgreementId}, no completed event`);
+        expect(message).to.be.equal(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
         done();
       })
       .catch(done);
