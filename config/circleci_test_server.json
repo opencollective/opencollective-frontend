@@ -1,16 +1,13 @@
 {
   "database": {
     "database": "dd7n9gp6tr4u36",
-    "username": "oshthceeahwmdn",
-    "password": "JalG9GcCdddujhfRVlBV5TJRm3", 
     "options": {
-      "host": "ec2-54-83-194-117.compute-1.amazonaws.com",
       "port": 5432,
-      "protocol": "postgres", 
+      "protocol": "postgres",
       "logging": true,
       "dialectOptions": {
         "ssl": true
       }
-    }   
+    }
   }
 }
