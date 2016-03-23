@@ -8,31 +8,21 @@ const slackLib = require('../app/lib/slack');
 
 onlyExecuteInProdOnMondays();
 
-const timeFrameClause = getTimeFrame();
-const donations = {
-  where: {
-    createdAt: timeFrameClause,
-    amount: {$gt: 0}
-  }
-};
-const expenseClause = {
-  $lt: 0
-};
-const unapprovedExpenses = {
-  where: {
-    createdAt: timeFrameClause,
-    amount: expenseClause,
-    approved: false
-  }
-};
-const approvedExpenses = {
-  where: {
-    createdAt: timeFrameClause,
-    amount: expenseClause,
-    approved: true
-  }
-};
-const currencyAggregate = {
+const createdLastWeek = getTimeFrame('createdAt');
+const updatedLastWeek = getTimeFrame('updatedAt');
+
+const donation = { where: { amount: { $gt: 0 } } };
+const expense = { where: { amount: { $lt: 0 } } };
+
+const approved = { where: { approved: true } };
+const unapproved = { where: { approved: false } };
+
+const lastWeekDonations = _.merge({}, createdLastWeek, donation);
+
+const unapprovedLastWeekExpenses = _.merge({}, createdLastWeek, unapproved, expense);
+const approvedLastWeekExpenses = _.merge({}, createdLastWeek, approved, expense);
+
+const groupByCurrency = {
   plain: false,
   group: ['currency'],
   attributes: ['currency'],
@@ -42,61 +32,57 @@ const currencyAggregate = {
 async.auto({
   donationCount: cb => {
     models.Transaction
-        .count(donations)
+        .count(lastWeekDonations)
         .done(cb);
   },
 
   unapprovedExpenseCount: cb => {
     models.Transaction
-        .count(unapprovedExpenses)
+        .count(unapprovedLastWeekExpenses)
         .done(cb);
   },
 
   approvedExpenseCount: cb => {
     models.Transaction
-        .count(approvedExpenses)
+        .count(approvedLastWeekExpenses)
         .done(cb);
   },
 
   stripeReceivedCount: cb => {
+    const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
     models.Activity
-        .count({
-          where: {
-            createdAt: timeFrameClause,
-            type: activities.WEBHOOK_STRIPE_RECEIVED
-          }
-        })
+        .count(_.merge({}, createdLastWeek, stripeReceived))
         .done(cb);
   },
 
   activeCollectiveCount: cb => {
+    const distinct = {
+      plain: false,
+      distinct: true
+    };
     models.Transaction
-      .aggregate('GroupId', 'COUNT', {
-        plain: false,
-        distinct: true,
-        where: { updatedAt: timeFrameClause }
-      })
+      .aggregate('GroupId', 'COUNT', _.merge({}, updatedLastWeek, distinct))
       .map(row => row.COUNT)
       .done(cb);
   },
 
   donationAmount: cb => {
     models.Transaction
-        .aggregate('amount', 'SUM', _.extend({}, currencyAggregate, donations))
+        .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
         .map(row => ' ' + row.SUM + ' ' + row.currency)
         .done(cb);
   },
 
   unapprovedExpenseAmount: cb => {
     models.Transaction
-        .aggregate('amount', 'SUM', _.extend({}, currencyAggregate, unapprovedExpenses))
+        .aggregate('amount', 'SUM', _.merge({}, unapprovedLastWeekExpenses, groupByCurrency))
         .map(row => ' ' + -row.SUM + ' ' + row.currency)
         .done(cb);
   },
 
   approvedExpenseAmount: cb => {
     models.Transaction
-        .aggregate('amount', 'SUM', _.extend({}, currencyAggregate, approvedExpenses))
+        .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
         .map(row => ' ' + -row.SUM + ' ' + row.currency)
         .done(cb);
   }
@@ -131,7 +117,7 @@ function onlyExecuteInProdOnMondays() {
   }
 }
 
-function getTimeFrame() {
+function getTimeFrame(propName) {
   const thisWeekStartRaw = moment()
     .tz('America/New_York')
     .startOf('isoWeek')
@@ -140,8 +126,12 @@ function getTimeFrame() {
   const lastWeekStart = thisWeekStartRaw.subtract(1, 'week').format();
 
   return {
-    $gt: lastWeekStart,
-    $lt: thisWeekStart
+    where: {
+      [propName]: {
+        $gt: lastWeekStart,
+        $lt: thisWeekStart
+      }
+    }
   };
 }
 
