@@ -29,7 +29,7 @@ const excludeOcTeam = { where: { UserId: { $notIn: [
 ] } } };
 
 const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam);
-const lastWeekExpenses = _.merge({}, createdLastWeek, unapproved, expense, excludeOcTeam);
+const lastWeekExpenses = _.merge({}, createdLastWeek, expense, excludeOcTeam);
 
 const unapprovedLastWeekExpenses = _.merge({}, lastWeekExpenses, unapproved);
 const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approved);
