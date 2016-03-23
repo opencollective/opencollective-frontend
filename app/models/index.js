@@ -50,7 +50,6 @@ function setupModels(client) {
 
   // PaymentMethod.
   m.PaymentMethod.belongsTo(m.User);
-  m.PaymentMethod.belongsTo(m.Group); // Not currently used
 
   // Group.
   m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});

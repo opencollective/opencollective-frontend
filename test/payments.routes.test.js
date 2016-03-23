@@ -220,12 +220,11 @@ describe('payments.routes.test.js', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a paymentMethod with the UserId and the GroupId', (done) => {
+      it('successfully creates a paymentMethod with the UserId', (done) => {
         models.PaymentMethod
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('token', STRIPE_TOKEN);
             expect(res.rows[0]).to.have.property('service', 'stripe');
@@ -244,7 +243,6 @@ describe('payments.routes.test.js', () => {
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
@@ -517,12 +515,11 @@ describe('payments.routes.test.js', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a paymentMethod with the GroupId', (done) => {
+      it('successfully creates a paymentMethod', (done) => {
         models.PaymentMethod
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', 1);
             done();
           })
