@@ -1,6 +1,7 @@
 var config = require('config');
 var jwt = require('jsonwebtoken');
 var errors = require('../../lib/errors');
+var required = require('../required_param');
 
 const Forbidden = errors.Forbidden;
 const Unauthorized = errors.Unauthorized;
@@ -22,8 +23,6 @@ const secret = config.keys.opencollective.secret;
  */
 module.exports = function (app) {
 
-  var Controllers = app.get('controllers');
-  var mw = Controllers.middlewares;
   var models = app.get('models');
   var Application = models.Application;
   var User = models.User;
@@ -99,7 +98,7 @@ module.exports = function (app) {
     },
 
     authenticateAppByApiKey: (req, res, next) => {
-      mw.required('api_key')(req, res, (e) => {
+      required('api_key')(req, res, (e) => {
         if (e) {
           return next(e);
         }
@@ -156,7 +155,7 @@ module.exports = function (app) {
      * Authenticate user by username/email/password.
      */
     authenticateUserByPassword: (req, res, next) => {
-      mw.required('password')(req, res, (e) => {
+      required('password')(req, res, (e) => {
         if (e) {
           return next(e);
         }
