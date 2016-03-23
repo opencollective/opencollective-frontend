@@ -43,5 +43,8 @@
     "api": "API_URL",
     "webapp": "WEBAPP_URL",
     "website": "WEBSITE_URL"
+  },
+  "slack": {
+    "hookUrl": "SLACK_HOOK_URL"
   }
 }
