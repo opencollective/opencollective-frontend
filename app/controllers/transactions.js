@@ -70,9 +70,13 @@ module.exports = function(app) {
       addTransactionToPaymentMethod: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
-        paymentMethod
-          .addTransaction(transaction)
-          .done(cb);
+        if (paymentMethod.addTransaction) {
+          paymentMethod
+            .addTransaction(transaction)
+            .done(cb);
+        } else {
+          cb();
+        }
       }],
 
       createActivity: ['createTransaction', (cb, results) => {
