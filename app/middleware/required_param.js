@@ -1,4 +1,4 @@
-const errors = require('./app/lib/errors');
+const errors = require('../lib/errors');
 
 /**
  *  Parameters required for a route.
