@@ -1,3 +1,5 @@
+const _ = require('lodash');
+const config = require('config');
 const app = require('../index');
 const models = app.set('models');
 
@@ -7,11 +9,22 @@ const done = (err) => {
   process.exit();
 }
 
+const isTest = (str) => _.contains(str, 'test');
+
+const publicKey = config.stripe.key;
+const secret = config.stripe.secret;
+
+
+if (!isTest(publicKey) || !isTest(secret)) {
+  console.log('can only replace with test keys');
+  return;
+}
+
 models.StripeAccount.findAll({})
 .map((stripeAccount) => {
 
-  stripeAccount.accessToken = 'sk_test_3jGhCKe3e1KiN8gHrdDqqHg4';
-  stripeAccount.stripePublishableKey = 'pk_test_5olkhgG5FgJDHcGpJllmCj6z';
+  stripeAccount.accessToken = secret;
+  stripeAccount.stripePublishableKey = key;
 
   return stripeAccount.save();
 })
