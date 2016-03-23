@@ -178,7 +178,11 @@ describe('transactions.routes.test.js', function() {
           api_key: application2.api_key
         })
         .expect(400)
-        .end(done);
+        .end((e,res) => {
+          expect(res.body.error.type).to.equal('missing_required');
+          expect(res.body.error.fields).to.have.property('transaction');
+          done();
+        });
     });
 
     it('fails creating a transaction if user has no access to the group', function(done) {
