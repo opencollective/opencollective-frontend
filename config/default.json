@@ -42,7 +42,6 @@
   "stripe": {
     "redirectUri": "http://localhost:3060/stripe/oauth/callback"
   },
-  "clearbit": "93890266fd5110a2f35ea61d31f484f7",
   "slack": {
     "activityChannel": "#activity_test"
   }

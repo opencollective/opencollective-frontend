@@ -46,5 +46,6 @@
   },
   "slack": {
     "hookUrl": "SLACK_HOOK_URL"
-  }
+  },
+  "clearbit": "CLEARBIT_KEY"
 }
