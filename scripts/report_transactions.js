@@ -95,12 +95,11 @@ async.auto({
 
     console.log(report);
 
-    // slackLib.postMessage(report)
-    // .then(() => {
-    //   console.log('Reporting done!');
-    //   process.exit();
-    // });
-    process.exit();
+    slackLib.postMessage(report)
+    .then(() => {
+      console.log('Reporting done!');
+      process.exit();
+    });
   }
 });
 
