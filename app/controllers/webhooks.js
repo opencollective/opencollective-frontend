@@ -20,7 +20,7 @@ module.exports = (app) => {
   const errors = app.errors;
 
   const models = app.set('models');
-  const Card = models.Card;
+  const PaymentMethod = models.PaymentMethod;
   const User = models.User;
   const Transaction = models.Transaction;
   const Activity = models.Activity;
@@ -99,7 +99,7 @@ module.exports = (app) => {
           include: [
             { model: Group },
             { model: User },
-            { model: Card },
+            { model: PaymentMethod },
             { model: Subscription, where: { stripeSubscriptionId } }
           ]
         })
@@ -132,7 +132,7 @@ module.exports = (app) => {
         const stripeSubscription = results.fetchEvent.stripeSubscription;
         const user = transaction.User || {};
         const group = transaction.Group || {};
-        const card = transaction.Card || {};
+        const paymentMethod = transaction.PaymentMethod || {};
 
         // If the subscription is not active, we will just update the already existing one
         // We only use pending subscriptions for the first subscription invoice
@@ -171,7 +171,7 @@ module.exports = (app) => {
           transaction: newTransaction,
           user,
           group,
-          card
+          paymentMethod
         }, cb);
       }]
 

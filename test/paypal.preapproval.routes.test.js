@@ -79,7 +79,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('preapprovalKey', paypalMock.adaptive.preapproval.preapprovalKey);
 
-          models.Card
+          models.PaymentMethod
             .findAndCountAll({})
             .then(function(res) {
               expect(res.count).to.equal(1);
@@ -93,7 +93,7 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
     });
 
-    describe('Check existing cards', function() {
+    describe('Check existing paymentMethods', function() {
 
       afterEach(function() {
         app.paypalAdaptive.preapprovalDetails.restore();
@@ -116,22 +116,22 @@ describe('paypal.preapproval.routes.test.js', function() {
         beforePastDate();
 
         var token = 'abc';
-        var card = {
+        var paymentMethod = {
           service: 'paypal',
           UserId: user.id,
           token: token
         };
 
-        models.Card.create(card)
-        .done(function checkIfCardIsCreated(err, res) {
+        models.PaymentMethod.create(paymentMethod)
+        .done(function checkIfPaymentMethodIsCreated(err, res) {
           expect(res.token).to.equal(token);
           request(app)
           .get('/users/' + user.id + '/paypal/preapproval')
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function() {
-            models.Card.findAndCountAll({where: {token: token} })
-            .then(function checkIfCardIsDestroyed(res) {
+            models.PaymentMethod.findAndCountAll({where: {token: token} })
+            .then(function checkIfPaymentMethodIsDestroyed(res) {
               expect(res.count).to.equal(0);
               done();
             });
@@ -151,22 +151,22 @@ describe('paypal.preapproval.routes.test.js', function() {
         beforeNotApproved();
 
         var token = 'def';
-        var card = {
+        var paymentMethod = {
           service: 'paypal',
           UserId: user.id,
           token: token
         };
 
-        models.Card.create(card)
-        .done(function checkIfCardIsCreated(err, res) {
+        models.PaymentMethod.create(paymentMethod)
+        .done(function checkIfPaymentMethodIsCreated(err, res) {
           expect(res.token).to.equal(token);
           request(app)
           .get('/users/' + user.id + '/paypal/preapproval')
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function() {
-            models.Card.findAndCountAll({where: {token: token} })
-            .then(function checkIfCardIsDestroyed(res) {
+            models.PaymentMethod.findAndCountAll({where: {token: token} })
+            .then(function checkIfPaymentMethodIsDestroyed(res) {
               expect(res.count).to.equal(0);
               done();
             });
@@ -229,8 +229,8 @@ describe('paypal.preapproval.routes.test.js', function() {
             expect(res.body.token).to.equal(preapprovalkey);
 
             async.auto({
-              checkCard: function(cb) {
-                models.Card.findAndCountAll({where: {token: preapprovalkey} }).then(function(res) {
+              checkPaymentMethod: function(cb) {
+                models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} }).then(function(res) {
                   expect(res.count).to.equal(1);
                   expect(res.rows[0].confirmedAt).not.to.be.null;
                   expect(res.rows[0].service).to.equal('paypal');
@@ -240,7 +240,7 @@ describe('paypal.preapproval.routes.test.js', function() {
                 });
               },
               checkActivity: function(cb) {
-                models.Activity.findAndCountAll({where: {type: 'user.card.created'} }).then(function(res) {
+                models.Activity.findAndCountAll({where: {type: 'user.paymentMethod.created'} }).then(function(res) {
                   expect(res.count).to.equal(1);
                   cb();
                 });
@@ -323,15 +323,15 @@ describe('paypal.preapproval.routes.test.js', function() {
       });
     });
 
-    describe('Cards clean up', function() {
-      it('should delete all other cards entries in the database to clean up', function(done) {
+    describe('PaymentMethods clean up', function() {
+      it('should delete all other paymentMethods entries in the database to clean up', function(done) {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
           .end(function(e, res) {
             expect(e).to.not.exist;
-            models.Card.findAndCountAll({where: {token: preapprovalkey} })
+            models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} })
             .then(function(res) {
               expect(res.count).to.equal(1);
               expect(res.rows[0].confirmedAt).not.to.be.null;

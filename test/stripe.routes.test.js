@@ -28,7 +28,7 @@ describe('stripe.routes.test.js', function() {
 
   var user;
   var user2;
-  var card;
+  var paymentMethod;
   var group;
   var application;
   var sandbox = sinon.sandbox.create();

@@ -8,16 +8,16 @@ module.exports = function(app) {
   var models = app.set('models');
 
   /**
-   * Get the cards of the user.
+   * Get the paymentMethods of the user.
    *
    * We use the method to know if the user need to confirm her/his paypal
    * account
    */
-  var getCards = function(req, res, next) {
+  var getPaymentMethods = function(req, res, next) {
     var filter = req.query.filter;
     var query = _.extend({}, filter, { UserId: req.user.id });
 
-    return models.Card.findAll({ where: query })
+    return models.PaymentMethod.findAll({ where: query })
     .then(function(response) {
       res.send(_.pluck(response, 'info'));
     })
@@ -28,6 +28,6 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
-    getCards: getCards
+    getPaymentMethods: getPaymentMethods
   };
 };

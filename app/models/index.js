@@ -31,7 +31,7 @@ function setupModels(client) {
   [
     'Activity',
     'Application',
-    'Card',
+    'PaymentMethod',
     'Group',
     'ConnectedAccount',
     'StripeAccount',
@@ -48,9 +48,9 @@ function setupModels(client) {
    * Relationships
    */
 
-  // Card.
-  m.Card.belongsTo(m.User);
-  m.Card.belongsTo(m.Group); // Not currently used
+  // PaymentMethod.
+  m.PaymentMethod.belongsTo(m.User);
+  m.PaymentMethod.belongsTo(m.Group); // Not currently used
 
   // Group.
   m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
@@ -88,8 +88,8 @@ function setupModels(client) {
   m.Group.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User);
   m.User.hasMany(m.Transaction);
-  m.Transaction.belongsTo(m.Card);
-  m.Card.hasMany(m.Transaction);
+  m.Transaction.belongsTo(m.PaymentMethod);
+  m.PaymentMethod.hasMany(m.Transaction);
 
   // Application.
   m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});

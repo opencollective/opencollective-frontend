@@ -6,7 +6,7 @@ module.exports = function(app) {
   var cs = {};
   var controllers = [
     'activities',
-    'cards',
+    'paymentmethods',
     'groups',
     'images',
     'middlewares',

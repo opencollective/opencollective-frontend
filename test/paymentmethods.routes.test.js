@@ -14,19 +14,19 @@ var utils = require('../test/utils.js')();
  * Variables.
  */
 var userData = utils.data('user1');
-var paypalCard = utils.data('card1');
-var stripeCard = utils.data('card2');
+var paypalPaymentMethod = utils.data('paymentMethod1');
+var stripePaymentMethod = utils.data('paymentMethod2');
 var models = app.set('models');
 
 /**
  * Tests.
  */
-describe('cards.routes.test.js', function() {
+describe('paymentMethods.routes.test.js', function() {
 
   var application;
   var user;
   var user2;
-  var card1;
+  var paymentMethod1;
   var sandbox = sinon.sandbox.create();
 
 
@@ -60,21 +60,21 @@ describe('cards.routes.test.js', function() {
     });
   });
 
-  // Create card.
+  // Create paymentMethod.
   beforeEach(function(done) {
-    var data = _.extend(paypalCard, { UserId: user.id });
-    models.Card.create(data).done(function(e, c) {
+    var data = _.extend(paypalPaymentMethod, { UserId: user.id });
+    models.PaymentMethod.create(data).done(function(e, c) {
       expect(e).to.not.exist;
-      card1 = c;
+      paymentMethod1 = c;
       done();
     });
   });
 
   beforeEach(function(done) {
-    var data = _.extend(stripeCard, { UserId: user.id });
-    models.Card.create(data).done(function(e, c) {
+    var data = _.extend(stripePaymentMethod, { UserId: user.id });
+    models.PaymentMethod.create(data).done(function(e, c) {
       expect(e).to.not.exist;
-      card2 = c;
+      paymentMethod2 = c;
       done();
     });
   });
@@ -88,9 +88,9 @@ describe('cards.routes.test.js', function() {
    */
   describe('#getUserGroups', function() {
 
-    it('fails getting another user\'s cards', function(done) {
+    it('fails getting another user\'s paymentMethods', function(done) {
       request(app)
-        .get('/users/' + user.id + '/cards')
+        .get('/users/' + user.id + '/payment-methods')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
         .end(function(e, res) {
@@ -99,9 +99,9 @@ describe('cards.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s card', function(done) {
+    it('successfully get a user\'s paymentMethod', function(done) {
       request(app)
-        .get('/users/' + user.id + '/cards')
+        .get('/users/' + user.id + '/payment-methods')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end(function(e, res) {
@@ -109,16 +109,16 @@ describe('cards.routes.test.js', function() {
 
           var body = res.body;
           expect(body).to.have.length(2);
-          expect(body[0].id).to.be.equal(card1.id);
-          expect(body[0].service).to.be.equal(card1.service);
-          expect(body[0].token).to.be.equal(card1.token);
+          expect(body[0].id).to.be.equal(paymentMethod1.id);
+          expect(body[0].service).to.be.equal(paymentMethod1.service);
+          expect(body[0].token).to.be.equal(paymentMethod1.token);
           done();
         });
     });
 
-    it('successfully get a user\'s card and filters by service', function(done) {
+    it('successfully get a user\'s paymentMethod and filters by service', function(done) {
       request(app)
-        .get('/users/' + user.id + '/cards')
+        .get('/users/' + user.id + '/payment-methods')
         .query({
           filter: {
             service: 'paypal'
@@ -131,9 +131,9 @@ describe('cards.routes.test.js', function() {
           var body = res.body;
 
           expect(body).to.have.length(1);
-          expect(body[0].id).to.be.equal(card1.id);
-          expect(body[0].service).to.be.equal(card1.service);
-          expect(body[0].token).to.be.equal(card1.token);
+          expect(body[0].id).to.be.equal(paymentMethod1.id);
+          expect(body[0].service).to.be.equal(paymentMethod1.service);
+          expect(body[0].token).to.be.equal(paymentMethod1.token);
           done();
         });
     });

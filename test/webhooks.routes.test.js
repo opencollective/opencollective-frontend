@@ -52,7 +52,7 @@ var stubStripe = () => {
 describe('webhooks.routes.test.js', () => {
   var nocks = {};
   var user;
-  var card;
+  var paymentMethod;
   var group;
   var application;
   var firstPayment;
@@ -153,7 +153,7 @@ describe('webhooks.routes.test.js', () => {
         'application_fee_percent=5',
         encodeURIComponent('metadata[groupId]') + '=' + group.id,
         encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
-        encodeURIComponent('metadata[cardId]') + '=1'
+        encodeURIComponent('metadata[paymentMethodId]') + '=1'
       ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -233,9 +233,9 @@ describe('webhooks.routes.test.js', () => {
         expect(res.count).to.equal(1);
         res.rows.forEach((transaction) => {
           expect(transaction.id).to.be.equal(firstPayment.id);
-          expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
+          expect(transaction.GroupId).to.be.equal(firstPayment.PaymentMethodId);
           expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-          expect(transaction.CardId).to.be.equal(firstPayment.CardId);
+          expect(transaction.PaymentMethodId).to.be.equal(firstPayment.PaymentMethodId);
           expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal('payment');
@@ -289,9 +289,9 @@ describe('webhooks.routes.test.js', () => {
           .then(res => {
             expect(res.count).to.be.equal(2); // second transaction
             res.rows.forEach((transaction) => {
-              expect(transaction.GroupId).to.be.equal(firstPayment.CardId);
+              expect(transaction.GroupId).to.be.equal(firstPayment.PaymentMethodId);
               expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-              expect(transaction.CardId).to.be.equal(firstPayment.CardId);
+              expect(transaction.PaymentMethodId).to.be.equal(firstPayment.PaymentMethodId);
               expect(transaction.approved).to.be.true;
               expect(transaction.currency).to.be.equal(CURRENCY);
               expect(transaction.type).to.be.equal('payment');

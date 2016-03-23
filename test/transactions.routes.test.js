@@ -919,7 +919,7 @@ describe('transactions.routes.test.js', function() {
     });
 
     beforeEach((done) => {
-      models.Card.create({
+      models.PaymentMethod.create({
         service: 'paypal',
         UserId: user.id,
         token: 'abc'

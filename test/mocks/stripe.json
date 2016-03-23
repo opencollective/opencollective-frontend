@@ -35,10 +35,10 @@
     },
 
     "createError": {
-      "type": "StripeCardError",
+      "type": "StripePaymentMethodError",
       "rawType": "card_error",
       "code": "card_declined",
-      "message": "Your card was declined",
+      "message": "Your paymentMethod was declined",
       "detail": {},
       "raw": {}
     }
@@ -59,7 +59,7 @@
       "refunded": false,
       "source": {
         "id": "card_165j1jIqnMN1wWwOzm6Cjmea",
-        "object": "card",
+        "object": "paymentMethod",
         "last4": "4242",
         "brand": "Visa",
         "funding": "credit",

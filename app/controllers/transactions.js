@@ -18,20 +18,20 @@ module.exports = function(app) {
   var Activity = models.Activity;
   var Notification = models.Notification;
   var User = models.User;
-  var Card = models.Card;
+  var PaymentMethod = models.PaymentMethod;
   var errors = app.errors;
   var emailLib = require('../lib/email')(app);
   var paypal = require('./paypal')(app);
 
   /**
-   * Create a transaction and add it to a group/user/card.
+   * Create a transaction and add it to a group/user/paymentMethod.
    */
   var create = (args, callback) => {
     var transaction = args.transaction;
     const subscription = args.subscription;
     var user = args.user || {};
     var group = args.group || {};
-    var card = args.card || {};
+    var paymentMethod = args.paymentMethod || {};
 
     async.auto({
 
@@ -67,11 +67,11 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      addTransactionToCard: ['createTransaction', (cb, results) => {
+      addTransactionToPaymentMethod: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
-        if (card && card.addTransaction) {
-          card
+        if (paymentMethod && paymentMethod.addTransaction) {
+          paymentMethod
             .addTransaction(transaction)
             .done(cb);
         } else {
@@ -92,7 +92,7 @@ module.exports = function(app) {
             group: group.info,
             transaction: transaction,
             user: user.info,
-            card: card.info
+            paymentMethod: paymentMethod.info
           }
         }).done(cb);
       }],
@@ -152,12 +152,12 @@ module.exports = function(app) {
         cb();
       }],
 
-      getCard: [function(cb) {
+      getPaymentMethod: [function(cb) {
         if (isManual) {
           return cb(null, {});
         }
 
-        Card
+        PaymentMethod
           .findAndCountAll({
             where: {
               service: service,
@@ -169,13 +169,13 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      checkCard: ['getCard', function(cb, results) {
+      checkPaymentMethod: ['getPaymentMethod', function(cb, results) {
         if (isManual) {
           return cb(null, {});
-        } else if (results.getCard.count === 0) {
-          return cb(new errors.BadRequest('This user has no confirmed card linked with this service.'));
+        } else if (results.getPaymentMethod.count === 0) {
+          return cb(new errors.BadRequest('This user has no confirmed paymentMethod linked with this service.'));
         } else {
-          return cb(null, results.getCard.rows[0]); // Use first card.
+          return cb(null, results.getPaymentMethod.rows[0]); // Use first paymentMethod.
         }
       }],
 
@@ -192,7 +192,7 @@ module.exports = function(app) {
           .catch(cb);
       }],
 
-      callService: ['checkTransaction', 'checkCard', 'getBeneficiary', function(cb, results) {
+      callService: ['checkTransaction', 'checkPaymentMethod', 'getBeneficiary', function(cb, results) {
         if (isManual) {
           return cb(null, {});
         }
@@ -206,17 +206,17 @@ module.exports = function(app) {
          * wants positive values in the API, we will change the sign of the amount
          */
         payServices[service]({
-          card: results.checkCard,
+          paymentMethod: results.checkPaymentMethod,
           group: group,
           transaction: _.extend({}, transaction.toJSON(), { amount: -transaction.amount }),
           beneficiary: results.getBeneficiary,
-          cardToken: results.checkCard.token
+          paymentMethodToken: results.checkPaymentMethod.token
         }, cb);
       }],
 
-      updateTransaction: ['checkCard', 'callService', function(cb, results) {
+      updateTransaction: ['checkPaymentMethod', 'callService', function(cb, results) {
         if (!isManual) {
-          transaction.CardId = results.checkCard.id;
+          transaction.PaymentMethodId = results.checkPaymentMethod.id;
         }
 
         transaction.status = 'REIMBURSED';
@@ -280,8 +280,8 @@ module.exports = function(app) {
 
     // We need to check the funds before approving a transaction
     async.auto({
-      fetchCards: (cb) => {
-        Card.findAll({
+      fetchPaymentMethods: (cb) => {
+        PaymentMethod.findAll({
           where: {
             service: 'paypal',
             UserId: req.remoteUser.id
@@ -290,14 +290,14 @@ module.exports = function(app) {
         .done(cb);
       },
 
-      getPreapprovalDetails: ['fetchCards', (cb, results) => {
-        const card = results.fetchCards[0];
+      getPreapprovalDetails: ['fetchPaymentMethods', (cb, results) => {
+        const paymentMethod = results.fetchPaymentMethods[0];
 
-        if (!card || !card.token) {
+        if (!paymentMethod || !paymentMethod.token) {
           return cb(new errors.BadRequest('You can\'t approve a transaction without linking your PayPal account'));
         }
 
-        paypal.getPreapprovalDetails(card.token, cb);
+        paypal.getPreapprovalDetails(paymentMethod.token, cb);
       }],
 
       checkIfEnoughFunds: ['getPreapprovalDetails', (cb, results) => {
