@@ -1,3 +1,5 @@
+const errors = require('./app/lib/errors');
+
 /**
  *  Parameters required for a route.
  */
