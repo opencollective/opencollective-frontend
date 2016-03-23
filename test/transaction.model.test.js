@@ -71,9 +71,9 @@ describe('transaction model', function() {
     .catch(done);
   });
 
-  it('isManual if paymentMethod is manual', done => {
+  it('isManual if payoutMethod is manual', done => {
     Transaction.create({
-      paymentMethod: 'manual'
+      payoutMethod: 'manual'
     })
     .then(transaction => {
       expect(transaction.info.isManual).to.be.true;

@@ -207,12 +207,12 @@ describe('transactions.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails creating a transaction with wrong paymentMethod', function(done) {
+    it('fails creating a transaction with wrong payoutMethod', function(done) {
       request(app)
         .post('/groups/' + privateGroup.id + '/transactions')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
-          transaction: _.extend({}, transactionsData[0], {paymentMethod:'lalala'})
+          transaction: _.extend({}, transactionsData[0], {payoutMethod:'lalala'})
         })
         .expect(400)
         .end(done);
@@ -235,7 +235,7 @@ describe('transactions.routes.test.js', function() {
           expect(t).to.have.property('vendor', transactionsData[0].vendor);
           expect(t).to.have.property('GroupId', privateGroup.id);
           expect(t).to.have.property('UserId', user.id); // ...
-          expect(t).to.have.property('paymentMethod', transactionsData[0].paymentMethod);
+          expect(t).to.have.property('payoutMethod', transactionsData[0].payoutMethod);
 
           models.Activity.findAndCountAll({}).then(function(res) {
             expect(res.rows[0]).to.have.property('TransactionId', t.id);
@@ -419,21 +419,21 @@ describe('transactions.routes.test.js', function() {
     });
 
     it('successfully updates a transaction', function(done) {
-      var paymentMethod = 'manual';
+      var payoutMethod = 'manual';
 
-      expect(toUpdate.paymentMethod).to.not.be.equal(paymentMethod);
+      expect(toUpdate.payoutMethod).to.not.be.equal(payoutMethod);
       request(app)
         .put('/groups/' + privateGroup.id + '/transactions/' + toUpdate.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           transaction: {
-            paymentMethod: paymentMethod
+            payoutMethod: payoutMethod
           }
         })
         .expect(200)
         .end(function(e, res) {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('paymentMethod', paymentMethod);
+          expect(res.body).to.have.property('payoutMethod', payoutMethod);
           done();
         });
     });
@@ -923,7 +923,7 @@ describe('transactions.routes.test.js', function() {
     });
 
     beforeEach((done) => {
-      models.Card.create({
+      models.PaymentMethod.create({
         service: 'paypal',
         UserId: user.id,
         token: 'abc'

@@ -3,8 +3,6 @@
  */
 const _ = require('lodash');
 const async = require('async');
-const config = require('config');
-const uuid = require('node-uuid');
 const activities = require('../constants/activities');
 
 /**
@@ -19,22 +17,21 @@ module.exports = function(app) {
   var Transaction = models.Transaction;
   var Activity = models.Activity;
   var Notification = models.Notification;
-  var Paykey = models.Paykey;
   var User = models.User;
-  var Card = models.Card;
+  var PaymentMethod = models.PaymentMethod;
   var errors = app.errors;
   var emailLib = require('../lib/email')(app);
   var paypal = require('./paypal')(app);
 
   /**
-   * Create a transaction and add it to a group/user/card.
+   * Create a transaction and add it to a group/user/paymentMethod.
    */
   var create = (args, callback) => {
     var transaction = args.transaction;
     const subscription = args.subscription;
     var user = args.user || {};
     var group = args.group || {};
-    var card = args.card || {};
+    var paymentMethod = args.paymentMethod || {};
 
     async.auto({
 
@@ -70,11 +67,11 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      addTransactionToCard: ['createTransaction', (cb, results) => {
+      addTransactionToPaymentMethod: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
-        if (card && card.addTransaction) {
-          card
+        if (paymentMethod.addTransaction) {
+          paymentMethod
             .addTransaction(transaction)
             .done(cb);
         } else {
@@ -95,7 +92,7 @@ module.exports = function(app) {
             group: group.info,
             transaction: transaction,
             user: user.info,
-            card: card.info
+            paymentMethod: paymentMethod.info
           }
         }).done(cb);
       }],
@@ -128,273 +125,6 @@ module.exports = function(app) {
   };
 
   /**
-   * Get a Paypal pay key.
-   */
-  var getPayKey = function(req, res, next) {
-    var uri = '/groups/' + req.group.id + '/transactions/' + req.transaction.id + '/paykey/${payKey}';
-
-    // Check if a user is attached to the transaction.
-    var userId = req.transaction.UserId;
-    if (!userId) {
-      return next(new errors.BadRequest('A user has to be attached to the transaction to be reimburse. The URI ' + uri + '/attribution/:userid' + ' can be used to link a user to the transaction.'));
-    }
-
-    // Parameters.
-    var amount = req.transaction.amount;
-    var baseUrl = config.host.webapp + uri;
-    var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
-    var returnUrl = req.query.returnUrl || (baseUrl + '/success');
-
-    async.auto({
-
-      getUser: function(cb) {
-        User
-          .find(parseInt(userId))
-          .then(function(user) {
-            if (!user) {
-              return cb(new errors.NotFound('User ' + userid + ' not found'));
-            } else {
-              cb(null, user);
-            }
-          })
-          .catch(cb);
-      },
-
-      getExistingPaykeys: ['getUser', function(cb) {
-        Paykey
-          .findAndCountAll({
-            where: {
-              TransactionId: req.transaction.id
-            }
-          })
-          .done(cb);
-      }],
-
-      checkExistingPaykeys: ['getExistingPaykeys', function(cb, results) {
-        async.each(results.getExistingPaykeys.rows, function(pk, cbEach) {
-          app.paypalAdaptive.paymentDetails({payKey: pk.paykey}, function(err, response) {
-            if (err || response.status === 'CREATED') {
-              pk.destroy().done(cbEach);
-            } else if (response.status === 'COMPLETED') {
-              _confirmPaymentDatabase({
-                paykey: pk,
-                transaction: req.transaction,
-                group: req.group,
-                paypalResponse: response,
-                user: req.remoteUser
-              }, function(e) {
-                if (e) return cbEach(e);
-                else return cbEach(new errors.BadRequest('This transaction has been paid already.'));
-              });
-            } else {
-              cbEach();
-            }
-          });
-        }, cb);
-      }],
-
-      createPaykeyEntry: ['checkExistingPaykeys', function(cb) {
-        Paykey.create({}).done(cb);
-      }],
-
-      createPayload: ['getUser', 'createPaykeyEntry', function(cb, results) {
-        var payload = {
-          requestEnvelope: {
-            errorLanguage: 'en_US',
-            detailLevel: 'ReturnAll'
-          },
-          actionType: 'PAY',
-          currencyCode: req.transaction.currency.toUpperCase() || 'USD',
-          feesPayer: 'SENDER',
-          memo: 'Reimbursement transaction ' + req.transaction.id + ': ' + req.transaction.description,
-          cancelUrl: cancelUrl,
-          returnUrl: returnUrl,
-          trackingId: [uuid.v1().substr(0, 8), results.createPaykeyEntry.id].join(':'),
-          receiverList: {
-            receiver: [
-              {
-                email: results.getUser.paypalEmail || results.getUser.email,
-                amount: amount,
-                paymentType: 'SERVICE'
-              }
-            ]
-          }
-        };
-
-        // Add the user preapproval key if it has one.
-        // payload.preapprovalKey = results.getUser.preapprovalKey;
-
-        return cb(null, payload);
-      }],
-
-      callPaypal: ['createPayload', function(cb, results) {
-        app.paypalAdaptive.pay(results.createPayload, cb);
-      }],
-
-      updatePaykeyEntry: ['createPaykeyEntry', 'createPayload', 'callPaypal', function(cb, results) {
-        var paykey = results.createPaykeyEntry;
-        paykey.trackingId = results.createPayload.trackingId;
-        paykey.paykey = results.callPaypal.payKey;
-        paykey.status = results.callPaypal.paymentExecStatus;
-        paykey.payload = results.createPayload;
-        paykey.data = results.callPaypal;
-        paykey.save().done(cb);
-      }],
-
-      linkPaykeyTransaction: ['callPaypal', 'updatePaykeyEntry', function(cb, results) {
-        req.transaction
-          .addPaykey(results.updatePaykeyEntry)
-          .done(cb);
-      }]
-
-    }, function(e, results) {
-      if (e) return next(e);
-      var response = results.callPaypal;
-      response.transactionId = req.transaction.id;
-      res.json(response);
-    });
-
-  };
-
-  /**
-   * Confirm the payment in the database:
-   *  - update paykey
-   *  - update transaction
-   *  - clean not used paykeys
-   *  - create an activity
-   *  Returns the transaction.
-   */
-  var _confirmPaymentDatabase = function(args, callback) {
-    var paykey = args.paykey; // model
-    var transaction = args.transaction; // model
-    var group = args.group; // model
-    var paypalResponse = args.paypalResponse; // response from paypal paymentDetails
-    var user = args.user || {};
-
-    async.auto({
-
-      updatePaykey: [function(cb) {
-        paykey.data = paypalResponse;
-        paykey.status = paypalResponse.status;
-        paykey.save().done(cb);
-      }],
-
-      updateTransaction: [function(cb) {
-        transaction.status = paypalResponse.status;
-        transaction.reimbursedAt = new Date();
-        transaction.save().done(cb);
-      }],
-
-      cleanPaykeys: ['updatePaykey', function(cb) {
-        Paykey
-          .destroy({
-            where: {
-              TransactionId: transaction.id,
-              paykey: {$ne: paykey.paykey}
-            }
-          })
-          .done(cb);
-      }],
-
-      createActivity: ['updatePaykey', 'updateTransaction', function(cb) {
-        Activity.create({
-          type: activities.GROUP_TRANSACTION_PAID,
-          UserId: user.id,
-          GroupId: group.id,
-          TransactionId: transaction.id,
-          data: {
-            group: group.info,
-            transaction: transaction.info,
-            user: user.info,
-            pay: paypalResponse
-          }
-        }).done(cb);
-      }]
-
-    }, function(err, results) {
-      if (err) return callback(err);
-      else callback(null, results.updateTransaction);
-    });
-
-  };
-
-  /**
-   * Confirm a transaction payment.
-   */
-  var confirmPayment = function(req, res, next) {
-
-    async.auto({
-
-      callPaypal: [function(cb) {
-        app.paypalAdaptive.paymentDetails({payKey: req.params.paykey}, function(err, response) {
-          if (err) {
-            return cb(new errors.BadRequest(response.error[0].message));
-          }
-
-          if (response.status !== 'COMPLETED') {
-            return cb(new errors.BadRequest('This transaction is not paid yet.'));
-          }
-
-          cb(null, response);
-        });
-      }],
-
-      confirmPaymentDatabase: ['callPaypal', function(cb, results) {
-        _confirmPaymentDatabase({
-          paykey: req.paykey,
-          transaction: req.transaction,
-          group: req.group,
-          paypalResponse: results.callPaypal,
-          user: req.remoteUser
-        }, cb);
-      }]
-
-    }, function(err, results) {
-      if (err) return next(err);
-      else res.send(results.confirmPaymentDatabase.info)
-    });
-
-  };
-
-  /**
-   * Specific method for paying with services.
-   */
-  var payServices = {
-
-    paypal: function(data, callback) {
-      var uri = '/groups/' + data.group.id + '/transactions/' + data.transaction.id + '/paykey/${payKey}';
-      var baseUrl = config.host.webapp + uri;
-      var amount = data.transaction.amount;
-      var payload = {
-        requestEnvelope: {
-          errorLanguage: 'en_US',
-          detailLevel: 'ReturnAll'
-        },
-        actionType: 'PAY',
-        currencyCode: data.transaction.currency.toUpperCase() || 'USD',
-        feesPayer: 'SENDER',
-        memo: 'Reimbursement transaction ' + data.transaction.id + ': ' + data.transaction.description,
-        trackingId: [uuid.v1().substr(0, 8), data.transaction.id].join(':'),
-        preapprovalKey: data.cardToken,
-        returnUrl: baseUrl + '/success',
-        cancelUrl: baseUrl + '/cancel',
-        receiverList: {
-          receiver: [
-            {
-              email: data.beneficiary.paypalEmail || data.beneficiary.email,
-              amount: amount,
-              paymentType: 'SERVICE'
-            }
-          ]
-        }
-      };
-
-      app.paypalAdaptive.pay(payload, callback);
-    }
-
-  };
-
-  /**
    * Pay a transaction.
    */
   var pay = function(req, res, next) {
@@ -402,7 +132,7 @@ module.exports = function(app) {
     var user = req.remoteUser;
     var group = req.group;
     var transaction = req.transaction;
-    var isManual = transaction.paymentMethod !== 'paypal';
+    var isManual = transaction.payoutMethod !== 'paypal';
 
     async.auto({
 
@@ -422,12 +152,12 @@ module.exports = function(app) {
         cb();
       }],
 
-      getCard: [function(cb) {
+      getPaymentMethod: [function(cb) {
         if (isManual) {
           return cb(null, {});
         }
 
-        Card
+        PaymentMethod
           .findAndCountAll({
             where: {
               service: service,
@@ -439,13 +169,13 @@ module.exports = function(app) {
           .done(cb);
       }],
 
-      checkCard: ['getCard', function(cb, results) {
+      checkPaymentMethod: ['getPaymentMethod', function(cb, results) {
         if (isManual) {
           return cb(null, {});
-        } else if (results.getCard.count === 0) {
-          return cb(new errors.BadRequest('This user has no confirmed card linked with this service.'));
+        } else if (results.getPaymentMethod.count === 0) {
+          return cb(new errors.BadRequest('This user has no confirmed paymentMethod linked with this service.'));
         } else {
-          return cb(null, results.getCard.rows[0]); // Use first card.
+          return cb(null, results.getPaymentMethod.rows[0]); // Use first paymentMethod.
         }
       }],
 
@@ -462,7 +192,7 @@ module.exports = function(app) {
           .catch(cb);
       }],
 
-      callService: ['checkTransaction', 'checkCard', 'getBeneficiary', function(cb, results) {
+      callService: ['checkTransaction', 'checkPaymentMethod', 'getBeneficiary', function(cb, results) {
         if (isManual) {
           return cb(null, {});
         }
@@ -476,17 +206,17 @@ module.exports = function(app) {
          * wants positive values in the API, we will change the sign of the amount
          */
         payServices[service]({
-          card: results.checkCard,
+          paymentMethod: results.checkPaymentMethod,
           group: group,
           transaction: _.extend({}, transaction.toJSON(), { amount: -transaction.amount }),
           beneficiary: results.getBeneficiary,
-          cardToken: results.checkCard.token
+          paymentMethodToken: results.checkPaymentMethod.token
         }, cb);
       }],
 
-      updateTransaction: ['checkCard', 'callService', function(cb, results) {
+      updateTransaction: ['checkPaymentMethod', 'callService', function(cb, results) {
         if (!isManual) {
-          transaction.CardId = results.checkCard.id;
+          transaction.PaymentMethodId = results.checkPaymentMethod.id;
         }
 
         transaction.status = 'REIMBURSED';
@@ -550,8 +280,8 @@ module.exports = function(app) {
 
     // We need to check the funds before approving a transaction
     async.auto({
-      fetchCards: (cb) => {
-        Card.findAll({
+      fetchPaymentMethods: (cb) => {
+        PaymentMethod.findAll({
           where: {
             service: 'paypal',
             UserId: req.remoteUser.id
@@ -560,14 +290,14 @@ module.exports = function(app) {
         .done(cb);
       },
 
-      getPreapprovalDetails: ['fetchCards', (cb, results) => {
-        const card = results.fetchCards[0];
+      getPreapprovalDetails: ['fetchPaymentMethods', (cb, results) => {
+        const paymentMethod = results.fetchPaymentMethods[0];
 
-        if (!card || !card.token) {
+        if (!paymentMethod || !paymentMethod.token) {
           return cb(new errors.BadRequest('You can\'t approve a transaction without linking your PayPal account'));
         }
 
-        paypal.getPreapprovalDetails(card.token, cb);
+        paypal.getPreapprovalDetails(paymentMethod.token, cb);
       }],
 
       checkIfEnoughFunds: ['getPreapprovalDetails', (cb, results) => {
@@ -619,8 +349,6 @@ module.exports = function(app) {
   return {
     approve,
     _create: create,
-    getPayKey,
-    confirmPayment,
     pay,
     attributeUser,
     getSubscriptions

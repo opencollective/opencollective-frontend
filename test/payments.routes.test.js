@@ -177,7 +177,7 @@ describe('payments.routes.test.js', () => {
       encodeURIComponent('metadata[groupId]') + '=' + group.id,
       encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
       encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
-      encodeURIComponent('metadata[cardId]') + '=1'
+      encodeURIComponent('metadata[paymentMethodId]') + '=1'
     ].join('&');
 
     nocks['charges.create'] = nock(STRIPE_URL)
@@ -220,8 +220,8 @@ describe('payments.routes.test.js', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a card with the UserId and the GroupId', (done) => {
-        models.Card
+      it('successfully creates a paymentMethod with the UserId and the GroupId', (done) => {
+        models.PaymentMethod
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
@@ -229,7 +229,7 @@ describe('payments.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('token', STRIPE_TOKEN);
             expect(res.rows[0]).to.have.property('service', 'stripe');
-            expect(res.rows[0]).to.have.property('serviceId', stripeMock.customers.create.id);
+            expect(res.rows[0]).to.have.property('customerId', stripeMock.customers.create.id);
             done();
           })
           .catch(done);
@@ -246,7 +246,7 @@ describe('payments.routes.test.js', () => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
-            expect(res.rows[0]).to.have.property('CardId', 1);
+            expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', 'payment');
             expect(res.rows[0]).to.have.property('amount', CHARGE);
@@ -299,7 +299,7 @@ describe('payments.routes.test.js', () => {
           encodeURIComponent('metadata[groupId]') + '=' + group.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
-          encodeURIComponent('metadata[cardId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1'
         ].join('&');
 
         nocks['charges.create2'] = nock(STRIPE_URL)
@@ -327,8 +327,8 @@ describe('payments.routes.test.js', () => {
         expect(nocks['customers.create2'].isDone()).to.be.false;
       });
 
-      it('does not re-create a card', (done) => {
-        models.Card
+      it('does not re-create a paymentMethod', (done) => {
+        models.PaymentMethod
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
@@ -366,7 +366,7 @@ describe('payments.routes.test.js', () => {
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(EMAIL),
-          encodeURIComponent('metadata[cardId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1'
         ].join('&');
 
         nocks['charges.create'] = nock(STRIPE_URL)
@@ -427,7 +427,7 @@ describe('payments.routes.test.js', () => {
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user4.email),
-          encodeURIComponent('metadata[cardId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1'
         ].join('&');
 
         nocks['charges.create'] = nock(STRIPE_URL)
@@ -491,7 +491,7 @@ describe('payments.routes.test.js', () => {
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(userData.email),
-          encodeURIComponent('metadata[cardId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1'
         ].join('&');
 
         nocks['charges.create'] = nock(STRIPE_URL)
@@ -517,8 +517,8 @@ describe('payments.routes.test.js', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
       });
 
-      it('successfully creates a card with the GroupId', (done) => {
-        models.Card
+      it('successfully creates a paymentMethod with the GroupId', (done) => {
+        models.PaymentMethod
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
@@ -555,10 +555,10 @@ describe('payments.routes.test.js', () => {
             expect(res.count).to.equal(1);
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('UserId', user.id);
-            expect(res.rows[0]).to.have.property('CardId', 1);
+            expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('tags');
-            expect(res.rows[0]).to.have.property('paymentMethod', null);
+            expect(res.rows[0]).to.have.property('payoutMethod', null);
             expect(res.rows[0]).to.have.property('amount', data.amount);
             expect(res.rows[0]).to.have.property('paidby', String(user.id));
             done();
@@ -613,7 +613,7 @@ describe('payments.routes.test.js', () => {
           'application_fee_percent=5',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
-          encodeURIComponent('metadata[cardId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1'
         ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -688,7 +688,7 @@ describe('payments.routes.test.js', () => {
               expect(res.count).to.equal(1);
               expect(res.rows[0]).to.have.property('GroupId', group2.id);
               expect(res.rows[0]).to.have.property('UserId', 2);
-              expect(res.rows[0]).to.have.property('CardId', 1);
+              expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
               expect(res.rows[0]).to.have.property('currency', CURRENCY);
               expect(res.rows[0]).to.have.property('tags');
               expect(res.rows[0]).to.have.property('interval', plan.interval);
@@ -805,7 +805,7 @@ describe('payments.routes.test.js', () => {
           // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
           nock('https://api.sandbox.paypal.com:443')
             .post('/v1/oauth2/token', "grant_type=client_credentials")
-            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-card/.* https://api.paypal.com/v1/vault/credit-card\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
+            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-paymentMethod/.* https://api.paypal.com/v1/vault/credit-paymentMethod\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
 
           const executeRequest = nock('https://api.sandbox.paypal.com:443')
             .post(`/v1/payments/billing-agreements/${token}/agreement-execute`)
@@ -916,7 +916,7 @@ describe('payments.routes.test.js', () => {
           // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
           nock('https://api.sandbox.paypal.com:443')
             .post('/v1/oauth2/token', "grant_type=client_credentials")
-            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-card/.* https://api.paypal.com/v1/vault/credit-card\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
+            .reply(200, "{\"scope\":\"https://uri.paypal.com/services/invoicing openid https://api.paypal.com/v1/developer/.* https://api.paypal.com/v1/payments/.* https://api.paypal.com/v1/vault/credit-paymentMethod/.* https://api.paypal.com/v1/vault/credit-paymentMethod\",\"access_token\":\"IUIkXAOcYVNHe5zcQajcNGwVWfoUcesp7-YURMLohPI\",\"token_type\":\"Bearer\",\"app_id\":\"APP-2EJ531395M785864S\",\"expires_in\":28800}");
 
           const executeRequest = nock('https://api.sandbox.paypal.com')
             .post(`/v1/payments/payment/${paymentId}/execute`, { payer_id: PayerID})
@@ -1047,7 +1047,7 @@ describe('payments.routes.test.js', () => {
 
       });
 
-      it('fails paying because of a card declined', (done) => {
+      it('fails paying because of a paymentMethod declined', (done) => {
         request(app)
           .post('/groups/' + group.id + '/payments')
           .set('Authorization', 'Bearer ' + user.jwt(application))

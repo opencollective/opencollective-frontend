@@ -85,7 +85,7 @@ module.exports = function(app) {
         models.Transaction.find({
           include: [
             { model: models.Group },
-            { model: models.Card },
+            { model: models.PaymentMethod },
             {
               model: models.Subscription,
               where: {
@@ -108,7 +108,7 @@ module.exports = function(app) {
           .then((stripeAccount) => {
             cb(null, {
               stripeSecret: stripeAccount.accessToken,
-              customerId: t.Card.serviceId,
+              customerId: t.PaymentMethod.customerId,
               subscriptionId: t.Subscription.stripeSubscriptionId,
               subscription: t.Subscription
             })

@@ -23,7 +23,7 @@ module.exports = function(Sequelize, DataTypes) {
     comment: DataTypes.STRING,
     link: DataTypes.STRING,
 
-    paymentMethod: {
+    payoutMethod: {
       type: DataTypes.STRING,
       validate: {
         isIn: {
@@ -86,7 +86,7 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       isManual() {
-        return this.paymentMethod === 'manual';
+        return this.payoutMethod === 'manual';
       },
 
       isReimbursed() {
@@ -114,7 +114,7 @@ module.exports = function(Sequelize, DataTypes) {
           reimbursedAt: this.reimbursedAt,
           UserId: this.UserId,
           GroupId: this.GroupId,
-          paymentMethod: this.paymentMethod,
+          payoutMethod: this.payoutMethod,
           isExpense: this.isExpense,
           isRejected: this.isRejected,
           isDonation: this.isDonation,

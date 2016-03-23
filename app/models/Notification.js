@@ -52,13 +52,13 @@ Types:
       data: user.email
       UserId: the user
 
-  - user.card.created
-      data: user, card
-      UserId: the one who added the card = the card's owner
-  - user.card.updated
-      data: user, card (updated values)
-  - user.card.deleted
-      data: user, card.number (only 4 last number)
+  - user.paymentMethod.created
+      data: user, paymentMethod
+      UserId: the one who added the paymentMethod = the paymentMethod's owner
+  - user.paymentMethod.updated
+      data: user, paymentMethod (updated values)
+  - user.paymentMethod.deleted
+      data: user, paymentMethod.number (only 4 last number)
 
   + group.created
       data: group, user.info

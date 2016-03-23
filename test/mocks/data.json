@@ -107,15 +107,15 @@
     "name": "Yeoman"
   },
 
-  "card1": {
+  "paymentMethod1": {
     "token": "PA-1B0110758V169653C",
     "service": "paypal"
   },
 
-  "card2": {
+  "paymentMethod2": {
     "token": "stripetoken123",
     "service": "stripe",
-    "serviceId": "cus_123"
+    "customerId": "cus_123"
   },
 
   "activities1": {
@@ -247,7 +247,7 @@
         "comment": "this is the reason why I bought this",
         "link": "https://opencollective-production.s3-us-west-1.amazonaws.com/Invoice_14417_OpenCollectivepdf_a1b3cfa0-c0ce-11e5-ab37-9d9c8fc41dba.pdf",
         "createdAt": "2015-01-23T08:00:00.000Z",
-        "paymentMethod": "paypal"
+        "payoutMethod": "paypal"
       },
       {
         "vendor": "@xdamman",
@@ -355,7 +355,7 @@
       "reimbursedAt": null,
       "UserId": 1,
       "GroupId": 1,
-      "paymentMethod": null,
+      "payoutMethod": null,
       "isExpense": false,
       "isRejected": false,
       "isDonation": true,
