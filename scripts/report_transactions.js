@@ -66,6 +66,12 @@ async.auto({
       .done(cb);
   },
 
+  newCollectiveCount: cb => {
+    models.Group
+      .count(createdLastWeek)
+      .done(cb);
+  },
+
   donationAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
@@ -96,10 +102,10 @@ async.auto({
     console.log(report);
 
     slackLib.postMessage(report)
-    .then(() => {
-      console.log('Reporting done!');
-      process.exit();
-    });
+      .then(() => {
+        console.log('Reporting done!');
+        process.exit();
+      });
   }
 });
 
@@ -140,5 +146,6 @@ function transactionReportString(results) {
 - ${results.unapprovedExpenseCount} unapproved expenses ${results.unapprovedExpenseAmount ? `totaling${results.unapprovedExpenseAmount}` : ''}
 - ${results.approvedExpenseCount} approved expenses ${results.approvedExpenseAmount ? `totaling${results.approvedExpenseAmount}` : ''}
 - ${results.stripeReceivedCount} payments received from Stripe
-- ${results.activeCollectiveCount} active collectives`;
+- ${results.activeCollectiveCount} active collectives
+- ${results.newCollectiveCount} new collectives`;
 }
