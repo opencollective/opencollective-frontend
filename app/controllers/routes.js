@@ -153,8 +153,6 @@ module.exports = function(app) {
 
   app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, required('approved'), transactions.approve); // Approve a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, required('service'), transactions.pay); // Pay a transaction.
-  app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
-  app.post('/groups/:groupid/transactions/:transactionid/paykey/:paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.confirmPayment); // Confirm a transaction's payment.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), transactions.attributeUser); // Attribute a transaction to a user.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
 
