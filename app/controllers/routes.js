@@ -2,6 +2,7 @@ var _ = require('lodash');
 var serverStatus = require('express-server-status');
 var roles = require('../constants/roles');
 var jwt = require('../middlewares/jwt');
+var required = require('../middleware/required_param');
 
 module.exports = function(app) {
 
@@ -49,10 +50,10 @@ module.exports = function(app) {
   /**
    * User reset password flow (no jwt verification)
    */
-  app.post('/users/password/forgot', aN.authenticateAppByApiKey, mw.required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, mw.required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+  app.post('/users/password/forgot', aN.authenticateAppByApiKey, required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-  app.post('/subscriptions/new_token', aN.authenticateAppByApiKey, mw.required('email'), subscriptions.sendNewTokenByEmail);
+  app.post('/subscriptions/new_token', aN.authenticateAppByApiKey, required('email'), subscriptions.sendNewTokenByEmail);
 
   /**
    * Routes without expiration validation
@@ -74,15 +75,15 @@ module.exports = function(app) {
   /**
    * Users.
    */
-  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUserByJwt(), users.show); // Get a user.
-  app.put('/users/:userid', aN.authenticateAppByApiKey, mw.required('user'), users.updateUserWithoutLoggedIn); // Update a user.
-  app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), mw.required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
-  app.put('/users/:userid/paypalemail', mw.required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/avatar', mw.required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
+  app.put('/users/:userid', aN.authenticateAppByApiKey, required('user'), users.updateUserWithoutLoggedIn); // Update a user.
+  app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
+  app.put('/users/:userid/paypalemail', required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
+  app.put('/users/:userid/avatar', required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
   // TODO why is this route duplicated?
-  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), mw.required('user'), users.create); // Create a user.
+  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
 
   /**
    * Authentication.
@@ -111,13 +112,13 @@ module.exports = function(app) {
   /**
    * Groups.
    */
-  app.post('/groups', aN.authenticateUserByJwt(), mw.required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.post('/groups', aN.authenticateUserByJwt(), required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}),  mw.cache(60), groups.getUsers); // Get group users
-  app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), mw.required('group'), groups.update); // Update a group.
+  app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
-  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), mw.required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), mw.required('payment'), payments.paypal); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), payments.paypal); // Make a payment/donation.
 
   /**
    * UserGroup.
@@ -139,16 +140,16 @@ module.exports = function(app) {
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
   // We should refactor this.
-  app.post('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
-  app.post('/groups/:groupid/transactions', mw.required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
   app.get('/groups/:groupid/transactions/:transactionid', groups.getTransaction); // Get a transaction.
-  app.put('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('transaction'), groups.updateTransaction); // Update a transaction.
+  app.put('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, required('transaction'), groups.updateTransaction); // Update a transaction.
   app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
 
-  app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.required('approved'), transactions.approve); // Approve a transaction.
-  app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, mw.required('service'), transactions.pay); // Pay a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, required('approved'), transactions.approve); // Approve a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, required('service'), transactions.pay); // Pay a transaction.
   app.get('/groups/:groupid/transactions/:transactionid/paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.getPayKey); // Get a transaction's pay key.
   app.post('/groups/:groupid/transactions/:transactionid/paykey/:paykey', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, transactions.confirmPayment); // Confirm a transaction's payment.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), transactions.attributeUser); // Attribute a transaction to a user.
@@ -201,7 +202,7 @@ module.exports = function(app) {
   /**
    * Leaderboard
    */
-  app.get('/leaderboard', mw.required('api_key'), mw.authorizeApp, groups.getLeaderboard); // Create a user.
+  app.get('/leaderboard', required('api_key'), mw.authorizeApp, groups.getLeaderboard); // Create a user.
 
   /**
    * Error handler.
