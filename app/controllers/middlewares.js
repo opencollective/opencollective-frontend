@@ -84,42 +84,6 @@ module.exports = function(app) {
     },
 
     /**
-     *  Parameters required for a route.
-     */
-    required: function(properties) {
-      properties = [].slice.call(arguments);
-
-      return function(req, res, next) {
-        var missing = {};
-        req.required = {};
-
-        properties.forEach(function(prop) {
-          var value = req.query[prop];
-          if (!value && value !== false)
-            value = req.headers[prop];
-          if (!value && value !== false)
-            value = req.body[prop];
-
-          if ((!value || value === 'null') && value !== false) {
-            missing[prop] = 'Required field ' + prop + ' missing';
-          } else {
-            try { // Try to parse if JSON
-              value = JSON.parse(value);
-            } catch (e) {}
-
-            req.required[prop] = value;
-          }
-        });
-
-        if (Object.keys(missing).length) {
-          return next(new errors.ValidationFailed('missing_required', missing));
-        }
-
-        next();
-      };
-    },
-
-    /**
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
