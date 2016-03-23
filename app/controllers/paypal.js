@@ -86,14 +86,14 @@ module.exports = function(app) {
         }, cb);
       }],
 
-      createPaymentMethodEntry: ['checkExistingPaymentMethod', function(cb) {
+      createPaymentMethod: ['checkExistingPaymentMethod', function(cb) {
         PaymentMethod.create({
           service: 'paypal',
           UserId: req.remoteUser.id
         }).done(cb);
       }],
 
-      createPayload: ['createPaymentMethodEntry', function(cb, results) {
+      createPayload: ['createPaymentMethod', function(cb, results) {
         var payload = {
           currencyCode: 'USD',
           startingDate: new Date().toISOString(),
@@ -106,7 +106,7 @@ module.exports = function(app) {
           requestEnvelope: {
             errorLanguage:  'en_US'
           },
-          clientDetails: results.createPaymentMethodEntry.id
+          clientDetails: results.createPaymentMethod.id
         };
         return cb(null, payload);
       }],
@@ -115,8 +115,8 @@ module.exports = function(app) {
         app.paypalAdaptive.preapproval(results.createPayload, cb);
       }],
 
-      updatePaymentMethodEntry: ['createPaymentMethodEntry', 'createPayload', 'callPaypal', function(cb, results) {
-        var paymentMethod = results.createPaymentMethodEntry;
+      updatePaymentMethod: ['createPaymentMethod', 'createPayload', 'callPaypal', function(cb, results) {
+        var paymentMethod = results.createPaymentMethod;
         paymentMethod.token = results.callPaypal.preapprovalKey;
         paymentMethod.save().done(cb);
       }]
