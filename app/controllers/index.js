@@ -10,7 +10,6 @@ module.exports = function(app) {
     'groups',
     'images',
     'middlewares',
-    'params',
     'payments',
     'paypal',
     'notifications',
