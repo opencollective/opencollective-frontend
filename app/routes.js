@@ -1,7 +1,7 @@
 const serverStatus = require('express-server-status');
 
 const roles = require('./constants/roles');
-const jwt = require('./middlewares/jwt');
+const jwt = require('./middleware/jwt');
 const required = require('./middleware/required_param');
 
 /**
