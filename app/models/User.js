@@ -255,26 +255,27 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     classMethods: {
-      auth: function(usernameOrEmail, password, fn) {
+      auth(usernameOrEmail, password, cb) {
         var msg = 'Invalid username/email or password.';
         usernameOrEmail = usernameOrEmail.toLowerCase();
 
-        User
-          .find({ where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail] })
-          .then(function(user) {
-            if (!user) return fn(new errors.BadRequest(msg));
+        User.find({
+          where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail]
+        })
+        .then((user) => {
+          if (!user) return cb(new errors.BadRequest(msg));
 
-            bcrypt.compare(password, user.password_hash, function(err, matched) {
-              if (!err && matched) {
-                user.updateAttributes({
-                  seenAt: new Date()
-                }).done(fn);
-              } else {
-                fn(new errors.BadRequest(msg));
-              }
-            });
-          })
-          .catch(fn);
+          bcrypt.compare(password, user.password_hash, (err, matched) => {
+            if (!err && matched) {
+              user.updateAttributes({
+                seenAt: new Date()
+              }).done(cb);
+            } else {
+              cb(new errors.BadRequest(msg));
+            }
+          });
+        })
+        .catch(cb);
       },
 
       decryptId(encrypted) {

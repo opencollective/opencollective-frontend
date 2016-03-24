@@ -1,6 +1,6 @@
 module.exports = function(Sequelize, DataTypes) {
 
-  var Application = Sequelize.define('Application', {
+  const Application = Sequelize.define('Application', {
     api_key: DataTypes.STRING,
     name: DataTypes.STRING,
     href: DataTypes.STRING,
@@ -23,21 +23,20 @@ module.exports = function(Sequelize, DataTypes) {
     }
   }, {
     classMethods: {
-      findByKey: function(key, fn) {
-        Application
-          .findOne({where: {
+      findByKey(key, cb) {
+        Application.findOne({
+          where: {
             api_key: key
-          }})
-          .then(function(application) {
-            return fn(null, application);
-          })
-          .catch(fn);
+          }
+        })
+        .then((application) => cb(null, application))
+        .catch(cb);
       }
     },
 
     getterMethods: {
       // Info.
-      info: function() {
+      info() {
         return {
           id: this.id,
           name: this.name,

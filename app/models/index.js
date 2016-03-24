@@ -7,7 +7,7 @@ const config = require('config').database;
 /**
  * Database connection.
  */
-console.log('Connecting to postgres://' + config.options.host + '/' + config.database);
+console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
 
 const sequelize = new Sequelize(
   config.database,
@@ -41,7 +41,7 @@ function setupModels(client) {
     'User',
     'UserGroup'
   ].forEach((model) => {
-    m[model] = client.import(__dirname + '/' + model);
+    m[model] = client.import(`${__dirname}/${model}`);
   });
 
   /**

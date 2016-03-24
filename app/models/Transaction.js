@@ -67,7 +67,7 @@ module.exports = function(Sequelize, DataTypes) {
           };
         } else {
           return {
-            src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + this.link,
+            src: `https://res.cloudinary.com/opencollective/image/fetch/w_640/${this.link}`,
             width: '100%'
           };
         }
