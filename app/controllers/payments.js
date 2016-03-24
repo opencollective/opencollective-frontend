@@ -73,7 +73,7 @@ module.exports = function(app) {
               return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
             }
 
-            cb(null, stripeAccount.accessToken);
+            cb(null, stripeAccount);
           })
           .catch(cb);
       },
