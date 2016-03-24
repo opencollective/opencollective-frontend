@@ -16,6 +16,7 @@ module.exports = (app) => {
   const aZ = require('./middleware/security/authorization')(app);
   const errorHandler = require('./middleware/error_handler');
   const cache = require('./middleware/cache');
+  const params = require('./params')(app);
 
   /**
    * Controllers
@@ -24,7 +25,6 @@ module.exports = (app) => {
   const Controllers = app.set('controllers');
   const mw = Controllers.middlewares;
   const users = Controllers.users;
-  const params = Controllers.params;
   const groups = Controllers.groups;
   const activities = Controllers.activities;
   const notifications = Controllers.notifications;
