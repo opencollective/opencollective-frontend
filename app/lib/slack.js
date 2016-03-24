@@ -13,6 +13,9 @@ module.exports = {
    * Post a given activity to Slack
    */
   postActivity: function(activity, options) {
+    if (!options) {
+      options = {};
+    }
     var message = activitiesLib.formatMessage(activity, true);
     options.attachments = formatAttachment(activity);
     this.postMessage(message, options);
