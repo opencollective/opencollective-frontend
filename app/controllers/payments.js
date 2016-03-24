@@ -1,12 +1,10 @@
 /**
  * Dependencies.
  */
-const utils = require('../lib/utils');
 const roles = require('../constants/roles');
 const _ = require('lodash');
 const config = require('config');
 const async = require('async');
-const Stripe = require('stripe');
 const gateways = require('../gateways');
 
 const OC_FEE_PERCENT = 5;
@@ -25,21 +23,7 @@ module.exports = function(app) {
   var users = require('../controllers/users')(app);
   var emailLib = require('../lib/email')(app);
 
-  const getOrCreatePlan = (params, cb) => {
-    var stripe = params.stripe;
-    var plan = params.plan;
 
-    stripe.plans.retrieve(plan.id, (err, result) => {
-      var type = err && err.type;
-      var message = err && err.message;
-
-      if (type === 'StripeInvalidRequest' && _.contains(message, 'No such plan')) {
-        stripe.plans.create(plan, cb);
-      } else {
-        cb(err, result);
-      }
-    });
-  };
 
   const getOrCreateUser = (attributes, cb) => {
      return models.User.findOne({
@@ -80,48 +64,47 @@ module.exports = function(app) {
 
     async.auto({
 
-      getGroupStripeAccount: function(cb) {
-        req.group.getStripeAccount(function(err, stripeAccount) {
-          if (err) return cb(err);
-          if (!stripeAccount || !stripeAccount.accessToken) {
-            return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
-          }
-
-          if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
-            return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
-          }
-
-          cb(null, Stripe(stripeAccount.accessToken));
-        });
-      },
-
-      getExistingPaymentMethod: ['getGroupStripeAccount', function(cb) {
-        models.PaymentMethod
-          .findOne({
-            where: {
-              token: payment.stripeToken,
-              service: 'stripe'
+      getGroupStripeAccount(cb) {
+        req.group.getStripeAccount()
+          .then((stripeAccount) => {
+            if (!stripeAccount || !stripeAccount.accessToken) {
+              return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
             }
-          })
-          .then(function(paymentMethod) {
-            cb(null, paymentMethod);
+
+            if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+              return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+            }
+
+            cb(null, stripeAccount.accessToken);
           })
           .catch(cb);
+      },
+
+      getExistingPaymentMethod: ['getGroupStripeAccount', (cb) => {
+        models.PaymentMethod.findOne({
+          where: {
+            token: payment.stripeToken,
+            service: 'stripe'
+          }
+        })
+        .then(p => cb(null, p))
+        .catch(cb);
       }],
 
-      createCustomer: ['getGroupStripeAccount', 'getExistingPaymentMethod', function(cb, results) {
-        var stripe = results.getGroupStripeAccount;
-
+      createCustomer: ['getGroupStripeAccount', 'getExistingPaymentMethod', (cb, results) => {
+        // Only create payment method for new customer
         if (results.getExistingPaymentMethod) {
           return cb(null, results.getExistingPaymentMethod);
         }
 
-        stripe.customers
-          .create({
-            source: payment.stripeToken,
-            description:  'Paying ' + email + ' to ' + group.name,
-            email: email
-          }, cb);
+        gateways.stripe.createCustomer(
+          results.getGroupStripeAccount,
+          payment.stripeToken, {
+            email,
+            group
+          })
+          .then((customer) => cb(null, customer))
+          .catch(cb);
       }],
 
       createPaymentMethod: ['createCustomer', 'getExistingPaymentMethod', function(cb, results) {
@@ -145,36 +128,23 @@ module.exports = function(app) {
        */
 
       createCharge: ['getGroupStripeAccount', 'createPaymentMethod', function(cb, results) {
-        var stripe = results.getGroupStripeAccount;
-        var paymentMethod = results.createPaymentMethod;
-        var amount = payment.amount * 100;
-        var currency = payment.currency || group.currency;
+        const paymentMethod = results.createPaymentMethod;
+        const amount = payment.amount * 100;
+        const currency = payment.currency || group.currency;
 
         /**
          * Subscription
          */
         if (isSubscription) {
-
-          var id = utils.planId({
-            currency,
+          const plan = {
             interval,
-            amount
-          });
+            amount,
+            currency
+          };
 
-          getOrCreatePlan({
-            plan: {
-              id,
-              interval,
-              amount,
-              name: id,
-              currency
-            },
-            stripe
-          }, (err, plan) => {
-            if (err) return cb(err);
-
-            stripe.customers
-              .createSubscription(paymentMethod.customerId, {
+          gateways.stripe.getOrCreatePlan(results.getGroupStripeAccount, plan)
+            .then(plan => {
+              const subscription = {
                 plan: plan.id,
                 application_fee_percent: OC_FEE_PERCENT,
                 metadata: {
@@ -182,27 +152,38 @@ module.exports = function(app) {
                   groupName: group.name,
                   paymentMethodId: paymentMethod.id
                 }
-              }, cb);
-          });
+              };
+
+              return gateways.stripe.createSubscription(
+                results.getGroupStripeAccount,
+                paymentMethod.customerId,
+                subscription
+              );
+            })
+            .then(subscription => cb(null, subscription))
+            .catch(cb);
 
         } else {
 
           /**
            * For one-time donation
            */
-          stripe.charges
-            .create({
-              amount: amount,
-              currency: currency,
-              customer: paymentMethod.customerId,
-              description: 'One time donation to ' + group.name,
-              metadata: {
-                groupId: group.id,
-                groupName: group.name,
-                customerEmail: email,
-                paymentMethodId: paymentMethod.id
-              }
-            }, cb);
+          const charge = {
+            amount,
+            currency,
+            customer: paymentMethod.customerId,
+            description: `One time donation to ${group.name}`,
+            metadata: {
+              groupId: group.id,
+              groupName: group.name,
+              customerEmail: email,
+              paymentMethodId: paymentMethod.id
+            }
+          };
+
+          gateways.stripe.createCharge(results.getGroupStripeAccount, charge)
+            .then(charge => cb(null, charge))
+            .catch(cb);
         }
       }],
 
@@ -495,7 +476,6 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
-    getOrCreatePlan, // Exposed for testing
     post,
     paypal: paypalDonation,
     paypalCallback

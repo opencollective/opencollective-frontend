@@ -136,14 +136,14 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      hasUserWithRole: function(userId, roles, cb) {
+      hasUserWithRole(userId, roles, cb) {
         this
           .getUsers({
             where: {
               id: userId
             }
           })
-          .then(function(users) {
+          .then((users) => {
             if (users.length === 0) {
               return cb(null, false);
             } else if (!_.contains(roles, users[0].UserGroup.role)) {
@@ -163,14 +163,14 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      getStripeAccount: function(cb) {
-        Sequelize.models.UserGroup.find({
+      getStripeAccount() {
+        return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
           }
         })
-        .then(function(userGroup) {
+        .then((userGroup) => {
           if (!userGroup) {
             return { stripeAccount: null };
           }
@@ -184,10 +184,7 @@ module.exports = function(Sequelize, DataTypes) {
             }]
           });
         })
-        .then(function(user) {
-          cb(null, user.StripeAccount);
-        })
-        .catch(cb);
+        .then((user) => user.StripeAccount);
       },
 
       getConnectedAccount() {
@@ -208,16 +205,14 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      hasHost: function(cb) {
-        Sequelize.models.UserGroup.find({
+      hasHost(cb) {
+        return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
           }
         })
-        .then(function(userGroup) {
-          return cb(null, !!userGroup);
-        })
+        .then((userGroup) => cb(null, !!userGroup))
         .catch(cb);
       }
 

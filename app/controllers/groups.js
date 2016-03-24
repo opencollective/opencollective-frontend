@@ -450,7 +450,12 @@ module.exports = function(app) {
           .catch(cb);
       },
 
-      getStripeAccount: (cb) =>  req.group.getStripeAccount(cb),
+      getStripeAccount: (cb) =>  {
+        req.group.getStripeAccount()
+          .then((account) => cb(null, account))
+          .catch(cb);
+      },
+
       getConnectedAccount: (cb) => {
         req.group.getConnectedAccount()
           .then((account) => cb(null, account))

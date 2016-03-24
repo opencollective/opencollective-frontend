@@ -1,34 +1,42 @@
-var _ = require('lodash');
-var serverStatus = require('express-server-status');
-var roles = require('../constants/roles');
-var jwt = require('../middlewares/jwt');
-var required = require('../middleware/required_param');
+const serverStatus = require('express-server-status');
 
-module.exports = function(app) {
+const roles = require('./constants/roles');
+const jwt = require('./middleware/jwt');
+const required = require('./middleware/required_param');
 
-  var aN = require('../middleware/security/authentication')(app);
-  var aZ = require('../middleware/security/authorization')(app);
+/**
+ * NotImplemented response.
+ */
+
+const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
+
+module.exports = (app) => {
+
+  const aN = require('./middleware/security/authentication')(app);
+  const aZ = require('./middleware/security/authorization')(app);
+  const errorHandler = require('./middleware/error_handler');
+  const cache = require('./middleware/cache');
 
   /**
-   * Public methods.
+   * Controllers
    */
-  var Controllers = app.set('controllers');
-  var mw = Controllers.middlewares;
-  var users = Controllers.users;
-  var params = Controllers.params;
-  var groups = Controllers.groups;
-  var activities = Controllers.activities;
-  var notifications = Controllers.notifications;
-  var transactions = Controllers.transactions;
-  var payments = Controllers.payments;
-  var paypal = Controllers.paypal;
-  var images = Controllers.images;
-  var paymentMethods = Controllers.paymentmethods;
-  var webhooks = Controllers.webhooks;
-  var stripe = Controllers.stripe;
-  var test = Controllers.test;
-  var subscriptions = Controllers.subscriptions;
-  var errors = app.errors;
+
+  const Controllers = app.set('controllers');
+  const mw = Controllers.middlewares;
+  const users = Controllers.users;
+  const params = Controllers.params;
+  const groups = Controllers.groups;
+  const activities = Controllers.activities;
+  const notifications = Controllers.notifications;
+  const transactions = Controllers.transactions;
+  const payments = Controllers.payments;
+  const paypal = Controllers.paypal;
+  const images = Controllers.images;
+  const paymentMethods = Controllers.paymentmethods;
+  const webhooks = Controllers.webhooks;
+  const stripe = Controllers.stripe;
+  const test = Controllers.test;
+  const subscriptions = Controllers.subscriptions;
 
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
@@ -58,13 +66,6 @@ module.exports = function(app) {
    * Routes without expiration validation
    */
   app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppByJwtNoExpiry(), subscriptions.refreshTokenByEmail);
-
-  /**
-   * NotImplemented response.
-   */
-  var NotImplemented = function(req, res, next) {
-    return next(new errors.NotImplemented('Not implemented yet.'));
-  };
 
   /**
    * For testing the email templates
@@ -117,7 +118,7 @@ module.exports = function(app) {
    */
   app.post('/groups', aN.authenticateUserByJwt(), required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}),  mw.cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
   app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
@@ -208,33 +209,6 @@ module.exports = function(app) {
   /**
    * Error handler.
    */
-  app.use(function(err, req, res, next) {
-
-    if (res.headersSent) {
-      return next(err);
-    }
-
-    var name = err.name;
-
-    if (name === 'UnauthorizedError') // because of jwt-express
-      err.code = err.status;
-    res.header('Cache-Control', 'no-cache');
-
-    // Validation error.
-    var e = name && name.toLowerCase ? name.toLowerCase() : '';
-    if (e.indexOf('validation') !== -1)
-      err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), err.message);
-    else if (e.indexOf('uniqueconstraint') !== -1)
-      err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
-
-    if (!err.code) {
-      var code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
-      err.code = err.status || code;
-    }
-
-    console.error('Error Express : ', err);
-    if (err.stack) console.log(err.stack);
-    res.status(err.code).send({error: err});
-  });
+  app.use(errorHandler);
 
 };
