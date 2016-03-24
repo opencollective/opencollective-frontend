@@ -15,14 +15,6 @@ module.exports = function(app) {
    */
   return {
 
-    cache: (maxAge) => {
-      maxAge = maxAge || 5;
-      return (req, res, next) => {
-        res.setHeader('Cache-Control', `public, max-age=${maxAge}`);
-        next();
-      }
-    },
-
     /**
      * Get the user based on its email or paypalEmail. If not found, creates one.
      * Used for creating a transaction from a new/returning donor or an expense from a new/returning user.

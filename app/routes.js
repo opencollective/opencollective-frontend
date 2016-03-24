@@ -15,6 +15,7 @@ module.exports = (app) => {
   const aN = require('./middleware/security/authentication')(app);
   const aZ = require('./middleware/security/authorization')(app);
   const errorHandler = require('./middleware/error_handler');
+  const cache = require('./middleware/cache');
 
   /**
    * Controllers
@@ -117,7 +118,7 @@ module.exports = (app) => {
    */
   app.post('/groups', aN.authenticateUserByJwt(), required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}),  mw.cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
   app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, payments.post); // Make a payment/donation.
