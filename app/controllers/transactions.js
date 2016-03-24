@@ -114,7 +114,7 @@ module.exports = function(app) {
         })
         .then(() => cb())
         .catch((err) => {
-          console.error('Unable to fetch subscribers of ' + activity.type + ' for group ' + activity.GroupId, err);
+          console.error(`Unable to fetch subscribers of ${activity.type} for group ${activity.GroupId}`, err);
         });
       }]
 
@@ -182,9 +182,9 @@ module.exports = function(app) {
       getBeneficiary: [function(cb) {
         User
           .find(parseInt(transaction.UserId))
-          .then(function(user) {
+          .then((user) => {
             if (!user) {
-              return cb(new errors.NotFound('Beneficiary ' + userid + ' not found'));
+              return cb(new errors.NotFound(`Beneficiary ${userid} not found`));
             } else {
               cb(null, user);
             }
@@ -239,7 +239,7 @@ module.exports = function(app) {
         }).done(cb);
       }]
 
-    }, function(err, results) {
+    }, (err, results) => {
       if (err && results.callService) {
         console.error('PayPal error', JSON.stringify(results.callService));
         if (results.callService.error instanceof Array) {
@@ -260,9 +260,7 @@ module.exports = function(app) {
   var attributeUser = function(req, res, next) {
     req.transaction
       .setUser(req.user)
-      .then(function() {
-        res.send({success: true});
-      })
+      .then(() => res.send({success: true}))
       .catch(next);
   };
 

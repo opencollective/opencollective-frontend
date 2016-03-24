@@ -13,16 +13,20 @@ module.exports = (err, req, res, next) => {
 
   var name = err.name;
 
-  if (name === 'UnauthorizedError') // because of jwt-express
+  if (name === 'UnauthorizedError') {// because of jwt-express
     err.code = err.status;
+  }
+
   res.header('Cache-Control', 'no-cache');
 
   // Validation error.
   var e = name && name.toLowerCase ? name.toLowerCase() : '';
-  if (e.indexOf('validation') !== -1)
-    err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), err.message);
-  else if (e.indexOf('uniqueconstraint') !== -1)
-    err = new errors.ValidationFailed(null, _.map(err.errors, function(e) { return e.path; }), 'Unique Constraint Error.');
+
+  if (e.indexOf('validation') !== -1) {
+    err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), err.message);
+  } else if (e.indexOf('uniqueconstraint') !== -1) {
+    err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), 'Unique Constraint Error.');
+  }
 
   if (!err.code) {
     var code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;

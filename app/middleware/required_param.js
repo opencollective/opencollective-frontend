@@ -10,7 +10,7 @@ module.exports = function(properties) {
     var missing = {};
     req.required = {};
 
-    properties.forEach(function (prop) {
+    properties.forEach((prop) => {
       var value = req.query[prop];
       if (!value && value !== false)
         value = req.headers[prop];
@@ -18,7 +18,7 @@ module.exports = function(properties) {
         value = req.body[prop];
 
       if ((!value || value === 'null') && value !== false) {
-        missing[prop] = 'Required field ' + prop + ' missing';
+        missing[prop] = `Required field ${prop} missing`;
       } else {
         try { // Try to parse if JSON
           value = JSON.parse(value);

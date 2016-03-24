@@ -110,7 +110,7 @@ module.exports = function (app) {
             return next(e);
           }
           if (!application) {
-            return next(new Unauthorized('Invalid API key: ' + appApiKey));
+            return next(new Unauthorized(`Invalid API key: ${appApiKey}`));
           }
           if (application.disabled) {
             return next(new Forbidden('Application disabled'));

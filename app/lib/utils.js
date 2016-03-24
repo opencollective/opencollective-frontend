@@ -40,7 +40,7 @@ const generateURLSafeToken = size => base64url(crypto.randomBytes(size));
  * Get current Url.
  */
 const getRequestedUrl = (req) => {
-  return req.protocol + '://' + req.get('Host') + req.url;
+  return `${req.protocol}://${req.get('Host')}${req.url}`;
 };
 
 /**
@@ -115,7 +115,7 @@ const getLinkHeader = (url, options) => {
   var header = '';
   var k = 0;
   for (var i in links) {
-    header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"';
+    header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"'; // eslint-disable-line
     k += 1;
   }
 

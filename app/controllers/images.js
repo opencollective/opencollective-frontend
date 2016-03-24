@@ -38,7 +38,7 @@ module.exports = function(app) {
 
     fs.createReadStream(file.path).pipe(put);
 
-    put.on('response', function(response) {
+    put.on('response', (response) => {
       res.send({
         status: response.statusCode,
         url: put.url
@@ -51,7 +51,7 @@ module.exports = function(app) {
    */
 
   return {
-    upload: upload
+    upload
   };
 
 };

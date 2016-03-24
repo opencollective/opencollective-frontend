@@ -54,6 +54,8 @@
     "chance": "^0.8.0",
     "cheerio": "^0.19.0",
     "eslint": "^1.9.0",
+    "eslint-config-opencollective": "^1.1.0",
+    "eslint-plugin-react": "^4.2.3",
     "istanbul": "0.3.2",
     "jsxhint": "^0.15.1",
     "mocha": "^2.4.5",

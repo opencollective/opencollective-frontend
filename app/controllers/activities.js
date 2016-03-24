@@ -7,7 +7,7 @@ var _ = require('lodash');
 /**
  * Controller.
  */
-module.exports = function(app) {
+module.exports = (app) => {
 
   /**
    * Internal Dependencies.
@@ -23,7 +23,7 @@ module.exports = function(app) {
     /**
      * Get group's activities.
      */
-    group: function(req, res, next) {
+    group(req, res, next) {
       var query = _.merge({
         where: {
           GroupId: req.group.id
@@ -33,7 +33,7 @@ module.exports = function(app) {
 
       Activity
         .findAndCountAll(query)
-        .then(function(activities) {
+        .then((activities) => {
 
           // Set headers for pagination.
           req.pagination.total = activities.count;
@@ -60,7 +60,7 @@ module.exports = function(app) {
 
       Activity
         .findAndCountAll(query)
-        .then(function(activities) {
+        .then((activities) => {
 
           // Set headers for pagination.
           req.pagination.total = activities.count;

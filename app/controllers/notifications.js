@@ -12,12 +12,12 @@ module.exports = function(app) {
         GroupId: req.group.id,
         type: req.params.activityType
       })
-      .then(function(notification) {
+      .then((notification) => {
         if (notification) {
           res.send(notification.get({plain:true}));
         }
       })
-      .catch(function(err) {
+      .catch((err) => {
         if (err.name == 'SequelizeUniqueConstraintError')
           return next(new errors.BadRequest('Already subscribed to this type of activity'));
 
@@ -33,11 +33,11 @@ module.exports = function(app) {
           type: req.params.activityType
         }
       })
-      .catch(function(err) {
+      .catch((err) => {
         console.error('Error when deleting a notification', err);
         next(err);
       })
-      .then(function(deletedRows) {
+      .then((deletedRows) => {
         if (deletedRows === 0)
           return next(new errors.BadRequest('You were not subscribed to this type of activity'));
         if (deletedRows === 1)

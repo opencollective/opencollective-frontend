@@ -38,7 +38,7 @@ module.exports = function(app) {
   var getDetails = function(req, res, next) {
     var preapprovalKey = req.params.preapprovalkey;
 
-    getPreapprovalDetails(preapprovalKey, function(err, response) {
+    getPreapprovalDetails(preapprovalKey, (err, response) => {
       if (err) return next(err);
       res.json(response);
     });
@@ -51,8 +51,8 @@ module.exports = function(app) {
     // TODO: This return and cancel URL doesn't work - no routes right now.
     var uri = `/users/${req.remoteUser.id}/paypal/preapproval/`;
     var baseUrl = config.host.webapp + uri;
-    var cancelUrl = req.query.cancelUrl || (baseUrl + '/cancel');
-    var returnUrl = req.query.returnUrl || (baseUrl + '/success');
+    var cancelUrl = req.query.cancelUrl || (`${baseUrl}/cancel`);
+    var returnUrl = req.query.returnUrl || (`${baseUrl}/success`);
     var endingDate = (req.query.endingDate && (new Date(req.query.endingDate)).toISOString()) || moment().add(1, 'years').toISOString();
     var maxTotalAmountOfAllPayments = req.query.maxTotalAmountOfAllPayments || 2000; // 2000 is the maximum: https://developer.paypal.com/docs/classic/api/adaptive-payments/Preapproval_API_Operation/
 
@@ -70,12 +70,12 @@ module.exports = function(app) {
       }],
 
       checkExistingPaymentMethod: ['getExistingPaymentMethod', function(cb, results) {
-        async.each(results.getExistingPaymentMethod.rows, function(paymentMethod, cbEach) {
+        async.each(results.getExistingPaymentMethod.rows, (paymentMethod, cbEach) => {
           if (!paymentMethod.token) {
             return paymentMethod.destroy().done(cbEach);
           }
 
-          getPreapprovalDetails(paymentMethod.token, function(err, response) {
+          getPreapprovalDetails(paymentMethod.token, (err, response) => {
             if (err) return cbEach(err);
             if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {
               paymentMethod.destroy().done(cbEach);
@@ -121,10 +121,9 @@ module.exports = function(app) {
         paymentMethod.save().done(cb);
       }]
 
-    }, function(err, results) {
+    }, (err, results) => {
       if (err) return next(err);
-      var response = results.callPaypal;
-      res.json(response);
+      res.json(results.callPaypal);
     });
 
   };
@@ -157,7 +156,7 @@ module.exports = function(app) {
       }],
 
       callPaypal: [function(cb) {
-        getPreapprovalDetails(req.params.preapprovalkey, function(err, response) {
+        getPreapprovalDetails(req.params.preapprovalkey, (err, response) => {
           if (err) {
             return cb(err);
           }
@@ -187,8 +186,8 @@ module.exports = function(app) {
               token: {$ne: req.params.preapprovalkey}
             }
           })
-          .then(function(results) {
-            async.each(results.rows, function(paymentMethod, cbEach) {
+          .then((results) => {
+            async.each(results.rows, (paymentMethod, cbEach) => {
               paymentMethod.destroy().done(cbEach);
             }, cb);
           })
@@ -206,7 +205,7 @@ module.exports = function(app) {
         }).done(cb);
       }]
 
-    }, function(err, results) {
+    }, (err, results) => {
       if (err) return next(err);
       else res.json(results.updatePaymentMethod.info);
     });

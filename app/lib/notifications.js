@@ -26,7 +26,7 @@ module.exports = (Sequelize, activity) => {
     })
   })
   .catch(err => {
-    console.error('Error while publishing activity type ' + activity.type + ' for group ' + activity.GroupId, err);
+    console.error(`Error while publishing activity type ${activity.type} for group ${activity.GroupId}`, err);
   });
 };
 

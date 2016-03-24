@@ -37,7 +37,7 @@ module.exports = (app) => {
         .then(id => User.find(id))
         .then((user) => {
           if (!user) {
-            return next(new errors.NotFound('User \'' + userid + '\' not found'));
+            return next(new errors.NotFound(`User '${userid}' not found`));
           } else {
             req.user = user;
             next();
@@ -52,7 +52,7 @@ module.exports = (app) => {
     groupid: (req, res, next, groupid) => {
       const callback = group => {
         if (!group) {
-          return next(new errors.NotFound('Group \'' + groupid + '\' not found'));
+          return next(new errors.NotFound(`Group '${groupid}' not found`));
         } else {
           req.group = group;
           next();
@@ -84,7 +84,7 @@ module.exports = (app) => {
         .then(id => Transaction.find(id))
         .then((transaction) => {
           if (!transaction) {
-            return next(new errors.NotFound('Transaction \'' + transactionid + '\' not found'));
+            return next(new errors.NotFound(`Transaction '${transactionid}' not found`));
           } else {
             req.transaction = transaction;
             next();

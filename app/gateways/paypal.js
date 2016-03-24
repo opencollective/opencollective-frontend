@@ -53,7 +53,7 @@ const createBillingAgreement = (group, planId, paypalConfig, cb) => {
   // From paypal example, fails with moment js, TO REFACTOR
   var isoDate = new Date();
   isoDate.setSeconds(isoDate.getSeconds() + 4);
-  isoDate.toISOString().slice(0, 19) + 'Z';
+  isoDate.toISOString().slice(0, 19) + 'Z';  // eslint-disable-line
 
   const billingAgreement = {
     name: `Agreement for donation to ${group.name}`,

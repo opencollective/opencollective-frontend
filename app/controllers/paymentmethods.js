@@ -1,11 +1,11 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
 module.exports = function(app) {
 
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models');
+  const models = app.set('models');
 
   /**
    * Get the paymentMethods of the user.
@@ -13,21 +13,19 @@ module.exports = function(app) {
    * We use the method to know if the user need to confirm her/his paypal
    * account
    */
-  var getPaymentMethods = function(req, res, next) {
-    var filter = req.query.filter;
-    var query = _.extend({}, filter, { UserId: req.user.id });
+  const getPaymentMethods = (req, res, next) => {
+    const filter = req.query.filter;
+    const query = _.extend({}, filter, { UserId: req.user.id });
 
     return models.PaymentMethod.findAll({ where: query })
-    .then(function(response) {
-      res.send(_.pluck(response, 'info'));
-    })
-    .catch(next);
+      .then((response) => res.send(_.pluck(response, 'info')))
+      .catch(next);
   };
 
   /**
    * Public methods.
    */
   return {
-    getPaymentMethods: getPaymentMethods
+    getPaymentMethods
   };
 };
