@@ -1,10 +1,4 @@
+// You can also omit the eslint-config- and it will be automatically assumed by ESLint:
 {
-  "parser": "babel-eslint",
-  "env": {
-    "node": true
-  },
-  "rules": {
-    "no-unused-vars": [2, {"vars": "all"}],
-    "no-trailing-spaces": 2
-  }
+    "extends": "opencollective"
 }
