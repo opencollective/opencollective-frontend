@@ -36,7 +36,7 @@ app.set('controllers', require('./app/controllers')(app));
 /**
  * Routes.
  */
-require('./app/controllers/routes')(app);
+require('./app/routes')(app);
 
 if (app.set('env') !== 'test' && app.set('env') !== 'circleci') {
   /**
