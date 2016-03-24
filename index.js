@@ -5,11 +5,11 @@
 const express = require('express');
 const _ = require('lodash');
 
-const NODE_ENV = process.env.NODE_ENV;
+var NODE_ENV = process.env.NODE_ENV;
 const app = express();
 
 if (!NODE_ENV) {
-  process.env.NODE_ENV = 'development';
+  NODE_ENV = process.env.NODE_ENV = 'development';
 }
 
 if (_.contains(['test', 'development', 'test_server', 'circleci_test_server'], NODE_ENV)) {
