@@ -124,6 +124,40 @@ module.exports = function(app) {
     });
   };
 
+var payServices = {
+  paypal: (data, callback) => {
+    var uri = `/groups/${data.group.id}/transactions/${data.transaction.id}/paykey/`;
+    var baseUrl = config.host.webapp + uri;
+    var amount = data.transaction.amount;
+    var payload = {
+      requestEnvelope: {
+        errorLanguage: 'en_US',
+        detailLevel: 'ReturnAll'
+      },
+      actionType: 'PAY',
+      currencyCode: data.transaction.currency.toUpperCase() || 'USD',
+      feesPayer: 'SENDER',
+      memo: `Reimbursement transaction ${data.transaction.id}: ${data.transaction.description}`,
+      trackingId: [uuid.v1().substr(0, 8), data.transaction.id].join(':'),
+      preapprovalKey: data.cardToken,
+      returnUrl: `${baseUrl}/success`,
+      cancelUrl: `${baseUrl}/cancel`,
+      receiverList: {
+        receiver: [
+          {
+            email: data.beneficiary.paypalEmail || data.beneficiary.email,
+            amount: amount,
+            paymentType: 'SERVICE'
+          }
+        ]
+      }
+    };
+
+    app.paypalAdaptive.pay(payload, callback);
+  }
+
+};
+
   /**
    * Pay a transaction.
    */
