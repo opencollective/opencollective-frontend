@@ -80,19 +80,20 @@ module.exports = function(app) {
 
     async.auto({
 
-      getGroupStripeAccount: function(cb) {
-        req.group.getStripeAccount(function(err, stripeAccount) {
-          if (err) return cb(err);
-          if (!stripeAccount || !stripeAccount.accessToken) {
-            return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
-          }
+      getGroupStripeAccount(cb) {
+        req.group.getStripeAccount()
+          .then((stripeAccount) => {
+            if (!stripeAccount || !stripeAccount.accessToken) {
+              return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
+            }
 
-          if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
-            return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
-          }
+            if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+              return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+            }
 
-          cb(null, Stripe(stripeAccount.accessToken));
-        });
+            cb(null, Stripe(stripeAccount.accessToken));
+          })
+          .catch(cb);
       },
 
       getExistingPaymentMethod: ['getGroupStripeAccount', function(cb) {

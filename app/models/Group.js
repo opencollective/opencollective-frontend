@@ -163,8 +163,8 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      getStripeAccount: function(cb) {
-        Sequelize.models.UserGroup.find({
+      getStripeAccount() {
+        return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
@@ -184,10 +184,7 @@ module.exports = function(Sequelize, DataTypes) {
             }]
           });
         })
-        .then(function(user) {
-          cb(null, user.StripeAccount);
-        })
-        .catch(cb);
+        .then((user) => user.StripeAccount);
       },
 
       getConnectedAccount() {

@@ -100,19 +100,15 @@ module.exports = function(app) {
             return cb(new errors.BadRequest(`No subscription found with id ${subscriptionid}`));
           }
 
-          return new Promise((resolve, reject) => {
-            t.Group.getStripeAccount((err, stripeAccount) => {
-              return err ? reject(err) : resolve(stripeAccount);
-            })
-          })
-          .then((stripeAccount) => {
-            cb(null, {
-              stripeSecret: stripeAccount.accessToken,
-              customerId: t.PaymentMethod.customerId,
-              subscriptionId: t.Subscription.stripeSubscriptionId,
-              subscription: t.Subscription
-            })
-          });
+          return t.Group.getStripeAccount()
+            .then((stripeAccount) => {
+              cb(null, {
+                stripeSecret: stripeAccount.accessToken,
+                customerId: t.PaymentMethod.customerId,
+                subscriptionId: t.Subscription.stripeSubscriptionId,
+                subscription: t.Subscription
+              });
+            });
         })
         .catch(cb);
       },
