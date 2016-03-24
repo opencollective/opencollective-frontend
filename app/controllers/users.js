@@ -28,15 +28,13 @@ module.exports = function(app) {
    * Private methods.
    */
 
-  var getUserGroups = function(userId) {
+  var getUserGroups = (UserId) => {
     return UserGroup.findAll({
       where: {
-        UserId: userId
+        UserId
       }
     })
-    .then(function(userGroups) {
-      return _.pluck(userGroups, 'info');
-    });
+    .then((userGroups) => _.pluck(userGroups, 'info'));
   };
 
   var getGroupsFromUser = function(req, options) {
@@ -47,7 +45,7 @@ module.exports = function(app) {
     return req.user
       .getGroups(options)
       .then(groups => _.uniq(groups, 'id'))
-      .map(function(group) { // sequelize uses bluebird
+      .map((group) => { // sequelize uses bluebird
         return _.extend(group.info, {
           activities: group.Activities
         });
@@ -64,11 +62,11 @@ module.exports = function(app) {
       usergroups: getUserGroups(req.user.id),
       groups: getGroupsFromUser(req, options)
     })
-    .then(function(props) {
+    .then((props) => {
       var usergroups = props.usergroups || [];
       var groups = props.groups || [];
 
-      return groups.map(function(group) {
+      return groups.map((group) => {
         var usergroup = _.find(usergroups, { GroupId: group.id }) || {};
         return _.extend(group, { role: usergroup.role });
       });
@@ -81,9 +79,7 @@ module.exports = function(app) {
     req.user.paypalEmail = required.paypalEmail;
 
     req.user.save()
-    .then(function(user) {
-      res.send(user.info);
-    })
+    .then((user) => res.send(user.info))
     .catch(next);
   };
 
@@ -93,9 +89,7 @@ module.exports = function(app) {
     req.user.avatar = required.avatar;
 
     req.user.save()
-    .then(function(user) {
-      res.send(user.info);
-    })
+    .then((user) => res.send(user.info))
     .catch(next);
   };
 
@@ -145,8 +139,8 @@ module.exports = function(app) {
   };
 
   var getBalancePromise = function(GroupId) {
-    return new Bluebird(function(resolve, reject) {
-      groups.getBalance(GroupId, function(err, balance) {
+    return new Bluebird((resolve, reject) => {
+      groups.getBalance(GroupId, (err, balance) => {
         return err ? reject(err) : resolve(balance);
       });
     });
@@ -156,14 +150,14 @@ module.exports = function(app) {
     userlib.fetchInfo(user, (err, user) => {
       User
         .create(user)
-        .tap(function(dbUser) {
+        .tap((dbUser) => {
           Activity.create({
             type: constants.USER_CREATED,
             UserId: dbUser.id,
             data: {user: dbUser.info}
           });
         })
-        .then(function(dbUser) {
+        .then((dbUser) => {
           cb(null, dbUser);
         })
         .catch(cb);
@@ -293,13 +287,13 @@ module.exports = function(app) {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
 
-      _create(user, function(err, user) {
+      _create(user, (err, user) => {
         if (err) return next(err);
         res.send(user.info);
       });
     },
 
-    _create: _create,
+    _create,
 
     /**
      * Get token.
@@ -317,7 +311,7 @@ module.exports = function(app) {
     show: function(req, res, next) {
       if (req.remoteUser.id === req.user.id) {
         req.user.getStripeAccount()
-          .then(function(account) {
+          .then((account) => {
             var response = _.extend({}, req.user.info, { stripeAccount: account });
 
             res.send(response);
@@ -347,15 +341,11 @@ module.exports = function(app) {
         getGroupsFromUserWithRoles(req, options) :
         getGroupsFromUser(req, options);
 
-      promise.map(function(group) {
+      promise.map((group) => {
         return getBalancePromise(group.id)
-        .then(function(balance) {
-          return _.extend(group, { balance: balance });
-        });
+        .then((balance) => _.extend(group, { balance }))
       })
-      .then(function(out) {
-        res.send(out);
-      })
+      .then((out) => res.send(out))
       .catch(next);
     },
 

@@ -24,8 +24,8 @@ module.exports = function(app) {
   /**
    * Exports.
    */
-  controllers.forEach(function(controller) {
-    cs[controller] = require(__dirname + '/' + controller)(app);
+  controllers.forEach((controller) => {
+    cs[controller] = require(`${__dirname}/${controller}`)(app);
   });
 
   return cs;

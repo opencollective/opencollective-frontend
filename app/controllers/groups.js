@@ -404,7 +404,7 @@ module.exports = function(app) {
       'isPublic'
     ];
 
-    whitelist.forEach(function(prop) {
+    whitelist.forEach((prop) => {
       if (req.required.group[prop]) {
         req.group[prop] = req.required.group[prop];
       }
@@ -414,9 +414,7 @@ module.exports = function(app) {
 
     req.group
       .save()
-      .then(function(group) {
-        res.send(group.info);
-      })
+      .then((group) => res.send(group.info))
       .catch(next);
   };
 
@@ -491,7 +489,7 @@ module.exports = function(app) {
   /**
    * Add a user to a group.
    */
-  const addUser = (req, res, next) =>{
+  const addUser = (req, res, next) => {
     var options = {
       role: req.body.role || roles.BACKER,
       remoteUser: req.remoteUser

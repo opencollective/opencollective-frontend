@@ -32,9 +32,9 @@ module.exports = function(app) {
         role: roles.HOST
       }
     })
-    .done(function(err, userGroup) {
+    .done((err, userGroup) => {
       if (err) return cb(err)
-      if (!userGroup) return cb(new errors.BadRequest('User is not a host ' + UserId));
+      if (!userGroup) return cb(new errors.BadRequest(`User is not a host ${UserId}`));
 
       return cb();
     });
@@ -45,7 +45,7 @@ module.exports = function(app) {
    */
 
   var authorize = function(req, res, next) {
-    checkIfUserIsHost(req.remoteUser.id, function(err) {
+    checkIfUserIsHost(req.remoteUser.id, (err) => {
       if (err) return next(err);
 
       var params = qs.stringify({
@@ -57,7 +57,7 @@ module.exports = function(app) {
       });
 
       res.send({
-        redirectUrl: AUTHORIZE_URI + '?' + params
+        redirectUrl: `${AUTHORIZE_URI}?${params}`
       });
     })
   };
@@ -93,9 +93,7 @@ module.exports = function(app) {
             code: code,
             client_secret: config.stripe.secret
           })
-          .then(function(response) {
-            cb(null, response.data);
-          })
+          .then((response) => cb(null, response.data))
           .catch(cb);
       }],
 
@@ -117,15 +115,13 @@ module.exports = function(app) {
         var host = results.findHost;
 
         host.setStripeAccount(results.createStripeAccount)
-          .then(function() {
-            cb();
-          })
+          .then(() => cb())
           .catch(cb);
       }]
 
-    }, function(err) {
+    }, (err) => {
       if (err) return next(err);
-      res.redirect(config.host.webapp + '/?stripeStatus=success');
+      res.redirect(`${config.host.webapp}/?stripeStatus=success`);
     });
   };
 

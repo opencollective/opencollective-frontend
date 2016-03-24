@@ -3,4 +3,3 @@ test/
 scripts/
 seeders/
 migrations/
-app/controllers

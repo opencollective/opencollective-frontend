@@ -50,7 +50,7 @@ module.exports = function(app) {
         });
       }
     })
-    .then(()=>res.send({ success: true }))
+    .then(() => res.send({ success: true }))
     .catch(next);
   };
 

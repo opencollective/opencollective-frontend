@@ -23,8 +23,6 @@ module.exports = function(app) {
   var users = require('../controllers/users')(app);
   var emailLib = require('../lib/email')(app);
 
-
-
   const getOrCreateUser = (attributes, cb) => {
      return models.User.findOne({
         where: {
@@ -68,7 +66,7 @@ module.exports = function(app) {
         req.group.getStripeAccount()
           .then((stripeAccount) => {
             if (!stripeAccount || !stripeAccount.accessToken) {
-              return cb(new errors.BadRequest('The host for the collective id ' + req.group.id + ' has no Stripe account set up'));
+              return cb(new errors.BadRequest(`The host for the collective id ${req.group.id} has no Stripe account set up`));
             }
 
             if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
@@ -253,7 +251,7 @@ module.exports = function(app) {
             role: roles.BACKER
           }
         })
-        .then(function(userGroup) {
+        .then((userGroup) => {
           if (!userGroup)
             group
               .addUserWithRole(user, roles.BACKER)
@@ -265,7 +263,7 @@ module.exports = function(app) {
         .catch(cb);
       }]
 
-    }, function(e) {
+    }, (e) => {
 
       if (e) {
         e.payload = req.body;

@@ -60,7 +60,7 @@ module.exports = function(app) {
           }
         }
       })
-      .then(function(user) {
+      .then((user) => {
         if (user) {
           cb(null, user);
         } else {
@@ -83,13 +83,13 @@ module.exports = function(app) {
 
       if (!key) return next();
 
-      Application.findByKey(key, function(e, application) {
+      Application.findByKey(key, (e, application) => {
         if (e) {
           return next(e);
         }
 
         if (!application) {
-          return next(new errors.Unauthorized('Invalid API key: ' + key));
+          return next(new errors.Unauthorized(`Invalid API key: ${key}`));
         }
 
         if (application.disabled) {
@@ -117,7 +117,7 @@ module.exports = function(app) {
         return next();
       }
 
-      User.auth((username || email), password, function(e, user) {
+      User.auth((username || email), password, (e, user) => {
 
         var errorMsg = 'Invalid username/email or password';
 
@@ -157,7 +157,7 @@ module.exports = function(app) {
         function(cb) {
           User
             .find(req.jwtPayload.sub)
-            .then(function(user) {
+            .then((user) => {
               req.remoteUser = user;
               cb();
             })
@@ -169,7 +169,7 @@ module.exports = function(app) {
           // Check the validity of the application in the token.
           Application
             .find(appId)
-            .then(function(application) {
+            .then((application) => {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));
 
@@ -242,9 +242,7 @@ module.exports = function(app) {
           }
 
           req.group.hasUser(req.remoteUser.id)
-            .then(function(hasUser) {
-              cb(null, hasUser);
-            })
+            .then((hasUser) => cb(null, hasUser))
             .catch(cb);
         },
         function(cb) { // If authenticated application, does it have access?
@@ -254,13 +252,11 @@ module.exports = function(app) {
 
           req.group
             .hasApplication(req.application)
-            .then(function(bool) {
-              return cb(null, bool);
-            })
+            .then((bool) => cb(null, bool))
             .catch(cb);
         }
 
-      ], function(e, results) {
+      ], (e, results) => {
         if (e) {
           return next(e);
         } else if (_.some(results)) {
@@ -292,7 +288,7 @@ module.exports = function(app) {
         if (!req.remoteUser && req.application) // called with an api_key without user
           return next();
 
-        req.group.hasUserWithRole(req.remoteUser.id, roles, function(err, hasUser) {
+        req.group.hasUserWithRole(req.remoteUser.id, roles, (err, hasUser) => {
           if (err) return next(err);
           if (!hasUser) return next(new errors.Forbidden('Unauthorized'));
 
