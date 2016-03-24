@@ -36,7 +36,7 @@ const render = (name, data, config) => {
  */
 var templates = {};
 function loadTemplates() {
-  const templatesPath = __dirname + '/../../templates';
+  const templatesPath = `${__dirname}/../../templates`;
 
   // Register partials
   const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
@@ -47,23 +47,23 @@ function loadTemplates() {
   handlebars.registerPartial('footer', footer);
   handlebars.registerPartial('subscriptions', subscriptions);
 
-  handlebars.registerHelper('moment', function(value) {
+  handlebars.registerHelper('moment', (value) => {
     return moment(value).format('MMMM Do YYYY');
   });
 
-  handlebars.registerHelper('currency', function(value, props) {
+  handlebars.registerHelper('currency', (value, props) => {
     const currency = props.hash.currency;
     switch(currency) {
       case 'USD':
-        return '$' + value;
+        return `$${value}`;
       case 'EUR':
-        return '€' + value;
+        return `€${value}`;
       case 'GBP':
-        return '£' + value;
+        return `£${value}`;
       case 'SEK':
-        return 'kr ' + value;
+        return `kr ${value}`;
       default:
-        return value + ' ' + currency;
+        return `${value} ${currency}`;
     }
   });
 

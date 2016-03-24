@@ -25,14 +25,14 @@ module.exports = {
     if (activity.data.user) {
       const userName = activity.data.user.username;
       const userEmail = activity.data.user.email;
-      userString = userName ? userName + ' (' + userEmail + ')' : userEmail;
+      userString = userName ? `${userName} (${userEmail})` : userEmail;
 
       const twitterHandle = activity.data.user.twitterHandle;
       if (linkify) {
-        twitter = linkifyForSlack('http://www.twitter.com/'+twitterHandle, '@'+twitterHandle);
+        twitter = linkifyForSlack(`http://www.twitter.com/${twitterHandle}`, `@${twitterHandle}`);
         website = linkifyForSlack(activity.data.user.websiteUrl, null);
       } else {
-        twitter = '@'+twitterHandle;
+        twitter = `@${twitterHandle}`;
         website = activity.data.user.websiteUrl;
       }
     }
@@ -47,7 +47,7 @@ module.exports = {
     if (activity.data.transaction) {
       amount = activity.data.transaction.amount;
       const interval = activity.data.transaction.interval;
-      recurringAmount = amount + (interval ? '/' + interval : '');
+      recurringAmount = amount + (interval ? `/${interval}` : '');
       currency = activity.data.transaction.currency;
       tags = JSON.stringify(activity.data.transaction.tags);
       description = activity.data.transaction.description;
@@ -109,7 +109,7 @@ module.exports = {
     const rows = Object.keys(flattenedData)
       .filter(key => flattenedData[key])
       .map(key => `${key}: ${flattenedData[key]}`);
-    return rows.join("\n");
+    return rows.join('\n');
   }
 }
 

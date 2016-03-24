@@ -4,4 +4,3 @@ scripts/
 seeders/
 migrations/
 app/controllers
-app/lib

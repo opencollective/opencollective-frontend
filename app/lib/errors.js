@@ -54,7 +54,7 @@ module.exports = {
     this.code = 408;
     this.timeout = ms;
     this.type = 'timeout';
-    this.message = 'Request to ' + url + ' timed out after ' + ms + 'ms.';
+    this.message = `Request to ${url} timed out after ${ms} ms.`;
     Error.call(this, this.message);
   },
 
@@ -82,7 +82,7 @@ module.exports = {
 
 };
 
-Object.keys(module.exports).forEach(function(error) {
+Object.keys(module.exports).forEach((error) => {
   module.exports[error].prototype.__proto__ = Error.prototype;
 });
 
