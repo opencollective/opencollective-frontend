@@ -1028,29 +1028,6 @@ describe('transactions.routes.test.js', function() {
             .catch(done);
         });
     });
-
-    it.skip('successfully approve a transaction with an app', function(done) {
-      request(app)
-        .post('/groups/' + privateGroup.id + '/transactions/' + transaction.id + '/approve')
-        .send({
-          api_key: application2.api_key,
-          approved: true
-        })
-        .expect(200)
-        .end(function(e, res) {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('success', true);
-          models.Transaction
-            .find(parseInt(transaction.id))
-            .then(function(t) {
-              expect(t.approved).to.be.true;
-              expect(t.approvedAt).not.to.be.null;
-              done();
-            })
-            .catch(done);
-        });
-    });
-
   });
 
   /**
