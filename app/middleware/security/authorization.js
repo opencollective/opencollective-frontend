@@ -28,7 +28,7 @@ module.exports = function (app) {
       };
     },
 
-    _authorizeAccessToUser: function (req, res, next) {
+    _authorizeUserToAccessUser: (req, res, next) => {
       if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access === 0)) {
         return next(new Forbidden('Unauthorized'));
       }
@@ -36,13 +36,35 @@ module.exports = function (app) {
     },
 
     authorizeUserToAccessUser() {
-      return [
-        // TODO how to reference aN.authenticateUser() instead of the 3 separate ones?
-        aN.parseJwtNoExpiryCheck,
-        aN.checkJwtExpiry,
-        aN._authenticateUserByJwt,
-        this._authorizeAccessToUser
-      ];
+      return (req, res, next) => {
+        aN.authenticateUserByJwt()(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this._authorizeUserToAccessUser(req, res, next);
+        });
+      };
+    },
+
+    _authorizeUserAccessToScope(scope) {
+      return (req, res, next) => {
+        const userScope = req.jwtPayload.scope;
+        if (!scope || scope === userScope) {
+          return next();
+        }
+        return next(new Unauthorized('User does not have the scope'));
+      }
+    },
+
+    authorizeUserToAccessScope(scope) {
+      return (req, res, next) => {
+        aN.authenticateUserByJwt()(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this._authorizeUserAccessToScope(scope)(req, res, next);
+        });
+      };
     },
 
     authorizeAccessToPublicGroup: (req, res, next) => {
@@ -111,6 +133,7 @@ module.exports = function (app) {
 
     // TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
     authorizeAccessToGroup(options) {
+      if (!options) options = {};
       return (req, res, next) => {
         var _authorizeAccessToGroup = () => {
           this.authorizeUserAccessToGroup(req, res, (e) => {
@@ -139,29 +162,33 @@ module.exports = function (app) {
       }
     },
 
-    authorizeGroupAccessToTransaction: function (req, res, next) {
-      // TODO shouldn't return NotFound before authorization check
-      if (!req.transaction) {
-        return next(new NotFound());
-      }
-      if (!req.group) {
-        return next(new NotFound('Cannot authorize a transaction without a specified group.'));
-      }
-      if (req.transaction.GroupId !== req.group.id) {
-        return next(new Forbidden('This group does not have access to this transaction.'));
-      }
-      next();
-    },
-
-    jwtScope: (scope) => {
+    authorizeGroupAccessToTransaction(options) {
+      if (!options) options = {};
       return (req, res, next) => {
-        const userScope = req.jwtPayload.scope;
+        var _authorizeAccessToTransaction = () => {
+          // TODO shouldn't return NotFound before authorization check
+          if (!req.transaction) {
+            return next(new NotFound());
+          }
+          if (!req.group) {
+            return next(new NotFound('Cannot authorize a transaction without a specified group.'));
+          }
+          if (req.transaction.GroupId !== req.group.id) {
+            return next(new Forbidden('This group does not have access to this transaction.'));
+          }
+          next();
+        };
 
-        if (scope === userScope) {
-          return next();
+        if (options.authIfPublic) {
+          this.authorizeAccessToPublicGroup(req, res, (e) => {
+            if (!e) {
+              return next();
+            }
+            _authorizeAccessToTransaction();
+          });
+        } else {
+          _authorizeAccessToTransaction();
         }
-
-        return next(new Unauthorized('User does not have the scope'));
       }
     }
   }
