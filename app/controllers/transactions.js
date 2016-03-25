@@ -342,7 +342,15 @@ var payServices = {
 
         cb();
       }]
-    }, (err) => {
+    }, (err, results) => {
+      if (err && results.getPreapprovalDetails) {
+        console.error('PayPal error', JSON.stringify(results.getPreapprovalDetails));
+        if (results.getPreapprovalDetails.error instanceof Array) {
+          var message = results.getPreapprovalDetails.error[0].message;
+          return next(new errors.BadRequest(message));
+        }
+      }
+
       if (err) return next(err);
 
       req.transaction.approved = true;
