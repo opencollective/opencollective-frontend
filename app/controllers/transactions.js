@@ -5,6 +5,7 @@ const _ = require('lodash');
 const async = require('async');
 const activities = require('../constants/activities');
 const config = require('config');
+const uuid = require('node-uuid');
 
 /**
  * Controller.
