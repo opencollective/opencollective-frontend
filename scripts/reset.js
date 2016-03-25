@@ -48,10 +48,27 @@ exec('make dropdb && make database')
       secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
     })
     .then((connectedAccount) => connectedAccount.setUser(data.user));
+  })
+  .then(() => {
+    return models.User.create({
+      email: 'devstripeuser@opencollective.com',
+      password: 'password'
+    })
+    .then((user) => data.user = user);
+  })
+  .then(() => {
+    return models.Group.create({
+      name: 'OpenCollective Demo with stripe',
+      description: 'OpenCollective Demo group with stripe',
+      isPublic: true,
+      slug: 'oc-stripe'
+    })
+    .then((group) => group.addUserWithRole(data.user, roles.HOST))
   });
 })
 .then(function() {
-  console.log('Please login on development with `devuser@opencollective.com` and `password`');
+  console.log('Please login on development with `devuser@opencollective.com` and `password` or ');
+  console.log('Please login on development with `devstripeuser@opencollective.com` and `password`');
   console.log('Script successful');
   process.exit();
 })

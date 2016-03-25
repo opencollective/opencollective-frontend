@@ -1,4 +1,4 @@
-Subject: Thank you for your {{{currency transaction.amount currency=transaction.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
 
 {{> header}}
 
@@ -12,7 +12,7 @@ Subject: Thank you for your {{{currency transaction.amount currency=transaction.
 <p>Hi!</p>
 {{/if}}
 
-<p>We would like to thank you for your donation of {{{currency transaction.amount currency=transaction.currency}}} on {{{moment transaction.createdAt}}}.
+<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
   Your gift will help us continue our activities.</p>
 
 <p>Please register for the event with John Poulsen before March the 20th: <a href="https://www.eventbrite.com.au/e/ispc-wa-networking-event-with-john-poulsen-registration-21584720480">https://www.eventbrite.com.au/e/ispc-wa-networking-event-with-john-poulsen-registration-21584720480</a></p>
