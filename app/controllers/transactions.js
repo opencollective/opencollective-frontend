@@ -141,7 +141,7 @@ var payServices = {
       feesPayer: 'SENDER',
       memo: `Reimbursement transaction ${data.transaction.id}: ${data.transaction.description}`,
       trackingId: [uuid.v1().substr(0, 8), data.transaction.id].join(':'),
-      preapprovalKey: data.cardToken,
+      preapprovalKey: data.paymentMethod.token,
       returnUrl: `${baseUrl}/success`,
       cancelUrl: `${baseUrl}/cancel`,
       receiverList: {
@@ -173,16 +173,20 @@ var payServices = {
     async.auto({
 
       checkTransaction: [function(cb) {
+        if(!transaction.UserId) {
+          return next(new errors.BadRequest(`Transaction id ${transaction.id} doesn't have a UserId.`));
+        }
+
         if (transaction.reimbursedAt) {
-          return cb(new errors.BadRequest('This transaction has been paid already.'));
+          return cb(new errors.BadRequest(`Transaction id ${transaction.id} has been paid already.`));
         }
 
         if (!transaction.approved) {
-          return cb(new errors.BadRequest('This transaction has not been approved yet.'));
+          return cb(new errors.BadRequest(`Transaction id ${transaction.id} has not been approved yet.`));
         }
 
         if (transaction.amount >= 0) {
-          return cb(new errors.BadRequest('This transaction doesn\'t need to get payed, it is a donation.'));
+          return cb(new errors.BadRequest(`Transaction id ${transaction.id} doesn\'t need to get payed, it is a donation.`));
         }
 
         cb();
@@ -215,7 +219,7 @@ var payServices = {
         }
       }],
 
-      getBeneficiary: [function(cb) {
+      getBeneficiary: ['checkTransaction', function(cb) {
         User
           .find(parseInt(transaction.UserId))
           .then((user) => {
@@ -238,6 +242,12 @@ var payServices = {
         }
 
         /**
+         * #TODO
+         * We should verify that there is enough money left on the preapprovalKey (paymentMethod.token)
+         * If we send it to payServices['paypal']() with not enough money left, it will fail (gracefully)
+         * If we don't send it, it will return a `paymentApprovalUrl` that we can use to redirect the user
+         * to PayPal.com to manually approve the payment.
+         * 
          * Expenses are stored with negative values in the backend but paypal
          * wants positive values in the API, we will change the sign of the amount
          */
@@ -246,18 +256,35 @@ var payServices = {
           group: group,
           transaction: _.extend({}, transaction.toJSON(), { amount: -transaction.amount }),
           beneficiary: results.getBeneficiary,
-          paymentMethodToken: results.checkPaymentMethod.token
         }, cb);
       }],
 
       updateTransaction: ['checkPaymentMethod', 'callService', function(cb, results) {
-        if (!isManual) {
-          transaction.PaymentMethodId = results.checkPaymentMethod.id;
+        if (isManual) {
+          transaction.status = 'REIMBURSED';
+          transaction.reimbursedAt = new Date();
+          return transaction.save().done(cb);
         }
 
-        transaction.status = 'REIMBURSED';
-        transaction.reimbursedAt = new Date();
-        transaction.save().done(cb);
+        switch(results.callService.paymentExecStatus) {
+          case 'COMPLETED':
+            transaction.PaymentMethodId = results.checkPaymentMethod.id;
+            transaction.status = 'REIMBURSED';
+            transaction.reimbursedAt = new Date();
+            return transaction.save().done(cb);
+            break;
+          case 'CREATED':
+            /*
+            * #TODO
+            * When we don't provide a preapprovalKey (paymentMethod.token) to payServices['paypal'](),
+            * it creates a payKey that we can use to redirect the user to PayPal.com to manually approve that payment
+            * We should handle that case on the frontend (app.opencollective.com)
+            */
+            return cb(new errors.BadRequest(`Please approve this payment manually on ${results.callService.paymentApprovalUrl}`));
+            break;
+          default:
+            return cb(new errors.ServerError(`controllers.transactions.pay: Unknown error while trying to update transaction ${transaction.id}`));
+        }
       }],
 
       createActivity: ['callService', 'updateTransaction', function(cb, results) {
@@ -301,7 +328,6 @@ var payServices = {
   };
 
   const approve = (req, res, next) => {
-
     if (req.required.approved === false) {
       req.transaction.approved = req.required.approved;
       req.transaction.approvedAt = new Date();
