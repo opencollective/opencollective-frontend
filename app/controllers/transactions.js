@@ -186,7 +186,7 @@ var payServices = {
         }
 
         if (transaction.amount >= 0) {
-          return cb(new errors.BadRequest(`Transaction id ${transaction.id} doesn\'t need to get payed, it is a donation.`));
+          return cb(new errors.BadRequest(`Transaction id ${transaction.id} is a donation, it can\'t be reimbursed.`));
         }
 
         cb();
