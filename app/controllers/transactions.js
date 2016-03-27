@@ -260,23 +260,30 @@ var payServices = {
       }],
 
       updateTransaction: ['checkPaymentMethod', 'callService', function(cb, results) {
-        if (!isManual) {
-          transaction.PaymentMethodId = results.checkPaymentMethod.id;
-        }
-
-        if(results.callService.paymentExecStatus === 'COMPLETED') {
+        if (isManual) {
           transaction.status = 'REIMBURSED';
           transaction.reimbursedAt = new Date();
-          transaction.save().done(cb);
+          return transaction.save().done(cb);
         }
-        else {
-          /*
-           * #TODO
-           * When we don't provide a preapprovalKey (paymentMethod.token) to payServices['paypal'](),
-           * it creates a payKey that we can use to redirect the user to PayPal.com to manually approve that payment
-           * We should handle that case on the frontend (app.opencollective.com)
-           */
-          return cb(new errors.BadRequest(`Please approve this payment manually on ${results.callService.paymentApprovalUrl}`));
+
+        switch(results.callService.paymentExecStatus) {
+          case 'COMPLETED':
+            transaction.PaymentMethodId = results.checkPaymentMethod.id;
+            transaction.status = 'REIMBURSED';
+            transaction.reimbursedAt = new Date();
+            return transaction.save().done(cb);
+            break;
+          case 'CREATED':
+            /*
+            * #TODO
+            * When we don't provide a preapprovalKey (paymentMethod.token) to payServices['paypal'](),
+            * it creates a payKey that we can use to redirect the user to PayPal.com to manually approve that payment
+            * We should handle that case on the frontend (app.opencollective.com)
+            */
+            return cb(new errors.BadRequest(`Please approve this payment manually on ${results.callService.paymentApprovalUrl}`));
+            break;
+          default:
+            return cb(new errors.ServerError(`controllers.transactions.pay: Unknown error while trying to update transaction ${transaction.id}`));
         }
       }],
 
