@@ -496,7 +496,7 @@ describe('transactions.routes.test.js', function() {
           error: {
             code: 403,
             type: 'forbidden',
-            message: 'Unauthorized'
+            message: 'Forbidden'
           }
         })
         .end(done);
