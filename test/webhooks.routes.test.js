@@ -12,6 +12,7 @@ const sinon = require('sinon');
 const app = require('../index');
 const roles = require('../app/constants/roles');
 const activities = require('../app/constants/activities');
+const constants = require('../app/constants/transactions');
 const utils = require('../test/utils.js')();
 const generatePlanId = require('../app/lib/utils.js').planId;
 
@@ -55,7 +56,7 @@ describe('webhooks.routes.test.js', () => {
   var paymentMethod;
   var group;
   var application;
-  var firstPayment;
+  var donation;
   var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
@@ -100,6 +101,7 @@ describe('webhooks.routes.test.js', () => {
       });
   });
 
+  // create a stripe account
   beforeEach((done) => {
     models.StripeAccount.create({
       accessToken: 'abc'
@@ -161,6 +163,7 @@ describe('webhooks.routes.test.js', () => {
         .reply(200, webhookSubscription);
     });
 
+    // Make the donation
     beforeEach((done) => {
       var payment = {
         stripeToken: STRIPE_TOKEN,
@@ -184,8 +187,9 @@ describe('webhooks.routes.test.js', () => {
         });
     });
 
+    // Find the donation
     beforeEach((done) => {
-      models.Transaction.findAndCountAll({
+      models.Donation.findAndCountAll({
           include: [
             {
               model: models.Subscription,
@@ -194,7 +198,22 @@ describe('webhooks.routes.test.js', () => {
           ]
         })
         .then((res) => {
-          firstPayment = res.rows[0];
+          expect(res.count).to.equal(1);
+          donation = res.rows[0];
+          done();
+        })
+        .catch(done);
+    });
+
+    // Find the paymentMethod
+    beforeEach((done) => {
+      models.PaymentMethod.findAndCountAll({
+        where: {
+          UserId: donation.UserId
+        }})
+        .then((res) => {
+          expect(res.count).to.equal(1);
+          paymentMethod = res.rows[0];
           done();
         })
         .catch(done);
@@ -203,7 +222,7 @@ describe('webhooks.routes.test.js', () => {
     /**
      * Send webhook
      */
-    beforeEach((done) => {
+    beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get('/v1/events/' + webhookEvent.id)
         .reply(200,
@@ -217,11 +236,17 @@ describe('webhooks.routes.test.js', () => {
         .post('/webhooks/stripe')
         .send(webhookEvent)
         .expect(200)
-        .end(done);
+        .end((err) => {
+          expect(err).to.not.exist;
+          done();
+        });
     });
 
-    it('updates the first transaction', (done) => {
+    it('adds the first transaction', (done) => {
       models.Transaction.findAndCountAll({
+        where: {
+          DonationId: donation.id
+        },
         include: [
           {
             model: models.Subscription,
@@ -232,13 +257,13 @@ describe('webhooks.routes.test.js', () => {
       .then((res) => {
         expect(res.count).to.equal(1);
         res.rows.forEach((transaction) => {
-          expect(transaction.id).to.be.equal(firstPayment.id);
-          expect(transaction.GroupId).to.be.equal(firstPayment.PaymentMethodId);
-          expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-          expect(transaction.PaymentMethodId).to.be.equal(firstPayment.PaymentMethodId);
+          expect(transaction.DonationId).to.be.equal(donation.id);
+          expect(transaction.GroupId).to.be.equal(donation.GroupId);
+          expect(transaction.UserId).to.be.equal(donation.UserId);
+          expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
           expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
-          expect(transaction.type).to.be.equal('payment');
+          expect(transaction.type).to.be.equal(constants.type.DONATION);
           expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
           expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
           expect(transaction.Subscription.isActive).to.be.equal(true);
@@ -265,7 +290,7 @@ describe('webhooks.routes.test.js', () => {
         .catch(done);
     });
 
-    it('should create a new transaction after the first webhook', done => {
+    it('should create a second transaction after the first webhook', done => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get('/v1/events/' + webhookEvent.id)
         .reply(200,
@@ -289,12 +314,12 @@ describe('webhooks.routes.test.js', () => {
           .then(res => {
             expect(res.count).to.be.equal(2); // second transaction
             res.rows.forEach((transaction) => {
-              expect(transaction.GroupId).to.be.equal(firstPayment.PaymentMethodId);
-              expect(transaction.UserId).to.be.equal(firstPayment.UserId);
-              expect(transaction.PaymentMethodId).to.be.equal(firstPayment.PaymentMethodId);
+              expect(transaction.GroupId).to.be.equal(donation.GroupId);
+              expect(transaction.UserId).to.be.equal(donation.UserId);
+              expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
               expect(transaction.approved).to.be.true;
               expect(transaction.currency).to.be.equal(CURRENCY);
-              expect(transaction.type).to.be.equal('payment');
+              expect(transaction.type).to.be.equal(constants.type.DONATION);
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
               expect(transaction.interval).to.be.equal('month');
 

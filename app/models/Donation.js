@@ -58,7 +58,23 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.DATE
     }
   }, {
-    paranoid: true
+    paranoid: true,
+
+    getterMethods: {
+      info() {
+        return {
+          id: this.id,
+          UserId: this.UserId,
+          GroupId: this.GroupId,
+          currency: this.currency,
+          amount: this.amount,
+          title: this.title,
+          SubscriptionId: this.SubscriptionId,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        }
+      }
+    }
   });
 
   return Donation;

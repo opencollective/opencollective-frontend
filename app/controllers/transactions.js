@@ -247,7 +247,7 @@ var payServices = {
          * If we send it to payServices['paypal']() with not enough money left, it will fail (gracefully)
          * If we don't send it, it will return a `paymentApprovalUrl` that we can use to redirect the user
          * to PayPal.com to manually approve the payment.
-         * 
+         *
          * Expenses are stored with negative values in the backend but paypal
          * wants positive values in the API, we will change the sign of the amount
          */

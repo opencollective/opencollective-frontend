@@ -47,6 +47,7 @@ module.exports = function(app) {
     const group = req.group;
     const interval = payment.interval;
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
+    const amountInt = payment.amount * 100; // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
     const isSubscription = _.contains(['month', 'year'], interval);
     var hasFullAccount = false; // Used to specify if a user has a real account
@@ -81,7 +82,7 @@ module.exports = function(app) {
           .catch(cb);
       },
 
-      getOrCreatePaymentMethod: ['getGroupStripeAccount', (cb, results) => {
+      getOrCreatePaymentMethod: ['getGroupStripeAccount', (cb) => {
         paymentMethods.getOrCreatePaymentMethod({
           token: payment.stripeToken,
           service: 'stripe',
@@ -118,7 +119,6 @@ module.exports = function(app) {
 
       createCharge: ['createCustomer', function(cb, results) {
         const paymentMethod = results.getOrCreatePaymentMethod;
-        const amountInt = payment.amount * 100;
 
         /**
          * Subscription
@@ -187,19 +187,23 @@ module.exports = function(app) {
           title: `Donation to ${group.name}`,
         };
 
-        // If it's a subscription, attach a subscription object with details
-        if (isSubscription) {
-          donation.subscription = {
-            amount: amountFloat,
-            currency,
-            interval,
-            stripeSubscriptionId: charge.id,
-            data: charge
-          }
-        }
-        // PICKUP HERE: Add subscription to Donation
         models.Donation.create(donation)
-        .done(cb);
+        .then(donation => {
+          if (isSubscription) {
+              const subscription = {
+              amount: amountFloat,
+              currency,
+              interval,
+              stripeSubscriptionId: charge.id,
+              data: charge
+            };
+            return donation.createSubscription(subscription)
+              .then(() => cb(null, donation));
+          } else {
+            return cb(null, donation);
+          }
+        })
+        .catch(cb);
       }],
 
       // Create the first transaction associated with that Donation, if this is not a subscription
@@ -213,8 +217,7 @@ module.exports = function(app) {
         const user = req.user;
         const charge = results.createCharge;
         const paymentMethod = results.getOrCreatePaymentMethod;
-        const applicationFee = charge.application_fee || constants.OC_FEE_PERCENT * amountInteger / 100;
-
+        const applicationFee = charge.application_fee || constants.OC_FEE_PERCENT * amountInt / 100;
         var payload = {
           user,
           group,
@@ -224,7 +227,7 @@ module.exports = function(app) {
         payload.transaction = {
           type: constants.type.DONATION,
           DonationId: results.createDonation.id,
-          amount,
+          amount: amountFloat,
           currency,
           platformFee: applicationFee,
           stripeFee: 0, // TODO: Need to make a separate call for this

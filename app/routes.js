@@ -156,7 +156,7 @@ module.exports = (app) => {
   app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.approve); // Approve a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
-  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
+  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
    * Activities.

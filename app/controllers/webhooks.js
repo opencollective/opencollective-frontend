@@ -103,7 +103,7 @@ module.exports = (app) => {
             { model: Subscription, where: { stripeSubscriptionId } }
           ]
         })
-        .then((transaction) => {
+        .then((donation) => {
           /**
            * Stripe doesn't make a difference between development, test, staging
            * environments. If we get a webhook from another env,
@@ -113,28 +113,32 @@ module.exports = (app) => {
            * For non-production environments, we will simply return 200 to avoid
            * the retry on Stripe side (and the email from Stripe support).
            */
-          if (!transaction && !isProduction) {
+          if (!donation && !isProduction) {
             return res.sendStatus(200);
           }
 
-          if (!transaction) {
-            return cb(new errors.BadRequest('Transaction not found: unknown subscription id'));
+          if (!donation) {
+            return cb(new errors.BadRequest('Donation not found: unknown subscription id'));
           }
 
-          return cb(null, transaction);
+          return cb(null, donation);
         })
         .catch(cb)
       }],
 
       fetchPaymentMethod: ['fetchDonation', (cb, results) => {
-        const user = results.fetchDonation.user;
+        const userId = results.fetchDonation.UserId;
         const customer = results.fetchEvent.event.data.object.customer;
 
+
+        if (!customer) {
+          return cb(new errors.BadRequest('Customer Id not found'));
+        }
 
         PaymentMethod.findOne({
           where: {
             customerId: customer,
-            userId: user.id
+            UserId: userId
           }
         })
         .then((paymentMethod) => {
@@ -146,16 +150,9 @@ module.exports = (app) => {
         .catch(cb)
       }],
 
-      createTransaction: ['fetchPaymentMethod', (cb, results) => {
-        const donation = results.fetchTransaction;
-        const subscription = donation.Subscription;
-        const stripeSubscription = results.fetchEvent.stripeSubscription;
-        const user = donation.User || {};
-        const group = donation.Group || {};
-        const paymentMethod = results.fetchPaymentMethod;
-
-        // If the subscription is not active, we will just update the already existing one
-        // We only use pending subscriptions for the first subscription invoice
+      activateSubscription: ['fetchPaymentMethod', (cb, results) => {
+        const subscription = results.fetchDonation.Subscription;
+        // If the subscription is not active, we will activate it
         if (!subscription.isActive) {
           return subscription.activate()
             .then(subscription => {
@@ -163,16 +160,27 @@ module.exports = (app) => {
                 type: activities.SUBSCRIPTION_CONFIRMED,
                 data: {
                   event: results.fetchEvent.event,
-                  group: results.fetchTransaction.Group,
-                  user: results.fetchTransaction.User,
-                  transaction: results.fetchTransaction,
+                  group: results.fetchDonation.Group,
+                  user: results.fetchDonation.User,
+                  donation: results.fetchDonation,
                   subscription
                 }
               });
             })
             .then(() => cb())
             .catch(cb);
+        } else {
+          return cb();
         }
+      }],
+
+      createTransaction: ['fetchPaymentMethod', (cb, results) => {
+        const donation = results.fetchDonation;
+        const subscription = donation.Subscription;
+        const stripeSubscription = results.fetchEvent.stripeSubscription;
+        const user = donation.User || {};
+        const group = donation.Group || {};
+        const paymentMethod = results.fetchPaymentMethod;
 
         // Now we record a new transaction
         const newTransaction = {
@@ -184,14 +192,14 @@ module.exports = (app) => {
           description: 'Recurring subscription', // remove #postmigration
           tags: ['Donation'], // remove #postmigration
           approved: true, // remove #postmigration
-          interval: transaction.interval, // remove #postmigration
+          interval: subscription.interval, // remove #postmigration
           SubscriptionId: subscription.id, // remove #postmigration
         };
 
         transactions._create({
           transaction: newTransaction,
-          user,
-          group,
+          user, // remove #postmigration
+          group, // remove #postmigration
           paymentMethod
         }, cb);
       }]

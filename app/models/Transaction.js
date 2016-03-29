@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const Temporal = require('sequelize-temporal');
 
 /*
  * Transaction model
@@ -145,5 +144,5 @@ module.exports = function(Sequelize, DataTypes) {
     }
   });
 
-  return Temporal(Transaction, Sequelize);
+  return Transaction;
 };
