@@ -4,14 +4,11 @@
 var _ = require('lodash');
 var app = require('../index');
 var async = require('async');
-var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var sinon = require('sinon');
-var nock = require('nock');
 var roles = require('../app/constants/roles');
-var activities = require('../app/constants/activities');
 
 /**
  * Variables.
@@ -22,92 +19,52 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe('transactions.paypal.routes.test.js', function() {
+describe('transactions.paypal.routes.test.js', () => {
   var application;
-  var application2;
-  var application3;
-  var user;
   var user2;
   var group;
-  var group2;
-  var transaction;
-  var transaction2;
   var transactionApproved;
   var transactionPositive;
   var transactionManual;
   var stub;
 
-  beforeEach(function() {
-    var stub = sinon.stub(app.paypalAdaptive, 'pay');
-    stub.yields(null, paypalMock.adaptive.pay);
+  before(() => {
+    stub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
+      return cb(null, paypalMock.adaptive.payCompleted);
+    });
   });
 
-  afterEach(function() {
+  after(() => {
     app.paypalAdaptive.pay.restore();
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.auto({
 
-      cleanAndCreateApplication: function(cb) {
+      cleanAndCreateApplication: (cb) => {
         utils.cleanAllDb(cb);
       },
-      createApplicationB: ['cleanAndCreateApplication', function(cb) {
-        models.Application.create(utils.data('application2')).done(cb);
-      }],
-      createApplicationC: ['cleanAndCreateApplication', function(cb) {
-        models.Application.create(utils.data('application3')).done(cb);
-      }],
-      createUserA: ['cleanAndCreateApplication', function(cb) {
-        models.User.create(utils.data('user1')).done(cb);
-      }],
-      createUserB: ['cleanAndCreateApplication', function(cb) {
+      createUserB: ['cleanAndCreateApplication', (cb) => {
         models.User.create(utils.data('user2')).done(cb);
       }],
-      createGroupA: ['cleanAndCreateApplication', function(cb) {
+      createGroupA: ['cleanAndCreateApplication', (cb) => {
         models.Group.create(utils.data('group1')).done(cb);
       }],
-      addUserAGroupA: ['createUserA', 'createGroupA', function(cb, results) {
-        results.createGroupA
-          .addUserWithRole(results.createUserA, roles.BACKER)
-          .done(cb);
-      }],
-      addUserBGroupA: ['createUserB', 'createGroupA', function(cb, results) {
+      addUserBGroupA: ['createUserB', 'createGroupA', (cb, results) => {
         results.createGroupA
           .addUserWithRole(results.createUserB, roles.MEMBER)
           .done(cb);
       }],
-      addApplicationCGroupA: ['createApplicationC', 'createGroupA', function(cb, results) {
-        results.createGroupA
-          .addApplication(results.createApplicationC)
-          .done(cb);
-      }],
-      createTransactionA: ['cleanAndCreateApplication', 'createGroupA', 'createUserA', 'addUserAGroupA', function(cb, results) {
-        request(app)
-          .post('/groups/' + results.createGroupA.id + '/transactions')
-          .set('Authorization', 'Bearer ' + results.createUserA.jwt(results.cleanAndCreateApplication))
-          .send({
-            transaction: utils.data('transactions1').transactions[0]
-          })
-          .expect(200)
-          .end(function(e, res) {
-            cb(e, res.body);
-          });
-      }],
-      createTransactionB: ['cleanAndCreateApplication', 'createGroupA', function(cb, results) {
-        var t = utils.data('transactions1').transactions[1];
-        t.GroupId = results.createGroupA.id;
-        models.Transaction.create(t).done(cb);
-      }],
-      createTransactionC: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+      createTransactionC: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[2];
         t.GroupId = results.createGroupA.id;
         t.approvedAt = Date.now();
         t.approved = true;
+        t.payoutMethod = 'paypal';
         t.UserId = results.createUserB.id;
         models.Transaction.create(t).done(cb);
       }],
-      createTransactionD: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+      createTransactionD: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[3  ];
         t.GroupId = results.createGroupA.id;
         t.approvedAt = Date.now();
@@ -116,7 +73,7 @@ describe('transactions.paypal.routes.test.js', function() {
         t.amount = 10;
         models.Transaction.create(t).done(cb);
       }],
-      createTransactionManual: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', function(cb, results) {
+      createTransactionManual: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[2];
         t.GroupId = results.createGroupA.id;
         t.approvedAt = Date.now();
@@ -125,23 +82,18 @@ describe('transactions.paypal.routes.test.js', function() {
         t.payoutMethod = 'manual';
         models.Transaction.create(t).done(cb);
       }],
-      createPaymentMethodUserB: ['cleanAndCreateApplication', 'createUserB', function(cb, results) {
+      createPaymentMethodUserB: ['cleanAndCreateApplication', 'createUserB', (cb, results) => {
         models.PaymentMethod.create({
           service: 'paypal',
           UserId: results.createUserB.id,
           confirmedAt: Date.now()
         }).done(cb);
       }]
-    }, function(e, results) {
+    }, (e, results) => {
       expect(e).to.not.exist;
       application = results.cleanAndCreateApplication;
-      application2 = results.createApplicationB;
-      application3 = results.createApplicationC;
-      user = results.createUserA;
       user2 = results.createUserB;
       group = results.createGroupA;
-      transaction = results.createTransactionA;
-      transaction2 = results.createTransactionB;
       transactionApproved = results.createTransactionC;
       transactionPositive = results.createTransactionD;
       transactionManual = results.createTransactionManual;
@@ -152,28 +104,29 @@ describe('transactions.paypal.routes.test.js', function() {
   /**
    * Pay a transaction
    */
-  describe('#pay', function() {
-    it('should pay a transaction', function(done) {
+  describe('#pay', () => {
+    it('should pay a transaction', (done) => {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transactionApproved.id + '/pay/')
         .field('service', 'paypal')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
-        .end(function(err, res) {
+        .end((err, res) => {
           var transaction = res.body;
+          expect(stub.called).to.be.true;
           expect(transaction.status).to.equal('REIMBURSED');
           expect(transaction.amount).to.equal(transactionApproved.amount);
           done();
         });
     });
 
-    it('should pay a transaction manually', function(done) {
+    it('should pay a transaction manually', (done) => {
       request(app)
         .post('/groups/' + group.id + '/transactions/' + transactionManual.id + '/pay/')
         .field('service', 'paypal')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
-        .end(function(err, res) {
+        .end((err, res) => {
           var transaction = res.body;
           expect(transaction.status).to.equal('REIMBURSED');
           expect(transaction.amount).to.equal(transactionManual.amount);
@@ -184,7 +137,7 @@ describe('transactions.paypal.routes.test.js', function() {
         });
     });
 
-    it('should fail if the transaction has a positive amount', function(done) {
+    it('should fail if the transaction has a positive amount', (done) => {
       expect(transactionPositive.amount).to.be.greaterThan(0);
 
       request(app)

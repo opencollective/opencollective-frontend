@@ -143,44 +143,41 @@ module.exports = (app) => {
    */
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
-  app.use(mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration);
-
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
-  // We should refactor this.
-  app.post('/groups/:groupid/transactions', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
-  app.post('/groups/:groupid/transactions', required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  // TODO refactor with single route using authentication.js and authorization.js middleware
+  const commonLegacySecurityMw = [mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration];
+  app.post('/groups/:groupid/transactions', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
+  app.post('/groups/:groupid/transactions', commonLegacySecurityMw, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
-  app.get('/groups/:groupid/transactions/:transactionid', mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, groups.getTransaction); // Get a transaction.
-  app.get('/groups/:groupid/transactions/:transactionid', groups.getTransaction); // Get a transaction.
-  app.put('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, required('transaction'), groups.updateTransaction); // Update a transaction.
-  app.delete('/groups/:groupid/transactions/:transactionid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeGroupRoles(roles.HOST), mw.authorizeTransaction, groups.deleteTransaction); // Delete a transaction.
-
-  app.post('/groups/:groupid/transactions/:transactionid/approve', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, required('approved'), transactions.approve); // Approve a transaction.
-  app.post('/groups/:groupid/transactions/:transactionid/pay', mw.authorizeAuthUser, mw.authorizeGroup, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), mw.authorizeTransaction, required('service'), transactions.pay); // Pay a transaction.
-  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.authorizeTransaction, mw.authorizeGroupRoles([roles.HOST, roles.MEMBER]), transactions.attributeUser); // Attribute a transaction to a user.
-  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
+  app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessToTransaction({authIfPublic: true}), groups.getTransaction); // Get a transaction.
+  app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
+  app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.approve); // Approve a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
+  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', payments.paypalCallback); // Callback after a payment
 
   /**
    * Activities.
    *
    *  An activity is any action linked to a User or a Group.
    */
-  app.get('/groups/:groupid/activities', mw.authorizeAuthUserOrApp, mw.authorizeGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
-  app.get('/users/:userid/activities', mw.authorizeAuthUser, mw.authorizeUser, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+  app.get('/groups/:groupid/activities', aZ.authorizeAccessToGroup(), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
+  app.get('/users/:userid/activities', aZ.authorizeUserToAccessUser(), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
 
   /**
    * Notifications.
    *
    *  A user can subscribe by email to any type of activity of a Group.
    */
-  app.post('/groups/:groupid/activities/:activityType/subscribe', mw.authorizeAuthUser, mw.authorizeGroup, notifications.subscribe); // Subscribe to a group's activities
-  app.post('/groups/:groupid/activities/:activityType/unsubscribe', mw.authorizeAuthUser, mw.authorizeGroup, notifications.unsubscribe); // Unsubscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/subscribe', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup(), notifications.subscribe); // Subscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup(), notifications.unsubscribe); // Unsubscribe to a group's activities
 
   /**
    * Separate route for uploading images to S3
    */
-  app.post('/images', mw.authorizeAuthUser, images.upload);
+  app.post('/images', aN.authenticateUserByJwt(), images.upload);
 
   /**
    * Webhook for stripe when it gets a new subscription invoice
@@ -191,7 +188,7 @@ module.exports = (app) => {
    * Stripe oAuth
    */
 
-  app.get('/stripe/authorize', mw.authorizeAuthUser, stripe.authorize);
+  app.get('/stripe/authorize', aN.authenticateUserByJwt(), stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
@@ -202,13 +199,13 @@ module.exports = (app) => {
   /**
    * Stripe subscriptions (recurring payments)
    */
-  app.get('/subscriptions', mw.jwtScope('subscriptions'), subscriptions.getAll);
-  app.post('/subscriptions/:subscriptionid/cancel', mw.jwtScope('subscriptions'), subscriptions.cancel);
+  app.get('/subscriptions', aZ.authorizeUserToAccessScope('subscriptions'), subscriptions.getAll);
+  app.post('/subscriptions/:subscriptionid/cancel', aZ.authorizeUserToAccessScope('subscriptions'), subscriptions.cancel);
 
   /**
    * Leaderboard
    */
-  app.get('/leaderboard', required('api_key'), mw.authorizeApp, groups.getLeaderboard); // Create a user.
+  app.get('/leaderboard', aN.authenticateAppByApiKey, groups.getLeaderboard); // Create a user.
 
   /**
    * Error handler.

@@ -4,6 +4,7 @@
 const _ = require('lodash');
 const Joi = require('joi');
 const config = require('config');
+const errors = require('../lib/errors');
 
 const roles = require('../constants/roles');
 
@@ -197,6 +198,10 @@ module.exports = function(Sequelize, DataTypes) {
           }
         })
         .then((userGroup) => {
+          if (!userGroup) {
+            throw new errors.NotFound(`No group with ID ${GroupId} and host user found`);
+          }
+
           return models.ConnectedAccount.find({
             where: {
               UserId: userGroup.UserId

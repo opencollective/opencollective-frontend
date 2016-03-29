@@ -44,5 +44,6 @@
   },
   "slack": {
     "activityChannel": "#activity_test"
-  }
+  },
+  "clearbit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }

@@ -271,7 +271,8 @@
         "status": "paid back on 4/17/15",
         "comment": "",
         "link": "http://cl.ly/image/39212o302x2c",
-        "createdAt": "2015-03-04T08:00:00.000Z"
+        "createdAt": "2015-03-04T08:00:00.000Z",
+        "payoutMethod": "paypal"
       },
       {
         "vendor": "OrangeWebsite",

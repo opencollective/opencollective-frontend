@@ -184,28 +184,6 @@ module.exports = function(app) {
     },
 
     /**
-     * Authorize application.
-     */
-    authorizeApp: function(req, res, next) {
-      if (!req.application) {
-        return next(new errors.Unauthorized('Unauthorized application.'));
-      }
-
-      next();
-    },
-
-    /**
-     * Authorize: the user has to be authenticated.
-     */
-    authorizeAuthUser: function(req, res, next) {
-      if (!req.remoteUser) {
-        return next(new errors.Unauthorized('Unauthorized'));
-      }
-
-      next();
-    },
-
-    /**
      * Or a user or an Application has to be authenticated.
      */
     authorizeAuthUserOrApp: function(req, res, next) {
@@ -215,17 +193,6 @@ module.exports = function(app) {
 
        next();
      },
-
-    /**
-     * Authorize User: same user referenced that the authenticated user.
-     */
-    authorizeUser: function(req, res, next) {
-      if (!req.remoteUser || !req.user || (req.remoteUser.id !== req.user.id && req.remoteUser._access === 0)) {
-        return next(new errors.Forbidden('Unauthorized'));
-      }
-
-      next();
-    },
 
     /**
      * Authorize to get the group.
@@ -276,44 +243,6 @@ module.exports = function(app) {
       }
 
       return next();
-    },
-
-    /**
-     * Authorize for group with specific role(s).
-     */
-    authorizeGroupRoles: function(roles) {
-      var roles = _.isArray(roles) ? roles : [roles];
-
-      return function(req, res, next) {
-        if (!req.remoteUser && req.application) // called with an api_key without user
-          return next();
-
-        req.group.hasUserWithRole(req.remoteUser.id, roles, (err, hasUser) => {
-          if (err) return next(err);
-          if (!hasUser) return next(new errors.Forbidden('Unauthorized'));
-
-          return next();
-        });
-      };
-    },
-
-    /**
-     * Authorize transaction.
-     */
-    authorizeTransaction: function(req, res, next) {
-      if (!req.transaction) {
-        return next(new errors.NotFound());
-      }
-
-      if (!req.group) {
-        return next(new errors.NotFound('Cannot authorize a transaction without a specified group.'));
-      }
-
-      if (req.transaction.GroupId !== req.group.id) {
-        return next(new errors.Forbidden('This group does not have access to this transaction.'));
-      }
-
-      next();
     },
 
     /**
@@ -377,18 +306,6 @@ module.exports = function(app) {
 
         next();
       };
-    },
-
-    jwtScope: (scope) => {
-      return (req, res, next) => {
-        const userScope = req.jwtPayload.scope;
-
-        if (scope === userScope) {
-          return next();
-        }
-
-        return next(new errors.Unauthorized('User does not have the scope'));
-      }
     },
 
     checkJWTExpiration: (req, res, next) => {
