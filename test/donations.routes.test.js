@@ -929,14 +929,12 @@ describe('donations.routes.test.js', () => {
             })
             .end((err, res) => {
               expect(err).to.not.exist;
-              console.log("res.body: ", res.body);
               links = res.body.links;
               done();
             });
         });
 
         it('creates a transaction and returns the links', (done) => {
-          console.log('links: ', links);
           const redirect = _.find(links, { method: 'REDIRECT' });
 
           expect(redirect).to.have.property('method', 'REDIRECT');
