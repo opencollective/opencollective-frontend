@@ -76,8 +76,9 @@
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --models-path app/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
-    "db:copyprod": "./scripts/db_copy_prod_to_localhost.sh",
-    "db:copyprodtostaging": "./scripts/db_copy_prod_to_staging.sh && npm run db:sanitize",
+    "db:copy:prod": "./scripts/db_copy_to_localhost.sh prod",
+    "db:copy:staging": "./scripts/db_copy_to_localhost.sh staging",
+    "db:copy:prod:staging": "./scripts/db_copy_prod_to_staging.sh && npm run db:sanitize",
     "db:sanitize": "node scripts/replace_stripe_accounts",
     "db:reset": "NODE_ENV=development node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
@@ -87,7 +88,7 @@
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
     "report:tx": "node scripts/report_transactions",
-    "checktransactions": "node scripts/check_transactions_on_stripe",
+    "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."

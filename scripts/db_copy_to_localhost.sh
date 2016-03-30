@@ -5,9 +5,16 @@
 # To run the API with the local version of the production database, run:
 # PG_DATABASE=opencollective_prod_snapshot npm start
 
+ENV=$1
+
+if [ "$1" != "staging" ] && [ "$1" != "prod" ]; then
+  echo "you need to specify from which environment you want to pull the database (valid values: staging or prod)"
+  exit 0;
+fi
+
 LOCALDBUSER="opencollective"
-LOCALDBNAME="opencollective_staging_snapshot"
-PG_URL=`heroku config:get PG_URL -a opencollective-staging-api`
+LOCALDBNAME="opencollective_${ENV}_snapshot"
+PG_URL=`heroku config:get PG_URL -a opencollective-${ENV}-api`
 DBDUMPS_DIR="dbdumps/"
 
 FILENAME=`date +"%Y-%m-%d"`-prod.pgsql
