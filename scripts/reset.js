@@ -26,7 +26,7 @@ exec('make dropdb && make database')
   })
   .then(() => {
     return models.User.create({
-      email: 'devuser@opencollective.com',
+      email: 'user@opencollective.com',
       password: 'password'
     })
     .then((user) => data.user = user);
@@ -51,7 +51,7 @@ exec('make dropdb && make database')
   })
   .then(() => {
     return models.User.create({
-      email: 'devstripeuser@opencollective.com',
+      email: 'stripeuser@opencollective.com',
       password: 'password'
     })
     .then((user) => data.user = user);
@@ -67,8 +67,8 @@ exec('make dropdb && make database')
   });
 })
 .then(function() {
-  console.log('Please login on development with `devuser@opencollective.com` and `password` or ');
-  console.log('Please login on development with `devstripeuser@opencollective.com` and `password`');
+  console.log('Please login on development with `user@opencollective.com` and `password` or ');
+  console.log('Please login on development with `stripeuser@opencollective.com` and `password`');
   console.log('Script successful');
   process.exit();
 })

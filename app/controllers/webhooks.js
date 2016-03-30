@@ -132,7 +132,7 @@ module.exports = (app) => {
 
 
         if (!customer) {
-          return cb(new errors.BadRequest('Customer Id not found'));
+          return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
         }
 
         PaymentMethod.findOne({

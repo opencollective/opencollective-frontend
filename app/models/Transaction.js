@@ -40,8 +40,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     platformFee: DataTypes.INTEGER,
     hostFee: DataTypes.INTEGER,
-    stripeFee: DataTypes.INTEGER,
-    paypalFee: DataTypes.INTEGER,
+    paymentProcessingFee: DataTypes.INTEGER,
     stripeSubscriptionId: DataTypes.STRING, // // delete #postmigration
 
     interval: {
@@ -137,8 +136,7 @@ module.exports = function(Sequelize, DataTypes) {
           interval: this.interval,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
-          stripeFee: this.stripeFee,
-          paypalFee: this.paypalFee
+          paymentProcessingFee: this.paymentProcessingFee
         };
       }
     }

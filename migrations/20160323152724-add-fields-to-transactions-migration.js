@@ -14,15 +14,13 @@ module.exports = {
       })
     .then(() => queryInterface.addColumn('Transactions', 'platformFee', Sequelize.INTEGER))
     .then(() => queryInterface.addColumn('Transactions', 'hostFee', Sequelize.INTEGER))
-    .then(() => queryInterface.addColumn('Transactions', 'stripeFee', Sequelize.INTEGER))
-    .then(() => queryInterface.addColumn('Transactions', 'paypalFee', Sequelize.INTEGER));
+    .then(() => queryInterface.addColumn('Transactions', 'paymentProcessingFee', Sequelize.INTEGER));
   },
 
   down: function (queryInterface) {
     return queryInterface.removeColumn('Transactions', 'DonationId')
     .then(() => queryInterface.removeColumn('Transactions', 'platformFee'))
     .then(() => queryInterface.removeColumn('Transactions', 'hostFee'))
-    .then(() => queryInterface.removeColumn('Transactions', 'stripeFee'))
-    .then(() => queryInterface.removeColumn('Transactions', 'paypalFee'));
+    .then(() => queryInterface.removeColumn('Transactions', 'paymentProcessingFee'));
   }
 };

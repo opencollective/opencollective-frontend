@@ -10,7 +10,7 @@ const gateways = require('../gateways');
 /**
  * Controller.
  */
-module.exports = function(app) {
+module.exports = (app) => {
 
   /**
    * Internal Dependencies.
@@ -20,7 +20,6 @@ module.exports = function(app) {
   const transactions = require('../controllers/transactions')(app);
   const users = require('../controllers/users')(app);
   const emailLib = require('../lib/email')(app);
-  const paymentMethods = require('../controllers/paymentmethods')(app);
   const constants = require('../constants/transactions');
 
 
@@ -47,7 +46,7 @@ module.exports = function(app) {
     const group = req.group;
     const interval = payment.interval;
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
-    const amountInt = payment.amount * 100; // TODO: clean this up when we switch all amounts to INTEGER
+    const amountInt = parseInt(payment.amount * 100, 10) // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
     const isSubscription = _.contains(['month', 'year'], interval);
     var hasFullAccount = false; // Used to specify if a user has a real account
@@ -83,7 +82,7 @@ module.exports = function(app) {
       },
 
       getOrCreatePaymentMethod: ['getGroupStripeAccount', (cb) => {
-        paymentMethods.getOrCreatePaymentMethod({
+        models.PaymentMethod.getOrCreate({
           token: payment.stripeToken,
           service: 'stripe',
           UserId: user.id
@@ -96,7 +95,6 @@ module.exports = function(app) {
       createCustomer: ['getOrCreatePaymentMethod', (cb, results) => {
         const paymentMethod = results.getOrCreatePaymentMethod;
 
-        // If paymentMethod already has a customer, move on
         if (paymentMethod.customerId) {
           return cb(null, results.getOrCreatePaymentMethod);
         }
@@ -117,7 +115,7 @@ module.exports = function(app) {
        * For one-time donation
        */
 
-      createCharge: ['createCustomer', function(cb, results) {
+      createCharge: ['createCustomer', (cb, results) => {
         const paymentMethod = results.getOrCreatePaymentMethod;
 
         /**
@@ -176,14 +174,14 @@ module.exports = function(app) {
       }],
 
       // Create donation first
-      createDonation: ['createCharge', function(cb, results) {
+      createDonation: ['createCharge', (cb, results) => {
         const charge = results.createCharge;
 
         const donation = {
           UserId: user.id,
           GroupId: group.id,
           currency: currency,
-          amount: amountFloat * 100,
+          amount: amountInt,
           title: `Donation to ${group.name}`,
         };
 
@@ -207,12 +205,13 @@ module.exports = function(app) {
       }],
 
       // Create the first transaction associated with that Donation, if this is not a subscription
-      createTransaction: ['createDonation', function(cb, results) {
+      createTransaction: ['createDonation', (cb, results) => {
 
         // If this is a subscription, wait for webhook to create a Transaction
         if (isSubscription) {
-          return cb(null, null);
+          return cb();
         }
+
         // Create a transaction for this one-time payment
         const user = req.user;
         const charge = results.createCharge;
@@ -230,7 +229,7 @@ module.exports = function(app) {
           amount: amountFloat,
           currency,
           platformFee: applicationFee,
-          stripeFee: 0, // TODO: Need to make a separate call for this
+          paymentProcessingFee: 0, // TODO: Need to make a separate call for this
           data: charge,
           paidby: user && user.id, // remove #postmigration
           description: `Donation to ${group.name}`, // remove #postmigration
@@ -242,8 +241,7 @@ module.exports = function(app) {
         transactions._create(payload, cb);
       }],
 
-      // Thank you emails are now based on Donation
-      sendThankYouEmail: ['createDonation', function(cb, results) {
+      sendThankYouEmail: ['createDonation', (cb, results) => {
         const user = req.user;
         const donation = results.createDonation;
         const data = {

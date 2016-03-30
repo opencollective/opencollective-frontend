@@ -23,6 +23,7 @@ module.exports = function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    // 3 letter international code (in uppercase) of the currency (e.g. USD, EUR, MXN, GBP, ...)
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -33,7 +34,7 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    amount: DataTypes.INTEGER,
+    amount: DataTypes.INTEGER, // In cents
     title: DataTypes.STRING,
 
     SubscriptionId: {
