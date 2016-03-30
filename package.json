@@ -66,7 +66,8 @@
     "supertest": ""
   },
   "scripts": {
-    "test": "NODE_ENV=test npm run hint && NODE_ENV=test mocha test",
+    "test": "NODE_ENV=test npm run hint && psql -c 'CREATE DATABASE opencollective_test' && NODE_ENV=test mocha test",
+    "posttest": "dropdb opencollective_test",
     "circleci": "NODE_ENV=circleci npm run hint && mocha --reporter mocha-circleci-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/junit.xml test",
     "start": "npm run hint && node .",
     "dev": "nodemon -e js,hbs -w app",
