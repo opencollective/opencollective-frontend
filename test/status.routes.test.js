@@ -3,15 +3,15 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 
-describe('status.routes.test.js', function() {
+describe('status.routes.test.js', () => {
 
-  describe('GET /status', function() {
+  describe('GET /status', () => {
 
-    it('responds with status information', function(done) {
+    it('responds with status information', (done) => {
       request(app)
         .get('/status')
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body.server.status).to.equal('up');
           // expect(res.body.server.env).to.equal(app.set('env'));

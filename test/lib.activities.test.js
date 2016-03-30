@@ -10,7 +10,7 @@ const activitiesLib = require('../app/lib/activities');
 /**
  * Tests.
  */
-describe('lib.activities.test.js', function() {
+describe('lib.activities.test.js', () => {
 
   it (`formatMessage: ${constants.GROUP_TRANSACTION_CREATED} donation`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[12], true);

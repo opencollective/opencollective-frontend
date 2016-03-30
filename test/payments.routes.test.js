@@ -406,7 +406,7 @@ describe('payments.routes.test.js', () => {
 
       // Add a user as a MEMBER
       beforeEach((done) => {
-        models.User.create(utils.data('user4')).done(function(e, u) {
+        models.User.create(utils.data('user4')).done((e, u) => {
           expect(e).to.not.exist;
           user4 = u;
           group2

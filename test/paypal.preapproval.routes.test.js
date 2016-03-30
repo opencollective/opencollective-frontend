@@ -20,7 +20,7 @@ var paypalMock = require('./mocks/paypal');
 /**
  * Tests.
  */
-describe('paypal.preapproval.routes.test.js', function() {
+describe('paypal.preapproval.routes.test.js', () => {
 
   var application;
   var user;
@@ -28,27 +28,27 @@ describe('paypal.preapproval.routes.test.js', function() {
 
   var stub;
 
-  beforeEach(function() {
+  beforeEach(() => {
     var stub = sinon.stub(app.paypalAdaptive, 'preapproval');
     stub.yields(null, paypalMock.adaptive.preapproval);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     app.paypalAdaptive.preapproval.restore();
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     async.auto({
-      cleanAndCreateApplication: function(cb) {
+      cleanAndCreateApplication: (cb) => {
         utils.cleanAllDb(cb);
       },
-      createUserA: ['cleanAndCreateApplication', function(cb) {
+      createUserA: ['cleanAndCreateApplication', (cb) => {
         models.User.create(utils.data('user1')).done(cb);
       }],
-      createUserB: ['cleanAndCreateApplication', function(cb) {
+      createUserB: ['cleanAndCreateApplication', (cb) => {
         models.User.create(utils.data('user2')).done(cb);
       }]
-    }, function(e, results) {
+    }, (e, results) => {
       expect(e).to.not.exist;
       application = results.cleanAndCreateApplication;
       user = results.createUserA;
@@ -60,9 +60,9 @@ describe('paypal.preapproval.routes.test.js', function() {
   /**
    * Get the preapproval Key.
    */
-  describe('#getPreapprovalKey', function() {
+  describe('#getPreapprovalKey', () => {
 
-    it('should fail if not the logged-in user', function(done) {
+    it('should fail if not the logged-in user', (done) => {
       request(app)
         .get('/users/' + user.id + '/paypal/preapproval')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -70,18 +70,18 @@ describe('paypal.preapproval.routes.test.js', function() {
         .end(done);
     });
 
-    it('should get a preapproval key', function(done) {
+    it('should get a preapproval key', (done) => {
       request(app)
         .get('/users/' + user.id + '/paypal/preapproval')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('preapprovalKey', paypalMock.adaptive.preapproval.preapprovalKey);
 
           models.PaymentMethod
             .findAndCountAll({})
-            .then(function(res) {
+            .then((res) => {
               expect(res.count).to.equal(1);
               var paykey = res.rows[0];
               expect(paykey).to.have.property('service', 'paypal');
@@ -93,13 +93,13 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
     });
 
-    describe('Check existing paymentMethods', function() {
+    describe('Check existing paymentMethods', () => {
 
-      afterEach(function() {
+      afterEach(() => {
         app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      var beforePastDate = function() {
+      var beforePastDate = () => {
         var date = new Date();
         date.setDate(date.getDate() - 1); // yesterday
 
@@ -112,7 +112,7 @@ describe('paypal.preapproval.routes.test.js', function() {
         stub.yields(null, mock);
       };
 
-      it('should delete if the date is past', function(done) {
+      it('should delete if the date is past', (done) => {
         beforePastDate();
 
         var token = 'abc';
@@ -129,7 +129,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           .get('/users/' + user.id + '/paypal/preapproval')
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function() {
+          .end(() => {
             models.PaymentMethod.findAndCountAll({where: {token: token} })
             .then(function checkIfPaymentMethodIsDestroyed(res) {
               expect(res.count).to.equal(0);
@@ -139,7 +139,7 @@ describe('paypal.preapproval.routes.test.js', function() {
         });
       });
 
-      var beforeNotApproved = function() {
+      var beforeNotApproved = () => {
         var mock = paypalMock.adaptive.preapprovalDetails.created;
         expect(mock.approved).to.be.equal('false');
 
@@ -147,7 +147,7 @@ describe('paypal.preapproval.routes.test.js', function() {
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       };
 
-      it('should delete if not approved yet', function(done) {
+      it('should delete if not approved yet', (done) => {
         beforeNotApproved();
 
         var token = 'def';
@@ -164,7 +164,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           .get('/users/' + user.id + '/paypal/preapproval')
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function() {
+          .end(() => {
             models.PaymentMethod.findAndCountAll({where: {token: token} })
             .then(function checkIfPaymentMethodIsDestroyed(res) {
               expect(res.count).to.equal(0);
@@ -179,11 +179,11 @@ describe('paypal.preapproval.routes.test.js', function() {
   /**
    * Confirm a preapproval.
    */
-  describe('#confirmPreapproval', function() {
+  describe('#confirmPreapproval', () => {
 
     var preapprovalkey = paypalMock.adaptive.preapproval.preapprovalKey;
 
-    beforeEach(function(done) {
+    beforeEach((done) => {
       request(app)
         .get('/users/' + user.id + '/paypal/preapproval')
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -191,18 +191,18 @@ describe('paypal.preapproval.routes.test.js', function() {
         .end(done);
     });
 
-    describe('Details from Paypal COMPLETED', function() {
+    describe('Details from Paypal COMPLETED', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.completed);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should fail if not the logged-in user', function(done) {
+      it('should fail if not the logged-in user', (done) => {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -210,7 +210,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           .end(done);
       });
 
-      it('should fail with an unknown preapproval key', function(done) {
+      it('should fail with an unknown preapproval key', (done) => {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + 'abc')
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -218,19 +218,19 @@ describe('paypal.preapproval.routes.test.js', function() {
           .end(done);
       });
 
-      it('should confirm the payment of a transaction', function(done) {
+      it('should confirm the payment of a transaction', (done) => {
         var mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.token).to.equal(preapprovalkey);
 
             async.auto({
-              checkPaymentMethod: function(cb) {
-                models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} }).then(function(res) {
+              checkPaymentMethod: (cb) => {
+                models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} }).then((res) => {
                   expect(res.count).to.equal(1);
                   expect(res.rows[0].confirmedAt).not.to.be.null;
                   expect(res.rows[0].service).to.equal('paypal');
@@ -239,8 +239,8 @@ describe('paypal.preapproval.routes.test.js', function() {
                   cb();
                 });
               },
-              checkActivity: function(cb) {
-                models.Activity.findAndCountAll({where: {type: 'user.paymentMethod.created'} }).then(function(res) {
+              checkActivity: (cb) => {
+                models.Activity.findAndCountAll({where: {type: 'user.paymentMethod.created'} }).then((res) => {
                   expect(res.count).to.equal(1);
                   cb();
                 });
@@ -252,18 +252,18 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe('Details from Paypal CREATED', function() {
+    describe('Details from Paypal CREATED', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if the preapproval is not completed', function(done) {
+      it('should return an error if the preapproval is not completed', (done) => {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -273,19 +273,19 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe('Details from Paypal ERROR', function(done) {
+    describe('Details from Paypal ERROR', (done) => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         var mock = paypalMock.adaptive.preapprovalDetails.error;
         var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
         stub.yields(mock.error, mock);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return an error if paypal returns one', function(done) {
+      it('should return an error if paypal returns one', (done) => {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -295,18 +295,18 @@ describe('paypal.preapproval.routes.test.js', function() {
 
     });
 
-    describe('Preapproval details', function() {
-      beforeEach(function() {
+    describe('Preapproval details', () => {
+      beforeEach(() => {
         var mock = paypalMock.adaptive.preapprovalDetails.created;
         var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
         stub.yields(mock.error, mock);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         app.paypalAdaptive.preapprovalDetails.restore();
       });
 
-      it('should return the preapproval details', function(done) {
+      it('should return the preapproval details', (done) => {
         request(app)
           .get('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -314,7 +314,7 @@ describe('paypal.preapproval.routes.test.js', function() {
           .end(done);
       });
 
-      it('should not be able to check another user preapproval details', function(done) {
+      it('should not be able to check another user preapproval details', (done) => {
         request(app)
           .get('/users/' + user2.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -323,16 +323,16 @@ describe('paypal.preapproval.routes.test.js', function() {
       });
     });
 
-    describe('PaymentMethods clean up', function() {
-      it('should delete all other paymentMethods entries in the database to clean up', function(done) {
+    describe('PaymentMethods clean up', () => {
+      it('should delete all other paymentMethods entries in the database to clean up', (done) => {
         request(app)
           .post('/users/' + user.id + '/paypal/preapproval/' + preapprovalkey)
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} })
-            .then(function(res) {
+            .then((res) => {
               expect(res.count).to.equal(1);
               expect(res.rows[0].confirmedAt).not.to.be.null;
               expect(res.rows[0].service).to.equal('paypal');

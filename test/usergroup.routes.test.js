@@ -21,15 +21,15 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe('usergroup.routes.test.js', function() {
+describe('usergroup.routes.test.js', () => {
   var application;
   var user;
   var user2;
   var group;
   var sandbox = sinon.sandbox.create();
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -42,24 +42,24 @@ describe('usergroup.routes.test.js', function() {
   });
 
   // Create users.
-  beforeEach(function(done) {
-    models.User.create(utils.data('user1')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user1')).done((e, u) => {
       expect(e).to.not.exist;
       user = u;
       done();
     });
   });
 
-  beforeEach(function(done) {
-    models.User.create(utils.data('user2')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user2')).done((e, u) => {
       expect(e).to.not.exist;
       user2 = u;
       done();
     });
   });
 
-  beforeEach(function(done) {
-    models.User.create(utils.data('user3')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user3')).done((e, u) => {
       expect(e).to.not.exist;
       user3 = u;
       done();
@@ -67,8 +67,8 @@ describe('usergroup.routes.test.js', function() {
   });
 
   // Create group.
-  beforeEach(function(done) {
-    models.Group.create(groupData).done(function(e, g) {
+  beforeEach((done) => {
+    models.Group.create(groupData).done((e, g) => {
       expect(e).to.not.exist;
       group = g;
       done();
@@ -76,14 +76,14 @@ describe('usergroup.routes.test.js', function() {
   });
 
   // Add an host to the group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     group
       .addUserWithRole(user, roles.HOST)
       .done(done);
   });
 
   // Add an backer to the group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     group
       .addUserWithRole(user3, roles.BACKER)
       .done(done);
@@ -96,9 +96,9 @@ describe('usergroup.routes.test.js', function() {
   /**
    * Add user to a group.
    */
-  describe('#addUser', function() {
+  describe('#addUser', () => {
 
-    it('fails adding a non-existing user to a group', function(done) {
+    it('fails adding a non-existing user to a group', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + 98765)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -106,7 +106,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a user to a non-existing group', function(done) {
+    it('fails adding a user to a non-existing group', (done) => {
       request(app)
         .post('/groups/' + 98765 + '/users/' + user2.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -114,7 +114,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a user with a non-existing role', function(done) {
+    it('fails adding a user with a non-existing role', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .send({
@@ -125,7 +125,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a user to a group if not a member of the group', function(done) {
+    it('fails adding a user to a group if not a member of the group', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .send({
@@ -136,7 +136,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a user to a group if no host', function(done) {
+    it('fails adding a user to a group if no host', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .send({
@@ -147,7 +147,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails adding a host if the group already has one', function(done) {
+    it('fails adding a host if the group already has one', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -164,16 +164,16 @@ describe('usergroup.routes.test.js', function() {
         .end(done)
     });
 
-    it('successfully add a user to a group', function(done) {
+    it('successfully add a user to a group', (done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user2.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
 
-          user2.getGroups().then(function(groups) {
+          user2.getGroups().then((groups) => {
             expect(groups[0].id).to.equal(group.id);
             expect(groups[0].UserGroup.role).to.equal(roles.BACKER);
             done();
@@ -182,7 +182,7 @@ describe('usergroup.routes.test.js', function() {
         });
     });
 
-    it('successfully add a user to a group with a role', function(done) {
+    it('successfully add a user to a group with a role', (done) => {
       var role = roles.MEMBER;
 
       request(app)
@@ -192,16 +192,16 @@ describe('usergroup.routes.test.js', function() {
           role: role
         })
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
 
-          user2.getGroups().then(function(groups) {
+          user2.getGroups().then((groups) => {
             expect(groups[0].id).to.equal(group.id);
             expect(groups[0].UserGroup.role).to.equal(role);
 
-            setTimeout(function() {
-              models.Activity.findAndCountAll({}).then(function(res) {
+            setTimeout(() => {
+              models.Activity.findAndCountAll({}).then((res) => {
                 expect(res.count).to.equal(1);
                 done();
               });
@@ -216,9 +216,9 @@ describe('usergroup.routes.test.js', function() {
   /**
    * Get user's groups.
    */
-  describe('#getUserGroups', function() {
+  describe('#getUserGroups', () => {
 
-    beforeEach(function(done) {
+    beforeEach((done) => {
       request(app)
         .post('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -226,35 +226,35 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails getting another user\'s groups', function(done) {
+    it('fails getting another user\'s groups', (done) => {
       request(app)
         .get('/users/' + user.id + '/groups')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           done();
         });
     });
 
-    it('successfully get a user\'s groups', function(done) {
+    it('successfully get a user\'s groups', (done) => {
       request(app)
         .get('/users/' + user2.id + '/groups')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.length(0);
           done();
         });
     });
 
-    it('successfully get a user\'s groups bis', function(done) {
+    it('successfully get a user\'s groups bis', (done) => {
       request(app)
         .get('/users/' + user.id + '/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.length(1);
           expect(res.body[0]).to.have.property('id');
@@ -265,12 +265,12 @@ describe('usergroup.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s groups with activities', function(done) {
+    it('successfully get a user\'s groups with activities', (done) => {
       request(app)
         .get('/users/' + user.id + '/groups?include=activities')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.length(1);
           expect(res.body[0]).to.have.property('id');
@@ -282,12 +282,12 @@ describe('usergroup.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s groups with the role', function(done) {
+    it('successfully get a user\'s groups with the role', (done) => {
       request(app)
         .get('/users/' + user.id + '/groups?include=usergroup.role')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.length(1);
           expect(res.body[0]).to.have.property('id');
@@ -303,9 +303,9 @@ describe('usergroup.routes.test.js', function() {
   /**
    * Update a user-group relation.
    */
-  describe('#updateUserGroup', function() {
+  describe('#updateUserGroup', () => {
 
-    it('fails if no access to the group', function(done) {
+    it('fails if no access to the group', (done) => {
       request(app)
         .put('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -313,7 +313,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if no host', function(done) {
+    it('fails if no host', (done) => {
       request(app)
         .put('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -321,7 +321,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if the user is not part of the group yet', function(done) {
+    it('fails if the user is not part of the group yet', (done) => {
       request(app)
         .put('/groups/' + group.id + '/users/' + user2.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -329,7 +329,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully update a user-group relation', function(done) {
+    it('successfully update a user-group relation', (done) => {
       var role = roles.MEMBER;
       request(app)
         .put('/groups/' + group.id + '/users/' + user3.id)
@@ -338,12 +338,12 @@ describe('usergroup.routes.test.js', function() {
           role: role
         })
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('role', role);
 
           // Check activities.
-          models.Activity.findAndCountAll({where: {type: 'group.user.updated'} }).then(function(res) {
+          models.Activity.findAndCountAll({where: {type: 'group.user.updated'} }).then((res) => {
             expect(res.count).to.equal(2);
             done();
           });
@@ -355,9 +355,9 @@ describe('usergroup.routes.test.js', function() {
   /**
    * Delete a user-group relation.
    */
-  describe('#deleteUserGroup', function() {
+  describe('#deleteUserGroup', () => {
 
-    it('fails if no access to the group', function(done) {
+    it('fails if no access to the group', (done) => {
       request(app)
         .del('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -365,7 +365,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if no host', function(done) {
+    it('fails if no host', (done) => {
       request(app)
         .del('/groups/' + group.id + '/users/' + user.id)
         .set('Authorization', 'Bearer ' + user3.jwt(application))
@@ -373,7 +373,7 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('fails if the user is not part of the group yet', function(done) {
+    it('fails if the user is not part of the group yet', (done) => {
       request(app)
         .del('/groups/' + group.id + '/users/' + user2.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -381,18 +381,18 @@ describe('usergroup.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully update a user-group relation', function(done) {
+    it('successfully update a user-group relation', (done) => {
       var role = 'member';
       request(app)
         .del('/groups/' + group.id + '/users/' + user3.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
 
           async.parallel([
-            function(cb) {
+            (cb) => {
               // Check usergroup.
               var query = {
                 where: {
@@ -400,14 +400,14 @@ describe('usergroup.routes.test.js', function() {
                   UserId: user3.id
                 }
               };
-              models.UserGroup.findAndCountAll(query).then(function(res) {
+              models.UserGroup.findAndCountAll(query).then((res) => {
                 expect(res.count).to.equal(0);
                 cb();
               });
             },
-            function(cb) {
+            (cb) => {
               // Check activities.
-              models.Activity.findAndCountAll({where: {type: 'group.user.deleted'} }).then(function(res) {
+              models.Activity.findAndCountAll({where: {type: 'group.user.deleted'} }).then((res) => {
                 expect(res.count).to.equal(2);
                 cb();
               });

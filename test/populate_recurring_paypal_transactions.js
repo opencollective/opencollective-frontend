@@ -56,14 +56,14 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
   });
 
   beforeEach((done) => {
-    models.Group.create(data('group1')).done(function(e, g) {
+    models.Group.create(data('group1')).done((e, g) => {
       expect(e).to.not.exist;
       group = g;
       done();
     });
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     group
       .addUserWithRole(user, roles.HOST)
       .done(done);

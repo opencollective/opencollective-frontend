@@ -31,7 +31,7 @@ var Notification = models.Notification;
 /**
  * Tests.
  */
-describe(require('path').basename(__filename), function() {
+describe(require('path').basename(__filename), () => {
 
   var application;
   var user;
@@ -40,8 +40,8 @@ describe(require('path').basename(__filename), function() {
   var group2;
   var sandbox = sinon.sandbox.create();
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -53,7 +53,7 @@ describe(require('path').basename(__filename), function() {
     done();
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
     Promise.all(promises).then((results) => {
       user = results[0];
@@ -73,13 +73,13 @@ describe(require('path').basename(__filename), function() {
     utils.clearbitStubAfterEach(sandbox);
   });
 
-  it('notifies for the `group.transaction.approved` email', function(done) {
+  it('notifies for the `group.transaction.approved` email', (done) => {
     request(app)
       .post('/groups/' + group.id + '/activities/group.transaction.approved/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         expect(res.body.active).to.be.true;
 
@@ -88,19 +88,19 @@ describe(require('path').basename(__filename), function() {
           GroupId: group.id,
           type: 'group.transaction.approved'
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(1);
         }).done(done);
       })
   });
 
-  it('disables notification for the ' + notificationData.type + ' email', function(done) {
+  it('disables notification for the ' + notificationData.type + ' email', (done) => {
     request(app)
       .post('/groups/' + group.id + '/activities/' + notificationData.type + '/unsubscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
 
         Notification.findAndCountAll({where: {
@@ -108,19 +108,19 @@ describe(require('path').basename(__filename), function() {
           GroupId: group.id,
           type: notificationData.type
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(0);
         }).done(done);
       })
   });
 
-  it('fails to add another notification if one exists', function(done) {
+  it('fails to add another notification if one exists', (done) => {
     request(app)
       .post('/groups/' + group.id + '/activities/' + notificationData.type + '/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(400)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
         Notification.findAndCountAll({where: {
@@ -128,19 +128,19 @@ describe(require('path').basename(__filename), function() {
           GroupId: group.id,
           type: notificationData.type
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(1);
         }).done(done);
       })
   });
 
-  it('fails to remove notification if it does not exist', function(done) {
+  it('fails to remove notification if it does not exist', (done) => {
     request(app)
       .post('/groups/' + group.id + '/activities/group.transaction.approved/unsubscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(400)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         expect(res.body.error.message).to.equal('You were not subscribed to this type of activity');
         Notification.findAndCountAll({where: {
@@ -148,49 +148,49 @@ describe(require('path').basename(__filename), function() {
           GroupId: group.id,
           type: notificationData.type
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(1);
         }).done(done);
       })
   });
 
-  it('fails to add a notification if not a member of the group', function(done) {
+  it('fails to add a notification if not a member of the group', (done) => {
     request(app)
       .post('/groups/' + group2.id + '/activities/group.transaction.approved/subscribe')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send()
       .expect(403)
-      .end(function() {
+      .end(() => {
         Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group2.id,
           type: notificationData.type
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(0);
         }).done(done);
       })
   });
 
-  it('automatically add a notification for a new host to `group.transaction.created` events', function(done) {
+  it('automatically add a notification for a new host to `group.transaction.created` events', (done) => {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user2.jwt(application))
       .send({group: group3Data, role: 'HOST'})
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         Notification.findAndCountAll({where: {
           UserId: user2.id,
           GroupId: res.body.id,
           type: constants.GROUP_TRANSACTION_CREATED
         }})
-        .then(function(res) {
+        .then((res) => {
           expect(res.count).to.equal(0);
         }).done(done);
       })
   });
 
-  it('sends a new `group.transaction.created` email notification', function(done) {
+  it('sends a new `group.transaction.created` email notification', (done) => {
 
     var templateData = {
       transaction: _.extend({}, transactionsData[0]),
@@ -212,7 +212,7 @@ describe(require('path').basename(__filename), function() {
     var body = emailLib.getBody(template);
 
     var previousSendMail = app.mailgun.sendMail;
-    app.mailgun.sendMail = function(options) {
+    app.mailgun.sendMail = (options) => {
       expect(options.to).to.equal(user.email);
       expect(options.subject).to.equal(subject);
       expect(options.html).to.equal(body);
@@ -228,7 +228,7 @@ describe(require('path').basename(__filename), function() {
         transaction: transactionsData[0]
       })
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         expect(res.body).to.have.property('GroupId', group.id);
         expect(res.body).to.have.property('UserId', user.id); // ...

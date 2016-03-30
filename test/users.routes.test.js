@@ -23,7 +23,7 @@ var mock = require('./mocks/clearbit.json');
 /**
  * Tests.
  */
-describe('users.routes.test.js', function() {
+describe('users.routes.test.js', () => {
 
   var application;
   var application2;
@@ -48,16 +48,16 @@ describe('users.routes.test.js', function() {
 
   afterEach(() => sandbox.restore() );
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
   });
 
   // Create a normal application.
-  beforeEach(function(done) {
-    models.Application.create(utils.data('application2')).done(function(e, a) {
+  beforeEach((done) => {
+    models.Application.create(utils.data('application2')).done((e, a) => {
       expect(e).to.not.exist;
       application2 = a;
       done();
@@ -65,8 +65,8 @@ describe('users.routes.test.js', function() {
   });
 
   // Create an application with user creation access.
-  beforeEach(function(done) {
-    models.Application.create(utils.data('application3')).done(function(e, a) {
+  beforeEach((done) => {
+    models.Application.create(utils.data('application3')).done((e, a) => {
       expect(e).to.not.exist;
       application3 = a;
       done();
@@ -76,9 +76,9 @@ describe('users.routes.test.js', function() {
   /**
    * Create.
    */
-  describe('#create', function() {
+  describe('#create', () => {
 
-    it('fails if no api_key', function(done) {
+    it('fails if no api_key', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -91,7 +91,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if invalid api_key', function(done) {
+    it('fails if invalid api_key', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -105,7 +105,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if no user object', function(done) {
+    it('fails if no user object', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -118,7 +118,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if no email', function(done) {
+    it('fails if no email', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -132,7 +132,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if bad email', function(done) {
+    it('fails if bad email', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -146,7 +146,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if @ symbol in twitterHandle', function(done) {
+    it('fails if @ symbol in twitterHandle', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -160,14 +160,14 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('successfully create a user', function(done) {
+    it('successfully create a user', (done) => {
       request(app)
         .post('/users')
         .send({
           api_key: application.api_key,
           user: userData
         })
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('email', userData.email);
           expect(res.body).to.not.have.property('_salt');
@@ -175,7 +175,7 @@ describe('users.routes.test.js', function() {
           expect(res.body).to.not.have.property('password_hash');
           models.User
             .find(parseInt(res.body.id))
-            .then(function(user) {
+            .then((user) => {
               expect(user).to.have.property('ApplicationId', application.id);
               done();
             })
@@ -183,18 +183,18 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('successfully create a user with just an email and auto prefills name, twitter, avatar', function(done) {
+    it('successfully create a user with just an email and auto prefills name, twitter, avatar', (done) => {
       request(app)
         .post('/users')
         .send({
           api_key: application.api_key,
           user: { email: "xdamman@gmail.com" }
         })
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           models.User
             .find(parseInt(res.body.id))
-            .then(function(user) {
+            .then((user) => {
               expect(user.name).to.equal("Xavier Damman");
               expect(user.twitterHandle).to.equal("xdamman");
               done();
@@ -203,18 +203,18 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('successfully create a user with an application that has access [0.5]', function(done) {
+    it('successfully create a user with an application that has access [0.5]', (done) => {
       request(app)
         .post('/users')
         .send({
           api_key: application3.api_key,
           user: userData
         })
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           models.User
             .find(parseInt(res.body.id))
-            .then(function(user) {
+            .then((user) => {
               expect(user).to.have.property('ApplicationId', application3.id);
               done();
             })
@@ -222,13 +222,13 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    describe('duplicate', function() {
+    describe('duplicate', () => {
 
-      beforeEach(function(done) {
+      beforeEach((done) => {
         models.User.create(userData).done(done);
       });
 
-      it('fails to create a user with the same email', function(done) {
+      it('fails to create a user with the same email', (done) => {
         request(app)
           .post('/users')
           .send({
@@ -242,7 +242,7 @@ describe('users.routes.test.js', function() {
           });
       });
 
-      it('fails to create a user with the same username', function(done) {
+      it('fails to create a user with the same username', (done) => {
         var u = {
           email: 'newemail@email.com', username: userData.username
         }
@@ -266,32 +266,32 @@ describe('users.routes.test.js', function() {
   /**
    * Get.
    */
-  describe('#get()', function() {
+  describe('#get()', () => {
 
     var user;
     var user2;
 
-    beforeEach(function(done) {
-      models.User.create(utils.data('user1')).done(function(e, u) {
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
         expect(e).to.not.exist;
         user = u;
         done();
       });
     });
 
-    beforeEach(function(done) {
-      models.User.create(utils.data('user2')).done(function(e, u) {
+    beforeEach((done) => {
+      models.User.create(utils.data('user2')).done((e, u) => {
         expect(e).to.not.exist;
         user2 = u;
         done(e);
       });
     });
 
-    it('successfully get a user\'s information', function(done) {
+    it('successfully get a user\'s information', (done) => {
       request(app)
         .get('/users/' + user.id)
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           var u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
@@ -300,11 +300,11 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s information when he is authenticated', function(done) {
+    it('successfully get a user\'s information when he is authenticated', (done) => {
       request(app)
         .get('/users/' + user.id)
         .set('Authorization', 'Bearer ' + user.jwt(application))
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           var u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
@@ -315,18 +315,18 @@ describe('users.routes.test.js', function() {
 
   });
 
-  describe('#update paypal email', function() {
+  describe('#update paypal email', () => {
     var user;
 
-    beforeEach(function(done) {
-      models.User.create(utils.data('user1')).done(function(e, u) {
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
         expect(e).to.not.exist;
         user = u;
         done();
       });
     });
 
-    it('should update the paypal email', function(done) {
+    it('should update the paypal email', (done) => {
       var email = 'test+paypal@email.com';
       request(app)
         .put('/users/' + user.id + '/paypalemail')
@@ -334,14 +334,14 @@ describe('users.routes.test.js', function() {
         .send({
           paypalEmail: email
         })
-        .end(function(err, res) {
+        .end((err, res) => {
           var body = res.body;
           expect(body.paypalEmail).to.equal(email);
           done();
         });
     });
 
-    it('fails if the user is not logged in', function(done) {
+    it('fails if the user is not logged in', (done) => {
       var email = 'test+paypal@email.com';
       request(app)
         .put('/users/' + user.id + '/paypalemail')
@@ -355,7 +355,7 @@ describe('users.routes.test.js', function() {
           });
     });
 
-    it('fails if the email is not valid', function(done) {
+    it('fails if the email is not valid', (done) => {
       request(app)
         .put('/users/' + user.id + '/paypalemail')
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -400,7 +400,7 @@ describe('users.routes.test.js', function() {
           password: newPassword,
           passwordConfirmation: newPassword
         })
-        .end(function(err, res) {
+        .end((err, res) => {
           var body = res.body;
           expect(body.success).to.equal(true);
           models.User.auth(user.email, newPassword, e => {
@@ -410,7 +410,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if the user is not logged in', function(done) {
+    it('fails if the user is not logged in', (done) => {
       request(app)
         .put('/users/' + user.id + '/password')
         .end((e,res) => {
@@ -420,7 +420,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if wrong user is logged in', function(done) {
+    it('fails if wrong user is logged in', (done) => {
       request(app)
         .put('/users/' + user.id + '/password')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -431,7 +431,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if the passwords don\'t match', function(done) {
+    it('fails if the passwords don\'t match', (done) => {
       const newPassword = 'aaa123';
 
       request(app)
@@ -451,18 +451,18 @@ describe('users.routes.test.js', function() {
 
   });
 
-  describe('#update avatar', function() {
+  describe('#update avatar', () => {
     var user;
 
-    beforeEach(function(done) {
-      models.User.create(utils.data('user1')).done(function(e, u) {
+    beforeEach((done) => {
+      models.User.create(utils.data('user1')).done((e, u) => {
         expect(e).to.not.exist;
         user = u;
         done();
       });
     });
 
-    it('should update avatar', function(done) {
+    it('should update avatar', (done) => {
       var link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
         .put('/users/' + user.id + '/avatar')
@@ -470,14 +470,14 @@ describe('users.routes.test.js', function() {
         .send({
           avatar: link
         })
-        .end(function(err, res) {
+        .end((err, res) => {
           var body = res.body;
           expect(body.avatar).to.equal(link);
           done();
         });
     });
 
-    it('fails if the user is not logged in', function(done) {
+    it('fails if the user is not logged in', (done) => {
       var link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
         .put('/users/' + user.id + '/avatar')
@@ -491,7 +491,7 @@ describe('users.routes.test.js', function() {
         });
     });
 
-    it('fails if the avatar key is missing from the payload', function(done) {
+    it('fails if the avatar key is missing from the payload', (done) => {
       request(app)
         .put('/users/' + user.id + '/avatar')
         .send({})
@@ -534,7 +534,7 @@ describe('users.routes.test.js', function() {
       models.User.create({
         email: 'xdamman@gmail.com' // will have twitter avatar
       })
-      .done(function(e, u) {
+      .done((e, u) => {
         expect(e).to.not.exist;
         userWithoutPassword = u;
         done();
@@ -563,7 +563,7 @@ describe('users.routes.test.js', function() {
           user: newUser,
           api_key: application.api_key
         })
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', userWithoutPassword.id);
           expect(res.body).to.have.property('name', newUser.name);

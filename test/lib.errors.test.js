@@ -9,56 +9,56 @@ var utils = require('../test/utils.js')();
 /**
  * Tests.
  */
-describe('lib.errors.test.js', function() {
+describe('lib.errors.test.js', () => {
 
-  it('BadRequest', function() {
+  it('BadRequest', () => {
     var e = new errors.BadRequest('message');
     expect(e).to.have.property('message', 'message');
     expect(e).to.have.property('code', 400);
     expect(e).to.have.property('type', 'bad_request');
   });
 
-  it('ValidationFailed', function() {
+  it('ValidationFailed', () => {
     var e = new errors.ValidationFailed();
     expect(e).to.have.property('message', 'Missing required fields');
   });
 
-  it('Unauthorized', function() {
+  it('Unauthorized', () => {
     var e = new errors.Unauthorized('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('Forbidden', function() {
+  it('Forbidden', () => {
     var e = new errors.Forbidden('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('SpamDetected', function() {
+  it('SpamDetected', () => {
     var e = new errors.SpamDetected('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('NotFound', function() {
+  it('NotFound', () => {
     var e = new errors.NotFound('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('ServerError', function() {
+  it('ServerError', () => {
     var e = new errors.ServerError('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('Timeout', function() {
+  it('Timeout', () => {
     var e = new errors.Timeout('message');
     expect(e).to.have.property('code', 408);
   });
 
-  it('ConflictError', function() {
+  it('ConflictError', () => {
     var e = new errors.ConflictError('message');
     expect(e).to.have.property('message', 'message');
   });
 
-  it('CustomError', function() {
+  it('CustomError', () => {
     var e = new errors.CustomError(123, 'type', 'message');
     expect(e).to.have.property('message', 'message');
     expect(e).to.have.property('type', 'type');

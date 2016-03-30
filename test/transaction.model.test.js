@@ -19,7 +19,7 @@ const Transaction = models.Transaction;
  * Tests.
  */
 
-describe('transaction model', function() {
+describe('transaction model', () => {
 
   beforeEach(done => {
     utils.cleanAllDb(done);

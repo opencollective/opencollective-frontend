@@ -10,15 +10,15 @@ const userlib = require('../app/lib/userlib');
 /**
  * Private methods.
  */
-const getData = function(item) {
+const getData = (item) => {
   return _.extend({}, data[item]); // to avoid changing these data
 };
 
-const createSuperApplication = function(callback) {
+const createSuperApplication = (callback) => {
   app.set('models').Application.create(getData('applicationSuper')).done(callback);
 };
 
-const clearbitStubBeforeEach = function(sandbox) {
+const clearbitStubBeforeEach = (sandbox) => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
       return new Bluebird((resolve, reject) => {
         reject(userlib.clearbit.Enrichment.NotFoundError(' NotFound'));
@@ -26,19 +26,19 @@ const clearbitStubBeforeEach = function(sandbox) {
     });
 };
 
-const clearbitStubAfterEach = function(sandbox) {
+const clearbitStubAfterEach = (sandbox) => {
   sandbox.restore();
 }
 
 /**
  * Utils.
  */
-module.exports = function() {
+module.exports = () => {
 
   return {
 
-    cleanAllDb: function(callback) {
-      app.set('models').sequelize.sync({force: true}).done(function(e) {
+    cleanAllDb: (callback) => {
+      app.set('models').sequelize.sync({force: true}).done((e) => {
         if (e) return callback(e);
         createSuperApplication(callback);
       });

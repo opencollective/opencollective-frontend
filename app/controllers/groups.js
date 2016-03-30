@@ -221,6 +221,10 @@ module.exports = function(app) {
       });
     }
 
+    if (req.query.exclude) {
+      where.$or = [ { type: { $ne: req.query.exclude } }, { type: { $eq: null } } ];
+    }
+
     var query = _.merge({
       where: where,
       order: [[req.sorting.key, req.sorting.dir]]
