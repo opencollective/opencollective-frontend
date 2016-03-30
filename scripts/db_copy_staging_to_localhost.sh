@@ -6,8 +6,8 @@
 # PG_DATABASE=opencollective_prod_snapshot npm start
 
 LOCALDBUSER="opencollective"
-LOCALDBNAME="opencollective_prod_snapshot"
-PG_URL=`heroku config:get PG_URL -a opencollective-prod-api`
+LOCALDBNAME="opencollective_staging_snapshot"
+PG_URL=`heroku config:get PG_URL -a opencollective-staging-api`
 DBDUMPS_DIR="dbdumps/"
 
 FILENAME=`date +"%Y-%m-%d"`-prod.pgsql
