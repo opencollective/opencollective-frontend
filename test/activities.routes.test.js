@@ -20,7 +20,7 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe('activities.routes.test.js', function() {
+describe('activities.routes.test.js', () => {
 
   var application;
   var user;
@@ -29,8 +29,8 @@ describe('activities.routes.test.js', function() {
   var sandbox = sinon.sandbox.create();
 
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -43,22 +43,22 @@ describe('activities.routes.test.js', function() {
   });
 
   // Create users.
-  beforeEach(function(done) {
-    models.User.create(utils.data('user1')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user1')).done((e, u) => {
       expect(e).to.not.exist;
       user = u;
       done();
     });
   });
-  beforeEach(function(done) {
-    models.User.create(utils.data('user2')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user2')).done((e, u) => {
       expect(e).to.not.exist;
       user2 = u;
       done();
     });
   });
-  beforeEach(function(done) {
-    models.User.create(utils.data('user3')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user3')).done((e, u) => {
       expect(e).to.not.exist;
       user3 = u;
       done();
@@ -66,8 +66,8 @@ describe('activities.routes.test.js', function() {
   });
 
   // Create group.
-  beforeEach(function(done) {
-    models.Group.create(groupData).done(function(e, g) {
+  beforeEach((done) => {
+    models.Group.create(groupData).done((e, g) => {
       expect(e).to.not.exist;
       group = g;
       done();
@@ -75,22 +75,22 @@ describe('activities.routes.test.js', function() {
   });
 
   // Add an host to the group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     group
       .addUserWithRole(user, roles.HOST)
       .done(done);
   });
 
   // Add an backer to the group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     group
       .addUserWithRole(user3, roles.BACKER)
       .done(done);
   });
 
   // Create activities.
-  beforeEach(function(done) {
-    async.eachSeries(activitiesData, function(a, cb) {
+  beforeEach((done) => {
+    async.eachSeries(activitiesData, (a, cb) => {
       models.Activity.create(a).done(cb);
     }, done);
   });
@@ -102,9 +102,9 @@ describe('activities.routes.test.js', function() {
   /**
    * Get group's activities.
    */
-  describe('#group', function() {
+  describe('#group', () => {
 
-    it('fails getting activities if not member of the group', function(done) {
+    it('fails getting activities if not member of the group', (done) => {
       request(app)
         .get('/groups/' + group.id + '/activities')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -112,17 +112,17 @@ describe('activities.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully get a group\'s activities', function(done) {
+    it('successfully get a group\'s activities', (done) => {
       request(app)
         .get('/groups/' + group.id + '/activities')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
 
           var activities = res.body;
           expect(activities.length).to.equal(12);
-          activities.forEach(function(a) {
+          activities.forEach((a) => {
             expect(a.GroupId).to.equal(group.id);
           });
           done();
@@ -130,11 +130,11 @@ describe('activities.routes.test.js', function() {
         });
     });
 
-    describe('Pagination', function() {
+    describe('Pagination', () => {
 
       var perPage = 3;
 
-      it('successfully get a group\'s activities with per_page', function(done) {
+      it('successfully get a group\'s activities with per_page', (done) => {
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
@@ -144,7 +144,7 @@ describe('activities.routes.test.js', function() {
           })
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
             expect(res.body[0].id).to.equal(4);
@@ -158,14 +158,14 @@ describe('activities.routes.test.js', function() {
             expect(headers.link).to.contain('page=1');
             expect(headers.link).to.contain('per_page=' + perPage);
             expect(headers.link).to.contain('/groups/' + group.id + '/activities');
-            var tot = _.reduce(activitiesData, function(memo, el) { return memo + ((el.GroupId === group.id) ? 1 : 0); }, 0);
+            var tot = _.reduce(activitiesData, (memo, el) => { return memo + ((el.GroupId === group.id) ? 1 : 0); }, 0);
             expect(headers.link).to.contain('/groups/1/activities?page=' + Math.ceil(tot / perPage) + '&per_page=' + perPage + '>; rel="last"');
 
             done();
           });
       });
 
-      it('successfully get the second page of a group\'s activities', function(done) {
+      it('successfully get the second page of a group\'s activities', (done) => {
         var page = 2;
         request(app)
           .get('/groups/' + group.id + '/activities')
@@ -177,7 +177,7 @@ describe('activities.routes.test.js', function() {
           })
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
             expect(res.body[0].id).to.equal(7);
@@ -190,7 +190,7 @@ describe('activities.routes.test.js', function() {
           });
       });
 
-      it('successfully get a group\'s activities using since_id', function(done) {
+      it('successfully get a group\'s activities using since_id', (done) => {
         var sinceId = 8;
 
         request(app)
@@ -202,12 +202,12 @@ describe('activities.routes.test.js', function() {
           })
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             var activities = res.body;
             expect(activities[0].id > sinceId).to.be.true;
             var last = 0;
-            _.each(activities, function(a) {
+            _.each(activities, (a) => {
               expect(a.id >= last).to.be.true;
             });
 
@@ -221,9 +221,9 @@ describe('activities.routes.test.js', function() {
 
     });
 
-    describe('Sorting', function() {
+    describe('Sorting', () => {
 
-      it('successfully get a group\'s activities with sorting', function(done) {
+      it('successfully get a group\'s activities with sorting', (done) => {
         request(app)
           .get('/groups/' + group.id + '/activities')
           .send({
@@ -232,11 +232,11 @@ describe('activities.routes.test.js', function() {
           })
           .set('Authorization', 'Bearer ' + user.jwt(application))
           .expect(200)
-          .end(function(e, res) {
+          .end((e, res) => {
             expect(e).to.not.exist;
             var activities = res.body;
             var last = new Date();
-            _.each(activities, function(a) {
+            _.each(activities, (a) => {
               expect((new Date(a.createdAt) <= new Date(last))).to.be.true;
               last = a.createdAt;
             });
@@ -251,9 +251,9 @@ describe('activities.routes.test.js', function() {
   /**
    * Get user's activities.
    */
-  describe('#user', function() {
+  describe('#user', () => {
 
-    it('fails getting other user\'s activities', function(done) {
+    it('fails getting other user\'s activities', (done) => {
       request(app)
         .get('/users/' + user.id + '/activities')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -261,17 +261,17 @@ describe('activities.routes.test.js', function() {
         .end(done);
     });
 
-    it('successfully get a user\'s activities', function(done) {
+    it('successfully get a user\'s activities', (done) => {
       request(app)
         .get('/users/' + user.id + '/activities')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
 
           var activities = res.body;
           expect(activities.length).to.equal(6);
-          activities.forEach(function(a) {
+          activities.forEach((a) => {
             expect(a.UserId).to.equal(user.id);
           });
           done();

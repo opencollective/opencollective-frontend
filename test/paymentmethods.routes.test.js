@@ -21,7 +21,7 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe('paymentMethods.routes.test.js', function() {
+describe('paymentMethods.routes.test.js', () => {
 
   var application;
   var user;
@@ -30,8 +30,8 @@ describe('paymentMethods.routes.test.js', function() {
   var sandbox = sinon.sandbox.create();
 
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -44,16 +44,16 @@ describe('paymentMethods.routes.test.js', function() {
   });
 
   // Create users.
-  beforeEach(function(done) {
-    models.User.create(utils.data('user1')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user1')).done((e, u) => {
       expect(e).to.not.exist;
       user = u;
       done();
     });
   });
 
-  beforeEach(function(done) {
-    models.User.create(utils.data('user2')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user2')).done((e, u) => {
       expect(e).to.not.exist;
       user2 = u;
       done();
@@ -61,18 +61,18 @@ describe('paymentMethods.routes.test.js', function() {
   });
 
   // Create paymentMethod.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     var data = _.extend(paypalPaymentMethod, { UserId: user.id });
-    models.PaymentMethod.create(data).done(function(e, c) {
+    models.PaymentMethod.create(data).done((e, c) => {
       expect(e).to.not.exist;
       paymentMethod1 = c;
       done();
     });
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     var data = _.extend(stripePaymentMethod, { UserId: user.id });
-    models.PaymentMethod.create(data).done(function(e, c) {
+    models.PaymentMethod.create(data).done((e, c) => {
       expect(e).to.not.exist;
       paymentMethod2 = c;
       done();
@@ -86,25 +86,25 @@ describe('paymentMethods.routes.test.js', function() {
   /**
    * Get user's groups.
    */
-  describe('#getUserGroups', function() {
+  describe('#getUserGroups', () => {
 
-    it('fails getting another user\'s paymentMethods', function(done) {
+    it('fails getting another user\'s paymentMethods', (done) => {
       request(app)
         .get('/users/' + user.id + '/payment-methods')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
         .expect(403)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           done();
         });
     });
 
-    it('successfully get a user\'s paymentMethod', function(done) {
+    it('successfully get a user\'s paymentMethod', (done) => {
       request(app)
         .get('/users/' + user.id + '/payment-methods')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
 
           var body = res.body;
@@ -116,7 +116,7 @@ describe('paymentMethods.routes.test.js', function() {
         });
     });
 
-    it('successfully get a user\'s paymentMethod and filters by service', function(done) {
+    it('successfully get a user\'s paymentMethod and filters by service', (done) => {
       request(app)
         .get('/users/' + user.id + '/payment-methods')
         .query({
@@ -126,7 +126,7 @@ describe('paymentMethods.routes.test.js', function() {
         })
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           var body = res.body;
 

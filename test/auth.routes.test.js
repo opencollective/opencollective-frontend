@@ -19,24 +19,24 @@ var models = app.set('models');
 /**
  * Tests.
  */
-describe('auth.routes.test.js', function() {
+describe('auth.routes.test.js', () => {
 
   var application;
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
   });
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     models.User.create(userData).done(done);
   });
 
-  describe('#authenticate', function() {
+  describe('#authenticate', () => {
 
-    it('fails authenticate if no password', function(done) {
+    it('fails authenticate if no password', (done) => {
       request(app)
         .post('/authenticate')
         .send({
@@ -44,13 +44,13 @@ describe('auth.routes.test.js', function() {
           username: userData.username
         })
         .expect(400)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           done();
         });
     });
 
-    it('fails authenticate if bad application', function(done) {
+    it('fails authenticate if bad application', (done) => {
       request(app)
         .post('/authenticate')
         .send({
@@ -59,13 +59,13 @@ describe('auth.routes.test.js', function() {
           password: userData.password
         })
         .expect(401)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           done();
         });
     });
 
-    it('fails authenticate if bad password', function(done) {
+    it('fails authenticate if bad password', (done) => {
       request(app)
         .post('/authenticate')
         .send({
@@ -74,13 +74,13 @@ describe('auth.routes.test.js', function() {
           password: 'bad'
         })
         .expect(400)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           done();
         });
     });
 
-    it('successfully authenticate with username', function(done) {
+    it('successfully authenticate with username', (done) => {
       request(app)
         .post('/authenticate')
         .send({
@@ -89,7 +89,7 @@ describe('auth.routes.test.js', function() {
           password: userData.password
         })
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('access_token');
           expect(res.body).to.have.property('refresh_token');
@@ -103,7 +103,7 @@ describe('auth.routes.test.js', function() {
         });
     });
 
-    it('successfully authenticate with email (case insensitive)', function(done) {
+    it('successfully authenticate with email (case insensitive)', (done) => {
       request(app)
         .post('/authenticate')
         .send({
@@ -112,7 +112,7 @@ describe('auth.routes.test.js', function() {
           password: userData.password
         })
         .expect(200)
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('access_token');
           expect(res.body).to.have.property('refresh_token');

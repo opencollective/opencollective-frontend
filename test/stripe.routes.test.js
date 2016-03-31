@@ -22,7 +22,7 @@ var roles = require('../app/constants/roles');
 
 var stripeMock = require('./mocks/stripe');
 
-describe('stripe.routes.test.js', function() {
+describe('stripe.routes.test.js', () => {
 
   var nocks = {};
 
@@ -33,8 +33,8 @@ describe('stripe.routes.test.js', function() {
   var application;
   var sandbox = sinon.sandbox.create();
 
-  beforeEach(function(done) {
-    utils.cleanAllDb(function(e, app) {
+  beforeEach((done) => {
+    utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
@@ -47,8 +47,8 @@ describe('stripe.routes.test.js', function() {
   });
 
   // Create a user.
-  beforeEach(function(done) {
-    models.User.create(utils.data('user1')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user1')).done((e, u) => {
       expect(e).to.not.exist;
       user = u;
       done();
@@ -56,8 +56,8 @@ describe('stripe.routes.test.js', function() {
   });
 
   // Create a user.
-  beforeEach(function(done) {
-    models.User.create(utils.data('user2')).done(function(e, u) {
+  beforeEach((done) => {
+    models.User.create(utils.data('user2')).done((e, u) => {
       expect(e).to.not.exist;
       user2 = u;
       done();
@@ -65,7 +65,7 @@ describe('stripe.routes.test.js', function() {
   });
 
   // Create a group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     request(app)
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -74,7 +74,7 @@ describe('stripe.routes.test.js', function() {
         role: roles.HOST
       })
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         group = res.body;
         done();
@@ -82,18 +82,18 @@ describe('stripe.routes.test.js', function() {
   });
 
   // Add user2 as backer to group.
-  beforeEach(function(done) {
+  beforeEach((done) => {
     request(app)
       .post('/groups/' + group.id + '/users/' + user2.id)
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .expect(200)
-      .end(function(e, res) {
+      .end((e, res) => {
         expect(e).to.not.exist;
         done();
       });
   });
 
-  afterEach(function() {
+  afterEach(() => {
     nock.cleanAll();
   });
 
@@ -101,15 +101,15 @@ describe('stripe.routes.test.js', function() {
     utils.clearbitStubAfterEach(sandbox);
   });
 
-  describe('authorize', function() {
-    it('should return an error if the user is not logged in', function(done) {
+  describe('authorize', () => {
+    it('should return an error if the user is not logged in', (done) => {
       request(app)
         .get('/stripe/authorize')
         .expect(401)
         .end(done);
     });
 
-    it('should fail is the group does not have an host', function(done) {
+    it('should fail is the group does not have an host', (done) => {
       request(app)
         .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
@@ -123,12 +123,12 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should redirect to stripe', function(done) {
+    it('should redirect to stripe', (done) => {
       request(app)
         .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200) // redirect
-        .end(function(e, res) {
+        .end((e, res) => {
           expect(e).to.not.exist;
 
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
@@ -138,7 +138,7 @@ describe('stripe.routes.test.js', function() {
     });
   });
 
-  describe('callback', function() {
+  describe('callback', () => {
     var stripeResponse = {
       access_token: 'sk_test_123',
       refresh_token: 'rt_123',
@@ -148,7 +148,7 @@ describe('stripe.routes.test.js', function() {
       scope: 'read_write'
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       nock('https://connect.stripe.com')
       .post('/oauth/token', {
         grant_type: 'authorization_code',
@@ -159,18 +159,18 @@ describe('stripe.routes.test.js', function() {
       .reply(200, stripeResponse);
     });
 
-    afterEach(function() {
+    afterEach(() => {
       nock.cleanAll();
     });
 
-    it('should fail if the state is empty', function(done) {
+    it('should fail if the state is empty', (done) => {
       request(app)
         .get('/stripe/oauth/callback')
         .expect(400)
         .end(done);
     });
 
-    it('should fail if the user does not exist', function(done) {
+    it('should fail if the user does not exist', (done) => {
       request(app)
         .get('/stripe/oauth/callback?state=123412312')
         .expect(400, {
@@ -183,7 +183,7 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should fail if the user is not a host', function(done) {
+    it('should fail if the user is not a host', (done) => {
       request(app)
         .get('/stripe/oauth/callback?state=' + user2.id)
         .expect(400, {
@@ -196,24 +196,24 @@ describe('stripe.routes.test.js', function() {
         .end(done);
     });
 
-    it('should set a stripeAccount', function(done) {
+    it('should set a stripeAccount', (done) => {
       var url = '/stripe/oauth/callback?state=' + user.id + '&code=abc';
 
       async.auto({
-        request: function(cb) {
+        request: (cb) => {
           request(app)
             .get(url)
             .expect(302)
-            .end(function(e, r) {
+            .end((e, r) => {
               console.log("error: ", e);
               console.log("response: ", r.body);
               cb();
             });
         },
 
-        checkStripeAccount: ['request', function(cb) {
+        checkStripeAccount: ['request', (cb) => {
           models.StripeAccount.findAndCountAll({})
-            .done(function(e, res) {
+            .done((e, res) => {
               expect(e).to.not.exist;
               expect(res.count).to.be.equal(1);
               var account = res.rows[0];
@@ -227,13 +227,13 @@ describe('stripe.routes.test.js', function() {
             });
         }],
 
-        checkUser: ['checkStripeAccount', function(cb, results) {
+        checkUser: ['checkStripeAccount', (cb, results) => {
           models.User.findAndCountAll({
             where: {
               StripeAccountId: results.checkStripeAccount.id
             }
           })
-          .done(function(e, res) {
+          .done((e, res) => {
             expect(e).to.not.exist;
             expect(res.count).to.be.equal(1);
             expect(res.rows[0].id).to.be.equal(user.id);
