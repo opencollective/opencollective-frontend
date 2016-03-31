@@ -14,7 +14,8 @@ module.exports = (Sequelize, activity) => {
       GroupId: activity.GroupId,
       // for now, only handle gitter and slack webhooks in this lib
       // TODO sdubois: move email + internal slack channels to this lib
-      channel: ['gitter', 'slack']
+      channel: ['gitter', 'slack'],
+      active: true
     }
   }).then(notifConfigs => {
     return notifConfigs.map(notifConfig => {
