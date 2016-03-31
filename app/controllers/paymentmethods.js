@@ -5,7 +5,7 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  const models = app.set('models');
+  const PaymentMethod = app.set('models').PaymentMethod;
 
   /**
    * Get the paymentMethods of the user.
@@ -17,9 +17,11 @@ module.exports = function(app) {
     const filter = req.query.filter;
     const query = _.extend({}, filter, { UserId: req.user.id });
 
-    return models.PaymentMethod.findAll({ where: query })
-      .then((response) => res.send(_.pluck(response, 'info')))
-      .catch(next);
+    return PaymentMethod.findAll({ where: query })
+    .then((response) => {
+      res.send(_.pluck(response, 'info'));
+    })
+    .catch(next);
   };
 
   /**

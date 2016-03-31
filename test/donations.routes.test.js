@@ -12,6 +12,7 @@ const chance = require('chance').Chance();
 const utils = require('../test/utils.js')();
 const generatePlanId = require('../app/lib/utils.js').planId;
 const roles = require('../app/constants/roles');
+const constants = require('../app/constants/transactions');
 
 /**
  * Variables.
@@ -29,7 +30,7 @@ const stripeMock = require('./mocks/stripe');
 /**
  * Tests.
  */
-describe('payments.routes.test.js', () => {
+describe('donations.routes.test.js', () => {
 
   var application;
   var application2;
@@ -238,6 +239,22 @@ describe('payments.routes.test.js', () => {
         expect(nocks['charges.create'].isDone()).to.be.true;
       });
 
+      it('successfully creates a donation in the database', (done) => {
+        models.Donation
+          .findAndCountAll({})
+          .then((res) => {
+            expect(res.count).to.equal(1);
+            expect(res.rows[0]).to.have.property('UserId', user.id);
+            expect(res.rows[0]).to.have.property('GroupId', group.id);
+            expect(res.rows[0]).to.have.property('currency', CURRENCY);
+            expect(res.rows[0]).to.have.property('amount', CHARGE*100);
+            expect(res.rows[0]).to.have.property('title',
+              'Donation to ' + group.name);
+            done();
+          })
+          .catch(done);
+      });
+
       it('successfully creates a transaction in the database', (done) => {
         models.Transaction
           .findAndCountAll({})
@@ -246,7 +263,7 @@ describe('payments.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('UserId', user.id);
             expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
-            expect(res.rows[0]).to.have.property('type', 'payment');
+            expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
             expect(res.rows[0]).to.have.property('amount', CHARGE);
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
             expect(res.rows[0]).to.have.property('approved', true);
@@ -337,6 +354,17 @@ describe('payments.routes.test.js', () => {
 
       it('successfully makes a new Stripe charge', () => {
         expect(nocks['charges.create2'].isDone()).to.be.true;
+      });
+
+      it('successfully creates a donation in the database', (done) => {
+        models.Donation
+          .findAndCountAll({})
+          .then((res) => {
+            expect(res.count).to.equal(2);
+            expect(res.rows[1]).to.have.property('amount', CHARGE2*100);
+            done();
+          })
+          .catch(done);
       });
 
       it('successfully creates a new transaction', (done) => {
@@ -545,6 +573,22 @@ describe('payments.routes.test.js', () => {
         .catch(done)
       })
 
+      it('successfully creates a donation in the database', (done) => {
+        models.Donation
+          .findAndCountAll({})
+          .then((res) => {
+            expect(res.count).to.equal(1);
+            expect(res.rows[0]).to.have.property('UserId', user.id);
+            expect(res.rows[0]).to.have.property('GroupId', group2.id);
+            expect(res.rows[0]).to.have.property('currency', CURRENCY);
+            expect(res.rows[0]).to.have.property('amount', CHARGE*100);
+            expect(res.rows[0]).to.have.property('title',
+              'Donation to ' + group.name);
+            done();
+          })
+          .catch(done);
+      });
+
       it('successfully creates a transaction in the database', (done) => {
         models.Transaction
           .findAndCountAll({})
@@ -635,7 +679,6 @@ describe('payments.routes.test.js', () => {
             })
             .expect(200)
             .end((e, res) => {
-              console.log('e', e);
               expect(e).to.not.exist;
               done();
             });
@@ -678,20 +721,28 @@ describe('payments.routes.test.js', () => {
           expect(nocks['subscriptions.create'].isDone()).to.be.true;
         });
 
-        it('creates a transaction', (done) => {
+      it('successfully creates a donation in the database', (done) => {
+        models.Donation
+          .findAndCountAll({})
+          .then((res) => {
+            expect(res.count).to.equal(1);
+            expect(res.rows[0]).to.have.property('UserId', 2);
+            expect(res.rows[0]).to.have.property('GroupId', group2.id);
+            expect(res.rows[0]).to.have.property('currency', CURRENCY);
+            expect(res.rows[0]).to.have.property('amount', data.amount*100);
+            expect(res.rows[0]).to.have.property('SubscriptionId');
+            expect(res.rows[0]).to.have.property('title',
+              `Donation to ${group.name}`);
+            done();
+          })
+          .catch(done);
+      });
+
+        it('does not create a transaction', (done) => {
           models.Transaction
             .findAndCountAll({})
             .then((res) => {
-              expect(res.count).to.equal(1);
-              expect(res.rows[0]).to.have.property('GroupId', group2.id);
-              expect(res.rows[0]).to.have.property('UserId', 2);
-              expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
-              expect(res.rows[0]).to.have.property('currency', CURRENCY);
-              expect(res.rows[0]).to.have.property('tags');
-              expect(res.rows[0]).to.have.property('interval', plan.interval);
-              expect(res.rows[0]).to.have.property('SubscriptionId');
-              expect(res.rows[0]).to.have.property('amount', data.amount);
-              expect(res.rows[0]).to.have.property('paidby', '2');
+              expect(res.count).to.equal(0);
               done();
             })
             .catch(done);

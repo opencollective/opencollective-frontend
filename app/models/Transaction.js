@@ -1,12 +1,17 @@
 const _ = require('lodash');
 
+/*
+ * Transaction model
+ * - this indicates that money was moved in the system
+ */
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Transaction = Sequelize.define('Transaction', {
-    type: DataTypes.STRING,
-    description: DataTypes.STRING,
-    amount: DataTypes.FLOAT,
-    vat: DataTypes.FLOAT,
+    type: DataTypes.STRING, // Expense or Donation
+    description: DataTypes.STRING, // delete #postmigration
+    amount: DataTypes.FLOAT, // TODO: change to INTEGER
+    vat: DataTypes.FLOAT, // delete #postmigration
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -16,12 +21,12 @@ module.exports = function(Sequelize, DataTypes) {
         }
       }
     },
-    vendor: DataTypes.STRING,
-    paidby: DataTypes.STRING,
+    vendor: DataTypes.STRING, // delete #postmigration
+    paidby: DataTypes.STRING, // delete #postmigration
     tags: DataTypes.ARRAY(DataTypes.STRING),
-    status: DataTypes.STRING,
-    comment: DataTypes.STRING,
-    link: DataTypes.STRING,
+    status: DataTypes.STRING, // delete #postmigration
+    comment: DataTypes.STRING, // delete #postmigration
+    link: DataTypes.STRING, // delete #postmigration
 
     payoutMethod: {
       type: DataTypes.STRING,
@@ -31,27 +36,35 @@ module.exports = function(Sequelize, DataTypes) {
           msg: 'Must be paypal, manual or other'
         }
       }
-    },
+    }, // delete #postmigration
 
-    stripeSubscriptionId: DataTypes.STRING, // to keep until migration is done so we don't lose data
+    platformFee: DataTypes.INTEGER,
+    hostFee: DataTypes.INTEGER,
+    paymentProcessingFee: DataTypes.INTEGER,
+    stripeSubscriptionId: DataTypes.STRING, // // delete #postmigration
 
     interval: {
       type: DataTypes.STRING
-    },
+    }, // delete #postmigration
+
+    data: DataTypes.JSON,
 
     approved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
-
-    data: DataTypes.JSON,
+    }, // delete #postmigration
 
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    approvedAt: DataTypes.DATE,
-    reimbursedAt: DataTypes.DATE
+
+    deletedAt: {
+      type: DataTypes.DATE
+    },
+
+    approvedAt: DataTypes.DATE, // delete #postmigration
+    reimbursedAt: DataTypes.DATE // delete #postmigration
   }, {
     paranoid: true,
 
@@ -120,7 +133,10 @@ module.exports = function(Sequelize, DataTypes) {
           isDonation: this.isDonation,
           isManual: this.isManual,
           isReimbursed: this.isReimbursed,
-          interval: this.interval
+          interval: this.interval,
+          platformFee: this.platformFee,
+          hostFee: this.hostFee,
+          paymentProcessingFee: this.paymentProcessingFee
         };
       }
     }
