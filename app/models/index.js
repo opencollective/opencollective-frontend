@@ -107,7 +107,6 @@ function setupModels(client) {
   m.Transaction.belongsTo(m.Subscription);
   m.Subscription.hasMany(m.Transaction);
   m.Donation.belongsTo(m.Subscription);
-  m.Subscription.hasMany(m.Donation);
 
   return m;
 };

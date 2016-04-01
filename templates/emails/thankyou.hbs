@@ -1,4 +1,8 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+{{else}}
 Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}} donation to {{group.name}}
+{{/if}}
 
 {{> header}}
 
@@ -12,8 +16,12 @@ Subject: Thank you for your {{{currency donation.amountFloat currency=donation.c
 <p>Hi!</p>
 {{/if}}
 
+{{#if interval}}
+<p>We would like to thank you for your pledge to give {{{currency donation.amountFloat currency=donation.currency}}} per {{interval}}. Your first payment was received on {{{moment donation.createdAt}}}. Your gift will help us continue our activities.</p>
+{{else}}
 <p>We would like to thank you for your donation of {{{currency donation.amountFloat currency=donation.currency}}} on {{{moment donation.createdAt}}}.
   Your gift will help us continue our activities.</p>
+{{/if}}
 
 <p>You can follow our future activities and how we will be spending the money on our open collective page:
   <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.

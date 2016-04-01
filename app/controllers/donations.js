@@ -248,6 +248,7 @@ module.exports = (app) => {
           donation: donation.info,
           user: user.info,
           group: group.info,
+          interval: interval,
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
         }
 

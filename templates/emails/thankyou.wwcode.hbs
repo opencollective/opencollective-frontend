@@ -1,4 +1,8 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+{{else}}
 Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}} donation to {{group.name}}
+{{/if}}
 
 {{> header}}
 
@@ -12,7 +16,12 @@ Subject: Thank you for your {{{currency donation.amountFloat currency=donation.c
 {{else}}
 <p>Hi,</p>
 {{/if}}
+
+{{#if interval}}
+<p>I would like to thank you for your pledge to give {{{currency donation.amountFloat currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift exponentially impacts the programs we offer to empower women to pursue careers in the technology sector.</p>
+{{else}}
 <p>I would like to thank you for your donation of {{{currency donation.amountFloat currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift exponentially impacts the programs we offer to empower women to pursue careers in the technology sector.</p>
+{{/if}}
 
 <p>With your support, we are able to provide a free professional community for women in tech which aides and supports their success. In addition, your donation positively fuels our growth, development, and goal of connecting one million in technology careers.</p>
 
