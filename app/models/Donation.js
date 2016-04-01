@@ -35,6 +35,13 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     amount: DataTypes.INTEGER, // In cents
+    amountFloat: { // remove #postmigration
+      type: DataTypes.VIRTUAL,
+      get: function () {
+        return parseFloat(this.get('amount') / 100);
+      }
+    },
+
     title: DataTypes.STRING,
 
     SubscriptionId: {
