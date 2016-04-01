@@ -53,7 +53,7 @@ models.Transaction.findAll({
     // recurring donations
 
     // check if a donation for this SubscriptionId already exists
-    models.Donation.findOne({
+    return models.Donation.findOne({
       where: {
         SubscriptionId: transaction.SubscriptionId
       }
