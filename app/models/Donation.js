@@ -76,6 +76,7 @@ module.exports = function(Sequelize, DataTypes) {
           GroupId: this.GroupId,
           currency: this.currency,
           amount: this.amount,
+          amountFloat: this.amountFloat,
           title: this.title,
           SubscriptionId: this.SubscriptionId,
           createdAt: this.createdAt,
