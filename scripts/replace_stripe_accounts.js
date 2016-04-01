@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const config = require('config');
 const app = require('../index');
+const config = require('config');
 const models = app.set('models');
 
 const done = (err) => {
