@@ -47,7 +47,6 @@ describe('groups.routes.test.js', () => {
 
   beforeEach((done) => {
     models.User.create(userData).done((e, u) => {
-      console.log(e);
       expect(e).to.not.exist;
       user = u;
       done();
