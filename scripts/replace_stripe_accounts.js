@@ -24,7 +24,7 @@ models.StripeAccount.findAll({})
 .map((stripeAccount) => {
 
   stripeAccount.accessToken = secret;
-  stripeAccount.stripePublishableKey = key;
+  stripeAccount.stripePublishableKey = publicKey;
 
   return stripeAccount.save();
 })
