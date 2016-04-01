@@ -3,3 +3,4 @@ test/
 scripts/
 seeders/
 migrations/
+coverage/
