@@ -81,6 +81,13 @@ describe('donations.routes.test.js', () => {
       .reply(200, stripeMock.customers.create);
   });
 
+  // Nock for retrieving balance transaction
+  beforeEach(() => {
+    nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
+      .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
+      .reply(200, stripeMock.balance);
+  });
+
   beforeEach(() => {
     stubStripe();
   });
@@ -175,6 +182,7 @@ describe('donations.routes.test.js', () => {
       'currency=' + CURRENCY,
       'customer=' + stripeMock.customers.create.id,
       'description=' + encodeURIComponent('One time donation to ' + group.name),
+      'application_fee=54',
       encodeURIComponent('metadata[groupId]') + '=' + group.id,
       encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
       encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
@@ -239,6 +247,10 @@ describe('donations.routes.test.js', () => {
         expect(nocks['charges.create'].isDone()).to.be.true;
       });
 
+      it('successfully gets a Stripe balance', () => {
+        expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+      });
+
       it('successfully creates a donation in the database', (done) => {
         models.Donation
           .findAndCountAll({})
@@ -249,7 +261,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('amount', CHARGE*100);
             expect(res.rows[0]).to.have.property('title',
-              'Donation to ' + group.name);
+              `Donation to ${group.name}`);
             done();
           })
           .catch(done);
@@ -265,6 +277,12 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
             expect(res.rows[0]).to.have.property('amount', CHARGE);
+            expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
+            expect(res.rows[0]).to.have.property('fxHostFee', 70);
+            expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
+            expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
+            expect(res.rows[0]).to.have.property('fxRate', 0.785);
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
             expect(res.rows[0]).to.have.property('approved', true);
             expect(res.rows[0].tags[0]).to.be.equal('Donation');
@@ -311,6 +329,7 @@ describe('donations.routes.test.js', () => {
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
           'description=' + encodeURIComponent('One time donation to ' + group.name),
+          'application_fee=9',
           encodeURIComponent('metadata[groupId]') + '=' + group.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
@@ -320,6 +339,13 @@ describe('donations.routes.test.js', () => {
         nocks['charges.create2'] = nock(STRIPE_URL)
           .post('/v1/charges', params)
           .reply(200, stripeMock.charges.create);
+      });
+
+      // Nock for retrieving balance transaction
+      beforeEach(() => {
+        nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
+          .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
+          .reply(200, stripeMock.balance);
       });
 
       beforeEach((done) => {
@@ -367,9 +393,13 @@ describe('donations.routes.test.js', () => {
           .catch(done);
       });
 
+      it('successfully gets a Stripe balance', () => {
+        expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+      });
+
       it('successfully creates a new transaction', (done) => {
         models.Transaction
-          .findAndCountAll({})
+          .findAndCountAll({order: 'id'})
           .then((res) => {
             expect(res.count).to.equal(2);
             expect(res.rows[1]).to.have.property('amount', CHARGE2);
@@ -389,6 +419,7 @@ describe('donations.routes.test.js', () => {
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
           'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(EMAIL),
@@ -450,6 +481,7 @@ describe('donations.routes.test.js', () => {
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
           'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user4.email),
@@ -514,6 +546,7 @@ describe('donations.routes.test.js', () => {
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
           'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
           encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(userData.email),
@@ -587,6 +620,10 @@ describe('donations.routes.test.js', () => {
             done();
           })
           .catch(done);
+      });
+
+      it('successfully gets a Stripe balance', () => {
+        expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
       });
 
       it('successfully creates a transaction in the database', (done) => {
@@ -721,22 +758,22 @@ describe('donations.routes.test.js', () => {
           expect(nocks['subscriptions.create'].isDone()).to.be.true;
         });
 
-      it('successfully creates a donation in the database', (done) => {
-        models.Donation
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', 2);
-            expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY);
-            expect(res.rows[0]).to.have.property('amount', data.amount*100);
-            expect(res.rows[0]).to.have.property('SubscriptionId');
-            expect(res.rows[0]).to.have.property('title',
-              `Donation to ${group.name}`);
-            done();
-          })
-          .catch(done);
-      });
+        it('successfully creates a donation in the database', (done) => {
+          models.Donation
+            .findAndCountAll({})
+            .then((res) => {
+              expect(res.count).to.equal(1);
+              expect(res.rows[0]).to.have.property('UserId', 2);
+              expect(res.rows[0]).to.have.property('GroupId', group2.id);
+              expect(res.rows[0]).to.have.property('currency', CURRENCY);
+              expect(res.rows[0]).to.have.property('amount', data.amount*100);
+              expect(res.rows[0]).to.have.property('SubscriptionId');
+              expect(res.rows[0]).to.have.property('title',
+                `Donation to ${group.name}`);
+              done();
+            })
+            .catch(done);
+        });
 
         it('does not create a transaction', (done) => {
           models.Transaction
@@ -784,9 +821,7 @@ describe('donations.routes.test.js', () => {
             })
             .end(done);
         });
-
       });
-
     });
 
     describe('Paypal recurring donation', () => {

@@ -205,8 +205,19 @@ module.exports = (app) => {
         .catch(cb);
       }],
 
+      retrieveBalanceTransaction: ['createCharge', (cb, results) => {
+        if (isSubscription) {
+          return cb();
+        } else {
+          const charge = results.createCharge;
+          gateways.stripe.retrieveBalanceTransaction(results.getGroupStripeAccount, charge.balance_transaction)
+          .then(balanceTransaction => cb(null, balanceTransaction))
+          .catch(cb);
+        }
+      }],
+
       // Create the first transaction associated with that Donation, if this is not a subscription
-      createTransaction: ['createDonation', (cb, results) => {
+      createTransaction: ['createDonation', 'retrieveBalanceTransaction', (cb, results) => {
 
         // If this is a subscription, wait for webhook to create a Transaction
         if (isSubscription) {
@@ -217,7 +228,8 @@ module.exports = (app) => {
         const user = req.user;
         const charge = results.createCharge;
         const paymentMethod = results.getOrCreatePaymentMethod;
-        const applicationFee = charge.application_fee || constants.OC_FEE_PERCENT * amountInt / 100;
+        const balanceTransaction = results.retrieveBalanceTransaction
+        const fees = gateways.stripe.extractFees(balanceTransaction);
         var payload = {
           user,
           group,
@@ -229,9 +241,14 @@ module.exports = (app) => {
           DonationId: results.createDonation.id,
           amount: amountFloat,
           currency,
-          platformFee: applicationFee,
-          paymentProcessingFee: 0, // TODO: Need to make a separate call for this
-          data: charge,
+          fxCurrency: balanceTransaction.currency,
+          fxAmount: balanceTransaction.amount,
+          fxRate: amountInt/balanceTransaction.amount,
+          fxHostFee: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
+          fxPlatformFee: fees.applicationFee,
+          fxPaymentProcessorFee: fees.stripeFee,
+          data: {charge, balanceTransaction},
+
           paidby: user && user.id, // remove #postmigration
           description: `Donation to ${group.name}`, // remove #postmigration
           tags: ['Donation'], // remove #postmigration

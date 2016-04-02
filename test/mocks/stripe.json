@@ -77,6 +77,44 @@
 
   },
 
+  "balance": {
+    "id": "txn_165j8oIqnMN1wWwOKlPn1D4y",
+    "object": "balance_transaction",
+    "source": "ch_2OEK6e5bc72wce",
+    "amount": 1400,
+    "currency": "usd",
+    "net": 1175,
+    "type": "charge",
+    "created": 1376577420,
+    "available_on": 1377129600,
+    "status": "pending",
+    "fee": 225,
+    "fee_details": [
+      {
+        "amount": 25,
+        "currency": "usd",
+        "type": "stripe_fee",
+        "description": "Stripe currency conversion fee",
+        "application": null
+      },
+      {
+        "amount": 70,
+        "currency": "usd",
+        "type": "application_fee",
+        "description": "VAT",
+        "application": null
+      },
+      {
+        "amount": 130,
+        "currency": "usd",
+        "type": "stripe_fee",
+        "description": "Stripe processing fees",
+        "application": null
+      }
+    ],
+    "description": "EUR charge on a USD account"
+  },
+
   "plans": {
     "create": {
       "id": "test",
@@ -153,7 +191,7 @@
         "amount": 25,
         "amount_refunded": 0,
         "application": "ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue",
-        "balance_transaction": "txn_17KUJnDjPFcHOcTmCnAzBdGY",
+        "balance_transaction": "txn_165j8oIqnMN1wWwOKlPn1D4y",
         "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4",
         "customer": "cus_6IJf9vLMFVsKzX",
         "created": 1450706839,

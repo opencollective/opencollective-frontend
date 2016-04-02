@@ -38,9 +38,12 @@ module.exports = function(Sequelize, DataTypes) {
       }
     }, // delete #postmigration
 
-    platformFee: DataTypes.INTEGER,
-    hostFee: DataTypes.INTEGER,
-    paymentProcessingFee: DataTypes.INTEGER,
+    fxCurrency: DataTypes.STRING,
+    fxRate: DataTypes.FLOAT,
+    fxAmount: DataTypes.INTEGER,
+    fxPlatformFee: DataTypes.INTEGER,
+    fxHostFee: DataTypes.INTEGER,
+    fxPaymentProcessorFee: DataTypes.INTEGER,
     stripeSubscriptionId: DataTypes.STRING, // // delete #postmigration
 
     interval: {
