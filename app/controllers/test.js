@@ -116,7 +116,6 @@ module.exports = function(app) {
           "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
-          "createdAt": "2016-02-29T08:00:00.000Z",
           "UserId": 1
         })
         .then(t => t.setGroup(results.createGroup))
@@ -124,14 +123,13 @@ module.exports = function(app) {
         .catch(cb);
       }],
 
-      addDonation2: ['createGroup', (cb, results) => {
+      addDonation2: ['createGroup', 'addDonation1', (cb, results) => {
         models.Transaction.create({
           "description": "Donation 2",
           "amount": 2,
           "tags": ['Donation'],
           "currency": "EUR",
           "paidby": "@semdubois",
-          "createdAt": "2016-03-01T08:00:00.000Z",
           "UserId": 1
         })
         .then(t => t.setGroup(results.createGroup))
