@@ -135,7 +135,6 @@ describe('webhooks.routes.test.js', () => {
 
     // Nock for plans.retrieve.
     beforeEach(() => {
-
       var plan = _.extend({}, stripeMock.plans.create, {
         amount: STRIPE_SUBSCRIPTION_CHARGE,
         interval: INTERVAL,
@@ -161,6 +160,20 @@ describe('webhooks.routes.test.js', () => {
       nocks['subscriptions.create'] = nock(STRIPE_URL)
         .post(`/v1/customers/${customerId}/subscriptions`, params)
         .reply(200, webhookSubscription);
+    });
+
+    // Nock for retrieving charge
+    beforeEach(() => {
+      nocks['charge.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/charges/_00000000000000')
+        .reply(200, stripeMock.charges.create);
+    });
+
+    // Nock for retrieving balance transaction
+    beforeEach(() => {
+      nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
+        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
+        .reply(200, stripeMock.balance);
     });
 
     // Make the donation
@@ -242,6 +255,14 @@ describe('webhooks.routes.test.js', () => {
         });
     });
 
+    it('successfully gets a Stripe charge', () => {
+      expect(nocks['charge.retrieve'].isDone()).to.be.true;
+    });
+
+    it('successfully gets a Stripe balance', () => {
+      expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+    });
+
     it('adds the first transaction', (done) => {
       models.Transaction.findAndCountAll({
         where: {
@@ -264,6 +285,12 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal(constants.type.DONATION);
+          expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
+          expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
+          expect(res.rows[0]).to.have.property('fxHostFee', 70);
+          expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
+          expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
+          expect(res.rows[0]).to.have.property('fxRate', 0.25);
           expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
           expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
           expect(transaction.Subscription.isActive).to.be.equal(true);
@@ -299,6 +326,13 @@ describe('webhooks.routes.test.js', () => {
             type: 'invoice.payment_succeeded'
           })
         );
+      nocks['charge.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/charges/_00000000000000')
+        .reply(200, stripeMock.charges.create);
+
+      nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
+        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
+        .reply(200, stripeMock.balance);
 
       request(app)
         .post('/webhooks/stripe')
@@ -323,6 +357,12 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
               expect(transaction.interval).to.be.equal('month');
 
+              expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
+              expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
+              expect(res.rows[0]).to.have.property('fxHostFee', 70);
+              expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
+              expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
+              expect(res.rows[0]).to.have.property('fxRate', 0.25);
               expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');
