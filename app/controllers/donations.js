@@ -159,6 +159,7 @@ module.exports = (app) => {
             currency,
             customer: paymentMethod.customerId,
             description: `One time donation to ${group.name}`,
+            application_fee: parseInt(amountInt*constants.OC_FEE_PERCENT/100, 10),
             metadata: {
               groupId: group.id,
               groupName: group.name,
