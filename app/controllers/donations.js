@@ -257,6 +257,8 @@ module.exports = (app) => {
           template += '.wwcode';
         if(group.name.match(/ispcwa/i))
           template += '.ispcwa';
+        if(group.slug === 'laprimaire')
+          template += '.fr';
 
         emailLib.send(template, user.email, data);
         cb();
