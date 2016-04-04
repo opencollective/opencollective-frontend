@@ -252,15 +252,7 @@ module.exports = (app) => {
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
         }
 
-        var template = 'thankyou';
-        if(group.name.match(/WWCode/i))
-          template += '.wwcode';
-        if(group.name.match(/ispcwa/i))
-          template += '.ispcwa';
-        if(group.slug === 'laprimaire')
-          template += '.fr';
-
-        emailLib.send(template, user.email, data);
+        emailLib.send('thankyou', user.email, data);
         cb();
       }],
 

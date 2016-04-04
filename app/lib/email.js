@@ -83,6 +83,25 @@ const EmailLib = (app) => {
 
   const send = (template, recipient, data) => {
 
+    if(template === 'thankyou') {
+      if(data.group.name.match(/WWCode/i))
+        template += '.wwcode';
+      if(data.group.name.match(/ispcwa/i))
+        template += '.ispcwa';
+      if(data.group.slug === 'laprimaire') {
+        template += '.fr';
+        // xdamman: hack
+        switch(data.interval) {
+          case 'month':
+            data.interval = 'mois';
+            break;
+          case 'year':
+            data.interval = 'an';
+            break;
+        }
+      }
+    }
+
     const templateString = render(template, data, config);
 
     return new Promise((resolve, reject) => {

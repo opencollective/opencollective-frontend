@@ -17,9 +17,9 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Votre premier paiement a été reçu le {{{moment donation.createdAt}}}. Votre don nous aidera à continuer nos activités.</p>
+<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
 {{else}}
-<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} faite le {{{moment donation.createdAt}}}.
+<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
 
@@ -27,9 +27,13 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
   <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
 </p>
 
-{{> subscriptions}}
+{{#if subscriptionsLink}}
+  <p>
+    Vous pouvez modifier ou annuler vos abonnements quand vous le souhaitez <a href="{{subscriptionsLink}}">ici</a>.
+  </p>
+{{/if}}
 
-<p>Gros bisous 😘,</p>
+<p>Encore merci et gros bisous de nous tous! 😘,</p>
 
 <p>
   – Le collectif {{group.name}}
