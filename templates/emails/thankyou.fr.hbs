@@ -1,0 +1,38 @@
+{{#if interval }}
+Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}/{{interval}} à {{group.name}}
+{{else}}
+Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} à {{group.name}}
+{{/if}}
+
+{{> header}}
+
+<center>
+  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{group.logo}}" style="border-radius: 50%;" width="80" height="80" />
+</center>
+
+{{#if user.name}}
+<p>{{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+{{#if interval}}
+<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Votre premier paiement a été reçu le {{{moment donation.createdAt}}}. Votre don nous aidera à continuer nos activités.</p>
+{{else}}
+<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} faite le {{{moment donation.createdAt}}}.
+  Votre don nous aidera à continuer nos activités.</p>
+{{/if}}
+
+<p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur notre page OpenCollective:
+  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+</p>
+
+{{> subscriptions}}
+
+<p>Gros bisous 😘,</p>
+
+<p>
+  – Le collectif {{group.name}}
+</p>
+
+{{> footer}}
