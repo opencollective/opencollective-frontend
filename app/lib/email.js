@@ -8,6 +8,7 @@ const templatesNames = [
   'thankyou',
   'thankyou.wwcode',
   'thankyou.ispcwa',
+  'thankyou.fr',
   'user.forgot.password',
   'user.new.token'
 ];
