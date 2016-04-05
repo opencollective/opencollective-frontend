@@ -327,12 +327,13 @@ var payServices = {
       .catch(next);
   };
 
-  const approve = (req, res, next) => {
+  const setApprovedState = (req, res, next) => {
     if (req.required.approved === false) {
       req.transaction.approved = req.required.approved;
+      // TODO why set approvedAt if disapproving?
       req.transaction.approvedAt = new Date();
 
-      req.transaction
+      return req.transaction
         .save()
         .then(() => res.send({success: true}))
         .catch(next);
@@ -415,7 +416,7 @@ var payServices = {
    * Public methods.
    */
   return {
-    approve,
+    setApprovedState,
     _create: create,
     pay,
     attributeUser,
