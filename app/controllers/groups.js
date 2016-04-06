@@ -395,16 +395,14 @@ module.exports = function(app) {
   const update = (req, res, next) => {
     const whitelist = [
       'name',
+      'mission',
       'description',
-      'budget',
-      'currency',
       'longDescription',
+      'currency',
       'logo',
       'video',
       'image',
       'expensePolicy',
-      'membershipType',
-      'membershipfee',
       'isPublic'
     ];
 

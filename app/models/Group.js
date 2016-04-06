@@ -30,15 +30,21 @@ module.exports = function(Sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+
+    mission: DataTypes.STRING(100),
+
     description: DataTypes.STRING, // max 95 characters
 
-    budget: DataTypes.FLOAT,
+    longDescription: DataTypes.TEXT('long'),
+
+    // We should update those two fields periodically (but no need to be real time)
+    budget: DataTypes.INTEGER, // yearly budget in cents
+    burnrate: DataTypes.INTEGER, // monthly burnrate (last 3 months average, in cents)
+
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD'
     },
-
-    longDescription: DataTypes.TEXT('long'),
 
     logo: DataTypes.STRING,
 
@@ -46,10 +52,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     image: DataTypes.STRING,
 
-    expensePolicy: DataTypes.STRING,
-
-    membershipType: DataTypes.ENUM('donation', 'monthlyfee', 'yearlyfee'),
-    membershipfee: DataTypes.FLOAT,
+    expensePolicy: DataTypes.TEXT('long'),
 
     tiers: {
       type: DataTypes.JSON,
@@ -114,16 +117,16 @@ module.exports = function(Sequelize, DataTypes) {
         return {
           id: this.id,
           name: this.name,
+          mission: this.mission,
           description: this.description,
-          budget: this.budget,
-          currency: this.currency,
           longDescription: this.longDescription,
+          budget: this.budget,
+          burnrate: this.burnrate,
+          currency: this.currency,
           logo: this.logo,
           video: this.video,
           image: this.image,
           expensePolicy: this.expensePolicy,
-          membershipType: this.membershipType,
-          membershipfee: this.membershipfee,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isPublic: this.isPublic,
