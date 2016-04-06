@@ -285,12 +285,12 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal(constants.type.DONATION);
-          expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
-          expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
-          expect(res.rows[0]).to.have.property('fxHostFee', 70);
-          expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
-          expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
-          expect(res.rows[0]).to.have.property('fxRate', 0.25);
+          expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
+          expect(res.rows[0]).to.have.property('txnCurrency', 'usd');
+          expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
+          expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
+          expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
+          expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
           expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
           expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
           expect(transaction.Subscription.isActive).to.be.equal(true);
@@ -357,12 +357,12 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
               expect(transaction.interval).to.be.equal('month');
 
-              expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
-              expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
-              expect(res.rows[0]).to.have.property('fxHostFee', 70);
-              expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
-              expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
-              expect(res.rows[0]).to.have.property('fxRate', 0.25);
+              expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
+              expect(res.rows[0]).to.have.property('txnCurrency', 'usd');
+              expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
+              expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
+              expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
+              expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
               expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');

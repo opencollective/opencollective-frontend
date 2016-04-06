@@ -277,12 +277,12 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
             expect(res.rows[0]).to.have.property('amount', CHARGE);
-            expect(res.rows[0]).to.have.property('fxAmount', 1400); // taken from stripe mocks
-            expect(res.rows[0]).to.have.property('fxCurrency', 'usd');
-            expect(res.rows[0]).to.have.property('fxHostFee', 70);
-            expect(res.rows[0]).to.have.property('fxPlatformFee', 70);
-            expect(res.rows[0]).to.have.property('fxPaymentProcessorFee', 155);
-            expect(res.rows[0]).to.have.property('fxRate', 0.785);
+            expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('txnCurrency', 'usd');
+            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
+            expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
+            expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
+            expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.785);
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
             expect(res.rows[0]).to.have.property('approved', true);
             expect(res.rows[0].tags[0]).to.be.equal('Donation');

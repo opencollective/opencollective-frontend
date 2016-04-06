@@ -220,12 +220,12 @@ module.exports = (app) => {
           DonationId: donation.id,
           amount: stripeSubscription.amount / 100,
           currency: stripeSubscription.currency,
-          fxCurrency: balanceTransaction.currency,
-          fxAmount: balanceTransaction.amount,
-          fxRate: donation.amount/balanceTransaction.amount,
-          fxHostFee: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
-          fxPlatformFee: fees.applicationFee,
-          fxPaymentProcessorFee: fees.stripeFee,
+          txnCurrency: balanceTransaction.currency,
+          amountInTxnCurrency: balanceTransaction.amount,
+          txnCurrencyFxRate: donation.amount/balanceTransaction.amount,
+          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
+          platformFeeInTxnCurrency: fees.applicationFee,
+          paymentProcessorFeeInTxnCurrency: fees.stripeFee,
           data: {charge, balanceTransaction},
 
           paidby: user && user.id, // remove #postmigration

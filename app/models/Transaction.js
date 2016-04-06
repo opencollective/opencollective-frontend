@@ -10,9 +10,9 @@ module.exports = function(Sequelize, DataTypes) {
   var Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING, // delete #postmigration
-    amount: DataTypes.FLOAT, // TODO: change to INTEGER
+    amount: DataTypes.FLOAT, // TODO: change to INTEGER and rename to donationAmount
     vat: DataTypes.FLOAT, // delete #postmigration
-    currency: {
+    currency: { // TODO: #postmigration rename to donationCurrency
       type: DataTypes.STRING,
       defaultValue: 'USD',
       set: function(val) {
@@ -38,12 +38,19 @@ module.exports = function(Sequelize, DataTypes) {
       }
     }, // delete #postmigration
 
-    fxCurrency: DataTypes.STRING,
-    fxRate: DataTypes.FLOAT,
-    fxAmount: DataTypes.INTEGER,
-    fxPlatformFee: DataTypes.INTEGER,
-    fxHostFee: DataTypes.INTEGER,
-    fxPaymentProcessorFee: DataTypes.INTEGER,
+    // stores the currency that the transaction happened in (currency of the host)
+    txnCurrency: DataTypes.STRING,
+
+    // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
+    // txnCurrencyFxRate = amount*100/amountInTxnCurrency
+    // TODO: #postmigration update comment above to remove 100
+    txnCurrencyFxRate: DataTypes.FLOAT,
+
+    // amount in currency of the host
+    amountInTxnCurrency: DataTypes.INTEGER,
+    platformFeeInTxnCurrency: DataTypes.INTEGER,
+    hostFeeInTxnCurrency: DataTypes.INTEGER,
+    paymentProcessorFeeInTxnCurrency: DataTypes.INTEGER,
     stripeSubscriptionId: DataTypes.STRING, // // delete #postmigration
 
     interval: {

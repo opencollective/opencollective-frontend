@@ -241,12 +241,12 @@ module.exports = (app) => {
           DonationId: results.createDonation.id,
           amount: amountFloat,
           currency,
-          fxCurrency: balanceTransaction.currency,
-          fxAmount: balanceTransaction.amount,
-          fxRate: amountInt/balanceTransaction.amount,
-          fxHostFee: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
-          fxPlatformFee: fees.applicationFee,
-          fxPaymentProcessorFee: fees.stripeFee,
+          txnCurrency: balanceTransaction.currency,
+          amountInTxnCurrency: balanceTransaction.amount,
+          txnCurrencyFxRate: amountInt/balanceTransaction.amount,
+          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
+          platformFeeInTxnCurrency: fees.applicationFee,
+          paymentProcessorFeeInTxnCurrency: fees.stripeFee,
           data: {charge, balanceTransaction},
 
           paidby: user && user.id, // remove #postmigration
