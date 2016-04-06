@@ -6,6 +6,7 @@ const async = require('async');
 const _ = require('lodash');
 const activities = require('../constants/activities');
 const utils = require('../lib/utils');
+const gateways = require('../gateways');
 
 /**
  * Controller.
@@ -174,13 +175,44 @@ module.exports = (app) => {
         }
       }],
 
-      createTransaction: ['fetchPaymentMethod', (cb, results) => {
+      retrieveCharge: ['fetchPaymentMethod', (cb, results) => {
+        const chargeId = results.fetchEvent.event.data.object.charge;
+        app.stripe.charges.retrieve(chargeId, {
+          stripe_account: body.user_id
+        })
+        .then(charge => {
+          if (!charge) {
+            return cb(new errors.BadRequest(`ChargeId not found: ${chargeId}`));
+          }
+          return cb(null, charge);
+        })
+        .catch(cb);
+      }],
+
+      retrieveBalance: ['retrieveCharge', (cb, results) => {
+        const charge = results.retrieveCharge;
+        app.stripe.balance.retrieveTransaction(charge.balance_transaction, {
+          stripe_account: body.user_id
+        })
+        .then(balanceTransaction => {
+          if (!balanceTransaction) {
+            return cb(new errors.BadRequest(`Balance transaction not found for chargeId: ${charge.id}`));
+          }
+          return cb(null, balanceTransaction);
+        })
+        .catch(cb);
+      }],
+
+      createTransaction: ['retrieveBalance', (cb, results) => {
         const donation = results.fetchDonation;
         const subscription = donation.Subscription;
         const stripeSubscription = results.fetchEvent.stripeSubscription;
         const user = donation.User || {};
         const group = donation.Group || {};
         const paymentMethod = results.fetchPaymentMethod;
+        const charge = results.retrieveCharge;
+        const balanceTransaction = results.retrieveBalance;
+        const fees = gateways.stripe.extractFees(balanceTransaction);
 
         // Now we record a new transaction
         const newTransaction = {
@@ -188,6 +220,14 @@ module.exports = (app) => {
           DonationId: donation.id,
           amount: stripeSubscription.amount / 100,
           currency: stripeSubscription.currency,
+          txnCurrency: balanceTransaction.currency,
+          amountInTxnCurrency: balanceTransaction.amount,
+          txnCurrencyFxRate: donation.amount/balanceTransaction.amount,
+          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
+          platformFeeInTxnCurrency: fees.applicationFee,
+          paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+          data: {charge, balanceTransaction},
+
           paidby: user && user.id, // remove #postmigration
           description: 'Recurring subscription', // remove #postmigration
           tags: ['Donation'], // remove #postmigration
