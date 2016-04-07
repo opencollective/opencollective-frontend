@@ -286,7 +286,7 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal(constants.type.DONATION);
           expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
-          expect(res.rows[0]).to.have.property('txnCurrency', 'usd');
+          expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
           expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
           expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
           expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
@@ -358,7 +358,7 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.interval).to.be.equal('month');
 
               expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
-              expect(res.rows[0]).to.have.property('txnCurrency', 'usd');
+              expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
               expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
               expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
               expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
