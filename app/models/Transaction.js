@@ -39,7 +39,14 @@ module.exports = function(Sequelize, DataTypes) {
     }, // delete #postmigration
 
     // stores the currency that the transaction happened in (currency of the host)
-    txnCurrency: DataTypes.STRING,
+    txnCurrency: {
+      type: DataTypes.STRING,
+      set: function(val) {
+        if (val && val.toUpperCase) {
+          this.setDataValue('txnCurrency', val.toUpperCase());
+        }
+      }
+    },
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
     // txnCurrencyFxRate = amount*100/amountInTxnCurrency
