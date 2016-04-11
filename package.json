@@ -70,7 +70,7 @@
     "circleci": "NODE_ENV=circleci npm run hint && mocha --reporter mocha-circleci-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/junit.xml test",
     "start": "npm run hint && node .",
     "dev": "nodemon -e js,hbs -w app",
-    "hint": "eslint '**/*.js' --quiet",
+    "hint": "eslint 'app/**/*.js' --quiet",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --models-path app/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
@@ -88,7 +88,9 @@
     "deploy:production": "bash -x scripts/deploy.sh production",
     "report:tx": "node scripts/report_transactions",
     "check:transactions": "node scripts/check_transactions_on_stripe",
-    "script": "node scripts/execute"
+    "script": "node scripts/execute",
+    "install:debs": "bash -x scripts/install_apt_get_debs.sh",
+    "test:e2e": "sh scripts/test_e2e.sh"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."
 }

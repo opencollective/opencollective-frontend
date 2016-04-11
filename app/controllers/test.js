@@ -13,14 +13,27 @@ module.exports = function(app) {
   var resetTestDatabase = function(req, res, next) {
 
     // Check to make sure this is the test_server
-    if (config.env !== 'test_server' && config.env !== 'circleci_test_server') {
+    if (config.env !== 'development' &&
+        config.env !== 'circleci' &&
+        // TODO remove these 2 when circleci client e2e tests run api locally
+        config.env !== 'test_server' &&
+        config.env !== 'circleci_test_server') {
       return next(new errors.BadRequest('Must only be run on test server'));
     }
 
-    // Hard code to avoid resetting the production db by mistake
-    const databaseName = config.env === 'test_server'
-      ? 'opencollective_test'
-      : 'dd7n9gp6tr4u36';
+    // Hard code database name to avoid resetting the production db by mistake
+    var databaseName;
+    switch(config.env) {
+      case 'circleci':
+        databaseName = 'circle_test';
+        break;
+      case 'development':
+        databaseName = 'opencollective_e2e';
+        break;
+      default:
+        databaseName = 'dd7n9gp6tr4u36';
+        break;
+    }
 
     const sequelize = new Sequelize(
       databaseName,

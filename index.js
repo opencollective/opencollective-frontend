@@ -44,15 +44,13 @@ app.set('controllers', require('./app/controllers')(app));
 
 require('./app/routes')(app);
 
-if (app.set('env') !== 'test' && app.set('env') !== 'circleci') {
-  /**
-   * Start server
-   */
- const port = process.env.PORT || 3060;
-  const server = app.listen(port, () => {
-    const host = require('os').hostname();
-    console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, server.address().port, app.set('env'));
-  });
-}
+/**
+ * Start server
+ */
+const port = process.env.PORT || 3060;
+const server = app.listen(port, () => {
+  const host = require('os').hostname();
+  console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, server.address().port, app.set('env'));
+});
 
 module.exports = app;

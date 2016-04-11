@@ -8,13 +8,23 @@ machine:
   post:
     - npm install jscs@1.13.1 -g
     - npm install mocha@2.4.5 -g
+    - cd api && npm run test:e2e website install
+#    - cd api && npm run test:e2e app install
   node:
     version: 5.1.0
   services:
     - postgresql
+dependencies:
+  cache_directories:
+    - "~/cache"
+  pre:
+    - npm run install:debs
 test:
   override:
     - npm run circleci
+  post:
+    - npm run test:e2e website run
+#    - npm run test:e2e app run
 deployment:
   staging:
     branch: staging
