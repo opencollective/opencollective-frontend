@@ -18,11 +18,6 @@ dependencies:
     - "~/cache"
   pre:
     - npm run install:debs
-test:
-  override:
-    - npm run circleci
-  post:
-    - npm run test:e2e api:run website:run website:testE2E
 deployment:
   staging:
     branch: staging

@@ -3,7 +3,6 @@
  */
 
 const express = require('express');
-const _ = require('lodash');
 
 var NODE_ENV = process.env.NODE_ENV;
 const app = express();
@@ -12,9 +11,7 @@ if (!NODE_ENV) {
   NODE_ENV = process.env.NODE_ENV = 'development';
 }
 
-if (_.contains(['test', 'development', 'test_server', 'circleci_test_server'], NODE_ENV)) {
-  require('./app/lib/load-dot-env')();
-}
+require('./app/lib/load-dot-env');
 
 app.errors = require('./app/lib/errors');
 
