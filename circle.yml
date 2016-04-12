@@ -8,8 +8,7 @@ machine:
   post:
     - npm install jscs@1.13.1 -g
     - npm install mocha@2.4.5 -g
-    - cd api && npm run test:e2e website install
-#    - cd api && npm run test:e2e app install
+    - cd api && npm run test:e2e website:install
   node:
     version: 5.1.0
   services:
@@ -23,8 +22,7 @@ test:
   override:
     - npm run circleci
   post:
-    - npm run test:e2e website run
-#    - npm run test:e2e app run
+    - npm run test:e2e api:run website:run website:testE2E
 deployment:
   staging:
     branch: staging
