@@ -9,6 +9,7 @@ const templatesNames = [
   'thankyou.wwcode',
   'thankyou.ispcwa',
   'thankyou.fr',
+  'thankyou.laprimaire',
   'user.forgot.password',
   'user.new.token'
 ];
@@ -89,7 +90,7 @@ const EmailLib = (app) => {
       if(data.group.name.match(/ispcwa/i))
         template += '.ispcwa';
       if(data.group.slug === 'laprimaire') {
-        template += '.fr';
+        template += '.laprimaire';
         // xdamman: hack
         switch(data.interval) {
           case 'month':
