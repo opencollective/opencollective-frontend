@@ -32,9 +32,9 @@ module.exports = function(app) {
       WITH total_donations AS (
         SELECT
           max("UserId") as "UserId",
-          SUM(amount) as amount
-        FROM "Transactions" t
-        WHERE t."GroupId" = :GroupId AND t.amount >= 0
+          SUM(amount/100) as amount
+        FROM "Donations" d
+        WHERE d."GroupId" = :GroupId AND d.amount >= 0
         GROUP BY "UserId"
       )
       SELECT
@@ -45,10 +45,10 @@ module.exports = function(app) {
         u.avatar as avatar,
         u.website as website,
         u."twitterHandle" as "twitterHandle",
-        d.amount as "totalDonations"
+        td.amount as "totalDonations"
       FROM "UserGroups" ug
       LEFT JOIN "Users" u ON u.id = ug."UserId"
-      LEFT JOIN total_donations d ON d."UserId" = ug."UserId"
+      LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
       WHERE ug."GroupId" = :GroupId
       ORDER BY "totalDonations" DESC
     `, {
