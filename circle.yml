@@ -5,14 +5,14 @@ general:
       - staging
       - production
 machine:
-  post:
-    - npm install jscs@1.13.1 -g
-    - npm install mocha@2.4.5 -g
-    - cd api && npm run test:e2e website:install
   node:
     version: 5.1.0
+  environment:
+    NODE_ENV: circleci
   services:
     - postgresql
+  post:
+    - cd api && npm run test:e2e website:install
 dependencies:
   cache_directories:
     - "~/cache"

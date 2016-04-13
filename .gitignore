@@ -21,3 +21,6 @@ tempStripe.js
 jsconfig.json
 typings
 .idea/
+
+# test artifacts
+output/
