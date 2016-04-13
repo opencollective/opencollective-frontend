@@ -1,5 +1,4 @@
 {
-  "env": "circleci",
   "database": {
     "database": "circle_test",
     "username": "ubuntu",

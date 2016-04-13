@@ -69,12 +69,14 @@
     "start": "node .",
     "dev": "nodemon -e js,hbs -w app",
     "hint": "eslint '**/*.js' --quiet",
+
     "pretest": "npm run hint",
     "test": "npm run test:unit",
-    "test:unit": "mocha --reporter-options mochaFile=$(sh scripts/get_artifacts_dir.sh)/junit/junit.xml test",
+    "test:unit": "mocha --reporter-options mochaFile=$(sh scripts/test_output_dir.sh junit)/junit.xml test",
     "test:cover": "istanbul cover _mocha -- -R spec test",
     "posttest": "npm run test:e2e cleanup api:run website:run website:testE2E",
     "test:e2e": "sh scripts/test_e2e.sh",
+
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path app/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --models-path app/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
@@ -92,7 +94,7 @@
     "report:tx": "node scripts/report_transactions",
     "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute",
-    "install:debs": "bash -x scripts/install_apt_get_debs.sh"
+    "install:debs": "bash scripts/install_apt_get_debs.sh"
   },
   "license": "Copyright (c) 2016 OpenCollective, Inc."
 }

@@ -35,17 +35,17 @@ that to your shell profile.
 
 
 ## Tests
-`npm test`
+
+See [Wiki](https://github.com/OpenCollective/OpenCollective/wiki/Software-testing).
+
 All the calls to 3rd party services are stubbed using either `sinon` or `nock`.
 
-If you get an error at the first test, you might have forgotten to run postgres in the background. I (Arnaud) keep the followign commands in my shell profile to start/stop postgres.
-
+If you get an error at the first test, you might have forgotten to run postgres. Use e.g. the following aliases to start/stop postgres:
 ```
 export PGDATA='/usr/local/var/postgres'
 alias pgstart='pg_ctl -l $PGDATA/server.log start'
 alias pgstop='pg_ctl stop -m fast'
 ```
-
 
 ## Start server
 `npm run start`
