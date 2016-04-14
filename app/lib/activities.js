@@ -13,6 +13,7 @@ module.exports = {
     var groupName = '';
     var publicUrl = '';
     var amount = null;
+    var interval = '';
     var recurringAmount = null;
     var currency = '';
     var tags = [];
@@ -43,10 +44,22 @@ module.exports = {
       publicUrl = activity.data.group.publicUrl;
     }
 
+    // get donation data
+    if (activity.data.donation) {
+      amount = activity.data.donation.amount/100;
+      currency = activity.data.donation.currency;
+    }
+
+    // get subscription data
+    if (activity.data.subscription) {
+      interval = activity.data.subscription.interval;
+      recurringAmount = amount + (interval ? `/${interval}` : '');
+    }
+
     // get transaction data
     if (activity.data.transaction) {
       amount = activity.data.transaction.amount;
-      const interval = activity.data.transaction.interval;
+      interval = activity.data.transaction.interval;
       recurringAmount = amount + (interval ? `/${interval}` : '');
       currency = activity.data.transaction.currency;
       tags = JSON.stringify(activity.data.transaction.tags);
@@ -72,11 +85,12 @@ module.exports = {
 
         if (activity.data.transaction.isDonation) {
           // Ex: Aseem gave 1 USD/month to WWCode-Seattle
-          return `Woohoo! ${userString} gave ${currency} ${recurringAmount} to ${group}!`;
-
+          return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
         } else if (activity.data.transaction.isExpense) {
           // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
-          return `Hurray! ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
+          return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
+        } else {
+          return `Hmm found a group.transaction.created that's neither donation or expense. Activity id: ${activity.id}`;
         }
         break;
 
@@ -96,7 +110,7 @@ module.exports = {
 
       case activities.SUBSCRIPTION_CONFIRMED:
         // Ex: Confirmed subscription of 1 USD/month from Aseem to WWCode-Seattle!
-        return `Yay! Confirmed subscription of ${currency} ${recurringAmount} from ${userString} to ${group}!`;
+        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
       break;
 
       default:

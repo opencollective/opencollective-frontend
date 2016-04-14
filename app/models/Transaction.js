@@ -108,7 +108,7 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       isDonation() {
-        return _.contains(this.tags, 'Donation');
+        return (_.contains(this.tags, 'Donation') || _.contains(this.tags, 'Fund'));
       },
 
       isExpense() {

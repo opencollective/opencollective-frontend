@@ -14,12 +14,12 @@ describe('lib.activities.test.js', () => {
 
   it (`formatMessage: ${constants.GROUP_TRANSACTION_CREATED} donation`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[12], true);
-    expect(actual).to.equal('Woohoo! john@doe.com gave USD 10.42 to <pubquiz.com|Pub quiz>!');
+    expect(actual).to.equal('New Donation: john@doe.com gave USD 10.42 to <pubquiz.com|Pub quiz>!');
   });
 
   it (`formatMessage: ${constants.GROUP_TRANSACTION_CREATED} expense`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[13], true);
-    expect(actual).to.equal('Hurray! john@doe.com submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
+    expect(actual).to.equal('New Expense: john@doe.com submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
   });
 
   it (`formatMessage: ${constants.GROUP_TRANSACTION_PAID} expense paid`, function(){
@@ -50,12 +50,12 @@ describe('lib.activities.test.js', () => {
 
   it (`formatMessage: ${constants.SUBSCRIPTION_CONFIRMED}`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[16], true);
-    expect(actual).to.equal('Yay! Confirmed subscription of EUR 12.34 from jussi@kuohujoki.fi to <blah.com|Blah>!');
+    expect(actual).to.equal('New subscription confirmed: EUR 12.34 from jussi@kuohujoki.fi to <blah.com|Blah>!');
   });
 
   it (`formatMessage: ${constants.SUBSCRIPTION_CONFIRMED} with month interval`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[17], true);
-    expect(actual).to.equal('Yay! Confirmed subscription of EUR 12.34/month from jussi@kuohujoki.fi to <blah.com|Blah>!');
+    expect(actual).to.equal('New subscription confirmed: EUR 12.34/month from jussi@kuohujoki.fi to <blah.com|Blah>!');
   });
 
 });

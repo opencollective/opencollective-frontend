@@ -19,7 +19,6 @@
     "redirectUri": "https://opencollective-prod-api.herokuapp.com/stripe/oauth/callback"
   },
   "slack": {
-    "hookUrl": "https://hooks.slack.com/services/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",
     "activityChannel": "#activity"
   },
   "paypal": {
