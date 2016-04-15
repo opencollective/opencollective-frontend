@@ -78,6 +78,7 @@ module.exports = (app) => {
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUserByJwt(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, required('user'), users.updateUserWithoutLoggedIn); // Update a user.
+  app.put('/users/:userid/avatars', aN.authenticateAppByApiKey, required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
   app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
@@ -177,7 +178,7 @@ module.exports = (app) => {
   /**
    * Separate route for uploading images to S3
    */
-  app.post('/images', aN.authenticateUserByJwt(), images.upload);
+  app.post('/images', images.upload);
 
   /**
    * Webhook for stripe when it gets a new subscription invoice

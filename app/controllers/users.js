@@ -107,7 +107,8 @@ module.exports = function(app) {
       updateFields: (cb) => {
         ['name',
          'twitterHandle',
-         'website'
+         'website',
+         'avatar'
          ].forEach((prop) => {
           if (req.required.user[prop]) {
             req.user[prop] = req.required.user[prop];
@@ -135,6 +136,24 @@ module.exports = function(app) {
     }, (err, results) => {
       if (err) return next(err);
       res.send(results.update);
+    });
+  };
+
+  /*
+   * End point for social media avatar lookup from the public donation page
+   * Only works if password is null, as an extra precaution
+   */
+  const getSocialMediaAvatars = (req, res, next) => {
+    if (req.user.hasPassword()) {
+      return next(new errors.BadRequest('Can\'t lookup user avatars with password from this route'));
+    }
+
+    var userData = req.body.userData;
+    userData.email = req.user.email;
+    userData.ip = req.ip;
+
+    userlib.resolveUserAvatars(userData, (err, results) => {
+      res.send(results);
     });
   };
 
@@ -352,6 +371,7 @@ module.exports = function(app) {
     updatePaypalEmail,
     updateAvatar,
     updateUserWithoutLoggedIn,
+    getSocialMediaAvatars,
     updatePassword,
     forgotPassword,
     resetPassword

@@ -58,11 +58,11 @@ describe('images.routes.test.js', () => {
     .end(done);
   });
 
-  it('should not upload if the user is not logged in', (done) => {
+  it('should upload if the user is not logged in', (done) => {
     request(app)
     .post('/images/')
     .attach('file', 'test/mocks/images/camera.png')
-    .expect(401)
+    .expect(200)
     .end(done);
   });
 });

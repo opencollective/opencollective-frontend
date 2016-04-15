@@ -16,6 +16,7 @@
   },
   "stripe": {
     "secret": "sk_test_3",
+    "clientId": "abc",
     "key": "pk_test_5"
   },
   "email": {
