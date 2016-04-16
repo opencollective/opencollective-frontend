@@ -35,6 +35,19 @@ module.exports = function(app) {
     var group = args.group || {};
     var paymentMethod = args.paymentMethod || {};
 
+    if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
+      // populate netAmountInGroupCurrency for donations
+        transaction.netAmountInGroupCurrency =
+          Math.round((transaction.amountInTxnCurrency
+            - transaction.platformFeeInTxnCurrency
+            - transaction.hostFeeInTxnCurrency
+            - transaction.paymentProcessorFeeInTxnCurrency)
+          *transaction.txnCurrencyFxRate);
+    } else {
+      // populate netAmountInGroupCurrency for "Add Funds" and Expenses
+      transaction.netAmountInGroupCurrency = transaction.amount*100;
+    }
+
     async.auto({
 
       createTransaction: (cb) => {

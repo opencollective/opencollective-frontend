@@ -58,7 +58,8 @@ module.exports = function(Sequelize, DataTypes) {
     platformFeeInTxnCurrency: DataTypes.INTEGER,
     hostFeeInTxnCurrency: DataTypes.INTEGER,
     paymentProcessorFeeInTxnCurrency: DataTypes.INTEGER,
-    stripeSubscriptionId: DataTypes.STRING, // // delete #postmigration
+    netAmountInGroupCurrency: DataTypes.INTEGER, // stores the net amount received by the group
+    stripeSubscriptionId: DataTypes.STRING, // delete #postmigration
 
     interval: {
       type: DataTypes.STRING
@@ -153,7 +154,8 @@ module.exports = function(Sequelize, DataTypes) {
           interval: this.interval,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
-          paymentProcessingFee: this.paymentProcessingFee
+          paymentProcessingFee: this.paymentProcessingFee,
+          netAmountInGroupCurrency: this.netAmountInGroupCurrency
         };
       }
     }
