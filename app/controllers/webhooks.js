@@ -213,6 +213,7 @@ module.exports = (app) => {
         const charge = results.retrieveCharge;
         const balanceTransaction = results.retrieveBalance;
         const fees = gateways.stripe.extractFees(balanceTransaction);
+        const hostFeePercent = group.hostFeePercent;
 
         // Now we record a new transaction
         const newTransaction = {
@@ -223,7 +224,7 @@ module.exports = (app) => {
           txnCurrency: balanceTransaction.currency,
           amountInTxnCurrency: balanceTransaction.amount,
           txnCurrencyFxRate: donation.amount/balanceTransaction.amount,
-          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*0.05, 10), // TODO: find a better way than hardcoding
+          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
           platformFeeInTxnCurrency: fees.applicationFee,
           paymentProcessorFeeInTxnCurrency: fees.stripeFee,
           data: {charge, balanceTransaction},

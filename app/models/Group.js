@@ -7,6 +7,7 @@ const config = require('config');
 const errors = require('../lib/errors');
 
 const roles = require('../constants/roles');
+const constants = require('../constants/transactions');
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -64,6 +65,11 @@ module.exports = function(Sequelize, DataTypes) {
           })
         }
       }
+    },
+
+    hostFeePercent: {
+      type: DataTypes.FLOAT,
+      defaultValue: constants.HOST_FEE_PERCENT
     },
 
     createdAt: {
@@ -134,7 +140,8 @@ module.exports = function(Sequelize, DataTypes) {
           tiers: this.tiers,
           website: this.website,
           twitterHandle: this.twitterHandle,
-          publicUrl: this.publicUrl
+          publicUrl: this.publicUrl,
+          hostFeePercent: this.hostFeePercent
         };
       }
     },
