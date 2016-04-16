@@ -51,6 +51,7 @@ module.exports = function(Sequelize, DataTypes) {
     video: DataTypes.STRING,
 
     image: DataTypes.STRING,
+    backgroundImage: DataTypes.STRING,
 
     expensePolicy: DataTypes.TEXT('long'),
 
@@ -126,6 +127,7 @@ module.exports = function(Sequelize, DataTypes) {
           logo: this.logo,
           video: this.video,
           image: this.image,
+          backgroundImage: this.backgroundImage,
           expensePolicy: this.expensePolicy,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,

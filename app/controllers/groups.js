@@ -402,6 +402,7 @@ module.exports = function(app) {
       'logo',
       'video',
       'image',
+      'backgroundImage',
       'expensePolicy',
       'isPublic'
     ];

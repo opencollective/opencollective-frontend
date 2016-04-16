@@ -182,6 +182,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('logo');
           expect(res.body).to.have.property('video');
           expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('backgroundImage');
           expect(res.body).to.have.property('expensePolicy');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
@@ -218,6 +219,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('logo');
           expect(res.body).to.have.property('video');
           expect(res.body).to.have.property('image');
+          expect(res.body).to.have.property('backgroundImage');
           expect(res.body).to.have.property('expensePolicy');
           expect(res.body).to.have.property('createdAt');
           expect(res.body).to.have.property('updatedAt');
@@ -602,9 +604,10 @@ describe('groups.routes.test.js', () => {
       longDescription: 'long description',
       budget: 1000000,
       burnrate: 10000,
-      logo: 'http://opencollective.com/assets/icon.svg',
-      video: 'http://opencollective.com/assets/icon.svg',
-      image: 'http://opencollective.com/assets/icon.svg',
+      logo: 'http://opencollective.com/assets/logo.svg',
+      video: 'http://opencollective.com/assets/video.mp4',
+      image: 'http://opencollective.com/assets/image.jpg',
+      backgroundImage: 'http://opencollective.com/assets/backgroundImage.png',
       expensePolicy: 'expense policy',
       isPublic: true,
       otherprop: 'value'
@@ -743,6 +746,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('logo', groupNew.logo);
           expect(res.body).to.have.property('video', groupNew.video);
           expect(res.body).to.have.property('image', groupNew.image);
+          expect(res.body).to.have.property('backgroundImage', groupNew.backgroundImage);
           expect(res.body).to.have.property('expensePolicy', groupNew.expensePolicy);
           expect(res.body).to.have.property('isPublic', groupNew.isPublic);
           expect(res.body).to.not.have.property('otherprop');
