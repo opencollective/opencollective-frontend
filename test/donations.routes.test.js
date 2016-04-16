@@ -279,7 +279,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('amount', CHARGE);
             expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
             expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 70);
+            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 0);
             expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
             expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.785);

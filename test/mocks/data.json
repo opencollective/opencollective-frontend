@@ -76,7 +76,8 @@
       "range": [50, 10000],
       "interval": "monthly",
       "button": "Become a member"
-    }]
+    }],
+    "hostFeePercent": 10
   },
 
   "group2": {
@@ -102,7 +103,8 @@
       "range": [0, 100],
       "interval": "monthly",
       "button": "Become a member"
-    }]
+    }],
+    "hostFeePercent": 0
   },
 
   "group3": {
