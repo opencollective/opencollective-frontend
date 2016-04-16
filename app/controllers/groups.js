@@ -110,18 +110,20 @@ module.exports = function(app) {
   };
 
   const getBalance = (id, cb) => {
-    sequelize.query(`
-      select
-        CAST(SUM("netAmountInGroupCurrency") AS FLOAT)/100 AS total
-        FROM "Transactions"
-        WHERE "GroupId"=${id} AND approved = true`,
-    {
-      type: sequelize.QueryTypes.SELECT
-    })
-    .then((result) => {
-      return cb(null, result[0].total)
-    })
-    .catch(cb);
+    Transaction
+      .find({
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('netAmountInGroupCurrency')), 'total']
+        ],
+        where: {
+          GroupId: id,
+            approved: true
+          }
+        })
+        .then((result) => {
+          return cb(null, result.toJSON().total/100);
+        })
+        .catch(cb);
   };
 
   const getPublicPageInfo = (id, cb) => {
