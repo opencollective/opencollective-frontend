@@ -154,7 +154,7 @@ module.exports = function(Sequelize, DataTypes) {
           interval: this.interval,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
-          paymentProcessingFee: this.paymentProcessingFee,
+          paymentProcessorFee: this.paymentProcessorFee,
           netAmountInGroupCurrency: this.netAmountInGroupCurrency
         };
       }
