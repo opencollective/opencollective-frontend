@@ -113,15 +113,17 @@ module.exports = function(app) {
     Transaction
       .find({
         attributes: [
-          [sequelize.fn('SUM', sequelize.col('amount')), 'total']
+          [sequelize.fn('SUM', sequelize.col('netAmountInGroupCurrency')), 'total']
         ],
         where: {
           GroupId: id,
-          approved: true
-        }
-      })
-      .then((result) => cb(null, result.toJSON().total))
-      .catch(cb);
+            approved: true
+          }
+        })
+        .then((result) => {
+          return cb(null, result.toJSON().total/100);
+        })
+        .catch(cb);
   };
 
   const getPublicPageInfo = (id, cb) => {
