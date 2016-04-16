@@ -122,6 +122,14 @@ module.exports = function(Sequelize, DataTypes) {
 
     resetPasswordSentAt: DataTypes.DATE,
 
+    referrerId: {
+      type: DataTypes.INTEGER,
+      references: 'Users',
+      referencesKey: 'id',
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW

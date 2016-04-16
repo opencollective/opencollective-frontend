@@ -12,7 +12,7 @@ module.exports = {
     .then(() => queryInterface.removeColumn('Groups', 'membershipfee'));
   },
 
-  down: function (queryInterface, Sequelize) {
+  down: function (queryInterface, DataTypes) {
     return queryInterface.removeColumn('Groups', 'burnrate')
     .then(() => queryInterface.addColumn('Groups', 'budget', { type: DataTypes.FLOAT }))
     .then(() => queryInterface.removeColumn('Groups', 'mission'))

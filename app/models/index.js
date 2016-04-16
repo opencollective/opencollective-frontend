@@ -52,6 +52,9 @@ function setupModels(client) {
   // PaymentMethod.
   m.PaymentMethod.belongsTo(m.User);
 
+  // Referrer
+  m.User.belongsTo(m.User, { as: 'referrer' });
+
   // Group.
   m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
   m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});

@@ -203,6 +203,30 @@ describe('users.routes.test.js', () => {
         });
     });
 
+    it('successfully creates a user with a referrer', (done) => {
+      models.User.create(utils.data('user2'))
+      .then((referrer) => {
+        request(app)
+          .post('/users')
+          .send({
+            api_key: application.api_key,
+            user: { email: "xdamman@gmail.com", referrerId: referrer.id }
+          })
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            models.User
+              .find(parseInt(res.body.id))
+              .then((user) => {
+                expect(user.name).to.equal("Xavier Damman");
+                expect(user.twitterHandle).to.equal("xdamman");
+                expect(user.referrerId).to.equal(referrer.id);
+                done();
+              })
+              .catch(done);
+          });
+      });
+    });
+
     it('successfully create a user with an application that has access [0.5]', (done) => {
       request(app)
         .post('/users')
