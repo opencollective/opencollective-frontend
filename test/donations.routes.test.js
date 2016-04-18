@@ -283,7 +283,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
             expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.785);
-            expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+            expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 922)
             expect(res.rows[0]).to.have.property('paidby', user.id.toString());
             expect(res.rows[0]).to.have.property('approved', true);
             expect(res.rows[0].tags[0]).to.be.equal('Donation');
