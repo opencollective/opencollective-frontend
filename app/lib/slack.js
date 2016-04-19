@@ -41,9 +41,16 @@ module.exports = {
       slackOptions.channel = options.channel;
     }
 
-    return new Slack(options.webhookUrl || config.slack.hookUrl, {})
-    .send(slackOptions, (err) => {
-      console.error(err);
+    return new Promise((resolve, reject) => {
+
+      return new Slack(options.webhookUrl || config.slack.hookUrl, {})
+        .send(slackOptions, (err) => {
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
+          resolve();
+        });
     });
   }
 };
