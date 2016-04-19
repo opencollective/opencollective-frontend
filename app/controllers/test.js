@@ -19,7 +19,7 @@ module.exports = function(app) {
         databaseName = 'circle_test';
         break;
       case 'development':
-        databaseName = 'opencollective_e2e';
+        databaseName = 'opencollective_test';
         break;
       default:
         return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for reset API`));

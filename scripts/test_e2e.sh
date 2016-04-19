@@ -4,41 +4,37 @@ main() {
   # exit script if any error occurs
   set -e
 
-  # cleanup upon exit or termination
-  trap "finish 2" INT
-  trap "finish 15" TERM
-  trap 'finish $?' EXIT
+  # cleanup upon interruption, termination or exit
+  trap 'echo "Received INT signal"; finish 2' INT
+  trap 'echo "Received TERM signal"; finish 15' TERM
+  trap 'echo "Received EXIT signal"; finish $?' EXIT
 
-  # check script parameters
-  for STEP in $@; do
+  scanFileParameter $@
+  parseSteps
+  setCommonEnvironment
+  cleanup
+
+  for STEP in ${STEPS}; do
+    echo "Running step $STEP"
     parseStep
-  done
+    setRepoDir
 
-  # set variables
-  LOCAL_DIR=$PWD
-  LOCAL_NAME=$(basename ${LOCAL_DIR})
-  [ -f "${LOCAL_DIR}/.env" ] && source ${LOCAL_DIR}/.env
+    if [ "$REPO_NAME" = "api" ]; then
+      setPgDatabase
+    fi
 
-  for STEP in $@; do
-    if [ ${STEP} != "cleanup" ]; then
-      # parse script parameters
-      parseStep
-      # set repository location
-      setRepoDir
-      if [ "$PHASE" = "install" ]; then
-        install
-      elif [ "$PHASE" = "run" ]; then
-        setArtifactsDir
-        [ "$REPO_NAME" = "api" ] && setPgDatabase
-        run
-      elif [ "$PHASE" = "testE2E" ]; then
-        testE2E
-      fi
+    if [ "$PHASE" = "install" ]; then
+      install
+    elif [ "$PHASE" = "run" ]; then
+      run
+    elif [ "$PHASE" = "testE2E" ]; then
+      testE2E
     fi
   done
 }
 
 cleanup() {
+  echo "Cleaning up node processes"
   #pkill -f node selenium chromedriver Chrome
   pkill node || true
 }
@@ -46,42 +42,103 @@ cleanup() {
 finish() {
   # can't rely on $? because of the sleep command running in parallel with spawned jobs
   EXIT_CODE=$1
-  if [ ${EXIT_CODE} -ne 0 ]; then
-    trap '' EXIT TERM
+  trap '' INT TERM EXIT
+  if [ "$NODE_ENV" = "development" ]; then
     cleanup
   fi
   echo "Finished with exit code $EXIT_CODE."
   exit ${EXIT_CODE}
 }
 
-parseStep() {
-  if [ "${STEP}" = "cleanup" ]; then
-    cleanup
-  else
-    REPO_NAME=$(echo ${STEP} | sed 's/:.*//')
-    PHASE=$(echo ${STEP} | sed 's/.*://')
-    if ( [ "$REPO_NAME" != "api" ] && [ "$REPO_NAME" != "website" ] && [ "$REPO_NAME" != "app" ] ) ||
-       ( [ "$PHASE" != "install" ] && [ "$PHASE" != "run" ] && [ "$PHASE" != "testE2E" ] ) ||
-       ( [ "$REPO_NAME" = "api" ] && [ "$PHASE" = "testE2E" ] ); then
+get_abs_filename() {
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
 
-      echo "Unrecognized step $STEP"
-      usage 1;
-    fi
+scanFileParameter() {
+  if [ $# -eq 0 ]; then
+    usage
   fi
+  for PARAM in $@; do
+    if [[ "$PARAM" =~ e2e\/.*\.js$ ]]; then
+      setTestFile ${PARAM}
+    else
+      PARAMS="$PARAMS $PARAM"
+    fi
+  done
+}
+
+setTestFile() {
+  ABS_FILE=$(get_abs_filename $1)
+  if [[ "$ABS_FILE" =~ \/website\/ ]]; then
+    WEBSITE_TEST_FILE=$1
+    echo "Setting website E2E test file to $WEBSITE_TEST_FILE"
+  elif [[ "$ABS_FILE" =~ \/app\/ ]]; then
+    APP_TEST_FILE=$1
+    echo "Setting app E2E test file to $APP_TEST_FILE"
+  else
+    echo "Provided file is neither for website nor for app"
+    usage 1;
+  fi
+}
+
+parseSteps() {
+  for STEP in ${PARAMS}; do
+    parseStep
+    if ( [ "$REPO_NAME" = "website" ] && [ ! -z "$APP_TEST_FILE" ] ) ||
+       ( [ "$REPO_NAME" = "app" ] && [ ! -z "$WEBSITE_TEST_FILE" ] ); then
+      echo "Skipping $STEP"
+      continue
+    fi
+    STEPS="$STEPS $STEP"
+  done
+}
+
+parseStep() {
+  REPO_NAME=$(echo ${STEP} | sed 's/:.*//')
+  PHASE=$(echo ${STEP} | sed 's/.*://')
+  if ( [ "$REPO_NAME" != "api" ] && [ "$REPO_NAME" != "website" ] && [ "$REPO_NAME" != "app" ] ) ||
+     ( [ "$PHASE" != "install" ] && [ "$PHASE" != "run" ] && [ "$PHASE" != "testE2E" ] ) ||
+     ( [ "$REPO_NAME" = "api" ] && [ "$PHASE" = "testE2E" ] ); then    echo "Unrecognized step $STEP"
+    usage 1;
+  fi
+}
+
+setOutputDir() {
+  OUTPUT_DIR=$(bash scripts/test_output_dir.sh e2e)
+  echo "Output directory set to $OUTPUT_DIR"
+}
+
+setCommonEnvironment() {
+  LOCAL_DIR=$PWD
+  LOCAL_NAME=$(basename ${LOCAL_DIR})
+  if [ -f "${LOCAL_DIR}/.env" ]; then
+    source ${LOCAL_DIR}/.env
+  fi
+  if [ -z "${NODE_ENV}" ]; then
+    NODE_ENV=development
+  fi
+  setOutputDir
 }
 
 usage() {
   CMD=test_e2e.sh
   echo " "
-  echo "Usage: $CMD [<repo>:<phase> <repo>:<phase> ... <repo>:<phase>] [cleanup]"
+  echo "Usage: $CMD <repo>:<phase> [<repo>:<phase> ... <repo>:<phase>] [path/to/e2e/test.js]"
   echo " "
   echo "  <repo>:  api, website or app"
   echo "  <phase>: install, run or testE2E. testE2E not applicable to api."
   echo " "
-  echo "E.g : $CMD website:install"
-  echo "      $CMD website:run"
+  echo "E.g : Install website and app:"
+  echo "      $CMD website:install app:install"
   echo " "
-  echo "      $CMD cleanup"
+  echo "      Run all website tests (api and website already installed):"
+  echo "      $CMD api:run website:run website:testE2E"
+  echo " "
+  echo "      Run all website and app tests:"
+  echo "      $CMD api:run website:run website:testE2E app:run app:testE2E"
+  echo " "
+  echo "      Run single website test file:"
+  echo "      $CMD api:run website:run website:testE2E ../website/test/e2e/expenses_page.js"
   echo " "
   exit $1;
 }
@@ -100,24 +157,6 @@ setRepoDir() {
     else
       REPO_DIR="$HOME/$REPO_NAME"
     fi
-  fi
-}
-
-setArtifactsDir() {
-  if [ "$NODE_ENV" = "development" ]; then
-    ARTIFACTS_DIR="${LOCAL_DIR}/test/e2e/output"
-  else
-    ARTIFACTS_DIR="${CIRCLE_ARTIFACTS}/e2e"
-  fi
-  mkdir -p ${ARTIFACTS_DIR}
-  echo "Artifacts directory set to $ARTIFACTS_DIR"
-}
-
-setPgDatabase() {
-  if [ "$NODE_ENV" = "development" ]; then
-    # don't override developer's database
-    echo "setting PG_DATABASE=opencollective_e2e"
-    export PG_DATABASE=opencollective_e2e
   fi
 }
 
@@ -148,24 +187,32 @@ linkRepoNmToCache() {
   ln -s ${REPO_NM} ${REPO_NM_CACHE}
 }
 
+setPgDatabase() {
+  if [ "$NODE_ENV" = "development" ]; then
+    # don't screw up developer's opencollective_localhost
+    echo "setting PG_DATABASE=opencollective_test"
+    export PG_DATABASE=opencollective_test
+  fi
+}
+
 runProcess() {
-  NAME=$1
-  cd $2
-  COMMAND=$3
-  LOG_FILE="$ARTIFACTS_DIR/$NAME.log"
+  cd ${REPO_DIR}
+  LOG_FILE="$OUTPUT_DIR/$REPO_NAME.log"
   PARENT=$$
   # in case spawned process exits unexpectedly, kill parent process and its sub-processes (via the trap)
-  sh -c "$COMMAND | tee $LOG_FILE 2>&1;
+  sh -c "npm start > $LOG_FILE;
          kill $PARENT 2>/dev/null" &
-  echo "Started $NAME with PID $! and saved output to $LOG_FILE"
-  # Wait for startup. Break down sleep into pieces to allow prospective kill signals to get trapped.
+  echo "Started $REPO_NAME with PID $! and saving output to $LOG_FILE"
+  # TODO should somehow detect when process is ready instead of fragile hard-coded delay
   if [ "$NODE_ENV" = "development" ]; then
     DELAY=5
   else
-    DELAY=40
+    DELAY=20
   fi
+  echo "Waiting for $REPO_NAME startup during $DELAY seconds"
+  # Wait for startup. Break down sleep into pieces to allow prospective kill signals to get trapped.
   for i in $(seq ${DELAY}); do sleep 1; done
-  echo "Waited for $NAME startup during $DELAY seconds"
+  echo "Waited for $REPO_NAME startup during $DELAY seconds"
 }
 
 run() {
@@ -173,14 +220,22 @@ run() {
     echo "${REPO_NAME} not installed in ${REPO_DIR}, exiting."
     exit 1;
   else
-    runProcess ${REPO_NAME} ${REPO_DIR} 'npm start'
+    runProcess
   fi
 }
 
 testE2E() {
-  echo "Starting ${REPO_NAME} E2E tests"
   cd ${REPO_DIR}
-  npm run nightwatch
+  if [ "$REPO_NAME" = "website" ] && [ ! -z "$WEBSITE_TEST_FILE" ]; then
+    echo "Starting ${REPO_NAME} E2E with test file $WEBSITE_TEST_FILE"
+    npm run nightwatch -- --test ${WEBSITE_TEST_FILE}
+  elif [ "$REPO_NAME" = "app" ] && [ ! -z "$APP_TEST_FILE" ]; then
+    echo "Starting ${REPO_NAME} E2E with test file $APP_TEST_FILE"
+    npm run nightwatch -- --test ${APP_TEST_FILE}
+  else
+    echo "Starting ${REPO_NAME} E2E tests"
+    npm run nightwatch
+  fi
   echo "Finished ${REPO_NAME} E2E tests"
 }
 
