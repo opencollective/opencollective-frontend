@@ -11,8 +11,6 @@ machine:
     NODE_ENV: circleci
   services:
     - postgresql
-  post:
-    - cd api && npm run test:e2e:exec website:install app:install
 dependencies:
   cache_directories:
     - "~/cache"
