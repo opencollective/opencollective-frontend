@@ -7,7 +7,7 @@ main() {
   # cleanup upon interruption, termination or exit
   trap 'echo "Received INT signal"; finish 2' INT
   trap 'echo "Received TERM signal"; finish 15' TERM
-  trap 'echo "Received EXIT signal"; finish $?' EXIT
+  trap 'EXIT_CODE=$?; echo "Received EXIT signal"; finish ${EXIT_CODE}' EXIT
 
   scanFileParameter $@
   parseSteps
