@@ -11,8 +11,8 @@ const done = (err) => {
 
 const isTest = (str) => _.contains(str, 'test');
 
-const publicKey = config.stripe.key;
-const secret = config.stripe.secret;
+const publicKey = 'pk_test_5aBB887rPuzvWzbdRiSzV3QB';
+const secret = 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j';
 
 
 if (!isTest(publicKey) || !isTest(secret)) {
