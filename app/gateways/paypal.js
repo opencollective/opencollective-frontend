@@ -15,19 +15,18 @@ const getConfig = (connectedAccount) => ({
 
 const getCallbackUrl = (group, transaction) => `${config.host.api}/groups/${group.id}/transactions/${transaction.id}/callback`;
 
-const createBillingPlan = (group, transaction, paypalConfig, cb) => {
+const createBillingPlan = (planDescription, group, transaction, paypalConfig, cb) => {
   const callbackUrl = getCallbackUrl(group, transaction);
 
   const amount = transaction.amount;
   const currency = transaction.currency;
   const interval = transaction.interval;
-
   // Paypal frequency is uppercase: 'MONTH'
   const frequency = interval.toUpperCase();
 
   const billingPlan = {
-    description: `Plan for donation to ${group.name} (${currency} ${amount} / ${interval})`,
-    name: `Plan ${group.name}`,
+    description: planDescription,
+    name: `Plan for ${planDescription}`,
     merchant_preferences: {
       cancel_url: callbackUrl,
       return_url: callbackUrl
@@ -49,15 +48,15 @@ const createBillingPlan = (group, transaction, paypalConfig, cb) => {
   paypal.billingPlan.create(billingPlan, paypalConfig, cb);
 };
 
-const createBillingAgreement = (group, planId, paypalConfig, cb) => {
+const createBillingAgreement = (agreementDescription, planId, paypalConfig, cb) => {
   // From paypal example, fails with moment js, TO REFACTOR
   var isoDate = new Date();
   isoDate.setSeconds(isoDate.getSeconds() + 4);
   isoDate.toISOString().slice(0, 19) + 'Z';  // eslint-disable-line
 
   const billingAgreement = {
-    name: `Agreement for donation to ${group.name}`,
-    description: `Agreement for donation to ${group.name}`,
+    name: `Agreement for ${agreementDescription}`,
+    description: agreementDescription,
     start_date: isoDate,
     plan: {
       id: planId
@@ -75,10 +74,12 @@ const createBillingAgreement = (group, planId, paypalConfig, cb) => {
  */
 const createSubscription = (connectedAccount, group, transaction, callback) => {
   const paypalConfig = getConfig(connectedAccount);
+  const description = `donation of ${transaction.currency} ${transaction.amount} / ${transaction.interval} to ${group.name}`;
 
   async.auto({
     createBillingPlan: (cb) => {
       createBillingPlan(
+        description,
         group,
         transaction,
         paypalConfig,
@@ -96,7 +97,7 @@ const createSubscription = (connectedAccount, group, transaction, callback) => {
 
     createBillingAgreement: ['activatePlan', (cb, results) => {
       createBillingAgreement(
-        group,
+        description,
         results.createBillingPlan.id,
         paypalConfig,
         cb
