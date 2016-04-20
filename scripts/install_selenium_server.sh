@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 CACHE_DIR=~/cache/bin
 SELENIUM_JAR=selenium-server-standalone-2.44.0.jar
 LOCAL_SELENIUM=${CACHE_DIR}/${SELENIUM_JAR}
