@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Rebuild for bcrypt on circleci and other envs
-npm rebuild
+
+set -e
 
 # Only run migrations automatically on staging and production
 if [ "$SEQUELIZE_ENV" = "staging" ] || [ "$SEQUELIZE_ENV" = "production" ]; then
