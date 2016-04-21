@@ -7,7 +7,7 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 {{> header}}
 
 <center>
-  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{group.logo}}" style="border-radius: 50%;" width="80" height="80" />
+  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{encodeURIComponent group.logo}}" style="border-radius: 50%;" width="80" height="80" />
 </center>
 
 {{#if user.name}}
@@ -17,7 +17,7 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 {{/if}}
 
 {{#if interval}}
-<p>Nous venons de recevoir votre donation 1ère donation récurrente de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Merci énormément pour votre engagement à nous aider dans la durée, votre don nous sera précieux pour faire de LaPrimaire.org un succès !</p> 
+<p>Nous venons de recevoir votre donation 1ère donation récurrente de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Merci énormément pour votre engagement à nous aider dans la durée, votre don nous sera précieux pour faire de LaPrimaire.org un succès !</p>
 {{else}}
 <p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>

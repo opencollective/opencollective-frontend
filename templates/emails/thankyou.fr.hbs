@@ -7,7 +7,7 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 {{> header}}
 
 <center>
-  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{group.logo}}" style="border-radius: 50%;" width="80" height="80" />
+  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{encodeURIComponent group.logo}}" style="border-radius: 50%;" width="80" height="80" />
 </center>
 
 {{#if user.name}}
