@@ -168,14 +168,14 @@ install() {
     # use Github SVN export to avoid fetching git history, faster
     REPO_SVN=https://github.com/OpenCollective/${REPO_NAME}/trunk
     svn export ${REPO_SVN} ${REPO_DIR}
+    cd ${REPO_DIR}
+    echo "Performing NPM install"
+    START=$(date +%s)
+    npm install
+    END=$(date +%s)
+    echo "Executed NPM install in $(($END - $START)) seconds"
+    linkRepoNmToCache
   fi
-  cd ${REPO_DIR}
-  echo "Performing NPM install"
-  START=$(date +%s)
-  npm install
-  END=$(date +%s)
-  echo "Executed NPM install in $(($END - $START)) seconds"
-  linkRepoNmToCache
 }
 
 linkRepoNmToCache() {
