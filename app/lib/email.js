@@ -69,6 +69,10 @@ function loadTemplates() {
     }
   });
 
+  handlebars.registerHelper('encodeURIComponent', (str) => {
+    return encodeURIComponent(str);
+  });
+
   templatesNames.forEach((template) => {
     var source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
     templates[template] = handlebars.compile(source);
