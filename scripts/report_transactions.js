@@ -84,13 +84,6 @@ async.auto({
       .done(cb);
   },
 
-  newCollectiveNames: cb => {
-    models.Group
-      .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
-      .map(group => group.dataValues.slug)
-      .done(cb);
-  },
-
   donationAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
@@ -120,11 +113,11 @@ async.auto({
 
     console.log(report);
 
-    // slackLib.postMessage(report)
-    //   .then(() => {
+    slackLib.postMessage(report)
+      .then(() => {
         console.log('Reporting done!');
         process.exit();
-      // });
+      });
   }
 });
 
@@ -166,19 +159,12 @@ function transactionReportString(results) {
 - ${results.approvedExpenseCount} approved expenses ${displayTotals(results.approvedExpenseAmount)}
 - ${results.stripeReceivedCount} payments received from Stripe
 - ${results.activeCollectiveCount} active collectives
-- ${results.newCollectiveCount} new collectives${displaySlugs(results.newCollectiveNames)}`;
+- ${results.newCollectiveCount} new collectives`;
 }
 
 function displayTotals(totals) {
   if(totals.length > 0) {
     return `totaling${totals}`;
-  }
-  return "";
-}
-
-function displaySlugs(slugs) {
-  if(slugs.length > 0) {
-    return `: ${slugs.join(', ').trim()}`;
   }
   return "";
 }
