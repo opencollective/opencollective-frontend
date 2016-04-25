@@ -154,10 +154,17 @@ function getTimeFrame(propName) {
 
 function transactionReportString(results) {
   return `Weekly transactions summary (excluding OC team transactions):
-- ${results.donationCount} donations received ${results.donationAmount ? `totaling${results.donationAmount}` : ''}
-- ${results.unapprovedExpenseCount} unapproved expenses ${results.unapprovedExpenseAmount ? `totaling${results.unapprovedExpenseAmount}` : ''}
-- ${results.approvedExpenseCount} approved expenses ${results.approvedExpenseAmount ? `totaling${results.approvedExpenseAmount}` : ''}
+- ${results.donationCount} donations received ${displayTotals(results.donationAmount)}
+- ${results.unapprovedExpenseCount} unapproved expenses ${displayTotals(results.unapprovedExpenseAmount)}
+- ${results.approvedExpenseCount} approved expenses ${displayTotals(results.approvedExpenseAmount)}
 - ${results.stripeReceivedCount} payments received from Stripe
 - ${results.activeCollectiveCount} active collectives
 - ${results.newCollectiveCount} new collectives`;
+}
+
+function displayTotals(totals) {
+  if(totals.length > 0) {
+    return `totaling${totals}`;
+  }
+  return "";
 }
