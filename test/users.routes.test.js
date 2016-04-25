@@ -8,8 +8,8 @@ var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
-var encrypt = require('../app/lib/utils').encrypt;
-var userlib = require('../app/lib/userlib');
+var encrypt = require('../server/lib/utils').encrypt;
+var userlib = require('../server/lib/userlib');
 var sinon = require('sinon');
 var Bluebird = require('bluebird');
 

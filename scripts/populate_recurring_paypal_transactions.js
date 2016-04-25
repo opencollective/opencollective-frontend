@@ -19,8 +19,8 @@ const _ = require('lodash');
 
 const app = require('../index');
 const models = app.set('models');
-const transactionsController = require('../app/controllers/transactions')(app);
-const slack = require('../app/lib/slack');
+const transactionsController = require('../server/controllers/transactions')(app);
+const slack = require('../server/lib/slack');
 
 const startDate = '2016-03-01'; // date that we started paypal payments
 const endDate = moment().format('YYYY-MM-DD');

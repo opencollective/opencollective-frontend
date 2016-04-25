@@ -10,9 +10,9 @@ const nock = require('nock');
 const chance = require('chance').Chance();
 
 const utils = require('../test/utils.js')();
-const generatePlanId = require('../app/lib/utils.js').planId;
-const roles = require('../app/constants/roles');
-const constants = require('../app/constants/transactions');
+const generatePlanId = require('../server/lib/utils.js').planId;
+const roles = require('../server/constants/roles');
+const constants = require('../server/constants/transactions');
 
 /**
  * Variables.

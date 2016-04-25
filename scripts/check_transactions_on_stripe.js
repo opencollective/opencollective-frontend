@@ -1,7 +1,7 @@
 const Stripe = require('stripe');
 const app = require('../index');
 const models = app.set('models');
-const slackLib = require('../app/lib/slack');
+const slackLib = require('../server/lib/slack');
 
 const done = (err) => {
   if (err) console.log('err', err);

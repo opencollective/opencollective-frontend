@@ -1,6 +1,6 @@
 'use strict';
 
-var roles = require('../app/constants/roles');
+var roles = require('../server/constants/roles');
 
 module.exports = {
   up: function (queryInterface, DataTypes) {

@@ -3,8 +3,8 @@ const models = app.set('models');
 const moment = require('moment-timezone');
 const async = require('async');
 const _ = require('lodash');
-const activities = require('../app/constants/activities');
-const slackLib = require('../app/lib/slack');
+const activities = require('../server/constants/activities');
+const slackLib = require('../server/lib/slack');
 
 onlyExecuteInProdOnMondays();
 

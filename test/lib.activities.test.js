@@ -4,8 +4,8 @@
 const expect = require('chai').expect;
 const utils = require('../test/utils.js')();
 const activitiesData = utils.data('activities1').activities;
-const constants = require('../app/constants/activities');
-const activitiesLib = require('../app/lib/activities');
+const constants = require('../server/constants/activities');
+const activitiesLib = require('../server/lib/activities');
 
 /**
  * Tests.

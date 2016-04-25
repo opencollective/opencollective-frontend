@@ -5,7 +5,7 @@ const _ = require('lodash');
 const Bluebird = require('bluebird');
 const app = require('../index');
 const data  = require('./mocks/data.json');
-const userlib = require('../app/lib/userlib');
+const userlib = require('../server/lib/userlib');
 
 /**
  * Private methods.
