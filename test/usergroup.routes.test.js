@@ -9,7 +9,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
-var roles = require('../app/constants/roles');
+var roles = require('../server/constants/roles');
 
 /**
  * Variables.

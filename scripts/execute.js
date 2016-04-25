@@ -1,4 +1,4 @@
-const slack = require('../app/lib/slack');
+const slack = require('../server/lib/slack');
 
 /**
  * Executes a script by name

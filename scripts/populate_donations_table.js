@@ -2,7 +2,7 @@ const _ = require('lodash');
 const app = require('../index');
 const config = require('config');
 const models = app.set('models');
-const constants = require('../app/constants/transactions');
+const constants = require('../server/constants/transactions');
 
 const done = (err) => {
   if (err) console.log('err', err);

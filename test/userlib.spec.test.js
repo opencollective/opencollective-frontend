@@ -1,7 +1,7 @@
 
 var expect = require('chai').expect;
 var utils = require('../test/utils.js')();
-var userlib = require('../app/lib/userlib.js');
+var userlib = require('../server/lib/userlib.js');
 var sinon = require('sinon');
 var Bluebird = require('bluebird');
 

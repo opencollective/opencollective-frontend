@@ -2,9 +2,9 @@ const _ = require('lodash');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const Slack = require('node-slack');
-const activitiesLib = require('../app/lib/activities');
+const activitiesLib = require('../server/lib/activities');
 
-const slackLib = require('../app/lib/slack');
+const slackLib = require('../server/lib/slack');
 
 describe('lib/slack', () => {
 

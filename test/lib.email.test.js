@@ -1,5 +1,5 @@
 const app = require('../index');
-const emailLib = require('../app/lib/email')(app);
+const emailLib = require('../server/lib/email')(app);
 const expect = require('chai').expect;
 const utils = require('../test/utils.js')();
 const emailData = utils.data('emailData');

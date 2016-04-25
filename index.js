@@ -11,35 +11,35 @@ if (!NODE_ENV) {
   NODE_ENV = process.env.NODE_ENV = 'development';
 }
 
-require('./app/lib/load-dot-env');
+require('./server/lib/load-dot-env');
 
-app.errors = require('./app/lib/errors');
+app.errors = require('./server/lib/errors');
 
-require('./app/lib/express')(app);
+require('./server/lib/express')(app);
 
 /**
  * Config.
  */
 
-require('./app/lib/config')(app);
+require('./server/lib/config')(app);
 
 /**
  * Models.
  */
 
-app.set('models', require('./app/models'));
+app.set('models', require('./server/models'));
 
 /**
  * Controllers.
  */
 
-app.set('controllers', require('./app/controllers')(app));
+app.set('controllers', require('./server/controllers')(app));
 
 /**
  * Routes.
  */
 
-require('./app/routes')(app);
+require('./server/routes')(app);
 
 /**
  * Start server

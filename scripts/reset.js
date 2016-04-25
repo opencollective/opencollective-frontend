@@ -2,7 +2,7 @@ const exec = require('child-process-promise').exec;
 
 const app = require('../index');
 const models = app.set('models');
-const roles = require('../app/constants/roles');
+const roles = require('../server/constants/roles');
 
 var data = {};
 

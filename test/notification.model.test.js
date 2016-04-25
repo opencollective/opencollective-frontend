@@ -8,8 +8,8 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
-var emailLib = require('../app/lib/email')(app);
-var constants = require('../app/constants/activities');
+var emailLib = require('../server/lib/email')(app);
+var constants = require('../server/constants/activities');
 
 /**
  * Variable.

@@ -10,11 +10,11 @@ const chance = require('chance').Chance();
 const sinon = require('sinon');
 
 const app = require('../index');
-const roles = require('../app/constants/roles');
-const activities = require('../app/constants/activities');
-const constants = require('../app/constants/transactions');
+const roles = require('../server/constants/roles');
+const activities = require('../server/constants/activities');
+const constants = require('../server/constants/transactions');
 const utils = require('../test/utils.js')();
-const generatePlanId = require('../app/lib/utils.js').planId;
+const generatePlanId = require('../server/lib/utils.js').planId;
 
 const models = app.set('models');
 

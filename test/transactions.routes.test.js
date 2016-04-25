@@ -10,7 +10,7 @@ const expect = require('chai').expect;
 const request = require('supertest');
 const config = require('config');
 const utils = require('../test/utils.js')();
-const createTransaction = require('../app/controllers/transactions')(app)._create;
+const createTransaction = require('../server/controllers/transactions')(app)._create;
 
 /**
  * Variables.
@@ -19,7 +19,7 @@ var publicGroupData = utils.data('group1');
 var privateGroupData = utils.data('group2');
 var models = app.set('models');
 var transactionsData = utils.data('transactions1').transactions;
-var roles = require('../app/constants/roles');
+var roles = require('../server/constants/roles');
 var paypalMock = require('./mocks/paypal');
 
 /**
