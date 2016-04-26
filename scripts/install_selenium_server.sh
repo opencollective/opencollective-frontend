@@ -6,7 +6,7 @@ CACHE_DIR=~/cache/bin
 SELENIUM_JAR=selenium-server-standalone-2.44.0.jar
 LOCAL_SELENIUM=${CACHE_DIR}/${SELENIUM_JAR}
 
-if [ ! -f ${CACHE_DIR} ]; then
+if [ ! -e "./bin" ]; then
   echo "Linking ./bin -> $CACHE_DIR"
   ln -s ${CACHE_DIR} ./bin
 fi
