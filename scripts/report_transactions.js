@@ -78,30 +78,31 @@ async.auto({
       .done(cb);
   },
 
-  newCollectiveCount: cb => {
+  newCollectives: cb => {
     models.Group
-      .count(createdLastWeek)
+      .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
+      .map(group => group.dataValues.slug)
       .done(cb);
   },
 
   donationAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
-        .map(row => ' ' + row.SUM + ' ' + row.currency)
+        .map(row => `${row.SUM} ${row.currency}`)
         .done(cb);
   },
 
   unapprovedExpenseAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', _.merge({}, unapprovedLastWeekExpenses, groupByCurrency))
-        .map(row => ' ' + -row.SUM + ' ' + row.currency)
+        .map(row => `${-row.SUM} ${row.currency}`)
         .done(cb);
   },
 
   approvedExpenseAmount: cb => {
     models.Transaction
         .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
-        .map(row => ' ' + -row.SUM + ' ' + row.currency)
+        .map(row => `${-row.SUM} ${row.currency}`)
         .done(cb);
   }
 }, (err, results) => {
@@ -154,17 +155,26 @@ function getTimeFrame(propName) {
 
 function transactionReportString(results) {
   return `Weekly transactions summary (excluding OC team transactions):
-- ${results.donationCount} donations received ${displayTotals(results.donationAmount)}
-- ${results.unapprovedExpenseCount} unapproved expenses ${displayTotals(results.unapprovedExpenseAmount)}
-- ${results.approvedExpenseCount} approved expenses ${displayTotals(results.approvedExpenseAmount)}
+\`\`\`
+- ${results.donationCount} donations received${displayTotals(results.donationAmount)}
+- ${results.unapprovedExpenseCount} unapproved expenses${displayTotals(results.unapprovedExpenseAmount)}
+- ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
 - ${results.stripeReceivedCount} payments received from Stripe
 - ${results.activeCollectiveCount} active collectives
-- ${results.newCollectiveCount} new collectives`;
+- ${results.newCollectives.length} new collectives${displayCollectives(results.newCollectives)}
+\`\`\``;
 }
 
 function displayTotals(totals) {
   if(totals.length > 0) {
-    return `totaling${totals}`;
+    return ` totaling:\n  * ${totals.join('\n  * ').trim()}`;
+  }
+  return "";
+}
+
+function displayCollectives(collectives) {
+  if(collectives.length > 0) {
+    return `:\n  * ${collectives.join('\n  * ').trim()}`;
   }
   return "";
 }
