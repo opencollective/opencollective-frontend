@@ -63,7 +63,7 @@ async.auto({
   stripeReceivedCount: cb => {
     const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
     models.Activity
-        .count(_.merge({}, createdLastWeek, stripeReceived, excludeOcTeam))
+        .count(_.merge({}, createdLastWeek, stripeReceived))
         .done(cb);
   },
 
