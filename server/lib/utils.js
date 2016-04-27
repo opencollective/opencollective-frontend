@@ -146,21 +146,30 @@ const paginateOffset = (page, perPage) => {
 /**
  * Try to find in which tier a backer falls into based on the tiers definition
  */
-const getTier = (backer, tiers) => {
+const getTier = (user, tiers) => {
 
-  if(!backer.totalDonations) return null;
+  let defaultTier;
+  switch(user.role) {
+    case 'MEMBER':
+      return 'contributor';
+      break;
+    case 'BACKER':
+      defaultTier = 'backer';
+      break;
+    case 'HOST':
+      defaultTier = 'host';
+      break;
+  }
 
-  const defaultTier = 'backer';
-
-  if(!tiers) return defaultTier;
+  if(!tiers || !user.totalDonations) return defaultTier;
 
   // We order the tiers by start range DESC
   tiers.sort((a,b) => { return a.range[0] < b.range[0]; });
 
   // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
-  const tier = tiers.find((tier) => (backer.totalDonations >= tier.range[0]));
+  const tier = tiers.find((tier) => (user.totalDonations >= tier.range[0]));
 
-  return (tier) ? tier.name : defaultTier;
+  return (tier && tier.name) ? tier.name : defaultTier;
 
 };
 
