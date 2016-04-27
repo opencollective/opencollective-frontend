@@ -33,8 +33,11 @@ module.exports = (err, req, res, next) => {
     err.code = err.status || code;
   }
 
-  console.error('Error Express : ', err);
-  if (err.stack) console.log(err.stack);
+  // We don't polute the tests results unless with explicitly run them with the DEBUG env variable
+  if(process.env.DEBUG) {
+    console.error('Error Express : ', err);
+    if (err.stack) console.log(err.stack);
+  }
 
   res.status(err.code).send({error: err});
 };
