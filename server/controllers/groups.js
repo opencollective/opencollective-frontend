@@ -50,7 +50,7 @@ module.exports = function(app) {
       LEFT JOIN "Users" u ON u.id = ug."UserId"
       LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
       WHERE ug."GroupId" = :GroupId
-      ORDER BY "totalDonations" DESC
+      ORDER BY "totalDonations" DESC, ug."createdAt" ASC
     `, {
       replacements: { GroupId },
       type: sequelize.QueryTypes.SELECT
