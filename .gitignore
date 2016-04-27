@@ -11,6 +11,7 @@ lib-cov
 node_modules
 coverage
 dbdumps
+test-results.xml
 
 temp.js
 tempStripe.js
