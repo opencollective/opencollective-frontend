@@ -126,6 +126,23 @@ module.exports = function(app) {
         .catch(cb);
   };
 
+  const getYearlyIncome = (GroupId, cb) => {
+    sequelize.query(`
+      SELECT
+        (SELECT COALESCE(SUM(t."netAmountInGroupCurrency"*12),0) FROM "Transactions" t LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id WHERE "GroupId" = :GroupId AND t.amount > 0 AND s.interval = 'month' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL)
+        +
+        (SELECT COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id WHERE "GroupId" = :GroupId AND t.amount > 0 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
+    `, {
+      replacements: { GroupId },
+      type: sequelize.QueryTypes.SELECT
+    }).then((result) => {
+      return cb(null, parseInt(result[0].yearlyIncome,10));
+    }).catch(e => {
+      console.error("Error computing yearlyIncome", e);
+      cb(e);
+    });
+  };
+
   const getPublicPageInfo = (id, cb) => {
     Transaction
       .find({
@@ -430,6 +447,7 @@ module.exports = function(app) {
     async.auto({
 
       getBalance: getBalance.bind(this, req.group.id),
+      getYearlyIncome: getYearlyIncome.bind(this, req.group.id),
       getPublicPageInfo: getPublicPageInfo.bind(this, req.group.id),
 
       getActivities: (cb) => {
@@ -470,6 +488,7 @@ module.exports = function(app) {
 
       const group = _.extend({}, req.group.info, {
         balance: results.getBalance,
+        yearlyIncome: results.getYearlyIncome,
         backersCount: results.getPublicPageInfo.backersCount,
         donationTotal: results.getPublicPageInfo.donationTotal
       });
