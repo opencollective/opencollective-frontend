@@ -1,5 +1,4 @@
 var activities = require('../constants/activities');
-var flatten = require('flat');
 
 module.exports = {
 
@@ -116,16 +115,8 @@ module.exports = {
       default:
         return `Oops... I got an unknown activity type: ${activity.type}`;
     }
-  },
-
-  formatAttachment: attachment => {
-    const flattenedData = flatten(attachment);
-    const rows = Object.keys(flattenedData)
-      .filter(key => flattenedData[key])
-      .map(key => `${key}: ${flattenedData[key]}`);
-    return rows.join('\n');
   }
-}
+};
 
 /**
  * Generates a url for Slack

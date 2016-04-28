@@ -4,7 +4,6 @@
 
 const Slack = require('node-slack');
 const config = require('config');
-const constants = require('../constants/activities');
 const activitiesLib = require('../lib/activities');
 
 module.exports = {
@@ -17,7 +16,7 @@ module.exports = {
       options = {};
     }
     var message = activitiesLib.formatMessage(activity, true);
-    options.attachments = formatAttachment(activity);
+    options.attachments = [];
     this.postMessage(message, options);
   },
 
@@ -54,14 +53,3 @@ module.exports = {
     });
   }
 };
-
-function formatAttachment(activity) {
-  if (activity.type === constants.WEBHOOK_STRIPE_RECEIVED) {
-    return [{
-      title: 'Data',
-      color: 'good',
-      text: activitiesLib.formatAttachment(activity.data)
-    }];
-  }
-  return [];
-}

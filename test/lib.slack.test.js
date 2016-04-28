@@ -88,39 +88,6 @@ describe('lib/slack', () => {
       expect(expected.called).to.be.ok;
       done();
     });
-
-    it('with WEBHOOK_STRIPE_RECEIVED activity creates the appropriate attachment', done => {
-      const activity = {
-        type: 'webhook.stripe.received',
-        data: 'activity data'
-      };
-      const formattedAttachmentText = "formatted attachment text";
-      const formatAttachmentStub = sinon
-        .stub(activitiesLib, "formatAttachment");
-
-      formatMessageStub
-        .withArgs(activity, true)
-        .returns(formattedMessage);
-
-      formatAttachmentStub
-        .withArgs(activity.data)
-        .returns(formattedAttachmentText);
-
-      const expected = postMessageStub
-        .withArgs(formattedMessage, {
-          attachments: [{
-            title: 'Data',
-            color: 'good',
-            text: formattedAttachmentText
-          }]
-        });
-
-      slackLib.postActivity(activity);
-
-      expect(expected.called).to.be.ok;
-      formatAttachmentStub.restore();
-      done();
-    });
   });
 });
 
