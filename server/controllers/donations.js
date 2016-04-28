@@ -315,6 +315,7 @@ module.exports = (app) => {
     const amount = payment.amount;
     const interval = payment.interval;
     const isSubscription = _.contains(['month', 'year'], interval);
+    const distribution = payment.distribution ? JSON.stringify({distribution: payment.distribution}) : '';
 
     if (interval && !isSubscription) {
       return next(new errors.BadRequest('Interval should be month or year.'));
@@ -344,6 +345,7 @@ module.exports = (app) => {
             description: `Donation to ${group.name}`,
             tags: ['Donation'],
             approved: true,
+            comment: distribution,
             // In paranoid mode, the deleted transactions are not visible
             // We will create that temporary transaction that will only be visible once
             // the user executes the paypal token
