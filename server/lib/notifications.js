@@ -5,7 +5,7 @@ const slackLib = require('./slack');
 const ACTIVITY_ALL = 'all';
 
 module.exports = (Sequelize, activity) => {
-  if(typeof activity.GroupId === 'undefined' || typeof activity.type === 'undefined') {
+  if(!activity.GroupId || !activity.type) {
     return;
   }
   Sequelize.models.Notification.findAll({
