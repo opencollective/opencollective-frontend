@@ -551,7 +551,7 @@ describe('groups.routes.test.js', () => {
             var userData = res.body[0];
             expect(userData.name).to.equal(user.public.name);
             expect(userData.role).to.equal(roles.HOST);
-            expect(userData.tier).to.equal(null);
+            expect(userData.tier).to.equal('host');
             done();
           });
       });
