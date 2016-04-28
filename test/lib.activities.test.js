@@ -42,12 +42,6 @@ describe('lib.activities.test.js', () => {
     expect(actual).to.equal('Stripe event received: invoice.payment_succeeded');
   });
 
-  it (`formatAttachment: ${constants.WEBHOOK_STRIPE_RECEIVED}`, function(){
-    var actual = activitiesLib.formatAttachment(activitiesData[15].data);
-
-    expect(actual).to.equal("event.type: invoice.payment_succeeded");
-  });
-
   it (`formatMessage: ${constants.SUBSCRIPTION_CONFIRMED}`, function(){
     var actual = activitiesLib.formatMessage(activitiesData[16], true);
     expect(actual).to.equal('New subscription confirmed: EUR 12.34 from jussi@kuohujoki.fi to <blah.com|Blah>!');
