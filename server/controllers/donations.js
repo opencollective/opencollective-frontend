@@ -296,7 +296,11 @@ module.exports = (app) => {
 
       if (e) {
         e.payload = req.body;
-        return next(new errors.CustomError(e.statusCode, e.type, e.message));
+        if(e.detail) {
+          e.message = e.detail.message;
+          e.type = e.detail.type;
+        }
+        return next(new errors.CustomError(e.code || e.statusCode, e.type, e.message));
       }
 
       res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});

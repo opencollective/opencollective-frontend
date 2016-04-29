@@ -46,7 +46,7 @@
     "sequelize": "2.0.4",
     "sequelize-cli": "^1.7.0",
     "slug": "^0.9.1",
-    "stripe": "^4.5.0"
+    "stripe": "^3.9.0"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
