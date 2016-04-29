@@ -111,10 +111,6 @@ module.exports = (app) => {
           .catch(cb);
       }],
 
-      /**
-       * For one-time donation
-       */
-
       createCharge: ['createCustomer', (cb, results) => {
         const paymentMethod = results.getOrCreatePaymentMethod;
 
@@ -300,7 +296,7 @@ module.exports = (app) => {
 
       if (e) {
         e.payload = req.body;
-        return next(e);
+        return next(new errors.CustomError(e.statusCode, e.type, e.message));
       }
 
       res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});

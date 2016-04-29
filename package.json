@@ -42,10 +42,11 @@
     "pg": "^4.3.0",
     "pg-hstore": "^2.3.1",
     "querystring": "^0.2.0",
+    "request-as-curl": "^0.1.0",
     "sequelize": "2.0.4",
     "sequelize-cli": "^1.7.0",
     "slug": "^0.9.1",
-    "stripe": "^3.3.4"
+    "stripe": "^4.5.0"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
