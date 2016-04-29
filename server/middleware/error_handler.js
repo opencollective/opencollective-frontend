@@ -1,11 +1,27 @@
 const _ = require('lodash');
-
+const curlify = require('request-as-curl');
 const errors = require('../lib/errors');
+const config = require('config');
+
+
+sendErrorByEmail = (req, err) => {
+  var errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
+  errorHTML += curlify(req, req.body);
+  errorHTML += "<br />\n<br />\n";
+  errorHTML += "Error: <br />\n";
+  errorHTML += JSON.stringify(err);
+
+  req.app.mailgun.sendMail({
+    from: config.email.from,
+    to: 'ops+servererror@opencollective.com',
+    subject: `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
+    html: errorHTML
+  }, e => { if (e) console.error(e); });
+}
 
 /**
  * error handler of the api
  */
-
 module.exports = (err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
@@ -35,6 +51,11 @@ module.exports = (err, req, res, next) => {
 
   // We don't pollute the tests results when running mocha unless the DEBUG variable is set
   if(process.env.DEBUG || !process.argv[1].match(/\/mocha\//)) {
+
+    if(req.app.set('env') === 'production') {
+      sendErrorByEmail(req, err);
+    }
+
     console.error('Error Express : ', err);
     if (err.stack) console.log(err.stack);
   }
