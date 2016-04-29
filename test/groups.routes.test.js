@@ -11,6 +11,7 @@ var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
 var sinon = require('sinon');
+var createTransaction = require('../server/controllers/transactions')(app)._create;
 
 /**
  * Variables.
@@ -483,6 +484,16 @@ describe('groups.routes.test.js', () => {
         }, done);
       });
 
+      // Create a subscription for PublicGroup.
+      beforeEach((done) => {
+        createTransaction({
+            transaction: transactionsData[7],
+            user,
+            group: publicGroup,
+            subscription: utils.data('subscription1')
+          }, done);
+      });
+
       // Create a transaction for group2.
       beforeEach((done) => {
         request(app)
@@ -505,7 +516,8 @@ describe('groups.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             var g = res.body;
-            expect(g).to.have.property('balance', totDonations + totTransactions);
+            expect(g).to.have.property('balance', Math.round((totDonations + totTransactions)*100)/100);
+            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12)*100);
             expect(g).to.not.have.property('activities');
             done();
           });
@@ -523,7 +535,7 @@ describe('groups.routes.test.js', () => {
             expect(e).to.not.exist;
             var group = res.body;
             expect(group).to.have.property('activities');
-            expect(group.activities).to.have.length(transactionsData.length + 1 + 1); // + group.created + group.user.added
+            expect(group.activities).to.have.length(transactionsData.length + 1 + 1 + 1); // + subscription + group.created + group.user.added
 
             // Check data content.
             group.activities.forEach((a) => {

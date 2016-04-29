@@ -330,7 +330,7 @@
         "vendor": "@montogeek",
         "description": "Donation to that great project",
         "tags": ["donation"],
-        "amount": 299.99,
+        "amount": 9.99,
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "comment": "",
@@ -407,6 +407,7 @@
     "amount": 20,
     "currency": "EUR",
     "interval": "month",
+    "isActive": true,
     "stripeSubscriptionId": "sub_tokentest"
   }
 }
