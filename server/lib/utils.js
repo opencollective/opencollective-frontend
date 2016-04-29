@@ -148,16 +148,16 @@ const paginateOffset = (page, perPage) => {
  */
 const getTier = (user, tiers) => {
 
-  var defaultTier = 'backer';
+  var defaultTier;
   switch(user.role) {
     case 'MEMBER':
       return 'contributor';
       break;
-    case 'BACKER':
-      defaultTier = 'backer';
-      break;
     case 'HOST':
       defaultTier = 'host';
+      break;
+   default:
+      defaultTier = 'backer';
       break;
   }
 
