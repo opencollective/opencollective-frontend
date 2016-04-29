@@ -4,7 +4,6 @@
 var app = require('../index');
 var errors = app.errors;
 var expect = require('chai').expect;
-var utils = require('../test/utils.js')();
 
 /**
  * Tests.
