@@ -6,6 +6,8 @@ const group = require('./mocks/data.json').group1;
 const backer = { totalDonations: 5 };
 const sponsor = { totalDonations: 500 };
 
+var roles = require('../server/constants/roles');
+
 describe("utils", () => {
   
   it("gets the right tier", () => {
@@ -17,8 +19,8 @@ describe("utils", () => {
     expect(libutils.getTier(backer, null)).to.equal('backer');
   });
 
-  it("returns null if the member didn't make any donation", () => {
-    expect(libutils.getTier({ totalDonations: null }, group.tiers)).to.equal(null);
+  it("returns contributor if the member didn't make any donation", () => {
+    expect(libutils.getTier({ role: roles.MEMBER, totalDonations: null }, group.tiers)).to.equal('contributor');
   });
   
 });
