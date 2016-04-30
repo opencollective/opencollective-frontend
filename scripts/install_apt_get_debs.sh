@@ -3,7 +3,7 @@
 
 set -e
 
-APT_PACKAGES=(google-chrome-stable)
+APT_PACKAGES=(google-chrome-stable subversion)
 APT_CACHE=~/cache/apt
 
 # Work from the directory CI will cache
@@ -30,4 +30,4 @@ sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable
 sudo apt-get update
 sudo apt-get install --reinstall "${APT_PACKAGES[@]}"
 
-cp -v /var/cache/apt/archives/*.deb ${APT_CACHE}
+cp -v /var/cache/apt/archives/*.deb ${APT_CACHE} || true
