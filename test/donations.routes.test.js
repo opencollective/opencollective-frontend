@@ -1122,8 +1122,7 @@ describe('donations.routes.test.js', () => {
               error: {
                 code: 400,
                 type: 'bad_request',
-                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`,
-                payload: { payment }
+                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
               }
             })
             .end(done);
@@ -1144,7 +1143,10 @@ describe('donations.routes.test.js', () => {
           })
           .expect(400)
           .then(res => {
-            expect(res.body.error.detail).to.deep.equal(stripeMock.customers.createError);
+            const error = res.body.error;
+            expect(error.message).to.equal('Your paymentMethod was declined');
+            expect(error.type).to.equal('StripePaymentMethodError');
+            expect(error.code).to.equal(400);
             done();
           });
       });
