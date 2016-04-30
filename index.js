@@ -47,7 +47,7 @@ require('./server/routes')(app);
 const port = process.env.PORT || 3060;
 const server = app.listen(port, () => {
   const host = require('os').hostname();
-  console.log('OpenCollective API listening at http://%s:%s in %s environment.', host, server.address().port, app.set('env'));
+  console.log('OpenCollective API listening at http://%s:%s in %s environment.\n', host, server.address().port, app.set('env'));
 });
 
 module.exports = app;
