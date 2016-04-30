@@ -42,6 +42,7 @@
     "pg": "4.5.1",
     "pg-hstore": "2.3.2",
     "querystring": "0.2.0",
+    "request-as-curl": "0.1.0",
     "sequelize": "2.0.4",
     "sequelize-cli": "1.9.2",
     "slug": "0.9.1",
