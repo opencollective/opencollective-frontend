@@ -1,3 +1,4 @@
+const moment = require('moment-timezone');
 var errors = require('../../lib/errors');
 
 const Forbidden = errors.Forbidden;
@@ -12,6 +13,7 @@ const Unauthorized = errors.Unauthorized;
 module.exports = function (app) {
 
   var aN = require('./authentication')(app);
+  var models = app.set('models');
 
   return {
 
@@ -190,6 +192,24 @@ module.exports = function (app) {
           _authorizeAccessToTransaction();
         }
       }
+    },
+
+    authorizeAccessToUserWithRecentDonation: (req, res, next) => {
+      models.Donation.findOne({
+        where: {
+          UserId: req.user.id,
+          updatedAt: {
+            $gt: moment().add(-10, 'minutes').format()
+          }
+        }
+      })
+        .then(donation => {
+          if (!donation) {
+            return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
+          }
+          next();
+        })
+        .catch(next);
     }
   }
 };

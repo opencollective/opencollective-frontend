@@ -566,35 +566,51 @@ describe('users.routes.test.js', () => {
     });
 
     it('fails if the user already has a password', done => {
-      request(app)
-        .put('/users/' + userWithPassword.id)
-        .send({
-          user: newUser,
-          api_key: application.api_key
+      // only users with a recent donation can be edited
+      models.Donation.create({
+          UserId: userWithPassword.id,
+          currency: 'USD',
+          amount: 100
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('bad_request');
-          expect(res.body.error.message).to.equal('Can\'t update user with password from this route');
-          done();
+        .then(() => {
+          request(app)
+            .put('/users/' + userWithPassword.id)
+            .send({
+              user: newUser,
+              api_key: application.api_key
+            })
+            .end((e,res) => {
+              expect(res.statusCode).to.equal(400);
+              expect(res.body.error.type).to.equal('bad_request');
+              expect(res.body.error.message).to.equal('Can\'t update user with password from this route');
+              done();
+            });
         });
     });
 
     it('successfully updates a user without a password', done => {
-      request(app)
-        .put('/users/' + userWithoutPassword.id)
-        .send({
-          user: newUser,
-          api_key: application.api_key
+      // only users with a recent donation can be edited
+      models.Donation.create({
+          UserId: userWithoutPassword.id,
+          currency: 'USD',
+          amount: 100
         })
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', userWithoutPassword.id);
-          expect(res.body).to.have.property('name', newUser.name);
-          expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
-          expect(res.body).to.have.property('website', newUser.website);
-          expect(res.body).to.have.property('avatar').to.contain('cloudfront');
-          done();
+        .then(() => {
+          request(app)
+            .put('/users/' + userWithoutPassword.id)
+            .send({
+              user: newUser,
+              api_key: application.api_key
+            })
+            .end((e, res) => {
+              expect(e).to.not.exist;
+              expect(res.body).to.have.property('id', userWithoutPassword.id);
+              expect(res.body).to.have.property('name', newUser.name);
+              expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
+              expect(res.body).to.have.property('website', newUser.website);
+              expect(res.body).to.have.property('avatar').to.contain('cloudfront');
+              done();
+            });
         });
     });
 
