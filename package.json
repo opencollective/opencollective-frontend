@@ -5,8 +5,8 @@
   "author": "@philmod @arnaudbenard @xdamman",
   "main": "index.js",
   "engines": {
-    "node": "5.1.0",
-    "npm": "3.3.12"
+    "node": "5.11.0",
+    "npm": "3.8.6"
   },
   "dependencies": {
     "async": "^0.9.0",
