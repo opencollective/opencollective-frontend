@@ -11,7 +11,7 @@ onlyExecuteInProdOnMondays();
 const createdLastWeek = getTimeFrame('createdAt');
 const updatedLastWeek = getTimeFrame('updatedAt');
 
-const donation = { where: { amount: { $gt: 0 } } };
+const donation = { where: { DonationId: { $not: null } } };
 const expense = { where: { amount: { $lt: 0 } } };
 
 const approved = { where: { approved: true } };
