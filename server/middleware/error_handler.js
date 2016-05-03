@@ -44,7 +44,7 @@ module.exports = (err, req, res, next) => {
     err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), 'Unique Constraint Error.');
   }
 
-  if (!err.code) {
+  if (!err.code || !Number.isInteger(err.code)) {
     var code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
     err.code = err.status || code;
   }
