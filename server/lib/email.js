@@ -93,6 +93,8 @@ const EmailLib = (app) => {
         template += '.wwcode';
       if(data.group.name.match(/ispcwa/i))
         template += '.ispcwa';
+      if(data.group.slug === 'lesbarbares') {
+        template += '.fr';
       if(data.group.slug === 'laprimaire') {
         template += '.laprimaire';
         // xdamman: hack
