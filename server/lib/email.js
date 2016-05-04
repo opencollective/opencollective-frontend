@@ -2,6 +2,7 @@ const fs = require('fs');
 const handlebars = require('handlebars');
 const config = require('config');
 const moment = require('moment');
+const _ = require('lodash');
 
 const templatesNames = [
   'group.transaction.created',
@@ -93,10 +94,12 @@ const EmailLib = (app) => {
         template += '.wwcode';
       if(data.group.name.match(/ispcwa/i))
         template += '.ispcwa';
-      if(data.group.slug === 'lesbarbares') {
+      if(_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
         template += '.fr';
-      if(data.group.slug === 'laprimaire') {
-        template += '.laprimaire';
+
+        if(data.group.slug === 'laprimaire')
+          template = 'thankyou.laprimaire';
+
         // xdamman: hack
         switch(data.interval) {
           case 'month':
