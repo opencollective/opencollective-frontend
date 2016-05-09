@@ -6,13 +6,15 @@ const config = require('config');
 
 module.exports = (Sequelize, DataTypes) => {
 
- return Sequelize.define('ConnectedAccount', {
+  const allowedTypes = ['paypal', 'stripe', 'github', 'twitter'];
+
+  return Sequelize.define('ConnectedAccount', {
     provider: {
       type: DataTypes.STRING,
       validate: {
         isIn: {
-          args: [['paypal', 'stripe']],
-          msg: 'Must be paypal or stripe'
+          args: [allowedTypes],
+          msg: `Must be in ${allowedTypes}`
         }
       }
     },
@@ -21,7 +23,8 @@ module.exports = (Sequelize, DataTypes) => {
 
     clientId: DataTypes.STRING, // paypal app id
 
-    secret: DataTypes.STRING, // paypal secret
+    // either paypal secret OR an accessToken to do requests to the provider on behalf of the user
+    secret: DataTypes.STRING, 
 
     data: DataTypes.JSON,
 

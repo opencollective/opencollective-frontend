@@ -65,6 +65,8 @@ function setupModels(client) {
   // ConnectedAccount
   m.User.hasMany(m.ConnectedAccount);
   m.ConnectedAccount.belongsTo(m.User);
+  m.Group.hasMany(m.ConnectedAccount);
+  m.ConnectedAccount.belongsTo(m.Group);
 
   // Application - User.
   m.User.belongsTo(m.Application);

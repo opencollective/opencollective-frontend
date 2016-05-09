@@ -37,6 +37,7 @@ module.exports = (app) => {
   const stripe = Controllers.stripe;
   const test = Controllers.test;
   const subscriptions = Controllers.subscriptions;
+  const connectedAccounts = Controllers.connectedAccounts;
 
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
@@ -191,6 +192,11 @@ module.exports = (app) => {
 
   app.get('/stripe/authorize', aN.authenticateUserByJwt(), stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
+
+  /**
+   * ConnectedAccounts
+   */
+  app.post('/groups/:slug/connected-accounts/:service', aN.authenticateAppByApiKey, required('accessToken'), connectedAccounts.post);
 
   /**
    * Reset test-api database

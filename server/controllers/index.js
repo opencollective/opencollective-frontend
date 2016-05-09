@@ -18,7 +18,8 @@ module.exports = function(app) {
     'transactions',
     'users',
     'webhooks',
-    'test'
+    'test',
+    'connectedAccounts'
   ];
 
   /**
