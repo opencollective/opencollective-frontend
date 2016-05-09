@@ -14,8 +14,12 @@ const updatedLastWeek = getTimeFrame('updatedAt');
 const donation = { where: { DonationId: { $not: null } } };
 const expense = { where: { amount: { $lt: 0 } } };
 
-const approved = { where: { approved: true } };
-const unapproved = { where: { approved: false } };
+const pendingExpense = { where: { approvedAt: null } };
+const approvedExpense = { where: { approved: true } };
+const rejectedExpense = { where: {
+  approved: false,
+  approvedAt: { $not: null }
+} };
 
 const excludeOcTeam = { where: { UserId: { $notIn: [
   1,  // arnaudbenard
@@ -31,8 +35,9 @@ const excludeOcTeam = { where: { UserId: { $notIn: [
 const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam);
 const lastWeekExpenses = _.merge({}, createdLastWeek, expense, excludeOcTeam);
 
-const unapprovedLastWeekExpenses = _.merge({}, lastWeekExpenses, unapproved);
-const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approved);
+const pendingLastWeekExpenses = _.merge({}, lastWeekExpenses, pendingExpense);
+const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approvedExpense);
+const rejectedLastWeekExpenses = _.merge({}, lastWeekExpenses, rejectedExpense);
 
 const groupByCurrency = {
   plain: false,
@@ -42,16 +47,35 @@ const groupByCurrency = {
 };
 
 async.auto({
+
+  // Donation statistics
+
   donationCount: cb => {
     models.Transaction
         .count(lastWeekDonations)
         .done(cb);
   },
 
-  unapprovedExpenseCount: cb => {
+  donationAmount: cb => {
     models.Transaction
-        .count(unapprovedLastWeekExpenses)
-        .done(cb);
+      .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
+      .map(row => `${row.SUM} ${row.currency}`)
+      .done(cb);
+  },
+
+  stripeReceivedCount: cb => {
+    const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
+    models.Activity
+      .count(_.merge({}, createdLastWeek, stripeReceived))
+      .done(cb);
+  },
+
+  // Expense statistics
+
+  pendingExpenseCount: cb => {
+    models.Transaction
+      .count(pendingLastWeekExpenses)
+      .done(cb);
   },
 
   approvedExpenseCount: cb => {
@@ -60,12 +84,34 @@ async.auto({
         .done(cb);
   },
 
-  stripeReceivedCount: cb => {
-    const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
-    models.Activity
-        .count(_.merge({}, createdLastWeek, stripeReceived))
-        .done(cb);
+  rejectedExpenseCount: cb => {
+    models.Transaction
+      .count(rejectedLastWeekExpenses)
+      .done(cb);
   },
+
+  pendingExpenseAmount: cb => {
+    models.Transaction
+      .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, groupByCurrency))
+      .map(row => `${-row.SUM} ${row.currency}`)
+      .done(cb);
+  },
+
+  approvedExpenseAmount: cb => {
+    models.Transaction
+      .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
+      .map(row => `${-row.SUM} ${row.currency}`)
+      .done(cb);
+  },
+
+  rejectedExpenseAmount: cb => {
+    models.Transaction
+      .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, groupByCurrency))
+      .map(row => `${-row.SUM} ${row.currency}`)
+      .done(cb);
+  },
+
+  // Collective statistics
 
   activeCollectiveCount: cb => {
     const distinct = {
@@ -83,27 +129,6 @@ async.auto({
       .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
       .map(group => group.dataValues.slug)
       .done(cb);
-  },
-
-  donationAmount: cb => {
-    models.Transaction
-        .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
-        .map(row => `${row.SUM} ${row.currency}`)
-        .done(cb);
-  },
-
-  unapprovedExpenseAmount: cb => {
-    models.Transaction
-        .aggregate('amount', 'SUM', _.merge({}, unapprovedLastWeekExpenses, groupByCurrency))
-        .map(row => `${-row.SUM} ${row.currency}`)
-        .done(cb);
-  },
-
-  approvedExpenseAmount: cb => {
-    models.Transaction
-        .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
-        .map(row => `${-row.SUM} ${row.currency}`)
-        .done(cb);
   }
 }, (err, results) => {
   if (err) {
@@ -156,25 +181,29 @@ function getTimeFrame(propName) {
 function transactionReportString(results) {
   return `Weekly transactions summary (excluding OC team transactions):
 \`\`\`
-- ${results.donationCount} donations received${displayTotals(results.donationAmount)}
-- ${results.unapprovedExpenseCount} unapproved expenses${displayTotals(results.unapprovedExpenseAmount)}
-- ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
-- ${results.stripeReceivedCount} payments received from Stripe
-- ${results.activeCollectiveCount} active collectives
-- ${results.newCollectives.length} new collectives${displayCollectives(results.newCollectives)}
+* Donations:
+  - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
+  - ${results.stripeReceivedCount} payments received from Stripe
+* Expenses:
+  - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
+  - ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
+  - ${results.rejectedExpenseCount} rejected expenses${displayTotals(results.rejectedExpenseAmount)}
+* Collectives:
+  - ${results.activeCollectiveCount} active collectives
+  - ${results.newCollectives.length} new collectives${displayCollectives(results.newCollectives)}
 \`\`\``;
 }
 
 function displayTotals(totals) {
   if(totals.length > 0) {
-    return ` totaling:\n  * ${totals.join('\n  * ').trim()}`;
+    return ` totaling:\n    * ${totals.join('\n    * ').trim()}`;
   }
   return "";
 }
 
 function displayCollectives(collectives) {
   if(collectives.length > 0) {
-    return `:\n  * ${collectives.join('\n  * ').trim()}`;
+    return `:\n    * ${collectives.join('\n    * ').trim()}`;
   }
   return "";
 }
