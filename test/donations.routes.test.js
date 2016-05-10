@@ -914,7 +914,8 @@ describe('donations.routes.test.js', () => {
               models.Transaction.findAndCountAll({
                 include: [
                   { model: models.Subscription },
-                  { model: models.User }
+                  { model: models.User },
+                  { model: models.Donation }
                 ]
               })
               .then((res) => {
@@ -922,6 +923,7 @@ describe('donations.routes.test.js', () => {
                 const transaction = res.rows[0];
                 const subscription = transaction.Subscription;
                 const user = transaction.User;
+                const donation = transaction.Donation;
 
                 expect(subscription).to.have.property('data');
                 expect(subscription.data).to.have.property('billingAgreementId');
@@ -932,6 +934,12 @@ describe('donations.routes.test.js', () => {
                 expect(text).to.contain(`userid=${user.id}`)
                 expect(text).to.contain('has_full_account=false')
                 expect(text).to.contain('status=payment_success')
+
+                expect(donation).to.have.property('UserId', user.id);
+                expect(donation).to.have.property('GroupId', group.id);
+                expect(donation).to.have.property('currency', 'USD');
+                expect(donation).to.have.property('amount', 1000);
+                expect(donation).to.have.property('title', `Donation to ${group.name}`);
 
                 return group.getUsers();
               })
@@ -996,6 +1004,7 @@ describe('donations.routes.test.js', () => {
 
         it('executes the billing agreement', (done) => {
           const email = 'testemail@test.com';
+          var transaction;
 
           // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
           nock('https://api.sandbox.paypal.com:443')
@@ -1025,13 +1034,15 @@ describe('donations.routes.test.js', () => {
               models.Transaction.findAndCountAll({
                 include: [
                   { model: models.Subscription },
-                  { model: models.User }
+                  { model: models.User },
+                  { model: models.Donation }
                 ]
               })
               .then((res) => {
                 expect(res.count).to.equal(1);
-                const transaction = res.rows[0];
+                transaction = res.rows[0];
                 const user = transaction.User;
+                const donation = transaction.Donation;
 
                 expect(user).to.have.property('email', email);
 
@@ -1039,13 +1050,31 @@ describe('donations.routes.test.js', () => {
                 expect(text).to.contain('has_full_account=false')
                 expect(text).to.contain('status=payment_success')
 
+                expect(donation).to.have.property('UserId', user.id);
+                expect(donation).to.have.property('GroupId', group.id);
+                expect(donation).to.have.property('currency', 'USD');
+                expect(donation).to.have.property('amount', 1000);
+                expect(donation).to.have.property('title', `Donation to ${group.name}`);
+
                 return group.getUsers();
               })
               .then((users) => {
                 const backer = _.find(users, {email: email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
-                done();
               })
+              .then(() => models.Activity.findAndCountAll({ where: { type: "group.transaction.created" } }))
+              .then(res => {
+                expect(res.count).to.equal(1);
+                const activity = res.rows[0].get();
+                console.log("activity", activity);
+                expect(activity).to.have.property('GroupId', group.id);
+                expect(activity).to.have.property('UserId', transaction.UserId);
+                expect(activity).to.have.property('TransactionId', transaction.id);
+                expect(activity.data.transaction).to.have.property('id', transaction.id);
+                expect(activity.data.group).to.have.property('id', group.id);
+                expect(activity.data.user).to.have.property('id', transaction.UserId);
+              })
+              .then(() => done())
               .catch(done);
             });
         });

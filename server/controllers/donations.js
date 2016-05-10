@@ -46,7 +46,7 @@ module.exports = (app) => {
     const group = req.group;
     const interval = payment.interval;
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
-    const amountInt = parseInt(payment.amount * 100, 10) // TODO: clean this up when we switch all amounts to INTEGER
+    const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
     const isSubscription = _.contains(['month', 'year'], interval);
     var hasFullAccount = false; // Used to specify if a user has a real account
@@ -179,26 +179,27 @@ module.exports = (app) => {
           GroupId: group.id,
           currency: currency,
           amount: amountInt,
-          title: `Donation to ${group.name}`,
+          title: `Donation to ${group.name}`
         };
 
         models.Donation.create(donation)
-        .then(donation => {
-          if (isSubscription) {
+          .then(donation => {
+            if (isSubscription) {
               const subscription = {
-              amount: amountFloat,
-              currency,
-              interval,
-              stripeSubscriptionId: charge.id,
-              data: charge
-            };
-            return donation.createSubscription(subscription)
-              .then(() => cb(null, donation));
-          } else {
-            return cb(null, donation);
-          }
-        })
-        .catch(cb);
+                amount: amountFloat,
+                currency,
+                interval,
+                stripeSubscriptionId: charge.id,
+                data: charge
+              };
+              return donation
+                .createSubscription(subscription)
+                .then(() => cb(null, donation));
+            } else {
+              return cb(null, donation);
+            }
+          })
+          .catch(cb);
       }],
 
       retrieveBalanceTransaction: ['createCharge', (cb, results) => {
@@ -312,7 +313,7 @@ module.exports = (app) => {
     const group = req.group;
     const payment = req.required.payment;
     const currency = payment.currency || group.currency;
-    const amount = payment.amount;
+    const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
     const interval = payment.interval;
     const isSubscription = _.contains(['month', 'year'], interval);
     const distribution = payment.distribution ? JSON.stringify({distribution: payment.distribution}) : '';
@@ -321,7 +322,7 @@ module.exports = (app) => {
       return next(new errors.BadRequest('Interval should be month or year.'));
     }
 
-    if (!payment.amount) {
+    if (!amountFloat) {
       return next(new errors.BadRequest('Payment Amount missing.'));
     }
 
@@ -340,7 +341,7 @@ module.exports = (app) => {
           group,
           transaction: {
             type: 'payment',
-            amount,
+            amount: amountFloat,
             currency,
             description: `Donation to ${group.name}`,
             tags: ['Donation'],
@@ -356,7 +357,7 @@ module.exports = (app) => {
        if (isSubscription) {
           payload.transaction.interval = interval;
           payload.subscription = {
-            amount,
+            amount: amountFloat,
             currency,
             interval
           };
@@ -468,6 +469,31 @@ module.exports = (app) => {
         getOrCreateUser({ email }, cb);
       }],
 
+      createDonation: ['getOrCreateUser', (cb, results) => {
+        const user = results.getOrCreateUser;
+        const currency = transaction.currency;
+        const amountFloat = transaction.amount; // TODO: clean this up when we switch all amounts to INTEGER
+        const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
+        const subscriptionId = transaction.getSubscription().id;
+
+        const donation = {
+          UserId: user.id,
+          GroupId: group.id,
+          currency: currency,
+          amount: amountInt,
+          title: `Donation to ${group.name}`
+        };
+
+        if (isSubscription) {
+          donation.SubscriptionId = subscriptionId;
+        }
+
+        models.Donation.create(donation)
+          .then(donation => transaction.setDonation(donation))
+          .then(donation => cb(null, donation))
+          .catch(cb);
+      }],
+
       addUserToGroup: ['getOrCreateUser', (cb, results) => {
         const user = results.getOrCreateUser;
 
@@ -493,6 +519,7 @@ module.exports = (app) => {
       updateTransaction: ['addUserToGroup', (cb, results) => {
         transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
           .then(() => transaction.setUser(results.getOrCreateUser))
+          .then(() => transactions.createGroupTransactionCreatedActivity(transaction.id))
           .then(() => cb())
           .catch(cb);
       }]

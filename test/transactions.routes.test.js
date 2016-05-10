@@ -5,12 +5,10 @@ const _ = require('lodash');
 const app = require('../index');
 const async = require('async');
 const sinon = require('sinon');
-const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;
 const request = require('supertest');
 const config = require('config');
 const utils = require('../test/utils.js')();
-const createTransaction = require('../server/controllers/transactions')(app)._create;
 
 /**
  * Variables.
@@ -237,9 +235,16 @@ describe('transactions.routes.test.js', () => {
           expect(t).to.have.property('UserId', user.id); // ...
           expect(t).to.have.property('payoutMethod', transactionsData[0].payoutMethod);
 
-          models.Activity.findAndCountAll({}).then((res) => {
-            expect(res.rows[0]).to.have.property('TransactionId', t.id);
+          models.Activity.findAndCountAll({}).then(res => {
             expect(res.count).to.equal(1);
+            const activity = res.rows[0].get();
+            expect(activity).to.have.property('type', 'group.transaction.created');
+            expect(activity).to.have.property('GroupId', privateGroup.id);
+            expect(activity).to.have.property('UserId', user.id);
+            expect(activity).to.have.property('TransactionId', t.id);
+            expect(activity.data.transaction).to.have.property('id', t.id);
+            expect(activity.data.group).to.have.property('id', privateGroup.id);
+            expect(activity.data.user).to.have.property('id', user.id);
             done();
           });
 

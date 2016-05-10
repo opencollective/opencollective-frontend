@@ -20,6 +20,7 @@ module.exports = function(app) {
   var Activity = models.Activity;
   var Notification = models.Notification;
   var User = models.User;
+  const Group = models.Group;
   var PaymentMethod = models.PaymentMethod;
   var errors = app.errors;
   var emailLib = require('../lib/email')(app);
@@ -31,9 +32,9 @@ module.exports = function(app) {
   var create = (args, callback) => {
     var transaction = args.transaction;
     const subscription = args.subscription;
-    var user = args.user || {};
-    var group = args.group || {};
-    var paymentMethod = args.paymentMethod || {};
+    var user = args.user;
+    var group = args.group;
+    var paymentMethod = args.paymentMethod;
 
     if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
       // populate netAmountInGroupCurrency for donations
@@ -65,7 +66,7 @@ module.exports = function(app) {
       addTransactionToUser: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
-        if (user && user.addTransaction) {
+        if (user) {
           user
             .addTransaction(transaction)
             .done(cb);
@@ -85,7 +86,7 @@ module.exports = function(app) {
       addTransactionToPaymentMethod: ['createTransaction', (cb, results) => {
         var transaction = results.createTransaction;
 
-        if (paymentMethod.addTransaction) {
+        if (paymentMethod) {
           paymentMethod
             .addTransaction(transaction)
             .done(cb);
@@ -94,44 +95,21 @@ module.exports = function(app) {
         }
       }],
 
-      createActivity: ['createTransaction', (cb, results) => {
-        var transaction = results.createTransaction;
+      createTransactionCreatedActivity: [
+        'addTransactionToUser', 'addTransactionToGroup', 'addTransactionToPaymentMethod',
+        (cb, results) => {
+          const transaction = results.createTransaction;
 
-        // Create activity.
-        Activity.create({
-          type: activities.GROUP_TRANSACTION_CREATED,
-          UserId: user.id,
-          GroupId: group.id,
-          TransactionId: transaction.id,
-          data: {
-            group: group.info,
-            transaction: transaction,
-            user: user.info,
-            paymentMethod: paymentMethod.info
+          // if the transaction hasn't been temporarily flagged as inactive (PayPal donation flow)
+          if (!transaction.deletedAt) {
+            createGroupTransactionCreatedActivity(transaction.id)
+              .then(() => cb())
+              .catch(cb);
+          } else {
+            cb();
           }
-        }).done(cb);
-      }],
-
-      notifySubscribers: ['createActivity', (cb, results) => {
-        var activity = results.createActivity;
-
-        Notification.findAll({
-          include:{
-            model: User,
-            attributes: ['email']
-          },
-          where: {
-            type: activity.type,
-            GroupId: activity.GroupId
-          }
-        }).then((notifications) => {
-          return notifications.map((s) => emailLib.send(activity.type, s.User.email, activity.data))
-        })
-        .then(() => cb())
-        .catch((err) => {
-          console.error(`Unable to fetch subscribers of ${activity.type} for group ${activity.GroupId}`, err);
-        });
-      }]
+        }
+      ]
 
     }, (e, results) => {
       if (e) return callback(e);
@@ -330,6 +308,55 @@ var payServices = {
 
   };
 
+  const createGroupTransactionCreatedActivity = function (transactionId) {
+    var activity;
+
+    return Transaction.findOne({
+      where: { id: transactionId },
+      include: [
+        { model: Group },
+        { model: User },
+        { model: PaymentMethod }
+      ]
+    })
+      // Create activity.
+      .then(transaction => {
+        const activityPayload = {
+          type: activities.GROUP_TRANSACTION_CREATED,
+          TransactionId: transaction.id,
+          GroupId: transaction.GroupId,
+          UserId: transaction.UserId,
+          data: {
+            transaction: transaction.get(),
+            group: transaction.Group.get('info')
+          }
+        };
+        if (transaction.User) {
+          activityPayload.data.user = transaction.User.get('info');
+        }
+        if (transaction.PaymentMethod) {
+          activityPayload.data.paymentMethod = transaction.PaymentMethod.get('info');
+        }
+        return Activity
+          .create(activityPayload)
+          .tap(a => activity = a);
+      })
+      .catch(err => console.error(`Error creating activity of type ${activities.GROUP_TRANSACTION_CREATED} for transaction ID ${transactionId}`, err))
+      // notify subscribers
+      .then(() => Notification.findAll({
+        include: {
+          model: User,
+          attributes: ['email']
+        },
+        where: {
+          type: activity.type,
+          GroupId: activity.GroupId
+        }
+      }))
+      .then(notifications => notifications.map(notif => emailLib.send(activity.type, notif.User.email, activity.data)))
+      .catch(err => console.error(`Unable to fetch subscribers of ${activity.type} for group ${activity.GroupId}`, err));
+  };
+
   /**
    * Attribute a transaction to a user.
    */
@@ -411,15 +438,11 @@ var payServices = {
    */
   const getSubscriptions = (req, res, next) => {
     models.Subscription.findAll({
-      include: [
-        {
-          model: models.Transaction,
-          where: {
-            UserId: req.remoteUser.id
-          },
-          include: [{ model: models.Group }]
-        },
-      ]
+      include: {
+        model: Transaction,
+        where: { UserId: req.remoteUser.id },
+        include: { model: Group }
+      }
     })
     .then((subscriptions) => res.send(subscriptions))
     .catch(next)
@@ -433,7 +456,7 @@ var payServices = {
     _create: create,
     pay,
     attributeUser,
-    getSubscriptions
+    getSubscriptions,
+    createGroupTransactionCreatedActivity
   }
-
 };
