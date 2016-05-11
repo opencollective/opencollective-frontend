@@ -13,7 +13,7 @@ sendErrorByEmail = (req, err) => {
 
   req.app.mailgun.sendMail({
     from: config.email.from,
-    to: 'ops+servererror@opencollective.com',
+    to: 'server-errors@opencollective.com',
     subject: `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
     html: errorHTML
   }, e => { if (e) console.error(e); });
