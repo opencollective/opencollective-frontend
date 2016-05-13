@@ -118,21 +118,15 @@ describe('groups.routes.test.js', () => {
         });
     });
 
-    it('fails if @ symbol in twitterHandle', (done) => {
+    it('gracefully handles twitterHandle with or without @', (done) => {
       request(app)
         .post('/groups')
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .send({
           group: _.extend({}, privateGroupData, {twitterHandle: '@asood123'})
         })
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'validation_failed',
-            message: 'Validation error: twitterHandle must be without @ symbol',
-            fields: ['twitterHandle']
-          }
-        })
+        .expect((res) => { res.body = { twitterHandle: res.body.twitterHandle }})
+        .expect(200, { twitterHandle: 'asood123' })
         .end(done);
     });
 
@@ -614,6 +608,7 @@ describe('groups.routes.test.js', () => {
       mission: 'new mission',
       description: 'new desc',
       longDescription: 'long description',
+      whyJoin: 'because you should',
       budget: 1000000,
       burnrate: 10000,
       logo: 'http://opencollective.com/assets/logo.svg',
@@ -622,6 +617,7 @@ describe('groups.routes.test.js', () => {
       backgroundImage: 'http://opencollective.com/assets/backgroundImage.png',
       expensePolicy: 'expense policy',
       isPublic: true,
+      settings: { lang: 'fr' },
       otherprop: 'value'
     };
 
@@ -753,6 +749,8 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('mission', groupNew.mission);
           expect(res.body).to.have.property('description', groupNew.description);
           expect(res.body).to.have.property('longDescription', groupNew.longDescription);
+          expect(res.body).to.have.property('whyJoin', groupNew.whyJoin);
+          expect(res.body.settings).to.have.property('lang', groupNew.settings.lang);
           expect(res.body).to.have.property('budget', groupNew.budget);
           expect(res.body).to.have.property('burnrate', groupNew.burnrate);
           expect(res.body).to.have.property('logo', groupNew.logo);

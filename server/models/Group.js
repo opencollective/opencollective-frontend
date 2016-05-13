@@ -37,6 +37,7 @@ module.exports = function(Sequelize, DataTypes) {
     description: DataTypes.STRING, // max 95 characters
 
     longDescription: DataTypes.TEXT('long'),
+    whyJoin: DataTypes.TEXT('long'),
 
     // We should update those two fields periodically (but no need to be real time)
     budget: DataTypes.INTEGER, // yearly budget in cents
@@ -66,6 +67,11 @@ module.exports = function(Sequelize, DataTypes) {
           })
         }
       }
+    },
+
+    settings: {
+      type: DataTypes.JSON,
+      allowNull: true
     },
 
     hostFeePercent: {
@@ -98,10 +104,9 @@ module.exports = function(Sequelize, DataTypes) {
 
     twitterHandle: {
       type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
-      validate: {
-        notContains: {
-          args: '@',
-          msg: 'twitterHandle must be without @ symbol'
+      set(username) {
+        if (username.substr(0,1) === '@') {
+          this.setDataValue('twitterHandle', username.substr(1));
         }
       }
     },
@@ -127,6 +132,7 @@ module.exports = function(Sequelize, DataTypes) {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
+          whyJoin: this.whyJoin,
           budget: this.budget,
           burnrate: this.burnrate,
           currency: this.currency,
@@ -140,6 +146,7 @@ module.exports = function(Sequelize, DataTypes) {
           isPublic: this.isPublic,
           slug: this.slug,
           tiers: this.tiers,
+          settings: this.settings,
           website: this.website,
           twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl,

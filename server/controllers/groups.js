@@ -417,6 +417,8 @@ module.exports = function(app) {
       'mission',
       'description',
       'longDescription',
+      'whyJoin',
+      'settings',
       'currency',
       'logo',
       'video',

@@ -1,20 +1,20 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, DataTypes) {
+  up: (queryInterface, DataTypes) => {
     return queryInterface.addColumn('Users', 'resetPasswordTokenHash', {
       type: DataTypes.STRING
     })
-    .then(function() {
+    .then(() => {
       return queryInterface.addColumn('Users', 'resetPasswordSentAt', {
         type: DataTypes.DATE
       });
     })
   },
 
-  down: function (queryInterface, Sequelize) {
+  down: (queryInterface) => {
     return queryInterface.removeColumn('Users', 'resetPasswordTokenHash')
-    .then(function() {
+    .then(() => {
       return queryInterface.removeColumn('Users', 'resetPasswordSentAt');
     })
   }
