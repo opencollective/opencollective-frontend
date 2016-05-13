@@ -6,6 +6,7 @@ var Bluebird = require('bluebird');
 var async = require('async');
 var userlib = require('../lib/userlib');
 var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
+var imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
 var constants = require('../constants/activities');
 
 /**
@@ -120,7 +121,18 @@ module.exports = function(app) {
 
       fetchUserAvatar: ['updateFields', (cb, results) => {
         userlib.fetchAvatar(results.updateFields, (err, user) => {
-          cb(null, user);
+          var avatar = user.avatar;
+          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(app.knox.bucket) === -1)
+          {
+            imageUrlToAmazonUrl(app.knox, avatar, (error, aws_src) => {
+              user.avatar = error ? user.avatar : aws_src;
+              cb(null, user);
+            });
+          }
+          else
+          {
+            cb(null, user);
+          }
         });
       }],
 
