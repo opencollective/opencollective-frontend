@@ -19,7 +19,7 @@ main() {
     parseStep
     setRepoDir
 
-    if [ "$REPO_NAME" = "api" ]; then
+    if [ "$REPO_NAME" = "opencollective-api" ]; then
       setPgDatabase
     fi
 
@@ -69,10 +69,10 @@ scanFileParameter() {
 
 setTestFile() {
   ABS_FILE=$(get_abs_filename $1)
-  if [[ "$ABS_FILE" =~ \/website\/ ]]; then
+  if [[ "$ABS_FILE" =~ website\/ ]]; then
     WEBSITE_TEST_FILE=$1
     echo "Setting website E2E test file to $WEBSITE_TEST_FILE"
-  elif [[ "$ABS_FILE" =~ \/app\/ ]]; then
+  elif [[ "$ABS_FILE" =~ app\/ ]]; then
     APP_TEST_FILE=$1
     echo "Setting app E2E test file to $APP_TEST_FILE"
   else
@@ -84,8 +84,8 @@ setTestFile() {
 parseSteps() {
   for STEP in ${PARAMS}; do
     parseStep
-    if ( [ "$REPO_NAME" = "website" ] && [ ! -z "$APP_TEST_FILE" ] ) ||
-       ( [ "$REPO_NAME" = "app" ] && [ ! -z "$WEBSITE_TEST_FILE" ] ); then
+    if ( [ "$REPO_NAME" = "opencollective-website" ] && [ ! -z "$APP_TEST_FILE" ] ) ||
+       ( [ "$REPO_NAME" = "opencollective-app" ] && [ ! -z "$WEBSITE_TEST_FILE" ] ); then
       echo "Skipping $STEP"
       continue
     fi
@@ -94,11 +94,11 @@ parseSteps() {
 }
 
 parseStep() {
-  REPO_NAME=$(echo ${STEP} | sed 's/:.*//')
+  REPO_NAME=opencollective-$(echo ${STEP} | sed 's/:.*//')
   PHASE=$(echo ${STEP} | sed 's/.*://')
-  if ( [ "$REPO_NAME" != "api" ] && [ "$REPO_NAME" != "website" ] && [ "$REPO_NAME" != "app" ] ) ||
+  if ( [ "$REPO_NAME" != "opencollective-api" ] && [ "$REPO_NAME" != "opencollective-website" ] && [ "$REPO_NAME" != "opencollective-app" ] ) ||
      ( [ "$PHASE" != "install" ] && [ "$PHASE" != "run" ] && [ "$PHASE" != "testE2E" ] ) ||
-     ( [ "$REPO_NAME" = "api" ] && [ "$PHASE" = "testE2E" ] ); then    echo "Unrecognized step $STEP"
+     ( [ "$REPO_NAME" = "opencollective-api" ] && [ "$PHASE" = "testE2E" ] ); then    echo "Unrecognized step $STEP"
     usage 1;
   fi
 }
@@ -148,14 +148,14 @@ setRepoDir() {
     REPO_DIR=${LOCAL_DIR}
   else
     if [ "$NODE_ENV" = "development" ]; then
-      REPO_DIR_VAR_NAME=$(echo ${REPO_NAME} | awk '{print toupper($0)}')_DIR
+      REPO_DIR_VAR_NAME=$(echo ${REPO_NAME} | sed 's/opencollective-//' | awk '{print toupper($0)}')_DIR
       if [ ! -d "${!REPO_DIR_VAR_NAME}" ]; then
         echo "$REPO_DIR_VAR_NAME not configured in .env"
         exit 1
       fi
       REPO_DIR=${!REPO_DIR_VAR_NAME}
     else
-      REPO_DIR="$HOME/opencollective-$REPO_NAME"
+      REPO_DIR="$HOME/$REPO_NAME"
     fi
   fi
 }
@@ -166,7 +166,7 @@ install() {
   else
     echo "Checking out $REPO_NAME into $REPO_DIR"
     # use Github SVN export to avoid fetching git history, faster
-    REPO_SVN=https://github.com/OpenCollective/opencollective-${REPO_NAME}/trunk
+    REPO_SVN=https://github.com/OpenCollective/${REPO_NAME}/trunk
     svn export ${REPO_SVN} ${REPO_DIR}
     cd ${REPO_DIR}
     echo "Performing NPM install"
@@ -226,10 +226,10 @@ run() {
 
 testE2E() {
   cd ${REPO_DIR}
-  if [ "$REPO_NAME" = "website" ] && [ ! -z "$WEBSITE_TEST_FILE" ]; then
+  if [ "$REPO_NAME" = "opencollective-website" ] && [ ! -z "$WEBSITE_TEST_FILE" ]; then
     echo "Starting ${REPO_NAME} E2E with test file $WEBSITE_TEST_FILE"
     npm run nightwatch -- --test ${WEBSITE_TEST_FILE}
-  elif [ "$REPO_NAME" = "app" ] && [ ! -z "$APP_TEST_FILE" ]; then
+  elif [ "$REPO_NAME" = "opencollective-app" ] && [ ! -z "$APP_TEST_FILE" ]; then
     echo "Starting ${REPO_NAME} E2E with test file $APP_TEST_FILE"
     npm run nightwatch -- --test ${APP_TEST_FILE}
   else
