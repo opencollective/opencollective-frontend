@@ -155,7 +155,7 @@ setRepoDir() {
       fi
       REPO_DIR=${!REPO_DIR_VAR_NAME}
     else
-      REPO_DIR="$HOME/$REPO_NAME"
+      REPO_DIR="$HOME/opencollective-$REPO_NAME"
     fi
   fi
 }
@@ -166,7 +166,7 @@ install() {
   else
     echo "Checking out $REPO_NAME into $REPO_DIR"
     # use Github SVN export to avoid fetching git history, faster
-    REPO_SVN=https://github.com/OpenCollective/${REPO_NAME}/trunk
+    REPO_SVN=https://github.com/OpenCollective/opencollective-${REPO_NAME}/trunk
     svn export ${REPO_SVN} ${REPO_DIR}
     cd ${REPO_DIR}
     echo "Performing NPM install"
