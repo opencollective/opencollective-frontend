@@ -7,6 +7,7 @@ module.exports = function(app) {
   var controllers = [
     'activities',
     'donations',
+    'expenses',
     'paymentmethods',
     'groups',
     'images',

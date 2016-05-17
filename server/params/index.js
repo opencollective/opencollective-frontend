@@ -9,6 +9,7 @@ module.exports = (app) => {
   const User = models.User;
   const Group = models.Group;
   const Transaction = models.Transaction;
+  const Expense = models.Expense;
   const errors = app.errors;
 
   /**
@@ -113,6 +114,23 @@ module.exports = (app) => {
           }
         })
         .catch(next);
+    },
+
+    /**
+     * ExpenseId.
+     */
+    expenseid: (req, res, next, expenseid) => {
+      parseId(expenseid)
+        .then(id => Expense.find(id))
+        .then((expense) => {
+          if (!expense) {
+            return next(new errors.NotFound(`Expense '${expenseid}' not found`));
+          } else {
+            req.expense = expense;
+            next();
+          }
+        })
+        .catch(next)
     },
   }
 };

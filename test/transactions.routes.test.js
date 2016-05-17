@@ -157,6 +157,7 @@ describe('transactions.routes.test.js', () => {
   /**
    * Create.
    */
+  // TODO remove #postmigration, replaced by expenses.routes.test.js
   describe('#create', () => {
 
     it('fails creating a transaction if no authenticated', (done) => {
@@ -863,6 +864,7 @@ describe('transactions.routes.test.js', () => {
   /**
    * Approve.
    */
+  // TODO remove #postmigration, replaced by expenses.routes.test.js
   describe('#approve', () => {
 
     var transaction;

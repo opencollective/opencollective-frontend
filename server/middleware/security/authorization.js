@@ -164,19 +164,19 @@ module.exports = function (app) {
       }
     },
 
-    authorizeGroupAccessToTransaction(options) {
+    authorizeGroupAccessTo(attributeName, options) {
       if (!options) options = {};
       return (req, res, next) => {
         var _authorizeAccessToTransaction = () => {
           // TODO shouldn't return NotFound before authorization check
-          if (!req.transaction) {
+          if (!req[attributeName]) {
             return next(new NotFound());
           }
           if (!req.group) {
             return next(new NotFound('Cannot authorize a transaction without a specified group.'));
           }
-          if (req.transaction.GroupId !== req.group.id) {
-            return next(new Forbidden('This group does not have access to this transaction.'));
+          if (req[attributeName].GroupId !== req.group.id) {
+            return next(new Forbidden(`This group does not have access to attribute ${attributeName}`));
           }
           next();
         };
@@ -194,6 +194,10 @@ module.exports = function (app) {
       }
     },
 
+    authorizeGroupAccessToTransaction(options) {
+      return this.authorizeGroupAccessTo('transaction', options);
+    },
+    
     authorizeAccessToUserWithRecentDonation: (req, res, next) => {
       models.Donation.findOne({
         where: {

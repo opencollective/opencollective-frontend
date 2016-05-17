@@ -30,6 +30,7 @@ module.exports = (app) => {
   const notifications = Controllers.notifications;
   const transactions = Controllers.transactions;
   const donations = Controllers.donations;
+  const expenses = Controllers.expenses;
   const paypal = Controllers.paypal;
   const images = Controllers.images;
   const paymentMethods = Controllers.paymentmethods;
@@ -38,7 +39,7 @@ module.exports = (app) => {
   const test = Controllers.test;
   const subscriptions = Controllers.subscriptions;
   const connectedAccounts = Controllers.connectedAccounts;
-
+  
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
 
@@ -54,6 +55,7 @@ module.exports = (app) => {
   app.param('groupid', params.groupid);
   app.param('transactionid', params.transactionid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
+  app.param('expenseid', params.expenseid);
 
   /**
    * User reset password flow (no jwt verification)
@@ -126,7 +128,7 @@ module.exports = (app) => {
   app.post('/groups/:groupid/donations', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
   app.post('/groups/:groupid/donations/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
 
-  // TODO: Remove after frontend migrates to new calls above
+  // TODO: Remove #postmigration after frontend migrates to POST /groups/:groupid/donations/*
   app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
   app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
 
@@ -145,9 +147,7 @@ module.exports = (app) => {
    */
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
-  // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
-  // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
-  // TODO refactor with single route using authentication.js and authorization.js middleware
+  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
   const commonLegacySecurityMw = [mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration];
   app.post('/groups/:groupid/transactions', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
   app.post('/groups/:groupid/transactions', commonLegacySecurityMw, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
@@ -155,10 +155,23 @@ module.exports = (app) => {
   app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessToTransaction({authIfPublic: true}), groups.getTransaction); // Get a transaction.
   app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
   app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
+  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/approve
   app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.setApprovedState); // Approve a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
+
+  /**
+   * Expenses
+   */
+
+  // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
+  // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
+  // TODO refactor with single route using authentication.js and authorization.js middleware
+  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense for a group.
+  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense for a group.
+  app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
+
 
   /**
    * Activities.

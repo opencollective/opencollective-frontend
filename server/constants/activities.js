@@ -3,6 +3,7 @@
  */
 
 module.exports = {
+  GROUP_EXPENSE_CREATED: 'group.expense.created',
   GROUP_TRANSACTION_CREATED: 'group.transaction.created',
   GROUP_TRANSACTION_PAID: 'group.transaction.paid',
   USER_CREATED: 'user.created',

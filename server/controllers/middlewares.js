@@ -29,10 +29,16 @@ module.exports = function(app) {
 
       var email, paypalEmail, password;
 
+      // TODO remove #postmigration, replaced by req.body.expense
       if(req.body.transaction) {
         email = req.body.transaction.email;
         paypalEmail = req.body.transaction.paypalEmail;
       }
+      else if(req.body.expense) {
+        email = req.body.expense.email;
+        paypalEmail = req.body.expense.paypalEmail;
+      }
+      // TODO remove #postmigration
       else if(req.body.payment) {
         email = req.body.payment.email;
       }

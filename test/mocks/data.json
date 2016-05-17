@@ -409,5 +409,11 @@
     "interval": "month",
     "isActive": true,
     "stripeSubscriptionId": "sub_tokentest"
+  },
+  "expense1": {
+    "description": "Lunch with Jenn",
+    "amount": 120.00,
+    "currency": "USD",
+    "paypalEmail": "userpaypal@gmail.com"
   }
 }
