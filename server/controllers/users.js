@@ -12,7 +12,7 @@ var constants = require('../constants/activities');
 /**
  * Controller.
  */
-module.exports = function(app) {
+module.exports = (app) => {
 
   /**
    * Internal Dependencies.
@@ -38,7 +38,7 @@ module.exports = function(app) {
     .then((userGroups) => _.pluck(userGroups, 'info'));
   };
 
-  var getGroupsFromUser = function(req, options) {
+  var getGroupsFromUser = (req, options) => {
     // UserGroup has multiple entries for a user and group because
     // of the multiple roles. We will get the unique groups in-memory for now
     // because of the small number of groups.
@@ -53,7 +53,7 @@ module.exports = function(app) {
       });
   };
 
-  var getGroupsFromUserWithRoles = function(req, options) {
+  var getGroupsFromUserWithRoles = (req, options) => {
     /**
      * This isn't the best way to get the user role but I couldn't find a
      * clean way to do it with sequelize. If you find it, please refactor.
@@ -74,7 +74,7 @@ module.exports = function(app) {
     });
   };
 
-  var updatePaypalEmail = function(req, res, next) {
+  var updatePaypalEmail = (req, res, next) => {
     var required = req.required || {};
 
     req.user.paypalEmail = required.paypalEmail;
@@ -84,7 +84,7 @@ module.exports = function(app) {
     .catch(next);
   };
 
-  var updateAvatar = function(req, res, next) {
+  var updateAvatar = (req, res, next) => {
     var required = req.required || {};
 
     req.user.avatar = required.avatar;
@@ -169,7 +169,7 @@ module.exports = function(app) {
     });
   };
 
-  var getBalancePromise = function(GroupId) {
+  var getBalancePromise = (GroupId) => {
     return new Bluebird((resolve, reject) => {
       groups.getBalance(GroupId, (err, balance) => {
         return err ? reject(err) : resolve(balance);
@@ -177,7 +177,7 @@ module.exports = function(app) {
     });
   };
 
-  var _create = function(user, cb) {
+  var _create = (user, cb) => {
     userlib.fetchInfo(user, (err, user) => {
       User
         .create(user)
@@ -311,10 +311,28 @@ module.exports = function(app) {
    */
   return {
 
+    getOrCreate: (email, cb) => {
+      if (!email) {
+        return _create({ email }, cb);
+      };
+     return models.User.findOne({
+        where: {
+          email: email
+        }
+      })
+      .then((user) => {
+        if (user) {
+          return cb(null, user);
+        }
+        _create({ email }, cb);
+      })
+      .catch(cb);
+    },
+
     /**
      * Create a user.
      */
-    create: function(req, res, next) {
+    create: (req, res, next) => {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
 
@@ -329,7 +347,7 @@ module.exports = function(app) {
     /**
      * Get token.
      */
-    getToken: function(req, res) {
+    getToken: (req, res) => {
       res.send({
         access_token: req.user.jwt(req.application),
         refresh_token: req.user.refresh_token
@@ -339,7 +357,7 @@ module.exports = function(app) {
     /**
      * Show.
      */
-    show: function(req, res, next) {
+    show: (req, res, next) => {
       if (req.remoteUser.id === req.user.id) {
         req.user.getStripeAccount()
           .then((account) => {
@@ -356,7 +374,7 @@ module.exports = function(app) {
     /**
      * Get a user's groups.
      */
-    getGroups: function(req, res, next) {
+    getGroups: (req, res, next) => {
       // Follows json api spec http://jsonapi.org/format/#fetching-includes
       var include = req.query.include;
       var withRoles = _.contains(include, 'usergroup.role');

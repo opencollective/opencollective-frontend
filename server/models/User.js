@@ -201,8 +201,9 @@ module.exports = function(Sequelize, DataTypes) {
 
     instanceMethods: {
       // JWT token.
-      jwt: function(application, payload) {
+      jwt: function(application, payload, expiresInHours) {
         const secret = config.keys.opencollective.secret;
+        expiresInHours = expiresInHours || 24*30; // 1 month
 
         // We are sending too much data (large jwt) but the app and website
         // need the id and email. We will refactor that progressively to have
@@ -213,7 +214,7 @@ module.exports = function(Sequelize, DataTypes) {
         });
 
         return jwt.sign(data, secret, {
-          expiresIn: 60 * 60 * 24 * 30, // 1 month
+          expiresIn: 60 * 60 * expiresInHours,
           subject: this.id, // user
           issuer: config.host.api,
           audience: application.id
@@ -255,9 +256,15 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       generateSubscriptionsLink(application) {
-        const token = this.jwt(application, { scope: 'subscriptions' });
+        const expiresInHours = 24*30;
+        const token = this.jwt(application, { scope: 'subscriptions' }, expiresInHours);
 
         return `${config.host.website}/subscriptions/${token}`;
+      },
+
+      generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
+        const expiresInHours = 24;
+        return token = this.jwt(application, { scope: 'github', connectedAccountId, username}, expiresInHours);
       }
 
     },
