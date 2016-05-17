@@ -75,7 +75,6 @@
     "test": "npm run test:unit",
     "test:unit": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
     "test:cover": "istanbul cover _mocha -- -R spec test",
-    "posttest": "npm run test:e2e",
     "test:e2e": "npm run test:e2e:exec api:run website:run website:testE2E app:run app:testE2E",
     "test:e2e:exec": "bash scripts/test_e2e.sh",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
