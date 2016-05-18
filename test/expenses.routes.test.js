@@ -9,7 +9,7 @@ const roles = require('../server/constants/roles');
 const models = app.set('models');
 const Expense = models.Expense;
 
-describe.only('expenses.routes.test.js: GIVEN an application, group, and host user', () => {
+describe('expenses.routes.test.js: GIVEN an application, group, and host user', () => {
   var application, user, group;
 
   beforeEach(done => {
