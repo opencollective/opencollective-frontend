@@ -39,7 +39,7 @@ module.exports = (app) => {
   const test = Controllers.test;
   const subscriptions = Controllers.subscriptions;
   const connectedAccounts = Controllers.connectedAccounts;
-  
+
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
 
@@ -121,6 +121,7 @@ module.exports = (app) => {
    * Groups.
    */
   app.post('/groups', aN.authenticateUserByJwt(), required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
+  app.post('/groups/create_from_github_repo', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, required('payload'), connectedAccounts.createGroupFromGithubRepo)
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.

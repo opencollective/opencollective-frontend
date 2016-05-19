@@ -67,7 +67,7 @@ module.exports = function(app) {
     });
   }
 
-  const addUserToGroup = (group, user, options, callback) => {
+  const _addUserToGroup = (group, user, options, callback) => {
     async.auto({
       checkIfGroupHasHost: (cb) => {
         if (options.role !== roles.HOST) {
@@ -397,7 +397,7 @@ module.exports = function(app) {
               remoteUser: req.remoteUser
             };
 
-            addUserToGroup(group, req.remoteUser, options, cb);
+            _addUserToGroup(group, req.remoteUser, options, cb);
           }
         }, (e) => {
           if (e) return next(e);
@@ -521,7 +521,7 @@ module.exports = function(app) {
       remoteUser: req.remoteUser
     };
 
-    addUserToGroup(req.group, req.user, options, (e) => {
+    _addUserToGroup(req.group, req.user, options, (e) => {
       if (e) return next(e);
 
       subscribeUserToGroupEvents(req.user, req.group, options.role);
@@ -615,6 +615,7 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
+    _addUserToGroup,
     create,
     update,
     getOne,

@@ -95,6 +95,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     slug: {
       type: DataTypes.STRING,
+      unique: true,
       set(slug) {
         if (slug && slug.toLowerCase) {
           this.setDataValue('slug', slug.toLowerCase());
