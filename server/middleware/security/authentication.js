@@ -1,5 +1,8 @@
 var config = require('config');
 var jwt = require('jsonwebtoken');
+const passport = require('passport');
+const request = require('request-promise');
+
 var errors = require('../../lib/errors');
 var required = require('../required_param');
 
@@ -24,6 +27,8 @@ const secret = config.keys.opencollective.secret;
 module.exports = function (app) {
 
   var models = app.get('models');
+  var controllers = app.get('controllers');
+  var connectedAccounts = controllers.connectedAccounts;
   var Application = models.Application;
   var User = models.User;
 
@@ -99,25 +104,8 @@ module.exports = function (app) {
 
     authenticateAppByApiKey: (req, res, next) => {
       required('api_key')(req, res, (e) => {
-        if (e) {
-          return next(e);
-        }
-        const appApiKey = req.query.api_key || req.body.api_key;
-
-        // TODO simplify with promises
-        Application.findByKey(appApiKey, (e, application) => {
-          if (e) {
-            return next(e);
-          }
-          if (!application) {
-            return next(new Unauthorized(`Invalid API key: ${appApiKey}`));
-          }
-          if (application.disabled) {
-            return next(new Forbidden('Application disabled'));
-          }
-          req.application = application;
-          next();
-        });
+        if (e) return next(e);
+        findApplicationByKey(req.required.api_key, req, next);
       });
     },
 
@@ -224,6 +212,66 @@ module.exports = function (app) {
           this.authenticateAppByApiKey(req, res, next);
         });
       };
+    },
+
+    authenticateAppByEncryptedApiKey: (req, res, next) => {
+      required('api_key_enc')(req, res, (e) => {
+        if (e) return next(e);
+        const apiKeyEnc = req.required.api_key_enc;
+        try {
+          const apiKey = jwt.verify(apiKeyEnc, secret).apiKey;
+          findApplicationByKey(apiKey, req, next);
+        } catch (e) {
+          return res.send(400, e.message);
+        }
+      });
+    },
+
+    authenticateService: (req, res, next) => {
+      const apiKey = req.required.api_key;
+      const apiKeyEnc = jwt.sign({apiKey}, secret, { expiresIn: '1min' });
+      const service = req.params.service;
+      passport.authenticate(service, {
+        callbackURL: `${config.host.api}/connected-accounts/${service}/callback?api_key_enc=${apiKeyEnc}`,
+        // TODO set proper scope
+        scope: [ 'user:email' ]
+      })(req, res, next);
+    },
+
+    authenticateServiceCallback: (req, res, next) => {
+      const service = req.params.service;
+      passport.authenticate(service, (err, accessToken, profile) => {
+        if (err) {
+          return next(err);
+        }
+        if (!accessToken) {
+          return res.redirect(config.host.website);
+        }
+        request({
+          uri: 'https://api.github.com/user/emails',
+          qs: { access_token: accessToken },
+          headers: { 'User-Agent': 'OpenCollective' },
+          json: true
+        })
+          .then(json => json.map(entry => entry.email))
+          .then(emails => connectedAccounts.createOrUpdate(req, res, next, accessToken, profile, emails))
+          .catch(next);
+      })(req, res, next);
     }
   };
+
+  function findApplicationByKey(api_key, req, next) {
+    Application.findOne({ where: { api_key }})
+      .then(application => {
+        if (!application) {
+          return next(new Unauthorized(`Invalid API key: ${api_key}`));
+        }
+        if (application.disabled) {
+          return next(new Forbidden('Application disabled'));
+        }
+        req.application = application;
+        next();
+      })
+      .catch(next);
+  }
 };

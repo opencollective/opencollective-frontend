@@ -1,12 +1,16 @@
 const app = require('../index');
+const config = require('config');
 const request = require('supertest');
 const utils = require('./utils')();
 const expect = require('chai').expect;
+const jwt = require('jsonwebtoken');
 
 const models = app.set('models');
+const clientId = config.github.clientID;
 
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
 
+  var application, req;
   beforeEach(done => {
     utils.cleanAllDb((e, app) => {
       application = app;
@@ -18,49 +22,77 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
     beforeEach(done => {
       req = request(app)
-        .post('/connected-accounts/github');
+        .get('/connected-accounts/github');
       done();
     });
 
     describe('WHEN calling without API key', () => {
-      beforeEach(done => {
-        req = req.send({ accessToken: 'blah' });
-        done();
-      });
 
       it('THEN returns 400', done => req.expect(400).end(done));
     });
 
-    describe('WHEN providing API key but no token', () => {
-      beforeEach(done => {
-        req = req.send({ api_key: application.api_key });
-        done();
-      });
-
-      it('THEN returns 400', done => req.expect(400).end(done));
-    });
-  });
-
-  [
-    { service: 'github', status: 200 },
-    { service: 'twitter', status: 200 },
-    { service: 'blah', status: 400 }
-  ]
-    .forEach(row => {
-
-    describe(`WHEN calling /connected-accounts/${row.service} with API key and token`, () => {
+    describe('WHEN calling /connected-accounts/github with API key', () => {
 
       beforeEach(done => {
         req = request(app)
-          .post(`/connected-accounts/${row.service}`)
-          .send({
-            api_key: application.api_key,
-            accessToken: 'blah'
-          });
+          .get(`/connected-accounts/github`)
+          .send({ api_key: application.api_key });
         done();
       });
 
-      it(`THEN returns ${row.status}`, done => req.expect(row.status).end(done));
+      it('THEN returns 302 with location', done => {
+        req.expect(302)
+          .end((err, res) => {
+            expect(err).not.to.exist;
+            const baseUrl = 'https://github.com/login/oauth/authorize';
+            const apiKeyEnc = '.*';
+            const redirectUri = encodeURIComponent(`${config.host.api}/connected-accounts/github/callback?api_key_enc=${apiKeyEnc}`);
+            const scope = encodeURIComponent('user:email');
+            const location = `^${baseUrl}\\?response_type=code&redirect_uri=${redirectUri}&scope=${scope}&client_id=${clientId}$`;
+            expect(res.headers.location).to.match(new RegExp(location));
+            done();
+          });
+      });
+    });
+  });
+
+  describe('WHEN calling /connected-accounts/github/callback', () => {
+
+    beforeEach(done => {
+      req = request(app)
+        .get('/connected-accounts/github/callback');
+      done();
+    });
+
+    describe('WHEN calling without API key', () => {
+
+      it('THEN returns 400', done => req.expect(400).end(done));
+    });
+
+    describe('WHEN calling with invalid API key', () => {
+      beforeEach(done => {
+        req = req.send({ api_key_enc: 'bla' });
+        done();
+      });
+
+      it('THEN returns 400', done => req.expect(400).end(done));
+    });
+
+    describe('WHEN calling with valid API key', () => {
+      beforeEach(done => {
+        const api_key_enc = jwt.sign({ apiKey: application.api_key }, config.keys.opencollective.secret);
+        req = req.send({ api_key_enc });
+        done();
+      });
+
+      it('THEN returns 302 with location', done => {
+        req.expect(302)
+          .end((err, res) => {
+            expect(err).not.to.exist;
+            expect(res.headers.location).to.be.equal(`https://github.com/login/oauth/authorize?response_type=code&client_id=${clientId}`);
+            done();
+          });
+      });
     });
   });
 
@@ -115,7 +147,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     describe('WHEN providing API key, token and scope', () => {
       beforeEach(done => {
         req = req
-              .set('Authorization', 'Bearer ' + user.jwt(application, { scope: 'github', username: 'asood123', connectedAccountId: 1}))
+              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'github', username: 'asood123', connectedAccountId: 1})}`)
               .send({ api_key: application.api_key });
         done();
       });

@@ -264,7 +264,7 @@ module.exports = function(Sequelize, DataTypes) {
 
       generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
         const expiresInHours = 24;
-        return token = this.jwt(application, { scope: 'github', connectedAccountId, username}, expiresInHours);
+        return this.jwt(application, { scope: 'connectedAccount', connectedAccountId, username }, expiresInHours);
       }
 
     },

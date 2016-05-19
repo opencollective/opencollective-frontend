@@ -207,10 +207,12 @@ module.exports = (app) => {
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
-   * ConnectedAccounts
+   * Generic OAuth2 (ConnectedAccounts)
    */
-  app.post('/connected-accounts/:service', aN.authenticateAppByApiKey, required('accessToken'), connectedAccounts.post);
+  app.get('/connected-accounts/:service(github)', aN.authenticateAppByApiKey, aN.authenticateService);
+  app.get('/connected-accounts/:service/callback', aN.authenticateAppByEncryptedApiKey, aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
+
   /**
    * Reset test-api database
    */

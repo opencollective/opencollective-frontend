@@ -47,5 +47,9 @@
   "slack": {
     "hookUrl": "SLACK_HOOK_URL"
   },
-  "clearbit": "CLEARBIT_KEY"
+  "clearbit": "CLEARBIT_KEY",
+  "github": {
+    "clientID": "GITHUB_CLIENT_ID",
+    "clientSecret": "GITHUB_CLIENT_SECRET"
+  }
 }

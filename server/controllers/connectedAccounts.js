@@ -1,41 +1,37 @@
+const config = require('config');
+
 module.exports = (app) => {
   const errors = app.errors;
-  const models = app.set('models');
+  const models = app.get('models');
   const ConnectedAccount = models.ConnectedAccount;
-  const users = require('../controllers/users')(app);
+  const User = models.User;
 
   return {
-    post: (req, res, next) => {
-      const accessToken = req.body.accessToken;
-      const username = req.body.clientId;
-      var email = req.body.email;
-      if (!accessToken) {
-        return next(new errors.BadRequest('Access Token not provided'));
-      }
+    createOrUpdate: (req, res, next, accessToken, profile, emails) => {
+      var caId, user;
+      const attrs = { provider: req.params.service };
 
-      var caId;
-      if (!email) {
-        // TODO: temporarily putting an email address in to get past "email can't be null" requirement
-        email = `${username}.${req.params.service}@opencollective.com`;
-      }
-      users.getOrCreate(email, (err, user) => {
-        if (err) return next(err);
-        const attrs = { provider: req.params.service, UserId: user.id };
-        ConnectedAccount
-          // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
-          // https://github.com/sequelize/sequelize/issues/4631
-          .findOne({ where: attrs})
-          .then(ca => ca || ConnectedAccount.create(attrs))
-          .then(ca => {
-            caId = ca.id;
-            return ca.update({username, secret: accessToken});
-          })
-          .then(() =>
-            res.send({
-              success: true,
-              token: user.generateConnectedAccountVerifiedToken(req.application, caId, username)}))
-          .catch(next);
-      });
+      // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
+      // https://github.com/sequelize/sequelize/issues/4631
+      User.findOne({ where: { email: { $in: emails }}})
+        .then(u => u || User.create({
+          name: profile.displayName,
+          avatar: profile.avatar_url,
+          email: emails[0]
+        }))
+        .tap(u => user = u)
+        .tap(user => attrs.UserId = user.id)
+        .then(() => ConnectedAccount.findOne({ where: attrs }))
+        .then(ca => ca || ConnectedAccount.create(attrs))
+        .then(ca => {
+          caId = ca.id;
+          return ca.update({ username: profile.username, secret: accessToken });
+        })
+        .then(() => {
+          const token = user.generateConnectedAccountVerifiedToken(req.application, caId, profile.username);
+          res.redirect(`${config.host.website}/github/apply/${token}`);
+        })
+        .catch(next);
     },
 
     get: (req, res, next) => {
