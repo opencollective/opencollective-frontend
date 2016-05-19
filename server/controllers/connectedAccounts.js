@@ -37,7 +37,7 @@ module.exports = (app) => {
     get: (req, res, next) => {
       const payload = req.jwtPayload;
       const provider = req.params.service;
-      if (payload.scope === provider && payload.username) {
+      if (payload.scope === 'connected-account' && payload.username) {
         res.send({provider, username: payload.username, connectedAccountId: payload.connectedAccountId})
       } else {
         return next(new errors.BadRequest('Github authorization failed'));
