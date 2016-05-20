@@ -1,9 +1,9 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var async = require('async');
-var utils = require('../lib/utils');
+const _ = require('lodash');
+const async = require('async');
+const utils = require('../lib/utils');
 
 /**
  * Controller.
@@ -13,16 +13,18 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var errors = app.errors;
-  var models = app.set('models');
-  var sequelize = models.sequelize;
-  var Activity = models.Activity;
-  var Notification = models.Notification;
-  var Group = models.Group;
-  var Transaction = models.Transaction;
-  var transactions = require('../controllers/transactions')(app);
-  var roles = require('../constants/roles');
-  var activities = require('../constants/activities');
+  const errors = app.errors;
+  const models = app.set('models');
+  const sequelize = models.sequelize;
+  const Activity = models.Activity;
+  const Notification = models.Notification;
+  const Group = models.Group;
+  const Transaction = models.Transaction;
+  const ConnectedAccount = models.ConnectedAccount;
+  const User = models.User;
+  const transactions = require('../controllers/transactions')(app);
+  const roles = require('../constants/roles');
+  const activities = require('../constants/activities');
 
   /**
    * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
@@ -374,7 +376,7 @@ module.exports = function(app) {
         async.series({
           createActivity: (cb) => {
             Activity.create({
-              type: 'group.created',
+              type: activities.GROUP_CREATED,
               UserId: req.remoteUser.id,
               GroupId: group.id,
               data: {
@@ -407,6 +409,92 @@ module.exports = function(app) {
       })
       .catch(next);
   };
+
+  /*
+   * Creates a group from Github
+   */
+  const createFromGithub = (req, res, next) => {
+
+      var payload = req.required.payload;
+      const connectedAccountId = req.jwtPayload.connectedAccountId;
+
+      var creator;
+      const group = payload.group;
+      const contributors = payload.users;
+      const creatorGithubUsername = payload.github_username;
+
+      ConnectedAccount
+        .findOne({
+          where: { id: connectedAccountId },
+          include: { model: User }
+        })
+        .then(ca => creator = ca.User)
+        .then(() => Group.create(group))
+        .then(group => {
+          const options = {
+            role: roles.MEMBER,
+            remoteUser: creator
+          };
+          async.auto({
+            createActivity: (cb) => {
+              Activity.create({
+                type: activities.GROUP_CREATED,
+                UserId: creator.id,
+                GroupId: group.id,
+                data: {
+                  group: group.info,
+                  user: creator.info
+                }
+              }).done(cb);
+            },
+
+            addCreator: ['createActivity', (cb) => {
+              _addUserToGroup(group, creator, options, cb);
+            }],
+
+            addContributors: ['addCreator', (cb) => {
+              // TODO: find a cleaner way of doing this
+              async.each(contributors, (contributor, callback) => {
+                // since we added the creator above with an email, avoid double adding
+                if (contributor !== creatorGithubUsername) {
+                  const caAttr = {
+                    username: contributor,
+                    provider: 'github'
+                  };
+                  var userAttr = {
+                    avatar: `http://avatars.githubusercontent.com/${contributor}`
+                  };
+                  var connectedAccount;
+                  ConnectedAccount.findOne({ where: caAttr })
+                    .then(ca => ca || ConnectedAccount.create(caAttr))
+                    .then(ca => {
+                      connectedAccount = ca;
+                      if (!ca.UserId) {
+                        return User.findOne({where: userAttr});
+                      } else {
+                        return ca.getUser();
+                      }
+                    })
+                    .then(user => user || User.create(userAttr))
+                    .then(user => user.addConnectedAccount(connectedAccount))
+                    .then(ca => ca.getUser())
+                    .then(user => _addUserToGroup(group, user, options, callback))
+                    .done();
+                } else {
+                  callback();
+                }
+              }, (err) => {
+                if (err) return next(err);
+                cb();
+              });
+            }]
+          }, (e) => {
+            if (e) return next(e);
+            res.send(group.info);
+          });
+        })
+        .catch(next);
+    }
 
   /**
    * Update.
@@ -617,6 +705,7 @@ module.exports = function(app) {
   return {
     _addUserToGroup,
     create,
+    createFromGithub,
     update,
     getOne,
     addUser,

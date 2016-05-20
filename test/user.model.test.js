@@ -35,11 +35,12 @@ describe('user.models.test.js', () => {
    */
   describe('#create', () => {
 
-    it('fails without email', (done) => {
+    it('succeeds without email', (done) => {
       User
         .create({ name: userData.name})
         .done((err, user) => {
-          expect(err).to.exist;
+          expect(err).to.not.exist;
+          expect(user).to.have.property('name', userData.name);
           done();
         });
 

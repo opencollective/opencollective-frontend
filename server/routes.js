@@ -3,6 +3,7 @@ const serverStatus = require('express-server-status');
 const roles = require('./constants/roles');
 const jwt = require('./middleware/jwt');
 const required = require('./middleware/required_param');
+const ifParam = require('./middleware/if_param');
 
 /**
  * NotImplemented response.
@@ -120,8 +121,8 @@ module.exports = (app) => {
   /**
    * Groups.
    */
+  app.post('/groups', ifParam('flow', 'github'), aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
   app.post('/groups', aN.authenticateUserByJwt(), required('group'), groups.create); // Create a group. Option `role` to assign the caller directly (default to null).
-  app.post('/groups/create_from_github_repo', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, required('payload'), connectedAccounts.createGroupFromGithubRepo)
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.

@@ -231,6 +231,137 @@ describe('groups.routes.test.js', () => {
   });
 
   /**
+   * Create from Github
+   */
+  describe('#createFromGithub', () => {
+
+    it('fails creating a group if param value is not github', (done) => {
+      request(app)
+        .post('/groups?flow=blah')
+        .send({
+          payload: privateGroupData
+        })
+        .expect(400)
+        .end((e, res) => {
+          done();
+        });
+    });
+
+    it('fails creating a group if no app key', (done) => {
+      request(app)
+        .post('/groups?flow=github')
+        .send({
+          payload: privateGroupData
+        })
+        .expect(400)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          done();
+        });
+    });
+
+
+    it('fails creating a group without payload', (done) => {
+      request(app)
+        .post('/groups?flow=github')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          group: privateGroupData,
+          api_key: application.api_key
+        })
+        .expect(400)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          done();
+        });
+    });
+
+
+    describe('Successfully create a group and ', () => {
+
+      const ConnectedAccount = models.ConnectedAccount;
+
+      beforeEach((done) => {
+        const User = models.User;
+
+        // create connected account like the oauth happened
+        var preCA;
+        var firstUser;
+        ConnectedAccount.create({
+          username: 'asood123',
+          provider: 'github',
+          secret: 'xxxxx'
+        })
+        .then(ca => {
+          preCA = ca;
+          return User.create({email: 'asood123@yahoo.com'});
+        })
+        .then(user => {
+          firstUser = user;
+          return user.addConnectedAccount(preCA)
+        })
+        .done(done);
+      });
+
+
+      it('assigns contributors as users with connectedAccounts', (done) => {
+        request(app)
+        .post('/groups?flow=github')
+        .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
+        .send({
+          payload: {
+            group: {
+              name:'Loot',
+              slug:'Loot',
+              expensePolicy: 'expense policy',
+              mission: 'mission statement'
+            },
+            users: ['asood123', 'oc'],
+            github_username: 'asood123'
+          },
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('id');
+          expect(res.body).to.have.property('name', 'Loot');
+          expect(res.body).to.have.property('slug', 'loot');
+          expect(res.body).to.have.property('mission', 'mission statement');
+          expect(res.body).to.have.property('description');
+          expect(res.body).to.have.property('longDescription');
+          expect(res.body).to.have.property('expensePolicy', 'expense policy');
+          expect(res.body).to.have.property('isPublic', false);
+
+          var caUser;
+          ConnectedAccount.findOne({where: {username: 'asood123'}})
+            .then(ca => {
+              expect(ca).to.have.property('provider', 'github');
+              return ca.getUser();
+            })
+            .then(user => expect(user).to.exist)
+            .then(() => ConnectedAccount.findOne({where: {username: 'oc'}}))
+            .then(ca => {
+              expect(ca).to.have.property('provider', 'github');
+              return ca.getUser();
+            })
+            .then(user => {
+              caUser = user;
+              expect(user).to.exist;
+            })
+            .then(() => caUser.getGroups())
+            .then((groups) => {
+              expect(groups).to.have.length(1);
+              done();
+            });
+        });
+      });
+
+    });
+
+  });
+
+  /**
    * Get.
    */
   describe('#get', () => {
@@ -445,7 +576,7 @@ describe('groups.routes.test.js', () => {
 
       // Create group2.
       beforeEach((done) => {
-        models.Group.create(utils.data('group2')).done((e, g) => {
+        models.Group.create(_.omit(utils.data('group2'),['slug'])).done((e, g) => {
           expect(e).to.not.exist;
           group2 = g;
           group2
