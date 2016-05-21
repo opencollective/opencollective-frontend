@@ -21,12 +21,13 @@ module.exports = (app) => {
   var User = models.User;
   var Activity = models.Activity;
   var UserGroup = models.UserGroup;
-  var groups = require('../controllers/groups')(app);
   var sendEmail = require('../lib/email')(app).send;
   var errors = app.errors;
 
   /**
+   *
    * Private methods.
+   *
    */
 
   var getUserGroups = (UserId) => {
@@ -169,14 +170,6 @@ module.exports = (app) => {
     });
   };
 
-  var getBalancePromise = (GroupId) => {
-    return new Bluebird((resolve, reject) => {
-      groups.getBalance(GroupId, (err, balance) => {
-        return err ? reject(err) : resolve(balance);
-      });
-    });
-  };
-
   var _create = (user, cb) => {
     userlib.fetchInfo(user, (err, user) => {
       User
@@ -307,27 +300,11 @@ module.exports = (app) => {
   };
 
   /**
+   *
    * Public methods.
+   *
    */
   return {
-
-    getOrCreate: (email, cb) => {
-      if (!email) {
-        return _create({ email }, cb);
-      };
-     return models.User.findOne({
-        where: {
-          email: email
-        }
-      })
-      .then((user) => {
-        if (user) {
-          return cb(null, user);
-        }
-        _create({ email }, cb);
-      })
-      .catch(cb);
-    },
 
     /**
      * Create a user.
@@ -390,12 +367,9 @@ module.exports = (app) => {
         getGroupsFromUserWithRoles(req, options) :
         getGroupsFromUser(req, options);
 
-      promise.map((group) => {
-        return getBalancePromise(group.id)
-        .then((balance) => _.extend(group, { balance }))
-      })
-      .then((out) => res.send(out))
-      .catch(next);
+      promise
+        .then(out => res.send(out))
+        .catch(next);
     },
 
     updatePaypalEmail,

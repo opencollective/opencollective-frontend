@@ -222,7 +222,7 @@ module.exports = function (app) {
           const apiKey = jwt.verify(apiKeyEnc, secret).apiKey;
           findApplicationByKey(apiKey, req, next);
         } catch (e) {
-          return res.send(400, e.message);
+          return res.sendStatus(400).send(e.message);
         }
       });
     },

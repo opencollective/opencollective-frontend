@@ -118,7 +118,7 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('fails if no email', (done) => {
+    it('succeeds even without email', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -126,8 +126,8 @@ describe('users.routes.test.js', () => {
           user: _.omit(userData, 'email')
         })
         .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('validation_failed');
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('name', userData.name);
           done();
         });
     });

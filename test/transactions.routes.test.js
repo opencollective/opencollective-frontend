@@ -87,7 +87,7 @@ describe('transactions.routes.test.js', () => {
 
   // Create the group2.
   beforeEach((done) => {
-    models.Group.create(utils.data('group2')).done((e, g) => {
+    models.Group.create(_.omit(utils.data('group2'), ['slug'])).done((e, g) => {
       expect(e).to.not.exist;
       group2 = g;
       done();

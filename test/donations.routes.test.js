@@ -125,7 +125,7 @@ describe('donations.routes.test.js', () => {
       .post('/groups')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
-        group: utils.data('group2'),
+        group: utils.data('group1'),
         role: roles.HOST
       })
       .expect(200)
@@ -617,7 +617,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('amount', CHARGE*100);
             expect(res.rows[0]).to.have.property('title',
-              'Donation to ' + group.name);
+              'Donation to ' + group2.name);
             done();
           })
           .catch(done);
@@ -770,7 +770,7 @@ describe('donations.routes.test.js', () => {
               expect(res.rows[0]).to.have.property('amount', data.amount*100);
               expect(res.rows[0]).to.have.property('SubscriptionId');
               expect(res.rows[0]).to.have.property('title',
-                `Donation to ${group.name}`);
+                `Donation to ${group2.name}`);
               done();
             })
             .catch(done);
@@ -1066,7 +1066,6 @@ describe('donations.routes.test.js', () => {
               .then(res => {
                 expect(res.count).to.equal(1);
                 const activity = res.rows[0].get();
-                console.log("activity", activity);
                 expect(activity).to.have.property('GroupId', group.id);
                 expect(activity).to.have.property('UserId', transaction.UserId);
                 expect(activity).to.have.property('TransactionId', transaction.id);

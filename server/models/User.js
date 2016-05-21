@@ -42,7 +42,6 @@ module.exports = function(Sequelize, DataTypes) {
 
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
       unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password
       set(val) {
         if (val && val.toLowerCase) {
@@ -264,7 +263,7 @@ module.exports = function(Sequelize, DataTypes) {
 
       generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
         const expiresInHours = 24;
-        return this.jwt(application, { scope: 'connectedAccount', connectedAccountId, username }, expiresInHours);
+        return this.jwt(application, { scope: 'connected-account', connectedAccountId, username }, expiresInHours);
       }
 
     },

@@ -147,7 +147,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     describe('WHEN providing API key, token and scope', () => {
       beforeEach(done => {
         req = req
-              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'github', username: 'asood123', connectedAccountId: 1})}`)
+              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
               .send({ api_key: application.api_key });
         done();
       });

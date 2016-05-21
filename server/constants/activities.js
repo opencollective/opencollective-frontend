@@ -8,5 +8,6 @@ module.exports = {
   GROUP_TRANSACTION_PAID: 'group.transaction.paid',
   USER_CREATED: 'user.created',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
-  SUBSCRIPTION_CONFIRMED: 'subscription.confirmed'
+  SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
+  GROUP_CREATED: 'group.created'
 };
