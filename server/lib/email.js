@@ -5,6 +5,7 @@ const moment = require('moment');
 const _ = require('lodash');
 
 const templatesNames = [
+  'github.signup',
   'group.transaction.created',
   'thankyou',
   'thankyou.wwcode',

@@ -25,6 +25,7 @@ module.exports = function(app) {
   const transactions = require('../controllers/transactions')(app);
   const roles = require('../constants/roles');
   const activities = require('../constants/activities');
+  const emailLib = require('../lib/email')(app);
 
   /**
    * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
@@ -429,7 +430,13 @@ module.exports = function(app) {
           include: { model: User }
         })
         .then(ca => creator = ca.User)
-        .then(() => Group.create(group))
+        .then(() => Group.findOne({where: {slug: group.slug.toLowerCase()}}))
+        .then(existingGroup => {
+          if (existingGroup) {
+            group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
+          }
+          return Group.create(group)
+        })
         .then(group => {
           const options = {
             role: roles.MEMBER,
@@ -487,6 +494,15 @@ module.exports = function(app) {
                 if (err) return next(err);
                 cb();
               });
+            }],
+
+            sendEmail: ['addCreator', (cb) => {
+              const data = {
+                name: creator.name,
+                group: group.info
+              }
+              emailLib.send('github.signup', creator.email, data);
+              cb();
             }]
           }, (e) => {
             if (e) return next(e);
