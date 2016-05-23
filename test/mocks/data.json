@@ -233,6 +233,31 @@
             "publicUrl": "blah.com"
           }
         }
+      },
+      {
+        "type": "group.created",
+        "data": {
+          "user": {
+            "email":"jussi@kuohujoki.fi"
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          }
+        }
+      },
+      {
+        "type": "group.user.added",
+        "data": {
+          "user": {
+            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "id": 2
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          }
+        }
       }
     ]
   },
