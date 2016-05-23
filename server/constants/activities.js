@@ -3,11 +3,12 @@
  */
 
 module.exports = {
+  GROUP_CREATED: 'group.created',
   GROUP_EXPENSE_CREATED: 'group.expense.created',
   GROUP_TRANSACTION_CREATED: 'group.transaction.created',
   GROUP_TRANSACTION_PAID: 'group.transaction.paid',
-  USER_CREATED: 'user.created',
-  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
+  GROUP_USER_ADDED: 'group.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
-  GROUP_CREATED: 'group.created'
+  USER_CREATED: 'user.created',
+  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received'
 };

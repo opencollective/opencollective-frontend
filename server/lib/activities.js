@@ -9,6 +9,7 @@ module.exports = {
 
     // declare common variables used across multiple activity types
     var userString = '';
+    var userId;
     var groupName = '';
     var publicUrl = '';
     var amount = null;
@@ -25,7 +26,10 @@ module.exports = {
     if (activity.data.user) {
       const userName = activity.data.user.username;
       const userEmail = activity.data.user.email;
+      const userAvatar = activity.data.user.avatar;
+      userId = activity.data.user.id;
       userString = userName ? `${userName} (${userEmail})` : userEmail;
+      userString = userString ? `${userString}` : linkifyForSlack(userAvatar);
 
       const twitterHandle = activity.data.user.twitterHandle;
       if (linkify) {
@@ -110,7 +114,15 @@ module.exports = {
       case activities.SUBSCRIPTION_CONFIRMED:
         // Ex: Confirmed subscription of 1 USD/month from Aseem to WWCode-Seattle!
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
-      break;
+        break;
+
+      case activities.GROUP_CREATED:
+        return `New group created: ${group} by ${userString}`;
+        break;
+
+      case activities.GROUP_USER_ADDED:
+        return `New user ${userString} (UserId: ${userId}) added to group: ${group}`;
+        break;
 
       default:
         return `Oops... I got an unknown activity type: ${activity.type}`;
