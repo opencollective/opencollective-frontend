@@ -294,7 +294,7 @@ describe('groups.routes.test.js', () => {
         })
         .then(ca => {
           preCA = ca;
-          return User.create({email: 'asood123@yahoo.com'});
+          return User.create({email: 'githubuser@gmail.com'});
         })
         .then(user => {
           firstUser = user;
@@ -305,6 +305,8 @@ describe('groups.routes.test.js', () => {
 
 
       it('assigns contributors as users with connectedAccounts', (done) => {
+        var mailgunStub = sinon.stub(app.mailgun, 'sendMail');
+
         request(app)
         .post('/groups?flow=github')
         .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
@@ -332,6 +334,8 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
           expect(res.body).to.have.property('isPublic', false);
+          expect(mailgunStub.lastCall.args[0].to).to.equal('githubuser@gmail.com');
+          app.mailgun.sendMail.restore();
 
           var caUser;
           ConnectedAccount.findOne({where: {username: 'asood123'}})
@@ -356,7 +360,6 @@ describe('groups.routes.test.js', () => {
             });
         });
       });
-
     });
 
   });

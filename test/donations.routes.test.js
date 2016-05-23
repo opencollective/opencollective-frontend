@@ -50,7 +50,6 @@ describe('donations.routes.test.js', () => {
     stub.yields(null, mock);
   };
 
-  var mailgunStub = sinon.stub(app.mailgun, 'sendMail');
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
@@ -540,6 +539,13 @@ describe('donations.routes.test.js', () => {
         email: userData.email
       };
 
+      var mailgunStub;
+
+      beforeEach(done => {
+        mailgunStub = sinon.stub(app.mailgun, 'sendMail');
+        done();
+      });
+
       // Nock for charges.create.
       beforeEach(() => {
         var params = [
@@ -572,6 +578,10 @@ describe('donations.routes.test.js', () => {
             done();
           });
       });
+
+      afterEach(() => {
+        app.mailgun.sendMail.restore();
+      })
 
       it('successfully creates a Stripe customer', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
