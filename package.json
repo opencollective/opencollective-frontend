@@ -100,5 +100,5 @@
     "script": "node scripts/execute",
     "install:debs": "bash scripts/install_apt_get_debs.sh"
   },
-  "license": "Copyright (c) 2016 OpenCollective, Inc."
+  "license": "MIT"
 }
