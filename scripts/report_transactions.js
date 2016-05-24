@@ -1,12 +1,16 @@
 const app = require('../index');
+const Promise = require('bluebird');
 const models = app.set('models');
 const moment = require('moment-timezone');
-const async = require('async');
 const _ = require('lodash');
 const activities = require('../server/constants/activities');
 const slackLib = require('../server/lib/slack');
 
 onlyExecuteInProdOnMondays();
+
+const Transaction = models.Transaction;
+const Activity = models.Activity;
+const Group = models.Group;
 
 const createdLastWeek = getTimeFrame('createdAt');
 const updatedLastWeek = getTimeFrame('updatedAt');
@@ -53,105 +57,65 @@ const groupByCurrency = {
   order: ['currency']
 };
 
-async.auto({
+const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
+
+const distinct = {
+  plain: false,
+  distinct: true
+};
+
+Promise.props({
 
   // Donation statistics
 
-  donationCount: cb => {
-    models.Transaction
-        .count(lastWeekDonations)
-        .done(cb);
-  },
+  donationCount: Transaction.count(lastWeekDonations),
 
-  donationAmount: cb => {
-    models.Transaction
-      .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
-      .map(row => `${row.SUM} ${row.currency}`)
-      .done(cb);
-  },
+  donationAmount: Transaction
+    .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
+    .map(row => `${row.SUM} ${row.currency}`),
 
-  stripeReceivedCount: cb => {
-    const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
-    models.Activity
-      .count(_.merge({}, createdLastWeek, stripeReceived))
-      .done(cb);
-  },
+  stripeReceivedCount: Activity.count(_.merge({}, createdLastWeek, stripeReceived)),
 
   // Expense statistics
 
-  pendingExpenseCount: cb => {
-    models.Transaction
-      .count(pendingLastWeekExpenses)
-      .done(cb);
-  },
+  pendingExpenseCount: Transaction.count(pendingLastWeekExpenses),
 
-  approvedExpenseCount: cb => {
-    models.Transaction
-        .count(approvedLastWeekExpenses)
-        .done(cb);
-  },
+  approvedExpenseCount: Transaction.count(approvedLastWeekExpenses),
 
-  rejectedExpenseCount: cb => {
-    models.Transaction
-      .count(rejectedLastWeekExpenses)
-      .done(cb);
-  },
+  rejectedExpenseCount: Transaction.count(rejectedLastWeekExpenses),
 
-  pendingExpenseAmount: cb => {
-    models.Transaction
-      .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, groupByCurrency))
-      .map(row => `${-row.SUM} ${row.currency}`)
-      .done(cb);
-  },
+  pendingExpenseAmount: Transaction
+    .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, groupByCurrency))
+    .map(row => `${-row.SUM} ${row.currency}`),
 
-  approvedExpenseAmount: cb => {
-    models.Transaction
-      .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
-      .map(row => `${-row.SUM} ${row.currency}`)
-      .done(cb);
-  },
+  approvedExpenseAmount: Transaction
+    .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
+    .map(row => `${-row.SUM} ${row.currency}`),
 
-  rejectedExpenseAmount: cb => {
-    models.Transaction
-      .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, groupByCurrency))
-      .map(row => `${-row.SUM} ${row.currency}`)
-      .done(cb);
-  },
+  rejectedExpenseAmount: Transaction
+    .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, groupByCurrency))
+    .map(row => `${-row.SUM} ${row.currency}`),
 
   // Collective statistics
 
-  activeCollectiveCount: cb => {
-    const distinct = {
-      plain: false,
-      distinct: true
-    };
-    models.Transaction
-      .aggregate('GroupId', 'COUNT', _.merge({}, updatedLastWeek, distinct, excludeOcTeam))
-      .map(row => row.COUNT)
-      .done(cb);
-  },
+  activeCollectiveCount: Transaction
+    .aggregate('GroupId', 'COUNT', _.merge({}, updatedLastWeek, distinct, excludeOcTeam))
+    .map(row => row.COUNT),
 
-  newCollectives: cb => {
-    models.Group
-      .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
-      .map(group => group.dataValues.slug)
-      .done(cb);
-  }
-}, (err, results) => {
-  if (err) {
-    console.log('err', err);
-    process.exit();
-  } else {
-    const report = transactionReportString(results);
+  newCollectives: Group
+    .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
+    .map(group => group.dataValues.slug)
 
-    console.log(report);
-
-    slackLib.postMessage(report)
-      .then(() => {
-        console.log('Reporting done!');
-        process.exit();
-      });
-  }
+}).then(results => {
+  const report = transactionReportString(results);
+  console.log(report);
+  return slackLib.postMessage(report);
+}).then(() => {
+  console.log('Reporting done!');
+  process.exit();
+}).catch(err => {
+  console.log('err', err);
+  process.exit();
 });
 
 /**
