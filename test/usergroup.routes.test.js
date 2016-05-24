@@ -68,13 +68,7 @@ describe('usergroup.routes.test.js', () => {
   });
 
   // Create group.
-  beforeEach((done) => {
-    models.Group.create(utils.data('group1')).done((e, g) => {
-      expect(e).to.not.exist;
-      group = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
 
   // Add the host and a backer to the group.
   beforeEach((done) => {
@@ -434,6 +428,6 @@ describe('usergroup.routes.test.js', () => {
         })
         .end(done);
     });
-    
+
   });
 });

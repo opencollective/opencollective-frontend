@@ -73,13 +73,7 @@ describe('webhooks.routes.test.js', () => {
   });
 
   // Create a user.
-  beforeEach((done) => {
-    models.User.create(userData).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   // Create a group.
   beforeEach((done) => {
