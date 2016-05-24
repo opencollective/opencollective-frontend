@@ -1,4 +1,4 @@
-  --timeout 20000
-  --reporter spec
-  --reporter mocha-circleci-reporter
-  --require=./test/set_pg_database.js
+--timeout 20000
+--reporter spec
+--reporter mocha-circleci-reporter
+--require=./test/setup.js
