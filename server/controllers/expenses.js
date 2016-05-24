@@ -2,6 +2,7 @@
  * Dependencies.
  */
 
+const Promise = require('bluebird');
 const constants = require('../constants');
 
 /**
@@ -10,7 +11,7 @@ const constants = require('../constants');
 
 module.exports = (app) => {
 
-  // const errors = app.errors;
+  const errors = app.errors;
   const models = app.set('models');
   const Expense = models.Expense;
   const paypal = require('./paypal')(app);
@@ -59,68 +60,68 @@ module.exports = (app) => {
    */
 
   const setApprovalStatus = (req, res, next) => {
-    const expense = req.expense;
+    var preapprovalDetails;
 
     if (req.required.approved === false) {
-      return expense.reject()
+      return req.expense.reject()
         .then(() => res.send({success: true}))
         .catch(next);
     }
 
-    // We need to check the funds before approving a transaction
-    async.auto({
-      fetchPaymentMethods: (cb) => {
-        PaymentMethod.findAll({
-          where: {
-            service: 'paypal',
-            UserId: req.remoteUser.id
-          }
-        })
-        .done(cb);
-      },
-
-      getPreapprovalDetails: ['fetchPaymentMethods', (cb, results) => {
-        const paymentMethod = results.fetchPaymentMethods[0];
-
-        if (!paymentMethod || !paymentMethod.token) {
-          return cb(new errors.BadRequest('You can\'t approve a transaction without linking your PayPal account'));
-        }
-
-        paypal.getPreapprovalDetails(paymentMethod.token, cb);
-      }],
-
-      checkIfEnoughFunds: ['getPreapprovalDetails', (cb, results) => {
-        const maxAmount = Number(results.getPreapprovalDetails.maxTotalAmountOfAllPayments);
-        const currency = results.getPreapprovalDetails.currencyCode;
-
-        if (Math.abs(req.transaction.amount) > maxAmount) {
-          return cb(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve transaction.`));
-        }
-
-        cb();
-      }]
-    }, (err, results) => {
-      if (err && results.getPreapprovalDetails) {
-        console.error('PayPal error', JSON.stringify(results.getPreapprovalDetails));
-        if (results.getPreapprovalDetails.error instanceof Array) {
-          var message = results.getPreapprovalDetails.error[0].message;
-          return next(new errors.BadRequest(message));
-        }
-      }
-
-      if (err) return next(err);
-
-      expense.approve()
-        .then(() => res.send({success: true}))
-        .catch(next);
-
-    });
+    fetchPaymentMethod(req.remoteUser.id)
+      .then(paymentMethod => getPreapprovalDetails(paymentMethod))
+      .tap(d => preapprovalDetails = d)
+      .then(checkIfEnoughFunds(req.expense.amount))
+      .then(() => req.expense.approve())
+      .then(() => res.send({success: true}))
+      .catch(err => handleError(err, next, preapprovalDetails));
   };
-
 
   return {
     create,
     setApprovalStatus
   };
 
+  function fetchPaymentMethod(UserId) {
+    return models.PaymentMethod.findAll({
+      where: {
+        service: 'paypal',
+        UserId
+      }
+    })
+      .then(paymentMethods => {
+        const paymentMethod = paymentMethods[0];
+        if (!paymentMethod || !paymentMethod.token) {
+          return new errors.BadRequest("You can't approve a transaction without linking your PayPal account");
+        }
+        return paymentMethod;
+      });
+  }
+
+  function getPreapprovalDetails(paymentMethod) {
+    return Promise.promisify(paypal.getPreapprovalDetails)(paymentMethod.token);
+  }
+
+  function checkIfEnoughFunds(txAmount) {
+    return preapprovalDetails => {
+      const maxAmount = Number(preapprovalDetails.maxTotalAmountOfAllPayments);
+      const currency = preapprovalDetails.currencyCode;
+
+      if (Math.abs(txAmount) > maxAmount) {
+        return Promise.reject(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve transaction.`));
+      }
+      return Promise.resolve();
+    };
+  }
+
+  function handleError(err, next, preapprovalDetails) {
+    if (preapprovalDetails) {
+      console.error('PayPal error', JSON.stringify(preapprovalDetails));
+      if (preapprovalDetails.error instanceof Array) {
+        var message = preapprovalDetails.error[0].message;
+        return next(new errors.BadRequest(message));
+      }
+    }
+    return next(err);
+  }
 };
