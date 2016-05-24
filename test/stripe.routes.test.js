@@ -1,34 +1,23 @@
 /**
  * Dependencies.
  */
-
 var expect = require('chai').expect;
 var request = require('supertest');
 var async = require('async');
 var nock = require('nock');
 var config = require('config');
-var _ = require('lodash');
 var chance = require('chance').Chance();
 var sinon = require('sinon');
 
 var app = require('../index');
 var utils = require('../test/utils.js')();
-var models = app.set('models');
+var models = app.get('models');
 var roles = require('../server/constants/roles');
-
-/**
- * Mock data
- */
-
-var stripeMock = require('./mocks/stripe');
 
 describe('stripe.routes.test.js', () => {
 
-  var nocks = {};
-
   var user;
   var user2;
-  var paymentMethod;
   var group;
   var application;
   var sandbox = sinon.sandbox.create();
@@ -113,14 +102,15 @@ describe('stripe.routes.test.js', () => {
       request(app)
         .get('/stripe/authorize')
         .set('Authorization', 'Bearer ' + user2.jwt(application))
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'User is not a host 2'
-          }
-        })
-        .end(done);
+        .expect(400)
+        .end((err, res) => {
+          expect(err).not.to.exist;
+          console.log("res", res);
+          expect(res.body.error.code).to.be.equal(400);
+          expect(res.body.error.type).to.be.equal('bad_request');
+          expect(res.body.error.message).to.be.equal('User 2 is not a host');
+          done();
+        });
     });
 
     it('should redirect to stripe', (done) => {
@@ -173,42 +163,38 @@ describe('stripe.routes.test.js', () => {
     it('should fail if the user does not exist', (done) => {
       request(app)
         .get('/stripe/oauth/callback?state=123412312')
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'User is not a host 123412312'
-          }
-        })
-        .end(done);
+        .expect(400)
+        .end((err, res) => {
+          expect(err).not.to.exist;
+          console.log("res", res);
+          expect(res.body.error.code).to.be.equal(400);
+          expect(res.body.error.type).to.be.equal('bad_request');
+          expect(res.body.error.message).to.be.equal('User 123412312 is not a host');
+          done();
+        });
     });
 
     it('should fail if the user is not a host', (done) => {
       request(app)
         .get('/stripe/oauth/callback?state=' + user2.id)
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'bad_request',
-            message: 'User is not a host ' + user2.id
-          }
-        })
-        .end(done);
+        .expect(400)
+        .end((err, res) => {
+          expect(err).not.to.exist;
+          console.log("res", res);
+          expect(res.body.error.code).to.be.equal(400);
+          expect(res.body.error.type).to.be.equal('bad_request');
+          expect(res.body.error.message).to.be.equal(`User ${user2.id} is not a host`);
+          done();
+        });
     });
 
     it('should set a stripeAccount', (done) => {
-      var url = '/stripe/oauth/callback?state=' + user.id + '&code=abc';
-
       async.auto({
         request: (cb) => {
           request(app)
-            .get(url)
+            .get(`/stripe/oauth/callback?state=${user.id}&code=abc`)
             .expect(302)
-            .end((e, r) => {
-              console.log("error: ", e);
-              console.log("response: ", r.body);
-              cb();
-            });
+            .end(() => cb());
         },
 
         checkStripeAccount: ['request', (cb) => {
