@@ -65,13 +65,7 @@ describe('donations.routes.test.js', () => {
   });
 
   // Create a user.
-  beforeEach((done) => {
-    models.User.create(userData).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   // Nock for customers.create.
   beforeEach(() => {
@@ -166,13 +160,9 @@ describe('donations.routes.test.js', () => {
   });
 
   // Create an application which has only access to `group`
-  beforeEach((done) => {
-    models.Application.create(utils.data('application2')).done((e, a) => {
-      expect(e).to.not.exist;
-      application2 = a;
-      application2.addGroup(group2).done(done);
-    });
-  });
+  beforeEach(() => models.Application.create(utils.data('application2'))
+    .tap(a => application2 = a)
+    .then(() => application2.addGroup(group2)));
 
   // Nock for charges.create.
   beforeEach(() => {
@@ -464,15 +454,9 @@ describe('donations.routes.test.js', () => {
     describe('Payment success by a user who is a MEMBER of the group and should become BACKER', () => {
 
       // Add a user as a MEMBER
-      beforeEach((done) => {
-        models.User.create(utils.data('user4')).done((e, u) => {
-          expect(e).to.not.exist;
-          user4 = u;
-          group2
-            .addUserWithRole(user4, roles.MEMBER)
-            .done(done);
-        });
-      });
+      beforeEach(() => models.User.create(utils.data('user4'))
+        .tap(u => user4 = u)
+        .then(() => group2.addUserWithRole(user4, roles.MEMBER)));
 
       // Nock for charges.create.
       beforeEach(() => {

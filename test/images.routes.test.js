@@ -29,14 +29,7 @@ describe('images.routes.test.js', () => {
    * Create user
    */
 
-  beforeEach((done) => {
-    models.User.create(userData)
-    .done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   it('should upload an image to S3', (done) => {
     request(app)

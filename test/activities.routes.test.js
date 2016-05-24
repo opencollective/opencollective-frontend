@@ -43,61 +43,31 @@ describe('activities.routes.test.js', () => {
   });
 
   // Create users.
-  beforeEach((done) => {
-    models.User.create(utils.data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
-  beforeEach((done) => {
-    models.User.create(utils.data('user2')).done((e, u) => {
-      expect(e).to.not.exist;
-      user2 = u;
-      done();
-    });
-  });
-  beforeEach((done) => {
-    models.User.create(utils.data('user3')).done((e, u) => {
-      expect(e).to.not.exist;
-      user3 = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
+
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
   // Create group.
-  beforeEach((done) => {
-    models.Group.create(groupData).done((e, g) => {
-      expect(e).to.not.exist;
-      group = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(groupData).tap(g => group = g));
 
   // Add an host to the group.
-  beforeEach((done) => {
-    group
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
   // Add an backer to the group.
-  beforeEach((done) => {
-    group
-      .addUserWithRole(user3, roles.BACKER)
-      .done(done);
-  });
+  beforeEach(() => group.addUserWithRole(user3, roles.BACKER));
 
   // Create activities.
   beforeEach((done) => {
     async.eachSeries(activitiesData, (a, cb) => {
-      models.Activity.create(a).done(cb);
+      models.Activity.create(a)
+        .then(() => cb())
+        .catch(cb);
     }, done);
   });
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Get group's activities.

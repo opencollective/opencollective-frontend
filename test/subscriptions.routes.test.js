@@ -48,52 +48,26 @@ describe('subscriptions.routes.test.js', () => {
   });
 
   // Create user.
-  beforeEach((done) => {
-    models.User.create(utils.data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
   // Create the group.
-  beforeEach((done) => {
-    models.Group.create(utils.data('group1')).done((e, g) => {
-      expect(e).to.not.exist;
-      group = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(utils.data('group1')).tap((g => group = g)));
 
   // Add user to the group.
-  beforeEach((done) => {
-    group
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
   // create stripe account
-  beforeEach((done) => {
+  beforeEach(() => {
     models.StripeAccount.create({
       accessToken: 'sktest_123'
     })
-    .then((account) => user.setStripeAccount(account))
-    .then(() => done())
-    .catch(done);
+    .then((account) => user.setStripeAccount(account));
   });
 
   // Create a paymentMethod.
-  beforeEach((done) => {
-    models.PaymentMethod.create(utils.data('paymentMethod2')).done((e, c) => {
-      expect(e).to.not.exist;
-      paymentMethod = c;
-      done();
-    });
-  });
+  beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => paymentMethod = c));
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Get the subscriptions of a user
