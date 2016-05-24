@@ -75,7 +75,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 400', done => req.expect(400).end(done));
+      it('THEN returns 401', done => req.expect(401).end(done));
     });
 
     describe('WHEN calling with valid API key', () => {

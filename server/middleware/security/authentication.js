@@ -218,12 +218,12 @@ module.exports = function (app) {
       required('api_key_enc')(req, res, (e) => {
         if (e) return next(e);
         const apiKeyEnc = req.required.api_key_enc;
-        try {
-          const apiKey = jwt.verify(apiKeyEnc, secret).apiKey;
-          findApplicationByKey(apiKey, req, next);
-        } catch (e) {
-          return res.sendStatus(400).send(e.message);
-        }
+        jwt.verify(apiKeyEnc, secret, (err, decoded) => {
+          if (err) {
+            return next(new Unauthorized(err.message));
+          }
+          findApplicationByKey(decoded.apiKey, req, next);
+        });
       });
     },
 
