@@ -66,19 +66,24 @@ module.exports = function(app) {
               UserId: req.remoteUser.id
             }
           })
-          .done(cb);
+          .then(paymentMethods => cb(null, paymentMethods))
+          .catch(cb);
       }],
 
       checkExistingPaymentMethod: ['getExistingPaymentMethod', function(cb, results) {
         async.each(results.getExistingPaymentMethod.rows, (paymentMethod, cbEach) => {
           if (!paymentMethod.token) {
-            return paymentMethod.destroy().done(cbEach);
+            return paymentMethod.destroy()
+              .then(() => cbEach())
+              .catch(cbEach);
           }
 
           getPreapprovalDetails(paymentMethod.token, (err, response) => {
             if (err) return cbEach(err);
             if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {
-              paymentMethod.destroy().done(cbEach);
+              paymentMethod.destroy()
+                .then(() => cbEach())
+                .catch(cbEach);
             } else {
               cbEach();
             }
@@ -90,7 +95,9 @@ module.exports = function(app) {
         PaymentMethod.create({
           service: 'paypal',
           UserId: req.remoteUser.id
-        }).done(cb);
+        })
+        .then(paymentMethod => cb(null, paymentMethod))
+        .catch(cb);
       }],
 
       createPayload: ['createPaymentMethod', function(cb, results) {
@@ -118,7 +125,9 @@ module.exports = function(app) {
       updatePaymentMethod: ['createPaymentMethod', 'createPayload', 'callPaypal', function(cb, results) {
         var paymentMethod = results.createPaymentMethod;
         paymentMethod.token = results.callPaypal.preapprovalKey;
-        paymentMethod.save().done(cb);
+        paymentMethod.save()
+          .then(paymentMethod => cb(null, paymentMethod))
+          .catch(cb);
       }]
 
     }, (err, results) => {
@@ -144,7 +153,8 @@ module.exports = function(app) {
               token: req.params.preapprovalkey
             }
           })
-          .done(cb);
+          .then(paymentMethod => cb(null, paymentMethod))
+          .catch(cb);
       }],
 
       checkPaymentMethod: ['getPaymentMethod', function(cb, results) {
@@ -174,7 +184,9 @@ module.exports = function(app) {
         paymentMethod.confirmedAt = new Date();
         paymentMethod.data = results.callPaypal;
         paymentMethod.number = results.callPaypal.senderEmail;
-        paymentMethod.save().done(cb);
+        paymentMethod.save()
+          .then(paymentMethod => cb(null, paymentMethod))
+          .catch(cb);
       }],
 
       cleanOldPaymentMethods: ['updatePaymentMethod', function(cb) {
@@ -188,7 +200,9 @@ module.exports = function(app) {
           })
           .then((results) => {
             async.each(results.rows, (paymentMethod, cbEach) => {
-              paymentMethod.destroy().done(cbEach);
+              paymentMethod.destroy()
+                .then(() => cbEach())
+                .catch(cbEach);
             }, cb);
           })
           .catch(cb);
@@ -202,7 +216,9 @@ module.exports = function(app) {
             user: req.remoteUser,
             paymentMethod: results.updatePaymentMethod
           }
-        }).done(cb);
+        })
+        .then(activity => cb(null, activity))
+        .catch(cb);
       }]
 
     }, (err, results) => {

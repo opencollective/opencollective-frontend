@@ -45,7 +45,8 @@ module.exports = function(app) {
     async.auto({
       resetDb: (cb) => {
         sequelize.sync({force: true})
-          .done(cb);
+          .then(() => cb())
+          .catch(cb);
       },
 
       createApplication: ['resetDb', (cb) => {
@@ -54,12 +55,14 @@ module.exports = function(app) {
           api_key: apiKey,
           _access: 1
         })
-        .done(cb);
+          .then(() => cb())
+          .catch(cb);
       }],
 
       createTestUser: ['createApplication', (cb) => {
         models.User.create(testUser)
-        .done(cb);
+          .then(u => cb(null, u))
+          .catch(cb);
       }],
 
       createStripeAccount: ['createTestUser', (cb, results) => {
@@ -70,10 +73,9 @@ module.exports = function(app) {
           stripeUserId: 'acct_17TL97HrqFRlDDP2',
           scope: 'read_write'
         })
-        .then(stripeAccount => {
-          return results.createTestUser.setStripeAccount(stripeAccount);
-        })
-        .done(cb);
+        .then(stripeAccount => results.createTestUser.setStripeAccount(stripeAccount))
+        .then(stripeAccount => cb(null, stripeAccount))
+        .catch(cb);
       }],
 
       createConnectedAccount: ['createTestUser', (cb, results) => {
@@ -96,7 +98,8 @@ module.exports = function(app) {
           currency: 'EUR',
           isPublic: true
         })
-        .done(cb);
+        .then(group => cb(null, group))
+        .catch(cb);
       }],
 
       addUserToGroup: ['createGroup', (cb, results) => {

@@ -44,44 +44,22 @@ describe('paymentMethods.routes.test.js', () => {
   });
 
   // Create users.
-  beforeEach((done) => {
-    models.User.create(utils.data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-  beforeEach((done) => {
-    models.User.create(utils.data('user2')).done((e, u) => {
-      expect(e).to.not.exist;
-      user2 = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
   // Create paymentMethod.
-  beforeEach((done) => {
+  beforeEach(() => {
     var data = _.extend(paypalPaymentMethod, { UserId: user.id });
-    models.PaymentMethod.create(data).done((e, c) => {
-      expect(e).to.not.exist;
-      paymentMethod1 = c;
-      done();
-    });
+    return models.PaymentMethod.create(data).tap(pm => paymentMethod1 = pm);
   });
 
-  beforeEach((done) => {
+  beforeEach(() => {
     var data = _.extend(stripePaymentMethod, { UserId: user.id });
-    models.PaymentMethod.create(data).done((e, c) => {
-      expect(e).to.not.exist;
-      paymentMethod2 = c;
-      done();
-    });
+    return models.PaymentMethod.create(data).tap(pm => paymentMethod2 = pm);
   });
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Get user's groups.
