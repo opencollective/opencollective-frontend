@@ -30,28 +30,13 @@ describe('stripe.routes.test.js', () => {
   });
 
   // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   // Create a user.
-  beforeEach((done) => {
-    models.User.create(utils.data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
   // Create a user.
-  beforeEach((done) => {
-    models.User.create(utils.data('user2')).done((e, u) => {
-      expect(e).to.not.exist;
-      user2 = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
   // Create a group.
   beforeEach((done) => {
@@ -199,8 +184,7 @@ describe('stripe.routes.test.js', () => {
 
         checkStripeAccount: ['request', (cb) => {
           models.StripeAccount.findAndCountAll({})
-            .done((e, res) => {
-              expect(e).to.not.exist;
+            .then(res => {
               expect(res.count).to.be.equal(1);
               var account = res.rows[0];
               expect(account).to.have.property('accessToken', stripeResponse.access_token);
@@ -210,7 +194,8 @@ describe('stripe.routes.test.js', () => {
               expect(account).to.have.property('stripeUserId', stripeResponse.stripe_user_id);
               expect(account).to.have.property('scope', stripeResponse.scope);
               cb(null, account);
-            });
+            })
+            .catch(cb);
         }],
 
         checkUser: ['checkStripeAccount', (cb, results) => {
@@ -219,12 +204,12 @@ describe('stripe.routes.test.js', () => {
               StripeAccountId: results.checkStripeAccount.id
             }
           })
-          .done((e, res) => {
-            expect(e).to.not.exist;
+          .then(res => {
             expect(res.count).to.be.equal(1);
             expect(res.rows[0].id).to.be.equal(user.id);
             cb();
-          });
+          })
+          .catch(cb);
         }]
       }, done);
 

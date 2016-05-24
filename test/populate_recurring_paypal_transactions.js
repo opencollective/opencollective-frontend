@@ -2,6 +2,7 @@ const _ = require('lodash');
 const async = require('async');
 const config = require('config');
 const expect = require('chai').expect;
+const Promise = require('bluebird');
 
 const script = require('../scripts/populate_recurring_paypal_transactions');
 const app = require('../index');
@@ -38,7 +39,6 @@ const paypalTransaction = {
 describe('scripts/populate_recurring_paypal_transactions', () => {
   const billingAgreementId = 'billingAgreementId-abc';
 
-  var application;
   var user;
   var group;
   var transaction;
@@ -47,27 +47,11 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach((done) => utils.cleanAllDb(done));
 
-  beforeEach((done) => {
-    models.User.create(data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(data('user1')).tap(u => user = u));
 
-  beforeEach((done) => {
-    models.Group.create(data('group1')).done((e, g) => {
-      expect(e).to.not.exist;
-      group = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(data('group1')).tap(g => group = g));
 
-  beforeEach((done) => {
-    group
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
   beforeEach((done) => {
     models.ConnectedAccount.create({
@@ -80,14 +64,14 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
     .catch(done);
   });
 
-  beforeEach((done) => {
+  beforeEach(() => {
     const fixture = {
       amount: 10,
       currency: 'USD',
       interval: 'month'
     };
 
-    createTransaction({
+    return Promise.promisify(createTransaction)({
       group,
       user,
       transaction: fixture,
@@ -96,22 +80,15 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
           billingAgreementId
         }
       })
-    }, (e, res) => {
-      expect(e).to.not.exist;
-
+    }).then(res =>
       models.Transaction.findOne({
         where: { id: res.id },
         include: [
           { model: models.Group },
           { model: models.User }
         ]
-      })
-      .done((e, t) => {
-        expect(e).to.not.exist;
-        transaction = t;
-        done();
-      });
-    });
+      }))
+    .tap(t => transaction = t);
   });
 
   beforeEach((done) => {

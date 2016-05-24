@@ -56,22 +56,10 @@ describe('users.routes.test.js', () => {
   });
 
   // Create a normal application.
-  beforeEach((done) => {
-    models.Application.create(utils.data('application2')).done((e, a) => {
-      expect(e).to.not.exist;
-      application2 = a;
-      done();
-    });
-  });
+  beforeEach(() => models.Application.create(utils.data('application2')).tap(a => application2 = a));
 
   // Create an application with user creation access.
-  beforeEach((done) => {
-    models.Application.create(utils.data('application3')).done((e, a) => {
-      expect(e).to.not.exist;
-      application3 = a;
-      done();
-    });
-  });
+  beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
 
   /**
    * Create.
@@ -248,9 +236,7 @@ describe('users.routes.test.js', () => {
 
     describe('duplicate', () => {
 
-      beforeEach((done) => {
-        models.User.create(userData).done(done);
-      });
+      beforeEach(() => models.User.create(userData));
 
       it('fails to create a user with the same email', (done) => {
         request(app)
@@ -295,21 +281,9 @@ describe('users.routes.test.js', () => {
     var user;
     var user2;
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user1')).done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user2')).done((e, u) => {
-        expect(e).to.not.exist;
-        user2 = u;
-        done(e);
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
     it('successfully get a user\'s information', (done) => {
       request(app)
@@ -342,13 +316,7 @@ describe('users.routes.test.js', () => {
   describe('#update paypal email', () => {
     var user;
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user1')).done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
     it('should update the paypal email', (done) => {
       var email = 'test+paypal@email.com';
@@ -398,21 +366,9 @@ describe('users.routes.test.js', () => {
     var user;
     var user2;
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user1')).done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user2')).done((e, u) => {
-        expect(e).to.not.exist;
-        user2 = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
     it('should update password', (done) => {
       const newPassword = 'aaa123';
@@ -478,13 +434,7 @@ describe('users.routes.test.js', () => {
   describe('#update avatar', () => {
     var user;
 
-    beforeEach((done) => {
-      models.User.create(utils.data('user1')).done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
     it('should update avatar', (done) => {
       var link = 'http://opencollective.com/assets/icon2.svg';
@@ -558,28 +508,18 @@ describe('users.routes.test.js', () => {
       app.knox.put.restore()
     })
 
-    beforeEach((done) => {
+    beforeEach(() => 
       models.User.create({
         email: 'withpassword@example.com',
         password: 'password'
       })
-      .done((e, u) => {
-        expect(e).to.not.exist;
-        userWithPassword = u;
-        done();
-      });
-    });
+      .tap(u => userWithPassword = u));
 
-    beforeEach((done) => {
+    beforeEach(() => 
       models.User.create({
         email: 'xdamman@gmail.com' // will have twitter avatar
       })
-      .done((e, u) => {
-        expect(e).to.not.exist;
-        userWithoutPassword = u;
-        done();
-      });
-    });
+      .tap(u => userWithoutPassword = u));
 
     it('fails if the user already has a password', done => {
       // only users with a recent donation can be edited
@@ -636,14 +576,7 @@ describe('users.routes.test.js', () => {
   describe('forgot password', () => {
     var user;
 
-    beforeEach((done) => {
-      models.User.create(userData)
-      .done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(userData).tap(u => user = u));
 
     it('fails if the email is missing', done => {
       request(app)
@@ -722,15 +655,10 @@ describe('users.routes.test.js', () => {
     var resetToken;
     var encId;
 
-    beforeEach((done) => {
-      models.User.create(userData)
-      .done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        encId = user.encryptId();
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(userData).tap(u => {
+      user = u;
+      encId = user.encryptId();
+    }));
 
     beforeEach((done) => {
       app.mailgun.sendMail = (options, cb) => {

@@ -43,10 +43,14 @@ describe('paypal.preapproval.routes.test.js', () => {
         utils.cleanAllDb(cb);
       },
       createUserA: ['cleanAndCreateApplication', (cb) => {
-        models.User.create(utils.data('user1')).done(cb);
+        models.User.create(utils.data('user1'))
+          .then(user => cb(null, user))
+          .catch(cb);
       }],
       createUserB: ['cleanAndCreateApplication', (cb) => {
-        models.User.create(utils.data('user2')).done(cb);
+        models.User.create(utils.data('user2'))
+          .then(user => cb(null, user))
+          .catch(cb);
       }]
     }, (e, results) => {
       expect(e).to.not.exist;
@@ -112,7 +116,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         stub.yields(null, mock);
       };
 
-      it('should delete if the date is past', (done) => {
+      it('should delete if the date is past', () => {
         beforePastDate();
 
         var token = 'abc';
@@ -122,21 +126,14 @@ describe('paypal.preapproval.routes.test.js', () => {
           token: token
         };
 
-        models.PaymentMethod.create(paymentMethod)
-        .done(function checkIfPaymentMethodIsCreated(err, res) {
-          expect(res.token).to.equal(token);
-          request(app)
-          .get('/users/' + user.id + '/paypal/preapproval')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
-          .expect(200)
-          .end(() => {
-            models.PaymentMethod.findAndCountAll({where: {token: token} })
-            .then(function checkIfPaymentMethodIsDestroyed(res) {
-              expect(res.count).to.equal(0);
-              done();
-            });
-          });
-        });
+        return models.PaymentMethod.create(paymentMethod)
+          .tap(res => expect(res.token).to.equal(token))
+          .then(() => request(app)
+            .get('/users/' + user.id + '/paypal/preapproval')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .expect(200))
+          .then(() => models.PaymentMethod.findAndCountAll({where: {token: token} }))
+          .tap(res => expect(res.count).to.equal(0));
       });
 
       var beforeNotApproved = () => {
@@ -147,7 +144,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       };
 
-      it('should delete if not approved yet', (done) => {
+      it('should delete if not approved yet', () => {
         beforeNotApproved();
 
         var token = 'def';
@@ -157,21 +154,14 @@ describe('paypal.preapproval.routes.test.js', () => {
           token: token
         };
 
-        models.PaymentMethod.create(paymentMethod)
-        .done(function checkIfPaymentMethodIsCreated(err, res) {
-          expect(res.token).to.equal(token);
-          request(app)
-          .get('/users/' + user.id + '/paypal/preapproval')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
-          .expect(200)
-          .end(() => {
-            models.PaymentMethod.findAndCountAll({where: {token: token} })
-            .then(function checkIfPaymentMethodIsDestroyed(res) {
-              expect(res.count).to.equal(0);
-              done();
-            });
-          });
-        });
+        return models.PaymentMethod.create(paymentMethod)
+          .tap(res => expect(res.token).to.equal(token))
+          .then(() => request(app)
+            .get('/users/' + user.id + '/paypal/preapproval')
+            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .expect(200))
+          .then(() => models.PaymentMethod.findAndCountAll({where: {token: token} }))
+          .tap(res => expect(res.count).to.equal(0));
       });
     });
   });
