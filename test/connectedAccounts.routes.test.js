@@ -99,13 +99,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
   describe('WHEN calling /connected-accounts/github/verify', () => {
 
     // Create user.
-    beforeEach((done) => {
-      models.User.create(utils.data('user1')).done((e, u) => {
-        expect(e).to.not.exist;
-        user = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
     beforeEach(done => {
       req = request(app)
