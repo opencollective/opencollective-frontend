@@ -91,7 +91,8 @@ module.exports = (app) => {
             dashboardUrl: `https://dashboard.stripe.com/${body.user_id}/events/${body.id}`
           }
         })
-        .done(cb);
+        .then(activity => cb(null, activity))
+        .catch(cb);
       }],
 
       fetchDonation: ['createActivity', (cb, results) => {

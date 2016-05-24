@@ -131,7 +131,8 @@ module.exports = function(app) {
         subscription.deactivatedAt = new Date();
 
         subscription.save()
-          .done(cb);
+          .then(() => cb())
+          .catch(cb);
       }],
     }, (err) => {
       if (err) return next(err);

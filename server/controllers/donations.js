@@ -285,7 +285,8 @@ module.exports = (app) => {
           if (!userGroup)
             group
               .addUserWithRole(user, roles.BACKER)
-              .done(cb);
+              .then(() => cb())
+              .catch(cb);
           else {
             return cb();
           }
@@ -508,7 +509,8 @@ module.exports = (app) => {
           if (!userGroup)
             group
               .addUserWithRole(user, roles.BACKER)
-              .done(cb);
+              .then(() => cb())
+              .catch(cb);
           else {
             return cb();
           }
