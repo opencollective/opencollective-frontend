@@ -45,15 +45,20 @@ describe('transactions.paypal.routes.test.js', () => {
         utils.cleanAllDb(cb);
       },
       createUserB: ['cleanAndCreateApplication', (cb) => {
-        models.User.create(utils.data('user2')).done(cb);
+        models.User.create(utils.data('user2'))
+          .then(user => cb(null, user))
+          .catch(cb);
       }],
       createGroupA: ['cleanAndCreateApplication', (cb) => {
-        models.Group.create(utils.data('group1')).done(cb);
+        models.Group.create(utils.data('group1'))
+          .then(user => cb(null, user))
+          .catch(cb);
       }],
       addUserBGroupA: ['createUserB', 'createGroupA', (cb, results) => {
         results.createGroupA
           .addUserWithRole(results.createUserB, roles.MEMBER)
-          .done(cb);
+          .then(() => cb())
+          .catch(cb);
       }],
       createTransactionC: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[2];
@@ -62,7 +67,9 @@ describe('transactions.paypal.routes.test.js', () => {
         t.approved = true;
         t.payoutMethod = 'paypal';
         t.UserId = results.createUserB.id;
-        models.Transaction.create(t).done(cb);
+        models.Transaction.create(t)
+          .then(t => cb(null, t))
+          .catch(cb);
       }],
       createTransactionD: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[3  ];
@@ -71,7 +78,9 @@ describe('transactions.paypal.routes.test.js', () => {
         t.approved = true;
         t.UserId = results.createUserB.id;
         t.amount = 10;
-        models.Transaction.create(t).done(cb);
+        models.Transaction.create(t)
+          .then(t => cb(null, t))
+          .catch(cb);
       }],
       createTransactionManual: ['cleanAndCreateApplication', 'createGroupA', 'createUserB', (cb, results) => {
         var t = utils.data('transactions1').transactions[2];
@@ -80,14 +89,18 @@ describe('transactions.paypal.routes.test.js', () => {
         t.approved = true;
         t.UserId = results.createUserB.id;
         t.payoutMethod = 'manual';
-        models.Transaction.create(t).done(cb);
+        models.Transaction.create(t)
+          .then(t => cb(null, t))
+          .catch(cb);
       }],
       createPaymentMethodUserB: ['cleanAndCreateApplication', 'createUserB', (cb, results) => {
         models.PaymentMethod.create({
           service: 'paypal',
           UserId: results.createUserB.id,
           confirmedAt: Date.now()
-        }).done(cb);
+        })
+        .then(pm => cb(null, pm))
+        .catch(cb);
       }]
     }, (e, results) => {
       expect(e).to.not.exist;

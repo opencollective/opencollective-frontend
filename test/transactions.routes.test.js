@@ -50,109 +50,44 @@ describe('transactions.routes.test.js', () => {
   });
 
   // Create user.
-  beforeEach((done) => {
-    models.User.create(utils.data('user1')).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
   // Create user2.
-  beforeEach((done) => {
-    models.User.create(utils.data('user2')).done((e, u) => {
-      expect(e).to.not.exist;
-      user2 = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
   // Create user3.
-  beforeEach((done) => {
-    models.User.create(utils.data('user3')).done((e, u) => {
-      expect(e).to.not.exist;
-      user3 = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
   // Create the group.
-  beforeEach((done) => {
-    models.Group.create(privateGroupData).done((e, g) => {
-      expect(e).to.not.exist;
-      privateGroup = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(privateGroupData).tap(g => privateGroup = g));
 
   // Create the group2.
-  beforeEach((done) => {
-    models.Group.create(_.omit(utils.data('group2'), ['slug'])).done((e, g) => {
-      expect(e).to.not.exist;
-      group2 = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(_.omit(utils.data('group2'), ['slug'])).tap(g => group2 = g));
 
   // Create the publicGroup.
-  beforeEach((done) => {
-    models.Group.create(publicGroupData).done((e, g) => {
-      expect(e).to.not.exist;
-      publicGroup = g;
-      done();
-    });
-  });
+  beforeEach(() => models.Group.create(publicGroupData).tap(g => publicGroup = g));
 
   // Add user to the group.
-  beforeEach((done) => {
-    privateGroup
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => privateGroup.addUserWithRole(user, roles.HOST));
 
   // Add user3 to the group.
-  beforeEach((done) => {
-    privateGroup
-      .addUserWithRole(user3, roles.MEMBER)
-      .done(done);
-  });
-
+  beforeEach(() => privateGroup.addUserWithRole(user3, roles.MEMBER));
 
   // Add user to the group2.
-  beforeEach((done) => {
-    group2
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => group2.addUserWithRole(user, roles.HOST));
 
   // Add user to the publicGroup.
-  beforeEach((done) => {
-    publicGroup
-      .addUserWithRole(user, roles.HOST)
-      .done(done);
-  });
+  beforeEach(() => publicGroup.addUserWithRole(user, roles.HOST));
 
   // Create an application which has only access to `group`
-  beforeEach((done) => {
-    models.Application.create(utils.data('application2')).done((e, a) => {
-      expect(e).to.not.exist;
-      application2 = a;
-      application2.addGroup(privateGroup).done(done);
-    });
-  });
+  beforeEach(() => models.Application.create(utils.data('application2'))
+    .tap(a => application2 = a)
+    .then(() => application2.addGroup(privateGroup)));
 
   // Create an independent application.
-  beforeEach((done) => {
-    models.Application.create(utils.data('application3')).done((e, a) => {
-      expect(e).to.not.exist;
-      application3 = a;
-      done();
-    });
-  });
+  beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Create.
@@ -929,14 +864,12 @@ describe('transactions.routes.test.js', () => {
         });
     });
 
-    beforeEach((done) => {
+    beforeEach(() => 
       models.PaymentMethod.create({
         service: 'paypal',
         UserId: user.id,
         token: 'abc'
-      })
-      .done(done);
-    });
+      }));
 
     beforeEach(() => {
       var stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
@@ -1060,7 +993,8 @@ describe('transactions.routes.test.js', () => {
               expect(e).to.not.exist;
               models.Transaction
                 .find(parseInt(res.body.id))
-                .done(cb);
+                .then(t => cb(null, t))
+                .catch(cb);
             });
         },
         createTransactionB: (cb) => {
@@ -1075,16 +1009,20 @@ describe('transactions.routes.test.js', () => {
               expect(e).to.not.exist;
               models.Transaction
                 .find(parseInt(res.body.id))
-                .done(cb);
+                .then(t => cb(null, t))
+                .catch(cb);
             });
         },
         createUserD: (cb) => {
-          models.User.create(utils.data('user4')).done(cb);
+          models.User.create(utils.data('user4'))
+            .then(u => cb(null, u))
+            .catch(cb);
         },
         addUserDGroupA: ['createUserD', (cb, results) => {
           privateGroup
             .addUserWithRole(results.createUserD, roles.BACKER)
-            .done(cb);
+            .then(() => cb())
+            .catch(cb);
         }]
       }, (e, results) => {
         expect(e).to.not.exist;
