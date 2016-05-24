@@ -11,13 +11,17 @@ module.exports = (app) => {
     createOrUpdate: (req, res, next, accessToken, profile, emails) => {
       var caId, user;
       const attrs = { provider: req.params.service };
+      var avatar;
+      if (req.params.service === 'github'){
+        avatar = `http://avatars.githubusercontent.com/${profile.username}`;
+      }
 
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
       User.findOne({ where: { email: { $in: emails }}})
         .then(u => u || User.create({
           name: profile.displayName,
-          avatar: profile.avatar_url,
+          avatar: avatar || profile.avatar_url,
           email: emails[0]
         }))
         .tap(u => user = u)
