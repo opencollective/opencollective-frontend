@@ -16,10 +16,6 @@ const getData = (item) => {
   return _.extend({}, data[item]); // to avoid changing these data
 };
 
-const createSuperApplication = (callback) => {
-  models.Application.create(getData('applicationSuper')).done(callback);
-};
-
 const clearbitStubBeforeEach = (sandbox) => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
       return new Bluebird((resolve, reject) => {
@@ -40,13 +36,13 @@ module.exports = () => {
   return {
 
     cleanAllDb: (callback) => {
-      app.set('models').sequelize.sync({force: true}).done((e) => {
-        if (e) {
+      app.get('models').sequelize.sync({force: true})
+        .then(() => models.Application.create(getData('applicationSuper')))
+        .then(a => callback(null, a))
+        .catch(e => {
           console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
           process.exit(1);
-        }
-        createSuperApplication(callback);
-      });
+        });
     },
 
     createUsers: (users, cb) => {

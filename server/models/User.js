@@ -283,7 +283,9 @@ module.exports = function(Sequelize, DataTypes) {
             if (!err && matched) {
               user.updateAttributes({
                 seenAt: new Date()
-              }).done(cb);
+              })
+                .then(user => cb(null, user))
+                .catch(cb);
             } else {
               cb(new errors.BadRequest(msg));
             }

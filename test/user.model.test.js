@@ -3,7 +3,6 @@
  */
 const app = require('../index');
 const expect = require('chai').expect;
-const request = require('supertest');
 const utils = require('../test/utils.js')();
 
 /**
@@ -35,76 +34,58 @@ describe('user.models.test.js', () => {
    */
   describe('#create', () => {
 
-    it('succeeds without email', (done) => {
+    it('succeeds without email', () =>
       User
         .create({ name: userData.name})
-        .done((err, user) => {
-          expect(err).to.not.exist;
-          expect(user).to.have.property('name', userData.name);
-          done();
-        });
+        .tap(user => expect(user).to.have.property('name', userData.name)));
 
-    });
-
-    it('fails if invalid email', (done) => {
+    it('fails if invalid email', () =>
       User
         .create({ name: userData.name, email: 'johndoe'})
-        .done((err, user) => {
-          expect(err).to.exist;
-          done();
-        });
+        .catch(err => expect(err).to.exist));
 
-    });
-
-    it('successfully creates a user and lowercase email', (done) => {
+    it('successfully creates a user and lowercase email', () => {
       var email = 'john.Doe@doe.com';
-      User
+      return User
         .create({ name: userData.name, email: userData.email})
-        .done((err, user) => {
-          expect(err).to.not.exist;
+        .tap(user => {
           expect(user).to.have.property('name', userData.name);
           expect(user).to.have.property('email', userData.email.toLowerCase());
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('updatedAt');
-          done();
         });
-
     });
 
 
-    it('successfully creates a user with a password that is a number', (done) => {
+    it('successfully creates a user with a password that is a number', () => {
       const email = 'john.doe@doe.com';
 
-      User
+      return User
         .create({
           email: email,
           password: 123456
         })
-        .done((err, user) => {
-          expect(err).to.not.exist;
+        .tap(user => {
           expect(user).to.have.property('email', email);
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('password_hash');
           expect(user).to.have.property('updatedAt');
-          done();
         });
     });
 
-    it('successfully creates a user with a password that is a string', (done) => {
+    it('successfully creates a user with a password that is a string', () => {
       const email = 'john.doe@doe.com';
 
-      User
+      return User
         .create({
           email: email,
           password: '123456'
         })
-        .done((err, user) => {
-          expect(err).to.not.exist;
+        .tap(user => {
           expect(user).to.have.property('email', email);
           expect(user).to.have.property('createdAt');
           expect(user).to.have.property('password_hash');
           expect(user).to.have.property('updatedAt');
-          done();
         });
     });
 
@@ -115,11 +96,7 @@ describe('user.models.test.js', () => {
    */
   describe('#get', () => {
 
-    beforeEach((done) => {
-      User
-        .create(userData)
-        .done(done);
-    });
+    beforeEach(() => User.create(userData));
 
 
     it('successfully get a user, user.info and user.public return correct information', (done) => {

@@ -289,7 +289,8 @@ module.exports = (app) => {
         user.password = password;
 
         user.save()
-          .done(cb);
+          .then(() => cb())
+          .catch(cb);
       }]
 
     }, err => {
