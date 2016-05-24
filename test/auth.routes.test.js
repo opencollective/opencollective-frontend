@@ -30,9 +30,7 @@ describe('auth.routes.test.js', () => {
     });
   });
 
-  beforeEach((done) => {
-    models.User.create(userData).done(done);
-  });
+  beforeEach(() => models.User.create(userData));
 
   describe('#authenticate', () => {
 

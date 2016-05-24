@@ -46,13 +46,7 @@ describe('groups.routes.test.js', () => {
     done();
   });
 
-  beforeEach((done) => {
-    models.User.create(userData).done((e, u) => {
-      expect(e).to.not.exist;
-      user = u;
-      done();
-    });
-  });
+  beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   // Stripe stub.
   var stub;
@@ -281,13 +275,13 @@ describe('groups.routes.test.js', () => {
 
       const ConnectedAccount = models.ConnectedAccount;
 
-      beforeEach((done) => {
+      beforeEach(() => {
         const User = models.User;
 
         // create connected account like the oauth happened
         var preCA;
         var firstUser;
-        ConnectedAccount.create({
+        return ConnectedAccount.create({
           username: 'asood123',
           provider: 'github',
           secret: 'xxxxx'
@@ -299,8 +293,7 @@ describe('groups.routes.test.js', () => {
         .then(user => {
           firstUser = user;
           return user.addConnectedAccount(preCA)
-        })
-        .done(done);
+        });
       });
 
 
@@ -455,31 +448,15 @@ describe('groups.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach((done) => {
-      models.User.create(utils.data('user2')).done((e, u) => {
-        expect(e).to.not.exist;
-        user2 = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
     // Create an application which has only access to `privateGroup`
-    beforeEach((done) => {
-      models.Application.create(utils.data('application2')).done((e, a) => {
-        expect(e).to.not.exist;
-        application2 = a;
-        application2.addGroup(privateGroup).done(done);
-      });
-    });
+    beforeEach(() => models.Application.create(utils.data('application2'))
+      .tap(a => application2 = a)
+      .then(() => application2.addGroup(privateGroup)));
 
     // Create an application which doesn't have access to any group
-    beforeEach((done) => {
-      models.Application.create(utils.data('application3')).done((e, a) => {
-        expect(e).to.not.exist;
-        application3 = a;
-        done();
-      });
-    });
+    beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
 
     it('fails getting a group if not authenticated', (done) => {
       request(app)
@@ -578,16 +555,10 @@ describe('groups.routes.test.js', () => {
       var totDonations = 0;
 
       // Create group2.
-      beforeEach((done) => {
-        models.Group.create(_.omit(utils.data('group2'),['slug'])).done((e, g) => {
-          expect(e).to.not.exist;
-          group2 = g;
-          group2
-            .addUserWithRole(user, roles.HOST)
-            .done(done);
-        });
-      });
-
+      beforeEach(() =>
+        models.Group.create(_.omit(utils.data('group2'),['slug']))
+          .tap(g => group2 = g)
+          .then(() => group2.addUserWithRole(user, roles.HOST)));
 
       // Create transactions for publicGroup.
       beforeEach((done) => {
@@ -778,44 +749,22 @@ describe('groups.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach((done) => {
-      models.User.create(utils.data('user2')).done((e, u) => {
-        expect(e).to.not.exist;
-        user2 = u;
-        done();
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
     // Create another user that is a backer.
-    beforeEach((done) => {
-      models.User.create(utils.data('user3')).done((e, u) => {
-        expect(e).to.not.exist;
-        user3 = u;
-        group
-          .addUserWithRole(user3, roles.BACKER)
-          .done(done);
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user3'))
+      .tap(u => user3 = u)
+      .then(() => group.addUserWithRole(user3, roles.BACKER)));
 
     // Create another user that is a member.
-    beforeEach((done) => {
-      models.User.create(utils.data('user4')).done((e, u) => {
-        expect(e).to.not.exist;
-        user4 = u;
-        group
-          .addUserWithRole(user4, roles.MEMBER)
-          .done(done);
-      });
-    });
+    beforeEach(() => models.User.create(utils.data('user4'))
+      .tap(u => user4 = u)
+      .then(() => group.addUserWithRole(user4, roles.MEMBER)));
 
     // Create an application which has only access to `group`
-    beforeEach((done) => {
-      models.Application.create(utils.data('application2')).done((e, a) => {
-        expect(e).to.not.exist;
-        application2 = a;
-        application2.addGroup(group).done(done);
-      });
-    });
+    beforeEach(() => models.Application.create(utils.data('application2'))
+      .tap(a => application2 = a)
+      .then(() => application2.addGroup(group)));
 
     it('fails updating a group if not authenticated', (done) => {
       request(app)
@@ -911,7 +860,7 @@ describe('groups.routes.test.js', () => {
         .end(done);
     });
 
-    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', (done) => {
+    it('successfully create a group with HOST and assign same person to be a MEMBER and a BACKER', () =>
       /* TODO: this works but we'll need to do a lot refactoring.
        * Need to find a way to call this with one line: like group.addUser()
        */
@@ -920,18 +869,8 @@ describe('groups.routes.test.js', () => {
         GroupId: group.id,
         role: roles.MEMBER
       })
-      .done((e) => {
-        expect(e).to.not.exist;
-        models.UserGroup
-            .findAll()
-            .then((rows) => {
-              expect(rows.length).to.equal(4);
-              done();
-            })
-            .catch(done);
-      });
-    });
-
+      .then(() => models.UserGroup.findAll())
+      .tap(rows => expect(rows.length).to.equal(4)));
   });
 
 });
