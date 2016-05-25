@@ -81,7 +81,7 @@ module.exports = function (app) {
 
       Application
         .find(appId)
-        .then(application => {
+        .tap(application => {
           if (application.disabled) {
             throw new Unauthorized();
           }

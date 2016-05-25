@@ -90,7 +90,6 @@ describe('stripe.routes.test.js', () => {
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
-          console.log("res", res);
           expect(res.body.error.code).to.be.equal(400);
           expect(res.body.error.type).to.be.equal('bad_request');
           expect(res.body.error.message).to.be.equal('User 2 is not a host');
@@ -151,7 +150,6 @@ describe('stripe.routes.test.js', () => {
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
-          console.log("res", res);
           expect(res.body.error.code).to.be.equal(400);
           expect(res.body.error.type).to.be.equal('bad_request');
           expect(res.body.error.message).to.be.equal('User 123412312 is not a host');
@@ -165,7 +163,6 @@ describe('stripe.routes.test.js', () => {
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
-          console.log("res", res);
           expect(res.body.error.code).to.be.equal(400);
           expect(res.body.error.type).to.be.equal('bad_request');
           expect(res.body.error.message).to.be.equal(`User ${user2.id} is not a host`);

@@ -33,8 +33,7 @@ module.exports = (app) => {
 
       Activity
         .findAndCountAll(query)
-        .then((activities) => {
-
+        .tap((activities) => {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({

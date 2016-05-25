@@ -291,7 +291,6 @@ describe('transactions.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body.error.type).to.equal('forbidden');
-          console.log("res: ", res.body);
           done();
         });
     });

@@ -59,13 +59,7 @@ describe('activities.routes.test.js', () => {
   beforeEach(() => group.addUserWithRole(user3, roles.BACKER));
 
   // Create activities.
-  beforeEach((done) => {
-    async.eachSeries(activitiesData, (a, cb) => {
-      models.Activity.create(a)
-        .then(() => cb())
-        .catch(cb);
-    }, done);
-  });
+  beforeEach(() => Promise.all(activitiesData.map(a => models.Activity.create(a))));
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 

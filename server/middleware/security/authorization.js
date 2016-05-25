@@ -83,7 +83,7 @@ module.exports = function (app) {
         }
         req.group
           .hasApplication(req.application)
-          .then(hasApplication => {
+          .tap(hasApplication => {
             if (hasApplication) {
               return next();
             }

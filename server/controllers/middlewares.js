@@ -1,6 +1,6 @@
-var _ = require('lodash');
 var async = require('async');
 var utils = require('../lib/utils');
+const Promise = require('bluebird');
 
 module.exports = function(app) {
 
@@ -163,7 +163,7 @@ module.exports = function(app) {
         function(cb) {
           User
             .find(req.jwtPayload.sub)
-            .then((user) => {
+            .tap((user) => {
               req.remoteUser = user;
               cb();
             })
@@ -175,7 +175,7 @@ module.exports = function(app) {
           // Check the validity of the application in the token.
           Application
             .find(appId)
-            .then((application) => {
+            .tap((application) => {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));
 
@@ -208,36 +208,29 @@ module.exports = function(app) {
         return next(new errors.NotFound());
       }
 
-      async.parallel([
-        function(cb) { // If authenticated user, does he have access?
-          if (!req.remoteUser) {
-            return cb();
-          }
+      const checkUserAccess = () => {
+        if (!req.remoteUser) {
+          return Promise.resolve(false);
+        }
+        return req.group.hasUser(req.remoteUser.id);
+      };
 
-          req.group.hasUser(req.remoteUser.id)
-            .then((hasUser) => cb(null, hasUser))
-            .catch(cb);
-        },
-        function(cb) { // If authenticated application, does it have access?
-          if (!req.application) {
-            return cb();
-          }
-
-          req.group
-            .hasApplication(req.application)
-            .then((bool) => cb(null, bool))
-            .catch(cb);
+      const checkAppAccess = () => {
+        if (!req.application) {
+          return Promise.resolve();
         }
 
-      ], (e, results) => {
-        if (e) {
-          return next(e);
-        } else if (_.some(results)) {
-          return next();
-        } else {
-          return next(new errors.Forbidden('Unauthorized'));
-        }
-      });
+        return req.group.hasApplication(req.application);
+      };
+
+      Promise.reduce([checkUserAccess(), checkAppAccess()], (total, auth) => total || auth)
+        .tap(hasAccess => {
+          if (!hasAccess) {
+            return next(new errors.Forbidden('Unauthorized'));
+          }
+          next();
+        })
+        .catch(next);
     },
 
     /**
