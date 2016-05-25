@@ -17,7 +17,7 @@ module.exports = {
     }
     var message = activitiesLib.formatMessage(activity, true);
     options.attachments = [];
-    this.postMessage(message, options);
+    return this.postMessage(message, options);
   },
 
   /*

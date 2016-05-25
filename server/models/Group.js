@@ -164,7 +164,7 @@ module.exports = function(Sequelize, DataTypes) {
               id: userId
             }
           })
-          .then((users) => {
+          .tap((users) => {
             if (users.length === 0) {
               return cb(null, false);
             } else if (!_.contains(roles, users[0].UserGroup.role)) {
@@ -230,15 +230,14 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      hasHost(cb) {
+      hasHost() {
         return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
           }
         })
-        .then((userGroup) => cb(null, !!userGroup))
-        .catch(cb);
+        .then(userGroup => Promise.resolve(!!userGroup));
       }
 
     }

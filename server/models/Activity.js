@@ -20,7 +20,7 @@ module.exports = function(Sequelize, DataTypes) {
         if (process.env.NODE_ENV === 'production') {
           slackLib.postActivity(activity);
         }
-        notify(Sequelize, activity);
+        return notify(Sequelize, activity);
       }
     }
   });

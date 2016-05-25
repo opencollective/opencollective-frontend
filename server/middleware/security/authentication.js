@@ -180,7 +180,7 @@ module.exports = function (app) {
     _authenticateUserByJwt: (req, res, next) => {
       User
         .find(req.jwtPayload.sub)
-        .then(user => {
+        .tap(user => {
           req.remoteUser = user;
           next();
         })
@@ -261,7 +261,7 @@ module.exports = function (app) {
 
   function findApplicationByKey(api_key, req, next) {
     Application.findOne({ where: { api_key }})
-      .then(application => {
+      .tap(application => {
         if (!application) {
           return next(new Unauthorized(`Invalid API key: ${api_key}`));
         }

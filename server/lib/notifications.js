@@ -6,9 +6,9 @@ const ACTIVITY_ALL = 'all';
 
 module.exports = (Sequelize, activity) => {
   if(!activity.GroupId || !activity.type) {
-    return;
+    return activity;
   }
-  Sequelize.models.Notification.findAll({
+  return Sequelize.models.Notification.findAll({
     where: {
       type: [
         ACTIVITY_ALL,
@@ -20,15 +20,14 @@ module.exports = (Sequelize, activity) => {
       channel: ['gitter', 'slack'],
       active: true
     }
-  }).then(notifConfigs => {
-    return notifConfigs.map(notifConfig => {
+  }).then(notifConfigs =>
+    Promise.all(notifConfigs, notifConfig => {
       if (notifConfig.channel === 'gitter') {
         return publishToGitter(activity, notifConfig);
       } else if (notifConfig.channel === 'slack') {
         return publishToSlack(activity, notifConfig);
       }
-    })
-  })
+    }))
   .catch(err => {
     console.error(`Error while publishing activity type ${activity.type} for group ${activity.GroupId}`, err);
   });

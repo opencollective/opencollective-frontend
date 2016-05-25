@@ -126,7 +126,7 @@ describe('donations.routes.test.js', () => {
         expect(e).to.not.exist;
         models.Group
           .find(parseInt(res.body.id))
-          .then((g) => {
+          .tap((g) => {
             group2 = g;
             done();
           })
@@ -143,7 +143,7 @@ describe('donations.routes.test.js', () => {
       accessToken: 'abc'
     })
     .then((account) => user.setStripeAccount(account))
-    .then(() => done())
+    .tap(() => done())
     .catch(done);
   });
 
@@ -155,7 +155,7 @@ describe('donations.routes.test.js', () => {
       secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
     })
     .then((account) => account.setUser(user))
-    .then(() => done())
+    .tap(() => done())
     .catch(done);
   });
 

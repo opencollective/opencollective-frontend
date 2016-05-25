@@ -41,17 +41,17 @@ module.exports = {
     }
 
     this.clearbit.Enrichment.find({email: email, stream: true})
-      .then((res) => {
+      .tap((res) => {
         this.memory[email] = res.person;
-        return cb(null, res.person);
+        cb(null, res.person);
       })
       .catch(clearbit.Enrichment.NotFoundError, () => {
         this.memory[email] = null;
-        return cb(new clearbit.Enrichment.NotFoundError());
+        cb(new clearbit.Enrichment.NotFoundError());
       })
       .catch((err) => {
         console.error('Clearbit error', err);
-        return cb(err);
+        cb(err);
       });
   },
 

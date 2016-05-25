@@ -100,7 +100,7 @@ module.exports = function (app) {
         }
         req.group
           .hasUser(req.remoteUser.id)
-          .then(hasUser => {
+          .tap(hasUser => {
             if (hasUser) {
               return next();
             }

@@ -181,7 +181,7 @@ module.exports = (app) => {
             data: {user: dbUser.info}
           });
         })
-        .then((dbUser) => {
+        .tap((dbUser) => {
           cb(null, dbUser);
         })
         .catch(cb);

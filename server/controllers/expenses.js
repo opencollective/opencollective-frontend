@@ -51,7 +51,7 @@ module.exports = (app) => {
       .tap(expense => expense.setUser(user))
       .tap(expense => expense.setGroup(group))
       .tap(expense => createNewExpenseActivity(expense.id))
-      .then(expense => res.send(expense))
+      .tap(expense => res.send(expense))
       .catch(next);
   };
 

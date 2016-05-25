@@ -4,6 +4,7 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('../lib/utils');
+const Promise = require('bluebird');
 
 /**
  * Controller.
@@ -61,58 +62,45 @@ module.exports = function(app) {
   };
 
   const subscribeUserToGroupEvents = (user, group, role) => {
-    if(role !== roles.HOST) return;
+    if(role !== roles.HOST) return Promise.resolve();
 
-    Notification.create({
+    return Notification.create({
       UserId: user.id,
       GroupId: group.id,
       type: activities.GROUP_TRANSACTION_CREATED
     });
-  }
+  };
 
-  const _addUserToGroup = (group, user, options, callback) => {
-    async.auto({
-      checkIfGroupHasHost: (cb) => {
-        if (options.role !== roles.HOST) {
-          return cb();
+  const _addUserToGroup = (group, user, options) => {
+    const checkIfGroupHasHost = () => {
+      if (options.role !== roles.HOST) {
+        return Promise.resolve();
+      }
+
+      return group.hasHost().then(hasHost => {
+        if (hasHost) {
+          return Promise.reject(new errors.BadRequest('Group already has a host'));
         }
+        return Promise.resolve();
+      })
+    };
 
-        group.hasHost((err, hasHost) => {
-          if (err) {
-            return cb(err);
-          } else if (hasHost) {
-            return cb(new errors.BadRequest('Group already has a host'));
-          }
+    const addUserToGroup = () => group.addUserWithRole(user, options.role);
 
-          cb();
-        });
-
-      },
-
-      addUserToGroup: ['checkIfGroupHasHost', (cb) => {
-        group.addUserWithRole(user, options.role)
-          .then(() => cb())
-          .catch(cb);
-      }],
-
-      createActivity: ['addUserToGroup', (cb) => {
-        Activity.create({
-          type: 'group.user.added',
-          GroupId: group.id,
-          data: {
-            group: group.info,
-            user: options.remoteUser.info,
-            target: user.info,
-            role: options.role
-          }
-        })
-        .then(activity => cb(null, activity))
-        .catch(cb);
-
-      }]
-    }, (err) => {
-      callback(err);
+    const createActivity = () => Activity.create({
+      type: 'group.user.added',
+      GroupId: group.id,
+      data: {
+        group: group.info,
+        user: options.remoteUser.info,
+        target: user.info,
+        role: options.role
+      }
     });
+
+    return checkIfGroupHasHost()
+      .then(addUserToGroup)
+      .then(createActivity);
   };
 
   const getBalance = (id, cb) => {
@@ -376,46 +364,35 @@ module.exports = function(app) {
    * Create a group.
    */
   const create = (req, res, next) => {
+    var group;
     Group
       .create(req.required.group)
-      .then((group) => {
+      .tap(g => group = g)
+      .then(() => Activity.create({
+        type: activities.GROUP_CREATED,
+        UserId: req.remoteUser.id,
+        GroupId: group.id,
+        data: {
+          group: group.info,
+          user: req.remoteUser.info
+        }
+      }))
+      .then(activity => {
+        // Add caller to the group if `role` specified.
+        const role = req.body.role;
 
-        async.series({
-          createActivity: (cb) => {
-            Activity.create({
-              type: activities.GROUP_CREATED,
-              UserId: req.remoteUser.id,
-              GroupId: group.id,
-              data: {
-                group: group.info,
-                user: req.remoteUser.info
-              }
-            })
-            .then(activity => cb(null, activity))
-            .catch(cb);
-          },
+        if (!role) {
+          return activity;
+        }
 
-          addUser: (cb) => {
-            // Add caller to the group if `role` specified.
-            const role = req.body.role;
+        const options = {
+          role,
+          remoteUser: req.remoteUser
+        };
 
-            if (!role) {
-              return cb();
-            }
-
-            const options = {
-              role,
-              remoteUser: req.remoteUser
-            };
-
-            _addUserToGroup(group, req.remoteUser, options, cb);
-          }
-        }, (e) => {
-          if (e) return next(e);
-          res.send(group.info);
-        });
-
+        return _addUserToGroup(group, req.remoteUser, options);
       })
+      .tap(() => res.send(group.info))
       .catch(next);
   };
 
@@ -466,7 +443,9 @@ module.exports = function(app) {
             },
 
             addCreator: ['createActivity', (cb) => {
-              _addUserToGroup(group, creator, options, cb);
+              _addUserToGroup(group, creator, options)
+                .then(() => cb())
+                .catch(cb);
             }],
 
             addContributors: ['addCreator', (cb) => {
@@ -495,7 +474,8 @@ module.exports = function(app) {
                     .then(user => user || User.create(userAttr))
                     .then(user => user.addConnectedAccount(connectedAccount))
                     .then(ca => ca.getUser())
-                    .then(user => _addUserToGroup(group, user, options, callback))
+                    .then(user => _addUserToGroup(group, user, options))
+                    .tap(() => callback())
                     .catch(callback);
                 } else {
                   callback();
@@ -635,12 +615,10 @@ module.exports = function(app) {
       remoteUser: req.remoteUser
     };
 
-    _addUserToGroup(req.group, req.user, options, (e) => {
-      if (e) return next(e);
-
-      subscribeUserToGroupEvents(req.user, req.group, options.role);
-      res.send({success: true});
-    });
+    _addUserToGroup(req.group, req.user, options)
+      .then(() => subscribeUserToGroupEvents(req.user, req.group, options.role))
+      .tap(() => res.send({success: true}))
+      .catch(next);
   };
 
   /**
@@ -729,7 +707,6 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
-    _addUserToGroup,
     create,
     createFromGithub,
     update,

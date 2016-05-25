@@ -331,7 +331,7 @@ module.exports = (app) => {
 
       getConnectedAccount: (cb) => {
         group.getConnectedAccount()
-          .then((connectedAccount) => cb(null, connectedAccount))
+          .tap(connectedAccount => cb(null, connectedAccount))
           .catch(cb);
       },
 

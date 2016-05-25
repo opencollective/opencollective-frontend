@@ -66,7 +66,7 @@ module.exports = function(app) {
           }
         }
       })
-      .then((user) => {
+      .tap((user) => {
         if (user) {
           cb(null, user);
         } else {

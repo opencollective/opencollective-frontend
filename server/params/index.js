@@ -67,12 +67,12 @@ module.exports = (app) => {
               slug: groupid.toLowerCase()
             }
           })
-          .then(callback)
+          .tap(callback)
           .catch(next)
       } else {
         Group
           .find(groupid)
-          .then(callback)
+          .tap(callback)
           .catch(next);
       }
     },

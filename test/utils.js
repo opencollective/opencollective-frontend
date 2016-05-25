@@ -38,7 +38,7 @@ module.exports = () => {
     cleanAllDb: (callback) => {
       app.get('models').sequelize.sync({force: true})
         .then(() => models.Application.create(getData('applicationSuper')))
-        .then(a => callback(null, a))
+        .tap(a => callback(null, a))
         .catch(e => {
           console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
           process.exit(1);
