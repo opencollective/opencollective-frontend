@@ -47,7 +47,7 @@
     "request": "2.72.0",
     "request-as-curl": "0.1.0",
     "request-promise": "3.0.0",
-    "sequelize": "2.0.4",
+    "sequelize": "2.1.0",
     "sequelize-cli": "1.9.2",
     "slug": "0.9.1",
     "stripe": "3.9.0"
