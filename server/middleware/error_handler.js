@@ -53,16 +53,12 @@ module.exports = (err, req, res, next) => {
     err.code = err.status || code;
   }
 
-  // We don't pollute the tests results when running mocha unless the DEBUG variable is set
-  if(process.env.DEBUG || !process.argv[1].match(/\/mocha\//)) {
-
-    if(req.app.set('env') === 'production') {
-      sendErrorByEmail(req, err);
-    }
-
-    console.error('Error Express : ', err);
-    if (err.stack) console.log(err.stack);
+  if (req.app.set('env') === 'production') {
+    sendErrorByEmail(req, err);
   }
+
+  console.error('Error Express : ', err);
+  if (err.stack) console.log(err.stack);
 
   res.status(err.code).send({error: err});
 };
