@@ -36,8 +36,8 @@ module.exports = function(Sequelize, DataTypes) {
 
     description: DataTypes.STRING, // max 95 characters
 
-    longDescription: DataTypes.TEXT('long'),
-    whyJoin: DataTypes.TEXT('long'),
+    longDescription: DataTypes.TEXT,
+    whyJoin: DataTypes.TEXT,
 
     // We should update those two fields periodically (but no need to be real time)
     budget: DataTypes.INTEGER, // yearly budget in cents
@@ -55,7 +55,7 @@ module.exports = function(Sequelize, DataTypes) {
     image: DataTypes.STRING,
     backgroundImage: DataTypes.STRING,
 
-    expensePolicy: DataTypes.TEXT('long'),
+    expensePolicy: DataTypes.TEXT,
 
     tiers: {
       type: DataTypes.JSON,

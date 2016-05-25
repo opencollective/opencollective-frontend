@@ -39,7 +39,7 @@ module.exports = function (Sequelize, DataTypes) {
 
     amount: DataTypes.INTEGER,
     title: DataTypes.STRING,
-    description: DataTypes.TEXT('long'),
+    description: DataTypes.TEXT,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
     vat: DataTypes.INTEGER,
