@@ -6,7 +6,6 @@ const nock = require('nock');
 const _ = require('lodash');
 const app = require('../index');
 const async = require('async');
-const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;
 const request = require('supertest');
@@ -31,7 +30,6 @@ describe('subscriptions.routes.test.js', () => {
   var user;
   var application;
   var paymentMethod;
-  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
@@ -39,12 +37,6 @@ describe('subscriptions.routes.test.js', () => {
       application = app;
       done();
     });
-  });
-
-  // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
   });
 
   // Create user.
@@ -66,8 +58,6 @@ describe('subscriptions.routes.test.js', () => {
 
   // Create a paymentMethod.
   beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => paymentMethod = c));
-
-  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Get the subscriptions of a user

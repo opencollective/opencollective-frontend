@@ -7,7 +7,6 @@ var async = require('async');
 var nock = require('nock');
 var config = require('config');
 var chance = require('chance').Chance();
-var sinon = require('sinon');
 
 var app = require('../index');
 var utils = require('../test/utils.js')();
@@ -20,7 +19,6 @@ describe('stripe.routes.test.js', () => {
   var user2;
   var group;
   var application;
-  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
@@ -28,9 +26,6 @@ describe('stripe.routes.test.js', () => {
       done();
     });
   });
-
-  // Create a stub for clearbit
-  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   // Create a user.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -69,10 +64,6 @@ describe('stripe.routes.test.js', () => {
 
   afterEach(() => {
     nock.cleanAll();
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   describe('authorize', () => {

@@ -6,14 +6,12 @@ var app = require('../index');
 var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
-var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 
 /**
  * Variables.
  */
-var userData = utils.data('user1');
 var paypalPaymentMethod = utils.data('paymentMethod1');
 var stripePaymentMethod = utils.data('paymentMethod2');
 var models = app.set('models');
@@ -27,7 +25,6 @@ describe('paymentMethods.routes.test.js', () => {
   var user;
   var user2;
   var paymentMethod1;
-  var sandbox = sinon.sandbox.create();
 
 
   beforeEach((done) => {
@@ -35,12 +32,6 @@ describe('paymentMethods.routes.test.js', () => {
       application = app;
       done();
     });
-  });
-
-  // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
   });
 
   // Create users.
@@ -58,8 +49,6 @@ describe('paymentMethods.routes.test.js', () => {
     var data = _.extend(stripePaymentMethod, { UserId: user.id });
     return models.PaymentMethod.create(data).tap(pm => paymentMethod2 = pm);
   });
-
-  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Get user's groups.

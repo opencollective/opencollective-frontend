@@ -31,19 +31,12 @@ describe('groups.routes.test.js', () => {
 
   var application;
   var user;
-  var sandbox = sinon.sandbox.create();
 
   beforeEach((done) => {
     utils.cleanAllDb((e, app) => {
       application = app;
       done();
     });
-  });
-
-  // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
   });
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
@@ -56,10 +49,6 @@ describe('groups.routes.test.js', () => {
   });
   afterEach(() => {
     app.stripe.accounts.create.restore();
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**
