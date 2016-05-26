@@ -1,4 +1,5 @@
-var activities = require('../constants/activities');
+const activities = require('../constants/activities');
+const flatten = require('flat');
 
 module.exports = {
 
@@ -7,7 +8,6 @@ module.exports = {
    */
   formatMessageForPrivateChannel: (activity, linkify) => {
 
-    // declare common variables used across multiple activity types
     var userString = '';
     var userId;
     var groupName = '';
@@ -72,10 +72,8 @@ module.exports = {
       case activities.GROUP_TRANSACTION_CREATED:
 
         if (activity.data.transaction.isDonation) {
-          // Ex: Aseem gave 1 USD/month to WWCode-Seattle
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
         } else if (activity.data.transaction.isExpense) {
-          // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
           return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
         } else {
           return `Hmm found a group.transaction.created that's neither donation or expense. Activity id: ${activity.id}`;
@@ -83,12 +81,10 @@ module.exports = {
         break;
 
       case activities.GROUP_TRANSACTION_PAID:
-        // Ex: Jon approved a transaction for WWCode-Seattle: USD 12.57 for 'pizza';
         return `Expense approved on ${group}: ${currency} ${amount} for '${description}'`;
         break;
 
       case activities.USER_CREATED:
-        // Ex: New user joined: Alice Walker (alice@walker.com) | @alicewalker | websiteUrl
         return `New user joined: ${userString}`;
         break;
 
@@ -97,7 +93,6 @@ module.exports = {
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:
-        // Ex: Confirmed subscription of 1 USD/month from Aseem to WWCode-Seattle!
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
         break;
 
@@ -106,11 +101,11 @@ module.exports = {
         break;
 
       case activities.GROUP_USER_ADDED:
-        return `New user ${userString} (UserId: ${userId}) added to group: ${group}`;
+        return `New user: ${userString} (UserId: ${userId}) added to group: ${group}`;
         break;
 
       default:
-        return `Oops... I got an unknown activity type: ${activity.type}`;
+        return `New event: ${activity.type}`;
     }
   },
 
@@ -121,7 +116,6 @@ module.exports = {
    */
   formatMessageForPublicChannel: (activity, linkify) => {
 
-    // declare common variables used across multiple activity types
     var userString = '';
     var groupName = '';
     var publicUrl = '';
@@ -199,6 +193,14 @@ module.exports = {
       default:
         return '';
     }
+  },
+
+  formatAttachment: (attachment) => {
+    const flattenedData = flatten(attachment);
+    const rows = Object.keys(flattenedData)
+      .filter(key => flattenedData[key])
+      .map(key => `${key}: ${flattenedData[key]}`);
+    return rows.join('\n');
   }
 }
 

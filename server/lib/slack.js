@@ -10,36 +10,34 @@ const constants = require('../constants/activities');
 module.exports = {
 
   /*
-   * Post a given activity to a private channel for Open Collective Core Team
+   * Post a given activity to OpenCollective private channel
+   * This method can only publish to our webhookUrl and our private channel, so we don't leak info by mistake
    */
-  postActivityOnPrivateChannel: function(activity, options) {
-    if (!options) {
-      options = {};
-    }
-    var message = activitiesLib.formatMessageForPrivateChannel(activity, true);
-    options.attachments = formatAttachment(activity);
-    options.channel = config.slack.privateActivityChannel;
-    return this.postMessage(message, config.slack.hookUrl, options);
+  postActivityOnPrivateChannel: function(activity) {
+    const message = activitiesLib.formatMessageForPrivateChannel(activity, true);
+    const options = {
+      attachments: formatAttachment(activity),
+      channel: config.slack.privateActivityChannel
+    };
+    return this.postMessage(message, config.slack.webhookUrl, options);
   },
 
   /*
-   * Post a given activity to a public channel for anyone to see the activity
+   * Post a given activity to a public channel (meaning scrubbed info only)
    */
-  postActivityOnPublicChannel: function(activity, options) {
+  postActivityOnPublicChannel: function(activity, webhookUrl, options) {
     if (!options) {
       options = {};
     }
-    var message = activitiesLib.formatMessageForPublicChannel(activity, true);
-    options.attachments = [];
-    options.channel = config.slack.publicActivityChannel;
-    return this.postMessage(message, config.slack.hookUrl, options);
+    const message = activitiesLib.formatMessageForPublicChannel(activity, true);
+    return this.postMessage(message, webhookUrl, options);
   },
 
   /*
    * Posts a message to a slack webhook
    */
   postMessage: function(msg, webhookUrl, options) {
-    if(!options) {
+    if (!options) {
       options = {};
     }
     var slackOptions = {
@@ -71,7 +69,7 @@ module.exports = {
   }
 };
 
-function formatAttachment(activity) {
+const formatAttachment = (activity) => {
   if (activity.type === constants.WEBHOOK_STRIPE_RECEIVED) {
     return [{
       title: 'Data',

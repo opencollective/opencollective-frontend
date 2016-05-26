@@ -11,18 +11,18 @@ describe('lib/slack', () => {
   describe('calling postMessage', () => {
 
     const message = "lorem ipsum";
+    const webhookUrl = 'hookurl';
     const basePayload = {
       text: message,
       username: 'OpenCollective Activity Bot',
       icon_url: 'https://opencollective.com/favicon.ico',
       attachments: [],
-      channel: '#activity_test'
     };
 
     it('with message succeeds', done => {
       expectPayload(basePayload);
 
-      callSlackLib(done, message);
+      callSlackLib(done, message, webhookUrl);
     });
 
     it('with attachment succeeds', done => {
@@ -30,7 +30,7 @@ describe('lib/slack', () => {
 
       expectPayload(_.extend({}, basePayload, { attachments }));
 
-      callSlackLib(done, message, { attachments });
+      callSlackLib(done, message, webhookUrl, { attachments });
     });
 
     it('with channel succeeds', done => {
@@ -38,7 +38,7 @@ describe('lib/slack', () => {
 
       expectPayload(_.extend({}, basePayload, { channel }));
 
-      callSlackLib(done, message, { channel });
+      callSlackLib(done, message, webhookUrl, { channel });
     });
   });
 
@@ -47,9 +47,10 @@ describe('lib/slack', () => {
     var formatMessageStub, postMessageStub;
     const activity = "my activity";
     const formattedMessage = "my formatted activity";
+    const webhookUrl = 'hookurl';
 
     beforeEach(() => {
-      formatMessageStub = sinon.stub(activitiesLib, "formatMessage");
+      formatMessageStub = sinon.stub(activitiesLib, "formatMessageForPublicChannel");
       postMessageStub = sinon.stub(slackLib, "postMessage");
     });
 
@@ -65,25 +66,25 @@ describe('lib/slack', () => {
         .returns(formattedMessage);
 
       const expected = postMessageStub
-        .withArgs(formattedMessage, { attachments: [] });
+        .withArgs(formattedMessage, webhookUrl, {});
 
-      slackLib.postActivity(activity);
+      slackLib.postActivityOnPublicChannel(activity, webhookUrl, {});
 
       expect(expected.called).to.be.ok;
       done();
     });
 
     it('with options keeps the options', done => {
-      const options = { option1: "option1" };
+      const options = { option1: "option1",  attachments: []  };
 
       formatMessageStub
         .withArgs(activity, true)
         .returns(formattedMessage);
 
       const expected = postMessageStub
-        .withArgs(formattedMessage, _.extend({}, { attachments: [] }, options));
+        .withArgs(formattedMessage, webhookUrl, options);
 
-      slackLib.postActivity(activity, options);
+      slackLib.postActivityOnPublicChannel(activity, webhookUrl, options);
 
       expect(expected.called).to.be.ok;
       done();
@@ -98,9 +99,9 @@ function expectPayload(expectedPayload) {
   };
 }
 
-function callSlackLib(done, msg, options) {
+function callSlackLib(done, msg, webhookUrl, options) {
   slackLib
-    .postMessage(msg, options)
+    .postMessage(msg, webhookUrl, options)
     .then(done)
     .catch(done);
 }

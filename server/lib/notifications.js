@@ -7,15 +7,10 @@ const activityType = require('../constants/activities');
 
 module.exports = (Sequelize, activity) => {
   // publish everything to our private channel
-  return publishToSlackPrivateChannel(activity,
-    {
-      webhookUrl: config.slack.hookUrl,
-      channel: config.slack.privateActivityChannel
-    })
+  return publishToSlackPrivateChannel(activity)
     // publish a filtered version to our public channel
-    .then(() => publishToSlack(activity,
+    .then(() => publishToSlack(activity, config.slack.webhookUrl,
       {
-        webhookUrl: config.slack.hookUrl,
         channel: config.slack.publicActivityChannel
       }))
     // process notification entries
@@ -42,7 +37,7 @@ module.exports = (Sequelize, activity) => {
         if (notifConfig.channel === 'gitter') {
           return publishToGitter(activity, notifConfig);
         } else if (notifConfig.channel === 'slack') {
-          return publishToSlack(activity, notifConfig);
+          return publishToSlack(activity, notifConfig.webhookUrl, {});
         } else {
           return Promise.resolve();
         }
@@ -62,10 +57,10 @@ function publishToGitter(activity, notifConfig) {
   }
 }
 
-function publishToSlack(activity, notifConfig) {
-  return slackLib.postActivityOnPublicChannel(activity, notifConfig);
+function publishToSlack(activity, webhookUrl, options) {
+  return slackLib.postActivityOnPublicChannel(activity, webhookUrl, options);
 }
 
-function publishToSlackPrivateChannel(activity, notifConfig) {
-  return slackLib.postActivityOnPrivateChannel(activity, notifConfig);
+function publishToSlackPrivateChannel(activity) {
+  return slackLib.postActivityOnPrivateChannel(activity);
 }
