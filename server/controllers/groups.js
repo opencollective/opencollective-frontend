@@ -92,8 +92,8 @@ module.exports = function(app) {
       GroupId: group.id,
       data: {
         group: group.info,
-        user: options.remoteUser.info,
-        target: user.info,
+        creator: options.remoteUser.info,
+        user: user.info,
         role: options.role
       }
     });

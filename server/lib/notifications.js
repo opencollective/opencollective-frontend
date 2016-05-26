@@ -3,11 +3,10 @@ const config = require('config');
 
 const activitiesLib = require('../lib/activities');
 const slackLib = require('./slack');
-const activities = require('../constants');
+const activityType = require('../constants/activities');
 
 module.exports = (Sequelize, activity) => {
   // publish everything to our private channel
-  console.log('reached inside notify');
   return publishToSlackPrivateChannel(activity,
     {
       webhookUrl: config.slack.hookUrl,
@@ -22,12 +21,12 @@ module.exports = (Sequelize, activity) => {
     // process notification entries
     .then(() => {
       if(!activity.GroupId || !activity.type) {
-        return activity;
+        return Promise.resolve([]);
       }
       return Sequelize.models.Notification.findAll({
         where: {
           type: [
-            activities.ACTIVITY_ALL,
+            activityType.ACTIVITY_ALL,
             activity.type
           ],
           GroupId: activity.GroupId,
@@ -44,6 +43,8 @@ module.exports = (Sequelize, activity) => {
           return publishToGitter(activity, notifConfig);
         } else if (notifConfig.channel === 'slack') {
           return publishToSlack(activity, notifConfig);
+        } else {
+          return Promise.resolve();
         }
       }))
     .catch(err => {
@@ -52,10 +53,13 @@ module.exports = (Sequelize, activity) => {
 };
 
 function publishToGitter(activity, notifConfig) {
-  return axios
-    .post(notifConfig.webhookUrl, {
-      message: activitiesLib.formatMessageForPublicChannel(activity, false)
-    });
+  const message = activitiesLib.formatMessageForPublicChannel(activity, false);
+
+  if (message) {
+    return axios.post(notifConfig.webhookUrl, { message });
+  } else {
+    Promise.resolve();
+  }
 }
 
 function publishToSlack(activity, notifConfig) {

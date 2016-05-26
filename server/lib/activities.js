@@ -18,27 +18,12 @@ module.exports = {
     var currency = '';
     var tags = [];
     var description = '';
-    var twitter = ''
-    var website = '';
     var eventType = '';
 
     // get user data
     if (activity.data.user) {
-      const userName = activity.data.user.name;
-      const userEmail = activity.data.user.email;
-      const userAvatar = activity.data.user.avatar;
+      userString = getUserString(activity.data.user, linkify, true);
       userId = activity.data.user.id;
-      userString = userName ? `${userName} (${userEmail})` : userEmail;
-      userString = userString ? `${userString}` : userAvatar;
-
-      const twitterHandle = activity.data.user.twitterHandle;
-      if (linkify) {
-        twitter = linkifyForSlack(`http://www.twitter.com/${twitterHandle}`, `@${twitterHandle}`);
-        website = linkifyForSlack(activity.data.user.websiteUrl, null);
-      } else {
-        twitter = `@${twitterHandle}`;
-        website = activity.data.user.websiteUrl;
-      }
     }
 
     // get group data
@@ -104,7 +89,7 @@ module.exports = {
 
       case activities.USER_CREATED:
         // Ex: New user joined: Alice Walker (alice@walker.com) | @alicewalker | websiteUrl
-        return `New user joined: ${userString} | ${twitter} | ${website}`;
+        return `New user joined: ${userString}`;
         break;
 
       case activities.WEBHOOK_STRIPE_RECEIVED:

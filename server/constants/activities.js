@@ -3,6 +3,7 @@
  */
 
 module.exports = {
+  ACTIVITY_ALL: 'all',
   GROUP_CREATED: 'group.created',
   GROUP_EXPENSE_CREATED: 'group.expense.created',
   GROUP_TRANSACTION_CREATED: 'group.transaction.created',
@@ -10,6 +11,5 @@ module.exports = {
   GROUP_USER_ADDED: 'group.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   USER_CREATED: 'user.created',
-  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
-  ACTIVITY_ALL: 'all'
+  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received'
 };

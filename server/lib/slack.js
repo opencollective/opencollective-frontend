@@ -13,7 +13,6 @@ module.exports = {
    * Post a given activity to a private channel for Open Collective Core Team
    */
   postActivityOnPrivateChannel: function(activity, options) {
-    console.log('reached inside private channel');
     if (!options) {
       options = {};
     }
@@ -27,7 +26,6 @@ module.exports = {
    * Post a given activity to a public channel for anyone to see the activity
    */
   postActivityOnPublicChannel: function(activity, options) {
-    console.log('reached inside public channell');
     if (!options) {
       options = {};
     }
@@ -41,7 +39,6 @@ module.exports = {
    * Posts a message to a slack webhook
    */
   postMessage: function(msg, webhookUrl, options) {
-    console.log('reaching inside postMessage: ', msg);
     if(!options) {
       options = {};
     }
@@ -59,7 +56,7 @@ module.exports = {
 
     return new Promise((resolve, reject) => {
       if (!slackOptions.text) {
-        resolve();
+        return resolve();
       }
 
       return new Slack(webhookUrl, {})
@@ -68,7 +65,7 @@ module.exports = {
             console.error(err);
             return reject(err);
           }
-          resolve();
+          return resolve();
         });
     });
   }
