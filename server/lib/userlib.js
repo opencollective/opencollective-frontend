@@ -1,4 +1,4 @@
-var config = require('config')
+var config = require('config');
 var clearbit = require('clearbit')(config.clearbit);
 var url = require('url');
 
@@ -6,7 +6,7 @@ module.exports = {
 
   memory: {},
 
-  clearbit: clearbit,
+  clearbit,
 
   fetchInfo(user, cb) {
     this.getUserData(user.email, (err, userData) => {
@@ -68,8 +68,7 @@ module.exports = {
       return cb(new Error("Invalid email"));
     }
 
-    if (website)
-    {
+    if (website) {
       var parsedWebsiteUrl = url.parse(website);
       var hostname = parsedWebsiteUrl.hostname;
       if (/facebook.com$/.test(hostname))
@@ -83,15 +82,15 @@ module.exports = {
     }
 
     this.clearbit.Enrichment.find({
-      email: email, 
-      given_name: name, 
+      email,
+      given_name: name,
       ip_address: ip,
       linkedin: linkedinUrl,
       facebook: facebookUrl,
       twitter: twitterHandle,
       stream: true
     })
-    .then((res) => {  
+    .then((res) => {
       var person = res.person;
       var company = res.company;
       var sources = [];
@@ -110,7 +109,7 @@ module.exports = {
           sources.push({src: person.avatar, source: 'clearbit'});
         }
       }
-      
+
       if (company)
       {
         const companyAvatarSources = ['twitter', 'angellist'];
@@ -136,4 +135,4 @@ module.exports = {
       return cb(err);
     });
   }
-}
+};

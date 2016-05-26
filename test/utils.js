@@ -2,7 +2,7 @@
  * Dependencies.
  */
 const _ = require('lodash');
-const Bluebird = require('bluebird');
+const Promise = require('bluebird');
 const app = require('../index');
 const models = app.set('models');
 
@@ -12,21 +12,15 @@ const userlib = require('../server/lib/userlib');
 /**
  * Private methods.
  */
-const getData = (item) => {
-  return _.extend({}, data[item]); // to avoid changing these data
-};
+const getData = (item) => _.extend({}, data[item]); // to avoid changing these data
 
-const clearbitStubBeforeEach = (sandbox) => {
+const clearbitStubBeforeEach = sandbox => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
-      return new Bluebird((resolve, reject) => {
-        reject(userlib.clearbit.Enrichment.NotFoundError(' NotFound'));
-      });
-    });
+    return Promise.reject(new userlib.clearbit.Enrichment.NotFoundError());
+  });
 };
 
-const clearbitStubAfterEach = (sandbox) => {
-  sandbox.restore();
-}
+const clearbitStubAfterEach = (sandbox) => sandbox.restore();
 
 /**
  * Utils.
@@ -57,7 +51,7 @@ module.exports = () => {
      * Test data.
      */
     data: getData,
-    clearbitStubBeforeEach: clearbitStubBeforeEach,
-    clearbitStubAfterEach: clearbitStubAfterEach
+    clearbitStubBeforeEach,
+    clearbitStubAfterEach
   }
-}
+};
