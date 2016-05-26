@@ -1,13 +1,13 @@
-var activities = require('../constants/activities');
+const activities = require('../constants/activities');
+const flatten = require('flat');
 
 module.exports = {
 
   /*
-   * Formats an activity based on its type
+   * Formats an activity *FOR INTERNAL USE* based on its type
    */
-  formatMessage: (activity, linkify) => {
+  formatMessageForPrivateChannel: (activity, linkify) => {
 
-    // declare common variables used across multiple activity types
     var userString = '';
     var userId;
     var groupName = '';
@@ -18,27 +18,12 @@ module.exports = {
     var currency = '';
     var tags = [];
     var description = '';
-    var twitter = ''
-    var website = '';
     var eventType = '';
 
     // get user data
     if (activity.data.user) {
-      const userName = activity.data.user.username;
-      const userEmail = activity.data.user.email;
-      const userAvatar = activity.data.user.avatar;
+      userString = getUserString(activity.data.user, linkify, true);
       userId = activity.data.user.id;
-      userString = userName ? `${userName} (${userEmail})` : userEmail;
-      userString = userString ? `${userString}` : linkifyForSlack(userAvatar);
-
-      const twitterHandle = activity.data.user.twitterHandle;
-      if (linkify) {
-        twitter = linkifyForSlack(`http://www.twitter.com/${twitterHandle}`, `@${twitterHandle}`);
-        website = linkifyForSlack(activity.data.user.websiteUrl, null);
-      } else {
-        twitter = `@${twitterHandle}`;
-        website = activity.data.user.websiteUrl;
-      }
     }
 
     // get group data
@@ -87,10 +72,8 @@ module.exports = {
       case activities.GROUP_TRANSACTION_CREATED:
 
         if (activity.data.transaction.isDonation) {
-          // Ex: Aseem gave 1 USD/month to WWCode-Seattle
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
         } else if (activity.data.transaction.isExpense) {
-          // Ex: Aseem submitted a Foods & Beverage expense to WWCode-Seattle: USD 12.57 for 'pizza'
           return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
         } else {
           return `Hmm found a group.transaction.created that's neither donation or expense. Activity id: ${activity.id}`;
@@ -98,13 +81,11 @@ module.exports = {
         break;
 
       case activities.GROUP_TRANSACTION_PAID:
-        // Ex: Jon approved a transaction for WWCode-Seattle: USD 12.57 for 'pizza';
         return `Expense approved on ${group}: ${currency} ${amount} for '${description}'`;
         break;
 
       case activities.USER_CREATED:
-        // Ex: New user joined: Alice Walker (alice@walker.com) | @alicewalker | websiteUrl
-        return `New user joined: ${userString} | ${twitter} | ${website}`;
+        return `New user joined: ${userString}`;
         break;
 
       case activities.WEBHOOK_STRIPE_RECEIVED:
@@ -112,7 +93,6 @@ module.exports = {
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:
-        // Ex: Confirmed subscription of 1 USD/month from Aseem to WWCode-Seattle!
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
         break;
 
@@ -121,19 +101,113 @@ module.exports = {
         break;
 
       case activities.GROUP_USER_ADDED:
-        return `New user ${userString} (UserId: ${userId}) added to group: ${group}`;
+        return `New user: ${userString} (UserId: ${userId}) added to group: ${group}`;
         break;
 
       default:
-        return `Oops... I got an unknown activity type: ${activity.type}`;
+        return `New event: ${activity.type}`;
     }
+  },
+
+  /*
+   * Formats an activity *FOR EXTERNAL USE* based on its type
+   * This function strips out email addresses and shows only a subset of activities
+   * because many of them aren't relevant externally (like USER_CREATED)
+   */
+  formatMessageForPublicChannel: (activity, linkify) => {
+
+    var userString = '';
+    var groupName = '';
+    var publicUrl = '';
+    var amount = null;
+    var interval = '';
+    var recurringAmount = null;
+    var currency = '';
+    var tags = [];
+    var description = '';
+
+    // get user data
+    if (activity.data.user) {
+      userString = getUserString(activity.data.user, linkify);
+    }
+
+    // get group data
+    if (activity.data.group) {
+      groupName = activity.data.group.name;
+      publicUrl = activity.data.group.publicUrl;
+    }
+
+    // get donation data
+    if (activity.data.donation) {
+      amount = activity.data.donation.amount/100;
+      currency = activity.data.donation.currency;
+    }
+
+    // get subscription data
+    if (activity.data.subscription) {
+      interval = activity.data.subscription.interval;
+      recurringAmount = amount + (interval ? `/${interval}` : '');
+    }
+
+    // get transaction data
+    if (activity.data.transaction) {
+      amount = activity.data.transaction.amount;
+      interval = activity.data.transaction.interval;
+      recurringAmount = amount + (interval ? `/${interval}` : '');
+      currency = activity.data.transaction.currency;
+      tags = JSON.stringify(activity.data.transaction.tags);
+      description = activity.data.transaction.description;
+    }
+
+    var group;
+    if (linkify) {
+      group = linkifyForSlack(publicUrl, groupName);
+    } else {
+      group = groupName;
+    }
+
+    switch (activity.type) {
+
+      // Currently used for both new donation and expense
+      case activities.GROUP_TRANSACTION_CREATED:
+
+        if (activity.data.transaction.isDonation) {
+          return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
+        } else if (activity.data.transaction.isExpense) {
+          return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
+        }
+        break;
+
+      case activities.GROUP_TRANSACTION_PAID:
+        return `Expense approved on ${group}: ${currency} ${amount} for '${description}'`;
+        break;
+
+      case activities.SUBSCRIPTION_CONFIRMED:
+        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
+        break;
+
+      case activities.GROUP_CREATED:
+        return `New group created: ${group} by ${userString}`;
+        break;
+
+      default:
+        return '';
+    }
+  },
+
+  formatAttachment: (attachment) => {
+    const flattenedData = flatten(attachment);
+    const rows = Object.keys(flattenedData)
+      .filter(key => flattenedData[key])
+      .map(key => `${key}: ${flattenedData[key]}`);
+    return rows.join('\n');
   }
-};
+}
 
 /**
  * Generates a url for Slack
  */
-function linkifyForSlack(link, text) {
+const linkifyForSlack = (link, text) => {
   if (link && !text) {
     text = link;
   } else if (!link && text) {
@@ -142,4 +216,24 @@ function linkifyForSlack(link, text) {
     return '';
   }
   return `<${link}|${text}>`;
+}
+
+/**
+ * Generates a userString given a user's info
+ */
+const getUserString = (user, linkify, includeEmail) => {
+  const userString = user.name || user.twitterHandle || 'someone';
+  const link = user.twitterHandle ? `http://www.twitter.com/${user.twitterHandle}` : user.website;
+
+  var returnVal;
+  if (linkify && link) {
+    returnVal = linkifyForSlack(link, userString);
+  } else {
+    returnVal = userString;
+  }
+
+  if (includeEmail && user.email) {
+    returnVal += ` (${user.email})`;
+  }
+  return returnVal;
 }
