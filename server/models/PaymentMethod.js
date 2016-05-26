@@ -52,29 +52,15 @@ module.exports = function(Sequelize, DataTypes) {
     classMethods: {
       // Note we can't use findOrCreate() method in Sequelize because of
       // https://github.com/sequelize/sequelize/issues/4631
-      getOrCreate: (params) => {
-        const token = params.token;
-        const service = params.service;
-        const UserId = params.UserId;
-
-        return PaymentMethod.findOne({
-          where: {
-            token,
-            service,
-            UserId: UserId
-          }
-        })
-        .then(paymentMethod => {
-          if (!paymentMethod) {
-            return PaymentMethod.create({
-              token,
-              service,
-              UserId
-            });
-          } else {
-            return paymentMethod;
-          }
-        });
+      getOrCreate: params => {
+        const attrs = {
+          token: params.token,
+          service: params.service,
+          UserId: params.UserId
+        };
+      
+        return PaymentMethod.findOne({ where: attrs })
+          .then(paymentMethod => paymentMethod || PaymentMethod.create(attrs));
       }
     }
   });

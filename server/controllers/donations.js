@@ -29,7 +29,7 @@ module.exports = (app) => {
           email: attributes.email
         }
       })
-      .then((user) => {
+      .tap((user) => {
         if (user) {
           return cb(null, user);
         }
@@ -281,11 +281,11 @@ module.exports = (app) => {
             role: roles.BACKER
           }
         })
-        .then((userGroup) => {
+        .tap((userGroup) => {
           if (!userGroup)
             group
               .addUserWithRole(user, roles.BACKER)
-              .then(() => cb())
+              .tap(() => cb())
               .catch(cb);
           else {
             return cb();
@@ -505,16 +505,8 @@ module.exports = (app) => {
             role: roles.BACKER
           }
         })
-        .then((userGroup) => {
-          if (!userGroup)
-            group
-              .addUserWithRole(user, roles.BACKER)
-              .then(() => cb())
-              .catch(cb);
-          else {
-            return cb();
-          }
-        })
+        .then(userGroup => userGroup || group.addUserWithRole(user, roles.BACKER))
+        .then(() => cb())
         .catch(cb);
       }],
 

@@ -172,18 +172,16 @@ module.exports = (app) => {
 
   var _create = (user, cb) => {
     userlib.fetchInfo(user, (err, user) => {
+      var dbUser;
       User
         .create(user)
-        .tap((dbUser) => {
-          Activity.create({
-            type: constants.USER_CREATED,
-            UserId: dbUser.id,
-            data: {user: dbUser.info}
-          });
-        })
-        .tap((dbUser) => {
-          cb(null, dbUser);
-        })
+        .tap(u => dbUser = u)
+        .then(dbUser => Activity.create({
+          type: constants.USER_CREATED,
+          UserId: dbUser.id,
+          data: {user: dbUser.info}
+        }))
+        .tap(() => cb(null, dbUser))
         .catch(cb);
     });
   };
