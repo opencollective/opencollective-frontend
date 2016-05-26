@@ -9,6 +9,7 @@ var sinon = require('sinon');
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
+const Promise = require('bluebird');
 
 /**
  * Variables.
@@ -59,7 +60,7 @@ describe('activities.routes.test.js', () => {
   beforeEach(() => group.addUserWithRole(user3, roles.BACKER));
 
   // Create activities.
-  beforeEach(() => Promise.all(activitiesData.map(a => models.Activity.create(a))));
+  beforeEach(() => Promise.map(activitiesData, a => models.Activity.create(a)));
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
