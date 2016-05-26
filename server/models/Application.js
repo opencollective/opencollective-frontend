@@ -23,14 +23,8 @@ module.exports = function(Sequelize, DataTypes) {
     }
   }, {
     classMethods: {
-      findByKey(key, cb) {
-        Application.findOne({
-          where: {
-            api_key: key
-          }
-        })
-        .then((application) => cb(null, application))
-        .catch(cb);
+      findByKey(api_key) {
+        return Application.findOne({ where: { api_key } });
       }
     },
 

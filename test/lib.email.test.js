@@ -6,8 +6,8 @@ const emailData = utils.data('emailData');
 const config = require('config');
 
 describe('lib/email', () => {
-  
-  it('sends the thankyou.fr email template', function(done) {
+
+  it('sends the thankyou.fr email template', function() {
     this.timeout(2000);
 
     const paymentData = {
@@ -26,18 +26,15 @@ describe('lib/email', () => {
       config: config
     };
 
-    const previousSendMail = app.mailgun.sendMail;
-    app.mailgun.sendMail = (options) => {
-      expect(options.to).to.equal(data.user.email);
-      expect(options.subject).to.contain('Merci pour votre donation de €50/mois à La Primaire');
-      done();
-      app.mailgun.sendMail = previousSendMail;
-      return options;
-    }
-    emailLib.send('thankyou', data.user.email, data);
+    return emailLib.send('thankyou', data.user.email, data)
+      .then(() => {
+        const options = app.mailgun.sendMail.lastCall.args[0];
+        expect(options.to).to.equal(data.user.email);
+        expect(options.subject).to.contain('Merci pour votre donation de €50/mois à La Primaire');
+      });
   });
 
-  it('sends the thankyou.wwcode email template', function(done) {
+  it('sends the thankyou.wwcode email template', function() {
     this.timeout(2000);
 
     const paymentData = {
@@ -56,15 +53,12 @@ describe('lib/email', () => {
       config: config
     };
 
-    const previousSendMail = app.mailgun.sendMail;
-    app.mailgun.sendMail = (options) => {
-      expect(options.to).to.equal(data.user.email);
-      expect(options.subject).to.contain('Thank you for your $50/month donation to WWCode Austin');
-      expect(options.html).to.contain('4218859');
-      done();
-      app.mailgun.sendMail = previousSendMail;
-      return options;
-    }
-    emailLib.send('thankyou', data.user.email, data);
+    return emailLib.send('thankyou', data.user.email, data)
+      .then(() => {
+        const options = app.mailgun.sendMail.lastCall.args[0];
+        expect(options.to).to.equal(data.user.email);
+        expect(options.subject).to.contain('Thank you for your $50/month donation to WWCode Austin');
+        expect(options.html).to.contain('4218859');
+      });
   });
 });

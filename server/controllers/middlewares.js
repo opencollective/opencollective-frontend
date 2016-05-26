@@ -89,11 +89,7 @@ module.exports = function(app) {
 
       if (!key) return next();
 
-      Application.findByKey(key, (e, application) => {
-        if (e) {
-          return next(e);
-        }
-
+      Application.findByKey(key).tap(application => {
         if (!application) {
           return next(new errors.Unauthorized(`Invalid API key: ${key}`));
         }
@@ -105,7 +101,8 @@ module.exports = function(app) {
         req.application = application;
 
         next();
-      });
+      })
+      .catch(next);
     },
 
     /**

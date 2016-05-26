@@ -3,12 +3,12 @@
  */
 const cheerio = require('cheerio');
 const nock = require('nock');
-const _ = require('lodash');
 const app = require('../index');
 const async = require('async');
 const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;
-const request = require('supertest');
+const request = require('supertest-as-promised');
+const sinon = require('sinon');
 const config = require('config');
 const utils = require('../test/utils.js')();
 const createTransaction = require('../server/controllers/transactions')(app)._create;
@@ -173,7 +173,7 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
-    it('sends an email with the new valid token', (done) => {
+    it('sends an email with the new valid token', () => {
       const secret = config.keys.opencollective.secret;
       const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
         expiresIn: -1,
@@ -182,17 +182,16 @@ describe('subscriptions.routes.test.js', () => {
         audience: application.id
       });
 
-      app.mailgun.sendMail = (options) => {
-        const $ = cheerio.load(options.html);
-        const token = $('a').attr('href').replace('http://localhost:3000/subscriptions/', '');
-        jwt.verify(token, secret, done);
-      };
-
-      request(app)
+      return request(app)
         .post('/subscriptions/refresh_token')
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(200)
-        .end(done);
+        .toPromise()
+        .then(() => {
+          const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+          const token = $('a').attr('href').replace('http://localhost:3000/subscriptions/', '');
+          return jwt.verify(token, secret);
+        });
     });
 
   });
@@ -236,13 +235,7 @@ describe('subscriptions.routes.test.js', () => {
 
     });
 
-    it('sends an email to the user with the new token', done => {
-      app.mailgun.sendMail = (options, cb) => {
-        expect(options.html).to.contain(`${config.host.webapp}/subscriptions/`);
-        expect(options.to).to.equal(user.email);
-        cb();
-      };
-
+    it('sends an email to the user with the new token', () =>
       request(app)
         .post('/subscriptions/new_token')
         .send({
@@ -250,8 +243,13 @@ describe('subscriptions.routes.test.js', () => {
           api_key: application.api_key
         })
         .expect(200)
-        .end(done);
-    });
+        .then(() => {
+          const options = app.mailgun.sendMail.lastCall.args[0];
+          const $ = cheerio.load(options.html);
+          const href = $('a').attr('href');
+          expect(href).to.contain(`${config.host.website}/subscriptions/`);
+          expect(options.to).to.equal(user.email);
+        }));
   });
 
   /**

@@ -6,7 +6,7 @@ var cheerio = require('cheerio');
 var app = require('../index');
 var config = require('config');
 var expect = require('chai').expect;
-var request = require('supertest');
+var request = require('supertest-as-promised');
 var utils = require('../test/utils.js')();
 var encrypt = require('../server/lib/utils').encrypt;
 var userlib = require('../server/lib/userlib');
@@ -226,7 +226,7 @@ describe('users.routes.test.js', () => {
           expect(e).to.not.exist;
           models.User
             .find(parseInt(res.body.id))
-            .then((user) => {
+            .tap((user) => {
               expect(user).to.have.property('ApplicationId', application3.id);
               done();
             })
@@ -508,14 +508,14 @@ describe('users.routes.test.js', () => {
       app.knox.put.restore()
     })
 
-    beforeEach(() => 
+    beforeEach(() =>
       models.User.create({
         email: 'withpassword@example.com',
         password: 'password'
       })
       .tap(u => userWithPassword = u));
 
-    beforeEach(() => 
+    beforeEach(() =>
       models.User.create({
         email: 'xdamman@gmail.com' // will have twitter avatar
       })
@@ -617,13 +617,7 @@ describe('users.routes.test.js', () => {
 
     });
 
-    it('sends an email to the user with a reset url', done => {
-      app.mailgun.sendMail = (options, cb) => {
-        expect(options.html).to.contain(`${config.host.webapp}/reset/`);
-        expect(options.to).to.equal(user.email);
-        cb();
-      };
-
+    it('sends an email to the user with a reset url', () =>
       request(app)
         .post('/users/password/forgot')
         .send({
@@ -631,28 +625,22 @@ describe('users.routes.test.js', () => {
           api_key: application.api_key
         })
         .expect(200)
-        .end(e => {
-          expect(e).to.not.exist;
+        .then(() => {
+          const options = app.mailgun.sendMail.lastCall.args[0];
+          expect(options.html).to.contain(`${config.host.webapp}/reset/`);
+          expect(options.to).to.equal(user.email);
+        })
+        .then(() => models.User.find(user.id))
+        .tap(u => {
+          const today = (new Date()).toString().substring(0, 15);
 
-          models.User.find(user.id)
-          .then(u => {
-            const today = (new Date()).toString().substring(0, 15);
-
-            expect(u.resetPasswordTokenHash).to.be.ok;
-            expect(u.resetPasswordSentAt.toString()).to.contain(today);
-            done();
-          })
-          .catch(done);
-        });
-    });
-
+          expect(u.resetPasswordTokenHash).to.be.ok;
+          expect(u.resetPasswordSentAt.toString()).to.contain(today);
+        }));
   });
 
   describe('reset password', () => {
     var user;
-    var resetUrl;
-    var mailOptions;
-    var resetToken;
     var encId;
 
     beforeEach(() => models.User.create(userData).tap(u => {
@@ -661,13 +649,6 @@ describe('users.routes.test.js', () => {
     }));
 
     beforeEach((done) => {
-      app.mailgun.sendMail = (options, cb) => {
-        mailOptions = options;
-        const $ = cheerio.load(mailOptions.html);
-        token = $('a').data('token');
-        cb();
-      };
-
       request(app)
         .post('/users/password/forgot')
         .send({
@@ -720,7 +701,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the reset passwords don\'t match', done => {
       const encId = user.encryptId();
-      const $ = cheerio.load(mailOptions.html);
+      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
       const token = $('a').data('token');
 
       request(app)
@@ -742,6 +723,8 @@ describe('users.routes.test.js', () => {
 
     it('fails if the reset token is too old', done => {
       const password = 'abc1234';
+      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+      const token = $('a').data('token');
 
       var d = new Date();
       d.setFullYear(d.getFullYear() - 1); // last year
@@ -772,6 +755,8 @@ describe('users.routes.test.js', () => {
 
     it('cleans up the token after reset', done => {
       const password = 'abc1234';
+      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+      const token = $('a').data('token');
 
       request(app)
         .post(`/users/password/reset/${encId}/${token}`)

@@ -339,7 +339,7 @@ module.exports = function(app) {
         return usergroup;
       })
       .then((usergroup) => usergroup.destroy())
-      .then(() => {
+      .tap(() => {
         // Create activities.
         const remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
         const activity = {
@@ -351,10 +351,13 @@ module.exports = function(app) {
             target: req.user.info
           }
         };
-        Activity.create(_.extend({UserId: req.user.id}, activity));
-        if (req.remoteUser && req.user.id !== req.remoteUser.id)
-          Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
-        return;
+        return Activity.create(_.extend({UserId: req.user.id}, activity))
+          .then(a => {
+            if (req.remoteUser && req.user.id !== req.remoteUser.id) {
+              return Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
+            }
+            return a;
+          });
       })
       .then(() => res.send({success: true}))
       .catch(next);
@@ -404,17 +407,24 @@ module.exports = function(app) {
       var payload = req.required.payload;
       const connectedAccountId = req.jwtPayload.connectedAccountId;
 
-      var creator;
+      var creator, options;
       const group = payload.group;
       const contributors = payload.users;
       const creatorGithubUsername = payload.github_username;
+      var dbGroup;
 
       ConnectedAccount
         .findOne({
           where: { id: connectedAccountId },
           include: { model: User }
         })
-        .then(ca => creator = ca.User)
+        .tap(ca => {
+          creator = ca.User;
+          options = {
+            role: roles.MEMBER,
+            remoteUser: creator
+          };
+        })
         .then(() => Group.findOne({where: {slug: group.slug.toLowerCase()}}))
         .then(existingGroup => {
           if (existingGroup) {
@@ -422,83 +432,53 @@ module.exports = function(app) {
           }
           return Group.create(group)
         })
-        .then(group => {
-          const options = {
-            role: roles.MEMBER,
-            remoteUser: creator
-          };
-          async.auto({
-            createActivity: (cb) => {
-              Activity.create({
-                type: activities.GROUP_CREATED,
-                UserId: creator.id,
-                GroupId: group.id,
-                data: {
-                  group: group.info,
-                  user: creator.info
+        .tap(g => dbGroup = g)
+        .then(() => Activity.create({
+          type: activities.GROUP_CREATED,
+          UserId: creator.id,
+          GroupId: dbGroup.id,
+          data: {
+            group: dbGroup.info,
+            user: creator.info
+          }
+        }))
+        .then(() => _addUserToGroup(dbGroup, creator, options))
+        .then(() => Promise.map(contributors, contributor => {
+          // since we added the creator above with an email, avoid double adding
+          if (contributor !== creatorGithubUsername) {
+            const caAttr = {
+              username: contributor,
+              provider: 'github'
+            };
+            var userAttr = {
+              avatar: `http://avatars.githubusercontent.com/${contributor}`
+            };
+            var connectedAccount;
+            return ConnectedAccount.findOne({where: caAttr})
+              .then(ca => ca || ConnectedAccount.create(caAttr))
+              .then(ca => {
+                connectedAccount = ca;
+                if (!ca.UserId) {
+                  return User.findOne({where: userAttr});
+                } else {
+                  return ca.getUser();
                 }
               })
-              .then(activity => cb(null, activity))
-              .catch(cb);
-            },
-
-            addCreator: ['createActivity', (cb) => {
-              _addUserToGroup(group, creator, options)
-                .then(() => cb())
-                .catch(cb);
-            }],
-
-            addContributors: ['addCreator', (cb) => {
-              // TODO: find a cleaner way of doing this
-              async.each(contributors, (contributor, callback) => {
-                // since we added the creator above with an email, avoid double adding
-                if (contributor !== creatorGithubUsername) {
-                  const caAttr = {
-                    username: contributor,
-                    provider: 'github'
-                  };
-                  var userAttr = {
-                    avatar: `http://avatars.githubusercontent.com/${contributor}`
-                  };
-                  var connectedAccount;
-                  ConnectedAccount.findOne({ where: caAttr })
-                    .then(ca => ca || ConnectedAccount.create(caAttr))
-                    .then(ca => {
-                      connectedAccount = ca;
-                      if (!ca.UserId) {
-                        return User.findOne({where: userAttr});
-                      } else {
-                        return ca.getUser();
-                      }
-                    })
-                    .then(user => user || User.create(userAttr))
-                    .then(user => user.addConnectedAccount(connectedAccount))
-                    .then(ca => ca.getUser())
-                    .then(user => _addUserToGroup(group, user, options))
-                    .tap(() => callback())
-                    .catch(callback);
-                } else {
-                  callback();
-                }
-              }, (err) => {
-                if (err) return next(err);
-                cb();
-              });
-            }],
-
-            sendEmail: ['addCreator', (cb) => {
-              const data = {
-                name: creator.name,
-                group: group.info
-              }
-              emailLib.send('github.signup', creator.email, data);
-              cb();
-            }]
-          }, (e) => {
-            if (e) return next(e);
-            res.send(group.info);
-          });
+              .then(user => user || User.create(userAttr))
+              .tap(user => user.addConnectedAccount(connectedAccount))
+              .then(user => _addUserToGroup(dbGroup, user, options));
+          } else {
+            return Promise.resolve();
+          }
+        }))
+        .then(() => {
+          const data = {
+            name: creator.name,
+            group: dbGroup.info
+          };
+          return emailLib.send('github.signup', creator.email, data);
         })
+        .tap(() => res.send(dbGroup.info))
         .catch(next);
     }
 

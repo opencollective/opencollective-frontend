@@ -3,6 +3,7 @@ const handlebars = require('handlebars');
 const config = require('config');
 const moment = require('moment');
 const _ = require('lodash');
+const Promise = require('bluebird');
 
 const templatesNames = [
   'github.signup',
@@ -113,25 +114,16 @@ const EmailLib = (app) => {
       }
     }
 
+    if(!templates[template]) return Promise.reject(new Error("Invalid email template"));
+
     const templateString = render(template, data, config);
 
-    return new Promise((resolve, reject) => {
-
-      if(!templates[template]) return reject(new Error("Invalid email template"));
-      app.mailgun.sendMail({
-        from: config.email.from,
-        to: recipient,
-        bcc: 'ops@opencollective.com',
-        subject: getSubject(templateString),
-        html: getBody(templateString)
-      }, err => {
-        if (err) {
-          console.error(err);
-          return reject(err);
-        }
-
-        resolve();
-      });
+    return app.mailgun.sendMail({
+      from: config.email.from,
+      to: recipient,
+      bcc: 'ops@opencollective.com',
+      subject: getSubject(templateString),
+      html: getBody(templateString)
     });
   };
 

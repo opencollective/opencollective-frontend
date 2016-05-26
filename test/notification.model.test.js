@@ -156,7 +156,7 @@ describe("notification.model.test.js", () => {
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('sends a new `group.transaction.created` email notification', (done) => {
+  it('sends a new `group.transaction.created` email notification', () => {
 
     var templateData = {
       transaction: _.extend({}, transactionsData[0]),
@@ -177,28 +177,22 @@ describe("notification.model.test.js", () => {
     var subject = emailLib.getSubject(template);
     var body = emailLib.getBody(template);
 
-    var previousSendMail = app.mailgun.sendMail;
-    app.mailgun.sendMail = (options) => {
-      expect(options.to).to.equal(user.email);
-      expect(options.subject).to.equal(subject);
-      expect(options.html).to.equal(body);
-      done();
-      app.mailgun.sendMail = previousSendMail;
-      return options;
-    };
-
-    request(app)
+    return request(app)
       .post('/groups/' + group.id + '/transactions')
       .set('Authorization', 'Bearer ' + user.jwt(application))
       .send({
         transaction: transactionsData[0]
       })
       .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
+      .then(res => {
         expect(res.body).to.have.property('GroupId', group.id);
         expect(res.body).to.have.property('UserId', user.id); // ...
-
+      })
+      .then(() => {
+        const options = app.mailgun.sendMail.lastCall.args[0];
+        expect(options.to).to.equal(user.email);
+        expect(options.subject).to.equal(subject);
+        expect(options.html).to.equal(body);
       });
   });
 

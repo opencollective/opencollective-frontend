@@ -5,6 +5,7 @@ var Paypal = require('paypal-adaptive');
 var knox = require('knox');
 var config = require('config');
 var nodemailer = require('nodemailer');
+const Promise = require('bluebird');
 
 /**
  * Module.
@@ -34,17 +35,19 @@ module.exports = function(app) {
 
   // Mailgun.
   if(config.mailgun.user) {
-    app.mailgun = nodemailer.createTransport({
+    app.mailgun = Promise.promisify(nodemailer.createTransport({
       service: 'Mailgun',
       auth: {
         user: config.mailgun.user,
         pass: config.mailgun.password
       }
-    });
+    }));
   }
   else {
     console.warn("Mailgun is not configured");
-    app.mailgun = { sendMail: (data, cb) => { if(cb) cb(); } };
+    app.mailgun = {
+      sendMail: () => Promise.resolve()
+    };
   }
 
 };

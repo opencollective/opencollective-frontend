@@ -20,8 +20,9 @@ sendErrorByEmail = (req, err) => {
     to: 'server-errors@opencollective.com',
     subject: `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
     html: errorHTML
-  }, e => { if (e) console.error(e); });
-}
+  })
+  .catch(console.error);
+};
 
 /**
  * error handler of the api

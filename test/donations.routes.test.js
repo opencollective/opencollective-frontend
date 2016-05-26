@@ -523,13 +523,6 @@ describe('donations.routes.test.js', () => {
         email: userData.email
       };
 
-      var mailgunStub;
-
-      beforeEach(done => {
-        mailgunStub = sinon.stub(app.mailgun, 'sendMail');
-        done();
-      });
-
       // Nock for charges.create.
       beforeEach(() => {
         var params = [
@@ -562,10 +555,6 @@ describe('donations.routes.test.js', () => {
             done();
           });
       });
-
-      afterEach(() => {
-        app.mailgun.sendMail.restore();
-      })
 
       it('successfully creates a Stripe customer', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
@@ -639,11 +628,8 @@ describe('donations.routes.test.js', () => {
           .catch(done);
       });
 
-      it('successfully send a thank you email', (done) => {
-        expect(mailgunStub.lastCall.args[0].to).to.equal(userData.email);
-        done();
-      });
-
+      it('successfully sends a thank you email', () => 
+        expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal(userData.email));
     });
 
     describe('Recurring payment success', () => {

@@ -53,16 +53,13 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
-  beforeEach((done) => {
+  beforeEach(() =>
     models.ConnectedAccount.create({
       provider: 'paypal',
       clientId: 'abc',
       secret: 'def'
     })
-    .then((account) => account.setUser(user))
-    .then(() => done())
-    .catch(done);
-  });
+    .then(account => account.setUser(user)));
 
   beforeEach(() => {
     const fixture = {
@@ -91,14 +88,7 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
     .tap(t => transaction = t);
   });
 
-  beforeEach((done) => {
-    script.findSubscriptions()
-    .then((res) => {
-      subscription = res[0];
-      done();
-    })
-    .catch(done);
-  });
+  beforeEach(() => script.findSubscriptions().tap(res => subscription = res[0]));
 
   beforeEach(() => {
     runScript = (paypalTransactions) => {
@@ -115,7 +105,7 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
     }
   });
 
-  it('updates if it has 1 completed event', done => {
+  it('updates if it has 1 completed event', () =>
     runScript([
       paypalTransaction.created,
       paypalTransaction.completed
@@ -128,16 +118,13 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
 
       return models.Transaction.count();
     })
-    .then(count => expect(count).to.be.equal(1))
-    .then(() => done())
-    .catch(done);
-  });
+    .then(count => expect(count).to.be.equal(1)));
 
-  it('creates a new transaction for an active subscription', (done) => {
+  it('creates a new transaction for an active subscription', () => {
     const transaction_id = 'transaction_id-abc';
 
     // First confirmation
-    script.handlePaypalTransactions([
+    return script.handlePaypalTransactions([
         paypalTransaction.created,
         paypalTransaction.completed
       ],
@@ -168,45 +155,33 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
       expect(res.rows[1]).to.have.property('UserId');
       expect(res.rows[1]).to.have.property('GroupId');
       expect(res.rows[1]).to.have.property('SubscriptionId');
-    })
-    .then(() => done())
-    .catch(done);
+    });
   });
 
-  it('does not create a new transaction if it is already created', (done) => {
+  it('does not create a new transaction if it is already created', () => {
     const paypalTransactions = [
       paypalTransaction.created,
       paypalTransaction.completed
     ];
 
-    runScript(paypalTransactions)
+    return runScript(paypalTransactions)
       .then(() => runScript(paypalTransactions))
       .then(() => models.Transaction.count())
-      .then((count) => expect(count).to.be.equal(1))
-      .then(() => done())
-      .catch(done);
+      .then((count) => expect(count).to.be.equal(1));
   });
 
 
-  it('ignores if it does not have a created event', (done) => {
+  it('ignores if it does not have a created event', () =>
     runScript([])
-      .then(message => {
-        expect(message).to.be.equal(`No Created event, invalid: ${billingAgreementId}`);
-        done();
-      })
-      .catch(done);
-  });
+      .then(message => expect(message).to.be.equal(`No Created event, invalid: ${billingAgreementId}`)));
 
-  it('fails if it does not have a completed event', (done) => {
+  it('fails if it does not have a completed event', () =>
     runScript([paypalTransaction.created])
       .then(message => {
         expect(message).to.be.equal(`Billing agreement (${billingAgreementId}) not processed yet, no completed event`);
-        done();
-      })
-      .catch(done);
-  });
+      }));
 
-  it('fails if it has more than 1 completed event', (done) => {
+  it('fails if it has more than 1 completed event', () =>
     runScript([
       paypalTransaction.created,
       paypalTransaction.completed,
@@ -214,9 +189,6 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
     ])
     .then(message => {
       expect(message).to.be.equal(`Invalid subscription ${subscription.id} with billingAgreement ${billingAgreementId}, it should be activated already`);
-      done();
-    })
-    .catch(done);
-  });
+    }));
 
 });

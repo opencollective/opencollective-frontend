@@ -49,75 +49,22 @@ module.exports = function(app) {
       transaction.netAmountInGroupCurrency = transaction.amount*100;
     }
 
-    async.auto({
-
-      createTransaction: (cb) => {
-        Transaction
-          .create(transaction)
-          .then(t => {
-            if (!subscription) return cb(null, t);
-
-            return t.createSubscription(subscription)
-              .then(() => cb(null, t));
-          })
-          .catch(cb)
-      },
-
-      addTransactionToUser: ['createTransaction', (cb, results) => {
-        var transaction = results.createTransaction;
-
-        if (user) {
-          user
-            .addTransaction(transaction)
-            .then(() => cb())
-            .catch(cb);
+    Transaction
+      .create(transaction)
+      .then(t => t.setGroup(group))
+      .then(t => user ? t.setUser(user) : t)
+      .then(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : t)
+      .then(t => subscription ? t.createSubscription(subscription) : t)
+      .then(t => {
+        // if the transaction hasn't been temporarily flagged as inactive (PayPal donation flow)
+        if (!t.deletedAt) {
+          return createGroupTransactionCreatedActivity(t.id).then(() => t);
         } else {
-          cb();
+          return t;
         }
-      }],
-
-      addTransactionToGroup: ['createTransaction', (cb, results) => {
-        var transaction = results.createTransaction;
-
-        group
-          .addTransaction(transaction)
-          .then(() => cb())
-          .catch(cb);
-      }],
-
-      addTransactionToPaymentMethod: ['createTransaction', (cb, results) => {
-        var transaction = results.createTransaction;
-
-        if (paymentMethod) {
-          paymentMethod
-            .addTransaction(transaction)
-            .then(() => cb())
-            .catch(cb);
-        } else {
-          cb();
-        }
-      }],
-
-      createTransactionCreatedActivity: [
-        'addTransactionToUser', 'addTransactionToGroup', 'addTransactionToPaymentMethod',
-        (cb, results) => {
-          const transaction = results.createTransaction;
-
-          // if the transaction hasn't been temporarily flagged as inactive (PayPal donation flow)
-          if (!transaction.deletedAt) {
-            createGroupTransactionCreatedActivity(transaction.id)
-              .then(() => cb())
-              .catch(cb);
-          } else {
-            cb();
-          }
-        }
-      ]
-
-    }, (e, results) => {
-      if (e) return callback(e);
-      else callback(null, results.createTransaction);
-    });
+      })
+      .tap(t => callback(null, t))
+      .catch(callback);
   };
 
 var payServices = {

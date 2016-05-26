@@ -6,7 +6,7 @@ var app = require('../index');
 var async = require('async');
 var config = require('config');
 var expect = require('chai').expect;
-var request = require('supertest');
+var request = require('supertest-as-promised');
 var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
@@ -21,8 +21,7 @@ var publicGroupData = utils.data('group1');
 var privateGroupData = utils.data('group2');
 var transactionsData = utils.data('transactions1').transactions;
 var models = app.set('models');
-var stripeMock = require('./mocks/stripe')
-var stripeEmail = stripeMock.accounts.create.email;
+var stripeMock = require('./mocks/stripe');
 
 /**
  * Tests.
@@ -286,9 +285,7 @@ describe('groups.routes.test.js', () => {
       });
 
 
-      it('assigns contributors as users with connectedAccounts', (done) => {
-        var mailgunStub = sinon.stub(app.mailgun, 'sendMail');
-
+      it('assigns contributors as users with connectedAccounts', () =>
         request(app)
         .post('/groups?flow=github')
         .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
@@ -306,8 +303,7 @@ describe('groups.routes.test.js', () => {
           api_key: application.api_key
         })
         .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
+        .then(res => {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name', 'Loot');
           expect(res.body).to.have.property('slug', 'loot');
@@ -316,8 +312,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
           expect(res.body).to.have.property('isPublic', false);
-          expect(mailgunStub.lastCall.args[0].to).to.equal('githubuser@gmail.com');
-          app.mailgun.sendMail.restore();
+          expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal('githubuser@gmail.com');
 
           var caUser;
           ConnectedAccount.findOne({where: {username: 'asood123'}})
@@ -336,12 +331,8 @@ describe('groups.routes.test.js', () => {
               expect(user).to.exist;
             })
             .then(() => caUser.getGroups())
-            .then((groups) => {
-              expect(groups).to.have.length(1);
-              done();
-            });
-        });
-      });
+            .tap(groups => expect(groups).to.have.length(1));
+        }));
     });
 
   });
@@ -412,7 +403,7 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           models.Group
             .find(parseInt(res.body.id))
-            .then((g) => {
+            .tap((g) => {
               publicGroup = g;
               done();
             })
@@ -430,7 +421,7 @@ describe('groups.routes.test.js', () => {
       .tap((account) => {
         return user.setStripeAccount(account);
       })
-      .then(() => {
+      .tap(() => {
         done();
       })
       .catch(done);
@@ -729,7 +720,7 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           models.Group
             .find(parseInt(res.body.id))
-            .then((g) => {
+            .tap((g) => {
               group = g;
               done();
             })

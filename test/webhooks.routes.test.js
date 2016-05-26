@@ -33,10 +33,7 @@ var customerId = stripeMock.customers.create.id;
 
 var STRIPE_TOKEN = 'superStripeToken';
 var STRIPE_URL = 'https://api.stripe.com:443';
-var CHARGE = 10.99;
-var STRIPE_CHARGE = 1099;
 var STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
-var SUBSCRIPTION_CHARGE = webhookSubscription.amount / 100;
 var CURRENCY = 'USD';
 var INTERVAL = 'month';
 
@@ -96,14 +93,11 @@ describe('webhooks.routes.test.js', () => {
   });
 
   // create a stripe account
-  beforeEach((done) => {
+  beforeEach(() =>
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => user.setStripeAccount(account))
-    .then(() => done())
-    .catch(done);
-  })
+    .then((account) => user.setStripeAccount(account)));
 
   afterEach(() => {
     nock.cleanAll();
@@ -204,7 +198,7 @@ describe('webhooks.routes.test.js', () => {
             }
           ]
         })
-        .then((res) => {
+        .tap((res) => {
           expect(res.count).to.equal(1);
           donation = res.rows[0];
           done();
@@ -218,7 +212,7 @@ describe('webhooks.routes.test.js', () => {
         where: {
           UserId: donation.UserId
         }})
-        .then((res) => {
+        .tap((res) => {
           expect(res.count).to.equal(1);
           paymentMethod = res.rows[0];
           done();
@@ -269,7 +263,7 @@ describe('webhooks.routes.test.js', () => {
           }
         ]
       })
-      .then((res) => {
+      .tap((res) => {
         expect(res.count).to.equal(1);
         res.rows.forEach((transaction) => {
           expect(transaction.DonationId).to.be.equal(donation.id);
@@ -303,7 +297,7 @@ describe('webhooks.routes.test.js', () => {
             type: activities.WEBHOOK_STRIPE_RECEIVED
           }
         })
-        .then((res) => {
+        .tap((res) => {
           var e = res.rows[0].data.event;
           expect(res.count).to.equal(1);
           expect(e.id).to.be.equal(webhookEvent.id);
@@ -340,7 +334,7 @@ describe('webhooks.routes.test.js', () => {
               { model: models.Subscription }
             ]
           })
-          .then(res => {
+          .tap(res => {
             expect(res.count).to.be.equal(2); // second transaction
             res.rows.forEach((transaction) => {
               expect(transaction.GroupId).to.be.equal(donation.GroupId);
@@ -509,7 +503,7 @@ describe('webhooks.routes.test.js', () => {
                 type: activities.WEBHOOK_STRIPE_RECEIVED
               }
             })
-            .then((res) => {
+            .tap((res) => {
               expect(res.count).to.equal(0); // nothing is created
               done();
             })
