@@ -13,7 +13,7 @@
     "axios": "0.7.0",
     "base64url": "1.0.6",
     "bcrypt": "0.8.5",
-    "bluebird": "3.3.4",
+    "bluebird": "3.4.0",
     "body-parser": "1.15.0",
     "child-process-promise": "1.1.0",
     "clearbit": "1.2.1",
