@@ -10,5 +10,6 @@ module.exports = {
   GROUP_USER_ADDED: 'group.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   USER_CREATED: 'user.created',
-  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received'
+  WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
+  ACTIVITY_ALL: 'all'
 };

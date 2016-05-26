@@ -43,7 +43,8 @@
     "redirectUri": "http://localhost:3060/stripe/oauth/callback"
   },
   "slack": {
-    "activityChannel": "#activity_test"
+    "privateActivityChannel": "#activity-private-test",
+    "publicActivityChannel": "#activity-public-test"
   },
   "clearbit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }

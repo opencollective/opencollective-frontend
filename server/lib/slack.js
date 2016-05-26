@@ -5,25 +5,43 @@
 const Slack = require('node-slack');
 const config = require('config');
 const activitiesLib = require('../lib/activities');
+const constants = require('../constants/activities');
 
 module.exports = {
 
   /*
-   * Post a given activity to Slack
+   * Post a given activity to a private channel for Open Collective Core Team
    */
-  postActivity: function(activity, options) {
+  postActivityOnPrivateChannel: function(activity, options) {
+    console.log('reached inside private channel');
     if (!options) {
       options = {};
     }
-    var message = activitiesLib.formatMessage(activity, true);
+    var message = activitiesLib.formatMessageForPrivateChannel(activity, true);
+    options.attachments = formatAttachment(activity);
+    options.channel = config.slack.privateActivityChannel;
+    return this.postMessage(message, config.slack.hookUrl, options);
+  },
+
+  /*
+   * Post a given activity to a public channel for anyone to see the activity
+   */
+  postActivityOnPublicChannel: function(activity, options) {
+    console.log('reached inside public channell');
+    if (!options) {
+      options = {};
+    }
+    var message = activitiesLib.formatMessageForPublicChannel(activity, true);
     options.attachments = [];
-    return this.postMessage(message, options);
+    options.channel = config.slack.publicActivityChannel;
+    return this.postMessage(message, config.slack.hookUrl, options);
   },
 
   /*
    * Posts a message to a slack webhook
    */
-  postMessage: function(msg, options) {
+  postMessage: function(msg, webhookUrl, options) {
+    console.log('reaching inside postMessage: ', msg);
     if(!options) {
       options = {};
     }
@@ -34,15 +52,17 @@ module.exports = {
       attachments: options.attachments || []
     };
 
-    if (!options.hasOwnProperty('channel')) {
-      slackOptions.channel = config.slack.activityChannel;
-    } else if (options.channel) {
+    // note that channel is optional on slack, as every webhook has a default channel
+    if (options.channel) {
       slackOptions.channel = options.channel;
     }
 
     return new Promise((resolve, reject) => {
+      if (!slackOptions.text) {
+        resolve();
+      }
 
-      return new Slack(options.webhookUrl || config.slack.hookUrl, {})
+      return new Slack(webhookUrl, {})
         .send(slackOptions, (err) => {
           if (err) {
             console.error(err);
@@ -53,3 +73,14 @@ module.exports = {
     });
   }
 };
+
+function formatAttachment(activity) {
+  if (activity.type === constants.WEBHOOK_STRIPE_RECEIVED) {
+    return [{
+      title: 'Data',
+      color: 'good',
+      text: activitiesLib.formatAttachment(activity.data)
+    }];
+  }
+  return [];
+}
