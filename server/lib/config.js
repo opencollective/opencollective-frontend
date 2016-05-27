@@ -35,13 +35,14 @@ module.exports = function(app) {
 
   // Mailgun.
   if(config.mailgun.user) {
-    app.mailgun = Promise.promisify(() => nodemailer.createTransport({
+    app.mailgun = nodemailer.createTransport({
       service: 'Mailgun',
       auth: {
         user: config.mailgun.user,
         pass: config.mailgun.password
       }
-    }));
+    });
+    app.mailgun.sendMail =  Promise.promisify(app.mailgun.sendMail, app.mailgun);
   }
   else {
     console.warn("Mailgun is not configured");
@@ -49,5 +50,6 @@ module.exports = function(app) {
       sendMail: () => Promise.resolve()
     };
   }
+  console.log("app.mailgun: ", app.mailgun);
 
 };
