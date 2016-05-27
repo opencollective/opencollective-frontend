@@ -35,7 +35,7 @@ module.exports = function(app) {
 
   // Mailgun.
   if(config.mailgun.user) {
-    app.mailgun = Promise.promisify(nodemailer.createTransport({
+    app.mailgun = Promise.promisify(() => nodemailer.createTransport({
       service: 'Mailgun',
       auth: {
         user: config.mailgun.user,
