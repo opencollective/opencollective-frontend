@@ -19,6 +19,7 @@
     "clearbit": "1.2.1",
     "config": "1.19.0",
     "cors": "2.7.1",
+    "errorhandler": "1.4.3",
     "express": "4.13.4",
     "express-server-status": "1.0.3",
     "flat": "2.0.0",
