@@ -109,7 +109,7 @@ Promise.props({
 }).then(results => {
   const report = transactionReportString(results);
   console.log(report);
-  return slackLib.postMessage(report);
+  return slackLib.postActivityOnPrivateChannel(report);
 }).then(() => {
   console.log('Reporting done!');
   process.exit();
