@@ -50,6 +50,4 @@ module.exports = function(app) {
       sendMail: () => Promise.resolve()
     };
   }
-  console.log("app.mailgun: ", app.mailgun);
-
 };
