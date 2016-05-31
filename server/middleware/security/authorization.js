@@ -197,7 +197,7 @@ module.exports = function (app) {
     authorizeGroupAccessToTransaction(options) {
       return this.authorizeGroupAccessTo('transaction', options);
     },
-    
+
     authorizeAccessToUserWithRecentDonation: (req, res, next) => {
       models.Donation.findOne({
         where: {
@@ -207,7 +207,7 @@ module.exports = function (app) {
           }
         }
       })
-        .then(donation => {
+        .tap(donation => {
           if (!donation) {
             return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
           }

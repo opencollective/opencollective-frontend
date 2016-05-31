@@ -29,13 +29,8 @@ module.exports = (app) => {
           email: attributes.email
         }
       })
-      .tap((user) => {
-        if (user) {
-          return cb(null, user);
-        }
-
-        users._create(attributes, cb);
-      })
+      .then(user => user || users._create(attributes))
+      .then(user => cb(null, user))
       .catch(cb);
   };
 
@@ -87,9 +82,8 @@ module.exports = (app) => {
           service: 'stripe',
           UserId: user.id
         })
-        .then((paymentMethod) => {
-          return cb(null, paymentMethod);
-        })
+        .tap(paymentMethod => cb(null, paymentMethod))
+        .catch(cb);
       }],
 
       createCustomer: ['getOrCreatePaymentMethod', (cb, results) => {

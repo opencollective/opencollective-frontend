@@ -7,6 +7,7 @@ var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
+const Promise = require('bluebird');
 
 /**
  * Variables.
@@ -51,13 +52,9 @@ describe('usergroup.routes.test.js', () => {
   });
 
   // Create users.
-  beforeEach(function(done) {
-    this.timeout(2000);
-    utils.createUsers(['user1','user2','user3', 'user4'], (results) => {
-      users = results;
-      done();
-    });
-  });
+  beforeEach(() =>
+    Promise.map(['user1','user2','user3', 'user4'], u => models.User.create(utils.data(u)))
+      .tap(results => users = results));
 
   // Create group.
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));

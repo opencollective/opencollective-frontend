@@ -98,7 +98,7 @@ describe('donations.routes.test.js', () => {
       .end((e, res) => {
         expect(e).to.not.exist;
         models.Group
-          .find(parseInt(res.body.id))
+          .findById(parseInt(res.body.id))
           .then((g) => {
             group = g;
             done();
@@ -125,7 +125,7 @@ describe('donations.routes.test.js', () => {
       .end((e, res) => {
         expect(e).to.not.exist;
         models.Group
-          .find(parseInt(res.body.id))
+          .findById(parseInt(res.body.id))
           .tap((g) => {
             group2 = g;
             done();

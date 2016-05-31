@@ -35,7 +35,7 @@ module.exports = (app) => {
      */
     userid: (req, res, next, userid) => {
       parseId(userid)
-        .then(id => User.find(id))
+        .then(id => User.findById(id))
         .then((user) => {
           if (!user) {
             return next(new errors.NotFound(`User '${userid}' not found`));
@@ -71,7 +71,7 @@ module.exports = (app) => {
           .catch(next)
       } else {
         Group
-          .find(groupid)
+          .findById(groupid)
           .tap(callback)
           .catch(next);
       }
@@ -82,7 +82,7 @@ module.exports = (app) => {
      */
     transactionid: (req, res, next, transactionid) => {
       parseId(transactionid)
-        .then(id => Transaction.find(id))
+        .then(id => Transaction.findById(id))
         .then((transaction) => {
           if (!transaction) {
             return next(new errors.NotFound(`Transaction '${transactionid}' not found`));
@@ -121,7 +121,7 @@ module.exports = (app) => {
      */
     expenseid: (req, res, next, expenseid) => {
       parseId(expenseid)
-        .then(id => Expense.find(id))
+        .then(id => Expense.findById(id))
         .then((expense) => {
           if (!expense) {
             return next(new errors.NotFound(`Expense '${expenseid}' not found`));

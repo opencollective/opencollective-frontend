@@ -45,10 +45,11 @@ module.exports = function(app) {
       // If you don't find a user, proceed without error
       // Otherwise, we can leak email addresses
       if (user) {
-        email.send('user.new.token', req.body.email, {
+        return email.send('user.new.token', req.body.email, {
           subscriptionsLink: user.generateSubscriptionsLink(req.application)
         });
       }
+      return null;
     })
     .then(() => res.send({ success: true }))
     .catch(next);

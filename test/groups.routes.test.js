@@ -303,7 +303,8 @@ describe('groups.routes.test.js', () => {
           api_key: application.api_key
         })
         .expect(200)
-        .then(res => {
+        .toPromise()
+        .tap(res => {
           expect(res.body).to.have.property('id');
           expect(res.body).to.have.property('name', 'Loot');
           expect(res.body).to.have.property('slug', 'loot');
@@ -313,26 +314,21 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
           expect(res.body).to.have.property('isPublic', false);
           expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal('githubuser@gmail.com');
-
-          var caUser;
-          ConnectedAccount.findOne({where: {username: 'asood123'}})
-            .then(ca => {
-              expect(ca).to.have.property('provider', 'github');
-              return ca.getUser();
-            })
-            .then(user => expect(user).to.exist)
-            .then(() => ConnectedAccount.findOne({where: {username: 'oc'}}))
-            .then(ca => {
-              expect(ca).to.have.property('provider', 'github');
-              return ca.getUser();
-            })
-            .then(user => {
-              caUser = user;
-              expect(user).to.exist;
-            })
-            .then(() => caUser.getGroups())
-            .tap(groups => expect(groups).to.have.length(1));
-        }));
+        })
+        .then(() => ConnectedAccount.findOne({where: {username: 'asood123'}}))
+        .then(ca => {
+          expect(ca).to.have.property('provider', 'github');
+          return ca.getUser();
+        })
+        .then(user => expect(user).to.exist)
+        .then(() => ConnectedAccount.findOne({where: {username: 'oc'}}))
+        .then(ca => {
+          expect(ca).to.have.property('provider', 'github');
+          return ca.getUser();
+        })
+        .tap(user => expect(user).to.exist)
+        .then(caUser => caUser.getGroups())
+        .tap(groups => expect(groups).to.have.length(1)));
     });
 
   });
@@ -375,7 +371,7 @@ describe('groups.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           models.Group
-            .find(parseInt(res.body.id))
+            .findById(parseInt(res.body.id))
             .then((g) => {
               privateGroup = g;
               done();
@@ -402,7 +398,7 @@ describe('groups.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           models.Group
-            .find(parseInt(res.body.id))
+            .findById(parseInt(res.body.id))
             .tap((g) => {
               publicGroup = g;
               done();
@@ -719,7 +715,7 @@ describe('groups.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           models.Group
-            .find(parseInt(res.body.id))
+            .findById(parseInt(res.body.id))
             .tap((g) => {
               group = g;
               done();

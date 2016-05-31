@@ -121,20 +121,19 @@ module.exports = (app) => {
       },
 
       fetchUserAvatar: ['updateFields', (cb, results) => {
-        userlib.fetchAvatar(results.updateFields, (err, user) => {
+        userlib.fetchAvatar(results.updateFields).tap(user => {
           var avatar = user.avatar;
-          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(app.knox.bucket) === -1)
-          {
+          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(app.knox.bucket) === -1) {
             imageUrlToAmazonUrl(app.knox, avatar, (error, aws_src) => {
               user.avatar = error ? user.avatar : aws_src;
               cb(null, user);
             });
           }
-          else
-          {
+          else {
             cb(null, user);
           }
-        });
+        })
+        .catch(cb);
       }],
 
       update: ['fetchUserAvatar', (cb, results) => {
@@ -170,21 +169,13 @@ module.exports = (app) => {
     });
   };
 
-  var _create = (user, cb) => {
-    userlib.fetchInfo(user, (err, user) => {
-      var dbUser;
-      User
-        .create(user)
-        .tap(u => dbUser = u)
-        .then(dbUser => Activity.create({
-          type: constants.USER_CREATED,
-          UserId: dbUser.id,
-          data: {user: dbUser.info}
-        }))
-        .tap(() => cb(null, dbUser))
-        .catch(cb);
-    });
-  };
+  var _create = user => userlib.fetchInfo(user)
+    .then(user => User.create(user))
+    .tap(dbUser => Activity.create({
+      type: constants.USER_CREATED,
+      UserId: dbUser.id,
+      data: {user: dbUser.info}
+    }));
 
   const updatePassword = (req, res, next) => {
     const password= req.required.password;
@@ -263,7 +254,7 @@ module.exports = (app) => {
 
     async.auto({
       getUser: cb => {
-        User.find(id)
+        User.findById(id)
         .then(user => {
           if (!user) {
             return next(new errors.BadRequest(`User with id ${id} not found`));
@@ -312,10 +303,9 @@ module.exports = (app) => {
       var user = req.required.user;
       user.ApplicationId = req.application.id;
 
-      _create(user, (err, user) => {
-        if (err) return next(err);
-        res.send(user.info);
-      });
+      _create(user)
+        .tap(user => res.send(user.info))
+        .catch(next);
     },
 
     _create,

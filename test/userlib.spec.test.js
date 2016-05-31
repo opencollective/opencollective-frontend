@@ -14,7 +14,7 @@ var userData3 = utils.data('user3');
 var mock = require('./mocks/clearbit.json');
 
 describe("userlib", () => {
-  
+
   var sandbox, stub;
   beforeEach(() => {
     userlib.memory = {};
@@ -37,56 +37,40 @@ describe("userlib", () => {
 
   afterEach(() => sandbox.restore() );
 
-  it("doesn't call clearbit if email invalid", (done) => {
-    userlib.fetchAvatar({email: "email.com"}, (err, user) => {
-      expect(err).to.exist;
-      expect(user.avatar).to.be.undefined;
-      expect(user.email).to.equal("email.com");
-      expect(stub.called).to.be.false;
-      done();
-    });
-  });
+  it("doesn't call clearbit if email invalid", () =>
+    userlib.fetchAvatar({email: "email.com"})
+      .then(() => expect(stub.called).to.be.false));
 
-  it("can't fetch the avatar of an unknown email", (done) => {
-    userlib.fetchAvatar(userData1, (err, user) => {
-      expect(err).to.be.an.instanceof(userlib.clearbit.Enrichment.NotFoundError);
+  it("can't fetch the avatar of an unknown email", () =>
+    userlib.fetchAvatar(userData1).then(user => {
       expect(userlib.memory).to.have.property(userData1.email);
       expect(stub.callCount).to.equal(1);
       expect(user).to.deep.equal(userData1);
-      done();
-    });
-  });
+    }));
 
-  it("only calls clearbit server once for an email not found", (done) => {
-    userlib.fetchAvatar(userData1, (err, user) => {
-      userlib.fetchAvatar(userData1, (err, user) => {
+  it("only calls clearbit server once for an email not found", () =>
+    userlib.fetchAvatar(userData1)
+      .then(() => userlib.fetchAvatar(userData1))
+      .then(user => {
         expect(stub.callCount).to.equal(1);
-        expect(err).to.be.null;
-        expect(user.avatar).to.be.undefined;
+        expect(user.avatar).to.be.falsy;
         expect(user).to.deep.equal(userData1);
-        done();
-      });
-    });
-  });
+    }));
 
-  it("fetches the avatar of a known email and only updates the user.avatar", (done) => {
-    userlib.fetchAvatar(userData3, (err, user) => {
-      expect(err).to.not.exist;
+  it("fetches the avatar of a known email and only updates the user.avatar", () =>
+    userlib.fetchAvatar(userData3).then(user => {
       expect(Object.keys(user).length).to.equal(Object.keys(userData3).length);
       expect(user.name).to.equal(userData3.name);
       expect(user.avatar).to.equal('https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764');
-      expect(user.name)
-      done();
-    });
-  });
+      expect(user.name);
+    }));
 
-  it("doesn't fetch the avatar if one has already been provided", (done) => {
+  it("doesn't fetch the avatar if one has already been provided", () => {
     userData3.avatar = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764';
     var currentCallCount = stub.callCount;
-    userlib.fetchAvatar(userData3, (err, user) => {
+    return userlib.fetchAvatar(userData3).then(user => {
       expect(stub.callCount).to.equal(currentCallCount);
       expect(user).to.deep.equal(userData3);
-      done();
     });
   });
 

@@ -284,7 +284,7 @@ module.exports = function(Sequelize, DataTypes) {
               user.updateAttributes({
                 seenAt: new Date()
               })
-                .then(user => cb(null, user))
+                .tap(user => cb(null, user))
                 .catch(cb);
             } else {
               cb(new errors.BadRequest(msg));

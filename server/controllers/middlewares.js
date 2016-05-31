@@ -53,11 +53,10 @@ module.exports = function(app) {
         return this.authenticate(req, res, next);
       }
 
-      const cb = (err, user) => {
-        if(user) req.user = user;
-        return next();
-      }
-
+      const userData = {
+        email: email || paypalEmail,
+        paypalEmail
+      };
       models.User.findOne({
         where: {
           $or: {
@@ -66,18 +65,10 @@ module.exports = function(app) {
           }
         }
       })
-      .tap((user) => {
-        if (user) {
-          cb(null, user);
-        } else {
-          const userData = {
-            email: email || paypalEmail,
-            paypalEmail
-          };
-          users._create(userData, cb);
-        }
-      })
-      .catch(cb);
+      .then(user => user || users._create(userData))
+      .tap(user => req.user = user)
+      .tap(() => next())
+      .catch(next);
 
     },
 
@@ -159,7 +150,7 @@ module.exports = function(app) {
       async.parallel([
         function(cb) {
           User
-            .find(req.jwtPayload.sub)
+            .findById(req.jwtPayload.sub)
             .tap((user) => {
               req.remoteUser = user;
               cb();
@@ -171,7 +162,7 @@ module.exports = function(app) {
 
           // Check the validity of the application in the token.
           Application
-            .find(appId)
+            .findById(appId)
             .tap((application) => {
               if (!application || application.disabled)
                 return cb(new errors.Unauthorized('Invalid API key.'));

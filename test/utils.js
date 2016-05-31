@@ -39,14 +39,6 @@ module.exports = () => {
         });
     },
 
-    createUsers: (users, cb) => {
-      const promises = users.map(u => models.User.create(getData(u)));
-      Promise.all(promises).then(cb)
-      .catch(e => {
-        console.error("Sequelize Error: ", e.errors);
-      });
-    },
-
     /**
      * Test data.
      */

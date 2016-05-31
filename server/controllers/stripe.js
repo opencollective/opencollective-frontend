@@ -84,7 +84,7 @@ module.exports = function(app) {
 
     var host;
     checkIfUserIsHost(UserId)
-      .then(() => models.User.find(UserId))
+      .then(() => models.User.findById(UserId))
       .tap(h => host = h)
       .then(getToken(req.query.code))
       .then(createStripeAccount)

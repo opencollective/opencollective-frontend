@@ -163,7 +163,7 @@ var payServices = {
 
       getBeneficiary: ['checkTransaction', function(cb) {
         User
-          .find(parseInt(transaction.UserId))
+          .findById(parseInt(transaction.UserId))
           .then((user) => {
             if (!user) {
               return cb(new errors.NotFound(`Beneficiary ${userid} not found`));
