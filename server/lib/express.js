@@ -1,7 +1,6 @@
 var bodyParser = require('body-parser');
 var config = require('config');
 var cors = require('cors');
-var errorhandler = require('errorhandler');
 var morgan = require('morgan');
 var multer = require('multer');
 var passport = require('passport');
@@ -22,7 +21,7 @@ module.exports = function(app) {
 
   // Error handling.
   if (process.env.NODE_ENV !== 'production') {
-    app.use(errorhandler());
+    app.use(require('errorhandler')());
   }
 
   // Authentication
