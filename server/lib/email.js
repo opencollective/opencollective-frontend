@@ -33,6 +33,7 @@ const getSubject = str => {
 const getBody = str => str.split('\n').slice(2).join('\n');
 const render = (name, data, config) => {
   data.config = config;
+  data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
   return templates[name](data);
 };
 
