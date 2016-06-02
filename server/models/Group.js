@@ -74,6 +74,11 @@ module.exports = function(Sequelize, DataTypes) {
       allowNull: true
     },
 
+    data: {
+      type: DataTypes.JSON,
+      allowNull: true
+    },
+
     hostFeePercent: {
       type: DataTypes.FLOAT,
       defaultValue: constants.HOST_FEE_PERCENT
