@@ -59,10 +59,7 @@ module.exports = function(app) {
       };
       models.User.findOne({
         where: {
-          $or: {
-            email,
-            paypalEmail
-          }
+          $or: userData
         }
       })
       .then(user => user || users._create(userData))
