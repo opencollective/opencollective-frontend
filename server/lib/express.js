@@ -20,7 +20,7 @@ module.exports = function(app) {
   app.use(morgan('dev'));
 
   // Error handling.
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
     app.use(require('errorhandler')());
   }
 
