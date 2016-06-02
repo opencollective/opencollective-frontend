@@ -27,16 +27,18 @@ module.exports = function(app) {
         return next();
       }
 
-      var email, paypalEmail, password;
+      var name, email, paypalEmail, password;
 
       // TODO remove #postmigration, replaced by req.body.expense
       if(req.body.transaction) {
         email = req.body.transaction.email;
         paypalEmail = req.body.transaction.paypalEmail;
+        name = req.body.transaction.name;
       }
       else if(req.body.expense) {
         email = req.body.expense.email;
         paypalEmail = req.body.expense.paypalEmail;
+        name = req.body.expense.name;
       }
       // TODO remove #postmigration
       else if(req.body.payment) {
@@ -54,12 +56,16 @@ module.exports = function(app) {
       }
 
       const userData = {
+        name,
         email: email || paypalEmail,
         paypalEmail
       };
       models.User.findOne({
         where: {
-          $or: userData
+          $or: {
+            email: userData.email,
+            paypalEmail: userData.paypalEmail
+          }
         }
       })
       .then(user => user || users._create(userData))
