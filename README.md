@@ -96,7 +96,7 @@ For localhost or other environments, the migrations has to be run manually.
 
 ### Create a new migration file
 
-`sequelize migration:create`
+`npm run migration:create`
 
 ### Apply migrations locally
 
