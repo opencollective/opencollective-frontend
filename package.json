@@ -100,5 +100,9 @@
     "script": "node scripts/execute",
     "install:debs": "bash scripts/install_apt_get_debs.sh"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opencollective/opencollective-api.git"
+  }
 }
