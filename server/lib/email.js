@@ -68,6 +68,10 @@ function loadTemplates() {
         return `£${value}`;
       case 'SEK':
         return `kr ${value}`;
+      case 'UYU':
+        return `$U ${value}`;
+      case 'INR':
+        return `₹${value}`;
       default:
         return `${value} ${currency}`;
     }
