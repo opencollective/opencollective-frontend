@@ -17,7 +17,7 @@ module.exports = (app) => {
   const aZ = require('./middleware/security/authorization')(app);
   const errorHandler = require('./middleware/error_handler');
   const cache = require('./middleware/cache');
-  const params = require('./params')(app);
+  const params = require('./middleware/params')(app);
 
   /**
    * Controllers
@@ -80,7 +80,7 @@ module.exports = (app) => {
    * Users.
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
-  app.get('/users/:userid', aN.authenticateUserByJwt(), users.show); // Get a user.
+  app.get('/users/:userid', aN.authenticateUserOrApp(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateAppByApiKey, required('user'), aZ.authorizeAccessToUserWithRecentDonation, users.updateUserWithoutLoggedIn); // Update a user.
   app.put('/users/:userid/avatars', aN.authenticateAppByApiKey, required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
   app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.

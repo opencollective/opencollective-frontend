@@ -158,6 +158,15 @@ module.exports = function(Sequelize, DataTypes) {
           publicUrl: this.publicUrl,
           hostFeePercent: this.hostFeePercent
         };
+      },
+      minimal: function() {
+        return {
+          id: this.id,
+          name: this.name,
+          logo: this.logo,
+          publicUrl: this.publicUrl,
+          mission: this.mission
+        }
       }
     },
 

@@ -281,14 +281,19 @@ describe('users.routes.test.js', () => {
     var user;
     var user2;
 
+    // Create two users
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
-
     beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+    // Create a collective with two members
+    beforeEach(() => models.Group.create(utils.data('group1'))
+      .tap(g => g.addUserWithRole(user, 'MEMBER'))
+      .tap(g => g.addUserWithRole(user2, 'MEMBER'))
+    );
 
     it('successfully get a user\'s information', (done) => {
       request(app)
-        .get('/users/' + user.id)
-        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .get(`/users/${user.id}?api_key=${application.api_key}`)
         .end((e, res) => {
           expect(e).to.not.exist;
           var u = res.body;
@@ -298,9 +303,24 @@ describe('users.routes.test.js', () => {
         });
     });
 
+    it('successfully get a user\'s profile by its username', (done) => {
+
+      request(app)
+        .get(`/users/${user.username}?profile=true&api_key=${application.api_key}`)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          var u = res.body;
+          expect(u.username).to.equal(utils.data('user1').username);
+          expect(u.groups[0].name).to.equal(utils.data('group1').name);
+          expect(u.groups[0].role).to.equal('MEMBER');
+          expect(u.groups[0].members).to.equal(2);
+          done();
+        });
+    });
+
     it('successfully get a user\'s information when he is authenticated', (done) => {
       request(app)
-        .get('/users/' + user.id)
+        .get(`/users/${user.id}`)
         .set('Authorization', 'Bearer ' + user.jwt(application))
         .end((e, res) => {
           expect(e).to.not.exist;

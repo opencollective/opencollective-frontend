@@ -8,6 +8,7 @@ var userlib = require('../lib/userlib');
 var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
 var imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
 var constants = require('../constants/activities');
+var sequelize = require('sequelize');
 
 /**
  * Controller.
@@ -324,16 +325,39 @@ module.exports = (app) => {
      * Show.
      */
     show: (req, res, next) => {
-      if (req.remoteUser.id === req.user.id) {
+
+      var userData = req.user.show;
+
+      if (req.remoteUser && req.remoteUser.id === req.user.id) {
         req.user.getStripeAccount()
           .then((account) => {
-            var response = _.extend({}, req.user.info, { stripeAccount: account });
-
+            var response = Object.assign(userData, req.user.info, { stripeAccount: account });
             res.send(response);
           })
           .catch(next);
-      } else {
-        res.send(req.user.show);
+      } else if (req.query.profile) {
+        var groups;
+        req.user
+        .getGroups()
+        .then(results => {
+          groups = results.map(g => Object.assign(g.minimal, { role: g.UserGroup.role, createdAt: g.UserGroup.createdAt }));
+          return groups;
+        })
+        .then(groups => UserGroup.findAll({
+          where: { GroupId: { $in: groups.map(g => g.id) } }, 
+          attributes: ['GroupId', [ sequelize.fn('count', sequelize.col('GroupId')), 'members' ]],
+          group: ['GroupId']
+        }))
+        .tap(counts => {
+          const membersByGroupId = {};
+          counts.map(g => { membersByGroupId[parseInt(g.GroupId,10)] = parseInt(g.dataValues.members, 10); } );
+          userData.groups = groups.map(g => Object.assign(g, { members: membersByGroupId[parseInt(g.id, 10)] }));
+          res.send(userData);
+        })
+        .catch(next);
+      }
+      else {
+        res.send(userData);
       }
     },
 

@@ -24,6 +24,17 @@ module.exports = (app) => {
       return Promise.resolve(id);
     }
   }
+  
+  /**
+   * Get a record by id or by name
+   */
+   function getByKeyValue(model, key, value) {
+     return model
+       .find({ where: { [key]: value.toLowerCase() } })
+       .tap(result => {
+         if(!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
+       });
+   }
 
   /**
    * Public methods.
@@ -33,48 +44,19 @@ module.exports = (app) => {
     /**
      * Userid.
      */
-    userid: (req, res, next, userid) => {
-      parseId(userid)
-        .then(id => User.findById(id))
-        .then((user) => {
-          if (!user) {
-            return next(new errors.NotFound(`User '${userid}' not found`));
-          } else {
-            req.user = user;
-            next();
-          }
-        })
-        .catch(next)
+    userid: (req, res, next, userIdOrName) => {
+      getByKeyValue(User, isNaN(userIdOrName) ? 'username' : 'id', userIdOrName)
+        .then(user => req.user = user)
+        .asCallback(next);
     },
 
     /**
      * Groupid.
      */
-    groupid: (req, res, next, groupid) => {
-      const callback = group => {
-        if (!group) {
-          return next(new errors.NotFound(`Group '${groupid}' not found`));
-        } else {
-          req.group = group;
-          next();
-        }
-      };
-
-      if (isNaN(groupid)) { // slug
-        Group
-          .find({
-            where: {
-              slug: groupid.toLowerCase()
-            }
-          })
-          .tap(callback)
-          .catch(next)
-      } else {
-        Group
-          .findById(groupid)
-          .tap(callback)
-          .catch(next);
-      }
+    groupid: (req, res, next, groupIdOrSlug) => {
+      getByKeyValue(Group, isNaN(groupIdOrSlug) ? 'slug' : 'id', groupIdOrSlug)
+        .then(group => req.group = group)
+        .asCallback(next);
     },
 
     /**
