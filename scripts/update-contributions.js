@@ -2,7 +2,6 @@
 
 'use strict';
 
-const Promise = require('bluebird');
 const app = require('../index');
 const GitHubClient = require('opencollective-jobs').GitHubClient;
 const Group = app.set('models').Group;
@@ -32,10 +31,13 @@ Group.findAll({
             return acc;
           }, {});
       })
-      .then(data => {
-        group.settings = group.settings || {};
-        group.settings.githubOrg = org;
-        group.data = data;
+      .then(contributorData => {
+        group.settings = _.assign(group.settings || {}, {
+          githubOrg: org
+        });
+        group.data = _.assign(group.data || {}, {
+          githubContributors: contributorData
+        });
         return group.save();
       })
       .then(() => {
@@ -44,4 +46,7 @@ Group.findAll({
       .catch(err => {
         console.log(`WARNING: ${err.message}`);
       })
+  })
+  .finally(() => {
+    process.exit();
   });
