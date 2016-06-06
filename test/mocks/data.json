@@ -436,9 +436,12 @@
     "stripeSubscriptionId": "sub_tokentest"
   },
   "expense1": {
-    "description": "Lunch with Jenn",
+    "title": "Lunch with Jenn",
+    "notes": "Some very long and super interesting extra notes for the whole world to see",
+    "category": "Engineering",
     "amount": 120.00,
     "currency": "USD",
-    "paypalEmail": "userpaypal@gmail.com"
+    "paypalEmail": "userpaypal@gmail.com",
+    "incurredAt": "2016-03-06 UTC+0300"
   }
 }

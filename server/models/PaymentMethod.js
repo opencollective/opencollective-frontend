@@ -1,5 +1,7 @@
 module.exports = function(Sequelize, DataTypes) {
-
+  
+  const payoutMethods = ['paypal', 'stripe'];
+  
   var PaymentMethod = Sequelize.define('PaymentMethod', {
     id: {
       type: DataTypes.INTEGER,
@@ -11,7 +13,13 @@ module.exports = function(Sequelize, DataTypes) {
     customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
     service: {
       type: DataTypes.STRING,
-      defaultValue: 'stripe'
+      defaultValue: 'stripe',
+      validate: {
+        isIn: {
+          args: [payoutMethods],
+          msg: `Must be in ${payoutMethods}`
+        }
+      }
     },
     data: DataTypes.JSON,
     createdAt: {
@@ -64,6 +72,8 @@ module.exports = function(Sequelize, DataTypes) {
       }
     }
   });
+  
+  PaymentMethod.payoutMethods = payoutMethods;
 
   return PaymentMethod;
 };

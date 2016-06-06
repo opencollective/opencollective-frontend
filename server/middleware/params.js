@@ -112,7 +112,7 @@ module.exports = (app) => {
             next();
           }
         })
-        .catch(next)
-    },
+        .catch(next);
+    }
   }
 };

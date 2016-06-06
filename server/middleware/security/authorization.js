@@ -167,7 +167,7 @@ module.exports = function (app) {
     authorizeGroupAccessTo(attributeName, options) {
       if (!options) options = {};
       return (req, res, next) => {
-        var _authorizeAccessToTransaction = () => {
+        var _authorizeAccess = () => {
           // TODO shouldn't return NotFound before authorization check
           if (!req[attributeName]) {
             return next(new NotFound());
@@ -186,10 +186,10 @@ module.exports = function (app) {
             if (!e) {
               return next();
             }
-            _authorizeAccessToTransaction();
+            _authorizeAccess();
           });
         } else {
-          _authorizeAccessToTransaction();
+          _authorizeAccess();
         }
       }
     },

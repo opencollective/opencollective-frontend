@@ -34,9 +34,14 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
-    amount: DataTypes.INTEGER, // In cents
+    amount: {
+      type:DataTypes.INTEGER, // In cents
+      min: 0
+    },
+
     amountFloat: { // remove #postmigration
       type: DataTypes.VIRTUAL,
+      min: 0,
       get: function () {
         return parseFloat(this.get('amount') / 100);
       }

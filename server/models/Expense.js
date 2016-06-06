@@ -1,4 +1,4 @@
-// const Temporal = require('sequelize-temporal');
+const Temporal = require('sequelize-temporal');
 
 const status = require('../constants/expense_status');
 
@@ -16,7 +16,8 @@ module.exports = function (Sequelize, DataTypes) {
       references: 'Users',
       referencesKey: 'id',
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     GroupId: {
@@ -24,12 +25,14 @@ module.exports = function (Sequelize, DataTypes) {
       references: 'Groups',
       referencesKey: 'id',
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
+      allowNull: false,
       set(val) {
         if (val && val.toUpperCase) {
           this.setDataValue('currency', val.toUpperCase());
@@ -37,9 +40,17 @@ module.exports = function (Sequelize, DataTypes) {
       }
     },
 
-    amount: DataTypes.INTEGER,
-    title: DataTypes.STRING,
-    description: DataTypes.TEXT,
+    amount: {
+      type: DataTypes.INTEGER,
+      validate: { min: 0 },
+      allowNull: false
+    },
+
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    notes: DataTypes.TEXT,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
     vat: DataTypes.INTEGER,
@@ -55,6 +66,7 @@ module.exports = function (Sequelize, DataTypes) {
     status: {
       type: DataTypes.STRING,
       defaultValue: status.PENDING,
+      allowNull: false,
       validate: {
         isIn: {
           args: [[status.PENDING, status.APPROVED, status.REJECTED, status.PAID]],
@@ -63,16 +75,22 @@ module.exports = function (Sequelize, DataTypes) {
       }
     },
 
-    incurredAt: DataTypes.DATE, // date when the expense was incurred
+    // date when the expense was incurred
+    incurredAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.NOW,
+      allowNull: false
     },
 
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.NOW,
+      allowNull: false
     },
 
     deletedAt: {
@@ -83,20 +101,20 @@ module.exports = function (Sequelize, DataTypes) {
 
     getterMethods: {
 
-      isRejected() {
-        return this.status === status.REJECTED;
+      isPending() {
+        return this.status === status.PENDING;
       },
 
       isApproved() {
         return this.status === status.APPROVED;
       },
 
-      isPaid() {
-        return this.status === status.PAID;
+      isRejected() {
+        return this.status === status.REJECTED;
       },
 
-      isPending() {
-        return this.status === status.PENDING;
+      isPaid() {
+        return this.status === status.PAID;
       },
 
       info() {
@@ -107,7 +125,6 @@ module.exports = function (Sequelize, DataTypes) {
           currency: this.currency,
           amount: this.amount,
           title: this.title,
-          description: this.description,
           attachment: this.attachment,
           category: this.category,
           vat: this.vat,
@@ -125,19 +142,22 @@ module.exports = function (Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      reject() {
+      setApproved() {
+        this.status = status.APPROVED;
+        return this.save();
+      },
+
+      setRejected() {
         this.status = status.REJECTED;
         return this.save();
       },
 
-      approve() {
-        this.status = status.APPROVED;
+      setPaid() {
+        this.status = status.PAID;
         return this.save();
       }
     }
   });
 
-  return Expense;
-  // TODO: enable Temporal
-  // return Temporal(Expense, Sequelize);
+  return Temporal(Expense, Sequelize);
 };
