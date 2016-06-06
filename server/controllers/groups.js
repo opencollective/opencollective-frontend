@@ -123,9 +123,24 @@ module.exports = function(app) {
   const getYearlyIncome = (GroupId, cb) => {
     sequelize.query(`
       SELECT
-        (SELECT COALESCE(SUM(t."netAmountInGroupCurrency"*12),0) FROM "Transactions" t LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id WHERE "GroupId" = :GroupId AND t.amount > 0 AND s.interval = 'month' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL)
+        (SELECT
+          COALESCE(SUM(t."netAmountInGroupCurrency"*12),0)
+          FROM "Transactions" t
+          LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+          WHERE "GroupId" = :GroupId
+            AND t.amount > 0
+            AND t."deletedAt" IS NULL
+            AND s.interval = 'month'
+            AND s."isActive" IS TRUE
+            AND s."deletedAt" IS NULL)
         +
-        (SELECT COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id WHERE "GroupId" = :GroupId AND t.amount > 0 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
+        (SELECT
+          COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
+          LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+          WHERE "GroupId" = :GroupId
+            AND t.amount > 0
+            AND t."deletedAt" IS NULL
+            AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
     `, {
       replacements: { GroupId },
       type: sequelize.QueryTypes.SELECT
