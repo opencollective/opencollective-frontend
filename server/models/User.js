@@ -123,8 +123,10 @@ module.exports = function(Sequelize, DataTypes) {
 
     referrerId: {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },

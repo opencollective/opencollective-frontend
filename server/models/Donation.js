@@ -9,16 +9,20 @@ module.exports = function(Sequelize, DataTypes) {
 
     UserId: {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },
 
     GroupId: {
       type: DataTypes.INTEGER,
-      references: 'Groups',
-      referencesKey: 'id',
+      references: {
+        model: 'Groups',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },
@@ -51,8 +55,10 @@ module.exports = function(Sequelize, DataTypes) {
 
     SubscriptionId: {
       type: DataTypes.INTEGER,
-      references: 'Subscriptions',
-      referencesKey: 'id',
+      references: {
+        model: 'Subscriptions',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },

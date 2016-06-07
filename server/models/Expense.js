@@ -13,8 +13,10 @@ module.exports = function (Sequelize, DataTypes) {
 
     UserId: {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
       allowNull: false
@@ -22,8 +24,10 @@ module.exports = function (Sequelize, DataTypes) {
 
     GroupId: {
       type: DataTypes.INTEGER,
-      references: 'Groups',
-      referencesKey: 'id',
+      references: {
+        model: 'Groups',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
       allowNull: false
@@ -57,8 +61,10 @@ module.exports = function (Sequelize, DataTypes) {
 
     lastEditedById: {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },
