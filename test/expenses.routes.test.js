@@ -1,5 +1,6 @@
 const app = require('../index');
 const expect = require('chai').expect;
+const Promise = require('bluebird');
 const request = require('supertest-as-promised');
 const sinon = require('sinon');
 const utils = require('./utils')();
@@ -30,6 +31,16 @@ describe('expenses.routes.test.js', () => {
 
   describe('WHEN expense does not exist', () => {
     var req;
+
+    describe('#getOne', () => {
+      beforeEach(() => {
+        req = request(app)
+          .get('/groups/' + group.id + '/expenses/123')
+          .set('Authorization', `Bearer ${user.jwt(application)}`);
+      });
+
+      it('THEN returns 404', () => req.expect(404));
+    });
 
     describe('#approve', () => {
       beforeEach(() => {
@@ -142,6 +153,95 @@ describe('expenses.routes.test.js', () => {
           it('THEN a group.expense.created activity is created', () =>
             expectExpenseActivity('group.expense.created', actualExpense.id));
 
+          describe('#getOne', () => {
+            it('THEN returns 200', () => request(app)
+              .get(`/groups/${group.id}/expenses/${actualExpense.id}`)
+              .expect(200)
+              .then(res => expect(res.body).to.have.property('id', actualExpense.id)));
+          });
+
+          describe('#list', () => {
+            beforeEach(() => createExpense(group, user));
+            beforeEach(() => createExpense(group, user));
+
+            it('THEN returns 200', () => request(app)
+              .get(`/groups/${group.id}/expenses`)
+              .expect(200)
+              .then(res => {
+                const expenses = res.body;
+                expect(expenses).to.have.length(3);
+                expenses.forEach(e => expect(e.GroupId).to.equal(group.id));
+              }));
+
+            describe('WHEN specifying per_page', () => {
+              var per_page = 2, response;
+
+              beforeEach(() => request(app)
+                .get(`/groups/${group.id}/expenses`)
+                .send({ per_page })
+                .expect(200)
+                .then(res => response = res));
+
+              it('THEN gets first page', () => {
+                const expenses = response.body;
+                expect(expenses.length).to.equal(per_page);
+                expect(expenses[0].id).to.equal(1);
+
+                var headers = response.headers;
+                expect(headers).to.have.property('link');
+                expect(headers.link).to.contain('next');
+                expect(headers.link).to.contain('page=2');
+                expect(headers.link).to.contain('current');
+                expect(headers.link).to.contain('page=1');
+                expect(headers.link).to.contain(`per_page=${per_page}`);
+                expect(headers.link).to.contain(`/groups/${group.id}/expenses`);
+                var tot = 3;
+                expect(headers.link).to.contain(`/groups/${group.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
+              });
+            });
+
+            describe('WHEN getting page 2', () => {
+              var page = 2, response;
+
+              beforeEach(() => request(app)
+                .get(`/groups/${group.id}/expenses`)
+                .send({ page, per_page: 1 })
+                .expect(200)
+                .then(res => response = res));
+
+              it('THEN gets 2nd page', () => {
+                const expenses = response.body;
+                expect(expenses.length).to.equal(1);
+                expect(expenses[0].id).to.equal(2);
+
+                var headers = response.headers;
+                expect(headers).to.have.property('link');
+                expect(headers.link).to.contain('next');
+                expect(headers.link).to.contain('page=3');
+                expect(headers.link).to.contain('current');
+                expect(headers.link).to.contain('page=2');
+              });
+            });
+
+            describe('WHEN specifying since_id', () => {
+              var since_id = 2, response;
+
+              beforeEach(() => request(app)
+                .get(`/groups/${group.id}/expenses`)
+                .send({ since_id })
+                .expect(200)
+                .then(res => response = res));
+
+              it('THEN returns expenses above ID', () => {
+                const expenses = response.body;
+                expect(expenses.length).to.be.equal(1);
+                expenses.forEach(e => expect(e.id >= since_id).to.be.true);
+                const headers = response.headers;
+                expect(headers.link).to.be.empty;
+              });
+            });
+          });
+
           describe('#delete', () => {
             describe('WHEN not authenticated', () =>
               it('THEN returns 401', () => request(app)
@@ -151,7 +251,7 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN expense does not belong to group', () => {
               var otherExpense;
 
-              beforeEach(() => createOtherExpense().tap(e => otherExpense = e));
+              beforeEach(() => createExpense().tap(e => otherExpense = e));
 
               it('THEN returns 403', () => request(app)
                 .delete(`/groups/${group.id}/expenses/${otherExpense.id}`)
@@ -201,7 +301,7 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN expense does not belong to group', () => {
               var otherExpense;
 
-              beforeEach(() => createOtherExpense().tap(e => otherExpense = e));
+              beforeEach(() => createExpense().tap(e => otherExpense = e));
 
               it('THEN returns 403', () => request(app)
                 .put(`/groups/${group.id}/expenses/${otherExpense.id}`)
@@ -503,13 +603,13 @@ describe('expenses.routes.test.js', () => {
       })
   }
 
-  function createOtherExpense() {
+  function createExpense(g, u) {
     var group, user;
-    return models.Group.create(utils.data('group2'))
+    return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
       .tap(g => group = g)
-      .then(() => models.User.create(utils.data('user2')))
+      .then(() => u ? u : models.User.create(utils.data('user2'))
+        .tap(user => group.addUserWithRole(user, roles.HOST)))
       .tap(u => user = u)
-      .then(() => group.addUserWithRole(user, roles.HOST))
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt(application)}`)

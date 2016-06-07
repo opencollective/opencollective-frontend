@@ -3,6 +3,14 @@ const config = require('config');
 const constants = require('../server/constants/transactions');
 const models = app.set('models');
 
+/*
+ * tested with:
+ * 
+ * - npm run db:copy:prod
+ * - PG_DATABASE=opencollective_prod_snapshot npm run db:migrate:dev
+ * - PG_DATABASE=opencollective_prod_snapshot node scripts/populate_expenses_table.js
+ */
+
 // Updates a transaction row, given an expense
 const updateTransaction = (expense, transaction) => {
   transaction.type = constants.type.EXPENSE;

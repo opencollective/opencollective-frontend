@@ -2,10 +2,12 @@
  * Dependencies.
  */
 
+const _ = require('lodash');
 const Promise = require('bluebird');
 const activities = require('../constants/activities');
 const includes = require('lodash/collection/includes');
 const status = require('../constants/expense_status');
+const utils = require('../lib/utils');
 
 /**
  * Controller.
@@ -35,6 +37,31 @@ module.exports = (app) => {
       .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
       .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
       .tap(expense => res.send(expense))
+      .catch(next);
+  };
+
+  /**
+   * Get an expense.
+   */
+  const getOne = (req, res) => res.json(req.expense.info);
+
+  /**
+   * Get expenses.
+   */
+  const list = (req, res, next) => {
+
+    var query = Object.assign({
+      where: { GroupId: req.group.id },
+      order: [[req.sorting.key, req.sorting.dir]]
+    }, req.pagination);
+
+    return models.Expense.findAndCountAll(query)
+      .tap(expenses => {
+        // Set headers for pagination.
+        req.pagination.total = expenses.count;
+        res.set({ Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination) });
+        res.send(_.pluck(expenses.rows, 'info'));
+      })
       .catch(next);
   };
 
@@ -197,6 +224,8 @@ module.exports = (app) => {
 
   return {
     create,
+    getOne,
+    list,
     deleteExpense,
     update,
     setApprovalStatus,

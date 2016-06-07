@@ -145,6 +145,7 @@ module.exports = (app) => {
   /**
    * Transactions (financial).
    */
+  // TODO remove #postmigration, replaced by GET /groups/:groupid/expenses
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
@@ -152,6 +153,7 @@ module.exports = (app) => {
   app.post('/groups/:groupid/transactions', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
   app.post('/groups/:groupid/transactions', commonLegacySecurityMw, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
+  // TODO remove #postmigration, replaced by GET /groups/:groupid/expenses/:expenseid
   app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessToTransaction({authIfPublic: true}), groups.getTransaction); // Get a transaction.
   // TODO remove #postmigration, replaced by PUT /groups/:groupid/expenses/:expenseid
   app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
@@ -167,13 +169,14 @@ module.exports = (app) => {
    * Expenses
    */
 
+  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), aZ.authorizeGroupAccessTo('expense', {authIfPublic: true}), expenses.list); // Get expenses.
+  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessTo('expense', {authIfPublic: true}), expenses.getOne); // Get an expense.
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
   // TODO refactor with single route using authentication.js and authorization.js middleware
   app.post('/groups/:groupid/expenses', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
   app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
   app.put('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('expense'), expenses.update); // Update an expense.
-  // TODO is option bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser present in DEL /groups/:id/transactions/:id really needed?
   app.delete('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), required('payoutMethod'), expenses.pay); // Pay an expense.
