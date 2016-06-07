@@ -46,14 +46,9 @@ describe('users.routes.test.js', () => {
     });
   });
 
-  afterEach(() => sandbox.restore() );
+  afterEach(() => sandbox.restore());
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create a normal application.
   beforeEach(() => models.Application.create(utils.data('application2')).tap(a => application2 = a));

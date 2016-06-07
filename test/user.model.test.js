@@ -18,16 +18,9 @@ describe('user.models.test.js', () => {
   var application;
   var User;
 
-  beforeEach(() => {
-    User = app.get('models').User;
-  })
+  beforeEach(() => User = app.get('models').User);
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   /**
    * Create a user.

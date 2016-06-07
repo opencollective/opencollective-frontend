@@ -27,13 +27,7 @@ describe('activities.routes.test.js', () => {
   var user2;
   var group;
 
-
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create users.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));

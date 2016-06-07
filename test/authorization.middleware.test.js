@@ -23,9 +23,7 @@ describe('authorization.middleware.test.js', () => {
 
   var user, req;
 
-  beforeEach(done => {
-    utils.cleanAllDb(done);
-  });
+  beforeEach(() => utils.cleanAllDb());
 
   beforeEach((done) => {
     models.User.create(userData)

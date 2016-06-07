@@ -18,12 +18,7 @@ describe('images.routes.test.js', () => {
   var application;
   var user;
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   /**
    * Create user

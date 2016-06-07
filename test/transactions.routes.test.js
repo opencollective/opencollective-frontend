@@ -36,18 +36,10 @@ describe('transactions.routes.test.js', () => {
   var application3;
   var sandbox = sinon.sandbox.create();
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   // Create user.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -863,7 +855,7 @@ describe('transactions.routes.test.js', () => {
         });
     });
 
-    beforeEach(() => 
+    beforeEach(() =>
       models.PaymentMethod.create({
         service: 'paypal',
         UserId: user.id,

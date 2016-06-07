@@ -11,12 +11,8 @@ const clientId = config.github.clientID;
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
 
   var application, req;
-  beforeEach(done => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   describe('WHEN calling /connected-accounts/github', () => {
 

@@ -31,21 +31,12 @@ describe('subscriptions.routes.test.js', () => {
   var application;
   var paymentMethod;
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      expect(e).to.not.exist;
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
-  // Create user.
   beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
-  // Create the group.
   beforeEach(() => models.Group.create(utils.data('group1')).tap((g => group = g)));
 
-  // Add user to the group.
   beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
   // create stripe account

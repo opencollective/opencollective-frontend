@@ -34,15 +34,13 @@ describe('transactions.paypal.routes.test.js', () => {
     });
   });
 
-  after(() => {
-    app.paypalAdaptive.pay.restore();
-  });
+  after(() => app.paypalAdaptive.pay.restore());
 
   beforeEach((done) => {
     async.auto({
 
       cleanAndCreateApplication: (cb) => {
-        utils.cleanAllDb(cb);
+        utils.cleanAllDb().asCallback(cb);
       },
       createUserB: ['cleanAndCreateApplication', (cb) => {
         models.User.create(utils.data('user2'))

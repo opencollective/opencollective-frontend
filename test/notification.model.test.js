@@ -38,12 +38,7 @@ describe("notification.model.test.js", () => {
   var group;
   var group2;
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   beforeEach(() => {
     var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];

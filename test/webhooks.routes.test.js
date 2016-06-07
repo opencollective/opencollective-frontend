@@ -56,20 +56,10 @@ describe('webhooks.routes.test.js', () => {
   var donation;
   var sandbox = sinon.sandbox.create();
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
-  // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
-  // Create a user.
   beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   // Create a group.
@@ -99,13 +89,9 @@ describe('webhooks.routes.test.js', () => {
     })
     .then((account) => user.setStripeAccount(account)));
 
-  afterEach(() => {
-    nock.cleanAll();
-  });
+  afterEach(() => nock.cleanAll());
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
     var planId = generatePlanId({

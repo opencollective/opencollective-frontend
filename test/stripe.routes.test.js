@@ -20,12 +20,7 @@ describe('stripe.routes.test.js', () => {
   var group;
   var application;
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create a user.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));

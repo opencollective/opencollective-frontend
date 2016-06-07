@@ -21,9 +21,7 @@ const Transaction = models.Transaction;
 
 describe('transaction model', () => {
 
-  beforeEach(done => {
-    utils.cleanAllDb(done);
-  });
+  beforeEach(() => utils.cleanAllDb());
 
   it('isExpense is true if the amount is negative', done => {
     Transaction.create({

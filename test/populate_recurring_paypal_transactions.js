@@ -45,7 +45,7 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
   var subscription;
   var runScript;
 
-  beforeEach((done) => utils.cleanAllDb(done));
+  beforeEach(() => utils.cleanAllDb());
 
   beforeEach(() => models.User.create(data('user1')).tap(u => user = u));
 

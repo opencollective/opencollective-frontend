@@ -44,12 +44,7 @@ const createDonations = (cb) => {
 describe('usergroup.routes.test.js', () => {
   var application;
 
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create users.
   beforeEach(() =>

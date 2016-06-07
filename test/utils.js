@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
 const Promise = require('bluebird');
 const app = require('../index');
 const models = app.set('models');
@@ -12,7 +11,7 @@ const userlib = require('../server/lib/userlib');
 /**
  * Private methods.
  */
-const getData = (item) => _.extend({}, data[item]); // to avoid changing these data
+const getData = (item) => Object.assign({}, data[item]); // to avoid changing these data
 
 const clearbitStubBeforeEach = sandbox => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
@@ -29,15 +28,12 @@ module.exports = () => {
 
   return {
 
-    cleanAllDb: (callback) => {
-      app.get('models').sequelize.sync({force: true})
-        .then(() => models.Application.create(getData('applicationSuper')))
-        .tap(a => callback(null, a))
-        .catch(e => {
-          console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
-          process.exit(1);
-        });
-    },
+    cleanAllDb: () => app.get('models').sequelize.sync({force: true})
+      .then(() => models.Application.create(getData('applicationSuper')))
+      .catch(e => {
+        console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
+        process.exit(1);
+      }),
 
     /**
      * Test data.

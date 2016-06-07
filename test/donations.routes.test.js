@@ -49,14 +49,8 @@ describe('donations.routes.test.js', () => {
     var stub = sinon.stub(app.stripe.accounts, 'create');
     stub.yields(null, mock);
   };
-
-
-  beforeEach((done) => {
-    utils.cleanAllDb((e, app) => {
-      application = app;
-      done();
-    });
-  });
+  
+  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create a stub for clearbit
   beforeEach((done) => {
