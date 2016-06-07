@@ -1,6 +1,7 @@
 const Temporal = require('sequelize-temporal');
 
 const status = require('../constants/expense_status');
+const allowedCurrencies = Object.keys(require('../constants/currencies'));
 
 module.exports = function (Sequelize, DataTypes) {
 
@@ -35,13 +36,13 @@ module.exports = function (Sequelize, DataTypes) {
 
     currency: {
       type: DataTypes.STRING,
-      defaultValue: 'USD',
-      allowNull: false,
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
+      validate: {
+        isIn: {
+          args: [allowedCurrencies],
+          msg: `Must be in ${allowedCurrencies}`
         }
-      }
+      },
+      allowNull: false
     },
 
     amount: {

@@ -5,6 +5,8 @@ const moment = require('moment');
 const _ = require('lodash');
 const Promise = require('bluebird');
 
+const currencies = require('../constants/currencies');
+
 const templatesNames = [
   'github.signup',
   'group.transaction.created',
@@ -59,22 +61,11 @@ function loadTemplates() {
 
   handlebars.registerHelper('currency', (value, props) => {
     const currency = props.hash.currency;
-    switch(currency) {
-      case 'USD':
-        return `$${value}`;
-      case 'EUR':
-        return `€${value}`;
-      case 'GBP':
-        return `£${value}`;
-      case 'SEK':
-        return `kr ${value}`;
-      case 'UYU':
-        return `$U ${value}`;
-      case 'INR':
-        return `₹${value}`;
-      default:
-        return `${value} ${currency}`;
+    if (currencies[currency]) {
+      return currencies[currency](value);
     }
+    console.error(`Unexpected currency ${currency}`);
+    return `${value} ${currency}`;
   });
 
   handlebars.registerHelper('encodeURIComponent', (str) => {

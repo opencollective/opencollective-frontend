@@ -14,7 +14,8 @@ module.exports = app => {
           detailLevel: 'ReturnAll'
         },
         actionType: 'PAY',
-        currencyCode: expense.currency.toUpperCase() || 'USD',
+        // TODO does PayPal accept all the currencies that we support in our expenses?
+        currencyCode: expense.currency,
         feesPayer: 'SENDER',
         memo: `Reimbursement from ${group.name}: ${expense.description}`,
         trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
