@@ -50,7 +50,6 @@
     "request-promise": "3.0.0",
     "sequelize": "3.23.3",
     "sequelize-cli": "1.9.2",
-    "sequelize-temporal": "1.0.3",
     "slug": "0.9.1",
     "stripe": "3.9.0"
   },
