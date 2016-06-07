@@ -166,7 +166,7 @@ module.exports = (app) => {
      */
     function pay() {
       const preapprovalKey = paymentMethod.token;
-      return payExpense(payoutMethod)(req.group.id, expense, email, preapprovalKey);
+      return payExpense(payoutMethod)(req.group, expense, email, preapprovalKey);
     }
   };
 

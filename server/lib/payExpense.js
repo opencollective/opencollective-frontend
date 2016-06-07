@@ -4,8 +4,8 @@ const uuid = require('node-uuid');
 
 module.exports = app => {
   const services = {
-    paypal: (groupId, expense, email, preapprovalKey) => {
-      var uri = `/groups/${groupId}/transactions/${expense.id}/paykey/`;
+    paypal: (group, expense, email, preapprovalKey) => {
+      var uri = `/groups/${group.id}/transactions/${expense.id}/paykey/`;
       var baseUrl = config.host.webapp + uri;
       var amount = expense.amount;
       var payload = {
@@ -16,7 +16,7 @@ module.exports = app => {
         actionType: 'PAY',
         currencyCode: expense.currency.toUpperCase() || 'USD',
         feesPayer: 'SENDER',
-        memo: `Reimbursement transaction ${expense.id}: ${expense.description}`,
+        memo: `Reimbursement from ${group.name}: ${expense.description}`,
         trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
         preapprovalKey,
         returnUrl: `${baseUrl}/success`,
