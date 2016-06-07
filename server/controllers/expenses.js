@@ -28,7 +28,8 @@ module.exports = (app) => {
     const group = req.group;
     const attributes = Object.assign({}, req.required.expense, {
       UserId: user.id,
-      GroupId: group.id
+      GroupId: group.id,
+      lastEditedById: user.id
     });
     models.Expense.create(attributes)
       .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
@@ -43,11 +44,43 @@ module.exports = (app) => {
 
   const deleteExpense = (req, res, next) => {
     const expense = req.expense;
+    const user = req.remoteUser || req.user;
 
     assertExpenseStatus(expense, status.PENDING)
+      .then(() => expense.lastEditedById = user.id)
+      .then(() => expense.save())
       .then(() => expense.destroy())
       .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_DELETED))
       .tap(() => res.send({success: true}))
+      .catch(next);
+  };
+
+  const update = (req, res, next) => {
+    const origExpense = req.expense;
+    const newExpense = req.required.expense;
+    const user = req.remoteUser || req.user;
+    const modifiableProps = [
+      'amount',
+      'attachment',
+      'category',
+      'comment',
+      'createdAt',
+      'currency',
+      'notes',
+      'payoutMethod',
+      'title',
+      'vat'
+    ];
+
+    assertExpenseStatus(origExpense, status.PENDING)
+      .tap(() => {
+        modifiableProps.forEach(prop => origExpense[prop] = newExpense[prop] || origExpense[prop]);
+        origExpense.updatedAt = new Date();
+        origExpense.lastEditedById = user.id;
+      })
+      .then(() => origExpense.save())
+      .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_UPDATED))
+      .tap(expense => res.send(expense.info))
       .catch(next);
   };
 
@@ -165,6 +198,7 @@ module.exports = (app) => {
   return {
     create,
     deleteExpense,
+    update,
     setApprovalStatus,
     pay
   };

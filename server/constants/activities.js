@@ -7,6 +7,7 @@ module.exports = {
   GROUP_CREATED: 'group.created',
   GROUP_EXPENSE_CREATED: 'group.expense.created',
   GROUP_EXPENSE_DELETED: 'group.expense.deleted',
+  GROUP_EXPENSE_UPDATED: 'group.expense.updated',
   GROUP_EXPENSE_REJECTED: 'group.expense.rejected',
   GROUP_EXPENSE_APPROVED: 'group.expense.approved',
   GROUP_TRANSACTION_CREATED: 'group.transaction.created',

@@ -50,6 +50,17 @@ describe('expenses.routes.test.js', () => {
 
       it('THEN returns 404', () => req.expect(404));
     });
+
+    describe('#update', () => {
+      beforeEach(() => {
+        req = request(app)
+          .put(`/groups/${group.id}/expenses/123`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`);
+      });
+
+      it('THEN returns 404', () => req.expect(404));
+    });
+
   });
 
   describe('#create', () => {
@@ -178,6 +189,55 @@ describe('expenses.routes.test.js', () => {
 
               it('THEN a group.expense.deleted activity is created', () =>
                 expectExpenseActivity('group.expense.deleted', actualExpense.id));
+            });
+          });
+
+          describe('#update', () => {
+            describe('WHEN not authenticated', () =>
+              it('THEN returns 401', () => request(app)
+                .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                .expect(401)));
+
+            describe('WHEN expense does not belong to group', () => {
+              var otherExpense;
+
+              beforeEach(() => createOtherExpense().tap(e => otherExpense = e));
+
+              it('THEN returns 403', () => request(app)
+                .put(`/groups/${group.id}/expenses/${otherExpense.id}`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .expect(403));
+            });
+
+            describe('WHEN not providing expense', () => {
+              var updateReq;
+
+              beforeEach(() => {
+                updateReq = request(app)
+                  .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                  .set('Authorization', `Bearer ${user.jwt(application)}`);
+              });
+
+              it('THEN returns 400', () => missingRequired(updateReq, 'expense'));
+            });
+
+            describe('success', () => {
+              var response;
+
+              beforeEach(() => request(app)
+                .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .send({expense: {title: 'new title'}})
+                .expect(200)
+                .then(res => response = res.body));
+
+              it('THEN returns modified expense', () => {
+                expect(response.title).to.be.equal('new title');
+                expect(response.category).to.be.equal('Engineering');
+              });
+
+              it('THEN a group.expense.updated activity is created', () =>
+                expectExpenseActivity('group.expense.updated', actualExpense.id));
             });
           });
 

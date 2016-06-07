@@ -1,5 +1,5 @@
 module.exports = {
-  
+
   badRequest(req, message) {
     req.expect(400, {
       error: {
@@ -9,18 +9,17 @@ module.exports = {
       }
     })
   },
-  
+
   missingRequired(req, field) {
-    req.expect(400, {
+    return req.expect(400, {
       error: {
         code: 400,
         type: 'missing_required',
         message: 'Missing required fields',
         fields: {
-          payoutMethod: `Required field ${field} missing`
+          [field]: `Required field ${field} missing`
         }
       }
     })
   }
-  
 };
