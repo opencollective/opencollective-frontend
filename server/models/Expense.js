@@ -100,23 +100,6 @@ module.exports = function (Sequelize, DataTypes) {
     paranoid: true,
 
     getterMethods: {
-
-      isPending() {
-        return this.status === status.PENDING;
-      },
-
-      isApproved() {
-        return this.status === status.APPROVED;
-      },
-
-      isRejected() {
-        return this.status === status.REJECTED;
-      },
-
-      isPaid() {
-        return this.status === status.PAID;
-      },
-
       info() {
         return {
           id: this.id,

@@ -14,52 +14,52 @@ describe('lib.activities.test.js', () => {
 
   describe('formatMessageForPrivateChannel', () => {
 
-    it (`formatMessageForPrivateChannel: ${constants.GROUP_TRANSACTION_CREATED} donation`, () => {
+    it (`${constants.GROUP_TRANSACTION_CREATED} donation`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[12], true);
       expect(actual).to.equal('New Donation: someone (john@doe.com) gave USD 10.42 to <pubquiz.com|Pub quiz>!');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
+    it (`${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[13], true);
       expect(actual).to.equal('New Expense: someone (john@doe.com) submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
+    it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[14], true);
       expect(actual).to.equal('Expense approved on Pub quiz: USD -12.98 for \'pizza\'');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.USER_CREATED} all fields present`, () =>{
+    it (`${constants.USER_CREATED} all fields present`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[0], true);
       expect(actual).to.equal('New user joined: <http://www.twitter.com/johndoe|john doe> (john@doe.com)');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.USER_CREATED} only email present`, () =>{
+    it (`${constants.USER_CREATED} only email present`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[1], true);
       expect(actual).to.equal('New user joined: someone (john@doe.com)');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.WEBHOOK_STRIPE_RECEIVED}`, () =>{
+    it (constants.WEBHOOK_STRIPE_RECEIVED, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[15], true);
       expect(actual).to.equal('Stripe event received: invoice.payment_succeeded');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.SUBSCRIPTION_CONFIRMED}`, () =>{
+    it (constants.SUBSCRIPTION_CONFIRMED, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[16], true);
       expect(actual).to.equal('New subscription confirmed: EUR 12.34 from someone (jussi@kuohujoki.fi) to <blah.com|Blah>!');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.SUBSCRIPTION_CONFIRMED} with month interval`, () =>{
+    it (`${constants.SUBSCRIPTION_CONFIRMED} with month interval`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[17], true);
       expect(actual).to.equal('New subscription confirmed: EUR 12.34/month from someone (jussi@kuohujoki.fi) to <blah.com|Blah>!');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.GROUP_CREATED}`, () =>{
+    it (constants.GROUP_CREATED, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[18], true);
       expect(actual).to.equal('New group created: <blah.com|Blah> by someone (jussi@kuohujoki.fi)');
     });
 
-    it (`formatMessageForPrivateChannel: ${constants.GROUP_USER_ADDED}`, () =>{
+    it (constants.GROUP_USER_ADDED, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], true);
       expect(actual).to.equal('New user: someone (UserId: 2) added to group: <blah.com|Blah>');
     });
@@ -67,32 +67,32 @@ describe('lib.activities.test.js', () => {
 
   describe('formatMessageForPublicChannel', () => {
 
-    it (`formatMessageForPublicChannel: ${constants.GROUP_TRANSACTION_CREATED} donation`, () => {
+    it (`${constants.GROUP_TRANSACTION_CREATED} donation`, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[12], true);
       expect(actual).to.equal('New Donation: someone gave USD 10.42 to <pubquiz.com|Pub quiz>!');
     });
 
-    it (`formatMessageForPublicChannel: ${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
+    it (`${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[13], true);
       expect(actual).to.equal('New Expense: someone submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
     });
 
-    it (`formatMessageForPublicChannel: ${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
+    it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[14], true);
       expect(actual).to.equal('Expense approved on Pub quiz: USD -12.98 for \'pizza\'');
     });
 
-    it (`formatMessageForPublicChannel: ${constants.SUBSCRIPTION_CONFIRMED}`, () =>{
+    it (constants.SUBSCRIPTION_CONFIRMED, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[16], true);
       expect(actual).to.equal('New subscription confirmed: EUR 12.34 from someone to <blah.com|Blah>!');
     });
 
-    it (`formatMessageForPublicChannel: ${constants.SUBSCRIPTION_CONFIRMED} with month interval`, () =>{
+    it (`${constants.SUBSCRIPTION_CONFIRMED} with month interval`, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[17], true);
       expect(actual).to.equal('New subscription confirmed: EUR 12.34/month from someone to <blah.com|Blah>!');
     });
 
-    it (`formatMessageForPublicChannel: ${constants.GROUP_CREATED}`, () =>{
+    it (constants.GROUP_CREATED, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[18], true);
       expect(actual).to.equal('New group created: <blah.com|Blah> by someone');
     });

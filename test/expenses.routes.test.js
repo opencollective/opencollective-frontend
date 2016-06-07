@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const app = require('../index');
 const expect = require('chai').expect;
 const request = require('supertest-as-promised');
@@ -18,27 +17,21 @@ const Expense = models.Expense;
 const Transaction = models.Transaction;
 const PaymentMethod = models.PaymentMethod;
 
-describe('expenses.routes.test.js: GIVEN an application, group, and host user', () => {
+describe('expenses.routes.test.js', () => {
   var application, user, group;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
-  beforeEach(() => Promise.props({
-      user: models.User.create(utils.data('user1')),
-      group: models.Group.create(utils.data('group1'))
-    })
-    .then(props => {
-      user = props.user;
-      group = props.group;
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-      return group.addUserWithRole(user, roles.HOST);
-    }));
+  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
 
-  describe('WHEN no expense exists', () => {
+  beforeEach(() => group.addUserWithRole(user, roles.HOST));
 
-    describe('WHEN calling approve route', () => {
-      var req;
+  describe('WHEN expense does not exist', () => {
+    var req;
 
+    describe('#approve', () => {
       beforeEach(() => {
         req = request(app)
           .post('/groups/' + group.id + '/expenses/123/approve')
@@ -47,22 +40,32 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
 
       it('THEN returns 404', () => req.expect(404));
     });
+
+    describe('#delete', () => {
+      beforeEach(() => {
+        req = request(app)
+          .delete(`/groups/${group.id}/expenses/123`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`);
+      });
+
+      it('THEN returns 404', () => req.expect(404));
+    });
   });
 
-  describe('WHEN calling expense route', () => {
-    var expenseReq;
+  describe('#create', () => {
+    var createReq;
 
     beforeEach(() => {
-      expenseReq = request(app).post(`/groups/${group.id}/expenses`);
+      createReq = request(app).post(`/groups/${group.id}/expenses`);
     });
 
     describe('WHEN not authenticated but providing an expense', () => {
       beforeEach(() => {
-        expenseReq = expenseReq.send({ expense });
+        createReq = createReq.send({ expense });
       });
 
       it('THEN returns 200 with expense', () =>
-        expenseReq
+        createReq
           .expect(200)
           .then(res => {
             expect(res.body.UserId).not.to.be.equal(user.id);
@@ -77,10 +80,10 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
 
     describe('WHEN submitting expense with negative amount', () => {
       beforeEach(() => {
-        expenseReq = expenseReq.send({ expense: Object.assign({}, expense, { amount: -1 }) });
+        createReq = createReq.send({ expense: Object.assign({}, expense, { amount: -1 }) });
       });
 
-      it('THEN returns 400', () => expenseReq.expect(400, {
+      it('THEN returns 400', () => createReq.expect(400, {
         error: {
           code: 400,
           type: 'validation_failed',
@@ -94,21 +97,21 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
     describe('WHEN authenticated', () => {
 
       beforeEach(() => {
-        expenseReq = expenseReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+        createReq = createReq.set('Authorization', `Bearer ${user.jwt(application)}`);
       });
 
       describe('WHEN not providing expense', () =>
-        it('THEN returns 400', () => missingRequired(expenseReq, 'expense')));
+        it('THEN returns 400', () => missingRequired(createReq, 'expense')));
 
       describe('WHEN providing expense', () => {
         beforeEach(() => {
-          expenseReq = expenseReq.send({ expense });
+          createReq = createReq.send({ expense });
         });
 
         describe('THEN returns 200 and expense', () => {
           var actualExpense;
 
-          beforeEach(() => expenseReq
+          beforeEach(() => createReq
             .expect(200)
             .then(res => actualExpense = res.body));
 
@@ -118,26 +121,67 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
             expect(actualExpense.category).to.be.equal(expense.category);
             expect(actualExpense.amount).to.be.equal(expense.amount);
             expect(actualExpense.currency).to.be.equal(expense.currency);
-            expect(actualExpense.isPending).to.be.true;
+            expect(actualExpense.status).to.be.equal('PENDING');
           });
 
           it('THEN expense belongs to the group', () => expect(actualExpense.GroupId).to.be.equal(group.id));
 
           it('THEN expense belongs to the user', () => expect(actualExpense.UserId).to.be.equal(user.id));
 
-          it('THEN a group.expense.created activity is created', () => Activity.findAndCountAll()
-            .then(res => {
-              expect(res.count).to.be.equal(1);
-              const activity = res.rows[0];
-              expect(activity.type).to.be.equal('group.expense.created');
-              expect(activity.UserId).to.be.equal(user.id);
-              expect(activity.GroupId).to.be.equal(group.id);
-              expect(activity.data.user.id).to.be.equal(user.id);
-              expect(activity.data.group.id).to.be.equal(group.id);
-              expect(activity.data.expense.id).to.be.equal(actualExpense.id);
-            }));
+          it('THEN a group.expense.created activity is created', () =>
+            expectExpenseActivity('group.expense.created', actualExpense.id));
 
-          describe('WHEN calling approve route', () => {
+          describe('#delete', () => {
+            describe('WHEN not authenticated', () =>
+              it('THEN returns 401', () => request(app)
+                .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                .expect(401)));
+
+            describe('WHEN expense does not belong to group', () => {
+              var otherExpense;
+
+              beforeEach(() => createOtherExpense().tap(e => otherExpense = e));
+
+              it('THEN returns 403', () => request(app)
+                .delete(`/groups/${group.id}/expenses/${otherExpense.id}`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .expect(403));
+            });
+
+            describe('WHEN user is not a host', () => {
+              var user2;
+
+              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
+
+              it('THEN returns 403', () => request(app)
+                .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                .set('Authorization', `Bearer ${user2.jwt(application)}`)
+                .expect(403));
+            });
+
+            describe('success', () => {
+              var response;
+
+              beforeEach(() => request(app)
+                .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .expect(200)
+                .toPromise()
+                .tap(res => response = res.body));
+
+              it('THEN returns success:true', () => expect(response).to.have.property('success', true));
+
+              it('THEN has deleted expense', () =>
+                Expense.findById(actualExpense.id).tap(e => expect(e).to.not.exist));
+
+              it('THEN a group.expense.deleted activity is created', () =>
+                expectExpenseActivity('group.expense.deleted', actualExpense.id));
+            });
+          });
+
+          describe('#approve', () => {
             var approveReq;
 
             beforeEach(() => {
@@ -162,7 +206,7 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
               describe('WHEN sending approved: true', () => {
 
                 beforeEach(() =>
-                  models.PaymentMethod.create({
+                  PaymentMethod.create({
                     service: 'paypal',
                     UserId: user.id,
                     token: 'abc'
@@ -177,7 +221,7 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
                   beforeEach(() => setExpenseApproval(true));
 
                   it('THEN returns 400', () =>
-                    badRequest(expenseReq, 'Not enough funds (119 USD left) to approve transaction.'));
+                    badRequest(createReq, 'Not enough funds (119 USD left) to approve transaction.'));
                 });
 
                 describe('WHEN funds are sufficient', () => {
@@ -214,7 +258,7 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
             });
           });
 
-          describe('WHEN paying unapproved expense', () => {
+          describe('#pay unapproved expense', () => {
             var payReq;
 
             beforeEach(() => {
@@ -228,12 +272,12 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
               error: {
                 code: 400,
                 type: 'bad_request',
-                message: `Expense ${actualExpense.id} has not been approved.`
+                message: `Expense ${actualExpense.id} status should be APPROVED.`
               }
             }));
           });
 
-          describe('WHEN paying approved expense', () => {
+          describe('#pay', () => {
 
             beforeEach(() => {
               sinon
@@ -316,7 +360,7 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
 
                 describe('WHEN user has paymentMethod', () => {
                   beforeEach(() => {
-                    models.PaymentMethod.create({
+                    PaymentMethod.create({
                       service: 'paypal',
                       UserId: user.id,
                       confirmedAt: Date.now()
@@ -386,4 +430,31 @@ describe('expenses.routes.test.js: GIVEN an application, group, and host user', 
       });
     });
   });
+
+  function expectExpenseActivity(type, expenseId) {
+    return Activity.findOne({ where: { type }})
+      .then(activity => {
+        expect(activity).to.be.ok;
+        expect(activity.UserId).to.be.equal(user.id);
+        expect(activity.GroupId).to.be.equal(group.id);
+        expect(activity.data.user.id).to.be.equal(user.id);
+        expect(activity.data.group.id).to.be.equal(group.id);
+        expect(activity.data.expense.id).to.be.equal(expenseId);
+      })
+  }
+
+  function createOtherExpense() {
+    var group, user;
+    return models.Group.create(utils.data('group2'))
+      .tap(g => group = g)
+      .then(() => models.User.create(utils.data('user2')))
+      .tap(u => user = u)
+      .then(() => group.addUserWithRole(user, roles.HOST))
+      .then(() => request(app)
+        .post(`/groups/${group.id}/expenses`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .send({expense})
+        .expect(200))
+      .then(res => res.body);
+  }
 });

@@ -103,7 +103,13 @@ module.exports = (app) => {
      */
     expenseid: (req, res, next, expenseid) => {
       parseId(expenseid)
-        .then(id => Expense.findById(id))
+        .then(id => Expense.findOne({
+          where: { id },
+          include: [
+            { model: models.Group },
+            { model: models.User }
+          ]
+        }))
         .then((expense) => {
           if (!expense) {
             return next(new errors.NotFound(`Expense '${expenseid}' not found`));

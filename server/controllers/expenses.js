@@ -3,8 +3,9 @@
  */
 
 const Promise = require('bluebird');
-const constants = require('../constants');
+const activities = require('../constants/activities');
 const includes = require('lodash/collection/includes');
+const status = require('../constants/expense_status');
 
 /**
  * Controller.
@@ -19,7 +20,7 @@ module.exports = (app) => {
   const payExpense = require('../lib/payExpense')(app);
 
   /**
-   * Create an expense and add it to a group.
+   * Create an expense.
    */
 
   const create = (req, res, next) => {
@@ -30,49 +31,47 @@ module.exports = (app) => {
       GroupId: group.id
     });
     models.Expense.create(attributes)
-      .tap(expense => createNewExpenseActivity(expense.id))
+      .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
+      .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
       .tap(expense => res.send(expense))
       .catch(next);
-
-    function createNewExpenseActivity(id) {
-      return models.Expense.findOne({
-        where: { id },
-        include: [
-          { model: models.Group },
-          { model: models.User }
-        ]
-      })
-      .then(expense => models.Activity.create({
-        type: constants.activities.GROUP_EXPENSE_CREATED,
-        UserId: expense.User.id,
-        GroupId: expense.Group.id,
-        data: {
-          group: expense.Group.info,
-          user: expense.User.info,
-          expense: expense.info
-        }
-      }));
-    }
   };
 
   /**
-   * Set the approval status of an expense
+   * Delete an expense.
+   */
+
+  const deleteExpense = (req, res, next) => {
+    const expense = req.expense;
+
+    assertExpenseStatus(expense, status.PENDING)
+      .then(() => expense.destroy())
+      .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_DELETED))
+      .tap(() => res.send({success: true}))
+      .catch(next);
+  };
+
+  /**
+   * Approve or reject an expense.
    */
 
   const setApprovalStatus = (req, res, next) => {
+    const expense = req.expense;
     var preapprovalDetails;
 
-    if (req.required.approved === false) {
-      return req.expense.setRejected()
-        .then(() => res.send({success: true}))
-        .catch(next);
-    }
-
-    fetchPaymentMethod(req.remoteUser.id)
-      .then(paymentMethod => getPreapprovalDetails(paymentMethod))
-      .tap(d => preapprovalDetails = d)
-      .then(checkIfEnoughFunds(req.expense.amount))
-      .then(() => req.expense.setApproved())
+    assertExpenseStatus(expense, status.PENDING)
+      .then(() => {
+        if (req.required.approved === false) {
+          return req.expense.setRejected()
+            .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_REJECTED))
+        }
+        return fetchPaymentMethod(req.remoteUser.id)
+          .then(paymentMethod => getPreapprovalDetails(paymentMethod))
+          .tap(d => preapprovalDetails = d)
+          .then(checkIfEnoughFunds(expense.amount))
+          .then(() => expense.setApproved())
+          .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
+      })
       .then(() => res.send({success: true}))
       .catch(err => next(formatError(err, preapprovalDetails)));
 
@@ -118,7 +117,7 @@ module.exports = (app) => {
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
     var paymentMethod, email, paymentResponse;
 
-    checkExpenseIsApproved()
+    assertExpenseStatus(expense, status.APPROVED)
       .then(() => isManual ? null : getPaymentMethod())
       .tap(m => paymentMethod = m)
       .then(getBeneficiaryEmail)
@@ -129,13 +128,6 @@ module.exports = (app) => {
       .tap(() => expense.setPaid())
       .tap(() => res.json(expense))
       .catch(err => next(formatError(err, paymentResponse)));
-
-    function checkExpenseIsApproved() {
-      if (!expense.isApproved) {
-        return Promise.reject(new errors.BadRequest(`Expense ${expense.id} has not been approved.`));
-      }
-      return Promise.resolve();
-    }
 
     function getPaymentMethod() {
       // Use first paymentMethod found
@@ -172,9 +164,30 @@ module.exports = (app) => {
 
   return {
     create,
+    deleteExpense,
     setApprovalStatus,
     pay
   };
+
+  function assertExpenseStatus(expense, status) {
+    if (expense.status !== status) {
+      return Promise.reject(new errors.BadRequest(`Expense ${expense.id} status should be ${status}.`));
+    }
+    return Promise.resolve();
+  }
+
+  function createActivity(expense, type) {
+    return models.Activity.create({
+      type,
+      UserId: expense.User.id,
+      GroupId: expense.Group.id,
+      data: {
+        group: expense.Group.info,
+        user: expense.User.info,
+        expense: expense.info
+      }
+    });
+  }
 
   function formatError(err, paypalResponse) {
     if (paypalResponse) {

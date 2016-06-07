@@ -154,6 +154,7 @@ module.exports = (app) => {
 
   app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessToTransaction({authIfPublic: true}), groups.getTransaction); // Get a transaction.
   app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
+  // TODO remove #postmigration, replaced by DEL /groups/:groupid/expenses/:expenseid
   app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/approve
   app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.setApprovedState); // Approve a transaction.
@@ -168,8 +169,10 @@ module.exports = (app) => {
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
   // TODO refactor with single route using authentication.js and authorization.js middleware
-  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense for a group.
-  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense for a group.
+  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
+  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
+  // TODO is option bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser present in DEL /groups/:id/transactions/:id really needed?
+  app.delete('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), required('payoutMethod'), expenses.pay); // Pay an expense.
 
