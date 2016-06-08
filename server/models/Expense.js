@@ -118,10 +118,6 @@ module.exports = function (Sequelize, DataTypes) {
           vat: this.vat,
           lastEditedById: this.lastEditedById,
           status: this.status,
-          isPending: this.isPending,
-          isRejected: this.isRejected,
-          isApproved: this.isApproved,
-          isPaid: this.isPaid,
           incurredAt: this.incurredAt,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt

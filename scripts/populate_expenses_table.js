@@ -33,7 +33,8 @@ const createExpense = transaction => {
     createdAt: transaction.createdAt,
     updatedAt: transaction.updatedAt,
     deletedAt: transaction.deletedAt,
-    incurredAt: transaction.createdAt
+    incurredAt: transaction.createdAt,
+    lastEditedBy: transaction.UserId
   };
 
   return models.Expense.create(expense)
