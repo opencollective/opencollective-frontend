@@ -65,7 +65,8 @@ module.exports = function (Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     status: {

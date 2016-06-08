@@ -34,7 +34,7 @@ const createExpense = transaction => {
     updatedAt: transaction.updatedAt,
     deletedAt: transaction.deletedAt,
     incurredAt: transaction.createdAt,
-    lastEditedBy: transaction.UserId
+    lastEditedById: getLastEditedBy(transaction)
   };
 
   return models.Expense.create(expense)
@@ -54,13 +54,42 @@ function getStatus(tx) {
   return 'PENDING';
 }
 
+function getLastEditedBy(tx) {
+  const status = getStatus(tx);
+  switch (status) {
+    case 'PENDING':
+      return tx.UserId;
+    case 'APPROVED':
+    case 'REJECTED':
+      // this is incorrect but better than nothing (don't know who approved)
+      console.warn(`WARN: Defaulting lastEditedById to ${tx.UserId} for expense created from tx ${tx.id}`);
+      return tx.UserId;
+    case 'PAID':
+      if (tx.paidby) {
+        return tx.paidby;
+      }
+      if (tx.PaymentMethod && tx.PaymentMethod.UserId) {
+        return tx.PaymentMethod.UserId;
+      }
+      console.warn(`WARN: Defaulting lastEditedById to ${tx.UserId} for expense created from tx ${tx.id}`);
+      // this is incorrect but better than nothing (don't know who paid manually)
+      return tx.UserId;
+    default:
+      throw new AssertionError(`unrecognized status ${status}`);
+  }
+}
+
 // Get all transactions
 models.Transaction.findAll({
   where: {
     amount: { $lt: 0 },
     ExpenseId: null // this ensures that we don't reprocess a transaction
   },
-  order: 'id'
+  order: 'id',
+  include: {
+    model: models.PaymentMethod,
+    paranoid: false
+  }
 })
 .map(transaction => createExpense(transaction))
 .catch(err => console.log('err', err))

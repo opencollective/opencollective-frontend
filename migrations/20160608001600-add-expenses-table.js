@@ -61,7 +61,8 @@ module.exports = {
             key: 'id'
           },
           onDelete: 'SET NULL',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
+          allowNull: false
         },
 
         status: {
