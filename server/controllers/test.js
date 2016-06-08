@@ -144,27 +144,29 @@ module.exports = function(app) {
       }],
 
       addExpense1: ['createGroup', (cb, results) => {
-        models.Transaction.create({
-          "description": "Expense 1",
-          "amount": -1,
+        models.Expense.create({
+          "title": "Expense 1",
+          "amount": 100,
           "currency": "EUR",
-          "paidby": "@semdubois",
-          "createdAt": "2016-02-29T08:00:00.000Z"
+          "incurredAt": "2016-02-29T08:00:00.000Z",
+          "GroupId": results.createGroup.id,
+          "UserId": results.createTestUser.id,
+          "lastEditedById": results.createTestUser.id
         })
-        .then(t => t.setGroup(results.createGroup))
         .then(() => cb())
         .catch(cb);
       }],
 
       addExpense2: ['createGroup', (cb, results) => {
-        models.Transaction.create({
-          "description": "Expense 2",
-          "amount": -2,
+        models.Expense.create({
+          "title": "Expense 2",
+          "amount": 200,
           "currency": "EUR",
-          "paidby": "@semdubois",
-          "createdAt": "2016-03-01T08:00:00.000Z"
+          "incurredAt": "2016-03-01T08:00:00.000Z",
+          "GroupId": results.createGroup.id,
+          "UserId": results.createTestUser.id,
+          "lastEditedById": results.createTestUser.id
         })
-        .then(t => t.setGroup(results.createGroup))
         .then(() => cb())
         .catch(cb);
       }]
