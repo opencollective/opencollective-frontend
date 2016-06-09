@@ -17,7 +17,6 @@ Group.findAll({
   attributes: [
     'id',
     'name',
-    'slug',
     'settings'
   ]
 })
@@ -25,7 +24,11 @@ Group.findAll({
     log.verbose('groups', `Found ${groups.length} group(s) to inspect`);
   })
   .each(group => {
-    const org = _.get(group, 'settings.githubOrg', group.slug);
+    const org = _.get(group, 'settings.githubOrg');
+    if (!org) {
+      log.warn(group.name, `GitHub org not associated`);
+      return;
+    }
     return client.contributorsInOrg({orgs: [org]})
       .get(org)
       .then(perRepo => {
