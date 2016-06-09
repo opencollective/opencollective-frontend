@@ -1,3 +1,5 @@
+const type = require('../constants/transactions').type.DONATION;
+
 module.exports = function(Sequelize, DataTypes) {
 
   var Donation = Sequelize.define('Donation', {
@@ -82,6 +84,7 @@ module.exports = function(Sequelize, DataTypes) {
     getterMethods: {
       info() {
         return {
+          type,
           id: this.id,
           UserId: this.UserId,
           GroupId: this.GroupId,

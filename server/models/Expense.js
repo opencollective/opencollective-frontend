@@ -1,4 +1,5 @@
 const status = require('../constants/expense_status');
+const type = require('../constants/transactions').type.EXPENSE;
 const allowedCurrencies = Object.keys(require('../constants/currencies'));
 
 module.exports = function (Sequelize, DataTypes) {
@@ -75,13 +76,12 @@ module.exports = function (Sequelize, DataTypes) {
       allowNull: false,
       validate: {
         isIn: {
-          args: [[status.PENDING, status.APPROVED, status.REJECTED, status.PAID]],
-          msg: 'Must be PENDING, APPROVED, REJECTED or PAID'
+          args: [Object.keys(status)],
+          msg: `Must be in ${Object.keys(status)}`
         }
       }
     },
 
-    // date when the expense was incurred
     incurredAt: {
       type: DataTypes.DATE,
       allowNull: false
@@ -108,6 +108,7 @@ module.exports = function (Sequelize, DataTypes) {
     getterMethods: {
       info() {
         return {
+          type,
           id: this.id,
           UserId: this.UserId,
           GroupId: this.GroupId,
