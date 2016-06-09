@@ -33,6 +33,7 @@ module.exports = (app) => {
       GroupId: group.id,
       lastEditedById: user.id
     });
+    // TODO make sure that the payoutMethod is also properly stored in DB, then propagated to Transaction when paying
     models.Expense.create(attributes)
       .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
       .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
@@ -73,7 +74,7 @@ module.exports = (app) => {
     const expense = req.expense;
     const user = req.remoteUser || req.user;
 
-    assertExpenseStatus(expense, status.PENDING)
+    assertExpenseStatus(expense, status.REJECTED)
       .then(() => expense.lastEditedById = user.id)
       .then(() => expense.save())
       .then(() => expense.destroy())
@@ -91,7 +92,7 @@ module.exports = (app) => {
       'attachment',
       'category',
       'comment',
-      'createdAt',
+      'incurredAt',
       'currency',
       'notes',
       'payoutMethod',

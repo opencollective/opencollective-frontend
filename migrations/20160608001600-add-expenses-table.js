@@ -41,7 +41,7 @@ module.exports = {
 
         amount: {
           type: Sequelize.INTEGER,
-          validate: { min: 0 },
+          validate: { min: 1 },
           allowNull: false
         },
 

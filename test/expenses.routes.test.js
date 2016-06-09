@@ -276,6 +276,12 @@ describe('expenses.routes.test.js', () => {
               var response;
 
               beforeEach(() => request(app)
+                .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .send({approved: false})
+                .expect(200));
+              
+              beforeEach(() => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
                 .set('Authorization', `Bearer ${user.jwt(application)}`)
                 .expect(200)
