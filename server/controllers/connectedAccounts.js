@@ -20,7 +20,7 @@ module.exports = (app) => {
 
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
-      User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) }}})
+      return User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) }}})
         .then(u => u || User.create({
           name: profile.displayName,
           avatar: avatar || profile.avatar_url,
