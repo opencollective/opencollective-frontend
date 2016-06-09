@@ -230,6 +230,11 @@ module.exports = (app) => {
   app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
 
   /**
+   * Github API - fetch all repositories using the user's access_token
+   */
+  app.get('/github-repositories', aN.authenticateUserByJwt(), connectedAccounts.fetchAllRepositories);
+
+  /**
    * Reset test-api database
    */
   app.get('/database/reset', test.resetTestDatabase);

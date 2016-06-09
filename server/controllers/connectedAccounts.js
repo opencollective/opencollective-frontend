@@ -1,4 +1,6 @@
 const config = require('config');
+const request = require('request');
+const Promise = require('bluebird');
 
 module.exports = (app) => {
   const errors = app.errors;
@@ -47,7 +49,24 @@ module.exports = (app) => {
       } else {
         return next(new errors.BadRequest('Github authorization failed'));
       }
-    }
+    },
 
+    fetchAllRepositories: (req, res, next) => {
+      const payload = req.jwtPayload;
+      ConnectedAccount
+      .findOne({where: {id: payload.connectedAccountId}})
+      .then(ca => {
+        const options = {
+          url: `https://api.github.com/user/repos?per_page=1000&sort=stars&access_token=${ca.secret}&type=all`,
+          headers: {
+            'User-Agent': 'OpenCollective'
+          },
+          json: true
+        };
+        return Promise.promisify(request, {multiArgs: true})(options).then(args => args[1]);
+      })
+      .then(body => res.json(body))
+      .catch(next)
+    }
   };
 };
