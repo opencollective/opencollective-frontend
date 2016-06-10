@@ -54,6 +54,18 @@ module.exports = function (Sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+
+    payoutMethod: {
+      type: DataTypes.STRING,
+      validate: {
+        isIn: {
+          args: [['paypal', 'manual', 'other']],
+          msg: 'Must be paypal, manual or other'
+        }
+      },
+      allowNull: false
+    },
+
     notes: DataTypes.TEXT,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
