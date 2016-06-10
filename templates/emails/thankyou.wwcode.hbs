@@ -18,16 +18,15 @@ Subject: Thank you for your {{{currency donation.amountFloat currency=donation.c
 {{/if}}
 
 {{#if interval}}
-<p>I would like to thank you for your pledge to give {{{currency donation.amountFloat currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift exponentially impacts the programs we offer to empower women to pursue careers in the technology sector.</p>
+<p>I would like to thank you for your pledge to give {{{currency donation.amountFloat currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
 {{else}}
-<p>I would like to thank you for your donation of {{{currency donation.amountFloat currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift exponentially impacts the programs we offer to empower women to pursue careers in the technology sector.</p>
+<p>I would like to thank you for your donation of {{{currency donation.amountFloat currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
 {{/if}}
 
-<p>With your support, we are able to provide a free professional community for women in tech which aides and supports their success. In addition, your donation positively fuels our growth, development, and goal of connecting one million in technology careers.</p>
+<p>With your support, we are able to extend our program reach. Through this, we are able to provide an avenue into tech, empower women with skills needed for professional advancement, and provide environments where networking and mentorship are valued.</p>
 
-<p>On behalf of the Women Who Code Board of Executives, our leadership team, and our members worldwide I thank you for furthering our mission and supporting our community of women in tech. We appreciate and value your contribution and continued support.</p>
+<p>On behalf of the Women Who Code Board of Executives, our leadership team, and our members worldwide, thank you for furthering our mission. We appreciate and value your contribution and continued support of our community.</p>
 
-{{> subscriptions}}
 
 <p>Warmly,</p>
 
@@ -37,5 +36,9 @@ Subject: Thank you for your {{{currency donation.amountFloat currency=donation.c
   Women Who Code, Inc.<br />
   EIN: 46 – 4218859
 </p>
+
+<p>Your contribution is tax-deductible to the extent allowed by law. You may save or print this receipt for your records. This email certifies that you have made this donation as a charitable contribution and you are not receiving any goods or services in return. This receipt may be useful to you when completing your tax return. Women Who Code, registered 501(c)3 Nonprofit TAX ID: 46-4218859. </p>
+
+{{> subscriptions}}
 
 {{> footer}}
