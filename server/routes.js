@@ -160,9 +160,9 @@ module.exports = (app) => {
   // TODO remove #postmigration, replaced by DEL /groups/:groupid/expenses/:expenseid
   app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/approve
-  app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.setApprovedState); // Approve a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.setApprovedState); // Approve a transaction.
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/pay
-  app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
+  app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
   app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
 
   /**
@@ -178,7 +178,7 @@ module.exports = (app) => {
   app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
   app.put('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('expense'), expenses.update); // Update an expense.
   app.delete('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.deleteExpense); // Delete an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
+  app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), required('payoutMethod'), expenses.pay); // Pay an expense.
 
   /**

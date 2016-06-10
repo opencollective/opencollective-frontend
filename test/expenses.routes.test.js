@@ -97,6 +97,7 @@ describe('expenses.routes.test.js', () => {
             expect(res.body.category).to.be.equal(expense.category);
             expect(res.body.amount).to.be.equal(expense.amount);
             expect(res.body.currency).to.be.equal(expense.currency);
+            expect(res.body.payoutMethod).to.be.equal(expense.payoutMethod);
           }));
     });
 
@@ -144,6 +145,7 @@ describe('expenses.routes.test.js', () => {
             expect(actualExpense.amount).to.be.equal(expense.amount);
             expect(actualExpense.currency).to.be.equal(expense.currency);
             expect(actualExpense.status).to.be.equal('PENDING');
+            expect(actualExpense.payoutMethod).to.be.equal(expense.payoutMethod);
           });
 
           it('THEN expense belongs to the group', () => expect(actualExpense.GroupId).to.be.equal(group.id));
@@ -416,6 +418,76 @@ describe('expenses.routes.test.js', () => {
                     expect(expenses.rows[0].status).to.be.equal(approvalStatus);
                   });
             });
+
+            describe('WHEN authenticated as a MEMBER', () => {
+
+              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
+
+              beforeEach(() => {
+                approveReq = approveReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+              });
+
+              describe('WHEN sending approved: false', () => {
+                beforeEach(() => setExpenseApproval(false));
+
+                it('THEN returns status: REJECTED', () => expectApprovalStatus('REJECTED'));
+              });
+
+              describe('WHEN sending approved: true', () => {
+
+                beforeEach(() =>
+                  PaymentMethod.create({
+                    service: 'paypal',
+                    UserId: user.id,
+                    token: 'abc'
+                  }));
+
+                afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+
+                describe('WHEN funds are insufficient', () => {
+
+                  beforeEach(setMaxFunds(119));
+
+                  beforeEach(() => setExpenseApproval(true));
+
+                  it('THEN returns 400', () =>
+                    badRequest(createReq, 'Not enough funds (119 USD left) to approve transaction.'));
+                });
+
+                describe('WHEN funds are sufficient', () => {
+
+                  beforeEach(setMaxFunds(121));
+
+                  beforeEach(() => setExpenseApproval(true));
+
+                  it('THEN returns status: APPROVED', () => expectApprovalStatus('APPROVED'));
+                });
+              });
+
+              function setMaxFunds(maxAmount) {
+                return () => {
+                  preapprovalDetailsMock.maxTotalAmountOfAllPayments = maxAmount;
+                  sinon
+                    .stub(app.paypalAdaptive, 'preapprovalDetails')
+                    .yields(null, preapprovalDetailsMock);
+                };
+              }
+
+              const setExpenseApproval = approved => {
+                approveReq = approveReq.send({approved});
+              };
+
+              const expectApprovalStatus = approvalStatus =>
+                approveReq
+                  .expect(200)
+                  .then(() => Expense.findAndCountAll())
+                  .tap(expenses => {
+                    expect(expenses.count).to.be.equal(1);
+                    expect(expenses.rows[0].status).to.be.equal(approvalStatus);
+                  });
+            });
           });
 
           describe('#pay unapproved expense', () => {
@@ -584,6 +656,19 @@ describe('expenses.routes.test.js', () => {
                     expect(activity.data.transaction.id).to.be.equal(transaction.id);
                   });
               }
+            });
+
+            describe('WHEN authenticated as a MEMBER', () => {
+
+              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
+
+              beforeEach(() => {
+                payReq = payReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+              });
+              it('THEN returns 403', () => payReq.send()
+                .expect(403));
             });
           });
         });
