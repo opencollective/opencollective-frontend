@@ -179,7 +179,7 @@ module.exports = (app) => {
   app.put('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('expense'), expenses.update); // Update an expense.
   app.delete('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), required('payoutMethod'), expenses.pay); // Pay an expense.
+  app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.pay); // Pay an expense.
 
   /**
    * Donations

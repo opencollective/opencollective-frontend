@@ -13,6 +13,7 @@ const preapprovalDetailsMock = Object.assign({}, paypalMock.adaptive.preapproval
 
 const models = app.get('models');
 const expense = utils.data('expense1');
+const expense2 = utils.data('expense2');
 const Activity = models.Activity;
 const Expense = models.Expense;
 const Transaction = models.Transaction;
@@ -497,7 +498,7 @@ describe('expenses.routes.test.js', () => {
               payReq = request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/pay`)
                 .set('Authorization', `Bearer ${user.jwt(application)}`)
-                .send({ payoutMethod: 'manual' });
+                .send();
             });
 
             it('THEN returns 400', () => payReq.expect(400, {
@@ -509,7 +510,140 @@ describe('expenses.routes.test.js', () => {
             }));
           });
 
-          describe('#pay', () => {
+          describe('#pay non-manual expense', () => {
+
+            beforeEach(() => {
+              sinon
+                .stub(app.paypalAdaptive, 'preapprovalDetails')
+                .yields(null, preapprovalDetailsMock);
+              return request(app)
+                .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .send({approved: true})
+                .expect(200);
+            });
+
+            afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+
+            var payReq;
+
+            beforeEach(() => {
+              payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay`);
+            });
+
+            describe('WHEN not authenticated', () =>
+              it('THEN returns 401 unauthorized', () => payReq.expect(401)));
+
+            describe('WHEN authenticated as host user', () => {
+
+              beforeEach(() => {
+                payReq = payReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+              });
+
+              var payStub;
+
+              beforeEach(() => {
+                payStub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
+                  return cb(null, payMock);
+                });
+              });
+
+              beforeEach(() => {
+                payReq = payReq.send();
+              });
+
+              afterEach(() => payStub.restore());
+
+              describe('WHEN user has no paymentMethod', () => {
+                it('returns 400', () =>
+                  badRequest(payReq, 'This user has no confirmed paymentMethod linked with this service.'));
+              });
+
+              describe('WHEN user has paymentMethod', () => {
+                beforeEach(() => {
+                  PaymentMethod.create({
+                    service: 'paypal',
+                    UserId: user.id,
+                    confirmedAt: Date.now()
+                  })
+                });
+
+                describe('THEN returns 200', () => {
+                  beforeEach(() => payReq.expect(200));
+
+                  var expense, transaction, paymentMethod;
+                  beforeEach(() => expectOne(Expense).tap(e => expense = e));
+                  beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
+                  beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
+
+                  it('THEN calls PayPal', () => expect(payStub.called).to.be.true);
+
+                  it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
+
+                  it('THEN creates transaction', () => {
+                    expectTransactionCreated(expense, transaction);
+                    expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
+                  });
+
+                  it('THEN creates a transaction paid activity', () =>
+                    expectTransactionPaidActivity(group, user, transaction)
+                      .tap(activity => expect(activity.data.pay).to.deep.equal(payMock)));
+                });
+              });
+
+              function expectTransactionCreated(expense, transaction) {
+                expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
+                expect(transaction).to.have.property('ExpenseId', expense.id);
+                // TODO remove #postmigration, info redundant with joined tables?
+                expect(transaction).to.have.property('amount', expense.amount);
+                expect(transaction).to.have.property('currency', expense.currency);
+                expect(transaction).to.have.property('description', expense.title);
+                expect(transaction).to.have.property('status', 'REIMBURSED');
+                expect(transaction.reimbursedAt).to.be.ok;
+                expect(transaction).to.have.property('UserId', expense.UserId);
+                expect(transaction).to.have.property('GroupId', expense.GroupId);
+                expect(transaction).to.have.property('payoutMethod', expense.payoutMethod);
+                // end TODO remove #postmigration
+              }
+
+              function expectTransactionPaidActivity(group, user, transaction) {
+                return Activity
+                  .findOne({ where: { type: 'group.transaction.paid' }})
+                  .tap(activity => {
+                    expect(activity.UserId).to.be.equal(user.id);
+                    expect(activity.GroupId).to.be.equal(group.id);
+                    expect(activity.TransactionId).to.be.equal(transaction.id);
+                    expect(activity.data.user.id).to.be.equal(user.id);
+                    expect(activity.data.group.id).to.be.equal(group.id);
+                    expect(activity.data.transaction.id).to.be.equal(transaction.id);
+                  });
+              }
+            });
+
+            describe('WHEN authenticated as a MEMBER', () => {
+
+              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+
+              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
+
+              beforeEach(() => {
+                payReq = payReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+              });
+              it('THEN returns 403', () => payReq.send()
+                .expect(403));
+            });
+          });
+
+          describe('#pay manual expense', () => {
+
+            beforeEach(() => {
+              return request(app)
+                .post(`/groups/${group.id}/expenses`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .send({ expense: expense2 })
+                .expect(200)
+                .then(res => actualExpense = res.body);
+            });
 
             beforeEach(() => {
               sinon
@@ -549,88 +683,31 @@ describe('expenses.routes.test.js', () => {
 
               afterEach(() => payStub.restore());
 
-              describe('WHEN not specifying payoutMethod', () => {
 
-                it('THEN returns 400', () => missingRequired(payReq, 'payoutMethod'));
+              beforeEach(() => {
+                payReq = payReq.send();
               });
 
-              describe('WHEN using manual payoutMethod', () => {
+              describe('THEN returns 200', () => {
+                beforeEach(() => payReq.expect(200));
 
-                beforeEach(() => {
-                  payReq = payReq.send({ payoutMethod: 'manual' });
-                });
+                var expense, transaction;
+                beforeEach(() => expectTwo(Expense).tap(e => expense = e));
+                beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
 
-                describe('THEN returns 200', () => {
-                  beforeEach(() => payReq.expect(200));
+                it('THEN does not call PayPal', () => expect(payStub.called).to.be.false);
 
-                  var expense, transaction;
-                  beforeEach(() => expectOne(Expense).tap(e => expense = e));
-                  beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
+                it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
-                  it('THEN does not call PayPal', () => expect(payStub.called).to.be.false);
+                it('THEN creates transaction', () => expectTransactionCreated(expense, transaction));
 
-                  it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
-
-                  it('THEN creates transaction', () => expectTransactionCreated(expense, transaction, 'manual'));
-
-                  it('THEN creates a transaction paid activity', () =>
-                    expectTransactionPaidActivity(group, user, transaction)
-                      .tap(activity => expect(activity.data.pay).to.be.undefined));
-                });
+                it('THEN creates a transaction paid activity', () =>
+                  expectTransactionPaidActivity(group, user, transaction)
+                    .tap(activity => expect(activity.data.pay).to.be.undefined));
               });
 
-              describe('WHEN specifying paypal payoutMethod', () => {
-
-                beforeEach(() => {
-                  payReq = payReq.send({payoutMethod: 'paypal'});
-                });
-
-                describe('WHEN user has no paymentMethod', () => {
-                  it('returns 400', () =>
-                    badRequest(payReq, 'This user has no confirmed paymentMethod linked with this service.'));
-                });
-
-                describe('WHEN user has paymentMethod', () => {
-                  beforeEach(() => {
-                    PaymentMethod.create({
-                      service: 'paypal',
-                      UserId: user.id,
-                      confirmedAt: Date.now()
-                    })
-                  });
-
-                  describe('THEN returns 200', () => {
-                    beforeEach(() => payReq.expect(200));
-
-                    var expense, transaction, paymentMethod;
-                    beforeEach(() => expectOne(Expense).tap(e => expense = e));
-                    beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
-                    beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
-
-                    it('THEN calls PayPal', () => expect(payStub.called).to.be.true);
-
-                    it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
-
-                    it('THEN creates transaction', () => {
-                      expectTransactionCreated(expense, transaction, 'paypal');
-                      expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-                    });
-
-                    it('THEN creates a transaction paid activity', () =>
-                      expectTransactionPaidActivity(group, user, transaction)
-                        .tap(activity => expect(activity.data.pay).to.deep.equal(payMock)));
-                  });
-                });
-              });
-
-              function expectOne(model) {
-                return model.findAndCountAll()
-                  .tap(entities => expect(entities.count).to.be.equal(1))
-                  .then(entities => entities.rows[0]);
-              }
-
-              function expectTransactionCreated(expense, transaction, payoutMethod) {
-                expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
+              function expectTransactionCreated(expense, transaction) {
+                expect(transaction).to.have.property('netAmountInGroupCurrency', -3700);
                 expect(transaction).to.have.property('ExpenseId', expense.id);
                 // TODO remove #postmigration, info redundant with joined tables?
                 expect(transaction).to.have.property('amount', expense.amount);
@@ -640,7 +717,7 @@ describe('expenses.routes.test.js', () => {
                 expect(transaction.reimbursedAt).to.be.ok;
                 expect(transaction).to.have.property('UserId', expense.UserId);
                 expect(transaction).to.have.property('GroupId', expense.GroupId);
-                expect(transaction).to.have.property('payoutMethod', payoutMethod);
+                expect(transaction).to.have.property('payoutMethod', expense.payoutMethod);
                 // end TODO remove #postmigration
               }
 
@@ -673,8 +750,21 @@ describe('expenses.routes.test.js', () => {
           });
         });
       });
+
     });
   });
+
+  function expectOne(model) {
+    return model.findAndCountAll()
+      .tap(entities => expect(entities.count).to.be.equal(1))
+      .then(entities => entities.rows[0]);
+  }
+
+  function expectTwo(model) {
+    return model.findAndCountAll()
+      .tap(entities => expect(entities.count).to.be.equal(2))
+      .then(entities => entities.rows[1]);
+  }
 
   function expectExpenseActivity(type, expenseId) {
     return Activity.findOne({ where: { type }})

@@ -173,7 +173,7 @@ module.exports = (app) => {
 
   const pay = (req, res, next) => {
     const expense = req.expense;
-    const payoutMethod = req.required.payoutMethod;
+    const payoutMethod = req.expense.payoutMethod;
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
     var paymentMethod, email, paymentResponse;
 
