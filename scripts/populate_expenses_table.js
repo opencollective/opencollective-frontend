@@ -5,7 +5,7 @@ const models = app.set('models');
 
 /*
  * tested with:
- * 
+ *
  * - npm run db:copy:prod
  * - PG_DATABASE=opencollective_prod_snapshot npm run db:migrate:dev
  * - PG_DATABASE=opencollective_prod_snapshot node scripts/populate_expenses_table.js
@@ -30,6 +30,7 @@ const createExpense = transaction => {
     category: transaction.tags && transaction.tags[0],
     title: transaction.description,
     status: getStatus(transaction),
+    payoutMethod: transaction.payoutMethod || 'manual',
     createdAt: transaction.createdAt,
     updatedAt: transaction.updatedAt,
     deletedAt: transaction.deletedAt,

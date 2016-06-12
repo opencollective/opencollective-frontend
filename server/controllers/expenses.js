@@ -56,7 +56,7 @@ module.exports = (app) => {
     }, req.pagination);
 
     return models.Expense.findAndCountAll(query)
-      .tap(expenses => {
+      .then(expenses => {
         // Set headers for pagination.
         req.pagination.total = expenses.count;
         res.set({ Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination) });

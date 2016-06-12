@@ -169,7 +169,7 @@ module.exports = (app) => {
    * Expenses
    */
 
-  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), aZ.authorizeGroupAccessTo('expense', {authIfPublic: true}), expenses.list); // Get expenses.
+  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
   app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessTo('expense', {authIfPublic: true}), expenses.getOne); // Get an expense.
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
