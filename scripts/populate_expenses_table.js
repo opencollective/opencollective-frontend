@@ -15,6 +15,14 @@ const models = app.set('models');
 const updateTransaction = (expense, transaction) => {
   transaction.type = constants.type.EXPENSE;
   transaction.ExpenseId = expense.id;
+  // mark any non-paid transactions as deleted At,
+  // since they shouldn't be in the Transactions after migration
+  if (getStatus(transaction) !== 'PAID' ) {
+    console.log(`Marking txn id: ${transaction.id} as deleted`);
+    return transaction.save()
+      .then(() => models.Transaction.findById(transaction.id))
+      .then(txn => txn.destroy());
+  }
   return transaction.save();
 };
 
@@ -33,7 +41,6 @@ const createExpense = transaction => {
     payoutMethod: transaction.payoutMethod || 'manual',
     createdAt: transaction.createdAt,
     updatedAt: transaction.updatedAt,
-    deletedAt: transaction.deletedAt,
     incurredAt: transaction.createdAt,
     lastEditedById: getLastEditedBy(transaction)
   };
@@ -88,8 +95,7 @@ models.Transaction.findAll({
   },
   order: 'id',
   include: {
-    model: models.PaymentMethod,
-    paranoid: false
+    model: models.PaymentMethod
   }
 })
 .map(transaction => createExpense(transaction))
