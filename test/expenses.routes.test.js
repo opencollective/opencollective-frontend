@@ -283,7 +283,7 @@ describe('expenses.routes.test.js', () => {
                 .set('Authorization', `Bearer ${user.jwt(application)}`)
                 .send({approved: false})
                 .expect(200));
-              
+
               beforeEach(() => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
                 .set('Authorization', `Bearer ${user.jwt(application)}`)
@@ -601,7 +601,7 @@ describe('expenses.routes.test.js', () => {
                 expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
                 expect(transaction).to.have.property('ExpenseId', expense.id);
                 // TODO remove #postmigration, info redundant with joined tables?
-                expect(transaction).to.have.property('amount', expense.amount);
+                expect(transaction).to.have.property('amount', -expense.amount/100);
                 expect(transaction).to.have.property('currency', expense.currency);
                 expect(transaction).to.have.property('description', expense.title);
                 expect(transaction).to.have.property('status', 'REIMBURSED');
@@ -641,6 +641,14 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#pay manual expense', () => {
+            // add some money, so we can approve a manual expense against it
+            beforeEach(() => {
+              return request(app)
+                .post(`/groups/${group.id}/transactions`)
+                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .send({ transaction: {amount: 100}})
+                .expect(200);
+            })
 
             beforeEach(() => {
               return request(app)
@@ -650,6 +658,7 @@ describe('expenses.routes.test.js', () => {
                 .expect(200)
                 .then(res => actualExpense = res.body);
             });
+
 
             beforeEach(() => {
               sinon
@@ -699,7 +708,7 @@ describe('expenses.routes.test.js', () => {
 
                 var expense, transaction;
                 beforeEach(() => expectTwo(Expense).tap(e => expense = e));
-                beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
+                beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
 
                 it('THEN does not call PayPal', () => expect(payStub.called).to.be.false);
 
@@ -713,10 +722,10 @@ describe('expenses.routes.test.js', () => {
               });
 
               function expectTransactionCreated(expense, transaction) {
-                expect(transaction).to.have.property('netAmountInGroupCurrency', -3700);
+                expect(transaction).to.have.property('netAmountInGroupCurrency', -3737);
                 expect(transaction).to.have.property('ExpenseId', expense.id);
                 // TODO remove #postmigration, info redundant with joined tables?
-                expect(transaction).to.have.property('amount', expense.amount);
+                expect(transaction).to.have.property('amount', -expense.amount/100);
                 expect(transaction).to.have.property('currency', expense.currency);
                 expect(transaction).to.have.property('description', expense.title);
                 expect(transaction).to.have.property('status', 'REIMBURSED');

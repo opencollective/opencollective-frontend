@@ -8,6 +8,7 @@ const activities = require('../constants/activities');
 const includes = require('lodash/collection/includes');
 const status = require('../constants/expense_status');
 const utils = require('../lib/utils');
+const roles = require('../constants/roles')
 
 /**
  * Controller.
@@ -18,6 +19,7 @@ module.exports = (app) => {
   const errors = app.errors;
   const models = app.set('models');
   const createTransaction = require('../lib/transactions')(app).createFromPaidExpense;
+  const getBalance = require('../lib/groups')(app).getBalance;
   const paypal = require('./paypal')(app);
   const payExpense = require('../lib/payExpense')(app);
 
@@ -123,15 +125,29 @@ module.exports = (app) => {
     assertExpenseStatus(expense, status.PENDING)
       .then(() => {
         if (req.required.approved === false) {
-          return req.expense.setRejected()
-            .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_REJECTED))
+          return expense.setRejected()
+            .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
         }
-        return fetchPaymentMethod(req.remoteUser.id)
+        if (expense.payoutMethod === 'manual') {
+          return getBalance(expense.GroupId)
+            .then(checkIfEnoughFunds(expense))
+            .then(() => expense.setApproved())
+            .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
+        }
+        else {
+           return models.UserGroup.findOne({
+            where: {
+              GroupId: expense.GroupId,
+              role: roles.HOST
+            }
+          })
+          .then(userGroup => fetchPaymentMethod(userGroup.UserId))
           .then(paymentMethod => getPreapprovalDetails(paymentMethod))
           .tap(d => preapprovalDetails = d)
-          .then(checkIfEnoughFunds(expense.amount))
+          .then(checkIfEnoughFunds(expense))
           .then(() => expense.setApproved())
           .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
+        }
       })
       .then(() => res.send({success: true}))
       .catch(err => next(formatError(err, preapprovalDetails)));
@@ -155,16 +171,28 @@ module.exports = (app) => {
       return Promise.promisify(paypal.getPreapprovalDetails)(paymentMethod.token);
     }
 
-    function checkIfEnoughFunds(txAmount) {
-      return preapprovalDetails => {
-        const maxAmount = Number(preapprovalDetails.maxTotalAmountOfAllPayments);
-        const currency = preapprovalDetails.currencyCode;
-
-        if (Math.abs(txAmount) > maxAmount) {
-          return Promise.reject(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve expense.`));
+    function checkIfEnoughFunds(expense) {
+      const txAmount = expense.amount/100;
+      if (expense.payoutMethod === 'manual') {
+        return balance => {
+          if (balance >= expense.amount) {
+            return Promise.resolve();
+          } else {
+            return Promise.reject(new errors.BadRequest(`Not enough funds in this collective to approve this request. Please add funds first.`));
+          }
         }
-        return Promise.resolve();
-      };
+      } else {
+        return preapprovalDetails => {
+          const maxAmount = Number(preapprovalDetails.maxTotalAmountOfAllPayments);
+          const currency = preapprovalDetails.currencyCode;
+
+          if (Math.abs(txAmount) > maxAmount) {
+            return Promise.reject(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve expense.`));
+          }
+          return Promise.resolve();
+        };
+      }
+
     }
   };
 
