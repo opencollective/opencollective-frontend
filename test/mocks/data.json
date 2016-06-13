@@ -442,6 +442,17 @@
     "amount": 120.00,
     "currency": "USD",
     "paypalEmail": "userpaypal@gmail.com",
-    "incurredAt": "2016-03-06 UTC+0300"
+    "incurredAt": "2016-03-06 UTC+0300",
+    "payoutMethod": "paypal"
+  },
+  "expense2": {
+    "title": "tshirts",
+    "notes": "longgggg note",
+    "category": "Engineering",
+    "amount": 37.37,
+    "currency": "USD",
+    "paypalEmail": "userpaypal2@gmail.com",
+    "incurredAt": "2016-03-09 UTC+0300",
+    "payoutMethod": "manual"
   }
 }

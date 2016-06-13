@@ -5,7 +5,7 @@ const models = app.set('models');
 
 /*
  * tested with:
- * 
+ *
  * - npm run db:copy:prod
  * - PG_DATABASE=opencollective_prod_snapshot npm run db:migrate:dev
  * - PG_DATABASE=opencollective_prod_snapshot node scripts/populate_expenses_table.js
@@ -15,6 +15,14 @@ const models = app.set('models');
 const updateTransaction = (expense, transaction) => {
   transaction.type = constants.type.EXPENSE;
   transaction.ExpenseId = expense.id;
+  // mark any non-paid transactions as deleted At,
+  // since they shouldn't be in the Transactions after migration
+  if (getStatus(transaction) !== 'PAID' ) {
+    console.log(`Marking txn id: ${transaction.id} as deleted`);
+    return transaction.save()
+      .then(() => models.Transaction.findById(transaction.id))
+      .then(txn => txn.destroy());
+  }
   return transaction.save();
 };
 
@@ -30,9 +38,9 @@ const createExpense = transaction => {
     category: transaction.tags && transaction.tags[0],
     title: transaction.description,
     status: getStatus(transaction),
+    payoutMethod: transaction.payoutMethod || 'manual',
     createdAt: transaction.createdAt,
     updatedAt: transaction.updatedAt,
-    deletedAt: transaction.deletedAt,
     incurredAt: transaction.createdAt,
     lastEditedById: getLastEditedBy(transaction)
   };
@@ -87,8 +95,7 @@ models.Transaction.findAll({
   },
   order: 'id',
   include: {
-    model: models.PaymentMethod,
-    paranoid: false
+    model: models.PaymentMethod
   }
 })
 .map(transaction => createExpense(transaction))

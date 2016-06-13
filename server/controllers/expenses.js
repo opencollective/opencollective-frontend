@@ -57,7 +57,7 @@ module.exports = (app) => {
     }, req.pagination);
 
     return models.Expense.findAndCountAll(query)
-      .tap(expenses => {
+      .then(expenses => {
         // Set headers for pagination.
         req.pagination.total = expenses.count;
         res.set({ Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination) });
@@ -174,7 +174,7 @@ module.exports = (app) => {
 
   const pay = (req, res, next) => {
     const expense = req.expense;
-    const payoutMethod = req.required.payoutMethod;
+    const payoutMethod = req.expense.payoutMethod;
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
     var paymentMethod, email, paymentResponse;
 

@@ -54,6 +54,19 @@ module.exports = function (Sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+
+    payoutMethod: {
+      type: DataTypes.STRING,
+      validate: {
+        isIn: {
+          args: [['paypal', 'manual', 'other']],
+          msg: 'Must be paypal, manual or other'
+        }
+      },
+      allowNull: false,
+      defaultValue: 'manual'
+    },
+
     notes: DataTypes.TEXT,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
@@ -117,7 +130,9 @@ module.exports = function (Sequelize, DataTypes) {
           title: this.title,
           attachment: this.attachment,
           category: this.category,
+          payoutMethod: this.payoutMethod,
           vat: this.vat,
+          notes: this.notes,
           lastEditedById: this.lastEditedById,
           status: this.status,
           incurredAt: this.incurredAt,

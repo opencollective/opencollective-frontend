@@ -54,7 +54,7 @@ describe('transactions.paypal.routes.test.js', () => {
       }],
       addUserBGroupA: ['createUserB', 'createGroupA', (cb, results) => {
         results.createGroupA
-          .addUserWithRole(results.createUserB, roles.MEMBER)
+          .addUserWithRole(results.createUserB, roles.HOST)
           .then(() => cb())
           .catch(cb);
       }],
