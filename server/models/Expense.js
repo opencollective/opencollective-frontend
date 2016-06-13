@@ -63,7 +63,8 @@ module.exports = function (Sequelize, DataTypes) {
           msg: 'Must be paypal, manual or other'
         }
       },
-      allowNull: false
+      allowNull: false,
+      defaultValue: 'manual'
     },
 
     notes: DataTypes.TEXT,

@@ -151,7 +151,8 @@ module.exports = function(app) {
           "incurredAt": "2016-02-29T08:00:00.000Z",
           "GroupId": results.createGroup.id,
           "UserId": results.createTestUser.id,
-          "lastEditedById": results.createTestUser.id
+          "lastEditedById": results.createTestUser.id,
+          "payoutMethod": 'paypal'
         })
         .then(() => cb())
         .catch(cb);
@@ -165,7 +166,8 @@ module.exports = function(app) {
           "incurredAt": "2016-03-01T08:00:00.000Z",
           "GroupId": results.createGroup.id,
           "UserId": results.createTestUser.id,
-          "lastEditedById": results.createTestUser.id
+          "lastEditedById": results.createTestUser.id,
+          "payoutMethod": 'manual'
         })
         .then(() => cb())
         .catch(cb);
