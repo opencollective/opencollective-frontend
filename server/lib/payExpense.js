@@ -5,9 +5,9 @@ const uuid = require('node-uuid');
 module.exports = app => {
   const services = {
     paypal: (group, expense, email, preapprovalKey) => {
-      var uri = `/groups/${group.id}/transactions/${expense.id}/paykey/`;
+      var uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;
       var baseUrl = config.host.webapp + uri;
-      var amount = expense.amount;
+      var amount = expense.amount/100;
       var payload = {
         requestEnvelope: {
           errorLanguage: 'en_US',
@@ -33,7 +33,7 @@ module.exports = app => {
         }
       };
 
-      return Promise.promisify(app.paypalAdaptive.pay)(payload);
+      return Promise.promisify(app.paypalAdaptive.pay, {context: app.paypalAdaptive})(payload);
     }
   };
 

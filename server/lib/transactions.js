@@ -28,11 +28,11 @@ module.exports = app => {
 
     return models.Transaction.create({
       // TODO expense currency might be different from group currency, how to convert?
-      netAmountInGroupCurrency: -expense.amount * 100,
+      netAmountInGroupCurrency: -expense.amount,
       ExpenseId: expense.id,
       // TODO remove #postmigration, info redundant with joined tables?
       type: expenseType,
-      amount: expense.amount,
+      amount: -expense.amount/100,
       currency: expense.currency,
       description: expense.title,
       status: 'REIMBURSED',
