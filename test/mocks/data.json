@@ -22,7 +22,7 @@
     "email": "user1@email.com",
     "paypalEmail": "user1+paypal@email.com",
     "password": "passpass",
-    "twitterHandle": "blahblah"
+    "twitterHandle": "philmod"
   },
 
   "user2": {
@@ -399,7 +399,7 @@
       "username":"philmod",
       "email":"philmod@email.com",
       "avatar":null,
-      "twitterHandle":"blahblah",
+      "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
       "createdAt":"2016-01-30T07:31:37.747Z",
       "updatedAt":"2016-01-30T07:31:37.889Z",

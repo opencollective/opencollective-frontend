@@ -151,7 +151,7 @@ describe("notification.model.test.js", () => {
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('sends a new `group.transaction.created` email notification', () => {
+  it('sends a new `group.expense.created` email notification', () => {
 
     var templateData = {
       transaction: _.extend({}, transactionsData[0]),
@@ -167,7 +167,7 @@ describe("notification.model.test.js", () => {
     else
       templateData.transaction.preview = {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + templateData.transaction.link, width: '100%'};
 
-    var template = emailLib.templates['group.transaction.created'](templateData);
+    var template = emailLib.templates['group.expense.created'](templateData);
 
     var subject = emailLib.getSubject(template);
     var body = emailLib.getBody(template);

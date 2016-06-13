@@ -285,6 +285,7 @@ var payServices = {
           UserId: transaction.UserId,
           data: {
             transaction: transaction.get(),
+            user: transaction.User.get('info'),
             group: transaction.Group.get('info')
           }
         };

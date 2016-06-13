@@ -1,0 +1,23 @@
+Subject: {{group.name}}: {{{currency transaction.amount currency=transaction.currency}}} from {{user.name}}
+
+{{> header}}
+
+<center>
+  <h1>{{{currency transaction.amount currency=transaction.currency}}}</h1>
+  <div>{{transaction.description}}</div>
+
+  <br /><br />
+
+  <a href="{{user.website}}">
+    <img src="{{user.avatar}}" width="48" />
+  </a>
+
+  <br /><br />
+  {{#if tweet}}
+    {{tweet.text}}<br />
+    <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}">Tweet this!</a>
+  {{/if}}
+
+</center>
+
+{{> footer}}

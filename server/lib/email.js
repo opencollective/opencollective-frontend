@@ -9,7 +9,8 @@ const currencies = require('../constants/currencies');
 
 const templatesNames = [
   'github.signup',
-  'group.transaction.created',
+  'group.expense.created',
+  'group.donation.created',
   'thankyou',
   'thankyou.wwcode',
   'thankyou.ispcwa',
@@ -107,6 +108,18 @@ const EmailLib = (app) => {
             data.interval = 'an';
             break;
         }
+      }
+    }
+
+    if(template === 'group.transaction.created') {
+      template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.created';
+      if(data.user && data.user.twitterHandle) {
+        const groupMention = (data.group.twitterHandle) ? `@${data.group.twitterHandle}` : data.group.name;
+        const text = `@${data.user.twitterHandle} thanks for your donations to ${groupMention} https://opencollective.com/${data.group.slug}`;
+        data.tweet = {
+          text,
+          encoded: encodeURIComponent(text)
+        };
       }
     }
 
