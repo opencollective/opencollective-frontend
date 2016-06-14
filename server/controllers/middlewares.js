@@ -1,6 +1,9 @@
-var async = require('async');
-var utils = require('../lib/utils');
+const async = require('async');
+const utils = require('../lib/utils');
 const Promise = require('bluebird');
+const json2csv = require('json2csv');
+const moment = require('moment');
+const _ = require('lodash');
 
 module.exports = function(app) {
 
@@ -14,6 +17,39 @@ module.exports = function(app) {
    * Public methods.
    */
   return {
+
+    /**
+     * Add this middleware before the controller (before calling res.send)
+     * `format` should be 'csv'
+     */
+    format: (format) => {
+
+      return (req, res, next) => {
+
+        switch(format) {
+          case 'csv':
+            const send = res.send;
+            res.send = (data) => {
+              data = _.map(data, (row) => {
+                if(row.createdAt)
+                  row.createdAt = moment(row.createdAt).format("YYYY-MM-DD HH:mm");
+
+                return row;
+              });
+              json2csv({data, fields: Object.keys(data[0])}, (err, csv) => {
+                res.setHeader('content-type', 'text/csv');
+                send.call(res, csv);
+              });
+            }
+            return next();
+
+          default:
+            return next();
+        }
+
+      }
+
+    },
 
     /**
      * Get the user based on its email or paypalEmail. If not found, creates one.

@@ -409,5 +409,19 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
+    it('get the list of users in CSV format', (done) => {
+      request(app)
+        .get(`/groups/${group.slug}/users.csv`)
+        .expect(200)
+        .expect((res) => {
+          const users = res.text.split('\n').slice(1);
+          expect(users.length).to.equal(4);
+          expect(users[0].split(",")[8]).to.equal('"host"');
+          expect(users[1].split(",")[8]).to.equal('"contributor"');
+          expect(users[2].split(",")[8]).to.equal('"sponsor"');
+          expect(users[3].split(",")[8]).to.equal('"backer"');
+        })
+        .end(done);
+    });
   });
 });
