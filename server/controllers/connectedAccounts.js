@@ -14,6 +14,8 @@ module.exports = (app) => {
       var caId, user;
       const attrs = { provider: req.params.service };
       var avatar;
+      const utmSource = req.query.utm_source;
+
       if (req.params.service === 'github'){
         avatar = `http://avatars.githubusercontent.com/${profile.username}`;
       }
@@ -36,7 +38,7 @@ module.exports = (app) => {
         })
         .then(() => {
           const token = user.generateConnectedAccountVerifiedToken(req.application, caId, profile.username);
-          res.redirect(`${config.host.website}/github/apply/${token}`);
+          res.redirect(`${config.host.website}/github/apply/${token}?utm_source=${utmSource}`);
         })
         .catch(next);
     },
