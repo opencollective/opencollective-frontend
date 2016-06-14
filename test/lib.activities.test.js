@@ -19,14 +19,9 @@ describe('lib.activities.test.js', () => {
       expect(actual).to.equal('New Donation: someone (john@doe.com) gave USD 10.42 to <pubquiz.com|Pub quiz>!');
     });
 
-    it (`${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
-      var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[13], true);
-      expect(actual).to.equal('New Expense: someone (john@doe.com) submitted a undefined expense to Pub quiz: USD -12.98 for pizza!');
-    });
-
     it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[14], true);
-      expect(actual).to.equal('Expense approved on Pub quiz: USD -12.98 for \'pizza\'');
+      expect(actual).to.equal('Expense paid on Pub quiz: USD -12.98 for \'pizza\'');
     });
 
     it (`${constants.USER_CREATED} all fields present`, () => {
@@ -63,6 +58,22 @@ describe('lib.activities.test.js', () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], true);
       expect(actual).to.equal('New user: someone (UserId: 2) added to group: <blah.com|Blah>');
     });
+
+    it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
+      var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[20], true);
+      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
+    });
+
+    it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
+      var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[21], true);
+      expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
+    });
+
+    it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
+      var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[22], true);
+      expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
+    });
+
   });
 
   describe('formatMessageForPublicChannel', () => {
@@ -79,7 +90,7 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[14], true);
-      expect(actual).to.equal('Expense approved on Pub quiz: USD -12.98 for \'pizza\'');
+      expect(actual).to.equal('Expense paid on Pub quiz: USD -12.98 for \'pizza\'');
     });
 
     it (constants.SUBSCRIPTION_CONFIRMED, () => {
@@ -95,6 +106,21 @@ describe('lib.activities.test.js', () => {
     it (constants.GROUP_CREATED, () => {
       var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[18], true);
       expect(actual).to.equal('New group created: <blah.com|Blah> by someone');
+    });
+
+    it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
+      var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[20], true);
+      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
+    });
+
+    it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
+      var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[21], true);
+      expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah>!');
+    });
+
+    it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
+      var actual = activitiesLib.formatMessageForPublicChannel(activitiesData[22], true);
+      expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah>!');
     });
 
   });
