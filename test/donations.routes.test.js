@@ -49,7 +49,7 @@ describe('donations.routes.test.js', () => {
     var stub = sinon.stub(app.stripe.accounts, 'create');
     stub.yields(null, mock);
   };
-  
+
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   // Create a stub for clearbit
@@ -622,7 +622,7 @@ describe('donations.routes.test.js', () => {
           .catch(done);
       });
 
-      it('successfully sends a thank you email', () => 
+      it('successfully sends a thank you email', () =>
         expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal(userData.email));
     });
 
