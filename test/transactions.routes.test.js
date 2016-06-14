@@ -7,7 +7,6 @@ const async = require('async');
 const sinon = require('sinon');
 const expect = require('chai').expect;
 const request = require('supertest');
-const config = require('config');
 const utils = require('../test/utils.js')();
 
 /**

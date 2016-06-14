@@ -152,7 +152,7 @@ describe('users.routes.test.js', () => {
         })
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('email', userData.email);
+          expect(res.body).to.have.property('email', userData.email.toLowerCase());
           expect(res.body).to.not.have.property('_salt');
           expect(res.body).to.not.have.property('password');
           expect(res.body).to.not.have.property('password_hash');
@@ -321,7 +321,7 @@ describe('users.routes.test.js', () => {
           expect(e).to.not.exist;
           var u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
-          expect(u.email).to.equal(utils.data('user1').email);
+          expect(u.email).to.equal(utils.data('user1').email.toLowerCase());
           done();
         });
     });

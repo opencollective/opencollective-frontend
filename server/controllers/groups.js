@@ -322,7 +322,6 @@ module.exports = function(app) {
 
     // Caller.
     var user = req.remoteUser || req.user || transaction.user || {};
-
     transactions._create({
       transaction,
       group,

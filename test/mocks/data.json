@@ -19,8 +19,8 @@
   "user1": {
     "name": "Phil Mod",
     "username": "philmod",
-    "email": "user1@email.com",
-    "paypalEmail": "user1+paypal@email.com",
+    "email": "User1@email.com",
+    "paypalEmail": "User1+paypal@email.com",
     "password": "passpass",
     "twitterHandle": "philmod"
   },
@@ -28,28 +28,28 @@
   "user2": {
     "name": "Anish Bas",
     "username": "abas",
-    "email": "xdam@email.com",
+    "email": "Xdam@email.com",
     "password": "ssapssap"
   },
 
   "user3": {
     "name": "Xavier Damman",
     "username": "xdamman",
-    "email": "user3@email.com",
+    "email": "User3@email.com",
     "password": "passssap"
   },
 
   "user4": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "user4@email.com",
+    "email": "User4@email.com",
     "password": "passssas"
   },
 
   "user5": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "user5@email.com"
+    "email": "uSer5@email.com"
   },
 
   "group1": {
@@ -441,7 +441,7 @@
     "category": "Engineering",
     "amount": 12000,
     "currency": "USD",
-    "paypalEmail": "userpaypal@gmail.com",
+    "paypalEmail": "uSerpaypal@gmail.com",
     "incurredAt": "2016-03-06 UTC+0300",
     "payoutMethod": "paypal"
   },
@@ -451,7 +451,7 @@
     "category": "Engineering",
     "amount": 3737,
     "currency": "USD",
-    "paypalEmail": "userpaypal2@gmail.com",
+    "paypalEmail": "Userpaypal2@gmail.com",
     "incurredAt": "2016-03-09 UTC+0300",
     "payoutMethod": "manual"
   }

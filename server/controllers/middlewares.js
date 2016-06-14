@@ -91,11 +91,19 @@ module.exports = function(app) {
         return this.authenticate(req, res, next);
       }
 
+      if (email) {
+        email = email.toLowerCase();
+      }
+      if (paypalEmail) {
+        paypalEmail = paypalEmail.toLowerCase();
+      }
+
       const userData = {
         name,
         email: email || paypalEmail,
         paypalEmail
       };
+
       models.User.findOne({
         where: {
           $or: {
