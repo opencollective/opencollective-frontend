@@ -4,6 +4,7 @@
 
 module.exports = {
   ACTIVITY_ALL: 'all',
+  CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
   GROUP_CREATED: 'group.created',
   GROUP_DONATION_CREATED: 'group.donation.created',
   GROUP_EXPENSE_CREATED: 'group.expense.created',

@@ -16,9 +16,12 @@ module.exports = {
     var interval = '';
     var recurringAmount = null;
     var currency = '';
-    var tags = [];
     var description = '';
     var eventType = '';
+    var provider = '';
+    var connectedAccountUsername = '';
+    var connectedAccountLink = '';
+
 
     // get user data
     if (activity.data.user) {
@@ -54,6 +57,24 @@ module.exports = {
       description = activity.data.transaction.description;
     }
 
+    // get expense data
+    if (activity.data.expense) {
+      amount = activity.data.expense.amount/100;
+      currency = activity.data.expense.currency;
+      category = activity.data.expense.category;
+      title = activity.data.expense.title;
+      lastEditedById = activity.data.expense.lastEditedById;
+    }
+
+    // get connected account data
+    if (activity.data.connectedAccount) {
+      provider = activity.data.connectedAccount.provider;
+      connectedAccountUsername = activity.data.connectedAccount.username;
+      if (provider === 'github' && linkify) {
+        connectedAccountUsernameLink = linkifyForSlack(`https://github.com/${connectedAccountUsername}`, null);
+      }
+    }
+
     // get event data
     if (activity.data.event) {
       eventType = activity.data.event.type;
@@ -73,15 +94,27 @@ module.exports = {
 
         if (activity.data.transaction.isDonation) {
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
-        } else if (activity.data.transaction.isExpense) {
-          return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
-        } else {
-          return `Hmm found a group.transaction.created that's neither donation or expense. Activity id: ${activity.id}`;
         }
         break;
 
+      case activities.GROUP_EXPENSE_CREATED:
+        return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${title}!`
+        break;
+
+      case activities.GROUP_EXPENSE_REJECTED:
+        return `Expense rejected: ${currency} ${amount} for ${title} in ${group} by userId: ${lastEditedById}!`
+        break;
+
+      case activities.GROUP_EXPENSE_APPROVED:
+        return `Expense approved: ${currency} ${amount} for ${title} in ${group} by userId: ${lastEditedById}!`
+        break;
+
+      case activities.CONNECTED_ACCOUNT_CREATED:
+        return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
+        break;
+
       case activities.GROUP_TRANSACTION_PAID:
-        return `Expense approved on ${group}: ${currency} ${amount} for '${description}'`;
+        return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
         break;
 
       case activities.USER_CREATED:
@@ -159,6 +192,14 @@ module.exports = {
       description = activity.data.transaction.description;
     }
 
+    // get expense data
+    if (activity.data.expense) {
+      amount = activity.data.expense.amount/100;
+      currency = activity.data.expense.currency;
+      category = activity.data.expense.category;
+      title = activity.data.expense.title;
+    }
+
     var group;
     if (linkify) {
       group = linkifyForSlack(publicUrl, groupName);
@@ -178,8 +219,21 @@ module.exports = {
         }
         break;
 
+      case activities.GROUP_EXPENSE_CREATED:
+        return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${title}!`
+        break;
+
+      case activities.GROUP_EXPENSE_REJECTED:
+        return `Expense rejected: ${currency} ${amount} for ${title} in ${group}!`
+        break;
+
+      case activities.GROUP_EXPENSE_APPROVED:
+        return `Expense approved: ${currency} ${amount} for ${title} in ${group}!`
+        break;
+
+
       case activities.GROUP_TRANSACTION_PAID:
-        return `Expense approved on ${group}: ${currency} ${amount} for '${description}'`;
+        return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
         break;
 
       case activities.SUBSCRIPTION_CONFIRMED:

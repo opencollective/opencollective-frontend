@@ -258,6 +258,62 @@
             "publicUrl": "blah.com"
           }
         }
+      },
+      {
+        "type": "group.expense.created",
+        "data": {
+          "user": {
+            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "id": 2
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          },
+          "expense": {
+            "amount": 12.34,
+            "currency": "EUR",
+            "title": "for pizza"
+          }
+        }
+      },
+      {
+        "type": "group.expense.rejected",
+        "data": {
+          "user": {
+            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "id": 2
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          },
+          "expense": {
+            "amount": 12.34,
+            "currency": "EUR",
+            "title": "for pizza",
+            "lastEditedById": 2
+          }
+        }
+      },
+      {
+        "type": "group.expense.approved",
+        "data": {
+          "user": {
+            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "id": 2
+          },
+          "group": {
+            "name": "Blah",
+            "publicUrl": "blah.com"
+          },
+          "expense": {
+            "amount": 12.34,
+            "currency": "EUR",
+            "title": "for pizza",
+            "lastEditedById": 2
+          }
+        }
       }
     ]
   },
