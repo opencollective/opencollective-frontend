@@ -19,8 +19,8 @@ module.exports = {
     var description = '';
     var eventType = '';
     var provider = '';
-    var caUsername = '';
-    var caLink = '';
+    var connectedAccountUsername = '';
+    var connectedAccountLink = '';
 
 
     // get user data
@@ -69,9 +69,9 @@ module.exports = {
     // get connected account data
     if (activity.data.connectedAccount) {
       provider = activity.data.connectedAccount.provider;
-      caUsername = activity.data.connectedAccount.username;
+      connectedAccountUsername = activity.data.connectedAccount.username;
       if (provider === 'github' && linkify) {
-        caLink = linkifyForSlack(`https://github.com/${caUsername}`, null);
+        connectedAccountUsernameLink = linkifyForSlack(`https://github.com/${connectedAccountUsername}`, null);
       }
     }
 
@@ -110,7 +110,7 @@ module.exports = {
         break;
 
       case activities.CONNECTED_ACCOUNT_CREATED:
-        return `New Connected Account created by ${caUsername} on ${provider}. ${caLink}`;
+        return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
         break;
 
       case activities.GROUP_TRANSACTION_PAID:
