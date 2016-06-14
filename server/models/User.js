@@ -73,7 +73,12 @@ module.exports = function(Sequelize, DataTypes) {
 
     paypalEmail: {
       type: DataTypes.STRING,
-      unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password
+      unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password,
+      set(val) {
+        if (val && val.toLowerCase) {
+          this.setDataValue('paypalEmail', val.toLowerCase());
+        }
+      },
       validate: {
         len: {
           args: [6, 128],
