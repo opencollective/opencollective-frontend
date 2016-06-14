@@ -11,7 +11,7 @@ const clientId = config.github.clientID;
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
 
   var application, req;
-  
+
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   describe('WHEN calling /connected-accounts/github', () => {
@@ -31,7 +31,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
       beforeEach(done => {
         req = request(app)
-          .get(`/connected-accounts/github`)
+          .get(`/connected-accounts/github?utm_source=mm`)
           .send({ api_key: application.api_key });
         done();
       });
@@ -42,7 +42,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
             expect(err).not.to.exist;
             const baseUrl = 'https://github.com/login/oauth/authorize';
             const apiKeyEnc = '.*';
-            const redirectUri = encodeURIComponent(`${config.host.api}/connected-accounts/github/callback?api_key_enc=${apiKeyEnc}`);
+            const redirectUri = encodeURIComponent(`${config.host.api}/connected-accounts/github/callback?api_key_enc=${apiKeyEnc}&utm_source=mm`);
             const scope = encodeURIComponent('user:email,public_repo');
             const location = `^${baseUrl}\\?response_type=code&redirect_uri=${redirectUri}&scope=${scope}&client_id=${clientId}$`;
             expect(res.headers.location).to.match(new RegExp(location));
