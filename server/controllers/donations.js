@@ -126,7 +126,8 @@ module.exports = (app) => {
                 metadata: {
                   groupId: group.id,
                   groupName: group.name,
-                  paymentMethodId: paymentMethod.id
+                  paymentMethodId: paymentMethod.id,
+                  description: `OpenCollective: ${group.slug}`
                 }
               };
 
@@ -148,7 +149,7 @@ module.exports = (app) => {
             amount: amountInt,
             currency,
             customer: paymentMethod.customerId,
-            description: `One time donation to ${group.name}`,
+            description: `OpenCollective: ${group.slug}`,
             application_fee: parseInt(amountInt*constants.OC_FEE_PERCENT/100, 10),
             metadata: {
               groupId: group.id,
