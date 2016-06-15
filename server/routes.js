@@ -77,6 +77,11 @@ module.exports = (app) => {
   app.get('/email/:template', test.generateTestEmail);
 
   /**
+   * Profile
+   */
+  app.get('/profile/:slug', Controllers.profile);
+
+  /**
    * Users.
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
