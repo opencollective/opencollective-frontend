@@ -477,7 +477,7 @@ module.exports = function(app) {
             var userAttr = {
               avatar: `http://avatars.githubusercontent.com/${contributor}`
             };
-            var connectedAccount;
+            var connectedAccount, contributorUser;
             return ConnectedAccount.findOne({where: caAttr})
               .then(ca => ca || ConnectedAccount.create(caAttr))
               .then(ca => {
@@ -489,15 +489,16 @@ module.exports = function(app) {
                 }
               })
               .then(user => user || User.create(userAttr))
+              .then(user => contributorUser = user)
               .then(() => githubLib.fetchUser(contributor))
-              .then(json => {
-                user.name = json.name;
-                user.website = json.blog;
-                user.email = json.email;
-                return user.save();
+              .tap(json => {
+                contributorUser.name = json.name;
+                contributorUser.website = json.blog;
+                contributorUser.email = json.email;
+                return contributorUser.save();
               })
-              .tap(user => user.addConnectedAccount(connectedAccount))
-              .then(user => _addUserToGroup(dbGroup, user, options));
+              .then(() => contributorUser.addConnectedAccount(connectedAccount))
+              .then(() => _addUserToGroup(dbGroup, contributorUser, options));
           } else {
             return Promise.resolve();
           }
