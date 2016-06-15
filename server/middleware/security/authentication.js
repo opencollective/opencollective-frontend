@@ -231,8 +231,9 @@ module.exports = function (app) {
       const apiKey = req.required.api_key;
       const apiKeyEnc = jwt.sign({apiKey}, secret, { expiresIn: '1min' });
       const service = req.params.service;
+      const utmSource = req.query.utm_source;
       passport.authenticate(service, {
-        callbackURL: `${config.host.api}/connected-accounts/${service}/callback?api_key_enc=${apiKeyEnc}`,
+        callbackURL: `${config.host.api}/connected-accounts/${service}/callback?api_key_enc=${apiKeyEnc}&utm_source=${utmSource}`,
         scope: [ 'user:email', 'public_repo' ]
       })(req, res, next);
     },

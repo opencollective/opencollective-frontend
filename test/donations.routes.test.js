@@ -164,7 +164,7 @@ describe('donations.routes.test.js', () => {
       'amount=' + CHARGE * 100,
       'currency=' + CURRENCY,
       'customer=' + stripeMock.customers.create.id,
-      'description=' + encodeURIComponent('One time donation to ' + group.name),
+      'description=' + encodeURIComponent(`OpenCollective: ${group.slug}`),
       'application_fee=54',
       encodeURIComponent('metadata[groupId]') + '=' + group.id,
       encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
@@ -312,7 +312,7 @@ describe('donations.routes.test.js', () => {
           'amount=' + CHARGE2 * 100,
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
-          'description=' + encodeURIComponent('One time donation to ' + group.name),
+          'description=' + encodeURIComponent(`OpenCollective: ${group.slug}`),
           'application_fee=9',
           encodeURIComponent('metadata[groupId]') + '=' + group.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group.name),
@@ -402,7 +402,7 @@ describe('donations.routes.test.js', () => {
           'amount=' + CHARGE * 100,
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
-          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'description=' + encodeURIComponent(`OpenCollective: ${group2.slug}`),
           'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
@@ -458,7 +458,7 @@ describe('donations.routes.test.js', () => {
           'amount=' + CHARGE * 100,
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
-          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'description=' + encodeURIComponent(`OpenCollective: ${group2.slug}`),
           'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
@@ -523,7 +523,7 @@ describe('donations.routes.test.js', () => {
           'amount=' + CHARGE * 100,
           'currency=' + CURRENCY,
           'customer=' + stripeMock.customers.create.id,
-          'description=' + encodeURIComponent('One time donation to ' + group2.name),
+          'description=' + encodeURIComponent(`OpenCollective: ${group2.slug}`),
           'application_fee=54',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
@@ -573,12 +573,12 @@ describe('donations.routes.test.js', () => {
 
         models.User.findAndCountAll({
           where: {
-              email: userData.email
+              email: userData.email.toLowerCase()
             }
         })
         .then((res) => {
           expect(res.count).to.equal(1);
-          expect(res.rows[0]).to.have.property('email', userData.email);
+          expect(res.rows[0]).to.have.property('email', userData.email.toLowerCase());
           done();
         })
         .catch(done)
@@ -623,7 +623,7 @@ describe('donations.routes.test.js', () => {
       });
 
       it('successfully sends a thank you email', () =>
-        expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal(userData.email));
+        expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal(userData.email.toLowerCase()));
     });
 
     describe('Recurring payment success', () => {
@@ -666,7 +666,8 @@ describe('donations.routes.test.js', () => {
           'application_fee_percent=5',
           encodeURIComponent('metadata[groupId]') + '=' + group2.id,
           encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group2.name),
-          encodeURIComponent('metadata[paymentMethodId]') + '=1'
+          encodeURIComponent('metadata[paymentMethodId]') + '=1',
+          encodeURIComponent('metadata[description]') + '=' + encodeURIComponent(`OpenCollective: ${group2.slug}`)
         ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
