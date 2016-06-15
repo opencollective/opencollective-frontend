@@ -151,7 +151,8 @@
             },
           "group": {
             "name": "Pub quiz",
-            "publicUrl": "pubquiz.com"
+            "slug": "pubquiz",
+            "publicUrl": "https://opencollective.com/pubquiz"
           }
         }
       },
@@ -170,7 +171,9 @@
             "description": "pizza"
             },
           "group": {
-            "name": "Pub quiz"
+            "name": "Pub quiz",
+            "slug": "pubquiz",
+            "publicUrl": "https://opencollective.com/pubquiz"
           }
         }
       },
@@ -189,7 +192,9 @@
             "description": "pizza"
             },
           "group": {
-            "name": "Pub quiz"
+            "name": "Pub quiz",
+            "slug": "pubquiz",
+            "publicUrl": "https://opencollective.com/pubquiz"
           }
         }
       },
@@ -213,7 +218,8 @@
           },
           "group": {
             "name": "Blah",
-            "publicUrl": "blah.com"
+            "slug": "blah",
+            "publicUrl": "https://opencollective.com/blah"
           }
         }
       },
@@ -221,7 +227,8 @@
         "type": "subscription.confirmed",
         "data": {
           "user": {
-            "email":"jussi@kuohujoki.fi"
+            "email":"jussi@kuohujoki.fi",
+            "twitterHandle": "xdamman"
           },
           "transaction": {
             "amount": 12.34,
@@ -229,8 +236,10 @@
             "interval": "month"
           },
           "group": {
-            "name": "Blah",
-            "publicUrl": "blah.com"
+            "name": "Yeoman",
+            "slug": "yeoman",
+            "twitterHandle": "yeoman",
+            "publicUrl": "https://opencollective.com/yeoman"
           }
         }
       },
@@ -242,7 +251,8 @@
           },
           "group": {
             "name": "Blah",
-            "publicUrl": "blah.com"
+            "slug": "blah",
+            "publicUrl": "https://opencollective.com/blah"
           }
         }
       },
@@ -255,7 +265,8 @@
           },
           "group": {
             "name": "Blah",
-            "publicUrl": "blah.com"
+            "slug": "blah",
+            "publicUrl": "https://opencollective.com/blah"
           }
         }
       },
