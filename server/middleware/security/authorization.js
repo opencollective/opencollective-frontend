@@ -99,9 +99,16 @@ module.exports = function (app) {
           return next(e);
         }
         req.group
-          .hasUser(req.remoteUser.id)
-          .tap(hasUser => {
-            if (hasUser) {
+          // can't use hasUser() because we removed the unique index of groupid, userid
+          // and replaced it with a unique index of groupid, userid, and role and
+          // that breaks user-related calls for Groups on Sequelize
+          .getUsers({
+            where: {
+              id: req.remoteUser.id
+            }
+          })
+          .tap(users => {
+            if (users.length > 0) {
               return next();
             }
             next(new Forbidden('Forbidden'));
@@ -109,6 +116,7 @@ module.exports = function (app) {
           .catch(next);
       });
     },
+
 
     /**
      * Authorize only users with the specified roles.
