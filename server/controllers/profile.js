@@ -7,7 +7,7 @@ module.exports = function(app) {
   const errors = app.errors;
 
   return (req, res, next) => {
-    const slug = req.params.slug;
+    const slug = req.params.slug.toLowerCase();
     const controllers = req.app.set('controllers');
 
     models.Group
@@ -26,7 +26,7 @@ module.exports = function(app) {
             return controllers.users.show(req, res, next);
             }
             else {
-              return next(new errors.NotFound("There is no collective or user with this slug"));
+              return next(new errors.NotFound(`There is no collective or user at this url /${slug}`));
             }
           })
         }
