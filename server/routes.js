@@ -257,6 +257,11 @@ module.exports = (app) => {
   app.get('/leaderboard', aN.authenticateAppByApiKey, groups.getLeaderboard); // Create a user.
 
   /**
+   * Override default 404 handler to make sure to obfuscate api_key visible in URL
+   */
+  app.use((req, res) => res.send(404));
+
+  /**
    * Error handler.
    */
   app.use(errorHandler);
