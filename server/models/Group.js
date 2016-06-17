@@ -124,6 +124,15 @@ module.exports = function(Sequelize, DataTypes) {
       get() {
         return `${config.host.website}/${this.get('slug')}`;
       }
+    },
+
+    tags: {
+      type: DataTypes.ARRAY(DataTypes.STRING)
+    },
+
+    isSupercollective: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
 
   }, {
@@ -156,7 +165,9 @@ module.exports = function(Sequelize, DataTypes) {
           website: this.website,
           twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl,
-          hostFeePercent: this.hostFeePercent
+          hostFeePercent: this.hostFeePercent,
+          tags: this.tags,
+          isSupercollective: this.isSupercollective
         };
       },
       minimal: function() {
@@ -165,7 +176,8 @@ module.exports = function(Sequelize, DataTypes) {
           name: this.name,
           logo: this.logo,
           publicUrl: this.publicUrl,
-          mission: this.mission
+          mission: this.mission,
+          isSupercollective: this.isSupercollective
         }
       }
     },

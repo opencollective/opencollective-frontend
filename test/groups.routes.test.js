@@ -161,6 +161,8 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('twitterHandle');
           expect(res.body).to.have.property('website');
           expect(res.body).to.have.property('isPublic', false);
+          expect(res.body.tags).to.eql(privateGroupData.tags);
+          expect(res.body).to.have.property('isSupercollective', false);
 
           user.getGroups().then((groups) => {
             expect(groups).to.have.length(0);
@@ -464,6 +466,8 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('description', privateGroup.description);
           expect(res.body).to.have.property('stripeAccount');
           expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body.tags).to.eql(privateGroupData.tags);
+          expect(res.body).to.have.property('isSupercollective', false);
           done();
         });
     });
@@ -478,6 +482,8 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('name', publicGroup.name);
           expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
           expect(res.body).to.have.property('stripeAccount');
+          expect(res.body.tags).to.eql(publicGroup.tags);
+          expect(res.body).to.have.property('isSupercollective', false);
           expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });

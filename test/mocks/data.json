@@ -77,7 +77,9 @@
       "interval": "monthly",
       "button": "Become a member"
     }],
-    "hostFeePercent": 10
+    "hostFeePercent": 10,
+    "tags": ["open source", "frameworks", "ruby"],
+    "isSupercollective": false
   },
 
   "group2": {
@@ -104,12 +106,15 @@
       "interval": "monthly",
       "button": "Become a member"
     }],
-    "hostFeePercent": 0
+    "hostFeePercent": 0,
+    "tags": ["wwcode", "austin"],
+    "isSupercollective": false
   },
 
   "group3": {
     "name": "Yeoman"
   },
+
 
   "paymentMethod1": {
     "token": "PA-1B0110758V169653C",
