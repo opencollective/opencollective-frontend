@@ -19,7 +19,6 @@ module.exports = (app) => {
   const errors = app.errors;
   const models = app.set('models');
   const createTransaction = require('../lib/transactions')(app).createFromPaidExpense;
-  const getBalance = require('../lib/groups')(app).getBalance;
   const paypal = require('./paypal')(app);
   const payExpense = require('../lib/payExpense')(app);
 
@@ -129,7 +128,8 @@ module.exports = (app) => {
             .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
         }
         if (expense.payoutMethod === 'manual') {
-          return getBalance(expense.GroupId)
+          return models.Group.findById(expense.GroupId)
+            .then(group => group.getBalance())
             .then(checkIfEnoughFunds(expense))
             .then(() => expense.setApproved())
             .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
