@@ -50,7 +50,7 @@
     "request-as-curl": "0.1.0",
     "request-promise": "3.0.0",
     "sequelize": "3.23.3",
-    "sequelize-cli": "1.9.2",
+    "sequelize-cli": "2.4.0",
     "slug": "0.9.1",
     "stripe": "3.9.0"
   },
