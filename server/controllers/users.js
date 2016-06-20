@@ -353,7 +353,8 @@ module.exports = (app) => {
       .then(groups => groups.map(group => groupData.push(group.info)))
       .then(() => groupObjects.map(groupObject => {
         const group = _.find(groupData, {id: groupObject.id})
-        return _.extend(group, { balance: groupObject.getBalance() })
+        return groupObject.getBalance()
+          .then(balance => _.extend(group, { balance }))
       }))
       .then(() => {
         if (withRoles) {
