@@ -293,6 +293,8 @@ describe('users.routes.test.js', () => {
           expect(e).to.not.exist;
           var u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
+          expect(res.body).to.have.property('description', utils.data('user1').description);
+          expect(res.body).to.have.property('isOrganization', utils.data('user1').isOrganization);
           expect(u).to.not.have.property('email');
           done();
         });
@@ -496,7 +498,6 @@ describe('users.routes.test.js', () => {
   /*
    * Update user (without authentication)
    */
-
   describe('#update user from public donation page', () => {
     var userWithPassword;
     var userWithoutPassword;
@@ -504,6 +505,8 @@ describe('users.routes.test.js', () => {
     var newUser = {
       name: 'newname',
       twitterHandle: 'twitter.com/asood123',
+      description: "engineer",
+      isOrganization: false,
       website: 'opencollective.com'
     };
 

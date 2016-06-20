@@ -22,6 +22,8 @@
     "email": "User1@email.com",
     "paypalEmail": "User1+paypal@email.com",
     "password": "passpass",
+    "description": "engineer",
+    "isOrganization": false,
     "twitterHandle": "philmod"
   },
 
@@ -473,6 +475,8 @@
       "avatar":null,
       "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
+      "description": "engineer",
+      "isOrganization": false,
       "createdAt":"2016-01-30T07:31:37.747Z",
       "updatedAt":"2016-01-30T07:31:37.889Z",
       "paypalEmail":"philmod+paypal@email.com"
