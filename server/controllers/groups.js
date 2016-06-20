@@ -105,81 +105,6 @@ module.exports = function(app) {
       .then(createActivity);
   };
 
-  const getBalance = (id, cb) => {
-    Transaction
-      .find({
-        attributes: [
-          [sequelize.fn('SUM', sequelize.col('netAmountInGroupCurrency')), 'total']
-        ],
-        where: {
-          GroupId: id,
-            approved: true
-          }
-        })
-        .then((result) => {
-          return cb(null, result.toJSON().total/100);
-        })
-        .catch(cb);
-  };
-
-  const getYearlyIncome = (GroupId, cb) => {
-    sequelize.query(`
-      SELECT
-        (SELECT
-          COALESCE(SUM(t."netAmountInGroupCurrency"*12),0)
-          FROM "Transactions" t
-          LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-          WHERE "GroupId" = :GroupId
-            AND t.amount > 0
-            AND t."deletedAt" IS NULL
-            AND s.interval = 'month'
-            AND s."isActive" IS TRUE
-            AND s."deletedAt" IS NULL)
-        +
-        (SELECT
-          COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
-          LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-          WHERE "GroupId" = :GroupId
-            AND t.amount > 0
-            AND t."deletedAt" IS NULL
-            AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
-    `, {
-      replacements: { GroupId },
-      type: sequelize.QueryTypes.SELECT
-    }).then((result) => {
-      return cb(null, parseInt(result[0].yearlyIncome,10));
-    }).catch(e => {
-      console.error("Error computing yearlyIncome", e);
-      cb(e);
-    });
-  };
-
-  const getPublicPageInfo = (id, cb) => {
-    Transaction
-      .find({
-        attributes: [
-          [sequelize.fn('SUM', sequelize.col('amount')), 'donationTotal'],
-          [sequelize.fn('COUNT', sequelize.col('UserId')), 'backersCount']
-        ],
-        where: {
-          GroupId: id,
-          approved: true,
-          amount: {
-            $gt: 0
-          }
-        }
-      })
-      .then((result) => {
-        const json = result.toJSON();
-
-        cb(null, {
-          donationTotal: Number(json.donationTotal),
-          backersCount: Number(json.backersCount)
-        });
-      })
-      .catch(cb);
-  };
-
   const getUsers = (req, res, next) => {
 
     const appendTier = (backers) => {
@@ -552,70 +477,27 @@ module.exports = function(app) {
    * Get group content.
    */
   const getOne = (req, res, next) => {
-    async.auto({
+    const group = req.group.info;
 
-      getBalance: getBalance.bind(this, req.group.id),
-      getYearlyIncome: getYearlyIncome.bind(this, req.group.id),
-      getPublicPageInfo: getPublicPageInfo.bind(this, req.group.id),
-
-      getActivities: (cb) => {
-        if (!req.query.activities && !req.body.activities) {
-          return cb();
-        }
-
-        const query = {
-          where: {
-            GroupId: req.group.id
-          },
-          order: [['createdAt', 'DESC']],
-          offset: 0,
-          limit: 20 // [TODO] I need to put this default value
-          // as a global parameter. Using mw.paginate?
-        };
-
-        Activity
-          .findAndCountAll(query)
-          .then((activities) => cb(null, activities.rows))
-          .catch(cb);
-      },
-
-      getStripeAccount: (cb) =>  {
-        req.group.getStripeAccount()
-          .then((account) => cb(null, account))
-          .catch(cb);
-      },
-
-      getConnectedAccount: (cb) => {
-        req.group.getConnectedAccount()
-          .then((account) => cb(null, account))
-          .catch(cb);
-      }
-
-    }, (e, results) => {
-      if (e) return next(e);
-
-      const group = _.extend({}, req.group.info, {
-        balance: results.getBalance,
-        yearlyIncome: results.getYearlyIncome,
-        backersCount: results.getPublicPageInfo.backersCount,
-        donationTotal: results.getPublicPageInfo.donationTotal
-      });
-
-      if (results.getActivities) {
-        group.activities = results.getActivities;
-      }
-
-      if (results.getStripeAccount) {
-        group.stripeAccount = _.pick(results.getStripeAccount, 'stripePublishableKey');
-      }
-
-      if (_.get(results, 'getConnectedAccount.provider') === 'paypal') {
-        group.hasPaypal = true; // hack for the prototype, to refactor
-      }
-
-      res.send(group);
-    });
-
+    Promise.all([
+      req.group.getStripeAccount(),
+      req.group.getConnectedAccount(),
+      req.group.getBalance(),
+      req.group.getYearlyIncome(),
+      req.group.getTotalDonations(),
+      req.group.getBackersCount()
+      ])
+    .then(values => {
+      group.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
+      group.hasPaypal = values[1] && values[1].provider === 'paypal';
+      group.balance = values[2];
+      group.yearlyIncome = values[3];
+      group.donationTotal = values[4];
+      group.backersCount = values[5];
+      return group;
+    })
+    .then(group => res.send(group))
+    .catch(next)
   };
 
   /**
@@ -730,7 +612,6 @@ module.exports = function(app) {
     deleteTransaction,
     getTransaction,
     getTransactions,
-    getBalance,
     getUsers,
     updateTransaction,
     getLeaderboard

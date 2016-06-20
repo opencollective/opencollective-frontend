@@ -26,6 +26,8 @@ const tiers = Joi.array().items(tier);
  */
 module.exports = function(Sequelize, DataTypes) {
 
+  const models = Sequelize.models;
+
   var Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
@@ -235,7 +237,6 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       getConnectedAccount() {
-        const models = Sequelize.models;
 
         return models.UserGroup.find({
           where: {
@@ -254,6 +255,84 @@ module.exports = function(Sequelize, DataTypes) {
             }
           });
         });
+      },
+
+      getBalance() {
+        return models.Transaction.find({
+          attributes: [
+            [Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 'total']
+          ],
+          where: {
+            GroupId: this.id
+            }
+          })
+        .then(result => Promise.resolve(result.toJSON().total));
+      },
+
+      getYearlyIncome() {
+        return Sequelize.query(`
+          SELECT
+            (SELECT
+              COALESCE(SUM(t."netAmountInGroupCurrency"*12),0)
+              FROM "Transactions" t
+              LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+              WHERE "GroupId" = :GroupId
+                AND t.amount > 0
+                AND t."deletedAt" IS NULL
+                AND s.interval = 'month'
+                AND s."isActive" IS TRUE
+                AND s."deletedAt" IS NULL)
+            +
+            (SELECT
+              COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
+              LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+              WHERE "GroupId" = :GroupId
+                AND t.amount > 0
+                AND t."deletedAt" IS NULL
+                AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
+        `, {
+          replacements: { GroupId: this.id },
+          type: Sequelize.QueryTypes.SELECT
+        }).then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
+      },
+
+      getTotalDonations() {
+        return models.Transaction
+          .find({
+            attributes: [
+              [Sequelize.fn('SUM', Sequelize.col('amount')), 'donationTotal']
+            ],
+            where: {
+              GroupId: this.id,
+              amount: {
+                $gt: 0
+              }
+            }
+          })
+          .then((result) => {
+            const json = result.toJSON();
+            return Promise.resolve(Number(json.donationTotal));
+          })
+      },
+
+      getBackersCount() {
+        return models.Transaction
+          .find({
+            attributes: [
+              [Sequelize.fn('COUNT', Sequelize.col('UserId')), 'backersCount']
+            ],
+            where: {
+              GroupId: this.id,
+              amount: {
+                $gt: 0
+              }
+            }
+          })
+          .then((result) => {
+            const json = result.toJSON();
+
+            return Promise.resolve(Number(json.backersCount));
+          })
       },
 
       hasHost() {

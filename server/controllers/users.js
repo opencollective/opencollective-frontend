@@ -1,14 +1,13 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var Bluebird = require('bluebird');
-var async = require('async');
-var userlib = require('../lib/userlib');
-var generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
-var imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
-var constants = require('../constants/activities');
-var sequelize = require('sequelize');
+const _ = require('lodash');
+const async = require('async');
+const userlib = require('../lib/userlib');
+const generateURLSafeToken = require('../lib/utils').generateURLSafeToken;
+const imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
+const constants = require('../constants/activities');
+const sequelize = require('sequelize');
 
 /**
  * Controller.
@@ -18,12 +17,12 @@ module.exports = (app) => {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models');
-  var User = models.User;
-  var Activity = models.Activity;
-  var UserGroup = models.UserGroup;
-  var sendEmail = require('../lib/email')(app).send;
-  var errors = app.errors;
+  const models = app.set('models');
+  const User = models.User;
+  const Activity = models.Activity;
+  const UserGroup = models.UserGroup;
+  const sendEmail = require('../lib/email')(app).send;
+  const errors = app.errors;
 
   /**
    *
@@ -31,7 +30,7 @@ module.exports = (app) => {
    *
    */
 
-  var getUserGroups = (UserId) => {
+  const getUserGroups = (UserId) => {
     return UserGroup.findAll({
       where: {
         UserId
@@ -40,44 +39,18 @@ module.exports = (app) => {
     .then((userGroups) => _.pluck(userGroups, 'info'));
   };
 
-  var getGroupsFromUser = (req, options) => {
+  const getGroupsFromUser = (req, options) => {
     // UserGroup has multiple entries for a user and group because
     // of the multiple roles. We will get the unique groups in-memory for now
     // because of the small number of groups.
     // Distinct queries are not supported by sequelize yet.
     return req.user
       .getGroups(options)
-      .then(groups => _.uniq(groups, 'id'))
-      .map((group) => { // sequelize uses bluebird
-        return _.extend(group.info, {
-          activities: group.Activities
-        });
-      });
+      .then(groups => _.uniq(groups, 'id'));
   };
 
-  var getGroupsFromUserWithRoles = (req, options) => {
-    /**
-     * This isn't the best way to get the user role but I couldn't find a
-     * clean way to do it with sequelize. If you find it, please refactor.
-     */
-
-    return Bluebird.props({
-      usergroups: getUserGroups(req.user.id),
-      groups: getGroupsFromUser(req, options)
-    })
-    .then((props) => {
-      var usergroups = props.usergroups || [];
-      var groups = props.groups || [];
-
-      return groups.map((group) => {
-        var usergroup = _.find(usergroups, { GroupId: group.id }) || {};
-        return _.extend(group, { role: usergroup.role });
-      });
-    });
-  };
-
-  var updatePaypalEmail = (req, res, next) => {
-    var required = req.required || {};
+  const updatePaypalEmail = (req, res, next) => {
+    const required = req.required || {};
 
     req.user.paypalEmail = required.paypalEmail;
 
@@ -86,8 +59,8 @@ module.exports = (app) => {
     .catch(next);
   };
 
-  var updateAvatar = (req, res, next) => {
-    var required = req.required || {};
+  const updateAvatar = (req, res, next) => {
+    const required = req.required || {};
 
     req.user.avatar = required.avatar;
 
@@ -123,7 +96,7 @@ module.exports = (app) => {
 
       fetchUserAvatar: ['updateFields', (cb, results) => {
         userlib.fetchAvatar(results.updateFields).tap(user => {
-          var avatar = user.avatar;
+          const avatar = user.avatar;
           if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(app.knox.bucket) === -1) {
             imageUrlToAmazonUrl(app.knox, avatar, (error, aws_src) => {
               user.avatar = error ? user.avatar : aws_src;
@@ -138,7 +111,7 @@ module.exports = (app) => {
       }],
 
       update: ['fetchUserAvatar', (cb, results) => {
-        var user = results.fetchUserAvatar;
+        const user = results.fetchUserAvatar;
 
         user.updatedAt = new Date();
         user
@@ -161,7 +134,7 @@ module.exports = (app) => {
       return next(new errors.BadRequest('Can\'t lookup user avatars with password from this route'));
     }
 
-    var userData = req.body.userData;
+    const userData = req.body.userData;
     userData.email = req.user.email;
     userData.ip = req.ip;
 
@@ -170,7 +143,7 @@ module.exports = (app) => {
     });
   };
 
-  var _create = user => userlib.fetchInfo(user)
+  const _create = user => userlib.fetchInfo(user)
     .then(user => User.create(user))
     .tap(dbUser => Activity.create({
       type: constants.USER_CREATED,
@@ -272,7 +245,7 @@ module.exports = (app) => {
       }],
 
       updateUser: ['checkResetToken', (cb, results) => {
-        var user = results.getUser;
+        const user = results.getUser;
 
         user.resetPasswordTokenHash = null;
         user.resetPasswordSentAt = null;
@@ -301,7 +274,7 @@ module.exports = (app) => {
      * Create a user.
      */
     create: (req, res, next) => {
-      var user = req.required.user;
+      const user = req.required.user;
       user.ApplicationId = req.application.id;
 
       _create(user)
@@ -326,12 +299,12 @@ module.exports = (app) => {
      */
     show: (req, res, next) => {
 
-      var userData = req.user.show;
+      const userData = req.user.show;
 
       if (req.remoteUser && req.remoteUser.id === req.user.id) {
         req.user.getStripeAccount()
           .then((account) => {
-            var response = Object.assign(userData, req.user.info, { stripeAccount: account });
+            const response = Object.assign(userData, req.user.info, { stripeAccount: account });
             res.send(response);
           })
           .catch(next);
@@ -344,7 +317,7 @@ module.exports = (app) => {
           return groups;
         })
         .then(groups => UserGroup.findAll({
-          where: { GroupId: { $in: groups.map(g => g.id) } }, 
+          where: { GroupId: { $in: groups.map(g => g.id) } },
           attributes: ['GroupId', [ sequelize.fn('count', sequelize.col('GroupId')), 'members' ]],
           group: ['GroupId']
         }))
@@ -366,23 +339,35 @@ module.exports = (app) => {
      */
     getGroups: (req, res, next) => {
       // Follows json api spec http://jsonapi.org/format/#fetching-includes
-      var include = req.query.include;
-      var withRoles = _.contains(include, 'usergroup.role');
-      var options = {
+      const include = req.query.include;
+      const withRoles = _.contains(include, 'usergroup.role');
+      const options = {
         include: []
       };
 
-      if (_.contains(include, 'activities')) {
-        options.include.push({ model: Activity });
-      }
+      var groupObjects; // stores sequelize objects
+      var groupData = []; // stores data to return
 
-      var promise = withRoles ?
-        getGroupsFromUserWithRoles(req, options) :
-        getGroupsFromUser(req, options);
-
-      promise
-        .then(out => res.send(out))
-        .catch(next);
+      return getGroupsFromUser(req, options)
+      .tap(groups => groupObjects = groups)
+      .then(groups => groups.map(group => groupData.push(group.info)))
+      .then(() => groupObjects.map(groupObject => {
+        const group = _.find(groupData, {id: groupObject.id})
+        return _.extend(group, { balance: groupObject.getBalance() })
+      }))
+      .then(() => {
+        if (withRoles) {
+          return getUserGroups(req.user.id)
+            .then(userGroups => groupData.map(group => {
+              const userGroup = _.find(userGroups, { GroupId: group.id }) || {};
+              return _.extend(group, { role: userGroup.role });
+            }))
+        } else {
+          return null;
+        }
+      })
+      .then(() => res.send(groupData))
+      .catch(next)
     },
 
     updatePaypalEmail,
