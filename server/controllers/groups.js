@@ -115,6 +115,7 @@ module.exports = function(app) {
       return backers;
     }
 
+
     return getUsersQuery(req.group.id)
       .then(appendTier)
       .then(backers => res.send(backers))

@@ -156,6 +156,7 @@ module.exports = function(Sequelize, DataTypes) {
           logo: this.logo,
           video: this.video,
           image: this.image,
+          data: this.data,
           backgroundImage: this.backgroundImage,
           expensePolicy: this.expensePolicy,
           createdAt: this.createdAt,
