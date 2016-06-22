@@ -198,6 +198,17 @@ const generateFXConversionSQL = () => {
   return sql;
 };
 
+
+/**
+ * Default host id, set this for new groups created through Github
+ */
+
+const defaultHostId = () => {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
+    return 40;
+  }
+  return 1;
+}
 /**
  * Export public methods.
  */
@@ -212,5 +223,6 @@ module.exports = {
   encrypt,
   getTier,
   decrypt,
-  generateFXConversionSQL
+  generateFXConversionSQL,
+  defaultHostId
 }

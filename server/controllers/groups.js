@@ -393,6 +393,14 @@ module.exports = function(app) {
           }
         }))
         .then(() => _addUserToGroup(dbGroup, creator, options))
+        .then(() => User.findById(utils.defaultHostId())) // make sure the host exists
+        .then(hostUser => {
+          if (hostUser) {
+            return _addUserToGroup(dbGroup, hostUser, {role: roles.HOST, remoteUser: creator})
+          } else {
+            return null;
+          }
+        })
         .then(() => Promise.map(contributors, contributor => {
           // since we added the creator above with an email, avoid double adding
           if (contributor !== creatorGithubUsername) {

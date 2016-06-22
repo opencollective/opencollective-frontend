@@ -25,7 +25,7 @@ var stripeMock = require('./mocks/stripe');
 /**
  * Tests.
  */
-describe('groups.routes.test.js', () => {
+describe.only('groups.routes.test.js', () => {
 
   var application;
   var user;
@@ -323,7 +323,15 @@ describe('groups.routes.test.js', () => {
         })
         .tap(user => expect(user).to.exist)
         .then(caUser => caUser.getGroups())
-        .tap(groups => expect(groups).to.have.length(1)));
+        .tap(groups => expect(groups).to.have.length(1))
+        .then(() => models.UserGroup.findAll())
+        .then(userGroups => {
+          expect(userGroups).to.have.length(3);
+          expect(userGroups[0]).to.have.property('role', roles.MEMBER);
+          expect(userGroups[1]).to.have.property('role', roles.HOST);
+          expect(userGroups[2]).to.have.property('role', roles.MEMBER);
+          return null;
+        }))
     });
 
   });
