@@ -349,7 +349,7 @@ module.exports = function(app) {
     var payload = req.required.payload;
     const connectedAccountId = req.jwtPayload.connectedAccountId;
 
-    var creator, options;
+    var creator, options, creatorConnectedAccount;
     const group = payload.group;
     const githubUser = payload.user;
     const contributors = payload.users;
@@ -363,6 +363,7 @@ module.exports = function(app) {
       })
       .tap(ca => {
         creator = ca.User;
+        creatorConnectedAccount = ca;
         options = {
           role: roles.MEMBER,
           remoteUser: creator
@@ -403,7 +404,7 @@ module.exports = function(app) {
         })
         .then(() => Promise.map(contributors, contributor => {
           // since we added the creator above with an email, avoid double adding
-          if (contributor !== creatorGithubUsername) {
+          if (contributor !== creatorGithubUsername && contributor !== creatorConnectedAccount.username) {
             const caAttr = {
               username: contributor,
               provider: 'github'

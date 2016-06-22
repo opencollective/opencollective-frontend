@@ -25,7 +25,7 @@ var stripeMock = require('./mocks/stripe');
 /**
  * Tests.
  */
-describe.only('groups.routes.test.js', () => {
+describe('groups.routes.test.js', () => {
 
   var application;
   var user;
