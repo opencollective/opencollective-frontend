@@ -247,7 +247,7 @@ module.exports = function(Sequelize, DataTypes) {
         })
         .then((userGroup) => {
           if (!userGroup) {
-            throw new errors.NotFound(`No group with ID ${GroupId} and host user found`);
+            throw new errors.NotFound(`No group with ID ${this.id} and host user found`);
           }
 
           return models.ConnectedAccount.find({
