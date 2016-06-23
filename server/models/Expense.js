@@ -1,10 +1,12 @@
+const Temporal = require('sequelize-temporal');
+
 const status = require('../constants/expense_status');
 const type = require('../constants/transactions').type.EXPENSE;
 const allowedCurrencies = Object.keys(require('../constants/currencies'));
 
 module.exports = function (Sequelize, DataTypes) {
 
-  return Sequelize.define('Expense', {
+  var Expense = Sequelize.define('Expense', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -159,4 +161,6 @@ module.exports = function (Sequelize, DataTypes) {
       }
     }
   });
+  Temporal(Expense, Sequelize);
+  return Expense;
 };
