@@ -1,4 +1,4 @@
-const Temporal = require('Sequelize-Temporal');
+const Temporal = require('sequelize-temporal');
 
 const status = require('../constants/expense_status');
 const type = require('../constants/transactions').type.EXPENSE;
