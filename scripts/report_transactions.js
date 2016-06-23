@@ -6,10 +6,11 @@ const moment = require('moment-timezone');
 const _ = require('lodash');
 const activities = require('../server/constants/activities');
 const slackLib = require('../server/lib/slack');
-
+const expenseStatus = require('../server/constants/expense_status')
 onlyExecuteInProdOnMondays();
 
 const Transaction = models.Transaction;
+const Expense = models.Expense;
 const Activity = models.Activity;
 const Group = models.Group;
 
@@ -17,14 +18,11 @@ const createdLastWeek = getTimeFrame('createdAt');
 const updatedLastWeek = getTimeFrame('updatedAt');
 
 const donation = { where: { DonationId: { $not: null } } };
-const expense = { where: { amount: { $lt: 0 } } };
 
-const pendingExpense = { where: { approvedAt: null } };
-const approvedExpense = { where: { approved: true } };
-const rejectedExpense = { where: {
-  approved: false,
-  approvedAt: { $not: null }
-} };
+const pendingExpense = { where: { status: expenseStatus.PENDING } };
+const approvedExpense = { where: { status: expenseStatus.APPROVED } };
+const rejectedExpense = { where: { status: expenseStatus.REJECTED } };
+const paidExpense = { where : { status: expenseStatus.PAID } };
 
 const excludeOcTeam = { where: {
   UserId: {
@@ -45,11 +43,12 @@ const excludeOcTeam = { where: {
 } };
 
 const lastWeekDonations = _.merge({}, createdLastWeek, donation, excludeOcTeam);
-const lastWeekExpenses = _.merge({}, createdLastWeek, expense, excludeOcTeam);
+const lastWeekExpenses = _.merge({}, updatedLastWeek, excludeOcTeam);
 
 const pendingLastWeekExpenses = _.merge({}, lastWeekExpenses, pendingExpense);
 const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approvedExpense);
 const rejectedLastWeekExpenses = _.merge({}, lastWeekExpenses, rejectedExpense);
+const paidLastWeekExpenses = _.merge({}, lastWeekExpenses, paidExpense);
 
 const groupByCurrency = {
   plain: false,
@@ -79,35 +78,46 @@ Promise.props({
 
   // Expense statistics
 
-  pendingExpenseCount: Transaction.count(pendingLastWeekExpenses),
+  pendingExpenseCount: Expense.count(pendingLastWeekExpenses),
 
-  approvedExpenseCount: Transaction.count(approvedLastWeekExpenses),
+  approvedExpenseCount: Expense.count(approvedLastWeekExpenses),
 
-  rejectedExpenseCount: Transaction.count(rejectedLastWeekExpenses),
+  rejectedExpenseCount: Expense.count(rejectedLastWeekExpenses),
 
-  pendingExpenseAmount: Transaction
+  paidExpenseCount: Expense.count(paidLastWeekExpenses),
+
+  pendingExpenseAmount: Expense
     .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, groupByCurrency))
-    .map(row => `${-row.SUM} ${row.currency}`),
+    .map(row => `${-row.SUM/100} ${row.currency}`),
 
-  approvedExpenseAmount: Transaction
+  approvedExpenseAmount: Expense
     .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
-    .map(row => `${-row.SUM} ${row.currency}`),
+    .map(row => `${-row.SUM/100} ${row.currency}`),
 
-  rejectedExpenseAmount: Transaction
+  rejectedExpenseAmount: Expense
     .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, groupByCurrency))
-    .map(row => `${-row.SUM} ${row.currency}`),
+    .map(row => `${-row.SUM/100} ${row.currency}`),
+
+  paidExpenseAmount: Expense
+    .aggregate('amount', 'SUM', _.merge({}, paidLastWeekExpenses, groupByCurrency))
+    .map(row => `${-row.SUM/100} ${row.currency}`),
 
   // Collective statistics
 
-  activeCollectiveCount: Transaction
-    .aggregate('GroupId', 'COUNT', _.merge({}, updatedLastWeek, distinct, excludeOcTeam))
-    .map(row => row.COUNT),
+  activeCollectivesWithTransactions: Transaction
+    .findAll(_.merge({attributes: ['GroupId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .map(row => row.GroupId),
+
+  activeCollectivesWithExpenses: Expense
+    .findAll(_.merge({attributes: ['GroupId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .map(row => row.GroupId),
 
   newCollectives: Group
     .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
     .map(group => group.dataValues.slug)
 
 }).then(results => {
+  results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length
   const report = transactionReportString(results);
   console.log(report);
   return slackLib.postMessage(report, config.slack.webhookUrl, { channel: config.slack.privateActivityChannel });
