@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('config');
+const Promise = require('bluebird');
 
 const activitiesLib = require('../lib/activities');
 const slackLib = require('./slack');
@@ -33,7 +34,7 @@ module.exports = (Sequelize, activity) => {
       })
     })
     .then(notifConfigs =>
-      Promise.all(notifConfigs, notifConfig => {
+      Promise.map(notifConfigs, notifConfig => {
         if (notifConfig.channel === 'gitter') {
           return publishToGitter(activity, notifConfig);
         } else if (notifConfig.channel === 'slack') {
@@ -49,7 +50,6 @@ module.exports = (Sequelize, activity) => {
 
 function publishToGitter(activity, notifConfig) {
   const message = activitiesLib.formatMessageForPublicChannel(activity, false);
-
   if (message) {
     return axios.post(notifConfig.webhookUrl, { message });
   } else {
