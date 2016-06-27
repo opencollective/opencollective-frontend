@@ -58,17 +58,29 @@ module.exports = (app) => {
       ConnectedAccount
       .findOne({where: {id: payload.connectedAccountId}})
       .then(ca => {
-        const options = {
-          url: `https://api.github.com/user/repos?per_page=1000&sort=stars&access_token=${ca.secret}&type=all`,
-          headers: {
-            'User-Agent': 'OpenCollective'
-          },
-          json: true
-        };
-        return Promise.promisify(request, {multiArgs: true})(options).then(args => args[1]);
+
+        return Promise.map([1,2,3,4,5], page => {
+          const options = {
+            url: `https://api.github.com/user/repos?per_page=100&sort=pushed&access_token=${ca.secret}&type=all&page=${page}`,
+            headers: {
+              'User-Agent': 'OpenCollective'
+            },
+            json: true
+          };
+          return Promise.promisify(request, {multiArgs: true})(options).then(args => args[1])
+        })
+        .then(data => {
+          const repositories = [];
+          data.map(repos => repos.map(repo => {
+            if (repo.permissions && repo.permissions.push) {
+              repositories.push(repo);
+            }
+          }))
+          return repositories;
+        })
       })
       .then(body => res.json(body))
-      .catch(next)
+      .catch(next);
     }
   };
 };
