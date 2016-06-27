@@ -31,8 +31,9 @@ Group.findAll({
     }
     return client.contributorsInOrg({orgs: [org]})
       .get(org)
-      .then(perRepo => {
-        return _(perRepo)
+      .then(repos => {
+      const data = {};
+      data.contributorData = _(repos)
           .map('contributors')
           .reduce((acc, contributions) => {
             _.each(contributions, (count, user) => {
@@ -40,13 +41,16 @@ Group.findAll({
             });
             return acc;
           }, {});
+        data.repoData = _.mapValues(repos, repo => _.omit(repo, 'contributors'));
+        return data;
       })
-      .then(contributorData => {
+      .then(data => {
         group.settings = _.assign(group.settings || {}, {
           githubOrg: org
         });
         group.data = _.assign(group.data || {}, {
-          githubContributors: contributorData
+          githubContributors: data.contributorData,
+          repos: data.repoData
         });
         return group.save();
       })
