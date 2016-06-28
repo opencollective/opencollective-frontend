@@ -42,7 +42,7 @@ module.exports = function(app) {
     `, {
       type: sequelize.QueryTypes.SELECT
     })
-    .then(res => res[0]);
+    .then(res => Math.round(res[0].totalDonationsInUSD));
   };
 
   /**
@@ -109,7 +109,7 @@ const getLeaderboard = () => {
     `, {
       type: sequelize.QueryTypes.SELECT
     })
-    .then(res => res[0]);
+    .then(res => res[0].totalDonors);
   };
 
   /**
@@ -122,7 +122,7 @@ const getLeaderboard = () => {
     `, {
       type: sequelize.QueryTypes.SELECT
     })
-    .then(res => res[0]);
+    .then(res => res[0].totalCollectives);
   };
   
 

@@ -10,8 +10,10 @@ module.exports = function(app) {
     const getGroupsByTag = (tag) => {
       return models.Group.findAll({
         where: {
+          isPublic: true,
           tags: { $contains: [tag] }
         },
+        order: [['updatedAt', 'DESC']],
         limit: 6
       })
     };
@@ -26,9 +28,9 @@ module.exports = function(app) {
     .then(r => {
       const hp = {
         stats: {
-          totalCollectives: r[0].totalCollectives,
-          totalDonors: r[1].totalDonors,
-          totalDonations: Math.round(r[2].totalDonationsInUSD)
+          totalCollectives: r[0],
+          totalDonors: r[1],
+          totalDonations: r[2]
         },
         collectives: {
           opensource: r[3],
