@@ -11,7 +11,7 @@ module.exports = function(app) {
     var amountColumn = "amount";
     
     if(aggregate) {
-      currencyColumn = 'MAX("currency")';
+      currencyColumn = 'MAX(g.currency)';
       amountColumn = 'SUM("amount")';
     }
 
