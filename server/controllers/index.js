@@ -13,6 +13,7 @@ module.exports = function(app) {
     'images',
     'middlewares',
     'paypal',
+    'homepage',
     'profile',
     'notifications',
     'stripe',
