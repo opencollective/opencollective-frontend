@@ -18,23 +18,46 @@ module.exports = function(app) {
       })
     };
 
+    /**
+     * get total number of active collectives
+     * (a collective is considered as active if it has ever received any funding from its host or through a donation)
+     */
+    const getTotalCollectives = () => {
+      return models.Transaction.aggregate('GroupId', 'count', {
+        distinct: true,
+        where: {
+          amount: { $gt: 0 }
+        }
+      })
+    };
+
+    const getTotalDonors = () => {
+      return models.Transaction.aggregate('UserId', 'count', {
+        distinct: true,
+        where: {
+          amount: { $gt: 0 },
+          PaymentMethodId: { $ne: null }
+        }
+      })
+    };
+
     Promise.all([
-      queries.getTotalCollectives(), 
-      queries.getTotalDonors(), 
+      getTotalCollectives(),
+      getTotalDonors(),
       queries.getTotalDonations(),
       getGroupsByTag('open source'),
       getGroupsByTag('meetup')
     ])
-    .then(r => {
+    .then(results => {
       const hp = {
         stats: {
-          totalCollectives: r[0],
-          totalDonors: r[1],
-          totalDonations: r[2]
+          totalCollectives: results[0],
+          totalDonors: results[1],
+          totalDonations: results[2]
         },
         collectives: {
-          opensource: r[3],
-          meetup: r[4]
+          opensource: results[3],
+          meetup: results[4]
         }
       }
       res.send(hp);

@@ -103,33 +103,8 @@ const getLeaderboard = () => {
     });
   };
 
-  const getTotalDonors = () => {
-    return sequelize.query(`
-      SELECT COUNT(DISTINCT("UserId")) as "totalDonors" FROM "Transactions" WHERE "PaymentMethodId" IS NOT NULL AND amount > 0
-    `, {
-      type: sequelize.QueryTypes.SELECT
-    })
-    .then(res => res[0].totalDonors);
-  };
-
-  /**
-   * get total number of active collectives 
-   * (a collective is considered as active if it has ever received any funding from its host or through a donation)
-   */
-  const getTotalCollectives = () => {
-    return sequelize.query(`
-      SELECT COUNT(DISTINCT("GroupId")) as "totalCollectives" FROM "Transactions" WHERE amount > 0
-    `, {
-      type: sequelize.QueryTypes.SELECT
-    })
-    .then(res => res[0].totalCollectives);
-  };
-  
-
   return {
-    getTotalDonors,
     getTotalDonations,
-    getTotalCollectives,
     getUsersFromGroupWithTotalDonations,
     getLeaderboard
   };
