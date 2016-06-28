@@ -4,7 +4,6 @@
 module.exports = function(app) {
 
   const models = app.set('models');
-  const errors = app.errors;
   const queries = require('../lib/queries')(app);
 
   return (req, res, next) => {
