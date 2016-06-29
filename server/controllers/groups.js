@@ -381,7 +381,7 @@ module.exports = function(app) {
         if (existingGroup) {
           group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
         }
-        return Group.create(group)
+        return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true}));
       })
       .tap(g => dbGroup = g)
       .tap(() => Activity.create({
