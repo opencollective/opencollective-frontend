@@ -307,7 +307,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('description');
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
-          expect(res.body).to.have.property('isPublic', false);
+          expect(res.body).to.have.property('isPublic', true);
           expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal('githubuser@gmail.com');
         })
         .then(() => ConnectedAccount.findOne({where: {username: 'asood123'}}))
@@ -322,7 +322,7 @@ describe('groups.routes.test.js', () => {
           return ca.getUser();
         })
         .tap(user => expect(user).to.exist)
-        .then(caUser => caUser.getGroups())
+        .then(caUser => caUser.getGroups({paranoid: false})) // because we are setting deletedAt
         .tap(groups => expect(groups).to.have.length(1))
         .then(() => models.UserGroup.findAll())
         .then(userGroups => {
