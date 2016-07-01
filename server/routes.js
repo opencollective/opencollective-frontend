@@ -251,8 +251,8 @@ module.exports = (app) => {
   /**
    * Stripe subscriptions (recurring payments)
    */
-  app.get('/subscriptions', aZ.authorizeUserToAccessScope('subscriptions'), subscriptions.getAll);
-  app.post('/subscriptions/:subscriptionid/cancel', aZ.authorizeUserToAccessScope('subscriptions'), subscriptions.cancel);
+  app.get('/subscriptions', aN.authenticateUserByJwt(), subscriptions.getAll);
+  app.post('/subscriptions/:subscriptionid/cancel', aN.authenticateUserByJwt(), subscriptions.cancel);
 
   /**
    * Leaderboard
