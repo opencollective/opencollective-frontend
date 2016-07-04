@@ -58,6 +58,7 @@ const groupByCurrency = {
 };
 
 const stripeReceived = { where: { type: activities.WEBHOOK_STRIPE_RECEIVED } };
+const paypalReceived = { where: { type: activities.WEBHOOK_PAYPAL_RECEIVED } };
 
 const distinct = {
   plain: false,
@@ -75,6 +76,8 @@ Promise.props({
     .map(row => `${row.SUM} ${row.currency}`),
 
   stripeReceivedCount: Activity.count(_.merge({}, createdLastWeek, stripeReceived)),
+
+  paypalReceivedCount: Activity.count(_.merge({}, createdLastWeek, paypalReceived)),
 
   // Expense statistics
 
@@ -165,7 +168,8 @@ function transactionReportString(results) {
 \`\`\`
 * Donations:
   - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
-  - ${results.stripeReceivedCount} payments received from Stripe
+  - ${results.stripeReceivedCount} donations received via Stripe
+  - ${results.paypalReceivedCount} donations received via PayPal
 * Expenses:
   - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
   - ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}

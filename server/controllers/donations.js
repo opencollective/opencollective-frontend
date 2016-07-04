@@ -6,6 +6,7 @@ const _ = require('lodash');
 const config = require('config');
 const async = require('async');
 const gateways = require('../gateways');
+const activities = require('../constants/activities');
 
 /**
  * Controller.
@@ -445,7 +446,19 @@ module.exports = (app) => {
         , cb)
       }],
 
-      activateSubscription: ['execute', (cb, results) => {
+      createActivity: ['execute', (cb, results) => {
+        models.Activity.create({
+          type: activities.WEBHOOK_PAYPAL_RECEIVED,
+          data: {
+            transaction: transaction.info,
+            executionResult: results.execute
+          }
+        })
+          .then(activity => cb(null, activity))
+          .catch(cb);
+      }],
+
+      activateSubscription: ['createActivity', (cb, results) => {
         if (!isSubscription) return cb();
 
         transaction.getSubscription()
