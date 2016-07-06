@@ -289,7 +289,7 @@ module.exports = function(Sequelize, DataTypes) {
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
               LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-              WHERE "GroupId" = "GroupId"
+              WHERE "GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
