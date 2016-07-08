@@ -271,6 +271,12 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       getYearlyIncome() {
+        /*
+          Three cases:
+          1) All active monthly subscriptions. Multiply by 12
+          2) All one-time and yearly subscriptions
+          3) All inactive monthly subscriptions that have contributed in the past
+        */
         return Sequelize.query(`
           SELECT
             (SELECT
@@ -292,7 +298,16 @@ module.exports = function(Sequelize, DataTypes) {
               WHERE "GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
-                AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL)) "yearlyIncome"
+                AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
+            +
+            (SELECT
+              COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
+              LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+              WHERE "GroupId" = :GroupId
+                AND t.amount > 0
+                AND t."deletedAt" IS NULL
+                AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
+            "yearlyIncome"
         `, {
           replacements: { GroupId: this.id },
           type: Sequelize.QueryTypes.SELECT
