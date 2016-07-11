@@ -121,11 +121,11 @@ Promise.props({
 
 }).then(results => {
   results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length
-  const report = transactionReportString(results);
+  const report = reportString(results);
   console.log(report);
   return slackLib.postMessage(report, config.slack.webhookUrl, { channel: config.slack.privateActivityChannel });
 }).then(() => {
-  console.log('Reporting done!');
+  console.log('Weekly reporting done!');
   process.exit();
 }).catch(err => {
   console.log('err', err);
@@ -163,8 +163,8 @@ function getTimeFrame(propName) {
   };
 }
 
-function transactionReportString(results) {
-  return `Weekly transactions summary (excluding OC team transactions):
+function reportString(results) {
+  return `Weekly activity summary (excluding OC team):
 \`\`\`
 * Donations:
   - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
