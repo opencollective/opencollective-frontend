@@ -8,7 +8,6 @@ const ifParam = require('./middleware/if_param');
 /**
  * NotImplemented response.
  */
-
 const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
 
 module.exports = (app) => {
@@ -20,26 +19,25 @@ module.exports = (app) => {
   const params = require('./middleware/params')(app);
 
   /**
-   * Controllers
+   * controllers
    */
-
-  const Controllers = app.set('controllers');
-  const mw = Controllers.middlewares;
-  const users = Controllers.users;
-  const groups = Controllers.groups;
-  const activities = Controllers.activities;
-  const notifications = Controllers.notifications;
-  const transactions = Controllers.transactions;
-  const donations = Controllers.donations;
-  const expenses = Controllers.expenses;
-  const paypal = Controllers.paypal;
-  const images = Controllers.images;
-  const paymentMethods = Controllers.paymentmethods;
-  const webhooks = Controllers.webhooks;
-  const stripe = Controllers.stripe;
-  const test = Controllers.test;
-  const subscriptions = Controllers.subscriptions;
-  const connectedAccounts = Controllers.connectedAccounts;
+  const controllers = app.set('controllers');
+  const mw = controllers.middlewares;
+  const users = controllers.users;
+  const groups = controllers.groups;
+  const activities = controllers.activities;
+  const notifications = controllers.notifications;
+  const transactions = controllers.transactions;
+  const donations = controllers.donations;
+  const expenses = controllers.expenses;
+  const paypal = controllers.paypal;
+  const images = controllers.images;
+  const paymentMethods = controllers.paymentmethods;
+  const webhooks = controllers.webhooks;
+  const stripe = controllers.stripe;
+  const test = controllers.test;
+  const subscriptions = controllers.subscriptions;
+  const connectedAccounts = controllers.connectedAccounts;
 
   const HOST = roles.HOST;
   const MEMBER = roles.MEMBER;
@@ -77,9 +75,14 @@ module.exports = (app) => {
   app.get('/email/:template', test.generateTestEmail);
 
   /**
+   * Homepage
+   */
+  app.get('/homepage', controllers.homepage);
+
+  /**
    * Profile
    */
-  app.get('/profile/:slug', Controllers.profile);
+  app.get('/profile/:slug', controllers.profile);
 
   /**
    * Users.
