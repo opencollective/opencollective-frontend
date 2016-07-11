@@ -62,7 +62,7 @@ describe('lib/slack', () => {
     it('with activity succeeds', done => {
 
       formatMessageStub
-        .withArgs(activity, true)
+        .withArgs(activity, 'slack')
         .returns(formattedMessage);
 
       const expected = postMessageStub
@@ -78,7 +78,7 @@ describe('lib/slack', () => {
       const options = { option1: "option1",  attachments: []  };
 
       formatMessageStub
-        .withArgs(activity, true)
+        .withArgs(activity, 'slack')
         .returns(formattedMessage);
 
       const expected = postMessageStub

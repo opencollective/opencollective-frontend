@@ -50,7 +50,7 @@ module.exports = (Sequelize, activity) => {
 };
 
 function publishToGitter(activity, notifConfig) {
-  const message = activitiesLib.formatMessageForPublicChannel(activity, false);
+  const message = activitiesLib.formatMessageForPublicChannel(activity, 'markdown');
   if (message) {
     return axios.post(notifConfig.webhookUrl, { message });
   } else {
