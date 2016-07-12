@@ -178,7 +178,7 @@ const getTier = (user, tiers) => {
  */
 const defaultHostId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
-    return 40;
+    return 772;
   }
   return 1;
 }
