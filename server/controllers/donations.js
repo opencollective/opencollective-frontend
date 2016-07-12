@@ -261,7 +261,7 @@ module.exports = (app) => {
           user: user.info,
           group: group.info,
           interval: interval,
-          subscriptionsLink: `${config.host.website}/subscriptions`
+          subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
         }
 
         emailLib.send('thankyou', user.email, data);
