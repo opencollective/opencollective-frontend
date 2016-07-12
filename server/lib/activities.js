@@ -7,7 +7,7 @@ module.exports = {
   /*
    * Formats an activity *FOR INTERNAL USE* based on its type
    */
-  formatMessageForPrivateChannel: (activity, linkify) => {
+  formatMessageForPrivateChannel: (activity, format) => {
 
     var userString = '';
     var userId;
@@ -26,7 +26,7 @@ module.exports = {
 
     // get user data
     if (activity.data.user) {
-      userString = getUserString(activity.data.user, linkify, true);
+      userString = getUserString(format, activity.data.user, true);
       userId = activity.data.user.id;
     }
 
@@ -71,8 +71,8 @@ module.exports = {
     if (activity.data.connectedAccount) {
       provider = activity.data.connectedAccount.provider;
       connectedAccountUsername = activity.data.connectedAccount.username;
-      if (provider === 'github' && linkify) {
-        connectedAccountUsernameLink = linkifyForSlack(`https://github.com/${connectedAccountUsername}`, null);
+      if (provider === 'github') {
+        connectedAccountUsernameLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
       }
     }
 
@@ -81,18 +81,12 @@ module.exports = {
       eventType = activity.data.event.type;
     }
 
-    var group;
-    if (linkify) {
-      group = linkifyForSlack(publicUrl, groupName);
-    } else {
-      group = groupName;
-    }
+    var group = linkify(format, publicUrl, groupName);
 
     switch (activity.type) {
 
       // Currently used for both new donation and expense
       case activities.GROUP_TRANSACTION_CREATED:
-
         if (activity.data.transaction.isDonation) {
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
         }
@@ -138,7 +132,7 @@ module.exports = {
    * This function strips out email addresses and shows only a subset of activities
    * because many of them aren't relevant externally (like USER_CREATED)
    */
-  formatMessageForPublicChannel: (activity, linkify) => {
+  formatMessageForPublicChannel: (activity, format) => {
 
     var userString = '';
     var groupName = '';
@@ -155,7 +149,7 @@ module.exports = {
 
     // get user data
     if (activity.data.user) {
-      userString = getUserString(activity.data.user, linkify);
+      userString = getUserString(format, activity.data.user);
       userTwitter = activity.data.user.twitterHandle;
     }
 
@@ -200,7 +194,7 @@ module.exports = {
 
     var group;
     if (linkify) {
-      group = linkifyForSlack(publicUrl, groupName);
+      group = linkify(format, publicUrl, groupName);
     } else {
       group = groupName;
     }
@@ -212,7 +206,7 @@ module.exports = {
         if (activity.data.transaction.isDonation) {
           if(userTwitter) {
             tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
-            tweetLink = linkifyForSlack(`https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
+            tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
             tweetThis = ` [${tweetLink}]`;
           }
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
@@ -236,7 +230,7 @@ module.exports = {
       case activities.SUBSCRIPTION_CONFIRMED:
         if(userTwitter) {
           tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
-          tweetLink = linkifyForSlack(`https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
+          tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
           tweetThis = ` [${tweetLink}]`;
         }
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!${tweetThis}`;
@@ -261,27 +255,34 @@ module.exports = {
 /**
  * Generates a url for Slack
  */
-const linkifyForSlack = (link, text) => {
-  if (link && !text) {
-    text = link;
-  } else if (!link && text) {
-    return text;
-  } else if (!link && !text){
-    return '';
+const linkify = (format, link, text) => {
+  switch(format) {
+    case 'slack':
+      if (link && !text) {
+        text = link;
+      } else if (!link && text) {
+        return text;
+      } else if (!link && !text){
+        return '';
+      }
+      return `<${link}|${text}>`;
+
+    case 'markdown':
+    default:
+      return `[${text}](${link})`;
   }
-  return `<${link}|${text}>`;
 }
 
 /**
  * Generates a userString given a user's info
  */
-const getUserString = (user, linkify, includeEmail) => {
+const getUserString = (format, user, includeEmail) => {
   const userString = user.name || user.twitterHandle || 'someone';
   const link = user.twitterHandle ? `https://twitter.com/${user.twitterHandle}` : user.website;
 
   var returnVal;
-  if (linkify && link) {
-    returnVal = linkifyForSlack(link, userString);
+  if (link) {
+    returnVal = linkify(format, link, userString);
   } else {
     returnVal = userString;
   }

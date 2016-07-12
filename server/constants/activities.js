@@ -18,5 +18,6 @@ module.exports = {
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   USER_CREATED: 'user.created',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
-  WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received'
+  WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
+  GROUP_MONTHLY: 'group.monthly'
 };

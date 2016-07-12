@@ -96,6 +96,7 @@ module.exports = function(app) {
           description: 'OpenCollective test group on the test server',
           slug: 'testcollective',
           mission: 'our awesome mission',
+          tags: ['open source'],
           currency: 'EUR',
           isPublic: true
         })

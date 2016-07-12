@@ -547,7 +547,7 @@ module.exports = function(app) {
    * Get leaderboard of collectives
    */
   const getLeaderboard = (req, res, next) => {
-    queries.getLeaderboard()
+    return queries.getLeaderboard()
     .then(groups => res.send(groups))
     .catch(next);
   };

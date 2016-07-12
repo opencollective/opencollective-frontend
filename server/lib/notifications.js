@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 
 const activitiesLib = require('../lib/activities');
 const slackLib = require('./slack');
+const twitter = require('./twitter');
 const activityType = require('../constants/activities');
 
 module.exports = (Sequelize, activity) => {
@@ -26,9 +27,7 @@ module.exports = (Sequelize, activity) => {
             activity.type
           ],
           GroupId: activity.GroupId,
-          // for now, only handle gitter and slack webhooks in this lib
-          // TODO sdubois: move email + internal slack channels to this lib
-          channel: ['gitter', 'slack'],
+          channel: ['gitter', 'slack', 'twitter'],
           active: true
         }
       })
@@ -39,6 +38,8 @@ module.exports = (Sequelize, activity) => {
           return publishToGitter(activity, notifConfig);
         } else if (notifConfig.channel === 'slack') {
           return publishToSlack(activity, notifConfig.webhookUrl, {});
+        } else if (notifConfig.channel === 'twitter') {
+          return twitter.tweetActivity(Sequelize, activity);
         } else {
           return Promise.resolve();
         }
@@ -49,7 +50,7 @@ module.exports = (Sequelize, activity) => {
 };
 
 function publishToGitter(activity, notifConfig) {
-  const message = activitiesLib.formatMessageForPublicChannel(activity, false);
+  const message = activitiesLib.formatMessageForPublicChannel(activity, 'markdown');
   if (message) {
     return axios.post(notifConfig.webhookUrl, { message });
   } else {

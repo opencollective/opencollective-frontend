@@ -4,7 +4,9 @@ var cors = require('cors');
 var morgan = require('morgan');
 var multer = require('multer');
 var passport = require('passport');
+const session = require('express-session');
 var GitHubStrategy = require('passport-github').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
 
 module.exports = function(app) {
 
@@ -25,11 +27,14 @@ module.exports = function(app) {
   }
 
   // Authentication
-  const serviceCallback = (accessToken, refreshToken, profile, done) => done(null, accessToken, profile);
 
-  passport.use(new GitHubStrategy(config.github, serviceCallback));
+  passport.use(new GitHubStrategy(config.github,
+    (accessToken, refreshToken, profile, done) => done(null, accessToken, { profile })));
 
-  // TODO add twitter etc strategies
+  passport.use(new TwitterStrategy(Object.assign({}, config.twitter, {session: false}),
+    (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile })));
 
+  // TODO if prod load ramps up, configure 'store' (default: MemoryStore)
+  app.use(session({ secret: 'my_precious', resave: true }));
   app.use(passport.initialize());
 };
