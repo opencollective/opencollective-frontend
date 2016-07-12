@@ -270,6 +270,13 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
+      generateLoginLink(application, redirect) {
+        const expiresInHours = 24*30;
+        const token = this.jwt(application, { scope: 'login' }, expiresInHours);
+
+        return `${config.host.website}/login/${token}?next=${redirect}`;
+      },
+
       generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
         const expiresInHours = 24;
         return this.jwt(application, { scope: 'connected-account', connectedAccountId, username }, expiresInHours);

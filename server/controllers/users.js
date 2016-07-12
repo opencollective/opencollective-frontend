@@ -27,6 +27,7 @@ module.exports = (app) => {
   const sendEmail = require('../lib/email')(app).send;
   const errors = app.errors;
   const queries = require('../lib/queries')(app);
+  const Unauthorized = errors.Unauthorized;
 
   /**
    *
@@ -398,6 +399,55 @@ module.exports = (app) => {
       })
       .then(() => res.send(groupData))
       .catch(next)
+    },
+
+    /**
+     * Send an email with refreshed token
+     */
+    refreshTokenByEmail: (req, res, next) => {
+      if (!req.jwtPayload || !req.remoteUser) {
+        return next(new Unauthorized('Invalid payload'));
+      }
+
+      const user = req.remoteUser;
+
+      sendEmail('user.new.token', req.remoteUser.email, {
+        loginLink: user.generateLoginLink(req.application, redirect)
+      })
+      .then(() => res.send({ success: true }))
+      .catch(next);
+    },
+
+    /**
+     * Send an email with the new token
+     */
+    sendNewTokenByEmail: (req, res, next) => {
+      if (!req.application || !req.required.email) {
+        return next(new Unauthorized('Unauthorized'))
+      }
+      var redirect;
+      if (req.body.redirect) {
+        redirect = req.body.redirect;
+      } else {
+        redirect = '/';
+      }
+      models.User.findOne({
+        where: {
+          email: req.required.email
+        }
+      })
+      .then((user) => {
+        // If you don't find a user, proceed without error
+        // Otherwise, we can leak email addresses
+        if (user) {
+          return sendEmail('user.new.token', req.body.email, {
+            loginLink: user.generateLoginLink(req.application, redirect)
+          });
+        }
+        return null;
+      })
+      .then(() => res.send({ success: true }))
+      .catch(next);
     },
 
     updatePaypalEmail,

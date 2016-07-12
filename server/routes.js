@@ -62,12 +62,12 @@ module.exports = (app) => {
   app.post('/users/password/forgot', aN.authenticateAppByApiKey, required('email'), users.forgotPassword); // Send forgot password email
   app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-  app.post('/subscriptions/new_token', aN.authenticateAppByApiKey, required('email'), subscriptions.sendNewTokenByEmail);
+  app.post('/users/new_login_token', aN.authenticateAppByApiKey, required('email'), users.sendNewTokenByEmail);
 
   /**
    * Routes without expiration validation
    */
-  app.post('/subscriptions/refresh_token', aN.authenticateUserAndAppByJwtNoExpiry(), subscriptions.refreshTokenByEmail);
+  app.post('/users/refresh_login_token', aN.authenticateUserAndAppByJwtNoExpiry(), users.refreshTokenByEmail);
 
   /**
    * For testing the email templates
