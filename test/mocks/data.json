@@ -23,6 +23,7 @@
     "paypalEmail": "User1+paypal@email.com",
     "password": "passpass",
     "description": "engineer",
+    "longDescription": "This is a long description with some *markdown* **style**",
     "isOrganization": false,
     "twitterHandle": "philmod"
   },

@@ -60,6 +60,7 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     description: DataTypes.STRING,
+    longDescription: DataTypes.TEXT,
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
 
     twitterHandle: {
@@ -162,6 +163,7 @@ module.exports = function(Sequelize, DataTypes) {
           username: this.username,
           email: this.email,
           description: this.description,
+          longDescription: this.longDescription,
           isOrganization: this.isOrganization,
           avatar: this.avatar,
           twitterHandle: this.twitterHandle,
@@ -183,6 +185,7 @@ module.exports = function(Sequelize, DataTypes) {
           twitterHandle: this.twitterHandle,
           website: this.website,
           description: this.description,
+          longDescription: this.longDescription,
           isOrganization: this.isOrganization,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
@@ -208,6 +211,7 @@ module.exports = function(Sequelize, DataTypes) {
           name: this.name,
           website: this.website,
           description: this.description,
+          longDescription: this.longDescription,
           isOrganization: this.isOrganization,
           twitterHandle: this.twitterHandle
         };

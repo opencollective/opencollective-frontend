@@ -294,6 +294,7 @@ describe('users.routes.test.js', () => {
           var u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
           expect(res.body).to.have.property('description', utils.data('user1').description);
+          expect(res.body).to.have.property('longDescription', utils.data('user1').longDescription);
           expect(res.body).to.have.property('isOrganization', utils.data('user1').isOrganization);
           expect(u).to.not.have.property('email');
           done();
