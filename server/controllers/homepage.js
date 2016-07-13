@@ -1,3 +1,7 @@
+const groupBy = require('lodash/collection/groupBy');
+const roles = require('../constants/roles');
+const utils = require('../lib/utils');
+
 /**
  * Controller.
  */
@@ -16,6 +20,41 @@ module.exports = function(app) {
         order: [['updatedAt', 'DESC']],
         limit: 6
       })
+    };
+
+    const getGroupsByTagForCollectiveCard = (tags) => {
+      return new Promise((resolve, reject) => {
+        getGroupsByTag(tags)
+        .then(groups => {
+          return Promise.all(groups.map(group => {
+            return Promise.all([
+              group.getYearlyIncome(),
+              new Promise((resolve, reject) => {
+                const appendTier = backers => {
+                  backers = backers.map(backer => {
+                    backer.tier = utils.getTier(backer, group.tiers);
+                    return backer;
+                  });
+                  return backers;
+                };
+                queries.getUsersFromGroupWithTotalDonations(group.id)
+                  .then(appendTier)
+                  .then(resolve)
+                  .catch(reject);
+              })
+            ])
+            .then(values => {
+              const groupInfo = group.info;
+              groupInfo.yearlyIncome = values[0];
+              const usersByRole = groupBy(values[1], 'role');
+              groupInfo.backers = usersByRole[roles.BACKER] || [];
+              return groupInfo;
+            })
+          }));
+        })
+        .then(resolve)
+        .catch(reject);
+      });
     };
 
     /**
@@ -45,8 +84,8 @@ module.exports = function(app) {
       getTotalCollectives(),
       getTotalDonors(),
       queries.getTotalDonations(),
-      getGroupsByTag('open source'),
-      getGroupsByTag('meetup')
+      getGroupsByTagForCollectiveCard('open source'),
+      getGroupsByTagForCollectiveCard('meetup')
     ])
     .then(results => {
       const hp = {
