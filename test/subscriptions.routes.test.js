@@ -1,14 +1,12 @@
 /**
  * Dependencies.
  */
-const cheerio = require('cheerio');
 const nock = require('nock');
 const app = require('../index');
 const async = require('async');
 const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;
 const request = require('supertest-as-promised');
-const sinon = require('sinon');
 const config = require('config');
 const utils = require('../test/utils.js')();
 const createTransaction = require('../server/controllers/transactions')(app)._create;
@@ -66,49 +64,23 @@ describe('subscriptions.routes.test.js', () => {
       }, done);
     });
 
-    it('fails if the payload does not have the scope', (done) => {
+    it('fails if no authorization provided', (done) => {
       request(app)
         .get('/subscriptions')
-        .set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: ''
-        }))
         .expect(401, {
           error: {
             code: 401,
             type: 'unauthorized',
-            message: 'User does not have the scope'
+            message: 'Missing authorization header'
           }
         })
         .end(done);
     });
 
-    it('fails if the token expired', (done) => {
-      const expiredToken = jwt.sign({
-        user,
-        scope: 'subscriptions'
-      }, config.keys.opencollective.secret, {
-        expiresIn: -1,
-        subject: user.id,
-        issuer: config.host.api,
-        audience: application.id
-      });
-
-      request(app)
-        .get('/subscriptions')
-        .set('Authorization', 'Bearer ' + expiredToken)
-        .end((err, res) => {
-          expect(res.body.error.code).to.be.equal(401);
-          expect(res.body.error.message).to.be.equal('jwt expired');
-          done();
-        });
-    });
-
     it('successfully has access to the subscriptions', (done) => {
       request(app)
         .get('/subscriptions')
-        .set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: 'subscriptions'
-        }))
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
@@ -121,126 +93,6 @@ describe('subscriptions.routes.test.js', () => {
           done();
         });
     });
-  });
-
-  /**
-   * Send a new link to the user for the subscription page
-   */
-
-  describe('#refreshTokenByEmail', () => {
-
-    it('fails if there is no auth', (done) => {
-      request(app)
-        .post('/subscriptions/refresh_token')
-        .expect(401, {
-          error: {
-            code: 401,
-            message: "Missing authorization header",
-            type: 'unauthorized'
-          }
-        })
-        .end(done);
-    });
-
-    it('fails if the user does not exist', (done) => {
-      const fakeUser = { id: 12312312 };
-      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
-        expiresIn: 100,
-        subject: fakeUser.id,
-        issuer: config.host.api,
-        audience: application.id
-      });
-
-      request(app)
-        .post('/subscriptions/refresh_token')
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(401, {
-          error: {
-            code: 401,
-            message: "Invalid payload",
-            type: 'unauthorized'
-          }
-        })
-        .end(done);
-    });
-
-    it('sends an email with the new valid token', () => {
-      const secret = config.keys.opencollective.secret;
-      const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
-        expiresIn: -1,
-        subject: user.id,
-        issuer: config.host.api,
-        audience: application.id
-      });
-
-      return request(app)
-        .post('/subscriptions/refresh_token')
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(200)
-        .toPromise()
-        .then(() => {
-          const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
-          const token = $('a').attr('href').replace('http://localhost:3000/subscriptions/', '');
-          return jwt.verify(token, secret);
-        });
-    });
-
-  });
-
-  /**
-   * Send a new link to the user for the subscription page
-   */
-
-  describe('#sendNewTokenByEmail', () => {
-
-    it('fails if there is no email', (done) => {
-      request(app)
-        .post('/subscriptions/new_token')
-        .send({
-          api_key: application.api_key
-        })
-        .expect(400, {
-          error: {
-            code: 400,
-            "fields": {
-              "email": "Required field email missing"
-            },
-            message: "Missing required fields",
-            type: 'missing_required'
-          }
-        })
-        .end(done);
-    });
-
-    it('fails silently if the user does not exist', done => {
-      const email = 'idonotexist@void.null';
-
-      request(app)
-        .post('/subscriptions/new_token')
-        .send({
-          email,
-          api_key: application.api_key
-        })
-        .expect(200)
-        .end(done);
-
-    });
-
-    it('sends an email to the user with the new token', () =>
-      request(app)
-        .post('/subscriptions/new_token')
-        .send({
-          email: user.email,
-          api_key: application.api_key
-        })
-        .expect(200)
-        .then(() => {
-          const options = app.mailgun.sendMail.lastCall.args[0];
-          const $ = cheerio.load(options.html);
-          const href = $('a').attr('href');
-          expect(href).to.contain(`${config.host.website}/subscriptions/`);
-          expect(options.to).to.equal(user.email);
-        }));
   });
 
   /**
@@ -273,17 +125,14 @@ describe('subscriptions.routes.test.js', () => {
 
     afterEach(() => nock.cleanAll());
 
-    it('fails if the scope is not subscriptions', (done) => {
+    it('fails if if no authorization provided', (done) => {
       request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: ''
-        }))
         .expect(401, {
           error: {
             code: 401,
             type: 'unauthorized',
-            message: 'User does not have the scope'
+            message: 'Missing authorization header'
           }
         })
         .end(done);
@@ -329,9 +178,7 @@ describe('subscriptions.routes.test.js', () => {
     it('cancels the transaction', (done) => {
        request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: 'subscriptions'
-        }))
+        .set('Authorization', 'Bearer ' + user.jwt(application))
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;

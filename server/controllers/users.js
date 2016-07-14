@@ -409,9 +409,15 @@ module.exports = (app) => {
         return next(new Unauthorized('Invalid payload'));
       }
 
+      var redirect;
+      if (req.body.redirect) {
+        redirect = req.body.redirect;
+      } else {
+        redirect = '/';
+      }
       const user = req.remoteUser;
 
-      sendEmail('user.new.token', req.remoteUser.email, {
+      return sendEmail('user.new.token', req.remoteUser.email, {
         loginLink: user.generateLoginLink(req.application, redirect)
       })
       .then(() => res.send({ success: true }))
@@ -431,7 +437,7 @@ module.exports = (app) => {
       } else {
         redirect = '/';
       }
-      models.User.findOne({
+      return models.User.findOne({
         where: {
           email: req.required.email
         }

@@ -1,24 +1,25 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var cheerio = require('cheerio');
-var app = require('../index');
-var config = require('config');
-var expect = require('chai').expect;
-var request = require('supertest-as-promised');
-var utils = require('../test/utils.js')();
-var encrypt = require('../server/lib/utils').encrypt;
-var userlib = require('../server/lib/userlib');
-var sinon = require('sinon');
-var Bluebird = require('bluebird');
+const _ = require('lodash');
+const cheerio = require('cheerio');
+const app = require('../index');
+const config = require('config');
+const expect = require('chai').expect;
+const request = require('supertest-as-promised');
+const utils = require('../test/utils.js')();
+const encrypt = require('../server/lib/utils').encrypt;
+const userlib = require('../server/lib/userlib');
+const sinon = require('sinon');
+const Bluebird = require('bluebird');
+const jwt = require('jsonwebtoken');
 
 /**
  * Variables.
  */
-var userData = utils.data('user1');
-var models = app.set('models');
-var mock = require('./mocks/clearbit.json');
+const userData = utils.data('user1');
+const models = app.set('models');
+const mock = require('./mocks/clearbit.json');
 
 /**
  * Tests.
@@ -799,6 +800,132 @@ describe('users.routes.test.js', () => {
             .catch(done);
           });
 
+        });
+    });
+
+  });
+
+   /**
+   * Send a new link to the user to login
+   */
+
+  describe('#sendNewTokenByEmail', () => {
+
+    beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
+
+    it('fails if there is no email', (done) => {
+      request(app)
+        .post('/users/new_login_token')
+        .send({
+          api_key: application.api_key
+        })
+        .expect(400, {
+          error: {
+            code: 400,
+            "fields": {
+              "email": "Required field email missing"
+            },
+            message: "Missing required fields",
+            type: 'missing_required'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails silently if the user does not exist', done => {
+      const email = 'idonotexist@void.null';
+
+      request(app)
+        .post('/users/new_login_token')
+        .send({
+          email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .end(done);
+
+    });
+
+    it('sends an email to the user with the new token', () =>
+      request(app)
+        .post('/users/new_login_token')
+        .send({
+          email: user.email,
+          api_key: application.api_key
+        })
+        .expect(200)
+        .then(() => {
+          const options = app.mailgun.sendMail.lastCall.args[0];
+          const $ = cheerio.load(options.html);
+          const href = $('a').attr('href');
+          expect(href).to.contain(`${config.host.website}/login/`);
+          expect(options.to).to.equal(user.email);
+        }));
+  });
+
+  /**
+   * Send a new link to the user for the subscription page
+   */
+
+  describe('#refreshTokenByEmail', () => {
+
+    beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
+
+    it('fails if there is no auth', (done) => {
+      request(app)
+        .post('/users/refresh_login_token')
+        .expect(401, {
+          error: {
+            code: 401,
+            message: "Missing authorization header",
+            type: 'unauthorized'
+          }
+        })
+        .end(done);
+    });
+
+    it('fails if the user does not exist', (done) => {
+      const fakeUser = { id: 12312312 };
+      const expiredToken = jwt.sign({ user: fakeUser }, config.keys.opencollective.secret, {
+        expiresIn: 100,
+        subject: fakeUser.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      request(app)
+        .post('/users/refresh_login_token')
+        .set('Authorization', `Bearer ${expiredToken}`)
+        .expect(401, {
+          error: {
+            code: 401,
+            message: "Invalid payload",
+            type: 'unauthorized'
+          }
+        })
+        .end(done);
+    });
+
+    it('sends an email with the new valid token', () => {
+      const secret = config.keys.opencollective.secret;
+      const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
+        expiresIn: -1,
+        subject: user.id,
+        issuer: config.host.api,
+        audience: application.id
+      });
+
+      return request(app)
+        .post('/users/refresh_login_token')
+        .set('Authorization', `Bearer ${expiredToken}`)
+        .expect(200)
+        .toPromise()
+        .then(() => {
+          const options = app.mailgun.sendMail.lastCall.args[0];
+          const $ = cheerio.load(options.html);
+          const href = $('a').attr('href');
+          expect(href).to.contain(`${config.host.website}/login/`);
+          expect(options.to).to.equal(user.email);
         });
     });
 
