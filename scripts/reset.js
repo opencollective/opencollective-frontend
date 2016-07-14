@@ -36,7 +36,8 @@ exec('make dropdb && make database')
       name: 'OpenCollective Demo',
       description: 'OpenCollective Demo group',
       isPublic: true,
-      slug: 'opencollective'
+      slug: 'opencollective',
+      mission: 'demo open collective'
     })
     .then((group) => group.addUserWithRole(data.user, roles.HOST))
   })
@@ -61,7 +62,8 @@ exec('make dropdb && make database')
       name: 'OpenCollective Demo with stripe',
       description: 'OpenCollective Demo group with stripe',
       isPublic: true,
-      slug: 'oc-stripe'
+      slug: 'oc-stripe',
+      mission: 'oc with stripe'
     })
     .then((group) => group.addUserWithRole(data.user, roles.HOST))
   });
