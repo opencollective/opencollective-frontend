@@ -402,7 +402,8 @@ module.exports = (app) => {
     },
 
     /**
-     * Send an email with refreshed token
+     * For the case when a user has submitted an expired token,
+     * we can automatically detect the email address and send a refreshed token.
      */
     refreshTokenByEmail: (req, res, next) => {
       if (!req.jwtPayload || !req.remoteUser) {
