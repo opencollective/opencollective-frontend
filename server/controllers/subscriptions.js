@@ -7,53 +7,8 @@ const async = require('async');
 
 module.exports = function(app) {
 
-  const email = require('../lib/email')(app);
   const models = app.set('models');
   const errors = app.errors;
-  const Unauthorized = errors.Unauthorized;
-
-  /**
-   * Send an email with refreshed token
-   */
-  const refreshTokenByEmail = (req, res, next) => {
-    if (!req.jwtPayload || !req.remoteUser) {
-      return next(new Unauthorized('Invalid payload'));
-    }
-
-    const user = req.remoteUser;
-
-    email.send('user.new.token', req.remoteUser.email, {
-      subscriptionsLink: user.generateSubscriptionsLink(req.application)
-    })
-    .then(() => res.send({ success: true }))
-    .catch(next);
-  };
-
-  /**
-   * Send an email with the new token
-   */
-  const sendNewTokenByEmail = (req, res, next) => {
-    if (!req.application || !req.required.email) {
-      return next(new Unauthorized('Unauthorized'))
-    }
-    models.User.findOne({
-      where: {
-        email: req.required.email
-      }
-    })
-    .then((user) => {
-      // If you don't find a user, proceed without error
-      // Otherwise, we can leak email addresses
-      if (user) {
-        return email.send('user.new.token', req.body.email, {
-          subscriptionsLink: user.generateSubscriptionsLink(req.application)
-        });
-      }
-      return null;
-    })
-    .then(() => res.send({ success: true }))
-    .catch(next);
-  };
 
   /**
    * Get subscriptions of a user
@@ -145,8 +100,6 @@ module.exports = function(app) {
 
   return {
     getAll,
-    refreshTokenByEmail,
-    sendNewTokenByEmail,
     cancel
   };
 };

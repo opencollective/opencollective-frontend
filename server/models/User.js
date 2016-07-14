@@ -274,11 +274,11 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      generateSubscriptionsLink(application) {
+      generateLoginLink(application, redirect) {
         const expiresInHours = 24*30;
-        const token = this.jwt(application, { scope: 'subscriptions' }, expiresInHours);
+        const token = this.jwt(application, { scope: 'login' }, expiresInHours);
 
-        return `${config.host.website}/subscriptions/${token}`;
+        return `${config.host.website}/login/${token}?next=${redirect}`;
       },
 
       generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
