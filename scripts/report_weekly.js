@@ -174,6 +174,7 @@ function reportString(results) {
   - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
   - ${results.approvedExpenseCount} approved expenses${displayTotals(results.approvedExpenseAmount)}
   - ${results.rejectedExpenseCount} rejected expenses${displayTotals(results.rejectedExpenseAmount)}
+  - ${results.paidExpenseCount} paid expenses${displayTotals(results.paidExpenseAmount)}
 * Collectives:
   - ${results.activeCollectiveCount} active collectives
   - ${results.newCollectives.length} new collectives${displayCollectives(results.newCollectives)}
