@@ -47,7 +47,7 @@ describe('homepage.routes.test.js', () => {
           expect(body.collectives).to.have.property('opensource');
           expect(body.collectives).to.have.property('meetup');
           expect(body.collectives.opensource.length).to.equal(1);
-          expect(body.collectives.opensource[0].slug).to.equal('scouts');
+          expect(body.collectives.opensource[0].name).to.equal(groupData.name);
           done();
         })
     });

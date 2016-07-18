@@ -46,6 +46,24 @@ module.exports = function(app) {
   };
 
   /**
+   * Returns top sponsors ordered by number of collectives they sponsor and total amount donated
+   */
+  const getTopSponsors = () => {
+    return sequelize.query(`
+      WITH "totalDonations" AS (
+        SELECT "UserId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "UserId"
+      )
+      SELECT u.id, u.name, u.username, u.mission, u.avatar as logo, t."totalDonations", t.currency, t.collectives
+      FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
+      WHERE t."totalDonations" > 100 AND u."isOrganization" IS TRUE
+      ORDER BY t.collectives DESC, "totalDonations" DESC LIMIT :limit
+      `, {
+        replacements: { limit: 6 },
+        type: sequelize.QueryTypes.SELECT
+    });
+  };
+
+  /**
    * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
    */
   const getUsersFromGroupWithTotalDonations = (GroupId) => {
@@ -106,7 +124,8 @@ const getLeaderboard = () => {
   return {
     getTotalDonations,
     getUsersFromGroupWithTotalDonations,
-    getLeaderboard
+    getLeaderboard,
+    getTopSponsors
   };
 
 };

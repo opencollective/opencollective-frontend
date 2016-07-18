@@ -173,6 +173,18 @@ module.exports = function(Sequelize, DataTypes) {
           isSupercollective: this.isSupercollective
         };
       },
+      card: function() {
+        return {
+          id: this.id,
+          createdAt: this.createdAt,
+          contributors: this.data && this.data.githubContributors,
+          name: this.name,
+          logo: this.logo,
+          backgroundImage: this.backgroundImage,
+          publicUrl: this.publicUrl,
+          mission: this.mission
+        }
+      },
       minimal: function() {
         return {
           id: this.id,

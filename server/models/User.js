@@ -59,6 +59,7 @@ module.exports = function(Sequelize, DataTypes) {
       }
     },
 
+    mission: DataTypes.STRING,
     description: DataTypes.STRING,
     longDescription: DataTypes.TEXT,
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
@@ -162,6 +163,7 @@ module.exports = function(Sequelize, DataTypes) {
           name: this.name,
           username: this.username,
           email: this.email,
+          mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
           isOrganization: this.isOrganization,
@@ -184,6 +186,7 @@ module.exports = function(Sequelize, DataTypes) {
           avatar: this.avatar,
           twitterHandle: this.twitterHandle,
           website: this.website,
+          mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
           isOrganization: this.isOrganization,
@@ -210,6 +213,7 @@ module.exports = function(Sequelize, DataTypes) {
           avatar: this.avatar,
           name: this.name,
           website: this.website,
+          mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
           isOrganization: this.isOrganization,

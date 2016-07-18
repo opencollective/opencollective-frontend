@@ -11,6 +11,7 @@ module.exports = function(app) {
   const queries = require('../lib/queries')(app);
 
   return (req, res, next) => {
+
     const getGroupsByTag = (tag) => {
       return models.Group.findAll({
         where: {
@@ -27,16 +28,18 @@ module.exports = function(app) {
         getGroupsByTag(tags)
         .then(groups => {
           return Promise.all(groups.map(group => {
+
+            const appendTier = backers => {
+              backers = backers.map(backer => {
+                backer.tier = utils.getTier(backer, group.tiers);
+                return backer;
+              });
+              return backers;
+            };
+
             return Promise.all([
               group.getYearlyIncome(),
               new Promise((resolve, reject) => {
-                const appendTier = backers => {
-                  backers = backers.map(backer => {
-                    backer.tier = utils.getTier(backer, group.tiers);
-                    return backer;
-                  });
-                  return backers;
-                };
                 queries.getUsersFromGroupWithTotalDonations(group.id)
                   .then(appendTier)
                   .then(resolve)
@@ -44,10 +47,11 @@ module.exports = function(app) {
               })
             ])
             .then(values => {
-              const groupInfo = group.info;
+              const groupInfo = group.card;
               groupInfo.yearlyIncome = values[0];
               const usersByRole = groupBy(values[1], 'role');
               groupInfo.backers = usersByRole[roles.BACKER] || [];
+              groupInfo.members = usersByRole[roles.MEMBER] || [];
               return groupInfo;
             })
           }));
@@ -85,7 +89,8 @@ module.exports = function(app) {
       getTotalDonors(),
       queries.getTotalDonations(),
       getGroupsByTagForCollectiveCard('open source'),
-      getGroupsByTagForCollectiveCard('meetup')
+      getGroupsByTagForCollectiveCard('meetup'),
+      queries.getTopSponsors()
     ])
     .then(results => {
       const hp = {
@@ -97,7 +102,8 @@ module.exports = function(app) {
         collectives: {
           opensource: results[3],
           meetup: results[4]
-        }
+        },
+        sponsors: results[5]
       }
       res.send(hp);
     })
