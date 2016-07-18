@@ -461,7 +461,8 @@ module.exports = function(app) {
       req.group.getBalance(),
       req.group.getYearlyIncome(),
       req.group.getTotalDonations(),
-      req.group.getBackersCount()
+      req.group.getBackersCount(),
+      req.group.getTwitterSettings()
       ])
     .then(values => {
       group.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
@@ -470,6 +471,8 @@ module.exports = function(app) {
       group.yearlyIncome = values[3];
       group.donationTotal = values[4];
       group.backersCount = values[5];
+      group.settings = group.settings || {};
+      group.settings.twitter = values[6];
       return group;
     })
     .then(group => res.send(group))

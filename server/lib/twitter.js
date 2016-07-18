@@ -8,8 +8,9 @@ function tweetActivity(Sequelize, activity) {
     && activity.data.transaction.amount > 0
     // users without twitterHandle are ignored
     && activity.data.user.twitterHandle) {
-      return getTemplate(Sequelize, activity.GroupId, activity.type)
-        .then(template => template.replace('#1', activity.data.user.twitterHandle))
+      return Sequelize.models.Group.findById(activity.GroupId)
+        .then(group => group.getTwitterSettings().thankDonation)
+        .then(template => template.replace('$backer', activity.data.user.twitterHandle))
         .then(status => tweetStatus(Sequelize, activity.GroupId, status));
   } else {
     return Promise.resolve();
@@ -40,37 +41,7 @@ function tweetStatus(Sequelize, GroupId, status) {
   });
 }
 
-function getTemplate(Sequelize, GroupId, templateType, singular) {
-  return Sequelize.models.Group.findById(GroupId)
-    .then(group => {
-      const twitterTemplates = group.settings.twitterTemplates;
-      const template = twitterTemplates && twitterTemplates[templateType];
-      if (singular && template && template.singular) {
-        return template.singular;
-      } else if (!singular && template && template.plural) {
-        return template.plural;
-      }
-      return template;
-    })
-    .then(groupTemplate => groupTemplate || getDefaultTemplate(templateType, singular));
-}
-
-function getDefaultTemplate(templateType, singular) {
-  switch (templateType) {
-    case activityType.GROUP_TRANSACTION_CREATED:
-      return `#1 thanks for backing us!`;
-
-    case activityType.GROUP_MONTHLY:
-      if (singular) {
-        return `Thank you #2for supporting our collective`;
-      } else {
-        return `Thanks to our #1 backers and sponsors #2for supporting our collective`;
-      }
-  }
-}
-
 module.exports = {
   tweetActivity,
-  tweetStatus,
-  getTemplate
+  tweetStatus
 };

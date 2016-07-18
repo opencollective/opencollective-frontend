@@ -353,6 +353,24 @@ module.exports = function(Sequelize, DataTypes) {
           })
       },
 
+      getTwitterSettings() {
+        const settings = this.settings || {};
+        settings.twitter = settings.twitter || {};
+        const defaults = {
+          // thank you message immediately when receiving donation
+          thankDonationEnabled: false,
+          thankDonation: '$backer thanks for backing us!',
+
+          // thank you message to all backers on 1st day of the month
+          monthlyThankDonationsEnabled: false,
+          monthlyThankDonationsSingular: 'Thank you $backer for supporting our collective',
+          monthlyThankDonationsPlural: 'Thanks to our $backerCount backers and sponsors $backerList for supporting our collective'
+        };
+        _.defaults(settings.twitter, defaults);
+
+        return settings.twitter;
+      },
+
       hasHost() {
         return Sequelize.models.UserGroup.find({
           where: {

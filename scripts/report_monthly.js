@@ -2,31 +2,13 @@ const app = require('../index');
 const models = app.set('models');
 const _ = require('lodash');
 const roles = require('../server/constants/roles');
-const activityType = require('../server/constants/activities');
 const twitter = require('../server/lib/twitter');
-const Promise = require('bluebird');
 onlyExecuteInProdOn1stDayOfTheMonth();
 
 
-models.Group.findAll().map(group => getNotifConfig(group.id)
-  .then(notify => {
-    if (!notify) {
-      return;
-    }
-    return getBackers(group)
-      .then(backers => {
-        if (backers.length === 0) {
-          return;
-        }
-        return getStatus(group.id, backers)
-          .then(status => {
-            if (!status) {
-              return;
-            }
-            return twitter.tweetStatus(models.sequelize, group.id, status);
-          });
-      });
-  }))
+models.Group.findAll().map(group => getBackers(group)
+  .then(backers => getStatus(group, backers))
+  .then(status => status && twitter.tweetStatus(models.sequelize, group.id, status)))
 .then(() => {
   console.log('Monthly reporting done!');
   process.exit();
@@ -41,20 +23,6 @@ function onlyExecuteInProdOn1stDayOfTheMonth() {
     console.log('NODE_ENV is production and it is not first day of the month, script aborted!');
     process.exit();
   }
-}
-
-function getNotifConfig(GroupId) {
-  return models.Notification.findOne({
-    where: {
-      type: [
-        activityType.ACTIVITY_ALL,
-        activityType.GROUP_MONTHLY
-      ],
-      GroupId,
-      channel: 'twitter',
-      active: true
-    }
-  });
 }
 
 function getBackers(group) {
@@ -73,38 +41,31 @@ function getBackers(group) {
   });
 }
 
-function getStatus(GroupId, backers) {
+function getStatus(group, backers) {
   const backerCount = backers.length;
   // backers without twitterHandle are ignored
   var backerList = _.remove(backers, backer => backer.twitterHandle)
     .map(backer => `@${backer.twitterHandle}`)
     .join(' ');
 
-  return getStatusFromDetails(GroupId, backerCount, backerList)
-    .then(longStatus => {
-      if (!longStatus) {
-        return longStatus;
-      }
-      if (longStatus.length <= 140) {
-        return longStatus;
-      }
-      return getStatusFromDetails(GroupId, backerCount, "");
-    });
+  const longStatus = getStatusFromDetails(group, backerCount, backerList);
+  if (!longStatus || longStatus.length <= 140) {
+    return longStatus;
+  }
+  return getStatusFromDetails(group, backerCount, "");
 }
 
-function getStatusFromDetails(GroupId, backerCount, backerList) {
-  // if we have just one backer without twitterHandle, message would look a bit sad, so don't tweet
-  if (backerCount === 1 && backerList.length === 0) {
-    return Promise.resolve();
+function getStatusFromDetails(group, backerCount, backerList) {
+  const twitterSettings = group.getTwitterSettings();
+  if (backerCount === 0 || !twitterSettings.monthlyThankDonationsEnabled) {
+    return null;
   }
-
-  if (backerList.length > 0) {
-    backerList += ' ';
+  if (backerCount === 1) {
+    return twitterSettings.monthlyThankDonationsSingular
+      .replace('$backer', backerList);
   }
-  return twitter.getTemplate(models.sequelize, GroupId, activityType.GROUP_MONTHLY, backerCount <= 1)
-    .then(template => {
-      return template
-        .replace('#1', backerCount)
-        .replace('#2', backerList);
-    });
+  return twitterSettings.monthlyThankDonationsPlural
+    .replace('$backerCount', backerCount)
+    .replace('$backerList', backerList)
+    .replace('  ', ' ');
 }

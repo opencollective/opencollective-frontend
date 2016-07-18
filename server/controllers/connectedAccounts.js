@@ -52,7 +52,7 @@ module.exports = (app) => {
               clientId: accessToken,
               secret: data.tokenSecret
             }))
-            .then(() => res.redirect(`${config.host.website}/${req.query.slug}`))
+            .then(() => res.redirect(`${config.host.website}/${req.query.slug}/edit-twitter`))
             .catch(next);
           break;
 
