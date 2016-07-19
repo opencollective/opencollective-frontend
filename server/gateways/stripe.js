@@ -20,10 +20,11 @@ const getOrCreatePlan = (stripeAccount, plan) => {
 
   return stripeClient.plans.retrieve(plan.id)
     .catch((err) => {
-      if (err.type === 'StripeInvalidRequest' && _.contains(err.message, 'No such plan')) {
+      if (err.type === 'StripeInvalidRequestError' && _.contains(err.message, 'No such plan')) {
         return stripeClient.plans.create(plan);
       }
 
+      console.log(err);
       return Promise.reject(err);
     });
 }
@@ -34,6 +35,30 @@ const getOrCreatePlan = (stripeAccount, plan) => {
 const createSubscription = (stripeAccount, customerId, subscription) => {
   return client(stripeAccount).customers.createSubscription(customerId, subscription);
 };
+
+/**
+ * Retrieve stripe subscription
+ */
+const retrieveSubscription = (stripeAccount, customerId, stripeSubsriptionId) => {
+  return client(stripeAccount).customers.retrieveSubscription(customerId, stripeSubsriptionId);
+}
+
+/**
+ * Get all subscriptions
+ */
+const getSubscriptionsList = (stripeAccount, limit) => {
+  if (!limit) {
+    limit = 10;
+  }
+  return client(stripeAccount).subscriptions.list({ limit });
+}
+
+/**
+ * Delete a subscription
+ */
+const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
+  return client(stripeAccount).subscriptions.del(stripeSubscriptionId);
+}
 
 /**
  * Create stripe customer
@@ -48,6 +73,13 @@ const createCustomer = (stripeAccount, token, options) => {
     email
   });
 };
+
+/**
+ * Fetch customer
+ */
+const retrieveCustomer = (stripeAccount, customerId) => {
+  return client(stripeAccount).customers.retrieve(customerId);
+}
 
 /**
  * Create charge
@@ -86,8 +118,12 @@ const extractFees = (balance) => {
 module.exports = {
   getOrCreatePlan,
   createSubscription,
+  retrieveSubscription,
+  getSubscriptionsList,
+  cancelSubscription,
   createCharge,
   createCustomer,
+  retrieveCustomer,
   retrieveBalanceTransaction,
   extractFees
 };
