@@ -72,14 +72,14 @@ return models.StripeAccount.findById(OLD_STRIPE_ACCOUNT_ID)
         // carryover fields
         plan: plan.id,
         application_fee_percent: constants.OC_FEE_PERCENT,
-        metadata: stripeSubscription.metadata,
+        metadata: oldStripeSubscription.metadata,
         // needed to make sure we don't double charge them
-        billing_cycle_anchor: stripeSubscription.current_period_end,
+        billing_cycle_anchor: oldStripeSubscription.current_period_end,
         prorate: false
       };
       return stripeGateway.createSubscription(
         newStripeAccount,
-        stripeSubscription.customer,
+        oldStripeSubscription.customer,
         subscription);
     })
     .tap(console.log)
