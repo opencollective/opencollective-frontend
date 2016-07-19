@@ -8,9 +8,11 @@ Subject: New donation to {{group.name}}: {{{currency transaction.amount currency
 
   <br /><br />
 
+{{#if user.avatar}}
   <a href="{{user.website}}">
     <img src="https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_124,r_max,w_124,bo_3px_solid_white/c_thumb,h_124,r_max,w_124,bo_2px_solid_rgb:66C71A/e_trim/f_auto/{{encodeURIComponent user.avatar}}" width="64" />
   </a>
+{{/if}}
 
   <br /><br />
   {{#if tweet}}
