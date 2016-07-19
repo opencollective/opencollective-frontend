@@ -33,7 +33,15 @@ module.exports = app => {
         }
       };
 
-      return Promise.promisify(app.paypalAdaptive.pay, {context: app.paypalAdaptive})(payload);
+      return new Promise((resolve, reject) => {
+        app.paypalAdaptive.pay(payload, (err, res) => {
+          if (err) {
+            console.log("PayPal payment error", err, res);
+            return reject(new Error(res.error[0].message));
+          }
+          resolve(res);
+        });
+      });
     }
   };
 
