@@ -25,7 +25,7 @@ return models.StripeAccount.findById(OLD_STRIPE_ACCOUNT_ID)
 .tap(stripeAccount => newStripeAccount = stripeAccount) // store new stripe account
 
 // fetch all active subscriptions for this account
-.then(() => stripeGateway.getSubscriptionsList(oldStripeAccount, 1)) // get one at a time for now
+.then(() => stripeGateway.getSubscriptionsList(oldStripeAccount, 10)) // get one at a time for now
 .then(oldStripeSubscriptionList => {
   console.log("Subscriptions fetched: ", oldStripeSubscriptionList.data.length);
   return oldStripeSubscriptionList.data;
