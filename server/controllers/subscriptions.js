@@ -1,6 +1,8 @@
 const Stripe = require('stripe');
 const async = require('async');
 
+const activities = require('../constants/activities');
+
 /**
  * Controller.
  */
@@ -42,6 +44,7 @@ module.exports = function(app) {
           include: [
             { model: models.Group },
             { model: models.PaymentMethod },
+            { model: models.User },
             {
               model: models.Subscription,
               where: {
@@ -62,7 +65,9 @@ module.exports = function(app) {
                 stripeSecret: stripeAccount.accessToken,
                 customerId: t.PaymentMethod.customerId,
                 subscriptionId: t.Subscription.stripeSubscriptionId,
-                subscription: t.Subscription
+                subscription: t.Subscription,
+                group: t.Group,
+                user: t.User
               });
             });
         })
@@ -87,6 +92,25 @@ module.exports = function(app) {
         subscription.deactivatedAt = new Date();
 
         subscription.save()
+          .then(() => cb())
+          .catch(cb);
+      }],
+
+      createActivity: ['deactivateSubscription', (cb, results) => {
+        const options = results.findSubscriptionsOptions;
+        const subscription = options.subscription;
+        const group = options.group;
+        const user = options.user;
+        models.Activity.create({
+          type: activities.SUBSCRIPTION_CANCELED,
+          GroupId: group.id,
+          UserId: user.id,
+          data: {
+            subscriptionId: subscription.id,
+            group: group.info,
+            user: user.info
+          }
+        })
           .then(() => cb())
           .catch(cb);
       }],

@@ -116,6 +116,10 @@ module.exports = {
       case activities.SUBSCRIPTION_CONFIRMED:
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
 
+      case activities.SUBSCRIPTION_CANCELED:
+        const subscriptionId = activity.data.subscriptionId;
+        return `Subscription ${subscriptionId} canceled`;
+
       case activities.GROUP_CREATED:
         return `New group created: ${group} by ${userString}`;
 

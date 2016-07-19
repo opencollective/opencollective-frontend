@@ -175,7 +175,7 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
-    it('cancels the transaction', (done) => {
+    it('cancels the subscription', (done) => {
        request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
         .set('Authorization', 'Bearer ' + user.jwt(application))
@@ -191,6 +191,15 @@ describe('subscriptions.routes.test.js', () => {
               expect(sub.isActive).to.be.false;
               expect(sub.deactivatedAt).to.be.ok;
               done();
+            })
+            .then(() => models.Activity.findOne({where: {type: 'subscription.canceled'}}))
+            .then(activity => {
+              expect(activity).to.be.defined;
+              expect(activity.GroupId).to.be.equal(group.id);
+              expect(activity.UserId).to.be.equal(user.id);
+              expect(activity.data.subscriptionId).to.be.equal(transaction.SubscriptionId);
+              expect(activity.data.group.id).to.be.equal(group.id);
+              expect(activity.data.user.id).to.be.equal(user.id);
             })
             .catch(done);
         });

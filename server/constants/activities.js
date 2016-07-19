@@ -16,6 +16,7 @@ module.exports = {
   GROUP_TRANSACTION_PAID: 'group.transaction.paid',
   GROUP_USER_ADDED: 'group.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
+  SUBSCRIPTION_CANCELED: 'subscription.canceled',
   USER_CREATED: 'user.created',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
