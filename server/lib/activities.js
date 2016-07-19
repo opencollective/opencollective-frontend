@@ -105,7 +105,9 @@ module.exports = {
         return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
 
       case activities.GROUP_TRANSACTION_PAID:
-        return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
+        const details = activity.data.preapprovalDetails;
+        const remaining = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
+        return `Expense paid on ${group}: ${currency} ${amount} for '${description}' (${remaining} ${currency} remaining on preapproval key)`;
 
       case activities.USER_CREATED:
         return `New user joined: ${userString}`;

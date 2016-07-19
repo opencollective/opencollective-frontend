@@ -22,6 +22,8 @@ module.exports = (app) => {
   const paypal = require('./paypal')(app);
   const payExpense = require('../lib/payExpense')(app);
 
+  const getPreapprovalDetails = Promise.promisify(paypal.getPreapprovalDetails);
+
   /**
    * Create an expense.
    */
@@ -142,7 +144,7 @@ module.exports = (app) => {
             }
           })
           .then(userGroup => fetchPaymentMethod(userGroup.UserId))
-          .then(paymentMethod => getPreapprovalDetails(paymentMethod))
+          .then(paymentMethod => getPreapprovalDetails(paymentMethod.token))
           .tap(d => preapprovalDetails = d)
           .then(checkIfEnoughFunds(expense))
           .then(() => expense.setApproved())
@@ -167,10 +169,6 @@ module.exports = (app) => {
       });
     }
 
-    function getPreapprovalDetails(paymentMethod) {
-      return Promise.promisify(paypal.getPreapprovalDetails)(paymentMethod.token);
-    }
-
     function checkIfEnoughFunds(expense) {
       const txAmount = expense.amount/100;
       if (expense.payoutMethod === 'manual') {
@@ -182,9 +180,9 @@ module.exports = (app) => {
           }
         }
       } else {
-        return preapprovalDetails => {
-          const maxAmount = Number(preapprovalDetails.maxTotalAmountOfAllPayments);
-          const currency = preapprovalDetails.currencyCode;
+        return details => {
+          const maxAmount = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
+          const currency = details.currencyCode;
 
           if (Math.abs(txAmount) > maxAmount) {
             return Promise.reject(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve expense.`));
@@ -204,7 +202,7 @@ module.exports = (app) => {
     const expense = req.expense;
     const payoutMethod = req.expense.payoutMethod;
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-    var paymentMethod, email, paymentResponse;
+    var paymentMethod, email, paymentResponse, preapprovalDetails;
 
     assertExpenseStatus(expense, status.APPROVED)
       .then(() => isManual ? null : getPaymentMethod())
@@ -212,8 +210,10 @@ module.exports = (app) => {
       .then(getBeneficiaryEmail)
       .tap(e => email = e)
       .then(() => isManual ? null : pay())
-      .then(r => paymentResponse = r)
-      .then(paymentResponse => createTransaction(payoutMethod, paymentMethod, paymentResponse, expense))
+      .tap(r => paymentResponse = r)
+      .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
+      .tap(d => preapprovalDetails = d)
+      .then(() => createTransaction(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails))
       .tap(() => expense.setPaid())
       .tap(() => res.json(expense))
       .catch(err => next(formatError(err, paymentResponse)));

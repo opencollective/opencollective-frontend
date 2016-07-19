@@ -593,7 +593,7 @@ describe('expenses.routes.test.js', () => {
 
                   it('THEN creates a transaction paid activity', () =>
                     expectTransactionPaidActivity(group, user, transaction)
-                      .tap(activity => expect(activity.data.pay).to.deep.equal(payMock)));
+                      .tap(activity => expect(activity.data.paymentResponse).to.deep.equal(payMock)));
                 });
               });
 
@@ -718,7 +718,7 @@ describe('expenses.routes.test.js', () => {
 
                 it('THEN creates a transaction paid activity', () =>
                   expectTransactionPaidActivity(group, user, transaction)
-                    .tap(activity => expect(activity.data.pay).to.be.undefined));
+                    .tap(activity => expect(activity.data.paymentResponse).to.be.undefined));
               });
 
               function expectTransactionCreated(expense, transaction) {

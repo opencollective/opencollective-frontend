@@ -21,7 +21,7 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
       var actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[14], 'slack');
-      expect(actual).to.equal('Expense paid on <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for \'pizza\'');
+      expect(actual).to.equal('Expense paid on <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for \'pizza\' (150 USD remaining on preapproval key)');
     });
 
     it (`${constants.USER_CREATED} all fields present`, () => {

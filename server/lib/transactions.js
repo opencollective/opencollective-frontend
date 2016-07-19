@@ -7,7 +7,7 @@ module.exports = app => {
   const errors = app.errors;
   const models = app.set('models');
 
-  function createFromPaidExpense(payoutMethod, paymentMethod, paymentResponse, expense) {
+  function createFromPaidExpense(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails) {
     if (paymentResponse) {
       switch (paymentResponse.paymentExecStatus) {
         case 'COMPLETED':
@@ -43,10 +43,10 @@ module.exports = app => {
       // end TODO remove #postmigration
     })
     .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
-    .then(t => createNewTransactionActivity(t, paymentResponse));
+    .then(t => createNewTransactionActivity(t, paymentResponse, preapprovalDetails));
   }
 
-  function createNewTransactionActivity(transaction, paymentResponse) {
+  function createNewTransactionActivity(transaction, paymentResponse, preapprovalDetails) {
     const payload = {
       type: constants.activities.GROUP_TRANSACTION_PAID,
       UserId: transaction.UserId,
@@ -57,7 +57,10 @@ module.exports = app => {
       }
     };
     if (paymentResponse) {
-      payload.data.pay = paymentResponse;
+      payload.data.paymentResponse = paymentResponse;
+    }
+    if (preapprovalDetails) {
+      payload.data.preapprovalDetails = preapprovalDetails;
     }
     return transaction.getUser()
       .tap(user => payload.data.user = user.info)

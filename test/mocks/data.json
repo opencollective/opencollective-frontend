@@ -203,6 +203,10 @@
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
+          },
+          "preapprovalDetails": {
+            "maxTotalAmountOfAllPayments": 200,
+            "curPaymentsAmount": 50
           }
         }
       },
