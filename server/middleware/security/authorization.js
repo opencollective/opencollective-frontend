@@ -134,7 +134,7 @@ module.exports = function (app) {
             return next(e);
           }
           if (!hasUser) {
-            return next(new Forbidden('Forbidden'));
+            return next(new Forbidden('User does not have expected role'));
           }
           next();
         });

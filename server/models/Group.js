@@ -198,22 +198,15 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      hasUserWithRole(userId, roles, cb) {
+      hasUserWithRole(userId, expectedRoles, cb) {
         this
           .getUsers({
             where: {
               id: userId
             }
           })
-          .tap((users) => {
-            if (users.length === 0) {
-              return cb(null, false);
-            } else if (!_.contains(roles, users[0].UserGroup.role)) {
-              return cb(null, false);
-            }
-
-            cb(null, true);
-          })
+          .then(users => users.map(user => user.UserGroup.role))
+          .tap(actualRoles => cb(null, _.intersection(expectedRoles, actualRoles).length > 0))
           .catch(cb);
       },
 
