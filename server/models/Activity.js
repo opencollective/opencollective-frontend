@@ -2,7 +2,7 @@ const notify = require('../lib/notifications');
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Activity = Sequelize.define('Activity', {
+  const Activity = Sequelize.define('Activity', {
     type: DataTypes.STRING,
 
     data: DataTypes.JSON,

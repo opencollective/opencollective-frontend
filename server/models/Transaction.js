@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Transaction = Sequelize.define('Transaction', {
+  const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING, // delete #postmigration
     amount: DataTypes.FLOAT, // TODO: change to INTEGER and rename to donationAmount

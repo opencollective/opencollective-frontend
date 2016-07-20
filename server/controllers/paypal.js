@@ -1,9 +1,9 @@
 /**
  * Dependencies.
  */
-var async = require('async');
-var config = require('config');
-var moment = require('moment');
+const async = require('async');
+const config = require('config');
+const moment = require('moment');
 
 /**
  * Controller.
@@ -13,16 +13,16 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models');
-  var Activity = models.Activity;
-  var PaymentMethod = models.PaymentMethod;
-  var errors = app.errors;
+  const models = app.set('models');
+  const Activity = models.Activity;
+  const PaymentMethod = models.PaymentMethod;
+  const errors = app.errors;
 
   /**
    * Get Preapproval Details.
    */
-  var getPreapprovalDetails = function(preapprovalKey, callback) {
-    var payload = {
+  const getPreapprovalDetails = function(preapprovalKey, callback) {
+    const payload = {
       requestEnvelope: {
         errorLanguage:  'en_US',
         detailLevel:    'ReturnAll'
@@ -35,8 +35,8 @@ module.exports = function(app) {
   /**
    * Get preapproval details route
    */
-  var getDetails = function(req, res, next) {
-    var preapprovalKey = req.params.preapprovalkey;
+  const getDetails = function(req, res, next) {
+    const preapprovalKey = req.params.preapprovalkey;
 
     getPreapprovalDetails(preapprovalKey, (err, response) => {
       if (err) return next(err);
@@ -47,14 +47,14 @@ module.exports = function(app) {
   /**
    * Get a preapproval key for a user.
    */
-  var getPreapprovalKey = function(req, res, next) {
+  const getPreapprovalKey = function(req, res, next) {
     // TODO: This return and cancel URL doesn't work - no routes right now.
-    var uri = `/users/${req.remoteUser.id}/paypal/preapproval/`;
-    var baseUrl = config.host.webapp + uri;
-    var cancelUrl = req.query.cancelUrl || (`${baseUrl}/cancel`);
-    var returnUrl = req.query.returnUrl || (`${baseUrl}/success`);
-    var endingDate = (req.query.endingDate && (new Date(req.query.endingDate)).toISOString()) || moment().add(1, 'years').toISOString();
-    var maxTotalAmountOfAllPayments = req.query.maxTotalAmountOfAllPayments || 2000; // 2000 is the maximum: https://developer.paypal.com/docs/classic/api/adaptive-payments/Preapproval_API_Operation/
+    const uri = `/users/${req.remoteUser.id}/paypal/preapproval/`;
+    const baseUrl = config.host.webapp + uri;
+    const cancelUrl = req.query.cancelUrl || (`${baseUrl}/cancel`);
+    const returnUrl = req.query.returnUrl || (`${baseUrl}/success`);
+    const endingDate = (req.query.endingDate && (new Date(req.query.endingDate)).toISOString()) || moment().add(1, 'years').toISOString();
+    const maxTotalAmountOfAllPayments = req.query.maxTotalAmountOfAllPayments || 2000; // 2000 is the maximum: https://developer.paypal.com/docs/classic/api/adaptive-payments/Preapproval_API_Operation/
 
     async.auto({
 
@@ -101,7 +101,7 @@ module.exports = function(app) {
       }],
 
       createPayload: ['createPaymentMethod', function(cb, results) {
-        var payload = {
+        const payload = {
           currencyCode: 'USD',
           startingDate: new Date().toISOString(),
           endingDate: endingDate,
@@ -123,7 +123,7 @@ module.exports = function(app) {
       }],
 
       updatePaymentMethod: ['createPaymentMethod', 'createPayload', 'callPaypal', function(cb, results) {
-        var paymentMethod = results.createPaymentMethod;
+        const paymentMethod = results.createPaymentMethod;
         paymentMethod.token = results.callPaypal.preapprovalKey;
         paymentMethod.save()
           .then(paymentMethod => cb(null, paymentMethod))
@@ -140,7 +140,7 @@ module.exports = function(app) {
   /**
    * Confirm a preapproval.
    */
-  var confirmPreapproval = function(req, res, next) {
+  const confirmPreapproval = function(req, res, next) {
 
     async.auto({
 
@@ -180,7 +180,7 @@ module.exports = function(app) {
       }],
 
       updatePaymentMethod: ['callPaypal', 'getPaymentMethod', 'checkPaymentMethod', function(cb, results) {
-        var paymentMethod = results.getPaymentMethod.rows[0];
+        const paymentMethod = results.getPaymentMethod.rows[0];
         paymentMethod.confirmedAt = new Date();
         paymentMethod.data = results.callPaypal;
         paymentMethod.number = results.callPaypal.senderEmail;

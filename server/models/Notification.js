@@ -9,7 +9,7 @@
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Notification = Sequelize.define('Notification', {
+  const Notification = Sequelize.define('Notification', {
 
     channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
 

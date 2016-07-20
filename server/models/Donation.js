@@ -2,7 +2,7 @@ const type = require('../constants/transactions').type.DONATION;
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var Donation = Sequelize.define('Donation', {
+  const Donation = Sequelize.define('Donation', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

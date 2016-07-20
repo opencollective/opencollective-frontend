@@ -12,14 +12,14 @@ const moment = require('moment');
 /**
  * Constants.
  */
-var SALT_WORK_FACTOR = 10;
+const SALT_WORK_FACTOR = 10;
 
 /**
  * Model.
  */
 module.exports = function(Sequelize, DataTypes) {
 
-  var User = Sequelize.define('User', {
+  const User = Sequelize.define('User', {
 
     _access: {
       type: DataTypes.INTEGER,
@@ -294,7 +294,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     classMethods: {
       auth(usernameOrEmail, password, cb) {
-        var msg = 'Invalid username/email or password.';
+        const msg = 'Invalid username/email or password.';
         usernameOrEmail = usernameOrEmail.toLowerCase();
 
         User.find({

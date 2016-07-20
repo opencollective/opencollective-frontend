@@ -28,7 +28,7 @@ module.exports = function(Sequelize, DataTypes) {
 
   const models = Sequelize.models;
 
-  var Group = Sequelize.define('Group', {
+  const Group = Sequelize.define('Group', {
     name: {
       type: DataTypes.STRING,
       allowNull: false

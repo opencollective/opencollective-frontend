@@ -6,7 +6,7 @@ const allowedCurrencies = Object.keys(require('../constants/currencies'));
 
 module.exports = function (Sequelize, DataTypes) {
 
-  var Expense = Sequelize.define('Expense', {
+  const Expense = Sequelize.define('Expense', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

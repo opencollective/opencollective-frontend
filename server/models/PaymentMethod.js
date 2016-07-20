@@ -2,7 +2,7 @@ module.exports = function(Sequelize, DataTypes) {
   
   const payoutMethods = ['paypal', 'stripe'];
   
-  var PaymentMethod = Sequelize.define('PaymentMethod', {
+  const PaymentMethod = Sequelize.define('PaymentMethod', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

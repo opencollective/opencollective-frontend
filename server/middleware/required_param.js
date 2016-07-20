@@ -7,7 +7,7 @@ module.exports = function(properties) {
   properties = [].slice.call(arguments);
 
   return function (req, res, next) {
-    var missing = {};
+    const missing = {};
     req.required = {};
 
     properties.forEach((prop) => {

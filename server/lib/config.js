@@ -1,17 +1,17 @@
 /**
  * Dependencies.
  */
-var Paypal = require('paypal-adaptive');
-var knox = require('knox');
-var config = require('config');
-var nodemailer = require('nodemailer');
+const Paypal = require('paypal-adaptive');
+const knox = require('knox');
+const config = require('config');
+const nodemailer = require('nodemailer');
 const Promise = require('bluebird');
 
 /**
  * Module.
  */
 module.exports = function(app) {
-  var env = config.env;
+  const env = config.env;
 
   // Stripe.
   app.stripe = require('stripe')(config.stripe.secret);
@@ -34,7 +34,7 @@ module.exports = function(app) {
   });
 
   // Mailgun.
-  if(config.mailgun.user) {
+  if (config.mailgun.user) {
     app.mailgun = nodemailer.createTransport({
       service: 'Mailgun',
       auth: {
@@ -43,8 +43,7 @@ module.exports = function(app) {
       }
     });
     app.mailgun.sendMail =  Promise.promisify(app.mailgun.sendMail, app.mailgun);
-  }
-  else {
+  } else {
     console.warn("Mailgun is not configured");
     app.mailgun = {
       sendMail: () => Promise.resolve()

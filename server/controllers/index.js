@@ -3,8 +3,8 @@ module.exports = function(app) {
   /**
    * Controllers.
    */
-  var cs = {};
-  var controllers = [
+  const cs = {};
+  const controllers = [
     'activities',
     'donations',
     'expenses',

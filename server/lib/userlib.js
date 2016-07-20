@@ -1,6 +1,6 @@
-var config = require('config');
-var clearbit = require('clearbit')(config.clearbit);
-var url = require('url');
+const config = require('config');
+const clearbit = require('clearbit')(config.clearbit);
+const url = require('url');
 const Promise = require('bluebird');
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
   },
 
   fetchAvatar(user) {
-    if(user.avatar) {
+    if (user.avatar) {
       return Promise.resolve(user);
     }
     return this.getUserData(user.email)
@@ -32,11 +32,11 @@ module.exports = {
   },
 
   getUserData(email) {
-    if(!email || !email.match(/.+@.+\..+/)) {
+    if (!email || !email.match(/.+@.+\..+/)) {
       return Promise.resolve();
     }
 
-    if(this.memory[email] !== undefined) {
+    if (this.memory[email] !== undefined) {
       return Promise.resolve(this.memory[email]);
     }
 
@@ -48,27 +48,24 @@ module.exports = {
   },
 
   resolveUserAvatars(userData, cb) {
-    var name = userData.name;
-    var email = userData.email;
-    var website = userData.website;
-    var twitterHandle = userData.twitterHandle;
+    const name = userData.name;
+    const email = userData.email;
+    const website = userData.website;
+    const twitterHandle = userData.twitterHandle;
     var linkedinUrl = userData.linkedinUrl;
     var facebookUrl = userData.facebookUrl;
-    var ip = userData.ip;
+    const ip = userData.ip;
 
-    if(!email || !email.match(/.+@.+\..+/)) {
+    if (!email || !email.match(/.+@.+\..+/)) {
       return cb(new Error("Invalid email"));
     }
 
     if (website) {
-      var parsedWebsiteUrl = url.parse(website);
-      var hostname = parsedWebsiteUrl.hostname;
-      if (/facebook.com$/.test(hostname))
-      {
+      const parsedWebsiteUrl = url.parse(website);
+      const hostname = parsedWebsiteUrl.hostname;
+      if (/facebook.com$/.test(hostname)) {
         facebookUrl = website;
-      }
-      else if (/linkedin.com\/pub|in|profile/.test(hostname))
-      {
+      } else if (/linkedin.com\/pub|in|profile/.test(hostname)) {
         linkedinUrl = website;
       }
     }
@@ -83,36 +80,30 @@ module.exports = {
       stream: true
     })
     .then((res) => {
-      var person = res.person;
-      var company = res.company;
-      var sources = [];
+      const person = res.person;
+      const company = res.company;
+      const sources = [];
 
-      if (person)
-      {
+      if (person) {
         const personAvatarSources = ['twitter', 'aboutme', 'gravatar', 'github'];
         personAvatarSources.forEach((source) => {
-          if (person[source] && person[source].avatar)
-          {
+          if (person[source] && person[source].avatar) {
             sources.push({src: person[source].avatar, source: source});
           }
         });
-        if (person.avatar)
-        {
+        if (person.avatar) {
           sources.push({src: person.avatar, source: 'clearbit'});
         }
       }
 
-      if (company)
-      {
+      if (company) {
         const companyAvatarSources = ['twitter', 'angellist'];
         companyAvatarSources.forEach((source) => {
-          if (company[source] && company[source].avatar)
-          {
+          if (company[source] && company[source].avatar) {
             sources.push({src: company[source].avatar, source: source});
           }
         });
-        if (company.logo)
-        {
+        if (company.logo) {
           sources.push({src: company.logo, source: 'clearbit'});
         }
       }

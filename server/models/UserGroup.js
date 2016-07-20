@@ -1,8 +1,8 @@
-var roles = require('../constants/roles');
+const roles = require('../constants/roles');
 
 module.exports = function(Sequelize, DataTypes) {
 
-  var UserGroup = Sequelize.define('UserGroup', {
+  const UserGroup = Sequelize.define('UserGroup', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

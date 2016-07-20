@@ -15,26 +15,26 @@ module.exports = function(app) {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models');
-  var Transaction = models.Transaction;
-  var Activity = models.Activity;
-  var Notification = models.Notification;
-  var User = models.User;
+  const models = app.set('models');
+  const Transaction = models.Transaction;
+  const Activity = models.Activity;
+  const Notification = models.Notification;
+  const User = models.User;
   const Group = models.Group;
-  var PaymentMethod = models.PaymentMethod;
-  var errors = app.errors;
-  var emailLib = require('../lib/email')(app);
-  var paypal = require('./paypal')(app);
+  const PaymentMethod = models.PaymentMethod;
+  const errors = app.errors;
+  const emailLib = require('../lib/email')(app);
+  const paypal = require('./paypal')(app);
 
   /**
    * Create a transaction and add it to a group/user/paymentMethod.
    */
-  var create = (args, callback) => {
-    var transaction = args.transaction;
+  const create = (args, callback) => {
+    const transaction = args.transaction;
     const subscription = args.subscription;
-    var user = args.user;
-    var group = args.group;
-    var paymentMethod = args.paymentMethod;
+    const user = args.user;
+    const group = args.group;
+    const paymentMethod = args.paymentMethod;
 
     if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
       // populate netAmountInGroupCurrency for donations
@@ -67,12 +67,12 @@ module.exports = function(app) {
       .catch(callback);
   };
 
-var payServices = {
+const payServices = {
   paypal: (data, callback) => {
-    var uri = `/groups/${data.group.id}/transactions/${data.transaction.id}/paykey/`;
-    var baseUrl = config.host.webapp + uri;
-    var amount = data.transaction.amount;
-    var payload = {
+    const uri = `/groups/${data.group.id}/transactions/${data.transaction.id}/paykey/`;
+    const baseUrl = config.host.webapp + uri;
+    const amount = data.transaction.amount;
+    const payload = {
       requestEnvelope: {
         errorLanguage: 'en_US',
         detailLevel: 'ReturnAll'
@@ -104,17 +104,17 @@ var payServices = {
   /**
    * Pay a transaction.
    */
-  var pay = function(req, res, next) {
-    var service = req.required.service;
-    var user = req.remoteUser;
-    var group = req.group;
-    var transaction = req.transaction;
-    var isManual = transaction.payoutMethod !== 'paypal';
+  const pay = function(req, res, next) {
+    const service = req.required.service;
+    const user = req.remoteUser;
+    const group = req.group;
+    const transaction = req.transaction;
+    const isManual = transaction.payoutMethod !== 'paypal';
 
     async.auto({
 
       checkTransaction: [function(cb) {
-        if(!transaction.UserId) {
+        if (!transaction.UserId) {
           return next(new errors.BadRequest(`Transaction id ${transaction.id} doesn't have a UserId.`));
         }
 
@@ -210,7 +210,7 @@ var payServices = {
             .catch(cb);
         }
 
-        switch(results.callService.paymentExecStatus) {
+        switch (results.callService.paymentExecStatus) {
           case 'COMPLETED':
             transaction.PaymentMethodId = results.checkPaymentMethod.id;
             transaction.status = 'REIMBURSED';
@@ -254,7 +254,7 @@ var payServices = {
       if (err && results.callService) {
         console.error('PayPal error', JSON.stringify(results.callService));
         if (results.callService.error instanceof Array) {
-          var message = results.callService.error[0].message;
+          const message = results.callService.error[0].message;
           return next(new errors.BadRequest(message));
         }
       }
@@ -318,7 +318,7 @@ var payServices = {
   /**
    * Attribute a transaction to a user.
    */
-  var attributeUser = function(req, res, next) {
+  const attributeUser = function(req, res, next) {
     req.transaction
       .setUser(req.user)
       .then(() => res.send({success: true}))
@@ -374,7 +374,7 @@ var payServices = {
       if (err && results.getPreapprovalDetails) {
         console.error('PayPal error', JSON.stringify(results.getPreapprovalDetails));
         if (results.getPreapprovalDetails.error instanceof Array) {
-          var message = results.getPreapprovalDetails.error[0].message;
+          const message = results.getPreapprovalDetails.error[0].message;
           return next(new errors.BadRequest(message));
         }
       }

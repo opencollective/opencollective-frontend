@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-var errors = require('../../lib/errors');
+const errors = require('../../lib/errors');
 
 const Forbidden = errors.Forbidden;
 const NotFound = errors.NotFound;
@@ -12,8 +12,8 @@ const Unauthorized = errors.Unauthorized;
  */
 module.exports = function (app) {
 
-  var aN = require('./authentication')(app);
-  var models = app.set('models');
+  const aN = require('./authentication')(app);
+  const models = app.set('models');
 
   return {
 
@@ -145,7 +145,7 @@ module.exports = function (app) {
     authorizeAccessToGroup(options) {
       if (!options) options = {};
       return (req, res, next) => {
-        var _authorizeAccessToGroup = () => {
+        const _authorizeAccessToGroup = () => {
           this.authorizeUserAccessToGroup(req, res, (e) => {
             if (!e) {
               return this._authorizeUserRoles(options)(req, res, next);
@@ -175,7 +175,7 @@ module.exports = function (app) {
     authorizeGroupAccessTo(attributeName, options) {
       if (!options) options = {};
       return (req, res, next) => {
-        var _authorizeAccess = () => {
+        const _authorizeAccess = () => {
           // TODO shouldn't return NotFound before authorization check
           if (!req[attributeName]) {
             return next(new NotFound());

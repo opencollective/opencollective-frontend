@@ -1,11 +1,11 @@
-var config = require('config');
-var jwt = require('jsonwebtoken');
+const config = require('config');
+const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const request = require('request-promise');
 const qs = require('querystring');
 
-var errors = require('../../lib/errors');
-var required = require('../required_param');
+const errors = require('../../lib/errors');
+const required = require('../required_param');
 
 const Forbidden = errors.Forbidden;
 const Unauthorized = errors.Unauthorized;
@@ -27,11 +27,11 @@ const secret = config.keys.opencollective.secret;
  */
 module.exports = function (app) {
 
-  var models = app.get('models');
-  var controllers = app.get('controllers');
-  var connectedAccounts = controllers.connectedAccounts;
-  var Application = models.Application;
-  var User = models.User;
+  const models = app.get('models');
+  const controllers = app.get('controllers');
+  const connectedAccounts = controllers.connectedAccounts;
+  const Application = models.Application;
+  const User = models.User;
 
   return {
 
@@ -163,13 +163,12 @@ module.exports = function (app) {
 
         User
           .auth((username || email), password, (e, user) => {
-            var errorMsg = 'Invalid username/email or password';
+            const errorMsg = 'Invalid username/email or password';
 
             if (e) {
               if (e.code === 400) {
                 return next(new errors.BadRequest(errorMsg));
-              }
-              else {
+              } else {
                 return next(new errors.ServerError(e.message));
               }
             }

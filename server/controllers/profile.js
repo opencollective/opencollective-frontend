@@ -13,19 +13,17 @@ module.exports = function(app) {
     models.Group
       .findOne({where: { slug }})
       .then((group) => {
-        if(group) {
+        if (group) {
           req.group = group;
           return controllers.groups.getOne(req, res, next);
-        }
-        else {
+        } else {
           models.User.findOne({where: {username: slug}})
           .then((user) => {
-            if(user) {
-            req.user = user;
-            req.query.profile = true;
-            return controllers.users.show(req, res, next);
-            }
-            else {
+            if (user) {
+              req.user = user;
+              req.query.profile = true;
+              return controllers.users.show(req, res, next);
+            } else {
               return next(new errors.NotFound(`There is no collective or user at this url /${slug}`));
             }
           })
