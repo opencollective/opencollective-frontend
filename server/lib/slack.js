@@ -40,7 +40,7 @@ module.exports = {
     if (!options) {
       options = {};
     }
-    var slackOptions = {
+    const slackOptions = {
       text: msg,
       username: 'OpenCollective Activity Bot',
       icon_url: 'https://opencollective.com/favicon.ico',

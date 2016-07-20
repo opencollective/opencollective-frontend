@@ -1,7 +1,6 @@
 module.exports = {
 
-  BadRequest: function(msg, err) {
-    err = err || {};
+  BadRequest: function(msg) {
     this.code = 400;
     this.type = 'bad_request';
     this.message = msg;
@@ -87,7 +86,7 @@ Object.keys(module.exports).forEach((error) => {
 });
 
 Error.prototype.info = function() {
-  var result = {
+  const result = {
     type: this.type,
     message: this.message || '',
     fields: this.fields,

@@ -31,7 +31,7 @@ module.exports = function(app) {
 
 
   const subscribeUserToGroupEvents = (user, group, role) => {
-    if(role !== roles.HOST) return Promise.resolve();
+    if (role !== roles.HOST) return Promise.resolve();
 
     return Notification.create({
       UserId: user.id,
@@ -147,7 +147,7 @@ module.exports = function(app) {
       where.$or = [ { type: { $ne: req.query.exclude } }, { type: { $eq: null } } ];
     }
 
-    var query = _.merge({
+    const query = _.merge({
       where: where,
       order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
@@ -171,9 +171,9 @@ module.exports = function(app) {
    * Delete a transaction.
    */
   const deleteTransaction = (req, res, next) => {
-     var transaction = req.transaction;
-     var group = req.group;
-     var user = req.remoteUser || {};
+     const transaction = req.transaction;
+     const group = req.group;
+     const user = req.remoteUser || {};
 
      async.auto({
 
@@ -209,11 +209,11 @@ module.exports = function(app) {
    * Create a transaction and add it to a group.
    */
   const createTransaction = (req, res, next) => {
-    var transaction = req.required.transaction;
-    var group = req.group;
+    const transaction = req.required.transaction;
+    const group = req.group;
 
     // Caller.
-    var user = req.remoteUser || req.user || transaction.user || {};
+    const user = req.remoteUser || req.user || transaction.user || {};
     transactions._create({
       transaction,
       group,
@@ -229,7 +229,7 @@ module.exports = function(app) {
    * Delete a member.
    */
   const deleteUser = (req, res, next) => {
-    var query = {
+    const query = {
       where: {
         GroupId: req.group.id,
         UserId: req.user.id
@@ -312,7 +312,7 @@ module.exports = function(app) {
    */
   const createFromGithub = (req, res, next) => {
 
-    var payload = req.required.payload;
+    const payload = req.required.payload;
     const connectedAccountId = req.jwtPayload.connectedAccountId;
 
     var creator, options, creatorConnectedAccount;
@@ -375,7 +375,7 @@ module.exports = function(app) {
               username: contributor,
               provider: 'github'
             };
-            var userAttr = {
+            const userAttr = {
               avatar: `http://avatars.githubusercontent.com/${contributor}`
             };
             var connectedAccount, contributorUser;
@@ -483,7 +483,7 @@ module.exports = function(app) {
    * Add a user to a group.
    */
   const addUser = (req, res, next) => {
-    var options = {
+    const options = {
       role: req.body.role || roles.BACKER,
       remoteUser: req.remoteUser
     };

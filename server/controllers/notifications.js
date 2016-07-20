@@ -1,9 +1,9 @@
-var errors = require('../lib/errors');
+const errors = require('../lib/errors');
 
 module.exports = function(app) {
 
-  var models = app.set('models');
-  var Notification = models.Notification;
+  const models = app.set('models');
+  const Notification = models.Notification;
 
   return {
     subscribe: function(req, res, next) {

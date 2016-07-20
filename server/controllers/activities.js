@@ -1,8 +1,8 @@
 /**
  * Dependencies.
  */
-var utils = require('../lib/utils');
-var _ = require('lodash');
+const utils = require('../lib/utils');
+const _ = require('lodash');
 
 /**
  * Controller.
@@ -12,8 +12,8 @@ module.exports = (app) => {
   /**
    * Internal Dependencies.
    */
-  var models = app.set('models');
-  var Activity = models.Activity;
+  const models = app.set('models');
+  const Activity = models.Activity;
 
   /**
    * Public methods.
@@ -24,7 +24,7 @@ module.exports = (app) => {
      * Get group's activities.
      */
     group(req, res, next) {
-      var query = _.merge({
+      const query = _.merge({
         where: {
           GroupId: req.group.id
         },
@@ -50,7 +50,7 @@ module.exports = (app) => {
      * Get user's activities.
      */
     user: function(req, res, next) {
-      var query = _.merge({
+      const query = _.merge({
         where: {
           UserId: req.user.id
         },

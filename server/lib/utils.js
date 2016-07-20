@@ -14,7 +14,7 @@ const base64url = require('base64url');
  * Encrypt with resetPasswordSecret
  */
 const encrypt = (text) => {
-  var cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
+  const cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   var crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
   return crypted;
@@ -24,7 +24,7 @@ const encrypt = (text) => {
  * Descript wih resetPasswordSecret
  */
 const decrypt = (text) => {
-  var decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
+  const decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   var dec = decipher.update(text,'hex','utf8')
   dec += decipher.final('utf8');
   return dec;
@@ -47,7 +47,7 @@ const getRequestedUrl = (req) => {
  * Add parameters to an url.
  */
 const addParameterUrl = (url, parameters) => {
-  var parsedUrl  = Url.parse(url, true);
+  const parsedUrl  = Url.parse(url, true);
 
   function removeTrailingChar(str, char) {
     if (str.substr(-1) === char) {
@@ -82,13 +82,13 @@ const paginatePage = (offset, limit) => {
  * Get links for pagination.
  */
 const getLinks = (url, options) => {
-  var page = options.page || paginatePage(options.offset, options.limit).page;
-  var perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
+  const page = options.page || paginatePage(options.offset, options.limit).page;
+  const perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
 
   if (!page && !perPage)
     return null;
 
-  var links = {
+  const links = {
     next: addParameterUrl(url, {page: page + 1, per_page: perPage}),
     current: addParameterUrl(url, {page: page, per_page: perPage})
   };
@@ -98,7 +98,7 @@ const getLinks = (url, options) => {
   }
 
   if (options.total) {
-    var lastPage = Math.ceil(options.total / perPage);
+    const lastPage = Math.ceil(options.total / perPage);
     links.last = addParameterUrl(url, {page: lastPage, per_page: perPage});
     if (page >= lastPage)
       delete links.next;
@@ -111,7 +111,7 @@ const getLinks = (url, options) => {
  * Get headers for pagination.
  */
 const getLinkHeader = (url, options) => {
-  var links = getLinks(url, options);
+  const links = getLinks(url, options);
   var header = '';
   var k = 0;
   for (var i in links) {
@@ -149,7 +149,7 @@ const paginateOffset = (page, perPage) => {
 const getTier = (user, tiers) => {
 
   var defaultTier;
-  switch(user.role) {
+  switch (user.role) {
     case 'MEMBER':
       return 'contributor';
       break;
@@ -161,10 +161,12 @@ const getTier = (user, tiers) => {
       break;
   }
 
-  if(!tiers || !user.totalDonations) return defaultTier;
+  if (!tiers || !user.totalDonations) return defaultTier;
 
   // We order the tiers by start range DESC
-  tiers.sort((a,b) => { return a.range[0] < b.range[0]; });
+  tiers.sort((a,b) => {
+    return a.range[0] < b.range[0];
+  });
 
   // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
   const tier = tiers.find((tier) => (user.totalDonations >= tier.range[0]));

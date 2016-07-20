@@ -21,7 +21,7 @@ module.exports = {
     var eventType = '';
     var provider = '';
     var connectedAccountUsername = '';
-    var connectedAccountLink = '';
+    const connectedAccountLink = '';
 
 
     // get user data
@@ -81,7 +81,7 @@ module.exports = {
       eventType = activity.data.event.type;
     }
 
-    var group = linkify(format, publicUrl, groupName);
+    const group = linkify(format, publicUrl, groupName);
 
     switch (activity.type) {
 
@@ -210,7 +210,7 @@ module.exports = {
       case activities.GROUP_TRANSACTION_CREATED:
 
         if (activity.data.transaction.isDonation) {
-          if(userTwitter) {
+          if (userTwitter) {
             tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
             tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
             tweetThis = ` [${tweetLink}]`;
@@ -234,7 +234,7 @@ module.exports = {
         return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
 
       case activities.SUBSCRIPTION_CONFIRMED:
-        if(userTwitter) {
+        if (userTwitter) {
           tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
           tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
           tweetThis = ` [${tweetLink}]`;
@@ -262,7 +262,7 @@ module.exports = {
  * Generates a url for Slack
  */
 const linkify = (format, link, text) => {
-  switch(format) {
+  switch (format) {
     case 'slack':
       if (link && !text) {
         text = link;

@@ -32,7 +32,7 @@ module.exports = (app) => {
      return model
        .find({ where: { [key]: value.toLowerCase() } })
        .tap(result => {
-         if(!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
+         if (!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
        });
    }
 

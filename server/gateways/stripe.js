@@ -96,7 +96,7 @@ const retrieveBalanceTransaction = (stripeAccount, txn) => {
 }
 
 const extractFees = (balance) => {
-  var fees = {
+  const fees = {
     total: balance.fee,
     stripeFee: 0,
     applicationFee: 0,

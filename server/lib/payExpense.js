@@ -5,10 +5,10 @@ const uuid = require('node-uuid');
 module.exports = app => {
   const services = {
     paypal: (group, expense, email, preapprovalKey) => {
-      var uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;
-      var baseUrl = config.host.webapp + uri;
-      var amount = expense.amount/100;
-      var payload = {
+      const uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;
+      const baseUrl = config.host.webapp + uri;
+      const amount = expense.amount/100;
+      const payload = {
         requestEnvelope: {
           errorLanguage: 'en_US',
           detailLevel: 'ReturnAll'

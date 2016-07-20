@@ -7,7 +7,7 @@ const config = require('config');
 sendErrorByEmail = (req, err) => {
   var errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
-  if(req.body.password) 
+  if (req.body.password)
     req.body.password = '***********';
 
   errorHTML += curlify(req, req.body);
@@ -32,7 +32,7 @@ module.exports = (err, req, res, next) => {
     return next(err);
   }
 
-  var name = err.name;
+  const name = err.name;
 
   if (name === 'UnauthorizedError') {// because of jwt-express
     err.code = err.status;
@@ -41,7 +41,7 @@ module.exports = (err, req, res, next) => {
   res.header('Cache-Control', 'no-cache');
 
   // Validation error.
-  var e = name && name.toLowerCase ? name.toLowerCase() : '';
+  const e = name && name.toLowerCase ? name.toLowerCase() : '';
 
   if (e.indexOf('validation') !== -1) {
     err = new errors.ValidationFailed(null, _.map(err.errors, (e) => e.path), err.message);
@@ -50,7 +50,7 @@ module.exports = (err, req, res, next) => {
   }
 
   if (!err.code || !Number.isInteger(err.code)) {
-    var code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
+    const code = (err.type && err.type.indexOf('Stripe') > -1) ? 400 : 500;
     err.code = err.status || code;
   }
 

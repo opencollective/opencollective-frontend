@@ -7,11 +7,11 @@ const _ = require('lodash');
 
 module.exports = function(app) {
 
-  var models = app.set('models');
-  var Application = models.Application;
-  var User = models.User;
-  var errors = app.errors;
-  var users = require('../controllers/users')(app);
+  const models = app.set('models');
+  const Application = models.Application;
+  const User = models.User;
+  const errors = app.errors;
+  const users = require('../controllers/users')(app);
 
   /**
    * Public methods.
@@ -26,12 +26,12 @@ module.exports = function(app) {
 
       return (req, res, next) => {
 
-        switch(format) {
+        switch (format) {
           case 'csv':
             const send = res.send;
             res.send = (data) => {
               data = _.map(data, (row) => {
-                if(row.createdAt)
+                if (row.createdAt)
                   row.createdAt = moment(row.createdAt).format("YYYY-MM-DD HH:mm");
 
                 return row;
@@ -58,32 +58,30 @@ module.exports = function(app) {
     getOrCreateUser: (req, res, next) => {
 
       // If already logged in, proceed
-      if(req.remoteUser) {
+      if (req.remoteUser) {
         req.user = req.remoteUser;
         return next();
       }
 
-      var name, email, paypalEmail, password;
+      var name, email, paypalEmail;
 
       // TODO remove #postmigration, replaced by req.body.expense
-      if(req.body.transaction) {
+      if (req.body.transaction) {
         email = req.body.transaction.email;
         paypalEmail = req.body.transaction.paypalEmail;
         name = req.body.transaction.name;
-      }
-      else if(req.body.expense) {
+      } else if (req.body.expense) {
         email = req.body.expense.email;
         paypalEmail = req.body.expense.paypalEmail;
         name = req.body.expense.name;
-      }
-      // TODO remove #postmigration
-      else if(req.body.payment) {
+      } else if (req.body.payment) {
+        // TODO remove #postmigration
         email = req.body.payment.email;
       }
 
-      password = req.body.password || req.query.password;
+      const password = req.body.password || req.query.password;
 
-      if(!email && !paypalEmail) {
+      if (!email && !paypalEmail) {
         return next(new errors.ValidationFailed("Email or paypalEmail required"));
       }
 
@@ -123,7 +121,7 @@ module.exports = function(app) {
      * Check the api_key.
      */
     apiKey: function(req, res, next) {
-      var key = req.query.api_key || req.body.api_key;
+      const key = req.query.api_key || req.body.api_key;
 
       if (!key) return next();
 
@@ -147,9 +145,9 @@ module.exports = function(app) {
      * Authenticate.
      */
     authenticate: function(req, res, next) {
-      var username = (req.body && req.body.username) || req.query.username;
-      var email = (req.body && req.body.email) || req.query.email;
-      var password = (req.body && req.body.password) || req.query.password;
+      const username = (req.body && req.body.username) || req.query.username;
+      const email = (req.body && req.body.email) || req.query.email;
+      const password = (req.body && req.body.password) || req.query.password;
       if (!req.application || !req.application.api_key) {
         return next();
       }
@@ -160,13 +158,12 @@ module.exports = function(app) {
 
       User.auth((username || email), password, (e, user) => {
 
-        var errorMsg = 'Invalid username/email or password';
+        const errorMsg = 'Invalid username/email or password';
 
         if (e) {
           if (e.code === 400) {
             return next(new errors.BadRequest(errorMsg));
-          }
-          else {
+          } else {
             return next(new errors.ServerError(e.message));
           }
         }
@@ -295,7 +292,7 @@ module.exports = function(app) {
       return function(req, res, next) {
 
         // Since ID.
-        var sinceId = req.body.since_id || req.query.since_id;
+        const sinceId = req.body.since_id || req.query.since_id;
         if (sinceId) {
           req.pagination = {
             where: {
@@ -330,8 +327,8 @@ module.exports = function(app) {
       options.dir = (typeof options.dir !== 'undefined') ? options.dir : 'ASC';
 
       return function(req, res, next) {
-        var key = req.body.sort || req.query.sort;
-        var dir = req.body.direction || req.query.direction;
+        const key = req.body.sort || req.query.sort;
+        const dir = req.body.direction || req.query.direction;
 
         req.sorting = {
           key: key || options.key,

@@ -17,7 +17,7 @@ module.exports = (Sequelize, activity) => {
       }))
     // process notification entries
     .then(() => {
-      if(!activity.GroupId || !activity.type) {
+      if (!activity.GroupId || !activity.type) {
         return Promise.resolve([]);
       }
       return Sequelize.models.Notification.findAll({

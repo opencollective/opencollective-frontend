@@ -6,15 +6,15 @@ const setupModels = require('../models').setupModels;
 
 module.exports = function(app) {
 
-  var errors = app.errors;
+  const errors = app.errors;
   /**
    * This resets the test-api database (and only the test-api database)
    */
-  var resetTestDatabase = function(req, res, next) {
+  const resetTestDatabase = function(req, res, next) {
 
     // Hard code database name to avoid resetting the production db by mistake
     var databaseName;
-    switch(process.env.NODE_ENV) {
+    switch (process.env.NODE_ENV) {
       case 'circleci':
         databaseName = 'circle_test';
         break;
@@ -187,8 +187,8 @@ module.exports = function(app) {
     });
   }
 
-  var generateTestEmail = function(req, res) {
-    var emailLib = require('../lib/email')(app);
+  const generateTestEmail = function(req, res) {
+    const emailLib = require('../lib/email')(app);
     // TODO: figure out why test.utils doesn't work here.
     data = require('../../test/mocks/data.json')['emailData'];
     const html = emailLib.templates[req.params.template](data);

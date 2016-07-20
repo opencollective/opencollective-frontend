@@ -54,7 +54,7 @@ module.exports = (app) => {
    */
   const list = (req, res, next) => {
 
-    var query = Object.assign({
+    const query = Object.assign({
       where: { GroupId: req.group.id },
       order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
@@ -135,8 +135,7 @@ module.exports = (app) => {
             .then(checkIfEnoughFunds(expense))
             .then(() => expense.setApproved())
             .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
-        }
-        else {
+        } else {
            return models.UserGroup.findOne({
             where: {
               GroupId: expense.GroupId,
@@ -285,7 +284,7 @@ module.exports = (app) => {
     if (paypalResponse) {
       console.error('PayPal error', JSON.stringify(paypalResponse));
       if (paypalResponse.error instanceof Array) {
-        var message = paypalResponse.error[0].message;
+        const message = paypalResponse.error[0].message;
         return new errors.BadRequest(message);
       }
     }

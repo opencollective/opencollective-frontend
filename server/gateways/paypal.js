@@ -50,7 +50,7 @@ const createBillingPlan = (planDescription, group, transaction, paypalConfig, cb
 
 const createBillingAgreement = (agreementDescription, planId, paypalConfig, cb) => {
   // From paypal example, fails with moment js, TO REFACTOR
-  var isoDate = new Date();
+  const isoDate = new Date();
   isoDate.setSeconds(isoDate.getSeconds() + 4);
   isoDate.toISOString().slice(0, 19) + 'Z';  // eslint-disable-line
 

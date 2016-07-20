@@ -9,8 +9,8 @@ module.exports = function(app) {
   const generateFXConversionSQL = (aggregate) => {
     var currencyColumn = "currency";
     var amountColumn = "amount";
-    
-    if(aggregate) {
+
+    if (aggregate) {
       currencyColumn = 'MAX(g.currency)';
       amountColumn = 'SUM("amount")';
     }
@@ -37,7 +37,7 @@ module.exports = function(app) {
   const getTotalDonations = () => {
     return sequelize.query(`
       SELECT SUM(${generateFXConversionSQL()}) AS "totalDonationsInUSD"
-      FROM "Transactions" 
+      FROM "Transactions"
       WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL
     `, {
       type: sequelize.QueryTypes.SELECT

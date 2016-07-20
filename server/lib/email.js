@@ -43,7 +43,7 @@ const render = (name, data, config) => {
 /***
  * Loading Handlebars templates for the HTML emails
  */
-var templates = {};
+const templates = {};
 function loadTemplates() {
   const templatesPath = `${__dirname}/../../templates`;
 
@@ -74,7 +74,7 @@ function loadTemplates() {
   });
 
   templatesNames.forEach((template) => {
-    var source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
+    const source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
     templates[template] = handlebars.compile(source);
   });
 };
@@ -88,19 +88,19 @@ const EmailLib = (app) => {
 
   const send = (template, recipient, data) => {
 
-    if(template === 'thankyou') {
-      if(data.group.name.match(/WWCode/i))
+    if (template === 'thankyou') {
+      if (data.group.name.match(/WWCode/i))
         template += '.wwcode';
-      if(data.group.name.match(/ispcwa/i))
+      if (data.group.name.match(/ispcwa/i))
         template += '.ispcwa';
-      if(_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
+      if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
         template += '.fr';
 
-        if(data.group.slug === 'laprimaire')
+        if (data.group.slug === 'laprimaire')
           template = 'thankyou.laprimaire';
 
         // xdamman: hack
-        switch(data.interval) {
+        switch (data.interval) {
           case 'month':
             data.interval = 'mois';
             break;
@@ -111,9 +111,9 @@ const EmailLib = (app) => {
       }
     }
 
-    if(template === 'group.transaction.created') {
+    if (template === 'group.transaction.created') {
       template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.created';
-      if(data.user && data.user.twitterHandle) {
+      if (data.user && data.user.twitterHandle) {
         const groupMention = (data.group.twitterHandle) ? `@${data.group.twitterHandle}` : data.group.name;
         const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${groupMention} https://opencollective.com/${data.group.slug} 🎉😊`;
         data.tweet = {
@@ -123,7 +123,7 @@ const EmailLib = (app) => {
       }
     }
 
-    if(!templates[template]) return Promise.reject(new Error("Invalid email template"));
+    if (!templates[template]) return Promise.reject(new Error("Invalid email template"));
 
     const templateString = render(template, data, config);
 

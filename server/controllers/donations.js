@@ -45,7 +45,7 @@ module.exports = (app) => {
     const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
     const isSubscription = _.contains(['month', 'year'], interval);
-    var hasFullAccount = false; // Used to specify if a user has a real account
+    const hasFullAccount = false; // Used to specify if a user has a real account
 
     if (interval && !isSubscription) {
       return next(new errors.BadRequest('Interval should be month or year.'));
@@ -224,7 +224,7 @@ module.exports = (app) => {
         const balanceTransaction = results.retrieveBalanceTransaction
         const fees = gateways.stripe.extractFees(balanceTransaction);
         const hostFeePercent = group.hostFeePercent;
-        var payload = {
+        const payload = {
           user,
           group,
           paymentMethod
@@ -294,7 +294,7 @@ module.exports = (app) => {
 
       if (e) {
         e.payload = req.body;
-        if(e.detail) {
+        if (e.detail) {
           e.message = e.detail.message;
           e.type = e.detail.type;
         }

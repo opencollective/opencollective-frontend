@@ -22,7 +22,7 @@ const models = setupModels(sequelize);
  * Separate function to be able to use in scripts
  */
 function setupModels(client) {
-  var m = {}; // models
+  const m = {}; // models
 
   /**
    * Models.
