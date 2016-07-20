@@ -27,8 +27,7 @@ module.exports = function(app) {
      */
 
     const ext = path.extname(file.originalname);
-    const name = file.originalname.replace(/\W/g, ''); // remove non alphanumeric
-    const filename = ['/', name, '_', uuid.v1(), ext].join('');
+    const filename = ['/', uuid.v1(), ext].join('');
 
     const put = app.knox.put(filename, {
       'Content-Length': file.size,
