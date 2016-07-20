@@ -12,23 +12,11 @@ module.exports = function(app) {
 
   return (req, res, next) => {
 
-    const getGroupsByTag = (tag) => {
-      return models.Group.findAll({
-        where: {
-          isPublic: true,
-          tags: { $contains: [tag] }
-        },
-        order: [['updatedAt', 'DESC']],
-        limit: 6
-      })
-    };
-
     const getGroupsByTagForCollectiveCard = (tags) => {
       return new Promise((resolve, reject) => {
-        getGroupsByTag(tags)
+        queries.getTopGroups(tags)
         .then(groups => {
           return Promise.all(groups.map(group => {
-
             const appendTier = backers => {
               backers = backers.map(backer => {
                 backer.tier = utils.getTier(backer, group.tiers);

@@ -18,7 +18,7 @@ var models = app.set('models');
  */
 describe('homepage.routes.test.js', () => {
 
-  var user, group;
+  var user, group, paymentMethod;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -28,6 +28,16 @@ describe('homepage.routes.test.js', () => {
       .create(groupData).tap(g => {
         group = g;
         return group.addUserWithRole(user, 'HOST');
+      })
+      .then(() => models.PaymentMethod.create({UserId: user.id}))
+      .tap(p => paymentMethod = p)
+      .then(() => {
+        return models.Transaction.create({
+          amount:1000,
+          PaymentMethodId: paymentMethod.id,
+          GroupId: group.id,
+          UserId: user.id
+        })
       })
       .then(() => done())
   );
