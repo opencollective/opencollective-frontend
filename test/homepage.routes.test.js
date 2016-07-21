@@ -23,7 +23,7 @@ describe('homepage.routes.test.js', () => {
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
-  beforeEach((done) => 
+  beforeEach((done) =>
     models.Group
       .create(groupData).tap(g => {
         group = g;

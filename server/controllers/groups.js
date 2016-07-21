@@ -27,7 +27,7 @@ module.exports = function(app) {
   const activities = require('../constants/activities');
   const emailLib = require('../lib/email')(app);
   const githubLib = require('../lib/github');
-  const queries = require('../lib/queries')(app);
+  const queries = require('../lib/queries')(models.sequelize);
 
 
   const subscribeUserToGroupEvents = (user, group, role) => {
@@ -462,7 +462,8 @@ module.exports = function(app) {
       req.group.getYearlyIncome(),
       req.group.getTotalDonations(),
       req.group.getBackersCount(),
-      req.group.getTwitterSettings()
+      req.group.getTwitterSettings(),
+      req.group.getRelatedGroups()
       ])
     .then(values => {
       group.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
@@ -473,6 +474,7 @@ module.exports = function(app) {
       group.backersCount = values[5];
       group.settings = group.settings || {};
       group.settings.twitter = values[6];
+      group.related = values[7];
       return group;
     })
     .then(group => res.send(group))

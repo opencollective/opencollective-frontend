@@ -78,6 +78,9 @@ describe('transactions.routes.test.js', () => {
   // Create an independent application.
   beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
 
+  beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
+
+
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**

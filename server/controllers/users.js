@@ -26,7 +26,7 @@ module.exports = (app) => {
   const UserGroup = models.UserGroup;
   const sendEmail = require('../lib/email')(app).send;
   const errors = app.errors;
-  const queries = require('../lib/queries')(app);
+  const queries = require('../lib/queries')(models.sequelize);
   const Unauthorized = errors.Unauthorized;
 
   /**

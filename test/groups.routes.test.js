@@ -426,6 +426,31 @@ describe('groups.routes.test.js', () => {
 
     // Create another user.
     beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+    beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
+
+    // Create a transaction for group2.
+    beforeEach((done) => {
+      request(app)
+        .post('/groups/' + publicGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: transactionsData[8]
+        })
+        .expect(200)
+        .end(done);
+    });
+
+    // Create a transaction for group2.
+    beforeEach((done) => {
+      request(app)
+        .post('/groups/' + privateGroup.id + '/transactions')
+        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .send({
+          transaction: transactionsData[8]
+        })
+        .expect(200)
+        .end(done);
+    });
 
     it('fails getting a group if not authenticated', (done) => {
       request(app)
@@ -478,9 +503,13 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('name', publicGroup.name);
           expect(res.body).to.have.property('isPublic', publicGroup.isPublic);
           expect(res.body).to.have.property('stripeAccount');
+          expect(res.body).to.have.property('yearlyIncome');
+          expect(res.body).to.have.property('backersCount');
+          expect(res.body).to.have.property('related');
           expect(res.body.tags).to.eql(publicGroup.tags);
           expect(res.body).to.have.property('isSupercollective', false);
           expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
+          expect(res.body.related.length).to.eql(1);
           done();
         });
     });
@@ -558,7 +587,7 @@ describe('groups.routes.test.js', () => {
           .end(done);
       });
 
-      it('successfully get a group with remaining budget', (done) => {
+      it('successfully get a group with remaining budget and yearlyIncome', (done) => {
         request(app)
           .get('/groups/' + publicGroup.id)
           .send({
@@ -568,8 +597,8 @@ describe('groups.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             var g = res.body;
-            expect(g).to.have.property('balance', (totDonations*100 + totTransactions*100 + transactionsData[7].amount*100).toFixed(0));
-            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12)*100);
+            expect(g).to.have.property('balance', (totDonations*100 + totTransactions*100 + transactionsData[7].amount*100 + transactionsData[8].amount*100).toFixed(0));
+            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount)*100);
             expect(g).to.not.have.property('activities');
             done();
           });

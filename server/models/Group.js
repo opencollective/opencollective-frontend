@@ -5,9 +5,11 @@ const _ = require('lodash');
 const Joi = require('joi');
 const config = require('config');
 const errors = require('../lib/errors');
+const groupBy = require('lodash/collection/groupBy');
 
 const roles = require('../constants/roles');
 const constants = require('../constants/transactions');
+const utils = require('../lib/utils');
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -27,6 +29,7 @@ const tiers = Joi.array().items(tier);
 module.exports = function(Sequelize, DataTypes) {
 
   const models = Sequelize.models;
+  const queries = require('../lib/queries')(Sequelize);
 
   const Group = Sequelize.define('Group', {
     name: {
@@ -376,6 +379,11 @@ module.exports = function(Sequelize, DataTypes) {
         return settings.twitter;
       },
 
+      getRelatedGroups(limit) {
+        limit = limit || 3
+        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id]);
+      },
+
       hasHost() {
         return Sequelize.models.UserGroup.find({
           where: {
@@ -385,7 +393,40 @@ module.exports = function(Sequelize, DataTypes) {
         })
         .then(userGroup => Promise.resolve(!!userGroup));
       }
+    },
 
+    classMethods: {
+      getGroupsSummaryByTag: (tags, limit, excludeList) => {
+        limit = limit || 3;
+        excludeList = excludeList || [];
+
+        return queries.getTopGroups(tags, limit, excludeList)
+          .then(groups => {
+            return Promise.all(groups.map(group => {
+              const appendTier = backers => {
+                backers = backers.map(backer => {
+                  backer.tier = utils.getTier(backer, group.tiers);
+                  return backer;
+                });
+                return backers;
+              };
+
+              return Promise.all([
+                  group.getYearlyIncome(),
+                  queries.getUsersFromGroupWithTotalDonations(group.id)
+                    .then(appendTier)
+                ])
+                .then(values => {
+                  const groupInfo = group.card;
+                  groupInfo.yearlyIncome = values[0];
+                  const usersByRole = groupBy(values[1], 'role');
+                  groupInfo.backers = usersByRole[roles.BACKER] || [];
+                  groupInfo.members = usersByRole[roles.MEMBER] || [];
+                  return groupInfo;
+                });
+            }));
+          });
+      }
     }
   });
 

@@ -81,7 +81,7 @@
       "button": "Become a member"
     }],
     "hostFeePercent": 10,
-    "tags": ["open source", "frameworks", "ruby"],
+    "tags": ["open source", "test"],
     "isSupercollective": false
   },
 
@@ -110,7 +110,7 @@
       "button": "Become a member"
     }],
     "hostFeePercent": 0,
-    "tags": ["wwcode", "austin"],
+    "tags": ["meetup", "test"],
     "isSupercollective": false
   },
 
@@ -440,6 +440,18 @@
         "comment": "",
         "link": "",
         "createdAt": "2015-05-29T07:00:00.000Z"
+      },
+      {
+        "vendor": "@montogeek",
+        "description": "Donation to that great project",
+        "tags": ["donation"],
+        "amount": 999,
+        "currency": "USD",
+        "paypalEmail": "userpaypal@gmail.com",
+        "comment": "",
+        "link": "",
+        "createdAt": "2015-05-29T07:00:00.000Z",
+        "PaymentMethodId": 1
       }
     ]
   },

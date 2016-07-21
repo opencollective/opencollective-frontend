@@ -1,54 +1,12 @@
-const groupBy = require('lodash/collection/groupBy');
-const roles = require('../constants/roles');
-const utils = require('../lib/utils');
-
 /**
  * Controller.
  */
 module.exports = function(app) {
 
   const models = app.set('models');
-  const queries = require('../lib/queries')(app);
+  const queries = require('../lib/queries')(models.sequelize);
 
   return (req, res, next) => {
-
-    const getGroupsByTagForCollectiveCard = (tags) => {
-      return new Promise((resolve, reject) => {
-        queries.getTopGroups(tags)
-        .then(groups => {
-          return Promise.all(groups.map(group => {
-            const appendTier = backers => {
-              backers = backers.map(backer => {
-                backer.tier = utils.getTier(backer, group.tiers);
-                return backer;
-              });
-              return backers;
-            };
-
-            return Promise.all([
-              group.getYearlyIncome(),
-              new Promise((resolve, reject) => {
-                queries.getUsersFromGroupWithTotalDonations(group.id)
-                  .then(appendTier)
-                  .then(resolve)
-                  .catch(reject);
-              })
-            ])
-            .then(values => {
-              const groupInfo = group.card;
-              groupInfo.yearlyIncome = values[0];
-              const usersByRole = groupBy(values[1], 'role');
-              groupInfo.backers = usersByRole[roles.BACKER] || [];
-              groupInfo.members = usersByRole[roles.MEMBER] || [];
-              return groupInfo;
-            })
-          }));
-        })
-        .then(resolve)
-        .catch(reject);
-      });
-    };
-
     /**
      * get total number of active collectives
      * (a collective is considered as active if it has ever received any funding from its host or through a donation)
@@ -76,8 +34,8 @@ module.exports = function(app) {
       getTotalCollectives(),
       getTotalDonors(),
       queries.getTotalDonations(),
-      getGroupsByTagForCollectiveCard('open source'),
-      getGroupsByTagForCollectiveCard('meetup'),
+      models.Group.getGroupsSummaryByTag('open source'),
+      models.Group.getGroupsSummaryByTag('meetup'),
       queries.getTopSponsors()
     ])
     .then(results => {

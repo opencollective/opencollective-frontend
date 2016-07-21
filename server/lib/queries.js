@@ -1,7 +1,6 @@
-module.exports = function(app) {
+module.exports = function(sequelize) {
 
-  const models = app.set('models');
-  const sequelize = models.sequelize;
+  const models = sequelize.models;
 
   /*
   * Hacky way to do currency conversion on Leaderboard
@@ -48,15 +47,19 @@ module.exports = function(app) {
   /**
    * Get top collectives based on total donations
    */
-  const getTopGroups = (tag) => {
+  const getTopGroups = (tag, limit, excludeList) => {
+    var excludeClause = '';
+    if (excludeList && excludeList.length > 0) {
+      excludeClause = `AND g.id not in (${excludeList})`;
+    }
     return sequelize.query(`
       WITH "totalDonations" AS (
         SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
       )
       SELECT g.id, g.name, g.slug, g.mission, g.logo, t."totalDonations", t.currency, t.collectives
       FROM "totalDonations" t LEFT JOIN "Groups" g ON t."GroupId" = g.id
-      WHERE t."totalDonations" > 100 AND g.tags @> $tag AND g."deletedAt" IS NULL
-      ORDER BY "totalDonations" DESC LIMIT 3
+      WHERE t."totalDonations" > 100 AND g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
+      ORDER BY "totalDonations" DESC LIMIT ${limit}
     `, {
       bind: { tag: [tag] },
       model: models.Group
