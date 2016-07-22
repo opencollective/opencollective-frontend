@@ -6,6 +6,8 @@ const Joi = require('joi');
 const config = require('config');
 const errors = require('../lib/errors');
 const groupBy = require('lodash/collection/groupBy');
+const filter = require('lodash/collection/filter');
+const values = require('lodash/object/values');
 
 const roles = require('../constants/roles');
 const constants = require('../constants/transactions');
@@ -416,16 +418,19 @@ module.exports = function(Sequelize, DataTypes) {
                   queries.getUsersFromGroupWithTotalDonations(group.id)
                     .then(appendTier)
                 ])
-                .then(values => {
+                .then(results => {
                   const groupInfo = group.card;
-                  groupInfo.yearlyIncome = values[0];
-                  const usersByRole = groupBy(values[1], 'role');
-                  groupInfo.backers = usersByRole[roles.BACKER] || [];
-                  groupInfo.members = usersByRole[roles.MEMBER] || [];
+                  groupInfo.yearlyIncome = results[0];
+                  const usersByRole = groupBy(results[1], 'role');
+                  const backers = usersByRole[roles.BACKER] || [];
+                  groupInfo.backersAndSponsorsCount = backers.length;
+                  groupInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;
+                  groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
+                  groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
                   return groupInfo;
                 });
             }));
-          });
+          })
       }
     }
   });

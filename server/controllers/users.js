@@ -11,6 +11,8 @@ const imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
 const constants = require('../constants/activities');
 const roles = require('../constants/roles');
 const sequelize = require('sequelize');
+const filter = require('lodash/collection/filter');
+const values = require('lodash/object/values');
 
 /**
  * Controller.
@@ -334,11 +336,14 @@ module.exports = (app) => {
                   .catch(reject);
               })
             ])
-            .then(values => {
+            .then(results => {
               var groupInfo = group.info;
-              groupInfo.yearlyIncome = values[0];
-              const usersByRole = groupBy(values[1], 'role');
-              groupInfo.backers = usersByRole[roles.BACKER] || [];
+              groupInfo.yearlyIncome = results[0];
+              const usersByRole = groupBy(results[1], 'role');
+              const backers = usersByRole[roles.BACKER] || [];
+              groupInfo.backersAndSponsorsCount = backers.length;
+              groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
+              groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
               groupInfo = Object.assign(groupInfo, { role: group.UserGroup.role, createdAt: group.UserGroup.createdAt });
               groupInfoArray.push(groupInfo);
               return group;
