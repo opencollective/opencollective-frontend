@@ -176,6 +176,17 @@ const getTier = (user, tiers) => {
 };
 
 /**
+ * Append tier to each backer in an array of backers
+ */
+const appendTier = (backers, tiers) => {
+  backers = backers.map((backer) => {
+    backer.tier = getTier(backer, tiers);
+    return backer;
+  });
+  return backers;
+}
+
+/**
  * Default host id, set this for new groups created through Github
  */
 const defaultHostId = () => {
@@ -198,6 +209,7 @@ module.exports = {
   planId,
   encrypt,
   getTier,
+  appendTier,
   decrypt,
   defaultHostId
 }

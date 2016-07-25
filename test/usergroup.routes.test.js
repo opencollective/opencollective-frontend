@@ -383,9 +383,10 @@ describe('usergroup.routes.test.js', () => {
         .expect(200)
         .expect((res) => {
           const users = res.body;
-          expect(users[0].tier).to.equal('host');
-          expect(users[1].tier).to.equal('contributor');
-          expect(users[2].tier).to.equal('sponsor');
+          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          expect(users[0].tier).to.equal('contributor');
+          expect(users[1].tier).to.equal('sponsor');
+          expect(users[2].tier).to.equal('host');
           expect(users[3].tier).to.equal('backer');
         })
         .end(done);
@@ -398,9 +399,10 @@ describe('usergroup.routes.test.js', () => {
         .expect((res) => {
           const users = res.text.split('\n').slice(1);
           expect(users.length).to.equal(4);
-          expect(users[0].split(",")[8]).to.equal('"host"');
-          expect(users[1].split(",")[8]).to.equal('"contributor"');
-          expect(users[2].split(",")[8]).to.equal('"sponsor"');
+          users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
+          expect(users[0].split(",")[8]).to.equal('"contributor"');
+          expect(users[1].split(",")[8]).to.equal('"sponsor"');
+          expect(users[2].split(",")[8]).to.equal('"host"');
           expect(users[3].split(",")[8]).to.equal('"backer"');
         })
         .end(done);

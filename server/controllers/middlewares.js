@@ -12,11 +12,25 @@ module.exports = function(app) {
   const User = models.User;
   const errors = app.errors;
   const users = require('../controllers/users')(app);
+  const queries = require('../lib/queries')(models.sequelize);
 
   /**
    * Public methods.
    */
   return {
+
+    /**
+     * Fetch backers of a group by tier
+     */
+    fetchUsers: (req, res, next) => {
+      queries.getUsersFromGroupWithTotalDonations(req.group.id)
+        .then(users => utils.appendTier(users, req.group.tiers))
+        .then(users => {
+          req.users = users;
+        })
+        .then(next)
+        .catch(next);
+    },
 
     /**
      * Add this middleware before the controller (before calling res.send)

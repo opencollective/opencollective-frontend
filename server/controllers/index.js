@@ -22,7 +22,8 @@ module.exports = function(app) {
     'users',
     'webhooks',
     'test',
-    'connectedAccounts'
+    'connectedAccounts',
+    'meetup'
   ];
 
   /**
