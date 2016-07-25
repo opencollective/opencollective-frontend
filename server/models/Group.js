@@ -382,8 +382,12 @@ module.exports = function(Sequelize, DataTypes) {
       },
 
       getRelatedGroups(limit) {
-        limit = limit || 3
-        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id]);
+        // don't fetch related groups for supercollectives for now
+        if (!this.isSupercollective) {
+          limit = limit || 3
+          return Group.getGroupsSummaryByTag(this.tags, limit, [this.id]);
+        }
+        return Promise.resolve();
       },
 
       hasHost() {
@@ -394,15 +398,24 @@ module.exports = function(Sequelize, DataTypes) {
           }
         })
         .then(userGroup => Promise.resolve(!!userGroup));
+      },
+
+      getSuperCollectiveData() {
+        if (this.isSupercollective &&
+          this.settings.superCollectiveTag &&
+          this.settings.superCollectiveTag.length > 0) {
+          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 100, [this.id], 0);
+        }
+        return Promise.resolve();
       }
     },
 
     classMethods: {
-      getGroupsSummaryByTag: (tags, limit, excludeList) => {
+      getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation) => {
         limit = limit || 3;
         excludeList = excludeList || [];
 
-        return queries.getTopGroups(tags, limit, excludeList)
+        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation)
           .then(groups => {
             return Promise.all(groups.map(group => {
               const appendTier = backers => {

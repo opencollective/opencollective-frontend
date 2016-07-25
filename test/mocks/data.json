@@ -118,6 +118,15 @@
     "name": "Yeoman"
   },
 
+  "group4": {
+    "name": "Open source collective",
+    "slug": "meetups",
+    "isPublic": true,
+    "settings": {
+      "superCollectiveTag": "meetup"
+    },
+    "isSupercollective": true
+  },
 
   "paymentMethod1": {
     "token": "PA-1B0110758V169653C",

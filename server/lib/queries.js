@@ -47,19 +47,27 @@ module.exports = function(sequelize) {
   /**
    * Get top collectives based on total donations
    */
-  const getTopGroups = (tag, limit, excludeList) => {
-    var excludeClause = '';
+  const getGroupsByTag = (tag, limit, excludeList, minTotalDonation) => {
+    var excludeClause = ''
+    var minTotalDonationClause = '';
+
     if (excludeList && excludeList.length > 0) {
       excludeClause = `AND g.id not in (${excludeList})`;
     }
+    if (minTotalDonation && minTotalDonation > 0) {
+      minTotalDonationClause = `t."totalDonations" >= ${minTotalDonation} AND`
+    } else {
+      minTotalDonationClause = ''
+    }
+
     return sequelize.query(`
       WITH "totalDonations" AS (
         SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
       )
       SELECT g.id, g.name, g.slug, g.mission, g.logo, t."totalDonations", t.currency, t.collectives
-      FROM "totalDonations" t LEFT JOIN "Groups" g ON t."GroupId" = g.id
-      WHERE t."totalDonations" > 100 AND g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
-      ORDER BY "totalDonations" DESC LIMIT ${limit}
+      FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
+      WHERE ${minTotalDonationClause} g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
+      ORDER BY t."totalDonations" DESC NULLS LAST LIMIT ${limit}
     `, {
       bind: { tag: [tag] },
       model: models.Group
@@ -147,7 +155,7 @@ const getLeaderboard = () => {
     getUsersFromGroupWithTotalDonations,
     getLeaderboard,
     getTopSponsors,
-    getTopGroups
+    getGroupsByTag
   };
 
 };

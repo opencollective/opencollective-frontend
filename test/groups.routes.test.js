@@ -651,6 +651,50 @@ describe('groups.routes.test.js', () => {
 
     });
 
+    describe('Supercollective', () => {
+      var supercollectiveData = utils.data('group4');
+      var supercollective;
+
+      // Create supercollective
+      beforeEach((done) => {
+        request(app)
+          .post('/groups')
+          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .send({
+            group: supercollectiveData,
+            role: roles.HOST
+          })
+          .expect(200)
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            models.Group
+              .findById(parseInt(res.body.id))
+              .tap((g) => {
+                supercollective = g;
+                done();
+              })
+              .catch(done);
+          });
+      });
+
+      it('successfully get a supercollective with data', (done) => {
+        request(app)
+          .get('/groups/' + supercollective.slug.toUpperCase())
+          .expect(200)
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            expect(res.body).to.have.property('id', supercollective.id);
+            expect(res.body).to.have.property('name', supercollective.name);
+            expect(res.body).to.have.property('isSupercollective', supercollective.isSupercollective);
+            expect(res.body).to.have.property('superCollectiveData')
+            expect(res.body.superCollectiveData.length).to.eql(1);
+            expect(res.body.superCollectiveData[0].publicUrl).to.contain('wwcode-austin');
+            done();
+        });
+      });
+
+    })
+
   });
 
   /**
