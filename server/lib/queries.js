@@ -47,10 +47,13 @@ module.exports = function(sequelize) {
   /**
    * Get top collectives based on total donations
    */
-  const getGroupsByTag = (tag, limit, excludeList, minTotalDonation) => {
+  const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder) => {
     var excludeClause = ''
     var minTotalDonationClause = '';
-
+    var orderClause = 'BY t."totalDonations"';
+    if (randomOrder) {
+      orderClause = 'BY random()'
+    }
     if (excludeList && excludeList.length > 0) {
       excludeClause = `AND g.id not in (${excludeList})`;
     }
@@ -67,7 +70,7 @@ module.exports = function(sequelize) {
       SELECT g.id, g.name, g.slug, g.mission, g.logo, t."totalDonations", t.currency, t.collectives
       FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
       WHERE ${minTotalDonationClause} g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
-      ORDER BY t."totalDonations" DESC NULLS LAST LIMIT ${limit}
+      ORDER ${orderClause} DESC NULLS LAST LIMIT ${limit}
     `, {
       bind: { tag: [tag] },
       model: models.Group

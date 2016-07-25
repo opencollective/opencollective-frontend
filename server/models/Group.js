@@ -385,7 +385,7 @@ module.exports = function(Sequelize, DataTypes) {
         // don't fetch related groups for supercollectives for now
         if (!this.isSupercollective) {
           limit = limit || 3
-          return Group.getGroupsSummaryByTag(this.tags, limit, [this.id]);
+          return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], 100, true);
         }
         return Promise.resolve();
       },
@@ -404,18 +404,18 @@ module.exports = function(Sequelize, DataTypes) {
         if (this.isSupercollective &&
           this.settings.superCollectiveTag &&
           this.settings.superCollectiveTag.length > 0) {
-          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 100, [this.id], 0);
+          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 100, [this.id], 0, false);
         }
         return Promise.resolve();
       }
     },
 
     classMethods: {
-      getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation) => {
+      getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder) => {
         limit = limit || 3;
         excludeList = excludeList || [];
 
-        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation)
+        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation, randomOrder)
           .then(groups => {
             return Promise.all(groups.map(group => {
               const appendTier = backers => {
