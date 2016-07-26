@@ -106,8 +106,14 @@ module.exports = {
 
       case activities.GROUP_TRANSACTION_PAID:
         const details = activity.data.preapprovalDetails;
-        const remaining = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
-        return `Expense paid on ${group}: ${currency} ${amount} for '${description}' (${remaining} ${currency} remaining on preapproval key)`;
+        var remainingClause = '';
+        if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
+          const remaining = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
+          remainingClause = `(${remaining} ${currency} remaining on preapproval key)`;
+        } else {
+          remainingClause = `[Manual payment]`;
+        }
+        return `Expense paid on ${group}: ${currency} ${amount} for '${description}' ${remainingClause}`;
 
       case activities.USER_CREATED:
         return `New user joined: ${userString}`;
