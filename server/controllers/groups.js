@@ -73,17 +73,8 @@ module.exports = function(app) {
   };
 
   const getUsers = (req, res, next) => {
-
-    const appendTier = (backers) => {
-      backers = backers.map((backer) => {
-        backer.tier = utils.getTier(backer, req.group.tiers);
-        return backer;
-      });
-      return backers;
-    }
-
     return queries.getUsersFromGroupWithTotalDonations(req.group.id)
-      .then(appendTier)
+      .then(backers => utils.appendTier(backers, req.group.tiers))
       .then(backers => res.send(backers))
       .catch(next);
   };

@@ -38,7 +38,8 @@ module.exports = function(sequelize) {
       SELECT SUM(${generateFXConversionSQL()}) AS "totalDonationsInUSD"
       FROM "Transactions"
       WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL
-    `, {
+    `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+    {
       type: sequelize.QueryTypes.SELECT
     })
     .then(res => Math.round(res[0].totalDonationsInUSD));
@@ -71,7 +72,8 @@ module.exports = function(sequelize) {
       FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
       WHERE ${minTotalDonationClause} g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
       ORDER ${orderClause} DESC NULLS LAST LIMIT ${limit}
-    `, {
+    `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+    {
       bind: { tag: [tag] },
       model: models.Group
     });
@@ -89,7 +91,8 @@ module.exports = function(sequelize) {
       FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
       WHERE t."totalDonations" > 100 AND u."isOrganization" IS TRUE
       ORDER BY t.collectives DESC, "totalDonations" DESC LIMIT :limit
-      `, {
+      `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+      {
         replacements: { limit: 6 },
         type: sequelize.QueryTypes.SELECT
     });
@@ -123,7 +126,8 @@ module.exports = function(sequelize) {
       WHERE ug."GroupId" = :GroupId
       AND ug."deletedAt" IS NULL
       ORDER BY "totalDonations" DESC, ug."createdAt" ASC
-    `, {
+    `.replace(/\n/g,' '), // this is to remove the new lines and save log space.
+    {
       replacements: { GroupId },
       type: sequelize.QueryTypes.SELECT
     });
