@@ -34,8 +34,8 @@ module.exports = function(app) {
       getTotalCollectives(),
       getTotalDonors(),
       queries.getTotalDonations(),
-      models.Group.getGroupsSummaryByTag('open source'),
-      models.Group.getGroupsSummaryByTag('meetup'),
+      models.Group.getGroupsSummaryByTag('open source', 3, [], 100, true),
+      models.Group.getGroupsSummaryByTag('meetup', 3, [], 100, true),
       queries.getTopSponsors()
     ])
     .then(results => {
