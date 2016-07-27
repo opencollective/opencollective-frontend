@@ -36,7 +36,12 @@ module.exports = app => {
       return new Promise((resolve, reject) => {
         app.paypalAdaptive.pay(payload, (err, res) => {
           if (err) {
-            console.log("PayPal payment error", err, res);
+            console.log("PayPal payment error: ", err);
+            console.log("PayPal response: ", res);
+            if (res.error && res.error[0] && res.error[0].parameter) {
+              console.log("PayPal error.parameter: ", res.error[0].parameter); // this'll give us more details on the error
+            }
+            console.log("PayPal payment error: ")
             return reject(new Error(res.error[0].message));
           }
           resolve(res);
