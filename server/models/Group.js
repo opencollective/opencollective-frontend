@@ -318,10 +318,11 @@ module.exports = function(Sequelize, DataTypes) {
                 AND t."deletedAt" IS NULL
                 AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
             "yearlyIncome"
-        `, {
-          replacements: { GroupId: this.id },
-          type: Sequelize.QueryTypes.SELECT
-        }).then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
+          `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+          {
+            replacements: { GroupId: this.id },
+            type: Sequelize.QueryTypes.SELECT
+          }).then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
       },
 
       getTotalDonations() {
