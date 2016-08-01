@@ -6,6 +6,7 @@ module.exports = function(app) {
   const cs = {};
   const controllers = [
     'activities',
+    'discover',
     'donations',
     'expenses',
     'paymentmethods',

@@ -85,6 +85,11 @@ module.exports = (app) => {
   app.get('/profile/:slug', controllers.profile);
 
   /**
+   * Discover
+   */
+  app.get('/discover', controllers.discover);
+
+  /**
    * Users.
    */
   app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
