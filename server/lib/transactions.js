@@ -7,7 +7,7 @@ module.exports = app => {
   const errors = app.errors;
   const models = app.set('models');
 
-  function createFromPaidExpense(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails) {
+  function createFromPaidExpense(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails, UserId) {
     if (paymentResponse) {
       switch (paymentResponse.paymentExecStatus) {
         case 'COMPLETED':
@@ -37,7 +37,7 @@ module.exports = app => {
       description: expense.title,
       status: 'REIMBURSED',
       reimbursedAt: new Date(),
-      UserId: expense.UserId,
+      UserId,
       GroupId: expense.GroupId,
       payoutMethod
       // end TODO remove #postmigration
