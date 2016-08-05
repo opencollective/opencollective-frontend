@@ -35,6 +35,6 @@ module.exports = function(app) {
     (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile })));
 
   // TODO if prod load ramps up, configure 'store' (default: MemoryStore)
-  app.use(session({ secret: 'my_precious', resave: true }));
+  app.use(session({ secret: 'my_precious', cookie : { secure: false } }));
   app.use(passport.initialize());
 };

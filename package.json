@@ -21,7 +21,7 @@
     "cors": "2.7.1",
     "express": "4.14.0",
     "express-server-status": "1.0.3",
-    "express-session": "1.13.0",
+    "express-session": "1.14.0",
     "flat": "2.0.0",
     "form-data": "0.2.0",
     "handlebars": "4.0.5",
