@@ -7,9 +7,29 @@ module.exports = (app) => {
   const models = app.get('models');
   const ConnectedAccount = models.ConnectedAccount;
   const User = models.User;
-
+  const slugLib = require('../lib/slug')(app);
 
   return {
+    list: (req, res, next) => {
+      const user = req.remoteUser;
+      const slug = req.params.slug.toLowerCase();
+
+      slugLib.getUserOrGroupFromSlug(slug, user.id)
+        .then(userOrGroup => {
+          const selector = userOrGroup.username ? 'UserId' : 'GroupId';
+          return models.ConnectedAccount.findAll({where: {
+            [selector]: userOrGroup.id,
+            deletedAt: null
+          }});
+        })
+        .map(connectedAccount => connectedAccount.info)
+        .tap(connectedAccounts => {
+          console.log("connectedAccounts tap", {connectedAccounts});
+          return res.json({connectedAccounts})
+        })
+        .catch(next);
+    },
+
     createOrUpdate: (req, res, next, accessToken, data, emails) => {
       const provider = req.params.service;
       const attrs = { provider };

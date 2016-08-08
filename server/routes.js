@@ -234,8 +234,9 @@ module.exports = (app) => {
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
-   * Generic OAuth2 (ConnectedAccounts)
+   * Generic OAuth (ConnectedAccounts)
    */
+  app.get('/:slug/connected-accounts', aN.authenticateUserAndAppByJwt(), connectedAccounts.list);
   app.get('/connected-accounts/:service(github|twitter)', aN.authenticateAppByApiKey, aN.authenticateService);
   app.get('/connected-accounts/:service/callback', aN.authenticateAppByEncryptedApiKey, aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
