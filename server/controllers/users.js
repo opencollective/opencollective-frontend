@@ -26,7 +26,7 @@ module.exports = (app) => {
   const User = models.User;
   const Activity = models.Activity;
   const UserGroup = models.UserGroup;
-  const sendEmail = require('../lib/email').send;
+  const emailLib = require('../lib/email');
   const errors = app.errors;
   const queries = require('../lib/queries')(models.sequelize);
   const Unauthorized = errors.Unauthorized;
@@ -208,7 +208,7 @@ module.exports = (app) => {
         const resetToken = results.generateToken;
         const resetUrl = user.generateResetUrl(resetToken);
 
-        sendEmail('user.forgot.password', email, {
+        emailLib.send('user.forgot.password', email, {
           resetUrl,
           resetToken
         })
@@ -423,7 +423,7 @@ module.exports = (app) => {
       }
       const user = req.remoteUser;
 
-      return sendEmail('user.new.token', req.remoteUser.email, {
+      return emailLib.send('user.new.token', req.remoteUser.email, {
         loginLink: user.generateLoginLink(req.application, redirect)
       })
       .then(() => res.send({ success: true }))
@@ -452,7 +452,7 @@ module.exports = (app) => {
         // If you don't find a user, proceed without error
         // Otherwise, we can leak email addresses
         if (user) {
-          return sendEmail('user.new.token', req.body.email, {
+          return emailLib.send('user.new.token', req.body.email, {
             loginLink: user.generateLoginLink(req.application, redirect)
           });
         }

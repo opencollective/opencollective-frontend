@@ -27,7 +27,7 @@ module.exports = (Sequelize, activity) => {
             activity.type
           ],
           GroupId: activity.GroupId,
-          channel: ['gitter', 'slack', 'twitter', 'email'],
+          channel: ['gitter', 'slack', 'twitter'],
           active: true
         }
       })
@@ -40,8 +40,6 @@ module.exports = (Sequelize, activity) => {
           return publishToSlack(activity, notifConfig.webhookUrl, {});
         } else if (notifConfig.channel === 'twitter') {
           return twitter.tweetActivity(Sequelize, activity);
-        } else if (notifConfig.channel === 'email') {
-          return emailLib.send();
         } else {
           return Promise.resolve();
         }

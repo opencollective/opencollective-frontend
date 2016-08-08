@@ -1,88 +1,15 @@
-const fs = require('fs');
-const handlebars = require('handlebars');
 const config = require('config');
-const moment = require('moment');
 const _ = require('lodash');
 const Promise = require('bluebird');
 const nodemailer = require('nodemailer');
 
 const debug = require('debug')('email');
-const currencies = require('../constants/currencies');
-
-
-/*
-* Loads templates
-*/
-const loadTemplates = () => {
-  var templates = {};
-
-  const templateNames = [
-    'github.signup',
-    'group.expense.created',
-    'group.donation.created',
-    'group.monthlyreport',
-    'thankyou',
-    'thankyou.wwcode',
-    'thankyou.ispcwa',
-    'thankyou.fr',
-    'thankyou.laprimaire',
-    'user.forgot.password',
-    'user.new.token'
-  ];
-
-  const templatesPath = `${__dirname}/../../templates`;
-
-  // Register partials
-  const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
-  const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
-  const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.hbs`, 'utf8');
-
-  handlebars.registerPartial('header', header);
-  handlebars.registerPartial('footer', footer);
-  handlebars.registerPartial('subscriptions', subscriptions);
-
-  handlebars.registerHelper('sign', (value) => {
-    if (value >= 0) return '+';
-    else return '';
-  });
-
-  handlebars.registerHelper('toLowerCase', (str) => {
-    return str.toLowerCase();
-  });
-
-  handlebars.registerHelper('moment', (value, props) => {
-    if (props && props.hash.format)
-      return moment(value).format(props.hash.format);
-    else
-      return moment(value).format('MMMM Do YYYY');
-  });
-
-  handlebars.registerHelper('currency', (value, props) => {
-    const currency = props.hash.currency;
-    value = value/100; // converting cents
-    if (currencies[currency]) {
-      return currencies[currency](value);
-    }
-    console.error(`Unexpected currency ${currency}`);
-    return `${value} ${currency}`;
-  });
-
-  handlebars.registerHelper('encodeURIComponent', (str) => {
-    return encodeURIComponent(str);
-  });
-
-  templateNames.forEach((template) => {
-    const source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
-    templates[template] = handlebars.compile(source);
-  });
-
-  return templates;
-};
+const templates = require('./loadEmailTemplates')();
 
 /*
  * renders the email
  */
-const render = (templates, name, data, config) => {
+const render = (name, data, config) => {
     data.config = config;
     data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
     return templates[name](data);
@@ -122,15 +49,21 @@ const sendMessage = (recipient, subject, html) => {
       }
     });
 
-    return Promise.promisify(
+    return new Promise((resolve, reject) => {
       mailgun.sendMail({
         from: config.email.from,
         to: recipient,
         bcc: 'ops@opencollective.com',
         subject,
         html
-      }),
-      mailgun); // Promise.promisify needs the context
+      }, (err, info) => {
+        if (err) {
+          return reject(err);
+        } else {
+          return resolve(info);
+        }
+      })
+    });
   } else {
     console.warn("Warning: No mail sent - Mailgun is not configured");
     return Promise.resolve();
@@ -138,13 +71,10 @@ const sendMessage = (recipient, subject, html) => {
 };
 
 /*
- * Given a template, recipient and data, generates email and sends it.
- * Deprecated. Should use sendMessageFromActivity() for sending new emails.
+ * Given a template, recipient and data, generates email.
  */
 
-const send = (template, recipient, data) => {
-
-  const templates = loadTemplates();
+const generateEmailFromTemplate = (template, recipient, data) => {
 
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
@@ -181,28 +111,28 @@ const send = (template, recipient, data) => {
     }
   }
 
-  if (!templates[template]) return Promise.reject(new Error("Invalid email template"));
-
-  const templateString = render(templates, template, data, config);
-
-  return sendMessage(recipient, getSubject(templateString), getBody(templateString));
+  if (!templates[template]) {
+    return Promise.reject(new Error("Invalid email template"));
+  }
+  return Promise.resolve(render(template, data, config));
 };
 
-
 /*
- * Given an activity, it sends out the appropriate email
+ * Given a template, recipient and data, generates email and sends it.
+ * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
-const sendMessageFromActivity = () => {
-  // TODO
+
+const generateEmailFromTemplateAndSend = (template, recipient, data) => {
+
+  return generateEmailFromTemplate(template, recipient, data)
+    .then(templateString => sendMessage(recipient, getSubject(templateString), getBody(templateString)));
 };
 
 module.exports = {
 
-  loadTemplates,
-  reload: loadTemplates, // needed for tests
   getBody,
   getSubject,
   sendMessage,
-  send,
-  sendMessageFromActivity,
+  generateEmailFromTemplate,
+  send: generateEmailFromTemplateAndSend
 };

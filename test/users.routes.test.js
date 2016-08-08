@@ -13,6 +13,8 @@ const userlib = require('../server/lib/userlib');
 const sinon = require('sinon');
 const Bluebird = require('bluebird');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const emailLib = require('../server/lib/email');
 
 /**
  * Variables.
@@ -29,6 +31,7 @@ describe('users.routes.test.js', () => {
   var application;
   var application2;
   var application3;
+  var nm;
 
   var sandbox, stub;
   beforeEach(() => {
@@ -56,6 +59,44 @@ describe('users.routes.test.js', () => {
 
   // Create an application with user creation access.
   beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
+
+  // create a fake nodemailer transport
+  beforeEach(done => {
+    config.mailgun.user = 'xxxxx';
+    config.mailgun.password = 'password';
+
+    nm = nodemailer.createTransport({
+          name: 'testsend',
+          service: 'Mailgun',
+          sendMail: function (data, callback) {
+              callback();
+          },
+          logger: false
+        });
+    sinon.stub(nodemailer, 'createTransport', () => {
+      return nm;
+    });
+    done();
+  });
+
+  // stub the transport
+  beforeEach(done => {
+    sinon.stub(nm, 'sendMail', (object, cb) => {
+      cb(null, object);
+    });
+    done();
+  });
+
+  afterEach(done => {
+    nm.sendMail.restore();
+    done();
+  })
+
+  afterEach(() => {
+    config.mailgun.user = '';
+    config.mailgun.password = '';
+    nodemailer.createTransport.restore();
+  });
 
   /**
    * Create.
@@ -598,6 +639,10 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() => models.User.create(userData).tap(u => user = u));
 
+    beforeEach(() => sinon.spy(emailLib, 'send'));
+
+    afterEach(() => emailLib.send.restore());
+
     it('fails if the email is missing', done => {
       request(app)
         .post('/users/password/forgot')
@@ -646,9 +691,7 @@ describe('users.routes.test.js', () => {
         })
         .expect(200)
         .then(() => {
-          const options = app.mailgun.sendMail.lastCall.args[0];
-          expect(options.html).to.contain(`${config.host.webapp}/reset/`);
-          expect(options.to).to.equal(user.email);
+          expect(emailLib.send.lastCall.args[1]).to.equal(user.email);
         })
         .then(() => models.User.findById(user.id))
         .tap(u => {
@@ -662,6 +705,8 @@ describe('users.routes.test.js', () => {
   describe('reset password', () => {
     var user;
     var encId;
+
+    beforeEach(() => sinon.spy(emailLib, 'send'));
 
     beforeEach(() => models.User.create(userData).tap(u => {
       user = u;
@@ -677,7 +722,10 @@ describe('users.routes.test.js', () => {
         })
         .expect(200)
         .end(done);
-    })
+    });
+
+    afterEach(() => emailLib.send.restore());
+
 
     it('fails if user is not found', done => {
       const encId = encrypt('1234');
@@ -721,7 +769,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the reset passwords don\'t match', done => {
       const encId = user.encryptId();
-      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+      const $ = cheerio.load(nm.sendMail.lastCall.args[0].html);
       const token = $('a').data('token');
 
       request(app)
@@ -743,7 +791,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the reset token is too old', done => {
       const password = 'abc1234';
-      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+      const $ = cheerio.load(nm.sendMail.lastCall.args[0].html);
       const token = $('a').data('token');
 
       var d = new Date();
@@ -775,7 +823,7 @@ describe('users.routes.test.js', () => {
 
     it('cleans up the token after reset', done => {
       const password = 'abc1234';
-      const $ = cheerio.load(app.mailgun.sendMail.lastCall.args[0].html);
+      const $ = cheerio.load(nm.sendMail.lastCall.args[0].html);
       const token = $('a').data('token');
 
       request(app)
@@ -858,7 +906,7 @@ describe('users.routes.test.js', () => {
         })
         .expect(200)
         .then(() => {
-          const options = app.mailgun.sendMail.lastCall.args[0];
+          const options = nm.sendMail.lastCall.args[0];
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/login/`);
@@ -926,7 +974,7 @@ describe('users.routes.test.js', () => {
         .expect(200)
         .toPromise()
         .then(() => {
-          const options = app.mailgun.sendMail.lastCall.args[0];
+          const options = nm.sendMail.lastCall.args[0];
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/login/`);

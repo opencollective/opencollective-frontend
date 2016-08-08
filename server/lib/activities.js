@@ -21,7 +21,9 @@ module.exports = {
     var eventType = '';
     var provider = '';
     var connectedAccountUsername = '';
+    var title = '';
     const connectedAccountLink = '';
+    var lastEditedById = 0;
 
 
     // get user data
@@ -54,7 +56,6 @@ module.exports = {
       interval = activity.data.transaction.interval;
       recurringAmount = amount + (interval ? `/${interval}` : '');
       currency = activity.data.transaction.currency;
-      tags = JSON.stringify(activity.data.transaction.tags);
       description = activity.data.transaction.description;
     }
 
@@ -62,7 +63,6 @@ module.exports = {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       currency = activity.data.expense.currency;
-      category = activity.data.expense.category;
       title = activity.data.expense.title;
       lastEditedById = activity.data.expense.lastEditedById;
     }
@@ -158,6 +158,7 @@ module.exports = {
     var userTwitter = '';
     var groupTwitter = '';
     var tweet = '';
+    var title = '';
 
     // get user data
     if (activity.data.user) {
@@ -200,7 +201,6 @@ module.exports = {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       currency = activity.data.expense.currency;
-      category = activity.data.expense.category;
       title = activity.data.expense.title;
     }
 
