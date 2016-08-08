@@ -427,6 +427,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('WHEN authenticated as a MEMBER', () => {
+
               beforeEach(() => {
                 approveReq = approveReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });
@@ -624,6 +625,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('WHEN authenticated as a MEMBER', () => {
+
               beforeEach(() => {
                 payReq = payReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });
@@ -743,6 +745,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('WHEN authenticated as a MEMBER', () => {
+
               beforeEach(() => {
                 payReq = payReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });

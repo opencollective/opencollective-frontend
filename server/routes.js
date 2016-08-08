@@ -72,7 +72,7 @@ module.exports = (app) => {
   /**
    * For testing the email templates
    */
-  app.get('/email/:template', test.generateTestEmail);
+  app.get('/templates/email/:template', test.generateTestEmail);
 
   /**
    * Homepage

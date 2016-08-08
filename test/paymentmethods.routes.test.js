@@ -25,6 +25,7 @@ describe('paymentMethods.routes.test.js', () => {
   var user;
   var user2;
   var paymentMethod1;
+  var paymentMethod2;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 

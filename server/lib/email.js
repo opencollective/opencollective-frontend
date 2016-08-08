@@ -5,12 +5,14 @@ const moment = require('moment');
 const _ = require('lodash');
 const Promise = require('bluebird');
 
+const debug = require('debug')('email');
 const currencies = require('../constants/currencies');
 
 const templatesNames = [
   'github.signup',
   'group.expense.created',
   'group.donation.created',
+  'group.monthlyreport',
   'thankyou',
   'thankyou.wwcode',
   'thankyou.ispcwa',
@@ -56,12 +58,25 @@ function loadTemplates() {
   handlebars.registerPartial('footer', footer);
   handlebars.registerPartial('subscriptions', subscriptions);
 
-  handlebars.registerHelper('moment', (value) => {
-    return moment(value).format('MMMM Do YYYY');
+  handlebars.registerHelper('sign', (value) => {
+    if (value >= 0) return '+';
+    else return '';
+  });
+
+  handlebars.registerHelper('toLowerCase', (str) => {
+    return str.toLowerCase();
+  });
+
+  handlebars.registerHelper('moment', (value, props) => {
+    if (props && props.hash.format)
+      return moment(value).format(props.hash.format);
+    else
+      return moment(value).format('MMMM Do YYYY');
   });
 
   handlebars.registerHelper('currency', (value, props) => {
     const currency = props.hash.currency;
+    value = value/100; // converting cents
     if (currencies[currency]) {
       return currencies[currency](value);
     }
@@ -126,6 +141,8 @@ const EmailLib = (app) => {
     if (!templates[template]) return Promise.reject(new Error("Invalid email template"));
 
     const templateString = render(template, data, config);
+
+    debug("email body", templateString);
 
     return app.mailgun.sendMail({
       from: config.email.from,

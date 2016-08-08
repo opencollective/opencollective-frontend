@@ -25,6 +25,7 @@ describe('activities.routes.test.js', () => {
   var application;
   var user;
   var user2;
+  var user3;
   var group;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));

@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}/{{interval}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}/{{interval}} à {{group.name}}
 {{else}}
-Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} à {{group.name}}
 {{/if}}
 
 {{> header}}
@@ -17,9 +17,9 @@ Subject: Merci pour votre donation de {{{currency donation.amountFloat currency=
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
 {{else}}
-<p>Merci pour votre donation de {{{currency donation.amountFloat currency=donation.currency}}}.
+<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
 

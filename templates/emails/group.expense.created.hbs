@@ -1,9 +1,9 @@
-Subject: {{group.name}}: {{{currency transaction.amount currency=transaction.currency}}} for {{transaction.description}} by {{user.username}}
+Subject: {{group.name}}: {{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}} for {{transaction.description}} by {{user.username}}
 
 {{> header}}
 
 <center>
-  <h1>{{{currency transaction.amount currency=transaction.currency}}}</h1>
+  <h1>{{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}}</h1>
   <div>{{transaction.description}}</div>
   <p><font color="#999">{{transaction.comment}}</font></p>
 

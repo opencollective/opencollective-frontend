@@ -11,7 +11,7 @@ describe('lib/email', () => {
     this.timeout(2000);
 
     const paymentData = {
-      amountFloat: 50.00,
+      amount: 5000,
       currency: 'EUR'
      };
 
@@ -38,7 +38,7 @@ describe('lib/email', () => {
     this.timeout(2000);
 
     const paymentData = {
-      amountFloat: 50.00,
+      amount: 5000,
       currency: 'USD'
      };
 

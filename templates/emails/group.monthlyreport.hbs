@@ -1,0 +1,34 @@
+Subject: {{group.name}} {{month}} report
+
+{{> header}}
+
+<h1>{{group.name}} {{month}} report</h1>
+<table border=0>
+  <tr>
+    <th align="left">Current balance:</th>
+    <td width=10></td>
+    <td align="right">{{{currency group.balance currency=group.currency}}}</td>
+    <td>({{{sign group.balanceDelta}}}{{{currency group.balanceDelta currency=group.currency}}})</td>
+  </tr>
+    <th align="left">Backers:</th>
+    <td width=10></td>
+    <td align="right">{{group.backersCount}}</td>
+    <td>({{{sign group.backersCountDelta}}}{{group.backersCountDelta}})</td>
+  </tr>
+</table>
+
+<h2>Expenses</h2>
+<table>
+{{#each group.expenses}}
+  <tr>
+    <td>{{{moment createdAt format="MM/DD"}}}</td>
+    <td>{{{currency netAmountInGroupCurrency currency=currency}}}</td>
+    <td><a href="{{@root.config.host.app}}/groups/{{@root.group.id}}/expenses/{{id}}">{{description}}</a></td>
+    <td>{{toLowerCase status}}</td>
+  </tr>
+{{else}}
+  No expense submitted. <a href="{{@root.config.host.website}}/{{@root.group.slug}}/expenses/new">Submit an expense</a>
+{{/each}}
+</table>
+
+{{> footer}}

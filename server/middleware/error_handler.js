@@ -4,7 +4,7 @@ const errors = require('../lib/errors');
 const config = require('config');
 
 
-sendErrorByEmail = (req, err) => {
+const sendErrorByEmail = (req, err) => {
   var errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
   if (req.body.password)

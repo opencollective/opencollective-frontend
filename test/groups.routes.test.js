@@ -343,6 +343,7 @@ describe('groups.routes.test.js', () => {
 
     var group;
     var publicGroup;
+    var privateGroup;
     var user2;
     var stripeEmail;
 
@@ -597,7 +598,7 @@ describe('groups.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             var g = res.body;
-            expect(g).to.have.property('balance', (totDonations*100 + totTransactions*100 + transactionsData[7].amount*100 + transactionsData[8].amount*100).toFixed(0));
+            expect(g).to.have.property('balance', parseInt((totDonations*100 + totTransactions*100 + transactionsData[7].amount*100 + transactionsData[8].amount*100).toFixed(0), 10));
             expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount)*100);
             expect(g).to.not.have.property('activities');
             done();
@@ -705,6 +706,7 @@ describe('groups.routes.test.js', () => {
     var group;
     var user2;
     var user3;
+    var user4;
     var groupNew = {
       name: 'new name',
       mission: 'new mission',

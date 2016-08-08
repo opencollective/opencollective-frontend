@@ -268,16 +268,31 @@ module.exports = function(Sequelize, DataTypes) {
         });
       },
 
-      getBalance() {
+      getExpenses(status, startDate, endDate) {
+        endDate = endDate || new Date;
+        const where = {
+          amount: { $lt: 0 },
+          createdAt: { $lte: endDate },
+          GroupId: this.id
+        };
+        if (status) where.status = status;
+        if (startDate) where.createdAt.$gte = startDate;
+
+        return models.Transaction.findAll({ where, order: [['createdAt','DESC']] });
+      },
+
+      getBalance(until) {
+        until = until || new Date();
         return models.Transaction.find({
           attributes: [
             [Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 'total']
           ],
           where: {
-            GroupId: this.id
-            }
-          })
-        .then(result => Promise.resolve(result.toJSON().total));
+            GroupId: this.id,
+            createdAt: { $lt: until }
+          }
+        })
+        .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
       },
 
       getYearlyIncome() {
@@ -344,7 +359,8 @@ module.exports = function(Sequelize, DataTypes) {
           })
       },
 
-      getBackersCount() {
+      getBackersCount(until) {
+        until = until || new Date;
         return models.Transaction
           .find({
             attributes: [
@@ -354,7 +370,8 @@ module.exports = function(Sequelize, DataTypes) {
               GroupId: this.id,
               amount: {
                 $gt: 0
-              }
+              },
+              createdAt: { $lt: until }
             }
           })
           .then((result) => {

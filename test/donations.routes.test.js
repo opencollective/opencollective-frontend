@@ -35,6 +35,7 @@ describe('donations.routes.test.js', () => {
   var application;
   var application2;
   var user;
+  var user4;
   var group;
   var group2;
   var nocks = {};

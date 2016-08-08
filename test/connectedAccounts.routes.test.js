@@ -10,7 +10,7 @@ const clientId = config.github.clientID;
 
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
 
-  var application, req;
+  var application, req, user;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 

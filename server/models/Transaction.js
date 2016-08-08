@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const _ = require('lodash');
 
 /*
@@ -5,7 +6,7 @@ const _ = require('lodash');
  * - this indicates that money was moved in the system
  */
 
-module.exports = function(Sequelize, DataTypes) {
+module.exports = (Sequelize, DataTypes) => {
 
   const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
@@ -85,6 +86,17 @@ module.exports = function(Sequelize, DataTypes) {
     reimbursedAt: DataTypes.DATE // delete #postmigration
   }, {
     paranoid: true,
+
+    classMethods: {
+      createMany: (transactions, defaultValues) => {
+        return Promise.map(transactions, transaction => {
+          for (var attr in defaultValues) {
+            transaction[attr] = defaultValues[attr];
+          }
+          return Transaction.create(transaction);
+        }).catch(console.error);
+      }
+    },
 
     getterMethods: {
 

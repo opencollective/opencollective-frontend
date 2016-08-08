@@ -812,6 +812,8 @@ describe('users.routes.test.js', () => {
 
   describe('#sendNewTokenByEmail', () => {
 
+    var user;
+
     beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
     it('fails if there is no email', (done) => {
@@ -869,6 +871,8 @@ describe('users.routes.test.js', () => {
    */
 
   describe('#refreshTokenByEmail', () => {
+
+    var user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 

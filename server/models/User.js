@@ -17,7 +17,7 @@ const SALT_WORK_FACTOR = 10;
 /**
  * Model.
  */
-module.exports = function(Sequelize, DataTypes) {
+module.exports = (Sequelize, DataTypes) => {
 
   const User = Sequelize.define('User', {
 
@@ -293,6 +293,21 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     classMethods: {
+
+      createMany: (users, defaultValues) => {
+        const promises = [];
+        for (var i=0; i < users.length; i++) {
+          const u = users[i];
+          for (var attr in defaultValues) {
+            u[attr] = defaultValues[attr];
+          }
+          promises.push(User.create(u).catch(e => {
+            console.error("Error in creating user", u, e, e.stack);
+          }));
+        }
+        return Promise.all(promises).catch(console.error);
+      },
+
       auth(usernameOrEmail, password, cb) {
         const msg = 'Invalid username/email or password.';
         usernameOrEmail = usernameOrEmail.toLowerCase();
