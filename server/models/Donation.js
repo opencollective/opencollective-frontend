@@ -57,6 +57,16 @@ module.exports = function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    PaymentMethodId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'PaymentMethods',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW

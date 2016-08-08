@@ -10,7 +10,6 @@ var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
 var sinon = require('sinon');
-var createTransaction = require('../server/controllers/transactions')(app)._create;
 
 /**
  * Variables.
@@ -410,18 +409,12 @@ describe('groups.routes.test.js', () => {
     });
 
     beforeEach((done) => {
-      models.StripeAccount.create({
+      return models.StripeAccount.create({
         stripePublishableKey: stripeMock.accounts.create.keys.publishable
       })
-      .tap((account) => {
-        return user.setStripeAccount(account);
-      })
-      .tap((account) => {
-        return user.setStripeAccount(account);
-      })
-      .tap(() => {
-        done();
-      })
+      .tap(account => user.setStripeAccount(account))
+      .tap(account => user.setStripeAccount(account))
+      .tap(() => done())
       .catch(done);
     });
 
@@ -429,7 +422,7 @@ describe('groups.routes.test.js', () => {
     beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
     beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
 
-    // Create a transaction for group2.
+    // Create a transaction for group1.
     beforeEach((done) => {
       request(app)
         .post('/groups/' + publicGroup.id + '/transactions')
@@ -568,12 +561,14 @@ describe('groups.routes.test.js', () => {
 
       // Create a subscription for PublicGroup.
       beforeEach((done) => {
-        createTransaction({
+        return models.Subscription.create(utils.data('subscription1'))
+        .then(subscription => models.Transaction.createFromPayload({
             transaction: transactionsData[7],
             user,
             group: publicGroup,
-            subscription: utils.data('subscription1')
-          }, done);
+            subscription
+          }))
+        .then(() => done());
       });
 
       // Create a transaction for group2.

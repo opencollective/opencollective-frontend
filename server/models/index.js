@@ -119,6 +119,10 @@ function setupModels(client) {
   m.Subscription.hasMany(m.Transaction);
   m.Donation.belongsTo(m.Subscription);
 
+  // PaymentMethod
+  m.Donation.belongsTo(m.PaymentMethod);
+  m.PaymentMethod.hasMany(m.Donation);
+
   return m;
 };
 

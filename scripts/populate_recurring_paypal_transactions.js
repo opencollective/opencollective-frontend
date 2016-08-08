@@ -19,7 +19,6 @@ const _ = require('lodash');
 
 const app = require('../index');
 const models = app.set('models');
-const transactionsController = require('../server/controllers/transactions')(app);
 const slack = require('../server/lib/slack');
 
 const startDate = '2016-03-01'; // date that we started paypal payments
@@ -67,13 +66,11 @@ const updateTransactions = (subscription, group, user, paypalTransactions) => {
       data: pt
     };
 
-    return new Bluebird((resolve, reject) => {
-      transactionsController._create({
+    return models.Transaction.createFromPayload({
         transaction,
         group,
         user
-      }, (err, res) => err ? reject(err) : resolve(res));
-    });
+      });
   });
 };
 

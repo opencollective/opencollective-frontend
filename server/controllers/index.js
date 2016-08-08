@@ -18,7 +18,6 @@ module.exports = function(app) {
     'notifications',
     'stripe',
     'subscriptions',
-    'transactions',
     'users',
     'webhooks',
     'test',

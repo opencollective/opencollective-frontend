@@ -432,7 +432,6 @@ module.exports = function(Sequelize, DataTypes) {
       getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder) => {
         limit = limit || 3;
         excludeList = excludeList || [];
-
         return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation, randomOrder)
           .then(groups => {
             return Promise.all(groups.map(group => {
