@@ -40,6 +40,8 @@ module.exports = (Sequelize, activity) => {
           return publishToSlack(activity, notifConfig.webhookUrl, {});
         } else if (notifConfig.channel === 'twitter') {
           return twitter.tweetActivity(Sequelize, activity);
+        } else if (notifConfig.channel === 'email') {
+          return emailLib.send();
         } else {
           return Promise.resolve();
         }

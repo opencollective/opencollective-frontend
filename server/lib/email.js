@@ -4,49 +4,32 @@ const config = require('config');
 const moment = require('moment');
 const _ = require('lodash');
 const Promise = require('bluebird');
+const nodemailer = require('nodemailer');
 
 const debug = require('debug')('email');
 const currencies = require('../constants/currencies');
 
-const templatesNames = [
-  'github.signup',
-  'group.expense.created',
-  'group.donation.created',
-  'group.monthlyreport',
-  'thankyou',
-  'thankyou.wwcode',
-  'thankyou.ispcwa',
-  'thankyou.fr',
-  'thankyou.laprimaire',
-  'user.forgot.password',
-  'user.new.token'
-];
 
-/**
- * Helpers
- */
-const getSubject = str => {
-  var subj = '';
-  if (process.env.NODE_ENV === 'staging') {
-    subj += '[STAGING] ';
-  } else if (process.env.NODE_ENV !== 'production'){
-    subj += '[TESTING] ';
-  }
-  subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
-  return subj;
-}
-const getBody = str => str.split('\n').slice(2).join('\n');
-const render = (name, data, config) => {
-  data.config = config;
-  data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
-  return templates[name](data);
-};
+/*
+* Loads templates
+*/
+const loadTemplates = () => {
+  var templates = {};
 
-/***
- * Loading Handlebars templates for the HTML emails
- */
-const templates = {};
-function loadTemplates() {
+  const templateNames = [
+    'github.signup',
+    'group.expense.created',
+    'group.donation.created',
+    'group.monthlyreport',
+    'thankyou',
+    'thankyou.wwcode',
+    'thankyou.ispcwa',
+    'thankyou.fr',
+    'thankyou.laprimaire',
+    'user.forgot.password',
+    'user.new.token'
+  ];
+
   const templatesPath = `${__dirname}/../../templates`;
 
   // Register partials
@@ -88,79 +71,138 @@ function loadTemplates() {
     return encodeURIComponent(str);
   });
 
-  templatesNames.forEach((template) => {
+  templateNames.forEach((template) => {
     const source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');
     templates[template] = handlebars.compile(source);
   });
+
+  return templates;
 };
 
-loadTemplates();
-
-/**
- * Mailgun wrapper
+/*
+ * renders the email
  */
-const EmailLib = (app) => {
+const render = (templates, name, data, config) => {
+    data.config = config;
+    data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
+    return templates[name](data);
+};
 
-  const send = (template, recipient, data) => {
+/*
+ * Gets the body from a string (usually a template)
+ */
+const getBody = str => str.split('\n').slice(2).join('\n');
 
-    if (template === 'thankyou') {
-      if (data.group.name.match(/WWCode/i))
-        template += '.wwcode';
-      if (data.group.name.match(/ispcwa/i))
-        template += '.ispcwa';
-      if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
-        template += '.fr';
-
-        if (data.group.slug === 'laprimaire')
-          template = 'thankyou.laprimaire';
-
-        // xdamman: hack
-        switch (data.interval) {
-          case 'month':
-            data.interval = 'mois';
-            break;
-          case 'year':
-            data.interval = 'an';
-            break;
-        }
-      }
+/*
+ * Appends appropriate prefix and cleans up subject
+ */
+const getSubject = str => {
+    var subj = '';
+    if (process.env.NODE_ENV === 'staging') {
+      subj += '[STAGING] ';
+    } else if (process.env.NODE_ENV !== 'production'){
+      subj += '[TESTING] ';
     }
+    subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
+    return subj;
+};
 
-    if (template === 'group.transaction.created') {
-      template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.created';
-      if (data.user && data.user.twitterHandle) {
-        const groupMention = (data.group.twitterHandle) ? `@${data.group.twitterHandle}` : data.group.name;
-        const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${groupMention} https://opencollective.com/${data.group.slug} 🎉😊`;
-        data.tweet = {
-          text,
-          encoded: encodeURIComponent(text)
-        };
+/*
+ * sends an email message to a recipient with given subject and body
+ */
+const sendMessage = (recipient, subject, html) => {
+  debug("email: ", recipient, subject, html);
+
+  if (config.mailgun.user) {
+    const mailgun = nodemailer.createTransport({
+      service: 'Mailgun',
+      auth: {
+        user: config.mailgun.user,
+        pass: config.mailgun.password
       }
-    }
-
-    if (!templates[template]) return Promise.reject(new Error("Invalid email template"));
-
-    const templateString = render(template, data, config);
-
-    debug("email body", templateString);
-
-    return app.mailgun.sendMail({
-      from: config.email.from,
-      to: recipient,
-      bcc: 'ops@opencollective.com',
-      subject: getSubject(templateString),
-      html: getBody(templateString)
     });
-  };
 
-  return {
-    send,
-    templates,
-    getBody,
-    getSubject,
-    reload: loadTemplates
-  };
+    return Promise.promisify(
+      mailgun.sendMail({
+        from: config.email.from,
+        to: recipient,
+        bcc: 'ops@opencollective.com',
+        subject,
+        html
+      }),
+      mailgun); // Promise.promisify needs the context
+  } else {
+    console.warn("Warning: No mail sent - Mailgun is not configured");
+    return Promise.resolve();
+  }
+};
 
-}
+/*
+ * Given a template, recipient and data, generates email and sends it.
+ * Deprecated. Should use sendMessageFromActivity() for sending new emails.
+ */
 
-module.exports = EmailLib;
+const send = (template, recipient, data) => {
+
+  const templates = loadTemplates();
+
+  if (template === 'thankyou') {
+    if (data.group.name.match(/WWCode/i))
+      template += '.wwcode';
+    if (data.group.name.match(/ispcwa/i))
+      template += '.ispcwa';
+    if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
+      template += '.fr';
+
+      if (data.group.slug === 'laprimaire')
+        template = 'thankyou.laprimaire';
+
+      // xdamman: hack
+      switch (data.interval) {
+        case 'month':
+          data.interval = 'mois';
+          break;
+        case 'year':
+          data.interval = 'an';
+          break;
+      }
+    }
+  }
+
+  if (template === 'group.transaction.created') {
+    template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.created';
+    if (data.user && data.user.twitterHandle) {
+      const groupMention = (data.group.twitterHandle) ? `@${data.group.twitterHandle}` : data.group.name;
+      const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${groupMention} https://opencollective.com/${data.group.slug} 🎉😊`;
+      data.tweet = {
+        text,
+        encoded: encodeURIComponent(text)
+      };
+    }
+  }
+
+  if (!templates[template]) return Promise.reject(new Error("Invalid email template"));
+
+  const templateString = render(templates, template, data, config);
+
+  return sendMessage(recipient, getSubject(templateString), getBody(templateString));
+};
+
+
+/*
+ * Given an activity, it sends out the appropriate email
+ */
+const sendMessageFromActivity = () => {
+  // TODO
+};
+
+module.exports = {
+
+  loadTemplates,
+  reload: loadTemplates, // needed for tests
+  getBody,
+  getSubject,
+  sendMessage,
+  send,
+  sendMessageFromActivity,
+};

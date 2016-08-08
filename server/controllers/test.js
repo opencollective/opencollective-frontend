@@ -188,7 +188,7 @@ module.exports = function(app) {
   }
 
   const generateTestEmail = function(req, res) {
-    const emailLib = require('../lib/email')(app);
+    const emailLib = require('../lib/email');
     const template = req.params.template;
     try {
       const data = JSON.parse(req.query.data);

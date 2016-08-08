@@ -8,7 +8,7 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 
-const emailLib = require('../../server/lib/email')(app);
+const emailLib = require('../../server/lib/email');
 const debug = require('debug')('monthlyreport');
 
 const Group = app.set('models').Group;
