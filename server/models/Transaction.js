@@ -174,6 +174,16 @@ module.exports = (Sequelize, DataTypes) => {
     },
 
     classMethods: {
+
+      createMany: (transactions, defaultValues) => {
+        return Promise.map(transactions, transaction => {
+          for (var attr in defaultValues) {
+            transaction[attr] = defaultValues[attr];
+          }
+          return Transaction.create(transaction);
+        }).catch(console.error);
+      },
+
       createFromPayload({ transaction, user, group, subscription, paymentMethod }) {
 
         // attach other objects manually. Needed for afterCreate hook to work properly
