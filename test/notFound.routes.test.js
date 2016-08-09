@@ -6,6 +6,8 @@ describe('notFound.routes.test.js', () => {
 
   describe('WHEN calling unknown route', () => {
 
+    var req;
+
     beforeEach(() => {
       req = request(app)
         .get('/blablabla?api_token=yabada');

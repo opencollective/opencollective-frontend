@@ -246,7 +246,6 @@ describe('webhooks.routes.test.js', () => {
         include: [
           {
             model: models.Subscription,
-            where: { stripeSubscriptionId: webhookSubscription.id }
           }
         ]
       })
@@ -268,7 +267,6 @@ describe('webhooks.routes.test.js', () => {
           expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
           expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 259)
           expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
-          expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
           expect(transaction.Subscription.isActive).to.be.equal(true);
           expect(transaction.Subscription).to.have.property('activatedAt');
         });
@@ -340,7 +338,6 @@ describe('webhooks.routes.test.js', () => {
               expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
               expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
               expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 259);
-              expect(transaction.Subscription.stripeSubscriptionId).to.be.equal(webhookSubscription.id);
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');
             });

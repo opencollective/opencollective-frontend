@@ -76,7 +76,7 @@ module.exports = function(sequelize) {
       WITH "totalDonations" AS (
         SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
       )
-      SELECT g.id, g.name, g.slug, g.mission, g.logo, t."totalDonations", t.currency, t.collectives, g."createdAt"
+      SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", t."totalDonations", t.currency, t.collectives
       FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
       WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
       ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}

@@ -20,15 +20,19 @@ const Transaction = models.Transaction;
 const PaymentMethod = models.PaymentMethod;
 
 describe('expenses.routes.test.js', () => {
-  var application, user, group;
+  var application, host, member, group;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => host = u));
+
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
 
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
 
-  beforeEach(() => group.addUserWithRole(user, roles.HOST));
+  beforeEach(() => group.addUserWithRole(host, roles.HOST));
+
+  beforeEach(() => group.addUserWithRole(member, roles.MEMBER));
 
   describe('WHEN expense does not exist', () => {
     var req;
@@ -37,7 +41,7 @@ describe('expenses.routes.test.js', () => {
       beforeEach(() => {
         req = request(app)
           .get('/groups/' + group.id + '/expenses/123')
-          .set('Authorization', `Bearer ${user.jwt(application)}`);
+          .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
       it('THEN returns 404', () => req.expect(404));
@@ -47,7 +51,7 @@ describe('expenses.routes.test.js', () => {
       beforeEach(() => {
         req = request(app)
           .post('/groups/' + group.id + '/expenses/123/approve')
-          .set('Authorization', `Bearer ${user.jwt(application)}`);
+          .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
       it('THEN returns 404', () => req.expect(404));
@@ -57,7 +61,7 @@ describe('expenses.routes.test.js', () => {
       beforeEach(() => {
         req = request(app)
           .delete(`/groups/${group.id}/expenses/123`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`);
+          .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
       it('THEN returns 404', () => req.expect(404));
@@ -67,7 +71,7 @@ describe('expenses.routes.test.js', () => {
       beforeEach(() => {
         req = request(app)
           .put(`/groups/${group.id}/expenses/123`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`);
+          .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
       it('THEN returns 404', () => req.expect(404));
@@ -91,7 +95,7 @@ describe('expenses.routes.test.js', () => {
         createReq
           .expect(200)
           .then(res => {
-            expect(res.body.UserId).not.to.be.equal(user.id);
+            expect(res.body.UserId).not.to.be.equal(host.id);
             expect(res.body.GroupId).to.be.equal(group.id);
             expect(res.body.title).to.be.equal(expense.title);
             expect(res.body.notes).to.be.equal(expense.notes);
@@ -121,7 +125,7 @@ describe('expenses.routes.test.js', () => {
     describe('WHEN authenticated', () => {
 
       beforeEach(() => {
-        createReq = createReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+        createReq = createReq.set('Authorization', `Bearer ${member.jwt(application)}`);
       });
 
       describe('WHEN not providing expense', () =>
@@ -151,7 +155,7 @@ describe('expenses.routes.test.js', () => {
 
           it('THEN expense belongs to the group', () => expect(actualExpense.GroupId).to.be.equal(group.id));
 
-          it('THEN expense belongs to the user', () => expect(actualExpense.UserId).to.be.equal(user.id));
+          it('THEN expense belongs to the user', () => expect(actualExpense.UserId).to.be.equal(member.id));
 
           it('THEN a group.expense.created activity is created', () =>
             expectExpenseActivity('group.expense.created', actualExpense.id));
@@ -164,8 +168,8 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#list', () => {
-            beforeEach(() => createExpense(group, user));
-            beforeEach(() => createExpense(group, user));
+            beforeEach(() => createExpense(group, host));
+            beforeEach(() => createExpense(group, host));
 
             it('THEN returns 200', () => request(app)
               .get(`/groups/${group.id}/expenses`)
@@ -258,20 +262,14 @@ describe('expenses.routes.test.js', () => {
 
               it('THEN returns 403', () => request(app)
                 .delete(`/groups/${group.id}/expenses/${otherExpense.id}`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .expect(403));
             });
 
             describe('WHEN user is not a host', () => {
-              var user2;
-
-              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
-
               it('THEN returns 403', () => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
-                .set('Authorization', `Bearer ${user2.jwt(application)}`)
+                .set('Authorization', `Bearer ${member.jwt(application)}`)
                 .expect(403));
             });
 
@@ -280,13 +278,13 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({approved: false})
                 .expect(200));
 
               beforeEach(() => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .expect(200)
                 .toPromise()
                 .tap(res => response = res.body));
@@ -314,7 +312,7 @@ describe('expenses.routes.test.js', () => {
 
               it('THEN returns 403', () => request(app)
                 .put(`/groups/${group.id}/expenses/${otherExpense.id}`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .expect(403));
             });
 
@@ -324,7 +322,7 @@ describe('expenses.routes.test.js', () => {
               beforeEach(() => {
                 updateReq = request(app)
                   .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
-                  .set('Authorization', `Bearer ${user.jwt(application)}`);
+                  .set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
               it('THEN returns 400', () => missingRequired(updateReq, 'expense'));
@@ -335,7 +333,7 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => request(app)
                 .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({expense: {title: 'new title'}})
                 .expect(200)
                 .then(res => response = res.body));
@@ -363,7 +361,7 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN authenticated as host user', () => {
 
               beforeEach(() => {
-                approveReq = approveReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+                approveReq = approveReq.set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
               describe('WHEN sending approved: false', () => {
@@ -377,7 +375,7 @@ describe('expenses.routes.test.js', () => {
                 beforeEach(() =>
                   PaymentMethod.create({
                     service: 'paypal',
-                    UserId: user.id,
+                    UserId: host.id,
                     token: 'abc'
                   }));
 
@@ -422,18 +420,16 @@ describe('expenses.routes.test.js', () => {
                   .then(() => Expense.findAndCountAll())
                   .tap(expenses => {
                     expect(expenses.count).to.be.equal(1);
-                    expect(expenses.rows[0].status).to.be.equal(approvalStatus);
+                    const expense = expenses.rows[0];
+                    expect(expense.status).to.be.equal(approvalStatus);
+                    expect(expense.lastEditedById).to.be.equal(host.id);
                   });
             });
 
             describe('WHEN authenticated as a MEMBER', () => {
 
-              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
-
               beforeEach(() => {
-                approveReq = approveReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+                approveReq = approveReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });
 
               describe('WHEN sending approved: false', () => {
@@ -447,7 +443,7 @@ describe('expenses.routes.test.js', () => {
                 beforeEach(() =>
                   PaymentMethod.create({
                     service: 'paypal',
-                    UserId: user.id,
+                    UserId: host.id,
                     token: 'abc'
                   }));
 
@@ -492,7 +488,9 @@ describe('expenses.routes.test.js', () => {
                   .then(() => Expense.findAndCountAll())
                   .tap(expenses => {
                     expect(expenses.count).to.be.equal(1);
-                    expect(expenses.rows[0].status).to.be.equal(approvalStatus);
+                    const expense = expenses.rows[0];
+                    expect(expense.status).to.be.equal(approvalStatus);
+                    expect(expense.lastEditedById).to.be.equal(member.id);
                   });
             });
           });
@@ -503,7 +501,7 @@ describe('expenses.routes.test.js', () => {
             beforeEach(() => {
               payReq = request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/pay`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send();
             });
 
@@ -524,7 +522,7 @@ describe('expenses.routes.test.js', () => {
                 .yields(null, preapprovalDetailsMock);
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({approved: true})
                 .expect(200);
             });
@@ -543,7 +541,7 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN authenticated as host user', () => {
 
               beforeEach(() => {
-                payReq = payReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+                payReq = payReq.set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
               var payStub;
@@ -569,7 +567,7 @@ describe('expenses.routes.test.js', () => {
                 beforeEach(() => {
                   PaymentMethod.create({
                     service: 'paypal',
-                    UserId: user.id,
+                    UserId: host.id,
                     confirmedAt: Date.now()
                   })
                 });
@@ -592,7 +590,7 @@ describe('expenses.routes.test.js', () => {
                   });
 
                   it('THEN creates a transaction paid activity', () =>
-                    expectTransactionPaidActivity(group, user, transaction)
+                    expectTransactionPaidActivity(group, host, transaction)
                       .tap(activity => expect(activity.data.paymentResponse).to.deep.equal(payMock)));
                 });
               });
@@ -606,7 +604,7 @@ describe('expenses.routes.test.js', () => {
                 expect(transaction).to.have.property('description', expense.title);
                 expect(transaction).to.have.property('status', 'REIMBURSED');
                 expect(transaction.reimbursedAt).to.be.ok;
-                expect(transaction).to.have.property('UserId', expense.UserId);
+                expect(transaction).to.have.property('UserId', host.id);
                 expect(transaction).to.have.property('GroupId', expense.GroupId);
                 expect(transaction).to.have.property('payoutMethod', expense.payoutMethod);
                 // end TODO remove #postmigration
@@ -628,12 +626,8 @@ describe('expenses.routes.test.js', () => {
 
             describe('WHEN authenticated as a MEMBER', () => {
 
-              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
-
               beforeEach(() => {
-                payReq = payReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+                payReq = payReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });
               it('THEN returns 403', () => payReq.send()
                 .expect(403));
@@ -645,7 +639,7 @@ describe('expenses.routes.test.js', () => {
             beforeEach(() => {
               return request(app)
                 .post(`/groups/${group.id}/transactions`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({ transaction: {amount: 100}})
                 .expect(200);
             })
@@ -653,7 +647,7 @@ describe('expenses.routes.test.js', () => {
             beforeEach(() => {
               return request(app)
                 .post(`/groups/${group.id}/expenses`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({ expense: expense2 })
                 .expect(200)
                 .then(res => actualExpense = res.body);
@@ -666,7 +660,7 @@ describe('expenses.routes.test.js', () => {
                 .yields(null, preapprovalDetailsMock);
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
-                .set('Authorization', `Bearer ${user.jwt(application)}`)
+                .set('Authorization', `Bearer ${host.jwt(application)}`)
                 .send({approved: true})
                 .expect(200);
             });
@@ -685,7 +679,7 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN authenticated as host user', () => {
 
               beforeEach(() => {
-                payReq = payReq.set('Authorization', `Bearer ${user.jwt(application)}`);
+                payReq = payReq.set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
               var payStub;
@@ -717,7 +711,7 @@ describe('expenses.routes.test.js', () => {
                 it('THEN creates transaction', () => expectTransactionCreated(expense, transaction));
 
                 it('THEN creates a transaction paid activity', () =>
-                  expectTransactionPaidActivity(group, user, transaction)
+                  expectTransactionPaidActivity(group, host, transaction)
                     .tap(activity => expect(activity.data.paymentResponse).to.be.undefined));
               });
 
@@ -752,12 +746,8 @@ describe('expenses.routes.test.js', () => {
 
             describe('WHEN authenticated as a MEMBER', () => {
 
-              beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-              beforeEach(() => group.addUserWithRole(user2, roles.MEMBER));
-
               beforeEach(() => {
-                payReq = payReq.set('Authorization', `Bearer ${user2.jwt(application)}`);
+                payReq = payReq.set('Authorization', `Bearer ${member.jwt(application)}`);
               });
               it('THEN returns 403', () => payReq.send()
                 .expect(403));
@@ -785,9 +775,9 @@ describe('expenses.routes.test.js', () => {
     return Activity.findOne({ where: { type }})
       .then(activity => {
         expect(activity).to.be.ok;
-        expect(activity.UserId).to.be.equal(user.id);
+        expect(activity.UserId).to.be.equal(member.id);
         expect(activity.GroupId).to.be.equal(group.id);
-        expect(activity.data.user.id).to.be.equal(user.id);
+        expect(activity.data.user.id).to.be.equal(member.id);
         expect(activity.data.group.id).to.be.equal(group.id);
         expect(activity.data.expense.id).to.be.equal(expenseId);
       })
@@ -797,7 +787,7 @@ describe('expenses.routes.test.js', () => {
     var group, user;
     return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
       .tap(g => group = g)
-      .then(() => u ? u : models.User.create(utils.data('user2'))
+      .then(() => u ? u : models.User.create(utils.data('user3'))
         .tap(user => group.addUserWithRole(user, roles.HOST)))
       .tap(u => user = u)
       .then(() => request(app)

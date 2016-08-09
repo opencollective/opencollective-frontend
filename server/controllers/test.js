@@ -189,11 +189,16 @@ module.exports = function(app) {
 
   const generateTestEmail = function(req, res) {
     const emailLib = require('../lib/email')(app);
-    // TODO: figure out why test.utils doesn't work here.
-    data = require('../../test/mocks/data.json')['emailData'];
-    const html = emailLib.templates[req.params.template](data);
-    res.send(html);
-    emailLib.reload();
+    const template = req.params.template;
+    try {
+      const data = JSON.parse(req.query.data);
+      console.log(`Generating ${template} with data`, data);
+      const html = emailLib.templates[template](data);
+      res.send(html);
+      emailLib.reload();
+    } catch (e) {
+      res.send("Invalid data", e);
+    }
   }
 
   /**

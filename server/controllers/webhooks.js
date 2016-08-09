@@ -28,7 +28,6 @@ module.exports = (app) => {
   const Subscription = models.Subscription;
   const Group = models.Group;
 
-  const transactions = require('./transactions')(app);
   const constants = require('../constants/transactions');
 
   const stripe = (req, res, next) => {
@@ -122,7 +121,6 @@ module.exports = (app) => {
           if (!donation) {
             return cb(new errors.BadRequest('Donation not found: unknown subscription id'));
           }
-
           return cb(null, donation);
         })
         .catch(cb)
@@ -235,15 +233,17 @@ module.exports = (app) => {
           tags: ['Donation'], // remove #postmigration
           approved: true, // remove #postmigration
           interval: subscription.interval, // remove #postmigration
-          SubscriptionId: subscription.id, // remove #postmigration
         };
 
-        transactions._create({
+        models.Transaction.createFromPayload({
           transaction: newTransaction,
-          user, // remove #postmigration
-          group, // remove #postmigration
-          paymentMethod
-        }, cb);
+          user,
+          group,
+          paymentMethod,
+          subscription
+        })
+        .then(t => cb(null, t))
+        .catch(cb);
       }]
 
     }, (err) => {

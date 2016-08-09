@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amountFloat currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
 {{/if}}
 
 {{> header}}
@@ -18,9 +18,9 @@ Subject: Thank you for your {{{currency donation.amountFloat currency=donation.c
 {{/if}}
 
 {{#if interval}}
-<p>I would like to thank you for your pledge to give {{{currency donation.amountFloat currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
+<p>I would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
 {{else}}
-<p>I would like to thank you for your donation of {{{currency donation.amountFloat currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
+<p>I would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
 {{/if}}
 
 <p>With your support, we are able to extend our program reach. Through this, we are able to provide an avenue into tech, empower women with skills needed for professional advancement, and provide environments where networking and mentorship are valued.</p>

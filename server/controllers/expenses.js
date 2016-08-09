@@ -120,20 +120,21 @@ module.exports = (app) => {
    */
 
   const setApprovalStatus = (req, res, next) => {
+    const user = req.remoteUser || req.user;
     const expense = req.expense;
     var preapprovalDetails;
 
     assertExpenseStatus(expense, status.PENDING)
       .then(() => {
         if (req.required.approved === false) {
-          return expense.setRejected()
+          return expense.setRejected(user.id)
             .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
         }
         if (expense.payoutMethod === 'manual') {
           return models.Group.findById(expense.GroupId)
             .then(group => group.getBalance())
             .then(checkIfEnoughFunds(expense))
-            .then(() => expense.setApproved())
+            .then(() => expense.setApproved(user.id))
             .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
         } else {
            return models.UserGroup.findOne({
@@ -146,7 +147,7 @@ module.exports = (app) => {
           .then(paymentMethod => getPreapprovalDetails(paymentMethod.token))
           .tap(d => preapprovalDetails = d)
           .then(checkIfEnoughFunds(expense))
-          .then(() => expense.setApproved())
+          .then(() => expense.setApproved(user.id))
           .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
         }
       })
@@ -198,6 +199,7 @@ module.exports = (app) => {
    */
 
   const pay = (req, res, next) => {
+    const user = req.remoteUser || req.user;
     const expense = req.expense;
     const payoutMethod = req.expense.payoutMethod;
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
@@ -212,8 +214,8 @@ module.exports = (app) => {
       .tap(r => paymentResponse = r)
       .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
       .tap(d => preapprovalDetails = d)
-      .then(() => createTransaction(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails))
-      .tap(() => expense.setPaid())
+      .then(() => createTransaction(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails, user.id))
+      .tap(() => expense.setPaid(user.id))
       .tap(() => res.json(expense))
       .catch(err => next(formatError(err, paymentResponse)));
 

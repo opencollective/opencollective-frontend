@@ -10,7 +10,6 @@ const models = app.set('models');
 const utils = require('../test/utils.js')();
 const data = utils.data;
 const roles = require('../server/constants/roles');
-const createTransaction = require('../server/controllers/transactions')(app)._create;
 
 const paypalTransaction = {
   created: {
@@ -68,16 +67,18 @@ describe('scripts/populate_recurring_paypal_transactions', () => {
       interval: 'month'
     };
 
-    return Promise.promisify(createTransaction)({
-      group,
-      user,
-      transaction: fixture,
-      subscription: _.extend({}, fixture, {
+    return models.Subscription.create(_.extend({}, fixture, {
         data: {
           billingAgreementId
         }
-      })
-    }).then(res =>
+      }))
+    .then(subscription => models.Transaction.createFromPayload({
+      group,
+      user,
+      subscription,
+      transaction: fixture
+    }))
+    .then(res =>
       models.Transaction.findOne({
         where: { id: res.id },
         include: [

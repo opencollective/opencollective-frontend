@@ -18,7 +18,7 @@ var models = app.set('models');
  */
 describe('homepage.routes.test.js', () => {
 
-  var user, group, paymentMethod;
+  var user, group, paymentMethod, application;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 

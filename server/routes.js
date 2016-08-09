@@ -27,7 +27,6 @@ module.exports = (app) => {
   const groups = controllers.groups;
   const activities = controllers.activities;
   const notifications = controllers.notifications;
-  const transactions = controllers.transactions;
   const donations = controllers.donations;
   const expenses = controllers.expenses;
   const paypal = controllers.paypal;
@@ -72,7 +71,7 @@ module.exports = (app) => {
   /**
    * For testing the email templates
    */
-  app.get('/email/:template', test.generateTestEmail);
+  app.get('/templates/email/:template', test.generateTestEmail);
 
   /**
    * Homepage
@@ -162,7 +161,6 @@ module.exports = (app) => {
   /**
    * Transactions (financial).
    */
-  // TODO remove #postmigration, replaced by GET /groups/:groupid/expenses
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
@@ -176,11 +174,6 @@ module.exports = (app) => {
   app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
   // TODO remove #postmigration, replaced by DEL /groups/:groupid/expenses/:expenseid
   app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
-  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/approve
-  app.post('/groups/:groupid/transactions/:transactionid/approve', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessToTransaction(), required('approved'), transactions.setApprovedState); // Approve a transaction.
-  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses/:expenseid/pay
-  app.post('/groups/:groupid/transactions/:transactionid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessToTransaction(), required('service'), transactions.pay); // Pay a transaction.
-  app.post('/groups/:groupid/transactions/:transactionid/attribution/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), transactions.attributeUser); // Attribute a transaction to a user.
 
   /**
    * Expenses
@@ -240,8 +233,9 @@ module.exports = (app) => {
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
-   * Generic OAuth2 (ConnectedAccounts)
+   * Generic OAuth (ConnectedAccounts)
    */
+  app.get('/:slug/connected-accounts', aN.authenticateUserAndAppByJwt(), connectedAccounts.list);
   app.get('/connected-accounts/:service(github|twitter)', aN.authenticateAppByApiKey, aN.authenticateService);
   app.get('/connected-accounts/:service/callback', aN.authenticateAppByEncryptedApiKey, aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);

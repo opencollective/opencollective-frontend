@@ -10,6 +10,7 @@ module.exports = function(app) {
     const slug = req.params.slug.toLowerCase();
     const controllers = req.app.set('controllers');
 
+    // TODO use slugLib.js to get user or group
     models.Group
       .findOne({where: { slug }})
       .then((group) => {

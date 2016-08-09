@@ -145,18 +145,21 @@ module.exports = function (Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      setApproved() {
+      setApproved(lastEditedById) {
         this.status = status.APPROVED;
+        this.lastEditedById = lastEditedById;
         return this.save();
       },
 
-      setRejected() {
+      setRejected(lastEditedById) {
         this.status = status.REJECTED;
+        this.lastEditedById = lastEditedById;
         return this.save();
       },
 
-      setPaid() {
+      setPaid(lastEditedById) {
         this.status = status.PAID;
+        this.lastEditedById = lastEditedById;
         return this.save();
       }
     }

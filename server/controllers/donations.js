@@ -18,7 +18,6 @@ module.exports = (app) => {
    */
   const models = app.set('models');
   const errors = app.errors;
-  const transactions = require('../controllers/transactions')(app);
   const users = require('../controllers/users')(app);
   const emailLib = require('../lib/email')(app);
   const constants = require('../constants/transactions');
@@ -250,7 +249,9 @@ module.exports = (app) => {
           interval // remove #postmigration
         };
 
-        transactions._create(payload, cb);
+        models.Transaction.createFromPayload(payload)
+        .then(t => cb(null, t))
+        .catch(cb)
       }],
 
       sendThankYouEmail: ['createDonation', (cb, results) => {
@@ -331,9 +332,19 @@ module.exports = (app) => {
           .catch(cb);
       },
 
+      createSubscription: ['getConnectedAccount', (cb) => {
+        models.Subscription.create({
+            amount: amountFloat,
+            currency,
+            interval
+          })
+        .then(subscription => cb(null, subscription))
+        .catch(cb)
+      }],
+
       // We create the transaction beforehand to have the id in the return url when
       // the user logs on the PayPal website
-      createTransaction: ['getConnectedAccount', (cb) => {
+      createTransaction: ['createSubscription', (cb, results) => {
         const payload = {
           group,
           transaction: {
@@ -353,14 +364,12 @@ module.exports = (app) => {
 
        if (isSubscription) {
           payload.transaction.interval = interval;
-          payload.subscription = {
-            amount: amountFloat,
-            currency,
-            interval
-          };
+          payload.subscription = results.createSubscription;
         }
 
-        transactions._create(payload, cb);
+        models.Transaction.createFromPayload(payload)
+        .then(t => cb(null, t))
+        .catch(cb)
       }],
 
       callPaypal: ['createTransaction', (cb, results) => {
@@ -521,7 +530,7 @@ module.exports = (app) => {
       updateTransaction: ['addUserToGroup', (cb, results) => {
         transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
           .then(() => transaction.setUser(results.getOrCreateUser))
-          .then(() => transactions.createGroupTransactionCreatedActivity(transaction.id))
+          .then(() => models.Transaction.createActivity(transaction))
           .then(() => cb())
           .catch(cb);
       }]

@@ -9,8 +9,8 @@ const expect = require('chai').expect;
 const request = require('supertest-as-promised');
 const config = require('config');
 const utils = require('../test/utils.js')();
-const createTransaction = require('../server/controllers/transactions')(app)._create;
 const stripeMock = require('./mocks/stripe');
+const Promise = require('bluebird');
 
 /**
  * Variables.
@@ -54,14 +54,16 @@ describe('subscriptions.routes.test.js', () => {
   describe('#getAll', () => {
     // Create transactions for group1.
     beforeEach((done) => {
-      async.map(transactionsData, (transaction, cb) => {
-        createTransaction({
-          transaction,
-          user,
-          group,
-          subscription: utils.data('subscription1')
-        }, cb);
-      }, done);
+      return Promise.map(transactionsData, transaction =>
+          models.Subscription.create(utils.data('subscription1'))
+            .then(subscription => models.Transaction.createFromPayload({
+              transaction,
+              user,
+              group,
+              subscription })
+          ))
+        .then(() => done())
+        .catch(done)
     });
 
     it('fails if no authorization provided', (done) => {
@@ -105,16 +107,17 @@ describe('subscriptions.routes.test.js', () => {
     var nocks = {};
 
     beforeEach((done) => {
-      createTransaction({
-        transaction: transactionsData[0],
+      models.Subscription.create(subscription)
+      .then(subscription => models.Transaction.createFromPayload({
+         transaction: transactionsData[0],
         user,
         group,
         subscription,
         paymentMethod
-      }, (err, t) => {
-        transaction = t;
-        done(err);
-      });
+      }))
+      .tap(t => transaction = t)
+      .then(() => done())
+      .catch(done)
     });
 
     beforeEach(() => {

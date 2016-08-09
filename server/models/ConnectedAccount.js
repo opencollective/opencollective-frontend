@@ -24,7 +24,7 @@ module.exports = (Sequelize, DataTypes) => {
     clientId: DataTypes.STRING, // paypal app id
 
     // either paypal secret OR an accessToken to do requests to the provider on behalf of the user
-    secret: DataTypes.STRING, 
+    secret: DataTypes.STRING,
 
     data: DataTypes.JSON,
 
@@ -41,6 +41,14 @@ module.exports = (Sequelize, DataTypes) => {
     paranoid: true,
 
     getterMethods: {
+      info() {
+        return {
+          id: this.id,
+          provider: this.provider,
+          username: this.username
+        };
+      },
+
       paypalConfig() {
         return {
           client_id: this.clientId,

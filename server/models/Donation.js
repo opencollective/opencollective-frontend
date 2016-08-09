@@ -45,20 +45,22 @@ module.exports = function(Sequelize, DataTypes) {
       min: 0
     },
 
-    amountFloat: { // remove #postmigration
-      type: DataTypes.VIRTUAL,
-      min: 0,
-      get: function () {
-        return parseFloat(this.get('amount') / 100);
-      }
-    },
-
     title: DataTypes.STRING,
 
     SubscriptionId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Subscriptions',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    PaymentMethodId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'PaymentMethods',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -90,7 +92,6 @@ module.exports = function(Sequelize, DataTypes) {
           GroupId: this.GroupId,
           currency: this.currency,
           amount: this.amount,
-          amountFloat: this.amountFloat,
           title: this.title,
           SubscriptionId: this.SubscriptionId,
           createdAt: this.createdAt,
