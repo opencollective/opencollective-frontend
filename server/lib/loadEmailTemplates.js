@@ -55,10 +55,13 @@ module.exports = () => {
     const currency = props.hash.currency;
     value = value/100; // converting cents
     if (currencies[currency]) {
-      return currencies[currency](value);
+      let str = currencies[currency](value);
+      if (str.indexOf('-') !== -1) {
+        // we move the minus sign to the beginning: $-10 -> -$10
+        str = `-${str.replace('-','')}`;
+      }
+      return str;
     }
-    console.error(`Unexpected currency ${currency}`);
-    return `${value} ${currency}`;
   });
 
   handlebars.registerHelper('encodeURIComponent', (str) => {

@@ -1,14 +1,13 @@
 const config = require('config');
 const _ = require('lodash');
 const Promise = require('bluebird');
+const juice = require('juice');
 const nodemailer = require('nodemailer');
 
 const debug = require('debug')('email');
 const templates = require('./loadEmailTemplates')();
 
-/*
- * renders the email
- */
+
 const render = (name, data, config) => {
     data.config = config;
     data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
@@ -114,7 +113,7 @@ const generateEmailFromTemplate = (template, recipient, data) => {
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));
   }
-  return Promise.resolve(render(template, data, config));
+  return Promise.resolve(juice(render(template, data, config)));
 };
 
 /*

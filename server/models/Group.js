@@ -285,7 +285,7 @@ module.exports = function(Sequelize, DataTypes) {
         until = until || new Date();
         return models.Transaction.find({
           attributes: [
-            [Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 'total']
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 0), 'total']
           ],
           where: {
             GroupId: this.id,

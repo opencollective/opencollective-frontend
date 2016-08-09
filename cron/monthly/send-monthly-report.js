@@ -30,12 +30,9 @@ const init = () => {
           'id',
           'slug',
           'name',
-          'currency'
-      ],
-      where: {
-        slug: { $in: ['railsgirlsatl'] } // for testing
-      },
-      limit: 1 // for testing
+          'currency',
+          'tags'
+      ]
   };
 
   Group.findAll(query)
@@ -56,26 +53,31 @@ const processGroup = (group) => {
     group.getBalance(endDate),
     group.getBackersCount(),
     group.getBackersCount(endDate),
-    group.getExpenses(null, startDate, endDate)
+    group.getExpenses(null, startDate, endDate),
+    group.getRelatedGroups(3)
   ];
 
   let emailData = {};
 
   return Promise.all(promises)
           .then(results => {
-            const data = { config, month, group: {} };
-            data.group = _.pick(group, ['id', 'name', 'slug', 'currency']);
+            const data = { config: { host: config.host }, month, group: {} };
+            data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
             data.group.balance = results[0];
             data.group.previousBalance = results[1];
             data.group.balanceDelta = results[0] - results[1];
             data.group.backersCount = results[2];
             data.group.backersCountDelta = results[2] - results[3];
-            data.group.expenses = results[4].map(e => e.dataValues);
+            data.group.expenses = results[4].map(e => _.pick(e.dataValues, ['id', 'description', 'status', 'createdAt','netAmountInGroupCurrency','currency']));
+            data.group.related = results[5];
             emailData = data;
             return group;
           })
           .then(getRecipients)
-          .then(recipients => sendEmail(recipients, emailData));
+          .then(recipients => sendEmail(recipients, emailData))
+          .catch(e => {
+            console.error("Error in processing group", group.slug, e);
+          });
 };
 
 const getRecipients = (group) => {
@@ -89,9 +91,9 @@ const getRecipients = (group) => {
 }
 
 const sendEmail = (recipients, data) => {
-  // debug(`Preview email template: http://localhost:3060/templates/email/group.monthlyreport?data=${encodeURIComponent(JSON.stringify(data))}`);
-  recipients.map(recipient => {
-    debug("Sending email to ", recipient);
+  debug(`Preview email template: http://localhost:3060/templates/email/group.monthlyreport?data=${encodeURIComponent(JSON.stringify(data))}`);
+  return Promise.map(recipients, recipient => {
+    debug("Sending email to ", recipient.email);
     return emailLib.send('group.monthlyreport', recipient.email, data);
   });
 }
