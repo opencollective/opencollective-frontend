@@ -7,7 +7,7 @@ var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest-as-promised');
 var utils = require('../test/utils.js')();
-var emailLib = require('../server/lib/email')(app);
+var emailLib = require('../server/lib/email');
 var constants = require('../server/constants/activities');
 
 /**

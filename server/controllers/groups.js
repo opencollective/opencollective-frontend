@@ -24,7 +24,7 @@ module.exports = function(app) {
   const User = models.User;
   const roles = require('../constants/roles');
   const activities = require('../constants/activities');
-  const emailLib = require('../lib/email')(app);
+  const emailLib = require('../lib/email');
   const githubLib = require('../lib/github');
   const queries = require('../lib/queries')(models.sequelize);
 

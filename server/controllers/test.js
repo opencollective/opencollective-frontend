@@ -188,14 +188,13 @@ module.exports = function(app) {
   }
 
   const generateTestEmail = function(req, res) {
-    const emailLib = require('../lib/email')(app);
+    const emailLib = require('../lib/email');
     const template = req.params.template;
     try {
       const data = JSON.parse(req.query.data);
       console.log(`Generating ${template} with data`, data);
-      const html = emailLib.templates[template](data);
+      const html = emailLib.generateEmailFromTemplate(template, null, data);
       res.send(html);
-      emailLib.reload();
     } catch (e) {
       res.send("Invalid data", e);
     }

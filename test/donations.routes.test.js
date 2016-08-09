@@ -13,6 +13,7 @@ const utils = require('../test/utils.js')();
 const generatePlanId = require('../server/lib/utils.js').planId;
 const roles = require('../server/constants/roles');
 const constants = require('../server/constants/transactions');
+const emailLib = require('../server/lib/email');
 
 /**
  * Variables.
@@ -537,6 +538,8 @@ describe('donations.routes.test.js', () => {
           .reply(200, stripeMock.charges.create);
       });
 
+      beforeEach(() => sinon.spy(emailLib, 'send'));
+
       beforeEach('successfully makes a anonymous payment', (done) => {
         request(app)
           .post('/groups/' + group2.id + '/payments')
@@ -550,6 +553,9 @@ describe('donations.routes.test.js', () => {
             done();
           });
       });
+
+
+      afterEach(() => emailLib.send.restore());
 
       it('successfully creates a Stripe customer', () => {
         expect(nocks['customers.create'].isDone()).to.be.true;
@@ -623,8 +629,9 @@ describe('donations.routes.test.js', () => {
           .catch(done);
       });
 
-      it('successfully sends a thank you email', () =>
-        expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal(userData.email.toLowerCase()));
+      it('successfully sends a thank you email', () => {
+        expect(emailLib.send.lastCall.args[1]).to.equal(userData.email.toLowerCase());
+      });
     });
 
     describe('Recurring payment success', () => {

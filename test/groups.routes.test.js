@@ -10,6 +10,7 @@ var chance = require('chance').Chance();
 var utils = require('../test/utils.js')();
 var roles = require('../server/constants/roles');
 var sinon = require('sinon');
+var emailLib = require('../server/lib/email');
 
 /**
  * Variables.
@@ -278,6 +279,10 @@ describe('groups.routes.test.js', () => {
         });
       });
 
+      beforeEach(() => sinon.spy(emailLib, 'send'));
+
+      afterEach(() => emailLib.send.restore());
+
 
       it('assigns contributors as users with connectedAccounts', () =>
         request(app)
@@ -307,7 +312,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
           expect(res.body).to.have.property('isPublic', true);
-          expect(app.mailgun.sendMail.lastCall.args[0].to).to.equal('githubuser@gmail.com');
+          expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
         })
         .then(() => ConnectedAccount.findOne({where: {username: 'asood123'}}))
         .then(ca => {

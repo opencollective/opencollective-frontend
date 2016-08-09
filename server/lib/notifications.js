@@ -27,7 +27,7 @@ module.exports = (Sequelize, activity) => {
             activity.type
           ],
           GroupId: activity.GroupId,
-          channel: ['gitter', 'slack', 'twitter', 'email'],
+          channel: ['gitter', 'slack', 'twitter'],
           active: true
         }
       })
