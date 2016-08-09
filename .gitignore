@@ -25,3 +25,6 @@ typings
 
 # test artifacts
 output/
+
+# JetBrains
+*.iml
