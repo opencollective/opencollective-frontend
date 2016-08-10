@@ -54,7 +54,7 @@ module.exports = () => {
     const currency = props.hash.currency;
     value = value/100; // converting cents
 
-	  return value.toLocaleString('USD', {
+	  return value.toLocaleString(currency, {
       style: 'currency',
       currency: currency,
       minimumFractionDigits : 2,
