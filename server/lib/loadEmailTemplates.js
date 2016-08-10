@@ -1,7 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
 const handlebars = require('handlebars');
-const currencies = require('../constants/currencies');
 
 /*
 * Loads all the email templates
