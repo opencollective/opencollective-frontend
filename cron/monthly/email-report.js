@@ -34,10 +34,7 @@ const init = () => {
           'name',
           'currency',
           'tags'
-      ],
-      where: {
-        slug: 'railsgirlsatl'
-      }
+      ]
   };
 
   Group.findAll(query)
