@@ -1,12 +1,12 @@
-const app = require('../index');
+const app = require('../../index');
 const config = require('config');
 const Promise = require('bluebird');
 const models = app.set('models');
 const moment = require('moment-timezone');
 const _ = require('lodash');
-const activities = require('../server/constants/activities');
-const slackLib = require('../server/lib/slack');
-const expenseStatus = require('../server/constants/expense_status')
+const activities = require('../../server/constants/activities');
+const slackLib = require('../../server/lib/slack');
+const expenseStatus = require('../../server/constants/expense_status')
 onlyExecuteInProdOnMondays();
 
 const Transaction = models.Transaction;
@@ -182,14 +182,14 @@ function reportString(results) {
 }
 
 function displayTotals(totals) {
-  if(totals.length > 0) {
+  if (totals.length > 0) {
     return ` totaling:\n    * ${totals.join('\n    * ').trim()}`;
   }
   return "";
 }
 
 function displayCollectives(collectives) {
-  if(collectives.length > 0) {
+  if (collectives.length > 0) {
     return `:\n    * ${collectives.join('\n    * ').trim()}`;
   }
   return "";

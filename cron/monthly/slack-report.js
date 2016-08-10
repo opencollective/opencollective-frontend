@@ -1,8 +1,8 @@
-const app = require('../index');
+const app = require('../../index');
 const models = app.set('models');
 const _ = require('lodash');
-const roles = require('../server/constants/roles');
-const twitter = require('../server/lib/twitter');
+const roles = require('../../server/constants/roles');
+const twitter = require('../../server/lib/twitter');
 onlyExecuteInProdOn1stDayOfTheMonth();
 
 

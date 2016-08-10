@@ -5,7 +5,7 @@
 require('bluebird')
   .longStackTraces();
 
-const app = require('../index');
+const app = require('../../index');
 const GitHubClient = require('opencollective-jobs').GitHubClient;
 const Group = app.set('models').Group;
 const _ = require('lodash');

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-
-process.env.PORT = 3066;
-
+/**
+ * This script subscribes all members of a collective (core contributors)
+ * to the `group.monthlyreport` notification (for all collectives)
+ */
 import _ from 'lodash';
 import app  from '../index';
 import Promise from 'bluebird';
@@ -19,8 +20,7 @@ const init = () => {
 
   const query = {
       where: {
-        role: 'BACKER',
-        UserId: { $in: [2] } // for testing
+        role: 'MEMBER'
       }
   };
 

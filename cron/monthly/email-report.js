@@ -25,6 +25,8 @@ const month = moment(d).format('MMMM');
 
 const init = () => {
 
+  const startTime = new Date;
+
   const query = {
       attributes: [
           'id',
@@ -37,10 +39,14 @@ const init = () => {
 
   Group.findAll(query)
   .tap(groups => {
-      debug(`Preparing the ${month} report for ${groups.length} groups`);
+      console.log(`Preparing the ${month} report for ${groups.length} groups`);
   })
   .then(processGroups)
-  .then(() => process.exit(0));
+  .then(() => {
+    const timeLapsed = Math.round((new Date - startTime)/1000);
+    console.log(`Total run time: ${timeLapsed}s`);
+    process.exit(0)
+  });
 }
 
 const processGroup = (group) => {
@@ -91,6 +97,7 @@ const getRecipients = (group) => {
 }
 
 const sendEmail = (recipients, data) => {
+  if (recipients.length === 0) return;
   debug(`Preview email template: http://localhost:3060/templates/email/group.monthlyreport?data=${encodeURIComponent(JSON.stringify(data))}`);
   return Promise.map(recipients, recipient => {
     debug("Sending email to ", recipient.email);
