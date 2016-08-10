@@ -29,7 +29,8 @@ module.exports = function(app) {
       },
       preapprovalKey: preapprovalKey
     };
-    app.paypalAdaptive.preapprovalDetails(payload, callback);
+
+    callPaypal('preapprovalDetails', payload, callback);
   };
 
   /**
@@ -238,4 +239,18 @@ module.exports = function(app) {
     getPreapprovalDetails
   };
 
+  function callPaypal(endpointName, payload, callback) {
+    console.log(`calling PayPal ${endpointName} with payload:`, payload); // leave this in permanently to help with paypal debugging
+    app.paypalAdaptive[endpointName](payload, (err, res) => {
+      console.log("PayPal response: ", res);
+      if (err) {
+        console.log(`PayPal ${endpointName} error: `, err);
+        if (res.error && res.error[0] && res.error[0].parameter) {
+          console.log("PayPal error.parameter: ", res.error[0].parameter); // this'll give us more details on the error
+        }
+        callback(new Error(res.error[0].message));
+      }
+      callback(null, res);
+    });
+  }
 };

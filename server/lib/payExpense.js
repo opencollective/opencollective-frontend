@@ -34,15 +34,15 @@ module.exports = app => {
       };
 
       return new Promise((resolve, reject) => {
-        console.log("Paypal payload: ", payload); // leave this in permanently to help with paypal debugging
+        console.log("PayPal payment payload: ", payload); // leave this in permanently to help with paypal debugging
         app.paypalAdaptive.pay(payload, (err, res) => {
+          console.log("PayPal response: ", res);
+          console.log("PayPal response paymentInfoList", res.paymentInfoList);
           if (err) {
             console.log("PayPal payment error: ", err);
-            console.log("PayPal response: ", res);
             if (res.error && res.error[0] && res.error[0].parameter) {
               console.log("PayPal error.parameter: ", res.error[0].parameter); // this'll give us more details on the error
             }
-            console.log("PayPal payment error: ")
             return reject(new Error(res.error[0].message));
           }
           resolve(res);
