@@ -92,9 +92,7 @@ module.exports = function(sequelize) {
   */
   const getUniqueGroupTags = () => {
     return sequelize.query('SELECT DISTINCT UNNEST(tags) FROM "Groups" WHERE ARRAY_LENGTH(tags, 1) > 0')
-    .then(results => {
-      return results[0].map(x => x.unnest).sort();
-    })
+    .then(results => results[0].map(x => x.unnest).sort())
   }
 
   /**

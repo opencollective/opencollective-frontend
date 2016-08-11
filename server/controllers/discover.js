@@ -19,12 +19,12 @@ module.exports = function(app) {
       sort === 'newest' ? 'desc' : 'asc',
       offset
     )
-    .then(results => {
+    .then(collectives => {
       const di = {
-        show: show,
-        sort: sort,
-        offset: offset,
-        collectives: results
+        show,
+        sort,
+        offset,
+        collectives
       };
       res.send(di);
     })
