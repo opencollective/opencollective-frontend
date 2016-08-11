@@ -17,7 +17,7 @@ module.exports = app => {
         // TODO does PayPal accept all the currencies that we support in our expenses?
         currencyCode: expense.currency,
         feesPayer: 'SENDER',
-        memo: `Reimbursement from ${group.name}: ${expense.description}`,
+        memo: `Reimbursement from ${group.name}: ${expense.title}`,
         trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
         preapprovalKey,
         returnUrl: `${baseUrl}/success`,
