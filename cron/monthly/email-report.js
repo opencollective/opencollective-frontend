@@ -55,10 +55,10 @@ const processGroup = (group) => {
   const endDate = new Date(d.getFullYear(), d.getMonth(), 0);
   debug(`Processing ${group.name}`, moment(startDate).format('MM/DD'), moment(endDate).format('MM/DD'));
   const promises = [
-    group.getBalance(),
     group.getBalance(endDate),
-    group.getBackersCount(),
+    group.getBalance(startDate),
     group.getBackersCount(endDate),
+    group.getBackersCount(startDate),
     group.getExpenses(null, startDate, endDate),
     group.getRelatedGroups(3)
   ];

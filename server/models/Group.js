@@ -364,7 +364,7 @@ module.exports = function(Sequelize, DataTypes) {
         return models.Transaction
           .find({
             attributes: [
-              [Sequelize.fn('COUNT', Sequelize.col('UserId')), 'backersCount']
+              [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('UserId'))), 'backersCount']
             ],
             where: {
               GroupId: this.id,

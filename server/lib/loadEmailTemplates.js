@@ -1,7 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
 const handlebars = require('handlebars');
-const currencies = require('../constants/currencies');
 
 /*
 * Loads all the email templates
@@ -54,14 +53,14 @@ module.exports = () => {
   handlebars.registerHelper('currency', (value, props) => {
     const currency = props.hash.currency;
     value = value/100; // converting cents
-    if (currencies[currency]) {
-      let str = currencies[currency](value);
-      if (str.indexOf('-') !== -1) {
-        // we move the minus sign to the beginning: $-10 -> -$10
-        str = `-${str.replace('-','')}`;
-      }
-      return str;
-    }
+
+	  return value.toLocaleString(currency, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits : 2,
+      maximumFractionDigits : 2
+    });
+
   });
 
   handlebars.registerHelper('encodeURIComponent', (str) => {
