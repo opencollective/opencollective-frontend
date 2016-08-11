@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const activitiesLib = require('../lib/activities');
 const slackLib = require('./slack');
 const twitter = require('./twitter');
+const emailLib = require('../lib/email');
 const activityType = require('../constants/activities');
 
 module.exports = (Sequelize, activity) => {
@@ -21,13 +22,17 @@ module.exports = (Sequelize, activity) => {
         return Promise.resolve([]);
       }
       return Sequelize.models.Notification.findAll({
+        include: {
+          model: Sequelize.models.User,
+          attributes: ['email']
+        },
         where: {
           type: [
             activityType.ACTIVITY_ALL,
             activity.type
           ],
           GroupId: activity.GroupId,
-          channel: ['gitter', 'slack', 'twitter'],
+          channel: ['gitter', 'slack', 'twitter', 'email'],
           active: true
         }
       })
@@ -40,6 +45,8 @@ module.exports = (Sequelize, activity) => {
           return publishToSlack(activity, notifConfig.webhookUrl, {});
         } else if (notifConfig.channel === 'twitter') {
           return twitter.tweetActivity(Sequelize, activity);
+        } else if (notifConfig.channel === 'email') {
+          return emailLib.sendMessageFromActivity(Sequelize, activity, notifConfig);
         } else {
           return Promise.resolve();
         }

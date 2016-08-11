@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 
 const debug = require('debug')('email');
 const templates = require('./loadEmailTemplates')();
+const activities = require('../constants/activities');
 
 
 const render = (name, data, config) => {
@@ -120,12 +121,22 @@ const generateEmailFromTemplate = (template, recipient, data) => {
  * Given a template, recipient and data, generates email and sends it.
  * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
-
 const generateEmailFromTemplateAndSend = (template, recipient, data) => {
 
   return generateEmailFromTemplate(template, recipient, data)
     .then(templateString => sendMessage(recipient, getSubject(templateString), getBody(templateString)));
 };
+
+/*
+ * Given an activity, it sends out an email to the right people and right template
+ */
+const sendFromActivity = (activity, notification) => {
+  if (activity.type === activities.GROUP_TRANSACTION_CREATED) {
+    return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
+  } else {
+    return Promise.resolve();
+  }
+}
 
 module.exports = {
 
@@ -133,5 +144,6 @@ module.exports = {
   getSubject,
   sendMessage,
   generateEmailFromTemplate,
-  send: generateEmailFromTemplateAndSend
+  send: generateEmailFromTemplateAndSend,
+  sendFromActivity
 };
