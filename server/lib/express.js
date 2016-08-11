@@ -31,7 +31,7 @@ module.exports = function(app) {
   passport.use(new GitHubStrategy(config.github,
     (accessToken, refreshToken, profile, done) => done(null, accessToken, { profile })));
 
-  passport.use(new TwitterStrategy(Object.assign({}, config.twitter, {session: false}),
+  passport.use(new TwitterStrategy(config.twitter,
     (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile })));
 
   // TODO if prod load ramps up, configure 'store' (default: MemoryStore)
