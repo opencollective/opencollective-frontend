@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const curlify = require('request-as-curl');
 const errors = require('../lib/errors');
-const config = require('config');
+const emailLib = require('../lib/email');
 
 
 const sendErrorByEmail = (req, err) => {
@@ -10,17 +10,18 @@ const sendErrorByEmail = (req, err) => {
   if (req.body.password)
     req.body.password = '***********';
 
+  if (req.body.passwordConfirmation)
+    req.body.passwordConfirmation = '***********';
+
   errorHTML += curlify(req, req.body);
   errorHTML += "<br />\n<br />\n";
   errorHTML += "Error: <br />\n";
   errorHTML += JSON.stringify(err);
 
-  req.app.mailgun.sendMail({
-    from: config.email.from,
-    to: 'server-errors@opencollective.com',
-    subject: `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
-    html: errorHTML
-  })
+  emailLib.sendMessage(
+    'server-errors@opencollective.com',
+    `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
+    errorHTML)
   .catch(console.error);
 };
 
