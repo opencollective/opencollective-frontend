@@ -6,8 +6,8 @@ module.exports = function(app) {
   const models = app.set('models');
 
   return (req, res, next) => {
-    const show = req.query.show;
-    const sort = req.query.sort;
+    const show = req.query.show || 'all';
+    const sort = req.query.sort === 'oldest' ? 'oldest' : 'newest';
     const offset = req.query.offset;
     models.Group.getGroupsSummaryByTag(
       !show || show === 'all' ? '' : show, 
