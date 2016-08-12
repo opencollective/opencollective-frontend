@@ -6,7 +6,9 @@ const _ = require('lodash');
 const app = require('../index');
 const config = require('config');
 const expect = require('chai').expect;
+const sinon = require('sinon');
 const utils = require('../test/utils.js')();
+var roles = require('../server/constants/roles');
 
 /**
  * Models
@@ -16,12 +18,31 @@ const models = app.get('models');
 const Transaction = models.Transaction;
 
 /**
+ * Data
+ */
+
+var userData = utils.data('user1');
+var groupData = utils.data('group1');
+var transactionsData = utils.data('transactions1').transactions;
+
+
+/**
  * Tests.
  */
 
-describe('transaction model', () => {
+describe.only('transaction model', () => {
+
+  var user, group;
 
   beforeEach(() => utils.cleanAllDb());
+
+  beforeEach(() => models.User.create(userData).tap(u => user = u));
+
+  // Create group2.
+  beforeEach(() =>
+    models.Group.create(groupData)
+      .tap(g => group = g)
+      .then(() => group.addUserWithRole(user, roles.HOST)));
 
   it('isExpense is true if the amount is negative', done => {
     Transaction.create({
@@ -98,4 +119,23 @@ describe('transaction model', () => {
     })
     .catch(done);
   });
+
+  it('createFromPayload() generates a new activity', done => {
+
+    beforeEach(() => sinon.spy(Transaction, 'createActivity'));
+
+    afterEach(() => Transaction.createActivity.restore());
+
+    Transaction.createFromPayload({
+      transaction: transactionsData[7],
+      user,
+      group
+    })
+    .then(transaction => {
+      expect(transaction.GroupId).to.equal(group.id);
+      expect(Transaction.createActivity.lastCall.args[0]).to.equal(transaction);
+      done();
+    })
+    .catch(done);
+  })
 });
