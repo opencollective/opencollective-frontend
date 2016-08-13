@@ -247,11 +247,9 @@ module.exports = function (app) {
 
       const params = qs.stringify({ api_key_enc, utm_source, slug });
       const opts = {
-        callbackURL: `/connected-accounts/${service}/callback?${params}`,
-        proxy: true
+        callbackURL: `${config.host.api}/connected-accounts/${service}/callback?${params}`
       };
       console.log("authenticateService: setting callbackURL", opts.callbackURL);
-      console.log("authenticateService: FYI, config.host.api:", config.host.api);
 
       if (service === 'github') {
         opts.scope = [ 'user:email', 'public_repo' ];
