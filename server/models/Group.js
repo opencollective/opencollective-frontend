@@ -429,10 +429,11 @@ module.exports = function(Sequelize, DataTypes) {
     },
 
     classMethods: {
-      getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder) => {
+      getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
         limit = limit || 3;
         excludeList = excludeList || [];
-        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation, randomOrder)
+
+        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset)
           .then(groups => {
             return Promise.all(groups.map(group => {
               const appendTier = backers => {

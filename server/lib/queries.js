@@ -48,12 +48,16 @@ module.exports = function(sequelize) {
   /**
    * Get top collectives based on total donations
    */
-  const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder) => {
-    var excludeClause = ''
+  const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
+    var tagClause = '';
+    var excludeClause = '';
     var minTotalDonationClause = '';
     var orderClause = 'BY t."totalDonations"';
-    if (randomOrder) {
-      orderClause = 'BY random()'
+    var orderDirection = (orderDir === 'asc') ? 'ASC' : 'DESC';
+    if (orderBy) {
+      orderClause = `BY ${ orderBy }`;
+    } else if (randomOrder) {
+      orderClause = 'BY random()';
     }
     if (excludeList && excludeList.length > 0) {
       excludeClause = `AND g.id not in (${excludeList})`;
@@ -64,20 +68,32 @@ module.exports = function(sequelize) {
       minTotalDonationClause = ''
     }
 
+    if (tag) {
+      tagClause = 'g.tags && $tag AND';
+    }
+
     return sequelize.query(`
       WITH "totalDonations" AS (
         SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
       )
       SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", t."totalDonations", t.currency, t.collectives
       FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
-      WHERE ${minTotalDonationClause} g.tags && $tag AND g."deletedAt" IS NULL ${excludeClause}
-      ORDER ${orderClause} DESC NULLS LAST LIMIT ${limit}
+      WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
+      ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
     `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
     {
       bind: { tag: [tag] },
       model: models.Group
     });
   };
+
+  /**
+  * Get list of all unique tags for groups.
+  */
+  const getUniqueGroupTags = () => {
+    return sequelize.query('SELECT DISTINCT UNNEST(tags) FROM "Groups" WHERE ARRAY_LENGTH(tags, 1) > 0')
+    .then(results => results[0].map(x => x.unnest).sort())
+  }
 
   /**
    * Returns top sponsors ordered by number of collectives they sponsor and total amount donated
@@ -162,7 +178,8 @@ const getLeaderboard = () => {
     getUsersFromGroupWithTotalDonations,
     getLeaderboard,
     getTopSponsors,
-    getGroupsByTag
+    getGroupsByTag,
+    getUniqueGroupTags
   };
 
 };

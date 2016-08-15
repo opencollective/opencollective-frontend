@@ -548,6 +548,15 @@ module.exports = function(app) {
   };
 
   /**
+   * Get array of unique group tags
+   */
+  const getGroupTags = (req, res, next) => {
+    return queries.getUniqueGroupTags()
+    .then(tags => res.send(tags))
+    .catch(next);
+  };
+
+  /**
    * Public methods.
    */
   return {
@@ -560,6 +569,7 @@ module.exports = function(app) {
     deleteUser,
     createTransaction,
     deleteTransaction,
+    getGroupTags,
     getTransaction,
     getTransactions,
     getUsers,
