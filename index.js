@@ -15,8 +15,6 @@ require('./server/lib/load-dot-env');
 
 app.errors = require('./server/lib/errors');
 
-require('./server/lib/express')(app);
-
 /**
  * Config.
  */
@@ -28,6 +26,8 @@ require('./server/lib/config')(app);
  */
 
 app.set('models', require('./server/models'));
+
+require('./server/lib/express')(app);
 
 /**
  * Controllers.
