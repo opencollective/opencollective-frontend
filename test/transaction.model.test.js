@@ -120,11 +120,17 @@ describe.only('transaction model', () => {
     .catch(done);
   });
 
-  it('createFromPayload() generates a new activity', done => {
+  var createActivitySpy;
 
-    beforeEach(() => sinon.spy(Transaction, 'createActivity'));
+  before(() => {
+    createActivitySpy = sinon.spy(Transaction, 'createActivity');
+  });
 
-    afterEach(() => Transaction.createActivity.restore());
+  beforeEach(() => createActivitySpy.reset());
+
+  after(() => createActivitySpy.restore());
+
+  it('createFromPayload() generates a new activity', (done) => {
 
     Transaction.createFromPayload({
       transaction: transactionsData[7],
@@ -133,9 +139,9 @@ describe.only('transaction model', () => {
     })
     .then(transaction => {
       expect(transaction.GroupId).to.equal(group.id);
-      expect(Transaction.createActivity.lastCall.args[0]).to.equal(transaction);
+      expect(createActivitySpy.lastCall.args[0]).to.equal(transaction);
       done();
     })
     .catch(done);
-  })
+  });
 });
