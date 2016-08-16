@@ -52,6 +52,10 @@
     "clientID": "GITHUB_CLIENT_ID",
     "clientSecret": "GITHUB_CLIENT_SECRET"
   },
+  "meetup": {
+    "clientID": "MEETUP_CLIENT_ID",
+    "clientSecret": "MEETUP_CLIENT_SECRET"
+  },
   "twitter": {
     "consumerKey": "TWITTER_CONSUMER_KEY",
     "consumerSecret": "TWITTER_CONSUMER_SECRET"

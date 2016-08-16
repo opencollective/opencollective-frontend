@@ -8,6 +8,7 @@ const passport = require('passport');
 const session = require('express-session');
 const GitHubStrategy = require('passport-github').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
+const MeetupStrategy = require('passport-meetup-oauth2').Strategy;
 
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
@@ -36,11 +37,10 @@ module.exports = function(app) {
   passport.serializeUser((user, cb) => cb(null, user));
   passport.deserializeUser((obj, cb) => cb(null, obj));
 
-  passport.use(new GitHubStrategy(config.github,
-    (accessToken, refreshToken, profile, done) => done(null, accessToken, { profile })));
-
-  passport.use(new TwitterStrategy(config.twitter,
-    (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile })));
+  const verify = (accessToken, tokenSecret, profile, done) => done(null, accessToken, { tokenSecret, profile });
+  passport.use(new GitHubStrategy(config.github, verify));
+  passport.use(new MeetupStrategy(config.meetup, verify));
+  passport.use(new TwitterStrategy(config.twitter, verify));
 
   app.use(cookieParser());
   app.use(session({
