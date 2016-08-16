@@ -46,7 +46,7 @@ module.exports = (Sequelize, activity) => {
         } else if (notifConfig.channel === 'twitter') {
           return twitter.tweetActivity(Sequelize, activity);
         } else if (notifConfig.channel === 'email') {
-          return emailLib.sendMessageFromActivity(Sequelize, activity, notifConfig);
+          return emailLib.sendMessageFromActivity(activity, notifConfig);
         } else {
           return Promise.resolve();
         }
@@ -58,7 +58,7 @@ module.exports = (Sequelize, activity) => {
 
 function publishToGitter(activity, notifConfig) {
   const message = activitiesLib.formatMessageForPublicChannel(activity, 'markdown');
-  if (message) {
+  if (message && process.env.NODE_ENV === 'production') {
     return axios.post(notifConfig.webhookUrl, { message });
   } else {
     Promise.resolve();

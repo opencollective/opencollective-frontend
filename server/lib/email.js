@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const debug = require('debug')('email');
 const templates = require('./loadEmailTemplates')();
 const activities = require('../constants/activities');
+const utils = require('./utils');
 
 
 const render = (name, data, config) => {
@@ -39,6 +40,11 @@ const getSubject = str => {
  */
 const sendMessage = (recipient, subject, html) => {
   debug("email: ", recipient, subject, html);
+
+  // if not in production, only send out emails to bcc'd opencollective address
+  if (process.env.NODE_ENV !== 'production' && !utils.isEmailInternal(recipient)) {
+    recipient = '';
+  }
 
   if (config.mailgun.user) {
     const mailgun = nodemailer.createTransport({
@@ -130,7 +136,7 @@ const generateEmailFromTemplateAndSend = (template, recipient, data) => {
 /*
  * Given an activity, it sends out an email to the right people and right template
  */
-const sendFromActivity = (activity, notification) => {
+const sendMessageFromActivity = (activity, notification) => {
   if (activity.type === activities.GROUP_TRANSACTION_CREATED) {
     return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
   } else {
@@ -145,5 +151,5 @@ module.exports = {
   sendMessage,
   generateEmailFromTemplate,
   send: generateEmailFromTemplateAndSend,
-  sendFromActivity
+  sendMessageFromActivity
 };

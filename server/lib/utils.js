@@ -197,6 +197,18 @@ const defaultHostId = () => {
 }
 
 /**
+ * Check if this is an internal email address.
+ * Useful for testing emails in localhost or staging
+ */
+const isEmailInternal = (email) => {
+  if (email.toLowerCase().indexOf('@opencollective.com') != -1 ||
+    email.toLowerCase().indexOf('@opencollective.org') != -1) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Export public methods.
  */
 module.exports = {
@@ -211,5 +223,6 @@ module.exports = {
   getTier,
   appendTier,
   decrypt,
-  defaultHostId
+  defaultHostId,
+  isEmailInternal
 }
