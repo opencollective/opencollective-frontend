@@ -30,7 +30,7 @@ var transactionsData = utils.data('transactions1').transactions;
  * Tests.
  */
 
-describe.only('transaction model', () => {
+describe('transaction model', () => {
 
   var user, group;
 
@@ -119,6 +119,22 @@ describe.only('transaction model', () => {
     })
     .catch(done);
   });
+
+  it('createFromPayload creates a new Transaction', done => {
+    Transaction.createFromPayload({
+      transaction: transactionsData[7],
+      user,
+      group
+    })
+    .then(() => {
+      Transaction.findAll()
+      .then(transactions => {
+        expect(transactions.length).to.equal(1);
+        done();
+      })
+    })
+    .catch(done);
+  })
 
   var createActivitySpy;
 
