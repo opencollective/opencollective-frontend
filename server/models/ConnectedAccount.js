@@ -6,7 +6,7 @@ const config = require('config');
 
 module.exports = (Sequelize, DataTypes) => {
 
-  const allowedTypes = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
+  const allowedTypes = ['paypal', 'stripe', 'github', 'twitter'];
 
   return Sequelize.define('ConnectedAccount', {
     provider: {
