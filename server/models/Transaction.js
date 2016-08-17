@@ -240,28 +240,13 @@ module.exports = (Sequelize, DataTypes) => {
           }
           return Sequelize.models.Activity.create(activityPayload);
         })
-        .catch(err => console.error(`Error creating activity of type ${activities.GROUP_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err))
-        // notify subscribers. TODO: #EmailLibRefactor bring this back once we refactor emailLib.
-        // Won't work as is because emailLib requires 'app' to be passed in, which is weird to do from a model
-        /*.then(() => Sequelize.Notification.findAll({
-          include: {
-            model: User,
-            attributes: ['email']
-          },
-          where: {
-            type: activity.type,
-            GroupId: activity.GroupId
-          }
-        }))
-        .then(notifications => notifications.map(notif => emailLib.send(activity.type, notif.User.email, activity.data)))
-        .catch(err => console.error(`Unable to fetch subscribers of ${activity.type} for group ${activity.GroupId}`, err));
-        */
+        .catch(err => console.error(`Error creating activity of type ${activities.GROUP_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err));
       }
     },
 
     hooks: {
       afterCreate: (transaction) => {
-        Transaction.createActivity(transaction);
+        return Transaction.createActivity(transaction);
       }
     }
   });

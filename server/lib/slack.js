@@ -29,8 +29,8 @@ module.exports = {
     if (!options) {
       options = {};
     }
-    const message = activitiesLib.formatMessageForPublicChannel(activity, 'slack');
-    return this.postMessage(message, webhookUrl, options);
+      const message = activitiesLib.formatMessageForPublicChannel(activity, 'slack');
+      return this.postMessage(message, webhookUrl, options);
   },
 
   /*
@@ -53,6 +53,11 @@ module.exports = {
     }
 
     return new Promise((resolve, reject) => {
+      // production check
+      if (process.env.NODE_ENV !== 'production') {
+        return resolve();
+      }
+
       if (!slackOptions.text) {
         return resolve();
       }

@@ -16,9 +16,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     hooks: {
       afterCreate: function(activity) {
-        if (process.env.NODE_ENV === 'production') {
-          return notify(Sequelize, activity);
-        }
+        return notify(Sequelize, activity);
       }
     }
   });

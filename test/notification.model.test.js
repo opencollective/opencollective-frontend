@@ -1,13 +1,10 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
 var app = require('../index');
-var config = require('config');
 var expect = require('chai').expect;
 var request = require('supertest-as-promised');
 var utils = require('../test/utils.js')();
-var emailLib = require('../server/lib/email');
 var constants = require('../server/constants/activities');
 
 /**
@@ -18,7 +15,6 @@ var user2Data = utils.data('user2');
 var groupData = utils.data('group1');
 var group2Data = utils.data('group2');
 var group3Data = utils.data('group3');
-var transactionsData = utils.data('transactions1').transactions;
 var notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
 
 var models = app.get('models');
@@ -55,6 +51,7 @@ describe("notification.model.test.js", () => {
       return Notification.create(notificationData);
     });
   });
+
 
   it('notifies for the `group.transaction.approved` email', () =>
     request(app)
@@ -150,46 +147,4 @@ describe("notification.model.test.js", () => {
           type: constants.GROUP_TRANSACTION_CREATED
         }}))
       .tap(res => expect(res.count).to.equal(0)));
-  /* TODO: #EmailLibRefactor. Bring back when emailLib is refactored
-  it('sends a new `group.expense.created` email notification', () => {
-
-    var templateData = {
-      transaction: _.extend({}, transactionsData[0]),
-      user: user,
-      group: group,
-      config: config
-    };
-
-    templateData.transaction.id = 1;
-
-    if(templateData.transaction.link.match(/\.pdf$/))
-      templateData.transaction.preview = {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};
-    else
-      templateData.transaction.preview = {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + templateData.transaction.link, width: '100%'};
-
-    var template = emailLib.templates['group.expense.created'](templateData);
-
-    var subject = emailLib.getSubject(template);
-    var body = emailLib.getBody(template);
-
-    return request(app)
-      .post('/groups/' + group.id + '/transactions')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
-      .send({
-        transaction: transactionsData[0]
-      })
-      .expect(200)
-      .then(res => {
-        expect(res.body).to.have.property('GroupId', group.id);
-        expect(res.body).to.have.property('UserId', user.id); // ...
-      })
-      .then(() => {
-        const options = app.mailgun.sendMail.lastCall.args[0];
-        expect(options.to).to.equal(user.email);
-        expect(options.subject).to.equal(subject);
-        expect(options.html).to.equal(body);
-      });
-  });
-  */
-
 });

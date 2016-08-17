@@ -19,8 +19,8 @@
   "user1": {
     "name": "Phil Mod",
     "username": "philmod",
-    "email": "User1@email.com",
-    "paypalEmail": "User1+paypal@email.com",
+    "email": "User1@opencollective.com",
+    "paypalEmail": "User1+paypal@opencollective.com",
     "password": "passpass",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
@@ -31,28 +31,34 @@
   "user2": {
     "name": "Anish Bas",
     "username": "abas",
-    "email": "Xdam@email.com",
+    "email": "Xdam@opencollective.com",
     "password": "ssapssap"
   },
 
   "user3": {
     "name": "Xavier Damman",
     "username": "xdamman",
-    "email": "User3@email.com",
+    "email": "User3@opencollective.com",
     "password": "passssap"
   },
 
   "user4": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "User4@email.com",
+    "email": "User4@opencollective.com",
     "password": "passssas"
   },
 
   "user5": {
     "name": "Bo Ki",
     "username": "boki",
-    "email": "uSer5@email.com"
+    "email": "uSer5@opencollective.org"
+  },
+
+  "user6": {
+    "name": "internal user",
+    "username": "interno",
+    "email": "internal_user@opencollective.com"
   },
 
   "group1": {
@@ -499,7 +505,7 @@
       "id":1,
       "name":"Phil Mod",
       "username":"philmod",
-      "email":"user1@email.com",
+      "email":"user1@opencollective.com",
       "avatar":null,
       "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
