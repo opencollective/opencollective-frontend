@@ -222,45 +222,28 @@ module.exports = function (app) {
       };
     },
 
-    authenticateAppByEncryptedApiKey: (req, res, next) => {
-      required('api_key_enc')(req, res, (e) => {
-        if (e) return next(e);
-        const apiKeyEnc = req.required.api_key_enc;
-        jwt.verify(apiKeyEnc, secret, (err, decoded) => {
-          if (err) {
-            return next(new Unauthorized(err.message));
-          }
-          findApplicationByKey(decoded.apiKey)
-            .tap(application => req.application = application)
-            .then(() => next())
-            .catch(next);
-        });
-      });
-    },
-
     authenticateService: (req, res, next) => {
-      const apiKey = req.required.api_key;
-      const api_key_enc = jwt.sign({apiKey}, secret, { expiresIn: '1min' });
+      const opts = { callbackURL: getOAuthCallbackUrl(req) };
+
       const service = req.params.service;
-      const utm_source = req.query.utm_source;
-      const slug = req.query.slug;
-
-      const params = qs.stringify({ api_key_enc, utm_source, slug });
-      const opts = {
-        callbackURL: `${config.host.api}/connected-accounts/${service}/callback?${params}`
-      };
-      console.log("authenticateService: setting callbackURL", opts.callbackURL);
-
-      if (service === 'github') {
-        opts.scope = [ 'user:email', 'public_repo' ];
+      switch (service) {
+        case 'github':
+          opts.scope = [ 'user:email', 'public_repo' ];
+          break;
+        case 'meetup':
+          opts.scope = 'ageless';
+          break;
       }
 
+      console.log("authenticateService calling Passport with options", opts);
       passport.authenticate(service, opts)(req, res, next);
     },
 
     authenticateServiceCallback: (req, res, next) => {
       const service = req.params.service;
-      passport.authenticate(service, (err, accessToken, data) => {
+      const opts = { callbackURL: getOAuthCallbackUrl(req) };
+      console.log("authenticateServiceCallback calling Passport with options", opts);
+      passport.authenticate(service, opts, (err, accessToken, data) => {
         if (err) {
           return next(err);
         }
@@ -294,5 +277,13 @@ module.exports = function (app) {
           throw new Forbidden('Application disabled');
         }
       });
+  }
+
+  function getOAuthCallbackUrl(req) {
+    const utm_source = req.query.utm_source;
+    const slug = req.query.slug;
+    const params = qs.stringify({ utm_source, slug });
+    const service = req.params.service;
+    return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
   }
 };

@@ -236,8 +236,8 @@ module.exports = (app) => {
    * Generic OAuth (ConnectedAccounts)
    */
   app.get('/:slug/connected-accounts', aN.authenticateUserAndAppByJwt(), connectedAccounts.list);
-  app.get('/connected-accounts/:service(github|twitter)', aN.authenticateAppByApiKey, aN.authenticateService);
-  app.get('/connected-accounts/:service/callback', aN.authenticateAppByEncryptedApiKey, aN.authenticateServiceCallback);
+  app.get('/connected-accounts/:service(github|twitter|meetup)', aN.authenticateAppByApiKey, aN.authenticateService);
+  app.get('/connected-accounts/:service/callback', aN.authenticateAppByApiKey, aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
 
   /**
