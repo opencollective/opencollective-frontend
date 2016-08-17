@@ -23,16 +23,19 @@ module.exports = (app) => {
           }});
         })
         .map(connectedAccount => connectedAccount.info)
-        .tap(connectedAccounts => res.json({connectedAccounts}))
+        .tap(connectedAccounts => {
+          console.log("connectedAccounts tap", {connectedAccounts});
+          return res.json({connectedAccounts})
+        })
         .catch(next);
     },
 
     createOrUpdate: (req, res, next, accessToken, data, emails) => {
       const provider = req.params.service;
+      const attrs = { provider };
 
       switch (provider) {
         case 'github':
-          const attrs = { provider };
           var caId, user;
           const utmSource = req.query.utm_source;
           const avatar = `http://avatars.githubusercontent.com/${data.profile.username}`;
@@ -59,18 +62,11 @@ module.exports = (app) => {
             .catch(next);
           break;
 
-        case 'meetup':
-          createConnectedAccountForGroup(req.query.slug, provider)
-            .then(ca => ca.update({
-              clientId: accessToken,
-              secret: data.tokenSecret
-            }))
-            .then(() => res.redirect(`${config.host.website}/${req.query.slug}`))
-            .catch(next);
-          break;
-
         case 'twitter':
-          createConnectedAccountForGroup(req.query.slug, provider)
+          models.Group.findOne({where: { slug: req.query.slug }})
+            .tap(group => attrs.GroupId = group.id)
+            .then(() => ConnectedAccount.findOne({ where: attrs }))
+            .then(ca => ca || ConnectedAccount.create(attrs))
             .then(ca => ca.update({
               username: data.profile.username,
               clientId: accessToken,
@@ -125,12 +121,4 @@ module.exports = (app) => {
       .catch(next);
     }
   };
-
-  function createConnectedAccountForGroup(slug, provider) {
-    const attrs = { provider };
-    return models.Group.findOne({where: { slug }})
-      .tap(group => attrs.GroupId = group.id)
-      .then(() => ConnectedAccount.findOne({ where: attrs }))
-      .then(ca => ca || ConnectedAccount.create(attrs));
-  }
 };
