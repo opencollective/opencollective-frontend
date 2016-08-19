@@ -18,7 +18,7 @@ var users, group;
 /**
  * Functions
  */
-const createDonations = (cb) => {
+const createDonationsAndTransaction = (cb) => {
   const donations = [{
     UserId: users[2].id,
     GroupId: group.id,
@@ -30,12 +30,20 @@ const createDonations = (cb) => {
     amount: 10000
   }];
 
-  group
+  const transaction = {
+    UserId: users[2].id,
+    GroupId: group.id,
+    amount: 2000,
+    DonationId: 1,
+    createdAt: '2016-05-07 19:52:21.203+00',
+    updatedAt: '2016-05-07 19:52:21.203+00'
+  };
+
+  return group
     .addUserWithRole(users[3], roles.BACKER)
-    .then(() => {
-      const promises = donations.map(d => models.Donation.create(d));
-      Promise.all(promises).then(() => cb());
-    });
+    .then(() => Promise.all(donations.map(d => models.Donation.create(d))))
+    .then(() => models.Transaction.create(transaction))
+    .then(() => cb());
 };
 
 /**
@@ -375,7 +383,7 @@ describe('usergroup.routes.test.js', () => {
    */
   describe('/groups/:slug/users', () => {
 
-    beforeEach(createDonations);
+    beforeEach(createDonationsAndTransaction);
 
     it('get the list of users with their corresponding tier', (done) => {
       request(app)
@@ -392,6 +400,18 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
+    it('get the list of active users with their corresponding tier', (done) => {
+      request(app)
+        .get(`/groups/${group.slug}/users?filter=active`)
+        .expect(200)
+        .expect((res) => {
+          const users = res.body;
+          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          expect(users[0].tier).to.equal('backer');
+        })
+        .end(done);
+    });
+
     it('get the list of users in CSV format', (done) => {
       request(app)
         .get(`/groups/${group.slug}/users.csv`)
@@ -400,10 +420,10 @@ describe('usergroup.routes.test.js', () => {
           const users = res.text.split('\n').slice(1);
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
-          expect(users[0].split(",")[8]).to.equal('"contributor"');
-          expect(users[1].split(",")[8]).to.equal('"sponsor"');
-          expect(users[2].split(",")[8]).to.equal('"host"');
-          expect(users[3].split(",")[8]).to.equal('"backer"');
+          expect(users[0].split(",")[9]).to.equal('"contributor"');
+          expect(users[1].split(",")[9]).to.equal('"sponsor"');
+          expect(users[2].split(",")[9]).to.equal('"host"');
+          expect(users[3].split(",")[9]).to.equal('"backer"');
         })
         .end(done);
     });

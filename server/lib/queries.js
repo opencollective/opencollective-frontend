@@ -126,6 +126,13 @@ module.exports = function(sequelize) {
         FROM "Donations" d
         WHERE d."GroupId" = :GroupId AND d.amount >= 0
         GROUP BY "UserId"
+      ), last_donation AS (
+        SELECT
+          max("UserId") as "UserId",
+          max("updatedAt") as "updatedAt"
+        FROM "Transactions" t
+        WHERE t."GroupId" = :GroupId AND t.amount >= 0
+        GROUP BY "UserId"
       )
       SELECT
         ug."UserId" as id,
@@ -135,10 +142,12 @@ module.exports = function(sequelize) {
         u.avatar as avatar,
         u.website as website,
         u."twitterHandle" as "twitterHandle",
-        td.amount as "totalDonations"
+        td.amount as "totalDonations",
+        ld."updatedAt" as "lastDonation"
       FROM "UserGroups" ug
       LEFT JOIN "Users" u ON u.id = ug."UserId"
       LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
+      LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
       WHERE ug."GroupId" = :GroupId
       AND ug."deletedAt" IS NULL
       ORDER BY "totalDonations" DESC, ug."createdAt" ASC
