@@ -4,7 +4,6 @@ const expect = require('chai').expect;
 const models = app.get('models');
 const moment = require('moment-timezone');
 const sequelize = models.sequelize;
-const sinon = require('sinon');
 const utils = require('../test/utils.js')();
 const userData = utils.data('user3');
 

@@ -1,9 +1,9 @@
-var config = require('config');
-var clearbit = require('clearbit')(config.clearbit);
-var sinon = require('sinon');
-var expect = require('chai').expect;
+const config = require('config');
+const clearbit = require('clearbit')(config.clearbit);
+const sinon = require('sinon');
+const expect = require('chai').expect;
 
-var stub = sinon.stub(clearbit.Enrichment, 'find', (email) => {
+const stub = sinon.stub(clearbit.Enrichment, 'find', (email) => {
   return Promise.reject(new clearbit.Enrichment.NotFoundError());
 });
 

@@ -18,7 +18,7 @@ module.exports = function(app) {
         }
       })
       .catch((err) => {
-        if (err.name == 'SequelizeUniqueConstraintError')
+        if (err.name === 'SequelizeUniqueConstraintError')
           return next(new errors.BadRequest('Already subscribed to this type of activity'));
 
         next(err);

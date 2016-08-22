@@ -1,0 +1,54 @@
+Subject: Please approve: {{subject}}
+
+{{> header}}
+
+<style>
+.btn {
+  background: #dde1e4;
+  background-color: #80d823;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  display: inline-block;
+  padding: .75rem 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 700;
+  min-width: 150px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.btn a {
+  color: #fff;
+  text-decoration: none;
+}
+</style>
+
+<table width="100%">
+  <tr>
+    <th align="left" width=75 height=25>From:</th>
+    <td>{{from}}</td>
+  </tr>
+  <tr>
+    <th align="left" width=75 height=25>To:</th>
+    <td>{{to}}</td>
+  </tr>
+  <tr>
+    <th align="left" height=25>Subject:</th>
+    <td>{{subject}}</td>
+  </tr>
+  <tr>
+    <td colspan=2 height=20></td>
+  </tr>
+  <tr>
+    <td colspan=2>{{{body}}}</td>
+  </tr>
+  <tr>
+    <td colspan=2 height=20></td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center"><div class="btn"><a href="{{approve_url}}">Approve</a></div></td>
+  </tr>
+</table>
+
+{{> footer}}

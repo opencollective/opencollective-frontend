@@ -40,6 +40,19 @@ module.exports = function(app) {
     });
   };
 
+  const subscribeUserToMailingList = (user, group, role) => {
+    const lists = {};
+    lists[roles.BACKER] = 'backers';
+    lists[roles.MEMBER] = 'members';
+
+    return Notification.create({
+      UserId: user.id,
+      GroupId: group.id,
+      type: `mailinglist.${lists[role]}`
+    });
+
+  };
+
   const _addUserToGroup = (group, user, options) => {
     const checkIfGroupHasHost = () => {
       if (options.role !== roles.HOST) {
@@ -492,6 +505,7 @@ module.exports = function(app) {
 
     _addUserToGroup(req.group, req.user, options)
       .then(() => subscribeUserToGroupEvents(req.user, req.group, options.role))
+      .then(() => subscribeUserToMailingList(req.user, req.group, options.role))
       .tap(() => res.send({success: true}))
       .catch(next);
   };

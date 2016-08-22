@@ -10,6 +10,8 @@ module.exports = () => {
   var templates = {};
 
   const templateNames = [
+    'email.approve',
+    'email.message',
     'github.signup',
     'group.expense.created',
     'group.donation.created',

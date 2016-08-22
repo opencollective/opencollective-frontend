@@ -24,7 +24,8 @@
   },
   "mailgun": {
     "user": "",
-    "password": ""
+    "password": "",
+    "api_key": ""
   },
   "paypal": {
     "classic": {

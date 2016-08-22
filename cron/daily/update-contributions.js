@@ -56,7 +56,7 @@ Group.findAll({
         });
     } else {
       const split = repoLink.split('/');
-      if (split.length != 2) {
+      if (split.length !== 2) {
         log.warn(group.name, 'Incorrect format of githubRepo');
         return;
       }

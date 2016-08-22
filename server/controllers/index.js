@@ -22,15 +22,24 @@ module.exports = function(app) {
     'users',
     'webhooks',
     'test',
-    'connectedAccounts',
-    'meetup'
+    'connectedAccounts'
   ];
+
+  const services = [
+    'email',
+    'meetup'
+  ]
 
   /**
    * Exports.
    */
   controllers.forEach((controller) => {
     cs[controller] = require(`${__dirname}/${controller}`)(app);
+  });
+
+  cs.services = {};
+  services.forEach((controller) => {
+    cs.services[controller] = require(`${__dirname}/services/${controller}`)(app);
   });
 
   return cs;

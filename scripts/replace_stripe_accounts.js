@@ -17,7 +17,7 @@ const secret = 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j';
 
 if (!isTest(publicKey) || !isTest(secret)) {
   console.log('can only replace with test keys');
-  return;
+  process.exit();
 }
 
 models.StripeAccount.findAll({})

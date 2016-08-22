@@ -188,6 +188,27 @@ describe('usergroup.routes.test.js', () => {
         });
     });
 
+    it('successfully adds the user to the mailing list', (done) => {
+      request(app)
+        .post('/groups/' + group.id + '/users/' + users[2].id)
+        .set('Authorization', 'Bearer ' + users[0].jwt(application))
+        .send({
+          role: roles.MEMBER
+        })
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          expect(res.body).to.have.property('success', true);
+
+          models.Notification.find({where: {
+            GroupId: group.id
+          }}).then(notification => {
+            expect(notification.type).to.equal('mailinglist.members');
+            done();
+          });
+        });
+    });
+
   });
 
   /**

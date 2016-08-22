@@ -37,7 +37,8 @@
   },
   "mailgun": {
     "user": "MAILGUN_USER",
-    "password": "MAILGUN_PASSWORD"
+    "password": "MAILGUN_PASSWORD",
+    "api_key": "MAILGUN_API_KEY"
   },
   "host": {
     "api": "API_URL",

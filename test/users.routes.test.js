@@ -39,7 +39,7 @@ describe('users.routes.test.js', () => {
     userlib.memory = {};
     stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
       return new Bluebird((resolve, reject) => {
-        if(opts.email == "xdamman@gmail.com") {
+        if(opts.email === "xdamman@gmail.com") {
           return resolve(mock);
         }
         else {

@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-const Meetup = require('../lib/meetup');
+const Meetup = require('../../lib/meetup');
 
 /**
  * Controller.
