@@ -49,7 +49,7 @@ const groupData = {
   settings: {}
 }
 
-let group;
+let group, users = [];
 
 describe("email.routes.test", () => {
 
@@ -79,8 +79,9 @@ describe("email.routes.test", () => {
           return group.addUserWithRole(user, usersData[index].role);
         });
       })
-      .tap(users => {
-        return Promise.map(users, (user, index) => {
+      .tap(usersRows => {
+        users = usersRows;
+        return Promise.map(usersRows, (user, index) => {
           const lists = usersData[index].lists || [];
           return Promise.map(lists, (list) => models.Notification.create({
               channel: 'email',
@@ -97,9 +98,7 @@ describe("email.routes.test", () => {
 
   it("forwards emails sent to info@:slug.opencollective.com", (done) => {
 
-    const spy = sandbox.spy(emailLib, 'sendMessage', (recipient, subject, body, opts) => {
-      return Promise.resolve();
-    });
+    const spy = sandbox.spy(emailLib, 'sendMessage');
 
     request(app)
       .post('/webhooks/mailgun')
@@ -114,9 +113,7 @@ describe("email.routes.test", () => {
   
   it("forwards the email for approval to the core members", (done) => {
 
-    const spy = sandbox.spy(emailLib, 'send', (template, recipient, data) => {
-      return Promise.resolve();
-    });
+    const spy = sandbox.spy(emailLib, 'send');
 
     request(app)
       .post('/webhooks/mailgun')
@@ -132,10 +129,7 @@ describe("email.routes.test", () => {
 
   it("approves the email", (done) => {
 
-    const spy = sandbox.spy(emailLib, 'send', (template, recipient, data) => {
-      console.log("emailLib.sendMessage called with ", template, recipient);
-      return Promise.resolve();
-    });
+    const spy = sandbox.spy(emailLib, 'send');
 
     request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
@@ -157,6 +151,66 @@ describe("email.routes.test", () => {
         expect(res.body.error.message).to.contain(messageId);
         done();
       });
+  });
+
+  describe("unsubscribe", () => {
+
+    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/mailinglist.members/3d87fb0a6ffa99e8c4307f6fcd649dd1`;
+
+    it("returns an error if invalid token", (done) => {
+      request(app)
+        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/mailinglist.members/xxxxxxxxxx`)
+        .then((res) => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.message).to.equal('Invalid token');
+          done();
+        });
+    });
+
+    it("sends the unsubscribe link in the footer of the email", (done) => {
+
+    const spy = sandbox.stub(emailLib, 'sendMessage');
+
+    request(app)
+      .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
+      .then((res) => {
+        expect(spy.args[0][2]).to.contain(unsubscribeUrl);
+        done();
+      });
+    });
+
+    it("unsubscribes", (done) => {
+      const where = {
+        UserId: users[0].id,
+        GroupId: group.id,
+        type: 'mailinglist.members'
+      };
+
+      request(app)
+        .get(unsubscribeUrl)
+        .then(res => {
+          console.log("res body", res.body);
+          models.Notification.count({ where })
+          .then(count => {
+            expect(count).to.equal(0);
+            done();
+          });
+      });
+    });
+
+    it("fails to unsubscribe if already unsubscribed", (done) => {
+
+      const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/unknownType/38e32567c52039a97252b1e0537fd848`;
+
+      request(app)
+        .get(unsubscribeUrl)
+        .then(res => {
+          expect(res.statusCode).to.equal(400);
+          expect(res.body.error.message).to.equal("No notification found for this user, group and type");
+          done();
+      });
+    });
+
   });
 
 });

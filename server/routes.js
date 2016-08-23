@@ -246,6 +246,7 @@ module.exports = (app) => {
    * TODO: we need to consolidate all 3rd party services within the /services/* routes
    */
   app.get('/services/email/approve', controllers.services.email.approve);
+  app.get('/services/email/unsubscribe/:email/:slug/:type/:token', controllers.services.email.unsubscribe);
 
   /**
    * Github API - fetch all repositories using the user's access_token

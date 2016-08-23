@@ -8,12 +8,18 @@ const debug = require('debug')('email');
 const templates = require('./loadEmailTemplates')();
 const activities = require('../constants/activities');
 const utils = require('./utils');
+const crypto = require('crypto');
 
 const render = (name, data, config) => {
     data.config = config;
     data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
     return templates[name](data);
 };
+
+const generateUnsubscribeToken = (email, groupSlug, type) => {
+  const uid = `${email}.${groupSlug}.${type}.${config.keys.opencollective.resetPasswordSecret}`;
+  return crypto.createHash('md5').update(uid).digest("hex");
+}
 
 /*
  * Gets the body from a string (usually a template)
@@ -80,7 +86,9 @@ const sendMessage = (recipient, subject, html, options) => {
  * Given a template, recipient and data, generates email.
  */
 
-const generateEmailFromTemplate = (template, recipient, data) => {
+const generateEmailFromTemplate = (template, recipient, data, options) => {
+
+  options = options || {};
 
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
@@ -117,6 +125,9 @@ const generateEmailFromTemplate = (template, recipient, data) => {
     }
   }
 
+  const slug = (data.group && data.group.slug) ? data.group.slug : 'undefined';
+  data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type)}`;
+
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));
   }
@@ -128,8 +139,8 @@ const generateEmailFromTemplate = (template, recipient, data) => {
  * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options) => {
-  return generateEmailFromTemplate(template, recipient, data)
-    .then(templateString => sendMessage(recipient, getSubject(templateString), getBody(templateString), options));
+  return generateEmailFromTemplate(template, recipient, data, options)
+    .then(templateString => emailLib.sendMessage(recipient, getSubject(templateString), getBody(templateString), options));
 };
 
 /*
@@ -143,8 +154,7 @@ const sendMessageFromActivity = (activity, notification) => {
   }
 }
 
-module.exports = {
-
+const emailLib = {
   getBody,
   getSubject,
   sendMessage,
@@ -152,3 +162,5 @@ module.exports = {
   send: generateEmailFromTemplateAndSend,
   sendMessageFromActivity
 };
+
+module.exports = emailLib;
