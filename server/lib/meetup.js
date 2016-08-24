@@ -17,10 +17,18 @@ class Meetup {
   }
 
   makeHeadersForTier(tiername) {
-    const usersInTier = filter(values(this.group.users), { tier: tiername});
-    let usersList = usersInTier.map((user) => (user.website) ? `<a href="${user.website}">${user.name}</a>` : user.name).join(', ');
-    usersList = usersList.replace(/,([^,]*)$/,' and$1');
-    const header = `<p>Thank you to our sponsors ${usersList}</p>\n<p><a href="https://opencollective.com/${this.group.slug}"><img src="https://opencollective.com/${this.group.slug}/${tiername}s.png?width=700"></a></p>`;
+    let header = '', usersList = '';
+
+    const usersInTier = filter(values(this.group.users), { tier: tiername });
+
+    if (usersInTier.length > 0) {
+      usersList = usersInTier.map((user) => (user.website) ? `<a href="${user.website}">${user.name}</a>` : user.name).join(', ');
+      usersList = usersList.replace(/,([^,]*)$/,' and$1');
+      header += `<p>Thank you to our sponsors ${usersList}</p>\n`;
+    }
+
+    header += `<p><a href="https://opencollective.com/${this.group.slug}"><img src="https://opencollective.com/${this.group.slug}/${tiername}s.png?width=700"></a></p>`;
+
     return header;
   };
 
