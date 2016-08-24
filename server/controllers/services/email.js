@@ -91,6 +91,7 @@ module.exports = (app) => {
   const approve = (req, res, next) => {
       const messageId = req.query.messageId;
       const approverEmail = req.query.approver;
+      const mailserver = req.query.mailserver || 'so';
 
       let approver, sender;
       let email = {};
@@ -119,7 +120,7 @@ module.exports = (app) => {
       };
 
       request
-      .get(`https://so.api.mailgun.net/v3/domains/opencollective.com/messages/${messageId}`, requestOptions)
+      .get(`https://${mailserver}.api.mailgun.net/v3/domains/opencollective.com/messages/${messageId}`, requestOptions)
       .then(json => {
         email = json;
         return email;
@@ -140,7 +141,7 @@ module.exports = (app) => {
       })
       .then(() => res.send(`Email from ${email.sender} with subject "${email.Subject}" approved for the ${email.To} mailing list`))
       .catch(e => {
-        if (e.statusCode === 404) return next(new errors.NotFound(`Message ${messageId} not found`));
+        if (e.statusCode === 404) return next(new errors.NotFound(`Message ${messageId} not found on the ${mailserver} server`));
         else return next(e);
       })
   };
@@ -192,13 +193,14 @@ module.exports = (app) => {
       })
       .then(users => {
         const messageId = email['message-url'].substr(email['message-url'].lastIndexOf('/')+1);
+        const mailserver = email['message-url'].substring(8, email['message-url'].indexOf('.'));
         const getData = (user) => {
           return {
             from: email.from,
             to: recipient,
             subject: email.subject,
             body: email['body-html'] || email['body-plain'],
-            approve_url: `${config.host.website}/api/services/email/approve?messageId=${messageId}&approver=${encodeURIComponent(user.email)}`
+            approve_url: `${config.host.website}/api/services/email/approve?mailserver=${mailserver}&messageId=${messageId}&approver=${encodeURIComponent(user.email)}`
           };
         };
         debug('preview')("Preview", `http://localhost:3060/templates/email/email.approve?data=${encodeURIComponent(JSON.stringify(getData(users[0])))}`);
