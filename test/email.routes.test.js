@@ -190,7 +190,9 @@ describe("email.routes.test", () => {
     request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
       .then((res) => {
-        expect(spy.args[0][2]).to.contain(unsubscribeUrl);
+        const emailBody = spy.args[0][2];
+        expect(emailBody).to.contain(unsubscribeUrl);
+        expect(emailBody).to.contain("To unsubscribe from members@testcollective.opencollective.com");
         done();
       });
     });

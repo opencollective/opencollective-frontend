@@ -82,6 +82,19 @@ const sendMessage = (recipient, subject, html, options) => {
   }
 };
 
+const getNotificationLabel = (template, recipient) => {
+
+  const notificationTypeLabels = {
+    'group.monthlyreport': 'monthly reports',
+    'group.transaction.created': 'notifications of new transactions for this collective',
+    'email.approve': 'notifications of new emails pending approval',
+    'email.message': recipient
+  }
+
+  return notificationTypeLabels[template];
+
+};
+
 /*
  * Given a template, recipient and data, generates email.
  */
@@ -89,6 +102,8 @@ const sendMessage = (recipient, subject, html, options) => {
 const generateEmailFromTemplate = (template, recipient, data, options) => {
 
   options = options || {};
+
+  data.notificationTypeLabel = getNotificationLabel(template, recipient);
 
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
