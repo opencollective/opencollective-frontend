@@ -145,7 +145,7 @@ describe("email.routes.test", () => {
   it("return 404 if message not found", (done) => {
     const messageId = 'eyJwIjpmYWxzZSwiayI6IjY5MTdlYTZlLWVhNzctNGQzOC04OGUxLWMzMTQwMzdmNGRhNiIsInMiOiIwMjNjMzgwYWFlIiwiYyI6InNhaWFkIn0=';
     request(app)
-      .get(`/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com`)
+      .get(`/services/email/approve?messageId=${messageId}&approver=xdamman%40gmail.com&mailserver=so`)
       .then((res) => {
         expect(res.statusCode).to.equal(404);
         expect(res.body.error.message).to.contain(messageId);
