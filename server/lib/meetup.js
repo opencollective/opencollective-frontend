@@ -1,7 +1,7 @@
-const filter = require('lodash/collection/filter');
-const values = require('lodash/object/values');
-const errors = require('../lib/errors');
-const requestPromise = require('request-promise');
+import filter from 'lodash/collection/filter';
+import values from 'lodash/object/values';
+import errors from '../lib/errors';
+import requestPromise from 'request-promise';
 
 class Meetup {
 
@@ -58,8 +58,8 @@ class Meetup {
     const promises = [];
     return requestPromise(reqopt)
       .then(meetups => {
-        for (var i=0;i<meetups.length;i++) {
-          var meetup = meetups[i];
+        for (let i=0;i<meetups.length;i++) {
+          const meetup = meetups[i];
           if (!meetup.description.match(new RegExp(`^${descriptionHeader.substr(0, 50)}`))) {
             promises.push(this.updateMeetupDescription(meetup.id, `${descriptionHeader}\n ${meetup.description}`));
           }
@@ -75,4 +75,4 @@ class Meetup {
 
 };
 
-module.exports = Meetup;
+export default Meetup;

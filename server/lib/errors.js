@@ -1,55 +1,55 @@
-module.exports = {
+const errors = {
 
-  BadRequest: function(msg) {
+  BadRequest(msg) {
     this.code = 400;
     this.type = 'bad_request';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  ValidationFailed: function(type, fields, msg) {
+  ValidationFailed(type, fields, msg) {
     this.code = 400;
     this.type = type || 'validation_failed';
     this.message = msg || 'Missing required fields';
     this.fields = fields;
   },
 
-  Unauthorized: function(msg) {
+  Unauthorized(msg) {
     this.code = 401;
     this.type = 'unauthorized';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  Forbidden: function(msg) {
+  Forbidden(msg) {
     this.code = 403;
     this.type = 'forbidden';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  SpamDetected: function(msg) {
+  SpamDetected(msg) {
     this.code = 403;
     this.type = 'spam_detected';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  NotFound: function(msg) {
+  NotFound(msg) {
     this.code = 404;
     this.type = 'not_found';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  ServerError: function(msg) {
+  ServerError(msg) {
     this.code = 500;
     this.type = 'server_error';
     this.message = msg;
     Error.call(this, msg);
   },
 
-  Timeout: function(url, ms) {
+  Timeout(url, ms) {
     this.code = 408;
     this.timeout = ms;
     this.type = 'timeout';
@@ -57,7 +57,7 @@ module.exports = {
     Error.call(this, this.message);
   },
 
-  ConflictError: function(msg, data) {
+  ConflictError(msg, data) {
     this.code    = 409;
     this.type    = 'conflict';
     this.message = msg;
@@ -65,14 +65,14 @@ module.exports = {
     Error.call(this, msg);
   },
 
-  NotImplemented: function(msg) {
+  NotImplemented(msg) {
     this.code    = 501;
     this.type    = 'not_implemented';
     this.message = msg || 'This is not implemented.';
     Error.call(this, msg);
   },
 
-  CustomError: function(code, type, msg) {
+  CustomError(code, type, msg) {
     this.code = code;
     this.type = type;
     this.message = msg;
@@ -81,8 +81,8 @@ module.exports = {
 
 };
 
-Object.keys(module.exports).forEach((error) => {
-  module.exports[error].prototype.__proto__ = Error.prototype;
+Object.keys(errors).forEach(error => {
+  errors[error].prototype.__proto__ = Error.prototype;
 });
 
 Error.prototype.info = function() {
@@ -100,3 +100,5 @@ Error.prototype.info = function() {
 
   return result;
 };
+
+export default errors;

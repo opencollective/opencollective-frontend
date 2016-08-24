@@ -1,8 +1,8 @@
-const config = require('config');
-const Promise = require('bluebird');
-const uuid = require('node-uuid');
+import config from 'config';
+import Promise from 'bluebird';
+import uuid from 'node-uuid';
 
-module.exports = app => {
+export default app => {
   const services = {
     paypal: (group, expense, email, preapprovalKey) => {
       const uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;

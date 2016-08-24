@@ -1,14 +1,14 @@
-const axios = require('axios');
-const config = require('config');
-const Promise = require('bluebird');
+import axios from 'axios';
+import config from 'config';
+import Promise from 'bluebird';
 
-const activitiesLib = require('../lib/activities');
-const slackLib = require('./slack');
-const twitter = require('./twitter');
-const emailLib = require('../lib/email');
-const activityType = require('../constants/activities');
+import activitiesLib from '../lib/activities';
+import slackLib from './slack';
+import twitter from './twitter';
+import emailLib from '../lib/email';
+import activityType from '../constants/activities';
 
-module.exports = (Sequelize, activity) => {
+export default (Sequelize, activity) => {
   // publish everything to our private channel
   return publishToSlackPrivateChannel(activity)
     // publish a filtered version to our public channel

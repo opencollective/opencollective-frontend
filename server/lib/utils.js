@@ -1,10 +1,10 @@
 /**
  * Dependencies
  */
-const Url = require('url');
-const config = require('config');
-const crypto = require('crypto');
-const base64url = require('base64url');
+import Url from 'url';
+import config from 'config';
+import crypto from 'crypto';
+import base64url from 'base64url';
 
 /**
  * Private methods.
@@ -15,7 +15,7 @@ const base64url = require('base64url');
  */
 const encrypt = (text) => {
   const cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
-  var crypted = cipher.update(text, 'utf8', 'hex')
+  let crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
   return crypted;
 }
@@ -25,7 +25,7 @@ const encrypt = (text) => {
  */
 const decrypt = (text) => {
   const decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
-  var dec = decipher.update(text,'hex','utf8')
+  let dec = decipher.update(text,'hex','utf8')
   dec += decipher.final('utf8');
   return dec;
 }
@@ -59,9 +59,9 @@ const addParameterUrl = (url, parameters) => {
 
   parsedUrl.pathname = removeTrailingChar(parsedUrl.pathname, '/');
 
-  delete parsedUrl.search; // Otherwise .search in used in place of .query
-  for (var p in parameters) {
-    var param = parameters[p];
+  delete parsedUrl.search; // Otherwise .search is used in place of .query
+  for (const p in parameters) {
+    const param = parameters[p];
     parsedUrl.query[p] = param;
   }
 
@@ -90,7 +90,7 @@ const getLinks = (url, options) => {
 
   const links = {
     next: addParameterUrl(url, {page: page + 1, per_page: perPage}),
-    current: addParameterUrl(url, {page: page, per_page: perPage})
+    current: addParameterUrl(url, {page, per_page: perPage})
   };
   if (page > 1) {
     links.prev = addParameterUrl(url, {page: page - 1, per_page: perPage});
@@ -112,9 +112,9 @@ const getLinks = (url, options) => {
  */
 const getLinkHeader = (url, options) => {
   const links = getLinks(url, options);
-  var header = '';
-  var k = 0;
-  for (var i in links) {
+  let header = '';
+  let k = 0;
+  for (const i in links) {
     header += ((k !== 0) ? ', ' : '') + '<' + links[i] + '>; rel="' + i + '"'; // eslint-disable-line
     k += 1;
   }
@@ -148,7 +148,7 @@ const paginateOffset = (page, perPage) => {
  */
 const getTier = (user, tiers) => {
 
-  var defaultTier;
+  let defaultTier;
   switch (user.role) {
     case 'MEMBER':
       return 'contributor';
@@ -211,18 +211,4 @@ const isEmailInternal = (email) => {
 /**
  * Export public methods.
  */
-module.exports = {
-  paginateOffset,
-  getRequestedUrl,
-  addParameterUrl,
-  getLinks,
-  generateURLSafeToken,
-  getLinkHeader,
-  planId,
-  encrypt,
-  getTier,
-  appendTier,
-  decrypt,
-  defaultHostId,
-  isEmailInternal
-}
+export default { paginateOffset, getRequestedUrl, addParameterUrl, getLinks, generateURLSafeToken, getLinkHeader, planId, encrypt, getTier, appendTier, decrypt, defaultHostId, isEmailInternal };

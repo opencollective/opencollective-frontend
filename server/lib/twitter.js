@@ -1,7 +1,7 @@
-const config = require('config');
-const Promise = require('bluebird');
-const Twitter = require('twitter');
-const activityType = require('../constants/activities');
+import config from 'config';
+import Promise from 'bluebird';
+import Twitter from 'twitter';
+import activityType from '../constants/activities';
 
 function tweetActivity(Sequelize, activity) {
   if (activity.type === activityType.GROUP_TRANSACTION_CREATED
@@ -41,7 +41,4 @@ function tweetStatus(Sequelize, GroupId, status) {
   });
 }
 
-module.exports = {
-  tweetActivity,
-  tweetStatus
-};
+export { tweetActivity, tweetStatus };

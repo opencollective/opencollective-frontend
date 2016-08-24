@@ -1,13 +1,13 @@
-module.exports = function(sequelize) {
+export default function(sequelize) {
 
-  const models = sequelize.models;
+  const { models } = sequelize;
 
   /*
   * Hacky way to do currency conversion on Leaderboard
   */
   const generateFXConversionSQL = (aggregate) => {
-    var currencyColumn = "currency";
-    var amountColumn = "amount";
+    let currencyColumn = "currency";
+    let amountColumn = "amount";
 
     if (aggregate) {
       currencyColumn = 'MAX(g.currency)';
@@ -26,7 +26,7 @@ module.exports = function(sequelize) {
       ['CAD', 1.3]
     ];
 
-    var sql = 'CASE ';
+    let sql = 'CASE ';
     sql += fxConversion.map(currency => `WHEN ${currencyColumn} = '${currency[0]}' THEN ${amountColumn} / ${currency[1]}`).join('\n');
     sql += 'ELSE 0 END';
 
@@ -49,11 +49,11 @@ module.exports = function(sequelize) {
    * Get top collectives based on total donations
    */
   const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
-    var tagClause = '';
-    var excludeClause = '';
-    var minTotalDonationClause = '';
-    var orderClause = 'BY t."totalDonations"';
-    var orderDirection = (orderDir === 'asc') ? 'ASC' : 'DESC';
+    let tagClause = '';
+    let excludeClause = '';
+    let minTotalDonationClause = '';
+    let orderClause = 'BY t."totalDonations"';
+    const orderDirection = (orderDir === 'asc') ? 'ASC' : 'DESC';
     if (orderBy) {
       orderClause = `BY ${ orderBy }`;
     } else if (randomOrder) {

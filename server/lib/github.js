@@ -1,8 +1,8 @@
-const config = require('config');
-const request = require('request');
-const Promise = require('bluebird');
+import config from 'config';
+import request from 'request';
+import Promise from 'bluebird';
 
-module.exports = {
+export default {
 
   fetchUser(username) {
     const options = {

@@ -1,9 +1,9 @@
-const config = require('config');
+import config from 'config';
 const clearbit = require('clearbit')(config.clearbit);
-const url = require('url');
-const Promise = require('bluebird');
+import url from 'url';
+import Promise from 'bluebird';
 
-module.exports = {
+export default {
 
   memory: {},
 
@@ -40,7 +40,7 @@ module.exports = {
       return Promise.resolve(this.memory[email]);
     }
 
-    return this.clearbit.Enrichment.find({email: email, stream: true})
+    return this.clearbit.Enrichment.find({email, stream: true})
       .tap(res => this.memory[email] = res.person)
       .then(res => res.person)
       .catch(clearbit.Enrichment.NotFoundError, () => this.memory[email] = null)
@@ -48,13 +48,13 @@ module.exports = {
   },
 
   resolveUserAvatars(userData, cb) {
-    const name = userData.name;
-    const email = userData.email;
-    const website = userData.website;
-    const twitterHandle = userData.twitterHandle;
-    var linkedinUrl = userData.linkedinUrl;
-    var facebookUrl = userData.facebookUrl;
-    const ip = userData.ip;
+    const { name } = userData;
+    const { email } = userData;
+    const { website } = userData;
+    const { twitterHandle } = userData;
+    let { linkedinUrl } = userData;
+    let { facebookUrl } = userData;
+    const { ip } = userData;
 
     if (!email || !email.match(/.+@.+\..+/)) {
       return cb(new Error("Invalid email"));
@@ -62,7 +62,7 @@ module.exports = {
 
     if (website) {
       const parsedWebsiteUrl = url.parse(website);
-      const hostname = parsedWebsiteUrl.hostname;
+      const { hostname } = parsedWebsiteUrl;
       if (/facebook.com$/.test(hostname)) {
         facebookUrl = website;
       } else if (/linkedin.com\/pub|in|profile/.test(hostname)) {
@@ -80,15 +80,15 @@ module.exports = {
       stream: true
     })
     .then((res) => {
-      const person = res.person;
-      const company = res.company;
+      const { person } = res;
+      const { company } = res;
       const sources = [];
 
       if (person) {
         const personAvatarSources = ['twitter', 'aboutme', 'gravatar', 'github'];
         personAvatarSources.forEach((source) => {
           if (person[source] && person[source].avatar) {
-            sources.push({src: person[source].avatar, source: source});
+            sources.push({src: person[source].avatar, source});
           }
         });
         if (person.avatar) {
@@ -100,7 +100,7 @@ module.exports = {
         const companyAvatarSources = ['twitter', 'angellist'];
         companyAvatarSources.forEach((source) => {
           if (company[source] && company[source].avatar) {
-            sources.push({src: company[source].avatar, source: source});
+            sources.push({src: company[source].avatar, source});
           }
         });
         if (company.logo) {
