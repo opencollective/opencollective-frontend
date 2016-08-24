@@ -103,7 +103,8 @@ describe("email.routes.test", () => {
     request(app)
       .post('/webhooks/mailgun')
       .send(_.defaults({recipient: 'info@testcollective.opencollective.com'}, webhookBody))
-      .then(() => {
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
         expect(spy.args[0][0]).to.equal('info@testcollective.opencollective.com');
         expect(spy.args[0][1]).to.equal(webhookBody.subject);
         expect(spy.args[0][3].bcc).to.equal(usersData[0].email);
@@ -118,11 +119,26 @@ describe("email.routes.test", () => {
     request(app)
       .post('/webhooks/mailgun')
       .send(webhookBody)
-      .then(() => {
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
         expect(spy.args[0][1]).to.equal('members@testcollective.opencollective.com');
         const emailSentTo = [spy.args[0][3].bcc,spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
         expect(emailSentTo.indexOf(usersData[1].email) !== -1).to.be.true;
+        done();
+      });
+  });
+
+  it("rejects emails sent to unknown mailing list", (done) => {
+
+    const unknownMailingListWebhook = _.defaults({ recipient: 'unknown@testcollective.opencollective.com' }, webhookBody);
+
+    request(app)
+      .post('/webhooks/mailgun')
+      .send(unknownMailingListWebhook)
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(res.body.error.message).to.equal('There is no user subscribed to unknown@testcollective.opencollective.com');
         done();
       });
   });
