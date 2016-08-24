@@ -52,6 +52,13 @@ describe('meetup lib', () => {
     expect(header).to.equal(expectedHeader);
   });
 
+  it("doesn't show the list of sponsors if none", () => {
+    const meetup = new Meetup(meetupAccount, group);
+    const header = meetup.makeHeadersForTier('unknownTier');
+    const expectedHeader = `<p><a href="https://opencollective.com/${group.slug}"><img src="https://opencollective.com/${group.slug}/unknownTiers.png?width=700"></a></p>`;
+    expect(header).to.equal(expectedHeader);
+  });
+
   it("updates the next 2 meetups", (done) => {
     const meetup = new Meetup(meetupAccount, group);
     meetup.syncCollective().then(result => {
