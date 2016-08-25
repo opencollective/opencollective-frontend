@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   AUD: value => `${value} AUD`,
   EUR: value => `€${value}`,
   GBP: value => `£${value}`,

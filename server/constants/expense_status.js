@@ -5,7 +5,7 @@
  * pending -> rejected
  */
 
-module.exports = {
+export default {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',

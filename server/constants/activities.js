@@ -2,7 +2,7 @@
  * Constant strings used in the activity model
  */
 
-module.exports = {
+export default {
   ACTIVITY_ALL: 'all',
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
   GROUP_CREATED: 'group.created',

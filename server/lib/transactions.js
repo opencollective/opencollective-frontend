@@ -1,4 +1,4 @@
-import constants from '../constants';
+import * as constants from '../constants';
 
 const expenseType = require('../constants/transactions').type.EXPENSE;
 

@@ -1,9 +1,5 @@
-const activities = require('./activities');
-const expenseStatus = require('./expense_status');
-const roles = require('./roles');
+import activities from './activities';
+import expenseStatus from './expense_status';
+import roles from './roles';
 
-module.exports = {
-  activities,
-  expenseStatus,
-  roles
-};
+export { activities, expenseStatus, roles };
