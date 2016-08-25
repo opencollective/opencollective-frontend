@@ -1,5 +1,5 @@
 
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const Session = Sequelize.define('Session', {
     sid: {

@@ -1,10 +1,12 @@
-const Temporal = require('sequelize-temporal');
+import Temporal from 'sequelize-temporal';
+import currencies from '../constants/currencies';
+import {type} from '../constants/transactions';
 
-const status = require('../constants/expense_status');
-const type = require('../constants/transactions').type.EXPENSE;
-const allowedCurrencies = Object.keys(require('../constants/currencies'));
+import status from '../constants/expense_status';
+const expenseType = type.EXPENSE;
+const allowedCurrencies = Object.keys(currencies);
 
-module.exports = function (Sequelize, DataTypes) {
+export default function (Sequelize, DataTypes) {
 
   const Expense = Sequelize.define('Expense', {
     id: {
@@ -123,7 +125,7 @@ module.exports = function (Sequelize, DataTypes) {
     getterMethods: {
       info() {
         return {
-          type,
+          type: expenseType,
           id: this.id,
           UserId: this.UserId,
           GroupId: this.GroupId,

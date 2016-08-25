@@ -5,16 +5,16 @@ import cors from 'cors';
 import morgan from 'morgan';
 import multer from 'multer';
 import passport from 'passport';
+import connectSessionSequelize from 'connect-session-sequelize';
 import session from 'express-session';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
+import { sequelize as db } from '../models';
 
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
-
-  const Sequelize = app.get('models').sequelize;
 
   // Body parser.
   app.use(bodyParser.json());
@@ -48,7 +48,7 @@ export default function(app) {
     resave: false,
     cookie: { maxAge: 1000 * 60 * 5 },
     saveUninitialized: false,
-    store: new SequelizeStore({ db: Sequelize }),
+    store: new SequelizeStore({ db }),
     proxy: true
   }));
   app.use(passport.initialize());

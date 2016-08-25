@@ -1,13 +1,13 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const errors = require('../lib/errors');
-const utils = require('../lib/utils');
-const config = require('config');
-const moment = require('moment');
+import _ from 'lodash';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import errors from '../lib/errors';
+import utils from '../lib/utils';
+import config from 'config';
+import moment from 'moment';
 
 /**
  * Constants.
@@ -17,7 +17,7 @@ const SALT_WORK_FACTOR = 10;
 /**
  * Model.
  */
-module.exports = (Sequelize, DataTypes) => {
+export default (Sequelize, DataTypes) => {
 
   const User = Sequelize.define('User', {
 
@@ -106,7 +106,7 @@ module.exports = (Sequelize, DataTypes) => {
     password_hash: DataTypes.STRING,
     password: {
       type: DataTypes.VIRTUAL,
-      set: function(val) {
+      set(val) {
         const password = String(val);
         this.setDataValue('password', password);
         this.setDataValue('password_hash', bcrypt.hashSync(password, this._salt));
@@ -123,7 +123,7 @@ module.exports = (Sequelize, DataTypes) => {
     // hash the token to avoid someone with access to the db to generate passwords
     resetPasswordToken: {
       type: DataTypes.VIRTUAL,
-      set: function(val) {
+      set(val) {
         this.setDataValue('resetPasswordToken', val);
         this.setDataValue('resetPasswordTokenHash', bcrypt.hashSync(val, this._salt));
       }
@@ -157,7 +157,7 @@ module.exports = (Sequelize, DataTypes) => {
     getterMethods: {
 
       // Info (private).
-      info: function() {
+      info() {
         return {
           id: this.id,
           name: this.name,
@@ -178,7 +178,7 @@ module.exports = (Sequelize, DataTypes) => {
       },
 
       // Show (to any other user).
-      show: function() {
+      show() {
         return {
           id: this.id,
           name: this.name,
@@ -196,7 +196,7 @@ module.exports = (Sequelize, DataTypes) => {
       },
 
       // Minimal (used to feed the jwt token)
-      minimal: function() {
+      minimal() {
         return {
           id: this.id,
           username: this.username,
@@ -207,7 +207,7 @@ module.exports = (Sequelize, DataTypes) => {
       },
 
       // Used for the public group
-      public: function() {
+      public() {
         return {
           id: this.id,
           avatar: this.avatar,
@@ -224,8 +224,8 @@ module.exports = (Sequelize, DataTypes) => {
 
     instanceMethods: {
       // JWT token.
-      jwt: function(application, payload, expiresInHours) {
-        const secret = config.keys.opencollective.secret;
+      jwt(application, payload, expiresInHours) {
+        const { secret } = config.keys.opencollective;
         expiresInHours = expiresInHours || 24*30; // 1 month
 
         // We are sending too much data (large jwt) but the app and website
@@ -296,9 +296,9 @@ module.exports = (Sequelize, DataTypes) => {
 
       createMany: (users, defaultValues) => {
         const promises = [];
-        for (var i=0; i < users.length; i++) {
+        for (let i=0; i < users.length; i++) {
           const u = users[i];
-          for (var attr in defaultValues) {
+          for (const attr in defaultValues) {
             u[attr] = defaultValues[attr];
           }
           promises.push(User.create(u).catch(e => {

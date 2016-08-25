@@ -8,13 +8,13 @@ import request from 'request-promise';
 import _ from 'lodash';
 import crypto from 'crypto';
 import debug from 'debug';
+import models, {sequelize} from '../../models';
 
 /**
  * Controller.
  */
 export default (app) => {
 
-  const models = app.set('models');
   const { errors } = app;
 
   const unsubscribe = (req, res, next) => {
@@ -104,9 +104,9 @@ export default (app) => {
         const where = { '$or': [ {email: approverEmail}, { email: email.sender } ] };
         sender = { name: email.From, email: email.sender }; // default value
         return models.User.findAll({ where })
-                .then(users => { 
+                .then(users => {
                   users.map(user => {
-                    if (approverEmail === user.email) approver = user; 
+                    if (approverEmail === user.email) approver = user;
                     if (email.sender === user.email) sender = user;
                   })
                 })
@@ -140,7 +140,7 @@ export default (app) => {
         }
         if ( approver && approver.email !== sender.email )
           emailData.approver = _.pick(approver, ['email', 'name', 'avatar']);
-        
+
         return sendEmailToList(email.To, emailData);
       })
       .then(() => res.send(`Email from ${email.sender} with subject "${email.Subject}" approved for the ${email.To} mailing list`))
@@ -149,7 +149,7 @@ export default (app) => {
         else return next(e);
       })
   };
-  
+
   const webhook = (req, res, next) => {
     const email = req.body;
     const { recipient } = email;
@@ -172,15 +172,15 @@ export default (app) => {
     // If an email is sent to info@:slug.opencollective.com,
     // we simply forward it to members who subscribed to that list
     if (list === 'info') {
-      return sendEmailToList(recipient, { 
-        subject: email.subject, 
+      return sendEmailToList(recipient, {
+        subject: email.subject,
         body,
-        from: email.from 
+        from: email.from
       })
       .then(() => res.send('ok'))
-      .catch(e => { 
-        console.error("Error: ", e); 
-        next(e); 
+      .catch(e => {
+        console.error("Error: ", e);
+        next(e);
       });
     }
 
@@ -194,7 +194,7 @@ export default (app) => {
         if (subscribers.length === 0) throw new Error('no_subscribers');
       })
       .then(() => {
-        return models.sequelize.query(`
+        return sequelize.query(`
           SELECT * FROM "UserGroups" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."GroupId"=:groupid AND ug.role=:role AND ug."deletedAt" IS NULL
         `, {
           replacements: { groupid: group.id, role: 'MEMBER' },

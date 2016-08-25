@@ -1,17 +1,18 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const Joi = require('joi');
-const config = require('config');
-const errors = require('../lib/errors');
-const groupBy = require('lodash/collection/groupBy');
-const filter = require('lodash/collection/filter');
-const values = require('lodash/object/values');
+import _ from 'lodash';
+import Joi from 'joi';
+import config from 'config';
+import errors from '../lib/errors';
+import queriesLib from '../lib/queries';
+import groupBy from 'lodash/collection/groupBy';
+import filter from 'lodash/collection/filter';
+import values from 'lodash/object/values';
 
-const roles = require('../constants/roles');
-const constants = require('../constants/transactions');
-const utils = require('../lib/utils');
+import roles from '../constants/roles';
+import constants from '../constants/transactions';
+import utils from '../lib/utils';
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -28,10 +29,10 @@ const tiers = Joi.array().items(tier);
 /**
  * Model.
  */
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
-  const models = Sequelize.models;
-  const queries = require('../lib/queries')(Sequelize);
+  const { models } = Sequelize;
+  const queries = queriesLib(Sequelize);
 
   const Group = Sequelize.define('Group', {
     name: {
@@ -147,7 +148,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     getterMethods: {
       // Info.
-      info: function() {
+      info() {
         return {
           id: this.id,
           name: this.name,
@@ -178,7 +179,7 @@ module.exports = function(Sequelize, DataTypes) {
           isSupercollective: this.isSupercollective
         };
       },
-      card: function() {
+      card() {
         return {
           id: this.id,
           createdAt: this.createdAt,
@@ -190,7 +191,7 @@ module.exports = function(Sequelize, DataTypes) {
           mission: this.mission
         }
       },
-      minimal: function() {
+      minimal() {
         return {
           id: this.id,
           name: this.name,

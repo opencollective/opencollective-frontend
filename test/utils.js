@@ -1,12 +1,11 @@
 /**
  * Dependencies.
  */
-const Promise = require('bluebird');
-const app = require('../index');
-const models = app.set('models');
+import Promise from 'bluebird';
+import models, {sequelize} from '../server/models';
 
-const data  = require('./mocks/data.json');
-const userlib = require('../server/lib/userlib');
+import data from './mocks/data.json';
+import userlib from '../server/lib/userlib';
 
 /**
  * Private methods.
@@ -24,11 +23,12 @@ const clearbitStubAfterEach = (sandbox) => sandbox.restore();
 /**
  * Utils.
  */
-module.exports = () => {
+// TODO get rid of wrapper arrow func
+export default () => {
 
   return {
 
-    cleanAllDb: () => app.get('models').sequelize.sync({force: true})
+    cleanAllDb: () => sequelize.sync({force: true})
       .then(() => models.Application.create(getData('applicationSuper')))
       .catch(e => {
         console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);

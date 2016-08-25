@@ -1,13 +1,13 @@
-const Promise = require('bluebird');
-const _ = require('lodash');
-const activities = require('../constants/activities');
+import Promise from 'bluebird';
+import _ from 'lodash';
+import activities from '../constants/activities';
 
 /*
  * Transaction model
  * - this indicates that money was moved in the system
  */
 
-module.exports = (Sequelize, DataTypes) => {
+export default (Sequelize, DataTypes) => {
 
   const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
@@ -17,7 +17,7 @@ module.exports = (Sequelize, DataTypes) => {
     currency: { // TODO: #postmigration rename to donationCurrency
       type: DataTypes.STRING,
       defaultValue: 'USD',
-      set: function(val) {
+      set(val) {
         if (val && val.toUpperCase) {
           this.setDataValue('currency', val.toUpperCase());
         }
@@ -43,7 +43,7 @@ module.exports = (Sequelize, DataTypes) => {
     // stores the currency that the transaction happened in (currency of the host)
     txnCurrency: {
       type: DataTypes.STRING,
-      set: function(val) {
+      set(val) {
         if (val && val.toUpperCase) {
           this.setDataValue('txnCurrency', val.toUpperCase());
         }
@@ -91,7 +91,7 @@ module.exports = (Sequelize, DataTypes) => {
     classMethods: {
       createMany: (transactions, defaultValues) => {
         return Promise.map(transactions, transaction => {
-          for (var attr in defaultValues) {
+          for (const attr in defaultValues) {
             transaction[attr] = defaultValues[attr];
           }
           return Transaction.create(transaction);
@@ -177,7 +177,7 @@ module.exports = (Sequelize, DataTypes) => {
 
       createMany: (transactions, defaultValues) => {
         return Promise.map(transactions, transaction => {
-          for (var attr in defaultValues) {
+          for (const attr in defaultValues) {
             transaction[attr] = defaultValues[attr];
           }
           return Transaction.create(transaction);

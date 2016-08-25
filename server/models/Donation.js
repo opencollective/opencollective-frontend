@@ -1,6 +1,8 @@
-const type = require('../constants/transactions').type.DONATION;
+import {type} from '../constants/transactions';
 
-module.exports = function(Sequelize, DataTypes) {
+const donationType = type.DONATION;
+
+export default function(Sequelize, DataTypes) {
 
   const Donation = Sequelize.define('Donation', {
     id: {
@@ -33,7 +35,7 @@ module.exports = function(Sequelize, DataTypes) {
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
-      set: function(val) {
+      set(val) {
         if (val && val.toUpperCase) {
           this.setDataValue('currency', val.toUpperCase());
         }
@@ -86,7 +88,7 @@ module.exports = function(Sequelize, DataTypes) {
     getterMethods: {
       info() {
         return {
-          type,
+          type: donationType,
           id: this.id,
           UserId: this.UserId,
           GroupId: this.GroupId,

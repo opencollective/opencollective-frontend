@@ -1,6 +1,6 @@
-const roles = require('../constants/roles');
+import roles from '../constants/roles';
 
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const UserGroup = Sequelize.define('UserGroup', {
     id: {
@@ -44,7 +44,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     getterMethods: {
       // Info.
-      info: function() {
+      info() {
         return {
           role: this.role,
           GroupId: this.GroupId,

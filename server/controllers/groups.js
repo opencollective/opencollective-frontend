@@ -28,7 +28,7 @@ export default function(app) {
   const { Transaction } = models;
   const { ConnectedAccount } = models;
   const { User } = models;
-  const queries = queriesImport(models.sequelize);
+  const queries = queriesImport();
 
 
   const subscribeUserToGroupEvents = (user, group, role) => {

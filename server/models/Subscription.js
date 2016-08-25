@@ -1,4 +1,4 @@
-module.exports = (Sequelize, DataTypes) => {
+export default (Sequelize, DataTypes) => {
 
   const Subscription = Sequelize.define('Subscription', {
 

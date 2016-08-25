@@ -1,15 +1,15 @@
 /**
  * Dependencies.
  */
-const Sequelize = require('sequelize');
-const config = require('config').database;
+import Sequelize from 'sequelize';
+import { database as config } from 'config';
 
 /**
  * Database connection.
  */
 console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
 
-const sequelize = new Sequelize(
+export const sequelize = new Sequelize(
   config.database,
   config.username,
   config.password,
@@ -17,11 +17,12 @@ const sequelize = new Sequelize(
 );
 
 const models = setupModels(sequelize);
+export default models;
 
 /**
  * Separate function to be able to use in scripts
  */
-function setupModels(client) {
+export function setupModels(client) {
   const m = {}; // models
 
   /**
@@ -125,11 +126,4 @@ function setupModels(client) {
   m.PaymentMethod.hasMany(m.Donation);
 
   return m;
-};
-
-/**
- * Exports.
- */
-module.exports = models;
-module.exports.sequelize = sequelize;
-module.exports.setupModels = setupModels;
+}

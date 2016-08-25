@@ -1,4 +1,4 @@
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const Application = Sequelize.define('Application', {
     api_key: DataTypes.STRING,

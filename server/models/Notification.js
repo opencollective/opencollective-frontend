@@ -7,7 +7,7 @@
  * Notification.unsubscribe(); // To disable a notification
  */
 
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const Notification = Sequelize.define('Notification', {
 

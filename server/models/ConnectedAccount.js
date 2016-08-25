@@ -1,10 +1,10 @@
-const config = require('config');
+import config from 'config';
 
 /**
  * Model.
  */
 
-module.exports = (Sequelize, DataTypes) => {
+export default (Sequelize, DataTypes) => {
 
   const allowedTypes = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
 

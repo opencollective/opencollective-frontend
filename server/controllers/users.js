@@ -28,7 +28,7 @@ export default (app) => {
   const { Activity } = models;
   const { UserGroup } = models;
   const { errors } = app;
-  const queries = queriesImport(models.sequelize);
+  const queries = queriesImport();
   const { Unauthorized } = errors;
 
   /**

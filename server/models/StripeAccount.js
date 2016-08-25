@@ -2,7 +2,7 @@
  * Model.
  */
 
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const StripeAccount = Sequelize.define('StripeAccount', {
     accessToken: DataTypes.STRING, // 'sk_xxx'

@@ -1,6 +1,7 @@
-export default function(sequelize) {
+import models, {sequelize} from '../models';
 
-  const { models } = sequelize;
+// TODO get rid of function wrapper
+export default function() {
 
   /*
   * Hacky way to do currency conversion on Leaderboard

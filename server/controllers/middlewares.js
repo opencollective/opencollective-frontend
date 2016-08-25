@@ -14,7 +14,7 @@ export default function(app) {
   const { User } = models;
   const { errors } = app;
   const users = usersImport(app);
-  const queries = queriesImport(models.sequelize);
+  const queries = queriesImport();
 
   /**
    * Public methods.

@@ -1,4 +1,4 @@
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
   
   const payoutMethods = ['paypal', 'stripe'];
   
@@ -47,7 +47,7 @@ module.exports = function(Sequelize, DataTypes) {
 
     getterMethods: {
       // Info.
-      info: function() {
+      info() {
         return {
           id: this.id,
           token: this.token,

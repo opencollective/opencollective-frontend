@@ -1,6 +1,6 @@
-const notify = require('../lib/notifications');
+import notify from '../lib/notifications';
 
-module.exports = function(Sequelize, DataTypes) {
+export default function(Sequelize, DataTypes) {
 
   const Activity = Sequelize.define('Activity', {
     type: DataTypes.STRING,
@@ -15,7 +15,7 @@ module.exports = function(Sequelize, DataTypes) {
     updatedAt: false,
 
     hooks: {
-      afterCreate: function(activity) {
+      afterCreate(activity) {
         return notify(Sequelize, activity);
       }
     }

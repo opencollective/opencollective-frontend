@@ -1,9 +1,8 @@
 const app = require('../index');
 const aZ = require('../server/middleware/security/authorization')(app);
 const expect = require('chai').expect;
-const models = app.get('models');
 const moment = require('moment-timezone');
-const sequelize = models.sequelize;
+import models, {sequelize} from '../server/models';
 const utils = require('../test/utils.js')();
 const userData = utils.data('user3');
 

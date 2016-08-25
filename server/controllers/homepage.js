@@ -6,7 +6,7 @@ import queriesImport from '../lib/queries';
 export default function(app) {
 
   const models = app.set('models');
-  const queries = queriesImport(models.sequelize);
+  const queries = queriesImport();
 
   return (req, res, next) => {
     /**
