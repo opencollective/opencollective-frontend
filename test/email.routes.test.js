@@ -4,7 +4,6 @@ import request from 'supertest-as-promised';
 import Promise from 'bluebird';
 import sinon from 'sinon';
 import emailLib from '../server/lib/email';
-import _ from 'lodash';
 import webhookBody from './mocks/mailgun.webhook.payload.json';
 
 import nock from 'nock';
@@ -102,7 +101,7 @@ describe("email.routes.test", () => {
 
     request(app)
       .post('/webhooks/mailgun')
-      .send(_.defaults({recipient: 'info@testcollective.opencollective.com'}, webhookBody))
+      .send(Object.assign({}, webhookBody, {recipient: 'info@testcollective.opencollective.com'}))
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         expect(spy.args[0][0]).to.equal('info@testcollective.opencollective.com');
@@ -131,7 +130,7 @@ describe("email.routes.test", () => {
 
   it("rejects emails sent to unknown mailing list", (done) => {
 
-    const unknownMailingListWebhook = _.defaults({ recipient: 'unknown@testcollective.opencollective.com' }, webhookBody);
+    const unknownMailingListWebhook = Object.assign({}, webhookBody, { recipient: 'unknown@testcollective.opencollective.com' });
 
     request(app)
       .post('/webhooks/mailgun')
