@@ -103,8 +103,6 @@ const generateEmailFromTemplate = (template, recipient, data, options) => {
 
   options = options || {};
 
-  data.notificationTypeLabel = getNotificationLabel(template, recipient);
-
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
       template += '.wwcode';
@@ -142,6 +140,7 @@ const generateEmailFromTemplate = (template, recipient, data, options) => {
 
   const slug = (data.group && data.group.slug) ? data.group.slug : 'undefined';
   data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type)}`;
+  data.notificationTypeLabel = getNotificationLabel(template, recipient);
 
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));
