@@ -1,22 +1,22 @@
 /**
  * Dependencies.
  */
-const axios = require('axios');
-const qs = require('querystring');
-const config = require('config');
+import axios from 'axios';
+import qs from 'querystring';
+import config from 'config';
 
-const roles = require('../constants/roles');
+import roles from '../constants/roles';
 
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   /**
    * Internal Dependencies.
    */
 
-  const errors = app.errors;
+  const { errors } = app;
   const models = app.get('models');
 
   const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
@@ -25,7 +25,7 @@ module.exports = function(app) {
   const checkIfUserIsHost = UserId =>
     models.UserGroup.find({
       where: {
-        UserId: UserId,
+        UserId,
         role: roles.HOST
       }
     })
@@ -82,7 +82,7 @@ module.exports = function(app) {
       return next(new errors.BadRequest('No state in the callback'));
     }
 
-    var host;
+    let host;
     checkIfUserIsHost(UserId)
       .then(() => models.User.findById(UserId))
       .tap(h => host = h)

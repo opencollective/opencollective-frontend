@@ -1,18 +1,20 @@
-const async = require('async');
-const utils = require('../lib/utils');
-const Promise = require('bluebird');
-const json2csv = require('json2csv');
-const moment = require('moment');
-const _ = require('lodash');
+import async from 'async';
+import utils from '../lib/utils';
+import Promise from 'bluebird';
+import json2csv from 'json2csv';
+import moment from 'moment';
+import _ from 'lodash';
+import usersImport from '../controllers/users';
+import queriesImport from '../lib/queries';
 
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
-  const Application = models.Application;
-  const User = models.User;
-  const errors = app.errors;
-  const users = require('../controllers/users')(app);
-  const queries = require('../lib/queries')(models.sequelize);
+  const { Application } = models;
+  const { User } = models;
+  const { errors } = app;
+  const users = usersImport(app);
+  const queries = queriesImport(models.sequelize);
 
   /**
    * Public methods.
@@ -42,7 +44,7 @@ module.exports = function(app) {
 
         switch (format) {
           case 'csv':
-            const send = res.send;
+            const { send } = res;
             res.send = (data) => {
               data = _.map(data, (row) => {
                 if (row.createdAt)
@@ -77,20 +79,20 @@ module.exports = function(app) {
         return next();
       }
 
-      var name, email, paypalEmail;
+      let name, email, paypalEmail;
 
       // TODO remove #postmigration, replaced by req.body.expense
       if (req.body.transaction) {
-        email = req.body.transaction.email;
-        paypalEmail = req.body.transaction.paypalEmail;
-        name = req.body.transaction.name;
+        ({ email } = req.body.transaction);
+        ({ paypalEmail } = req.body.transaction);
+        ({ name } = req.body.transaction);
       } else if (req.body.expense) {
-        email = req.body.expense.email;
-        paypalEmail = req.body.expense.paypalEmail;
-        name = req.body.expense.name;
+        ({ email } = req.body.expense);
+        ({ paypalEmail } = req.body.expense);
+        ({ name } = req.body.expense);
       } else if (req.body.payment) {
         // TODO remove #postmigration
-        email = req.body.payment.email;
+        ({ email } = req.body.payment);
       }
 
       const password = req.body.password || req.query.password;
@@ -134,7 +136,7 @@ module.exports = function(app) {
     /**
      * Check the api_key.
      */
-    apiKey: function(req, res, next) {
+    apiKey(req, res, next) {
       const key = req.query.api_key || req.body.api_key;
 
       if (!key) return next();
@@ -158,7 +160,7 @@ module.exports = function(app) {
     /**
      * Authenticate.
      */
-    authenticate: function(req, res, next) {
+    authenticate(req, res, next) {
       const username = (req.body && req.body.username) || req.query.username;
       const email = (req.body && req.body.email) || req.query.email;
       const password = (req.body && req.body.password) || req.query.password;
@@ -201,7 +203,7 @@ module.exports = function(app) {
      *  Use the req.remoteUser.audience (from the access_token) to get the
      *    full application's model
      */
-    identifyFromToken: function(req, res, next) {
+    identifyFromToken(req, res, next) {
       if (!req.jwtPayload || !req.jwtPayload.sub) {
         return next();
       }
@@ -238,7 +240,7 @@ module.exports = function(app) {
     /**
      * Or a user or an Application has to be authenticated.
      */
-    authorizeAuthUserOrApp: function(req, res, next) {
+    authorizeAuthUserOrApp(req, res, next) {
        if (!req.remoteUser && !req.application) {
          return next(new errors.Unauthorized('Unauthorized'));
        }
@@ -249,7 +251,7 @@ module.exports = function(app) {
     /**
      * Authorize to get the group.
      */
-    authorizeGroup: function(req, res, next) {
+    authorizeGroup(req, res, next) {
       if (!req.group) {
         return next(new errors.NotFound());
       }
@@ -282,7 +284,7 @@ module.exports = function(app) {
     /**
      * Authorize if group is public
      */
-    authorizeIfGroupPublic: function(req, res, next) {
+    authorizeIfGroupPublic(req, res, next) {
       if (req.group && req.group.isPublic) {
         return next('route'); // bypass the callbacks
       }
@@ -293,7 +295,7 @@ module.exports = function(app) {
     /**
      * Paginate.
      */
-    paginate: function(options) {
+    paginate(options) {
       options = options || {};
 
       options = {
@@ -317,9 +319,9 @@ module.exports = function(app) {
         }
 
         // Page / Per_page.
-        var perPage = (req.body.per_page || req.query.per_page);
+        let perPage = (req.body.per_page || req.query.per_page);
         perPage = perPage * 1 || options.default;
-        var page = (req.body.page || req.query.page) * 1 || 1;
+        let page = (req.body.page || req.query.page) * 1 || 1;
 
         page = (page < 1) ? 1 : page;
         perPage = (perPage < options.min) ? options.min : perPage;
@@ -334,7 +336,7 @@ module.exports = function(app) {
     /**
      * Sorting.
      */
-    sorting: function(options) {
+    sorting(options) {
       options = options || {};
 
       options.key = (typeof options.key !== 'undefined') ? options.key : 'id';

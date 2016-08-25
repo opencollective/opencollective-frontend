@@ -1,35 +1,35 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const groupBy = require('lodash/collection/groupBy');
-const async = require('async');
-const userlib = require('../lib/userlib');
-const utils = require('../lib/utils');
-const generateURLSafeToken = utils.generateURLSafeToken;
-const imageUrlToAmazonUrl = require('../lib/imageUrlToAmazonUrl');
-const constants = require('../constants/activities');
-const roles = require('../constants/roles');
-const sequelize = require('sequelize');
-const filter = require('lodash/collection/filter');
-const values = require('lodash/object/values');
+import _ from 'lodash';
+import groupBy from 'lodash/collection/groupBy';
+import async from 'async';
+import userlib from '../lib/userlib';
+import { generateURLSafeToken, getTier } from '../lib/utils';
+import imageUrlToAmazonUrl from '../lib/imageUrlToAmazonUrl';
+import constants from '../constants/activities';
+import roles from '../constants/roles';
+import sequelize from 'sequelize';
+import filter from 'lodash/collection/filter';
+import values from 'lodash/object/values';
+import emailLib from '../lib/email';
+import queriesImport from '../lib/queries';
 
 /**
  * Controller.
  */
-module.exports = (app) => {
+export default (app) => {
 
   /**
    * Internal Dependencies.
    */
   const models = app.set('models');
-  const User = models.User;
-  const Activity = models.Activity;
-  const UserGroup = models.UserGroup;
-  const emailLib = require('../lib/email');
-  const errors = app.errors;
-  const queries = require('../lib/queries')(models.sequelize);
-  const Unauthorized = errors.Unauthorized;
+  const { User } = models;
+  const { Activity } = models;
+  const { UserGroup } = models;
+  const { errors } = app;
+  const queries = queriesImport(models.sequelize);
+  const { Unauthorized } = errors;
 
   /**
    *
@@ -103,7 +103,7 @@ module.exports = (app) => {
 
       fetchUserAvatar: ['updateFields', (cb, results) => {
         userlib.fetchAvatar(results.updateFields).tap(user => {
-          const avatar = user.avatar;
+          const { avatar } = user;
           if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(app.knox.bucket) === -1) {
             imageUrlToAmazonUrl(app.knox, avatar, (error, aws_src) => {
               user.avatar = error ? user.avatar : aws_src;
@@ -140,7 +140,7 @@ module.exports = (app) => {
       return next(new errors.BadRequest('Can\'t lookup user avatars with password from this route'));
     }
 
-    const userData = req.body.userData;
+    const { userData } = req.body;
     userData.email = req.user.email;
     userData.ip = req.ip;
 
@@ -158,8 +158,8 @@ module.exports = (app) => {
     }));
 
   const updatePassword = (req, res, next) => {
-    const password= req.required.password;
-    const passwordConfirmation = req.required.passwordConfirmation;
+    const { password }= req.required;
+    const { passwordConfirmation } = req.required;
 
     if (password !== passwordConfirmation) {
       return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
@@ -173,7 +173,7 @@ module.exports = (app) => {
   };
 
   const forgotPassword = (req, res, next) => {
-    const email = req.required.email;
+    const { email } = req.required;
 
     async.auto({
       getUser: (cb) => {
@@ -204,7 +204,7 @@ module.exports = (app) => {
 
       sendEmailToUser: ['generateToken', (cb, results) => {
         const user = results.getUser;
-        const email = results.getUser.email;
+        const { email } = results.getUser;
         const resetToken = results.generateToken;
         const resetUrl = user.generateResetUrl(resetToken);
 
@@ -225,8 +225,8 @@ module.exports = (app) => {
   const resetPassword = (req, res, next) => {
     const resetToken = req.params.reset_token;
     const id = User.decryptId(req.params.userid_enc);
-    const password= req.required.password;
-    const passwordConfirmation = req.required.passwordConfirmation;
+    const { password }= req.required;
+    const { passwordConfirmation } = req.required;
 
     if (password !== passwordConfirmation) {
       return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
@@ -280,7 +280,7 @@ module.exports = (app) => {
      * Create a user.
      */
     create: (req, res, next) => {
-      const user = req.required.user;
+      const { user } = req.required;
       user.ApplicationId = req.application.id;
 
       _create(user)
@@ -324,7 +324,7 @@ module.exports = (app) => {
               new Promise((resolve, reject) => {
                 const appendTier = (backers) => {
                   backers = backers.map((backer) => {
-                    backer.tier = utils.getTier(backer, group.tiers);
+                    backer.tier = getTier(backer, group.tiers);
                     return backer;
                   });
                   return backers;
@@ -337,7 +337,7 @@ module.exports = (app) => {
               })
             ])
             .then(results => {
-              var groupInfo = group.info;
+              let groupInfo = group.info;
               groupInfo.yearlyIncome = results[0];
               const usersByRole = groupBy(results[1], 'role');
               const backers = usersByRole[roles.BACKER] || [];
@@ -374,13 +374,13 @@ module.exports = (app) => {
      */
     getGroups: (req, res, next) => {
       // Follows json api spec http://jsonapi.org/format/#fetching-includes
-      const include = req.query.include;
+      const { include } = req.query;
       const withRoles = _.contains(include, 'usergroup.role');
       const options = {
         include: []
       };
 
-      var groupObjects; // stores sequelize objects
+      let groupObjects; // stores sequelize objects
       const groupData = []; // stores data to return
 
       return getGroupsFromUser(req, options)
@@ -415,9 +415,9 @@ module.exports = (app) => {
         return next(new Unauthorized('Invalid payload'));
       }
 
-      var redirect;
+      let redirect;
       if (req.body.redirect) {
-        redirect = req.body.redirect;
+        ({ redirect } = req.body);
       } else {
         redirect = '/';
       }
@@ -437,9 +437,9 @@ module.exports = (app) => {
       if (!req.application || !req.required.email) {
         return next(new Unauthorized('Unauthorized'))
       }
-      var redirect;
+      let redirect;
       if (req.body.redirect) {
-        redirect = req.body.redirect;
+        ({ redirect } = req.body);
       } else {
         redirect = '/';
       }

@@ -1,33 +1,34 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const async = require('async');
-const utils = require('../lib/utils');
-const Promise = require('bluebird');
-const moment = require('moment');
+import _ from 'lodash';
+import async from 'async';
+import utils from '../lib/utils';
+import Promise from 'bluebird';
+import moment from 'moment';
+import roles from '../constants/roles';
+import activities from '../constants/activities';
+import emailLib from '../lib/email';
+import githubLib from '../lib/github';
+import queriesImport from '../lib/queries';
 
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   /**
    * Internal Dependencies.
    */
-  const errors = app.errors;
+  const { errors } = app;
   const models = app.set('models');
-  const Activity = models.Activity;
-  const Notification = models.Notification;
-  const Group = models.Group;
-  const Transaction = models.Transaction;
-  const ConnectedAccount = models.ConnectedAccount;
-  const User = models.User;
-  const roles = require('../constants/roles');
-  const activities = require('../constants/activities');
-  const emailLib = require('../lib/email');
-  const githubLib = require('../lib/github');
-  const queries = require('../lib/queries')(models.sequelize);
+  const { Activity } = models;
+  const { Notification } = models;
+  const { Group } = models;
+  const { Transaction } = models;
+  const { ConnectedAccount } = models;
+  const { User } = models;
+  const queries = queriesImport(models.sequelize);
 
 
   const subscribeUserToGroupEvents = (user, group, role) => {
@@ -91,7 +92,7 @@ module.exports = function(app) {
   };
 
   const getUsers = (req, res, next) => {
-    var promise = getUserData(req.group.id, req.group.tiers);
+    let promise = getUserData(req.group.id, req.group.tiers);
     if (req.query.filter && req.query.filter === 'active') {
       const now = moment();
       promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
@@ -136,7 +137,7 @@ module.exports = function(app) {
    * Get group's transactions.
    */
   const getTransactions = (req, res, next) => {
-    var where = {
+    let where = {
       GroupId: req.group.id
     };
 
@@ -161,7 +162,7 @@ module.exports = function(app) {
     }
 
     const query = _.merge({
-      where: where,
+      where,
       order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
 
@@ -184,8 +185,8 @@ module.exports = function(app) {
    * Delete a transaction.
    */
   const deleteTransaction = (req, res, next) => {
-     const transaction = req.transaction;
-     const group = req.group;
+     const { transaction } = req;
+     const { group } = req;
      const user = req.remoteUser || {};
 
      async.auto({
@@ -204,7 +205,7 @@ module.exports = function(app) {
            GroupId: group.id,
            data: {
              group: group.info,
-             transaction: transaction,
+             transaction,
              user: user.info
            }
          })
@@ -222,8 +223,8 @@ module.exports = function(app) {
    * Create a transaction and add it to a group.
    */
   const createTransaction = (req, res, next) => {
-    const transaction = req.required.transaction;
-    const group = req.group;
+    const { transaction } = req.required;
+    const { group } = req;
 
     // Caller.
     const user = req.remoteUser || req.user || transaction.user || {};
@@ -286,7 +287,7 @@ module.exports = function(app) {
    * Create a group.
    */
   const create = (req, res, next) => {
-    var group;
+    let group;
     Group
       .create(req.required.group)
       .tap(g => group = g)
@@ -301,7 +302,7 @@ module.exports = function(app) {
       }))
       .then(activity => {
         // Add caller to the group if `role` specified.
-        const role = req.body.role;
+        const { role } = req.body;
 
         if (!role) {
           return activity;
@@ -323,15 +324,15 @@ module.exports = function(app) {
    */
   const createFromGithub = (req, res, next) => {
 
-    const payload = req.required.payload;
-    const connectedAccountId = req.jwtPayload.connectedAccountId;
+    const { payload } = req.required;
+    const { connectedAccountId } = req.jwtPayload;
 
-    var creator, options, creatorConnectedAccount;
-    const group = payload.group;
+    let creator, options, creatorConnectedAccount;
+    const { group } = payload;
     const githubUser = payload.user;
     const contributors = payload.users;
     const creatorGithubUsername = payload.github_username;
-    var dbGroup;
+    let dbGroup;
 
     ConnectedAccount
       .findOne({
@@ -389,7 +390,7 @@ module.exports = function(app) {
             const userAttr = {
               avatar: `http://avatars.githubusercontent.com/${contributor}`
             };
-            var connectedAccount, contributorUser;
+            let connectedAccount, contributorUser;
             return ConnectedAccount.findOne({where: caAttr})
               .then(ca => ca || ConnectedAccount.create(caAttr))
               .then(ca => {

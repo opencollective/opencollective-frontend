@@ -1,19 +1,21 @@
-const async = require('async');
-const config = require('config');
-const Sequelize = require('sequelize');
-const setupModels = require('../models').setupModels;
+import async from 'async';
+import config from 'config';
+import Sequelize from 'sequelize';
+import { setupModels } from '../models';
 //const utils = require('../../test/utils.js')();
+import roles from '../constants/roles';
+import emailLib from '../lib/email';
 
-module.exports = function(app) {
+export default function(app) {
 
-  const errors = app.errors;
+  const { errors } = app;
   /**
    * This resets the test-api database (and only the test-api database)
    */
   const resetTestDatabase = function(req, res, next) {
 
     // Hard code database name to avoid resetting the production db by mistake
-    var databaseName;
+    let databaseName;
     switch (process.env.NODE_ENV) {
       case 'circleci':
         databaseName = 'circle_test';
@@ -35,7 +37,6 @@ module.exports = function(app) {
     const models = setupModels(sequelize);
 
     const apiKey = '0ac43519edcf4421d80342403fb5985d';
-    const roles = require('../constants/roles');
 
     const testUser = {
       email: 'testuser@opencollective.com',
@@ -188,8 +189,7 @@ module.exports = function(app) {
   }
 
   const generateTestEmail = function(req, res) {
-    const emailLib = require('../lib/email');
-    const template = req.params.template;
+    const { template } = req.params;
     try {
       const data = JSON.parse(req.query.data);
       console.log(`Generating ${template} with data`, data);
@@ -205,8 +205,8 @@ module.exports = function(app) {
    */
 
   return {
-    resetTestDatabase: resetTestDatabase,
-    generateTestEmail: generateTestEmail
+    resetTestDatabase,
+    generateTestEmail
   };
 
 };

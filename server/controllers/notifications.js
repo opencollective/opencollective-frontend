@@ -1,12 +1,12 @@
-const errors = require('../lib/errors');
+import errors from '../lib/errors';
 
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
-  const Notification = models.Notification;
+  const { Notification } = models;
 
   return {
-    subscribe: function(req, res, next) {
+    subscribe(req, res, next) {
       Notification.create({
         UserId: req.remoteUser.id,
         GroupId: req.group.id,
@@ -25,7 +25,7 @@ module.exports = function(app) {
       });
     },
 
-    unsubscribe: function(req, res, next) {
+    unsubscribe(req, res, next) {
       Notification.destroy({
         where: {
           UserId: req.remoteUser.id,

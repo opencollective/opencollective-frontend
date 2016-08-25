@@ -1,13 +1,14 @@
-const config = require('config');
-const request = require('request');
-const Promise = require('bluebird');
+import config from 'config';
+import request from 'request';
+import Promise from 'bluebird';
+import slugLibImport from '../lib/slug';
 
-module.exports = (app) => {
-  const errors = app.errors;
+export default (app) => {
+  const { errors } = app;
   const models = app.get('models');
-  const ConnectedAccount = models.ConnectedAccount;
-  const User = models.User;
-  const slugLib = require('../lib/slug')(app);
+  const { ConnectedAccount } = models;
+  const { User } = models;
+  const slugLib = slugLibImport(app);
 
   return {
     list: (req, res, next) => {
@@ -33,7 +34,7 @@ module.exports = (app) => {
       switch (provider) {
         case 'github':
           const attrs = { provider };
-          var caId, user;
+          let caId, user;
           const utmSource = req.query.utm_source;
           const avatar = `http://avatars.githubusercontent.com/${data.profile.username}`;
           // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:

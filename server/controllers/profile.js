@@ -1,10 +1,10 @@
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
-  const errors = app.errors;
+  const { errors } = app;
 
   return (req, res, next) => {
     const slug = req.params.slug.toLowerCase();

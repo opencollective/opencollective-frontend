@@ -1,26 +1,27 @@
 /**
  * Dependencies.
  */
-const roles = require('../constants/roles');
-const _ = require('lodash');
-const config = require('config');
-const async = require('async');
-const gateways = require('../gateways');
-const activities = require('../constants/activities');
+import roles from '../constants/roles';
+import _ from 'lodash';
+import config from 'config';
+import async from 'async';
+import usersController from '../controllers/users';
+import emailLib from '../lib/email';
+import gateways from '../gateways';
+import activities from '../constants/activities';
+import constants from '../constants/transactions';
 
 /**
  * Controller.
  */
-module.exports = (app) => {
+export default (app) => {
 
   /**
    * Internal Dependencies.
    */
   const models = app.set('models');
-  const errors = app.errors;
-  const users = require('../controllers/users')(app);
-  const emailLib = require('../lib/email');
-  const constants = require('../constants/transactions');
+  const { errors } = app;
+  const users = usersController(app);
 
 
   const getOrCreateUser = (attributes, cb) => {
@@ -35,11 +36,11 @@ module.exports = (app) => {
   };
 
   const stripeDonation = (req, res, next) => {
-    const payment = req.required.payment;
-    const user = req.user;
-    const email = payment.email;
-    const group = req.group;
-    const interval = payment.interval;
+    const { payment } = req.required;
+    const { user } = req;
+    const { email } = payment;
+    const { group } = req;
+    const { interval } = payment;
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
     const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
@@ -172,7 +173,7 @@ module.exports = (app) => {
         const donation = {
           UserId: user.id,
           GroupId: group.id,
-          currency: currency,
+          currency,
           amount: amountInt,
           title: `Donation to ${group.name}`
         };
@@ -217,12 +218,12 @@ module.exports = (app) => {
         }
 
         // Create a transaction for this one-time payment
-        const user = req.user;
+        const { user } = req;
         const charge = results.createCharge;
         const paymentMethod = results.getOrCreatePaymentMethod;
         const balanceTransaction = results.retrieveBalanceTransaction
         const fees = gateways.stripe.extractFees(balanceTransaction);
-        const hostFeePercent = group.hostFeePercent;
+        const { hostFeePercent } = group;
         const payload = {
           user,
           group,
@@ -255,13 +256,13 @@ module.exports = (app) => {
       }],
 
       sendThankYouEmail: ['createDonation', (cb, results) => {
-        const user = req.user;
+        const { user } = req;
         const donation = results.createDonation;
         const data = {
           donation: donation.info,
           user: user.info,
           group: group.info,
-          interval: interval,
+          interval,
           subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
         }
 
@@ -270,7 +271,7 @@ module.exports = (app) => {
       }],
 
       addUserToGroup: ['createDonation', (cb) => {
-        const user = req.user;
+        const { user } = req;
         models.UserGroup.findOne({
           where: {
             GroupId: group.id,
@@ -302,17 +303,17 @@ module.exports = (app) => {
         return next(new errors.CustomError(e.code || e.statusCode, e.type, e.message));
       }
 
-      res.send({success: true, user: user.info, hasFullAccount: hasFullAccount});
+      res.send({success: true, user: user.info, hasFullAccount});
     });
 
   };
 
   const paypalDonation = (req, res, next) => {
-    const group = req.group;
-    const payment = req.required.payment;
+    const { group } = req;
+    const { payment } = req.required;
     const currency = payment.currency || group.currency;
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
-    const interval = payment.interval;
+    const { interval } = payment;
     const isSubscription = _.contains(['month', 'year'], interval);
     const distribution = payment.distribution ? JSON.stringify({distribution: payment.distribution}) : '';
 
@@ -426,12 +427,12 @@ module.exports = (app) => {
 
   const paypalCallback = (req, res, next) => {
     const transaction = req.paranoidtransaction;
-    const group = req.group;
-    const token = req.query.token;
+    const { group } = req;
+    const { token } = req.query;
 
     // For single payments
-    const paymentId = req.query.paymentId;
-    const PayerID = req.query.PayerID;
+    const { paymentId } = req.query;
+    const { PayerID } = req.query;
 
     const isSubscription = !paymentId || !PayerID;
 
@@ -482,14 +483,14 @@ module.exports = (app) => {
       }],
 
       getOrCreateUser: ['activateSubscription', (cb, results) => {
-        const email = results.execute.payer.payer_info.email;
+        const { email } = results.execute.payer.payer_info;
 
         getOrCreateUser({ email }, cb);
       }],
 
       createDonation: ['getOrCreateUser', (cb, results) => {
         const user = results.getOrCreateUser;
-        const currency = transaction.currency;
+        const { currency } = transaction;
         const amountFloat = transaction.amount; // TODO: clean this up when we switch all amounts to INTEGER
         const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
         const subscriptionId = transaction.getSubscription().id;
@@ -497,7 +498,7 @@ module.exports = (app) => {
         const donation = {
           UserId: user.id,
           GroupId: group.id,
-          currency: currency,
+          currency,
           amount: amountInt,
           title: `Donation to ${group.name}`
         };

@@ -1,19 +1,19 @@
 /**
  * Dependencies.
  */
-const utils = require('../lib/utils');
-const _ = require('lodash');
+import utils from '../lib/utils';
+import _ from 'lodash';
 
 /**
  * Controller.
  */
-module.exports = (app) => {
+export default (app) => {
 
   /**
    * Internal Dependencies.
    */
   const models = app.set('models');
-  const Activity = models.Activity;
+  const { Activity } = models;
 
   /**
    * Public methods.
@@ -49,7 +49,7 @@ module.exports = (app) => {
     /**
      * Get user's activities.
      */
-    user: function(req, res, next) {
+    user(req, res, next) {
       const query = _.merge({
         where: {
           UserId: req.user.id

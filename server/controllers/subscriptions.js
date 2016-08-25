@@ -1,16 +1,16 @@
-const Stripe = require('stripe');
-const async = require('async');
+import Stripe from 'stripe';
+import async from 'async';
 
-const activities = require('../constants/activities');
+import activities from '../constants/activities';
 
 /**
  * Controller.
  */
 
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
-  const errors = app.errors;
+  const { errors } = app;
 
   /**
    * Get subscriptions of a user
@@ -36,7 +36,7 @@ module.exports = function(app) {
    * Cancel a subscription
    */
   const cancel = (req, res, next) => {
-    const subscriptionid = req.params.subscriptionid;
+    const { subscriptionid } = req.params;
 
     async.auto({
       findSubscriptionsOptions: (cb) => {
@@ -86,7 +86,7 @@ module.exports = function(app) {
       }],
 
       deactivateSubscription: ['cancelOnStripe', (cb, results) => {
-        const subscription = results.findSubscriptionsOptions.subscription;
+        const { subscription } = results.findSubscriptionsOptions;
 
         subscription.isActive = false;
         subscription.deactivatedAt = new Date();
@@ -98,9 +98,9 @@ module.exports = function(app) {
 
       createActivity: ['deactivateSubscription', (cb, results) => {
         const options = results.findSubscriptionsOptions;
-        const subscription = options.subscription;
-        const group = options.group;
-        const user = options.user;
+        const { subscription } = options;
+        const { group } = options;
+        const { user } = options;
         models.Activity.create({
           type: activities.SUBSCRIPTION_CANCELED,
           GroupId: group.id,

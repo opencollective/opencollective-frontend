@@ -2,19 +2,19 @@
  * Dependencies.
  */
 
-const fs = require('fs');
-const path = require('path');
-const uuid = require('node-uuid');
+import fs from 'fs';
+import path from 'path';
+import uuid from 'node-uuid';
 
 /**
  * Controller.
  */
 
-module.exports = function(app) {
-  const errors = app.errors;
+export default function(app) {
+  const { errors } = app;
 
   const upload = function(req, res, next) {
-    const file = req.files.file;
+    const { file } = req.files;
 
     if (!file) {
       return next(new errors.ValidationFailed('missing_required', {

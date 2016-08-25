@@ -1,22 +1,22 @@
 /**
  * Dependencies.
  */
-const async = require('async');
-const config = require('config');
-const moment = require('moment');
+import async from 'async';
+import config from 'config';
+import moment from 'moment';
 
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   /**
    * Internal Dependencies.
    */
   const models = app.set('models');
-  const Activity = models.Activity;
-  const PaymentMethod = models.PaymentMethod;
-  const errors = app.errors;
+  const { Activity } = models;
+  const { PaymentMethod } = models;
+  const { errors } = app;
 
   /**
    * Get Preapproval Details.
@@ -27,7 +27,7 @@ module.exports = function(app) {
         errorLanguage:  'en_US',
         detailLevel:    'ReturnAll'
       },
-      preapprovalKey: preapprovalKey
+      preapprovalKey
     };
 
     callPaypal('preapprovalDetails', payload, callback);
@@ -105,12 +105,12 @@ module.exports = function(app) {
         const payload = {
           currencyCode: 'USD',
           startingDate: new Date().toISOString(),
-          endingDate: endingDate,
-          returnUrl: returnUrl,
-          cancelUrl: cancelUrl,
+          endingDate,
+          returnUrl,
+          cancelUrl,
           displayMaxTotalAmount: false,
           feesPayer: 'SENDER',
-          maxTotalAmountOfAllPayments: maxTotalAmountOfAllPayments,
+          maxTotalAmountOfAllPayments,
           requestEnvelope: {
             errorLanguage:  'en_US'
           },

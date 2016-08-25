@@ -2,36 +2,35 @@
  * Dependencies.
  */
 
-const async = require('async');
-const _ = require('lodash');
-const activities = require('../constants/activities');
-const utils = require('../lib/utils');
-const gateways = require('../gateways');
+import async from 'async';
+import _ from 'lodash';
+import activities from '../constants/activities';
+import utils from '../lib/utils';
+import gateways from '../gateways';
+import constants from '../constants/transactions';
 
 /**
  * Controller.
  */
 
-module.exports = (app) => {
+export default (app) => {
 
   /**
    * Internal Dependencies.
    */
 
-  const errors = app.errors;
+  const { errors } = app;
 
   const models = app.set('models');
-  const PaymentMethod = models.PaymentMethod;
-  const User = models.User;
-  const Donation = models.Donation;
-  const Activity = models.Activity;
-  const Subscription = models.Subscription;
-  const Group = models.Group;
-
-  const constants = require('../constants/transactions');
+  const { PaymentMethod } = models;
+  const { User } = models;
+  const { Donation } = models;
+  const { Activity } = models;
+  const { Subscription } = models;
+  const { Group } = models;
 
   const stripe = (req, res, next) => {
-    const body = req.body;
+    const { body } = req;
     const isProduction = app.set('env') === 'production';
 
     // Stripe send test events to production as well
@@ -128,7 +127,7 @@ module.exports = (app) => {
 
       fetchPaymentMethod: ['fetchDonation', (cb, results) => {
         const userId = results.fetchDonation.UserId;
-        const customer = results.fetchEvent.event.data.object.customer;
+        const { customer } = results.fetchEvent.event.data.object;
 
 
         if (!customer) {
@@ -205,14 +204,14 @@ module.exports = (app) => {
       createTransaction: ['retrieveBalance', (cb, results) => {
         const donation = results.fetchDonation;
         const subscription = donation.Subscription;
-        const stripeSubscription = results.fetchEvent.stripeSubscription;
+        const { stripeSubscription } = results.fetchEvent;
         const user = donation.User || {};
         const group = donation.Group || {};
         const paymentMethod = results.fetchPaymentMethod;
         const charge = results.retrieveCharge;
         const balanceTransaction = results.retrieveBalance;
         const fees = gateways.stripe.extractFees(balanceTransaction);
-        const hostFeePercent = group.hostFeePercent;
+        const { hostFeePercent } = group;
 
         // Now we record a new transaction
         const newTransaction = {

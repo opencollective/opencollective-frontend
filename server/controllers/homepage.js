@@ -1,10 +1,12 @@
+import queriesImport from '../lib/queries';
+
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
-  const queries = require('../lib/queries')(models.sequelize);
+  const queries = queriesImport(models.sequelize);
 
   return (req, res, next) => {
     /**

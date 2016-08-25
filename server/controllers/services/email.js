@@ -1,27 +1,27 @@
 /**
  * Dependencies.
  */
-const emailLib = require('../../lib/email');
-const Promise = require('bluebird');
-const config = require('config');
-const request = require('request-promise');
-const _ = require('lodash');
-const crypto = require('crypto');
-const debug = require('debug');
+import emailLib from '../../lib/email';
+import Promise from 'bluebird';
+import config from 'config';
+import request from 'request-promise';
+import _ from 'lodash';
+import crypto from 'crypto';
+import debug from 'debug';
 
 /**
  * Controller.
  */
-module.exports = (app) => {
+export default (app) => {
 
   const models = app.set('models');
-  const errors = app.errors;
+  const { errors } = app;
 
   const unsubscribe = (req, res, next) => {
 
-    const type = req.params.type;
-    const email = req.params.email;
-    const slug = req.params.slug;
+    const { type } = req.params;
+    const { email } = req.params;
+    const { slug } = req.params;
 
     const identifier = `${email}.${slug}.${type}.${config.keys.opencollective.resetPasswordSecret}`;
     const token = crypto.createHash('md5').update(identifier).digest("hex");
@@ -93,7 +93,7 @@ module.exports = (app) => {
   };
 
   const approve = (req, res, next) => {
-      const messageId = req.query.messageId;
+      const { messageId } = req.query;
       const approverEmail = req.query.approver;
       const mailserver = req.query.mailserver || 'so';
 
@@ -152,7 +152,7 @@ module.exports = (app) => {
   
   const webhook = (req, res, next) => {
     const email = req.body;
-    const recipient = email.recipient;
+    const { recipient } = email;
 
     const tokens = recipient.match(/(.+)@(.+)\.opencollective\.com/i);
     const list = tokens[1];

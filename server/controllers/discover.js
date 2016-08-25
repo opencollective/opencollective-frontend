@@ -1,14 +1,14 @@
 /**
  * Controller.
  */
-module.exports = function(app) {
+export default function(app) {
 
   const models = app.set('models');
 
   return (req, res, next) => {
     const show = req.query.show || 'all';
     const sort = req.query.sort === 'oldest' ? 'oldest' : 'newest';
-    const offset = req.query.offset;
+    const { offset } = req.query;
     models.Group.getGroupsSummaryByTag(
       !show || show === 'all' ? '' : show, 
       12,

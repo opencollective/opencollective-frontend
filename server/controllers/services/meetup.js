@@ -1,12 +1,12 @@
 /**
  * Dependencies.
  */
-const Meetup = require('../../lib/meetup');
+import Meetup from '../../lib/meetup';
 
 /**
  * Controller.
  */
-module.exports = (app) => {
+export default (app) => {
 
   const models = app.set('models');
 

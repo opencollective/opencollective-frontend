@@ -2,25 +2,28 @@
  * Dependencies.
  */
 
-const _ = require('lodash');
-const Promise = require('bluebird');
-const activities = require('../constants/activities');
-const includes = require('lodash/collection/includes');
-const status = require('../constants/expense_status');
-const utils = require('../lib/utils');
-const roles = require('../constants/roles')
+import _ from 'lodash';
+import Promise from 'bluebird';
+import activities from '../constants/activities';
+import includes from 'lodash/collection/includes';
+import status from '../constants/expense_status';
+import utils from '../lib/utils';
+import roles from '../constants/roles';
+import transactions from '../lib/transactions';
+import paypalImport from './paypal';
+import payExpenseImport from '../lib/payExpense';
 
 /**
  * Controller.
  */
 
-module.exports = (app) => {
+export default (app) => {
 
-  const errors = app.errors;
+  const { errors } = app;
   const models = app.set('models');
-  const createTransaction = require('../lib/transactions')(app).createFromPaidExpense;
-  const paypal = require('./paypal')(app);
-  const payExpense = require('../lib/payExpense')(app);
+  const createTransaction = transactions(app).createFromPaidExpense;
+  const paypal = paypalImport(app);
+  const payExpense = payExpenseImport(app);
 
   const getPreapprovalDetails = Promise.promisify(paypal.getPreapprovalDetails);
 
@@ -30,7 +33,7 @@ module.exports = (app) => {
 
   const create = (req, res, next) => {
     const user = req.remoteUser || req.user;
-    const group = req.group;
+    const { group } = req;
     const attributes = Object.assign({}, req.required.expense, {
       UserId: user.id,
       GroupId: group.id,
@@ -74,7 +77,7 @@ module.exports = (app) => {
    */
 
   const deleteExpense = (req, res, next) => {
-    const expense = req.expense;
+    const { expense } = req;
     const user = req.remoteUser || req.user;
 
     assertExpenseStatus(expense, status.REJECTED)
@@ -121,8 +124,8 @@ module.exports = (app) => {
 
   const setApprovalStatus = (req, res, next) => {
     const user = req.remoteUser || req.user;
-    const expense = req.expense;
-    var preapprovalDetails;
+    const { expense } = req;
+    let preapprovalDetails;
 
     assertExpenseStatus(expense, status.PENDING)
       .then(() => {
@@ -200,10 +203,10 @@ module.exports = (app) => {
 
   const pay = (req, res, next) => {
     const user = req.remoteUser || req.user;
-    const expense = req.expense;
-    const payoutMethod = req.expense.payoutMethod;
+    const { expense } = req;
+    const { payoutMethod } = req.expense;
     const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-    var paymentMethod, email, paymentResponse, preapprovalDetails;
+    let paymentMethod, email, paymentResponse, preapprovalDetails;
 
     assertExpenseStatus(expense, status.APPROVED)
       .then(() => isManual ? null : getPaymentMethod())
@@ -286,7 +289,7 @@ module.exports = (app) => {
     if (paypalResponse) {
       console.error('PayPal error', JSON.stringify(paypalResponse));
       if (paypalResponse.error instanceof Array) {
-        const message = paypalResponse.error[0].message;
+        const { message } = paypalResponse.error[0];
         return new errors.BadRequest(message);
       }
     }

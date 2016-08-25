@@ -1,11 +1,11 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-module.exports = function(app) {
+export default function(app) {
 
   /**
    * Internal Dependencies.
    */
-  const PaymentMethod = app.set('models').PaymentMethod;
+  const { PaymentMethod } = app.set('models');
 
   /**
    * Get the paymentMethods of the user.
@@ -14,7 +14,7 @@ module.exports = function(app) {
    * account
    */
   const getPaymentMethods = (req, res, next) => {
-    const filter = req.query.filter;
+    const { filter } = req.query;
     const query = _.extend({}, filter, { UserId: req.user.id });
 
     return PaymentMethod.findAll({ where: query })
