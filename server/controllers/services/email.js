@@ -48,6 +48,18 @@ module.exports = (app) => {
 
   };
 
+  const fetchSubscribers = (groupSlug, type) => {
+    return models.Notification.findAll(
+      {
+        where: {
+          channel: 'email',
+          type
+        },
+        include: [{model: models.User }, {model: models.Group, where: { slug: groupSlug } }]
+      }
+    );
+  };
+
   // TODO: move to emailLib.js
   const sendEmailToList = (to, email) => {
     const tokens = to.match(/(.+)@(.+)\.opencollective\.com/i);
@@ -57,17 +69,9 @@ module.exports = (app) => {
     email.from = email.from || `${slug} collective <info@${slug}.opencollective.com>`;
     email.group = email.group || { slug }; // used for the unsubscribe url
 
-    return models.Notification.findAll(
-      { 
-        where: { 
-          channel: 'email',
-          type
-        },
-        include: [{model: models.User }, {model: models.Group, where: { slug } }] 
-      }
-    )
-    .tap(users => {
-      if (users.length === 0) throw new errors.NotFound(`There is no user subscribed to ${email.recipient}`);
+    return fetchSubscribers(slug, type)
+    .tap(subscribers => {
+      if (subscribers.length === 0) return mailinglistNotFound(recipient);
     })
     .then(results => results.map(r => r.User.email))
     .then(recipients => {
@@ -156,6 +160,8 @@ module.exports = (app) => {
 
     const body = email['body-html'] || email['body-plain'];
 
+    let group;
+
     // If receive an email that has already been processed, we skip it
     // (it happens since we send the approved email to the mailing list and add the recipients in /bcc)
     if (body.indexOf('<!-- OpenCollective.com -->') !== -1 ) {
@@ -179,17 +185,24 @@ module.exports = (app) => {
     }
 
     models.Group.find({ where: { slug } })
-      .then(g => {
-        if (!g) throw new errors.NotFound(`There is no group with slug ${slug}`);
+      .tap(g => {
+        if (!g) throw new Error('group_not_found');
+        group = g;
+      })
+      .then(group => fetchSubscribers(group.slug, `mailinglist.${list}`))
+      .tap(subscribers => {
+        if (subscribers.length === 0) throw new Error('no_subscribers');
+      })
+      .then(() => {
         return models.sequelize.query(`
           SELECT * FROM "UserGroups" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."GroupId"=:groupid AND ug.role=:role AND ug."deletedAt" IS NULL
         `, {
-          replacements: { groupid: g.id, role: 'MEMBER' },
+          replacements: { groupid: group.id, role: 'MEMBER' },
           model: models.User
         });
       })
-      .tap(users => {
-        if (users.length === 0) throw new errors.NotFound(`There is no user subscribed to ${email.recipient}`);
+      .tap(members => {
+        if (members.length === 0) throw new Error('no_members');
       })
       .then(users => {
         const messageId = email['message-url'].substr(email['message-url'].lastIndexOf('/')+1);
@@ -207,7 +220,30 @@ module.exports = (app) => {
         return Promise.map(users, (user) => emailLib.send('email.approve', `members@${slug}.opencollective.com`, getData(user), {bcc:user.email}));
       })
       .then(() => res.send('Mailgun webhook processed successfully'))
-      .catch(next);
+      .catch(e => {
+        switch (e.message) {
+          case 'no_subscribers':
+            /**
+             * TODO
+             * If there is no such mailing list,
+             * - if the sender is a MEMBER, we send an email to confirm to create the mailing list
+             *   with the people in /cc as initial subscribers
+             * - if the sender is unknown, we return an email suggesting to contact info@:slug.opencollective.com
+             */
+            return res.send({error: { message: `There is no user subscribed to ${recipient}` }});
+          case 'group_not_found':
+            /**
+             * TODO
+             * If there is no such collective, we send an email to confirm to create the collective
+             * with the people in /cc as initial members
+             */
+            return res.send({error: { message: `There is no group with slug ${slug}` }});
+          case 'no_members':
+            return res.send({error: { message: `There is no members to approve emails sent to ${email.recipient}` }});
+          default:
+            return next(e);
+        }
+      });
   };
 
   return { webhook, approve, unsubscribe };

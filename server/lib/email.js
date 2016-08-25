@@ -82,6 +82,19 @@ const sendMessage = (recipient, subject, html, options) => {
   }
 };
 
+const getNotificationLabel = (template, recipient) => {
+
+  const notificationTypeLabels = {
+    'group.monthlyreport': 'monthly reports',
+    'group.transaction.created': 'notifications of new transactions for this collective',
+    'email.approve': 'notifications of new emails pending approval',
+    'email.message': recipient
+  }
+
+  return notificationTypeLabels[template];
+
+};
+
 /*
  * Given a template, recipient and data, generates email.
  */
@@ -127,6 +140,7 @@ const generateEmailFromTemplate = (template, recipient, data, options) => {
 
   const slug = (data.group && data.group.slug) ? data.group.slug : 'undefined';
   data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type)}`;
+  data.notificationTypeLabel = getNotificationLabel(template, recipient);
 
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));
