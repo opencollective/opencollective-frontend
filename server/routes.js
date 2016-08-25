@@ -140,6 +140,7 @@ module.exports = (app) => {
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
   app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), mw.format('csv'), groups.getUsers); // Get group users
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
+  app.put('/groups/:groupid/settings', required('group'), groups.updateSettings); // Update group settings
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   // TODO: Remove #postmigration after frontend migrates to POST /groups/:groupid/donations/*

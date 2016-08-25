@@ -446,9 +446,21 @@ module.exports = function(app) {
       'isPublic'
     ];
 
+    doUpdate(whitelist, req, res, next);
+  };
+
+  const updateSettings = (req, res, next) => {
+    doUpdate(['settings'], req, res, next);
+  };
+
+  function doUpdate(whitelist, req, res, next) {
     whitelist.forEach((prop) => {
       if (req.required.group[prop]) {
-        req.group[prop] = req.required.group[prop];
+        if (req.group[prop] && typeof req.group[prop] === 'object') {
+          req.group[prop] = Object.assign(req.group[prop], req.required.group[prop]);
+        } else {
+          req.group[prop] = req.required.group[prop];
+        }
       }
     });
 
@@ -458,7 +470,7 @@ module.exports = function(app) {
       .save()
       .then((group) => res.send(group.info))
       .catch(next);
-  };
+  }
 
   /**
    * Get group content.
@@ -587,6 +599,7 @@ module.exports = function(app) {
     create,
     createFromGithub,
     update,
+    updateSettings,
     getOne,
     addUser,
     updateUser,
