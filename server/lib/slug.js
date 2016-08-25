@@ -1,8 +1,8 @@
-const Promise = require('bluebird');
-const roles = require('../constants/roles');
+import Promise from 'bluebird';
+import roles from '../constants/roles';
 
-module.exports = app => {
-  const errors = app.errors;
+export default app => {
+  const { errors } = app;
   const models = app.get('models');
 
   return {

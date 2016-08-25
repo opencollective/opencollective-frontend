@@ -1,14 +1,14 @@
-const config = require('config');
-const _ = require('lodash');
-const Promise = require('bluebird');
-const juice = require('juice');
-const nodemailer = require('nodemailer');
+import config from 'config';
+import _ from 'lodash';
+import Promise from 'bluebird';
+import juice from 'juice';
+import nodemailer from 'nodemailer';
 
 const debug = require('debug')('email');
 const templates = require('./loadEmailTemplates')();
-const activities = require('../constants/activities');
-const utils = require('./utils');
-const crypto = require('crypto');
+import activities from '../constants/activities';
+import utils from './utils';
+import crypto from 'crypto';
 
 const render = (name, data, config) => {
     data.config = config;
@@ -30,7 +30,7 @@ const getBody = str => str.split('\n').slice(2).join('\n');
  * Appends appropriate prefix and cleans up subject
  */
 const getSubject = str => {
-    var subj = '';
+    let subj = '';
     if (process.env.NODE_ENV === 'staging') {
       subj += '[STAGING] ';
     } else if (process.env.NODE_ENV !== 'production'){
@@ -178,4 +178,4 @@ const emailLib = {
   sendMessageFromActivity
 };
 
-module.exports = emailLib;
+export default emailLib;

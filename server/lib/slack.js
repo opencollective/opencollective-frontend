@@ -2,18 +2,18 @@
  * Slack message sending logic
  */
 
-const Slack = require('node-slack');
-const config = require('config');
-const activitiesLib = require('../lib/activities');
-const constants = require('../constants/activities');
+import Slack from 'node-slack';
+import config from 'config';
+import activitiesLib from '../lib/activities';
+import constants from '../constants/activities';
 
-module.exports = {
+export default {
 
   /*
    * Post a given activity to OpenCollective private channel
    * This method can only publish to our webhookUrl and our private channel, so we don't leak info by mistake
    */
-  postActivityOnPrivateChannel: function(activity) {
+  postActivityOnPrivateChannel(activity) {
     const message = activitiesLib.formatMessageForPrivateChannel(activity, 'slack');
     const options = {
       attachments: formatAttachment(activity),
@@ -25,7 +25,7 @@ module.exports = {
   /*
    * Post a given activity to a public channel (meaning scrubbed info only)
    */
-  postActivityOnPublicChannel: function(activity, webhookUrl, options) {
+  postActivityOnPublicChannel(activity, webhookUrl, options) {
     if (!options) {
       options = {};
     }
@@ -36,7 +36,7 @@ module.exports = {
   /*
    * Posts a message to a slack webhook
    */
-  postMessage: function(msg, webhookUrl, options) {
+  postMessage(msg, webhookUrl, options) {
     if (!options) {
       options = {};
     }

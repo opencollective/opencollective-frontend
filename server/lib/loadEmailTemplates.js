@@ -1,13 +1,13 @@
-const fs = require('fs');
-const moment = require('moment');
-const handlebars = require('handlebars');
+import fs from 'fs';
+import moment from 'moment';
+import handlebars from 'handlebars';
 
 /*
 * Loads all the email templates
 */
-module.exports = () => {
+export default () => {
 
-  var templates = {};
+  const templates = {};
 
   const templateNames = [
     'email.approve',
@@ -53,12 +53,12 @@ module.exports = () => {
   });
 
   handlebars.registerHelper('currency', (value, props) => {
-    const currency = props.hash.currency;
+    const { currency } = props.hash;
     value = value/100; // converting cents
 
 	  return value.toLocaleString(currency, {
       style: 'currency',
-      currency: currency,
+      currency,
       minimumFractionDigits : 2,
       maximumFractionDigits : 2
     });

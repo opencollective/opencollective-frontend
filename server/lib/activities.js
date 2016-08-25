@@ -1,29 +1,29 @@
-const activities = require('../constants/activities');
-const flatten = require('flat');
-const currencies = require('../constants/currencies');
+import activities from '../constants/activities';
+import flatten from 'flat';
+import currencies from '../constants/currencies';
 
-module.exports = {
+export default {
 
   /*
    * Formats an activity *FOR INTERNAL USE* based on its type
    */
   formatMessageForPrivateChannel: (activity, format) => {
 
-    var userString = '';
-    var userId;
-    var groupName = '';
-    var publicUrl = '';
-    var amount = null;
-    var interval = '';
-    var recurringAmount = null;
-    var currency = '';
-    var description = '';
-    var eventType = '';
-    var provider = '';
-    var connectedAccountUsername = '';
-    var title = '';
+    let userString = '';
+    let userId;
+    let groupName = '';
+    let publicUrl = '';
+    let amount = null;
+    let interval = '';
+    let recurringAmount = null;
+    let currency = '';
+    let description = '';
+    let eventType = '';
+    let provider = '';
+    let connectedAccountUsername = '';
+    let title = '';
     const connectedAccountLink = '';
-    var lastEditedById = 0;
+    let lastEditedById = 0;
 
 
     // get user data
@@ -35,41 +35,41 @@ module.exports = {
     // get group data
     if (activity.data.group) {
       groupName = activity.data.group.name;
-      publicUrl = activity.data.group.publicUrl;
+      ({ publicUrl } = activity.data.group);
     }
 
     // get donation data
     if (activity.data.donation) {
       amount = activity.data.donation.amount/100;
-      currency = activity.data.donation.currency;
+      ({ currency } = activity.data.donation);
     }
 
     // get subscription data
     if (activity.data.subscription) {
-      interval = activity.data.subscription.interval;
+      ({ interval } = activity.data.subscription);
       recurringAmount = amount + (interval ? `/${interval}` : '');
     }
 
     // get transaction data
     if (activity.data.transaction) {
-      amount = activity.data.transaction.amount;
-      interval = activity.data.transaction.interval;
+      ({ amount } = activity.data.transaction);
+      ({ interval } = activity.data.transaction);
       recurringAmount = amount + (interval ? `/${interval}` : '');
-      currency = activity.data.transaction.currency;
-      description = activity.data.transaction.description;
+      ({ currency } = activity.data.transaction);
+      ({ description } = activity.data.transaction);
     }
 
     // get expense data
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
-      currency = activity.data.expense.currency;
-      title = activity.data.expense.title;
-      lastEditedById = activity.data.expense.lastEditedById;
+      ({ currency } = activity.data.expense);
+      ({ title } = activity.data.expense);
+      ({ lastEditedById } = activity.data.expense);
     }
 
     // get connected account data
     if (activity.data.connectedAccount) {
-      provider = activity.data.connectedAccount.provider;
+      ({ provider } = activity.data.connectedAccount);
       connectedAccountUsername = activity.data.connectedAccount.username;
       if (provider === 'github') {
         connectedAccountUsernameLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
@@ -106,7 +106,7 @@ module.exports = {
 
       case activities.GROUP_TRANSACTION_PAID:
         const details = activity.data.preapprovalDetails;
-        var remainingClause = '';
+        let remainingClause = '';
         if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
           const remaining = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
           remainingClause = `(${remaining} ${currency} remaining on preapproval key)`;
@@ -125,7 +125,7 @@ module.exports = {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
 
       case activities.SUBSCRIPTION_CANCELED:
-        const subscriptionId = activity.data.subscriptionId;
+        const { subscriptionId } = activity.data;
         return `Subscription ${subscriptionId} canceled`;
 
       case activities.GROUP_CREATED:
@@ -146,19 +146,19 @@ module.exports = {
    */
   formatMessageForPublicChannel: (activity, format) => {
 
-    var userString = '';
-    var groupName = '';
-    var publicUrl = '';
-    var amount = null;
-    var interval = '';
-    var recurringAmount = null;
-    var currency = '';
-    var tags = [];
-    var description = '';
-    var userTwitter = '';
-    var groupTwitter = '';
-    var tweet = '';
-    var title = '';
+    let userString = '';
+    let groupName = '';
+    let publicUrl = '';
+    let amount = null;
+    let interval = '';
+    let recurringAmount = null;
+    let currency = '';
+    let tags = [];
+    let description = '';
+    let userTwitter = '';
+    let groupTwitter = '';
+    let tweet = '';
+    let title = '';
 
     // get user data
     if (activity.data.user) {
@@ -169,42 +169,42 @@ module.exports = {
     // get group data
     if (activity.data.group) {
       groupName = activity.data.group.name;
-      publicUrl = activity.data.group.publicUrl;
+      ({ publicUrl } = activity.data.group);
       groupTwitter = activity.data.group.twitterHandle;
     }
 
     // get donation data
     if (activity.data.donation) {
       amount = activity.data.donation.amount/100;
-      currency = activity.data.donation.currency;
+      ({ currency } = activity.data.donation);
     }
 
     // get subscription data
     if (activity.data.subscription) {
-      interval = activity.data.subscription.interval;
+      ({ interval } = activity.data.subscription);
       recurringAmount = amount + (interval ? `/${interval}` : '');
     }
 
     // get transaction data
     if (activity.data.transaction) {
-      amount = activity.data.transaction.amount;
-      interval = activity.data.transaction.interval;
+      ({ amount } = activity.data.transaction);
+      ({ interval } = activity.data.transaction);
       recurringAmount = amount + (interval ? `/${interval}` : '');
-      currency = activity.data.transaction.currency;
+      ({ currency } = activity.data.transaction);
       tags = JSON.stringify(activity.data.transaction.tags);
-      description = activity.data.transaction.description;
+      ({ description } = activity.data.transaction);
     }
 
-    var tweetLink, tweetThis = '';
+    let tweetLink, tweetThis = '';
 
     // get expense data
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
-      currency = activity.data.expense.currency;
-      title = activity.data.expense.title;
+      ({ currency } = activity.data.expense);
+      ({ title } = activity.data.expense);
     }
 
-    var group;
+    let group;
     if (linkify) {
       group = linkify(format, publicUrl, groupName);
     } else {
@@ -292,7 +292,7 @@ const getUserString = (format, user, includeEmail) => {
   const userString = user.name || user.twitterHandle || 'someone';
   const link = user.twitterHandle ? `https://twitter.com/${user.twitterHandle}` : user.website;
 
-  var returnVal;
+  let returnVal;
   if (link) {
     returnVal = linkify(format, link, userString);
   } else {

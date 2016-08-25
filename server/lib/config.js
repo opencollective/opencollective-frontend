@@ -1,15 +1,15 @@
 /**
  * Dependencies.
  */
-const Paypal = require('paypal-adaptive');
-const knox = require('knox');
-const config = require('config');
+import Paypal from 'paypal-adaptive';
+import knox from 'knox';
+import config from 'config';
 
 /**
  * Module.
  */
-module.exports = function(app) {
-  const env = config.env;
+export default function(app) {
+  const { env } = config;
 
   // Stripe.
   app.stripe = require('stripe')(config.stripe.secret);

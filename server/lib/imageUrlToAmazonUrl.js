@@ -1,8 +1,8 @@
-module.exports = imageUrlToAmazonUrl;
-const path = require('path');
-const uuid = require('node-uuid');
-const mime = require('mime');
-const request = require('request');
+export default imageUrlToAmazonUrl;
+import path from 'path';
+import uuid from 'node-uuid';
+import mime from 'mime';
+import request from 'request';
 
 /**
 * Takes an external image URL and returns a Amazon S3 URL with the

@@ -1,7 +1,7 @@
-const filter = require('lodash/collection/filter');
-const values = require('lodash/object/values');
-const errors = require('../lib/errors');
-const requestPromise = require('request-promise');
+import filter from 'lodash/collection/filter';
+import values from 'lodash/object/values';
+import errors from '../lib/errors';
+import requestPromise from 'request-promise';
 
 class Meetup {
 
@@ -17,10 +17,18 @@ class Meetup {
   }
 
   makeHeadersForTier(tiername) {
-    const usersInTier = filter(values(this.group.users), { tier: tiername});
-    let usersList = usersInTier.map((user) => (user.website) ? `<a href="${user.website}">${user.name}</a>` : user.name).join(', ');
-    usersList = usersList.replace(/,([^,]*)$/,' and$1');
-    const header = `<p>Thank you to our sponsors ${usersList}</p>\n<p><a href="https://opencollective.com/${this.group.slug}"><img src="https://opencollective.com/${this.group.slug}/${tiername}s.png?width=700"></a></p>`;
+    let header = '', usersList = '';
+
+    const usersInTier = filter(values(this.group.users), { tier: tiername });
+
+    if (usersInTier.length > 0) {
+      usersList = usersInTier.map((user) => (user.website) ? `<a href="${user.website}">${user.name}</a>` : user.name).join(', ');
+      usersList = usersList.replace(/,([^,]*)$/,' and$1');
+      header += `<p>Thank you to our sponsors ${usersList}</p>\n`;
+    }
+
+    header += `<p><a href="https://opencollective.com/${this.group.slug}"><img src="https://opencollective.com/${this.group.slug}/${tiername}s.png?width=700"></a></p>`;
+
     return header;
   };
 
@@ -50,8 +58,8 @@ class Meetup {
     const promises = [];
     return requestPromise(reqopt)
       .then(meetups => {
-        for (var i=0;i<meetups.length;i++) {
-          var meetup = meetups[i];
+        for (let i=0;i<meetups.length;i++) {
+          const meetup = meetups[i];
           if (!meetup.description.match(new RegExp(`^${descriptionHeader.substr(0, 50)}`))) {
             promises.push(this.updateMeetupDescription(meetup.id, `${descriptionHeader}\n ${meetup.description}`));
           }
@@ -67,4 +75,4 @@ class Meetup {
 
 };
 
-module.exports = Meetup;
+export default Meetup;
