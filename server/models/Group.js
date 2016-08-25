@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Joi from 'joi';
 import config from 'config';
 import errors from '../lib/errors';
-import queriesLib from '../lib/queries';
+import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import filter from 'lodash/collection/filter';
 import values from 'lodash/object/values';
@@ -32,7 +32,6 @@ const tiers = Joi.array().items(tier);
 export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
-  const queries = queriesLib(Sequelize);
 
   const Group = Sequelize.define('Group', {
     name: {

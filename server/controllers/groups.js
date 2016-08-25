@@ -10,7 +10,17 @@ import roles from '../constants/roles';
 import activities from '../constants/activities';
 import emailLib from '../lib/email';
 import githubLib from '../lib/github';
-import queriesImport from '../lib/queries';
+import queries from '../lib/queries';
+import models from '../models';
+
+const {
+  Activity,
+  Notification,
+  Group,
+  Transaction,
+  ConnectedAccount,
+  User
+} = models;
 
 /**
  * Controller.
@@ -21,14 +31,6 @@ export default function(app) {
    * Internal Dependencies.
    */
   const { errors } = app;
-  const models = app.set('models');
-  const { Activity } = models;
-  const { Notification } = models;
-  const { Group } = models;
-  const { Transaction } = models;
-  const { ConnectedAccount } = models;
-  const { User } = models;
-  const queries = queriesImport();
 
 
   const subscribeUserToGroupEvents = (user, group, role) => {

@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+import './server/env' // important to load first for environment config
 import express from 'express';
 import models from './server/models';
 import controllers from './server/controllers';
@@ -9,14 +10,7 @@ import config from './server/lib/config';
 import errors from './server/lib/errors';
 import os from 'os';
 
-var NODE_ENV = process.env.NODE_ENV;
 const app = express();
-
-if (!NODE_ENV) {
-  NODE_ENV = process.env.NODE_ENV = 'development';
-}
-
-require('./server/lib/load-dot-env');
 
 app.errors = errors;
 

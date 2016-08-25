@@ -1,12 +1,11 @@
-import queriesImport from '../lib/queries';
+import queries from '../lib/queries';
+import models from '../models';
 
 /**
  * Controller.
  */
-export default function(app) {
-
-  const models = app.set('models');
-  const queries = queriesImport();
+// TODO remove wrapper func
+export default function() {
 
   return (req, res, next) => {
     /**

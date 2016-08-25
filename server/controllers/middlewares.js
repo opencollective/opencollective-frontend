@@ -5,16 +5,18 @@ import json2csv from 'json2csv';
 import moment from 'moment';
 import _ from 'lodash';
 import usersImport from '../controllers/users';
-import queriesImport from '../lib/queries';
+import queries from '../lib/queries';
+import models from '../models';
+
+const {
+  Application,
+  User
+} = models;
 
 export default function(app) {
 
-  const models = app.set('models');
-  const { Application } = models;
-  const { User } = models;
   const { errors } = app;
   const users = usersImport(app);
-  const queries = queriesImport();
 
   /**
    * Public methods.
@@ -118,7 +120,7 @@ export default function(app) {
         paypalEmail
       };
 
-      models.User.findOne({
+      User.findOne({
         where: {
           $or: {
             email: userData.email,

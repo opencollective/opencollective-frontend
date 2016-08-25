@@ -13,7 +13,14 @@ import sequelize from 'sequelize';
 import filter from 'lodash/collection/filter';
 import values from 'lodash/object/values';
 import emailLib from '../lib/email';
-import queriesImport from '../lib/queries';
+import queries from '../lib/queries';
+import models from '../models';
+
+const {
+  User,
+  Activity,
+  UserGroup
+} = models;
 
 /**
  * Controller.
@@ -23,12 +30,7 @@ export default (app) => {
   /**
    * Internal Dependencies.
    */
-  const models = app.set('models');
-  const { User } = models;
-  const { Activity } = models;
-  const { UserGroup } = models;
   const { errors } = app;
-  const queries = queriesImport();
   const { Unauthorized } = errors;
 
   /**
@@ -443,7 +445,7 @@ export default (app) => {
       } else {
         redirect = '/';
       }
-      return models.User.findOne({
+      return User.findOne({
         where: {
           email: req.required.email
         }
