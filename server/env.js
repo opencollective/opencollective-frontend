@@ -1,7 +1,7 @@
-var NODE_ENV = process.env.NODE_ENV;
+let { NODE_ENV } = process.env;
 
 if (!NODE_ENV) {
   NODE_ENV = process.env.NODE_ENV = 'development';
 }
 
-require('./lib/load-dot-env');
+import './lib/load-dot-env';

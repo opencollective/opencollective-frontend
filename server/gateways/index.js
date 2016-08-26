@@ -1,7 +1,4 @@
-const paypal = require('./paypal');
-const stripe = require('./stripe');
+import * as paypal from './paypal';
+import * as stripe from './stripe';
 
-module.exports = {
-  paypal,
-  stripe
-};
+export { paypal, stripe };

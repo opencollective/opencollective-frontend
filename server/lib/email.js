@@ -3,12 +3,13 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
-
-const debug = require('debug')('email');
-const templates = require('./loadEmailTemplates')();
+import debugLib from 'debug';
+import templates from './emailTemplates';
 import activities from '../constants/activities';
 import utils from './utils';
 import crypto from 'crypto';
+
+const debug = debugLib('email');
 
 const render = (name, data, config) => {
     data.config = config;

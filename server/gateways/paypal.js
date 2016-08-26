@@ -1,6 +1,6 @@
-const paypal = require('paypal-rest-sdk');
-const async = require('async');
-const config = require('config');
+import paypal from 'paypal-rest-sdk';
+import async from 'async';
+import config from 'config';
 
 /**
  * We will pass the config in all the subsequent calls to be sure we don't
@@ -18,9 +18,9 @@ const getCallbackUrl = (group, transaction) => `${config.host.api}/groups/${grou
 const createBillingPlan = (planDescription, group, transaction, paypalConfig, cb) => {
   const callbackUrl = getCallbackUrl(group, transaction);
 
-  const amount = transaction.amount;
-  const currency = transaction.currency;
-  const interval = transaction.interval;
+  const { amount } = transaction;
+  const { currency } = transaction;
+  const { interval } = transaction;
   // Paypal frequency is uppercase: 'MONTH'
   const frequency = interval.toUpperCase();
 
@@ -119,8 +119,7 @@ const createSubscription = (connectedAccount, group, transaction, callback) => {
  * https://developer.paypal.com/docs/rest/api/payments/#payment.create
  */
 const createPayment = (connectedAccount, group, transaction, callback) => {
-  const currency = transaction.currency;
-  const amount = transaction.amount;
+  const { amount, currency } = transaction;
   const callbackUrl = getCallbackUrl(group, transaction);
   const paypalConfig = getConfig(connectedAccount);
 
@@ -162,8 +161,4 @@ const execute = (connectedAccount, token, paymentId, PayerID, cb) => {
 
 }
 
-module.exports = {
-  createSubscription,
-  createPayment,
-  execute
-};
+export { createSubscription, createPayment, execute };

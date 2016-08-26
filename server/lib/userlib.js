@@ -1,7 +1,9 @@
 import config from 'config';
-const clearbit = require('clearbit')(config.clearbit);
+import clearbitLib from 'clearbit';
 import url from 'url';
 import Promise from 'bluebird';
+
+const clearbit = clearbitLib(config.clearbit);
 
 export default {
 

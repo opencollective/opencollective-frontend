@@ -1,6 +1,7 @@
 import * as constants from '../constants';
+import transactions from '../constants/transactions';
 
-const expenseType = require('../constants/transactions').type.EXPENSE;
+const expenseType = transactions.type.EXPENSE;
 
 export default app => {
 

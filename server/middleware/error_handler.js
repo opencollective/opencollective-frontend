@@ -1,11 +1,11 @@
-const _ = require('lodash');
-const curlify = require('request-as-curl');
-const errors = require('../lib/errors');
-const emailLib = require('../lib/email');
+import _ from 'lodash';
+import curlify from 'request-as-curl';
+import errors from '../lib/errors';
+import emailLib from '../lib/email';
 
 
 const sendErrorByEmail = (req, err) => {
-  var errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
+  let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
   if (req.body.password)
     req.body.password = '***********';
@@ -28,12 +28,12 @@ const sendErrorByEmail = (req, err) => {
 /**
  * error handler of the api
  */
-module.exports = (err, req, res, next) => {
+export default (err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
 
-  const name = err.name;
+  const { name } = err;
 
   if (name === 'UnauthorizedError') {// because of jwt-express
     err.code = err.status;

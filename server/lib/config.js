@@ -4,6 +4,7 @@
 import Paypal from 'paypal-adaptive';
 import knox from 'knox';
 import config from 'config';
+import stripe from 'stripe';
 
 /**
  * Module.
@@ -12,7 +13,7 @@ export default function(app) {
   const { env } = config;
 
   // Stripe.
-  app.stripe = require('stripe')(config.stripe.secret);
+  app.stripe = stripe(config.stripe.secret);
 
   // Paypal.
   app.paypalAdaptive = new Paypal({

@@ -1,45 +1,48 @@
-const serverStatus = require('express-server-status');
+import serverStatus from 'express-server-status';
 
-const roles = require('./constants/roles');
-const jwt = require('./middleware/jwt');
-const required = require('./middleware/required_param');
-const ifParam = require('./middleware/if_param');
+import roles from './constants/roles';
+import jwt from './middleware/jwt';
+import required from './middleware/required_param';
+import ifParam from './middleware/if_param';
+import authentication from './middleware/security/authentication';
+import authorization from './middleware/security/authorization';
+import errorHandler from './middleware/error_handler';
+import cache from './middleware/cache';
+import * as params from './middleware/params';
 
 /**
  * NotImplemented response.
  */
 const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
 
-module.exports = (app) => {
+export default (app) => {
 
-  const aN = require('./middleware/security/authentication')(app);
-  const aZ = require('./middleware/security/authorization')(app);
-  const errorHandler = require('./middleware/error_handler');
-  const cache = require('./middleware/cache');
-  const params = require('./middleware/params')(app);
+  const aN = authentication(app);
+  const aZ = authorization(app);
 
   /**
    * controllers
    */
   const controllers = app.set('controllers');
+  const {
+    users,
+    groups,
+    activities,
+    notifications,
+    donations,
+    expenses,
+    paypal,
+    images,
+    webhooks,
+    stripe,
+    test,
+    subscriptions,
+    connectedAccounts
+  } = controllers;
   const mw = controllers.middlewares;
-  const users = controllers.users;
-  const groups = controllers.groups;
-  const activities = controllers.activities;
-  const notifications = controllers.notifications;
-  const donations = controllers.donations;
-  const expenses = controllers.expenses;
-  const paypal = controllers.paypal;
-  const images = controllers.images;
   const paymentMethods = controllers.paymentmethods;
-  const webhooks = controllers.webhooks;
-  const stripe = controllers.stripe;
-  const test = controllers.test;
-  const subscriptions = controllers.subscriptions;
-  const connectedAccounts = controllers.connectedAccounts;
 
-  const HOST = roles.HOST;
-  const MEMBER = roles.MEMBER;
+  const { HOST, MEMBER } = roles;
 
   /**
    * Status.

@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const Stripe = require('stripe');
+import _ from 'lodash';
+import Stripe from 'stripe';
 
-const utils = require('../lib/utils');
+import utils from '../lib/utils';
 
 /**
  * Get the stripe client for the connected account
@@ -115,7 +115,7 @@ const extractFees = (balance) => {
   return fees;
 }
 
-module.exports = {
+export {
   getOrCreatePlan,
   createSubscription,
   retrieveSubscription,

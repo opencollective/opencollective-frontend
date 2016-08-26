@@ -1,17 +1,13 @@
 #!/usr/bin/env node
+import Promise from 'bluebird';
+import { GitHubClient } from 'opencollective-jobs';
+import _ from 'lodash';
+import models from '../../server/models';
 
-'use strict';
-
-require('bluebird')
-  .longStackTraces();
-
-const app = require('../../index');
-const GitHubClient = require('opencollective-jobs').GitHubClient;
-const Group = app.set('models').Group;
-const _ = require('lodash');
-
+Promise.longStackTraces();
 const client = GitHubClient({logLevel: 'verbose'});
-const log = client.log; // repurpose the logger
+const { log } = client; // repurpose the logger
+const { Group } = models;
 
 Group.findAll({
   attributes: [
@@ -31,7 +27,7 @@ Group.findAll({
       log.warn(group.name, `No GitHub org or repo associated`);
       return;
     }
-    var fetchPromise;
+    let fetchPromise;
 
     if (org) {
       fetchPromise = client.contributorsInOrg({orgs: [org]})

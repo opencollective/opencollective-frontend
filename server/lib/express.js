@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import multer from 'multer';
+import errorHandler from 'errorhandler';
 import passport from 'passport';
 import connectSessionSequelize from 'connect-session-sequelize';
 import session from 'express-session';
@@ -29,7 +30,7 @@ export default function(app) {
 
   // Error handling.
   if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
-    app.use(require('errorhandler')());
+    app.use(errorHandler());
   }
 
   // Authentication

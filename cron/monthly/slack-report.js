@@ -1,8 +1,8 @@
-const app = require('../../index');
+import app from '../../index';
 const models = app.set('models');
-const _ = require('lodash');
-const roles = require('../../server/constants/roles');
-const twitter = require('../../server/lib/twitter');
+import _ from 'lodash';
+import roles from '../../server/constants/roles';
+import twitter from '../../server/lib/twitter';
 onlyExecuteInProdOn1stDayOfTheMonth();
 
 
@@ -44,7 +44,7 @@ function getBackers(group) {
 function getStatus(group, backers) {
   const backerCount = backers.length;
   // backers without twitterHandle are ignored
-  var backerList = _.remove(backers, backer => backer.twitterHandle)
+  const backerList = _.remove(backers, backer => backer.twitterHandle)
     .map(backer => `@${backer.twitterHandle}`)
     .join(' ');
 

@@ -6,7 +6,7 @@ import async from 'async';
 import _ from 'lodash';
 import activities from '../constants/activities';
 import utils from '../lib/utils';
-import gateways from '../gateways';
+import * as stripeGateway from '../gateways/stripe';
 import constants from '../constants/transactions';
 
 /**
@@ -210,7 +210,7 @@ export default (app) => {
         const paymentMethod = results.fetchPaymentMethod;
         const charge = results.retrieveCharge;
         const balanceTransaction = results.retrieveBalance;
-        const fees = gateways.stripe.extractFees(balanceTransaction);
+        const fees = stripeGateway.extractFees(balanceTransaction);
         const { hostFeePercent } = group;
 
         // Now we record a new transaction

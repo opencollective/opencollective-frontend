@@ -1,18 +1,20 @@
-const app = require('../../index');
-const config = require('config');
-const Promise = require('bluebird');
+import app from '../../index';
+import config from 'config';
+import Promise from 'bluebird';
 const models = app.set('models');
-const moment = require('moment-timezone');
-const _ = require('lodash');
-const activities = require('../../server/constants/activities');
-const slackLib = require('../../server/lib/slack');
-const expenseStatus = require('../../server/constants/expense_status')
+import moment from 'moment-timezone';
+import _ from 'lodash';
+import activities from '../../server/constants/activities';
+import slackLib from '../../server/lib/slack';
+import expenseStatus from '../../server/constants/expense_status';
 onlyExecuteInProdOnMondays();
 
-const Transaction = models.Transaction;
-const Expense = models.Expense;
-const Activity = models.Activity;
-const Group = models.Group;
+const {
+  Activity,
+  Expense,
+  Group,
+  Transaction
+} = models;
 
 const createdLastWeek = getTimeFrame('createdAt');
 const updatedLastWeek = getTimeFrame('updatedAt');

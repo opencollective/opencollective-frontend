@@ -7,7 +7,7 @@ import config from 'config';
 import async from 'async';
 import usersController from '../controllers/users';
 import emailLib from '../lib/email';
-import gateways from '../gateways';
+import {stripe, paypal} from '../gateways';
 import activities from '../constants/activities';
 import constants from '../constants/transactions';
 
@@ -95,7 +95,7 @@ export default (app) => {
         }
 
         // Otherwise, create a customer on Stripe and add to paymentMethod
-        gateways.stripe.createCustomer(
+        stripe.createCustomer(
           results.getGroupStripeAccount,
           payment.stripeToken, {
             email,
@@ -119,7 +119,7 @@ export default (app) => {
             currency
           };
 
-          gateways.stripe.getOrCreatePlan(results.getGroupStripeAccount, plan)
+          stripe.getOrCreatePlan(results.getGroupStripeAccount, plan)
             .then(plan => {
               const subscription = {
                 plan: plan.id,
@@ -132,7 +132,7 @@ export default (app) => {
                 }
               };
 
-              return gateways.stripe.createSubscription(
+              return stripe.createSubscription(
                 results.getGroupStripeAccount,
                 paymentMethod.customerId,
                 subscription
@@ -160,7 +160,7 @@ export default (app) => {
             }
           };
 
-          gateways.stripe.createCharge(results.getGroupStripeAccount, charge)
+          stripe.createCharge(results.getGroupStripeAccount, charge)
             .then(charge => cb(null, charge))
             .catch(cb);
         }
@@ -203,7 +203,7 @@ export default (app) => {
           return cb();
         } else {
           const charge = results.createCharge;
-          gateways.stripe.retrieveBalanceTransaction(results.getGroupStripeAccount, charge.balance_transaction)
+          stripe.retrieveBalanceTransaction(results.getGroupStripeAccount, charge.balance_transaction)
           .then(balanceTransaction => cb(null, balanceTransaction))
           .catch(cb);
         }
@@ -222,7 +222,7 @@ export default (app) => {
         const charge = results.createCharge;
         const paymentMethod = results.getOrCreatePaymentMethod;
         const balanceTransaction = results.retrieveBalanceTransaction
-        const fees = gateways.stripe.extractFees(balanceTransaction);
+        const fees = stripe.extractFees(balanceTransaction);
         const { hostFeePercent } = group;
         const payload = {
           user,
@@ -378,13 +378,13 @@ export default (app) => {
         const transaction = results.createTransaction;
 
         if (isSubscription) {
-          gateways.paypal.createSubscription(
+          paypal.createSubscription(
             connectedAccount,
             group,
             transaction
           , cb);
         } else {
-          gateways.paypal.createPayment(
+          paypal.createPayment(
             connectedAccount,
             group,
             transaction
@@ -448,7 +448,7 @@ export default (app) => {
       },
 
       execute: ['getConnectedAccount', (cb, results) => {
-        gateways.paypal.execute(
+        paypal.execute(
           results.getConnectedAccount,
           req.query.token,
           req.query.paymentId,

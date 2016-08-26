@@ -1,8 +1,4 @@
 // You can also omit the eslint-config- and it will be automatically assumed by ESLint:
 {
-    "extends": "opencollective",
-    "rules": {
-    	// override the rule because this requires strict-mode
-    	"no-var": 0
-    }
+    "extends": "opencollective"
 }

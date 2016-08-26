@@ -1,8 +1,8 @@
-const config = require('config');
-const Unauthorized = require('../lib/errors').Unauthorized;
-const jwt = require('jsonwebtoken');
+import config from 'config';
+import { Unauthorized } from '../lib/errors';
+import jwt from 'jsonwebtoken';
 
-const secret = config.keys.opencollective.secret;
+const { secret } = config.keys.opencollective;
 
 /**
  * Express-jwt will either force all routes to have auth and throw
@@ -10,7 +10,7 @@ const secret = config.keys.opencollective.secret;
  * expirations errors. This is a cleaned up version of that code that only
  * decodes the token (expected behaviour).
  */
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   if (req.headers && req.headers.authorization) {
     const parts = req.headers.authorization.split(' ');
 

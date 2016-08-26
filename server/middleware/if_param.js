@@ -1,9 +1,9 @@
-const errors = require('../lib/errors');
+import errors from '../lib/errors';
 
 /**
  *  Parameters optionally for a route.
  */
-module.exports = function(param, value) {
+export default function(param, value) {
 
   return function (req, res, next) {
     // if param doesn't exist, go to next route

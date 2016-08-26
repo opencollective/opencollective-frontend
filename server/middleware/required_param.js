@@ -1,9 +1,9 @@
-const errors = require('../lib/errors');
+import errors from '../lib/errors';
 
 /**
  *  Parameters required for a route.
  */
-module.exports = function(properties) {
+export default function(properties) {
   properties = [].slice.call(arguments);
 
   return function (req, res, next) {
@@ -11,7 +11,7 @@ module.exports = function(properties) {
     req.required = {};
 
     properties.forEach((prop) => {
-      var value = req.query[prop];
+      let value = req.query[prop];
       if (!value && value !== false)
         value = req.headers[prop];
       if (!value && value !== false)

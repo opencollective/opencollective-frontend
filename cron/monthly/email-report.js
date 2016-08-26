@@ -3,17 +3,21 @@
 process.env.PORT = 3066;
 
 import _ from 'lodash';
-import app  from '../../index';
 import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
+import debugLib from 'debug';
 
-const emailLib = require('../../server/lib/email');
-const debug = require('debug')('monthlyreport');
+import models from '../../server/models';
+import emailLib from '../../server/lib/email';
 
-const Group = app.set('models').Group;
-const User = app.set('models').User;
-const Notification = app.set('models').Notification;
+const debug = debugLib('monthlyreport');
+
+const {
+  Group,
+  Notification,
+  User
+} = models;
 
 const processGroups = (groups) => {
     return Promise.map(groups, processGroup);

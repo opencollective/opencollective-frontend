@@ -1,22 +1,18 @@
-/**
- * Dependencies.
- */
 import async from 'async';
 import config from 'config';
 import moment from 'moment';
+import models from '../models';
+import errors from '../lib/errors';
+
+const {
+  Activity,
+  PaymentMethod
+} = models;
 
 /**
  * Controller.
  */
 export default function(app) {
-
-  /**
-   * Internal Dependencies.
-   */
-  const models = app.set('models');
-  const { Activity } = models;
-  const { PaymentMethod } = models;
-  const { errors } = app;
 
   /**
    * Get Preapproval Details.
