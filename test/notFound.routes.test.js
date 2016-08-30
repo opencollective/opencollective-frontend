@@ -1,4 +1,4 @@
-const app = require('../index');
+const app = require('../server/index');
 const expect = require('chai').expect;
 const request = require('supertest-as-promised');
 

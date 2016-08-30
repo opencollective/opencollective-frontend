@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const app = require('../index');
+const app = require('../server/index');
 const config = require('config');
 const models = app.set('models');
 const constants = require('../server/constants/transactions');

@@ -12,6 +12,7 @@ node_modules
 coverage
 dbdumps
 test-results.xml
+dist
 
 temp.js
 tempStripe.js

@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var app = require('../index');
+var app = require('../server/index');
 var errors = app.errors;
 var expect = require('chai').expect;
 

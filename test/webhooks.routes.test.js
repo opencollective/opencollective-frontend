@@ -9,7 +9,7 @@ const _ = require('lodash');
 const chance = require('chance').Chance();
 const sinon = require('sinon');
 
-const app = require('../index');
+const app = require('../server/index');
 const roles = require('../server/constants/roles');
 const activities = require('../server/constants/activities');
 const constants = require('../server/constants/transactions');

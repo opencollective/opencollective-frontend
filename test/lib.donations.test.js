@@ -8,7 +8,7 @@ const nock = require('nock');
 const chance = require('chance').Chance();
 const request = require('supertest');
 
-const app = require('../index');
+const app = require('../server/index');
 const utils = require('../test/utils.js')();
 const donationsLib = require('../server/lib/donations.js');
 const generatePlanId = require('../server/lib/utils.js').planId;

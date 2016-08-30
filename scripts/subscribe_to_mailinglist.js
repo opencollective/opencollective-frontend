@@ -4,7 +4,7 @@
  * to the `group.monthlyreport` notification (for all collectives)
  */
 import _ from 'lodash';
-import app  from '../index';
+import app  from '../server/index';
 import Promise from 'bluebird';
 
 const debug = require('debug')('subscribe');

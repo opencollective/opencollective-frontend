@@ -2,7 +2,7 @@
  * Dependencies.
  */
 const _ = require('lodash');
-const app = require('../index');
+const app = require('../server/index');
 const async = require('async');
 const sinon = require('sinon');
 const expect = require('chai').expect;

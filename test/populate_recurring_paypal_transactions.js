@@ -5,7 +5,7 @@ const expect = require('chai').expect;
 const Promise = require('bluebird');
 
 const script = require('../scripts/populate_recurring_paypal_transactions');
-const app = require('../index');
+const app = require('../server/index');
 const models = app.set('models');
 const utils = require('../test/utils.js')();
 const data = utils.data;

@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import app from '../index';
+import app from '../server/index';
 import request from 'supertest-as-promised';
 import Promise from 'bluebird';
 import sinon from 'sinon';

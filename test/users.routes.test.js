@@ -3,7 +3,7 @@
  */
 const _ = require('lodash');
 const cheerio = require('cheerio');
-const app = require('../index');
+const app = require('../server/index');
 const config = require('config');
 const expect = require('chai').expect;
 const request = require('supertest-as-promised');

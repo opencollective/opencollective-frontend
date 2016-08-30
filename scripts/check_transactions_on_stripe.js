@@ -1,5 +1,5 @@
 const Stripe = require('stripe');
-const app = require('../index');
+const app = require('../server/index');
 const models = app.set('models');
 const slackLib = require('../server/lib/slack');
 

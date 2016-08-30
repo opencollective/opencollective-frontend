@@ -1,4 +1,4 @@
-var app = require('../index');
+var app = require('../server/index');
 var config = require('config');
 var imageUrlToAmazonUrl = require('../server/lib/imageUrlToAmazonUrl');
 var expect = require('chai').expect;

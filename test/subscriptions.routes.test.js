@@ -2,7 +2,7 @@
  * Dependencies.
  */
 const nock = require('nock');
-const app = require('../index');
+const app = require('../server/index');
 const async = require('async');
 const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;

@@ -17,7 +17,7 @@ const Bluebird = require('bluebird');
 const moment = require('moment');
 const _ = require('lodash');
 
-const app = require('../index');
+const app = require('../server/index');
 const models = app.set('models');
 const slack = require('../server/lib/slack');
 

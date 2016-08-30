@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var app = require('../index');
+var app = require('../server/index');
 var expect = require('chai').expect;
 var request = require('supertest-as-promised');
 var utils = require('../test/utils.js')();
@@ -24,7 +24,7 @@ describe('profile.routes.test.js', () => {
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
-  beforeEach((done) => 
+  beforeEach((done) =>
     models.Group
       .create(groupData).tap(g => {
         group = g;
