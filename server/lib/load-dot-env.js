@@ -1,6 +1,7 @@
-/**
- * Load .env file
- */
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
+
 if (process.env.NODE_ENV === 'development') {
   const dotenv = require('dotenv');
   dotenv.config(); // this loads .env with real values. It needs to be first because dotenv doesn't overwrite any values
