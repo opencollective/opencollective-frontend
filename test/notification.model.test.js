@@ -106,7 +106,7 @@ describe("notification.model.test.js", () => {
 
   it('fails to remove notification if it does not exist', () =>
     request(app)
-      .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
+      .post(`/groups/${group.id}/activities/group.transaction.approved/unsubscribe`)
       .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(400)
@@ -124,7 +124,7 @@ describe("notification.model.test.js", () => {
 
   it('fails to add a notification if not a member of the group', () =>
     request(app)
-      .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
+      .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(403)

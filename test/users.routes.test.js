@@ -35,7 +35,7 @@ describe('users.routes.test.js', () => {
 
   let sandbox;
   beforeEach(() => {
-    const sandbox = sinon.sandbox.create();
+    sandbox = sinon.sandbox.create();
     userlib.memory = {};
     sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
       return new Bluebird((resolve, reject) => {
