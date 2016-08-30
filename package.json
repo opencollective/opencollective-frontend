@@ -115,7 +115,7 @@
     "db:sanitize": "babel-node scripts/replace_stripe_accounts",
     "db:reset": "node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
-    "postinstall": "sh ./scripts/postinstall.sh",
+    "postinstall": "npm run build && sh ./scripts/postinstall.sh",
     "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d",
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
