@@ -3,7 +3,6 @@
  */
 const nock = require('nock');
 const app = require('../server/index');
-const async = require('async');
 const jwt = require('jsonwebtoken');
 const expect = require('chai').expect;
 const request = require('supertest-as-promised');
@@ -16,18 +15,18 @@ const Promise = require('bluebird');
  * Variables.
  */
 const STRIPE_URL = 'https://api.stripe.com:443';
-var models = app.set('models');
-var transactionsData = utils.data('transactions1').transactions;
-var roles = require('../server/constants/roles');
+const models = app.set('models');
+const transactionsData = utils.data('transactions1').transactions;
+const roles = require('../server/constants/roles');
 
 /**
  * Tests.
  */
 describe('subscriptions.routes.test.js', () => {
-  var group;
-  var user;
-  var application;
-  var paymentMethod;
+  let group;
+  let user;
+  let application;
+  let paymentMethod;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -82,7 +81,7 @@ describe('subscriptions.routes.test.js', () => {
     it('successfully has access to the subscriptions', (done) => {
       request(app)
         .get('/subscriptions')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
@@ -103,8 +102,8 @@ describe('subscriptions.routes.test.js', () => {
   describe('#cancel', () => {
 
     const subscription = utils.data('subscription1');
-    var transaction;
-    var nocks = {};
+    let transaction;
+    const nocks = {};
 
     beforeEach((done) => {
       models.Subscription.create(subscription)
@@ -154,7 +153,7 @@ describe('subscriptions.routes.test.js', () => {
 
       request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', 'Bearer ' + expiredToken)
+        .set('Authorization', `Bearer ${expiredToken}`)
         .end((err, res) => {
           expect(res.body.error.code).to.be.equal(401);
           expect(res.body.error.message).to.be.equal('jwt expired');
@@ -163,11 +162,12 @@ describe('subscriptions.routes.test.js', () => {
     });
 
     it('fails if the subscription does not exist', (done) => {
+      const token = user.jwt(application, {
+        scope: 'subscriptions'
+      });
       request(app)
         .post('/subscriptions/12345/cancel')
-        .set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: 'subscriptions'
-        }))
+        .set('Authorization', `Bearer ${token}`)
         .expect(400, {
           error: {
             code: 400,
@@ -181,7 +181,7 @@ describe('subscriptions.routes.test.js', () => {
     it('cancels the subscription', (done) => {
        request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;

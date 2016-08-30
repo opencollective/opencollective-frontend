@@ -3,14 +3,14 @@ import app from '../server/index';
 import request from 'supertest-as-promised';
 import Promise from 'bluebird';
 import sinon from 'sinon';
-import emailLib from '../server/lib/email';
-import webhookBody from './mocks/mailgun.webhook.payload.json';
-
 import nock from 'nock';
-const MailgunNock = require('./mocks/mailgun.nock.js');
+import models from '../server/models';
+import emailLib from '../server/lib/email';
+import MailgunNock from './mocks/mailgun.nock.js';
+
+const webhookBody = require('./mocks/mailgun.webhook.payload.json');
 
 const utils = require('../test/utils.js')();
-const models = app.set('models');
 const Group = models.Group;
 const User = models.User;
 
@@ -54,7 +54,7 @@ describe("email.routes.test", () => {
 
   let sandbox;
 
-  before((done) => utils.cleanAllDb().tap(a => done()));
+  before((done) => utils.cleanAllDb().tap(() => done()));
 
   after(() => nock.cleanAll());
 
@@ -92,7 +92,7 @@ describe("email.routes.test", () => {
         })
       })
       .then(() => done())
-      .catch(e => console.error);
+      .catch(console.error);
   });
 
   it("forwards emails sent to info@:slug.opencollective.com", () => {
@@ -144,7 +144,7 @@ describe("email.routes.test", () => {
 
     return request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
-      .then((res) => {
+      .then(() => {
         expect(spy.args[0][1]).to.equal('members@testcollective.opencollective.com');
         expect(spy.args[0][2].subject).to.equal('test collective members');
         expect(spy.args[0][3].bcc).to.equal(usersData[0].email);
@@ -181,7 +181,7 @@ describe("email.routes.test", () => {
 
     return request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
-      .then((res) => {
+      .then(() => {
         const emailBody = spy.args[0][2];
         expect(emailBody).to.contain(unsubscribeUrl);
         expect(emailBody).to.contain("To unsubscribe from members@testcollective.opencollective.com");

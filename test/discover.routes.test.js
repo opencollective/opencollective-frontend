@@ -1,29 +1,28 @@
 /**
  * Dependencies.
  */
-var app = require('../server/index');
-var expect = require('chai').expect;
-var request = require('supertest-as-promised');
-var utils = require('../test/utils.js')();
+const app = require('../server/index');
+const expect = require('chai').expect;
+const request = require('supertest-as-promised');
+const utils = require('../test/utils.js')();
 
 /**
  * Variables.
  */
-var groupData1 = utils.data('group1'); // `open source` tag
-var groupData2 = utils.data('group2'); // `meetup` tag
-var paymentMethodData1 = utils.data('paymentMethod1');
-var transactionsData = utils.data('transactions1').transactions;
-var models = app.set('models');
+const groupData1 = utils.data('group1'); // `open source` tag
+const groupData2 = utils.data('group2'); // `meetup` tag
+const paymentMethodData1 = utils.data('paymentMethod1');
+const transactionsData = utils.data('transactions1').transactions;
+const models = app.set('models');
 
 /**
  * Tests.
  */
 describe('profile.routes.test.js', () => {
 
-  var application;
-  var group1, group2, paymentMethod1;
+  let group1, group2, paymentMethod1;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.cleanAllDb());
   beforeEach(() => models.PaymentMethod.create(paymentMethodData1).tap(pm => paymentMethod1 = pm));
   beforeEach(() => models.Group.create(groupData1).tap(g => group1 = g));
   beforeEach(() => models.Group.create(groupData2).tap(g => group2 = g));
@@ -104,7 +103,6 @@ describe('profile.routes.test.js', () => {
         .expect(200)
         .end((err, res) => {
           const body = res.body;
-          const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('undefined');
           expect(body.sort).equal('newest');
           expect(body.collectives).to.be.Array;

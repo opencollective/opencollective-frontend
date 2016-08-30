@@ -1,31 +1,32 @@
 
-var expect = require('chai').expect;
-var utils = require('../test/utils.js')();
-var userlib = require('../server/lib/userlib.js');
-var sinon = require('sinon');
-var Bluebird = require('bluebird');
+const expect = require('chai').expect;
+const utils = require('../test/utils.js')();
+const userlib = require('../server/lib/userlib.js');
+const sinon = require('sinon');
+const Bluebird = require('bluebird');
 
 /**
  * Variables.
  */
-var userData1 = utils.data('user1');
-var userData3 = utils.data('user3');
+const userData1 = utils.data('user1');
+const userData3 = utils.data('user3');
 
-var mock = require('./mocks/clearbit.json');
+const mock = require('./mocks/clearbit.json');
 
 describe("userlib", () => {
 
-  var sandbox, stub;
+  let sandbox, stub;
   beforeEach(() => {
     userlib.memory = {};
     sandbox = sinon.sandbox.create();
     stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
       return new Bluebird((resolve, reject) => {
-        switch(opts.email) {
-          case userData1.email:
-            var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
+        switch (opts.email) {
+          case userData1.email: {
+            const NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
             reject(NotFound);
             break;
+          }
           case userData3.email:
             return resolve(mock);
           default:
@@ -67,7 +68,7 @@ describe("userlib", () => {
 
   it("doesn't fetch the avatar if one has already been provided", () => {
     userData3.avatar = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764';
-    var currentCallCount = stub.callCount;
+    const currentCallCount = stub.callCount;
     return userlib.fetchAvatar(userData3).then(user => {
       expect(stub.callCount).to.equal(currentCallCount);
       expect(user).to.deep.equal(userData3);

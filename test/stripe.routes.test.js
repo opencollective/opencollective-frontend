@@ -1,24 +1,23 @@
 /**
  * Dependencies.
  */
-var expect = require('chai').expect;
-var request = require('supertest');
-var async = require('async');
-var nock = require('nock');
-var config = require('config');
-var chance = require('chance').Chance();
+const expect = require('chai').expect;
+const request = require('supertest');
+const async = require('async');
+const nock = require('nock');
+const config = require('config');
 
-var app = require('../server/index');
-var utils = require('../test/utils.js')();
-var models = app.get('models');
-var roles = require('../server/constants/roles');
+const app = require('../server/index');
+const utils = require('../test/utils.js')();
+const models = app.get('models');
+const roles = require('../server/constants/roles');
 
 describe('stripe.routes.test.js', () => {
 
-  var user;
-  var user2;
-  var group;
-  var application;
+  let user;
+  let user2;
+  let group;
+  let application;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -32,7 +31,7 @@ describe('stripe.routes.test.js', () => {
   beforeEach((done) => {
     request(app)
       .post('/groups')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
         group: utils.data('group1'),
         role: roles.HOST
@@ -48,10 +47,10 @@ describe('stripe.routes.test.js', () => {
   // Add user2 as backer to group.
   beforeEach((done) => {
     request(app)
-      .post('/groups/' + group.id + '/users/' + user2.id)
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group.id}/users/${user2.id}`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .expect(200)
-      .end((e, res) => {
+      .end(e => {
         expect(e).to.not.exist;
         done();
       });
@@ -72,7 +71,7 @@ describe('stripe.routes.test.js', () => {
     it('should fail is the group does not have an host', (done) => {
       request(app)
         .get('/stripe/authorize')
-        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .set('Authorization', `Bearer ${user2.jwt(application)}`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -86,20 +85,20 @@ describe('stripe.routes.test.js', () => {
     it('should redirect to stripe', (done) => {
       request(app)
         .get('/stripe/authorize')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .expect(200) // redirect
         .end((e, res) => {
           expect(e).to.not.exist;
 
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(res.body.redirectUrl).to.contain('state=' + group.id)
+          expect(res.body.redirectUrl).to.contain(`state=${group.id}`)
           done();
         });
     });
   });
 
   describe('callback', () => {
-    var stripeResponse = {
+    const stripeResponse = {
       access_token: 'sk_test_123',
       refresh_token: 'rt_123',
       token_type: 'bearer',
@@ -145,7 +144,7 @@ describe('stripe.routes.test.js', () => {
 
     it('should fail if the user is not a host', (done) => {
       request(app)
-        .get('/stripe/oauth/callback?state=' + user2.id)
+        .get(`/stripe/oauth/callback?state=${user2.id}`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -169,7 +168,7 @@ describe('stripe.routes.test.js', () => {
           models.StripeAccount.findAndCountAll({})
             .then(res => {
               expect(res.count).to.be.equal(1);
-              var account = res.rows[0];
+              const account = res.rows[0];
               expect(account).to.have.property('accessToken', stripeResponse.access_token);
               expect(account).to.have.property('refreshToken', stripeResponse.refresh_token);
               expect(account).to.have.property('tokenType', stripeResponse.token_type);

@@ -30,18 +30,16 @@ const STRIPE_TOKEN = 'superStripeToken';
  */
 describe('lib.donation.test.js', () => {
 
-  var sandbox = sinon.sandbox.create();
-  var processDonationSpy, emailSendMessageSpy, emailSendSpy;
-  var application;
+  const sandbox = sinon.sandbox.create();
+  let processDonationSpy, emailSendMessageSpy, emailSendSpy;
+  let application;
 
   before(() => {
     processDonationSpy = sinon.spy(donationsLib, 'processDonation');
   });
 
   beforeEach(() => {
-    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage', (recipient, subject, body, opts) => {
-      return Promise.resolve();
-    });
+    emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage', () => Promise.resolve());
   });
 
   beforeEach(() => {
@@ -111,14 +109,14 @@ describe('lib.donation.test.js', () => {
 
   describe('Stripe', () => {
 
-    var user, application2, group, group2;
-    var nocks = {};
+    let user, application2, group, group2;
+    const nocks = {};
 
-    var stubStripe = () => {
-      var mock = stripeMock.accounts.create;
+    const stubStripe = () => {
+      const mock = stripeMock.accounts.create;
       mock.email = chance.email();
 
-      var stub = sinon.stub(app.stripe.accounts, 'create');
+      const stub = sinon.stub(app.stripe.accounts, 'create');
       stub.yields(null, mock);
     };
 
@@ -143,7 +141,7 @@ describe('lib.donation.test.js', () => {
     beforeEach((done) => {
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           group: groupData,
           role: roles.HOST
@@ -169,7 +167,7 @@ describe('lib.donation.test.js', () => {
     beforeEach((done) => {
       request(app)
         .post('/groups')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           group: utils.data('group1'),
           role: roles.HOST
@@ -203,16 +201,16 @@ describe('lib.donation.test.js', () => {
 
     // Nock for charges.create.
     beforeEach(() => {
-      var params = [
-        'amount=' + CHARGE * 100,
-        'currency=' + CURRENCY,
-        'customer=' + stripeMock.customers.create.id,
-        'description=' + encodeURIComponent(`OpenCollective: ${group.slug}`),
+      const params = [
+        `amount=${CHARGE * 100}`,
+        `currency=${CURRENCY}`,
+        `customer=${stripeMock.customers.create.id}`,
+        `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
         'application_fee=54',
-        encodeURIComponent('metadata[groupId]') + '=' + group.id,
-        encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
-        encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
-        encodeURIComponent('metadata[paymentMethodId]') + '=1'
+        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
+        `${encodeURIComponent('metadata[paymentMethodId]')}=1`
       ].join('&');
 
       nocks['charges.create'] = nock(STRIPE_URL)
@@ -281,7 +279,7 @@ describe('lib.donation.test.js', () => {
           .getUsers()
           .then((users) => {
             expect(users).to.have.length(2);
-            var backer = _.find(users, {email: user.email});
+            const backer = _.find(users, {email: user.email});
             expect(backer.UserGroup.role).to.equal(roles.BACKER);
             done();
           })
@@ -297,14 +295,14 @@ describe('lib.donation.test.js', () => {
 
     describe('Recurring donation', () => {
 
-      var customerId = stripeMock.customers.create.id;
-      var planId = generatePlanId({
+      const customerId = stripeMock.customers.create.id;
+      const planId = generatePlanId({
         currency: CURRENCY,
         interval: 'month',
         amount: 1000
       });
 
-      var plan = _.extend({}, stripeMock.plans.create, {
+      const plan = _.extend({}, stripeMock.plans.create, {
         amount: 1000,
         interval: 'month',
         name: planId,
@@ -316,13 +314,13 @@ describe('lib.donation.test.js', () => {
           .post('/v1/plans')
           .reply(200, plan);
 
-        var params = [
+        const params = [
           `plan=${planId}`,
           'application_fee_percent=5',
-          encodeURIComponent('metadata[groupId]') + '=' + group.id,
-          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(group.name),
-          encodeURIComponent('metadata[paymentMethodId]') + '=1',
-          encodeURIComponent('metadata[description]') + '=' + encodeURIComponent(`OpenCollective: ${group.slug}`)
+          `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+          `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
+          `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
+          `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`
         ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -333,14 +331,14 @@ describe('lib.donation.test.js', () => {
       describe('plan does not exist', () => {
         beforeEach(() => {
           nocks['plans.retrieve'] = nock(STRIPE_URL)
-            .get('/v1/plans/' + planId)
+            .get(`/v1/plans/${planId}`)
             .reply(200, {
               error: stripeMock.plans.create_not_found
             });
         });
 
         beforeEach(() => {
-          var pm;
+          let pm;
           return models.PaymentMethod.create({
             number: 'blah',
             token: STRIPE_TOKEN,
@@ -376,7 +374,7 @@ describe('lib.donation.test.js', () => {
             .getUsers()
             .then((users) => {
               expect(users).to.have.length(2);
-              var backer = _.find(users, {email: user.email});
+              const backer = _.find(users, {email: user.email});
               expect(backer.UserGroup.role).to.equal(roles.BACKER);
               done();
             })
@@ -387,12 +385,12 @@ describe('lib.donation.test.js', () => {
       describe('plan exists', () => {
         beforeEach(() => {
           nocks['plans.retrieve'] = nock(STRIPE_URL)
-            .get('/v1/plans/' + planId)
+            .get(`/v1/plans/${planId}`)
             .reply(200, plan);
         });
 
         beforeEach(() => {
-          var pm;
+          let pm;
           return models.PaymentMethod.create({
             number: 'blah',
             token: STRIPE_TOKEN,
@@ -428,7 +426,7 @@ describe('lib.donation.test.js', () => {
             .getUsers()
             .then((users) => {
               expect(users).to.have.length(2);
-              var backer = _.find(users, {email: user.email});
+              const backer = _.find(users, {email: user.email});
               expect(backer.UserGroup.role).to.equal(roles.BACKER);
               done();
             })
@@ -454,16 +452,16 @@ describe('lib.donation.test.js', () => {
 
       // Nock for charges.create.
       beforeEach(() => {
-        var params = [
-          'amount=' + CHARGE * 100,
-          'currency=' + CURRENCY,
-          'customer=' + stripeMock.customers.create.id,
-          'description=' + encodeURIComponent(`OpenCollective: ${group.slug}`),
+        const params = [
+          `amount=${CHARGE * 100}`,
+          `currency=${CURRENCY}`,
+          `customer=${stripeMock.customers.create.id}`,
+          `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
           'application_fee=54',
-          encodeURIComponent('metadata[groupId]') + '=' + group.id,
-          encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
-          encodeURIComponent('metadata[customerEmail]') + '=' + encodeURIComponent(user.email),
-          encodeURIComponent('metadata[paymentMethodId]') + '=1'
+          `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+          `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+          `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
+          `${encodeURIComponent('metadata[paymentMethodId]')}=1`
         ].join('&');
 
         nocks['charges.create'] = nock(STRIPE_URL)

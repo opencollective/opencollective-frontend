@@ -44,7 +44,7 @@ describe('lib/slack', () => {
 
   describe('calling postActivity', () => {
 
-    var formatMessageStub, postMessageStub;
+    let formatMessageStub, postMessageStub;
     const activity = "my activity";
     const formattedMessage = "my formatted activity";
     const webhookUrl = 'hookurl';

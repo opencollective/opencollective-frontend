@@ -1,8 +1,5 @@
 const _ = require('lodash');
-const async = require('async');
-const config = require('config');
 const expect = require('chai').expect;
-const Promise = require('bluebird');
 
 const script = require('../scripts/populate_recurring_paypal_transactions');
 const app = require('../server/index');
@@ -38,11 +35,11 @@ const paypalTransaction = {
 describe('scripts/populate_recurring_paypal_transactions', () => {
   const billingAgreementId = 'billingAgreementId-abc';
 
-  var user;
-  var group;
-  var transaction;
-  var subscription;
-  var runScript;
+  let user;
+  let group;
+  let transaction;
+  let subscription;
+  let runScript;
 
   beforeEach(() => utils.cleanAllDb());
 

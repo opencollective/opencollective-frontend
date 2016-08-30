@@ -3,14 +3,13 @@ const config = require('config');
 const request = require('supertest');
 const utils = require('./utils')();
 const expect = require('chai').expect;
-const jwt = require('jsonwebtoken');
 
 const models = app.set('models');
 const clientId = config.github.clientID;
 
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
 
-  var application, req, user;
+  let application, req, user;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -101,9 +100,8 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
     describe('WHEN calling without API key', () => {
       beforeEach(done => {
-        req = req.set('Authorization', 'Bearer ' + user.jwt(application, {
-          scope: ''
-        }))
+        const token = user.jwt(application, { scope: '' });
+        req = req.set('Authorization', `Bearer ${token}`);
         done();
       });
 
@@ -122,7 +120,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     describe('WHEN providing API key and token but no username', () => {
       beforeEach(done => {
         req = req
-              .set('Authorization', 'Bearer ' + user.jwt(application, { scope: 'github'}))
+              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'github'})}`)
               .send({ api_key: application.api_key });
         done();
       });

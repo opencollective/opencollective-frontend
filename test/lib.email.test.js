@@ -9,7 +9,7 @@ const config = require('config');
 
 describe('lib/email', () => {
 
-  var nm;
+  let nm;
 
   // create a fake nodemailer transport
   beforeEach(done => {

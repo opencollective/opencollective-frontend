@@ -4,7 +4,7 @@
 import Promise from 'bluebird';
 import models, {sequelize} from '../server/models';
 
-import data from './mocks/data.json';
+const data = require('./mocks/data.json');
 import userlib from '../server/lib/userlib';
 
 /**

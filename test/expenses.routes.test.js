@@ -20,7 +20,7 @@ const Transaction = models.Transaction;
 const PaymentMethod = models.PaymentMethod;
 
 describe('expenses.routes.test.js', () => {
-  var application, host, member, group;
+  let application, host, member, group;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -35,12 +35,12 @@ describe('expenses.routes.test.js', () => {
   beforeEach(() => group.addUserWithRole(member, roles.MEMBER));
 
   describe('WHEN expense does not exist', () => {
-    var req;
+    let req;
 
     describe('#getOne', () => {
       beforeEach(() => {
         req = request(app)
-          .get('/groups/' + group.id + '/expenses/123')
+          .get(`/groups/${group.id}/expenses/123`)
           .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
@@ -50,7 +50,7 @@ describe('expenses.routes.test.js', () => {
     describe('#approve', () => {
       beforeEach(() => {
         req = request(app)
-          .post('/groups/' + group.id + '/expenses/123/approve')
+          .post(`/groups/${group.id}/expenses/123/approve`)
           .set('Authorization', `Bearer ${host.jwt(application)}`);
       });
 
@@ -80,7 +80,7 @@ describe('expenses.routes.test.js', () => {
   });
 
   describe('#create', () => {
-    var createReq;
+    let createReq;
 
     beforeEach(() => {
       createReq = request(app).post(`/groups/${group.id}/expenses`);
@@ -137,7 +137,7 @@ describe('expenses.routes.test.js', () => {
         });
 
         describe('THEN returns 200 and expense', () => {
-          var actualExpense;
+          let actualExpense;
 
           beforeEach(() => createReq
             .expect(200)
@@ -181,7 +181,8 @@ describe('expenses.routes.test.js', () => {
               }));
 
             describe('WHEN specifying per_page', () => {
-              var per_page = 2, response;
+              const per_page = 2;
+              let response;
 
               beforeEach(() => request(app)
                 .get(`/groups/${group.id}/expenses`)
@@ -194,7 +195,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenses.length).to.equal(per_page);
                 expect(expenses[0].id).to.equal(1);
 
-                var headers = response.headers;
+                const headers = response.headers;
                 expect(headers).to.have.property('link');
                 expect(headers.link).to.contain('next');
                 expect(headers.link).to.contain('page=2');
@@ -202,13 +203,14 @@ describe('expenses.routes.test.js', () => {
                 expect(headers.link).to.contain('page=1');
                 expect(headers.link).to.contain(`per_page=${per_page}`);
                 expect(headers.link).to.contain(`/groups/${group.id}/expenses`);
-                var tot = 3;
+                const tot = 3;
                 expect(headers.link).to.contain(`/groups/${group.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
               });
             });
 
             describe('WHEN getting page 2', () => {
-              var page = 2, response;
+              const page = 2;
+              let response;
 
               beforeEach(() => request(app)
                 .get(`/groups/${group.id}/expenses`)
@@ -221,7 +223,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenses.length).to.equal(1);
                 expect(expenses[0].id).to.equal(2);
 
-                var headers = response.headers;
+                const headers = response.headers;
                 expect(headers).to.have.property('link');
                 expect(headers.link).to.contain('next');
                 expect(headers.link).to.contain('page=3');
@@ -231,7 +233,8 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('WHEN specifying since_id', () => {
-              var since_id = 2, response;
+              const since_id = 2;
+              let response;
 
               beforeEach(() => request(app)
                 .get(`/groups/${group.id}/expenses`)
@@ -256,7 +259,7 @@ describe('expenses.routes.test.js', () => {
                 .expect(401)));
 
             describe('WHEN expense does not belong to group', () => {
-              var otherExpense;
+              let otherExpense;
 
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
@@ -274,7 +277,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('success', () => {
-              var response;
+              let response;
 
               beforeEach(() => request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
@@ -306,7 +309,7 @@ describe('expenses.routes.test.js', () => {
                 .expect(401)));
 
             describe('WHEN expense does not belong to group', () => {
-              var otherExpense;
+              let otherExpense;
 
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
@@ -317,7 +320,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('WHEN not providing expense', () => {
-              var updateReq;
+              let updateReq;
 
               beforeEach(() => {
                 updateReq = request(app)
@@ -329,7 +332,7 @@ describe('expenses.routes.test.js', () => {
             });
 
             describe('success', () => {
-              var response;
+              let response;
 
               beforeEach(() => request(app)
                 .put(`/groups/${group.id}/expenses/${actualExpense.id}`)
@@ -349,7 +352,7 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#approve', () => {
-            var approveReq;
+            let approveReq;
 
             beforeEach(() => {
               approveReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`);
@@ -496,7 +499,7 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#pay unapproved expense', () => {
-            var payReq;
+            let payReq;
 
             beforeEach(() => {
               payReq = request(app)
@@ -529,7 +532,7 @@ describe('expenses.routes.test.js', () => {
 
             afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
 
-            var payReq;
+            let payReq;
 
             beforeEach(() => {
               payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay`);
@@ -544,7 +547,7 @@ describe('expenses.routes.test.js', () => {
                 payReq = payReq.set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
-              var payStub;
+              let payStub;
 
               beforeEach(() => {
                 payStub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
@@ -575,7 +578,7 @@ describe('expenses.routes.test.js', () => {
                 describe('THEN returns 200', () => {
                   beforeEach(() => payReq.expect(200));
 
-                  var expense, transaction, paymentMethod;
+                  let expense, transaction, paymentMethod;
                   beforeEach(() => expectOne(Expense).tap(e => expense = e));
                   beforeEach(() => expectOne(Transaction).tap(t => transaction = t));
                   beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
@@ -667,7 +670,7 @@ describe('expenses.routes.test.js', () => {
 
             afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
 
-            var payReq;
+            let payReq;
 
             beforeEach(() => {
               payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay`);
@@ -682,7 +685,7 @@ describe('expenses.routes.test.js', () => {
                 payReq = payReq.set('Authorization', `Bearer ${host.jwt(application)}`);
               });
 
-              var payStub;
+              let payStub;
 
               beforeEach(() => {
                 payStub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
@@ -700,7 +703,7 @@ describe('expenses.routes.test.js', () => {
               describe('THEN returns 200', () => {
                 beforeEach(() => payReq.expect(200));
 
-                var expense, transaction;
+                let expense, transaction;
                 beforeEach(() => expectTwo(Expense).tap(e => expense = e));
                 beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
 
@@ -784,7 +787,7 @@ describe('expenses.routes.test.js', () => {
   }
 
   function createExpense(g, u) {
-    var group, user;
+    let group, user;
     return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
       .tap(g => group = g)
       .then(() => u ? u : models.User.create(utils.data('user3'))
