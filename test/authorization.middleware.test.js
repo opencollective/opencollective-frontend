@@ -1,4 +1,4 @@
-const app = require('../index');
+const app = require('../server/index');
 const aZ = require('../server/middleware/security/authorization')(app);
 const expect = require('chai').expect;
 const moment = require('moment-timezone');

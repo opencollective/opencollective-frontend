@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-const app = require('../index');
+const app = require('../server/index');
 const expect = require('chai').expect;
 const utils = require('../test/utils.js')();
 

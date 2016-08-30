@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var app = require('../index');
+var app = require('../server/index');
 var async = require('async');
 var expect = require('chai').expect;
 var request = require('supertest');

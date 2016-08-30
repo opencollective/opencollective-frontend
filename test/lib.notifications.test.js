@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-const app = require('../index');
+const app = require('../server/index');
 const _ = require('lodash');
 const config = require('config');
 const sinon = require('sinon');

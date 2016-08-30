@@ -4,3 +4,4 @@ scripts/
 seeders/
 migrations/
 coverage/
+dist/

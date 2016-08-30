@@ -1,4 +1,4 @@
-const app = require('../index');
+const app = require('../server/index');
 const models = app.set('models');
 
 const done = (err) => {

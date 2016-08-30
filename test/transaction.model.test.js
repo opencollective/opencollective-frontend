@@ -3,7 +3,7 @@
  */
 
 const _ = require('lodash');
-const app = require('../index');
+const app = require('../server/index');
 const config = require('config');
 const expect = require('chai').expect;
 const sinon = require('sinon');

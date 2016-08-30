@@ -8,7 +8,7 @@ var nock = require('nock');
 var config = require('config');
 var chance = require('chance').Chance();
 
-var app = require('../index');
+var app = require('../server/index');
 var utils = require('../test/utils.js')();
 var models = app.get('models');
 var roles = require('../server/constants/roles');

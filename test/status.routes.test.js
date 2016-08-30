@@ -1,4 +1,4 @@
-var app = require('../index');
+var app = require('../server/index');
 var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('../test/utils.js')();

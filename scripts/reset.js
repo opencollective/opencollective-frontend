@@ -1,6 +1,6 @@
 const exec = require('child-process-promise').exec;
 
-const app = require('../index');
+const app = require('../server/index');
 const models = app.set('models');
 const roles = require('../server/constants/roles');
 

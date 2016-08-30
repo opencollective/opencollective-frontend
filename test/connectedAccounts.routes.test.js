@@ -1,4 +1,4 @@
-const app = require('../index');
+const app = require('../server/index');
 const config = require('config');
 const request = require('supertest');
 const utils = require('./utils')();

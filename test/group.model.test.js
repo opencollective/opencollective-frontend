@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import app from '../index';
+import app from '../server/index';
 
 const utils = require('../test/utils.js')();
 
