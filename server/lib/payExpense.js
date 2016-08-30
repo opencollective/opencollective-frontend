@@ -1,6 +1,7 @@
 import config from 'config';
 import Promise from 'bluebird';
 import uuid from 'node-uuid';
+import errors from './errors';
 
 export default app => {
   const services = {

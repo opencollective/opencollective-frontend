@@ -4,7 +4,7 @@ import Promise from 'bluebird';
 
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
-import twitter from './twitter';
+import {tweetActivity} from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
 
@@ -44,7 +44,7 @@ export default (Sequelize, activity) => {
         } else if (notifConfig.channel === 'slack') {
           return publishToSlack(activity, notifConfig.webhookUrl, {});
         } else if (notifConfig.channel === 'twitter') {
-          return twitter.tweetActivity(Sequelize, activity);
+          return tweetActivity(Sequelize, activity);
         } else if (notifConfig.channel === 'email') {
           return emailLib.sendMessageFromActivity(activity, notifConfig);
         } else {

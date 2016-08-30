@@ -23,6 +23,7 @@ export default function(properties) {
         try { // Try to parse if JSON
           value = JSON.parse(value);
         } catch (e) {
+          // ignore error: leave value as it is
         }
 
         req.required[prop] = value;
@@ -35,4 +36,4 @@ export default function(properties) {
 
     next();
   };
-};
+}

@@ -58,4 +58,4 @@ export default function(Sequelize, DataTypes) {
   });
 
   return UserGroup;
-};
+}

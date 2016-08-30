@@ -1,4 +1,8 @@
 // You can also omit the eslint-config- and it will be automatically assumed by ESLint:
 {
-    "extends": "opencollective"
+  "extends": "opencollective",
+  "rules": {
+    // console logs are OK in Node
+    "no-console": 0
+  }
 }

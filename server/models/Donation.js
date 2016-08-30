@@ -1,4 +1,4 @@
-import donationsLib from '../lib/donations';
+import {processDonation} from '../lib/donations';
 import {type} from '../constants/transactions';
 
 const donationType = type.DONATION;
@@ -112,7 +112,7 @@ export default function(Sequelize, DataTypes) {
 
     hooks: {
       afterCreate: function(donation) {
-        return donationsLib.processDonation(Sequelize, donation);
+        return processDonation(Sequelize, donation);
       }
     }
   });

@@ -1,5 +1,5 @@
 import config from 'config';
-import { Unauthorized } from '../lib/errors';
+import errors from '../lib/errors';
 import jwt from 'jsonwebtoken';
 
 const { secret } = config.keys.opencollective;
@@ -18,7 +18,7 @@ export default (req, res, next) => {
     const token = parts[1];
 
     if (!/^Bearer$/i.test(scheme) || !token) {
-      return next(new Unauthorized('Format is Authorization: Bearer [token]'));
+      return next(new errors.Unauthorized('Format is Authorization: Bearer [token]'));
     }
 
     jwt.verify(token, secret, (err, decoded) => {
@@ -27,7 +27,7 @@ export default (req, res, next) => {
         req.jwtExpired = true;
         req.jwtPayload = jwt.decode(token, secret); // we need to decode again
       } else if (err) {
-        return next(new Unauthorized(err.message));
+        return next(new errors.Unauthorized(err.message));
       } else {
         req.jwtPayload = decoded;
       }

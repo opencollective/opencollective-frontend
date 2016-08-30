@@ -53,4 +53,4 @@ export default function(app) {
     upload
   };
 
-};
+}

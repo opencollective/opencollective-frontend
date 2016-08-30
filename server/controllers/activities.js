@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-import utils from '../lib/utils';
+import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import _ from 'lodash';
 
 /**
@@ -37,7 +37,7 @@ export default (app) => {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            Link: utils.getLinkHeader(utils.getRequestedUrl(req),
+            Link: getLinkHeader(getRequestedUrl(req),
                                         req.pagination)
           });
 
@@ -64,8 +64,7 @@ export default (app) => {
           // Set headers for pagination.
           req.pagination.total = activities.count;
           res.set({
-            Link: utils.getLinkHeader(utils.getRequestedUrl(req),
-                                        req.pagination)
+            Link: getLinkHeader(getRequestedUrl(req), req.pagination)
           });
 
           res.send(activities.rows);

@@ -22,7 +22,7 @@ export default {
     let provider = '';
     let connectedAccountUsername = '';
     let title = '';
-    const connectedAccountLink = '';
+    let connectedAccountLink = '';
     let lastEditedById = 0;
 
 
@@ -72,7 +72,7 @@ export default {
       ({ provider } = activity.data.connectedAccount);
       connectedAccountUsername = activity.data.connectedAccount.username;
       if (provider === 'github') {
-        connectedAccountUsernameLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
+        connectedAccountLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
       }
     }
 
@@ -104,7 +104,7 @@ export default {
       case activities.CONNECTED_ACCOUNT_CREATED:
         return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
 
-      case activities.GROUP_TRANSACTION_PAID:
+      case activities.GROUP_TRANSACTION_PAID: {
         const details = activity.data.preapprovalDetails;
         let remainingClause = '';
         if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
@@ -114,6 +114,7 @@ export default {
           remainingClause = `[Manual payment]`;
         }
         return `Expense paid on ${group}: ${currency} ${amount} for '${description}' ${remainingClause}`;
+      }
 
       case activities.USER_CREATED:
         return `New user joined: ${userString}`;
@@ -125,8 +126,7 @@ export default {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
 
       case activities.SUBSCRIPTION_CANCELED:
-        const { subscriptionId } = activity.data;
-        return `Subscription ${subscriptionId} canceled`;
+        return `Subscription ${activity.data.subscriptionId} canceled`;
 
       case activities.GROUP_CREATED:
         return `New group created: ${group} by ${userString}`;

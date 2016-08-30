@@ -1,5 +1,5 @@
 import async from 'async';
-import utils from '../lib/utils';
+import {appendTier, paginateOffset} from '../lib/utils';
 import Promise from 'bluebird';
 import json2csv from 'json2csv';
 import moment from 'moment';
@@ -28,7 +28,7 @@ export default function(app) {
      */
     fetchUsers: (req, res, next) => {
       queries.getUsersFromGroupWithTotalDonations(req.group.id)
-        .then(users => utils.appendTier(users, req.group.tiers))
+        .then(users => appendTier(users, req.group.tiers))
         .then(users => {
           req.users = users;
         })
@@ -45,8 +45,8 @@ export default function(app) {
       return (req, res, next) => {
 
         switch (format) {
-          case 'csv':
-            const { send } = res;
+          case 'csv': {
+            const {send} = res;
             res.send = (data) => {
               data = _.map(data, (row) => {
                 if (row.createdAt)
@@ -60,7 +60,7 @@ export default function(app) {
               });
             }
             return next();
-
+          }
           default:
             return next();
         }
@@ -329,7 +329,7 @@ export default function(app) {
         perPage = (perPage < options.min) ? options.min : perPage;
         perPage = (perPage > options.max) ? options.max : perPage;
 
-        req.pagination = utils.paginateOffset(page, perPage);
+        req.pagination = paginateOffset(page, perPage);
 
         next();
       };
@@ -367,4 +367,4 @@ export default function(app) {
 
   };
 
-};
+}

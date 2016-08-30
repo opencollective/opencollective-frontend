@@ -11,8 +11,8 @@ import filter from 'lodash/collection/filter';
 import values from 'lodash/object/values';
 
 import roles from '../constants/roles';
-import constants from '../constants/transactions';
-import utils from '../lib/utils';
+import {HOST_FEE_PERCENT} from '../constants/transactions';
+import {getTier} from '../lib/utils';
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -88,7 +88,7 @@ export default function(Sequelize, DataTypes) {
 
     hostFeePercent: {
       type: DataTypes.FLOAT,
-      defaultValue: constants.HOST_FEE_PERCENT
+      defaultValue: HOST_FEE_PERCENT
     },
 
     createdAt: {
@@ -454,7 +454,7 @@ export default function(Sequelize, DataTypes) {
             return Promise.all(groups.map(group => {
               const appendTier = backers => {
                 backers = backers.map(backer => {
-                  backer.tier = utils.getTier(backer, group.tiers);
+                  backer.tier = getTier(backer, group.tiers);
                   return backer;
                 });
                 return backers;
@@ -483,4 +483,4 @@ export default function(Sequelize, DataTypes) {
   });
 
   return Group;
-};
+}

@@ -88,17 +88,6 @@ export default (Sequelize, DataTypes) => {
   }, {
     paranoid: true,
 
-    classMethods: {
-      createMany: (transactions, defaultValues) => {
-        return Promise.map(transactions, transaction => {
-          for (const attr in defaultValues) {
-            transaction[attr] = defaultValues[attr];
-          }
-          return Transaction.create(transaction);
-        }).catch(console.error);
-      }
-    },
-
     getterMethods: {
 
       preview() {

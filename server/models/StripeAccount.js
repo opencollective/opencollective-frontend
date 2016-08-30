@@ -26,4 +26,4 @@ export default function(Sequelize, DataTypes) {
   });
 
   return StripeAccount;
-};
+}

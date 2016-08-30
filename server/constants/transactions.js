@@ -1,8 +1,7 @@
-export default {
-	type: {
-		DONATION: 'DONATION',
-		EXPENSE: 'EXPENSE'
-	},
-	OC_FEE_PERCENT: 5,
-	HOST_FEE_PERCENT: 5
-}
+export const type = {
+  DONATION: 'DONATION',
+  EXPENSE: 'EXPENSE'
+};
+
+export const OC_FEE_PERCENT = 5;
+export const HOST_FEE_PERCENT = 5;

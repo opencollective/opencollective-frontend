@@ -249,4 +249,4 @@ export default function(app) {
       callback(null, res);
     });
   }
-};
+}

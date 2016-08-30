@@ -30,7 +30,7 @@ class Meetup {
     header += `<p><a href="https://opencollective.com/${this.group.slug}"><img src="https://opencollective.com/${this.group.slug}/${tiername}s.png?width=700"></a></p>`;
 
     return header;
-  };
+  }
 
   updateMeetupDescription(eventId, description) {
     return requestPromise({
@@ -71,8 +71,8 @@ class Meetup {
         return Promise.reject(new errors.ValidationFailed(error));
       });
 
-  };
+  }
 
-};
+}
 
 export default Meetup;

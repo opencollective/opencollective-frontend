@@ -13,7 +13,7 @@ import base64url from 'base64url';
 /**
  * Encrypt with resetPasswordSecret
  */
-const encrypt = (text) => {
+export const encrypt = (text) => {
   const cipher = crypto.createCipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   let crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
@@ -23,7 +23,7 @@ const encrypt = (text) => {
 /**
  * Descript wih resetPasswordSecret
  */
-const decrypt = (text) => {
+export const decrypt = (text) => {
   const decipher = crypto.createDecipher('aes-256-cbc', config.keys.opencollective.resetPasswordSecret)
   let dec = decipher.update(text,'hex','utf8')
   dec += decipher.final('utf8');
@@ -34,12 +34,12 @@ const decrypt = (text) => {
  * Generate a secured token that works inside URLs
  * http://stackoverflow.com/a/25690754
  */
-const generateURLSafeToken = size => base64url(crypto.randomBytes(size));
+export const generateURLSafeToken = size => base64url(crypto.randomBytes(size));
 
 /**
  * Get current Url.
  */
-const getRequestedUrl = (req) => {
+export const getRequestedUrl = (req) => {
   return `${req.protocol}://${req.get('Host')}${req.url}`;
 };
 
@@ -110,7 +110,7 @@ const getLinks = (url, options) => {
 /**
  * Get headers for pagination.
  */
-const getLinkHeader = (url, options) => {
+export const getLinkHeader = (url, options) => {
   const links = getLinks(url, options);
   let header = '';
   let k = 0;
@@ -129,14 +129,14 @@ const getLinkHeader = (url, options) => {
  *
  * 'USD-MONTH-1000'
  */
-const planId = (plan) =>  {
+export const planId = (plan) =>  {
   return [plan.currency, plan.interval, plan.amount].join('-').toUpperCase();
 };
 
 /**
  * Pagination offset: from (page,per_page) to (offset, limit).
  */
-const paginateOffset = (page, perPage) => {
+export const paginateOffset = (page, perPage) => {
   return {
     offset: (page - 1) * perPage,
     limit: perPage
@@ -146,13 +146,12 @@ const paginateOffset = (page, perPage) => {
 /**
  * Try to find in which tier a backer falls into based on the tiers definition
  */
-const getTier = (user, tiers) => {
+export const getTier = (user, tiers) => {
 
   let defaultTier;
   switch (user.role) {
     case 'MEMBER':
       return 'contributor';
-      break;
     case 'HOST':
       defaultTier = 'host';
       break;
@@ -178,7 +177,7 @@ const getTier = (user, tiers) => {
 /**
  * Append tier to each backer in an array of backers
  */
-const appendTier = (backers, tiers) => {
+export const appendTier = (backers, tiers) => {
   backers = backers.map((backer) => {
     backer.tier = getTier(backer, tiers);
     return backer;
@@ -189,7 +188,7 @@ const appendTier = (backers, tiers) => {
 /**
  * Default host id, set this for new groups created through Github
  */
-const defaultHostId = () => {
+export const defaultHostId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
     return 772;
   }
@@ -200,7 +199,7 @@ const defaultHostId = () => {
  * Check if this is an internal email address.
  * Useful for testing emails in localhost or staging
  */
-const isEmailInternal = (email) => {
+export const isEmailInternal = (email) => {
   if (email.toLowerCase().indexOf('@opencollective.com') != -1 ||
     email.toLowerCase().indexOf('@opencollective.org') != -1) {
     return true;
@@ -211,4 +210,4 @@ const isEmailInternal = (email) => {
 /**
  * Export public methods.
  */
-export default { paginateOffset, getRequestedUrl, addParameterUrl, getLinks, generateURLSafeToken, getLinkHeader, planId, encrypt, getTier, appendTier, decrypt, defaultHostId, isEmailInternal };
+export default { addParameterUrl, getLinks };

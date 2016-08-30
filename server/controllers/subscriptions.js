@@ -126,4 +126,4 @@ export default function(app) {
     getAll,
     cancel
   };
-};
+}

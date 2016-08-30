@@ -38,7 +38,7 @@ export default function(Sequelize, DataTypes) {
   });
 
   return Notification;
-};
+}
 
 /*
 Types:

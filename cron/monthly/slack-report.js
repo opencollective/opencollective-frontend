@@ -1,14 +1,14 @@
-import app from '../../index';
-const models = app.set('models');
 import _ from 'lodash';
+import models, {sequelize} from '../../server/models';
 import roles from '../../server/constants/roles';
-import twitter from '../../server/lib/twitter';
+import {tweetStatus} from '../../server/lib/twitter';
+
 onlyExecuteInProdOn1stDayOfTheMonth();
 
 
 models.Group.findAll().map(group => getBackers(group)
   .then(backers => getStatus(group, backers))
-  .then(status => status && twitter.tweetStatus(models.sequelize, group.id, status)))
+  .then(status => status && tweetStatus(sequelize, group.id, status)))
 .then(() => {
   console.log('Monthly reporting done!');
   process.exit();
@@ -26,7 +26,7 @@ function onlyExecuteInProdOn1stDayOfTheMonth() {
 }
 
 function getBackers(group) {
-  return models.sequelize.query(`
+  return sequelize.query(`
         SELECT
           ug."UserId" as id,
           u."twitterHandle" as "twitterHandle"
@@ -37,7 +37,7 @@ function getBackers(group) {
         AND ug."deletedAt" IS NULL
       `, {
     replacements: { GroupId: group.id },
-    type: models.sequelize.QueryTypes.SELECT
+    type: sequelize.QueryTypes.SELECT
   });
 }
 

@@ -295,4 +295,4 @@ export default function (app) {
     const { service } = req.params;
     return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
   }
-};
+}

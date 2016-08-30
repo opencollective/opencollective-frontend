@@ -7,7 +7,7 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
-import utils from '../lib/utils';
+import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import roles from '../constants/roles';
 import transactions from '../lib/transactions';
 import paypalImport from './paypal';
@@ -66,7 +66,7 @@ export default (app) => {
       .then(expenses => {
         // Set headers for pagination.
         req.pagination.total = expenses.count;
-        res.set({ Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination) });
+        res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
         res.send(_.pluck(expenses.rows, 'info'));
       })
       .catch(next);

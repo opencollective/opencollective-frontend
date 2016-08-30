@@ -21,4 +21,4 @@ export default function(param, value) {
       return next(new errors.ValidationFailed('bad_parameter_value', param));
     }
   };
-};
+}

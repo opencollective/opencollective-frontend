@@ -5,9 +5,10 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import errors from '../lib/errors';
-import utils from '../lib/utils';
+import {decrypt, encrypt} from '../lib/utils';
 import config from 'config';
 import moment from 'moment';
+import Promise from 'bluebird';
 
 /**
  * Constants.
@@ -249,7 +250,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       encryptId() {
-        return utils.encrypt(String(this.id));
+        return encrypt(String(this.id));
       },
 
       generateResetUrl(plainToken) {
@@ -334,7 +335,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       decryptId(encrypted) {
-        return utils.decrypt(encrypted);
+        return decrypt(encrypted);
       }
     }
 

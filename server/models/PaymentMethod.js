@@ -78,4 +78,4 @@ export default function(Sequelize, DataTypes) {
   PaymentMethod.payoutMethods = payoutMethods;
 
   return PaymentMethod;
-};
+}

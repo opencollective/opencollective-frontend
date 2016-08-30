@@ -12,7 +12,7 @@ const sinon = require('sinon');
 const app = require('../server/index');
 const roles = require('../server/constants/roles');
 const activities = require('../server/constants/activities');
-const constants = require('../server/constants/transactions');
+const type = require('../server/constants/transactions').type;
 const utils = require('../test/utils.js')();
 const generatePlanId = require('../server/lib/utils.js').planId;
 
@@ -258,7 +258,7 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
           expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
-          expect(transaction.type).to.be.equal(constants.type.DONATION);
+          expect(transaction.type).to.be.equal(type.DONATION);
           expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
           expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
           expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 140);
@@ -327,7 +327,7 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
               expect(transaction.approved).to.be.true;
               expect(transaction.currency).to.be.equal(CURRENCY);
-              expect(transaction.type).to.be.equal(constants.type.DONATION);
+              expect(transaction.type).to.be.equal(type.DONATION);
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
               expect(transaction.interval).to.be.equal('month');
 

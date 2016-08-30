@@ -3,7 +3,7 @@ const transactions = require('../constants/transactions');
 const roles = require('../constants/roles');
 const emailLib = require('./email');
 
-const processDonation = (Sequelize, donation) => {
+export const processDonation = (Sequelize, donation) => {
 
   const services = {
 
@@ -150,7 +150,3 @@ const processDonation = (Sequelize, donation) => {
         )
     });
 };
-
-module.exports = {
-  processDonation
-}

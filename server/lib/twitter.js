@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import Twitter from 'twitter';
 import activityType from '../constants/activities';
 
-function tweetActivity(Sequelize, activity) {
+export function tweetActivity(Sequelize, activity) {
   if (activity.type === activityType.GROUP_TRANSACTION_CREATED
     && activity.data.transaction.amount > 0
     // users without twitterHandle are ignored
@@ -17,7 +17,7 @@ function tweetActivity(Sequelize, activity) {
   }
 }
 
-function tweetStatus(Sequelize, GroupId, status) {
+export function tweetStatus(Sequelize, GroupId, status) {
   return Sequelize.models.ConnectedAccount.findOne({
     where: {
       GroupId,
@@ -40,5 +40,3 @@ function tweetStatus(Sequelize, GroupId, status) {
     }
   });
 }
-
-export { tweetActivity, tweetStatus };

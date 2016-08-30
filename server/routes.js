@@ -9,6 +9,7 @@ import authorization from './middleware/security/authorization';
 import errorHandler from './middleware/error_handler';
 import cache from './middleware/cache';
 import * as params from './middleware/params';
+import errors from './lib/errors';
 
 /**
  * NotImplemented response.

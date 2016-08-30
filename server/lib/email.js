@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import debugLib from 'debug';
 import templates from './emailTemplates';
 import activities from '../constants/activities';
-import utils from './utils';
+import {isEmailInternal} from './utils';
 import crypto from 'crypto';
 
 const debug = debugLib('email');
@@ -49,7 +49,7 @@ const sendMessage = (recipient, subject, html, options) => {
   debug("email: ", recipient, subject, html, options);
 
   // if not in production, only send out emails to bcc'd opencollective address
-  if (process.env.NODE_ENV !== 'production' && !utils.isEmailInternal(recipient)) {
+  if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
     recipient = '';
   }
 

@@ -22,7 +22,7 @@ export default function(Sequelize, DataTypes) {
   });
 
   return Activity;
-};
+}
 
 
 /*

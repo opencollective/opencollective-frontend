@@ -168,4 +168,4 @@ export default function (Sequelize, DataTypes) {
   });
   Temporal(Expense, Sequelize);
   return Expense;
-};
+}

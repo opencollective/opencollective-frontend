@@ -209,4 +209,4 @@ export default function(app) {
     generateTestEmail
   };
 
-};
+}

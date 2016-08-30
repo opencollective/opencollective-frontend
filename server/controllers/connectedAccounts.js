@@ -32,14 +32,14 @@ export default (app) => {
       const provider = req.params.service;
 
       switch (provider) {
-        case 'github':
-          const attrs = { provider };
+        case 'github': {
+          const attrs = {provider};
           let caId, user;
           const utmSource = req.query.utm_source;
           const avatar = `http://avatars.githubusercontent.com/${data.profile.username}`;
           // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
           // https://github.com/sequelize/sequelize/issues/4631
-          return User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) }}})
+          return User.findOne({where: {email: {$in: emails.map(email => email.toLowerCase())}}})
             .then(u => u || User.create({
               name: data.profile.displayName,
               avatar,
@@ -47,19 +47,18 @@ export default (app) => {
             }))
             .tap(u => user = u)
             .tap(user => attrs.UserId = user.id)
-            .then(() => ConnectedAccount.findOne({ where: attrs }))
+            .then(() => ConnectedAccount.findOne({where: attrs}))
             .then(ca => ca || ConnectedAccount.create(attrs))
             .then(ca => {
               caId = ca.id;
-              return ca.update({ username: data.profile.username, secret: accessToken });
+              return ca.update({username: data.profile.username, secret: accessToken});
             })
             .then(() => {
               const token = user.generateConnectedAccountVerifiedToken(req.application, caId, data.profile.username);
               res.redirect(`${config.host.website}/github/apply/${token}?utm_source=${utmSource}`);
             })
             .catch(next);
-          break;
-
+        }
         case 'meetup':
           createConnectedAccountForGroup(req.query.slug, provider)
             .then(ca => ca.update({

@@ -32,4 +32,4 @@ export default function(app) {
     region: 'us-west-1'
   });
 
-};
+}

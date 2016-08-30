@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import utils from '../lib/utils';
+import {appendTier, defaultHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
 import Promise from 'bluebird';
 import moment from 'moment';
 import roles from '../constants/roles';
@@ -90,7 +90,7 @@ export default function(app) {
 
   const getUserData = (groupId, tiers) => {
     return queries.getUsersFromGroupWithTotalDonations(groupId)
-      .then(backers => utils.appendTier(backers, tiers))
+      .then(backers => appendTier(backers, tiers))
   };
 
   const getUsers = (req, res, next) => {
@@ -175,7 +175,7 @@ export default function(app) {
         // Set headers for pagination.
         req.pagination.total = transactions.count;
         res.set({
-          Link: utils.getLinkHeader(utils.getRequestedUrl(req), req.pagination)
+          Link: getLinkHeader(getRequestedUrl(req), req.pagination)
         });
 
         res.send(_.pluck(transactions.rows, 'info'));
@@ -374,7 +374,7 @@ export default function(app) {
           }
         }))
         .then(() => _addUserToGroup(dbGroup, creator, options))
-        .then(() => User.findById(utils.defaultHostId())) // make sure the host exists
+        .then(() => User.findById(defaultHostId())) // make sure the host exists
         .then(hostUser => {
           if (hostUser) {
             return _addUserToGroup(dbGroup, hostUser, {role: roles.HOST, remoteUser: creator})
@@ -617,4 +617,4 @@ export default function(app) {
     getLeaderboard
   };
 
-};
+}

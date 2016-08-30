@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Stripe from 'stripe';
 
-import utils from '../lib/utils';
+import {planId} from '../lib/utils';
 
 /**
  * Get the stripe client for the connected account
@@ -13,10 +13,10 @@ const client = stripeAccount => Stripe(stripeAccount.accessToken);
  */
 const getOrCreatePlan = (stripeAccount, plan) => {
   const stripeClient = client(stripeAccount);
-  const planId = utils.planId(plan);
+  const id = planId(plan);
 
-  plan.id = planId;
-  plan.name = planId;
+  plan.id = id;
+  plan.name = id;
 
   return stripeClient.plans.retrieve(plan.id)
     .catch((err) => {

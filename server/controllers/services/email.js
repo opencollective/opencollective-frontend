@@ -71,7 +71,7 @@ export default (app) => {
 
     return fetchSubscribers(slug, type)
     .tap(subscribers => {
-      if (subscribers.length === 0) return mailinglistNotFound(recipient);
+      if (subscribers.length === 0) throw new errors.NotFound(`No subscribers found in ${slug} for email type ${type}`);
     })
     .then(results => results.map(r => r.User.email))
     .then(recipients => {
