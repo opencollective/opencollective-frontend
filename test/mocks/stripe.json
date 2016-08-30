@@ -73,6 +73,15 @@
       "balance_transaction": "txn_165j8oIqnMN1wWwOKlPn1D4y",
       "customer": "cus_6IJf9vLMFVsKzX",
       "metadata": {}
+    },
+
+    "createError": {
+      "type": "StripePaymentMethodError",
+      "rawType": "card_error",
+      "code": "card_declined",
+      "message": "Your paymentMethod was declined",
+      "detail": {},
+      "raw": {}
     }
 
   },

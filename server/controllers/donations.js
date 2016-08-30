@@ -1,15 +1,15 @@
 /**
  * Dependencies.
  */
+
+import Promise from 'bluebird';
 import roles from '../constants/roles';
 import _ from 'lodash';
 import config from 'config';
 import async from 'async';
 import usersController from '../controllers/users';
-import emailLib from '../lib/email';
-import {stripe, paypal} from '../gateways';
+import {paypal} from '../gateways';
 import activities from '../constants/activities';
-import constants from '../constants/transactions';
 
 /**
  * Controller.
@@ -23,7 +23,6 @@ export default (app) => {
   const { errors } = app;
   const users = usersController(app);
 
-
   const getOrCreateUser = (attributes, cb) => {
      return models.User.findOne({
         where: {
@@ -36,11 +35,12 @@ export default (app) => {
   };
 
   const stripeDonation = (req, res, next) => {
+
     const { payment } = req.required;
     const { user } = req;
-    const { email } = payment;
     const { group } = req;
     const { interval } = payment;
+
     const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
     const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
     const currency = payment.currency || group.currency;
@@ -59,253 +59,52 @@ export default (app) => {
       return next(new errors.BadRequest('Payment Amount missing.'));
     }
 
-    async.auto({
+    let paymentMethod;
 
-      getGroupStripeAccount(cb) {
-        req.group.getStripeAccount()
-          .then((stripeAccount) => {
-            if (!stripeAccount || !stripeAccount.accessToken) {
-              return cb(new errors.BadRequest(`The host for the collective id ${req.group.id} has no Stripe account set up`));
-            }
-
-            if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
-              return cb(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
-            }
-
-            cb(null, stripeAccount);
-          })
-          .catch(cb);
-      },
-
-      getOrCreatePaymentMethod: ['getGroupStripeAccount', (cb) => {
-        models.PaymentMethod.getOrCreate({
-          token: payment.stripeToken,
-          service: 'stripe',
-          UserId: user.id
-        })
-        .tap(paymentMethod => cb(null, paymentMethod))
-        .catch(cb);
-      }],
-
-      createCustomer: ['getOrCreatePaymentMethod', (cb, results) => {
-        const paymentMethod = results.getOrCreatePaymentMethod;
-
-        if (paymentMethod.customerId) {
-          return cb(null, results.getOrCreatePaymentMethod);
-        }
-
-        // Otherwise, create a customer on Stripe and add to paymentMethod
-        stripe.createCustomer(
-          results.getGroupStripeAccount,
-          payment.stripeToken, {
-            email,
-            group
-          })
-          .tap((customer) => paymentMethod.update({customerId: customer.id}))
-          .then((customer) => cb(null, customer))
-          .catch(cb);
-      }],
-
-      createCharge: ['createCustomer', (cb, results) => {
-        const paymentMethod = results.getOrCreatePaymentMethod;
-
-        /**
-         * Subscription
-         */
-        if (isSubscription) {
-          const plan = {
-            interval,
-            amount: amountInt,
-            currency
-          };
-
-          stripe.getOrCreatePlan(results.getGroupStripeAccount, plan)
-            .then(plan => {
-              const subscription = {
-                plan: plan.id,
-                application_fee_percent: constants.OC_FEE_PERCENT,
-                metadata: {
-                  groupId: group.id,
-                  groupName: group.name,
-                  paymentMethodId: paymentMethod.id,
-                  description: `OpenCollective: ${group.slug}`
-                }
-              };
-
-              return stripe.createSubscription(
-                results.getGroupStripeAccount,
-                paymentMethod.customerId,
-                subscription
-              );
-            })
-            .then(subscription => cb(null, subscription))
-            .catch(cb);
-
-        } else {
-
-          /**
-           * For one-time donation
-           */
-          const charge = {
-            amount: amountInt,
-            currency,
-            customer: paymentMethod.customerId,
-            description: `OpenCollective: ${group.slug}`,
-            application_fee: parseInt(amountInt*constants.OC_FEE_PERCENT/100, 10),
-            metadata: {
-              groupId: group.id,
-              groupName: group.name,
-              customerEmail: email,
-              paymentMethodId: paymentMethod.id
-            }
-          };
-
-          stripe.createCharge(results.getGroupStripeAccount, charge)
-            .then(charge => cb(null, charge))
-            .catch(cb);
-        }
-      }],
-
-      // Create donation first
-      createDonation: ['createCharge', (cb, results) => {
-        const charge = results.createCharge;
-
-        const donation = {
-          UserId: user.id,
-          GroupId: group.id,
-          currency,
-          amount: amountInt,
-          title: `Donation to ${group.name}`
-        };
-
-        models.Donation.create(donation)
-          .then(donation => {
-            if (isSubscription) {
-              const subscription = {
-                amount: amountFloat,
-                currency,
-                interval,
-                stripeSubscriptionId: charge.id,
-                data: charge
-              };
-              return donation
-                .createSubscription(subscription)
-                .then(() => cb(null, donation));
-            } else {
-              return cb(null, donation);
-            }
-          })
-          .catch(cb);
-      }],
-
-      retrieveBalanceTransaction: ['createCharge', (cb, results) => {
-        if (isSubscription) {
-          return cb();
-        } else {
-          const charge = results.createCharge;
-          stripe.retrieveBalanceTransaction(results.getGroupStripeAccount, charge.balance_transaction)
-          .then(balanceTransaction => cb(null, balanceTransaction))
-          .catch(cb);
-        }
-      }],
-
-      // Create the first transaction associated with that Donation, if this is not a subscription
-      createTransaction: ['createDonation', 'retrieveBalanceTransaction', (cb, results) => {
-
-        // If this is a subscription, wait for webhook to create a Transaction
-        if (isSubscription) {
-          return cb();
-        }
-
-        // Create a transaction for this one-time payment
-        const { user } = req;
-        const charge = results.createCharge;
-        const paymentMethod = results.getOrCreatePaymentMethod;
-        const balanceTransaction = results.retrieveBalanceTransaction
-        const fees = stripe.extractFees(balanceTransaction);
-        const { hostFeePercent } = group;
-        const payload = {
-          user,
-          group,
-          paymentMethod
-        };
-
-        payload.transaction = {
-          type: constants.type.DONATION,
-          DonationId: results.createDonation.id,
+    // fetch Stripe Account and get or create Payment Method
+    return Promise.props({
+      stripeAccount: req.group.getStripeAccount(),
+      paymentMethod: models.PaymentMethod.getOrCreate({
+        token: payment.stripeToken,
+        service: 'stripe',
+        UserId: user.id })
+      })
+    .then(results => {
+      const stripeAccount = results.stripeAccount;
+      if (!stripeAccount || !stripeAccount.accessToken) {
+        return Promise.reject(new errors.BadRequest(`The host for the collective slug ${req.group.slug} has no Stripe account set up`));
+      } else if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+        return Promise.reject(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+      } else {
+        paymentMethod = results.paymentMethod;
+        return Promise.resolve();
+      }
+    })
+    // create a new subscription
+    // (this needs to happen first, because of hook on Donation model)
+    .then(() => {
+      if (isSubscription) {
+        return models.Subscription.create({
           amount: amountFloat,
           currency,
-          txnCurrency: balanceTransaction.currency,
-          amountInTxnCurrency: balanceTransaction.amount,
-          txnCurrencyFxRate: amountInt/balanceTransaction.amount,
-          hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
-          platformFeeInTxnCurrency: fees.applicationFee,
-          paymentProcessorFeeInTxnCurrency: fees.stripeFee,
-          data: {charge, balanceTransaction},
-
-          paidby: user && user.id, // remove #postmigration
-          description: `Donation to ${group.name}`, // remove #postmigration
-          tags: ['Donation'], // remove #postmigration
-          approved: true, // remove #postmigration
-          interval // remove #postmigration
-        };
-
-        models.Transaction.createFromPayload(payload)
-        .then(t => cb(null, t))
-        .catch(cb)
-      }],
-
-      sendThankYouEmail: ['createDonation', (cb, results) => {
-        const { user } = req;
-        const donation = results.createDonation;
-        const data = {
-          donation: donation.info,
-          user: user.info,
-          group: group.info,
-          interval,
-          subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
-        }
-
-        emailLib.send('thankyou', user.email, data);
-        cb();
-      }],
-
-      addUserToGroup: ['createDonation', (cb) => {
-        const { user } = req;
-        models.UserGroup.findOne({
-          where: {
-            GroupId: group.id,
-            UserId: user.id,
-            role: roles.BACKER
-          }
+          interval
         })
-        .tap((userGroup) => {
-          if (!userGroup)
-            group
-              .addUserWithRole(user, roles.BACKER)
-              .tap(() => cb())
-              .catch(cb);
-          else {
-            return cb();
-          }
-        })
-        .catch(cb);
-      }]
-
-    }, (e) => {
-
-      if (e) {
-        e.payload = req.body;
-        if (e.detail) {
-          e.message = e.detail.message;
-          e.type = e.detail.type;
-        }
-        return next(new errors.CustomError(e.code || e.statusCode, e.type, e.message));
+      } else {
+        return Promise.resolve();
       }
-
-      res.send({success: true, user: user.info, hasFullAccount});
-    });
-
+    })
+    // create a new donation
+    .then(subscription => models.Donation.create({
+        UserId: user.id,
+        GroupId: group.id,
+        currency: currency,
+        amount: amountInt,
+        title: `Donation to ${group.name}`,
+        PaymentMethodId: paymentMethod.id,
+        SubscriptionId: subscription && subscription.id
+      }))
+    .then(() => res.send({success: true, user: req.user.info, hasFullAccount: hasFullAccount}))
+    .catch(next);
   };
 
   const paypalDonation = (req, res, next) => {
@@ -334,13 +133,17 @@ export default (app) => {
       },
 
       createSubscription: ['getConnectedAccount', (cb) => {
-        models.Subscription.create({
-            amount: amountFloat,
-            currency,
-            interval
-          })
-        .then(subscription => cb(null, subscription))
-        .catch(cb)
+        if (isSubscription) {
+          models.Subscription.create({
+              amount: amountFloat,
+              currency,
+              interval
+            })
+          .then(subscription => cb(null, subscription))
+          .catch(cb)
+        } else {
+          cb();
+        }
       }],
 
       // We create the transaction beforehand to have the id in the return url when
@@ -370,7 +173,7 @@ export default (app) => {
 
         models.Transaction.createFromPayload(payload)
         .then(t => cb(null, t))
-        .catch(cb)
+        .catch(cb);
       }],
 
       callPaypal: ['createTransaction', (cb, results) => {

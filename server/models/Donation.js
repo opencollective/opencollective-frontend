@@ -1,3 +1,4 @@
+import donationsLib from '../lib/donations';
 import {type} from '../constants/transactions';
 
 const donationType = type.DONATION;
@@ -43,7 +44,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     amount: {
-      type:DataTypes.INTEGER, // In cents
+      type: DataTypes.INTEGER, // In cents
       min: 0
     },
 
@@ -68,6 +69,13 @@ export default function(Sequelize, DataTypes) {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },
+
+    isProcessed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+
+    processedAt: DataTypes.DATE,
 
     createdAt: {
       type: DataTypes.DATE,
@@ -99,6 +107,12 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      }
+    },
+
+    hooks: {
+      afterCreate: function(donation) {
+        return donationsLib.processDonation(Sequelize, donation);
       }
     }
   });

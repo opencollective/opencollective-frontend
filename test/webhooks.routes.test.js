@@ -180,14 +180,14 @@ describe('webhooks.routes.test.js', () => {
       models.Donation.findAndCountAll({
           include: [
             {
-              model: models.Subscription,
-              where: { stripeSubscriptionId: webhookSubscription.id }
+              model: models.Subscription
             }
           ]
         })
         .tap((res) => {
           expect(res.count).to.equal(1);
           donation = res.rows[0];
+          expect(donation.isProcessed).to.equal(true);
           done();
         })
         .catch(done);

@@ -223,6 +223,22 @@ export default function(Sequelize, DataTypes) {
         });
       },
 
+      findOrAddUserWithRole(user, role) {
+        return Sequelize.models.UserGroup.find({
+          where: {
+            role,
+            UserId: user.id,
+            GroupId: this.id
+          }})
+        .then(userGroup => {
+          if (!userGroup) {
+            return this.addUserWithRole(user, role)
+          } else {
+            return userGroup;
+          }
+        });
+      },
+
       getStripeAccount() {
         return Sequelize.models.UserGroup.find({
           where: {

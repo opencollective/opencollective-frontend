@@ -109,12 +109,11 @@ describe("email.routes.test", () => {
         expect(spy.args[0][3].bcc).to.equal(usersData[0].email);
       });
   });
-  
-  it("forwards the email for approval to the core members", () => {
 
+  it("forwards the email for approval to the core members", () => {
     const spy = sandbox.spy(emailLib, 'send');
 
-   return request(app)
+    return request(app)
       .post('/webhooks/mailgun')
       .send(webhookBody)
       .then((res) => {
