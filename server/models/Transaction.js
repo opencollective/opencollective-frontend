@@ -111,7 +111,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       isDonation() {
-        return (_.contains(this.tags, 'Donation') || _.contains(this.tags, 'Fund'));
+        return this.amount > 0;
       },
 
       isExpense() {
