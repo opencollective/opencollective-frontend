@@ -3,7 +3,7 @@
   "version": "0.0.136",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
-  "main": "index.js",
+  "main": "server/index.js",
   "engines": {
     "node": "6.2.2",
     "npm": "3.10.5"
@@ -91,8 +91,11 @@
     "supertest-as-promised": "3.1.0"
   },
   "scripts": {
-    "start": "babel-node .",
-    "dev": "nodemon -x babel-node . -e js,hbs",
+    "start": "node ./dist/index.js",
+    "dev": "nodemon server/index.js -x babel-node . -e js,hbs",
+    "clean": "rm -rf dist && mkdir dist",
+    "build-server": "babel server -d ./dist",
+    "build": "npm run clean && npm run build-server",
     "hint": "eslint '**/*.js' --quiet",
     "nsp": "nsp check",
     "pretest": "npm run hint",
