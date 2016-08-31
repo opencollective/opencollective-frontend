@@ -4,7 +4,6 @@
 import _ from 'lodash';
 import Joi from 'joi';
 import config from 'config';
-import errors from '../lib/errors';
 import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import filter from 'lodash/collection/filter';
@@ -273,12 +272,13 @@ export default function(Sequelize, DataTypes) {
         })
         .then((userGroup) => {
           if (!userGroup) {
-            throw new errors.NotFound(`No group with ID ${this.id} and host user found`);
+            return null;
           }
 
           return models.ConnectedAccount.find({
             where: {
-              UserId: userGroup.UserId
+              UserId: userGroup.UserId,
+              provider: 'paypal',
             }
           });
         });

@@ -33,8 +33,7 @@ describe('stripe.routes.test.js', () => {
       .post('/groups')
       .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
-        group: utils.data('group1'),
-        role: roles.HOST
+        group: Object.assign(utils.data('group1'), { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e, res) => {

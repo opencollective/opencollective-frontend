@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
@@ -217,6 +218,35 @@ export default function (app) {
             this._authenticateUserByJwt(req, res, next);
           });
         });
+      }
+    },
+
+    authenticateInternalUserByJwt() {
+      return (req, res, next) => {
+        this.parseJwtNoExpiryCheck(req, res, (e) => {
+          if (e) {
+            return next(e);
+          }
+          this.checkJwtExpiry(req, res, (e) => {
+            if (e) {
+              return next(e);
+            }
+            this._authenticateUserByJwt(req, res, (e) => {
+              if (e) {
+                return next(e);
+              }
+              this._authenticateInternalUserById(req, res, next);
+            });
+          });
+        });
+      }
+    },
+
+    _authenticateInternalUserById: (req, res, next) => {
+      if (_.contains([1,2,8,30,40,212,772], req.jwtPayload.sub)) {
+        next();
+      } else {
+        throw new Unauthorized();
       }
     },
 

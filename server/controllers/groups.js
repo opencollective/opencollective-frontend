@@ -291,35 +291,28 @@ export default function(app) {
    * Create a group.
    */
   const create = (req, res, next) => {
-    let group;
-    Group
-      .create(req.required.group)
-      .tap(g => group = g)
-      .then(() => Activity.create({
+    const { group } = req.required;
+    const { users = [] } = group;
+
+    return Group
+      .create(group)
+      .tap(g => Activity.create({
         type: activities.GROUP_CREATED,
         UserId: req.remoteUser.id,
-        GroupId: group.id,
+        GroupId: g.id,
         data: {
-          group: group.info,
+          group: g.info,
           user: req.remoteUser.info
         }
       }))
-      .then(activity => {
-        // Add caller to the group if `role` specified.
-        const { role } = req.body;
-
-        if (!role) {
-          return activity;
-        }
-
-        const options = {
-          role,
-          remoteUser: req.remoteUser
-        };
-
-        return _addUserToGroup(group, req.remoteUser, options);
+      .tap(g => {
+        return Promise.map(users, user => {
+          return User.findOne({where: { email: user.email.toLowerCase() }})
+            .then(u => u || User.create(user))
+            .then(u => _addUserToGroup(g, u, {role: user.role, remoteUser: req.remoteUser}))
+        })
       })
-      .tap(() => res.send(group.info))
+      .tap(g => res.send(g.info))
       .catch(next);
   };
 
