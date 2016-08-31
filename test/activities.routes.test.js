@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 import _ from 'lodash';
 import app from '../server/index';
 import { expect } from 'chai';
@@ -8,17 +5,11 @@ import request from 'supertest';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import Promise from 'bluebird';
+import models from '../server/models';
 
-/**
- * Variables.
- */
 const groupData = utils.data('group1');
 const activitiesData = utils.data('activities1').activities;
-const models = app.set('models');
 
-/**
- * Tests.
- */
 describe('activities.routes.test.js', () => {
 
   let application;

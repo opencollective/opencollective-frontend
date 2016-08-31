@@ -1,7 +1,7 @@
 const app = require('../server/index');
 const config = require('config');
 const constants = require('../server/constants/transactions');
-const models = app.set('models');
+import models from '../server/models';
 
 /*
  * tested with:

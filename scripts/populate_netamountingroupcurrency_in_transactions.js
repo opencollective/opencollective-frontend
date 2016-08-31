@@ -1,5 +1,5 @@
 const app = require('../server/index');
-const models = app.set('models');
+import models from '../server/models';
 
 const done = (err) => {
   if (err) console.log('err', err);
