@@ -1,19 +1,14 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const _ = require('lodash');
-const config = require('config');
-const sinon = require('sinon');
-const nodemailer = require('nodemailer');
-const request = require('supertest-as-promised');
-const expect = require('chai').expect;
-const emailLib = require('../server/lib/email');
-const utils = require('../test/utils.js')();
-
-const models = app.get('models');
-const constants = require('../server/constants/activities');
-
+import app from '../server/index';
+import _ from 'lodash';
+import config from 'config';
+import sinon from 'sinon';
+import nodemailer from 'nodemailer';
+import request from 'supertest-as-promised';
+import { expect } from 'chai';
+import emailLib from '../server/lib/email';
+import * as utils from '../test/utils';
+import models from '../server/models';
+import constants from '../server/constants/activities';
 
 const userData = utils.data('user6');
 const groupData = utils.data('group1');
@@ -23,9 +18,11 @@ const notificationData = {
   active: true };
 const transactionsData = utils.data('transactions1').transactions;
 
-const User = models.User;
-const Group = models.Group;
-const Notification = models.Notification;
+const {
+  User,
+  Group,
+  Notification
+} = models;
 
 describe('lib.notifications.test.js', () => {
 
@@ -58,7 +55,7 @@ describe('lib.notifications.test.js', () => {
     nm = nodemailer.createTransport({
           name: 'testsend',
           service: 'Mailgun',
-          sendMail: function (data, callback) {
+          sendMail (data, callback) {
               callback();
           },
           logger: false
@@ -93,9 +90,9 @@ describe('lib.notifications.test.js', () => {
 
     const templateData = {
       transaction: _.extend({}, transactionsData[0]),
-      user: user,
-      group: group,
-      config: config
+      user,
+      group,
+      config
     };
 
     let subject, body;

@@ -1,27 +1,18 @@
-/**
- * Dependencies.
- */
-const nock = require('nock');
-const app = require('../server/index');
-const jwt = require('jsonwebtoken');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
-const config = require('config');
-const utils = require('../test/utils.js')();
-const stripeMock = require('./mocks/stripe');
-const Promise = require('bluebird');
+import nock from 'nock';
+import app from '../server/index';
+import jwt from 'jsonwebtoken';
+import { expect } from 'chai';
+import request from 'supertest-as-promised';
+import config from 'config';
+import * as utils from '../test/utils';
+import stripeMock from './mocks/stripe';
+import Promise from 'bluebird';
+import models from '../server/models';
+import roles from '../server/constants/roles';
 
-/**
- * Variables.
- */
 const STRIPE_URL = 'https://api.stripe.com:443';
-const models = app.set('models');
 const transactionsData = utils.data('transactions1').transactions;
-const roles = require('../server/constants/roles');
 
-/**
- * Tests.
- */
 describe('subscriptions.routes.test.js', () => {
   let group;
   let user;

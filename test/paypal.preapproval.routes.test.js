@@ -1,23 +1,14 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const app = require('../server/index');
-const async = require('async');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
-const sinon = require('sinon');
+import _ from 'lodash';
+import app from '../server/index';
+import async from 'async';
+import { expect } from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import sinon from 'sinon';
+import models from '../server/models';
+import paypalMock from './mocks/paypal';
+import paypalAdaptive from '../server/gateways/paypalAdaptive';
 
-/**
- * Variables.
- */
-const models = app.set('models');
-const paypalMock = require('./mocks/paypal');
-
-/**
- * Tests.
- */
 describe('paypal.preapproval.routes.test.js', () => {
 
   let application;
@@ -25,12 +16,12 @@ describe('paypal.preapproval.routes.test.js', () => {
   let user2;
 
   beforeEach(() => {
-    const stub = sinon.stub(app.paypalAdaptive, 'preapproval');
+    const stub = sinon.stub(paypalAdaptive, 'preapproval');
     stub.yields(null, paypalMock.adaptive.preapproval);
   });
 
   afterEach(() => {
-    app.paypalAdaptive.preapproval.restore();
+    paypalAdaptive.preapproval.restore();
   });
 
   beforeEach((done) => {
@@ -96,19 +87,19 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Check existing paymentMethods', () => {
 
       afterEach(() => {
-        app.paypalAdaptive.preapprovalDetails.restore();
+        paypalAdaptive.preapprovalDetails.restore();
       });
 
       const beforePastDate = () => {
         const date = new Date();
         date.setDate(date.getDate() - 1); // yesterday
 
-        const completed = paypalMock.adaptive.preapprovalDetails.completed;
+        const { completed } = paypalMock.adaptive.preapprovalDetails;
         const mock = _.extend(completed, {
           endingDate: date.toString()
         });
 
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, mock);
       };
 
@@ -119,7 +110,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         const paymentMethod = {
           service: 'paypal',
           UserId: user.id,
-          token: token
+          token
         };
 
         return models.PaymentMethod.create(paymentMethod)
@@ -128,7 +119,7 @@ describe('paypal.preapproval.routes.test.js', () => {
             .get(`/users/${user.id}/paypal/preapproval`)
             .set('Authorization', `Bearer ${user.jwt(application)}`)
             .expect(200))
-          .then(() => models.PaymentMethod.findAndCountAll({where: {token: token} }))
+          .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
           .tap(res => expect(res.count).to.equal(0));
       });
 
@@ -136,7 +127,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         const mock = paypalMock.adaptive.preapprovalDetails.created;
         expect(mock.approved).to.be.equal('false');
 
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       };
 
@@ -147,7 +138,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         const paymentMethod = {
           service: 'paypal',
           UserId: user.id,
-          token: token
+          token
         };
 
         return models.PaymentMethod.create(paymentMethod)
@@ -156,7 +147,7 @@ describe('paypal.preapproval.routes.test.js', () => {
             .get(`/users/${user.id}/paypal/preapproval`)
             .set('Authorization', `Bearer ${user.jwt(application)}`)
             .expect(200))
-          .then(() => models.PaymentMethod.findAndCountAll({where: {token: token} }))
+          .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
           .tap(res => expect(res.count).to.equal(0));
       });
     });
@@ -180,12 +171,12 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal COMPLETED', () => {
 
       beforeEach(() => {
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.completed);
       });
 
       afterEach(() => {
-        app.paypalAdaptive.preapprovalDetails.restore();
+        paypalAdaptive.preapprovalDetails.restore();
       });
 
       it('should fail if not the logged-in user', (done) => {
@@ -241,12 +232,12 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal CREATED', () => {
 
       beforeEach(() => {
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
       });
 
       afterEach(() => {
-        app.paypalAdaptive.preapprovalDetails.restore();
+        paypalAdaptive.preapprovalDetails.restore();
       });
 
       it('should return an error if the preapproval is not completed', (done) => {
@@ -263,12 +254,12 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       beforeEach(() => {
         const mock = paypalMock.adaptive.preapprovalDetails.error;
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(mock.error, mock);
       });
 
       afterEach(() => {
-        app.paypalAdaptive.preapprovalDetails.restore();
+        paypalAdaptive.preapprovalDetails.restore();
       });
 
       it('should return an error if paypal returns one', (done) => {
@@ -284,12 +275,12 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Preapproval details', () => {
       beforeEach(() => {
         const mock = paypalMock.adaptive.preapprovalDetails.created;
-        const stub = sinon.stub(app.paypalAdaptive, 'preapprovalDetails');
+        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
         stub.yields(mock.error, mock);
       });
 
       afterEach(() => {
-        app.paypalAdaptive.preapprovalDetails.restore();
+        paypalAdaptive.preapprovalDetails.restore();
       });
 
       it('should return the preapproval details', (done) => {

@@ -1,10 +1,10 @@
-const app = require('../server/index');
-const config = require('config');
-const request = require('supertest');
-const utils = require('./utils')();
-const expect = require('chai').expect;
+import app from '../server/index';
+import config from 'config';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import { expect } from 'chai';
+import models from '../server/models';
 
-const models = app.set('models');
 const clientId = config.github.clientID;
 
 describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {

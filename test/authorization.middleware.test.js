@@ -1,9 +1,8 @@
-const app = require('../server/index');
-const aZ = require('../server/middleware/security/authorization')(app);
-const expect = require('chai').expect;
-const moment = require('moment-timezone');
+import * as aZ from '../server/middleware/security/authorization';
+import { expect } from 'chai';
+import moment from 'moment-timezone';
 import models, {sequelize} from '../server/models';
-const utils = require('../test/utils.js')();
+import * as utils from '../test/utils';
 const userData = utils.data('user3');
 
 const expect401Callback = done => err => {

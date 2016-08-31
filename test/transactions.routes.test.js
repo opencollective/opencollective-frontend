@@ -1,26 +1,17 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const app = require('../server/index');
-const async = require('async');
-const sinon = require('sinon');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
+import _ from 'lodash';
+import app from '../server/index';
+import async from 'async';
+import sinon from 'sinon';
+import {expect} from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import models from '../server/models';
+import roles from '../server/constants/roles';
 
-/**
- * Variables.
- */
 const publicGroupData = utils.data('group1');
 const privateGroupData = utils.data('group2');
-const models = app.set('models');
 const transactionsData = utils.data('transactions1').transactions;
-const roles = require('../server/constants/roles');
 
-/**
- * Tests.
- */
 describe('transactions.routes.test.js', () => {
 
   let privateGroup;
@@ -209,7 +200,7 @@ describe('transactions.routes.test.js', () => {
         .post(`/groups/${publicGroup.id}/transactions`)
         .send({
           api_key: application.api_key,
-          transaction: transaction
+          transaction
         })
         .expect(200)
         .end((e, res) => {
@@ -229,7 +220,7 @@ describe('transactions.routes.test.js', () => {
         .post(`/groups/${publicGroup.id}/transactions`)
         .send({
           api_key: application.api_key,
-          transaction: transaction
+          transaction
         })
         .expect(200)
         .end((e, res) => {
@@ -327,7 +318,7 @@ describe('transactions.routes.test.js', () => {
         .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           transaction: {
-            payoutMethod: payoutMethod
+            payoutMethod
           }
         })
         .expect(200)
@@ -353,7 +344,7 @@ describe('transactions.routes.test.js', () => {
           .post(`/groups/${privateGroup.id}/transactions`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
-            transaction: transaction
+            transaction
           })
           .expect(200)
           .end((e, res) => {
@@ -460,7 +451,7 @@ describe('transactions.routes.test.js', () => {
           .post(`/groups/${privateGroup.id}/transactions`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
-            transaction: transaction
+            transaction
           })
           .expect(200)
           .end((e, res) => {
@@ -478,7 +469,7 @@ describe('transactions.routes.test.js', () => {
           .post(`/groups/${publicGroup.id}/transactions`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
-            transaction: transaction
+            transaction
           })
           .expect(200)
           .end((e, res) => {
@@ -564,7 +555,7 @@ describe('transactions.routes.test.js', () => {
           .post(`/groups/${privateGroup.id}/transactions`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
-            transaction: transaction
+            transaction
           })
           .expect(200)
           .end(e => {
@@ -581,7 +572,7 @@ describe('transactions.routes.test.js', () => {
           .post(`/groups/${publicGroup.id}/transactions`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
-            transaction: transaction
+            transaction
           })
           .expect(200)
           .end(e => {
@@ -656,7 +647,7 @@ describe('transactions.routes.test.js', () => {
             expect(res.body[0].id).to.equal(1);
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers).to.have.property('link');
             expect(headers.link).to.contain('next');
             expect(headers.link).to.contain('page=2');
@@ -677,7 +668,7 @@ describe('transactions.routes.test.js', () => {
           .get(`/groups/${privateGroup.id}/transactions`)
           .send({
             per_page: perPage,
-            page: page,
+            page,
             sort: 'id',
             direction: 'asc'
           })
@@ -689,7 +680,7 @@ describe('transactions.routes.test.js', () => {
             expect(res.body[0].id).to.equal(perPage + 1);
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers.link).to.contain('page=3');
             expect(headers.link).to.contain('page=2');
             done();
@@ -718,7 +709,7 @@ describe('transactions.routes.test.js', () => {
             });
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers.link).to.be.empty;
             done();
           });

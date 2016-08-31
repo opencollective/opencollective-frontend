@@ -1,21 +1,12 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
-const utils = require('../test/utils.js')();
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest-as-promised';
+import * as utils from '../test/utils';
+import models from '../server/models';
 
-/**
- * Variables.
- */
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
-const models = app.set('models');
 
-/**
- * Tests.
- */
 describe('profile.routes.test.js', () => {
 
   let user, group;
@@ -42,7 +33,7 @@ describe('profile.routes.test.js', () => {
         .get(`/profile/${user.username}`)
         .expect(200)
         .end((err, res) => {
-          const body = res.body;
+          const { body } = res;
           expect(body.username).to.equal(user.username);
           done();
         })
@@ -53,7 +44,7 @@ describe('profile.routes.test.js', () => {
         .get(`/profile/${group.slug}`)
         .expect(200)
         .end((err, res) => {
-          const body = res.body;
+          const { body } = res;
           expect(body.mission).to.equal(group.mission);
           done();
         })

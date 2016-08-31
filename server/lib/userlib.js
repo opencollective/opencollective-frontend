@@ -1,9 +1,6 @@
-import config from 'config';
-import clearbitLib from 'clearbit';
 import url from 'url';
 import Promise from 'bluebird';
-
-const clearbit = clearbitLib(config.clearbit);
+import clearbit from '../gateways/clearbit';
 
 export default {
 

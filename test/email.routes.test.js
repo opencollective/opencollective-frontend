@@ -7,14 +7,13 @@ import nock from 'nock';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 import MailgunNock from './mocks/mailgun.nock.js';
+import webhookBody from './mocks/mailgun.webhook.payload';
+import * as utils from '../test/utils';
 
-const webhookBody = require('./mocks/mailgun.webhook.payload.json');
-
-const utils = require('../test/utils.js')();
-const Group = models.Group;
-const User = models.User;
-
-// nock.recorder.rec();
+const {
+  User,
+  Group
+} = models;
 
 const usersData = [
   {
@@ -40,13 +39,13 @@ const usersData = [
     role: 'BACKER',
     lists: ['mailinglist.backers']
   }
-]
+];
 
 const groupData = {
   slug: 'testcollective',
   name: 'Test Collective',
   settings: {}
-}
+};
 
 let group, users = [];
 
@@ -61,10 +60,10 @@ describe("email.routes.test", () => {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     MailgunNock();
-  })
+  });
 
   afterEach(() => {
-    nock.cleanAll()
+    nock.cleanAll();
     sandbox.restore();
   });
 

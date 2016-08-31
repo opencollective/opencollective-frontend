@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const Slack = require('node-slack');
-const activitiesLib = require('../server/lib/activities');
+import _ from 'lodash';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import Slack from 'node-slack';
+import activitiesLib from '../server/lib/activities';
 
-const slackLib = require('../server/lib/slack');
+import slackLib from '../server/lib/slack';
 
 describe('lib/slack', () => {
 

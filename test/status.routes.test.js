@@ -1,6 +1,6 @@
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest');
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest';
 
 describe('status.routes.test.js', () => {
 

@@ -1,7 +1,10 @@
 import _ from 'lodash';
 import Stripe from 'stripe';
+import config from 'config';
 
 import {planId} from '../lib/utils';
+
+export const appStripe = Stripe(config.stripe.secret);
 
 /**
  * Get the stripe client for the connected account
@@ -11,7 +14,7 @@ const client = stripeAccount => Stripe(stripeAccount.accessToken);
 /**
  * Create a plan if it doesn not find it
  */
-const getOrCreatePlan = (stripeAccount, plan) => {
+export const getOrCreatePlan = (stripeAccount, plan) => {
   const stripeClient = client(stripeAccount);
   const id = planId(plan);
 
@@ -27,43 +30,43 @@ const getOrCreatePlan = (stripeAccount, plan) => {
       console.log(err);
       return Promise.reject(err);
     });
-}
+};
 
 /**
  * Create stripe subscription with plan
  */
-const createSubscription = (stripeAccount, customerId, subscription) => {
+export const createSubscription = (stripeAccount, customerId, subscription) => {
   return client(stripeAccount).customers.createSubscription(customerId, subscription);
 };
 
 /**
  * Retrieve stripe subscription
  */
-const retrieveSubscription = (stripeAccount, customerId, stripeSubsriptionId) => {
+export const retrieveSubscription = (stripeAccount, customerId, stripeSubsriptionId) => {
   return client(stripeAccount).customers.retrieveSubscription(customerId, stripeSubsriptionId);
-}
+};
 
 /**
  * Get all subscriptions
  */
-const getSubscriptionsList = (stripeAccount, limit) => {
+export const getSubscriptionsList = (stripeAccount, limit) => {
   if (!limit) {
     limit = 10;
   }
   return client(stripeAccount).subscriptions.list({ limit });
-}
+};
 
 /**
  * Delete a subscription
  */
-const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
+export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
   return client(stripeAccount).subscriptions.del(stripeSubscriptionId);
-}
+};
 
 /**
  * Create stripe customer
  */
-const createCustomer = (stripeAccount, token, options) => {
+export const createCustomer = (stripeAccount, token, options) => {
   const group = options.group || {};
   const email = options.email || '';
 
@@ -77,25 +80,25 @@ const createCustomer = (stripeAccount, token, options) => {
 /**
  * Fetch customer
  */
-const retrieveCustomer = (stripeAccount, customerId) => {
+export const retrieveCustomer = (stripeAccount, customerId) => {
   return client(stripeAccount).customers.retrieve(customerId);
-}
+};
 
 /**
  * Create charge
  */
-const createCharge = (stripeAccount, charge) => {
+export const createCharge = (stripeAccount, charge) => {
   return client(stripeAccount).charges.create(charge);
 };
 
 /**
  * Retrieve a balance transaction (for fees)
  */
-const retrieveBalanceTransaction = (stripeAccount, txn) => {
+export const retrieveBalanceTransaction = (stripeAccount, txn) => {
   return client(stripeAccount).balance.retrieveTransaction(txn);
-}
+};
 
-const extractFees = (balance) => {
+export const extractFees = (balance) => {
   const fees = {
     total: balance.fee,
     stripeFee: 0,
@@ -111,20 +114,6 @@ const extractFees = (balance) => {
     } else {
       fees.other += fee.amount;
     }
-  })
+  });
   return fees;
-}
-
-export {
-  getOrCreatePlan,
-  createSubscription,
-  retrieveSubscription,
-  getSubscriptionsList,
-  cancelSubscription,
-  createCharge,
-  createCustomer,
-  retrieveCustomer,
-  retrieveBalanceTransaction,
-  extractFees
 };
-

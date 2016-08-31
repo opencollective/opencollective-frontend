@@ -1,18 +1,10 @@
-/**
- * Dependencies.
- */
-
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
-
-/**
- * Variables.
- */
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import models from '../server/models';
 
 const userData = utils.data('user1');
-const models = app.set('models');
 
 describe('images.routes.test.js', () => {
   let application;

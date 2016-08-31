@@ -1,7 +1,7 @@
-const gateways = require('../gateways');
-const transactions = require('../constants/transactions');
-const roles = require('../constants/roles');
-const emailLib = require('./email');
+import * as stripe from '../gateways/stripe';
+import * as transactions from '../constants/transactions';
+import roles from '../constants/roles';
+import emailLib from './email';
 
 export const processDonation = (Sequelize, donation) => {
 
@@ -15,13 +15,13 @@ export const processDonation = (Sequelize, donation) => {
       const subscription = donation.Subscription;
 
       const createSubscription = (groupStripeAccount) => {
-        return gateways.stripe.getOrCreatePlan(
+        return stripe.getOrCreatePlan(
             groupStripeAccount,
             { interval: subscription.interval,
               amount: donation.amount, // needs to be in INT
               currency: donation.currency
             })
-          .then(plan => gateways.stripe.createSubscription(
+          .then(plan => stripe.createSubscription(
               groupStripeAccount,
               paymentMethod.customerId,
               { plan: plan.id,
@@ -38,7 +38,7 @@ export const processDonation = (Sequelize, donation) => {
 
       const createChargeAndTransaction = (groupStripeAccount) => {
         let charge;
-        return gateways.stripe.createCharge(
+        return stripe.createCharge(
             groupStripeAccount,
             { amount: donation.amount,
               currency: donation.currency,
@@ -53,12 +53,12 @@ export const processDonation = (Sequelize, donation) => {
               }
             })
           .tap(c => charge = c)
-          .then(charge => gateways.stripe.retrieveBalanceTransaction(
+          .then(charge => stripe.retrieveBalanceTransaction(
               groupStripeAccount,
               charge.balance_transaction))
           .then(balanceTransaction => {
             // create a transaction
-            const fees = gateways.stripe.extractFees(balanceTransaction);
+            const fees = stripe.extractFees(balanceTransaction);
             const hostFeePercent = group.hostFeePercent;
             const payload = {
               user,
@@ -77,7 +77,7 @@ export const processDonation = (Sequelize, donation) => {
               platformFeeInTxnCurrency: fees.applicationFee,
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
               data: {charge, balanceTransaction},
-            }
+            };
             return Sequelize.models.Transaction.createFromPayload(payload)
           })
       };
@@ -88,7 +88,7 @@ export const processDonation = (Sequelize, donation) => {
         .then(stripeAccount => groupStripeAccount = stripeAccount)
 
         // get or create a customer
-        .then(() => paymentMethod.customerId || gateways.stripe.createCustomer(
+        .then(() => paymentMethod.customerId || stripe.createCustomer(
           groupStripeAccount,
           paymentMethod.token, {
             email: user.email,

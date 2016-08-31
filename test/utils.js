@@ -1,45 +1,22 @@
-/**
- * Dependencies.
- */
 import Promise from 'bluebird';
 import models, {sequelize} from '../server/models';
-
-const data = require('./mocks/data.json');
+import jsonData from './mocks/data';
 import userlib from '../server/lib/userlib';
 
-/**
- * Private methods.
- */
-const getData = (item) => Object.assign({}, data[item]); // to avoid changing these data
 
-const clearbitStubBeforeEach = sandbox => {
+export const data = (item) => Object.assign({}, jsonData[item]); // to avoid changing these data
+
+export const clearbitStubBeforeEach = sandbox => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {
     return Promise.reject(new userlib.clearbit.Enrichment.NotFoundError());
   });
 };
 
-const clearbitStubAfterEach = (sandbox) => sandbox.restore();
+export const clearbitStubAfterEach = (sandbox) => sandbox.restore();
 
-/**
- * Utils.
- */
-// TODO get rid of wrapper arrow func
-export default () => {
-
-  return {
-
-    cleanAllDb: () => sequelize.sync({force: true})
-      .then(() => models.Application.create(getData('applicationSuper')))
-      .catch(e => {
-        console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
-        process.exit(1);
-      }),
-
-    /**
-     * Test data.
-     */
-    data: getData,
-    clearbitStubBeforeEach,
-    clearbitStubAfterEach
-  }
-};
+export const cleanAllDb = () => sequelize.sync({force: true})
+  .then(() => models.Application.create(data('applicationSuper')))
+  .catch(e => {
+    console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
+    process.exit(1);
+  });

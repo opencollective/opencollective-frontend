@@ -1,11 +1,11 @@
-const sinon = require('sinon');
-const nodemailer = require('nodemailer');
-const expect = require('chai').expect;
+import sinon from 'sinon';
+import nodemailer from 'nodemailer';
+import { expect } from 'chai';
+import emailLib from '../server/lib/email';
+import * as utils from '../test/utils';
+import config from 'config';
 
-const emailLib = require('../server/lib/email');
-const utils = require('../test/utils.js')();
 const emailData = utils.data('emailData');
-const config = require('config');
 
 describe('lib/email', () => {
 
@@ -19,7 +19,7 @@ describe('lib/email', () => {
     nm = nodemailer.createTransport({
           name: 'testsend',
           service: 'Mailgun',
-          sendMail: function (data, callback) {
+          sendMail (data, callback) {
               callback();
           },
           logger: false
@@ -64,7 +64,7 @@ describe('lib/email', () => {
         name: "La Primaire",
         slug: "laprimaire"
       },
-      config: config
+      config
     };
 
     return emailLib.send('thankyou', data.user.email, data)
@@ -90,7 +90,7 @@ describe('lib/email', () => {
         name: "WWCode Austin",
         slug: "wwcodeaustin"
       },
-      config: config
+      config
     };
 
     return emailLib.send('thankyou', data.user.email, data)

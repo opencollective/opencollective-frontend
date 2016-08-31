@@ -1,17 +1,16 @@
 
-const expect = require('chai').expect;
-const utils = require('../test/utils.js')();
-const userlib = require('../server/lib/userlib.js');
-const sinon = require('sinon');
-const Bluebird = require('bluebird');
+import {expect} from 'chai';
+import * as utils from '../test/utils';
+import userlib from '../server/lib/userlib';
+import sinon from 'sinon';
+import Bluebird from 'bluebird';
+import mock from './mocks/clearbit';
 
 /**
  * Variables.
  */
 const userData1 = utils.data('user1');
 const userData3 = utils.data('user3');
-
-const mock = require('./mocks/clearbit.json');
 
 describe("userlib", () => {
 

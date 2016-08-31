@@ -1,11 +1,12 @@
 import {expect} from 'chai';
 import models from '../server/models';
+import * as utils from '../test/utils';
 
-const utils = require('../test/utils.js')();
-
-const Transaction = models.Transaction;
-const Group = models.Group;
-const User = models.User;
+const {
+  Transaction,
+  Group,
+  User
+} = models;
 
 describe('Group model', () => {
 

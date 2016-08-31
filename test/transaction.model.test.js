@@ -1,32 +1,14 @@
-/**
- * Dependencies.
- */
+import {expect} from 'chai';
+import sinon from 'sinon';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import models from '../server/models';
 
-const app = require('../server/index');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const utils = require('../test/utils.js')();
-const roles = require('../server/constants/roles');
-
-/**
- * Models
- */
-
-const models = app.get('models');
-const Transaction = models.Transaction;
-
-/**
- * Data
- */
+const {Transaction} = models;
 
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
 const transactionsData = utils.data('transactions1').transactions;
-
-
-/**
- * Tests.
- */
 
 describe('transaction model', () => {
 

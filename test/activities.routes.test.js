@@ -1,13 +1,13 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
-const roles = require('../server/constants/roles');
-const Promise = require('bluebird');
+import _ from 'lodash';
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import Promise from 'bluebird';
 
 /**
  * Variables.
@@ -99,7 +99,7 @@ describe('activities.routes.test.js', () => {
             expect(res.body[0].id).to.equal(4);
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers).to.have.property('link');
             expect(headers.link).to.contain('next');
             expect(headers.link).to.contain('page=2');
@@ -122,7 +122,7 @@ describe('activities.routes.test.js', () => {
           .get(`/groups/${group.id}/activities`)
           .send({
             per_page: perPage,
-            page: page,
+            page,
             sort: 'id',
             direction: 'asc'
           })
@@ -134,7 +134,7 @@ describe('activities.routes.test.js', () => {
             expect(res.body[0].id).to.equal(7);
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers.link).to.contain('page=3');
             expect(headers.link).to.contain('page=2');
             done();
@@ -163,7 +163,7 @@ describe('activities.routes.test.js', () => {
             });
 
             // Check pagination header.
-            const headers = res.headers;
+            const { headers } = res;
             expect(headers.link).to.be.empty;
             done();
           });

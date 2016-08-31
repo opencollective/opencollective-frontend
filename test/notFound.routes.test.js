@@ -1,6 +1,6 @@
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest-as-promised';
 
 describe('notFound.routes.test.js', () => {
 

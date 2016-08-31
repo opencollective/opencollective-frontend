@@ -1,28 +1,24 @@
-const config = require('config');
-const clearbit = require('clearbit')(config.clearbit);
-const sinon = require('sinon');
-const expect = require('chai').expect;
-
-const stub = sinon.stub(clearbit.Enrichment, 'find', () => {
-  return Promise.reject(new clearbit.Enrichment.NotFoundError());
-});
+import clearbit from '../server/gateways/clearbit';
+import sinon from 'sinon';
+import { expect } from 'chai';
+import * as utils from '../test/utils';
+import userlib from '../server/lib/userlib';
 
 describe("clearbit", () => {
 
-  it("catches the NotFound error", (done) => {
+  const sandbox = sinon.sandbox.create();
 
-    clearbit.Enrichment
-      .find({email:"xddddfsdf@gmail.com", stream: true})
+  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
+
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
+
+  it("catches the NotFound error", () => {
+    const stub = userlib.clearbit.Enrichment.find;
+    return clearbit.Enrichment
+      .find({email: "xddddfsdf@gmail.com", stream: true})
       .catch(clearbit.Enrichment.NotFoundError, (err) => {
         expect(err).to.exist;
         expect(stub.called).to.be.true;
-        done();
       })
-      .catch((err) => {
-        console.log("unknown error", err);
-        done();
-      });
-
   });
-
 });

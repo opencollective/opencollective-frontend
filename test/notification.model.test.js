@@ -1,16 +1,11 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
-const utils = require('../test/utils.js')();
-const constants = require('../server/constants/activities');
-const roles = require('../server/constants/roles');
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest-as-promised';
+import * as utils from '../test/utils';
+import constants from '../server/constants/activities';
+import models from '../server/models';
+import roles from '../server/constants/roles';
 
-/**
- * Variable.
- */
 const userData = utils.data('user1');
 const user2Data = utils.data('user2');
 const groupData = utils.data('group1');
@@ -18,15 +13,12 @@ const group2Data = utils.data('group2');
 const group3Data = utils.data('group3');
 const notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
 
-const models = app.get('models');
+const {
+  User,
+  Group,
+  Notification
+} = models;
 
-const User = models.User;
-const Group = models.Group;
-const Notification = models.Notification;
-
-/**
- * Tests.
- */
 describe("notification.model.test.js", () => {
 
   let application;
