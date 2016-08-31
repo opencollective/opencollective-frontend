@@ -1,5 +1,4 @@
 import Promise from 'bluebird';
-import _ from 'lodash';
 import activities from '../constants/activities';
 
 /*
