@@ -75,9 +75,9 @@ describe('transaction model', () => {
     .catch(done);
   });
 
-  it('isDonation is true tags contains `Donation`', done => {
+  it('isDonation is true when amount is > 0', done => {
     Transaction.create({
-      tags: ['Donation']
+      amount: 0.1
     })
     .then(transaction => {
       expect(transaction.info.isDonation).to.be.true;
