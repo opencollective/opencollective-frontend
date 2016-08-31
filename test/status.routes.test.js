@@ -1,7 +1,6 @@
-var app = require('../server/index');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const app = require('../server/index');
+const expect = require('chai').expect;
+const request = require('supertest');
 
 describe('status.routes.test.js', () => {
 

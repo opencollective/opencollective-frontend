@@ -6,7 +6,7 @@ const group = require('./mocks/data.json').group1;
 const backer = { totalDonations: 5 };
 const sponsor = { totalDonations: 500 };
 
-var roles = require('../server/constants/roles');
+const roles = require('../server/constants/roles');
 
 describe("utils", () => {
   

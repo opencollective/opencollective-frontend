@@ -1,27 +1,24 @@
 /**
  * Dependencies.
  */
-var _ = require('lodash');
-var app = require('../server/index');
-var async = require('async');
-var config = require('config');
-var expect = require('chai').expect;
-var jwt = require('jsonwebtoken');
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const app = require('../server/index');
+const expect = require('chai').expect;
+const jwt = require('jsonwebtoken');
+const request = require('supertest');
+const utils = require('../test/utils.js')();
 
 /**
  * Variables.
  */
-var userData = utils.data('user1');
-var models = app.set('models');
+const userData = utils.data('user1');
+const models = app.set('models');
 
 /**
  * Tests.
  */
 describe('auth.routes.test.js', () => {
 
-  var application;
+  let application;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -37,7 +34,7 @@ describe('auth.routes.test.js', () => {
           username: userData.username
         })
         .expect(400)
-        .end((e, res) => {
+        .end(e => {
           expect(e).to.not.exist;
           done();
         });
@@ -52,7 +49,7 @@ describe('auth.routes.test.js', () => {
           password: userData.password
         })
         .expect(401)
-        .end((e, res) => {
+        .end(e => {
           expect(e).to.not.exist;
           done();
         });
@@ -67,7 +64,7 @@ describe('auth.routes.test.js', () => {
           password: 'bad'
         })
         .expect(400)
-        .end((e, res) => {
+        .end(e => {
           expect(e).to.not.exist;
           done();
         });
@@ -86,7 +83,7 @@ describe('auth.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('access_token');
           expect(res.body).to.have.property('refresh_token');
-          var data = jwt.decode(res.body.access_token);
+          const data = jwt.decode(res.body.access_token);
           expect(data).to.have.property('iat');
           expect(data).to.have.property('exp');
           expect(data).to.have.property('aud');

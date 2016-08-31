@@ -29,12 +29,12 @@ const paypalNock = require('./mocks/paypal.nock');
  */
 describe('donations.routes.test.js', () => {
 
-  var application;
-  var application2;
-  var user;
-  var group;
-  var group2;
-  var sandbox = sinon.sandbox.create();
+  let application;
+  let application2;
+  let user;
+  let group;
+  let group2;
+  const sandbox = sinon.sandbox.create();
 
   beforeEach(() => {
     sandbox.stub(donationsLib, 'processDonation');
@@ -55,7 +55,7 @@ describe('donations.routes.test.js', () => {
   beforeEach((done) => {
     request(app)
       .post('/groups')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
         group: groupData,
         role: roles.HOST
@@ -77,7 +77,7 @@ describe('donations.routes.test.js', () => {
   beforeEach((done) => {
     request(app)
       .post('/groups')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
         group: utils.data('group1'),
         role: roles.HOST
@@ -134,8 +134,8 @@ describe('donations.routes.test.js', () => {
 
       beforeEach((done) => {
         request(app)
-          .post('/groups/' + group.id + '/payments')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .post(`/groups/${group.id}/payments`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -181,12 +181,12 @@ describe('donations.routes.test.js', () => {
 
     describe('Next payment success with a same stripe token', () => {
 
-      var CHARGE2 = 1.99;
+      const CHARGE2 = 1.99;
 
       beforeEach((done) => {
         request(app)
-          .post('/groups/' + group.id + '/payments')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .post(`/groups/${group.id}/payments`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -201,8 +201,8 @@ describe('donations.routes.test.js', () => {
 
       beforeEach((done) => {
         request(app)
-          .post('/groups/' + group.id + '/payments')
-          .set('Authorization', 'Bearer ' + user.jwt(application))
+          .post(`/groups/${group.id}/payments`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -240,7 +240,7 @@ describe('donations.routes.test.js', () => {
 
     describe('Payment success by anonymous user', () => {
 
-      var data = {
+      const data = {
         stripeToken: STRIPE_TOKEN,
         amount: CHARGE,
         currency: CURRENCY,
@@ -255,7 +255,7 @@ describe('donations.routes.test.js', () => {
 
       beforeEach('successfully makes a anonymous payment', (done) => {
         request(app)
-          .post('/groups/' + group2.id + '/payments')
+          .post(`/groups/${group2.id}/payments`)
           .send({
             api_key: application2.api_key,
             payment: data
@@ -302,8 +302,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('amount', CHARGE*100);
-            expect(res.rows[0]).to.have.property('title',
-              'Donation to ' + group2.name);
+            expect(res.rows[0]).to.have.property('title', `Donation to ${group2.name}`);
             done();
           })
           .catch(done);
@@ -313,7 +312,7 @@ describe('donations.routes.test.js', () => {
 
     describe('Recurring payment success', () => {
 
-      var data = {
+      const data = {
         stripeToken: STRIPE_TOKEN,
         amount: 10,
         currency: CURRENCY,
@@ -325,13 +324,13 @@ describe('donations.routes.test.js', () => {
 
       beforeEach((done) => {
         request(app)
-          .post('/groups/' + group2.id + '/payments')
+          .post(`/groups/${group2.id}/payments`)
           .send({
             api_key: application2.api_key,
             payment: data
           })
           .expect(200)
-          .end((e, res) => {
+          .end(e => {
             expect(e).to.not.exist;
             done();
           });
@@ -395,7 +394,7 @@ describe('donations.routes.test.js', () => {
       it('fails if the interval is not month or year', (done) => {
 
         request(app)
-          .post('/groups/' + group2.id + '/payments')
+          .post(`/groups/${group2.id}/payments`)
           .send({
             api_key: application2.api_key,
             payment: _.extend({}, data, {interval: 'something'})
@@ -418,7 +417,7 @@ describe('donations.routes.test.js', () => {
       })
 
       describe('success', () => {
-        var links;
+        let links;
         const token = 'EC-123';
 
         beforeEach((done) => {
@@ -542,7 +541,7 @@ describe('donations.routes.test.js', () => {
 
     describe('Paypal single donation', () => {
       describe('success', () => {
-        var links;
+        let links;
         const token = 'EC-123';
         const paymentId = 'PAY-123';
         const PayerID = 'ABC123';
@@ -593,7 +592,7 @@ describe('donations.routes.test.js', () => {
 
         it('executes the billing agreement', (done) => {
           const email = 'testemail@test.com';
-          var transaction;
+          let transaction;
 
           // Taken from https://github.com/paypal/PayPal-node-SDK/blob/71dcd3a5e2e288e2990b75a54673fb67c1d6855d/test/mocks/generate_token.js
           nock('https://api.sandbox.paypal.com:443')
@@ -725,8 +724,8 @@ describe('donations.routes.test.js', () => {
         .then((account) => user.setStripeAccount(account))
         .then(() => {
           request(app)
-            .post('/groups/' + group.id + '/payments')
-            .set('Authorization', 'Bearer ' + user.jwt(application))
+            .post(`/groups/${group.id}/payments`)
+            .set('Authorization', `Bearer ${user.jwt(application)}`)
             .send({ payment })
             .expect(400, {
               error: {

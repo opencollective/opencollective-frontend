@@ -19,7 +19,7 @@ const expectNoErrCallback = done => err => {
 
 describe('authorization.middleware.test.js', () => {
 
-  var user, req;
+  let user, req;
 
   beforeEach(() => utils.cleanAllDb());
 

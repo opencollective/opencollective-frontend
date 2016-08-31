@@ -1,43 +1,43 @@
 /**
  * Dependencies.
  */
-var app = require('../server/index');
-var expect = require('chai').expect;
-var request = require('supertest-as-promised');
-var utils = require('../test/utils.js')();
-var constants = require('../server/constants/activities');
+const app = require('../server/index');
+const expect = require('chai').expect;
+const request = require('supertest-as-promised');
+const utils = require('../test/utils.js')();
+const constants = require('../server/constants/activities');
 
 /**
  * Variable.
  */
-var userData = utils.data('user1');
-var user2Data = utils.data('user2');
-var groupData = utils.data('group1');
-var group2Data = utils.data('group2');
-var group3Data = utils.data('group3');
-var notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
+const userData = utils.data('user1');
+const user2Data = utils.data('user2');
+const groupData = utils.data('group1');
+const group2Data = utils.data('group2');
+const group3Data = utils.data('group3');
+const notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
 
-var models = app.get('models');
+const models = app.get('models');
 
-var User = models.User;
-var Group = models.Group;
-var Notification = models.Notification;
+const User = models.User;
+const Group = models.Group;
+const Notification = models.Notification;
 
 /**
  * Tests.
  */
 describe("notification.model.test.js", () => {
 
-  var application;
-  var user;
-  var user2;
-  var group;
-  var group2;
+  let application;
+  let user;
+  let user2;
+  let group;
+  let group2;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   beforeEach(() => {
-    var promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
+    const promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
     return Promise.all(promises).then((results) => {
       user = results[0];
       user2 = results[1];
@@ -55,8 +55,8 @@ describe("notification.model.test.js", () => {
 
   it('notifies for the `group.transaction.approved` email', () =>
     request(app)
-      .post('/groups/' + group.id + '/activities/group.transaction.approved/subscribe')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(200)
       .then(res => {
@@ -72,13 +72,13 @@ describe("notification.model.test.js", () => {
       })
       .tap(res => expect(res.count).to.equal(1)));
 
-  it('disables notification for the ' + notificationData.type + ' email', () =>
+  it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
-      .post('/groups/' + group.id + '/activities/' + notificationData.type + '/unsubscribe')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group.id}/activities/${notificationData.type}/unsubscribe`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(200)
-      .then(res =>
+      .then(() =>
         Notification.findAndCountAll({where: {
           UserId: user.id,
           GroupId: group.id,
@@ -88,8 +88,8 @@ describe("notification.model.test.js", () => {
 
   it('fails to add another notification if one exists', () =>
     request(app)
-      .post('/groups/' + group.id + '/activities/' + notificationData.type + '/subscribe')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group.id}/activities/${notificationData.type}/subscribe`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(400)
       .then(res => {
@@ -106,8 +106,8 @@ describe("notification.model.test.js", () => {
 
   it('fails to remove notification if it does not exist', () =>
     request(app)
-      .post('/groups/' + group.id + '/activities/group.transaction.approved/unsubscribe')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group.id}/activities/group.transaction.approved/unsubscribe`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(400)
       .then(res => {
@@ -124,8 +124,8 @@ describe("notification.model.test.js", () => {
 
   it('fails to add a notification if not a member of the group', () =>
     request(app)
-      .post('/groups/' + group2.id + '/activities/group.transaction.approved/subscribe')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send()
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {
@@ -138,7 +138,7 @@ describe("notification.model.test.js", () => {
   it('automatically add a notification for a new host to `group.transaction.created` events', () =>
     request(app)
       .post('/groups')
-      .set('Authorization', 'Bearer ' + user2.jwt(application))
+      .set('Authorization', `Bearer ${user2.jwt(application)}`)
       .send({group: group3Data, role: 'HOST'})
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {

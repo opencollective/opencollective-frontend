@@ -2,21 +2,21 @@
  * Dependencies.
  */
 
-var app = require('../server/index');
-var expect = require('chai').expect;
-var request = require('supertest');
-var utils = require('../test/utils.js')();
+const app = require('../server/index');
+const expect = require('chai').expect;
+const request = require('supertest');
+const utils = require('../test/utils.js')();
 
 /**
  * Variables.
  */
 
-var userData = utils.data('user1');
-var models = app.set('models');
+const userData = utils.data('user1');
+const models = app.set('models');
 
 describe('images.routes.test.js', () => {
-  var application;
-  var user;
+  let application;
+  let user;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -30,7 +30,7 @@ describe('images.routes.test.js', () => {
     request(app)
     .post('/images/')
     .attach('file', 'test/mocks/images/camera.png')
-    .set('Authorization', 'Bearer ' + user.jwt(application))
+    .set('Authorization', `Bearer ${user.jwt(application)}`)
     .expect(200)
     .end((err, res) => {
       expect(res.body.url).to.contain('.png');
@@ -41,7 +41,7 @@ describe('images.routes.test.js', () => {
   it('should throw an error if no file field is sent', (done) => {
     request(app)
     .post('/images/')
-    .set('Authorization', 'Bearer ' + user.jwt(application))
+    .set('Authorization', `Bearer ${user.jwt(application)}`)
     .expect(400)
     .end(done);
   });

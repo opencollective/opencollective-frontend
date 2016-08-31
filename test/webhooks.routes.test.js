@@ -22,39 +22,39 @@ const models = app.set('models');
  * Mock data
  */
 
-var stripeMock = require('./mocks/stripe');
-var userData = utils.data('user1');
-var groupData = utils.data('group1');
-var stripeEmail;
-var webhookEvent = stripeMock.webhook;
-var webhookInvoice = webhookEvent.data.object;
-var webhookSubscription = webhookInvoice.lines.data[0];
-var customerId = stripeMock.customers.create.id;
+const stripeMock = require('./mocks/stripe');
+const userData = utils.data('user1');
+const groupData = utils.data('group1');
+let stripeEmail;
+const webhookEvent = stripeMock.webhook;
+const webhookInvoice = webhookEvent.data.object;
+const webhookSubscription = webhookInvoice.lines.data[0];
+const customerId = stripeMock.customers.create.id;
 
-var STRIPE_TOKEN = 'superStripeToken';
-var STRIPE_URL = 'https://api.stripe.com:443';
-var STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
-var CURRENCY = 'USD';
-var INTERVAL = 'month';
+const STRIPE_TOKEN = 'superStripeToken';
+const STRIPE_URL = 'https://api.stripe.com:443';
+const STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
+const CURRENCY = 'USD';
+const INTERVAL = 'month';
 
-var stubStripe = () => {
-  var mock = stripeMock.accounts.create;
+const stubStripe = () => {
+  const mock = stripeMock.accounts.create;
   mock.email = chance.email();
   stripeEmail = mock.email;
 
-  var stub = sinon.stub(app.stripe.accounts, 'create');
+  const stub = sinon.stub(app.stripe.accounts, 'create');
   stub.yields(null, mock);
 };
 
 
 describe('webhooks.routes.test.js', () => {
-  var nocks = {};
-  var user;
-  var paymentMethod;
-  var group;
-  var application;
-  var donation;
-  var sandbox = sinon.sandbox.create();
+  const nocks = {};
+  let user;
+  let paymentMethod;
+  let group;
+  let application;
+  let donation;
+  const sandbox = sinon.sandbox.create();
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -68,7 +68,7 @@ describe('webhooks.routes.test.js', () => {
 
     request(app)
       .post('/groups')
-      .set('Authorization', 'Bearer ' + user.jwt(application))
+      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
         group: groupData,
         role: roles.HOST
@@ -94,7 +94,7 @@ describe('webhooks.routes.test.js', () => {
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
-    var planId = generatePlanId({
+    const planId = generatePlanId({
       amount: STRIPE_SUBSCRIPTION_CHARGE,
       interval: INTERVAL,
       currency: CURRENCY
@@ -109,7 +109,7 @@ describe('webhooks.routes.test.js', () => {
 
     // Nock for plans.retrieve.
     beforeEach(() => {
-      var plan = _.extend({}, stripeMock.plans.create, {
+      const plan = _.extend({}, stripeMock.plans.create, {
         amount: STRIPE_SUBSCRIPTION_CHARGE,
         interval: INTERVAL,
         name: planId,
@@ -117,19 +117,19 @@ describe('webhooks.routes.test.js', () => {
       });
 
       nocks['plans.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/plans/' + planId)
+        .get(`/v1/plans/${planId}`)
         .reply(200, plan);
     });
 
     // Nock for subscriptions.create.
     beforeEach(() => {
-      var params = [
+      const params = [
         `plan=${planId}`,
         'application_fee_percent=5',
-        encodeURIComponent('metadata[groupId]') + '=' + group.id,
-        encodeURIComponent('metadata[groupName]') + '=' + encodeURIComponent(groupData.name),
-        encodeURIComponent('metadata[paymentMethodId]') + '=1',
-        encodeURIComponent('metadata[description]') + '=' + encodeURIComponent(`OpenCollective: ${group.slug}`)
+        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
+        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`
       ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -153,7 +153,7 @@ describe('webhooks.routes.test.js', () => {
 
     // Make the donation
     beforeEach((done) => {
-      var payment = {
+      const payment = {
         stripeToken: STRIPE_TOKEN,
         amount: webhookSubscription.amount / 100,
         currency: CURRENCY,
@@ -162,7 +162,7 @@ describe('webhooks.routes.test.js', () => {
       };
 
       request(app)
-        .post('/groups/' + group.id + '/payments')
+        .post(`/groups/${group.id}/payments`)
         .send({
           api_key: application.api_key,
           payment: payment
@@ -212,7 +212,7 @@ describe('webhooks.routes.test.js', () => {
      */
     beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + webhookEvent.id)
+        .get(`/v1/events/${webhookEvent.id}`)
         .reply(200,
           _.extend({},
             webhookEvent, {
@@ -283,7 +283,7 @@ describe('webhooks.routes.test.js', () => {
           }
         })
         .tap((res) => {
-          var e = res.rows[0].data.event;
+          const e = res.rows[0].data.event;
           expect(res.count).to.equal(1);
           expect(e.id).to.be.equal(webhookEvent.id);
           done();
@@ -293,7 +293,7 @@ describe('webhooks.routes.test.js', () => {
 
     it('should create a second transaction after the first webhook', done => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + webhookEvent.id)
+        .get(`/v1/events/${webhookEvent.id}`)
         .reply(200,
           _.extend({},
             webhookEvent, {
@@ -312,7 +312,7 @@ describe('webhooks.routes.test.js', () => {
         .post('/webhooks/stripe')
         .send(webhookEvent)
         .expect(200)
-        .end((err, res) => {
+        .end(err => {
           expect(err).to.not.exist;
           models.Transaction.findAndCountAll({
             include: [
@@ -351,16 +351,16 @@ describe('webhooks.routes.test.js', () => {
   });
 
   it('returns 200 if the event is not livemode in production', (done) => {
-    var event = _.extend({}, webhookEvent, {
+    const event = _.extend({}, webhookEvent, {
       livemode: false
     });
 
-    var env = app.set('env');
+    const env = app.set('env');
 
     app.set('env', 'production');
 
     nocks['events.retrieve'] = nock(STRIPE_URL)
-      .get('/v1/events/' + event.id)
+      .get(`/v1/events/${event.id}`)
       .reply(200, event);
 
     request(app)
@@ -378,12 +378,12 @@ describe('webhooks.routes.test.js', () => {
   describe('errors', () => {
 
     it('returns an error if the event is not `invoice.payment_succeeded`', (done) => {
-      var event = _.extend({}, webhookEvent, {
+      const event = _.extend({}, webhookEvent, {
         type: 'application_fee.created'
       });
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + event.id)
+        .get(`/v1/events/${event.id}`)
         .reply(200, event);
 
       request(app)
@@ -400,10 +400,10 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns an error if the event does not exist', (done) => {
-      var id = webhookEvent.id;
+      const id = webhookEvent.id;
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + id)
+        .get(`/v1/events/${id}`)
         .reply(200, {
           error: {
             type: 'invalid_request_error',
@@ -423,14 +423,14 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns an error if the subscription id does not appear in an exisiting transaction in production', (done) => {
-      var e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
+      const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + webhookEvent.id)
+        .get(`/v1/events/${webhookEvent.id}`)
         .reply(200, e);
 
-      var env = app.set('env');
+      const env = app.set('env');
       app.set('env', 'production');
 
       request(app)
@@ -451,11 +451,11 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns 200 if the subscription id does not appear in an exisiting transaction in NON-production', (done) => {
-      var e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
+      const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + webhookEvent.id)
+        .get(`/v1/events/${webhookEvent.id}`)
         .reply(200, e);
 
       request(app)
@@ -471,7 +471,7 @@ describe('webhooks.routes.test.js', () => {
       e.data.object.lines.data[0].plan.id = 'abc';
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/events/' + e.id)
+        .get(`/v1/events/${e.id}`)
         .reply(200, e);
 
       request(app)

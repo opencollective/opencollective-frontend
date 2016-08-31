@@ -3,7 +3,7 @@ const clearbit = require('clearbit')(config.clearbit);
 const sinon = require('sinon');
 const expect = require('chai').expect;
 
-const stub = sinon.stub(clearbit.Enrichment, 'find', (email) => {
+const stub = sinon.stub(clearbit.Enrichment, 'find', () => {
   return Promise.reject(new clearbit.Enrichment.NotFoundError());
 });
 
@@ -19,7 +19,7 @@ describe("clearbit", () => {
         done();
       })
       .catch((err) => {
-        console.log("unknown error");
+        console.log("unknown error", err);
         done();
       });
 

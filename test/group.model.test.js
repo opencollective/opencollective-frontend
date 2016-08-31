@@ -1,9 +1,8 @@
 import {expect} from 'chai';
-import app from '../server/index';
+import models from '../server/models';
 
 const utils = require('../test/utils.js')();
 
-const models = app.get('models');
 const Transaction = models.Transaction;
 const Group = models.Group;
 const User = models.User;
@@ -59,13 +58,13 @@ describe('Group model', () => {
   }];
 
 
-  before((done) => utils.cleanAllDb().tap(a => done()));
+  before((done) => utils.cleanAllDb().tap(() => done()));
 
   before((done) => {
     Group.create(groupData)
       .tap(g => group = g)
-      .tap(g => User.createMany(users))
-      .tap((g) => Transaction.createMany(transactions, { GroupId: group.id }))
+      .tap(() => User.createMany(users))
+      .tap(() => Transaction.createMany(transactions, { GroupId: group.id }))
       .then(() => done())
       .catch(e => {
         console.error('Error in creating group', groupData, e, e.stack);
@@ -87,7 +86,7 @@ describe('Group model', () => {
     group.getBalance(until).then(balance => {
       let sum = 0;
       transactions.map(t => {
-        if(t.createdAt < until)
+        if (t.createdAt < until)
           sum += t.netAmountInGroupCurrency
       });
       expect(balance).to.equal(sum);
@@ -106,9 +105,9 @@ describe('Group model', () => {
   it('computes the number of backers until a certain month', (done) => {
     const until = new Date('2016-07-01');
     group.getBackersCount(until).then(count => {
-      let backers = {};
+      const backers = {};
       transactions.map(t => {
-        if(t.amount > 0 && t.createdAt < until)
+        if (t.amount > 0 && t.createdAt < until)
           backers[t.UserId] = t.amount;
       });
       expect(count).to.equal(Object.keys(backers).length);
@@ -119,7 +118,7 @@ describe('Group model', () => {
   it('gets all the expenses', (done) => {
     let totalExpenses = 0;
     transactions.map(t => {
-      if(t.netAmountInGroupCurrency < 0)
+      if (t.netAmountInGroupCurrency < 0)
         totalExpenses++;
     });
 
@@ -128,7 +127,9 @@ describe('Group model', () => {
         expect(expenses.length).to.equal(totalExpenses);
         done();
       })
-      .catch(e => { console.error('error', e, e.stack) });
+      .catch(e => {
+        console.error('error', e, e.stack);
+      });
   });
 
   it('gets all the expenses in a given month', (done) => {
@@ -138,7 +139,7 @@ describe('Group model', () => {
     let totalExpenses = 0;
 
     transactions.map(t => {
-      if(t.netAmountInGroupCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate)
+      if (t.netAmountInGroupCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate)
         totalExpenses++;
     });
 
@@ -147,6 +148,8 @@ describe('Group model', () => {
         expect(expenses.length).to.equal(totalExpenses);
         done();
       })
-      .catch(e => { console.error('error', e, e.stack) });
+      .catch(e => {
+        console.error('error', e, e.stack);
+      });
   });
 });

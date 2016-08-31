@@ -2,13 +2,11 @@
  * Dependencies.
  */
 
-const _ = require('lodash');
 const app = require('../server/index');
-const config = require('config');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const utils = require('../test/utils.js')();
-var roles = require('../server/constants/roles');
+const roles = require('../server/constants/roles');
 
 /**
  * Models
@@ -21,9 +19,9 @@ const Transaction = models.Transaction;
  * Data
  */
 
-var userData = utils.data('user1');
-var groupData = utils.data('group1');
-var transactionsData = utils.data('transactions1').transactions;
+const userData = utils.data('user1');
+const groupData = utils.data('group1');
+const transactionsData = utils.data('transactions1').transactions;
 
 
 /**
@@ -32,7 +30,7 @@ var transactionsData = utils.data('transactions1').transactions;
 
 describe('transaction model', () => {
 
-  var user, group;
+  let user, group;
 
   beforeEach(() => utils.cleanAllDb());
 
@@ -136,7 +134,7 @@ describe('transaction model', () => {
     .catch(done);
   })
 
-  var createActivitySpy;
+  let createActivitySpy;
 
   before(() => {
     createActivitySpy = sinon.spy(Transaction, 'createActivity');

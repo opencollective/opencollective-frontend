@@ -49,4 +49,4 @@ const server = app.listen(port, () => {
   console.log('OpenCollective API listening at http://%s:%s in %s environment.\n', host, server.address().port, app.set('env'));
 });
 
-module.exports = app;
+export default app;

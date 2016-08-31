@@ -6,7 +6,7 @@ describe('notFound.routes.test.js', () => {
 
   describe('WHEN calling unknown route', () => {
 
-    var req;
+    let req;
 
     beforeEach(() => {
       req = request(app)

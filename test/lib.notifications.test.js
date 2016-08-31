@@ -29,15 +29,15 @@ const Notification = models.Notification;
 
 describe('lib.notifications.test.js', () => {
 
-  var user;
-  var group;
-  var nm;
-  var application;
+  let user;
+  let group;
+  let nm;
+  let application;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
   beforeEach(() => {
-    var promises = [User.create(userData), Group.create(groupData)];
+    const promises = [User.create(userData), Group.create(groupData)];
     return Promise.all(promises).then(results => {
       user = results[0];
       group = results[1];
@@ -91,21 +91,21 @@ describe('lib.notifications.test.js', () => {
 
   it('sends a new `group.expense.created` email notification', done => {
 
-    var templateData = {
+    const templateData = {
       transaction: _.extend({}, transactionsData[0]),
       user: user,
       group: group,
       config: config
     };
 
-    var subject, body;
+    let subject, body;
 
     templateData.transaction.id = 1;
 
     if (templateData.transaction.link.match(/\.pdf$/))
       templateData.transaction.preview = {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};
     else
-      templateData.transaction.preview = {src: 'https://res.cloudinary.com/opencollective/image/fetch/w_640/' + templateData.transaction.link, width: '100%'};
+      templateData.transaction.preview = {src: `https://res.cloudinary.com/opencollective/image/fetch/w_640/${templateData.transaction.link}`, width: '100%'};
 
     return emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
       .then(template => {
@@ -113,8 +113,8 @@ describe('lib.notifications.test.js', () => {
         body = emailLib.getBody(template);
       })
       .then(() => request(app)
-        .post('/groups/' + group.id + '/transactions')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .post(`/groups/${group.id}/transactions`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           transaction: transactionsData[0]
         })

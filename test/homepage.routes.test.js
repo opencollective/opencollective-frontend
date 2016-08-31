@@ -1,26 +1,26 @@
 /**
  * Dependencies.
  */
-var app = require('../server/index');
-var expect = require('chai').expect;
-var request = require('supertest-as-promised');
-var utils = require('../test/utils.js')();
+const app = require('../server/index');
+const expect = require('chai').expect;
+const request = require('supertest-as-promised');
+const utils = require('../test/utils.js')();
 
 /**
  * Variables.
  */
-var userData = utils.data('user1');
-var groupData = utils.data('group1');
-var models = app.set('models');
+const userData = utils.data('user1');
+const groupData = utils.data('group1');
+const models = app.set('models');
 
 /**
  * Tests.
  */
 describe('homepage.routes.test.js', () => {
 
-  var user, group, paymentMethod, application;
+  let user, group, paymentMethod;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.cleanAllDb());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach((done) =>

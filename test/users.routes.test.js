@@ -28,22 +28,21 @@ const mock = require('./mocks/clearbit.json');
  */
 describe('users.routes.test.js', () => {
 
-  var application;
-  var application2;
-  var application3;
-  var nm;
+  let application;
+  let application2;
+  let application3;
+  let nm;
 
-  var sandbox, stub;
+  let sandbox;
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     userlib.memory = {};
-    stub = sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
+    sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
       return new Bluebird((resolve, reject) => {
-        if(opts.email === "xdamman@gmail.com") {
+        if (opts.email === "xdamman@gmail.com") {
           return resolve(mock);
-        }
-        else {
-          var NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
+        } else {
+          const NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
           reject(NotFound);
         }
       });
@@ -290,7 +289,7 @@ describe('users.routes.test.js', () => {
       });
 
       it('fails to create a user with the same username', (done) => {
-        var u = {
+        const u = {
           email: 'newemail@email.com', username: userData.username
         }
         request(app)
@@ -315,8 +314,8 @@ describe('users.routes.test.js', () => {
    */
   describe('#get()', () => {
 
-    var user;
-    var user2;
+    let user;
+    let user2;
 
     // Create two users
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -333,7 +332,7 @@ describe('users.routes.test.js', () => {
         .get(`/users/${user.id}?api_key=${application.api_key}`)
         .end((e, res) => {
           expect(e).to.not.exist;
-          var u = res.body;
+          const u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
           expect(res.body).to.have.property('description', utils.data('user1').description);
           expect(res.body).to.have.property('longDescription', utils.data('user1').longDescription);
@@ -349,7 +348,7 @@ describe('users.routes.test.js', () => {
         .get(`/users/${user.username}?profile=true&api_key=${application.api_key}`)
         .end((e, res) => {
           expect(e).to.not.exist;
-          var u = res.body;
+          const u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
           expect(u.groups[0].name).to.equal(utils.data('group1').name);
           expect(u.groups[0].role).to.equal('MEMBER');
@@ -361,10 +360,10 @@ describe('users.routes.test.js', () => {
     it('successfully get a user\'s information when he is authenticated', (done) => {
       request(app)
         .get(`/users/${user.id}`)
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .end((e, res) => {
           expect(e).to.not.exist;
-          var u = res.body;
+          const u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
           expect(u.email).to.equal(utils.data('user1').email.toLowerCase());
           done();
@@ -374,29 +373,29 @@ describe('users.routes.test.js', () => {
   });
 
   describe('#update paypal email', () => {
-    var user;
+    let user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
     it('should update the paypal email', (done) => {
-      var email = 'test+paypal@email.com';
+      const email = 'test+paypal@email.com';
       request(app)
-        .put('/users/' + user.id + '/paypalemail')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put(`/users/${user.id}/paypalemail`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           paypalEmail: email
         })
         .end((err, res) => {
-          var body = res.body;
+          const body = res.body;
           expect(body.paypalEmail).to.equal(email);
           done();
         });
     });
 
     it('fails if the user is not logged in', (done) => {
-      var email = 'test+paypal@email.com';
+      const email = 'test+paypal@email.com';
       request(app)
-        .put('/users/' + user.id + '/paypalemail')
+        .put(`/users/${user.id}/paypalemail`)
         .send({
           paypalEmail: email
         })
@@ -409,8 +408,8 @@ describe('users.routes.test.js', () => {
 
     it('fails if the email is not valid', (done) => {
       request(app)
-        .put('/users/' + user.id + '/paypalemail')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put(`/users/${user.id}/paypalemail`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           paypalEmail: 'abc'
         })
@@ -423,8 +422,8 @@ describe('users.routes.test.js', () => {
   });
 
   describe('#update password', () => {
-    var user;
-    var user2;
+    let user;
+    let user2;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
@@ -434,14 +433,14 @@ describe('users.routes.test.js', () => {
       const newPassword = 'aaa123';
 
       request(app)
-        .put('/users/' + user.id + '/password')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put(`/users/${user.id}/password`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           password: newPassword,
           passwordConfirmation: newPassword
         })
         .end((err, res) => {
-          var body = res.body;
+          const body = res.body;
           expect(body.success).to.equal(true);
           models.User.auth(user.email, newPassword, e => {
             expect(e).to.not.exist;
@@ -452,7 +451,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the user is not logged in', (done) => {
       request(app)
-        .put('/users/' + user.id + '/password')
+        .put(`/users/${user.id}/password`)
         .end((e,res) => {
           expect(res.statusCode).to.equal(401);
           expect(res.body.error.type).to.equal('unauthorized');
@@ -462,8 +461,8 @@ describe('users.routes.test.js', () => {
 
     it('fails if wrong user is logged in', (done) => {
       request(app)
-        .put('/users/' + user.id + '/password')
-        .set('Authorization', 'Bearer ' + user2.jwt(application))
+        .put(`/users/${user.id}/password`)
+        .set('Authorization', `Bearer ${user2.jwt(application)}`)
         .end((e,res) => {
           expect(res.statusCode).to.equal(403);
           expect(res.body.error.type).to.equal('forbidden');
@@ -475,11 +474,11 @@ describe('users.routes.test.js', () => {
       const newPassword = 'aaa123';
 
       request(app)
-        .put('/users/' + user.id + '/password')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put(`/users/${user.id}/password`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           password: newPassword,
-          passwordConfirmation: newPassword + 'a'
+          passwordConfirmation: `${newPassword}a`
         })
         .end((e,res) => {
           expect(res.statusCode).to.equal(400);
@@ -492,29 +491,29 @@ describe('users.routes.test.js', () => {
   });
 
   describe('#update avatar', () => {
-    var user;
+    let user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
     it('should update avatar', (done) => {
-      var link = 'http://opencollective.com/assets/icon2.svg';
+      const link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
-        .put('/users/' + user.id + '/avatar')
-        .set('Authorization', 'Bearer ' + user.jwt(application))
+        .put(`/users/${user.id}/avatar`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           avatar: link
         })
         .end((err, res) => {
-          var body = res.body;
+          const body = res.body;
           expect(body.avatar).to.equal(link);
           done();
         });
     });
 
     it('fails if the user is not logged in', (done) => {
-      var link = 'http://opencollective.com/assets/icon2.svg';
+      const link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
-        .put('/users/' + user.id + '/avatar')
+        .put(`/users/${user.id}/avatar`)
         .send({
           avatar: link
         })
@@ -527,7 +526,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the avatar key is missing from the payload', (done) => {
       request(app)
-        .put('/users/' + user.id + '/avatar')
+        .put(`/users/${user.id}/avatar`)
         .send({})
         .end((e,res) => {
           expect(res.statusCode).to.equal(400);
@@ -542,10 +541,10 @@ describe('users.routes.test.js', () => {
    * Update user (without authentication)
    */
   describe('#update user from public donation page', () => {
-    var userWithPassword;
-    var userWithoutPassword;
+    let userWithPassword;
+    let userWithoutPassword;
 
-    var newUser = {
+    const newUser = {
       name: 'newname',
       twitterHandle: 'twitter.com/asood123',
       description: "engineer",
@@ -555,7 +554,7 @@ describe('users.routes.test.js', () => {
 
     before(() => {
       sinon.stub(app.knox, 'put', () => {
-        var s = new require('stream').Readable();
+        const s = new require('stream').Readable();
         s.write = function(){}
         s.end = function(){
           s.url = `https://${config.aws.s3.bucket}.s3-us-west-1.amazonaws.com/31654v3_2ba16cc0-124d-11e6-b36a-2d79eed36137.png`
@@ -591,7 +590,7 @@ describe('users.routes.test.js', () => {
         })
         .then(() => {
           request(app)
-            .put('/users/' + userWithPassword.id)
+            .put(`/users/${userWithPassword.id}`)
             .send({
               user: newUser,
               api_key: application.api_key
@@ -614,7 +613,7 @@ describe('users.routes.test.js', () => {
         })
         .then(() => {
           request(app)
-            .put('/users/' + userWithoutPassword.id)
+            .put(`/users/${userWithoutPassword.id}`)
             .send({
               user: newUser,
               api_key: application.api_key
@@ -635,7 +634,7 @@ describe('users.routes.test.js', () => {
   });
 
   describe('forgot password', () => {
-    var user;
+    let user;
 
     beforeEach(() => models.User.create(userData).tap(u => user = u));
 
@@ -703,8 +702,8 @@ describe('users.routes.test.js', () => {
   });
 
   describe('reset password', () => {
-    var user;
-    var encId;
+    let user;
+    let encId;
 
     beforeEach(() => sinon.spy(emailLib, 'send'));
 
@@ -794,7 +793,7 @@ describe('users.routes.test.js', () => {
       const $ = cheerio.load(nm.sendMail.lastCall.args[0].html);
       const token = $('a').data('token');
 
-      var d = new Date();
+      const d = new Date();
       d.setFullYear(d.getFullYear() - 1); // last year
 
       user.resetPasswordSentAt = d;
@@ -860,7 +859,7 @@ describe('users.routes.test.js', () => {
 
   describe('#sendNewTokenByEmail', () => {
 
-    var user;
+    let user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
@@ -920,7 +919,7 @@ describe('users.routes.test.js', () => {
 
   describe('#refreshTokenByEmail', () => {
 
-    var user;
+    let user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
@@ -960,7 +959,6 @@ describe('users.routes.test.js', () => {
     });
 
     it('sends an email with the new valid token', () => {
-      const secret = config.keys.opencollective.secret;
       const expiredToken = jwt.sign({ user }, config.keys.opencollective.secret, {
         expiresIn: -1,
         subject: user.id,
