@@ -19,7 +19,8 @@ const {
   Group,
   Transaction,
   ConnectedAccount,
-  User
+  User,
+  Donation
 } = models;
 
 /**
@@ -165,6 +166,7 @@ export default function(app) {
 
     const query = _.merge({
       where,
+      include: { model: Donation },
       order: [[req.sorting.key, req.sorting.dir]]
     }, req.pagination);
 
@@ -178,7 +180,7 @@ export default function(app) {
           Link: getLinkHeader(getRequestedUrl(req), req.pagination)
         });
 
-        res.send(_.pluck(transactions.rows, 'info'));
+        res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': transaction.Donation && transaction.Donation.title})));
       })
       .catch(next);
   };
