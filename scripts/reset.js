@@ -1,7 +1,7 @@
 const exec = require('child-process-promise').exec;
 
 const app = require('../server/index');
-const models = app.set('models');
+import models from '../server/models';
 const roles = require('../server/constants/roles');
 
 var data = {};

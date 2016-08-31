@@ -17,8 +17,7 @@ const Bluebird = require('bluebird');
 const moment = require('moment');
 const _ = require('lodash');
 
-const app = require('../server/index');
-const models = app.set('models');
+import models from '../server/models';
 const slack = require('../server/lib/slack');
 
 const startDate = '2016-03-01'; // date that we started paypal payments

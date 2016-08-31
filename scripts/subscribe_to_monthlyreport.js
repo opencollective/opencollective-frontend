@@ -3,14 +3,15 @@
  * This script subscribes all members of a collective (core contributors)
  * to the `group.monthlyreport` notification (for all collectives)
  */
-import _ from 'lodash';
-import app  from '../server/index';
 import Promise from 'bluebird';
+import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const UserGroup = app.set('models').UserGroup;
-const Notification = app.set('models').Notification;
+const {
+  Notification,
+  UserGroup
+} = models;
 
 const processRows = (rows) => {
     return Promise.map(rows, processRow);

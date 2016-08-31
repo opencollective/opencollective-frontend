@@ -1,5 +1,5 @@
 const app = require('../server/index');
-const models = app.set('models');
+import models from '../server/models';
 const stripeGateway = require('../server/gateways').stripe;
 const constants = require('../server/constants/transactions');
 

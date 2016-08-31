@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const app = require('../server/index');
 const config = require('config');
-const models = app.set('models');
+import models from '../server/models';
 const constants = require('../server/constants/transactions');
 
 const done = (err) => {
