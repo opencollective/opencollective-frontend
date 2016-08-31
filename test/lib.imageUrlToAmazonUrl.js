@@ -1,8 +1,8 @@
-import app from '../server/index';
 import config from 'config';
 import imageUrlToAmazonUrl from '../server/lib/imageUrlToAmazonUrl';
 import { expect } from 'chai';
 import sinon from 'sinon';
+import knox from '../server/gateways/knox';
 
 const SAMPLE = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764'
 
@@ -10,7 +10,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
   describe('#Convert an external image url to a Amazon url', () => {
 
     before(() => {
-      sinon.stub(app.knox, 'put', () => {
+      sinon.stub(knox, 'put', () => {
         const s = new require('stream').Readable();
         s.write = function(){}
         s.end = function(){
@@ -22,12 +22,12 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     });
 
     after(() => {
-      app.knox.put.restore()
+      knox.put.restore()
     })
 
     it('successfully converts cloudfront.net url to amazon aws url', done => {
       imageUrlToAmazonUrl(
-        app.knox,
+        knox,
         SAMPLE,
         (e, aws_src) => {
           expect(e).to.not.exist;

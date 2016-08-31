@@ -1,14 +1,9 @@
-/**
- * Dependencies.
- */
-
 import {expect} from 'chai';
 import request from 'supertest';
 import nock from 'nock';
 import _ from 'lodash';
 import chanceLib from 'chance';
 import sinon from 'sinon';
-
 import app from '../server/index';
 import roles from '../server/constants/roles';
 import activities from '../server/constants/activities';
@@ -16,7 +11,7 @@ import {type} from '../server/constants/transactions';
 import * as utils from '../test/utils';
 import {planId as generatePlanId} from '../server/lib/utils';
 import models from '../server/models';
-import * as stripe from '../server/gateways/stripe';
+import {appStripe} from '../server/gateways/stripe';
 import stripeMock from './mocks/stripe';
 
 const chance = chanceLib.Chance();
@@ -44,7 +39,7 @@ const stubStripe = () => {
   mock.email = chance.email();
   stripeEmail = mock.email;
 
-  const stub = sinon.stub(stripe.appStripe.accounts, 'create');
+  const stub = sinon.stub(appStripe.accounts, 'create');
   stub.yields(null, mock);
 };
 
@@ -78,7 +73,7 @@ describe('webhooks.routes.test.js', () => {
       .end((e, res) => {
         expect(e).to.not.exist;
         group = res.body;
-        stripe.appStripe.accounts.create.restore();
+        appStripe.accounts.create.restore();
         done();
       });
   });
@@ -356,9 +351,8 @@ describe('webhooks.routes.test.js', () => {
       livemode: false
     });
 
-    const env = app.set('env');
-
-    app.set('env', 'production');
+    const env = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
 
     nocks['events.retrieve'] = nock(STRIPE_URL)
       .get(`/v1/events/${event.id}`)
@@ -370,7 +364,7 @@ describe('webhooks.routes.test.js', () => {
       .expect(200)
       .end((err) => {
         expect(err).to.not.exist;
-        app.set('env', env);
+        process.env.NODE_ENV = env;
         expect(nocks['events.retrieve'].isDone()).to.be.false;
         done();
       });

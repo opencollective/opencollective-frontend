@@ -61,7 +61,7 @@ describe('users.routes.test.js', () => {
   beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
 
   // create a fake nodemailer transport
-  beforeEach(done => {
+  beforeEach(() => {
     config.mailgun.user = 'xxxxx';
     config.mailgun.password = 'password';
 
@@ -73,24 +73,13 @@ describe('users.routes.test.js', () => {
           },
           logger: false
         });
-    sinon.stub(nodemailer, 'createTransport', () => {
-      return nm;
-    });
-    done();
+    sinon.stub(nodemailer, 'createTransport', () => nm);
   });
 
   // stub the transport
-  beforeEach(done => {
-    sinon.stub(nm, 'sendMail', (object, cb) => {
-      cb(null, object);
-    });
-    done();
-  });
+  beforeEach(() => sinon.stub(nm, 'sendMail', (object, cb) => cb(null, object)));
 
-  afterEach(done => {
-    nm.sendMail.restore();
-    done();
-  })
+  afterEach(() => nm.sendMail.restore());
 
   afterEach(() => {
     config.mailgun.user = '';

@@ -16,10 +16,9 @@ const {
   PaymentMethod
 } = models;
 
-const isProduction = process.env.NODE_ENV === 'production';
-
 export default function stripeWebhook(req, res, next) {
   const { body } = req;
+  const isProduction = process.env.NODE_ENV === 'production';
 
   // Stripe send test events to production as well
   // don't do anything if the event is not livemode
