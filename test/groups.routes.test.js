@@ -16,6 +16,8 @@ const emailLib = require('../server/lib/email');
  * Variables.
  */
 const userData = utils.data('user1');
+const userData2 = utils.data('user2');
+const userData3 = utils.data('user3');
 const publicGroupData = utils.data('group1');
 const privateGroupData = utils.data('group2');
 const transactionsData = utils.data('transactions1').transactions;
@@ -28,7 +30,7 @@ const stripeMock = require('./mocks/stripe');
 describe('groups.routes.test.js', () => {
 
   let application;
-  let user;
+  let user, user2, user3;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -48,12 +50,26 @@ describe('groups.routes.test.js', () => {
    */
   describe('#create', () => {
 
-    it('fails creating a group if not authenticated', (done) => {
+    beforeEach(() => models.User.create(userData2).tap(u => user2 = u));
+    beforeEach(() => models.User.create(userData3).tap(u => user3 = u));
+
+    it('fails creating a group if no token', (done) => {
       request(app)
         .post('/groups')
         .send({
           group: privateGroupData
         })
+        .expect(401)
+        .end(e => {
+          expect(e).to.not.exist;
+          done();
+        });
+    });
+
+    it('fails creating a group if token but a different id', (done) => {
+      request(app)
+        .post('/groups')
+        .set('Authorization', `Bearer ${user3.jwt(application)}`)
         .expect(401)
         .end(e => {
           expect(e).to.not.exist;
@@ -172,16 +188,19 @@ describe('groups.routes.test.js', () => {
 
     });
 
-    it('successfully create a group assigning the caller as host', (done) => {
-      const role = roles.HOST;
+    it('successfully create a group, while assigning the users as members', (done) => {
+
+      const users = [
+            _.assign(_.omit(userData, 'password'), {role: roles.HOST}),
+            _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
+            _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
+
+      const g = Object.assign(privateGroupData, {users})
 
       request(app)
         .post('/groups')
         .set('Authorization', `Bearer ${user.jwt(application)}`)
-        .send({
-          group: privateGroupData,
-          role: role
-        })
+        .send({group: g})
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -200,10 +219,17 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('twitterHandle');
           expect(res.body).to.have.property('website');
 
-          user.getGroups().then((groups) => {
-            expect(groups).to.have.length(1);
+          Promise.all([
+            models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
+            models.UserGroup.findOne({where: { UserId: user2.id, role: roles.MEMBER }}),
+            models.UserGroup.findOne({where: { UserId: user3.id, role: roles.MEMBER }}),
+            ])
+          .then(results => {
+            expect(results[0].GroupId).to.equal(1);
+            expect(results[1].GroupId).to.equal(1);
+            expect(results[2].GroupId).to.equal(1);
             done();
-          });
+          })
         });
     });
 
@@ -365,8 +391,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
-          group: privateGroupData,
-          role: roles.HOST
+          group: Object.assign(privateGroupData, { users: [{ email: user.email, role: roles.HOST}]}),
         })
         .expect(200)
         .end((e, res) => {
@@ -392,8 +417,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
-          group: publicGroupData,
-          role: roles.HOST
+          group: Object.assign(publicGroupData, { users: [{ email: user.email, role: roles.HOST}]})
         })
         .expect(200)
         .end((e, res) => {
@@ -419,7 +443,7 @@ describe('groups.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+    beforeEach(() => models.User.create(userData2).tap(u => user2 = u));
     beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
 
     // Create a transaction for group1.

@@ -70,8 +70,7 @@ describe('webhooks.routes.test.js', () => {
       .post('/groups')
       .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
-        group: groupData,
-        role: roles.HOST
+        group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e, res) => {

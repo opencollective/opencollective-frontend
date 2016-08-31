@@ -6,6 +6,7 @@ const expect = require('chai').expect;
 const request = require('supertest-as-promised');
 const utils = require('../test/utils.js')();
 const constants = require('../server/constants/activities');
+const roles = require('../server/constants/roles');
 
 /**
  * Variable.
@@ -139,7 +140,9 @@ describe("notification.model.test.js", () => {
     request(app)
       .post('/groups')
       .set('Authorization', `Bearer ${user2.jwt(application)}`)
-      .send({group: group3Data, role: 'HOST'})
+      .send({
+        group: Object.assign(group3Data, { users: [{ email: user2.email, role: roles.HOST}]})
+      })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
           UserId: user2.id,
