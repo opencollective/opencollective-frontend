@@ -1,6 +1,3 @@
-/**
- * Dependencies
- */
 import Url from 'url';
 import config from 'config';
 import crypto from 'crypto';
@@ -18,7 +15,7 @@ export const encrypt = (text) => {
   let crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
   return crypted;
-}
+};
 
 /**
  * Descript wih resetPasswordSecret
@@ -28,7 +25,7 @@ export const decrypt = (text) => {
   let dec = decipher.update(text,'hex','utf8')
   dec += decipher.final('utf8');
   return dec;
-}
+};
 
 /**
  * Generate a secured token that works inside URLs
@@ -183,7 +180,7 @@ export const appendTier = (backers, tiers) => {
     return backer;
   });
   return backers;
-}
+};
 
 /**
  * Default host id, set this for new groups created through Github
@@ -193,7 +190,7 @@ export const defaultHostId = () => {
     return 772;
   }
   return 1;
-}
+};
 
 /**
  * Check if this is an internal email address.
@@ -205,7 +202,7 @@ export const isEmailInternal = (email) => {
     return true;
   }
   return false;
-}
+};
 
 /**
  * Export public methods.

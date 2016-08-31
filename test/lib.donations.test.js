@@ -1,25 +1,23 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const nock = require('nock');
-const chance = require('chance').Chance();
-const request = require('supertest');
+import _ from 'lodash';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import nock from 'nock';
+import chanceLib from 'chance';
+import request from 'supertest';
+import app from '../server/index';
+import * as utils from '../test/utils';
+import * as donationsLib from '../server/lib/donations';
+import { planId as generatePlanId } from '../server/lib/utils.js';
+import * as constants from '../server/constants/transactions';
+import emailLib from '../server/lib/email';
+import roles from '../server/constants/roles';
+import models from '../server/models';
+import {appStripe} from '../server/gateways/stripe';
 
-const app = require('../server/index');
-const utils = require('../test/utils.js')();
-const donationsLib = require('../server/lib/donations.js');
-const generatePlanId = require('../server/lib/utils.js').planId;
-const constants = require('../server/constants/transactions');
-const emailLib = require('../server/lib/email');
-const roles = require('../server/constants/roles');
-
-const models = app.get('models');
+const chance = chanceLib.Chance();
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
-const stripeMock = require('./mocks/stripe');
+import stripeMock from './mocks/stripe';
 const STRIPE_URL = 'https://api.stripe.com:443';
 const CHARGE = 10.99;
 const CURRENCY = 'EUR';
@@ -116,7 +114,7 @@ describe('lib.donation.test.js', () => {
       const mock = stripeMock.accounts.create;
       mock.email = chance.email();
 
-      const stub = sinon.stub(app.stripe.accounts, 'create');
+      const stub = sinon.stub(appStripe.accounts, 'create');
       stub.yields(null, mock);
     };
 
@@ -218,7 +216,7 @@ describe('lib.donation.test.js', () => {
     });
 
     afterEach(() => {
-      app.stripe.accounts.create.restore();
+      appStripe.accounts.create.restore();
       nock.cleanAll();
     });
 

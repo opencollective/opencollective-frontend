@@ -1,4 +1,4 @@
-{
+export default {
     "domain": "opencollective.com",
     "From": "Xavier Damman <xdamman+test@gmail.com>",
     "X-Envelope-From": "<xdamman+test@gmail.com>",

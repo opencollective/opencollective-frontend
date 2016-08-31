@@ -1,32 +1,25 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const app = require('../server/index');
-const async = require('async');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
-const chance = require('chance').Chance();
-const utils = require('../test/utils.js')();
-const roles = require('../server/constants/roles');
-const sinon = require('sinon');
-const emailLib = require('../server/lib/email');
+import _ from 'lodash';
+import app from '../server/index';
+import async from 'async';
+import { expect } from 'chai';
+import request from 'supertest-as-promised';
+import chanceLib from 'chance';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import sinon from 'sinon';
+import emailLib from '../server/lib/email';
+import stripeMock from './mocks/stripe';
+import models from '../server/models';
+import {appStripe} from '../server/gateways/stripe';
 
-/**
- * Variables.
- */
+const chance = chanceLib.Chance();
 const userData = utils.data('user1');
 const userData2 = utils.data('user2');
 const userData3 = utils.data('user3');
 const publicGroupData = utils.data('group1');
 const privateGroupData = utils.data('group2');
 const transactionsData = utils.data('transactions1').transactions;
-const models = app.set('models');
-const stripeMock = require('./mocks/stripe');
 
-/**
- * Tests.
- */
 describe('groups.routes.test.js', () => {
 
   let application;
@@ -38,11 +31,11 @@ describe('groups.routes.test.js', () => {
 
   // Stripe stub.
   beforeEach(() => {
-    const stub = sinon.stub(app.stripe.accounts, 'create');
+    const stub = sinon.stub(appStripe.accounts, 'create');
     stub.yields(null, stripeMock.accounts.create);
   });
   afterEach(() => {
-    app.stripe.accounts.create.restore();
+    appStripe.accounts.create.restore();
   });
 
   /**
@@ -95,7 +88,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
-          group: group
+          group
         })
         .expect(400)
         .end((e, res) => {
@@ -284,10 +277,10 @@ describe('groups.routes.test.js', () => {
 
     describe('Successfully create a group and ', () => {
 
-      const ConnectedAccount = models.ConnectedAccount;
+      const { ConnectedAccount } = models;
 
       beforeEach(() => {
-        const User = models.User;
+        const { User } = models;
 
         // create connected account like the oauth happened
         let preCA;
@@ -374,14 +367,14 @@ describe('groups.routes.test.js', () => {
     let user2;
 
     const stubStripe = () => {
-      const stub = sinon.stub(app.stripe.accounts, 'create');
+      const stub = sinon.stub(appStripe.accounts, 'create');
       const mock = stripeMock.accounts.create;
       mock.email = chance.email();
       stub.yields(null, mock);
     };
 
     beforeEach(() => {
-      app.stripe.accounts.create.restore();
+      appStripe.accounts.create.restore();
       stubStripe();
     });
 
@@ -407,7 +400,7 @@ describe('groups.routes.test.js', () => {
     });
 
     beforeEach(() => {
-      app.stripe.accounts.create.restore();
+      appStripe.accounts.create.restore();
       stubStripe();
     });
 

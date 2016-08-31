@@ -1,23 +1,26 @@
-const app = require('../server/index');
-const expect = require('chai').expect;
-const Promise = require('bluebird');
-const request = require('supertest-as-promised');
-const sinon = require('sinon');
-const utils = require('./utils')();
-const roles = require('../server/constants/roles');
-const badRequest = require('./lib/expectHelpers').badRequest;
-const missingRequired = require('./lib/expectHelpers').missingRequired;
-const paypalMock = require('./mocks/paypal');
+import app from '../server/index';
+import { expect } from 'chai';
+import Promise from 'bluebird';
+import request from 'supertest-as-promised';
+import sinon from 'sinon';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import { badRequest, missingRequired } from './lib/expectHelpers';
+import paypalMock from './mocks/paypal';
+import paypalAdaptive from '../server/gateways/paypalAdaptive';
+import models from '../server/models';
+
 const payMock = paypalMock.adaptive.payCompleted;
 const preapprovalDetailsMock = Object.assign({}, paypalMock.adaptive.preapprovalDetails.completed);
 
-const models = app.get('models');
 const expense = utils.data('expense1');
 const expense2 = utils.data('expense2');
-const Activity = models.Activity;
-const Expense = models.Expense;
-const Transaction = models.Transaction;
-const PaymentMethod = models.PaymentMethod;
+const {
+  Activity,
+  Expense,
+  Transaction,
+  PaymentMethod
+} = models;
 
 describe('expenses.routes.test.js', () => {
   let application, host, member, group;
@@ -195,7 +198,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenses.length).to.equal(per_page);
                 expect(expenses[0].id).to.equal(1);
 
-                const headers = response.headers;
+                const { headers } = response;
                 expect(headers).to.have.property('link');
                 expect(headers.link).to.contain('next');
                 expect(headers.link).to.contain('page=2');
@@ -223,7 +226,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenses.length).to.equal(1);
                 expect(expenses[0].id).to.equal(2);
 
-                const headers = response.headers;
+                const { headers } = response;
                 expect(headers).to.have.property('link');
                 expect(headers.link).to.contain('next');
                 expect(headers.link).to.contain('page=3');
@@ -246,7 +249,7 @@ describe('expenses.routes.test.js', () => {
                 const expenses = response.body;
                 expect(expenses.length).to.be.equal(1);
                 expenses.forEach(e => expect(e.id >= since_id).to.be.true);
-                const headers = response.headers;
+                const { headers } = response;
                 expect(headers.link).to.be.empty;
               });
             });
@@ -382,7 +385,7 @@ describe('expenses.routes.test.js', () => {
                     token: 'abc'
                   }));
 
-                afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+                afterEach(() => paypalAdaptive.preapprovalDetails.restore());
 
                 describe('WHEN funds are insufficient', () => {
 
@@ -408,7 +411,7 @@ describe('expenses.routes.test.js', () => {
                 return () => {
                   preapprovalDetailsMock.maxTotalAmountOfAllPayments = maxAmount;
                   sinon
-                    .stub(app.paypalAdaptive, 'preapprovalDetails')
+                    .stub(paypalAdaptive, 'preapprovalDetails')
                     .yields(null, preapprovalDetailsMock);
                 };
               }
@@ -450,7 +453,7 @@ describe('expenses.routes.test.js', () => {
                     token: 'abc'
                   }));
 
-                afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+                afterEach(() => paypalAdaptive.preapprovalDetails.restore());
 
                 describe('WHEN funds are insufficient', () => {
 
@@ -476,7 +479,7 @@ describe('expenses.routes.test.js', () => {
                 return () => {
                   preapprovalDetailsMock.maxTotalAmountOfAllPayments = maxAmount;
                   sinon
-                    .stub(app.paypalAdaptive, 'preapprovalDetails')
+                    .stub(paypalAdaptive, 'preapprovalDetails')
                     .yields(null, preapprovalDetailsMock);
                 };
               }
@@ -521,7 +524,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach(() => {
               sinon
-                .stub(app.paypalAdaptive, 'preapprovalDetails')
+                .stub(paypalAdaptive, 'preapprovalDetails')
                 .yields(null, preapprovalDetailsMock);
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
@@ -530,7 +533,7 @@ describe('expenses.routes.test.js', () => {
                 .expect(200);
             });
 
-            afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+            afterEach(() => paypalAdaptive.preapprovalDetails.restore());
 
             let payReq;
 
@@ -550,7 +553,7 @@ describe('expenses.routes.test.js', () => {
               let payStub;
 
               beforeEach(() => {
-                payStub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
+                payStub = sinon.stub(paypalAdaptive, 'pay', (data, cb) => {
                   return cb(null, payMock);
                 });
               });
@@ -659,7 +662,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach(() => {
               sinon
-                .stub(app.paypalAdaptive, 'preapprovalDetails')
+                .stub(paypalAdaptive, 'preapprovalDetails')
                 .yields(null, preapprovalDetailsMock);
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
@@ -668,7 +671,7 @@ describe('expenses.routes.test.js', () => {
                 .expect(200);
             });
 
-            afterEach(() => app.paypalAdaptive.preapprovalDetails.restore());
+            afterEach(() => paypalAdaptive.preapprovalDetails.restore());
 
             let payReq;
 
@@ -688,7 +691,7 @@ describe('expenses.routes.test.js', () => {
               let payStub;
 
               beforeEach(() => {
-                payStub = sinon.stub(app.paypalAdaptive, 'pay', (data, cb) => {
+                payStub = sinon.stub(paypalAdaptive, 'pay', (data, cb) => {
                   return cb(null, payMock);
                 });
               });

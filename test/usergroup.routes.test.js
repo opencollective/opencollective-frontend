@@ -1,18 +1,18 @@
 /**
  * Dependencies.
  */
-const app = require('../server/index');
-const async = require('async');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
-const roles = require('../server/constants/roles');
-const Promise = require('bluebird');
+import app from '../server/index';
+import async from 'async';
+import {expect} from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import Promise from 'bluebird';
+import models from '../server/models';
 
 /**
  * Variables.
  */
-const models = app.set('models');
 let users, group;
 
 /**
@@ -166,7 +166,7 @@ describe('usergroup.routes.test.js', () => {
         .post(`/groups/${group.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt(application)}`)
         .send({
-          role: role
+          role
         })
         .expect(200)
         .end((e, res) => {
@@ -315,7 +315,7 @@ describe('usergroup.routes.test.js', () => {
         .put(`/groups/${group.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt(application)}`)
         .send({
-          role: role
+          role
         })
         .expect(200)
         .end((e, res) => {

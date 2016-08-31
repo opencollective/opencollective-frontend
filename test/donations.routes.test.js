@@ -1,32 +1,22 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest');
-const sinon = require('sinon');
-const nock = require('nock');
+import _ from 'lodash';
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest';
+import sinon from 'sinon';
+import nock from 'nock';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import * as donationsLib from '../server/lib/donations';
+import models from '../server/models';
 
-const utils = require('../test/utils.js')();
-const roles = require('../server/constants/roles');
-const donationsLib = require('../server/lib/donations');
-
-/**
- * Variables.
- */
 const CHARGE = 10.99;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
 const EMAIL = 'paypal@email.com';
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
-const models = app.set('models');
-const paypalNock = require('./mocks/paypal.nock');
+import paypalNock from './mocks/paypal.nock';
 
-/**
- * Tests.
- */
 describe('donations.routes.test.js', () => {
 
   let application;
@@ -432,7 +422,7 @@ describe('donations.routes.test.js', () => {
             })
             .end((err, res) => {
               expect(err).to.not.exist;
-              links = res.body.links;
+              ({ links } = res.body);
               done();
             });
         });
@@ -493,7 +483,7 @@ describe('donations.routes.test.js', () => {
             .end((err, res) => {
               expect(err).to.not.exist;
               expect(executeRequest.isDone()).to.be.true;
-              const text = res.text;
+              const { text } = res;
 
               models.Transaction.findAndCountAll({
                 include: [
@@ -528,7 +518,7 @@ describe('donations.routes.test.js', () => {
                 return group.getUsers();
               })
               .then((users) => {
-                const backer = _.find(users, {email: email});
+                const backer = _.find(users, {email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();
               })
@@ -561,7 +551,7 @@ describe('donations.routes.test.js', () => {
             })
             .end((err, res) => {
               expect(err).to.not.exist;
-              links = res.body.links;
+              ({ links } = res.body);
               done();
             });
         });
@@ -616,7 +606,7 @@ describe('donations.routes.test.js', () => {
             .end((err, res) => {
               expect(err).to.not.exist;
               expect(executeRequest.isDone()).to.be.true;
-              const text = res.text;
+              const { text } = res;
 
               models.Transaction.findAndCountAll({
                 include: [
@@ -646,7 +636,7 @@ describe('donations.routes.test.js', () => {
                 return group.getUsers();
               })
               .then((users) => {
-                const backer = _.find(users, {email: email});
+                const backer = _.find(users, {email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
               })
               .then(() => models.Activity.findAndCountAll({ where: { type: "group.transaction.created" } }))

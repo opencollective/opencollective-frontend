@@ -1,16 +1,12 @@
-/**
- * Dependencies.
- */
-const expect = require('chai').expect;
-const request = require('supertest');
-const async = require('async');
-const nock = require('nock');
-const config = require('config');
-
-const app = require('../server/index');
-const utils = require('../test/utils.js')();
-const models = app.get('models');
-const roles = require('../server/constants/roles');
+import { expect } from 'chai';
+import request from 'supertest';
+import async from 'async';
+import nock from 'nock';
+import config from 'config';
+import app from '../server/index';
+import models from '../server/models';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
 
 describe('stripe.routes.test.js', () => {
 

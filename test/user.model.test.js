@@ -1,23 +1,14 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const expect = require('chai').expect;
-const utils = require('../test/utils.js')();
+import {expect} from 'chai';
+import * as utils from '../test/utils';
+import models from '../server/models';
 
-/**
- * Variable.
- */
 const userData = utils.data('user1');
 
-/**
- * Tests.
- */
 describe('user.models.test.js', () => {
 
   let User;
 
-  beforeEach(() => User = app.get('models').User);
+  beforeEach(() => User = models.User);
 
   beforeEach(() => utils.cleanAllDb());
 
@@ -52,7 +43,7 @@ describe('user.models.test.js', () => {
 
       return User
         .create({
-          email: email,
+          email,
           password: 123456
         })
         .tap(user => {
@@ -68,7 +59,7 @@ describe('user.models.test.js', () => {
 
       return User
         .create({
-          email: email,
+          email,
           password: '123456'
         })
         .tap(user => {

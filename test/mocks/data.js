@@ -1,4 +1,4 @@
-{
+export default {
   "applicationSuper": {
     "name": "webapp",
     "api_key": "0ac43519edcf4421d80342403fb5985d",

@@ -1,27 +1,28 @@
 /**
  * Dependencies.
  */
-const _ = require('lodash');
-const cheerio = require('cheerio');
-const app = require('../server/index');
-const config = require('config');
-const expect = require('chai').expect;
-const request = require('supertest-as-promised');
-const utils = require('../test/utils.js')();
-const encrypt = require('../server/lib/utils').encrypt;
-const userlib = require('../server/lib/userlib');
-const sinon = require('sinon');
-const Bluebird = require('bluebird');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const emailLib = require('../server/lib/email');
+import _ from 'lodash';
+import cheerio from 'cheerio';
+import app from '../server/index';
+import config from 'config';
+import {expect} from 'chai';
+import request from 'supertest-as-promised';
+import * as utils from '../test/utils';
+import {encrypt} from '../server/lib/utils';
+import userlib from '../server/lib/userlib';
+import sinon from 'sinon';
+import Bluebird from 'bluebird';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import emailLib from '../server/lib/email';
+import models from '../server/models';
+import mock from './mocks/clearbit';
+import knox from '../server/gateways/knox';
 
 /**
  * Variables.
  */
 const userData = utils.data('user1');
-const models = app.set('models');
-const mock = require('./mocks/clearbit.json');
 
 /**
  * Tests.
@@ -67,7 +68,7 @@ describe('users.routes.test.js', () => {
     nm = nodemailer.createTransport({
           name: 'testsend',
           service: 'Mailgun',
-          sendMail: function (data, callback) {
+          sendMail (data, callback) {
               callback();
           },
           logger: false
@@ -386,7 +387,7 @@ describe('users.routes.test.js', () => {
           paypalEmail: email
         })
         .end((err, res) => {
-          const body = res.body;
+          const { body } = res;
           expect(body.paypalEmail).to.equal(email);
           done();
         });
@@ -440,7 +441,7 @@ describe('users.routes.test.js', () => {
           passwordConfirmation: newPassword
         })
         .end((err, res) => {
-          const body = res.body;
+          const { body } = res;
           expect(body.success).to.equal(true);
           models.User.auth(user.email, newPassword, e => {
             expect(e).to.not.exist;
@@ -504,7 +505,7 @@ describe('users.routes.test.js', () => {
           avatar: link
         })
         .end((err, res) => {
-          const body = res.body;
+          const { body } = res;
           expect(body.avatar).to.equal(link);
           done();
         });
@@ -553,7 +554,7 @@ describe('users.routes.test.js', () => {
     };
 
     before(() => {
-      sinon.stub(app.knox, 'put', () => {
+      sinon.stub(knox, 'put', () => {
         const s = new require('stream').Readable();
         s.write = function(){}
         s.end = function(){
@@ -565,7 +566,7 @@ describe('users.routes.test.js', () => {
     });
 
     after(() => {
-      app.knox.put.restore()
+      knox.put.restore()
     })
 
     beforeEach(() =>
@@ -804,7 +805,7 @@ describe('users.routes.test.js', () => {
           .post(`/users/password/reset/${encId}/${token}`)
           .send({
             api_key: application.api_key,
-            password: password,
+            password,
             passwordConfirmation: password
           })
           .expect(400, {
@@ -829,7 +830,7 @@ describe('users.routes.test.js', () => {
         .post(`/users/password/reset/${encId}/${token}`)
         .send({
           api_key: application.api_key,
-          password: password,
+          password,
           passwordConfirmation: password
         })
         .expect(200)

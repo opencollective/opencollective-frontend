@@ -1,6 +1,7 @@
-const Meetup = require('../server/lib/meetup');
-const expect = require('chai').expect;
-const nock = require('nock');
+import Meetup from '../server/lib/meetup';
+import { expect } from 'chai';
+import nock from 'nock';
+import nockMeetup from './mocks/meetup.nock';
 
 // nock.recorder.rec();
 
@@ -28,9 +29,7 @@ const meetupAccount = {
 
 describe('meetup lib', () => {
 
-  before(() => {
-    require('./mocks/meetup.nock.js');
-  });
+  before(() => nockMeetup());
 
   after(() => {
     nock.cleanAll();

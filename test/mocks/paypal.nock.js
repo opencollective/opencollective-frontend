@@ -1,6 +1,6 @@
-const nock = require('nock');
+import nock from 'nock';
 
-module.exports = () => {
+export default () => {
 
   nock('https://api.sandbox.paypal.com:443')
     .post('/v1/oauth2/token', "grant_type=client_credentials")

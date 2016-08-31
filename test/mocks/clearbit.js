@@ -1,6 +1,6 @@
-{
+export default {
   "options": {
-    
+
   },
   "person": {
     "id": "1dca3d82-9c91-4d2a-8fc9-4a565c531764",

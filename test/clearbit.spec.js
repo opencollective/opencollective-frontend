@@ -1,7 +1,6 @@
-const config = require('config');
-const clearbit = require('clearbit')(config.clearbit);
-const sinon = require('sinon');
-const expect = require('chai').expect;
+import clearbit from '../server/gateways/clearbit';
+import sinon from 'sinon';
+import { expect } from 'chai';
 
 const stub = sinon.stub(clearbit.Enrichment, 'find', () => {
   return Promise.reject(new clearbit.Enrichment.NotFoundError());

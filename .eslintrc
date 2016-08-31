@@ -10,6 +10,8 @@
   "rules": {
     // console logs are OK in Node
     "no-console": 0,
-    "mocha/no-exclusive-tests": "error"
+    "mocha/no-exclusive-tests": "error",
+    // use es6 module imports and exports
+    "import/no-commonjs": "error"
   }
 }

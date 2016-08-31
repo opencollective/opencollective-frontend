@@ -1,24 +1,11 @@
-/**
- * Dependencies.
- */
 import './lib/load-dot-env'; // important to load first for environment config
 import express from 'express';
 import models from './models';
-import controllers from './controllers';
 import routes from './routes';
-import config from './lib/config';
-import errors from './lib/errors';
 import os from 'os';
+import expressLib from './lib/express';
 
 const app = express();
-
-app.errors = errors;
-
-/**
- * Config.
- */
-
-config(app);
 
 /**
  * Models.
@@ -26,13 +13,7 @@ config(app);
 
 app.set('models', models);
 
-require('./lib/express')(app);
-
-/**
- * Controllers.
- */
-
-app.set('controllers', controllers(app));
+expressLib(app);
 
 /**
  * Routes.

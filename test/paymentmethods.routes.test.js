@@ -1,22 +1,13 @@
-/**
- * Dependencies.
- */
-const _ = require('lodash');
-const app = require('../server/index');
-const expect = require('chai').expect;
-const request = require('supertest');
-const utils = require('../test/utils.js')();
+import _ from 'lodash';
+import app from '../server/index';
+import { expect } from 'chai';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import models from '../server/models';
 
-/**
- * Variables.
- */
 const paypalPaymentMethod = utils.data('paymentMethod1');
 const stripePaymentMethod = utils.data('paymentMethod2');
-const models = app.set('models');
 
-/**
- * Tests.
- */
 describe('paymentMethods.routes.test.js', () => {
 
   let application;
@@ -66,7 +57,7 @@ describe('paymentMethods.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
 
-          const body = res.body;
+          const { body } = res;
           expect(body).to.have.length(2);
           expect(body[0].id).to.be.equal(paymentMethod1.id);
           expect(body[0].service).to.be.equal(paymentMethod1.service);
@@ -87,7 +78,7 @@ describe('paymentMethods.routes.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          const body = res.body;
+          const { body } = res;
 
           expect(body).to.have.length(1);
           expect(body[0].id).to.be.equal(paymentMethod1.id);

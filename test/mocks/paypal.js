@@ -1,4 +1,4 @@
-{
+export default {
   "adaptive": {
     "pay": {
       "responseEnvelope": {

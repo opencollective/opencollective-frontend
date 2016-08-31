@@ -1,15 +1,39 @@
 import serverStatus from 'express-server-status';
 
+import * as activities from './controllers/activities';
+import * as connectedAccounts from './controllers/connectedAccounts';
+import getDiscoverPage from './controllers/discover';
+import * as donations from './controllers/donations';
+import * as expenses from './controllers/expenses';
+import * as groups from './controllers/groups';
+import getHomePage from './controllers/homepage';
+import uploadImage from './controllers/images';
+import * as mw from './controllers/middlewares';
+import * as notifications from './controllers/notifications';
+import getPaymentMethods from './controllers/paymentMethods';
+import * as paypal from './controllers/paypal';
+import getProfilePage from './controllers/profile';
+import * as stripe from './controllers/stripe';
+import * as subscriptions from './controllers/subscriptions';
+import * as test from './controllers/test';
+import * as users from './controllers/users';
+import stripeWebhook from './controllers/stripeWebhook';
+
+import * as email from './controllers/services/email';
+import syncMeetup from './controllers/services/meetup';
+
 import roles from './constants/roles';
 import jwt from './middleware/jwt';
 import required from './middleware/required_param';
 import ifParam from './middleware/if_param';
-import authentication from './middleware/security/authentication';
-import authorization from './middleware/security/authorization';
+import * as aN from './middleware/security/authentication';
+import * as aZ from './middleware/security/authorization';
 import errorHandler from './middleware/error_handler';
 import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
+
+const { HOST, MEMBER } = roles;
 
 /**
  * NotImplemented response.
@@ -17,34 +41,6 @@ import errors from './lib/errors';
 const NotImplemented = (req, res, next) => next(new errors.NotImplemented('Not implemented yet.'));
 
 export default (app) => {
-
-  const aN = authentication(app);
-  const aZ = authorization(app);
-
-  /**
-   * controllers
-   */
-  const controllers = app.set('controllers');
-  const {
-    users,
-    groups,
-    activities,
-    notifications,
-    donations,
-    expenses,
-    paypal,
-    images,
-    webhooks,
-    stripe,
-    test,
-    subscriptions,
-    connectedAccounts
-  } = controllers;
-  const mw = controllers.middlewares;
-  const paymentMethods = controllers.paymentmethods;
-
-  const { HOST, MEMBER } = roles;
-
   /**
    * Status.
    */
@@ -80,17 +76,17 @@ export default (app) => {
   /**
    * Homepage
    */
-  app.get('/homepage', controllers.homepage);
+  app.get('/homepage', getHomePage);
 
   /**
    * Profile
    */
-  app.get('/profile/:slug', controllers.profile);
+  app.get('/profile/:slug', getProfilePage);
 
   /**
    * Discover
    */
-  app.get('/discover', controllers.discover);
+  app.get('/discover', getDiscoverPage);
 
   /**
    * Users.
@@ -120,9 +116,9 @@ export default (app) => {
    */
 
   // delete this route #postmigration, once frontend is updated
-  app.get('/users/:userid/cards', aZ.authorizeUserToAccessUser(), paymentMethods.getPaymentMethods); // Get a user's paymentMethods.
+  app.get('/users/:userid/cards', aZ.authorizeUserToAccessUser(), getPaymentMethods); // Get a user's paymentMethods.
 
-  app.get('/users/:userid/payment-methods', aZ.authorizeUserToAccessUser(), paymentMethods.getPaymentMethods); // Get a user's paymentMethods.
+  app.get('/users/:userid/payment-methods', aZ.authorizeUserToAccessUser(), getPaymentMethods); // Get a user's paymentMethods.
   app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
   app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
@@ -151,7 +147,7 @@ export default (app) => {
   app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
   app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
 
-  app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, controllers.services.meetup.sync);
+  app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
    * UserGroup.
@@ -223,13 +219,13 @@ export default (app) => {
   /**
    * Separate route for uploading images to S3
    */
-  app.post('/images', images.upload);
+  app.post('/images', uploadImage);
 
   /**
    * Webhook for stripe when it gets a new subscription invoice
    */
-  app.post('/webhooks/stripe', webhooks.stripe);
-  app.post('/webhooks/mailgun', controllers.services.email.webhook);
+  app.post('/webhooks/stripe', stripeWebhook);
+  app.post('/webhooks/mailgun', email.webhook);
 
   /**
    * Stripe oAuth
@@ -250,8 +246,8 @@ export default (app) => {
    * External services
    * TODO: we need to consolidate all 3rd party services within the /services/* routes
    */
-  app.get('/services/email/approve', controllers.services.email.approve);
-  app.get('/services/email/unsubscribe/:email/:slug/:type/:token', controllers.services.email.unsubscribe);
+  app.get('/services/email/approve', email.approve);
+  app.get('/services/email/unsubscribe/:email/:slug/:type/:token', email.unsubscribe);
 
   /**
    * Github API - fetch all repositories using the user's access_token

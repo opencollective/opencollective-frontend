@@ -1,9 +1,5 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const errors = app.errors;
-const expect = require('chai').expect;
+import errors from '../server/lib/errors';
+import { expect } from 'chai';
 
 /**
  * Tests.

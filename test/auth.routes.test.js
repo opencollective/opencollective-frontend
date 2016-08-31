@@ -1,21 +1,12 @@
-/**
- * Dependencies.
- */
-const app = require('../server/index');
-const expect = require('chai').expect;
-const jwt = require('jsonwebtoken');
-const request = require('supertest');
-const utils = require('../test/utils.js')();
+import app from '../server/index';
+import { expect } from 'chai';
+import jwt from 'jsonwebtoken';
+import request from 'supertest';
+import * as utils from '../test/utils';
+import models from '../server/models';
 
-/**
- * Variables.
- */
 const userData = utils.data('user1');
-const models = app.set('models');
 
-/**
- * Tests.
- */
 describe('auth.routes.test.js', () => {
 
   let application;

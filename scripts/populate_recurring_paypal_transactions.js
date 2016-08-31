@@ -86,7 +86,7 @@ const updateFirstTransaction = (transaction, subscription, paypalTransaction) =>
   });
 };
 
-const findSubscriptions = () => {
+export const findSubscriptions = () => {
   return models.Subscription.findAll({
     where: {
       stripeSubscriptionId: null
@@ -111,7 +111,7 @@ const log = (message) => {
   return message; // for testing
 };
 
-const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
+export const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
   const group = transaction.Group;
   const user = transaction.User;
   const completedList = _.filter(paypalTransactions, { status: 'Completed'});
@@ -150,7 +150,7 @@ const handlePaypalTransactions = (paypalTransactions, transaction, subscription,
 
 };
 
-const populateTransactions = (subscription) => {
+export const populateTransactions = (subscription) => {
   const billingAgreementId = subscription.data.billingAgreementId;
   const transaction = subscription.Transactions[0] || {};
   const group = transaction.Group;
@@ -180,11 +180,4 @@ const populateTransactions = (subscription) => {
     });
 };
 
-const run = () => findSubscriptions().map(populateTransactions);
-
-module.exports = {
-  handlePaypalTransactions,
-  populateTransactions,
-  run,
-  findSubscriptions
-};
+export const run = () => findSubscriptions().map(populateTransactions);

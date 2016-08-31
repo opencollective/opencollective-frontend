@@ -1,15 +1,9 @@
-/**
- * Dependencies.
- */
-const expect = require('chai').expect;
-const utils = require('../test/utils.js')();
+import { expect } from 'chai';
+import * as utils from '../test/utils';
 const activitiesData = utils.data('activities1').activities;
-const constants = require('../server/constants/activities');
-const activitiesLib = require('../server/lib/activities');
+import constants from '../server/constants/activities';
+import activitiesLib from '../server/lib/activities';
 
-/**
- * Tests.
- */
 describe('lib.activities.test.js', () => {
 
   describe('formatMessageForPrivateChannel', () => {

@@ -2,27 +2,29 @@
  * Dependencies.
  */
 
-const expect = require('chai').expect;
-const request = require('supertest');
-const nock = require('nock');
-const _ = require('lodash');
-const chance = require('chance').Chance();
-const sinon = require('sinon');
+import {expect} from 'chai';
+import request from 'supertest';
+import nock from 'nock';
+import _ from 'lodash';
+import chanceLib from 'chance';
+import sinon from 'sinon';
 
-const app = require('../server/index');
-const roles = require('../server/constants/roles');
-const activities = require('../server/constants/activities');
-const type = require('../server/constants/transactions').type;
-const utils = require('../test/utils.js')();
-const generatePlanId = require('../server/lib/utils.js').planId;
+import app from '../server/index';
+import roles from '../server/constants/roles';
+import activities from '../server/constants/activities';
+import {type} from '../server/constants/transactions';
+import * as utils from '../test/utils';
+import {planId as generatePlanId} from '../server/lib/utils';
+import models from '../server/models';
+import * as stripe from '../server/gateways/stripe';
+import stripeMock from './mocks/stripe';
 
-const models = app.set('models');
+const chance = chanceLib.Chance();
 
 /**
  * Mock data
  */
 
-const stripeMock = require('./mocks/stripe');
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
 let stripeEmail;
@@ -42,7 +44,7 @@ const stubStripe = () => {
   mock.email = chance.email();
   stripeEmail = mock.email;
 
-  const stub = sinon.stub(app.stripe.accounts, 'create');
+  const stub = sinon.stub(stripe.appStripe.accounts, 'create');
   stub.yields(null, mock);
 };
 
@@ -76,7 +78,7 @@ describe('webhooks.routes.test.js', () => {
       .end((e, res) => {
         expect(e).to.not.exist;
         group = res.body;
-        app.stripe.accounts.create.restore();
+        stripe.appStripe.accounts.create.restore();
         done();
       });
   });
@@ -164,7 +166,7 @@ describe('webhooks.routes.test.js', () => {
         .post(`/groups/${group.id}/payments`)
         .send({
           api_key: application.api_key,
-          payment: payment
+          payment
         })
         .expect(200)
         .end((err, res) => {
@@ -399,7 +401,7 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns an error if the event does not exist', (done) => {
-      const id = webhookEvent.id;
+      const { id } = webhookEvent;
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get(`/v1/events/${id}`)
@@ -415,7 +417,7 @@ describe('webhooks.routes.test.js', () => {
       request(app)
         .post('/webhooks/stripe')
         .send({
-          id: id
+          id
         })
         .expect(400)
         .end(done);

@@ -1,12 +1,11 @@
-const _ = require('lodash');
-const expect = require('chai').expect;
+import _ from 'lodash';
+import { expect } from 'chai';
+import * as script from '../scripts/populate_recurring_paypal_transactions';
+import * as utils from '../test/utils';
+import roles from '../server/constants/roles';
+import models from '../server/models';
 
-const script = require('../scripts/populate_recurring_paypal_transactions');
-const app = require('../server/index');
-const models = app.set('models');
-const utils = require('../test/utils.js')();
-const data = utils.data;
-const roles = require('../server/constants/roles');
+const { data } = utils;
 
 const paypalTransaction = {
   created: {

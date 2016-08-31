@@ -1,8 +1,8 @@
-const app = require('../server/index');
-const config = require('config');
-const imageUrlToAmazonUrl = require('../server/lib/imageUrlToAmazonUrl');
-const expect = require('chai').expect;
-const sinon = require('sinon');
+import app from '../server/index';
+import config from 'config';
+import imageUrlToAmazonUrl from '../server/lib/imageUrlToAmazonUrl';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 const SAMPLE = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764'
 

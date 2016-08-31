@@ -1,4 +1,5 @@
 --timeout 20000
 --reporter spec
 --reporter mocha-circleci-reporter
+--require babel-core/register
 --require=./test/setup.js
