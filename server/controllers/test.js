@@ -116,28 +116,36 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     addDonation1: ['createGroup', (cb, results) => {
-      models.Transaction.create({
-        "description": "Donation 1",
-        "amount": 1,
-        "tags": ['Donation'],
-        "currency": "EUR",
-        "paidby": "@semdubois",
-        "UserId": 1
+      models.Donation.create({
+        title: "Donation 1",
+        amount: 100,
+        currency: 'EUR'
       })
+      .then(donation => models.Transaction.create({
+        amount: 1,
+        currency: "EUR",
+        paidby: "@semdubois",
+        UserId: 1,
+        DonationId: donation.id
+      }))
       .then(t => t.setGroup(results.createGroup))
       .then(() => cb())
       .catch(cb);
     }],
 
     addDonation2: ['createGroup', 'addDonation1', (cb, results) => {
-      models.Transaction.create({
-        "description": "Donation 2",
-        "amount": 2,
-        "tags": ['Donation'],
-        "currency": "EUR",
-        "paidby": "@semdubois",
-        "UserId": 1
+      models.Donation.create({
+        title: "Donation 2",
+        amount: 200,
+        currency: 'EUR'
       })
+      .then(donation => models.Transaction.create({
+        amount: 2,
+        currency: "EUR",
+        paidby: "@semdubois",
+        UserId: 1,
+        DonationId: donation.id
+      }))
       .then(t => t.setGroup(results.createGroup))
       .then(() => cb())
       .catch(cb);
