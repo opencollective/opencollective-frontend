@@ -10,7 +10,7 @@ export function tweetActivity(Sequelize, activity) {
     && activity.data.user.twitterHandle) {
       return Sequelize.models.Group.findById(activity.GroupId)
         .then(group => group.getTwitterSettings().thankDonation)
-        .then(template => template.replace('$backer', activity.data.user.twitterHandle))
+        .then(template => template.replace('$backer', `@${activity.data.user.twitterHandle}`))
         .then(status => tweetStatus(Sequelize, activity.GroupId, status));
   } else {
     return Promise.resolve();
