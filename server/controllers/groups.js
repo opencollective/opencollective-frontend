@@ -439,8 +439,29 @@ export const update = (req, res, next) => {
 };
 
 export const updateSettings = (req, res, next) => {
-  doUpdate(['settings'], req, res, next);
+  putThankDonationOptInIntoNotifTable(req.group.id, req.required.group.settings)
+    .then(() => doUpdate(['settings'], req, res, next))
+    .catch(next);
 };
+
+function putThankDonationOptInIntoNotifTable(GroupId, groupSettings) {
+  const twitterSettings = groupSettings && groupSettings.twitter;
+  const attrs = {
+    channel: 'twitter',
+    type: activities.GROUP_TRANSACTION_CREATED,
+    GroupId
+  };
+
+  const thankDonationEnabled = twitterSettings.thankDonationEnabled;
+  delete twitterSettings.thankDonationEnabled;
+  if (thankDonationEnabled) {
+    return Notification.findOne({where: attrs})
+      .then(n => n || Notification.create(Object.assign({active:true}, attrs)));
+  } else {
+    return Notification.findOne({where: attrs})
+      .then(n => n && n.destroy());
+  }
+}
 
 function doUpdate(whitelist, req, res, next) {
   whitelist.forEach((prop) => {

@@ -8,10 +8,10 @@ import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import filter from 'lodash/collection/filter';
 import values from 'lodash/object/values';
-
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
 import {getTier} from '../lib/utils';
+import activities from '../constants/activities';
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -402,7 +402,6 @@ export default function(Sequelize, DataTypes) {
         settings.twitter = settings.twitter || {};
         const defaults = {
           // thank you message immediately when receiving donation
-          thankDonationEnabled: false,
           thankDonation: '$backer thanks for backing us!',
 
           // thank you message to all backers on 1st day of the month
@@ -410,9 +409,13 @@ export default function(Sequelize, DataTypes) {
           monthlyThankDonationsSingular: 'Thank you $backer for supporting our collective',
           monthlyThankDonationsPlural: 'Thanks to our $backerCount backers and sponsors $backerList for supporting our collective'
         };
-        _.defaults(settings.twitter, defaults);
 
-        return settings.twitter;
+        return isThankDonationEnabled(this.id)
+          .then(thankDonationEnabled => {
+            settings.twitter.thankDonationEnabled = thankDonationEnabled;
+            _.defaults(settings.twitter, defaults);
+            return settings.twitter;
+          });
       },
 
       getRelatedGroups(limit) {
@@ -483,4 +486,13 @@ export default function(Sequelize, DataTypes) {
   });
 
   return Group;
+
+  function isThankDonationEnabled(GroupId) {
+    return models.Notification.findOne({where: {
+      channel: 'twitter',
+      type: activities.GROUP_TRANSACTION_CREATED,
+      GroupId,
+      active: true
+    }}).then(n => !!n);
+  }
 }
