@@ -126,9 +126,9 @@
     "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute",
     "install:debs": "bash scripts/install_apt_get_debs.sh",
-    "cron:daily": "node cron/daily/update-contributions.js",
-    "cron:weekly": "node cron/weekly/slack-report.js",
-    "cron:monthly": "babel-node cron/monthly/email-report.js && node cron/monthly/slack-report.js"
+    "cron:daily": "babel-node cron/daily/update-contributions.js",
+    "cron:weekly": "babel-node cron/weekly/slack-report.js",
+    "cron:monthly": "babel-node cron/monthly/email-report.js && babel-node cron/monthly/slack-report.js"
   },
   "license": "MIT",
   "repository": {
