@@ -173,8 +173,10 @@ describe('groups.routes.test.js', () => {
           expect(res.body.tags).to.eql(privateGroupData.tags);
           expect(res.body).to.have.property('isSupercollective', false);
 
-          user.getGroups().then((groups) => {
-            expect(groups).to.have.length(0);
+          models.UserGroup.findAll({})
+          .then(usergroups => {
+            expect(usergroups).to.have.length(1);
+            expect(usergroups[0].role).to.equal(roles.HOST);
             done();
           });
         });

@@ -308,16 +308,23 @@ export const create = (req, res, next) => {
           return null;
         }
       })
-      .then(() => User.findById(demoHostId())) // make sure the host exists
-      .then(hostUser => {
-        if (hostUser) {
-          return _addUserToGroup(createdGroup, hostUser, {role: roles.HOST, remoteUser: req.remoteUser})
-        } else {
-          return null;
-        }
-      })
     })
-    .tap(g => res.send(g.info))
+    .then(() => createdGroup.hasHost())
+    .then(hasHost => {
+      if (!hasHost) {
+        return User.findById(demoHostId())
+          .then(hostUser => {
+            if (hostUser) {
+              return _addUserToGroup(createdGroup, hostUser, {role: roles.HOST, remoteUser: req.remoteUser})
+            } else {
+              return null;
+            }
+          })
+      } else {
+        return null;
+      }
+    })
+    .then(() => res.send(createdGroup.info))
     .catch(next);
 };
 
