@@ -193,6 +193,16 @@ export const defaultHostId = () => {
 };
 
 /**
+ * Demo host id, set this for new groups created through the flow
+ */
+export const demoHostId = () => {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
+    return 254;
+  }
+  return 1;
+};
+
+/**
  * Check if this is an internal email address.
  * Useful for testing emails in localhost or staging
  */

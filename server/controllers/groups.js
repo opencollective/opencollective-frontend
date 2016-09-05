@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import {appendTier, defaultHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
+import {appendTier, defaultHostId, demoHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
 import Promise from 'bluebird';
 import moment from 'moment';
 import roles from '../constants/roles';
@@ -285,8 +285,10 @@ export const create = (req, res, next) => {
   const { group } = req.required;
   const { users = [] } = group;
 
+  let createdGroup;
   return Group
     .create(group)
+    .tap(g => createdGroup = g)
     .tap(g => Activity.create({
       type: activities.GROUP_CREATED,
       UserId: req.remoteUser.id,
@@ -298,12 +300,31 @@ export const create = (req, res, next) => {
     }))
     .tap(g => {
       return Promise.map(users, user => {
-        return User.findOne({where: { email: user.email.toLowerCase() }})
+        if (user.email) {
+          return User.findOne({where: { email: user.email.toLowerCase() }})
           .then(u => u || User.create(user))
           .then(u => _addUserToGroup(g, u, {role: user.role, remoteUser: req.remoteUser}))
+        } else {
+          return null;
+        }
       })
     })
-    .tap(g => res.send(g.info))
+    .then(() => createdGroup.hasHost())
+    .then(hasHost => {
+      if (!hasHost) {
+        return User.findById(demoHostId())
+          .then(hostUser => {
+            if (hostUser) {
+              return _addUserToGroup(createdGroup, hostUser, {role: roles.HOST, remoteUser: req.remoteUser})
+            } else {
+              return null;
+            }
+          })
+      } else {
+        return null;
+      }
+    })
+    .then(() => res.send(createdGroup.info))
     .catch(next);
 };
 
