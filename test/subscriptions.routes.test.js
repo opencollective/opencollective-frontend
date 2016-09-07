@@ -43,20 +43,19 @@ describe('subscriptions.routes.test.js', () => {
    */
   describe('#getAll', () => {
     // Create transactions for group1.
-    beforeEach((done) => {
-      return Promise.map(transactionsData, transaction =>
-          models.Subscription.create(utils.data('subscription1'))
-            .then(subscription => models.Transaction.createFromPayload({
-              transaction,
-              user,
-              group,
-              subscription })
-          ))
-        .then(() => done())
-        .catch(done)
-    });
+    beforeEach(() =>
+      Promise.map(transactionsData, transaction =>
+        models.Subscription.create(utils.data('subscription1'))
+          .then(subscription => models.Transaction.createFromPayload({
+            transaction,
+            user,
+            group,
+            subscription
+          })
+        ))
+    );
 
-    it('fails if no authorization provided', (done) => {
+    it('fails if no authorization provided', () =>
       request(app)
         .get('/subscriptions')
         .expect(401, {
@@ -66,8 +65,7 @@ describe('subscriptions.routes.test.js', () => {
             message: 'Missing authorization header'
           }
         })
-        .end(done);
-    });
+    );
 
     it('successfully has access to the subscriptions', (done) => {
       request(app)

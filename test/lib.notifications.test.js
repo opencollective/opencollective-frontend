@@ -104,7 +104,7 @@ describe('lib.notifications.test.js', () => {
     else
       templateData.transaction.preview = {src: `https://res.cloudinary.com/opencollective/image/fetch/w_640/${templateData.transaction.link}`, width: '100%'};
 
-    return emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
+    emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
       .then(template => {
         subject = emailLib.getSubject(template);
         body = emailLib.getBody(template);
@@ -135,7 +135,7 @@ describe('lib.notifications.test.js', () => {
           expect(options.subject).to.equal(subject);
           expect(options.html).to.equal(body);
           done();
-        }, 1000)
+        }, 1000);
 
       });
   });

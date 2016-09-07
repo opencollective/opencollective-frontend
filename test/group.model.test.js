@@ -59,28 +59,19 @@ describe('Group model', () => {
   }];
 
 
-  before((done) => utils.cleanAllDb().tap(() => done()));
+  before(() => utils.cleanAllDb());
 
-  before((done) => {
-    Group.create(groupData)
-      .tap(g => group = g)
-      .tap(() => User.createMany(users))
-      .tap(() => Transaction.createMany(transactions, { GroupId: group.id }))
-      .then(() => done())
-      .catch(e => {
-        console.error('Error in creating group', groupData, e, e.stack);
-        done();
-      });
-  });
+  before(() => Group.create(groupData)
+    .tap(g => group = g)
+    .tap(() => User.createMany(users))
+    .tap(() => Transaction.createMany(transactions, { GroupId: group.id })));
 
-  it('computes the balance ', (done) => {
+  it('computes the balance ', () =>
     group.getBalance().then(balance => {
       let sum = 0;
       transactions.map(t => sum += t.netAmountInGroupCurrency);
       expect(balance).to.equal(sum);
-      done();
-    })
-  });
+    }));
 
   it('computes the balance until a certain month', (done) => {
     const until = new Date('2016-07-01');

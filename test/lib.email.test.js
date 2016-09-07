@@ -50,7 +50,7 @@ describe('lib/email', () => {
   });
 
 
-  it('sends the thankyou.fr email template', done => {
+  it('sends the thankyou.fr email template', () => {
     const paymentData = {
       amount: 5000,
       currency: 'EUR'
@@ -68,14 +68,13 @@ describe('lib/email', () => {
     };
 
     return emailLib.send('thankyou', data.user.email, data)
-      .then(() => {
+      .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain('Merci pour votre donation de €50.00/mois à La Primaire');
-        done();
       });
   });
 
-  it('sends the thankyou.wwcode email template', done => {
+  it('sends the thankyou.wwcode email template', () => {
 
     const paymentData = {
       amount: 5000,
@@ -94,11 +93,10 @@ describe('lib/email', () => {
     };
 
     return emailLib.send('thankyou', data.user.email, data)
-      .then(() => {
+      .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your $50.00/month donation to WWCode Austin');
         expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
-        done();
       });
   });
 

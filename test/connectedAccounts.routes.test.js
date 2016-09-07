@@ -23,7 +23,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
     describe('WHEN calling without API key', () => {
 
-      it('THEN returns 400', done => req.expect(400).end(done));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN calling /connected-accounts/github with API key', () => {
@@ -58,7 +58,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
       done();
     });
     describe('WHEN calling without API key', () => {
-      it('THEN returns 400', done => req.expect(400).end(done));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN calling with invalid API key', () => {
@@ -67,7 +67,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 401', done => req.expect(401).end(done));
+      it('THEN returns 401', () => req.expect(401));
     });
 
     describe('WHEN calling with valid API key', () => {
@@ -105,7 +105,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 400', done => req.expect(400).end(done));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN providing API key but no token', () => {
@@ -114,7 +114,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 401 Unauthorized', done => req.expect(401).end(done));
+      it('THEN returns 401 Unauthorized', () => req.expect(401));
     });
 
     describe('WHEN providing API key and token but no username', () => {
@@ -125,7 +125,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 400', done => req.expect(400).end(done));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN providing API key, token and scope', () => {

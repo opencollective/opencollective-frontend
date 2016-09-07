@@ -1,10 +1,7 @@
-/**
- * Dependencies.
- */
 import app from '../server/index';
 import async from 'async';
 import {expect} from 'chai';
-import request from 'supertest';
+import request from 'supertest-as-promised';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import Promise from 'bluebird';
@@ -18,7 +15,7 @@ let users, group;
 /**
  * Functions
  */
-const createDonationsAndTransaction = (cb) => {
+const createDonationsAndTransaction = () => {
   const donations = [{
     UserId: users[2].id,
     GroupId: group.id,
@@ -42,13 +39,9 @@ const createDonationsAndTransaction = (cb) => {
   return group
     .addUserWithRole(users[3], roles.BACKER)
     .then(() => Promise.all(donations.map(d => models.Donation.create(d))))
-    .then(() => models.Transaction.create(transaction))
-    .then(() => cb());
+    .then(() => models.Transaction.create(transaction));
 };
 
-/**
- * Tests.
- */
 describe('usergroup.routes.test.js', () => {
   let application;
 
@@ -405,11 +398,12 @@ describe('usergroup.routes.test.js', () => {
 
     beforeEach(createDonationsAndTransaction);
 
-    it('get the list of users with their corresponding tier', (done) => {
+    it('get the list of users with their corresponding tier', () =>
       request(app)
         .get(`/groups/${group.slug}/users`)
         .expect(200)
-        .expect((res) => {
+        .toPromise()
+        .tap(res => {
           const users = res.body;
           users.sort((a,b) => (a.name < b.name) ? -1 : 1);
           expect(users[0].tier).to.equal('contributor');
@@ -417,8 +411,7 @@ describe('usergroup.routes.test.js', () => {
           expect(users[2].tier).to.equal('host');
           expect(users[3].tier).to.equal('backer');
         })
-        .end(done);
-    });
+    );
 
     it('get the list of active users with their corresponding tier', (done) => {
       request(app)

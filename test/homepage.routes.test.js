@@ -14,7 +14,7 @@ describe('homepage.routes.test.js', () => {
   beforeEach(() => utils.cleanAllDb());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
-  beforeEach((done) =>
+  beforeEach(() =>
     models.Group
       .create(groupData).tap(g => {
         group = g;
@@ -30,7 +30,6 @@ describe('homepage.routes.test.js', () => {
           UserId: user.id
         })
       })
-      .then(() => done())
   );
 
   /**

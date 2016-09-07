@@ -14,13 +14,12 @@ describe('profile.routes.test.js', () => {
   beforeEach(() => utils.cleanAllDb());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
-  beforeEach((done) =>
+  beforeEach(() =>
     models.Group
       .create(groupData).tap(g => {
         group = g;
         return group.addUserWithRole(user, 'HOST');
       })
-      .then(() => done())
   );
 
   /**
@@ -28,16 +27,16 @@ describe('profile.routes.test.js', () => {
    */
   describe('#get /profile/:slug', () => {
 
-    it('gets the user', (done) => {
+    it('gets the user', () =>
       request(app)
         .get(`/profile/${user.username}`)
         .expect(200)
-        .end((err, res) => {
+        .toPromise()
+        .then(res => {
           const { body } = res;
           expect(body.username).to.equal(user.username);
-          done();
         })
-    });
+    );
 
     it('gets the group', (done) => {
       request(app)

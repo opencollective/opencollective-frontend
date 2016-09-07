@@ -427,15 +427,10 @@ describe('groups.routes.test.js', () => {
         });
     });
 
-    beforeEach((done) => {
-      return models.StripeAccount.create({
-        stripePublishableKey: stripeMock.accounts.create.keys.publishable
-      })
+    beforeEach(() => models.StripeAccount
+      .create({ stripePublishableKey: stripeMock.accounts.create.keys.publishable })
       .tap(account => user.setStripeAccount(account))
-      .tap(account => user.setStripeAccount(account))
-      .tap(() => done())
-      .catch(done);
-    });
+      .tap(account => user.setStripeAccount(account)));
 
     // Create another user.
     beforeEach(() => models.User.create(userData2).tap(u => user2 = u));
@@ -579,16 +574,14 @@ describe('groups.routes.test.js', () => {
       });
 
       // Create a subscription for PublicGroup.
-      beforeEach((done) => {
-        return models.Subscription.create(utils.data('subscription1'))
+      beforeEach(() => models.Subscription
+        .create(utils.data('subscription1'))
         .then(subscription => models.Transaction.createFromPayload({
             transaction: transactionsData[7],
             user,
             group: publicGroup,
             subscription
-          }))
-        .then(() => done());
-      });
+          })));
 
       // Create a transaction for group2.
       beforeEach((done) => {
