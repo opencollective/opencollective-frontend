@@ -22,7 +22,6 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-    vendor: DataTypes.STRING, // delete #postmigration
     paidby: DataTypes.STRING, // delete #postmigration
     tags: DataTypes.ARRAY(DataTypes.STRING),
     status: DataTypes.STRING, // delete #postmigration
@@ -134,7 +133,6 @@ export default (Sequelize, DataTypes) => {
           amount: this.amount,
           vat: this.vat,
           currency: this.currency,
-          vendor: this.vendor,
           paidby: this.paidby,
           tags: this.tags,
           status: this.status,

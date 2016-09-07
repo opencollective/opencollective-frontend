@@ -234,7 +234,6 @@ describe('donations.routes.test.js', () => {
         amount: CHARGE,
         currency: CURRENCY,
         description: 'super description',
-        vendor: '@vendor',
         tags: ['tag1', 'tag2'],
         status: 'super status',
         link: 'www.opencollective.com',

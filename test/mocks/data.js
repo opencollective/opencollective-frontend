@@ -359,7 +359,6 @@ export default {
   "transactions1": {
     "transactions": [
       {
-        "vendor": "@evilrabbit_",
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -200.00,
@@ -375,7 +374,6 @@ export default {
         "payoutMethod": "paypal"
       },
       {
-        "vendor": "@xdamman",
         "description": "Flight SFO-BRU",
         "tags": ["travel"],
         "amount": -918.59,
@@ -387,7 +385,6 @@ export default {
         "createdAt": "2015-02-22T08:00:00.000Z"
       },
       {
-        "vendor": "@xdamman",
         "description": "Byword",
         "tags": ["software"],
         "amount": -11.99,
@@ -400,7 +397,6 @@ export default {
         "payoutMethod": "paypal"
       },
       {
-        "vendor": "OrangeWebsite",
         "description": "Tipbox.is domain + dedicated server",
         "tags": ["hosting"],
         "amount": -588.61,
@@ -412,7 +408,6 @@ export default {
         "createdAt": "2015-04-06T07:00:00.000Z"
       },
       {
-        "vendor": "@mdp @xdamman",
         "description": "Working lunch with @mdp",
         "tags": ["food"],
         "amount": -36.00,
@@ -424,7 +419,6 @@ export default {
         "createdAt": "2015-04-07T07:00:00.000Z"
       },
       {
-        "vendor": "@evilrabbit_",
         "description": "Homepage design end",
         "tags": ["consultancy"],
         "amount": -300.00,
@@ -436,7 +430,6 @@ export default {
         "createdAt": "2015-04-28T07:00:00.000Z"
       },
       {
-        "vendor": "@montogeek",
         "description": "Homepage frontend code",
         "tags": ["consultancy"],
         "amount": -300.00,
@@ -448,7 +441,6 @@ export default {
         "createdAt": "2015-04-29T07:00:00.000Z"
       },
       {
-        "vendor": "@montogeek",
         "description": "Donation to that great project",
         "tags": ["donation"],
         "amount": 9.99,
@@ -459,7 +451,6 @@ export default {
         "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
-        "vendor": "@montogeek",
         "description": "Donation to that great project",
         "tags": ["donation"],
         "amount": 999,
@@ -481,7 +472,6 @@ export default {
       "amount": 10.99,
       "vat": null,
       "currency": "USD",
-      "vendor": null,
       "paidby": "1",
       "tags": ["Donation"],
       "status": null,
