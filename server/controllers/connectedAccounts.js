@@ -1,5 +1,5 @@
 import config from 'config';
-import request from 'request';
+import request from 'request-promise';
 import Promise from 'bluebird';
 import models from '../models';
 import {getUserOrGroupFromSlug} from '../lib/slug';
@@ -100,23 +100,25 @@ export const fetchAllRepositories = (req, res, next) => {
   .findOne({where: {id: payload.connectedAccountId}})
   .then(ca => {
 
-    return Promise.map([1,2,3,4,5], page => {
-      const options = {
-        url: `https://api.github.com/user/repos?per_page=100&sort=pushed&access_token=${ca.secret}&type=all&page=${page}`,
-        headers: {
-          'User-Agent': 'OpenCollective'
-        },
-        json: true
-      };
-      return Promise.promisify(request, {multiArgs: true})(options).then(args => args[1])
-    })
+    return Promise.map([1,2,3,4,5], page => request({
+      uri: 'https://api.github.com/user/repos',
+      qs: {
+        per_page: 100,
+        sort: 'pushed',
+        access_token: ca.secret,
+        type: 'all',
+        page
+      },
+      headers: { 'User-Agent': 'OpenCollective' },
+      json: true
+    }))
     .then(data => {
       const repositories = [];
       data.map(repos => repos.map(repo => {
         if (repo.permissions && repo.permissions.push) {
           repositories.push(repo);
         }
-      }))
+      }));
       return repositories;
     })
   })

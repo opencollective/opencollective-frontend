@@ -1,7 +1,6 @@
 {
   "exceptions": [
   	"https://nodesecurity.io/advisories/118",
-  	"https://nodesecurity.io/advisories/122", // sequelize vulnerability from geoJSON
-  	"https://nodesecurity.io/advisories/130" // TODO: we should upgrade to fix. Need a new version of request
+  	"https://nodesecurity.io/advisories/122" // sequelize vulnerability from geoJSON
   	]
 }

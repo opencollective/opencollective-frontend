@@ -9,7 +9,7 @@ import moment from 'moment';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
 import emailLib from '../lib/email';
-import githubLib from '../lib/github';
+import fetchGithubUser from '../lib/github';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
@@ -412,7 +412,7 @@ export const createFromGithub = (req, res, next) => {
             })
             .then(user => user || User.create(userAttr))
             .then(user => contributorUser = user)
-            .then(() => githubLib.fetchUser(contributor))
+            .then(() => fetchGithubUser(contributor))
             .tap(json => {
               contributorUser.name = json.name;
               contributorUser.website = json.blog;
