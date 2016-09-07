@@ -9,11 +9,11 @@ export function tweetActivity(Sequelize, activity) {
     // users without twitterHandle are ignored
     && activity.data.user.twitterHandle) {
       return Sequelize.models.Group.findById(activity.GroupId)
-        .then(group => group.getTwitterSettings().thankDonation)
-        .then(template => template.replace('$backer', `@${activity.data.user.twitterHandle}`))
+        .then(group => group.getTwitterSettings())
+        .then(template => template.thankDonation.replace('$backer', `@${activity.data.user.twitterHandle}`))
         .then(status => tweetStatus(Sequelize, activity.GroupId, status));
   } else {
-    return Promise.resolve();
+    return null;
   }
 }
 
@@ -34,9 +34,14 @@ export function tweetStatus(Sequelize, GroupId, status) {
         access_token_secret: connectedAccount.secret
       });
 
-      const tweet = Promise.promisify(client.post, { context: client });
       console.log(`Tweeting for group ID ${GroupId}: ${status}`);
-      return tweet("statuses/update", { status });
+      if (process.env.NODE_ENV === 'production') {
+        const tweet = Promise.promisify(client.post, { context: client });
+        return tweet("statuses/update", { status });
+      } else {
+        console.log('No tweet sent: must be in production');
+        return null;
+      }
     }
   });
 }
