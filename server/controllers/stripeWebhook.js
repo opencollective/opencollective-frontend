@@ -211,8 +211,6 @@ export default function stripeWebhook(req, res, next) {
         platformFeeInTxnCurrency: fees.applicationFee,
         paymentProcessorFeeInTxnCurrency: fees.stripeFee,
         data: {charge, balanceTransaction},
-
-        paidby: user && user.id, // remove #postmigration
         description: 'Recurring subscription', // remove #postmigration
         tags: ['Donation'], // remove #postmigration
         approved: true, // remove #postmigration
