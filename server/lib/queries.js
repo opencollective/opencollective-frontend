@@ -44,6 +44,36 @@ const getTotalDonations = () => {
 };
 
 /**
+ * Returns the top backers in a given time range in given tags
+ * E.g. top backers in open source collectives last June
+ */
+const getTopBackers = (since, until, tags, limit) => {
+
+  const sinceClause = (since) ? `AND t."createdAt" >= '${since.toISOString()}'`: '';
+  const untilClause = (until) ? `AND t."createdAt" < '${until.toISOString()}'` : '';
+  const tagsClause = (tags) ? `AND g.tags && $tags` : ''; // && operator means "overlaps"
+
+  return sequelize.query(`
+    SELECT MAX(u.id) as id, MAX(u.name) as "name", MAX(u.username) as username, MAX(u.website) as "website", MAX(u."twitterHandle") as "twitterHandle", MAX(u.avatar) as "avatar", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
+    FROM "Transactions" t
+    LEFT JOIN "Users" u ON u.id = t."UserId"
+    LEFT JOIN "Groups" g ON g.id = t."GroupId"
+    WHERE 
+      t.amount > 0
+      ${sinceClause}
+      ${untilClause}
+      ${tagsClause}      
+    GROUP BY "UserId" 
+    ORDER BY "totalDonations" DESC
+    LIMIT ${limit}
+    `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+    {
+      bind: { tags: tags || [] },
+      model: models.User
+    });
+  }
+
+/**
  * Get top collectives based on total donations
  */
 const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
@@ -67,7 +97,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
   }
 
   if (tag) {
-    tagClause = 'g.tags && $tag AND';
+    tagClause = 'g.tags && $tag AND'; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
   }
 
   return sequelize.query(`
@@ -185,6 +215,7 @@ export default {
   getUsersFromGroupWithTotalDonations,
   getLeaderboard,
   getTopSponsors,
+  getTopBackers,
   getGroupsByTag,
   getUniqueGroupTags
 };

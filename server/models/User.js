@@ -9,6 +9,7 @@ import {decrypt, encrypt} from '../lib/utils';
 import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
+import queries from '../lib/queries';
 
 /**
  * Constants.
@@ -289,6 +290,18 @@ export default (Sequelize, DataTypes) => {
       generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
         const expiresInHours = 24;
         return this.jwt(application, { scope: 'connected-account', connectedAccountId, username }, expiresInHours);
+      },
+
+      getLatestDonations(since, until, tags) {
+        tags = tags || [];
+        return Sequelize.models.Transaction.findAll({
+          where: {
+            UserId: this.id,
+            createdAt: { $gte: since || 0, $lt: until || new Date}
+          },
+          order: [ ['amount','DESC'] ],
+          include: [ { model: Sequelize.models.Group, where: { tags: { $contains: tags } } } ]
+        });
       }
 
     },
@@ -336,6 +349,10 @@ export default (Sequelize, DataTypes) => {
 
       decryptId(encrypted) {
         return decrypt(encrypted);
+      },
+
+      getTopBackers(since, until, tags, limit) {
+        return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5);
       }
     }
 

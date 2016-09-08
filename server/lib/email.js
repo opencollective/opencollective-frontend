@@ -46,10 +46,10 @@ const getSubject = str => {
  */
 const sendMessage = (recipient, subject, html, options) => {
   options = options || {};
-  debug("email: ", recipient, subject, html, options);
-
+  debug("email: ", recipient, subject); 
   // if not in production, only send out emails to bcc'd opencollective address
   if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
+    debug(`${recipient} is an external email address, skipping in development environment`);
     recipient = '';
   }
 

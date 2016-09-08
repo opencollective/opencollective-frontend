@@ -12,6 +12,7 @@ import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
 import {getTier} from '../lib/utils';
 import activities from '../constants/activities';
+import Promise from 'bluebird';
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -448,6 +449,15 @@ export default function(Sequelize, DataTypes) {
     },
 
     classMethods: {
+      createMany: (groups, defaultValues) => {
+        return Promise.map(groups, group => {
+          for (const attr in defaultValues) {
+            group[attr] = defaultValues[attr];
+          }
+          return Group.create(group);
+        }).catch(console.error);
+      },
+
       getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
         limit = limit || 3;
         excludeList = excludeList || [];

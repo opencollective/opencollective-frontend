@@ -38,7 +38,8 @@ const init = () => {
           'name',
           'currency',
           'tags'
-      ]
+      ],
+      include: [ { model: models.Transaction, required: true }]
   };
 
   Group.findAll(query)
@@ -53,6 +54,61 @@ const init = () => {
   });
 }
 
+const topBackersCache = {};
+const getTopBackers = (startDate, endDate, tags) => {
+  tags = tags || [];
+  const cacheKey = `${startDate.getTime()}${endDate.getTime()}${tags.join(',')}`;
+  if (topBackersCache[cacheKey]) return Promise.resolve(topBackersCache[cacheKey]);
+  else {
+    return User.getTopBackers(startDate, endDate, tags, 5)
+      .then(backers => {
+        if (!backers) return []; 
+        return Promise.map(backers, backer => processBacker(backer, startDate, endDate, tags))
+      })
+      .then(backers => {
+        backers = _.without(backers, null)
+        topBackersCache[cacheKey] = backers;
+        return backers;
+    });
+  }
+};
+
+const formatCurrency =  (amount, currency) => {
+  return amount.toLocaleString(currency, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits : 0,
+    maximumFractionDigits : 2
+  })
+}
+
+const generateDonationsString = (backer, donations) => {
+  if (!backer.name) {
+    debug(`Skipping ${backer.name} because it doesn't have a name (${backer.username})`);
+    return;
+  }
+  const donationsArray = [];
+  let donationsString;
+  donations.map(donation => {
+    donationsArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);
+  });
+  donationsString = donationsArray.join(', ');
+  donationsString = donationsString.replace(/,([^, ]*)$/,' and $1');
+  return donationsString;
+};
+
+const processBacker = (backer, startDate, endDate, tags) => {
+  return backer.getLatestDonations(startDate, endDate, tags)
+    .then((donations) => generateDonationsString(backer, donations))
+    .then(donationsString => {
+      backer.website = (backer.username) ? `https://opencollective.com/${backer.username}` : backer.website || backer.twitterHandle;
+      if (!donationsString || !backer.website) return null;
+      backer = _.pick(backer, ['name','username','avatar','website']);
+      backer.donationsString = donationsString;
+      return backer;
+    })
+};
+
 const processGroup = (group) => {
   const d = new Date;
   const startDate = new Date(d.getFullYear(), d.getMonth() -1, 1);
@@ -64,7 +120,8 @@ const processGroup = (group) => {
     group.getBackersCount(endDate),
     group.getBackersCount(startDate),
     group.getExpenses(null, startDate, endDate),
-    group.getRelatedGroups(3)
+    group.getRelatedGroups(3),
+    getTopBackers(startDate, endDate, group.tags)
   ];
 
   let emailData = {};
@@ -80,6 +137,7 @@ const processGroup = (group) => {
             data.group.backersCountDelta = results[2] - results[3];
             data.group.expenses = results[4].map(e => _.pick(e.dataValues, ['id', 'description', 'status', 'createdAt','netAmountInGroupCurrency','currency']));
             data.group.related = results[5];
+            data.topBackers = _.filter(results[6], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
             emailData = data;
             return group;
           })

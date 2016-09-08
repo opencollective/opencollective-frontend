@@ -40,8 +40,8 @@ ul li {
 
 <h1>{{group.name}} {{month}} report</h1>
 
-<p>Hi there! This your new monthly report for your open collective. In this report, you will find your latest balance (as of the last day of last month) and all the expenses that were submitted.
-We hope it's useful. Don't hesitate to send us your feedback by replying to this email. You can always visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}">{{group.publicUrl}}</a></p>
+<p>Hi there! This your monthly report for your open collective with your latest balance (as of the last day of last month) and all the expenses that were submitted.
+ Don't hesitate to send us your feedback by replying to this email. You can always visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}">{{group.publicUrl}}</a></p>
 
 <center>
 <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -81,35 +81,38 @@ We hope it's useful. Don't hesitate to send us your feedback by replying to this
 {{/each}}
 </table>
 
-<h2>Newest sponsors on OpenCollective</h2>
+{{#if topBackers}}
+<h2>Recent sponsor activity on Open Collective</h2>
 <ul>
-<li><a href="https://opencollective.com/iDoneThis">iDoneThis</a>: they are committing $500/month to open source collectives</li>
-<li><a href="https://opencollective.com/auth0">Auth0</a>: they are sponsoring open source projects related to authentication</li>
+{{#each topBackers}}
+  <li><a href="{{website}}">{{name}}</a> gave {{{donationsString}}}</li>
+{{/each}}
 </ul>
+{{/if}}
 
 {{#if group.related}}
-  <h2>Newest related collectives</h2>
+  <h2>Check out similar collectives</h2>
   <ul>
   {{#each group.related}}
-    <li><a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport">{{name}}</a>, on a mission to {{mission}} [<a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport#support">support that mission!</a>]</li>
+    <li><a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport">{{name}}</a>, on a mission to {{mission}} [<a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport#support">support them!</a>]</li>
   {{/each}}
   </ul>
 {{/if}}
 
 <h2>Featured collective</h2>
 <ul>
-  <li><a href="https://opencollective.com/FreeRideToVote?utm_source=email&utm_campaign=monthlyreport">#FreeRideToVote</a>, on a mission to give a free ride to people who need one in order to go vote on November 8th. [<a href="https://opencollective.com/FreeRideToVote?utm_source=email&utm_campaign=monthlyreport#support">support that mission!</a>]</li> 
+  <li><a href="https://opencollective.com/sfartandfilm?utm_source=email&utm_campaign=monthlyreport">San Francisco Art & Film for Teenagers</a>, is on a mission to make all the arts an important part of young people's lives. [<a href="https://opencollective.com/FreeRideToVote?utm_source=email&utm_campaign=monthlyreport#support">support that mission!</a>]</li>
+</ul>
+
+<h2>Blog posts</h2>
+<li><a href="http://empathia.agency">Empathia Agency</a> (who works with us) is giving back to the open source community. They decided to add 1% to their bills to donate to the Open Source Collective + 1% coming from their margin. <a href="https://medium.empathia.agency/believe-in-giving-back-b451887d79cb#.5j4bysm00">Read more</a>.</li>
+<li><a href="http://blog.idonethis.com/open-source-community/">How iDoneThis says thank you to the open source community</a></li>
 </ul>
 
 <h2>Changelog</h2>
 <ul>
-<li>Check out our <a href="https://opencollective.com">new homepage</a> with featured collectives and sponsors</li>
-<li>New Twitter and Meetup integrations; contact us if you want to test them!
-  <ul>
-    <li>Connect your Twitter account and automatically send a monthly thank you tweet mentioning your sponsors</li>
-    <li>Connect your Meetup.com account and automatically add your backers and sponsors to your latest meetup description</li>
-  </ul>
-</li>
+<li>Check out our <a href="https://opencollective.com/discover">discovery page</a> with featured collectives and sponsors</li>
+<li>Apply for sponsorship. You can now contact existing sponsors on Open Collective to apply for sponsorship. See at the bottom of their profile page, e.g. <a href="https://opencollective.com/digitalocean">DigitalOcean</a>, <a href="https://opencollective.com/iDoneThis">iDoneThis</a>, <a href="https://opencollective.com/saucelabs">SauceLabs</a> and <a href="https://opencollective.com/saucelabs">SauceLabs</a></li>
 </ul>
 
 </div>

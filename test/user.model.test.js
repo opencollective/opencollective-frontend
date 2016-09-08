@@ -4,11 +4,9 @@ import models from '../server/models';
 
 const userData = utils.data('user1');
 
+const { User, Group, Transaction } = models;
+
 describe('user.models.test.js', () => {
-
-  let User;
-
-  beforeEach(() => User = models.User);
 
   beforeEach(() => utils.cleanAllDb());
 
@@ -79,7 +77,6 @@ describe('user.models.test.js', () => {
 
     beforeEach(() => User.create(userData));
 
-
     it('successfully get a user, user.info and user.public return correct information', (done) => {
       User.findOne({}).then((user) => {
         expect(user.info).to.have.property('email');
@@ -90,6 +87,104 @@ describe('user.models.test.js', () => {
         expect(user.public).to.have.property('twitterHandle');
         expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
         done();
+      });
+    });
+
+  });
+
+  describe('class methods', () => {
+
+    const users = [ utils.data('user1'), utils.data('user2') ];
+    const groups = [ utils.data('group1'), utils.data('group2') ];
+    const transactions = [{
+      createdAt: new Date('2016-06-14'),
+      amount: 100,
+      netAmountInGroupCurrency: 10000,
+      currency: 'USD',
+      type: 'donation',
+      UserId: 1,
+      GroupId: 1
+    },{
+      createdAt: new Date('2016-06-15'),
+      amount: 150,
+      netAmountInGroupCurrency: 15000,
+      currency: 'USD',
+      type: 'donation',
+      UserId: 1,
+      GroupId: 2
+    },{
+      createdAt: new Date('2016-07-15'),
+      amount: 250,
+      netAmountInGroupCurrency: 25000,
+      currency: 'USD',
+      type: 'donation',
+      UserId: 2,
+      GroupId: 1
+    },{
+      createdAt: new Date('2016-07-16'),
+      amount: 500,
+      netAmountInGroupCurrency: 50000,
+      currency: 'USD',
+      type: 'donation',
+      UserId: 2,
+      GroupId: 2
+    }];
+
+    beforeEach(() => utils.cleanAllDb());
+    beforeEach(() => User.createMany(users));
+    beforeEach(() => Group.createMany(groups));
+    beforeEach(() => Transaction.createMany(transactions));
+
+    it('gets the top backers', () => {
+      return User.getTopBackers()
+        .then(backers => {
+          backers = backers.map(g => g.dataValues);
+          expect(backers.length).to.equal(2);
+          expect(backers[0].totalDonations).to.equal(750);
+          expect(backers[0]).to.have.property('name');
+          expect(backers[0]).to.have.property('avatar');
+          expect(backers[0]).to.have.property('website');
+          expect(backers[0]).to.have.property('twitterHandle');
+        });
+    });
+
+    it('gets the top backers in a given month', () => {
+      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'))
+        .then(backers => {
+          backers = backers.map(g => g.dataValues);
+          expect(backers.length).to.equal(1);
+          expect(backers[0].totalDonations).to.equal(250);
+        });
+    });
+
+    it('gets the top backers in open source', () => {
+      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'), ['open source'])
+        .then(backers => {
+          backers = backers.map(g => g.dataValues);
+          expect(backers.length).to.equal(1);
+          expect(backers[0].totalDonations).to.equal(100);
+        });
+    });
+
+    it('gets the latest donations of a user', () => {
+      return User.findOne().then(user => {
+        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
+          .then(donations => {
+            expect(donations.length).to.equal(2);
+          })
+      });
+    });
+
+    it('gets the latest donations of a user to open source', () => {
+      return User.findOne().then(user => {
+        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
+          .then(donations => {
+            expect(donations.length).to.equal(1);
+            expect(donations[0]).to.have.property("amount");
+            expect(donations[0]).to.have.property("currency");
+            expect(donations[0]).to.have.property("Group");
+            expect(donations[0].Group).to.have.property("name");
+          })
       });
     });
 
