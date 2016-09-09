@@ -11,15 +11,18 @@ import crypto from 'crypto';
 
 const debug = debugLib('email');
 
-const render = (name, data, config) => {
-    data.config = config;
+const render = (template, data) => {
     data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
-    return templates[name](data);
+    debug(`Preview email template: http://localhost:3060/templates/email/${template}?data=${encodeURIComponent(JSON.stringify(data))}`);
+    return juice(templates[template](data));
 };
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
-  const uid = `${email}.${groupSlug}.${type}.${config.keys.opencollective.resetPasswordSecret}`;
-  return crypto.createHash('md5').update(uid).digest("hex");
+  const uid = `${email}.${groupSlug}.${type}.${config.keys.opencollective.secret}`;
+  console.log("Generating unsubscribe token from ", uid);
+  const token = crypto.createHash('md5').update(uid).digest("hex");
+  console.log("token:", token);
+  return token;
 }
 
 /*
@@ -140,13 +143,15 @@ const generateEmailFromTemplate = (template, recipient, data, options) => {
   }
 
   const slug = (data.group && data.group.slug) ? data.group.slug : 'undefined';
-  data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type)}`;
+
+  data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   data.notificationTypeLabel = getNotificationLabel(template, recipient);
+  data.config = config;
 
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));
   }
-  return Promise.resolve(juice(render(template, data, config)));
+  return Promise.resolve(render(template, data));
 };
 
 /*
@@ -170,6 +175,7 @@ const sendMessageFromActivity = (activity, notification) => {
 }
 
 const emailLib = {
+  render,
   getBody,
   getSubject,
   sendMessage,

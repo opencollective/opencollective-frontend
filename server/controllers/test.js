@@ -196,8 +196,8 @@ export const generateTestEmail = function(req, res) {
   try {
     const data = JSON.parse(req.query.data);
     console.log(`Generating ${template} with data`, data);
-    return emailLib.generateEmailFromTemplate(template, null, data)
-      .then(html => res.send(html))
+    const html = emailLib.render(template, data);
+    res.send(html);
   } catch (e) {
     res.send("Invalid data", e);
   }
