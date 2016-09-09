@@ -19,9 +19,7 @@ const render = (template, data) => {
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
   const uid = `${email}.${groupSlug}.${type}.${config.keys.opencollective.secret}`;
-  console.log("Generating unsubscribe token from ", uid);
   const token = crypto.createHash('md5').update(uid).digest("hex");
-  console.log("token:", token);
   return token;
 }
 
