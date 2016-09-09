@@ -9,6 +9,13 @@ import emailLib from '../server/lib/email';
 import MailgunNock from './mocks/mailgun.nock.js';
 import webhookBody from './mocks/mailgun.webhook.payload';
 import * as utils from '../test/utils';
+import crypto from 'crypto';
+import config from 'config';
+
+const generateToken = (email, slug, template) => {
+  const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
+  return crypto.createHash('md5').update(uid).digest("hex");
+}
 
 const {
   User,
@@ -163,11 +170,13 @@ describe("email.routes.test", () => {
 
   describe("unsubscribe", () => {
 
-    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/mailinglist.members/3d87fb0a6ffa99e8c4307f6fcd649dd1`;
+    const template = 'mailinglist.members';
+    const token = generateToken(usersData[0].email, groupData.slug, template);
+    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/${token}`;
 
     it("returns an error if invalid token", () => {
       return request(app)
-        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/mailinglist.members/xxxxxxxxxx`)
+        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/xxxxxxxxxx`)
         .then((res) => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.error.message).to.equal('Invalid token');
@@ -207,7 +216,9 @@ describe("email.routes.test", () => {
 
     it("fails to unsubscribe if already unsubscribed", () => {
 
-      const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/unknownType/38e32567c52039a97252b1e0537fd848`;
+      const template = 'unknownType';
+      const token = generateToken(usersData[0].email, groupData.slug, template);
+      const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/${token}`;
 
       return request(app)
         .get(unsubscribeUrl)

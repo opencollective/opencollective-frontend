@@ -10,14 +10,11 @@ import errors from '../../lib/errors';
 
 export const unsubscribe = (req, res, next) => {
 
-  const { type } = req.params;
-  const { email } = req.params;
-  const { slug } = req.params;
+  const { type, email, slug, token } = req.params;
 
-  const identifier = `${email}.${slug}.${type}.${config.keys.opencollective.resetPasswordSecret}`;
-  const token = crypto.createHash('md5').update(identifier).digest("hex");
-
-  if (token !== req.params.token) {
+  const identifier = `${email}.${slug}.${type}.${config.keys.opencollective.secret}`;
+  const computedToken = crypto.createHash('md5').update(identifier).digest("hex");
+  if (token !== computedToken) {
     return next(new errors.BadRequest('Invalid token'));
   }
 
