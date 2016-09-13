@@ -113,7 +113,7 @@
     "db:copy:staging": "./scripts/db_copy_to_localhost.sh staging",
     "db:copy:prod:staging": "./scripts/db_copy_prod_to_staging.sh && heroku run npm run db:sanitize --app opencollective-staging-api",
     "db:sanitize": "babel-node scripts/replace_stripe_accounts",
-    "db:reset": "node scripts/reset",
+    "db:reset": "babel-node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "npm run build && sh ./scripts/postinstall.sh",
     "git:clean": "git branch --merged | grep -v \\* | grep -v master | grep -v dev | xargs -n 1 git branch -d",

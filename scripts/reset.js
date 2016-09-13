@@ -7,7 +7,8 @@ const roles = require('../server/constants/roles');
 var data = {};
 
 if (process.env.NODE_ENV !== 'development') {
-  return console.error('Only run reset script in development');
+  console.error('Only run reset script in development');
+  process.exit(0);
 }
 
 exec('make dropdb && make database')
