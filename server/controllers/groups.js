@@ -131,7 +131,7 @@ export const getTransaction = (req, res) => res.json(req.transaction.info);
  * Get group's transactions.
  */
 export const getTransactions = (req, res, next) => {
-  let where = {
+  const where = {
     GroupId: req.group.id
   };
 
@@ -143,12 +143,6 @@ export const getTransactions = (req, res, next) => {
     where.amount = {
       $lt: 0
     };
-  } else if (req.query.pending) {
-    where = _.extend({}, where, {
-      amount: { $lt: 0 },
-      approved: false,
-      approvedAt: null
-    });
   }
 
   if (req.query.exclude) {

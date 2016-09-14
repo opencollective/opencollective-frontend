@@ -146,7 +146,6 @@ const paypalDonation = (req, res, next) => {
           currency,
           description: `Donation to ${group.name}`,
           tags: ['Donation'],
-          approved: true,
           comment: distribution,
           // In paranoid mode, the deleted transactions are not visible
           // We will create that temporary transaction that will only be visible once

@@ -61,11 +61,6 @@ export default (Sequelize, DataTypes) => {
 
     data: DataTypes.JSON,
 
-    approved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    }, // delete #postmigration
-
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -98,10 +93,6 @@ export default (Sequelize, DataTypes) => {
         }
       },
 
-      isRejected() {
-        return !!this.approvedAt && !this.approved;
-      },
-
       isDonation() {
         return this.amount > 0;
       },
@@ -131,7 +122,6 @@ export default (Sequelize, DataTypes) => {
           status: this.status,
           comment: this.comment,
           link: this.link,
-          approved: this.approved,
           createdAt: this.createdAt,
           approvedAt: this.approvedAt,
           reimbursedAt: this.reimbursedAt,
@@ -139,7 +129,6 @@ export default (Sequelize, DataTypes) => {
           GroupId: this.GroupId,
           payoutMethod: this.payoutMethod,
           isExpense: this.isExpense,
-          isRejected: this.isRejected,
           isDonation: this.isDonation,
           isManual: this.isManual,
           isReimbursed: this.isReimbursed,
