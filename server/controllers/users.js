@@ -306,25 +306,14 @@ export const show = (req, res, next) => {
   } else if (req.query.profile) {
     const groupInfoArray = []
     req.user.getGroups()
-    .then(groups => {
-      return Promise.all(groups.map(group => {
-        return Promise.all([
-          group.getYearlyIncome(),
-          new Promise((resolve, reject) => {
-            const appendTier = (backers) => {
-              backers = backers.map((backer) => {
-                backer.tier = getTier(backer, group.tiers);
-                return backer;
-              });
-              return backers;
-            }
-
-            queries.getUsersFromGroupWithTotalDonations(group.id)
-              .then(appendTier)
-              .then(resolve)
-              .catch(reject);
-          })
-        ])
+      .then(groups => {
+        return Promise.all(groups.map(group => {
+          return Promise.all([
+            group.getYearlyIncome(),
+            queries.getUsersFromGroupWithTotalDonations(group.id).tap(backers => {
+              backers.map(b => b.tier = getTier(b, group.tiers));
+            })
+          ])
         .then(results => {
           let groupInfo = group.info;
           groupInfo.yearlyIncome = results[0];
