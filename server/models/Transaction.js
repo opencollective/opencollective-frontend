@@ -58,7 +58,6 @@ export default (Sequelize, DataTypes) => {
     hostFeeInTxnCurrency: DataTypes.INTEGER,
     paymentProcessorFeeInTxnCurrency: DataTypes.INTEGER,
     netAmountInGroupCurrency: DataTypes.INTEGER, // stores the net amount received by the group
-    stripeSubscriptionId: DataTypes.STRING, // delete #postmigration
 
     data: DataTypes.JSON,
 
