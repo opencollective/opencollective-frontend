@@ -214,7 +214,6 @@ export default function stripeWebhook(req, res, next) {
         description: 'Recurring subscription', // remove #postmigration
         tags: ['Donation'], // remove #postmigration
         approved: true, // remove #postmigration
-        interval: subscription.interval, // remove #postmigration
       };
 
       models.Transaction.createFromPayload({

@@ -60,10 +60,6 @@ export default (Sequelize, DataTypes) => {
     netAmountInGroupCurrency: DataTypes.INTEGER, // stores the net amount received by the group
     stripeSubscriptionId: DataTypes.STRING, // delete #postmigration
 
-    interval: {
-      type: DataTypes.STRING
-    }, // delete #postmigration
-
     data: DataTypes.JSON,
 
     approved: {
@@ -148,7 +144,6 @@ export default (Sequelize, DataTypes) => {
           isDonation: this.isDonation,
           isManual: this.isManual,
           isReimbursed: this.isReimbursed,
-          interval: this.interval,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
           paymentProcessorFee: this.paymentProcessorFee,

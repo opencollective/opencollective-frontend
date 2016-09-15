@@ -325,7 +325,6 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.currency).to.be.equal(CURRENCY);
               expect(transaction.type).to.be.equal(type.DONATION);
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
-              expect(transaction.interval).to.be.equal('month');
 
               expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
               expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
@@ -336,6 +335,7 @@ describe('webhooks.routes.test.js', () => {
               expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 259);
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');
+              expect(transaction.Subscription.interval).to.be.equal('month');
             });
 
             done();
@@ -445,7 +445,7 @@ describe('webhooks.routes.test.js', () => {
 
     });
 
-    it('returns 200 if the subscription id does not appear in an exisiting transaction in NON-production', (done) => {
+    it('returns 200 if the subscription id does not appear in an existing transaction in NON-production', (done) => {
       const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
 

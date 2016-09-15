@@ -15,12 +15,12 @@ const getConfig = (connectedAccount) => ({
 
 const getCallbackUrl = (group, transaction) => `${config.host.api}/groups/${group.id}/transactions/${transaction.id}/callback`;
 
-const createBillingPlan = (planDescription, group, transaction, paypalConfig, cb) => {
+const createBillingPlan = (planDescription, group, transaction, subscription, paypalConfig, cb) => {
   const callbackUrl = getCallbackUrl(group, transaction);
 
   const { amount } = transaction;
   const { currency } = transaction;
-  const { interval } = transaction;
+  const { interval } = subscription;
   // Paypal frequency is uppercase: 'MONTH'
   const frequency = interval.toUpperCase();
 
@@ -72,9 +72,9 @@ const createBillingAgreement = (agreementDescription, planId, paypalConfig, cb) 
 /**
  * Create a subscription payment and return the links to the paypal approval
  */
-const createSubscription = (connectedAccount, group, transaction, callback) => {
+const createSubscription = (connectedAccount, group, transaction, subscription, callback) => {
   const paypalConfig = getConfig(connectedAccount);
-  const description = `donation of ${transaction.currency} ${transaction.amount} / ${transaction.interval} to ${group.name}`;
+  const description = `donation of ${transaction.currency} ${transaction.amount} / ${subscription.interval} to ${group.name}`;
 
   async.auto({
     createBillingPlan: (cb) => {
@@ -82,6 +82,7 @@ const createSubscription = (connectedAccount, group, transaction, callback) => {
         description,
         group,
         transaction,
+        subscription,
         paypalConfig,
         cb
       );

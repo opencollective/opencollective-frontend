@@ -7,7 +7,7 @@ const done = (err) => {
   if (err) console.log('err', err);
   console.log('done!');
   process.exit();
-}
+};
 
 var message = [];
 
@@ -54,17 +54,17 @@ models.Transaction.findAll({
     const url = `https://dashboard.stripe.com/${accountId}/plans/${stripeSubscription.plan.id}`;
 
     if (amount !== transaction.amount) {
-      message.push(`Missmatched amount: ${transaction.id}, url: ${url}`);
+      message.push(`transaction.amount mismatch: ${transaction.id}, url: ${url}`);
     }
 
-    if (!transaction.interval) {
-      message.push(`Interval missing: ${transaction.id}, url: ${url}`);
-    } else if (transaction.interval !== stripeSubscription.plan.interval) {
-      message.push(`Missmatched interval: ${transaction.id}, url: ${url}`);
+    if (!transaction.Subscription.interval) {
+      message.push(`subscription.interval missing: ${transaction.Subscription.id}, url: ${url}`);
+    } else if (transaction.Subscription.interval !== stripeSubscription.plan.interval) {
+      message.push(`subscription.interval mismatch: ${transaction.Subscription.id}, url: ${url}`);
     }
 
     if (currency !== transaction.currency) {
-      message.push(`Missmatched currency: ${transaction.id}, url: ${url}`);
+      message.push(`transaction.currency mismatch: ${transaction.id}, url: ${url}`);
     }
   });
 })
@@ -76,4 +76,4 @@ models.Transaction.findAll({
   }
 })
 .then(() => done())
-.catch(done)
+.catch(done);

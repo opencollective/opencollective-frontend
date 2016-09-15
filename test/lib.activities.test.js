@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import * as utils from '../test/utils';
-const activitiesData = utils.data('activities1').activities;
 import constants from '../server/constants/activities';
 import activitiesLib from '../server/lib/activities';
+
+const activitiesData = utils.data('activities1').activities;
 
 describe('lib.activities.test.js', () => {
 
@@ -128,6 +129,6 @@ describe('lib.activities.test.js', () => {
 
   });
 
-})
+});
 
 

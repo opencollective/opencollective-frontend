@@ -257,9 +257,11 @@ export default {
             "email":"jussi@kuohujoki.fi",
             "twitterHandle": "xdamman"
           },
-          "transaction": {
-            "amount": 12.34,
-            "currency": "EUR",
+          "donation": {
+            "amount": 1234,
+            "currency": "EUR"
+          },
+          "subscription": {
             "interval": "month"
           },
           "group": {

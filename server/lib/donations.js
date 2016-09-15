@@ -64,7 +64,7 @@ export const processDonation = (Sequelize, donation) => {
               user,
               group,
               paymentMethod
-            }
+            };
             payload.transaction = {
               type: transactions.type.DONATION,
               DonationId: donation.id,
@@ -78,8 +78,8 @@ export const processDonation = (Sequelize, donation) => {
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
               data: {charge, balanceTransaction},
             };
-            return Sequelize.models.Transaction.createFromPayload(payload)
-          })
+            return Sequelize.models.Transaction.createFromPayload(payload);
+          });
       };
 
       let groupStripeAccount;
@@ -125,7 +125,7 @@ export const processDonation = (Sequelize, donation) => {
             // subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
           }));
       }
-    }
+    };
 
   return Sequelize.models.Donation.findById(donation.id, {
     include: [{ model: Sequelize.models.User },

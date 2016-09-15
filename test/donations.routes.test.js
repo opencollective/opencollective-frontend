@@ -28,7 +28,7 @@ describe('donations.routes.test.js', () => {
 
   beforeEach(() => {
     sandbox.stub(donationsLib, 'processDonation');
-  })
+  });
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -449,7 +449,6 @@ describe('donations.routes.test.js', () => {
             expect(transaction).to.have.property('GroupId', group.id);
             expect(transaction).to.have.property('currency', 'USD');
             expect(transaction).to.have.property('tags');
-            expect(transaction).to.have.property('interval', 'month');
             expect(transaction).to.have.property('amount', 10);
 
             expect(subscription).to.have.property('data');
@@ -569,7 +568,6 @@ describe('donations.routes.test.js', () => {
             expect(transaction).to.have.property('GroupId', group.id);
             expect(transaction).to.have.property('currency', 'USD');
             expect(transaction).to.have.property('tags');
-            expect(transaction).to.have.property('interval', null);
             expect(transaction).to.have.property('SubscriptionId', null);
             expect(transaction).to.have.property('amount', 10);
 

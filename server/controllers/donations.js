@@ -156,7 +156,6 @@ const paypalDonation = (req, res, next) => {
       };
 
      if (isSubscription) {
-        payload.transaction.interval = interval;
         payload.subscription = results.createSubscription;
       }
 
@@ -173,7 +172,8 @@ const paypalDonation = (req, res, next) => {
         paypal.createSubscription(
           connectedAccount,
           group,
-          transaction
+          transaction,
+          results.createSubscription
         , cb);
       } else {
         paypal.createPayment(
