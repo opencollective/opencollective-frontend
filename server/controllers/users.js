@@ -304,40 +304,26 @@ export const show = (req, res, next) => {
       })
       .catch(next);
   } else if (req.query.profile) {
-    const groupInfoArray = []
-    req.user.getGroups()
-    .then(groups => {
-      return Promise.all(groups.map(group => {
-        return Promise.all([
-          group.getYearlyIncome(),
-          new Promise((resolve, reject) => {
-            const appendTier = (backers) => {
-              backers = backers.map((backer) => {
-                backer.tier = getTier(backer, group.tiers);
-                return backer;
-              });
-              return backers;
-            }
-
-            queries.getUsersFromGroupWithTotalDonations(group.id)
-              .then(appendTier)
-              .then(resolve)
-              .catch(reject);
-          })
-        ])
-        .then(results => {
-          let groupInfo = group.info;
-          groupInfo.yearlyIncome = results[0];
-          const usersByRole = groupBy(results[1], 'role');
-          const backers = usersByRole[roles.BACKER] || [];
-          groupInfo.backersAndSponsorsCount = backers.length;
-          groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
-          groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
-          groupInfo = Object.assign(groupInfo, { role: group.UserGroup.role, createdAt: group.UserGroup.createdAt });
-          groupInfoArray.push(groupInfo);
-          return group;
+    const groupInfoArray = [];
+    req.user.getGroups().map(group => {
+      return Promise.all([
+        group.getYearlyIncome(),
+        queries.getUsersFromGroupWithTotalDonations(group.id).tap(backers => {
+          backers.map(b => b.tier = getTier(b, group.tiers));
         })
-      }))
+      ])
+      .then(results => {
+        let groupInfo = group.info;
+        groupInfo.yearlyIncome = results[0];
+        const usersByRole = groupBy(results[1], 'role');
+        const backers = usersByRole[roles.BACKER] || [];
+        groupInfo.backersAndSponsorsCount = backers.length;
+        groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
+        groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
+        groupInfo = Object.assign(groupInfo, { role: group.UserGroup.role, createdAt: group.UserGroup.createdAt });
+        groupInfoArray.push(groupInfo);
+        return group;
+      })
     })
     .then(groups => UserGroup.findAll({
       where: { GroupId: { $in: groups.map(g => g.id) } },
