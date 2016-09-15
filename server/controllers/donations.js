@@ -269,10 +269,11 @@ export const paypalCallback = (req, res, next) => {
         .then(subscription => {
           const billingAgreementId = results.execute.id;
           subscription.data = _.extend({}, subscription.data, { billingAgreementId });
+          subscription.isActive = true;
 
           return subscription.save();
         })
-        .then(() => cb())
+        .then(subscription => cb(null, subscription))
         .catch(cb);
     }],
 
@@ -287,19 +288,16 @@ export const paypalCallback = (req, res, next) => {
       const { currency } = transaction;
       const amountFloat = transaction.amount; // TODO: clean this up when we switch all amounts to INTEGER
       const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
-      const subscriptionId = transaction.getSubscription().id;
+      const subscriptionId = results.activateSubscription && results.activateSubscription.id;
 
       const donation = {
         UserId: user.id,
         GroupId: group.id,
         currency,
         amount: amountInt,
-        title: `Donation to ${group.name}`
+        title: `Donation to ${group.name}`,
+        SubscriptionId: subscriptionId
       };
-
-      if (isSubscription) {
-        donation.SubscriptionId = subscriptionId;
-      }
 
       models.Donation.create(donation)
         .then(donation => transaction.setDonation(donation))
