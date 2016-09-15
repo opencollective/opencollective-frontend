@@ -95,7 +95,6 @@ describe('user.models.test.js', () => {
   describe('class methods', () => {
 
     const users = [ utils.data('user1'), utils.data('user2') ];
-    const groups = [ utils.data('group1'), utils.data('group2') ];
     const transactions = [{
       createdAt: new Date('2016-06-14'),
       amount: 100,
@@ -132,7 +131,8 @@ describe('user.models.test.js', () => {
 
     beforeEach(() => utils.cleanAllDb());
     beforeEach(() => User.createMany(users));
-    beforeEach(() => Group.createMany(groups));
+    beforeEach(() => Group.create(utils.data('group1')));
+    beforeEach(() => Group.create(utils.data('group2')));
     beforeEach(() => Transaction.createMany(transactions));
 
     it('gets the top backers', () => {
