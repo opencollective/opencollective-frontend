@@ -6,9 +6,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 {{> header}}
 
-<center>
-  <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{encodeURIComponent group.logo}}" style="border-radius: 50%;" width="80" height="80" />
-</center>
+{{> toplogo}}
 
 {{#if user.name}}
 <p>Dear {{user.name}},</p>
