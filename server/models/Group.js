@@ -449,6 +449,10 @@ export default function(Sequelize, DataTypes) {
     },
 
     classMethods: {
+      createMany: (groups, defaultValues) => {
+        return Promise.map(groups, u => Group.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
+      },
+
       getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
         limit = limit || 3;
         excludeList = excludeList || [];
