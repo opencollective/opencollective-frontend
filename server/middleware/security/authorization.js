@@ -67,14 +67,7 @@ export function authorizeUserToAccessScope(scope) {
   };
 }
 
-export const authorizeAccessToPublicGroup = (req, res, next) => {
-  if (!req.group.isPublic) {
-    return next(new Forbidden("Group is not public"));
-  }
-  next();
-};
-
-export const authorizeAppAccessToGroup = (req, res, next) => {
+export const _authorizeAppAccessToGroup = (req, res, next) => {
   aN.authenticateApp()(req, res, (e) => {
     if (e) {
       return next(e);
@@ -85,13 +78,21 @@ export const authorizeAppAccessToGroup = (req, res, next) => {
         if (hasApplication) {
           return next();
         }
-        next(new Forbidden('Forbidden'));
+        next(new Forbidden(`Application key doesn't have access to this group`));
       })
       .catch(next);
   });
 };
 
-export const authorizeUserAccessToGroup = (req, res, next) => {
+/**
+ * Authenticate the user via its JWT token
+ * Returns a Forbidden error if the user doesn't belong to req.group
+ * 
+ * @PRE: JWT token passed in the `Authorization: Bearer [token]` header
+ *       req.group
+ * @POST: req.remoteUser is set
+ */
+export const _authorizeUserAccessToGroup = (req, res, next) => {
   aN.authenticateUserByJwt()(req, res, (e) => {
     if (e) {
       return next(e);
@@ -109,14 +110,20 @@ export const authorizeUserAccessToGroup = (req, res, next) => {
         if (users.length > 0) {
           return next();
         }
-        next(new Forbidden('Forbidden'));
+        next(new Forbidden(`User doesn't have access to this group`));
       })
       .catch(next);
   });
 };
 
 /**
- * Authorize only users with the specified roles.
+ * Authorizes users with the specified roles
+ * 
+ * @PRE: options.userRoles[] (optional)
+ *       req.remoteUser
+ *       req.group
+ * @POST: returns a Forbidden error if user doesn't have one of the roles specified in options.userRoles[]
+ *        continues if it does or if options.userRoles is not specified
  */
 export function _authorizeUserRoles (options) {
   return (req, res, next) => {
@@ -127,50 +134,45 @@ export function _authorizeUserRoles (options) {
       return next();
     }
     req.group.hasUserWithRole(req.remoteUser.id, options.userRoles, (e, hasUser) => {
-      if (e) {
-        return next(e);
-      }
-      if (!hasUser) {
-        return next(new Forbidden('User does not have expected role'));
-      }
-      next();
+      if (e) return next(e);
+      if (!hasUser) return next(new Forbidden(`User does not have one of the expected role: ${options.userRoles.join(', ')}`));
+      return next();
     });
   };
 }
 
-// TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
-export function authorizeAccessToGroup(options) {
-  if (!options) options = {};
+/**
+ * Grants access if the application has a specific access to the group
+ * or if the logged in user has access to the group
+ * Authenticates the user with its JWT token if any
+ * then it grants access if the group is public and there is no required roles passed in options.userRoles[]
+ * OR if the user has one of the roles specified in options.userRoles[]
+ * 
+ * @PRE: api_key of the application 
+ *       (optional) a valid JWT token in the `Authorization: Bearer [token]` header to authenticate the user
+ * @POST: req.remoteUser is set to the logged in user if any
+ */
+// @TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
+export function authorizeAccessToGroup(options = {}) {
   return (req, res, next) => {
-    const _authorizeAccessToGroup = () => {
-      this.authorizeUserAccessToGroup(req, res, (e) => {
-        if (!e) {
-          return this._authorizeUserRoles(options)(req, res, next);
-        }
-        this.authorizeAppAccessToGroup(req, res, (e) => {
-          if (e) {
-            return next(e);
-          }
-          this._authorizeUserRoles(options)(req, res, next)
-        });
-      })
+
+    const handleAuthCallback = (e, res) => {
+      if (e && req.group.isPublic && options.allowNonAuthenticatedAccessIfGroupIsPublic) return next();
+      else return next(e, res);
     };
 
-    if (options.authIfPublic) {
-      this.authorizeAccessToPublicGroup(req, res, (e) => {
-        if (!e) {
-          return next();
-        }
-        _authorizeAccessToGroup();
+    this._authorizeUserAccessToGroup(req, res, (e) => {
+      if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
+      this._authorizeAppAccessToGroup(req, res, (e) => {
+        if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
+        else return handleAuthCallback(e);
       });
-    } else {
-      _authorizeAccessToGroup();
-    }
+    });
+
   }
 }
 
-export function authorizeGroupAccessTo(attributeName, options) {
-  if (!options) options = {};
+export function authorizeGroupAccessTo(attributeName, options = {}) {
   return (req, res, next) => {
     const _authorizeAccess = () => {
       // TODO shouldn't return NotFound before authorization check
@@ -186,16 +188,10 @@ export function authorizeGroupAccessTo(attributeName, options) {
       next();
     };
 
-    if (options.authIfPublic) {
-      this.authorizeAccessToPublicGroup(req, res, (e) => {
-        if (!e) {
-          return next();
-        }
-        _authorizeAccess();
-      });
-    } else {
-      _authorizeAccess();
+    if (options.allowNonAuthenticatedAccessIfGroupIsPublic && !req.group.isPublic) {
+      return next(new Forbidden("Group is not public"));
     }
+    _authorizeAccess();
   }
 }
 

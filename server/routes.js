@@ -136,9 +136,9 @@ export default (app) => {
   app.post('/groups', ifParam('flow', 'github'), aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
   app.post('/groups', aN.authenticateInternalUserByJwt(), required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them.
   app.get('/groups/tags', groups.getGroupTags); // List all unique tags on all groups
-  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({authIfPublic: true}), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({authIfPublic: true}), cache(60), mw.format('csv'), groups.getUsers); // Get group users
+  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), groups.getOne);
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), cache(60), mw.fetchRoles, mw.format('csv'), groups.getUsers);
   app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
   app.put('/groups/:groupid/settings', required('group'), groups.updateSettings); // Update group settings
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
@@ -162,7 +162,7 @@ export default (app) => {
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
   const commonLegacySecurityMw = [mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration];
@@ -170,7 +170,7 @@ export default (app) => {
   app.post('/groups/:groupid/transactions', commonLegacySecurityMw, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
 
   // TODO remove #postmigration, replaced by GET /groups/:groupid/expenses/:expenseid
-  app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessToTransaction({authIfPublic: true}), groups.getTransaction); // Get a transaction.
+  app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), aZ.authorizeGroupAccessToTransaction({allowNonAuthenticatedAccessIfGroupIsPublic: true}), groups.getTransaction); // Get a transaction.
   // TODO remove #postmigration, replaced by PUT /groups/:groupid/expenses/:expenseid
   app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
   // TODO remove #postmigration, replaced by DEL /groups/:groupid/expenses/:expenseid
@@ -180,8 +180,8 @@ export default (app) => {
    * Expenses
    */
 
-  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({authIfPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({authIfPublic: true}), aZ.authorizeGroupAccessTo('expense', {authIfPublic: true}), expenses.getOne); // Get an expense.
+  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), aZ.authorizeGroupAccessTo('expense', {allowNonAuthenticatedAccessIfGroupIsPublic: true}), expenses.getOne); // Get an expense.
   // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
   // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
   // TODO refactor with single route using authentication.js and authorization.js middleware
@@ -273,7 +273,7 @@ export default (app) => {
   /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL
    */
-  app.use((req, res) => res.send(404));
+  app.use((req, res) => res.sendStatus(404));
 
   /**
    * Error handler.
