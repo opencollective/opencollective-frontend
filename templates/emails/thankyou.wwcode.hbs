@@ -6,10 +6,12 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 {{> header}}
 
+{{#if logoNotSvg }}
 <center>
   <img src="http://photos2.meetupstatic.com/photos/event/b/9/8/e/highres_431687502.jpeg" width="250" />
   <h3 style="margin-top:0;">{{group.name}}</h3>
 </center>
+{{/if}}
 
 {{#if user.name}}
 <p>{{user.name}},</p>

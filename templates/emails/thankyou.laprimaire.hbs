@@ -6,9 +6,11 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 
 {{> header}}
 
+{{#if logoNotSvg }}
 <center>
   <img src="https://res.cloudinary.com/opencollective/image/fetch/w_80/{{encodeURIComponent group.logo}}" style="border-radius: 50%;" width="80" height="80" />
 </center>
+{{/if}}
 
 {{#if user.name}}
 <p>Merci beaucoup {{user.name}} !</p>
