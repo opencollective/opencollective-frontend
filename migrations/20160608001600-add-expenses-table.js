@@ -1,7 +1,5 @@
 'use strict';
 
-const status = require('../server/constants/expense_status');
-
 module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.createTable(
@@ -67,11 +65,11 @@ module.exports = {
 
         status: {
           type: Sequelize.STRING,
-          defaultValue: status.PENDING,
+          defaultValue: 'PENDING',
           allowNull: false,
           validate: {
             isIn: {
-              args: [[status.PENDING, status.APPROVED, status.REJECTED, status.PAID]],
+              args: [['PENDING', 'APPROVED', 'REJECTED', 'PAID']],
               msg: 'Must be PENDING, APPROVED, REJECTED or PAID'
             }
           }
