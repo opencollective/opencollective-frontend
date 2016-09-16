@@ -308,18 +308,8 @@ export default (Sequelize, DataTypes) => {
 
     classMethods: {
 
-      createMany: (users, defaultValues) => {
-        const promises = [];
-        for (let i=0; i < users.length; i++) {
-          const u = users[i];
-          for (const attr in defaultValues) {
-            u[attr] = defaultValues[attr];
-          }
-          promises.push(User.create(u).catch(e => {
-            console.error("Error in creating user", u, e, e.stack);
-          }));
-        }
-        return Promise.all(promises).catch(console.error);
+      createMany: (users, defaultValues = {}) => {
+        return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), {concurrency: 1});
       },
 
       auth(usernameOrEmail, password, cb) {
