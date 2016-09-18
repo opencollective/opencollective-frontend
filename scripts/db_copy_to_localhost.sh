@@ -15,7 +15,6 @@ fi
 
 LOCALDBUSER="opencollective"
 LOCALDBNAME="opencollective_${ENV}_snapshot"
-PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
 DBDUMPS_DIR="dbdumps/"
 
 FILENAME="`date +"%Y-%m-%d"`-prod.pgsql"
@@ -33,6 +32,7 @@ echo "Creating ${LOCALDBNAME}"
 createdb "${LOCALDBNAME}"
 
 if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
+  PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
   echo "Dumping ${PG_URL}"
   pg_dump -O -F t "${PG_URL}" > "${DBDUMPS_DIR}${FILENAME}"
 fi
