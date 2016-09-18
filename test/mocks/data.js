@@ -17,7 +17,8 @@ export default {
   },
 
   "user1": {
-    "name": "Phil Mod",
+    "firstName": "Phil",
+    "lastName": "Mod",
     "username": "philmod",
     "email": "User1@opencollective.com",
     "paypalEmail": "User1+paypal@opencollective.com",
@@ -29,34 +30,39 @@ export default {
   },
 
   "user2": {
-    "name": "Anish Bas",
+    "firstName": "Anish",
+    "lastName": "Bas",
     "username": "abas",
     "email": "Xdam@opencollective.com",
     "password": "ssapssap"
   },
 
   "user3": {
-    "name": "Xavier Damman",
+    "firstName": "Xavier",
+    "lastName": "Damman",
     "username": "xdamman",
     "email": "User3@opencollective.com",
     "password": "passssap"
   },
 
   "user4": {
-    "name": "Bo Ki",
+    "firstName": "Bo",
+    "lastName": "Ki",
     "username": "boki",
     "email": "User4@opencollective.com",
     "password": "passssas"
   },
 
   "user5": {
-    "name": "Bo Ki",
+    "firstName": "Bo",
+    "lastName": "Ki",
     "username": "boki",
     "email": "uSer5@opencollective.org"
   },
 
   "user6": {
-    "name": "internal user",
+    "firstName": "internal",
+    "lastName": "user",
     "username": "interno",
     "email": "internal_user@opencollective.com"
   },
@@ -147,7 +153,7 @@ export default {
 
   "activities1": {
     "activities": [
-      {"type": "user.created", "UserId": 1, "data": {"user": {"name": "john doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
+      {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "john", "lastName": "Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
       {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
       {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
@@ -487,7 +493,8 @@ export default {
 
     "user": {
       "id":1,
-      "name":"Phil Mod",
+      "firstName":"Phil",
+      "lastName":"Mod",
       "username":"philmod",
       "email":"user1@opencollective.com",
       "avatar":null,

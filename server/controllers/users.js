@@ -80,7 +80,8 @@ export const updateUserWithoutLoggedIn = (req, res, next) => {
 
   async.auto({
     updateFields: (cb) => {
-      ['name',
+      ['firstName',
+       'lastName',
        'twitterHandle',
        'website',
        'avatar'

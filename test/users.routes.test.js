@@ -141,7 +141,7 @@ describe('users.routes.test.js', () => {
         })
         .end((e,res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('name', userData.name);
+          expect(res.body).to.have.property('firstName', userData.firstName);
           done();
         });
     });
@@ -197,7 +197,7 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('successfully create a user with just an email and auto prefills name, twitter, avatar', (done) => {
+    it('successfully create a user with just an email and auto prefills firstName, lastName, twitter, avatar', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -209,7 +209,8 @@ describe('users.routes.test.js', () => {
           models.User
             .findById(parseInt(res.body.id))
             .then((user) => {
-              expect(user.name).to.equal("Xavier Damman");
+              expect(user.firstName).to.equal("Xavier");
+              expect(user.lastName).to.equal("Damman");
               expect(user.twitterHandle).to.equal("xdamman");
               done();
             })
@@ -231,8 +232,6 @@ describe('users.routes.test.js', () => {
             models.User
               .findById(parseInt(res.body.id))
               .then((user) => {
-                expect(user.name).to.equal("Xavier Damman");
-                expect(user.twitterHandle).to.equal("xdamman");
                 expect(user.referrerId).to.equal(referrer.id);
                 done();
               })
@@ -535,7 +534,8 @@ describe('users.routes.test.js', () => {
     let userWithoutPassword;
 
     const newUser = {
-      name: 'newname',
+      firstName: 'Aseem',
+      lastName: 'Sood',
       twitterHandle: 'twitter.com/asood123',
       description: "engineer",
       isOrganization: false,
@@ -611,7 +611,8 @@ describe('users.routes.test.js', () => {
             .end((e, res) => {
               expect(e).to.not.exist;
               expect(res.body).to.have.property('id', userWithoutPassword.id);
-              expect(res.body).to.have.property('name', newUser.name);
+              expect(res.body).to.have.property('firstName', newUser.firstName);
+              expect(res.body).to.have.property('lastName', newUser.lastName);
               expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
               expect(res.body).to.have.property('website', newUser.website);
               expect(res.body).to.have.property('avatar').to.contain('.amazonaws.com/');

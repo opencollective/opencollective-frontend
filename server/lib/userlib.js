@@ -12,7 +12,8 @@ export default {
     return this.getUserData(user.email)
       .then(userData => {
         if (userData) {
-          user.name = user.name || userData.name.fullName;
+          user.firstName = user.firstName || userData.name.givenName;
+          user.lastName = user.lastName || userData.name.familyName;
           user.avatar = user.avatar || userData.avatar;
           user.twitterHandle = user.twitterHandle || userData.twitter.handle;
           user.website = user.website || userData.site;

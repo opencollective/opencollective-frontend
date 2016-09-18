@@ -28,7 +28,8 @@ export default (Sequelize, DataTypes) => {
       defaultValue: 0
     },
 
-    name: DataTypes.STRING,
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
 
     username: {
       type: DataTypes.STRING,
@@ -162,7 +163,9 @@ export default (Sequelize, DataTypes) => {
       info() {
         return {
           id: this.id,
-          name: this.name,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          name: `${this.firstName} ${this.lastName}`,
           username: this.username,
           email: this.email,
           mission: this.mission,
@@ -183,7 +186,9 @@ export default (Sequelize, DataTypes) => {
       show() {
         return {
           id: this.id,
-          name: this.name,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          name: `${this.firstName} ${this.lastName}`,
           username: this.username,
           avatar: this.avatar,
           twitterHandle: this.twitterHandle,
@@ -203,7 +208,9 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           username: this.username,
           avatar: this.avatar,
-          name: this.name,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          name: `${this.firstName} ${this.lastName}`,
           email: this.email
         };
       },
@@ -213,7 +220,9 @@ export default (Sequelize, DataTypes) => {
         return {
           id: this.id,
           avatar: this.avatar,
-          name: this.name,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          name: `${this.firstName} ${this.lastName}`,
           website: this.website,
           mission: this.mission,
           description: this.description,

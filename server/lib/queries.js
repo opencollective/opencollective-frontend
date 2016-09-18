@@ -54,7 +54,7 @@ const getTopBackers = (since, until, tags, limit) => {
   const tagsClause = (tags) ? `AND g.tags && $tags` : ''; // && operator means "overlaps"
 
   return sequelize.query(`
-    SELECT MAX(u.id) as id, MAX(u.name) as "name", MAX(u.username) as username, MAX(u.website) as "website", MAX(u."twitterHandle") as "twitterHandle", MAX(u.avatar) as "avatar", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
+    SELECT MAX(u.id) as id, MAX(u."firstName") as "firstName", MAX(u."lastName") as "lastName", MAX(u.username) as username, MAX(u.website) as "website", MAX(u."twitterHandle") as "twitterHandle", MAX(u.avatar) as "avatar", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
     FROM "Transactions" t
     LEFT JOIN "Users" u ON u.id = t."UserId"
     LEFT JOIN "Groups" g ON g.id = t."GroupId"
@@ -131,7 +131,7 @@ const getTopSponsors = () => {
     WITH "totalDonations" AS (
       SELECT "UserId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "UserId"
     )
-    SELECT u.id, u.name, u.username, u.mission, u.avatar as logo, t."totalDonations", t.currency, t.collectives
+    SELECT u.id, u."firstName", u."lastName", u.username, u.mission, u.avatar as logo, t."totalDonations", t.currency, t.collectives
     FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
     WHERE t."totalDonations" > 100 AND u."isOrganization" IS TRUE
     ORDER BY t.collectives DESC, "totalDonations" DESC LIMIT :limit
@@ -165,7 +165,8 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
     SELECT
       ug."UserId" as id,
       ug."createdAt" as "createdAt",
-      u.name as name,
+      u."firstName" as "firstName",
+      u."lastName" as "lastName",
       ug.role as role,
       u.avatar as avatar,
       u.website as website,
