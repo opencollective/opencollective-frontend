@@ -58,7 +58,6 @@ const updateTransactions = (subscription, group, user, paypalTransactions) => {
       currency: subscription.currency,
       description: 'Recurring subscription',
       tags: ['Donation'],
-      approved: true,
       interval: subscription.interval,
       SubscriptionId: subscription.id,
       data: pt

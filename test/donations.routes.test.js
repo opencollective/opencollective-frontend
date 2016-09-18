@@ -500,6 +500,7 @@ describe('donations.routes.test.js', () => {
                 expect(subscription).to.have.property('data');
                 expect(subscription.data).to.have.property('billingAgreementId');
                 expect(subscription.data).to.have.property('plan');
+                expect(subscription.isActive).to.equal(true);
 
                 expect(user).to.have.property('email', email);
 
@@ -512,6 +513,7 @@ describe('donations.routes.test.js', () => {
                 expect(donation).to.have.property('currency', 'USD');
                 expect(donation).to.have.property('amount', 1000);
                 expect(donation).to.have.property('title', `Donation to ${group.name}`);
+                expect(donation).to.have.property('SubscriptionId', transaction.Subscription.id);
 
                 return group.getUsers();
               })

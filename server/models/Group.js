@@ -450,12 +450,7 @@ export default function(Sequelize, DataTypes) {
 
     classMethods: {
       createMany: (groups, defaultValues) => {
-        return Promise.each(groups, group => {
-          for (const attr in defaultValues) {
-            group[attr] = defaultValues[attr];
-          }
-          return Group.create(group);
-        }).catch(console.error);
+        return Promise.map(groups, u => Group.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
       },
 
       getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {

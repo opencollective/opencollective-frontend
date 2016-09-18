@@ -477,7 +477,6 @@ export default {
       "status": null,
       "comment":null,
       "link": null,
-      "approved": true,
       "createdAt": "2016-01-30T07:31:37.965Z",
       "approvedAt": null,
       "reimbursedAt": null,
@@ -485,7 +484,6 @@ export default {
       "GroupId": 1,
       "payoutMethod": null,
       "isExpense": false,
-      "isRejected": false,
       "isDonation": true,
       "isManual": false,
       "isReimbursed": false
