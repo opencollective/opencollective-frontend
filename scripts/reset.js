@@ -1,13 +1,14 @@
-const exec = require('child-process-promise').exec;
-
-const app = require('../server/index');
+import '../server/lib/load-dot-env'; // important to load first for environment config
 import models from '../server/models';
+
+const exec = require('child-process-promise').exec;
 const roles = require('../server/constants/roles');
 
-var data = {};
+const data = {};
 
 if (process.env.NODE_ENV !== 'development') {
-  return console.error('Only run reset script in development');
+  console.error('Only run reset script in development');
+  process.exit(0);
 }
 
 exec('make dropdb && make database')

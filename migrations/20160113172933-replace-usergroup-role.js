@@ -1,7 +1,5 @@
 'use strict';
 
-var roles = require('../server/constants/roles');
-
 module.exports = {
   up: function (queryInterface, DataTypes) {
     return queryInterface.removeColumn('UserGroups', 'role')
@@ -9,7 +7,7 @@ module.exports = {
       return queryInterface.addColumn('UserGroups', 'role', {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: roles.MEMBER
+        defaultValue: 'MEMBER'
       });
     });
   },

@@ -252,7 +252,6 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.GroupId).to.be.equal(donation.GroupId);
           expect(transaction.UserId).to.be.equal(donation.UserId);
           expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-          expect(transaction.approved).to.be.true;
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal(type.DONATION);
           expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
@@ -321,7 +320,6 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.GroupId).to.be.equal(donation.GroupId);
               expect(transaction.UserId).to.be.equal(donation.UserId);
               expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-              expect(transaction.approved).to.be.true;
               expect(transaction.currency).to.be.equal(CURRENCY);
               expect(transaction.type).to.be.equal(type.DONATION);
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
