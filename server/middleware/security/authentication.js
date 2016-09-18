@@ -127,7 +127,7 @@ export function authenticateApp() {
   return (req, res, next) => {
     this.authenticateAppByApiKey(req, res, (e) => {
       if (e) {
-        this.authenticateAppByJwt()(req, res, next);
+        return this.authenticateAppByJwt()(req, res, next);
       }
       next();
     });

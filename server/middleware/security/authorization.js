@@ -69,9 +69,7 @@ export function authorizeUserToAccessScope(scope) {
 
 export const _authorizeAppAccessToGroup = (req, res, next) => {
   aN.authenticateApp()(req, res, (e) => {
-    if (e) {
-      return next(e);
-    }
+    if (e) return next(e);
     req.group
       .hasApplication(req.application)
       .tap(hasApplication => {
