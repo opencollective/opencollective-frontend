@@ -14,8 +14,8 @@ const updateUsers = (sequelize, action) => {
   const splitName = (user) => {
     if (!user.name) return;
     const tokens = user.name.split(' ');
-    const firstName = tokens[0];
-    const lastName = tokens.length > 0 ? tokens[1] || '' : '';
+    const firstName = tokens.shift();
+    const lastName = tokens.join(' ');
     return sequelize.query(`UPDATE "Users" SET "firstName"=:firstName, "lastName"=:lastName WHERE id=:id`, { replacements: { id: user.id, firstName, lastName } });
   };
 
