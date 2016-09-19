@@ -302,6 +302,14 @@ export default (Sequelize, DataTypes) => {
           order: [ ['amount','DESC'] ],
           include: [ { model: Sequelize.models.Group, where: { tags: { $contains: tags } } } ]
         });
+      },
+
+      getRoles() {
+        return Sequelize.models.UserGroup.findAll({
+          where: {
+            UserId: this.id
+          }
+        });
       }
 
     },

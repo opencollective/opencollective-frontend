@@ -169,6 +169,7 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
       ug.role as role,
       u.avatar as avatar,
       u.website as website,
+      u.email as email,
       u."twitterHandle" as "twitterHandle",
       td.amount as "totalDonations",
       ld."updatedAt" as "lastDonation"

@@ -87,6 +87,28 @@ const getUserData = (groupId, tiers) => {
 
 export const getUsers = (req, res, next) => {
   let promise = getUserData(req.group.id, req.group.tiers);
+
+  if (req.query.filter && req.query.filter === 'active') {
+    const now = moment();
+    promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
+  }
+
+  const isHostOrMember = !!(req.remoteUser && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
+
+  return promise
+  .then(backers => {
+    if (isHostOrMember) return backers;
+    else return backers.map(b => {
+      delete b.email;
+      return b;
+    });
+  })
+  .then(backers => res.send(backers))
+  .catch(next)
+};
+
+export const getUsersWithEmail = (req, res, next) => {
+  let promise = getUserData(req.group.id, req.group.tiers);
   if (req.query.filter && req.query.filter === 'active') {
     const now = moment();
     promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);

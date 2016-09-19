@@ -48,8 +48,8 @@ const { secret } = config.keys.opencollective;
  */
 export const parseJwtNoExpiryCheck = (req, res, next) => {
   let token;
-  if (req.param('access_token')) {
-    token = req.param('access_token');
+  if (req.params.access_token) {
+    token = req.params.access_token;
   } else {
     const header = req.headers && req.headers.authorization;
     if (!header) {
@@ -127,7 +127,7 @@ export function authenticateApp() {
   return (req, res, next) => {
     this.authenticateAppByApiKey(req, res, (e) => {
       if (e) {
-        this.authenticateAppByJwt()(req, res, next);
+        return this.authenticateAppByJwt()(req, res, next);
       }
       next();
     });
@@ -200,6 +200,12 @@ export const _authenticateUserByJwt = (req, res, next) => {
     .catch(next);
 };
 
+/**
+ * Authenticate the user with the JWT token 
+ * 
+ * @PRE: Request with a `Authorization: Bearer [token]` with a valid token
+ * @POST: req.remoteUser is set to the logged in user or null if authentication failed
+ */
 export function authenticateUserByJwt() {
   return (req, res, next) => {
     this.parseJwtNoExpiryCheck(req, res, (e) => {

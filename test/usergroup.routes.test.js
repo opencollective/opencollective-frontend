@@ -413,7 +413,7 @@ describe('usergroup.routes.test.js', () => {
         })
     );
 
-    it('get the list of active users with their corresponding tier', (done) => {
+    it('get the list of *active* users with their corresponding tier', (done) => {
       request(app)
         .get(`/groups/${group.slug}/users?filter=active`)
         .expect(200)
@@ -425,7 +425,7 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
-    it('get the list of users in CSV format', (done) => {
+    it('get the list of users in csv format without emails if not logged in as admin', (done) => {
       request(app)
         .get(`/groups/${group.slug}/users.csv`)
         .expect(200)
@@ -437,8 +437,39 @@ describe('usergroup.routes.test.js', () => {
           expect(users[1].split(",")[9]).to.equal('"sponsor"');
           expect(users[2].split(",")[9]).to.equal('"host"');
           expect(users[3].split(",")[9]).to.equal('"backer"');
+          const headers = res.text.split('\n')[0];
+          expect(headers).to.not.contain('"email"');
         })
         .end(done);
     });
+
+    it('get the list of users in csv format without emails if logged in as backer', (done) => {
+      request(app)
+        .get(`/groups/${group.slug}/users.csv`)
+        .set('Authorization', `Bearer ${users[2].jwt(application)}`) // BACKER
+        .expect(200)
+        .expect((res) => {
+          const users = res.text.split('\n').slice(1);
+          expect(users.length).to.equal(4);
+
+          const headers = res.text.split('\n')[0];
+          expect(headers).to.not.contain('"email"');
+        })
+        .end(done);
+    });
+
+    it('get the list of users in csv format with emails if logged in as admin', (done) => {
+      request(app)
+        .get(`/groups/${group.slug}/users.csv`)
+        .set('Authorization', `Bearer ${users[1].jwt(application)}`) // MEMBER
+        .expect(200)
+        .expect((res) => {
+          const users = res.text.split('\n').slice(1);
+          const headers = res.text.split('\n')[0];
+          expect(headers).to.contain('"email"');
+          expect(users[0].split(",")[6]).to.contain('@');
+        })
+        .end(done);
+    });    
   });
 });

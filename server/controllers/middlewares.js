@@ -45,7 +45,8 @@ export const format = (format) => {
 
             return row;
           });
-          json2csv({data, fields: Object.keys(data[0])}, (err, csv) => {
+          const fields = (data.length > 0) ? Object.keys(data[0]) : [];
+          json2csv({data, fields }, (err, csv) => {
             res.setHeader('content-type', 'text/csv');
             send.call(res, csv);
           });
@@ -152,6 +153,9 @@ export const apiKey = (req, res, next) => {
 
 /**
  * Authenticate.
+ * @PRE: Need to submit a login (username or email)/password as a POST request.
+ *       api_key is also required
+ * @POST: req.remoteUser and req.user are set to the logged in user
  */
 export const authenticate = (req, res, next) => {
   const username = (req.body && req.body.username) || req.query.username;
@@ -271,6 +275,28 @@ export const authorizeGroup = (req, res, next) => {
       }
       next();
     })
+    .catch(next);
+};
+
+/**
+ * Fetch user roles for the group
+ */
+export const fetchRoles = (req, res, next) => {
+  if (!req.remoteUser) return next();
+
+  req.remoteUser.getRoles()
+    .then(roles => {
+      const rolesByGroupId = {};
+      roles.map(r => {
+        rolesByGroupId[r.GroupId] = rolesByGroupId[r.GroupId] || [];
+        rolesByGroupId[r.GroupId].push(r.role);
+      });
+      return rolesByGroupId;
+    })
+    .then(rolesByGroupId => {
+      req.remoteUser.rolesByGroupId = rolesByGroupId; 
+    })
+    .then(() => next())
     .catch(next);
 };
 
