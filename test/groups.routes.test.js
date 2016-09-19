@@ -622,7 +622,7 @@ describe('groups.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             const userData = res.body[0];
-            expect(userData.name).to.equal(user.public.name);
+            expect(userData.firstName).to.equal(user.public.firstName);
             expect(userData.role).to.equal(roles.HOST);
             expect(userData.tier).to.equal('host');
             done();

@@ -430,7 +430,9 @@ export const createFromGithub = (req, res, next) => {
             .then(user => contributorUser = user)
             .then(() => fetchGithubUser(contributor))
             .tap(json => {
-              contributorUser.name = json.name;
+              const nameTokens = json.name.split(' ');
+              contributorUser.firstName = nameTokens.shift();
+              contributorUser.lastName = nameTokens.join(' ');
               contributorUser.website = json.blog;
               contributorUser.email = json.email;
               return contributorUser.save();

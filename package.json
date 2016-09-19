@@ -108,6 +108,7 @@
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:dev": "sequelize db:migrate --models-path server/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
+    "db:migrate:dev:undo": "sequelize db:migrate:undo --models-path server/models/ --env development --url postgres://localhost:5432/${PG_DATABASE:='opencollective_localhost'}",
     "db:seed": "sequelize db:seed --config config/sequelize_cli.json --env  $SEQUELIZE_ENV",
     "db:copy:prod": "./scripts/db_copy_to_localhost.sh prod && PG_DATABASE=opencollective_prod_snapshot npm run db:sanitize",
     "db:copy:staging": "./scripts/db_copy_to_localhost.sh staging",

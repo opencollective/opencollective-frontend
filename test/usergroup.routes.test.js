@@ -405,7 +405,7 @@ describe('usergroup.routes.test.js', () => {
         .toPromise()
         .tap(res => {
           const users = res.body;
-          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('contributor');
           expect(users[1].tier).to.equal('sponsor');
           expect(users[2].tier).to.equal('host');
@@ -419,7 +419,7 @@ describe('usergroup.routes.test.js', () => {
         .expect(200)
         .expect((res) => {
           const users = res.body;
-          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('backer');
         })
         .end(done);
@@ -430,14 +430,18 @@ describe('usergroup.routes.test.js', () => {
         .get(`/groups/${group.slug}/users.csv`)
         .expect(200)
         .expect((res) => {
+          const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');
           const users = res.text.split('\n').slice(1);
+          const getValue = (rowIndex, colName) => {
+            const row = users[rowIndex].split(',');
+            return row[headers.indexOf(colName)];
+          }
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
-          expect(users[0].split(",")[9]).to.equal('"contributor"');
-          expect(users[1].split(",")[9]).to.equal('"sponsor"');
-          expect(users[2].split(",")[9]).to.equal('"host"');
-          expect(users[3].split(",")[9]).to.equal('"backer"');
-          const headers = res.text.split('\n')[0];
+          expect(getValue(0, "tier")).to.equal('"contributor"');
+          expect(getValue(1, "tier")).to.equal('"sponsor"');
+          expect(getValue(2, "tier")).to.equal('"host"');
+          expect(getValue(3, "tier")).to.equal('"backer"');
           expect(headers).to.not.contain('"email"');
         })
         .end(done);
@@ -449,9 +453,6 @@ describe('usergroup.routes.test.js', () => {
         .set('Authorization', `Bearer ${users[2].jwt(application)}`) // BACKER
         .expect(200)
         .expect((res) => {
-          const users = res.text.split('\n').slice(1);
-          expect(users.length).to.equal(4);
-
           const headers = res.text.split('\n')[0];
           expect(headers).to.not.contain('"email"');
         })
@@ -464,10 +465,14 @@ describe('usergroup.routes.test.js', () => {
         .set('Authorization', `Bearer ${users[1].jwt(application)}`) // MEMBER
         .expect(200)
         .expect((res) => {
+          const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');
           const users = res.text.split('\n').slice(1);
-          const headers = res.text.split('\n')[0];
-          expect(headers).to.contain('"email"');
-          expect(users[0].split(",")[6]).to.contain('@');
+          const getValue = (rowIndex, colName) => {
+            const row = users[rowIndex].split(',');
+            return row[headers.indexOf(colName)];
+          }
+          expect(headers).to.contain('email');
+          expect(getValue(0,"email")).to.contain('@');
         })
         .end(done);
     });    
