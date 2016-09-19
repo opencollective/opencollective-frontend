@@ -385,7 +385,8 @@ describe('transactions.routes.test.js', () => {
         .expect(403, {
           error: {
             code: 403,
-            type: 'forbidden'
+            type: 'forbidden',
+            message: "User doesn't have access to this group"
           }
         })
         .end(done);

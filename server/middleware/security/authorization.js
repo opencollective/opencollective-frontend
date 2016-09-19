@@ -91,27 +91,22 @@ export const _authorizeAppAccessToGroup = (req, res, next) => {
  * @POST: req.remoteUser is set
  */
 export const _authorizeUserAccessToGroup = (req, res, next) => {
-  aN.authenticateUserByJwt()(req, res, (e) => {
-    if (e) {
-      return next(e);
-    }
-    req.group
-      // can't use hasUser() because we removed the unique index of groupid, userid
-      // and replaced it with a unique index of groupid, userid, and role and
-      // that breaks user-related calls for Groups on Sequelize
-      .getUsers({
-        where: {
-          id: req.remoteUser.id
-        }
-      })
-      .tap(users => {
-        if (users.length > 0) {
-          return next();
-        }
-        next(new Forbidden(`User doesn't have access to this group`));
-      })
-      .catch(next);
-  });
+  req.group
+    // can't use hasUser() because we removed the unique index of groupid, userid
+    // and replaced it with a unique index of groupid, userid, and role and
+    // that breaks user-related calls for Groups on Sequelize
+    .getUsers({
+      where: {
+        id: req.remoteUser.id
+      }
+    })
+    .tap(users => {
+      if (users.length > 0) {
+        return next();
+      }
+      next(new Forbidden(`User doesn't have access to this group`));
+    })
+    .catch(next);
 };
 
 /**
@@ -159,15 +154,21 @@ export function authorizeAccessToGroup(options = {}) {
       else return next(e, res);
     };
 
-    this._authorizeUserAccessToGroup(req, res, (e) => {
-      if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
-      this._authorizeAppAccessToGroup(req, res, (e) => {
-        if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
-        else return handleAuthCallback(e);
-      });
+    aN.authenticateUserByJwt()(req, res, (e) => {
+      if (e) {
+        this._authorizeAppAccessToGroup(req, res, (e) => {
+          if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
+          else return handleAuthCallback(e);
+        });
+      }
+      else {
+        this._authorizeUserAccessToGroup(req, res, (e) => {
+          if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
+          else return handleAuthCallback(e);
+        });
+      }
     });
-
-  }
+  };
 }
 
 export function authorizeGroupAccessTo(attributeName, options = {}) {
