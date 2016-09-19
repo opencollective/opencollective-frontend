@@ -405,7 +405,7 @@ describe('usergroup.routes.test.js', () => {
         .toPromise()
         .tap(res => {
           const users = res.body;
-          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('contributor');
           expect(users[1].tier).to.equal('sponsor');
           expect(users[2].tier).to.equal('host');
@@ -419,7 +419,7 @@ describe('usergroup.routes.test.js', () => {
         .expect(200)
         .expect((res) => {
           const users = res.body;
-          users.sort((a,b) => (a.name < b.name) ? -1 : 1);
+          users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('backer');
         })
         .end(done);
