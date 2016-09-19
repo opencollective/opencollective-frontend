@@ -159,6 +159,10 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
+      name() {
+        return `${this.firstName} ${this.lastName}`;
+      },
+
       // Info (private).
       info() {
         return {

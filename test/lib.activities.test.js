@@ -21,7 +21,7 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.USER_CREATED} all fields present`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[0], 'slack');
-      expect(actual).to.equal('New user joined: <https://twitter.com/johndoe|john doe> (john@doe.com)');
+      expect(actual).to.equal('New user joined: <https://twitter.com/johndoe|John Doe> (john@doe.com)');
     });
 
     it (`${constants.USER_CREATED} only email present`, () => {

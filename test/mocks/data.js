@@ -153,7 +153,7 @@ export default {
 
   "activities1": {
     "activities": [
-      {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "john", "lastName": "Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
+      {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "John", "lastName": "Doe", "name": "John Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
       {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
       {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
