@@ -93,20 +93,18 @@ export const getUsers = (req, res, next) => {
     promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
   }
 
-  const isAdmin = !!(req.remoteUser && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
+  const isHostOrMember = !!(req.remoteUser && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
 
   return promise
   .then(backers => {
-    if (isAdmin) return backers;
+    if (isHostOrMember) return backers;
     else return backers.map(b => {
       delete b.email;
       return b;
     });
   })
   .then(backers => res.send(backers))
-  .catch(e => {
-    console.log("Error in getUsers", e); next(e); 
-  })
+  .catch(next)
 };
 
 export const getUsersWithEmail = (req, res, next) => {
