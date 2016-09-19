@@ -386,7 +386,7 @@ describe('transactions.routes.test.js', () => {
           error: {
             code: 403,
             type: 'forbidden',
-            message: 'Forbidden'
+            message: "User doesn't have access to this group"
           }
         })
         .end(done);
