@@ -160,8 +160,7 @@ export function authorizeAccessToGroup(options = {}) {
           if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
           else return handleAuthCallback(e);
         });
-      }
-      else {
+      } else {
         this._authorizeUserAccessToGroup(req, res, (e) => {
           if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
           else return handleAuthCallback(e);
