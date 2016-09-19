@@ -186,10 +186,10 @@ export function authorizeGroupAccessTo(attributeName, options = {}) {
       next();
     };
 
-    if (options.allowNonAuthenticatedAccessIfGroupIsPublic && !req.group.isPublic) {
-      return next(new Forbidden("Group is not public"));
-    }
-    _authorizeAccess();
+    if (options.allowNonAuthenticatedAccessIfGroupIsPublic && req.group.isPublic)
+      return next();
+    else
+      return _authorizeAccess();
   }
 }
 

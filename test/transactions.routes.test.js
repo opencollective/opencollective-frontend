@@ -385,8 +385,7 @@ describe('transactions.routes.test.js', () => {
         .expect(403, {
           error: {
             code: 403,
-            type: 'forbidden',
-            message: 'Forbidden'
+            type: 'forbidden'
           }
         })
         .end(done);
