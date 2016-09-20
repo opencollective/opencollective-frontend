@@ -93,7 +93,7 @@ export const getUsers = (req, res, next) => {
     promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
   }
 
-  const isHostOrMember = !!(req.remoteUser && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
+  const isHostOrMember = !!(req.remoteUser && req.remoteUser.rolesByGroupId && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
 
   return promise
   .then(backers => {
