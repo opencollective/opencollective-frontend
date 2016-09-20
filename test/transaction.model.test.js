@@ -32,7 +32,6 @@ describe('transaction model', () => {
       expect(transaction.info.isExpense).to.be.true;
       expect(transaction.info.isManual).to.be.false;
       expect(transaction.info.isDonation).to.be.false;
-      expect(transaction.info.isReimbursed).to.be.false;
       done();
     })
     .catch(done);
@@ -46,7 +45,6 @@ describe('transaction model', () => {
       expect(transaction.info.isDonation).to.be.true;
       expect(transaction.info.isExpense).to.be.false;
       expect(transaction.info.isManual).to.be.false;
-      expect(transaction.info.isReimbursed).to.be.false;
       done();
     })
     .catch(done);
@@ -58,21 +56,6 @@ describe('transaction model', () => {
     })
     .then(transaction => {
       expect(transaction.info.isManual).to.be.true;
-      expect(transaction.info.isDonation).to.be.false;
-      expect(transaction.info.isExpense).to.be.false;
-      expect(transaction.info.isReimbursed).to.be.false;
-      done();
-    })
-    .catch(done);
-  });
-
-  it('isReimbursed if reimbursedAt is set', done => {
-    Transaction.create({
-      reimbursedAt: new Date()
-    })
-    .then(transaction => {
-      expect(transaction.info.isReimbursed).to.be.true;
-      expect(transaction.info.isManual).to.be.false;
       expect(transaction.info.isDonation).to.be.false;
       expect(transaction.info.isExpense).to.be.false;
       done();

@@ -609,7 +609,6 @@ describe('expenses.routes.test.js', () => {
                 expect(transaction).to.have.property('currency', expense.currency);
                 expect(transaction).to.have.property('description', expense.title);
                 expect(transaction).to.have.property('status', 'REIMBURSED');
-                expect(transaction.reimbursedAt).to.be.ok;
                 expect(transaction).to.have.property('UserId', host.id);
                 expect(transaction).to.have.property('GroupId', expense.GroupId);
                 expect(transaction).to.have.property('payoutMethod', expense.payoutMethod);
@@ -729,7 +728,6 @@ describe('expenses.routes.test.js', () => {
                 expect(transaction).to.have.property('currency', expense.currency);
                 expect(transaction).to.have.property('description', expense.title);
                 expect(transaction).to.have.property('status', 'REIMBURSED');
-                expect(transaction.reimbursedAt).to.be.ok;
                 expect(transaction).to.have.property('UserId', expense.UserId);
                 expect(transaction).to.have.property('GroupId', expense.GroupId);
                 expect(transaction).to.have.property('payoutMethod', expense.payoutMethod);
