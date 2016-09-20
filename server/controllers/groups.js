@@ -374,8 +374,10 @@ export const createFromGithub = (req, res, next) => {
     })
     .tap(() => {
       if (githubUser) {
+        const nameTokens = githubUser.name.split(' ');
+        creator.firstName = nameTokens.shift();
+        creator.lastName = nameTokens.join(' ');
         creator.website = githubUser.blog;
-        creator.name = githubUser.name;
         return creator.save();
       }
     })
@@ -445,7 +447,8 @@ export const createFromGithub = (req, res, next) => {
       }))
       .then(() => {
         const data = {
-          name: creator.name,
+          firstName: creator.firstName,
+          lastName: creator.lastName,
           group: dbGroup.info
         };
         return emailLib.send('github.signup', creator.email, data);
