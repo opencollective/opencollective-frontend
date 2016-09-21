@@ -238,7 +238,7 @@ export default {
       "object": {
         "id": "in_00000000000000",
         "object": "invoice",
-        "amount_due": 0,
+        "amount_due": 1000,
         "application_fee": null,
         "attempt_count": 0,
         "attempted": true,
