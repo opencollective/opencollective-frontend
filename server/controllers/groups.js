@@ -374,9 +374,11 @@ export const createFromGithub = (req, res, next) => {
     })
     .tap(() => {
       if (githubUser) {
-        const nameTokens = githubUser.name.split(' ');
-        creator.firstName = nameTokens.shift();
-        creator.lastName = nameTokens.join(' ');
+        if (githubUser.name) {
+          const nameTokens = githubUser.name.split(' ');
+          creator.firstName = nameTokens.shift();
+          creator.lastName = nameTokens.join(' ');
+        }
         creator.website = githubUser.blog;
         return creator.save();
       }
