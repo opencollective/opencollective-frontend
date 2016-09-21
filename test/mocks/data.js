@@ -478,7 +478,6 @@ export default {
       "comment":null,
       "link": null,
       "createdAt": "2016-01-30T07:31:37.965Z",
-      "approvedAt": null,
       "UserId": 1,
       "GroupId": 1,
       "payoutMethod": null,

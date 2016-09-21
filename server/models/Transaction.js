@@ -68,9 +68,7 @@ export default (Sequelize, DataTypes) => {
 
     deletedAt: {
       type: DataTypes.DATE
-    },
-
-    approvedAt: DataTypes.DATE, // delete #postmigration
+    }
   }, {
     paranoid: true,
 
@@ -118,7 +116,6 @@ export default (Sequelize, DataTypes) => {
           comment: this.comment,
           link: this.link,
           createdAt: this.createdAt,
-          approvedAt: this.approvedAt,
           UserId: this.UserId,
           GroupId: this.GroupId,
           payoutMethod: this.payoutMethod,
