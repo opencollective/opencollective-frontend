@@ -378,7 +378,6 @@ export default {
         "comment": "this is the reason why I bought this",
         "link": "https://opencollective-production.s3-us-west-1.amazonaws.com/Invoice_14417_OpenCollectivepdf_a1b3cfa0-c0ce-11e5-ab37-9d9c8fc41dba.pdf",
         "createdAt": "2015-01-23T08:00:00.000Z",
-        "payoutMethod": "paypal"
       },
       {
         "description": "Flight SFO-BRU",
@@ -399,7 +398,6 @@ export default {
         "comment": "",
         "link": "http://cl.ly/image/39212o302x2c",
         "createdAt": "2015-03-04T08:00:00.000Z",
-        "payoutMethod": "paypal"
       },
       {
         "description": "Tipbox.is domain + dedicated server",
@@ -480,10 +478,8 @@ export default {
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
       "GroupId": 1,
-      "payoutMethod": null,
       "isExpense": false,
-      "isDonation": true,
-      "isManual": false,
+      "isDonation": true
     },
 
     "user": {

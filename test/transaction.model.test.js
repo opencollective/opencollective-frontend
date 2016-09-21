@@ -30,7 +30,6 @@ describe('transaction model', () => {
     })
     .then(transaction => {
       expect(transaction.info.isExpense).to.be.true;
-      expect(transaction.info.isManual).to.be.false;
       expect(transaction.info.isDonation).to.be.false;
       done();
     })
@@ -43,20 +42,6 @@ describe('transaction model', () => {
     })
     .then(transaction => {
       expect(transaction.info.isDonation).to.be.true;
-      expect(transaction.info.isExpense).to.be.false;
-      expect(transaction.info.isManual).to.be.false;
-      done();
-    })
-    .catch(done);
-  });
-
-  it('isManual if payoutMethod is manual', done => {
-    Transaction.create({
-      payoutMethod: 'manual'
-    })
-    .then(transaction => {
-      expect(transaction.info.isManual).to.be.true;
-      expect(transaction.info.isDonation).to.be.false;
       expect(transaction.info.isExpense).to.be.false;
       done();
     })

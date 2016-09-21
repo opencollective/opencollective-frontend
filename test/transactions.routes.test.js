@@ -125,17 +125,6 @@ describe('transactions.routes.test.js', () => {
         .end(done);
     });
 
-    it('fails creating a transaction with wrong payoutMethod', (done) => {
-      request(app)
-        .post(`/groups/${privateGroup.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
-        .send({
-          transaction: _.extend({}, transactionsData[0], {payoutMethod:'lalala'})
-        })
-        .expect(400)
-        .end(done);
-    });
-
     it('successfully create a transaction with an application', (done) => {
       request(app)
         .post(`/groups/${privateGroup.id}/transactions`)
@@ -152,7 +141,6 @@ describe('transactions.routes.test.js', () => {
           expect(t).to.have.property('currency', 'USD');
           expect(t).to.have.property('GroupId', privateGroup.id);
           expect(t).to.have.property('UserId', user.id); // ...
-          expect(t).to.have.property('payoutMethod', transactionsData[0].payoutMethod);
           done();
         });
     });
@@ -306,26 +294,6 @@ describe('transactions.routes.test.js', () => {
           }
         })
         .end(done);
-    });
-
-    it('successfully updates a transaction', (done) => {
-      const payoutMethod = 'manual';
-
-      expect(toUpdate.payoutMethod).to.not.be.equal(payoutMethod);
-      request(app)
-        .put(`/groups/${privateGroup.id}/transactions/${toUpdate.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
-        .send({
-          transaction: {
-            payoutMethod
-          }
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('payoutMethod', payoutMethod);
-          done();
-        });
     });
   });
 

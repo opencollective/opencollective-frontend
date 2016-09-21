@@ -5,7 +5,7 @@ import errors from '../lib/errors';
 
 const expenseType = type.EXPENSE;
 
-export function createFromPaidExpense(payoutMethod, paymentMethod, expense, paymentResponse, preapprovalDetails, UserId) {
+export function createFromPaidExpense(paymentMethod, expense, paymentResponse, preapprovalDetails, UserId) {
   if (paymentResponse) {
     switch (paymentResponse.paymentExecStatus) {
       case 'COMPLETED':
@@ -36,7 +36,6 @@ export function createFromPaidExpense(payoutMethod, paymentMethod, expense, paym
     status: 'REIMBURSED',
     UserId,
     GroupId: expense.GroupId,
-    payoutMethod
     // end TODO remove #postmigration
   })
   .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)

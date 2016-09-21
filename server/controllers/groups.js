@@ -125,7 +125,6 @@ export const updateTransaction = (req, res, next) => {
     'amount',
     'tags',
     'createdAt',
-    'payoutMethod',
     'comment',
     'vat'
   ];
