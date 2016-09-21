@@ -10,20 +10,29 @@ const group = {
   users: [{
     name: 'Github',
     website: 'https://github.com',
-    tier: 'sponsor'
+    tier: 'sponsor',
+    totalDonations: 100
   },{
     name: 'Xavier',
-    tier: 'backer'
+    tier: 'backer',
+    website: 'https://twitter.com/xdamman',
+    totalDonations: 50
+  },{
+    name: 'Pia',
+    tier: 'backer',
+    website: 'https://twitter.com/piamancini',
+    totalDonations: 70
   },{
     name: 'Gitlab',
-    tier: 'sponsor'
+    tier: 'sponsor',
+    totalDonations: 500
   }]
 };
 
 const meetupAccount = {
   provider: 'meetup',
-  username: 'meetup-group-NqJGKtSx',
-  secret: '27652da7f3a3ab586c6b29f3b7940',
+  username: 'opencollective',
+  secret: '620459537f4174273a5d4g535321445',
   GroupId: 1
 }
 
@@ -43,30 +52,54 @@ describe('meetup lib', () => {
     });
   });
 
-  it("generate the list of sponsors", () => {
+  it("generates the list of sponsors sorted by total donations", () => {
     const meetup = new Meetup(meetupAccount, group);
-    const header = meetup.makeHeadersForTier('sponsor');
-    const expectedHeader = `<p>Thank you to our sponsors <a href="https://github.com">Github</a> and Gitlab</p>
-<p><a href="https://opencollective.com/${group.slug}"><img src="https://opencollective.com/${group.slug}/sponsors.png?width=700"></a></p>`;
+    const header = meetup.makeHeader();
+    const expectedHeader = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/${group.slug}#sponsors"><img src="https://opencollective.com/${group.slug}/sponsors.png?width=700"></a></p>`;
     expect(header).to.equal(expectedHeader);
   });
 
-  it("doesn't show the list of sponsors if none", () => {
-    const meetup = new Meetup(meetupAccount, group);
-    const header = meetup.makeHeadersForTier('unknownTier');
-    const expectedHeader = `<p><a href="https://opencollective.com/${group.slug}"><img src="https://opencollective.com/${group.slug}/unknownTiers.png?width=700"></a></p>`;
+  it("shows the list of backers if no sponsors", () => {
+    const groupWithoutSponsors = Object.assign({}, group, { users: group.users.slice(1,3)});
+    const meetup = new Meetup(meetupAccount, groupWithoutSponsors);
+    const header = meetup.makeHeader();
+    const expectedHeader = `<p>Thank you to our backers <a href="https://twitter.com/piamancini">Pia</a> and <a href="https://twitter.com/xdamman">Xavier</a></p> <p><a href="https://opencollective.com/opencollective#backers"><img src="https://opencollective.com/opencollective/backers.png?width=700"></a></p>`;
     expect(header).to.equal(expectedHeader);
   });
 
-  it("updates the next 2 meetups", (done) => {
+  it("adds/removes the header when no backers", () => {
+    const groupWithoutBackers = Object.assign({}, group, { users: [] });
+    const description = "<p>Hello World</p>";
+
+    const meetup = new Meetup(meetupAccount, groupWithoutBackers);
+    const header = meetup.makeHeader();
+    const descriptionWithHeader = meetup.generateNewDescription('addHeader', description);
+    const descriptionWithoutHeader = meetup.generateNewDescription('removeHeader', descriptionWithHeader);
+
+    expect(header).to.equal(`<p><a href="https://opencollective.com/opencollective#backers"><img src="https://opencollective.com/opencollective/backers.png?width=700"></a></p>`);
+    expect(descriptionWithHeader).to.equal(`<p><a href="https://opencollective.com/opencollective#backers"><img src="https://opencollective.com/opencollective/backers.png?width=700"></a></p> <p>Hello World</p>`);
+    expect(descriptionWithoutHeader).to.equal(description);
+  });
+
+  it("adds the header to the next meetup", (done) => {
     const meetup = new Meetup(meetupAccount, group);
-    meetup.syncCollective().then(result => {
-      expect(result.length).to.equal(2);
-      const expectedDescription = `<p>Thank you to our sponsors <a href="https://github.com">Github</a> and Gitlab</p> <p><a href="https://opencollective.com/opencollective"><a href="https://opencollective.com/opencollective/sponsors.png?width=700" class="linkified">https://opencollective.com/opencollective/sponsors.png?width=700</a></a></p> <p>Our cofounder Pia Mancini is in town from SF so let\'s get together at a bar.</p> <p>Let\'s talk about your communities (meetups, open source projects, ...) and discuss how we can help them be more economically sustainable.</p> <p>Our goal at Open Collective is to enable communities to collect and disburse money in full transparency. We believe that we can make our communities stronger if we give them the tools to be economically sustainable. It\'s a work in progress and we value your input. If you are managing a community we want to hear from you and we want to help you!</p>`;
+    meetup.syncCollective('addHeader').then(result => {
+      expect(result.length).to.equal(1);
+      const expectedDescription = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/opencollective#sponsors"><a href="https://opencollective.com/opencollective/sponsors.png?width=700" class="linkified">https://opencollective.com/opencollective/sponsors.png?width=700</a></a></p> <p>We\'ll share how meetups are currently using OpenCollective to raise money - through donations and/or memberships - and increasing their impact on the world.</p> <p>Also a good chance to meet our core team - Xavier, Pia and Aseem.</p>`;
       expect(result[0].description).to.equal(expectedDescription);
       done();
     })
     .catch(done);
   });
 
+  it("removes the header from the next meetup", (done) => {
+    const meetup = new Meetup(meetupAccount, group);
+    meetup.syncCollective('removeHeader').then(result => {
+      expect(result.length).to.equal(1);
+      const expectedDescription = `<p>We\'ll share how meetups are currently using OpenCollective to raise money - through donations and/or memberships - and increasing their impact on the world.</p> <p>Also a good chance to meet our core team - Xavier, Pia and Aseem.</p>`;
+      expect(result[0].description).to.equal(expectedDescription);
+      done();
+    })
+    .catch(done);
+  });
 });

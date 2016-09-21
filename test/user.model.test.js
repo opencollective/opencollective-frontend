@@ -86,6 +86,8 @@ describe('user.models.test.js', () => {
         expect(user.public).to.have.property('website');
         expect(user.public).to.have.property('twitterHandle');
         expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
+        expect(userData.website).to.be.undefined;
+        expect(user.website).to.equal(`https://twitter.com/${userData.twitterHandle}`);
         done();
       });
     });
