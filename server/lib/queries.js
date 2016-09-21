@@ -165,6 +165,7 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
     SELECT
       ug."UserId" as id,
       ug."createdAt" as "createdAt",
+      concat_ws(' ', u."firstName", u."lastName") as name,
       u."firstName" as "firstName",
       u."lastName" as "lastName",
       ug.role as role,
