@@ -2,6 +2,7 @@ import * as stripe from '../gateways/stripe';
 import * as transactions from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from './email';
+import config from 'config';
 
 export const processDonation = (Sequelize, donation) => {
 
@@ -120,9 +121,10 @@ export const processDonation = (Sequelize, donation) => {
           { donation: donation.info,
             user,
             group,
-            interval: subscription && subscription.interval
+            interval: subscription && subscription.interval,
             // TODO: bring this back. Figure out how to pass the application link
             // subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
+            subscriptionsLink: `${config.host.website}/subscriptions`
           }));
       }
     };
