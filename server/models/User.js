@@ -166,7 +166,7 @@ export default (Sequelize, DataTypes) => {
     getterMethods: {
 
       name() {
-        return `${this.firstName} ${this.lastName}`;
+        return [this.firstName,this.lastName].join(' ').trim();
       },
 
       // Info (private).
@@ -175,7 +175,7 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: `${this.firstName} ${this.lastName}`,
+          name: this.name,
           username: this.username,
           email: this.email,
           mission: this.mission,
@@ -198,7 +198,7 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: `${this.firstName} ${this.lastName}`,
+          name: this.name,
           username: this.username,
           avatar: this.avatar,
           twitterHandle: this.twitterHandle,
@@ -220,7 +220,7 @@ export default (Sequelize, DataTypes) => {
           avatar: this.avatar,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: `${this.firstName} ${this.lastName}`,
+          name: this.name,
           email: this.email
         };
       },
@@ -232,7 +232,7 @@ export default (Sequelize, DataTypes) => {
           avatar: this.avatar,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: `${this.firstName} ${this.lastName}`,
+          name: this.name,
           website: this.website,
           mission: this.mission,
           description: this.description,
