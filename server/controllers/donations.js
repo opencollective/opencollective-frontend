@@ -45,8 +45,8 @@ const stripeDonation = (req, res, next) => {
     return next(new errors.BadRequest('Payment Amount missing.'));
   }
 
-  if (amountInt === 0) {
-    return next(new errors.BadRequest('Amount must be greater than 0'));
+  if (amountInt < 50) {
+    return next(new errors.BadRequest('Payment amount must be at least $0.50'));
   }
 
   let paymentMethod;
