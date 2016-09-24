@@ -360,6 +360,28 @@ describe('users.routes.test.js', () => {
     });
 
   });
+  describe('#update user info', () => {
+    let user;
+
+    beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
+
+    it('should update first name and last name if logged in', (done) => {
+      request(app)
+        .put(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .send({
+          user: {
+            firstName: "Xavier",
+            lastName: "Damman"
+          }
+        })
+        .end((err, res) => {
+          const { body } = res;
+          expect(body.firstName).to.equal("Xavier");
+          done();
+        });
+    });
+  });
 
   describe('#update paypal email', () => {
     let user;
@@ -389,8 +411,8 @@ describe('users.routes.test.js', () => {
           paypalEmail: email
         })
           .end((e,res) => {
-            expect(res.statusCode).to.equal(401);
-            expect(res.body.error.type).to.equal('unauthorized');
+            expect(res.statusCode).to.equal(403);
+            expect(res.body.error.type).to.equal('forbidden');
             done();
           });
     });
@@ -442,8 +464,8 @@ describe('users.routes.test.js', () => {
       request(app)
         .put(`/users/${user.id}/password`)
         .end((e,res) => {
-          expect(res.statusCode).to.equal(401);
-          expect(res.body.error.type).to.equal('unauthorized');
+          expect(res.statusCode).to.equal(403);
+          expect(res.body.error.type).to.equal('forbidden');
           done();
         });
     });
@@ -507,8 +529,8 @@ describe('users.routes.test.js', () => {
           avatar: link
         })
         .end((e,res) => {
-          expect(res.statusCode).to.equal(401);
-          expect(res.body.error.type).to.equal('unauthorized');
+          expect(res.statusCode).to.equal(403);
+          expect(res.body.error.type).to.equal('forbidden');
           done();
         });
     });
@@ -920,7 +942,7 @@ describe('users.routes.test.js', () => {
         .expect(401, {
           error: {
             code: 401,
-            message: "Missing authorization header",
+            message: "Invalid payload",
             type: 'unauthorized'
           }
         })

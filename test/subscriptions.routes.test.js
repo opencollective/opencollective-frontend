@@ -62,7 +62,7 @@ describe('subscriptions.routes.test.js', () => {
           error: {
             code: 401,
             type: 'unauthorized',
-            message: 'Missing authorization header'
+            message: 'User is not authenticated'
           }
         })
     );
@@ -123,7 +123,7 @@ describe('subscriptions.routes.test.js', () => {
           error: {
             code: 401,
             type: 'unauthorized',
-            message: 'Missing authorization header'
+            message: 'User is not authenticated'
           }
         })
         .end(done);

@@ -14,6 +14,7 @@ import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
 import knox from '../gateways/knox';
+import moment from 'moment-timezone';
 
 const {
   User,
@@ -69,59 +70,84 @@ export const updateAvatar = (req, res, next) => {
 };
 
 /*
- * End point to update user info from the public donation page
- * Only works if password is null, as an extra precaution
+ * Update user info.
+ * @PRE: user is logged in
+ *       OR user doesn't have a password yet
+ *       and has done a donation in the past 10mn
+ *       (to allow updates from the public donation page)
  */
+export const updateUser = (req, res, next) => {
 
-export const updateUserWithoutLoggedIn = (req, res, next) => {
+  const _updateUser = () => {
+    async.auto({
+      updateFields: (cb) => {
+        ['firstName',
+        'lastName',
+        'twitterHandle',
+        'website',
+        'avatar'
+        ].forEach((prop) => {
+          if (req.required.user[prop]) {
+            req.user[prop] = req.required.user[prop];
+          }
+        });
+
+        cb(null, req.user);
+      },
+
+      fetchUserAvatar: ['updateFields', (cb, results) => {
+        userlib.fetchAvatar(results.updateFields).tap(user => {
+          const { avatar } = user;
+          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
+            imageUrlToAmazonUrl(knox, avatar, (error, aws_src) => {
+              user.avatar = error ? user.avatar : aws_src;
+              cb(null, user);
+            });
+          } else {
+            cb(null, user);
+          }
+        })
+        .catch(cb);
+      }],
+
+      update: ['fetchUserAvatar', (cb, results) => {
+        const user = results.fetchUserAvatar;
+
+        user.updatedAt = new Date();
+        user
+          .save()
+          .then(u => cb(null, u.info))
+          .catch(cb);
+      }]
+    }, (err, results) => {
+      if (err) return next(err);
+      res.send(results.update);
+    });
+  }
+
+  if (req.remoteUser && req.remoteUser.id === req.user.id)
+    return _updateUser();
+
   if (req.user.hasPassword()) {
     return next(new errors.BadRequest('Can\'t update user with password from this route'));
   }
 
-  async.auto({
-    updateFields: (cb) => {
-      ['firstName',
-       'lastName',
-       'twitterHandle',
-       'website',
-       'avatar'
-       ].forEach((prop) => {
-        if (req.required.user[prop]) {
-          req.user[prop] = req.required.user[prop];
-        }
-      });
+  models.Donation.findOne({
+    where: {
+      UserId: req.user.id,
+      updatedAt: {
+        $gt: moment().add(-10, 'minutes').format()
+      }
+    }
+  })
+  .tap(donation => {
+    if (!donation) {
+      return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
+    }
+    _updateUser();
+  })
+  .catch(next);
 
-      cb(null, req.user);
-    },
-
-    fetchUserAvatar: ['updateFields', (cb, results) => {
-      userlib.fetchAvatar(results.updateFields).tap(user => {
-        const { avatar } = user;
-        if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
-          imageUrlToAmazonUrl(knox, avatar, (error, aws_src) => {
-            user.avatar = error ? user.avatar : aws_src;
-            cb(null, user);
-          });
-        } else {
-          cb(null, user);
-        }
-      })
-      .catch(cb);
-    }],
-
-    update: ['fetchUserAvatar', (cb, results) => {
-      const user = results.fetchUserAvatar;
-
-      user.updatedAt = new Date();
-      user
-        .save()
-        .then(u => cb(null, u.info))
-        .catch(cb);
-    }]
-  }, (err, results) => {
-    if (err) return next(err);
-    res.send(results.update);
-  });
 };
 
 /*

@@ -1,6 +1,4 @@
-import moment from 'moment-timezone';
 import errors from '../../lib/errors';
-import models from '../../models';
 import * as aN from './authentication';
 
 const {
@@ -34,6 +32,18 @@ export const _authorizeUserToAccessUser = (req, res, next) => {
   }
   next();
 };
+
+export function authorizeUser() {
+  return (req, res, next) => {
+    aN.authenticateUserByJwt()(req, res, (e) => {
+      if (e) {
+        return next(e);
+      }
+      if (!req.remoteUser) return next(new Unauthorized("User is not authenticated"));
+      return next();
+    });
+  };
+}
 
 export function authorizeUserToAccessUser() {
   return (req, res, next) => {
@@ -76,7 +86,7 @@ export const _authorizeAppAccessToGroup = (req, res, next) => {
         if (hasApplication) {
           return next();
         }
-        next(new Forbidden(`Application key doesn't have access to this group`));
+        next(new Unauthorized(`Application key doesn't have access to this group`));
       })
       .catch(next);
   });
@@ -91,6 +101,7 @@ export const _authorizeAppAccessToGroup = (req, res, next) => {
  * @POST: req.remoteUser is set
  */
 export const _authorizeUserAccessToGroup = (req, res, next) => {
+  if (!req.remoteUser) return next(new Unauthorized("User is not authenticated"));
   req.group
     // can't use hasUser() because we removed the unique index of groupid, userid
     // and replaced it with a unique index of groupid, userid, and role and
@@ -155,6 +166,9 @@ export function authorizeAccessToGroup(options = {}) {
     };
 
     aN.authenticateUserByJwt()(req, res, (e) => {
+      if (!req.remoteUser)
+        e = new Unauthorized('User is not authenticated');
+
       if (e) {
         this._authorizeAppAccessToGroup(req, res, (e) => {
           if (!e) return this._authorizeUserRoles(options)(req, res, handleAuthCallback);
@@ -196,21 +210,3 @@ export function authorizeGroupAccessTo(attributeName, options = {}) {
 export function authorizeGroupAccessToTransaction(options) {
   return this.authorizeGroupAccessTo('transaction', options);
 }
-
-export const authorizeAccessToUserWithRecentDonation = (req, res, next) => {
-  models.Donation.findOne({
-    where: {
-      UserId: req.user.id,
-      updatedAt: {
-        $gt: moment().add(-10, 'minutes').format()
-      }
-    }
-  })
-    .tap(donation => {
-      if (!donation) {
-        return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
-      }
-      next();
-    })
-    .catch(next);
-};

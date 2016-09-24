@@ -87,6 +87,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
 export const get = (req, res, next) => {
   const payload = req.jwtPayload;
   const provider = req.params.service;
+  if (!payload) return next(new errors.Unauthorized());
   if (payload.scope === 'connected-account' && payload.username) {
     res.send({provider, username: payload.username, connectedAccountId: payload.connectedAccountId})
   } else {

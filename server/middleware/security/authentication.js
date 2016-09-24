@@ -53,7 +53,7 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
   } else {
     const header = req.headers && req.headers.authorization;
     if (!header) {
-      return next(new Unauthorized('Missing authorization header'));
+      return next();
     }
     const parts = header.split(' ');
     const scheme = parts[0];
@@ -88,6 +88,8 @@ export const checkJwtExpiry = (req, res, next) => {
 };
 
 export const _authenticateAppByJwt = (req, res, next) => {
+  if (!req.jwtPayload) return next();
+
   const appId = parseInt(req.jwtPayload.aud);
 
   Application
@@ -191,6 +193,7 @@ export const authenticateUserByPassword = (req, res, next) => {
 };
 
 export const _authenticateUserByJwt = (req, res, next) => {
+  if (!req.jwtPayload) return next();
   User
     .findById(req.jwtPayload.sub)
     .tap(user => {
@@ -244,7 +247,7 @@ export function authenticateInternalUserByJwt() {
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (_.contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
+  if (req.jwtPayload && _.contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
     next();
   } else {
     throw new Unauthorized();
