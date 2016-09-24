@@ -68,6 +68,26 @@ describe('user.models.test.js', () => {
         });
     });
 
+    it('creates a unique username', () => {
+      return User
+        .create({username: 'xdamman'})
+        .tap(user => {
+          expect(user.username).to.equal('xdamman')
+        })
+        .then(() => User.create({ email: 'xdamman@gmail.com'}))
+        .then(user => {
+          expect(user.username).to.equal('xdamman1')
+        })
+        .then(() => User.create({ twitterHandle: 'xdamman'}))
+        .then(user => {
+          expect(user.username).to.equal('xdamman2')
+        })
+        .then(() => User.create({ firstName: 'Xavier', lastName: 'Damman'}))
+        .then(user => {
+          expect(user.username).to.equal('xavierdamman')
+        })
+    })
+
   });
 
   /**

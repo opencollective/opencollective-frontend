@@ -27,6 +27,13 @@
     "password": "",
     "api_key": ""
   },
+  "aws": {
+    "s3": {
+      "key": "xxx",
+      "secret": "xxx",
+      "bucket": "xxx"
+    }
+  },
   "paypal": {
     "classic": {
       "email": "xdamman+opencollective-facilitator@gmail.com",
@@ -47,5 +54,17 @@
     "privateActivityChannel": "#activity-private-test",
     "publicActivityChannel": "#activity-public-test"
   },
-  "clearbit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  "clearbit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "github": {
+    "clientID": "xxx",
+    "clientSecret": "xxxxx"
+  },
+  "meetup": {
+    "clientID": "xxxxx",
+    "clientSecret": "xxxxx"
+  },
+  "twitter": {
+    "consumerKey": "xxxx",
+    "consumerSecret": "xxxxx"
+  }
 }
