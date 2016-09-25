@@ -65,8 +65,8 @@ describe('webhooks.routes.test.js', () => {
 
     request(app)
       .post('/groups')
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
+        api_key: application.api_key,
         group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)

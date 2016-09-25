@@ -23,7 +23,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
     describe('WHEN calling without API key', () => {
 
-      it('THEN returns 400', () => req.expect(400));
+      it('THEN returns 401', () => req.expect(401));
     });
 
     describe('WHEN calling /connected-accounts/github with API key', () => {
@@ -58,7 +58,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
       done();
     });
     describe('WHEN calling without API key', () => {
-      it('THEN returns 400', () => req.expect(400));
+      it('THEN returns 401', () => req.expect(401));
     });
 
     describe('WHEN calling with invalid API key', () => {
@@ -105,7 +105,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
         done();
       });
 
-      it('THEN returns 400', () => req.expect(400));
+      it('THEN returns 401', () => req.expect(401));
     });
 
     describe('WHEN providing API key but no token', () => {

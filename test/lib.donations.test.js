@@ -61,7 +61,7 @@ describe('lib.donation.test.js', () => {
   after(() => processDonationSpy.restore());
 
   describe('No payment method', () => {
-    beforeEach(() => {
+    beforeEach('create a donation', () => {
       return models.Donation.create({
         amount: 100,
         currency: 'USD',
@@ -81,7 +81,7 @@ describe('lib.donation.test.js', () => {
   });
 
   describe('Paypal payment method', () => {
-    beforeEach(() => {
+    beforeEach('create a payment method', () => {
       return models.PaymentMethod.create({
         number: 'blah',
         token: 'token-xxx',
@@ -119,7 +119,7 @@ describe('lib.donation.test.js', () => {
     };
 
     // Create a user.
-    beforeEach(() => models.User.create(userData).tap(u => user = u));
+    beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
 
     // Nock for customers.create.
     beforeEach(() => {
@@ -136,11 +136,11 @@ describe('lib.donation.test.js', () => {
     });
 
     // Create a group.
-    beforeEach((done) => {
+    beforeEach('create a group', (done) => {
       request(app)
         .post('/groups')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
+          api_key: application.api_key,
           group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
         })
         .expect(200)
@@ -161,13 +161,12 @@ describe('lib.donation.test.js', () => {
     });
 
     // Create a second group.
-    beforeEach((done) => {
+    beforeEach('create a second group', (done) => {
       request(app)
         .post('/groups')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
-          group: utils.data('group1'),
-          role: roles.HOST
+          api_key: application.api_key,
+          group: Object.assign({}, utils.data('group1'), { users: [{email: user.email, role: roles.HOST}]}),
         })
         .expect(200)
         .end((e, res) => {
@@ -221,7 +220,7 @@ describe('lib.donation.test.js', () => {
     });
 
     describe('One-time donation', () => {
-      beforeEach(() => {
+      beforeEach('create a payment method and a donation', () => {
         return models.PaymentMethod.create({
           number: 'blah',
           token: STRIPE_TOKEN,

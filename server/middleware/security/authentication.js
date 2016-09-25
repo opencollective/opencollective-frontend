@@ -118,7 +118,14 @@ export function authenticateAppByJwt() {
 export const authenticateAppByApiKey = (req, res, next) => {
   required('api_key')(req, res, (e) => {
     if (e) return next(e);
-    findApplicationByKey(req.required.api_key)
+    const api_key = req.required.api_key;
+    Application.findOne({ where: { api_key }})
+      .tap(application => {
+        if (!application)
+          throw new Unauthorized(`Invalid API key: ${api_key}`);
+        if (application.disabled)
+          throw new Forbidden('Application disabled');
+      })
       .then(application => req.application = application)
       .then(() => next())
       .catch(next);
@@ -308,18 +315,6 @@ export const authenticateServiceCallback = (req, res, next) => {
     }
   })(req, res, next);
 };
-
-function findApplicationByKey(api_key) {
-  return Application.findOne({ where: { api_key }})
-    .tap(application => {
-      if (!application) {
-        throw new Unauthorized(`Invalid API key: ${api_key}`);
-      }
-      if (application.disabled) {
-        throw new Forbidden('Application disabled');
-      }
-    });
-}
 
 function getOAuthCallbackUrl(req) {
   const { utm_source } = req.query;

@@ -92,45 +92,33 @@ describe('users.routes.test.js', () => {
    */
   describe('#create', () => {
 
-    it('fails if no api_key', (done) => {
+    it('fails if no api_key', () =>
       request(app)
         .post('/users')
         .send({
           user: userData
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('missing_required');
-          done();
-        });
-    });
+        .expect(401)
+    );
 
-    it('fails if invalid api_key', (done) => {
+    it('fails if invalid api_key', () =>
       request(app)
         .post('/users')
         .send({
           api_key: application2.api_key,
           user: userData
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(403);
-          expect(res.body.error.type).to.equal('forbidden');
-          done();
-        });
-    });
+        .expect(403)
+    );
 
-    it('fails if no user object', (done) => {
+    it('fails if no user object', () =>
       request(app)
         .post('/users')
         .send({
           api_key: application.api_key
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('missing_required');
-          done();
-        });
-    });
+        .expect(400)
+    );
 
     it('succeeds even without email', (done) => {
       request(app)

@@ -102,7 +102,7 @@ export default function(Sequelize, DataTypes) {
 
     isPublic: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false
+      defaultValue: true
     },
 
     slug: {

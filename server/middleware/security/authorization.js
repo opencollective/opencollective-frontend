@@ -1,5 +1,7 @@
 import errors from '../../lib/errors';
 import * as aN from './authentication';
+import required from '../required_param';
+import models from '../../models';
 
 const {
   Forbidden,
@@ -77,8 +79,26 @@ export function authorizeUserToAccessScope(scope) {
   };
 }
 
+/**
+ * Use this middleware to prevent a route to be accessed
+ * without a valid api_key
+ */
+export const authorizeAppByApiKey = (req, res, next) => {
+  required('api_key')(req, res, (e) => {
+    if (e) return next(new Unauthorized("Invalid api_key"));
+    models.Application.findOne({ where: { api_key: req.required.api_key }})
+      .then(application => {
+        if (!application) throw new Unauthorized("Invalid api_key");
+        if (application.disabled) throw new Forbidden('Application disabled');
+        req.application = application
+      })
+      .then(() => next())
+      .catch(next);
+  });
+};
+
 export const _authorizeAppAccessToGroup = (req, res, next) => {
-  aN.authenticateApp()(req, res, (e) => {
+  authorizeAppByApiKey(req, res, (e) => {
     if (e) return next(e);
     req.group
       .hasApplication(req.application)
@@ -159,7 +179,6 @@ export function _authorizeUserRoles (options) {
 // @TODO is there no way to wrap the middlewares into promises to avoid this callback cascade?
 export function authorizeAccessToGroup(options = {}) {
   return (req, res, next) => {
-
     const handleAuthCallback = (e, res) => {
       if (e && req.group.isPublic && options.allowNonAuthenticatedAccessIfGroupIsPublic) return next();
       else return next(e, res);

@@ -58,10 +58,10 @@ export default (app) => {
   /**
    * User reset password flow (no jwt verification)
    */
-  app.post('/users/password/forgot', aN.authenticateAppByApiKey, required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', aN.authenticateAppByApiKey, required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+  app.post('/users/password/forgot', aZ.authorizeAppByApiKey, required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', aZ.authorizeAppByApiKey, required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-  app.post('/users/new_login_token', aN.authenticateAppByApiKey, required('email'), users.sendNewTokenByEmail);
+  app.post('/users/new_login_token', aZ.authorizeAppByApiKey, required('email'), users.sendNewTokenByEmail);
 
   /**
    * Routes without expiration validation
@@ -91,21 +91,21 @@ export default (app) => {
   /**
    * Users.
    */
-  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
+  app.post('/users', aZ.authorizeAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUserOrApp(), users.show); // Get a user.
   app.put('/users/:userid', aN.authenticateUserAndAppByJwt(), required('user'), users.updateUser); // Update a user.
-  app.put('/users/:userid/avatars', aN.authenticateAppByApiKey, required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
+  app.put('/users/:userid/avatars', aZ.authorizeAppByApiKey, required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
   app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/avatar', required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
   // TODO why is this route duplicated?
-  app.post('/users', aN.authenticateAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
+  app.post('/users', aZ.authorizeAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
 
   /**
    * Authentication.
    */
-  app.post('/authenticate', aN.authenticateAppByApiKey, aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
+  app.post('/authenticate', aZ.authorizeAppByApiKey, aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
 
@@ -133,8 +133,8 @@ export default (app) => {
   /**
    * Groups.
    */
-  app.post('/groups', ifParam('flow', 'github'), aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
-  app.post('/groups', aN.authenticateInternalUserByJwt(), required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them.
+  app.post('/groups', ifParam('flow', 'github'), aZ.authorizeAppByApiKey, aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
+  app.post('/groups', aZ.authorizeAppByApiKey, required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them.
   app.get('/groups/tags', groups.getGroupTags); // List all unique tags on all groups
   app.get('/groups/:groupid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), groups.getOne);
   app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), cache(60), groups.getUsers); // Get group users
@@ -238,9 +238,9 @@ export default (app) => {
    * Generic OAuth (ConnectedAccounts)
    */
   app.get('/:slug/connected-accounts', aN.authenticateUserAndAppByJwt(), connectedAccounts.list);
-  app.get('/connected-accounts/:service(github|twitter|meetup)', aN.authenticateAppByApiKey, aN.authenticateService);
-  app.get('/connected-accounts/:service/callback', aN.authenticateAppByApiKey, aN.authenticateServiceCallback);
-  app.get('/connected-accounts/:service/verify', aN.authenticateAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
+  app.get('/connected-accounts/:service(github|twitter|meetup)', aZ.authorizeAppByApiKey, aN.authenticateService);
+  app.get('/connected-accounts/:service/callback', aZ.authorizeAppByApiKey, aN.authenticateServiceCallback);
+  app.get('/connected-accounts/:service/verify', aZ.authorizeAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
 
   /**
    * External services
@@ -268,7 +268,7 @@ export default (app) => {
   /**
    * Leaderboard
    */
-  app.get('/leaderboard', aN.authenticateAppByApiKey, groups.getLeaderboard); // Create a user.
+  app.get('/leaderboard', aZ.authorizeAppByApiKey, groups.getLeaderboard); // Create a user.
 
   /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL

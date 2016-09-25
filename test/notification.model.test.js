@@ -131,8 +131,8 @@ describe("notification.model.test.js", () => {
   it('automatically add a notification for a new host to `group.transaction.created` events', () =>
     request(app)
       .post('/groups')
-      .set('Authorization', `Bearer ${user2.jwt(application)}`)
       .send({
+        api_key: application.api_key,
         group: Object.assign(group3Data, { users: [{ email: user2.email, role: roles.HOST}]})
       })
       .expect(200)

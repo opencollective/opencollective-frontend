@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import {appendTier, defaultHostId, demoHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
+import {appendTier, defaultHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
 import Promise from 'bluebird';
 import moment from 'moment';
 import roles from '../constants/roles';
@@ -299,46 +299,45 @@ export const deleteUser = (req, res, next) => {
 export const create = (req, res, next) => {
   const { group } = req.required;
   const { users = [] } = group;
+  let createdGroup, creator;
 
-  let createdGroup;
+  if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a group');
+
+  const sendConfirmationEmail = (user, group) => {
+    const data = {
+      group,
+      confirmation_url: user.generateLoginLink(req.application, `/${group.slug}`)
+    }
+    emailLib.send('group.created', user.email, data);
+  };
+
   return Group
     .create(group)
     .tap(g => createdGroup = g)
-    .tap(g => Activity.create({
-      type: activities.GROUP_CREATED,
-      UserId: req.remoteUser.id,
-      GroupId: g.id,
-      data: {
-        group: g.info,
-        user: req.remoteUser.info
-      }
-    }))
     .tap(g => {
       return Promise.map(users, user => {
         if (user.email) {
           return User.findOne({where: { email: user.email.toLowerCase() }})
           .then(u => u || User.create(user))
-          .then(u => _addUserToGroup(g, u, {role: user.role, remoteUser: req.remoteUser}))
+          .then(u => {
+            if (!creator) creator = u;
+            _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
+          })
         } else {
           return null;
         }
       })
     })
-    .then(() => createdGroup.hasHost())
-    .then(hasHost => {
-      if (!hasHost) {
-        return User.findById(demoHostId())
-          .then(hostUser => {
-            if (hostUser) {
-              return _addUserToGroup(createdGroup, hostUser, {role: roles.HOST, remoteUser: req.remoteUser})
-            } else {
-              return null;
-            }
-          })
-      } else {
-        return null;
+    .tap(g => Activity.create({
+      type: activities.GROUP_CREATED,
+      UserId: creator.id,
+      GroupId: g.id,
+      data: {
+        group: g.info,
+        user: creator.info
       }
-    })
+    }))
+    .then((group) => sendConfirmationEmail(creator, group))
     .then(() => res.send(createdGroup.info))
     .catch(next);
 };

@@ -42,11 +42,11 @@ describe('donations.routes.test.js', () => {
   beforeEach(() => models.User.create(userData).tap(u => user = u));
 
   // Create a group.
-  beforeEach((done) => {
+  beforeEach('create group', (done) => {
     request(app)
       .post('/groups')
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
+        api_key: application.api_key,
         group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)
@@ -62,12 +62,11 @@ describe('donations.routes.test.js', () => {
       });
   });
 
-  // Create a second group.
-  beforeEach((done) => {
+  beforeEach('create second group', (done) => {
     request(app)
       .post('/groups')
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
       .send({
+        api_key: application.api_key,
         group: Object.assign(utils.data('group1'), { users: [{ email: user.email, role: roles.HOST}]}),
         role: roles.HOST
       })
@@ -84,7 +83,7 @@ describe('donations.routes.test.js', () => {
       });
   });
 
-  beforeEach((done) => {
+  beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
@@ -93,7 +92,7 @@ describe('donations.routes.test.js', () => {
     .catch(done);
   });
 
-  beforeEach((done) => {
+  beforeEach('create paypal account', (done) => {
     models.ConnectedAccount.create({
       provider: 'paypal',
       // Sandbox api keys
