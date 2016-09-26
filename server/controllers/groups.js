@@ -470,7 +470,6 @@ export const update = (req, res, next) => {
     'description',
     'longDescription',
     'whyJoin',
-    'settings',
     'currency',
     'logo',
     'video',
@@ -480,7 +479,18 @@ export const update = (req, res, next) => {
     'isPublic'
   ];
 
-  doUpdate(whitelist, req, res, next);
+  const updatedGroupAttrs = _.pick(req.required.group, whitelist);
+
+  const newGroup = _.merge(req.group, updatedGroupAttrs);
+
+  // Need to handle settings separately, since it's an object
+  if (req.required.group.settings) {
+    newGroup.settings = Object.assign(req.group.settings || {}, req.required.group.settings);
+  }
+
+  return newGroup.save()
+    .then(group => res.send(group.info))
+    .catch(next)
 };
 
 export const updateSettings = (req, res, next) => {
