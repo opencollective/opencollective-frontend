@@ -22,7 +22,7 @@ const transactionsData = utils.data('transactions1').transactions;
 describe('groups.routes.test.js', () => {
 
   let application;
-  let user, user2, user3;
+  let user;
 
   beforeEach(() => utils.cleanAllDb().tap(a => application = a));
 
@@ -41,9 +41,6 @@ describe('groups.routes.test.js', () => {
    * Create.
    */
   describe('#create', () => {
-
-    beforeEach(() => models.User.create(userData2).tap(u => user2 = u));
-    beforeEach(() => models.User.create(userData3).tap(u => user3 = u));
 
     it('fails creating a group if no api_key', () =>
       request(app)
@@ -76,7 +73,7 @@ describe('groups.routes.test.js', () => {
     });
 
     it('fails if the tier has missing data', () => {
-      const g = Object.assign({}, publicGroupData, { users: [{email: user.email, role: roles.HOST}]});
+      const g = Object.assign({}, publicGroupData, { users: [{email: userData.email, role: roles.HOST}]});
       g.tiers = [{ // interval missing
         name: 'Silver',
         description: 'Silver',
@@ -134,13 +131,11 @@ describe('groups.routes.test.js', () => {
 
           Promise.all([
             models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
-            models.UserGroup.findOne({where: { UserId: user2.id, role: roles.MEMBER }}),
-            models.UserGroup.findOne({where: { UserId: user3.id, role: roles.MEMBER }}),
+            models.UserGroup.count({where: { role: roles.MEMBER }}),
             ])
           .then(results => {
             expect(results[0].GroupId).to.equal(1);
-            expect(results[1].GroupId).to.equal(1);
-            expect(results[2].GroupId).to.equal(1);
+            expect(results[1]).to.equal(2);
             done();
           })
         });
@@ -290,7 +285,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .send({
           api_key: application.api_key,
-          group: Object.assign(publicGroupData, { slug: 'another', users: [{ firstName: user.firstName, email: user.email, role: roles.HOST}]})
+          group: Object.assign(publicGroupData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -311,8 +306,7 @@ describe('groups.routes.test.js', () => {
       .tap(account => user.setStripeAccount(account)));
 
     // Create another user.
-    beforeEach(() => models.User.create(userData2).tap(u => user2 = u));
-    beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
+    beforeEach('create a new payment method for user', () => models.PaymentMethod.create({UserId: user.id}))
 
     // Create a transaction for group1.
     beforeEach('create a transaction for group 1', () =>
@@ -437,6 +431,9 @@ describe('groups.routes.test.js', () => {
             expect(e).to.not.exist;
             const userData = res.body[0];
             expect(userData.firstName).to.equal(user.public.firstName);
+            expect(userData.lastName).to.equal(user.public.lastName);
+            expect(userData.name).to.equal(user.public.name);
+            expect(userData.username).to.equal(user.public.username);
             expect(userData.role).to.equal(roles.HOST);
             expect(userData.tier).to.equal('host');
             done();

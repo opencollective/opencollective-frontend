@@ -19,6 +19,7 @@ export default {
   "user1": {
     "firstName": "Phil",
     "lastName": "Mod",
+    "name": "Phil Mod",
     "username": "philmod",
     "email": "User1@opencollective.com",
     "paypalEmail": "User1+paypal@opencollective.com",

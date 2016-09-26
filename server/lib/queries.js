@@ -168,6 +168,7 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
       concat_ws(' ', u."firstName", u."lastName") as name,
       u."firstName" as "firstName",
       u."lastName" as "lastName",
+      u.username as username,
       ug.role as role,
       u.avatar as avatar,
       u.website as website,

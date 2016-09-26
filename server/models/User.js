@@ -233,6 +233,7 @@ export default (Sequelize, DataTypes) => {
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
+          username: this.username,
           website: this.website,
           mission: this.mission,
           description: this.description,
