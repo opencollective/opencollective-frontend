@@ -30,4 +30,12 @@ Subject: Please confirm the creation of your {{group.name}} collective
   <div class="btn"><a href="{{confirmation_url}}">Confirm</a></div>
 </center>
 
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
+    <link itemprop="url" content="{{loginLink}}"/>
+    <meta itemprop="name" content="confirm"/>
+  </div>
+  <meta itemprop="description" content="Confirm the creation of your collective"/>
+</div>
+
 {{> footer}}
