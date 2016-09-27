@@ -371,6 +371,23 @@ describe('users.routes.test.js', () => {
           done();
         });
     });
+
+    it('should update name and automatially split it into firstName and lastName', (done) => {
+      request(app)
+        .put(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .send({
+          user: {
+            name: "Xavier Damman"
+          }
+        })
+        .end((err, res) => {
+          const { body } = res;
+          expect(body.firstName).to.equal("Xavier");
+          expect(body.lastName).to.equal("Damman");
+          done();
+        });
+    });
   });
 
   describe('#update paypal email', () => {

@@ -92,6 +92,15 @@ export const updateUser = (req, res, next) => {
           if (req.required.user[prop]) {
             req.user[prop] = req.required.user[prop];
           }
+
+          // Split user.name into user.firstName and user.lastName
+          if (req.required.user.name) {
+            const nameTokens = req.required.user.name.split(' ');
+            req.user.firstName = nameTokens.shift();
+            req.user.lastName = nameTokens.join(' ');
+            delete req.required.user.name;
+          }
+
         });
 
         cb(null, req.user);
