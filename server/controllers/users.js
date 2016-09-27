@@ -83,6 +83,8 @@ export const updateUser = (req, res, next) => {
       updateFields: (cb) => {
         ['firstName',
         'lastName',
+        'description',
+        'longDescription',
         'twitterHandle',
         'website',
         'avatar'
