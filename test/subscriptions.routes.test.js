@@ -151,9 +151,7 @@ describe('subscriptions.routes.test.js', () => {
     });
 
     it('fails if the subscription does not exist', (done) => {
-      const token = user.jwt(application, {
-        scope: 'subscriptions'
-      });
+      const token = user.jwt({ scope: 'subscriptions' });
       request(app)
         .post('/subscriptions/12345/cancel')
         .set('Authorization', `Bearer ${token}`)

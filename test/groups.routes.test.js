@@ -205,7 +205,7 @@ describe('groups.routes.test.js', () => {
       it('assigns contributors as users with connectedAccounts', () =>
         request(app)
         .post('/groups?flow=github')
-        .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
+        .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
         .send({
           payload: {
             group: {
