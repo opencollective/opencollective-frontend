@@ -11,7 +11,7 @@ describe('profile.routes.test.js', () => {
 
   let user, group;
 
-  beforeEach(() => utils.cleanAllDb());
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach(() =>

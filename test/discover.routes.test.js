@@ -13,7 +13,7 @@ describe('profile.routes.test.js', () => {
 
   let group1, group2, paymentMethod1;
 
-  beforeEach(() => utils.cleanAllDb());
+  beforeEach(() => utils.resetTestDB());
   beforeEach(() => models.PaymentMethod.create(paymentMethodData1).tap(pm => paymentMethod1 = pm));
   beforeEach(() => models.Group.create(groupData1).tap(g => group1 = g));
   beforeEach(() => models.Group.create(groupData2).tap(g => group2 = g));

@@ -271,7 +271,7 @@ export const deleteUser = (req, res, next) => {
     .then((usergroup) => usergroup.destroy())
     .tap(() => {
       // Create activities.
-      const remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+      const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
         type: 'group.user.deleted',
         GroupId: req.group.id,
@@ -306,7 +306,7 @@ export const create = (req, res, next) => {
   const sendConfirmationEmail = (user, group) => {
     const data = {
       group,
-      confirmation_url: user.generateLoginLink(req.application, `/${group.slug}`)
+      confirmation_url: user.generateLoginLink(`/${group.slug}`)
     }
     emailLib.send('group.created', user.email, data);
   };
@@ -617,7 +617,7 @@ export const updateUser = (req, res, next) => {
     })
     .then((usergroup) => {
       // Create activities.
-      const remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+      const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
         type: 'group.user.updated',
         GroupId: req.group.id,

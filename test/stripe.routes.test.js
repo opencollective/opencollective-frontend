@@ -15,7 +15,7 @@ describe('stripe.routes.test.js', () => {
   let group;
   let application;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create a user.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -43,7 +43,7 @@ describe('stripe.routes.test.js', () => {
   beforeEach((done) => {
     request(app)
       .post(`/groups/${group.id}/users/${user2.id}`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .expect(200)
       .end(e => {
         expect(e).to.not.exist;
@@ -66,7 +66,7 @@ describe('stripe.routes.test.js', () => {
     it('should fail is the group does not have an host', (done) => {
       request(app)
         .get('/stripe/authorize')
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -80,7 +80,7 @@ describe('stripe.routes.test.js', () => {
     it('should redirect to stripe', (done) => {
       request(app)
         .get('/stripe/authorize')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200) // redirect
         .end((e, res) => {
           expect(e).to.not.exist;

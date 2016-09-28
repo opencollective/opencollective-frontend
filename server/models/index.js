@@ -31,7 +31,6 @@ export function setupModels(client) {
 
   [
     'Activity',
-    'Application',
     'ConnectedAccount',
     'Donation',
     'Expense',
@@ -71,10 +70,6 @@ export function setupModels(client) {
   m.Group.hasMany(m.ConnectedAccount);
   m.ConnectedAccount.belongsTo(m.Group);
 
-  // Application - User.
-  m.User.belongsTo(m.Application);
-  m.Application.hasMany(m.User);
-
   // Activity.
   m.Activity.belongsTo(m.Group);
   m.Group.hasMany(m.Activity);
@@ -111,10 +106,6 @@ export function setupModels(client) {
   m.Group.hasMany(m.Donation);
   m.Transaction.belongsTo(m.Donation);
   m.Donation.hasMany(m.Transaction);
-
-  // Application.
-  m.Application.belongsToMany(m.Group, {through: 'ApplicationGroup'});
-  m.Group.belongsToMany(m.Application, {through: 'ApplicationGroup'});
 
   // Subscription
   m.Transaction.belongsTo(m.Subscription);

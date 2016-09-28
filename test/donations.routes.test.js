@@ -13,14 +13,13 @@ const CHARGE = 10.99;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
 const EMAIL = 'paypal@email.com';
+const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
 import paypalNock from './mocks/paypal.nock';
 
 describe('donations.routes.test.js', () => {
 
-  let application;
-  let application2;
   let user;
   let group;
   let group2;
@@ -30,7 +29,7 @@ describe('donations.routes.test.js', () => {
     sandbox.stub(donationsLib, 'processDonation');
   });
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create a stub for clearbit
   beforeEach((done) => {
@@ -104,11 +103,6 @@ describe('donations.routes.test.js', () => {
     .catch(done);
   });
 
-  // Create an application which has only access to `group`
-  beforeEach(() => models.Application.create(utils.data('application2'))
-    .tap(a => application2 = a)
-    .then(() => application2.addGroup(group2)));
-
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
   });
@@ -123,7 +117,7 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -174,7 +168,7 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -190,7 +184,7 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             payment: {
               stripeToken: STRIPE_TOKEN,
@@ -244,7 +238,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: data
           })
           .expect(200)
@@ -313,7 +307,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: data
           })
           .expect(200)
@@ -383,7 +377,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: _.extend({}, data, {interval: 'something'})
           })
           .expect(400, {
@@ -416,7 +410,7 @@ describe('donations.routes.test.js', () => {
                 currency: 'USD',
                 interval: 'month'
               },
-              api_key: application2.api_key
+              api_key: application.api_key
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -546,7 +540,7 @@ describe('donations.routes.test.js', () => {
                 amount: 10,
                 currency: 'USD'
               },
-              api_key: application2.api_key
+              api_key: application.api_key
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -664,7 +658,7 @@ describe('donations.routes.test.js', () => {
                 currency: 'USD',
                 interval: 'abc'
               },
-              api_key: application2.api_key
+              api_key: application.api_key
             })
             .expect(400, {
               error: {
@@ -684,7 +678,7 @@ describe('donations.routes.test.js', () => {
                 currency: 'USD',
                 interval: 'month'
               },
-              api_key: application2.api_key
+              api_key: application.api_key
             })
             .expect(400, {
               error: {
@@ -712,7 +706,7 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           request(app)
             .post(`/groups/${group.id}/payments`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
+            .set('Authorization', `Bearer ${user.jwt()}`)
             .send({ payment })
             .expect(400, {
               error: {

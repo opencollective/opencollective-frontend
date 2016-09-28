@@ -24,7 +24,7 @@ describe('groups.routes.test.js', () => {
   let application;
   let user;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
 
@@ -272,7 +272,7 @@ describe('groups.routes.test.js', () => {
       stub.yields(null, mock);
     };
 
-    beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+    beforeEach(() => utils.resetTestDB());
 
     beforeEach(() => {
       appStripe.accounts.create.restore();
@@ -312,7 +312,7 @@ describe('groups.routes.test.js', () => {
     beforeEach('create a transaction for group 1', () =>
       request(app)
         .post(`/groups/${publicGroup.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           transaction: transactionsData[8]
         })
@@ -383,7 +383,7 @@ describe('groups.routes.test.js', () => {
 
           request(app)
             .post(`/groups/${publicGroup.id}/transactions`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
+            .set('Authorization', `Bearer ${user.jwt()}`)
             .send({
               transaction: _.extend({}, transaction, { approved: true })
             })
@@ -588,7 +588,7 @@ describe('groups.routes.test.js', () => {
     it('fails updating a group if the user authenticated has no access', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
           group: groupNew
         })
@@ -599,7 +599,7 @@ describe('groups.routes.test.js', () => {
     it('fails updating a group if the user authenticated is a viewer', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user3.jwt(application)}`)
+        .set('Authorization', `Bearer ${user3.jwt()}`)
         .send({
           group: groupNew
         })
@@ -610,7 +610,7 @@ describe('groups.routes.test.js', () => {
     it('fails updating a group if no data passed', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(400)
         .end(done);
     });
@@ -618,7 +618,7 @@ describe('groups.routes.test.js', () => {
     it('successfully updates a group if authenticated as a MEMBER', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user4.jwt(application)}`)
+        .set('Authorization', `Bearer ${user4.jwt()}`)
         .send({
           group: groupNew
         })
@@ -629,7 +629,7 @@ describe('groups.routes.test.js', () => {
     it('successfully udpates a group if authenticated as a user', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           group: groupNew
         })

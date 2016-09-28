@@ -11,7 +11,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
   let application, req, user;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   describe('WHEN calling /connected-accounts/github', () => {
 

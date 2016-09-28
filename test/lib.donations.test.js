@@ -44,7 +44,7 @@ describe('lib.donation.test.js', () => {
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => processDonationSpy.reset());
 
@@ -107,7 +107,7 @@ describe('lib.donation.test.js', () => {
 
   describe('Stripe', () => {
 
-    let user, application2, group, group2;
+    let user, group, group2;
     const nocks = {};
 
     const stubStripe = () => {
@@ -189,11 +189,6 @@ describe('lib.donation.test.js', () => {
       .tap(() => done())
       .catch(done);
     });
-
-    // Create an application which has only access to `group`
-    beforeEach(() => models.Application.create(utils.data('application2'))
-      .tap(a => application2 = a)
-      .then(() => application2.addGroup(group2)));
 
     // Nock for charges.create.
     beforeEach(() => {

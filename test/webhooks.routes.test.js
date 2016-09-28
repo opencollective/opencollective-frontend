@@ -53,7 +53,7 @@ describe('webhooks.routes.test.js', () => {
   let donation;
   const sandbox = sinon.sandbox.create();
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 

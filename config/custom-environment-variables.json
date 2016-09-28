@@ -10,6 +10,7 @@
   },
   "keys": {
     "opencollective": {
+      "api_key": "API_KEY",
       "secret": "JWT_SECRET",
       "resetPasswordSecret": "RESET_PASSWORD_SECRET"
     }

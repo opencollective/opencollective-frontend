@@ -19,7 +19,7 @@ describe('subscriptions.routes.test.js', () => {
   let application;
   let paymentMethod;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
@@ -70,7 +70,7 @@ describe('subscriptions.routes.test.js', () => {
     it('successfully has access to the subscriptions', (done) => {
       request(app)
         .get('/subscriptions')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
@@ -170,7 +170,7 @@ describe('subscriptions.routes.test.js', () => {
     it('cancels the subscription', (done) => {
        request(app)
         .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;

@@ -27,7 +27,7 @@ describe("notification.model.test.js", () => {
   let group;
   let group2;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
     const promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
@@ -49,7 +49,7 @@ describe("notification.model.test.js", () => {
   it('notifies for the `group.transaction.approved` email', () =>
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .send()
       .expect(200)
       .then(res => {
@@ -68,7 +68,7 @@ describe("notification.model.test.js", () => {
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/unsubscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .send()
       .expect(200)
       .then(() =>
@@ -82,7 +82,7 @@ describe("notification.model.test.js", () => {
   it('fails to add another notification if one exists', () =>
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .send()
       .expect(400)
       .then(res => {
@@ -100,7 +100,7 @@ describe("notification.model.test.js", () => {
   it('fails to remove notification if it does not exist', () =>
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/unsubscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .send()
       .expect(400)
       .then(res => {
@@ -118,7 +118,7 @@ describe("notification.model.test.js", () => {
   it('fails to add a notification if not a member of the group', () =>
     request(app)
       .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .send()
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {

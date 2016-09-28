@@ -10,7 +10,6 @@ import models from '../models';
 import errors from '../lib/errors';
 
 const {
-  Application,
   User
 } = models;
 
@@ -128,42 +127,14 @@ export const getOrCreateUser = (req, res, next) => {
 };
 
 /**
- * Check the api_key.
- */
-export const apiKey = (req, res, next) => {
-  const key = req.query.api_key || req.body.api_key;
-
-  if (!key) return next();
-
-  Application.findByKey(key).tap(application => {
-    if (!application) {
-      return next(new errors.Unauthorized(`Invalid API key: ${key}`));
-    }
-
-    if (application.disabled) {
-      return next(new errors.Forbidden('Application disabled'));
-    }
-
-    req.application = application;
-
-    next();
-  })
-  .catch(next);
-};
-
-/**
  * Authenticate.
  * @PRE: Need to submit a login (username or email)/password as a POST request.
- *       api_key is also required
- * @POST: req.remoteUser and req.user are set to the logged in user
+ * @POST: req.remoteUser is set to the logged in user
  */
 export const authenticate = (req, res, next) => {
   const username = (req.body && req.body.username) || req.query.username;
   const email = (req.body && req.body.email) || req.query.email;
   const password = (req.body && req.body.password) || req.query.password;
-  if (!req.application || !req.application.api_key) {
-    return next();
-  }
 
   if (!(username || email) || !password) {
     return next();
@@ -186,96 +157,9 @@ export const authenticate = (req, res, next) => {
     }
 
     req.remoteUser = user;
-    req.user = req.remoteUser;
 
     next();
   });
-};
-
-/**
- * Identify User and Application from the jwtoken.
- *
- *  Use the req.remoteUser._id (from the access_token) to get the
- *    full user's model
- *  Use the req.remoteUser.audience (from the access_token) to get the
- *    full application's model
- */
-export const identifyFromToken = (req, res, next) => {
-  if (!req.jwtPayload || !req.jwtPayload.sub) {
-    return next();
-  }
-  async.parallel([
-    function(cb) {
-      User
-        .findById(req.jwtPayload.sub)
-        .tap((user) => {
-          req.remoteUser = user;
-          cb();
-        })
-        .catch(cb);
-    },
-    function(cb) {
-      const appId = parseInt(req.jwtPayload.aud);
-
-      // Check the validity of the application in the token.
-      Application
-        .findById(appId)
-        .tap((application) => {
-          if (!application || application.disabled)
-            return cb(new errors.Unauthorized('Invalid API key.'));
-
-          req.application = application;
-          cb();
-        })
-        .catch(next);
-    }
-
-  ], next);
-
-};
-
-/**
- * Either a user or an Application has to be authenticated.
- */
-export const authorizeAuthUserOrApp = (req, res, next) => {
-  if (!req.remoteUser && !req.application) {
-    return next(new errors.Unauthorized('Unauthorized'));
-  }
-
-  next();
-};
-
-/**
- * Authorize to get the group.
- */
-export const authorizeGroup = (req, res, next) => {
-  if (!req.group) {
-    return next(new errors.NotFound());
-  }
-
-  const checkUserAccess = () => {
-    if (!req.remoteUser) {
-      return Promise.resolve(false);
-    }
-    return req.group.hasUser(req.remoteUser.id);
-  };
-
-  const checkAppAccess = () => {
-    if (!req.application) {
-      return Promise.resolve();
-    }
-
-    return req.group.hasApplication(req.application);
-  };
-
-  Promise.reduce([checkUserAccess(), checkAppAccess()], (total, auth) => total || auth)
-    .tap(hasAccess => {
-      if (!hasAccess) {
-        return next(new errors.Forbidden('Unauthorized'));
-      }
-      next();
-    })
-    .catch(next);
 };
 
 /**
@@ -298,17 +182,6 @@ export const fetchRoles = (req, res, next) => {
     })
     .then(() => next())
     .catch(next);
-};
-
-/**
- * Authorize if group is public
- */
-export const authorizeIfGroupPublic = (req, res, next) => {
-  if (req.group && req.group.isPublic) {
-    return next('route'); // bypass the callbacks
-  }
-
-  return next();
 };
 
 /**
@@ -372,12 +245,4 @@ export const sorting = (options) => {
 
     next();
   };
-};
-
-export const checkJWTExpiration = (req, res, next) => {
-  if (req.jwtExpired) {
-    return next(new errors.CustomError(401, 'jwt_expired', 'jwt expired'));
-  }
-
-  return next();
 };

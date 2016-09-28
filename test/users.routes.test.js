@@ -22,6 +22,7 @@ import knox from '../server/gateways/knox';
 /**
  * Variables.
  */
+const application = utils.data('application');
 const userData = utils.data('user1');
 
 /**
@@ -29,9 +30,6 @@ const userData = utils.data('user1');
  */
 describe('users.routes.test.js', () => {
 
-  let application;
-  let application2;
-  let application3;
   let nm;
 
   let sandbox;
@@ -52,13 +50,7 @@ describe('users.routes.test.js', () => {
 
   afterEach(() => sandbox.restore());
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
-
-  // Create a normal application.
-  beforeEach(() => models.Application.create(utils.data('application2')).tap(a => application2 = a));
-
-  // Create an application with user creation access.
-  beforeEach(() => models.Application.create(utils.data('application3')).tap(a => application3 = a));
+  beforeEach(() => utils.resetTestDB());
 
   // create a fake nodemailer transport
   beforeEach(() => {
@@ -105,7 +97,7 @@ describe('users.routes.test.js', () => {
       request(app)
         .post('/users')
         .send({
-          api_key: application2.api_key,
+          api_key: '*invalid_api_key*',
           user: userData
         })
         .expect(403)
@@ -175,13 +167,7 @@ describe('users.routes.test.js', () => {
           expect(res.body).to.not.have.property('_salt');
           expect(res.body).to.not.have.property('password');
           expect(res.body).to.not.have.property('password_hash');
-          models.User
-            .findById(parseInt(res.body.id))
-            .then((user) => {
-              expect(user).to.have.property('ApplicationId', application.id);
-              done();
-            })
-            .catch(done);
+          done();
         });
     });
 
@@ -226,25 +212,6 @@ describe('users.routes.test.js', () => {
               .catch(done);
           });
       });
-    });
-
-    it('successfully create a user with an application that has access [0.5]', (done) => {
-      request(app)
-        .post('/users')
-        .send({
-          api_key: application3.api_key,
-          user: userData
-        })
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          models.User
-            .findById(parseInt(res.body.id))
-            .tap((user) => {
-              expect(user).to.have.property('ApplicationId', application3.id);
-              done();
-            })
-            .catch(done);
-        });
     });
 
     describe('duplicate', () => {
@@ -337,7 +304,7 @@ describe('users.routes.test.js', () => {
     it('successfully get a user\'s information when he is authenticated', (done) => {
       request(app)
         .get(`/users/${user.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .end((e, res) => {
           expect(e).to.not.exist;
           const u = res.body;
@@ -356,7 +323,7 @@ describe('users.routes.test.js', () => {
     it('should update first name and last name if logged in', (done) => {
       request(app)
         .put(`/users/${user.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           user: {
             firstName: "Xavier",
@@ -380,7 +347,7 @@ describe('users.routes.test.js', () => {
       const email = 'test+paypal@email.com';
       request(app)
         .put(`/users/${user.id}/paypalemail`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           paypalEmail: email
         })
@@ -408,7 +375,7 @@ describe('users.routes.test.js', () => {
     it('fails if the email is not valid', (done) => {
       request(app)
         .put(`/users/${user.id}/paypalemail`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           paypalEmail: 'abc'
         })
@@ -433,7 +400,7 @@ describe('users.routes.test.js', () => {
 
       request(app)
         .put(`/users/${user.id}/password`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           password: newPassword,
           passwordConfirmation: newPassword
@@ -461,7 +428,7 @@ describe('users.routes.test.js', () => {
     it('fails if wrong user is logged in', (done) => {
       request(app)
         .put(`/users/${user.id}/password`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .end((e,res) => {
           expect(res.statusCode).to.equal(403);
           expect(res.body.error.type).to.equal('forbidden');
@@ -474,7 +441,7 @@ describe('users.routes.test.js', () => {
 
       request(app)
         .put(`/users/${user.id}/password`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           password: newPassword,
           passwordConfirmation: `${newPassword}a`
@@ -498,7 +465,7 @@ describe('users.routes.test.js', () => {
       const link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
         .put(`/users/${user.id}/avatar`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           avatar: link
         })

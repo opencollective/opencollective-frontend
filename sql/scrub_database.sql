@@ -62,5 +62,3 @@ UPDATE "PaymentMethods" SET token='*****', data=NULL, number='*****@paypal.com',
 
 TRUNCATE "Activities";
 TRUNCATE "ExpenseHistories";
-
-DELETE FROM "Applications" WHERE id < 5;

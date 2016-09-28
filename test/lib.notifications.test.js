@@ -31,7 +31,7 @@ describe('lib.notifications.test.js', () => {
   let nm;
   let application;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
     const promises = [User.create(userData), Group.create(groupData)];
@@ -111,7 +111,7 @@ describe('lib.notifications.test.js', () => {
       })
       .then(() => request(app)
         .post(`/groups/${group.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           transaction: transactionsData[0]
         })

@@ -45,7 +45,7 @@ const createDonationsAndTransaction = () => {
 describe('usergroup.routes.test.js', () => {
   let application;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create users.
   beforeEach(() =>
@@ -71,7 +71,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails adding a non-existing user to a group', (done) => {
       request(app)
         .post(`/groups/${group.id}/users/98765`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
@@ -79,7 +79,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails adding a user to a non-existing group', (done) => {
       request(app)
         .post(`/groups/98765/users/${users[1].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
@@ -90,7 +90,7 @@ describe('usergroup.routes.test.js', () => {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(400)
         .end(done);
     });
@@ -101,7 +101,7 @@ describe('usergroup.routes.test.js', () => {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -112,7 +112,7 @@ describe('usergroup.routes.test.js', () => {
         .send({
           role: 'nonexistingrole'
         })
-        .set('Authorization', `Bearer ${users[2].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -120,7 +120,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails adding a host if the group already has one', (done) => {
       request(app)
         .post(`/groups/${group.id}/users/${users[1].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(400, {
           error: {
             code: 400,
@@ -137,7 +137,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully add a user to a group', (done) => {
       request(app)
         .post(`/groups/${group.id}/users/${users[1].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -157,7 +157,7 @@ describe('usergroup.routes.test.js', () => {
 
       request(app)
         .post(`/groups/${group.id}/users/${users[2].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           role
         })
@@ -184,7 +184,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully adds the user to the mailing list', (done) => {
       request(app)
         .post(`/groups/${group.id}/users/${users[2].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           role: roles.MEMBER
         })
@@ -212,7 +212,7 @@ describe('usergroup.routes.test.js', () => {
     beforeEach((done) => {
       request(app)
         .post(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end(done);
     });
@@ -220,7 +220,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails getting another user\'s groups', (done) => {
       request(app)
         .get(`/users/${users[0].id}/groups`)
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(403)
         .end(e => {
           expect(e).to.not.exist;
@@ -231,7 +231,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully get a user\'s groups', (done) => {
       request(app)
         .get(`/users/${users[1].id}/groups`)
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -243,7 +243,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully get a user\'s groups bis', (done) => {
       request(app)
         .get(`/users/${users[0].id}/groups`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -258,7 +258,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully get a user\'s groups with the role', (done) => {
       request(app)
         .get(`/users/${users[0].id}/groups?include=usergroup.role`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -281,7 +281,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if no access to the group', (done) => {
       request(app)
         .put(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -289,7 +289,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if no host', (done) => {
       request(app)
         .put(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[2].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -297,7 +297,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if the user is not part of the group yet', (done) => {
       request(app)
         .put(`/groups/${group.id}/users/${users[3].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
@@ -306,7 +306,7 @@ describe('usergroup.routes.test.js', () => {
       const role = roles.MEMBER;
       request(app)
         .put(`/groups/${group.id}/users/${users[2].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           role
         })
@@ -333,7 +333,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if no access to the group', (done) => {
       request(app)
         .del(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -341,7 +341,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if no host', (done) => {
       request(app)
         .del(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[2].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -349,7 +349,7 @@ describe('usergroup.routes.test.js', () => {
     it('fails if the user is not part of the group yet', (done) => {
       request(app)
         .del(`/groups/${group.id}/users/${users[3].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
@@ -357,7 +357,7 @@ describe('usergroup.routes.test.js', () => {
     it('successfully update a user-group relation', (done) => {
       request(app)
         .del(`/groups/${group.id}/users/${users[2].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt(application)}`)
+        .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -450,7 +450,7 @@ describe('usergroup.routes.test.js', () => {
     it('get the list of users in csv format without emails if logged in as backer', (done) => {
       request(app)
         .get(`/groups/${group.slug}/users.csv`)
-        .set('Authorization', `Bearer ${users[2].jwt(application)}`) // BACKER
+        .set('Authorization', `Bearer ${users[2].jwt()}`) // BACKER
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0];
@@ -462,7 +462,7 @@ describe('usergroup.routes.test.js', () => {
     it('get the list of users in csv format with emails if logged in as admin', (done) => {
       request(app)
         .get(`/groups/${group.slug}/users.csv`)
-        .set('Authorization', `Bearer ${users[1].jwt(application)}`) // MEMBER
+        .set('Authorization', `Bearer ${users[1].jwt()}`) // MEMBER
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');

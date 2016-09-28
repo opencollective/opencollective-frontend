@@ -15,7 +15,7 @@ describe('paymentMethods.routes.test.js', () => {
   let user2;
   let paymentMethod1;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create users.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -41,7 +41,7 @@ describe('paymentMethods.routes.test.js', () => {
     it('fails getting another user\'s paymentMethods', (done) => {
       request(app)
         .get(`/users/${user.id}/payment-methods`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(e => {
           expect(e).to.not.exist;
@@ -52,7 +52,7 @@ describe('paymentMethods.routes.test.js', () => {
     it('successfully get a user\'s paymentMethod', (done) => {
       request(app)
         .get(`/users/${user.id}/payment-methods`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -74,7 +74,7 @@ describe('paymentMethods.routes.test.js', () => {
             service: 'paypal'
           }
         })
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;

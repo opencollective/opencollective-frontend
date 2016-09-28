@@ -1,19 +1,7 @@
 export default {
-  "applicationSuper": {
+  "application": {
     "name": "webapp",
-    "api_key": "0ac43519edcf4421d80342403fb5985d",
-    "_access": 1
-  },
-
-  "application2": {
-    "name": "tipbox_app",
-    "api_key": "920cb291778adad8a563f488239968b4"
-  },
-
-  "application3": {
-    "name": "scouts_app",
-    "api_key": "1c96ce6b1119bec18e4a4680d25883da",
-    "_access": 0.5
+    "api_key": "dvl-1510egmf4a23d80342403fb599qd"
   },
 
   "user1": {

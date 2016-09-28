@@ -8,7 +8,7 @@ const { User, Group, Transaction } = models;
 
 describe('user.models.test.js', () => {
 
-  beforeEach(() => utils.cleanAllDb());
+  beforeEach(() => utils.resetTestDB());
 
   /**
    * Create a user.
@@ -151,7 +151,7 @@ describe('user.models.test.js', () => {
       GroupId: 2
     }];
 
-    beforeEach(() => utils.cleanAllDb());
+    beforeEach(() => utils.resetTestDB());
     beforeEach(() => User.createMany(users));
     beforeEach(() => Group.create(utils.data('group1')));
     beforeEach(() => Group.create(utils.data('group2')));

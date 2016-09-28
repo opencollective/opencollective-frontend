@@ -47,17 +47,7 @@ export const resetTestDatabase = function(req, res, next) {
         .catch(cb);
     },
 
-    createApplication: ['resetDb', (cb) => {
-      models.Application.create({
-        name: 'test_server',
-        api_key: apiKey,
-        _access: 1
-      })
-        .then(() => cb())
-        .catch(cb);
-    }],
-
-    createTestUser: ['createApplication', (cb) => {
+    createTestUser: [(cb) => {
       models.User.create(testUser)
         .then(u => cb(null, u))
         .catch(cb);

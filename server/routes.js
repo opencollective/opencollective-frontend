@@ -23,17 +23,15 @@ import * as email from './controllers/services/email';
 import syncMeetup from './controllers/services/meetup';
 
 import roles from './constants/roles';
-import jwt from './middleware/jwt';
 import required from './middleware/required_param';
 import ifParam from './middleware/if_param';
 import * as aN from './middleware/security/authentication';
 import * as aZ from './middleware/security/authorization';
+import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
 import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
-
-const { HOST, MEMBER } = roles;
 
 /**
  * NotImplemented response.
@@ -45,6 +43,14 @@ export default (app) => {
    * Status.
    */
   app.use('/status', serverStatus(app));
+
+  app.use('*', auth.authorizeApiKey);
+  app.use('*', aN.authenticateUser()); // populate req.remoteUser if JWT token provided in the request
+
+  /**
+   * For testing the email templates
+   */
+  app.get('/templates/email/:template', test.generateTestEmail);
 
   /**
    * Parameters.
@@ -58,20 +64,15 @@ export default (app) => {
   /**
    * User reset password flow (no jwt verification)
    */
-  app.post('/users/password/forgot', aZ.authorizeAppByApiKey, required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', aZ.authorizeAppByApiKey, required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
+  app.post('/users/password/forgot', required('email'), users.forgotPassword); // Send forgot password email
+  app.post('/users/password/reset/:userid_enc/:reset_token', required('password', 'passwordConfirmation'), users.resetPassword); // Reset password
 
-  app.post('/users/new_login_token', aZ.authorizeAppByApiKey, required('email'), users.sendNewTokenByEmail);
+  app.post('/users/new_login_token', required('email'), users.sendNewTokenByEmail);
 
   /**
    * Routes without expiration validation
    */
-  app.post('/users/refresh_login_token', aN.authenticateUserAndAppByJwtNoExpiry(), users.refreshTokenByEmail);
-
-  /**
-   * For testing the email templates
-   */
-  app.get('/templates/email/:template', test.generateTestEmail);
+  app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
   /**
    * Homepage
@@ -79,7 +80,7 @@ export default (app) => {
   app.get('/homepage', getHomePage);
 
   /**
-   * Profile
+   * Profile page of a user, organization or collective
    */
   app.get('/profile/:slug', getProfilePage);
 
@@ -91,21 +92,21 @@ export default (app) => {
   /**
    * Users.
    */
-  app.post('/users', aZ.authorizeAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
-  app.get('/users/:userid', aN.authenticateUserOrApp(), users.show); // Get a user.
-  app.put('/users/:userid', aN.authenticateUserAndAppByJwt(), required('user'), users.updateUser); // Update a user.
-  app.put('/users/:userid/avatars', aZ.authorizeAppByApiKey, required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
-  app.put('/users/:userid/password', aZ.authorizeUserToAccessUser(), required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
-  app.put('/users/:userid/paypalemail', required('paypalEmail'), aZ.authorizeUserToAccessUser(), users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/avatar', required('avatar'), aZ.authorizeUserToAccessUser(), users.updateAvatar); // Update a user's avatar
+  app.post('/users', required('user'), users.create); // Create a user.
+  app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
+  app.put('/users/:userid', auth.mustBeLoggedInAsUser, required('user'), users.updateUser); // Update a user.
+  app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
+  app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
+  app.put('/users/:userid/avatar', auth.mustBeLoggedInAsUser, required('avatar'), users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
-  // TODO why is this route duplicated?
-  app.post('/users', aZ.authorizeAppByApiKey, aZ.appAccess(0.5), required('user'), users.create); // Create a user.
 
+  // TODO: Why is this a PUT and not a GET?
+  app.put('/users/:userid/avatars', required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
+  
   /**
    * Authentication.
    */
-  app.post('/authenticate', aZ.authorizeAppByApiKey, aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
+  app.post('/authenticate', aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
   app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
   app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
 
@@ -114,11 +115,10 @@ export default (app) => {
    *
    *  Let's assume for now a paymentMethod is linked to a user.
    */
-
   // delete this route #postmigration, once frontend is updated
-  app.get('/users/:userid/cards', aZ.authorizeUserToAccessUser(), getPaymentMethods); // Get a user's paymentMethods.
+  app.get('/users/:userid/cards', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
 
-  app.get('/users/:userid/payment-methods', aZ.authorizeUserToAccessUser(), getPaymentMethods); // Get a user's paymentMethods.
+  app.get('/users/:userid/payment-methods', auth.mustBeLoggedInAsUser, getPaymentMethods); // Get a user's paymentMethods.
   app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
   app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
@@ -126,26 +126,26 @@ export default (app) => {
   /**
    * Paypal Preapproval.
    */
-  app.get('/users/:userid/paypal/preapproval', aZ.authorizeUserToAccessUser(), paypal.getPreapprovalKey); // Get a user's preapproval key.
-  app.post('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.confirmPreapproval); // Confirm a preapproval key.
-  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', aZ.authorizeUserToAccessUser(), paypal.getDetails); // Get a preapproval key details.
+  app.get('/users/:userid/paypal/preapproval', auth.mustBeLoggedInAsUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
+  app.post('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.confirmPreapproval); // Confirm a preapproval key.
+  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
 
   /**
    * Groups.
    */
-  app.post('/groups', ifParam('flow', 'github'), aZ.authorizeAppByApiKey, aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
-  app.post('/groups', aZ.authorizeAppByApiKey, required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them.
+  app.post('/groups', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
+  app.post('/groups', required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/groups/tags', groups.getGroupTags); // List all unique tags on all groups
-  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), cache(60), groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), cache(60), mw.fetchRoles, mw.format('csv'), groups.getUsers);
-  app.put('/groups/:groupid', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), required('group'), groups.update); // Update a group.
-  app.put('/groups/:groupid/settings', required('group'), groups.updateSettings); // Update group settings
+  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), groups.getOne);
+  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), cache(60), mw.fetchRoles, mw.format('csv'), groups.getUsers);
+  app.put('/groups/:groupid', auth.canEditGroup, required('group'), groups.update); // Update a group.
+  app.put('/groups/:groupid/settings', auth.canEditGroup, required('group'), groups.updateSettings); // Update group settings
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   // TODO: Remove #postmigration after frontend migrates to POST /groups/:groupid/donations/*
-  app.post('/groups/:groupid/payments', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', aN.authenticateUser(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', aN.authenticateUser(), required('payment'), donations.paypal); // Make a payment/donation.
 
   app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
@@ -155,49 +155,31 @@ export default (app) => {
    *  Relations between a group and a user.
    */
   app.get('/users/:userid/groups', aZ.authorizeUserToAccessUser(), users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.addUser); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.updateUser); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), groups.deleteUser); // Remove a user from a group.
+  app.post('/groups/:groupid/users/:userid', auth.canEditGroup, groups.addUser); // Add a user to a group.
+  app.put('/groups/:groupid/users/:userid', auth.canEditGroup, groups.updateUser); // Update a user's role in a group.
+  app.delete('/groups/:groupid/users/:userid', auth.canEditGroup, groups.deleteUser); // Remove a user from a group.
 
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
-
-  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
-  const commonLegacySecurityMw = [mw.apiKey, jwt, mw.identifyFromToken, mw.checkJWTExpiration];
-  app.post('/groups/:groupid/transactions', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
-  app.post('/groups/:groupid/transactions', commonLegacySecurityMw, required('transaction'), mw.getOrCreateUser, groups.createTransaction); // Create a transaction for a group.
-
-  // TODO remove #postmigration, replaced by GET /groups/:groupid/expenses/:expenseid
-  app.get('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), aZ.authorizeGroupAccessToTransaction({allowNonAuthenticatedAccessIfGroupIsPublic: true}), groups.getTransaction); // Get a transaction.
-  // TODO remove #postmigration, replaced by PUT /groups/:groupid/expenses/:expenseid
-  app.put('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessToTransaction(), required('transaction'), groups.updateTransaction); // Update a transaction.
-  // TODO remove #postmigration, replaced by DEL /groups/:groupid/expenses/:expenseid
-  app.delete('/groups/:groupid/transactions/:transactionid', aZ.authorizeAccessToGroup({userRoles: [HOST], bypassUserRolesCheckIfAuthenticatedAsAppAndNotUser: true}), aZ.authorizeGroupAccessToTransaction(), groups.deleteTransaction); // Delete a transaction.
+  app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
   /**
    * Expenses
    */
-
-  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccessIfGroupIsPublic: true}), aZ.authorizeGroupAccessTo('expense', {allowNonAuthenticatedAccessIfGroupIsPublic: true}), expenses.getOne); // Get an expense.
-  // xdamman: having two times the same route is a mess (hard to read and error prone if we forget to return)
-  // This is caused by mw.authorizeIfGroupPublic that is doing a next('route')
-  // TODO refactor with single route using authentication.js and authorization.js middleware
-  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, mw.authorizeIfGroupPublic, mw.authorizeAuthUserOrApp, mw.authorizeGroup, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
-  app.post('/groups/:groupid/expenses', commonLegacySecurityMw, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense.
-  app.put('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup(), aZ.authorizeGroupAccessTo('expense'), required('expense'), expenses.update); // Update an expense.
-  app.delete('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.deleteExpense); // Delete an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/approve', aZ.authorizeAccessToGroup({userRoles: [HOST, MEMBER]}), aZ.authorizeGroupAccessTo('expense'), required('approved'), expenses.setApprovalStatus); // Approve an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/pay', aZ.authorizeAccessToGroup({userRoles: [HOST]}), aZ.authorizeGroupAccessTo('expense'), expenses.pay); // Pay an expense.
+  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), aZ.authorizeGroupAccessTo('expense', {allowNonAuthenticatedAccess: true}), expenses.getOne); // Get an expense.
+  app.post('/groups/:groupid/expenses', aN.authenticateUser, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
+  app.put('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
+  app.delete('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
+  app.post('/groups/:groupid/expenses/:expenseid/approve', auth.canEditGroup, required('approved'), expenses.setApprovalStatus); // Approve an expense.
+  app.post('/groups/:groupid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
 
   /**
    * Donations
    */
-
-  app.post('/groups/:groupid/donations', aN.authenticateUserOrApp(), required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
-  app.post('/groups/:groupid/donations/paypal', aN.authenticateUserOrApp(), required('payment'), donations.paypal); // Make a paypal donation.
+  app.post('/groups/:groupid/donations', aN.authenticateUser(), required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
+  app.post('/groups/:groupid/donations/paypal', aN.authenticateUser(), required('payment'), donations.paypal); // Make a paypal donation.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
@@ -205,19 +187,20 @@ export default (app) => {
    *
    *  An activity is any action linked to a User or a Group.
    */
-  app.get('/groups/:groupid/activities', aZ.authorizeAccessToGroup(), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
-  app.get('/users/:userid/activities', aZ.authorizeUserToAccessUser(), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+  app.get('/groups/:groupid/activities', auth.mustBePartOfTheGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
+  app.get('/users/:userid/activities', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
 
   /**
    * Notifications.
    *
    *  A user can subscribe by email to any type of activity of a Group.
    */
-  app.post('/groups/:groupid/activities/:activityType/subscribe', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup(), notifications.subscribe); // Subscribe to a group's activities
-  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUserByJwt(), aZ.authorizeAccessToGroup(), notifications.unsubscribe); // Unsubscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/subscribe', auth.mustBePartOfTheGroup, notifications.subscribe); // Subscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUser, notifications.unsubscribe); // Unsubscribe to a group's activities
 
   /**
    * Separate route for uploading images to S3
+   * TODO: User should be logged in
    */
   app.post('/images', uploadImage);
 
@@ -237,10 +220,10 @@ export default (app) => {
   /**
    * Generic OAuth (ConnectedAccounts)
    */
-  app.get('/:slug/connected-accounts', aN.authenticateUserAndAppByJwt(), connectedAccounts.list);
-  app.get('/connected-accounts/:service(github|twitter|meetup)', aZ.authorizeAppByApiKey, aN.authenticateService);
-  app.get('/connected-accounts/:service/callback', aZ.authorizeAppByApiKey, aN.authenticateServiceCallback);
-  app.get('/connected-accounts/:service/verify', aZ.authorizeAppByApiKey, aN.parseJwtNoExpiryCheck, connectedAccounts.get);
+  app.get('/:slug/connected-accounts', aN.authenticateUser(), connectedAccounts.list);
+  app.get('/connected-accounts/:service(github|twitter|meetup)', aN.authenticateService);
+  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback);
+  app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.get);
 
   /**
    * External services
@@ -252,7 +235,7 @@ export default (app) => {
   /**
    * Github API - fetch all repositories using the user's access_token
    */
-  app.get('/github-repositories', aN.authenticateUserByJwt(), connectedAccounts.fetchAllRepositories);
+  app.get('/github-repositories', aN.authenticateUser(), connectedAccounts.fetchAllRepositories);
 
   /**
    * Reset test-api database
@@ -268,7 +251,7 @@ export default (app) => {
   /**
    * Leaderboard
    */
-  app.get('/leaderboard', aZ.authorizeAppByApiKey, groups.getLeaderboard); // Create a user.
+  app.get('/leaderboard', groups.getLeaderboard); // Create a user.
 
   /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL

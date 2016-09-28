@@ -10,7 +10,7 @@ describe('images.routes.test.js', () => {
   let application;
   let user;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   /**
    * Create user
@@ -22,7 +22,7 @@ describe('images.routes.test.js', () => {
     request(app)
     .post('/images/')
     .attach('file', 'test/mocks/images/camera.png')
-    .set('Authorization', `Bearer ${user.jwt(application)}`)
+    .set('Authorization', `Bearer ${user.jwt()}`)
     .expect(200)
     .end((err, res) => {
       expect(res.body.url).to.contain('.png');
@@ -33,7 +33,7 @@ describe('images.routes.test.js', () => {
   it('should throw an error if no file field is sent', (done) => {
     request(app)
     .post('/images/')
-    .set('Authorization', `Bearer ${user.jwt(application)}`)
+    .set('Authorization', `Bearer ${user.jwt()}`)
     .expect(400)
     .end(done);
   });

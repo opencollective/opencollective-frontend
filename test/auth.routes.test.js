@@ -6,12 +6,11 @@ import * as utils from '../test/utils';
 import models from '../server/models';
 
 const userData = utils.data('user1');
+const application = utils.data('application');
 
 describe('auth.routes.test.js', () => {
 
-  let application;
-
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData));
 

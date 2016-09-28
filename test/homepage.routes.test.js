@@ -11,7 +11,7 @@ describe('homepage.routes.test.js', () => {
 
   let user, group, paymentMethod;
 
-  beforeEach(() => utils.cleanAllDb());
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach(() =>
