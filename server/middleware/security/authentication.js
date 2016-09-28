@@ -148,8 +148,6 @@ export const _authenticateUserByJwt = (req, res, next) => {
 export function authenticateUser() {
   return (req, res, next) => {
 
-    console.log("authenticate user", req.remoteUser);
-
     if (req.remoteUser && req.remoteUser.id) return next();
 
     this.parseJwtNoExpiryCheck(req, res, (e) => {

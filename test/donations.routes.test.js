@@ -119,6 +119,7 @@ describe('donations.routes.test.js', () => {
           .post(`/groups/${group.id}/payments`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
