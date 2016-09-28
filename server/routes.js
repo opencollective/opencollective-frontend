@@ -169,7 +169,7 @@ export default (app) => {
    */
   app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
   app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), aZ.authorizeGroupAccessTo('expense', {allowNonAuthenticatedAccess: true}), expenses.getOne); // Get an expense.
-  app.post('/groups/:groupid/expenses', aN.authenticateUser, required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
+  app.post('/groups/:groupid/expenses', aN.authenticateUser(), required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
   app.put('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
   app.delete('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', auth.canEditGroup, required('approved'), expenses.setApprovalStatus); // Approve an expense.
@@ -196,7 +196,7 @@ export default (app) => {
    *  A user can subscribe by email to any type of activity of a Group.
    */
   app.post('/groups/:groupid/activities/:activityType/subscribe', auth.mustBePartOfTheGroup, notifications.subscribe); // Subscribe to a group's activities
-  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUser, notifications.unsubscribe); // Unsubscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUser(), notifications.unsubscribe); // Unsubscribe to a group's activities
 
   /**
    * Separate route for uploading images to S3

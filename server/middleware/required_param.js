@@ -32,6 +32,7 @@ export default function(properties) {
         value = req[prop];
 
       if ((!value || value === 'null') && value !== false) {
+        if (prop === 'remoteUser') return next(new errors.Unauthorized("User is not authenticated"));
         missing[prop] = `Required field ${prop} missing`;
       } else {
         try { // Try to parse if JSON
