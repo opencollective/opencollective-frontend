@@ -8,6 +8,7 @@ const groupData1 = utils.data('group1'); // `open source` tag
 const groupData2 = utils.data('group2'); // `meetup` tag
 const paymentMethodData1 = utils.data('paymentMethod1');
 const transactionsData = utils.data('transactions1').transactions;
+const application = utils.data('application');
 
 describe('profile.routes.test.js', () => {
 
@@ -35,7 +36,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover - No params defaults to: /discover?show=all&sort=newest', (done) => {
       request(app)
-        .get('/discover')
+        .get(`/discover?api_key=${application.api_key}`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
@@ -54,7 +55,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover?show=open source', (done) => {
       request(app)
-        .get('/discover?show=open source')
+        .get(`/discover?api_key=${application.api_key}&show=open source`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
@@ -72,7 +73,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover?show=meetup', (done) => {
       request(app)
-        .get('/discover?show=meetup')
+        .get(`/discover?api_key=${application.api_key}&show=meetup`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
@@ -90,7 +91,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover?show=undefined', (done) => {
       request(app)
-        .get('/discover?show=undefined')
+        .get(`/discover?api_key=${application.api_key}&show=undefined`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
@@ -104,7 +105,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover?show=all&sort=oldest', (done) => {
       request(app)
-        .get('/discover?show=all&sort=oldest')
+        .get(`/discover?api_key=${application.api_key}&show=all&sort=oldest`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
@@ -123,7 +124,7 @@ describe('profile.routes.test.js', () => {
 
     it('/discover?show=all&sort=undefined', (done) => {
       request(app)
-        .get('/discover?show=all&sort=undefined')
+        .get(`/discover?api_key=${application.api_key}&show=all&sort=undefined`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
