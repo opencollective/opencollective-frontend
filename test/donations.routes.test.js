@@ -171,6 +171,7 @@ describe('donations.routes.test.js', () => {
           .post(`/groups/${group.id}/payments`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
@@ -187,6 +188,7 @@ describe('donations.routes.test.js', () => {
           .post(`/groups/${group.id}/payments`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE2,
@@ -406,12 +408,12 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD',
                 interval: 'month'
-              },
-              api_key: application.api_key
+              }
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -537,11 +539,11 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD'
-              },
-              api_key: application.api_key
+              }
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -654,12 +656,12 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD',
                 interval: 'abc'
-              },
-              api_key: application.api_key
+              }
             })
             .expect(400, {
               error: {
@@ -675,11 +677,11 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 currency: 'USD',
                 interval: 'month'
-              },
-              api_key: application.api_key
+              }
             })
             .expect(400, {
               error: {
@@ -708,7 +710,10 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments`)
             .set('Authorization', `Bearer ${user.jwt()}`)
-            .send({ payment })
+            .send({
+              api_key: application.api_key,
+              payment
+            })
             .expect(400, {
               error: {
                 code: 400,
@@ -718,11 +723,7 @@ describe('donations.routes.test.js', () => {
             })
             .end(done);
         })
-
       });
-
     });
-
   });
-
 });
