@@ -184,11 +184,11 @@ describe('activities.routes.test.js', () => {
    */
   describe('#user', () => {
 
-    it('fails getting other user\'s activities', (done) => {
+    it('should be able to get another user\'s activities', (done) => {
       request(app)
         .get(`/users/${user.id}/activities?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
-        .expect(403)
+        .expect(200)
         .end(done);
     });
 
