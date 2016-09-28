@@ -76,7 +76,6 @@ describe('auth.routes.test.js', () => {
           const data = jwt.decode(res.body.access_token);
           expect(data).to.have.property('iat');
           expect(data).to.have.property('exp');
-          expect(data).to.have.property('aud');
           expect(data).to.have.property('iss');
           expect(data).to.have.property('sub');
           done();
