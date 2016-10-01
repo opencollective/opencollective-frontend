@@ -164,6 +164,10 @@ export default (app) => {
    */
   app.get('/groups/:groupid/transactions', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
+  // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
+  app.post('/groups/:groupid/transactions', auth.canEditGroup, required('transaction'), groups.createTransaction); // Create a transaction for a group.
+
+
   /**
    * Expenses
    */

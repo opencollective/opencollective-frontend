@@ -1,35 +1,34 @@
 import errors from '../lib/errors';
 
 /**
- *  Parameters required for a route.
+ *  Parameters required for a route (POST, GET or headers params)
  */
-export default function(properties) {
+export default function required(properties) {
+  return _required_options({ include: ['query', 'body', 'headers']}, properties);
+}
+
+/**
+ * Check that the middlewares have populated the needed values 
+ * (such as `req.remoteUser` or `reg.group` or any other model)
+ */
+export function required_valid(properties) {
+  return _required_options({ include: ['query', 'body', 'headers', '']}, properties);
+}
+
+function _required_options(options, properties) {
   properties = [].slice.call(arguments);
+  properties.shift();
 
   return function (req, res, next) {
     const missing = {};
     req.required = {};
 
     properties.forEach((prop) => {
-      // A required value can be defined as a GET parameter
-      let value = req.query[prop];
-
-      // Or as a header
-      if (!value && value !== false)
-        value = req.headers[prop];
-
-      // Or as a POST parameter
-      if (!value && value !== false)
-        value = req.body[prop];
-
-      // Or as a param in the route, e.g. :slug or :groupid
-      if (!value && value !== false)
-        value = req.params[prop];
-
-      // Or it can have done prepopulated by a middleware before
-      // e.g. we can require that req.remoteUser or that req.group has been populated
-      if (!value && value !== false)
-        value = req[prop];
+      let value;
+      options.include.forEach(source => {
+        if (value || value === false) return;
+        value = (source) ? req[source][prop] : req[prop];
+      });
 
       if ((!value || value === 'null') && value !== false) {
         if (prop === 'remoteUser') return next(new errors.Unauthorized("User is not authenticated"));

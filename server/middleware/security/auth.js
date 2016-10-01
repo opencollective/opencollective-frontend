@@ -3,12 +3,13 @@ import config from 'config';
 
 import models from '../../models';
 import errors from '../../lib/errors';
-import required from '../required_param';
+import {required_valid} from '../required_param';
 import * as authentication from './authentication';
 import { HOST, MEMBER, BACKER } from '../../constants/roles';
 
 const {
   BadRequest,
+  NotFound,
   Forbidden, // I know who you are, but you permanently don't have access to this resource
   Unauthorized // You are not authorized, try to authenticate again
 } = errors;
@@ -35,7 +36,7 @@ export function authorizeApiKey(req, res, next) {
     if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) return next();
   }
 
-  required('api_key')(req, res, (e) => {
+  required_valid('api_key')(req, res, (e) => {
     if (e) return next(e);
     const api_key = req.required.api_key;
     if (api_key !== config.keys.opencollective.api_key)
@@ -48,7 +49,7 @@ export function authorizeApiKey(req, res, next) {
  * Makes sure that the authenticated user is the user that we are trying to access
  */
 export function mustBeLoggedInAsUser(req, res, next) {
-  required('remoteUser', 'userid')(req, res, (e) => {
+  required_valid('remoteUser', 'userid')(req, res, (e) => {
     if (e) return next(e);
     if (req.remoteUser !== req.userid) return next(new Forbidden(`The authenticated user (${req.remoteUser.username} cannot edit this user id (${req.userid})`));
     return next();
@@ -60,7 +61,7 @@ export function mustHaveRole(possibleRoles) {
     possibleRoles = [possibleRoles];
 
   return (req, res, next) => {
-    required('remoteUser', 'groupid')(req, res, (e) => {
+    required_valid('remoteUser', 'groupid')(req, res, (e) => {
       if (e) return next(e);
       models.UserGroup.findOne({ where: {
         UserId: req.remoteUser.id,
@@ -88,18 +89,18 @@ export function mustBePartOfTheGroup(req, res, next) {
  * Only the author of the expense or the host or an admin of the group can edit an expense
  */
 export function canEditExpense(req, res, next) {
-  required('remoteUser', 'expenseid')(req, res, (e) => {
+  required_valid('remoteUser', 'expenseid')(req, res, (e) => {
     if (e) return next(e);
     models.Expense
       .findOne({ where: {
-        id: req.params.expenseid,
-        UserId: req.remoteUser.id
+        id: req.params.expenseid
       }})
       .then(expense => {
-        if (expense) return next();
-
+        if (!expense) return NotFound();        
+        if (expense.UserId === req.remoteUser.id) return next();
+        req.params.groupid = expense.GroupId;
         canEditGroup(req, res, (err) => {
-          if (!err) return next(new Forbidden('Logged in user must be the author of the expense or the host or an admin of this group'));
+          if (err) return next(new Forbidden('Logged in user must be the author of the expense or the host or an admin of this group'));
           return next();
         });
       })
@@ -111,7 +112,7 @@ export function canEditExpense(req, res, next) {
  * Only the author of the donation or the host or an admin of the group can edit a donation
  */
 export function canEditDonation (req, res, next) {
-  required('remoteUser', 'donation')(req, res, (e) => {
+  required_valid('remoteUser', 'donation')(req, res, (e) => {
     if (e) return next(e);
     if (req.donation.UserId === req.remoteUser.id) return next();
     mustHaveRole([HOST, MEMBER])(req, res, (err) => {

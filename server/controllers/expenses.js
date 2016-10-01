@@ -60,7 +60,6 @@ export const list = (req, res, next) => {
 /**
  * Delete an expense.
  */
-
 export const deleteExpense = (req, res, next) => {
   const { expense } = req;
   const user = req.remoteUser || req.user;

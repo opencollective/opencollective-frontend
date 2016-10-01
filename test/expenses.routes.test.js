@@ -24,7 +24,7 @@ const {
 } = models;
 
 describe('expenses.routes.test.js', () => {
-  let host, member, group;
+  let host, member, otherUser, group;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -33,6 +33,8 @@ describe('expenses.routes.test.js', () => {
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
 
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
+
+  beforeEach(() => models.User.create(utils.data('user3')).tap(u => otherUser = u));
 
   beforeEach(() => group.addUserWithRole(host, roles.HOST));
 
@@ -152,13 +154,13 @@ describe('expenses.routes.test.js', () => {
 
       describe('WHEN providing expense', () => {
         beforeEach(() => {
-          createReq = createReq.send({ expense });
+          createReq = createReq.send({ expense, api_key: application.api_key });
         });
 
         describe('THEN returns 200 and expense', () => {
           let actualExpense;
 
-          beforeEach(() => createReq
+          beforeEach('create expense', () => createReq
             .expect(200)
             .then(res => actualExpense = res.body));
 
@@ -187,8 +189,8 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#list', () => {
-            beforeEach(() => createExpense(group, host));
-            beforeEach(() => createExpense(group, host));
+            beforeEach('create expense', () => createExpense(group, host));
+            beforeEach('create expense 2', () => createExpense(group, host));
 
             it('THEN returns 200', () => request(app)
               .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
@@ -282,34 +284,44 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
-              it('THEN returns 400', () => request(app)
+              it('THEN returns 403', () => {
+                return request(app)
                 .delete(`/groups/${group.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .expect(400));
+                .expect(403);
+              });
             });
 
-            describe('WHEN user is not a host', () => {
+            describe('WHEN user is not the host, not a member and not the author of the expense', () => {
+
+              beforeEach('set status to rejected', () =>
+                request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                .set('Authorization', `Bearer ${host.jwt()}`)
+                .send({ approved: false })
+                .expect(200)
+              );
+
               it('THEN returns 403', () => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
-                .set('Authorization', `Bearer ${member.jwt()}`)
+                .set('Authorization', `Bearer ${otherUser.jwt()}`)
                 .expect(403));
             });
 
             describe('success', () => {
               let response;
 
-              beforeEach(() => request(app)
+              beforeEach('reject expense', () => request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: false})
                 .expect(200));
 
-              beforeEach(() => request(app)
+              beforeEach('delete expense', () => request(app)
                 .delete(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(200)
                 .toPromise()
-                .tap(res => response = res.body));
+                .tap(res => response = res.body ));
 
               it('THEN returns success:true', () => expect(response).to.have.property('success', true));
 
@@ -501,7 +513,7 @@ describe('expenses.routes.test.js', () => {
               }
 
               const setExpenseApproval = approved => {
-                approveReq = approveReq.send({approved});
+                approveReq = approveReq.send({approved, api_key: application.api_key});
               };
 
               const expectApprovalStatus = approvalStatus =>
@@ -545,7 +557,7 @@ describe('expenses.routes.test.js', () => {
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .send({approved: true})
+                .send({approved: true, api_key:application.api_key})
                 .expect(200);
             });
 
@@ -575,7 +587,7 @@ describe('expenses.routes.test.js', () => {
               });
 
               beforeEach(() => {
-                payReq = payReq.send();
+                payReq = payReq.send({api_key:application.api_key});
               });
 
               afterEach(() => payStub.restore());
@@ -656,23 +668,22 @@ describe('expenses.routes.test.js', () => {
 
           describe('#pay manual expense', () => {
             // add some money, so we can approve a manual expense against it
-            beforeEach(() => {
+            beforeEach('create a transaction', () => {
               return request(app)
                 .post(`/groups/${group.id}/transactions`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .send({ transaction: {amount: 100}})
+                .send({ api_key: application.api_key, transaction: {amount: 100}})
                 .expect(200);
             })
 
-            beforeEach(() => {
+            beforeEach('create an expense', () => {
               return request(app)
                 .post(`/groups/${group.id}/expenses`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .send({ expense: expense2 })
+                .send({ api_key: application.api_key, expense: expense2 })
                 .expect(200)
                 .then(res => actualExpense = res.body);
             });
-
 
             beforeEach(() => {
               sinon
@@ -805,13 +816,13 @@ describe('expenses.routes.test.js', () => {
     let group, user;
     return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
       .tap(g => group = g)
-      .then(() => u ? u : models.User.create(utils.data('user3'))
+      .then(() => u ? u : models.User.create(utils.data('user4'))
         .tap(user => group.addUserWithRole(user, roles.HOST)))
       .tap(u => user = u)
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({expense})
+        .send({expense, api_key: application.api_key})
         .expect(200))
       .then(res => res.body);
   }
