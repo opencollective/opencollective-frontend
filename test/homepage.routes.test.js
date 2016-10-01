@@ -4,6 +4,7 @@ import request from 'supertest-as-promised';
 import * as utils from '../test/utils';
 import models from '../server/models';
 
+const application = utils.data('application');
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
 
@@ -39,7 +40,7 @@ describe('homepage.routes.test.js', () => {
 
     it('gets the homepage data', (done) => {
       request(app)
-        .get('/homepage')
+        .get(`/homepage?api_key=${application.api_key}`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
