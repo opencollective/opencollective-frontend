@@ -9,9 +9,10 @@ import models from '../server/models';
 import paypalMock from './mocks/paypal';
 import paypalAdaptive from '../server/gateways/paypalAdaptive';
 
+const application = utils.data('application');
+
 describe('paypal.preapproval.routes.test.js', () => {
 
-  let application;
   let user;
   let user2;
 
@@ -41,7 +42,6 @@ describe('paypal.preapproval.routes.test.js', () => {
       }]
     }, (e, results) => {
       expect(e).to.not.exist;
-      application = results.resetDB;
       user = results.createUserA;
       user2 = results.createUserB;
       done();
@@ -55,7 +55,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     it('should fail if not the logged-in user', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(done);
@@ -63,7 +63,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     it('should get a preapproval key', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -116,7 +116,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         return models.PaymentMethod.create(paymentMethod)
           .tap(res => expect(res.token).to.equal(token))
           .then(() => request(app)
-            .get(`/users/${user.id}/paypal/preapproval`)
+            .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
             .set('Authorization', `Bearer ${user.jwt()}`)
             .expect(200))
           .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
@@ -144,7 +144,7 @@ describe('paypal.preapproval.routes.test.js', () => {
         return models.PaymentMethod.create(paymentMethod)
           .tap(res => expect(res.token).to.equal(token))
           .then(() => request(app)
-            .get(`/users/${user.id}/paypal/preapproval`)
+            .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
             .set('Authorization', `Bearer ${user.jwt()}`)
             .expect(200))
           .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
@@ -162,7 +162,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     beforeEach((done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end(done);
@@ -181,7 +181,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should fail if not the logged-in user', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user2.jwt()}`)
           .expect(403)
           .end(done);
@@ -189,7 +189,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should fail with an unknown preapproval key', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/abc`)
+          .post(`/users/${user.id}/paypal/preapproval/abc?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(404)
           .end(done);
@@ -198,7 +198,7 @@ describe('paypal.preapproval.routes.test.js', () => {
       it('should confirm the payment of a transaction', (done) => {
         const mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
@@ -242,7 +242,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if the preapproval is not completed', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(400)
           .end(done);
@@ -264,7 +264,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if paypal returns one', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(500)
           .end(done);
@@ -285,7 +285,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return the preapproval details', (done) => {
         request(app)
-          .get(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .get(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(done);
@@ -293,7 +293,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should not be able to check another user preapproval details', (done) => {
         request(app)
-          .get(`/users/${user2.id}/paypal/preapproval/${preapprovalkey}`)
+          .get(`/users/${user2.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(403)
           .end(done);
@@ -303,7 +303,7 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('PaymentMethods clean up', () => {
       it('should delete all other paymentMethods entries in the database to clean up', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(e => {
