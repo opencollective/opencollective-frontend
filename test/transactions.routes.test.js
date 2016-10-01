@@ -54,6 +54,7 @@ describe('transactions.routes.test.js', () => {
       request(app)
         .post(`/groups/${publicGroup.id}/transactions`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[0]
         })
         .expect(401)
@@ -79,6 +80,7 @@ describe('transactions.routes.test.js', () => {
         .post(`/groups/${publicGroup.id}/transactions`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[0]
         })
         .expect(403)
@@ -90,6 +92,7 @@ describe('transactions.routes.test.js', () => {
         .post(`/groups/${publicGroup.id}/transactions`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[0]
         })
         .expect(200)
@@ -104,306 +107,16 @@ describe('transactions.routes.test.js', () => {
 
     // TODO: this shouldn't be allowed. 
     // Should only be able to create an expense or a donation (that need to be approved)
-    it('successfully creates a transaction without a user', (done) => {
+    // xdamman: fixed -- but need to test on staging to be sure
+    it('cannot create a transaction without a user', () => 
       request(app)
         .post(`/groups/${publicGroup.id}/transactions`)
         .send({
           api_key: application.api_key,
           transaction: transactionsData[7]
         })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body.UserId > 0).to.be.true;
-          expect(res.body).to.have.property('GroupId', publicGroup.id);
-          done();
-        });
-    });
-
-    it('successfully creates a transaction with a logged out user', (done) => {
-      const transaction = _.merge({}, transactionsData[7]);
-      transaction.email = user.email;
-      transaction.paypalEmail = null;
-
-      request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
-        .send({
-          api_key: application.api_key,
-          transaction
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body.UserId).to.equal(user.id);
-          expect(res.body).to.have.property('GroupId', publicGroup.id);
-          done();
-        });
-    });
-
-    it('successfully creates a transaction with a logged out user with its paypalEmail', (done) => {
-      const transaction = _.merge({}, transactionsData[7]);
-      transaction.email = null;
-      transaction.paypalEmail = user.paypalEmail;
-
-      request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
-        .send({
-          api_key: application.api_key,
-          transaction
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body.UserId).to.equal(user.id);
-          expect(res.body).to.have.property('GroupId', publicGroup.id);
-          done();
-        });
-    });
-  });
-
-  /**
-   * Update
-   */
-  describe('#update', () => {
-    let toUpdate;
-
-    beforeEach('create a transaction', (done) => {
-      request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          api_key: application.api_key,
-          transaction: transactionsData[0]
-        })
-        .expect(200)
-        .end((err, res) => {
-          expect(err).to.not.exist;
-          toUpdate = res.body;
-          done();
-        });
-    });
-
-    it('fails updating a non-existing transaction', (done) => {
-      request(app)
-        .put(`/groups/${publicGroup.id}/transactions/987123`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(404)
-        .end(done);
-    });
-
-    it('fails updating a transaction which does not belong to the group', (done) => {
-      request(app)
-        .put(`/groups/${group2.id}/transactions/${toUpdate.id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails updating a transaction if user has no access to the group', (done) => {
-      request(app)
-        .put(`/groups/${publicGroup.id}/transactions/${toUpdate.id}`)
-        .set('Authorization', `Bearer ${user2.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails updating a transaction if transaction is not included', (done) => {
-      request(app)
-        .put(`/groups/${publicGroup.id}/transactions/${toUpdate.id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({})
-        .expect(400, {
-          error: {
-            code: 400,
-            type: 'missing_required',
-            message: 'Missing required fields',
-            fields: { transaction: 'Required field transaction missing' }
-          }
-        })
-        .end(done);
-    });
-  });
-
-  /**
-   * Delete.
-   */
-  describe('#delete', () => {
-
-    const transactions = [];
-
-    // Create transactions.
-    beforeEach('create a transaction', (done) => {
-      async.each(transactionsData, (transaction, cb) => {
-        request(app)
-          .post(`/groups/${publicGroup.id}/transactions`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            transaction
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            transactions.push(res.body);
-            cb();
-          });
-      }, done);
-    });
-
-    it('fails deleting a non-existing transaction', (done) => {
-      request(app)
-        .delete(`/groups/${publicGroup.id}/transactions/987123`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(404)
-        .end(done);
-    });
-
-    it('fails deleting a transaction which does not belong to the group', (done) => {
-      request(app)
-        .delete(`/groups/${group2.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails deleting a transaction if user has no access to the group', (done) => {
-      request(app)
-        .delete(`/groups/${publicGroup.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user2.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails deleting a transaction if user is not a host', (done) => {
-      request(app)
-        .delete(`/groups/${group2.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user3.jwt()}`)
-        .expect(403, {
-          error: {
-            code: 403,
-            type: 'forbidden',
-            message: "User doesn't have access to this group"
-          }
-        })
-        .end(done);
-    });
-
-    it('successfully delete a transaction', (done) => {
-      request(app)
-        .delete(`/groups/${publicGroup.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('success', true);
-
-          async.parallel([
-            (cb) => {
-              models.Transaction.findById(transactions[0].id).then((t) => {
-                expect(t).to.not.exist;
-                cb();
-              });
-            },
-            (cb) => {
-              models.Activity.findAndCountAll({where: {type: 'group.transaction.deleted'} }).then((res) => {
-                expect(res.count).to.equal(1);
-                cb();
-              });
-            }
-
-          ], done);
-
-        });
-    });
-
-  });
-
-  /**
-   * Get one.
-   */
-  describe('#getOne', () => {
-
-    const transactions = [];
-
-    beforeEach('create a transaction', (done) => {
-      async.each(transactionsData, (transaction, cb) => {
-        request(app)
-          .post(`/groups/${publicGroup.id}/transactions`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            transaction
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            transactions.push(res.body);
-            cb();
-          });
-      }, done);
-    });
-
-    beforeEach('create a transaction for group2', (done) => {
-      async.each(transactionsData, (transaction, cb) => {
-        request(app)
-          .post(`/groups/${group2.id}/transactions`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            transaction
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            transactions.push(res.body);
-            cb();
-          });
-      }, done);
-    });
-
-    it('fails getting a non-existing transaction', (done) => {
-      request(app)
-        .get(`/groups/${publicGroup.id}/transactions/987123`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(404)
-        .end(done);
-    });
-
-    it('fails getting a transaction which does not belong to the group', (done) => {
-      request(app)
-        .get(`/groups/${group2.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails getting a transaction if user has no access to the group', (done) => {
-      request(app)
-        .get(`/groups/${publicGroup.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user2.jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('successfully get a transaction', (done) => {
-      request(app)
-        .get(`/groups/${publicGroup.id}/transactions/${transactions[0].id}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', transactions[0].id);
-          done();
-        });
-    });
-
-    it('successfully get a transaction if the group is public', (done) => {
-      request(app)
-        .get(`/groups/${publicGroup.id}/transactions/${transactions[0].id}`)
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', transactions[0].id);
-          done();
-        });
-    });
+        .expect(401)    
+    );
 
   });
 
@@ -415,7 +128,7 @@ describe('transactions.routes.test.js', () => {
     beforeEach('create a transaction for publicGroup', (done) => {
       async.each(transactionsData, (transaction, cb) => {
         request(app)
-          .post(`/groups/${publicGroup.id}/transactions`)
+          .post(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             transaction
@@ -431,7 +144,7 @@ describe('transactions.routes.test.js', () => {
     beforeEach('create a transaction for group2', (done) => {
       async.each(transactionsData, (transaction, cb) => {
         request(app)
-          .post(`/groups/${group2.id}/transactions`)
+          .post(`/groups/${group2.id}/transactions?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             transaction
@@ -446,7 +159,7 @@ describe('transactions.routes.test.js', () => {
 
     it('successfully get a group\'s transactions', (done) => {
       request(app)
-        .get(`/groups/${publicGroup.id}/transactions`)
+        .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -469,7 +182,7 @@ describe('transactions.routes.test.js', () => {
 
       it('successfully get a group\'s transactions with per_page', (done) => {
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions`)
+          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
           .send({
             per_page: perPage,
             sort: 'id',
@@ -501,7 +214,7 @@ describe('transactions.routes.test.js', () => {
       it('successfully get the second page of a group\'s transactions', (done) => {
         const page = 2;
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions`)
+          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
           .send({
             per_page: perPage,
             page,
@@ -527,7 +240,7 @@ describe('transactions.routes.test.js', () => {
         const sinceId = 5;
 
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions`)
+          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
           .send({
             since_id: sinceId,
             sort: 'id',
@@ -558,7 +271,7 @@ describe('transactions.routes.test.js', () => {
 
       it('successfully get a group\'s transactions with sorting', (done) => {
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions`)
+          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
           .send({
             sort: 'createdAt',
             direction: 'asc'

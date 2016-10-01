@@ -63,6 +63,7 @@ export function mustHaveRole(possibleRoles) {
   return (req, res, next) => {
     required_valid('remoteUser', 'groupid')(req, res, (e) => {
       if (e) return next(e);
+      if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does'
       models.UserGroup.findOne({ where: {
         UserId: req.remoteUser.id,
         GroupId: req.params.groupid,

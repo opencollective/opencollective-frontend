@@ -144,11 +144,6 @@ export const updateTransaction = (req, res, next) => {
 };
 
 /**
- * Get a group's transaction.
- */
-export const getTransaction = (req, res) => res.json(req.transaction.info);
-
-/**
  * Get group's transactions.
  */
 export const getTransactions = (req, res, next) => {

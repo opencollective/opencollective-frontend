@@ -21,7 +21,7 @@ function _required_options(options, properties) {
 
   return function (req, res, next) {
     const missing = {};
-    req.required = {};
+    req.required = req.required || {};
 
     properties.forEach((prop) => {
       let value;
@@ -39,7 +39,6 @@ function _required_options(options, properties) {
         } catch (e) {
           // ignore error: leave value as it is
         }
-
         req.required[prop] = value;
       }
     });
