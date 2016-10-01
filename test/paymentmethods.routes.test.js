@@ -5,12 +5,12 @@ import request from 'supertest';
 import * as utils from '../test/utils';
 import models from '../server/models';
 
+const application = utils.data('application');
 const paypalPaymentMethod = utils.data('paymentMethod1');
 const stripePaymentMethod = utils.data('paymentMethod2');
 
 describe('paymentMethods.routes.test.js', () => {
 
-  let application;
   let user;
   let user2;
   let paymentMethod1;
@@ -40,7 +40,7 @@ describe('paymentMethods.routes.test.js', () => {
 
     it('fails getting another user\'s paymentMethods', (done) => {
       request(app)
-        .get(`/users/${user.id}/payment-methods`)
+        .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(e => {
@@ -50,8 +50,9 @@ describe('paymentMethods.routes.test.js', () => {
     });
 
     it('successfully get a user\'s paymentMethod', (done) => {
+      console.log("Call ", `/users/${user.id}/payment-methods?api_key=${application.api_key}`);
       request(app)
-        .get(`/users/${user.id}/payment-methods`)
+        .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -68,7 +69,7 @@ describe('paymentMethods.routes.test.js', () => {
 
     it('successfully get a user\'s paymentMethod and filters by service', (done) => {
       request(app)
-        .get(`/users/${user.id}/payment-methods`)
+        .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .query({
           filter: {
             service: 'paypal'

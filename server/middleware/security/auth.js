@@ -51,7 +51,7 @@ export function authorizeApiKey(req, res, next) {
 export function mustBeLoggedInAsUser(req, res, next) {
   required_valid('remoteUser', 'userid')(req, res, (e) => {
     if (e) return next(e);
-    if (req.remoteUser !== req.userid) return next(new Forbidden(`The authenticated user (${req.remoteUser.username} cannot edit this user id (${req.userid})`));
+    if (req.remoteUser.id !== parseInt(req.params.userid, 10)) return next(new Forbidden(`The authenticated user (${req.remoteUser.username}) cannot edit this user id (${req.params.userid})`));
     return next();
   });
 };
