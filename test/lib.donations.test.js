@@ -15,6 +15,7 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 
 const chance = chanceLib.Chance();
+const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
 import stripeMock from './mocks/stripe';
@@ -30,7 +31,6 @@ describe('lib.donation.test.js', () => {
 
   const sandbox = sinon.sandbox.create();
   let processDonationSpy, emailSendMessageSpy, emailSendSpy;
-  let application;
 
   before(() => {
     processDonationSpy = sinon.spy(donationsLib, 'processDonation');

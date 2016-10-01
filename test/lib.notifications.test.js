@@ -10,6 +10,7 @@ import * as utils from '../test/utils';
 import models from '../server/models';
 import constants from '../server/constants/activities';
 
+const application = utils.data('application');
 const userData = utils.data('user6');
 const groupData = utils.data('group1');
 const notificationData = {
@@ -29,7 +30,6 @@ describe('lib.notifications.test.js', () => {
   let user;
   let group;
   let nm;
-  let application;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -113,6 +113,7 @@ describe('lib.notifications.test.js', () => {
         .post(`/groups/${group.id}/transactions`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[0]
         })
         .expect(200))
