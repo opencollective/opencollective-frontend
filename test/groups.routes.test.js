@@ -13,6 +13,8 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 
 const chance = chanceLib.Chance();
+
+const application = utils.data('application');
 const userData = utils.data('user1');
 const userData2 = utils.data('user2');
 const userData3 = utils.data('user3');
@@ -21,12 +23,11 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('groups.routes.test.js', () => {
 
-  let application;
   let user;
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
 
   // Stripe stub.
   beforeEach(() => {
@@ -48,7 +49,7 @@ describe('groups.routes.test.js', () => {
         .send({
           group: publicGroupData
         })
-        .expect(401)
+        .expect(400)
     );
 
     it('fails creating a group without name', (done) => {
@@ -163,7 +164,7 @@ describe('groups.routes.test.js', () => {
         .send({
           payload: publicGroupData
         })
-        .expect(401)
+        .expect(400)
     );
 
     it('fails creating a group without payload', () =>
@@ -314,6 +315,7 @@ describe('groups.routes.test.js', () => {
         .post(`/groups/${publicGroup.id}/transactions`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[8]
         })
         .expect(200)
@@ -321,7 +323,7 @@ describe('groups.routes.test.js', () => {
 
     it('fails getting an undefined group', () =>
       request(app)
-        .get('/groups/undefined')
+        .get(`/groups/undefined?api_key=${application.api_key}`)
         .expect(404)
     );
 
@@ -385,6 +387,7 @@ describe('groups.routes.test.js', () => {
             .post(`/groups/${publicGroup.id}/transactions`)
             .set('Authorization', `Bearer ${user.jwt()}`)
             .send({
+              api_key: application.api_key,
               transaction: _.extend({}, transaction, { approved: true })
             })
             .expect(200)
@@ -443,12 +446,6 @@ describe('groups.routes.test.js', () => {
     });
 
     describe('Leaderboard', () => {
-
-      it('fails if the app is not authorized', () =>
-        request(app)
-          .get('/leaderboard')
-          .expect(401)
-      );
 
       it('returns the leaderboard', () =>
         request(app)
@@ -579,6 +576,7 @@ describe('groups.routes.test.js', () => {
       request(app)
         .put(`/groups/${group.id}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(401)
@@ -590,6 +588,7 @@ describe('groups.routes.test.js', () => {
         .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(403)
@@ -601,6 +600,7 @@ describe('groups.routes.test.js', () => {
         .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user3.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(403)
@@ -609,7 +609,7 @@ describe('groups.routes.test.js', () => {
 
     it('fails updating a group if no data passed', (done) => {
       request(app)
-        .put(`/groups/${group.id}`)
+        .put(`/groups/${group.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(400)
         .end(done);
@@ -620,6 +620,7 @@ describe('groups.routes.test.js', () => {
         .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user4.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(200)
@@ -631,6 +632,7 @@ describe('groups.routes.test.js', () => {
         .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(200)
