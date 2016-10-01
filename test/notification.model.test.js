@@ -6,6 +6,7 @@ import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 
+const application = utils.data('application');
 const userData = utils.data('user1');
 const user2Data = utils.data('user2');
 const groupData = utils.data('group1');
@@ -21,7 +22,6 @@ const {
 
 describe("notification.model.test.js", () => {
 
-  let application;
   let user;
   let user2;
   let group;
@@ -50,7 +50,7 @@ describe("notification.model.test.js", () => {
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
-      .send()
+      .send({ api_key: application.api_key })
       .expect(200)
       .then(res => {
         expect(res.body.active).to.be.true;
@@ -69,7 +69,7 @@ describe("notification.model.test.js", () => {
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/unsubscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
-      .send()
+      .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
         Notification.findAndCountAll({where: {
@@ -83,7 +83,7 @@ describe("notification.model.test.js", () => {
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
-      .send()
+      .send({ api_key: application.api_key })
       .expect(400)
       .then(res => {
         expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
@@ -101,7 +101,7 @@ describe("notification.model.test.js", () => {
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/unsubscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
-      .send()
+      .send({ api_key: application.api_key })
       .expect(400)
       .then(res => {
         expect(res.body.error.message).to.equal('You were not subscribed to this type of activity');
@@ -119,7 +119,7 @@ describe("notification.model.test.js", () => {
     request(app)
       .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
-      .send()
+      .send({ api_key: application.api_key })
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {
           UserId: user.id,
