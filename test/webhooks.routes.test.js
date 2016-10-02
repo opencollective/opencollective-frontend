@@ -19,7 +19,7 @@ const chance = chanceLib.Chance();
 /**
  * Mock data
  */
-
+const application = utils.data('application');
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
 let stripeEmail;
@@ -49,7 +49,6 @@ describe('webhooks.routes.test.js', () => {
   let user;
   let paymentMethod;
   let group;
-  let application;
   let donation;
   const sandbox = sinon.sandbox.create();
 
