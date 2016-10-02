@@ -1,19 +1,21 @@
-import _ from 'lodash';
 import config from 'config';
 
 import models from '../../models';
 import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
-import * as authentication from './authentication';
-import { HOST, MEMBER, BACKER } from '../../constants/roles';
+import roles from '../../constants/roles';
 
 const {
-  BadRequest,
   NotFound,
   Forbidden, // I know who you are, but you permanently don't have access to this resource
   Unauthorized // You are not authorized, try to authenticate again
 } = errors;
 
+const {
+  HOST,
+  MEMBER,
+  BACKER
+} = roles;
 
 /**
  * Authorize api_key
@@ -54,7 +56,7 @@ export function mustBeLoggedInAsUser(req, res, next) {
     if (req.remoteUser.id !== parseInt(req.params.userid, 10)) return next(new Forbidden(`The authenticated user (${req.remoteUser.username}) cannot edit this user id (${req.params.userid})`));
     return next();
   });
-};
+}
 
 export function mustHaveRole(possibleRoles) {
   if (typeof possibleRoles === 'string')
@@ -76,15 +78,15 @@ export function mustHaveRole(possibleRoles) {
       .catch(next);
     })
   };
-};
+}
 
 export function canEditGroup(req, res, next) {
   return mustHaveRole([HOST, MEMBER])(req, res, next);
-};
+}
 
 export function mustBePartOfTheGroup(req, res, next) {
   return mustHaveRole([HOST, MEMBER, BACKER])(req, res, next);
-};  
+}
 
 /**
  * Only the author of the expense or the host or an admin of the group can edit an expense

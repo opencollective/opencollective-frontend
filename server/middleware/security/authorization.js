@@ -1,7 +1,5 @@
 import errors from '../../lib/errors';
 import * as aN from './authentication';
-import required from '../required_param';
-import config from 'config';
 
 const {
   Forbidden,

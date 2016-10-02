@@ -32,9 +32,6 @@ export const resetTestDatabase = function(req, res, next) {
   );
 
   const models = setupModels(sequelize);
-
-  const apiKey = '0ac43519edcf4421d80342403fb5985d';
-
   const testUser = {
     email: 'testuser@opencollective.com',
     password: 'password'
