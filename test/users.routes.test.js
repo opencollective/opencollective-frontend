@@ -320,19 +320,38 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-    it('should update first name and last name if logged in', (done) => {
+    it('should update first name, last name and description if logged in', (done) => {
       request(app)
         .put(`/users/${user.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           user: {
             firstName: "Xavier",
-            lastName: "Damman"
+            lastName: "Damman",
+            description: "new description"
           }
         })
         .end((err, res) => {
           const { body } = res;
           expect(body.firstName).to.equal("Xavier");
+          expect(body.description).to.equal("new description");
+          done();
+        });
+    });
+
+    it('should update name and automatially split it into firstName and lastName', (done) => {
+      request(app)
+        .put(`/users/${user.id}`)
+        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .send({
+          user: {
+            name: "Xavier Damman"
+          }
+        })
+        .end((err, res) => {
+          const { body } = res;
+          expect(body.firstName).to.equal("Xavier");
+          expect(body.lastName).to.equal("Damman");
           done();
         });
     });
