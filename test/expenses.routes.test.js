@@ -182,10 +182,22 @@ describe('expenses.routes.test.js', () => {
             expectExpenseActivity('group.expense.created', actualExpense.id));
 
           describe('#getOne', () => {
-            it('THEN returns 200', () => request(app)
+            it('THEN returns the expense without the attachment if not logged in', () => request(app)
               .get(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
               .expect(200)
-              .then(res => expect(res.body).to.have.property('id', actualExpense.id)));
+              .then(res => {
+                const expenseData = res.body;
+                expect(expenseData).to.have.property('id', actualExpense.id)
+                expect(expenseData).to.not.have.property('attachment');
+              }));
+            it('THEN returns the expense with the attachment if logged in', () => request(app)
+              .get(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+              .set('Authorization', `Bearer ${member.jwt()}`)
+              .expect(200)
+              .then(res => {
+                const expenseData = res.body;
+                expect(expenseData).to.have.property('attachment');
+              }));
           });
 
           describe('#list', () => {
@@ -282,13 +294,13 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN expense does not belong to group', () => {
               let otherExpense;
 
-              beforeEach(() => createExpense().tap(e => otherExpense = e));
+              beforeEach('create another expense', () => createExpense().tap(e => otherExpense = e));
 
-              it('THEN returns 403', () => {
+              it('THEN returns 404', () => {
                 return request(app)
                 .delete(`/groups/${group.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .expect(403);
+                .expect(404);
               });
             });
 
@@ -344,10 +356,10 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
-              it('THEN returns 403', () => request(app)
+              it('THEN returns 404', () => request(app)
                 .put(`/groups/${group.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .expect(403));
+                .expect(404));
             });
 
             describe('WHEN not providing expense', () => {

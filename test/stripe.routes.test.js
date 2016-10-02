@@ -64,7 +64,7 @@ describe('stripe.routes.test.js', () => {
         .end(done);
     });
 
-    it('should fail is the group does not have an host', (done) => {
+    it('should fail if the group does not have an host', (done) => {
       request(app)
         .get(`/stripe/authorize?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)

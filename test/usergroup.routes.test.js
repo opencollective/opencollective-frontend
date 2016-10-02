@@ -215,24 +215,17 @@ describe('usergroup.routes.test.js', () => {
    */
   describe('#getUserGroups', () => {
 
-    beforeEach((done) => {
+    beforeEach('add users[0] to group', () =>
       request(app)
         .post(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
-        .expect(200)
-        .end(done);
-    });
+        .expect(200));
 
-    it('fails getting another user\'s groups', (done) => {
+    it('successfully get another user\'s groups', () =>
       request(app)
         .get(`/users/${users[0].id}/groups?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`)
-        .expect(403)
-        .end(e => {
-          expect(e).to.not.exist;
-          done();
-        });
-    });
+        .expect(200));
 
     it('successfully get a user\'s groups', (done) => {
       request(app)

@@ -4,6 +4,7 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
 import roles from '../../constants/roles';
+import {authenticateUser} from './authentication';
 
 const {
   NotFound,
@@ -48,7 +49,19 @@ export function authorizeApiKey(req, res, next) {
 }
 
 /**
- * Makes sure that the authenticated user is the user that we are trying to access
+ * Makes sure that the user the is logged in and req.remoteUser is populated.
+ * if we cannot authenticate the user, we directly return an Unauthorized error. 
+ */
+export function mustBeLoggedIn(req, res, next) {
+  authenticateUser(req, res, (e) => {
+    if (e) return next(e);
+    if (!req.remoteUser) return next(new Unauthorized("User is not authenticated"));
+    else return next();
+  });
+}
+
+/**
+ * Makes sure that the authenticated user is the user that we are trying to access (as defined by req.params.userid)
  */
 export function mustBeLoggedInAsUser(req, res, next) {
   required_valid('remoteUser', 'userid')(req, res, (e) => {
@@ -63,17 +76,20 @@ export function mustHaveRole(possibleRoles) {
     possibleRoles = [possibleRoles];
 
   return (req, res, next) => {
-    required_valid('remoteUser', 'groupid')(req, res, (e) => {
+    required_valid('remoteUser', 'group')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does'
-      models.UserGroup.findOne({ where: {
-        UserId: req.remoteUser.id,
-        GroupId: req.params.groupid,
-        role: { $in: possibleRoles }
-      }})
+      const query = {
+        where: {
+          UserId: req.remoteUser.id,
+          GroupId: req.group.id,
+          role: { $in: possibleRoles }
+        }
+      };
+      models.UserGroup.findOne(query)
       .then(ug => {
         if (!ug) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this group`));
-        return next();
+        else return next(null, true);
       })
       .catch(next);
     })
@@ -100,11 +116,11 @@ export function canEditExpense(req, res, next) {
       }})
       .then(expense => {
         if (!expense) return NotFound();        
-        if (expense.UserId === req.remoteUser.id) return next();
+        if (expense.UserId === req.remoteUser.id) return next(null, true);
         req.params.groupid = expense.GroupId;
         canEditGroup(req, res, (err) => {
           if (err) return next(new Forbidden('Logged in user must be the author of the expense or the host or an admin of this group'));
-          return next();
+          return next(null, true);
         });
       })
       .catch(next);

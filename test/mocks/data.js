@@ -519,7 +519,8 @@ export default {
     "currency": "USD",
     "paypalEmail": "uSerpaypal@gmail.com",
     "incurredAt": "2016-03-06 UTC+0300",
-    "payoutMethod": "paypal"
+    "payoutMethod": "paypal",
+    "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
   },
   "expense2": {
     "title": "tshirts",

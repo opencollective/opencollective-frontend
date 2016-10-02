@@ -145,40 +145,37 @@ export const _authenticateUserByJwt = (req, res, next) => {
  * @POST: req.remoteUser is set to the logged in user or null if authentication failed
  * @ERROR: Will return an error if a JWT token is provided and invalid
  */
-export function authenticateUser() {
-  return (req, res, next) => {
+export function authenticateUser(req, res, next) {
+  if (req.remoteUser && req.remoteUser.id) return next();
 
-    if (req.remoteUser && req.remoteUser.id) return next();
+  parseJwtNoExpiryCheck(req, res, (e) => {
+    // If a token was submitted but is invalid, we return an error
+    if (e) return next(e);
 
-    this.parseJwtNoExpiryCheck(req, res, (e) => {
-      // If a token was submitted but is invalid, we return an error
+    checkJwtExpiry(req, res, (e) => {
+      // If a token was submitted and is expired, we return an error
       if (e) return next(e);
-
-      this.checkJwtExpiry(req, res, (e) => {
-        // If a token was submitted and is expired, we return an error
-        if (e) return next(e);
-        this._authenticateUserByJwt(req, res, next);
-      });
-
+      _authenticateUserByJwt(req, res, next);
     });
-  }
+
+  });
 }
 
 export function authenticateInternalUserByJwt() {
   return (req, res, next) => {
-    this.parseJwtNoExpiryCheck(req, res, (e) => {
+    parseJwtNoExpiryCheck(req, res, (e) => {
       if (e) {
         return next(e);
       }
-      this.checkJwtExpiry(req, res, (e) => {
+      checkJwtExpiry(req, res, (e) => {
         if (e) {
           return next(e);
         }
-        this._authenticateUserByJwt(req, res, (e) => {
+        _authenticateUserByJwt(req, res, (e) => {
           if (e) {
             return next(e);
           }
-          this._authenticateInternalUserById(req, res, next);
+          _authenticateInternalUserById(req, res, next);
         });
       });
     });

@@ -161,28 +161,6 @@ export const authenticate = (req, res, next) => {
 };
 
 /**
- * Fetch user roles for the group
- */
-export const fetchRoles = (req, res, next) => {
-  if (!req.remoteUser) return next();
-
-  req.remoteUser.getRoles()
-    .then(roles => {
-      const rolesByGroupId = {};
-      roles.map(r => {
-        rolesByGroupId[r.GroupId] = rolesByGroupId[r.GroupId] || [];
-        rolesByGroupId[r.GroupId].push(r.role);
-      });
-      return rolesByGroupId;
-    })
-    .then(rolesByGroupId => {
-      req.remoteUser.rolesByGroupId = rolesByGroupId; 
-    })
-    .then(() => next())
-    .catch(next);
-};
-
-/**
  * Paginate.
  */
 export const paginate = (options) => {

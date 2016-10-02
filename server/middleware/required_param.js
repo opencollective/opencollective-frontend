@@ -31,7 +31,6 @@ function _required_options(options, properties) {
       });
 
       if ((!value || value === 'null') && value !== false) {
-        if (prop === 'remoteUser') return next(new errors.Unauthorized("User is not authenticated"));
         missing[prop] = `Required field ${prop} missing`;
       } else {
         try { // Try to parse if JSON
@@ -43,8 +42,12 @@ function _required_options(options, properties) {
       }
     });
 
-    if (Object.keys(missing).length) {
-      return next(new errors.ValidationFailed('missing_required', missing));
+    const missingProps = Object.keys(missing);
+    if (missingProps.length) {
+      if (missingProps.indexOf('remoteUser') !== -1)
+        return next(new errors.Unauthorized("User is not authenticated"))
+      else
+        return next(new errors.ValidationFailed('missing_required', missing));
     }
 
     next();

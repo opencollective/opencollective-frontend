@@ -13,6 +13,7 @@ import fetchGithubUser from '../lib/github';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
+import * as auth from '../middleware/security/auth';
 
 const {
   Activity,
@@ -45,7 +46,6 @@ const subscribeUserToMailingList = (user, group, role) => {
     GroupId: group.id,
     type: `mailinglist.${lists[role]}`
   });
-
 };
 
 const _addUserToGroup = (group, user, options) => {
@@ -86,25 +86,25 @@ const getUserData = (groupId, tiers) => {
 };
 
 export const getUsers = (req, res, next) => {
-  let promise = getUserData(req.group.id, req.group.tiers);
+  auth.canEditGroup(req, res, (e, canEditGroup) => {
+    let promise = getUserData(req.group.id, req.group.tiers);
 
-  if (req.query.filter && req.query.filter === 'active') {
-    const now = moment();
-    promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
-  }
+    if (req.query.filter && req.query.filter === 'active') {
+      const now = moment();
+      promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
+    }
 
-  const isHostOrMember = !!(req.remoteUser && req.remoteUser.rolesByGroupId && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
-
-  return promise
-  .then(backers => {
-    if (isHostOrMember) return backers;
-    else return backers.map(b => {
-      delete b.email;
-      return b;
-    });
-  })
-  .then(backers => res.send(backers))
-  .catch(next)
+    return promise
+    .then(backers => {
+      if (canEditGroup) return backers;
+      else return backers.map(b => {
+        delete b.email;
+        return b;
+      });
+    })
+    .then(backers => res.send(backers))
+    .catch(next)
+  });
 };
 
 export const getUsersWithEmail = (req, res, next) => {

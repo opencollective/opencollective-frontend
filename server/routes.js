@@ -26,7 +26,6 @@ import roles from './constants/roles';
 import required from './middleware/required_param';
 import ifParam from './middleware/if_param';
 import * as aN from './middleware/security/authentication';
-import * as aZ from './middleware/security/authorization';
 import * as auth from './middleware/security/auth';
 import errorHandler from './middleware/error_handler';
 import cache from './middleware/cache';
@@ -54,7 +53,7 @@ export default (app) => {
    * (an error will be returned if the JWT token is invalid, if not present it will simply continue)
    */
   app.use('*', auth.authorizeApiKey);
-  app.use('*', aN.authenticateUser()); // populate req.remoteUser if JWT token provided in the request
+  app.use('*', aN.authenticateUser); // populate req.remoteUser if JWT token provided in the request
 
   /**
    * For testing the email templates
@@ -97,7 +96,7 @@ export default (app) => {
    * Users.
    */
   app.post('/users', required('user'), users.create); // Create a user.
-  app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
+  app.get('/users/:userid', users.show); // Get a user.
   app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent donation)
   app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
@@ -140,16 +139,16 @@ export default (app) => {
   app.post('/groups', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
   app.post('/groups', required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/groups/tags', groups.getGroupTags); // List all unique tags on all groups
-  app.get('/groups/:groupid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), groups.getOne);
-  app.get('/groups/:groupid/users', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), cache(60), groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users.csv', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), cache(60), mw.fetchRoles, mw.format('csv'), groups.getUsers);
+  app.get('/groups/:groupid', groups.getOne);
+  app.get('/groups/:groupid/users', cache(60), groups.getUsers); // Get group users
+  app.get('/groups/:groupid/users.csv', cache(60), mw.format('csv'), groups.getUsers);
   app.put('/groups/:groupid', auth.canEditGroup, required('group'), groups.update); // Update a group.
   app.put('/groups/:groupid/settings', auth.canEditGroup, required('group'), groups.updateSettings); // Update group settings
   app.delete('/groups/:groupid', NotImplemented); // Delete a group.
 
   // TODO: Remove #postmigration after frontend migrates to POST /groups/:groupid/donations/*
-  app.post('/groups/:groupid/payments', aN.authenticateUser(), required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', aN.authenticateUser(), required('payment'), donations.paypal); // Make a payment/donation.
+  app.post('/groups/:groupid/payments', required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
+  app.post('/groups/:groupid/payments/paypal', required('payment'), donations.paypal); // Make a payment/donation.
 
   app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
@@ -158,7 +157,7 @@ export default (app) => {
    *
    *  Relations between a group and a user.
    */
-  app.get('/users/:userid/groups', aZ.authorizeUserToAccessUser(), users.getGroups); // Get user's groups.
+  app.get('/users/:userid/groups', users.getGroups); // Get user's groups.
   app.post('/groups/:groupid/users/:userid', auth.canEditGroup, groups.addUser); // Add a user to a group.
   app.put('/groups/:groupid/users/:userid', auth.canEditGroup, groups.updateUser); // Update a user's role in a group.
   app.delete('/groups/:groupid/users/:userid', auth.canEditGroup, groups.deleteUser); // Remove a user from a group.
@@ -175,9 +174,9 @@ export default (app) => {
   /**
    * Expenses
    */
-  app.get('/groups/:groupid/expenses', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/groups/:groupid/expenses/:expenseid', aZ.authorizeAccessToGroup({allowNonAuthenticatedAccess: true}), aZ.authorizeGroupAccessTo('expense', {allowNonAuthenticatedAccess: true}), expenses.getOne); // Get an expense.
-  app.post('/groups/:groupid/expenses', aN.authenticateUser(), required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
+  app.get('/groups/:groupid/expenses', mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+  app.get('/groups/:groupid/expenses/:expenseid', expenses.getOne); // Get an expense.
+  app.post('/groups/:groupid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
   app.put('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
   app.delete('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', auth.canEditGroup, required('approved'), expenses.setApprovalStatus); // Approve an expense.
@@ -186,8 +185,8 @@ export default (app) => {
   /**
    * Donations
    */
-  app.post('/groups/:groupid/donations', aN.authenticateUser(), required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
-  app.post('/groups/:groupid/donations/paypal', aN.authenticateUser(), required('payment'), donations.paypal); // Make a paypal donation.
+  app.post('/groups/:groupid/donations', required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
+  app.post('/groups/:groupid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
@@ -204,7 +203,7 @@ export default (app) => {
    *  A user can subscribe by email to any type of activity of a Group.
    */
   app.post('/groups/:groupid/activities/:activityType/subscribe', auth.mustBePartOfTheGroup, notifications.subscribe); // Subscribe to a group's activities
-  app.post('/groups/:groupid/activities/:activityType/unsubscribe', aN.authenticateUser(), notifications.unsubscribe); // Unsubscribe to a group's activities
+  app.post('/groups/:groupid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a group's activities
 
   /**
    * Separate route for uploading images to S3
@@ -222,13 +221,13 @@ export default (app) => {
    * Stripe oAuth
    */
 
-  app.get('/stripe/authorize', aZ.authorizeUser(), stripe.authorize);
+  app.get('/stripe/authorize', auth.mustBeLoggedIn, stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
 
   /**
    * Generic OAuth (ConnectedAccounts)
    */
-  app.get('/:slug/connected-accounts', aN.authenticateUser(), connectedAccounts.list);
+  app.get('/:slug/connected-accounts', connectedAccounts.list);
   app.get('/connected-accounts/:service(github|twitter|meetup)', aN.authenticateService);
   app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.get);
@@ -243,7 +242,7 @@ export default (app) => {
   /**
    * Github API - fetch all repositories using the user's access_token
    */
-  app.get('/github-repositories', aN.authenticateUser(), connectedAccounts.fetchAllRepositories);
+  app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
 
   /**
    * Reset test-api database
@@ -253,8 +252,8 @@ export default (app) => {
   /**
    * Stripe subscriptions (recurring payments)
    */
-  app.get('/subscriptions', aZ.authorizeUser(), subscriptions.getAll);
-  app.post('/subscriptions/:subscriptionid/cancel', aZ.authorizeUser(), subscriptions.cancel);
+  app.get('/subscriptions', auth.mustBeLoggedIn, subscriptions.getAll);
+  app.post('/subscriptions/:subscriptionid/cancel', auth.mustBeLoggedIn, subscriptions.cancel);
 
   /**
    * Leaderboard

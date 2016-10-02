@@ -10,6 +10,7 @@ import {getPreapprovalDetails as gpd} from './paypal';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
 import models from '../models';
+import * as auth from '../middleware/security/auth';
 
 const getPreapprovalDetails = Promise.promisify(gpd);
 
@@ -35,7 +36,17 @@ export const create = (req, res, next) => {
 /**
  * Get an expense.
  */
-export const getOne = (req, res) => res.json(req.expense.info);
+export const getOne = (req, res) => {
+  auth.canEditExpense(req, res, (e, canEditExpense) => {
+    if (canEditExpense) {
+      res.json(req.expense.info);
+    } else {
+      // If the user is not logged in or if the logged in user cannot edit this expense (is not host, member or author)
+      // then we don't return the attachment (which may contain private data)
+      res.json(_.omit(req.expense.info, 'attachment'))
+    }
+  });
+}
 
 /**
  * Get expenses.
