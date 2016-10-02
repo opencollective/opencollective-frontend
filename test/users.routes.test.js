@@ -341,7 +341,7 @@ describe('users.routes.test.js', () => {
 
     it('should update name and automatially split it into firstName and lastName', (done) => {
       request(app)
-        .put(`/users/${user.id}`)
+        .put(`/users/${user.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt(application)}`)
         .send({
           user: {
