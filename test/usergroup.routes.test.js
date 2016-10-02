@@ -10,6 +10,7 @@ import models from '../server/models';
 /**
  * Variables.
  */
+const application = utils.data('application');
 let users, group;
 
 /**
@@ -43,7 +44,6 @@ const createDonationsAndTransaction = () => {
 };
 
 describe('usergroup.routes.test.js', () => {
-  let application;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -70,7 +70,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails adding a non-existing user to a group', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/98765`)
+        .post(`/groups/${group.id}/users/98765?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -78,7 +78,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails adding a user to a non-existing group', (done) => {
       request(app)
-        .post(`/groups/98765/users/${users[1].id}`)
+        .post(`/groups/98765/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -88,6 +88,7 @@ describe('usergroup.routes.test.js', () => {
       request(app)
         .post(`/groups/${group.id}/users/${users[1].id}`)
         .send({
+          api_key: application.api_key,
           role: 'nonexistingrole'
         })
         .set('Authorization', `Bearer ${users[0].jwt()}`)
@@ -97,11 +98,12 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails adding a user to a group if not a member of the group', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}`)
+        .post(`/groups/${group.id}/users/${users[2].id}`)
         .send({
-          role: 'nonexistingrole'
+          api_key: application.api_key,
+          role: 'MEMBER'
         })
-        .set('Authorization', `Bearer ${users[1].jwt()}`)
+        .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
     });
@@ -110,6 +112,7 @@ describe('usergroup.routes.test.js', () => {
       request(app)
         .post(`/groups/${group.id}/users/${users[1].id}`)
         .send({
+          api_key: application.api_key,
           role: 'nonexistingrole'
         })
         .set('Authorization', `Bearer ${users[2].jwt()}`)
@@ -129,6 +132,7 @@ describe('usergroup.routes.test.js', () => {
           }
         })
         .send({
+          api_key: application.api_key,
           role: roles.HOST
         })
         .end(done)
@@ -136,7 +140,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('successfully add a user to a group', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}`)
+        .post(`/groups/${group.id}/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -159,6 +163,7 @@ describe('usergroup.routes.test.js', () => {
         .post(`/groups/${group.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
+          api_key: application.api_key,
           role
         })
         .expect(200)
@@ -186,6 +191,7 @@ describe('usergroup.routes.test.js', () => {
         .post(`/groups/${group.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
+          api_key: application.api_key,
           role: roles.MEMBER
         })
         .expect(200)
@@ -211,7 +217,7 @@ describe('usergroup.routes.test.js', () => {
 
     beforeEach((done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[0].id}`)
+        .post(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end(done);
@@ -219,7 +225,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails getting another user\'s groups', (done) => {
       request(app)
-        .get(`/users/${users[0].id}/groups`)
+        .get(`/users/${users[0].id}/groups?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(403)
         .end(e => {
@@ -230,7 +236,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('successfully get a user\'s groups', (done) => {
       request(app)
-        .get(`/users/${users[1].id}/groups`)
+        .get(`/users/${users[1].id}/groups?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -242,7 +248,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('successfully get a user\'s groups bis', (done) => {
       request(app)
-        .get(`/users/${users[0].id}/groups`)
+        .get(`/users/${users[0].id}/groups?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -257,7 +263,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('successfully get a user\'s groups with the role', (done) => {
       request(app)
-        .get(`/users/${users[0].id}/groups?include=usergroup.role`)
+        .get(`/users/${users[0].id}/groups?include=usergroup.role&api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -278,17 +284,9 @@ describe('usergroup.routes.test.js', () => {
    */
   describe('#updateUserGroup', () => {
 
-    it('fails if no access to the group', (done) => {
+    it('fails if not the host', (done) => {
       request(app)
-        .put(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[1].jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails if no host', (done) => {
-      request(app)
-        .put(`/groups/${group.id}/users/${users[0].id}`)
+        .put(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
@@ -296,7 +294,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails if the user is not part of the group yet', (done) => {
       request(app)
-        .put(`/groups/${group.id}/users/${users[3].id}`)
+        .put(`/groups/${group.id}/users/${users[3].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -305,9 +303,10 @@ describe('usergroup.routes.test.js', () => {
     it('successfully update a user-group relation', (done) => {
       const role = roles.MEMBER;
       request(app)
-        .put(`/groups/${group.id}/users/${users[2].id}`)
+        .put(`/groups/${group.id}/users/${users[2].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
+          api_key: application.api_key,
           role
         })
         .expect(200)
@@ -330,33 +329,21 @@ describe('usergroup.routes.test.js', () => {
    */
   describe('#deleteUserGroup', () => {
 
-    it('fails if no access to the group', (done) => {
+    it('fails if not the host', () =>
       request(app)
-        .del(`/groups/${group.id}/users/${users[0].id}`)
-        .set('Authorization', `Bearer ${users[1].jwt()}`)
-        .expect(403)
-        .end(done);
-    });
-
-    it('fails if no host', (done) => {
-      request(app)
-        .del(`/groups/${group.id}/users/${users[0].id}`)
+        .del(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`)
-        .expect(403)
-        .end(done);
-    });
+        .expect(403));
 
-    it('fails if the user is not part of the group yet', (done) => {
+    it('fails if the user is not part of the group yet', () =>
       request(app)
-        .del(`/groups/${group.id}/users/${users[3].id}`)
+        .del(`/groups/${group.id}/users/${users[3].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
-        .expect(404)
-        .end(done);
-    });
+        .expect(404));
 
     it('successfully update a user-group relation', (done) => {
       request(app)
-        .del(`/groups/${group.id}/users/${users[2].id}`)
+        .del(`/groups/${group.id}/users/${users[2].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -400,7 +387,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users with their corresponding tier', () =>
       request(app)
-        .get(`/groups/${group.slug}/users`)
+        .get(`/groups/${group.slug}/users?api_key=${application.api_key}`)
         .expect(200)
         .toPromise()
         .tap(res => {
@@ -415,7 +402,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of *active* users with their corresponding tier', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users?filter=active`)
+        .get(`/groups/${group.slug}/users?filter=active&api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const users = res.body;
@@ -427,7 +414,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users in csv format without emails if not logged in as admin', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv`)
+        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');
@@ -449,7 +436,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users in csv format without emails if logged in as backer', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv`)
+        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`) // BACKER
         .expect(200)
         .expect((res) => {
@@ -461,7 +448,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users in csv format with emails if logged in as admin', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv`)
+        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`) // MEMBER
         .expect(200)
         .expect((res) => {
