@@ -44,6 +44,15 @@ export default (app) => {
    */
   app.use('/status', serverStatus(app));
 
+  /**
+   * Routes without expiration validation
+   */
+  app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
+
+  /**
+   * Moving forward, all requests will try to authenticate the user if there is a JWT token provided
+   * (an error will be returned if the JWT token is invalid, if not present it will simply continue)
+   */
   app.use('*', auth.authorizeApiKey);
   app.use('*', aN.authenticateUser()); // populate req.remoteUser if JWT token provided in the request
 
@@ -70,11 +79,6 @@ export default (app) => {
   app.post('/users/new_login_token', required('email'), users.sendNewTokenByEmail);
 
   /**
-   * Routes without expiration validation
-   */
-  app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
-
-  /**
    * Homepage
    */
   app.get('/homepage', getHomePage);
@@ -94,10 +98,10 @@ export default (app) => {
    */
   app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/:userid', aN.authenticateUser(), users.show); // Get a user.
-  app.put('/users/:userid', auth.mustBeLoggedInAsUser, required('user'), users.updateUser); // Update a user.
+  app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent donation)
   app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/avatar', auth.mustBeLoggedInAsUser, required('avatar'), users.updateAvatar); // Update a user's avatar
+  app.put('/users/:userid/avatar', required('avatar'), auth.mustBeLoggedInAsUser, users.updateAvatar); // Update a user's avatar
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   // TODO: Why is this a PUT and not a GET?

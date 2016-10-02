@@ -90,7 +90,7 @@ describe('users.routes.test.js', () => {
         .send({
           user: userData
         })
-        .expect(401)
+        .expect(400)
     );
 
     it('fails if invalid api_key', () =>
@@ -100,7 +100,7 @@ describe('users.routes.test.js', () => {
           api_key: '*invalid_api_key*',
           user: userData
         })
-        .expect(403)
+        .expect(401)
     );
 
     it('fails if no user object', () =>
@@ -303,7 +303,7 @@ describe('users.routes.test.js', () => {
 
     it('successfully get a user\'s information when he is authenticated', (done) => {
       request(app)
-        .get(`/users/${user.id}`)
+        .get(`/users/${user.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -322,7 +322,7 @@ describe('users.routes.test.js', () => {
 
     it('should update first name and last name if logged in', (done) => {
       request(app)
-        .put(`/users/${user.id}`)
+        .put(`/users/${user.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           user: {
@@ -346,7 +346,7 @@ describe('users.routes.test.js', () => {
     it('should update the paypal email', (done) => {
       const email = 'test+paypal@email.com';
       request(app)
-        .put(`/users/${user.id}/paypalemail`)
+        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           paypalEmail: email
@@ -358,33 +358,24 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('fails if the user is not logged in', (done) => {
+    it('fails if the user is not logged in', () => {
       const email = 'test+paypal@email.com';
-      request(app)
-        .put(`/users/${user.id}/paypalemail`)
+      return request(app)
+        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
         .send({
           paypalEmail: email
         })
-          .end((e,res) => {
-            expect(res.statusCode).to.equal(403);
-            expect(res.body.error.type).to.equal('forbidden');
-            done();
-          });
+        .expect(401);
     });
 
-    it('fails if the email is not valid', (done) => {
+    it('fails if the email is not valid', () =>
       request(app)
-        .put(`/users/${user.id}/paypalemail`)
+        .put(`/users/${user.id}/paypalemail?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           paypalEmail: 'abc'
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('validation_failed');
-          done();
-        });
-    });
+        .expect(400));
   });
 
   describe('#update password', () => {
@@ -399,7 +390,7 @@ describe('users.routes.test.js', () => {
       const newPassword = 'aaa123';
 
       request(app)
-        .put(`/users/${user.id}/password`)
+        .put(`/users/${user.id}/password?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           password: newPassword,
@@ -407,6 +398,7 @@ describe('users.routes.test.js', () => {
         })
         .end((err, res) => {
           const { body } = res;
+          console.log("body", body);
           expect(body.success).to.equal(true);
           models.User.auth(user.email, newPassword, e => {
             expect(e).to.not.exist;
@@ -415,32 +407,22 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('fails if the user is not logged in', (done) => {
+    it('fails if the user is not logged in', () =>
       request(app)
-        .put(`/users/${user.id}/password`)
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(403);
-          expect(res.body.error.type).to.equal('forbidden');
-          done();
-        });
-    });
+        .put(`/users/${user.id}/password?api_key=${application.api_key}`)
+        .expect(401));
 
-    it('fails if wrong user is logged in', (done) => {
+    it('fails if wrong user is logged in', () =>
       request(app)
-        .put(`/users/${user.id}/password`)
+        .put(`/users/${user.id}/password?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(403);
-          expect(res.body.error.type).to.equal('forbidden');
-          done();
-        });
-    });
+        .expect(403));
 
     it('fails if the passwords don\'t match', (done) => {
       const newPassword = 'aaa123';
 
       request(app)
-        .put(`/users/${user.id}/password`)
+        .put(`/users/${user.id}/password?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           password: newPassword,
@@ -464,7 +446,7 @@ describe('users.routes.test.js', () => {
     it('should update avatar', (done) => {
       const link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
-        .put(`/users/${user.id}/avatar`)
+        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           avatar: link
@@ -476,30 +458,19 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('fails if the user is not logged in', (done) => {
-      const link = 'http://opencollective.com/assets/icon2.svg';
+    it('fails if the user is not logged in', () =>
       request(app)
-        .put(`/users/${user.id}/avatar`)
+        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
         .send({
-          avatar: link
+          avatar: 'http://opencollective.com/assets/icon2.svg'
         })
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(403);
-          expect(res.body.error.type).to.equal('forbidden');
-          done();
-        });
-    });
+        .expect(401));
 
-    it('fails if the avatar key is missing from the payload', (done) => {
+    it('fails if the avatar key is missing from the payload', () =>
       request(app)
-        .put(`/users/${user.id}/avatar`)
+        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
         .send({})
-        .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('missing_required');
-          done();
-        });
-    });
+        .expect(400));
 
   });
 
@@ -891,18 +862,10 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
-    it('fails if there is no auth', (done) => {
+    it('fails if there is no auth', () =>
       request(app)
-        .post('/users/refresh_login_token')
-        .expect(401, {
-          error: {
-            code: 401,
-            message: "Invalid payload",
-            type: 'unauthorized'
-          }
-        })
-        .end(done);
-    });
+        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
+        .expect(401));
 
     it('fails if the user does not exist', (done) => {
       const fakeUser = { id: 12312312 };
@@ -914,7 +877,7 @@ describe('users.routes.test.js', () => {
       });
 
       request(app)
-        .post('/users/refresh_login_token')
+        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(401, {
           error: {
@@ -935,7 +898,7 @@ describe('users.routes.test.js', () => {
       });
 
       return request(app)
-        .post('/users/refresh_login_token')
+        .post(`/users/refresh_login_token?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(200)
         .toPromise()

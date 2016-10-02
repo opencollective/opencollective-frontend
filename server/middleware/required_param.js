@@ -4,6 +4,7 @@ import errors from '../lib/errors';
  *  Parameters required for a route (POST, GET or headers params)
  */
 export default function required(properties) {
+  properties = [].slice.call(arguments);
   return _required_options({ include: ['query', 'body', 'headers']}, properties);
 }
 
@@ -12,12 +13,11 @@ export default function required(properties) {
  * (such as `req.remoteUser` or `reg.group` or any other model)
  */
 export function required_valid(properties) {
-  return _required_options({ include: ['query', 'body', 'headers', '']}, properties);
+  properties = [].slice.call(arguments);
+  return _required_options({ include: ['query', 'body', 'headers', 'params', '']}, properties);
 }
 
 function _required_options(options, properties) {
-  properties = [].slice.call(arguments);
-  properties.shift();
 
   return function (req, res, next) {
     const missing = {};

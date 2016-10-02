@@ -177,8 +177,7 @@ export const _create = user => userlib.fetchInfo(user)
   }));
 
 export const updatePassword = (req, res, next) => {
-  const { password }= req.required;
-  const { passwordConfirmation } = req.required;
+  const { password, passwordConfirmation } = req.required;
 
   if (password !== passwordConfirmation) {
     return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
