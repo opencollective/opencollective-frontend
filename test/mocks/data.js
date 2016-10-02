@@ -1,9 +1,4 @@
 export default {
-  "application": {
-    "name": "webapp",
-    "api_key": "dvl-1510egmf4a23d80342403fb599qd"
-  },
-
   "user1": {
     "firstName": "Phil",
     "lastName": "Mod",

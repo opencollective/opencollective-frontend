@@ -2,6 +2,9 @@ import Promise from 'bluebird';
 import {sequelize} from '../server/models';
 import jsonData from './mocks/data';
 import userlib from '../server/lib/userlib';
+import config from 'config';
+
+jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
 export const data = (item) => Object.assign({}, jsonData[item]); // to avoid changing these data
 
