@@ -456,7 +456,7 @@ describe('lib.donation.test.js', () => {
       });
 
       it('fails paying because of a paymentMethod declined', (done) => {
-        expect(emailSendMessageSpy.lastCall.args[0]).to.equal('server-errors@opencollective.com');
+        expect(emailSendMessageSpy.lastCall.args[0]).to.contain('server-errors@opencollective.com');
         expect(emailSendMessageSpy.lastCall.args[1]).to.contain('Failed to process donation');
         done();
       });
