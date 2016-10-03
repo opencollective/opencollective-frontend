@@ -13,14 +13,13 @@ const CHARGE = 10.99;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
 const EMAIL = 'paypal@email.com';
+const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
 import paypalNock from './mocks/paypal.nock';
 
 describe('donations.routes.test.js', () => {
 
-  let application;
-  let application2;
   let user;
   let group;
   let group2;
@@ -30,7 +29,7 @@ describe('donations.routes.test.js', () => {
     sandbox.stub(donationsLib, 'processDonation');
   });
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create a stub for clearbit
   beforeEach((done) => {
@@ -38,11 +37,9 @@ describe('donations.routes.test.js', () => {
     done();
   });
 
-  // Create a user.
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
 
-  // Create a group.
-  beforeEach('create group', (done) => {
+  beforeEach('create group with user as first member', (done) => {
     request(app)
       .post('/groups')
       .send({
@@ -62,7 +59,7 @@ describe('donations.routes.test.js', () => {
       });
   });
 
-  beforeEach('create second group', (done) => {
+  beforeEach('create second group with user as first member', (done) => {
     request(app)
       .post('/groups')
       .send({
@@ -104,13 +101,120 @@ describe('donations.routes.test.js', () => {
     .catch(done);
   });
 
-  // Create an application which has only access to `group`
-  beforeEach(() => models.Application.create(utils.data('application2'))
-    .tap(a => application2 = a)
-    .then(() => application2.addGroup(group2)));
-
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
+  });
+
+
+  describe('#list', () => {
+
+    const createDonation = (index, UserId = user.id, GroupId = group.id) => {
+      const donations = utils.data('donations');
+      const donation = Object.assign({}, donations[index], { GroupId, UserId });
+      return models.Donation.create(donation)
+    }
+
+    beforeEach('create donation', () => createDonation(0));
+    beforeEach('create donation 2', () => createDonation(1));
+    beforeEach('create donation 3', () => createDonation(2));
+
+    it('THEN returns 200', (done) => {
+      request(app)
+      .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+      .expect(200)
+      .then(res => {
+        const donations = res.body;
+        expect(donations).to.have.length(3);
+        done();
+      })
+    });
+
+    describe('WHEN specifying per_page', () => {
+      const per_page = 2;
+      let response;
+
+      beforeEach('get 2 per page', (done) => {
+        request(app)
+        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .send({ per_page })
+        .expect(200)
+        .then(res => {
+          response = res;
+          done();
+        })
+      });
+
+      it('THEN gets first page', () => {
+        const donations = response.body;
+        console.log("donations", donations);
+        expect(donations.length).to.equal(per_page);
+        expect(donations[0].id).to.equal(1);
+
+        const { headers } = response;
+        expect(headers).to.have.property('link');
+        expect(headers.link).to.contain('next');
+        expect(headers.link).to.contain('page=2');
+        expect(headers.link).to.contain('current');
+        expect(headers.link).to.contain('page=1');
+        expect(headers.link).to.contain(`per_page=${per_page}`);
+        expect(headers.link).to.contain(`/groups/${group.id}/donations`);
+        const tot = 3;
+        expect(headers.link).to.contain(`/groups/${group.id}/donations?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
+      });
+    });
+
+    describe('WHEN getting page 2', () => {
+      const page = 2;
+      let response;
+
+      beforeEach('get page 2 with one per page', (done) => {
+        request(app)
+        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .send({ page, per_page: 1 })
+        .expect(200)
+        .then(res => {
+          response = res;
+          done();
+        })
+      });
+
+      it('THEN gets 2nd page', () => {
+        const donations = response.body;
+        expect(donations.length).to.equal(1);
+        expect(donations[0].id).to.equal(2);
+
+        const { headers } = response;
+        expect(headers).to.have.property('link');
+        expect(headers.link).to.contain('next');
+        expect(headers.link).to.contain('page=3');
+        expect(headers.link).to.contain('current');
+        expect(headers.link).to.contain('page=2');
+      });
+    });
+
+    describe('WHEN specifying since_id', () => {
+      const since_id = 2;
+      let response;
+
+      beforeEach('get expenses since id 2', (done) => {
+        request(app)
+        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .send({ since_id })
+        .expect(200)
+        .then(res => {
+          response = res;
+          done();
+        })
+      });
+
+      it('THEN returns donations above ID', () => {
+        const donations = response.body;
+        expect(donations.length).to.be.equal(1);
+        donations.forEach(e => expect(e.id >= since_id).to.be.true);
+        const { headers } = response;
+        expect(headers.link).to.be.empty;
+      });
+    });
   });
 
   /**
@@ -123,8 +227,9 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
@@ -174,8 +279,9 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE,
@@ -190,8 +296,9 @@ describe('donations.routes.test.js', () => {
       beforeEach((done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
+            api_key: application.api_key,
             payment: {
               stripeToken: STRIPE_TOKEN,
               amount: CHARGE2,
@@ -244,7 +351,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: data
           })
           .expect(200)
@@ -313,7 +420,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: data
           })
           .expect(200)
@@ -383,7 +490,7 @@ describe('donations.routes.test.js', () => {
         request(app)
           .post(`/groups/${group2.id}/payments`)
           .send({
-            api_key: application2.api_key,
+            api_key: application.api_key,
             payment: _.extend({}, data, {interval: 'something'})
           })
           .expect(400, {
@@ -411,12 +518,12 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD',
                 interval: 'month'
-              },
-              api_key: application2.api_key
+              }
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -542,11 +649,11 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD'
-              },
-              api_key: application2.api_key
+              }
             })
             .end((err, res) => {
               expect(err).to.not.exist;
@@ -659,12 +766,12 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 amount: 10,
                 currency: 'USD',
                 interval: 'abc'
-              },
-              api_key: application2.api_key
+              }
             })
             .expect(400, {
               error: {
@@ -680,11 +787,11 @@ describe('donations.routes.test.js', () => {
           request(app)
             .post(`/groups/${group.id}/payments/paypal`)
             .send({
+              api_key: application.api_key,
               payment: {
                 currency: 'USD',
                 interval: 'month'
-              },
-              api_key: application2.api_key
+              }
             })
             .expect(400, {
               error: {
@@ -712,8 +819,11 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           request(app)
             .post(`/groups/${group.id}/payments`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
-            .send({ payment })
+            .set('Authorization', `Bearer ${user.jwt()}`)
+            .send({
+              api_key: application.api_key,
+              payment
+            })
             .expect(400, {
               error: {
                 code: 400,
@@ -723,11 +833,7 @@ describe('donations.routes.test.js', () => {
             })
             .end(done);
         })
-
       });
-
     });
-
   });
-
 });

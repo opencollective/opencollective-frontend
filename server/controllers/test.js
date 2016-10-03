@@ -32,9 +32,6 @@ export const resetTestDatabase = function(req, res, next) {
   );
 
   const models = setupModels(sequelize);
-
-  const apiKey = '0ac43519edcf4421d80342403fb5985d';
-
   const testUser = {
     email: 'testuser@opencollective.com',
     password: 'password'
@@ -47,17 +44,7 @@ export const resetTestDatabase = function(req, res, next) {
         .catch(cb);
     },
 
-    createApplication: ['resetDb', (cb) => {
-      models.Application.create({
-        name: 'test_server',
-        api_key: apiKey,
-        _access: 1
-      })
-        .then(() => cb())
-        .catch(cb);
-    }],
-
-    createTestUser: ['createApplication', (cb) => {
+    createTestUser: [(cb) => {
       models.User.create(testUser)
         .then(u => cb(null, u))
         .catch(cb);

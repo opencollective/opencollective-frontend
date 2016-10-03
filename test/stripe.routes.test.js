@@ -8,14 +8,15 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 
+const application = utils.data('application');
+
 describe('stripe.routes.test.js', () => {
 
   let user;
   let user2;
   let group;
-  let application;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   // Create a user.
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
@@ -42,8 +43,8 @@ describe('stripe.routes.test.js', () => {
   // Add user2 as backer to group.
   beforeEach((done) => {
     request(app)
-      .post(`/groups/${group.id}/users/${user2.id}`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
+      .post(`/groups/${group.id}/users/${user2.id}?api_key=${application.api_key}`)
+      .set('Authorization', `Bearer ${user.jwt()}`)
       .expect(200)
       .end(e => {
         expect(e).to.not.exist;
@@ -58,15 +59,15 @@ describe('stripe.routes.test.js', () => {
   describe('authorize', () => {
     it('should return an error if the user is not logged in', (done) => {
       request(app)
-        .get('/stripe/authorize')
+        .get('/stripe/authorize?api_key=${application.api_key}')
         .expect(401)
         .end(done);
     });
 
-    it('should fail is the group does not have an host', (done) => {
+    it('should fail if the group does not have an host', (done) => {
       request(app)
-        .get('/stripe/authorize')
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .get(`/stripe/authorize?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -79,8 +80,8 @@ describe('stripe.routes.test.js', () => {
 
     it('should redirect to stripe', (done) => {
       request(app)
-        .get('/stripe/authorize')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .get(`/stripe/authorize?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200) // redirect
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -119,14 +120,14 @@ describe('stripe.routes.test.js', () => {
 
     it('should fail if the state is empty', (done) => {
       request(app)
-        .get('/stripe/oauth/callback')
+        .get(`/stripe/oauth/callback?api_key=${application.api_key}`)
         .expect(400)
         .end(done);
     });
 
     it('should fail if the user does not exist', (done) => {
       request(app)
-        .get('/stripe/oauth/callback?state=123412312')
+        .get(`/stripe/oauth/callback?api_key=${application.api_key}&state=123412312`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -139,7 +140,7 @@ describe('stripe.routes.test.js', () => {
 
     it('should fail if the user is not a host', (done) => {
       request(app)
-        .get(`/stripe/oauth/callback?state=${user2.id}`)
+        .get(`/stripe/oauth/callback?state=${user2.id}&api_key=${application.api_key}`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -154,7 +155,7 @@ describe('stripe.routes.test.js', () => {
       async.auto({
         request: (cb) => {
           request(app)
-            .get(`/stripe/oauth/callback?state=${user.id}&code=abc`)
+            .get(`/stripe/oauth/callback?state=${user.id}&code=abc&api_key=${application.api_key}`)
             .expect(302)
             .end(() => cb());
         },

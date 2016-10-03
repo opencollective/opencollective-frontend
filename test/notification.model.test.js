@@ -6,6 +6,7 @@ import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 
+const application = utils.data('application');
 const userData = utils.data('user1');
 const user2Data = utils.data('user2');
 const groupData = utils.data('group1');
@@ -21,13 +22,12 @@ const {
 
 describe("notification.model.test.js", () => {
 
-  let application;
   let user;
   let user2;
   let group;
   let group2;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
     const promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
@@ -49,8 +49,8 @@ describe("notification.model.test.js", () => {
   it('notifies for the `group.transaction.approved` email', () =>
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
-      .send()
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .send({ api_key: application.api_key })
       .expect(200)
       .then(res => {
         expect(res.body.active).to.be.true;
@@ -68,8 +68,8 @@ describe("notification.model.test.js", () => {
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/unsubscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
-      .send()
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
         Notification.findAndCountAll({where: {
@@ -82,8 +82,8 @@ describe("notification.model.test.js", () => {
   it('fails to add another notification if one exists', () =>
     request(app)
       .post(`/groups/${group.id}/activities/${notificationData.type}/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
-      .send()
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .send({ api_key: application.api_key })
       .expect(400)
       .then(res => {
         expect(res.body.error.message).to.equal('Already subscribed to this type of activity');
@@ -100,8 +100,8 @@ describe("notification.model.test.js", () => {
   it('fails to remove notification if it does not exist', () =>
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/unsubscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
-      .send()
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .send({ api_key: application.api_key })
       .expect(400)
       .then(res => {
         expect(res.body.error.message).to.equal('You were not subscribed to this type of activity');
@@ -118,8 +118,8 @@ describe("notification.model.test.js", () => {
   it('fails to add a notification if not a member of the group', () =>
     request(app)
       .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
-      .set('Authorization', `Bearer ${user.jwt(application)}`)
-      .send()
+      .set('Authorization', `Bearer ${user.jwt()}`)
+      .send({ api_key: application.api_key })
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {
           UserId: user.id,

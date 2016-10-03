@@ -6,12 +6,13 @@ import { expect } from 'chai';
 import models from '../server/models';
 
 const clientId = config.github.clientID;
+const application = utils.data('application');
 
-describe('connectedAccounts.routes.test.js: GIVEN an application and group', () => {
+describe('connectedAccounts.routes.test.js: GIVEN a group', () => {
 
-  let application, req, user;
+  let req, user;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   describe('WHEN calling /connected-accounts/github', () => {
 
@@ -22,8 +23,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     });
 
     describe('WHEN calling without API key', () => {
-
-      it('THEN returns 401', () => req.expect(401));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN calling /connected-accounts/github with API key', () => {
@@ -58,7 +58,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
       done();
     });
     describe('WHEN calling without API key', () => {
-      it('THEN returns 401', () => req.expect(401));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN calling with invalid API key', () => {
@@ -100,12 +100,12 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
 
     describe('WHEN calling without API key', () => {
       beforeEach(done => {
-        const token = user.jwt(application, { scope: '' });
+        const token = user.jwt({ scope: '' });
         req = req.set('Authorization', `Bearer ${token}`);
         done();
       });
 
-      it('THEN returns 401', () => req.expect(401));
+      it('THEN returns 400', () => req.expect(400));
     });
 
     describe('WHEN providing API key but no token', () => {
@@ -120,7 +120,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     describe('WHEN providing API key and token but no username', () => {
       beforeEach(done => {
         req = req
-              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'github'})}`)
+              .set('Authorization', `Bearer ${user.jwt({ scope: 'github'})}`)
               .send({ api_key: application.api_key });
         done();
       });
@@ -131,7 +131,7 @@ describe('connectedAccounts.routes.test.js: GIVEN an application and group', () 
     describe('WHEN providing API key, token and scope', () => {
       beforeEach(done => {
         req = req
-              .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
+              .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
               .send({ api_key: application.api_key });
         done();
       });

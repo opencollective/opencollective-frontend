@@ -59,7 +59,7 @@ describe('Group model', () => {
   }];
 
 
-  before(() => utils.cleanAllDb());
+  before(() => utils.resetTestDB());
 
   before(() => Group.create(groupData)
     .tap(g => group = g)

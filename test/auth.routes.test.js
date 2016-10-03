@@ -6,12 +6,11 @@ import * as utils from '../test/utils';
 import models from '../server/models';
 
 const userData = utils.data('user1');
+const application = utils.data('application');
 
 describe('auth.routes.test.js', () => {
 
-  let application;
-
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData));
 
@@ -77,7 +76,6 @@ describe('auth.routes.test.js', () => {
           const data = jwt.decode(res.body.access_token);
           expect(data).to.have.property('iat');
           expect(data).to.have.property('exp');
-          expect(data).to.have.property('aud');
           expect(data).to.have.property('iss');
           expect(data).to.have.property('sub');
           done();

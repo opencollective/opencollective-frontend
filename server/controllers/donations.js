@@ -8,6 +8,28 @@ import * as paypal from '../gateways/paypal';
 import activities from '../constants/activities';
 import models from '../models';
 import errors from '../lib/errors';
+import {getLinkHeader, getRequestedUrl} from '../lib/utils';
+
+
+/**
+ * Get donations
+ */
+export const list = (req, res, next) => {
+
+  const query = Object.assign({
+    where: { GroupId: req.group.id },
+    order: [[req.sorting.key, req.sorting.dir]]
+  }, req.pagination);
+
+  return models.Donation.findAndCountAll(query)
+    .then(donations => {
+      // Set headers for pagination.
+      req.pagination.total = donations.count;
+      res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
+      res.send(_.pluck(donations.rows, 'info'));
+    })
+    .catch(next);
+};
 
 const getOrCreateUser = (attributes, cb) => {
    return models.User.findOne({

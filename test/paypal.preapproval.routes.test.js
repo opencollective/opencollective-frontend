@@ -9,9 +9,10 @@ import models from '../server/models';
 import paypalMock from './mocks/paypal';
 import paypalAdaptive from '../server/gateways/paypalAdaptive';
 
+const application = utils.data('application');
+
 describe('paypal.preapproval.routes.test.js', () => {
 
-  let application;
   let user;
   let user2;
 
@@ -26,22 +27,21 @@ describe('paypal.preapproval.routes.test.js', () => {
 
   beforeEach((done) => {
     async.auto({
-      cleanAndCreateApplication: (cb) => {
-        utils.cleanAllDb().asCallback(cb);
+      resetDB: (cb) => {
+        utils.resetTestDB().asCallback(cb);
       },
-      createUserA: ['cleanAndCreateApplication', (cb) => {
+      createUserA: ['resetDB', (cb) => {
         models.User.create(utils.data('user1'))
           .then(user => cb(null, user))
           .catch(cb);
       }],
-      createUserB: ['cleanAndCreateApplication', (cb) => {
+      createUserB: ['resetDB', (cb) => {
         models.User.create(utils.data('user2'))
           .then(user => cb(null, user))
           .catch(cb);
       }]
     }, (e, results) => {
       expect(e).to.not.exist;
-      application = results.cleanAndCreateApplication;
       user = results.createUserA;
       user2 = results.createUserB;
       done();
@@ -55,16 +55,16 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     it('should fail if not the logged-in user', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(done);
     });
 
     it('should get a preapproval key', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -116,8 +116,8 @@ describe('paypal.preapproval.routes.test.js', () => {
         return models.PaymentMethod.create(paymentMethod)
           .tap(res => expect(res.token).to.equal(token))
           .then(() => request(app)
-            .get(`/users/${user.id}/paypal/preapproval`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
+            .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+            .set('Authorization', `Bearer ${user.jwt()}`)
             .expect(200))
           .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
           .tap(res => expect(res.count).to.equal(0));
@@ -144,8 +144,8 @@ describe('paypal.preapproval.routes.test.js', () => {
         return models.PaymentMethod.create(paymentMethod)
           .tap(res => expect(res.token).to.equal(token))
           .then(() => request(app)
-            .get(`/users/${user.id}/paypal/preapproval`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
+            .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+            .set('Authorization', `Bearer ${user.jwt()}`)
             .expect(200))
           .then(() => models.PaymentMethod.findAndCountAll({where: {token} }))
           .tap(res => expect(res.count).to.equal(0));
@@ -162,8 +162,8 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     beforeEach((done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end(done);
     });
@@ -181,16 +181,16 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should fail if not the logged-in user', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user2.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user2.jwt()}`)
           .expect(403)
           .end(done);
       });
 
       it('should fail with an unknown preapproval key', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/abc`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/abc?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(404)
           .end(done);
       });
@@ -198,8 +198,8 @@ describe('paypal.preapproval.routes.test.js', () => {
       it('should confirm the payment of a transaction', (done) => {
         const mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -242,8 +242,8 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if the preapproval is not completed', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(400)
           .end(done);
       });
@@ -264,8 +264,8 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if paypal returns one', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(500)
           .end(done);
       });
@@ -285,16 +285,16 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return the preapproval details', (done) => {
         request(app)
-          .get(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .get(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(done);
       });
 
       it('should not be able to check another user preapproval details', (done) => {
         request(app)
-          .get(`/users/${user2.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .get(`/users/${user2.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(403)
           .end(done);
       });
@@ -303,8 +303,8 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('PaymentMethods clean up', () => {
       it('should delete all other paymentMethods entries in the database to clean up', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}`)
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(e => {
             expect(e).to.not.exist;

@@ -246,7 +246,7 @@ export default (Sequelize, DataTypes) => {
 
     instanceMethods: {
       // JWT token.
-      jwt(application, payload, expiresInHours) {
+      jwt(payload, expiresInHours) {
         const { secret } = config.keys.opencollective;
         expiresInHours = expiresInHours || 24*30; // 1 month
 
@@ -261,8 +261,7 @@ export default (Sequelize, DataTypes) => {
         return jwt.sign(data, secret, {
           expiresIn: 60 * 60 * expiresInHours,
           subject: this.id, // user
-          issuer: config.host.api,
-          audience: application.id
+          issuer: config.host.api
         });
       },
 
@@ -300,16 +299,16 @@ export default (Sequelize, DataTypes) => {
         });
       },
 
-      generateLoginLink(application, redirect) {
+      generateLoginLink(redirect) {
         const expiresInHours = 24*30;
-        const token = this.jwt(application, { scope: 'login' }, expiresInHours);
+        const token = this.jwt({ scope: 'login' }, expiresInHours);
 
         return `${config.host.website}/login/${token}?next=${redirect}`;
       },
 
-      generateConnectedAccountVerifiedToken(application, connectedAccountId, username) {
+      generateConnectedAccountVerifiedToken(connectedAccountId, username) {
         const expiresInHours = 24;
-        return this.jwt(application, { scope: 'connected-account', connectedAccountId, username }, expiresInHours);
+        return this.jwt({ scope: 'connected-account', connectedAccountId, username }, expiresInHours);
       },
 
       getLatestDonations(since, until, tags) {

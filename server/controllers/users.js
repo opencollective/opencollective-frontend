@@ -188,8 +188,7 @@ export const _create = user => userlib.fetchInfo(user)
   }));
 
 export const updatePassword = (req, res, next) => {
-  const { password }= req.required;
-  const { passwordConfirmation } = req.required;
+  const { password, passwordConfirmation } = req.required;
 
   if (password !== passwordConfirmation) {
     return next(new errors.BadRequest('password and passwordConfirmation don\'t match'));
@@ -310,7 +309,6 @@ export const resetPassword = (req, res, next) => {
  */
 export const create = (req, res, next) => {
   const { user } = req.required;
-  user.ApplicationId = req.application.id;
 
   _create(user)
     .tap(user => res.send(user.info))
@@ -322,7 +320,7 @@ export const create = (req, res, next) => {
  */
 export const getToken = (req, res) => {
   res.send({
-    access_token: req.user.jwt(req.application),
+    access_token: req.user.jwt(),
     refresh_token: req.user.refresh_token
   });
 };
@@ -437,7 +435,7 @@ export const refreshTokenByEmail = (req, res, next) => {
   const user = req.remoteUser;
 
   return emailLib.send('user.new.token', req.remoteUser.email, {
-    loginLink: user.generateLoginLink(req.application, redirect)
+    loginLink: user.generateLoginLink(redirect)
   })
   .then(() => res.send({ success: true }))
   .catch(next);
@@ -447,15 +445,7 @@ export const refreshTokenByEmail = (req, res, next) => {
  * Send an email with the new token
  */
 export const sendNewTokenByEmail = (req, res, next) => {
-  if (!req.application || !req.required.email) {
-    return next(new Unauthorized('Unauthorized'))
-  }
-  let redirect;
-  if (req.body.redirect) {
-    ({ redirect } = req.body);
-  } else {
-    redirect = '/';
-  }
+  const redirect = req.body.redirect || '/';
   return User.findOne({
     where: {
       email: req.required.email
@@ -466,7 +456,7 @@ export const sendNewTokenByEmail = (req, res, next) => {
     // Otherwise, we can leak email addresses
     if (user) {
       return emailLib.send('user.new.token', req.body.email, {
-        loginLink: user.generateLoginLink(req.application, redirect)
+        loginLink: user.generateLoginLink(redirect)
       });
     }
     return null;

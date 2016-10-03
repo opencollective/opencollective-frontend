@@ -60,7 +60,7 @@ describe("email.routes.test", () => {
 
   let sandbox;
 
-  before(() => utils.cleanAllDb());
+  before(() => utils.resetTestDB());
 
   after(() => nock.cleanAll());
 

@@ -13,6 +13,7 @@ import fetchGithubUser from '../lib/github';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
+import * as auth from '../middleware/security/auth';
 
 const {
   Activity,
@@ -45,7 +46,6 @@ const subscribeUserToMailingList = (user, group, role) => {
     GroupId: group.id,
     type: `mailinglist.${lists[role]}`
   });
-
 };
 
 const _addUserToGroup = (group, user, options) => {
@@ -86,25 +86,25 @@ const getUserData = (groupId, tiers) => {
 };
 
 export const getUsers = (req, res, next) => {
-  let promise = getUserData(req.group.id, req.group.tiers);
+  auth.canEditGroup(req, res, (e, canEditGroup) => {
+    let promise = getUserData(req.group.id, req.group.tiers);
 
-  if (req.query.filter && req.query.filter === 'active') {
-    const now = moment();
-    promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
-  }
+    if (req.query.filter && req.query.filter === 'active') {
+      const now = moment();
+      promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
+    }
 
-  const isHostOrMember = !!(req.remoteUser && req.remoteUser.rolesByGroupId && _.intersection(req.remoteUser.rolesByGroupId[req.group.id], ['HOST', 'MEMBER']).length > 0);
-
-  return promise
-  .then(backers => {
-    if (isHostOrMember) return backers;
-    else return backers.map(b => {
-      delete b.email;
-      return b;
-    });
-  })
-  .then(backers => res.send(backers))
-  .catch(next)
+    return promise
+    .then(backers => {
+      if (canEditGroup) return backers;
+      else return backers.map(b => {
+        delete b.email;
+        return b;
+      });
+    })
+    .then(backers => res.send(backers))
+    .catch(next)
+  });
 };
 
 export const getUsersWithEmail = (req, res, next) => {
@@ -142,11 +142,6 @@ export const updateTransaction = (req, res, next) => {
     .then(transaction => res.send(transaction.info))
     .catch(next);
 };
-
-/**
- * Get a group's transaction.
- */
-export const getTransaction = (req, res) => res.json(req.transaction.info);
 
 /**
  * Get group's transactions.
@@ -271,7 +266,7 @@ export const deleteUser = (req, res, next) => {
     .then((usergroup) => usergroup.destroy())
     .tap(() => {
       // Create activities.
-      const remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+      const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
         type: 'group.user.deleted',
         GroupId: req.group.id,
@@ -306,7 +301,7 @@ export const create = (req, res, next) => {
   const sendConfirmationEmail = (user, group) => {
     const data = {
       group,
-      confirmation_url: user.generateLoginLink(req.application, `/${group.slug}`)
+      confirmation_url: user.generateLoginLink(`/${group.slug}`)
     }
     emailLib.send('group.created', user.email, data);
   };
@@ -617,7 +612,7 @@ export const updateUser = (req, res, next) => {
     })
     .then((usergroup) => {
       // Create activities.
-      const remoteUser = (req.remoteUser && req.remoteUser.info) || (req.application && req.application.info);
+      const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
         type: 'group.user.updated',
         GroupId: req.group.id,

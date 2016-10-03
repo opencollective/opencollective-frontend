@@ -53,7 +53,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           return ca.update({username: data.profile.username, secret: accessToken});
         })
         .then(() => {
-          const token = user.generateConnectedAccountVerifiedToken(req.application, caId, data.profile.username);
+          const token = user.generateConnectedAccountVerifiedToken(caId, data.profile.username);
           res.redirect(`${config.host.website}/github/apply/${token}?utm_source=${utmSource}`);
         })
         .catch(next);

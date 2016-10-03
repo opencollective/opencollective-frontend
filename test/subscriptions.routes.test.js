@@ -10,16 +10,17 @@ import Promise from 'bluebird';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 
+const application = utils.data('application');
+
 const STRIPE_URL = 'https://api.stripe.com:443';
 const transactionsData = utils.data('transactions1').transactions;
 
 describe('subscriptions.routes.test.js', () => {
   let group;
   let user;
-  let application;
   let paymentMethod;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
@@ -57,7 +58,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('fails if no authorization provided', () =>
       request(app)
-        .get('/subscriptions')
+        .get(`/subscriptions?api_key=${application.api_key}`)
         .expect(401, {
           error: {
             code: 401,
@@ -69,8 +70,8 @@ describe('subscriptions.routes.test.js', () => {
 
     it('successfully has access to the subscriptions', (done) => {
       request(app)
-        .get('/subscriptions')
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .get(`/subscriptions?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
@@ -118,7 +119,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('fails if if no authorization provided', (done) => {
       request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .expect(401, {
           error: {
             code: 401,
@@ -141,7 +142,7 @@ describe('subscriptions.routes.test.js', () => {
       });
 
       request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${expiredToken}`)
         .end((err, res) => {
           expect(res.body.error.code).to.be.equal(401);
@@ -151,11 +152,9 @@ describe('subscriptions.routes.test.js', () => {
     });
 
     it('fails if the subscription does not exist', (done) => {
-      const token = user.jwt(application, {
-        scope: 'subscriptions'
-      });
+      const token = user.jwt({ scope: 'subscriptions' });
       request(app)
-        .post('/subscriptions/12345/cancel')
+        .post(`/subscriptions/12345/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(400, {
           error: {
@@ -169,8 +168,8 @@ describe('subscriptions.routes.test.js', () => {
 
     it('cancels the subscription', (done) => {
        request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;

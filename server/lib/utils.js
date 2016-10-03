@@ -57,6 +57,8 @@ const addParameterUrl = (url, parameters) => {
   parsedUrl.pathname = removeTrailingChar(parsedUrl.pathname, '/');
 
   delete parsedUrl.search; // Otherwise .search is used in place of .query
+  delete parsedUrl.query.api_key; // make sure we don't surface the api_key publicly
+
   for (const p in parameters) {
     const param = parameters[p];
     parsedUrl.query[p] = param;

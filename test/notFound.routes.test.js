@@ -1,6 +1,9 @@
 import app from '../server/index';
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
+import * as utils from '../test/utils';
+
+const application = utils.data('application');
 
 describe('notFound.routes.test.js', () => {
 
@@ -10,7 +13,7 @@ describe('notFound.routes.test.js', () => {
 
     beforeEach(() => {
       req = request(app)
-        .get('/blablabla?api_token=yabada');
+        .get(`/blablabla?api_key=${application.api_key}`);
     });
 
     it("THEN returns 404", () =>

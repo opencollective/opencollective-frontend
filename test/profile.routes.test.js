@@ -4,6 +4,7 @@ import request from 'supertest-as-promised';
 import * as utils from '../test/utils';
 import models from '../server/models';
 
+const application = utils.data('application');
 const userData = utils.data('user1');
 const groupData = utils.data('group1');
 
@@ -11,7 +12,7 @@ describe('profile.routes.test.js', () => {
 
   let user, group;
 
-  beforeEach(() => utils.cleanAllDb());
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach(() =>
@@ -29,7 +30,7 @@ describe('profile.routes.test.js', () => {
 
     it('gets the user', () =>
       request(app)
-        .get(`/profile/${user.username}`)
+        .get(`/profile/${user.username}?api_key=${application.api_key}`)
         .expect(200)
         .toPromise()
         .then(res => {
@@ -40,7 +41,7 @@ describe('profile.routes.test.js', () => {
 
     it('gets the group', (done) => {
       request(app)
-        .get(`/profile/${group.slug}`)
+        .get(`/profile/${group.slug}?api_key=${application.api_key}`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;

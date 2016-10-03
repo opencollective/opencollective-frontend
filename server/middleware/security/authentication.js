@@ -11,14 +11,12 @@ import errors from '../../lib/errors';
 import required from '../required_param';
 
 const {
-  Application,
   User
 } = models;
 
 const {
   BadRequest,
   CustomError,
-  Forbidden,
   ServerError,
   Unauthorized
 } = errors;
@@ -31,12 +29,10 @@ const { secret } = config.keys.opencollective;
  * Identification is provided through two vectors:
  * - api_key URL parameter which uniquely identifies an application
  * - JSON web token JWT payload which contains 3 items:
- *   - aud: application ID which also uniquely identifies an application
  *   - sub: user ID
  *   - scope: user scope (e.g. 'subscriptions')
  *
  * Thus:
- * - an application is identified with either an api_key or a JWT
  * - a user is identified with a JWT
  */
 
@@ -52,15 +48,14 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
     token = req.params.access_token;
   } else {
     const header = req.headers && req.headers.authorization;
-    if (!header) {
-      return next();
-    }
+    if (!header) return next();
+
     const parts = header.split(' ');
     const scheme = parts[0];
     token = parts[1];
 
     if (!/^Bearer$/i.test(scheme) || !token) {
-      return next(new Unauthorized('Format is Authorization: Bearer [token]'));
+      return next(new BadRequest('Format is Authorization: Bearer [token]'));
     }
   }
 
@@ -70,7 +65,7 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
       req.jwtExpired = true;
       req.jwtPayload = jwt.decode(token, secret); // we need to decode again
     } else if (err) {
-      return next(new Unauthorized(err.message));
+      return next(new BadRequest(err.message));
     } else {
       req.jwtPayload = decoded;
     }
@@ -87,79 +82,12 @@ export const checkJwtExpiry = (req, res, next) => {
   return next();
 };
 
-export const _authenticateAppByJwt = (req, res, next) => {
-  if (!req.jwtPayload) return next();
 
-  const appId = parseInt(req.jwtPayload.aud);
-
-  Application
-    .findById(appId)
-    .tap(application => {
-      if (application.disabled) {
-        throw new Unauthorized();
-      }
-      req.application = application;
-      return next();
-    })
-    .catch(next);
-};
-
-export function authenticateAppByJwt() {
-  return (req, res, next) => {
-    this.parseJwtNoExpiryCheck(req, res, (e) => {
-      if (e) {
-        return next(e);
-      }
-      this._authenticateAppByJwt(req, res, next);
-    });
-  }
-}
-
-export const authenticateAppByApiKey = (req, res, next) => {
-  required('api_key')(req, res, (e) => {
-    if (e) return next(e);
-    const api_key = req.required.api_key;
-    Application.findOne({ where: { api_key }})
-      .tap(application => {
-        if (!application)
-          throw new Unauthorized(`Invalid API key: ${api_key}`);
-        if (application.disabled)
-          throw new Forbidden('Application disabled');
-      })
-      .then(application => req.application = application)
-      .then(() => next())
-      .catch(next);
-  });
-};
-
-export function authenticateApp() {
-  return (req, res, next) => {
-    this.authenticateAppByApiKey(req, res, (e) => {
-      if (e) {
-        return this.authenticateAppByJwt()(req, res, next);
-      }
-      next();
-    });
-  }
-}
-
-export function authenticateUserAndAppByJwtNoExpiry() {
+export function authenticateUserByJwtNoExpiry() {
   return [
     this.parseJwtNoExpiryCheck,
-    this._authenticateAppByJwt,
     this._authenticateUserByJwt
   ]
-}
-
-export function authenticateUserAndAppByJwt() {
-  return (req, res, next) => {
-    this.authenticateUserByJwt()(req, res, (e) => {
-      if (e) {
-        return next(e);
-      }
-      this._authenticateAppByJwt(req, res, next);
-    });
-  };
 }
 
 /**
@@ -211,42 +139,43 @@ export const _authenticateUserByJwt = (req, res, next) => {
 };
 
 /**
- * Authenticate the user with the JWT token 
+ * Authenticate the user with the JWT token if any, otherwise continues
  * 
  * @PRE: Request with a `Authorization: Bearer [token]` with a valid token
  * @POST: req.remoteUser is set to the logged in user or null if authentication failed
+ * @ERROR: Will return an error if a JWT token is provided and invalid
  */
-export function authenticateUserByJwt() {
-  return (req, res, next) => {
-    this.parseJwtNoExpiryCheck(req, res, (e) => {
-      if (e) {
-        return next(e);
-      }
-      this.checkJwtExpiry(req, res, (e) => {
-        if (e) {
-          return next(e);
-        }
-        this._authenticateUserByJwt(req, res, next);
-      });
+export function authenticateUser(req, res, next) {
+  if (req.remoteUser && req.remoteUser.id) return next();
+
+  parseJwtNoExpiryCheck(req, res, (e) => {
+    // If a token was submitted but is invalid, we return an error
+    if (e) return next(e);
+
+    checkJwtExpiry(req, res, (e) => {
+      // If a token was submitted and is expired, we return an error
+      if (e) return next(e);
+      _authenticateUserByJwt(req, res, next);
     });
-  }
+
+  });
 }
 
 export function authenticateInternalUserByJwt() {
   return (req, res, next) => {
-    this.parseJwtNoExpiryCheck(req, res, (e) => {
+    parseJwtNoExpiryCheck(req, res, (e) => {
       if (e) {
         return next(e);
       }
-      this.checkJwtExpiry(req, res, (e) => {
+      checkJwtExpiry(req, res, (e) => {
         if (e) {
           return next(e);
         }
-        this._authenticateUserByJwt(req, res, (e) => {
+        _authenticateUserByJwt(req, res, (e) => {
           if (e) {
             return next(e);
           }
-          this._authenticateInternalUserById(req, res, next);
+          _authenticateInternalUserById(req, res, next);
         });
       });
     });
@@ -259,17 +188,6 @@ export const _authenticateInternalUserById = (req, res, next) => {
   } else {
     throw new Unauthorized();
   }
-}
-
-export function authenticateUserOrApp() {
-  return (req, res, next) => {
-    this.authenticateUserAndAppByJwt()(req, res, (e) => {
-      if (!e) {
-        return next();
-      }
-      this.authenticateAppByApiKey(req, res, next);
-    });
-  };
 }
 
 export const authenticateService = (req, res, next) => {

@@ -1,21 +1,4 @@
 export default {
-  "applicationSuper": {
-    "name": "webapp",
-    "api_key": "0ac43519edcf4421d80342403fb5985d",
-    "_access": 1
-  },
-
-  "application2": {
-    "name": "tipbox_app",
-    "api_key": "920cb291778adad8a563f488239968b4"
-  },
-
-  "application3": {
-    "name": "scouts_app",
-    "api_key": "1c96ce6b1119bec18e4a4680d25883da",
-    "_access": 0.5
-  },
-
   "user1": {
     "firstName": "Phil",
     "lastName": "Mod",
@@ -365,6 +348,30 @@ export default {
     ]
   },
 
+  "donations": [
+      {
+        "title": "Donation to that great project",
+        "amount": 100,
+        "currency": "USD",
+        "paypalEmail": "userpaypal@gmail.com",
+        "createdAt": "2015-05-29T07:00:00.000Z"
+      },
+      {
+        "title": "Donation to that other great project",
+        "amount": 999,
+        "currency": "USD",
+        "paypalEmail": "userpaypal@gmail.com",
+        "createdAt": "2015-05-29T07:00:00.000Z"
+      },
+      {
+        "title": "Donation to that amazing project",
+        "amount": 12000,
+        "currency": "USD",
+        "paypalEmail": "user2paypal@gmail.com",
+        "createdAt": "2016-09-29T07:00:00.000Z"
+      }
+  ],
+
   "transactions1": {
     "transactions": [
       {
@@ -536,7 +543,8 @@ export default {
     "currency": "USD",
     "paypalEmail": "uSerpaypal@gmail.com",
     "incurredAt": "2016-03-06 UTC+0300",
-    "payoutMethod": "paypal"
+    "payoutMethod": "paypal",
+    "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
   },
   "expense2": {
     "title": "tshirts",

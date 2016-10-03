@@ -20,13 +20,7 @@ exec('make dropdb && make database')
 .then((result) => {
   console.log('output', result.stdout);
 
-  return models.Application.create({
-    api_key: '0ac43519edcf4421d80342403fb5985d',
-    name: 'webapp',
-    _access: 1
-  })
-  .then(() => {
-    return models.User.create({
+  return models.User.create({
       email: 'user@opencollective.com',
       password: 'password'
     })

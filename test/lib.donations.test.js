@@ -15,6 +15,7 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 
 const chance = chanceLib.Chance();
+const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
 import stripeMock from './mocks/stripe';
@@ -30,7 +31,6 @@ describe('lib.donation.test.js', () => {
 
   const sandbox = sinon.sandbox.create();
   let processDonationSpy, emailSendMessageSpy, emailSendSpy;
-  let application;
 
   before(() => {
     processDonationSpy = sinon.spy(donationsLib, 'processDonation');
@@ -44,7 +44,7 @@ describe('lib.donation.test.js', () => {
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => processDonationSpy.reset());
 
@@ -107,7 +107,7 @@ describe('lib.donation.test.js', () => {
 
   describe('Stripe', () => {
 
-    let user, application2, group, group2;
+    let user, group;
     const nocks = {};
 
     const stubStripe = () => {
@@ -160,27 +160,6 @@ describe('lib.donation.test.js', () => {
       stubStripe();
     });
 
-    // Create a second group.
-    beforeEach('create a second group', (done) => {
-      request(app)
-        .post('/groups')
-        .send({
-          api_key: application.api_key,
-          group: Object.assign({}, utils.data('group1'), { users: [{email: user.email, role: roles.HOST}]}),
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          models.Group
-            .findById(parseInt(res.body.id))
-            .tap((g) => {
-              group2 = g;
-              done();
-            })
-            .catch(done);
-        });
-    });
-
     beforeEach((done) => {
       models.StripeAccount.create({
         accessToken: 'abc'
@@ -189,11 +168,6 @@ describe('lib.donation.test.js', () => {
       .tap(() => done())
       .catch(done);
     });
-
-    // Create an application which has only access to `group`
-    beforeEach(() => models.Application.create(utils.data('application2'))
-      .tap(a => application2 = a)
-      .then(() => application2.addGroup(group2)));
 
     // Nock for charges.create.
     beforeEach(() => {

@@ -7,55 +7,48 @@ import roles from '../server/constants/roles';
 import Promise from 'bluebird';
 import models from '../server/models';
 
+const application = utils.data('application');
 const groupData = utils.data('group1');
 const activitiesData = utils.data('activities1').activities;
 
 describe('activities.routes.test.js', () => {
 
-  let application;
   let user;
   let user2;
   let user3;
   let group;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  before(() => utils.resetTestDB());
 
   // Create users.
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
+  before('create user1', () => models.User.create(utils.data('user1')).tap(u => user = u));
+  before('create user2', () => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  before('create user3', () => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  before('create group', () => models.Group.create(groupData).tap(g => group = g));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
+  before('add user as host', () => group.addUserWithRole(user, roles.HOST));
+  before('add user3 as backer', () => group.addUserWithRole(user3, roles.BACKER));
 
-  // Create group.
-  beforeEach(() => models.Group.create(groupData).tap(g => group = g));
-
-  // Add an host to the group.
-  beforeEach(() => group.addUserWithRole(user, roles.HOST));
-
-  // Add an backer to the group.
-  beforeEach(() => group.addUserWithRole(user3, roles.BACKER));
-
-  // Create activities.
-  beforeEach(() => Promise.map(activitiesData, a => models.Activity.create(a)));
+  before('create activities', () => Promise.map(activitiesData, a => models.Activity.create(a)));
 
   /**
    * Get group's activities.
    */
   describe('#group', () => {
 
+    const getActivitiesForGroup = (groupid) => request(app).get(`/groups/${groupid}/activities?api_key=${application.api_key}`);
+
     it('fails getting activities if not member of the group', (done) => {
-      request(app)
-        .get(`/groups/${group.id}/activities`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+      getActivitiesForGroup(group.id)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(done);
     });
 
     it('successfully get a group\'s activities', (done) => {
-      request(app)
-        .get(`/groups/${group.id}/activities`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+      getActivitiesForGroup(group.id)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -75,14 +68,13 @@ describe('activities.routes.test.js', () => {
       const perPage = 3;
 
       it('successfully get a group\'s activities with per_page', (done) => {
-        request(app)
-          .get(`/groups/${group.id}/activities`)
+        getActivitiesForGroup(group.id)
           .send({
             per_page: perPage,
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -109,15 +101,14 @@ describe('activities.routes.test.js', () => {
 
       it('successfully get the second page of a group\'s activities', (done) => {
         const page = 2;
-        request(app)
-          .get(`/groups/${group.id}/activities`)
+        getActivitiesForGroup(group.id)
           .send({
             per_page: perPage,
             page,
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -135,14 +126,13 @@ describe('activities.routes.test.js', () => {
       it('successfully get a group\'s activities using since_id', (done) => {
         const sinceId = 8;
 
-        request(app)
-          .get(`/groups/${group.id}/activities`)
+        getActivitiesForGroup(group.id)
           .send({
             since_id: sinceId,
             sort: 'id',
             direction: 'asc'
           })
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -166,13 +156,12 @@ describe('activities.routes.test.js', () => {
     describe('Sorting', () => {
 
       it('successfully get a group\'s activities with sorting', (done) => {
-        request(app)
-          .get(`/groups/${group.id}/activities`)
+        getActivitiesForGroup(group.id)
           .send({
             sort: 'createdAt',
             direction: 'desc'
           })
-          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -195,18 +184,18 @@ describe('activities.routes.test.js', () => {
    */
   describe('#user', () => {
 
-    it('fails getting other user\'s activities', (done) => {
+    it('should be able to get another user\'s activities', (done) => {
       request(app)
-        .get(`/users/${user.id}/activities`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
-        .expect(403)
+        .get(`/users/${user.id}/activities?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
+        .expect(200)
         .end(done);
     });
 
     it('successfully get a user\'s activities', (done) => {
       request(app)
-        .get(`/users/${user.id}/activities`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .get(`/users/${user.id}/activities?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;

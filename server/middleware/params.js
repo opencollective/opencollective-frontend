@@ -94,9 +94,14 @@ export function paranoidtransactionid(req, res, next, id) {
  * ExpenseId.
  */
 export function expenseid(req, res, next, expenseid) {
+  let queryInGroup, NotFoundInGroup = '';
+  if (req.params.groupid) {
+    queryInGroup = { GroupId: req.params.groupid };
+    NotFoundInGroup = `in group ${req.params.groupid}`;
+  }
   parseId(expenseid)
     .then(id => Expense.findOne({
-      where: { id },
+      where: Object.assign({}, { id }, queryInGroup),
       include: [
         { model: models.Group },
         { model: models.User }
@@ -104,7 +109,7 @@ export function expenseid(req, res, next, expenseid) {
     }))
     .then((expense) => {
       if (!expense) {
-        return next(new errors.NotFound(`Expense '${expenseid}' not found`));
+        return next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInGroup}`));
       } else {
         req.expense = expense;
         next();

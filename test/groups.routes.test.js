@@ -13,6 +13,8 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 
 const chance = chanceLib.Chance();
+
+const application = utils.data('application');
 const userData = utils.data('user1');
 const userData2 = utils.data('user2');
 const userData3 = utils.data('user3');
@@ -21,12 +23,11 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('groups.routes.test.js', () => {
 
-  let application;
   let user;
 
-  beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+  beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
 
   // Stripe stub.
   beforeEach(() => {
@@ -48,7 +49,7 @@ describe('groups.routes.test.js', () => {
         .send({
           group: publicGroupData
         })
-        .expect(401)
+        .expect(400)
     );
 
     it('fails creating a group without name', (done) => {
@@ -163,7 +164,7 @@ describe('groups.routes.test.js', () => {
         .send({
           payload: publicGroupData
         })
-        .expect(401)
+        .expect(400)
     );
 
     it('fails creating a group without payload', () =>
@@ -205,7 +206,7 @@ describe('groups.routes.test.js', () => {
       it('assigns contributors as users with connectedAccounts', () =>
         request(app)
         .post('/groups?flow=github')
-        .set('Authorization', `Bearer ${user.jwt(application, { scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
+        .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
         .send({
           payload: {
             group: {
@@ -272,7 +273,7 @@ describe('groups.routes.test.js', () => {
       stub.yields(null, mock);
     };
 
-    beforeEach(() => utils.cleanAllDb().tap(a => application = a));
+    beforeEach(() => utils.resetTestDB());
 
     beforeEach(() => {
       appStripe.accounts.create.restore();
@@ -312,8 +313,9 @@ describe('groups.routes.test.js', () => {
     beforeEach('create a transaction for group 1', () =>
       request(app)
         .post(`/groups/${publicGroup.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           transaction: transactionsData[8]
         })
         .expect(200)
@@ -321,7 +323,7 @@ describe('groups.routes.test.js', () => {
 
     it('fails getting an undefined group', () =>
       request(app)
-        .get('/groups/undefined')
+        .get(`/groups/undefined?api_key=${application.api_key}`)
         .expect(404)
     );
 
@@ -383,8 +385,9 @@ describe('groups.routes.test.js', () => {
 
           request(app)
             .post(`/groups/${publicGroup.id}/transactions`)
-            .set('Authorization', `Bearer ${user.jwt(application)}`)
+            .set('Authorization', `Bearer ${user.jwt()}`)
             .send({
+              api_key: application.api_key,
               transaction: _.extend({}, transaction, { approved: true })
             })
             .expect(200)
@@ -443,12 +446,6 @@ describe('groups.routes.test.js', () => {
     });
 
     describe('Leaderboard', () => {
-
-      it('fails if the app is not authorized', () =>
-        request(app)
-          .get('/leaderboard')
-          .expect(401)
-      );
 
       it('returns the leaderboard', () =>
         request(app)
@@ -579,6 +576,7 @@ describe('groups.routes.test.js', () => {
       request(app)
         .put(`/groups/${group.id}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(401)
@@ -588,8 +586,9 @@ describe('groups.routes.test.js', () => {
     it('fails updating a group if the user authenticated has no access', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user2.jwt(application)}`)
+        .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(403)
@@ -599,8 +598,9 @@ describe('groups.routes.test.js', () => {
     it('fails updating a group if the user authenticated is a viewer', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user3.jwt(application)}`)
+        .set('Authorization', `Bearer ${user3.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(403)
@@ -609,8 +609,8 @@ describe('groups.routes.test.js', () => {
 
     it('fails updating a group if no data passed', (done) => {
       request(app)
-        .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .put(`/groups/${group.id}?api_key=${application.api_key}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(400)
         .end(done);
     });
@@ -618,8 +618,9 @@ describe('groups.routes.test.js', () => {
     it('successfully updates a group if authenticated as a MEMBER', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user4.jwt(application)}`)
+        .set('Authorization', `Bearer ${user4.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(200)
@@ -629,8 +630,9 @@ describe('groups.routes.test.js', () => {
     it('successfully udpates a group if authenticated as a user', (done) => {
       request(app)
         .put(`/groups/${group.id}`)
-        .set('Authorization', `Bearer ${user.jwt(application)}`)
+        .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
+          api_key: application.api_key,
           group: groupNew
         })
         .expect(200)
