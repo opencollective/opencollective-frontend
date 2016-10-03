@@ -88,6 +88,14 @@ describe('user.models.test.js', () => {
         })
     })
 
+    it('creates a valid username from an email', () => {
+      return User
+        .create({email: 'xdamman+opencollective@gmail.com'})
+        .tap(user => {
+          expect(user.username).to.equal('xdamman')
+        })
+    })
+    
   });
 
   /**
