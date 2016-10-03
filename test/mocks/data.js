@@ -348,6 +348,30 @@ export default {
     ]
   },
 
+  "donations": [
+      {
+        "title": "Donation to that great project",
+        "amount": 100,
+        "currency": "USD",
+        "paypalEmail": "userpaypal@gmail.com",
+        "createdAt": "2015-05-29T07:00:00.000Z"
+      },
+      {
+        "title": "Donation to that other great project",
+        "amount": 999,
+        "currency": "USD",
+        "paypalEmail": "userpaypal@gmail.com",
+        "createdAt": "2015-05-29T07:00:00.000Z"
+      },
+      {
+        "title": "Donation to that amazing project",
+        "amount": 12000,
+        "currency": "USD",
+        "paypalEmail": "user2paypal@gmail.com",
+        "createdAt": "2016-09-29T07:00:00.000Z"
+      }
+  ],
+
   "transactions1": {
     "transactions": [
       {

@@ -185,6 +185,7 @@ export default (app) => {
   /**
    * Donations
    */
+  app.get('/groups/:groupid/donations', mw.paginate(), mw.sorting({key: 'processedAt', dir: 'DESC'}), donations.list); // Callback after a payment
   app.post('/groups/:groupid/donations', required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
   app.post('/groups/:groupid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
   app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
