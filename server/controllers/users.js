@@ -445,12 +445,7 @@ export const refreshTokenByEmail = (req, res, next) => {
  * Send an email with the new token
  */
 export const sendNewTokenByEmail = (req, res, next) => {
-  let redirect;
-  if (req.body.redirect) {
-    ({ redirect } = req.body);
-  } else {
-    redirect = '/';
-  }
+  const redirect = req.body.redirect || '/';
   return User.findOne({
     where: {
       email: req.required.email
