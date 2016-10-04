@@ -44,7 +44,7 @@ export const resetTestDatabase = function(req, res, next) {
         .catch(cb);
     },
 
-    createTestUser: [(cb) => {
+    createTestUser: ['resetDb', (cb) => {
       models.User.create(testUser)
         .then(u => cb(null, u))
         .catch(cb);
