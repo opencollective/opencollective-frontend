@@ -106,7 +106,9 @@ export const resetTestDatabase = function(req, res, next) {
       models.Donation.create({
         title: "Donation 1",
         amount: 100,
-        currency: 'EUR'
+        currency: 'EUR',
+        GroupId: results.createGroup.id,
+        UserId: results.createTestUser.id
       })
       .then(donation => models.Transaction.create({
         amount: 1,
@@ -123,7 +125,9 @@ export const resetTestDatabase = function(req, res, next) {
       models.Donation.create({
         title: "Donation 2",
         amount: 200,
-        currency: 'EUR'
+        currency: 'EUR',
+        GroupId: results.createGroup.id,
+        UserId: results.createTestUser.id
       })
       .then(donation => models.Transaction.create({
         amount: 2,
