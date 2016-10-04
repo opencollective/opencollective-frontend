@@ -34,5 +34,6 @@ fi
 # xdamman: so in the meantime, we force to download the version we need:
 wget http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_53.0.2785.143-1_amd64.deb
 sudo dpkg -i google-chrome-stable_53.0.2785.143-1_amd64.deb
+sudo apt-get install subversion
 
 cp -v /var/cache/apt/archives/*.deb ${APT_CACHE} || true
