@@ -32,7 +32,7 @@ fi
 # sudo apt-get install --reinstall "${APT_PACKAGES[@]}"
 
 # xdamman: so in the meantime, we force to download the version we need:
-wget -O http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_53.0.2785.143-1_amd64.deb
+wget http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_53.0.2785.143-1_amd64.deb
 sudo dpkg -i google-chrome-stable_53.0.2785.143-1_amd64.deb
 
 cp -v /var/cache/apt/archives/*.deb ${APT_CACHE} || true
