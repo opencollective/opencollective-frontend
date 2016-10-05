@@ -113,7 +113,7 @@ export const resetTestDatabase = function(req, res, next) {
       .then(donation => models.Transaction.create({
         amount: 1,
         currency: "EUR",
-        UserId: 1,
+        UserId: results.createTestUser.id,
         DonationId: donation.id
       }))
       .then(t => t.setGroup(results.createGroup))
@@ -132,7 +132,7 @@ export const resetTestDatabase = function(req, res, next) {
       .then(donation => models.Transaction.create({
         amount: 2,
         currency: "EUR",
-        UserId: 1,
+        UserId: results.createTestUser.id,
         DonationId: donation.id
       }))
       .then(t => t.setGroup(results.createGroup))
@@ -142,11 +142,11 @@ export const resetTestDatabase = function(req, res, next) {
 
     addExpense1: ['createGroup', (cb, results) => {
       models.Expense.create({
-        "title": "Expense 1",
+        "title": "Expense 2",
         "amount": 100,
         "currency": "EUR",
-        "incurredAt": "2016-02-29T08:00:00.000Z",
-        "createdAt": "2016-02-29T08:00:00.000Z",
+        "incurredAt": "2016-03-01T08:00:00.000Z",
+        "createdAt": "2016-03-01T08:00:00.000Z",
         "GroupId": results.createGroup.id,
         "UserId": results.createTestUser.id,
         "lastEditedById": results.createTestUser.id,
@@ -156,12 +156,13 @@ export const resetTestDatabase = function(req, res, next) {
       .catch(cb);
     }],
 
-    addExpense2: ['createGroup', (cb, results) => {
+    // We add a second expense that incurred before the first expense we created
+    addExpense2: ['createGroup', 'addExpense1', (cb, results) => {
       models.Expense.create({
-        "title": "Expense 2",
+        "title": "Expense 1",
         "amount": 200,
         "currency": "EUR",
-        "incurredAt": "2016-03-01T08:00:00.000Z",
+        "incurredAt": "2016-02-29T08:00:00.000Z",
         "createdAt": "2016-03-01T08:00:00.000Z",
         "GroupId": results.createGroup.id,
         "UserId": results.createTestUser.id,
@@ -193,3 +194,4 @@ export const generateTestEmail = function(req, res) {
     res.send("Invalid data", e);
   }
 };
+
