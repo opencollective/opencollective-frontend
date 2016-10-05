@@ -165,7 +165,7 @@ export default (app) => {
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', auth.mustBePartOfTheGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
   app.post('/groups/:groupid/transactions', required('transaction'), auth.canEditGroup, groups.createTransaction); // Create a transaction for a group.

@@ -160,7 +160,6 @@ describe('transactions.routes.test.js', () => {
     it('successfully get a group\'s transactions', (done) => {
       request(app)
         .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
