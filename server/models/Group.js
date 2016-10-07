@@ -3,6 +3,7 @@
  */
 import _ from 'lodash';
 import Joi from 'joi';
+import Temporal from 'sequelize-temporal';
 import config from 'config';
 import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
@@ -499,7 +500,7 @@ export default function(Sequelize, DataTypes) {
       }
     }
   });
-
+  Temporal(Group, Sequelize);
   return Group;
 
   function isThankDonationEnabled(GroupId) {
