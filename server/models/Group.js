@@ -140,8 +140,18 @@ export default function(Sequelize, DataTypes) {
     isSupercollective: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    }
+    },
 
+    lastEditedById: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true // needs to be true because of old rows
+    }
   }, {
     paranoid: true,
 
