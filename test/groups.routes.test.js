@@ -133,10 +133,12 @@ describe('groups.routes.test.js', () => {
           Promise.all([
             models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
             models.UserGroup.count({where: { role: roles.MEMBER }}),
+            models.Group.find({where: { slug: g.slug }})
             ])
           .then(results => {
             expect(results[0].GroupId).to.equal(1);
             expect(results[1]).to.equal(2);
+            expect(results[2].lastEditedByUserId).to.equal(1);
             done();
           })
         });
@@ -247,6 +249,7 @@ describe('groups.routes.test.js', () => {
         .tap(user => expect(user).to.exist)
         .then(caUser => caUser.getGroups({paranoid: false})) // because we are setting deletedAt
         .tap(groups => expect(groups).to.have.length(1))
+        .tap(groups => expect(groups[0].lastEditedByUserId).to.equal(2))
         .then(() => models.UserGroup.findAll())
         .then(userGroups => {
           expect(userGroups).to.have.length(3);

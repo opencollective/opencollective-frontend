@@ -315,13 +315,12 @@ export const create = (req, res, next) => {
           return User.findOne({where: { email: user.email.toLowerCase() }})
           .then(u => u || User.create(user))
           .then(u => {
-            if (!creator) creator = u;
-            _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
+            if (!creator) {
+              creator = u;
+            }
+            return _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
           })
-          .then(() => {
-            createdGroup.lastEditedByUserId = creator.id;
-            return createdGroup.save();
-          })
+          .then(() => createdGroup.update({ lastEditedByUserId: creator.id }))
         } else {
           return null;
         }
