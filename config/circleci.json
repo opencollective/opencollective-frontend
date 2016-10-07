@@ -12,7 +12,7 @@
   "keys": {
     "opencollective": {
       "api_key": "circleci-1510egmf4a23d80342403fb599qd",
-      "secret": "8f047749ba6ad8e62b53b18b4c30295f45d849c1"
+      "secret": "circleci-a6ad8e62b53b18b4c30295f45d849c1"
     }
   },
   "stripe": {
