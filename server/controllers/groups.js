@@ -315,9 +315,12 @@ export const create = (req, res, next) => {
           return User.findOne({where: { email: user.email.toLowerCase() }})
           .then(u => u || User.create(user))
           .then(u => {
-            if (!creator) creator = u;
-            _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
+            if (!creator) {
+              creator = u;
+            }
+            return _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
           })
+          .then(() => createdGroup.update({ lastEditedByUserId: creator.id }))
         } else {
           return null;
         }
@@ -381,7 +384,7 @@ export const createFromGithub = (req, res, next) => {
       if (existingGroup) {
         group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true}));
+      return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true, lastEditedByUserId: creator.id}));
     })
     .tap(g => dbGroup = g)
     .tap(() => Activity.create({
@@ -476,6 +479,8 @@ export const update = (req, res, next) => {
   const updatedGroupAttrs = _.pick(req.required.group, whitelist);
 
   const newGroup = _.merge(req.group, updatedGroupAttrs);
+
+  newGroup.lastEditedByUserId = req.remoteUser.id;
 
   // Need to handle settings separately, since it's an object
   if (req.required.group.settings) {

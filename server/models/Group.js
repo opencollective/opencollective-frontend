@@ -3,6 +3,7 @@
  */
 import _ from 'lodash';
 import Joi from 'joi';
+import Temporal from 'sequelize-temporal';
 import config from 'config';
 import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
@@ -145,8 +146,18 @@ export default function(Sequelize, DataTypes) {
     isSupercollective: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    }
+    },
 
+    lastEditedByUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true // needs to be true because of old rows
+    }
   }, {
     paranoid: true,
 
@@ -494,7 +505,7 @@ export default function(Sequelize, DataTypes) {
       }
     }
   });
-
+  Temporal(Group, Sequelize);
   return Group;
 
   function isThankDonationEnabled(GroupId) {
