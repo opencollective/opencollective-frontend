@@ -55,7 +55,12 @@ export default function(Sequelize, DataTypes) {
       defaultValue: 'USD'
     },
 
-    logo: DataTypes.STRING,
+    logo: {
+      type: DataTypes.STRING,
+      get() {
+        return this.getDataValue('logo') || 'https://opencollective.com/static/images/1px.png';
+      }
+    },
 
     video: DataTypes.STRING,
 

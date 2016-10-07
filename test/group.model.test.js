@@ -66,6 +66,10 @@ describe('Group model', () => {
     .tap(() => User.createMany(users))
     .tap(() => Transaction.createMany(transactions, { GroupId: group.id })));
 
+  it('returns a default logo if no logo', () => {
+    expect(group.logo).to.equal('https://opencollective.com/static/images/1px.png');
+  });
+
   it('computes the balance ', () =>
     group.getBalance().then(balance => {
       let sum = 0;
