@@ -478,16 +478,14 @@ export const update = (req, res, next) => {
 
   const updatedGroupAttrs = _.pick(req.required.group, whitelist);
 
-  const newGroup = _.merge(req.group, updatedGroupAttrs);
-
-  newGroup.lastEditedByUserId = req.remoteUser.id;
+  updatedGroupAttrs.lastEditedByUserId = req.remoteUser.id;
 
   // Need to handle settings separately, since it's an object
   if (req.required.group.settings) {
-    newGroup.settings = Object.assign(req.group.settings || {}, req.required.group.settings);
+    updatedGroupAttrs.settings = Object.assign(req.group.settings || {}, req.required.group.settings);
   }
 
-  return newGroup.save()
+  return req.group.update(updatedGroupAttrs)
     .then(group => res.send(group.info))
     .catch(next)
 };
