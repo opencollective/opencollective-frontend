@@ -43,6 +43,11 @@ export default (app) => {
    */
   app.use('/status', serverStatus(app));
 
+  /**
+   * For testing the email templates
+   */
+  app.get('/templates/email/:template', test.generateTestEmail);
+
   app.use('*', auth.authorizeApiKey);
 
   /**
@@ -58,11 +63,6 @@ export default (app) => {
    * (an error will be returned if the JWT token is invalid, if not present it will simply continue)
    */
   app.use('*', aN.authenticateUser); // populate req.remoteUser if JWT token provided in the request
-
-  /**
-   * For testing the email templates
-   */
-  app.get('/templates/email/:template', test.generateTestEmail);
 
   /**
    * Parameters.

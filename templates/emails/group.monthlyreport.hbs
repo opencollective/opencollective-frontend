@@ -43,6 +43,8 @@ ul li {
 <p>Hi there! This your monthly report for your open collective with your latest balance (as of the last day of last month) and all the expenses that were submitted.
  Don't hesitate to send us your feedback by replying to this email. You can always visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}">{{group.publicUrl}}</a></p>
 
+<p>You've probably seen some changes to your collective already, we'd like to tell you more about them! See the #changelog at the bottom of this email.</p> 
+
 <center>
 <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
   <tr>
@@ -71,10 +73,10 @@ ul li {
 
 {{#each group.expenses}}
   <tr>
-    <td>{{{moment createdAt format="MM/DD"}}}</td>
-    <td align="right">{{{currency netAmountInGroupCurrency currency=currency}}}</td>
-    <td><a href="{{@root.config.host.app}}/groups/{{@root.group.id}}/expenses/{{id}}">{{description}}</a></td>
-    <td class="{{toLowerCase status}}">{{toLowerCase status}}</td>
+    <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
+    <td align="right" valign="top" nowrap>{{{currency netAmountInGroupCurrency currency=currency}}}</td>
+    <td valign="top"><a href="{{@root.config.host.app}}/groups/{{@root.group.id}}/expenses/{{id}}">{{description}}</a></td>
+    <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
   </tr>
 {{else}}
   No expense submitted. <a href="{{@root.group.publicUrl}}/expenses/new">Submit an expense</a>
@@ -101,18 +103,29 @@ ul li {
 
 <h2>Featured collective</h2>
 <ul>
-  <li><a href="https://opencollective.com/sfartandfilm?utm_source=email&utm_campaign=monthlyreport">San Francisco Art & Film for Teenagers</a>, is on a mission to make all the arts an important part of young people's lives. [<a href="https://opencollective.com/FreeRideToVote?utm_source=email&utm_campaign=monthlyreport#support">support that mission!</a>]</li>
+  <li><a href="https://opencollective.com/ubie?utm_source=email&utm_campaign=monthlyreport">UBIE Network</a>: We are on a mission to get Unconditional Basic Income (UBI) introduced in Europe. [<a href="https://opencollective.com/ubie?utm_source=email&utm_campaign=monthlyreport#support">support that mission!</a>]</li>
 </ul>
 
 <h2>Blog posts</h2>
-<li><a href="http://empathia.agency">Empathia Agency</a> (who works with us) is giving back to the open source community. They decided to add 1% to their bills to donate to the Open Source Collective + 1% coming from their margin. <a href="https://medium.empathia.agency/believe-in-giving-back-b451887d79cb#.5j4bysm00">Read more</a>.</li>
-<li><a href="http://blog.idonethis.com/open-source-community/">How iDoneThis says thank you to the open source community</a></li>
+<li>No new blog post this month 🤔<br />
+<i>Why don't you write a blog post to explain how you are using Open Collective? We will feature it here! 😊</i></li>
 </ul>
 
 <h2>Changelog</h2>
 <ul>
-<li>Check out our <a href="https://opencollective.com/discover">discovery page</a> with featured collectives and sponsors</li>
-<li>Apply for sponsorship. You can now contact existing sponsors on Open Collective to apply for sponsorship. See at the bottom of their profile page, e.g. <a href="https://opencollective.com/digitalocean">DigitalOcean</a>, <a href="https://opencollective.com/iDoneThis">iDoneThis</a>, <a href="https://opencollective.com/saucelabs">SauceLabs</a> and <a href="https://opencollective.com/saucelabs">SauceLabs</a></li>
+
+<li><b>Editable Collective</b> Woohooo You can log in through your collective, hover over logo, mission and texts to modify. Also access your profile from the dropdown menu. We are still working on hero image and adding contributors.</li>
+
+<li><b>Counter</b> We tried to remove the counter with the yearly budget but many of you were missing it. So it's back and we've added the total number of people that contribute to your collective (that includes your core contributors, your backers, your sponsors and your contributors on github if you have attached a github repository to your collective)</li>
+
+<li><b>Why Join Section</b> The black section in the middle is going away soon. You'll be able to use markdown to create any title and content in the long description as well as use it to show images and video.</li>
+
+<li><b>Support</b> We now have an dedicated email for requests (support@opencollective.com) as well as the <a href="https://slack.opencollective.com">#user-feedback channel in slack</a></li>
+
+<li><b>Twitter</b> You can now link your collective to your twitter account to automatically thank your backers/sponsors. <a href="{{group.publicUrl}}/connect/twitter">Deets here</a> (it's still a bit ugly but it works!)</li>
+
+<li><b>Slack</b> Don't forget to send Pia (pia@opencollective.com) your slack webhook url if you'd like to receive notifications for new donations/expenses in your slack channel.</li>
+
 </ul>
 
 </div>

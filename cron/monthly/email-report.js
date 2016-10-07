@@ -42,6 +42,9 @@ const init = () => {
       include: [ { model: models.Transaction, required: true }]
   };
 
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
+    query.limit = 10;
+
   Group.findAll(query)
   .tap(groups => {
       console.log(`Preparing the ${month} report for ${groups.length} groups`);
