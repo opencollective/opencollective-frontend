@@ -318,6 +318,10 @@ export const create = (req, res, next) => {
             if (!creator) creator = u;
             _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
           })
+          .then(() => {
+            createdGroup.lastEditedByUserId = creator.id;
+            return createdGroup.save();
+          })
         } else {
           return null;
         }
@@ -381,7 +385,7 @@ export const createFromGithub = (req, res, next) => {
       if (existingGroup) {
         group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true}));
+      return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true, lastEditedByUserId: creator.id}));
     })
     .tap(g => dbGroup = g)
     .tap(() => Activity.create({
@@ -477,7 +481,7 @@ export const update = (req, res, next) => {
 
   const newGroup = _.merge(req.group, updatedGroupAttrs);
 
-  newGroup.lastEditedById = req.remoteUser.id;
+  newGroup.lastEditedByUserId = req.remoteUser.id;
 
   // Need to handle settings separately, since it's an object
   if (req.required.group.settings) {

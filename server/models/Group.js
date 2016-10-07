@@ -143,7 +143,7 @@ export default function(Sequelize, DataTypes) {
       defaultValue: false
     },
 
-    lastEditedById: {
+    lastEditedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',

@@ -4,7 +4,7 @@ module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.addColumn(
       'Groups',
-      'lastEditedById',
+      'lastEditedByUserId',
       { type: Sequelize.INTEGER,
         references: {
           model: 'Users',
@@ -17,6 +17,6 @@ module.exports = {
   },
 
   down: function (queryInterface) {
-    return queryInterface.removeColumn('Groups', 'lastEditedById')
+    return queryInterface.removeColumn('Groups', 'lastEditedByUserId')
   }
 };

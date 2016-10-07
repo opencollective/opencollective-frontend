@@ -30,7 +30,7 @@ module.exports = {
       data: DataTypes.JSON,
       tags: DataTypes.ARRAY(DataTypes.STRING),
       isSupercollective: DataTypes.BOOLEAN,
-      lastEditedById: DataTypes.INTEGER,
+      lastEditedByUserId: DataTypes.INTEGER,
 
       hid: {
         type: DataTypes.BIGINT,
