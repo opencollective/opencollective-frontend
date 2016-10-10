@@ -181,7 +181,7 @@ export const getTransactions = (req, res, next) => {
         Link: getLinkHeader(getRequestedUrl(req), req.pagination)
       });
 
-      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': transaction.Donation && transaction.Donation.title})));
+      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': (transaction.Donation && transaction.Donation.title) || transaction.description })));
     })
     .catch(next);
 };
