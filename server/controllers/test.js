@@ -67,8 +67,8 @@ export const resetTestDatabase = function(req, res, next) {
         mission: 'our awesome mission',
         tags: ['open source'],
         tiers: [
-          {"name":"backer","title":"Backers","description":"Support us with a monthly donation and help us continue our activities.","button":"Become a backer","range":[1,100000],"presets":[1,5,10,25,50],"interval":"monthly"},
-          {"name":"sponsor","title":"Sponsors","description":"Is your company using Mocha? Ask your manager to support us. Your company logo will show up on our Github page.","button":"Become a sponsor","range":[500,500000],"presets":[500,1000],"interval":"monthly"}
+          {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
+          {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
         ],
         currency: 'EUR',
         isPublic: true

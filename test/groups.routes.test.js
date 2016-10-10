@@ -91,7 +91,7 @@ describe('groups.routes.test.js', () => {
           error: {
             code: 400,
             type: 'validation_failed',
-            message: 'Validation error: \"title\" is required',
+            message: 'Validation error: \"interval\" is required',
             fields: ['tiers']
           }
         })
