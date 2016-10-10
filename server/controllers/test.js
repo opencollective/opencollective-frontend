@@ -36,6 +36,21 @@ export const resetTestDatabase = function(req, res, next) {
     email: 'testuser@opencollective.com',
     password: 'password'
   };
+  const member = {
+    email: 'member@opencollective.com',
+    firstName: 'Xavier',
+    lastName: 'Damman'
+  }
+  const backer = {
+    email: 'backer@opencollective.com',
+    firstName: 'Aseem',
+    lastName: 'Sood'
+  }
+  const backer2 = {
+    email: 'backer2@opencollective.com',
+    firstName: 'Pia',
+    lastName: 'Mancini'
+  }
 
   async.auto({
     resetDb: (cb) => {
@@ -44,8 +59,48 @@ export const resetTestDatabase = function(req, res, next) {
         .catch(cb);
     },
 
-    createTestUser: ['resetDb', (cb) => {
+    createGroup: ['resetDb', (cb) => {
+      models.Group.create({
+        name: 'OpenCollective Test Group',
+        description: 'OpenCollective test group on the test server',
+        slug: 'testcollective',
+        mission: 'our awesome mission',
+        tags: ['open source'],
+        tiers: [
+          {"name":"backer","title":"Backers","description":"Support us with a monthly donation and help us continue our activities.","button":"Become a backer","range":[1,100000],"presets":[1,5,10,25,50],"interval":"monthly"},
+          {"name":"sponsor","title":"Sponsors","description":"Is your company using Mocha? Ask your manager to support us. Your company logo will show up on our Github page.","button":"Become a sponsor","range":[500,500000],"presets":[500,1000],"interval":"monthly"}
+        ],
+        currency: 'EUR',
+        isPublic: true
+      })
+      .then(group => cb(null, group))
+      .catch(cb);
+    }],
+
+    createTestUser: ['createGroup', (cb, results) => {
       models.User.create(testUser)
+        .tap(u => results.createGroup.addUserWithRole(u, roles.HOST))
+        .then(u => cb(null, u))
+        .catch(cb);
+    }],
+
+    createMember: ['createGroup', (cb, results) => {
+      models.User.create(member)
+        .tap(u => results.createGroup.addUserWithRole(u, roles.MEMBER))
+        .then(u => cb(null, u))
+        .catch(cb);
+    }],
+
+    createBacker: ['createGroup', (cb, results) => {
+      models.User.create(backer)
+        .tap(u => results.createGroup.addUserWithRole(u, roles.BACKER))
+        .then(u => cb(null, u))
+        .catch(cb);
+    }],
+
+    createBacker2: ['createGroup', (cb, results) => {
+      models.User.create(backer2)
+        .tap(u => results.createGroup.addUserWithRole(u, roles.BACKER))
         .then(u => cb(null, u))
         .catch(cb);
     }],
@@ -75,45 +130,24 @@ export const resetTestDatabase = function(req, res, next) {
       .catch(cb);
     }],
 
-    createGroup: ['createTestUser', (cb) => {
-      models.Group.create({
-        name: 'OpenCollective Test Group',
-        description: 'OpenCollective test group on the test server',
-        slug: 'testcollective',
-        mission: 'our awesome mission',
-        tags: ['open source'],
-        currency: 'EUR',
-        isPublic: true
-      })
-      .then(group => cb(null, group))
-      .catch(cb);
-    }],
-
-    addUserToGroup: ['createGroup', (cb, results) => {
-      const group = results.createGroup;
-      group.addUserWithRole(results.createTestUser, roles.HOST)
-        .then(() => cb())
-        .catch(cb)
-    }],
-
     createPaypalPaymentMethod: ['createTestUser', (cb, results) => {
       models.PaymentMethod.create({ service: 'paypal', UserId: results.createTestUser.id})
       .then(() => cb())
       .catch(cb);
     }],
 
-    addDonation1: ['createGroup', (cb, results) => {
+    addDonation1: ['createBacker', (cb, results) => {
       models.Donation.create({
         title: "Donation 1",
         amount: 100,
         currency: 'EUR',
         GroupId: results.createGroup.id,
-        UserId: results.createTestUser.id
+        UserId: results.createBacker.id
       })
       .then(donation => models.Transaction.create({
         amount: 1,
         currency: "EUR",
-        UserId: results.createTestUser.id,
+        UserId: results.createBacker.id,
         DonationId: donation.id
       }))
       .then(t => t.setGroup(results.createGroup))
@@ -121,18 +155,18 @@ export const resetTestDatabase = function(req, res, next) {
       .catch(cb);
     }],
 
-    addDonation2: ['createGroup', 'addDonation1', (cb, results) => {
+    addDonation2: ['createBacker2', 'addDonation1', (cb, results) => {
       models.Donation.create({
         title: "Donation 2",
         amount: 200,
         currency: 'EUR',
         GroupId: results.createGroup.id,
-        UserId: results.createTestUser.id
+        UserId: results.createBacker2.id
       })
       .then(donation => models.Transaction.create({
         amount: 2,
         currency: "EUR",
-        UserId: results.createTestUser.id,
+        UserId: results.createBacker2.id,
         DonationId: donation.id
       }))
       .then(t => t.setGroup(results.createGroup))
@@ -140,7 +174,7 @@ export const resetTestDatabase = function(req, res, next) {
       .catch(cb);
     }],
 
-    addExpense1: ['createGroup', (cb, results) => {
+    addExpense1: ['createTestUser', (cb, results) => {
       models.Expense.create({
         "title": "Expense 2",
         "amount": 100,
@@ -157,7 +191,7 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     // We add a second expense that incurred before the first expense we created
-    addExpense2: ['createGroup', 'addExpense1', (cb, results) => {
+    addExpense2: ['createMember', 'addExpense1', (cb, results) => {
       models.Expense.create({
         "title": "Expense 1",
         "amount": 200,
@@ -165,8 +199,8 @@ export const resetTestDatabase = function(req, res, next) {
         "incurredAt": "2016-02-29T08:00:00.000Z",
         "createdAt": "2016-03-01T08:00:00.000Z",
         "GroupId": results.createGroup.id,
-        "UserId": results.createTestUser.id,
-        "lastEditedById": results.createTestUser.id,
+        "UserId": results.createMember.id,
+        "lastEditedById": results.createMember.id,
         "payoutMethod": 'manual'
       })
       .then(() => cb())
