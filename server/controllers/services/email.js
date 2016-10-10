@@ -43,9 +43,15 @@ const fetchSubscribers = (groupSlug, type) => {
         channel: 'email',
         type
       },
+      order: [['createdAt','DESC']],
       include: [{model: models.User }, {model: models.Group, where: { slug: groupSlug } }]
     }
-  );
+  )
+  .then(subscriptions => subscriptions.map(s => s.User.info))
+  .then(subscribers => subscribers.map(s => {
+    s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.avatar)}`;
+    return s;
+  }));
 };
 
 // TODO: move to emailLib.js
@@ -61,7 +67,7 @@ const sendEmailToList = (to, email) => {
   .tap(subscribers => {
     if (subscribers.length === 0) throw new errors.NotFound(`No subscribers found in ${slug} for email type ${type}`);
   })
-  .then(results => results.map(r => r.User.email))
+  .then(results => results.map(r => r.email))
   .then(recipients => {
     console.log(`Sending email from ${email.from} to ${to} (${recipients.length} recipient(s))`);
     return Promise.map(recipients, (recipient) => {
@@ -172,14 +178,17 @@ export const webhook = (req, res, next) => {
     });
   }
 
+  let subscribers;
+
   models.Group.find({ where: { slug } })
     .tap(g => {
       if (!g) throw new Error('group_not_found');
       group = g;
     })
     .then(group => fetchSubscribers(group.slug, `mailinglist.${list}`))
-    .tap(subscribers => {
-      if (subscribers.length === 0) throw new Error('no_subscribers');
+    .tap(s => {
+      if (s.length === 0) throw new Error('no_subscribers');
+      subscribers = s;
     })
     .then(() => {
       return sequelize.query(`
@@ -192,7 +201,7 @@ export const webhook = (req, res, next) => {
     .tap(members => {
       if (members.length === 0) throw new Error('no_members');
     })
-    .then(users => {
+    .then(members => {
       const messageId = email['message-url'].substr(email['message-url'].lastIndexOf('/')+1);
       const mailserver = email['message-url'].substring(8, email['message-url'].indexOf('.'));
       const getData = (user) => {
@@ -201,11 +210,13 @@ export const webhook = (req, res, next) => {
           to: recipient,
           subject: email.subject,
           body: email['body-html'] || email['body-plain'],
+          subscribers,
+          latestSubscribers: subscribers.slice(0,15),
           approve_url: `${config.host.website}/api/services/email/approve?mailserver=${mailserver}&messageId=${messageId}&approver=${encodeURIComponent(user.email)}`
         };
       };
-      debug('preview')("Preview", `http://localhost:3060/templates/email/email.approve?data=${encodeURIComponent(JSON.stringify(getData(users[0])))}`);
-      return Promise.map(users, (user) => emailLib.send('email.approve', `members@${slug}.opencollective.com`, getData(user), {bcc:user.email}));
+      debug('preview')("Preview", `http://localhost:3060/templates/email/email.approve?data=${encodeURIComponent(JSON.stringify(getData(members[0])))}`);
+      return Promise.map(members, (user) => emailLib.send('email.approve', `members@${slug}.opencollective.com`, getData(user), {bcc:user.email}));
     })
     .then(() => res.send('Mailgun webhook processed successfully'))
     .catch(e => {

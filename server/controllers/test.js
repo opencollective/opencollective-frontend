@@ -39,17 +39,20 @@ export const resetTestDatabase = function(req, res, next) {
   const member = {
     email: 'member@opencollective.com',
     firstName: 'Xavier',
-    lastName: 'Damman'
+    lastName: 'Damman',
+    avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   }
   const backer = {
     email: 'backer@opencollective.com',
     firstName: 'Aseem',
-    lastName: 'Sood'
+    lastName: 'Sood',
+    avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/908fbcbca45e4a52a4309d00e980018c_e554f450-2127-11e6-9a76-e98f5a4a50b6.jpeg'
   }
   const backer2 = {
     email: 'backer2@opencollective.com',
     firstName: 'Pia',
-    lastName: 'Mancini'
+    lastName: 'Mancini',
+    avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/9EflVQqM_400x400jpg_2aee92e0-858d-11e6-9fd7-73dd31eb7c0c.jpeg'
   }
 
   async.auto({

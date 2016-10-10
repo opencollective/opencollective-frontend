@@ -24,24 +24,29 @@ const {
 
 const usersData = [
   {
-    name: 'Xavier Damman',
+    firstName: 'Xavier',
+    lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
     role: 'MEMBER',
+    avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
     lists: ['mailinglist.members','mailinglist.info']
   },
   {
-    name: 'Aseem Sood',
+    firstName: 'Aseem',
+    lastName: 'Sood',
     email: 'asood123+test@gmail.com',
     role: 'MEMBER'
   },
   {
-    name: 'Pia Mancini',
+    firstName: 'Pia',
+    lastName: 'Mancini',
     email: 'pia+test@opencollective.com',
     role: 'BACKER',
     lists: ['mailinglist.backers']
   },
   {
-    name: 'github',
+    firstName: 'github',
+    lastName: '',
     email: 'github+test@opencollective.com',
     role: 'BACKER',
     lists: ['mailinglist.backers']
