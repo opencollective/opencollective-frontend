@@ -24,7 +24,7 @@ const tier = Joi.object().keys({
   presets: Joi.array().items(Joi.number().integer()), // e.g. [1, 5, 20] for presets of $1, $5 and $20
   interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required(),
   amount: Joi.number()
-});
+}).unknown(); // this keeps unknown fields in the returned objects
 
 const tiers = Joi.array().items(tier);
 
