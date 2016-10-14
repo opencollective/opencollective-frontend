@@ -117,7 +117,7 @@
     "db:reset": "babel-node scripts/reset",
     "migration:create": "sequelize migration:create --config config/sequelize_cli.json",
     "postinstall": "npm run build && sh ./scripts/postinstall.sh",
-    "git:clean": "if [[ `git checkout master` ]]; then for BRANCH in `git branch | grep -v \"*\"`; do  if [[ `git diff master...$BRANCH` ]]; then echo \"- $BRANCH has unmerged changes\"; else echo \"> Deleting $BRANCH\"; git branch -D $BRANCH; fi; done; fi;",
+    "git:clean": "if [[ `git checkout master` ]]; then for BRANCH in `git branch | grep -v \"*\"`; do  if [[ `git diff master..$BRANCH` ]]; then echo \"- $BRANCH has unmerged changes\"; else echo \"> Deleting $BRANCH\"; git branch -D $BRANCH; fi; done; fi;",
     "deploy:staging": "bash -x scripts/deploy.sh staging",
     "deploy:production": "bash -x scripts/deploy.sh production",
     "report:weekly": "node cron/weekly/slack-report.js",
