@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import Promise from 'bluebird';
 import { GitHubClient } from 'opencollective-jobs';
-import _ from 'lodash';
 import models from '../../server/models';
+const _ = require('lodash');
 
 Promise.longStackTraces();
 const client = GitHubClient({logLevel: 'verbose'});
