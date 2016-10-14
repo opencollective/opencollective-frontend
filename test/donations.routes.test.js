@@ -451,8 +451,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('amount', data.amount*100);
             expect(res.rows[0]).to.have.property('SubscriptionId');
-            expect(res.rows[0]).to.have.property('title',
-              `Donation to ${group2.name}`);
+            expect(res.rows[0]).to.have.property('title', `Monthly donation to ${group2.name}`);
             done();
           })
           .catch(done)

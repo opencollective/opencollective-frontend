@@ -8,8 +8,7 @@ import * as paypal from '../gateways/paypal';
 import activities from '../constants/activities';
 import models from '../models';
 import errors from '../lib/errors';
-import {getLinkHeader, getRequestedUrl} from '../lib/utils';
-
+import {getLinkHeader, getRequestedUrl, capitalize} from '../lib/utils';
 
 /**
  * Get donations
@@ -72,6 +71,7 @@ const stripeDonation = (req, res, next) => {
   }
 
   let paymentMethod;
+  let title = `Donation to ${group.name}`;
 
   // fetch Stripe Account and get or create Payment Method
   return Promise.props({
@@ -96,6 +96,7 @@ const stripeDonation = (req, res, next) => {
   // (this needs to happen first, because of hook on Donation model)
   .then(() => {
     if (isSubscription) {
+      title = capitalize(`${interval}ly donation to ${group.name}`);
       return models.Subscription.create({
         amount: amountFloat,
         currency,
@@ -111,7 +112,7 @@ const stripeDonation = (req, res, next) => {
       GroupId: group.id,
       currency: currency,
       amount: amountInt,
-      title: `Donation to ${group.name}`,
+      title,
       PaymentMethodId: paymentMethod.id,
       SubscriptionId: subscription && subscription.id
     }))

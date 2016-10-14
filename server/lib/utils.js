@@ -217,6 +217,10 @@ export const isEmailInternal = (email) => {
   return false;
 };
 
+export function capitalize(str) {
+  return str[0].toUpperCase() + str.slice(1);
+}
+
 /**
  * Export public methods.
  */
