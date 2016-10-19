@@ -10,6 +10,7 @@ import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
 import queries from '../lib/queries';
+import slug from 'slug';
 
 /**
  * Constants.
@@ -35,8 +36,8 @@ export default (Sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
       set(val) {
-        if (val && val.toLowerCase) {
-          this.setDataValue('username', val.toLowerCase());
+        if (typeof val === 'string') {
+          this.setDataValue('username', slug(val).toLowerCase());
         }
       }
     },
@@ -69,10 +70,9 @@ export default (Sequelize, DataTypes) => {
 
     twitterHandle: {
       type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
-      validate: {
-        notContains: {
-          args: '@',
-          msg: 'twitterHandle must be without @ symbol'
+      set(val) {
+        if (typeof val === 'string') {
+          this.setDataValue('twitterHandle', val.replace(/^@/,''));
         }
       }
     },
@@ -336,11 +336,14 @@ export default (Sequelize, DataTypes) => {
     classMethods: {
 
       suggestUsername: (user) => {
-        let username = user.username || user.twitterHandle || user.name.replace(/ /g,'').toLowerCase();
+        let username = user.username || user.twitterHandle || user.name.replace(/ /g,'');
         if (!username && user.email) {
-          username = user.email.substr(0,user.email.indexOf('@'));
+          const tokens = user.email.split(/@|\+/);
+          username = tokens[0];
         }
         
+        username = slug(username).toLowerCase();
+
         const plusIndex = username.indexOf('+');
         if (plusIndex !== -1) {
           username = username.substr(0,plusIndex);
@@ -348,7 +351,7 @@ export default (Sequelize, DataTypes) => {
 
         if (!username) return Promise.resolve();
 
-        const where = { username: { $like: `${username.toLowerCase()}%`} };
+        const where = { username: { $like: `${username}%`} };
         if (user.id) where.id = { $ne: user.id };
 
         return User.count({ where }).then(count => {

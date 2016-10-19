@@ -78,13 +78,18 @@ describe('user.models.test.js', () => {
         .then(user => {
           expect(user.username).to.equal('xdamman1')
         })
-        .then(() => User.create({ twitterHandle: 'xdamman'}))
+        .then(() => User.create({ twitterHandle: '@xdamman'}))
         .then(user => {
           expect(user.username).to.equal('xdamman2')
+          expect(user.twitterHandle).to.equal('xdamman')
         })
         .then(() => User.create({ firstName: 'Xavier', lastName: 'Damman'}))
         .then(user => {
           expect(user.username).to.equal('xavierdamman')
+        })
+        .then(() => User.create({'username': 'hélène & les g.arçons'}))
+        .then(user => {
+          expect(user.username).to.equal('helene-and-les-garcons');
         })
     })
 

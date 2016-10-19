@@ -140,16 +140,16 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('fails if @ symbol in twitterHandle', (done) => {
+    it('removes the @ symbol in twitterHandle', (done) => {
       request(app)
         .post('/users')
         .send({
           api_key: application.api_key,
           user: _.extend({}, userData, {twitterHandle: '@asood123'})
         })
+        .expect(200)
         .end((e,res) => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.type).to.equal('validation_failed');
+          expect(res.body.twitterHandle).to.equal('asood123');
           done();
         });
     });

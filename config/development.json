@@ -1,4 +1,14 @@
 {
+  "database": {
+    "database": "opencollective_localhost",
+    "username": "opencollective",
+    "password": "",
+    "options": {
+      "host": "127.0.0.1",
+      "dialect": "postgres",
+      "logging": false
+    }
+  },
   "keys": {
     "opencollective": {
       "api_key": "dvl-1510egmf4a23d80342403fb599qd",
