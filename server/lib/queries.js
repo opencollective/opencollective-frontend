@@ -36,7 +36,7 @@ const getTotalDonations = () => {
     SELECT SUM(${generateFXConversionSQL()}) AS "totalDonationsInUSD"
     FROM "Transactions"
     WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL
-  `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
     type: sequelize.QueryTypes.SELECT
   })
@@ -66,7 +66,7 @@ const getTopBackers = (since, until, tags, limit) => {
     GROUP BY "UserId" 
     ORDER BY "totalDonations" DESC
     LIMIT ${limit}
-    `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+    `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
     {
       bind: { tags: tags || [] },
       model: models.User
@@ -108,7 +108,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
     FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
     WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
-  `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
     bind: { tag: [tag] },
     model: models.Group
@@ -135,7 +135,7 @@ const getTopSponsors = () => {
     FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
     WHERE t."totalDonations" > 100 AND u."isOrganization" IS TRUE
     ORDER BY t.collectives DESC, "totalDonations" DESC LIMIT :limit
-    `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+    `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
     {
       replacements: { limit: 6 },
       type: sequelize.QueryTypes.SELECT
@@ -183,7 +183,7 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
     WHERE ug."GroupId" = :GroupId
     AND ug."deletedAt" IS NULL
     ORDER BY "totalDonations" DESC, ug."createdAt" ASC
-  `.replace(/\n/g,' '), // this is to remove the new lines and save log space.
+  `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
     replacements: { GroupId },
     type: sequelize.QueryTypes.SELECT

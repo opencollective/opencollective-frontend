@@ -367,7 +367,7 @@ export default function(Sequelize, DataTypes) {
                 AND t."deletedAt" IS NULL
                 AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
             "yearlyIncome"
-          `.replace(/\n/g, ' '), // this is to remove the new lines and save log space.
+          `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
           {
             replacements: { GroupId: this.id },
             type: Sequelize.QueryTypes.SELECT
