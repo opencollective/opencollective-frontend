@@ -80,14 +80,15 @@ const _addUserToGroup = (group, user, options) => {
     .then(createActivity);
 };
 
-const getUserData = (groupId, tiers) => {
-  return queries.getUsersFromGroupWithTotalDonations(groupId)
-    .then(backers => appendTier(backers, tiers))
+const _getUsersData = (group) => {
+  return group.getSuperCollectiveGroupsIds()
+    .then(ids => queries.getUsersFromGroupWithTotalDonations(ids))
+    .then(backers => appendTier(backers, group.tiers))
 };
 
 export const getUsers = (req, res, next) => {
   auth.canEditGroup(req, res, (e, canEditGroup) => {
-    let promise = getUserData(req.group.id, req.group.tiers);
+    let promise = _getUsersData(req.group);
 
     if (req.query.filter && req.query.filter === 'active') {
       const now = moment();
@@ -108,7 +109,7 @@ export const getUsers = (req, res, next) => {
 };
 
 export const getUsersWithEmail = (req, res, next) => {
-  let promise = getUserData(req.group.id, req.group.tiers);
+  let promise = _getUsersData(req.group);
   if (req.query.filter && req.query.filter === 'active') {
     const now = moment();
     promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);

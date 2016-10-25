@@ -508,8 +508,20 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('superCollectiveData')
             expect(res.body.superCollectiveData.length).to.eql(1);
             expect(res.body.superCollectiveData[0].publicUrl).to.contain('wwcode-austin');
+            expect(res.body.superCollectiveData[0]).to.have.property('settings');
             done();
           })
+      });
+
+      it('successfully get contributors across all sub collectives', (done) => {
+        request(app)
+          .get(`/groups/${supercollective.slug}/users?api_key=${application.api_key}`)
+          .expect(200)
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            expect(res.body.length).to.equal(2);
+            done();
+          });
       });
     });
   });

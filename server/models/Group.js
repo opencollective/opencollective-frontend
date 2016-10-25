@@ -204,7 +204,8 @@ export default function(Sequelize, DataTypes) {
           logo: this.logo,
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
-          mission: this.mission
+          mission: this.mission,
+          settings: this.settings
         }
       },
       minimal() {
@@ -220,6 +221,22 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
+      getSuperCollectiveGroupsIds() {
+        if (!this.isSupercollective) return Promise.resolve([this.id]);
+        if (this.superCollectiveGroupsIds) return Promise.resolve(this.superCollectiveGroupsIds);
+        return models.Group.findAll({
+          attributes: ['id'],
+          where: {
+            tags: { $contains: [this.settings.superCollectiveTag] }
+          }
+        })
+        .then(rows => rows.map(r => r.id))
+        .then(ids => {
+          ids.push(this.id);
+          this.superCollectiveGroupsIds = ids;
+          return ids;
+        });
+      },
       hasUserWithRole(userId, expectedRoles, cb) {
         this
           .getUsers({
@@ -336,7 +353,8 @@ export default function(Sequelize, DataTypes) {
           2) All one-time and yearly subscriptions
           3) All inactive monthly subscriptions that have contributed in the past
         */
-        return Sequelize.query(`
+        return this.getSuperCollectiveGroupsIds()
+          .then(groupids => Sequelize.query(`
           SELECT
             (SELECT
              COALESCE(SUM( t."netAmountInGroupCurrency"*12),0)
@@ -344,7 +362,7 @@ export default function(Sequelize, DataTypes) {
               LEFT JOIN "Transactions" t
               ON (s.id = t."SubscriptionId"
                 AND t.id = (SELECT MAX(id) from "Transactions" t where t."SubscriptionId" = s.id))
-              WHERE "GroupId" = :GroupId
+              WHERE "GroupId" IN (:groupids)
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND s.interval = 'month'
@@ -354,7 +372,7 @@ export default function(Sequelize, DataTypes) {
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
               LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-              WHERE "GroupId" = :GroupId
+              WHERE "GroupId" IN (:groupids)
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
@@ -362,31 +380,32 @@ export default function(Sequelize, DataTypes) {
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
               LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-              WHERE "GroupId" = :GroupId
+              WHERE "GroupId" IN (:groupids)
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
             "yearlyIncome"
           `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
           {
-            replacements: { GroupId: this.id },
+            replacements: { groupids },
             type: Sequelize.QueryTypes.SELECT
-          }).then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
+          }))
+          .then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
       },
 
       getTotalDonations() {
-        return models.Transaction
-          .find({
+        return this.getSuperCollectiveGroupsIds()
+          .then(ids => models.Transaction.find({
             attributes: [
               [Sequelize.fn('SUM', Sequelize.col('amount')), 'donationTotal']
             ],
             where: {
-              GroupId: this.id,
+              GroupId: { $in: ids },
               amount: {
                 $gt: 0
               }
             }
-          })
+          }))
           .then((result) => {
             const json = result.toJSON();
             return Promise.resolve(Number(json.donationTotal));
@@ -395,24 +414,24 @@ export default function(Sequelize, DataTypes) {
 
       getBackersCount(until) {
         until = until || new Date;
-        return models.Transaction
-          .find({
+
+        return this.getSuperCollectiveGroupsIds()
+          .then(ids => models.Transaction.find({
             attributes: [
               [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('UserId'))), 'backersCount']
             ],
             where: {
-              GroupId: this.id,
+              GroupId: { $in: ids },
               amount: {
                 $gt: 0
               },
               createdAt: { $lt: until }
             }
-          })
-          .then((result) => {
-            const json = result.toJSON();
-
-            return Promise.resolve(Number(json.backersCount));
-          })
+          }))
+        .then((result) => {
+          const json = result.toJSON();
+          return Promise.resolve(Number(json.backersCount));
+        });
       },
 
       getTwitterSettings() {
@@ -473,7 +492,6 @@ export default function(Sequelize, DataTypes) {
       getGroupsSummaryByTag: (tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
         limit = limit || 3;
         excludeList = excludeList || [];
-
         return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset)
           .then(groups => {
             return Promise.all(groups.map(group => {

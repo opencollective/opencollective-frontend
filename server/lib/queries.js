@@ -104,7 +104,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
     WITH "totalDonations" AS (
       SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
     )
-    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", t."totalDonations", t.currency, t.collectives
+    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.settings, t."totalDonations", t.currency, t.collectives
     FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
     WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
@@ -145,21 +145,22 @@ const getTopSponsors = () => {
 /**
  * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
  */
-const getUsersFromGroupWithTotalDonations = (GroupId) => {
+const getUsersFromGroupWithTotalDonations = (GroupIds) => {
+  const groupids = (typeof GroupIds === 'number') ? [GroupIds] : GroupIds;
   return sequelize.query(`
     WITH total_donations AS (
       SELECT
         max("UserId") as "UserId",
         SUM(amount/100) as amount
       FROM "Donations" d
-      WHERE d."GroupId" = :GroupId AND d.amount >= 0
+      WHERE d."GroupId" IN (:groupids) AND d.amount >= 0
       GROUP BY "UserId"
     ), last_donation AS (
       SELECT
         max("UserId") as "UserId",
         max("updatedAt") as "updatedAt"
       FROM "Transactions" t
-      WHERE t."GroupId" = :GroupId AND t.amount >= 0
+      WHERE t."GroupId" IN (:groupids) AND t.amount >= 0
       GROUP BY "UserId"
     )
     SELECT
@@ -180,12 +181,12 @@ const getUsersFromGroupWithTotalDonations = (GroupId) => {
     LEFT JOIN "Users" u ON u.id = ug."UserId"
     LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
     LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
-    WHERE ug."GroupId" = :GroupId
+    WHERE ug."GroupId" IN (:groupids)
     AND ug."deletedAt" IS NULL
     ORDER BY "totalDonations" DESC, ug."createdAt" ASC
   `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
-    replacements: { GroupId },
+    replacements: { groupids },
     type: sequelize.QueryTypes.SELECT
   });
 };
