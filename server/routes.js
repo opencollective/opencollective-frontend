@@ -217,7 +217,6 @@ export default (app) => {
   /**
    * Stripe oAuth
    */
-
   app.get('/stripe/authorize', auth.mustBeLoggedIn, stripe.authorize);
   app.get('/stripe/oauth/callback', stripe.callback);
 
