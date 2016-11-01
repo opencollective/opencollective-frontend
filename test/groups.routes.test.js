@@ -462,6 +462,7 @@ describe('groups.routes.test.js', () => {
     });
 
     describe('Supercollective', () => {
+      const data = {"utmSource":"undefined","githubContributors":{"staltz":1710,"TylorS":165,"Frikki":24,"ntilwalli":11,"pH200":10,"laszlokorte":7,"shvaikalesh":7,"Cmdv":7,"whitecolor":6,"Widdershin":4,"greenkeeperio-bot":4,"ccapndave":3,"chromakode":3,"bumblehead":3,"carloslfu":2,"niieani":2,"aqum":2,"craigmichaelmartin":2,"dobrite":2,"erykpiast":2,"Hypnosphi":2,"bloodyKnuckles":2,"mxstbr":2,"michalvankodev":2,"raquelxmoss":2,"secobarbital":2,"schrepfler":2,"SteveALee":2,"wbreakell":2,"arnodenuijl":2,"naruaway":2,"chadrien":2,"nlarche":1,"bcbcarl":1,"wyqydsyq":1,"voronianski":1,"dmitriid":1,"hhariri":1,"arlair":1,"harrywincup":1,"ivan-kleshnin":1,"jmeas":1,"joakimbeng":1,"kay-is":1,"krawaller":1,"leesiongchan":1,"ludovicofischer":1,"Maximilianos":1,"MicheleBertoli":1,"AdrianoFerrari":1,"axefrog":1,"benjyhirsch":1,"phadej":1,"pasih":1,"paulkogel":1,"pe3":1,"piamancini":1,"stevenmathews":1,"travenasty":1,"Vinnl":1,"psychowico":1,"wcastand":1,"fiatjaf":1,"iambumblehead":1,"joneshf":1,"m90":1,"mikekidder":1,"mz3":1,"tautvilas":1}};
       const supercollectiveData = utils.data('group4');
       supercollectiveData.users = [{email:'testuser@test.com', role: roles.MEMBER}];
       let supercollective;
@@ -487,14 +488,14 @@ describe('groups.routes.test.js', () => {
           });
       });
 
-      beforeEach('create a second group', () =>
-        request(app).post('/groups')
+      beforeEach('create a second group', () => {
+        return request(app).post('/groups')
           .send({
             api_key: application.api_key,
-            group: Object.assign({}, utils.data('group2'), { users: [{email:userData3.email, role: roles.MEMBER}]})
+            group: Object.assign({}, utils.data('group2'), { users: [{email:userData3.email, role: roles.MEMBER}], data })
           })
-          .expect(200)
-      );
+          .expect(200);
+      });
 
       it('successfully get a supercollective with data', (done) => {
         request(app)
@@ -507,6 +508,8 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('isSupercollective', supercollective.isSupercollective);
             expect(res.body).to.have.property('superCollectiveData')
             expect(res.body.superCollectiveData.length).to.eql(1);
+            expect(res.body.superCollectiveData[0].contributorsCount).to.eql(Object.keys(data.githubContributors).length);
+            expect(res.body.contributorsCount).to.equal(Object.keys(data.githubContributors).length);
             expect(res.body.superCollectiveData[0].publicUrl).to.contain('wwcode-austin');
             expect(res.body.superCollectiveData[0]).to.have.property('settings');
             done();

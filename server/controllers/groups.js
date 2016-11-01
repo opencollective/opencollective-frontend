@@ -553,6 +553,10 @@ function doUpdate(whitelist, req, res, next) {
 export const getOne = (req, res, next) => {
   const group = req.group.info;
 
+  const aggregate = (array, attribute) => {
+    return array.map(d => d[attribute]).reduce((a, b) => a + b);
+  };
+
   Promise.all([
     req.group.getStripeAccount(),
     req.group.getConnectedAccount(),
@@ -571,10 +575,18 @@ export const getOne = (req, res, next) => {
     group.yearlyIncome = values[3];
     group.donationTotal = values[4];
     group.backersCount = values[5];
+    group.contributorsCount = (group.data && group.data.contributors) ? Object.keys(group.data.contributors).length : 0;
     group.settings = group.settings || {};
     group.settings.twitter = values[6];
     group.related = values[7];
     group.superCollectiveData = values[8];
+    if (group.superCollectiveData) {
+      group.collectivesCount = group.superCollectiveData.length;
+      group.contributorsCount += aggregate(group.superCollectiveData, 'contributorsCount');
+      group.yearlyIncome += aggregate(group.superCollectiveData, 'yearlyIncome');
+      group.backersCount += aggregate(group.superCollectiveData, 'backersCount');
+      group.donationTotal += aggregate(group.superCollectiveData, 'donationTotal');
+    }
     return group;
   })
   .then(group => res.send(group))

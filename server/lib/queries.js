@@ -104,7 +104,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
     WITH "totalDonations" AS (
       SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
     )
-    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.settings, t."totalDonations", t.currency, t.collectives
+    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.settings, g.data, t."totalDonations", t.currency, t.collectives
     FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
     WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
@@ -177,8 +177,8 @@ const getUsersFromGroupWithTotalDonations = (GroupIds) => {
       u."twitterHandle" as "twitterHandle",
       td.amount as "totalDonations",
       ld."updatedAt" as "lastDonation"
-    FROM "UserGroups" ug
-    LEFT JOIN "Users" u ON u.id = ug."UserId"
+    FROM "Users" u
+    LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
     LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
     LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
     WHERE ug."GroupId" IN (:groupids)
