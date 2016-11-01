@@ -64,5 +64,8 @@
   },
   "session": {
     "secret": "EXPRESS_SESSION_SECRET"
+  },
+  "expressperf": {
+    "api_key": "EXPRESS_PERF_API_KEY"
   }
 }
