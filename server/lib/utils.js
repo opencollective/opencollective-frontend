@@ -167,7 +167,7 @@ export const getTier = (user, tiers) => {
   });
 
   // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
-  const tier = tiers.find((tier) => (user.totalDonations >= tier.range[0]));
+  const tier = tiers.find((tier) => (user.totalDonations / 100 >= tier.range[0]));
 
   return (tier && tier.name) ? tier.name : defaultTier;
 

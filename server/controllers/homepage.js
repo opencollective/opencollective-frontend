@@ -28,7 +28,7 @@ export default (req, res, next) => {
   Promise.all([
     getTotalCollectives(),
     getTotalDonors(),
-    queries.getTotalDonations(),
+    queries.getTotalAnnualBudget(),
     models.Group.getGroupsSummaryByTag('open source', 3, [], 100, true),
     models.Group.getGroupsSummaryByTag('meetup', 3, [], 100, true),
     queries.getTopSponsors()
@@ -38,7 +38,7 @@ export default (req, res, next) => {
       stats: {
         totalCollectives: results[0],
         totalDonors: results[1],
-        totalDonations: results[2]
+        totalAnnualBudget: results[2]
       },
       collectives: {
         opensource: results[3],

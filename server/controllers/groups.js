@@ -662,15 +662,6 @@ export const updateUser = (req, res, next) => {
 };
 
 /**
- * Get leaderboard of collectives
- */
-export const getLeaderboard = (req, res, next) => {
-  return queries.getLeaderboard()
-  .then(groups => res.send(groups))
-  .catch(next);
-};
-
-/**
  * Get array of unique group tags
  */
 export const getGroupTags = (req, res, next) => {

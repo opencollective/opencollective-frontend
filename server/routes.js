@@ -252,11 +252,6 @@ export default (app) => {
   app.post('/subscriptions/:subscriptionid/cancel', auth.mustBeLoggedIn, subscriptions.cancel);
 
   /**
-   * Leaderboard
-   */
-  app.get('/leaderboard', groups.getLeaderboard); // Create a user.
-
-  /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL
    */
   app.use((req, res) => res.sendStatus(404));

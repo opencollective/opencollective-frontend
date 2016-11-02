@@ -4,8 +4,8 @@ import data from './mocks/data';
 import roles from '../server/constants/roles';
 
 const group = data.group1;
-const backer = { totalDonations: 5 };
-const sponsor = { totalDonations: 500 };
+const backer = { totalDonations: 500 };
+const sponsor = { totalDonations: 50000 };
 
 describe("utils", () => {
 
