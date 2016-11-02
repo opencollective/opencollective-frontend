@@ -351,11 +351,15 @@ export const show = (req, res, next) => {
       .then(results => {
         let groupInfo = group.info;
         groupInfo.yearlyIncome = results[0];
-        const usersByRole = groupBy(results[1], 'role');
+        const users = results[1];
+        const user = users.filter(u => u.id === req.user.id)[0];
+        const usersByRole = groupBy(users, 'role');
         const backers = usersByRole[roles.BACKER] || [];
         groupInfo.backersAndSponsorsCount = backers.length;
         groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
         groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
+        groupInfo.myTotalDonations = user.totalDonations;
+        groupInfo.myTier = user.tier;
         groupInfo = Object.assign(groupInfo, { role: group.UserGroup.role, createdAt: group.UserGroup.createdAt });
         groupInfoArray.push(groupInfo);
         return group;
