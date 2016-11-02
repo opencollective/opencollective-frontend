@@ -58,6 +58,10 @@ export const list = (req, res, next) => {
     order: [[req.sorting.key, req.sorting.dir]]
   }, req.pagination);
 
+  if (req.body.unpaid_only || req.query.unpaid_only) {
+    query.where.status = [status.PENDING, status.APPROVED];
+  }
+
   return models.Expense.findAndCountAll(query)
     .then(expenses => {
       // Set headers for pagination.
