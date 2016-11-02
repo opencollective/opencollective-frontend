@@ -18,6 +18,7 @@ const templateNames = [
   'group.monthlyreport',
   'thankyou',
   'thankyou.wwcode',
+  'thankyou.brusselstogether',
   'thankyou.ispcwa',
   'thankyou.fr',
   'thankyou.laprimaire',
@@ -32,11 +33,13 @@ const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
 const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
 const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.hbs`, 'utf8');
 const toplogo = fs.readFileSync(`${templatesPath}/partials/toplogo.hbs`, 'utf8');
+const relatedgroups = fs.readFileSync(`${templatesPath}/partials/relatedgroups.hbs`, 'utf8');
 
 handlebars.registerPartial('header', header);
 handlebars.registerPartial('footer', footer);
 handlebars.registerPartial('subscriptions', subscriptions);
 handlebars.registerPartial('toplogo', toplogo);
+handlebars.registerPartial('relatedgroups', relatedgroups);
 
 handlebars.registerHelper('sign', (value) => {
   if (value >= 0) return '+';

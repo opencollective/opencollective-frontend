@@ -1,0 +1,37 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+{{else}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+{{/if}}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if user.name}}
+<p>Dear {{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+{{#if interval}}
+<p>We would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}}. Your first payment was received on {{{moment donation.createdAt}}}. Your gift will help us continue our activities.</p>
+{{else}}
+<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+  Your gift will help us continue our activities.</p>
+{{/if}}
+
+<p>Join our <a href="https://facebook.com/groups/BrusselsTogether">Facebook Group</a> or join the conversation on <a href="https://slack.brusselstogether.org">our slack</a>.
+And don't forget to use the hashtag #BrusselsTogether whenever you share something on social networks about initiatives that are happening that we need to support together.</p>
+
+{{> subscriptions}}
+
+<p>Warmly,</p>
+
+<p>
+  – The {{group.name}} collective
+</p>
+
+{{> relatedgroups}}
+
+{{> footer}}

@@ -2,7 +2,6 @@ import * as stripe from '../gateways/stripe';
 import * as transactions from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from './email';
-import config from 'config';
 
 export const processDonation = (Sequelize, donation) => {
 
@@ -114,17 +113,18 @@ export const processDonation = (Sequelize, donation) => {
         // Mark donation row as processed
         .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
 
+        .then(() => group.getRelatedGroups(3))
+
         // send out confirmation email
-        .then(() => emailLib.send(
+        .then((relatedGroups) => emailLib.send(
           'thankyou',
           user.email,
           { donation: donation.info,
             user,
             group,
+            relatedGroups,
             interval: subscription && subscription.interval,
-            // TODO: bring this back. Figure out how to pass the application link
-            // subscriptionsLink: user.generateLoginLink(req.application, '/subscriptions')
-            subscriptionsLink: `${config.host.website}/subscriptions`
+            subscriptionsLink: user.generateLoginLink('/subscriptions')
           }));
       }
     };
