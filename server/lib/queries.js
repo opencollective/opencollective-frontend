@@ -1,4 +1,5 @@
 import models, {sequelize} from '../models';
+import config from 'config';
 
 /*
 * Hacky way to do currency conversion
@@ -174,7 +175,11 @@ const getTopSponsors = () => {
     {
       replacements: { limit: 6 },
       type: sequelize.QueryTypes.SELECT
-  });
+  })
+  .then(sponsors => sponsors.map(sponsor => {
+    sponsor.publicUrl = `${config.host.website}/${sponsor.username}`
+    return sponsor;
+  }));
 };
 
 /**
