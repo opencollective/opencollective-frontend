@@ -68,6 +68,6 @@
     "consumerSecret": "xxxxx"
   },
   "expressperf": {
-    "api_key": "xxx"
+    "api_key": ""
   }
 }
