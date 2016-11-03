@@ -188,7 +188,7 @@ describe('subscriptions.routes.test.js', () => {
               expect(activity).to.be.defined;
               expect(activity.GroupId).to.be.equal(group.id);
               expect(activity.UserId).to.be.equal(user.id);
-              expect(activity.data.subscriptionId).to.be.equal(transaction.SubscriptionId);
+              expect(activity.data.subscription.id).to.be.equal(transaction.SubscriptionId);
               expect(activity.data.group.id).to.be.equal(group.id);
               expect(activity.data.user.id).to.be.equal(user.id);
             })

@@ -263,6 +263,29 @@ export default {
         }
       },
       {
+        "type": "subscription.canceled",
+        "data": {
+          "user": {
+            "email":"jussi@kuohujoki.fi",
+            "twitterHandle": "xdamman"
+          },
+          "donation": {
+            "amount": 1234,
+            "currency": "EUR"
+          },
+          "subscription": {
+            "interval": "month",
+            "id": 4
+          },
+          "group": {
+            "name": "Yeoman",
+            "slug": "yeoman",
+            "twitterHandle": "yeoman",
+            "publicUrl": "https://opencollective.com/yeoman"
+          }
+        }
+      },
+      {
         "type": "group.created",
         "data": {
           "user": {
