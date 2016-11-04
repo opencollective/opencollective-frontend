@@ -449,13 +449,8 @@ export default function(Sequelize, DataTypes) {
           });
       },
 
-      getRelatedGroups(limit) {
-        // don't fetch related groups for supercollectives for now
-        if (!this.isSupercollective) {
-          limit = limit || 3
-          return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], 100, true);
-        }
-        return Promise.resolve();
+      getRelatedGroups(limit=3, minTotalDonation=100) {
+        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonation, true);
       },
 
       hasHost() {

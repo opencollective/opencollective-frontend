@@ -15,7 +15,12 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 {{/if}}
 
 {{#if interval}}
-<p>I would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
+  {{#if firstPayment}}
+  <p>I would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
+  {{else}}
+    <p>I would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment donation.createdAt}}}.
+    Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
+  {{/if}}
 {{else}}
 <p>I would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}. Your generous gift helps us promote, inspire, and advance more women leaders in tech.</p>
 {{/if}}

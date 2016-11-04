@@ -1,4 +1,5 @@
 import models, {sequelize} from '../models';
+import currencies from '../constants/currencies'
 import config from 'config';
 
 /*
@@ -13,17 +14,10 @@ const generateFXConversionSQL = (aggregate) => {
     amountColumn = 'SUM("t.\"netAmountInGroupCurrency\"")';
   }
 
-  // FXRate as of 6/27/2016
-  const fxConversion = [
-    ['USD', 1.0],
-    ['EUR', 0.92],
-    ['GBP', 0.82],
-    ['MXN', 18.49],
-    ['SEK', 8.93],
-    ['AUD', 1.31],
-    ['INR', 66.78],
-    ['CAD', 1.33]
-  ];
+  const fxConversion = [];
+  for (const currency in currencies) {
+    fxConversion.push([currency, currencies[currency].fxrate]);
+  }
 
   let sql = 'CASE ';
   sql += fxConversion.map(currency => `WHEN ${currencyColumn} = '${currency[0]}' THEN ${amountColumn} / ${currency[1]}`).join('\n');
@@ -140,7 +134,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
     WITH "totalDonations" AS (
       SELECT "GroupId", SUM(amount*100) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
     )
-    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.settings, g.data, t."totalDonations", t.currency, t.collectives
+    SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.currency, g.settings, g.data, t."totalDonations", t.collectives
     FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
     WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}

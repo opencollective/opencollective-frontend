@@ -557,6 +557,12 @@ export const getOne = (req, res, next) => {
     return array.map(d => d[attribute]).reduce((a, b) => a + b);
   };
 
+  const getRelatedGroups = () => {
+    // don't fetch related groups for supercollectives for now
+    if (req.group.isSupercollective) return Promise.resolve();
+    else return req.group.getRelatedGroups();
+  }
+
   Promise.all([
     req.group.getStripeAccount(),
     req.group.getConnectedAccount(),
@@ -565,7 +571,7 @@ export const getOne = (req, res, next) => {
     req.group.getTotalDonations(),
     req.group.getBackersCount(),
     req.group.getTwitterSettings(),
-    req.group.getRelatedGroups(),
+    getRelatedGroups(),
     req.group.getSuperCollectiveData()
     ])
   .then(values => {

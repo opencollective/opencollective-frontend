@@ -116,35 +116,7 @@ describe('lib/email', () => {
         slug: 'brusselstogether',
         logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png'
       },
-      relatedGroups: [
-        {
-          name: 'Reinventing Brussels',
-          slug: 'reinventingbrussels',
-          description: 'Co-creating the City of our Dreams',
-          logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-          currency: 'EUR',
-          contributorsCount: 3,
-          yearlyIncome: 1020
-        },
-        {
-          name: 'Refugees Got Talent',
-          slug: 'refugeesgottalent',
-          description: 'We offer a space and artistic material to refugees artists, so they can practice their art again.',
-          logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-          currency: 'EUR',
-          contributorsCount: 20,
-          yearlyIncome: 5000
-        },
-        {
-          name: 'Brussels Smart City',
-          slug: 'brusselssmartcity',
-          description: 'Connect people to create value, one project at a time.',
-          logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-          currency: 'EUR',
-          contributorsCount: 2,
-          yearlyIncome: 100
-        }
-      ],
+      relatedGroups: utils.data('relatedGroups'),
       config
     };
 

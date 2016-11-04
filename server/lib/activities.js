@@ -215,7 +215,7 @@ export default {
 
         if (activity.data.transaction.isDonation) {
           if (userTwitter) {
-            tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
+            tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
             tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
             tweetThis = ` [${tweetLink}]`;
           }
@@ -239,7 +239,7 @@ export default {
 
       case activities.SUBSCRIPTION_CONFIRMED:
         if (userTwitter) {
-          tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency](recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
+          tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
           tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
           tweetThis = ` [${tweetLink}]`;
         }

@@ -95,6 +95,7 @@
 }
 </style>
 
+{{#if relatedGroups.length}}
 <h2>Related collectives</h2>
 
 <div class="CollectiveCards">
@@ -108,7 +109,7 @@
         </div>
         <div class='CollectiveCard-body'>
           <div class='CollectiveCard-name'>{{name}}</div>
-          <div class='CollectiveCard-description'>{{description}}</div>
+          <div class='CollectiveCard-description'>We are on a mission to {{mission}}</div>
         </div>
         <div class='CollectiveCard-footer'>
           <div class='clearfix mt2'>
@@ -127,3 +128,5 @@
   </div>
   {{/each}}
 </div>
+
+{{/if}}

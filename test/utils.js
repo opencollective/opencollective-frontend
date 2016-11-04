@@ -6,7 +6,12 @@ import config from 'config';
 
 jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
-export const data = (item) => Object.assign({}, jsonData[item]); // to avoid changing these data
+export const data = (item) => {
+  // we make a copy of the data to avoid modifying original
+  const data = jsonData[item];
+  if (data.length > 0) return data.slice();
+  else return Object.assign({}, data);
+}
 
 export const clearbitStubBeforeEach = sandbox => {
   sandbox.stub(userlib.clearbit.Enrichment, 'find', () => {

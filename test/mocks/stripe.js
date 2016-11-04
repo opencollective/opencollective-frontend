@@ -90,31 +90,31 @@ export default {
     "id": "txn_165j8oIqnMN1wWwOKlPn1D4y",
     "object": "balance_transaction",
     "source": "ch_2OEK6e5bc72wce",
-    "amount": 1400,
+    "amount": 140000,
     "currency": "usd",
-    "net": 1175,
+    "net": 117500,
     "type": "charge",
     "created": 1376577420,
     "available_on": 1377129600,
     "status": "pending",
-    "fee": 225,
+    "fee": 22500,
     "fee_details": [
       {
-        "amount": 25,
+        "amount": 2500,
         "currency": "usd",
         "type": "stripe_fee",
         "description": "Stripe currency conversion fee",
         "application": null
       },
       {
-        "amount": 70,
+        "amount": 7000,
         "currency": "usd",
         "type": "application_fee",
         "description": "VAT",
         "application": null
       },
       {
-        "amount": 130,
+        "amount": 13000,
         "currency": "usd",
         "type": "stripe_fee",
         "description": "Stripe processing fees",
@@ -256,7 +256,7 @@ export default {
             {
               "id": "sub_7ZdqElVkS7b8Ep",
               "object": "line_item",
-              "amount": 350,
+              "amount": 35000,
               "currency": "usd",
               "description": null,
               "discountable": true,

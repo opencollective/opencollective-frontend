@@ -124,6 +124,30 @@ export default {
     "isSupercollective": true
   },
 
+  "relatedGroups": [
+    {
+      name: 'Reinventing Brussels',
+      slug: 'reinventingbrussels',
+      mission: 'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
+      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      currency: 'EUR'
+    },
+    {
+      name: 'Refugees Got Talent',
+      slug: 'refugeesgottalent',
+      mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
+      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      currency: 'EUR'
+    },
+    {
+      name: 'Brussels Smart City',
+      slug: 'brusselssmartcity',
+      mission: 'improve the life of Brussels Citizens by the use of technology',
+      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      currency: 'EUR'
+    }
+  ],
+
   "paymentMethod1": {
     "token": "PA-1B0110758V169653C",
     "service": "paypal"

@@ -13,6 +13,7 @@ import {planId as generatePlanId} from '../server/lib/utils';
 import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 import stripeMock from './mocks/stripe';
+import emailLib from '../server/lib/email';
 
 const chance = chanceLib.Chance();
 
@@ -46,11 +47,12 @@ const stubStripe = () => {
 
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
-  let user;
-  let paymentMethod;
-  let group;
-  let donation;
   const sandbox = sinon.sandbox.create();
+  let user, paymentMethod, group, donation, emailSendSpy;
+
+  beforeEach(() => {
+    emailSendSpy = sandbox.spy(emailLib, 'send');
+  });
 
   beforeEach(() => utils.resetTestDB());
 
@@ -253,13 +255,13 @@ describe('webhooks.routes.test.js', () => {
           expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
           expect(transaction.currency).to.be.equal(CURRENCY);
           expect(transaction.type).to.be.equal(type.DONATION);
-          expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
+          expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
           expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-          expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 140);
-          expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
-          expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
+          expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
+          expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+          expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
           expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-          expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 259)
+          expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875)
           expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
           expect(transaction.Subscription.isActive).to.be.equal(true);
           expect(transaction.Subscription).to.have.property('activatedAt');
@@ -323,13 +325,13 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.type).to.be.equal(type.DONATION);
               expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
 
-              expect(res.rows[0]).to.have.property('amountInTxnCurrency', 1400); // taken from stripe mocks
+              expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
               expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-              expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 140);
-              expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 70);
-              expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 155);
+              expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
+              expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+              expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
               expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-              expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 259);
+              expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875);
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');
               expect(transaction.Subscription.interval).to.be.equal('month');
@@ -341,6 +343,15 @@ describe('webhooks.routes.test.js', () => {
 
         });
     });
+
+    it('successfully sends out an invoice by email to donor', () => {
+      expect(emailSendSpy.callCount).to.equal(3);
+      expect(emailSendSpy.secondCall.args[0])
+      expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
+      expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.true;
+      expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
+      expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
+    })
   });
 
   it('returns 200 if the event is not livemode in production', (done) => {

@@ -6,6 +6,8 @@ import {appStripe, extractFees} from '../gateways/stripe';
 import models from '../models';
 import errors from '../lib/errors';
 import {type} from '../constants/transactions';
+import emailLib from '../lib/email';
+import currencies from '../constants/currencies';
 
 const {
   Activity,
@@ -230,6 +232,29 @@ export default function stripeWebhook(req, res, next) {
         subscription
       })
       .then(t => cb(null, t))
+      .catch(cb);
+    }],
+
+    sendInvoice: ['createTransaction', (cb, results) => {
+      const donation = results.fetchDonation;
+      // We only send an invoice for donations > $50 equivalent
+      if (donation.amount < 50 * currencies[donation.currency].fxrate * 100) return cb(null);
+      const user = donation.User || {};
+      const group = donation.Group || {};
+      const subscription = donation.Subscription;
+      group.getRelatedGroups(3, 0)
+      .then((relatedGroups) => emailLib.send(
+        'thankyou',
+        user.email,
+        { donation: donation.info,
+          user: user.info,
+          firstPayment: false,
+          group: group.info,
+          relatedGroups,
+          interval: subscription && subscription.interval,
+          subscriptionsLink: user.generateLoginLink('/subscriptions')
+        }))
+      .then(() => cb())
       .catch(cb);
     }]
 
