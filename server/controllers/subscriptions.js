@@ -98,7 +98,7 @@ export const cancel = (req, res, next) => {
         GroupId: group.id,
         UserId: user.id,
         data: {
-          subscriptionId: subscription.id,
+          subscription: subscription,
           group: group.info,
           user: user.info
         }

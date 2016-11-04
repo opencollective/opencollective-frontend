@@ -44,28 +44,33 @@ describe('lib.activities.test.js', () => {
       expect(actual).to.equal('New subscription confirmed: EUR 12.34/month from <https://twitter.com/xdamman|xdamman> (jussi@kuohujoki.fi) to <https://opencollective.com/yeoman|Yeoman>!');
     });
 
-    it (constants.GROUP_CREATED, () => {
+    it (`${constants.SUBSCRIPTION_CANCELLED}`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[18], 'slack');
+      expect(actual).to.equal('Subscription 4 canceled: EUR 12.34/month from <https://twitter.com/xdamman|xdamman> (jussi@kuohujoki.fi) to <https://opencollective.com/yeoman|Yeoman>');
+    });    
+
+    it (constants.GROUP_CREATED, () => {
+      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], 'slack');
       expect(actual).to.equal('New group created: <https://opencollective.com/blah|Blah> by someone (jussi@kuohujoki.fi)');
     });
 
     it (constants.GROUP_USER_ADDED, () => {
-      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], 'slack');
+      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[20], 'slack');
       expect(actual).to.equal('New user: someone (UserId: 2) added to group: <https://opencollective.com/blah|Blah>');
     });
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
-      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[20], 'slack');
+      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[21], 'slack');
       expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
     });
 
     it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
-      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[21], 'slack');
+      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[22], 'slack');
       expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
     });
 
     it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
-      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[22], 'slack');
+      const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[23], 'slack');
       expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
     });
 
@@ -99,22 +104,22 @@ describe('lib.activities.test.js', () => {
     });
 
     it (constants.GROUP_CREATED, () => {
-      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[18], 'slack');
+      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[19], 'slack');
       expect(actual).to.equal('New group created: <https://opencollective.com/blah|Blah> by someone');
     });
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
-      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[20], 'slack');
+      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[21], 'slack');
       expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
     });
 
     it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
-      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[21], 'slack');
+      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[22], 'slack');
       expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah>!');
     });
 
     it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
-      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[22], 'slack');
+      const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[23], 'slack');
       expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah>!');
     });
 

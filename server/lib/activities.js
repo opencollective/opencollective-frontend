@@ -125,7 +125,7 @@ export default {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
 
       case activities.SUBSCRIPTION_CANCELED:
-        return `Subscription ${activity.data.subscriptionId} canceled`;
+        return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${group}`;
 
       case activities.GROUP_CREATED:
         return `New group created: ${group} by ${userString}`;
