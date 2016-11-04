@@ -48,13 +48,29 @@ const getSubject = str => {
 /*
  * sends an email message to a recipient with given subject and body
  */
-const sendMessage = (recipient, subject, html, options) => {
+const sendMessage = (recipients, subject, html, options) => {
   options = options || {};
-  debug("email: ", recipient, subject); 
-  // if not in production, only send out emails to bcc'd opencollective address
-  if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
-    debug(`${recipient} is an external email address, skipping in development environment`);
-    recipient = '';
+  debug("email: ", recipients, subject);
+
+  if (!_.isArray(recipients)) recipients = [ recipients ];
+
+  recipients = recipients.filter(recipient => {
+    if (!recipient.match(/.+@.+\..+/)) {
+      debug(`${recipient} is an invalid email address, skipping`);
+      return false;
+    }
+    // if not in production, only send out emails to bcc'd opencollective address
+    if (process.env.NODE_ENV !== 'production' && !isEmailInternal(recipient)) {
+      debug(`${recipient} is an external email address, skipping in development environment`);
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  debug(`sending email to ${recipients.join(', ')}`);
+  if (recipients.length === 0) {
+    debug("No recipient to send to, only sending to ops");
   }
 
   if (config.mailgun.user) {
@@ -69,7 +85,7 @@ const sendMessage = (recipient, subject, html, options) => {
     return new Promise((resolve, reject) => {
       mailgun.sendMail({
         from: options.from || config.email.from,
-        to: recipient,
+        to: recipients.join(', '),
         bcc: `ops@opencollective.com,${options.bcc}`,
         subject,
         html

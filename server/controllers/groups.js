@@ -581,7 +581,8 @@ export const getOne = (req, res, next) => {
     group.yearlyIncome = values[3];
     group.donationTotal = values[4];
     group.backersCount = values[5];
-    group.contributorsCount = (group.data && group.data.contributors) ? Object.keys(group.data.contributors).length : 0;
+    group.contributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : 0;
+    group.contributorsCount += group.backersCount;
     group.settings = group.settings || {};
     group.settings.twitter = values[6];
     group.related = values[7];
