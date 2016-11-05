@@ -5,6 +5,7 @@ import * as utils from '../test/utils';
 import constants from '../server/constants/activities';
 import models from '../server/models';
 import roles from '../server/constants/roles';
+import _ from 'lodash';
 
 const application = utils.data('application');
 const userData = utils.data('user1');
@@ -46,7 +47,7 @@ describe("notification.model.test.js", () => {
   });
 
 
-  it('notifies for the `group.transaction.approved` email', () =>
+  it('subscribes to the notifications for the `group.transaction.approved` email', () =>
     request(app)
       .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
@@ -128,18 +129,21 @@ describe("notification.model.test.js", () => {
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('automatically add a notification for a new host to `group.transaction.created` events', () =>
+  it('automatically subscribe new members to `group.transaction.created` and `group.monthlyreport` events', () =>
     request(app)
       .post('/groups')
       .send({
         api_key: application.api_key,
-        group: Object.assign(group3Data, { users: [{ email: user2.email, role: roles.HOST}]})
+        group: Object.assign(group3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.MEMBER}]})
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
-          UserId: user2.id,
-          GroupId: res.body.id,
-          type: constants.GROUP_TRANSACTION_CREATED
+          GroupId: res.body.id
         }}))
-      .tap(res => expect(res.count).to.equal(0)));
+      .tap(res => {
+        const notifications = res.rows;
+        const types = _.map(notifications, 'type').sort();
+        expect(types).to.deep.equal([ 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
+      })
+      .tap(res => expect(res.count).to.equal(4)));
 });

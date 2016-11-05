@@ -40,11 +40,22 @@ const subscribeUserToMailingList = (user, group, role) => {
   const lists = {};
   lists[roles.BACKER] = 'backers';
   lists[roles.MEMBER] = 'members';
+  lists[roles.HOST] = 'host';
 
   return Notification.create({
     UserId: user.id,
     GroupId: group.id,
     type: `mailinglist.${lists[role]}`
+  });
+};
+
+const subscribeUserToMonthlyReport = (user, group, role) => {
+  if (role !== roles.MEMBER) return Promise.resolve();
+
+  return Notification.create({
+    UserId: user.id,
+    GroupId: group.id,
+    type: `group.monthlyreport`
   });
 };
 
@@ -77,6 +88,9 @@ const _addUserToGroup = (group, user, options) => {
 
   return checkIfGroupHasHost()
     .then(addUserToGroup)
+    .then(() => subscribeUserToGroupEvents(user, group, options.role))
+    .then(() => subscribeUserToMailingList(user, group, options.role))
+    .then(() => subscribeUserToMonthlyReport(user, group, options.role))
     .then(createActivity);
 };
 
@@ -610,8 +624,6 @@ export const addUser = (req, res, next) => {
   };
 
   _addUserToGroup(req.group, req.user, options)
-    .then(() => subscribeUserToGroupEvents(req.user, req.group, options.role))
-    .then(() => subscribeUserToMailingList(req.user, req.group, options.role))
     .tap(() => res.send({success: true}))
     .catch(next);
 };

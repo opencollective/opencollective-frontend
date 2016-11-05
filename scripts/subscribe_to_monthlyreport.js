@@ -21,7 +21,8 @@ const init = () => {
 
   const query = {
       where: {
-        role: 'MEMBER'
+        role: 'MEMBER',
+        createdAt: { $gt: '2016-08-11 00:22:42.277+00' }
       }
   };
 
@@ -37,8 +38,9 @@ const processRow = (row) => {
     UserId: row.UserId,
     GroupId: row.GroupId,
     type
-  }).catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of GroupId ${row.GroupId}`));
+  })
+  .then(notification => console.log(`> UserId ${row.UserId} is now subscribed to ${type} of GroupId ${row.GroupId}`))
+  .catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of GroupId ${row.GroupId}`));
 };
-
 
 init();

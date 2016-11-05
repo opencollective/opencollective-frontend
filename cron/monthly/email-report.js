@@ -155,7 +155,8 @@ const getRecipients = (group) => {
   return Notification.findAll({
     where: {
       GroupId: group.id,
-      type: 'group.monthlyreport'
+      type: 'group.monthlyreport',
+      createdAt: { $gt: '2016-11-04' } // temporary, just to send to the people who weren't automatically added
     },
     include: [{ model: User }]
   }).then(results => results.map(r => r.User.dataValues));
