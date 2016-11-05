@@ -202,7 +202,8 @@ export default function(Sequelize, DataTypes) {
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
           mission: this.mission,
-          settings: this.settings
+          settings: this.settings,
+          currency: this.currency
         }
       },
       minimal() {
