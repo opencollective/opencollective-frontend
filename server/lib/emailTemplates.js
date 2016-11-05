@@ -9,6 +9,7 @@ import handlebars from 'handlebars';
 const templates = {};
 
 const templateNames = [
+  'comment.approve',
   'email.approve',
   'email.message',
   'github.signup',

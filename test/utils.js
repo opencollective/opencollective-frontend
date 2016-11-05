@@ -3,14 +3,13 @@ import {sequelize} from '../server/models';
 import jsonData from './mocks/data';
 import userlib from '../server/lib/userlib';
 import config from 'config';
+import { isArray, values } from 'lodash';
 
 jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
 export const data = (item) => {
-  // we make a copy of the data to avoid modifying original
-  const data = jsonData[item];
-  if (data.length > 0) return data.slice();
-  else return Object.assign({}, data);
+  const copy = Object.assign({}, jsonData[item]); // to avoid changing these data
+  return (isArray(jsonData[item])) ? values(copy) : copy;
 }
 
 export const clearbitStubBeforeEach = sandbox => {

@@ -6,7 +6,8 @@ const {
   User,
   Group,
   Transaction,
-  Expense
+  Expense,
+  Comment
 } = models;
 
 /**
@@ -34,7 +35,7 @@ const parseId = (param) => {
  }
 
 /**
- * Userid.
+ * userid
  */
 export function userid(req, res, next, userIdOrName) {
   getByKeyValue(User, isNaN(userIdOrName) ? 'username' : 'id', userIdOrName)
@@ -43,7 +44,7 @@ export function userid(req, res, next, userIdOrName) {
 }
 
 /**
- * Groupid.
+ * groupid
  */
 export function groupid(req, res, next, groupIdOrSlug) {
   getByKeyValue(Group, isNaN(groupIdOrSlug) ? 'slug' : 'id', groupIdOrSlug)
@@ -52,7 +53,24 @@ export function groupid(req, res, next, groupIdOrSlug) {
 }
 
 /**
- * Transactionid.
+ * commentid
+ */
+export function commentid(req, res, next, commentid) {
+  parseId(commentid)
+    .then(id => Comment.findById(id))
+    .then((comment) => {
+      if (!comment) {
+        return next(new errors.NotFound(`Comment '${commentid}' not found`));
+      } else {
+        req.comment = comment;
+        next();
+      }
+    })
+    .catch(next);
+}
+
+/**
+ * transactionid
  */
 export function transactionid(req, res, next, transactionid) {
   parseId(transactionid)

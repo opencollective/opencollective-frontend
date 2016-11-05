@@ -31,6 +31,7 @@ export function setupModels(client) {
 
   [
     'Activity',
+    'Comment',
     'ConnectedAccount',
     'Donation',
     'Expense',
@@ -98,6 +99,14 @@ export function setupModels(client) {
   m.Expense.belongsTo(m.User);
   m.Expense.belongsTo(m.Group);
   m.Transaction.belongsTo(m.Expense);
+
+  // Comment
+  m.Comment.belongsTo(m.User);
+  m.Comment.belongsTo(m.Group);
+  m.Comment.belongsTo(m.Expense);
+  m.Expense.hasMany(m.Comment);
+  m.User.hasMany(m.Comment);
+  m.Group.hasMany(m.Comment);
 
   // Donation.
   m.Donation.belongsTo(m.User);

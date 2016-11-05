@@ -6,6 +6,7 @@ import * as users from '../controllers/users';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
+import required from '../middleware/required_param';
 
 const {
   User
@@ -59,6 +60,34 @@ export const format = (format) => {
 };
 
 /**
+ * Use the logged in user or create a new user
+ * Returns an error if not logged in and a user already exists for the email address provided
+ * Used for creating a comment
+ */
+export const authOrCreateUser = (req, res, next) => {
+  // If already logged in, proceed
+  if (req.remoteUser) {
+    req.user = req.remoteUser;
+    return next();
+  }
+  required('user')(req, res, (e) => {
+    if (e) return next(e);
+    User.findOne({
+      where: {
+        email: req.required.user.email.toLowerCase()
+      }
+    })
+    .then(user => {
+      if (user) throw new errors.Unauthorized("A user already exists with that email address. Please login first");
+      else return users._create(req.body.user);
+    })
+    .tap(user => req.user = user)
+    .tap(() => next())
+    .catch(next);
+  });
+}
+
+/**
  * Get the user based on its email or paypalEmail. If not found, creates one.
  * Used for creating a transaction from a new/returning donor or an expense from a new/returning user.
  */
@@ -81,6 +110,9 @@ export const getOrCreateUser = (req, res, next) => {
     ({ email } = req.body.expense);
     ({ paypalEmail } = req.body.expense);
     ({ name } = req.body.expense);
+  } else if (req.body.user) {
+    ({ name } = req.body.user);
+    ({ email } = req.body.user);
   } else if (req.body.payment) {
     // TODO remove #postmigration
     ({ email } = req.body.payment);

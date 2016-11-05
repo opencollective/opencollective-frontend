@@ -203,13 +203,17 @@ describe('expenses.routes.test.js', () => {
           describe('#list', () => {
             beforeEach('create expense', () => createExpense(group, host));
             beforeEach('create expense 2', () => createExpense(group, host));
-
-            it('THEN returns 200', () => request(app)
+            beforeEach('create 1 comment', () => models.Comment.createMany([utils.data('comments')[0]], { UserId: 1, GroupId: group.id, ExpenseId: 1 }));
+            beforeEach('create many comments', () => models.Comment.createMany(utils.data('comments'), { UserId: 1, GroupId: group.id, ExpenseId: 2 }));
+            it('ttt THEN returns 200', () => request(app)
               .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenses = res.body;
                 expect(expenses).to.have.length(3);
+                expect(expenses[0].commentsCount).to.equal(1);
+                expect(expenses[1].commentsCount).to.equal(3);
+                expect(expenses[2].commentsCount).to.equal(0);
                 expenses.forEach(e => expect(e.GroupId).to.equal(group.id));
               }));
 

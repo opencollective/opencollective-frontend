@@ -9,6 +9,7 @@ import {createFromPaidExpense as createTransaction} from '../lib/transactions';
 import {getPreapprovalDetails as gpd} from './paypal';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
+import sequelize from 'sequelize';
 import models from '../models';
 import * as auth from '../middleware/security/auth';
 
@@ -64,10 +65,28 @@ export const list = (req, res, next) => {
 
   return models.Expense.findAndCountAll(query)
     .then(expenses => {
+      const ids = _.pluck(expenses.rows, 'id');
+      return models.Comment.findAll({
+        attributes: ['ExpenseId', [sequelize.fn('COUNT', sequelize.col('ExpenseId')), 'comments']],
+        where: { ExpenseId: { $in: ids }},
+        group: ['ExpenseId']
+      })
+      .then(commentIds => {
+        const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
+        expenses.rows = expenses.rows.map(expense => {
+          const r = expense.info;
+          commentsCount[r.id] = commentsCount[r.id] || [{ dataValues: { comments: 0 } }];
+          r.commentsCount = parseInt(commentsCount[r.id][0].dataValues.comments,10);
+          return r;
+        });
+        return expenses;
+      })
+    })
+    .then(expenses => {
       // Set headers for pagination.
       req.pagination.total = expenses.count;
       res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
-      res.send(_.pluck(expenses.rows, 'info'));
+      res.send(expenses.rows);
     })
     .catch(next);
 };

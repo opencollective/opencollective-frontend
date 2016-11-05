@@ -129,9 +129,12 @@ export const authenticateUserByPassword = (req, res, next) => {
 
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
+  const userid = req.jwtPayload.sub;
   User
-    .findById(req.jwtPayload.sub)
+    .findById(userid)
     .tap(user => {
+      if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
+      user.update({seenAt: new Date()});
       req.remoteUser = user;
       next();
     })

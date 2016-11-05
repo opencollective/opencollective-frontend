@@ -33,7 +33,7 @@ export default {
     "firstName": "Bo",
     "lastName": "Ki",
     "username": "boki",
-    "email": "User4@opencollective.com",
+    "email": "user4@opencollective.com",
     "password": "passssas"
   },
 
@@ -417,6 +417,18 @@ export default {
         "paypalEmail": "user2paypal@gmail.com",
         "createdAt": "2016-09-29T07:00:00.000Z"
       }
+  ],
+
+  "comments": [
+    {
+      "text": "Where did you buy this?"
+    },
+    {
+      "text": "I think we should go with a V-neck model"
+    },
+    {
+      "text": "No way!"
+    }
   ],
 
   "transactions1": {

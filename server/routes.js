@@ -5,6 +5,7 @@ import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as donations from './controllers/donations';
 import * as expenses from './controllers/expenses';
+import * as comments from './controllers/comments';
 import * as groups from './controllers/groups';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
@@ -72,6 +73,7 @@ export default (app) => {
   app.param('transactionid', params.transactionid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
+  app.param('commentid', params.commentid);
 
   /**
    * Homepage
@@ -177,6 +179,15 @@ export default (app) => {
   app.delete('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
   app.post('/groups/:groupid/expenses/:expenseid/approve', auth.canEditGroup, required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/groups/:groupid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
+
+  /**
+   * Comments
+   */
+  app.get('/groups/:groupid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), comments.list); // Get latest comments for a collective
+  app.get('/groups/:groupid/expenses/:expenseid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'ASC'}), comments.list); // Get latest comments for an expense
+  app.put('/groups/:groupid/expenses/:expenseid/comments/:commentid/approve', auth.canEditComment, comments.approve); // Approve comment
+  app.post('/groups/:groupid/expenses/:expenseid/comments', required('comment'), mw.getOrCreateUser, comments.create); // Create a comment as a new user
+  app.delete('/groups/:groupid/expenses/:expenseid/comments/:commentid', auth.canEditComment, comments.deleteComment); // Delete a comment
 
   /**
    * Donations

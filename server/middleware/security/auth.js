@@ -7,7 +7,6 @@ import roles from '../../constants/roles';
 import {authenticateUser} from './authentication';
 
 const {
-  NotFound,
   Forbidden, // I know who you are, but you permanently don't have access to this resource
   Unauthorized // You are not authorized, try to authenticate again
 } = errors;
@@ -106,38 +105,38 @@ export function mustBePartOfTheGroup(req, res, next) {
 }
 
 /**
- * Only the author of the expense or the host or an admin of the group can edit an expense
+ * Only the author of the object or the host or an admin member of the group can edit the object
  */
-export function canEditExpense(req, res, next) {
-  required_valid('remoteUser', 'expenseid')(req, res, (e) => {
-    if (e) return next(e);
-    models.Expense
-      .findOne({ where: {
-        id: req.params.expenseid
-      }})
-      .then(expense => {
-        if (!expense) return NotFound();        
-        if (expense.UserId === req.remoteUser.id) return next(null, true);
-        req.params.groupid = expense.GroupId;
-        canEditGroup(req, res, (err) => {
-          if (err) return next(new Forbidden('Logged in user must be the author of the expense or the host or an admin of this group'));
-          return next(null, true);
-        });
-      })
-      .catch(next);
-  });
+export function canEditObject(object) {
+  return (req, res, next) => {
+    required_valid('remoteUser', object)(req, res, (e) => {
+      if (e) return next(e, false);
+      if (req[object].UserId === req.remoteUser.id) return next(null, true);
+      mustHaveRole([HOST, MEMBER])(req, res, (err) => {
+        if (err) return next(new Forbidden(`Logged in user must be the author of the ${object} or the host or an admin of this group`), false);
+        return next(null, true);
+      });
+    });
+  }
 }
 
 /**
- * Only the author of the donation or the host or an admin of the group can edit a donation
+ * Only the author of the comment or the host or an admin member of the group can edit an expense
+ */
+export function canEditComment(req, res, next) {
+  return canEditObject('comment')(req, res, next);
+}
+
+/**
+ * Only the author of the expense or the host or an admin member of the group can edit an expense
+ */
+export function canEditExpense(req, res, next) {
+  return canEditObject('expense')(req, res, next);
+}
+
+/**
+ * Only the author of the donation or the host or an admin member of the group can edit a donation
  */
 export function canEditDonation (req, res, next) {
-  required_valid('remoteUser', 'donation')(req, res, (e) => {
-    if (e) return next(e);
-    if (req.donation.UserId === req.remoteUser.id) return next();
-    mustHaveRole([HOST, MEMBER])(req, res, (err) => {
-      if (!err) return next(new Forbidden('Logged in user must be the author of the donation or the host or an admin of this group'));
-      return next();
-    });
-  });
+  return canEditObject('donation')(req, res, next);
 }
