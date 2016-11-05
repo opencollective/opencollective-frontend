@@ -59,10 +59,6 @@ handlebars.registerHelper('moment', (value, props) => {
 
 handlebars.registerHelper('currency', (value, props) => {
   const { currency } = props.hash;
-  if (!value || !currency || currency.length !== 3) {
-    console.error("currency hbs helper called with invalid inputs", "value:", value, "currency:", currency);
-    return value || 0;
-  }
   value = value/100; // converting cents
 
   return value.toLocaleString(currency, {
