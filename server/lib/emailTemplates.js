@@ -48,6 +48,7 @@ handlebars.registerHelper('sign', (value) => {
 });
 
 handlebars.registerHelper('toLowerCase', (str) => {
+  if (!str) return '';
   return str.toLowerCase();
 });
 

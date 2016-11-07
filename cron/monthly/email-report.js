@@ -162,11 +162,13 @@ const getRecipients = (group) => {
   }).then(results => results.map(r => r.User.dataValues));
 }
 
-const sendEmail = (users, data) => {
-  if (users.length === 0) return;
+const sendEmail = (recipients, data) => {
+  if (recipients.length === 0) return;
   debug(`Preview email template: http://localhost:3060/templates/email/group.monthlyreport?data=${encodeURIComponent(JSON.stringify(data))}`);
-  const recipients = users.map(u => `${u.firstName} ${u.lastName} <${u.email}>`);
-  return emailLib.send('group.monthlyreport', recipients, data);
+  return Promise.map(recipients, recipient => {
+    debug("Sending email to ", recipient.email);
+    return emailLib.send('group.monthlyreport', recipient.email, data);
+  });
 }
 
 init();
