@@ -22,7 +22,7 @@ const init = () => {
   const query = {
       where: {
         role: 'MEMBER',
-        createdAt: { $gt: '2016-08-11 00:22:42.277+00' }
+        createdAt: { $gt: '2016-08-11 00:22:42.277+00' } // only subscribe users who became members of a collective after August 11th 2016
       }
   };
 
