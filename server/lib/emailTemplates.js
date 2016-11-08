@@ -1,6 +1,7 @@
 import fs from 'fs';
 import moment from 'moment';
 import handlebars from 'handlebars';
+import { resizeImage } from './utils';
 
 /*
 * Loads all the email templates
@@ -60,21 +61,24 @@ handlebars.registerHelper('moment', (value, props) => {
 });
 
 handlebars.registerHelper('currency', (value, props) => {
-  const { currency } = props.hash;
+  const { currency, precision } = props.hash;
   value = value/100; // converting cents
 
   return value.toLocaleString(currency, {
     style: 'currency',
     currency,
-    minimumFractionDigits : 2,
-    maximumFractionDigits : 2
+    minimumFractionDigits : precision || 0,
+    maximumFractionDigits : precision || 0
   });
-
 });
+
+handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
 
 handlebars.registerHelper('encodeURIComponent', (str) => {
   return encodeURIComponent(str);
 });
+
+handlebars.registerHelper('debug', console.log);
 
 templateNames.forEach((template) => {
   const source = fs.readFileSync(`${templatesPath}/emails/${template}.hbs`, 'utf8');

@@ -60,7 +60,6 @@ export default {
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
     "slug": "scouts",
-    "isPublic": true,
     "tiers": [{
       "name": "backer",
       "title": "Backers",
@@ -89,7 +88,6 @@ export default {
     "currency": "EUR",
     "budget": 1000000,
     "burnrate": 1000,
-    "isPublic": false,
     "tiers": [{
       "name": "donor",
       "title": "Donors",
@@ -117,9 +115,17 @@ export default {
   "group4": {
     "name": "Open source collective",
     "slug": "meetups",
-    "isPublic": true,
     "settings": {
       "superCollectiveTag": "meetup"
+    },
+    "isSupercollective": true
+  },
+
+  "group5": {
+    "name": "Brussels Together",
+    "slug": "brusselstogether",
+    "settings": {
+      "superCollectiveTag": "#brusselstogether"
     },
     "isSupercollective": true
   },
@@ -129,22 +135,27 @@ export default {
       name: 'Reinventing Brussels',
       slug: 'reinventingbrussels',
       mission: 'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
-      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-      currency: 'EUR'
+      logo: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
+      currency: 'EUR',
+      settings: { "style": { "hero": { "cover": { "background": "rgb(36,189,213)" } } } },
+      tags: ['#brusselstogether']
     },
     {
       name: 'Refugees Got Talent',
       slug: 'refugeesgottalent',
       mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
       logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-      currency: 'EUR'
+      currency: 'EUR',
+      tags: ['#brusselstogether']
     },
     {
       name: 'Brussels Smart City',
       slug: 'brusselssmartcity',
       mission: 'improve the life of Brussels Citizens by the use of technology',
       logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
-      currency: 'EUR'
+      currency: 'EUR',
+      tags: ['#brusselstogether'],
+      backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg'
     }
   ],
 
@@ -581,7 +592,6 @@ export default {
       "expensePolicy": null,
       "createdAt": "2016-01-30T07:31:37.802Z",
       "updatedAt": "2016-01-30T07:31:37.802Z",
-      "isPublic": false,
       "slug": "WWCodeAtl",
       "website": "http://scouts.org.uk/home/",
       "twitterHandle": "scouts"

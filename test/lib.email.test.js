@@ -70,7 +70,7 @@ describe('lib/email', () => {
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Merci pour votre donation de €50.00/mois à La Primaire');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Merci pour votre donation de €50/mois à La Primaire');
       });
   });
 
@@ -95,7 +95,7 @@ describe('lib/email', () => {
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your $50.00/month donation to WWCode Austin');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your $50/month donation to WWCode Austin');
         expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
       });
   });
@@ -123,7 +123,7 @@ describe('lib/email', () => {
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your €50.00/month donation to #BrusselsTogether');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your €50/month donation to #BrusselsTogether');
         expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedGroups[0].name);
       });
   });

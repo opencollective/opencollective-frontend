@@ -4,10 +4,6 @@ import crypto from 'crypto';
 import base64url from 'base64url';
 
 /**
- * Private methods.
- */
-
-/**
  * Encrypt with resetPasswordSecret
  */
 export const encrypt = (text) => {
@@ -43,7 +39,7 @@ export const getRequestedUrl = (req) => {
 /**
  * Add parameters to an url.
  */
-const addParameterUrl = (url, parameters) => {
+export const addParameterUrl = (url, parameters) => {
   const parsedUrl  = Url.parse(url, true);
 
   function removeTrailingChar(str, char) {
@@ -80,7 +76,7 @@ const paginatePage = (offset, limit) => {
 /**
  * Get links for pagination.
  */
-const getLinks = (url, options) => {
+export const getLinks = (url, options) => {
   const page = options.page || paginatePage(options.offset, options.limit).page;
   const perPage = options.perPage || paginatePage(options.offset, options.limit).perPage;
 
@@ -221,7 +217,14 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-/**
- * Export public methods.
- */
-export default { addParameterUrl, getLinks };
+export function resizeImage(imageUrl, { width, height, query }) {
+  if (!imageUrl) return null;
+  let queryurl = '';
+  if (query) {
+    queryurl = encodeURIComponent(query);
+  } else {
+    if (width) queryurl += `&width=${width}`;
+    if (height) queryurl += `&height=${height}`;
+  }
+  return `${config.host.website}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+}

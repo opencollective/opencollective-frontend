@@ -9,9 +9,24 @@ import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
-import {getTier} from '../lib/utils';
+import {getTier } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
+
+const DEFAULT_GROUP_STYLES = { 
+  hero: { 
+    cover: { 
+      filter: "blur(4px)",
+      transform: "scale(1.06)",
+      backgroundImage: "url('/static/images/collectives/default-header-bg.jpg')"
+    }, 
+    a: {}
+  }
+};
+
+const DEFAULT_SETTINGS = {
+  style: DEFAULT_GROUP_STYLES
+};
 
 const tier = Joi.object().keys({
   name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
@@ -65,7 +80,12 @@ export default function(Sequelize, DataTypes) {
     video: DataTypes.STRING,
 
     image: DataTypes.STRING,
-    backgroundImage: DataTypes.STRING,
+    backgroundImage: {
+      type: DataTypes.STRING,
+      get() {
+        return this.getDataValue('backgroundImage') || `${config.host.website}/static/images/collectives/default-header-bg.jpg`;
+      }
+    },
 
     expensePolicy: DataTypes.TEXT,
 
@@ -83,7 +103,10 @@ export default function(Sequelize, DataTypes) {
 
     settings: {
       type: DataTypes.JSON,
-      allowNull: true
+      allowNull: true,
+      get() {
+        return this.getDataValue('settings') || DEFAULT_SETTINGS;
+      }
     },
 
     data: {

@@ -13,7 +13,7 @@ const debug = debugLib('email');
 
 const render = (template, data) => {
     data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
-    data = Object.assign({}, data);
+    data = _.merge({}, data);
     delete data.config;
     data.config = { host: config.host };
     debug(`Preview email template: http://localhost:3060/templates/email/${template}?data=${encodeURIComponent(JSON.stringify(data))}`);

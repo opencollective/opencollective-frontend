@@ -15,7 +15,8 @@ describe('Group model', () => {
   const groupData = {
     slug: 'tipbox',
     name: 'tipbox',
-    currency: 'USD'
+    currency: 'USD',
+    tags: ['#brusselstogether']
   };
 
   const users = [{
@@ -147,5 +148,15 @@ describe('Group model', () => {
       .catch(e => {
         console.error('error', e, e.stack);
       });
+  });
+
+  it('get the related groups', (done) => {
+    Group.createMany(utils.data('relatedGroups'))
+    .then(() => group.getRelatedGroups(3, 0))
+    .then(relatedGroups => {
+      expect(relatedGroups).to.have.length(3);
+      expect(relatedGroups[0].settings.style.hero).to.have.property('cover');
+      done();
+    })
   });
 });

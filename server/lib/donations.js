@@ -112,7 +112,7 @@ export const processDonation = (Sequelize, donation) => {
 
         // Mark donation row as processed
         .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
-        .then(() => group.getRelatedGroups(3, 0))
+        .then(() => group.getRelatedGroups(2, 0))
         // send out confirmation email
         .then((relatedGroups) => emailLib.send(
           'thankyou',

@@ -242,7 +242,7 @@ export default function stripeWebhook(req, res, next) {
       const user = donation.User || {};
       const group = donation.Group || {};
       const subscription = donation.Subscription;
-      group.getRelatedGroups(3, 0)
+      group.getRelatedGroups(2, 0)
       .then((relatedGroups) => emailLib.send(
         'thankyou',
         user.email,
