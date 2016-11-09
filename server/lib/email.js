@@ -186,10 +186,13 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options) =>
  * Given an activity, it sends out an email to the right people and right template
  */
 const sendMessageFromActivity = (activity, notification) => {
-  if (activity.type === activities.GROUP_TRANSACTION_CREATED) {
-    return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
-  } else {
-    return Promise.resolve();
+  switch (activity.type) {
+    case activities.GROUP_TRANSACTION_CREATED:
+      return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
+    case activities.GROUP_EXPENSE_CREATED:
+      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, activity.data);
+    default:
+      return Promise.resolve();
   }
 }
 

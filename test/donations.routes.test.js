@@ -19,11 +19,13 @@ const groupData = utils.data('group2');
 import paypalNock from './mocks/paypal.nock';
 
 describe('donations.routes.test.js', () => {
+  let user, group, group2, sandbox;
 
-  let user;
-  let group;
-  let group2;
-  const sandbox = sinon.sandbox.create();
+  before(() => {
+    sandbox = sinon.sandbox.create();
+  });
+
+  after(() => sandbox.restore());
 
   beforeEach(() => {
     sandbox.stub(donationsLib, 'processDonation');

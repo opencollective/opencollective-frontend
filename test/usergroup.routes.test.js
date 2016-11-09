@@ -187,27 +187,39 @@ describe('usergroup.routes.test.js', () => {
     });
 
     it('successfully adds the user to the mailing list', (done) => {
-      request(app)
-        .post(`/groups/${group.id}/users/${users[2].id}`)
-        .set('Authorization', `Bearer ${users[0].jwt()}`)
-        .send({
-          api_key: application.api_key,
-          role: roles.MEMBER
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('success', true);
+      models.Notification.findOne({where: {
+        GroupId: group.id,
+        UserId: users[2].id,
+        type: 'mailinglist.members'
+      }}).then(notification => {
+        expect(notification).to.not.exist;
+      })
+      .then(() => {
+        request(app)
+          .post(`/groups/${group.id}/users/${users[2].id}`)
+          .set('Authorization', `Bearer ${users[0].jwt()}`)
+          .send({
+            api_key: application.api_key,
+            role: roles.MEMBER
+          })
+          .expect(200)
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            expect(res.body).to.have.property('success', true);
 
-          models.Notification.find({where: {
-            GroupId: group.id
-          }}).then(notification => {
-            expect(notification.type).to.equal('mailinglist.members');
-            done();
+            models.Notification.findOne({where: {
+              GroupId: group.id,
+              UserId: users[2].id,
+              type: 'mailinglist.members'
+            }}).then(notification => {
+              expect(notification.type).to.equal('mailinglist.members');
+              expect(notification.channel).to.equal('email');
+              expect(notification.active).to.be.true;
+              done();
+            });
           });
-        });
+      });
     });
-
   });
 
   /**

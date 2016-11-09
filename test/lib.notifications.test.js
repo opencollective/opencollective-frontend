@@ -1,5 +1,4 @@
 import app from '../server/index';
-import _ from 'lodash';
 import config from 'config';
 import sinon from 'sinon';
 import nodemailer from 'nodemailer';
@@ -8,43 +7,29 @@ import { expect } from 'chai';
 import emailLib from '../server/lib/email';
 import * as utils from '../test/utils';
 import models from '../server/models';
-import constants from '../server/constants/activities';
 
 const application = utils.data('application');
 const userData = utils.data('user6');
 const groupData = utils.data('group1');
-const notificationData = {
-  channel: 'email',
-  type: constants.GROUP_TRANSACTION_CREATED,
-  active: true };
-const transactionsData = utils.data('transactions1').transactions;
 
 const {
   User,
-  Group,
-  Notification
+  Group
 } = models;
 
 describe('lib.notifications.test.js', () => {
 
-  let user;
-  let group;
-  let nm;
+  let user, group, nm;
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => {
+  beforeEach('create user and group', () => {
     const promises = [User.create(userData), Group.create(groupData)];
     return Promise.all(promises).then(results => {
       user = results[0];
       group = results[1];
       return group.addUserWithRole(user, 'HOST')
     })
-    .then(() => {
-      notificationData.UserId = user.id;
-      notificationData.GroupId = group.id;
-      return Notification.create(notificationData);
-    });
   });
 
   // create a fake nodemailer transport
@@ -87,22 +72,17 @@ describe('lib.notifications.test.js', () => {
   });
 
   it('sends a new `group.expense.created` email notification', done => {
+    let subject, body;
+    const expense = utils.data('expense1');
 
     const templateData = {
-      transaction: _.extend({}, transactionsData[0]),
+      expense,
       user,
       group,
       config
     };
 
-    let subject, body;
-
-    templateData.transaction.id = 1;
-
-    if (templateData.transaction.link.match(/\.pdf$/))
-      templateData.transaction.preview = {src: 'https://opencollective.com/static/images/mime-pdf.png', width: '100px'};
-    else
-      templateData.transaction.preview = {src: `https://res.cloudinary.com/opencollective/image/fetch/w_640/${templateData.transaction.link}`, width: '100%'};
+    templateData.expense.id = 1;
 
     emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
       .then(template => {
@@ -110,20 +90,20 @@ describe('lib.notifications.test.js', () => {
         body = emailLib.getBody(template);
       })
       .then(() => request(app)
-        .post(`/groups/${group.id}/transactions`)
+        .post(`/groups/${group.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
-          transaction: transactionsData[0]
+          expense
         })
         .expect(200))
       .then(res => {
         expect(res.body).to.have.property('GroupId', group.id);
         expect(res.body).to.have.property('UserId', user.id); // ...
       })
-      .then(() => models.Transaction.findAll())
-      .then(transactions => {
-        expect(transactions.length).to.equal(1);
+      .then(() => models.Expense.findAll())
+      .then(expenses => {
+        expect(expenses.length).to.equal(1);
       })
       .then(() => models.Activity.findAll())
       .then(activities => {
@@ -137,7 +117,6 @@ describe('lib.notifications.test.js', () => {
           expect(options.html).to.equal(body);
           done();
         }, 1000);
-
       });
   });
 });

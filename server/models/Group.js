@@ -271,11 +271,27 @@ export default function(Sequelize, DataTypes) {
       },
 
       addUserWithRole(user, role) {
-        return Sequelize.models.UserGroup.create({
-          role,
-          UserId: user.id,
-          GroupId: this.id
-        });
+        const lists = {};
+        lists[roles.BACKER] = 'backers';
+        lists[roles.MEMBER] = 'members';
+        lists[roles.HOST] = 'host';
+
+        const notifications = [{type:`mailinglist.${lists[role]}`}];
+
+        switch (role) {
+          case roles.HOST:
+            notifications.push({type:activities.GROUP_TRANSACTION_CREATED});
+            notifications.push({type:activities.GROUP_EXPENSE_CREATED});
+            break;
+          case roles.MEMBER:
+            notifications.push({type:'group.monthlyreport'});
+            break;
+        }
+
+        return Promise.all([
+          Sequelize.models.UserGroup.create({ role, UserId: user.id, GroupId: this.id }),
+          Sequelize.models.Notification.createMany(notifications, { UserId: user.id, GroupId: this.id, channel: 'email' })
+        ]);
       },
 
       findOrAddUserWithRole(user, role) {

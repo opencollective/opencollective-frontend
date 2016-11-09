@@ -25,40 +25,6 @@ const {
   Donation
 } = models;
 
-
-const subscribeUserToGroupEvents = (user, group, role) => {
-  if (role !== roles.HOST) return Promise.resolve();
-
-  return Notification.create({
-    UserId: user.id,
-    GroupId: group.id,
-    type: activities.GROUP_TRANSACTION_CREATED
-  });
-};
-
-const subscribeUserToMailingList = (user, group, role) => {
-  const lists = {};
-  lists[roles.BACKER] = 'backers';
-  lists[roles.MEMBER] = 'members';
-  lists[roles.HOST] = 'host';
-
-  return Notification.create({
-    UserId: user.id,
-    GroupId: group.id,
-    type: `mailinglist.${lists[role]}`
-  });
-};
-
-const subscribeUserToMonthlyReport = (user, group, role) => {
-  if (role !== roles.MEMBER) return Promise.resolve();
-
-  return Notification.create({
-    UserId: user.id,
-    GroupId: group.id,
-    type: `group.monthlyreport`
-  });
-};
-
 const _addUserToGroup = (group, user, options) => {
   const checkIfGroupHasHost = () => {
     if (options.role !== roles.HOST) {
@@ -88,9 +54,6 @@ const _addUserToGroup = (group, user, options) => {
 
   return checkIfGroupHasHost()
     .then(addUserToGroup)
-    .then(() => subscribeUserToGroupEvents(user, group, options.role))
-    .then(() => subscribeUserToMailingList(user, group, options.role))
-    .then(() => subscribeUserToMonthlyReport(user, group, options.role))
     .then(createActivity);
 };
 

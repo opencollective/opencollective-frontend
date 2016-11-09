@@ -6,6 +6,8 @@
  * })
  * Notification.unsubscribe(); // To disable a notification
  */
+import Promise from 'bluebird';
+import _ from 'lodash';
 
 export default function(Sequelize, DataTypes) {
 
@@ -33,7 +35,13 @@ export default function(Sequelize, DataTypes) {
     indexes: [{
       fields: ['type', 'GroupId', 'UserId'],
       type: 'unique'
-    }]
+    }],
+
+    classMethods: {
+      createMany: (notifications, defaultValues) => {
+        return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
+      }
+    }
 
   });
 

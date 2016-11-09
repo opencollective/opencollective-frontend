@@ -1,18 +1,18 @@
-Subject: {{group.name}}: {{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}} for {{transaction.description}} by {{user.username}}
+Subject: {{group.name}}: {{{currency expense.amount currency=expense.currency}}} for {{expense.title}} by {{user.username}}
 
 {{> header}}
 
 <center>
-  <h1>{{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}}</h1>
-  <div>{{transaction.description}}</div>
-  <p><font color="#999">{{transaction.comment}}</font></p>
+  <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
+  <div>{{expense.title}}</div>
+  <p><font color="#999">{{expense.notes}}</font></p>
 
-  <a href="{{config.host.webapp}}/groups/{{group.id}}/transactions/{{transaction.id}}" style="color:#7fadf2">
-    <img src="{{transaction.preview.src}}" width="{{transaction.preview.width}}" />
+  <a href="{{config.host.webapp}}/groups/{{group.id}}/expenses/{{expense.id}}" style="color:#7fadf2">
+    <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{expense.attachment}}" width="100%" />
   </a>
 
   <br /><br />
-  <a href="{{config.host.webapp}}/groups/{{group.id}}/transactions/{{transaction.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on OpenCollective to approve or reject it</a>
+  <a href="{{config.host.webapp}}/groups/{{group.id}}/expenses/{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on OpenCollective to approve or reject it</a>
 
 </center>
 

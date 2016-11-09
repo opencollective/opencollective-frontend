@@ -39,11 +39,6 @@ describe("notification.model.test.js", () => {
       group2 = results[3];
       return group.addUserWithRole(user, 'HOST')
     })
-    .then(() => {
-      notificationData.UserId = user.id;
-      notificationData.GroupId = group.id;
-      return Notification.create(notificationData);
-    });
   });
 
 
@@ -143,7 +138,7 @@ describe("notification.model.test.js", () => {
       .tap(res => {
         const notifications = res.rows;
         const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([ 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
+        expect(types).to.deep.equal([ 'group.expense.created', 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
       })
-      .tap(res => expect(res.count).to.equal(4)));
+      .tap(res => expect(res.count).to.equal(5)));
 });

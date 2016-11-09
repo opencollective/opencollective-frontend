@@ -29,7 +29,7 @@ const usersData = [
     email: 'xdamman+test@gmail.com',
     role: 'MEMBER',
     avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg',
-    lists: ['mailinglist.members','mailinglist.info']
+    lists: ['mailinglist.info']
   },
   {
     firstName: 'Aseem',
@@ -41,15 +41,13 @@ const usersData = [
     firstName: 'Pia',
     lastName: 'Mancini',
     email: 'pia+test@opencollective.com',
-    role: 'BACKER',
-    lists: ['mailinglist.backers']
+    role: 'BACKER'
   },
   {
     firstName: 'github',
     lastName: '',
     email: 'github+test@opencollective.com',
-    role: 'BACKER',
-    lists: ['mailinglist.backers']
+    role: 'BACKER'
   }
 ];
 
@@ -79,7 +77,7 @@ describe("email.routes.test", () => {
     sandbox.restore();
   });
 
-  before((done) => {
+  before('create group and members', (done) => {
 
     Group.create(groupData)
       .tap(g => group = g )
@@ -156,9 +154,10 @@ describe("email.routes.test", () => {
     return request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
       .then(() => {
+        expect(spy.callCount).to.equal(2);
         expect(spy.args[0][1]).to.equal('members@testcollective.opencollective.com');
         expect(spy.args[0][2].subject).to.equal('test collective members');
-        expect(spy.args[0][3].bcc).to.equal(usersData[0].email);
+        expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(usersData[0].email);
         expect(spy.args[0][3].from).to.equal('testcollective collective <info@testcollective.opencollective.com>');
       });
   });

@@ -14,12 +14,13 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('transactions.routes.test.js', () => {
 
-  let publicGroup;
-  let group2;
-  let user;
-  let user2;
-  let user3;
-  const sandbox = sinon.sandbox.create();
+  let sandbox, publicGroup, group2, user, user2, user3;
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+  });
+
+  after(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 

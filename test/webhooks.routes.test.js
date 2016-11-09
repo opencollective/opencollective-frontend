@@ -47,8 +47,13 @@ const stubStripe = () => {
 
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
-  const sandbox = sinon.sandbox.create();
-  let user, paymentMethod, group, donation, emailSendSpy;
+  let sandbox, user, paymentMethod, group, donation, emailSendSpy;
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+  });
+
+  after(() => sandbox.restore());
 
   beforeEach(() => {
     emailSendSpy = sandbox.spy(emailLib, 'send');
