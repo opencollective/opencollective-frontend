@@ -25,15 +25,9 @@ if [ ${useCache} == true ]; then
   exit 0
 fi
 
-# xdamman: this returns "Failed to fetch 404 error" -- might be temporary
-# wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-# sudo sh -c 'echo "deb [arch=amd64] https://dl-ssl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-# sudo apt-get update
-# sudo apt-get install --reinstall "${APT_PACKAGES[@]}"
-
-# xdamman: so in the meantime, we force to download the version we need:
-wget http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_53.0.2785.143-1_amd64.deb
-sudo dpkg -i google-chrome-stable_53.0.2785.143-1_amd64.deb
-sudo apt-get install subversion
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+sudo apt-get update
+sudo apt-get install --reinstall "${APT_PACKAGES[@]}"
 
 cp -v /var/cache/apt/archives/*.deb ${APT_CACHE} || true
