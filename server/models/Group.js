@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Joi from 'joi';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
+import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import roles from '../constants/roles';
@@ -13,19 +14,22 @@ import {getTier } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 
-const DEFAULT_GROUP_STYLES = { 
-  hero: { 
-    cover: { 
-      filter: "blur(4px)",
-      transform: "scale(1.06)",
-      backgroundImage: "url('/static/images/collectives/default-header-bg.jpg')"
-    }, 
-    a: {}
-  }
-};
+const DEFAULT_LOGO = '/static/images/1px.png';
+const DEFAULT_BACKGROUND_IMG = '/static/images/collectives/default-header-bg.jpg';
 
-const DEFAULT_SETTINGS = {
-  style: DEFAULT_GROUP_STYLES
+const getDefaultSettings = (group) => {
+  return {
+    style: {
+      hero: { 
+        cover: { 
+          filter: "blur(4px)",
+          transform: "scale(1.06)",
+          backgroundImage: `url(${group.backgroundImage || DEFAULT_BACKGROUND_IMG})`
+        }, 
+        a: {}
+      }
+    }    
+  }
 };
 
 const tier = Joi.object().keys({
@@ -73,7 +77,7 @@ export default function(Sequelize, DataTypes) {
     logo: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('logo') || 'https://opencollective.com/static/images/1px.png';
+        return this.getDataValue('logo') || `${config.host.website}${DEFAULT_LOGO}`;
       }
     },
 
@@ -83,7 +87,7 @@ export default function(Sequelize, DataTypes) {
     backgroundImage: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('backgroundImage') || `${config.host.website}/static/images/collectives/default-header-bg.jpg`;
+        return this.getDataValue('backgroundImage') || `${config.host.website}${DEFAULT_BACKGROUND_IMG}`;
       }
     },
 
@@ -105,7 +109,7 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.JSON,
       allowNull: true,
       get() {
-        return this.getDataValue('settings') || DEFAULT_SETTINGS;
+        return deepmerge(getDefaultSettings(this), this.getDataValue('settings') || {});
       }
     },
 
