@@ -3,7 +3,7 @@
 set -e
 
 CACHE_DIR=~/cache/bin
-SELENIUM_JAR=selenium-server-standalone-2.44.0.jar
+SELENIUM_JAR=selenium-server-standalone-3.0.1.jar
 LOCAL_SELENIUM=${CACHE_DIR}/${SELENIUM_JAR}
 
 if [ ! -e "./bin" ]; then
@@ -13,7 +13,7 @@ fi
 if [ ! -f ${LOCAL_SELENIUM} ]; then
   echo "Installing $SELENIUM_JAR to $CACHE_DIR"
   mkdir -p ${CACHE_DIR}
-  curl http://selenium-release.storage.googleapis.com/2.44/${SELENIUM_JAR} > ${LOCAL_SELENIUM}
+  curl http://selenium-release.storage.googleapis.com/3.0/${SELENIUM_JAR} > ${LOCAL_SELENIUM}
 else
   echo "$SELENIUM_JAR already available in $CACHE_DIR"
 fi
