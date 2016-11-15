@@ -1,0 +1,54 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+{{else}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+{{/if}}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if user.name}}
+<p>Dear {{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+{{#if interval}}
+  {{#if firstPayment }}
+    <p>We want to thank you for your contribution of {{{currency donation.amount currency=donation.currency}}} per {{interval}} to San Francisco Art & Film for Teenagers.
+      Your first payment was received on {{{moment donation.createdAt}}}.</p>
+  {{else}}
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment donation.createdAt}}}.</p>
+  {{/if}}
+{{else}}
+<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.</p>
+{{/if}}
+
+<p>SF Art & Film remains steadfast in its goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible. We hope you’ll continue to introduce people like yourself—people who understand the importance of art education—to our program.</p>
+<p>We greatly appreciate your support.</p>
+<p>You can follow our future activities and how we will be spending the money on our open collective page:
+<a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+</p>
+
+<p>Many Thanks,</p>
+
+<p>
+  Ronald Chase
+  Director
+  San Francisco Art & Film for Teenagers
+</p>
+<p>Your donation is tax-deductible to the extent allowed by law. You may save this receipt for your records. San Francisco Art & Film for Teenagers is a qualified non-profit organization with 501-C status, tax ID: 94-3310464.</p>
+
+{{> subscriptions}}
+{{> relatedgroups}}
+
+{{> footer}}
+
+<p style="text-align:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;box-sizing:border-box;font-size:12px;color:#999;">
+OpenCollective, Inc.<br />
+EIN: 47-3896707<br />
+340 S LEMON AVE #3717<br />
+Walnut CA 91789<br />
+USA
+</p>
