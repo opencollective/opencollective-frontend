@@ -22,7 +22,6 @@ const getDefaultSettings = (group) => {
     style: {
       hero: { 
         cover: { 
-          filter: "blur(4px)",
           transform: "scale(1.06)",
           backgroundImage: `url(${group.backgroundImage || DEFAULT_BACKGROUND_IMG})`
         }, 

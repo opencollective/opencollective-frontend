@@ -117,7 +117,7 @@ export const approve = (req, res, next) => {
       }
     };
 
-    request
+    return request
     .get(`https://${mailserver}.api.mailgun.net/v3/domains/opencollective.com/messages/${messageId}`, requestOptions)
     .then(json => {
       email = json;
