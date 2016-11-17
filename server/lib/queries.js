@@ -198,26 +198,27 @@ const getUsersFromGroupWithTotalDonations = (GroupIds) => {
       GROUP BY "UserId"
     )
     SELECT
-      ug."UserId" as id,
-      ug."createdAt" as "createdAt",
-      concat_ws(' ', u."firstName", u."lastName") as name,
-      u."firstName" as "firstName",
-      u."lastName" as "lastName",
-      u.username as username,
-      ug.role as role,
-      u.avatar as avatar,
-      u.website as website,
-      u.email as email,
-      u."twitterHandle" as "twitterHandle",
-      td.amount as "totalDonations",
-      ld."updatedAt" as "lastDonation"
-    FROM "Users" u
+      max(u.id) as id,
+      max(ug."createdAt") as "createdAt",
+      max(concat_ws(' ', u."firstName", u."lastName")) as name,
+      max(u."firstName") as "firstName",
+      max(u."lastName") as "lastName",
+      max(u.username) as username,
+      max(ug.role) as role,
+      max(u.avatar) as avatar,
+      max(u.website) as website,
+      max(u.email) as email,
+      max(u."twitterHandle") as "twitterHandle",
+      max(td.amount) as "totalDonations",
+      max(ld."updatedAt") as "lastDonation"
+    FROM total_donations td
+    LEFT JOIN "Users" u ON u.id = td."UserId"
     LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
-    LEFT JOIN total_donations td ON td."UserId" = ug."UserId"
     LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
     WHERE ug."GroupId" IN (:groupids)
     AND ug."deletedAt" IS NULL
-    ORDER BY "totalDonations" DESC, ug."createdAt" ASC
+    GROUP BY u.id
+    ORDER BY "totalDonations" DESC, "createdAt" ASC
   `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
     replacements: { groupids },
