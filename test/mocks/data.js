@@ -27,7 +27,8 @@ export default {
     "lastName": "Damman",
     "username": "xdamman",
     "email": "User3@opencollective.com",
-    "password": "passssap"
+    "password": "passssap",
+    "billingAddress": "Rue du paradis\n1000 Brussels\nBelgium"
   },
 
   "user4": {
