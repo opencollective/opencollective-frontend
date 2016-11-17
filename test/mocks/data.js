@@ -10,7 +10,8 @@ export default {
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "isOrganization": false,
-    "twitterHandle": "philmod"
+    "twitterHandle": "philmod",
+    "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA"
   },
 
   "user2": {

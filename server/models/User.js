@@ -77,6 +77,8 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
+    billingAddress: DataTypes.STRING, // Used for the invoices, we should create a separate table for addresses (billing/shipping)
+
     website: {
       type: DataTypes.STRING,
       get() {

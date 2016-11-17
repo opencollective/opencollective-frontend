@@ -187,6 +187,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails).to.have.property('host');
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.username).to.equal(user.username);
+          expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
           done();
         });
