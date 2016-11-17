@@ -16,10 +16,9 @@ describe('transaction model', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
 
-  // Create group2.
-  beforeEach(() =>
+  beforeEach('create group2 and add user as host', () =>
     models.Group.create(groupData)
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
@@ -34,6 +33,18 @@ describe('transaction model', () => {
       done();
     })
     .catch(done);
+  });
+
+  it('get the host', (done) => {
+    Transaction.create({
+      GroupId: group.id,
+      amount: 100
+    })
+    .then(transaction => transaction.getHost())
+    .then(host => {
+      expect(host.id).to.equal(user.id);
+      done();
+    })
   });
 
   it('isDonation is true when amount is > 0', done => {

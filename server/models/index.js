@@ -9,6 +9,12 @@ import { database as config } from 'config';
  */
 console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
 
+if (config.options.logging) {
+  config.options.logging = (query) => {
+    console.log('\n-------------------- <query> --------------------\n',query,'\n-------------------- </query> --------------------\n');
+  }
+}
+
 export const sequelize = new Sequelize(
   config.database,
   config.username,
@@ -61,6 +67,7 @@ export function setupModels(client) {
   // Group.
   m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
   m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});
+  m.User.hasMany(m.UserGroup);
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User

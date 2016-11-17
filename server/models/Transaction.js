@@ -8,6 +8,8 @@ import activities from '../constants/activities';
 
 export default (Sequelize, DataTypes) => {
 
+  const { models } = Sequelize;
+
   const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING, // delete #postmigration
@@ -111,6 +113,16 @@ export default (Sequelize, DataTypes) => {
           paymentProcessorFee: this.paymentProcessorFee,
           netAmountInGroupCurrency: this.netAmountInGroupCurrency
         };
+      }
+    },
+
+    instanceMethods: {
+      getHost() {
+        return models.User.findOne({
+          include: [
+            { model: models.UserGroup, where: { role: 'HOST', GroupId: this.GroupId } }
+          ]
+        });
       }
     },
 
