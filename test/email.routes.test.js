@@ -175,8 +175,8 @@ describe("email.routes.test", () => {
   describe("unsubscribe", () => {
 
     const template = 'mailinglist.members';
-    const token = generateToken(usersData[0].email, groupData.slug, template);
-    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/${token}`;
+    const token = generateToken(usersData[1].email, groupData.slug, template);
+    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[1].email)}/${groupData.slug}/${template}/${token}`;
 
     it("returns an error if invalid token", () => {
       return request(app)
