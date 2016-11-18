@@ -211,8 +211,8 @@ const getUsersFromGroupWithTotalDonations = (GroupIds) => {
       max(u."twitterHandle") as "twitterHandle",
       max(td.amount) as "totalDonations",
       max(ld."updatedAt") as "lastDonation"
-    FROM total_donations td
-    LEFT JOIN "Users" u ON u.id = td."UserId"
+    FROM "Users" u
+    LEFT JOIN total_donations td ON u.id = td."UserId"
     LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
     LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
     WHERE ug."GroupId" IN (:groupids)
