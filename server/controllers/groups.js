@@ -64,12 +64,22 @@ const _getUsersData = (group) => {
 };
 
 export const getUsers = (req, res, next) => {
+
+  const now = moment();
+  const tiers = _.groupBy(req.group.tiers, 'name');
+
+  const _isActive = (backer) => {
+    if (tiers[backer.tier] && tiers[backer.tier].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
+      return false
+    else
+      return true;
+  }
+
   auth.canEditGroup(req, res, (e, canEditGroup) => {
     let promise = _getUsersData(req.group);
 
     if (req.query.filter && req.query.filter === 'active') {
-      const now = moment();
-      promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
+      promise = promise.filter(backer => _isActive(backer));
     }
 
     return promise
