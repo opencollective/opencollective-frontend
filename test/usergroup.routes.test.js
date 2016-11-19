@@ -412,7 +412,7 @@ describe('usergroup.routes.test.js', () => {
         .expect((res) => {
           const users = res.body;
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].tier).to.equal('backer');
+          expect(users[0].tier).to.equal('contributor');
         })
         .end(done);
     });
