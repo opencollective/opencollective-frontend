@@ -4,6 +4,7 @@ import * as activities from './controllers/activities';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
 import * as donations from './controllers/donations';
+import * as transactions from './controllers/transactions';
 import * as expenses from './controllers/expenses';
 import * as comments from './controllers/comments';
 import * as groups from './controllers/groups';
@@ -164,6 +165,7 @@ export default (app) => {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/transactions/:transactionid', transactions.getOne); // Get the transaction details
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
   app.post('/groups/:groupid/transactions', required('transaction'), auth.canEditGroup, groups.createTransaction); // Create a transaction for a group.

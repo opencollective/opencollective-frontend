@@ -10,7 +10,8 @@ export default {
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "isOrganization": false,
-    "twitterHandle": "philmod"
+    "twitterHandle": "philmod",
+    "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA"
   },
 
   "user2": {
@@ -26,7 +27,8 @@ export default {
     "lastName": "Damman",
     "username": "xdamman",
     "email": "User3@opencollective.com",
-    "password": "passssap"
+    "password": "passssap",
+    "billingAddress": "Rue du paradis\n1000 Brussels\nBelgium"
   },
 
   "user4": {

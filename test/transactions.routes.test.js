@@ -126,17 +126,18 @@ describe('transactions.routes.test.js', () => {
    */
   describe('#get', () => {
 
-    beforeEach('create a transaction for publicGroup', (done) => {
-      async.each(transactionsData, (transaction, cb) => {
+    let transaction;
+
+    beforeEach('create multiple transactions for publicGroup', (done) => {
+      async.each(transactionsData, (t, cb) => {
         request(app)
           .post(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            transaction
-          })
+          .set('Authorization', `Bearer ${user3.jwt()}`)
+          .send({ transaction: t })
           .expect(200)
-          .end(e => {
+          .end((e, res) => {
             expect(e).to.not.exist;
+            transaction = res.body;
             cb();
           });
       }, done);
@@ -173,6 +174,23 @@ describe('transactions.routes.test.js', () => {
 
           done();
 
+        });
+    });
+
+    it('get the transaction details with host info', (done) => {
+      request(app)
+        .get(`/transactions/${transaction.id}?api_key=${application.api_key}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          const transactionDetails = res.body;
+          expect(transactionDetails).to.have.property('host');
+          expect(transactionDetails.description).to.equal(transaction.description);
+          expect(transactionDetails.host.username).to.equal(user.username);
+          expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
+          expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
+          expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
+          done();
         });
     });
 
