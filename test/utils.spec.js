@@ -19,7 +19,7 @@ describe("utils", () => {
   });
 
   it("returns contributor if the member didn't make any donation", () => {
-    expect(getTier({ role: roles.MEMBER, totalDonations: null }, group.tiers)).to.equal('contributor');
+    expect(getTier({ role: roles.MEMBER, totalDonations: null }, group.tiers)).to.equal('core contributor');
   });
 
 });

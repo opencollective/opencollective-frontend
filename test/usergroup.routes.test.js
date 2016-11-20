@@ -398,7 +398,7 @@ describe('usergroup.routes.test.js', () => {
         .tap(res => {
           const users = res.body;
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].tier).to.equal('contributor');
+          expect(users[0].tier).to.equal('core contributor');
           expect(users[1].tier).to.equal('sponsor');
           expect(users[2].tier).to.equal('host');
           expect(users[3].tier).to.equal('backer');
@@ -412,7 +412,7 @@ describe('usergroup.routes.test.js', () => {
         .expect((res) => {
           const users = res.body;
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].tier).to.equal('contributor');
+          expect(users[0].tier).to.equal('core contributor');
         })
         .end(done);
     });
@@ -430,7 +430,7 @@ describe('usergroup.routes.test.js', () => {
           }
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
-          expect(getValue(0, "tier")).to.equal('"contributor"');
+          expect(getValue(0, "tier")).to.equal('"core contributor"');
           expect(getValue(1, "tier")).to.equal('"sponsor"');
           expect(getValue(2, "tier")).to.equal('"host"');
           expect(getValue(3, "tier")).to.equal('"backer"');
