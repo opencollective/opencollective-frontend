@@ -146,7 +146,7 @@ export const getTier = (user, tiers) => {
   let defaultTier;
   switch (user.role) {
     case 'MEMBER':
-      return 'contributor';
+      return 'core contributor';
     case 'HOST':
       defaultTier = 'host';
       break;
