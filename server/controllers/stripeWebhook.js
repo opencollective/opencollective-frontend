@@ -237,6 +237,7 @@ export default function stripeWebhook(req, res, next) {
 
     sendInvoice: ['createTransaction', (cb, results) => {
       const donation = results.fetchDonation;
+      const transaction = results.createTransaction;
       // We only send an invoice for donations > $10 equivalent
       if (donation.amount < 10 * currencies[donation.currency].fxrate * 100) return cb(null);
       const user = donation.User || {};
@@ -247,6 +248,7 @@ export default function stripeWebhook(req, res, next) {
         'thankyou',
         user.email,
         { donation: donation.info,
+          transaction: transaction.info,
           user: user.info,
           firstPayment: false,
           group: group.info,

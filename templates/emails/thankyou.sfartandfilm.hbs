@@ -19,7 +19,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
     <p>We want to thank you for your contribution of {{{currency donation.amount currency=donation.currency}}} per {{interval}} to San Francisco Art & Film for Teenagers.
       Your first payment was received on {{{moment donation.createdAt}}}.</p>
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment donation.createdAt}}}.</p>
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.</p>
   {{/if}}
 {{else}}
 <p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.</p>
