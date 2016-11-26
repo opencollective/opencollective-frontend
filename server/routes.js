@@ -57,7 +57,7 @@ export default (app) => {
    */
   app.post('/users/password/forgot', required('email'), users.forgotPassword); // Send forgot password email
   app.post('/users/password/reset/:userid_enc/:reset_token', required('password', 'passwordConfirmation'), users.resetPassword); // Reset password`
-  app.post('/users/new_login_token', required('email'), users.sendNewTokenByEmail);
+  app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
   app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
   /**
