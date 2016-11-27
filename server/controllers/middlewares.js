@@ -116,6 +116,8 @@ export const getOrCreateUser = (req, res, next) => {
   } else if (req.body.payment) {
     // TODO remove #postmigration
     ({ email } = req.body.payment);
+  } else if (req.body.email) {
+    email = req.body.email; // used by /new_login_token
   }
 
   const password = req.body.password || req.query.password;
