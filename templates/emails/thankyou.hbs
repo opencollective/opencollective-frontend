@@ -19,7 +19,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
     <p>We would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
       Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us continue our activities.</p>
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment donation.createdAt}}}.
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your donation helps us continue our activities.</p>
   {{/if}}
 {{else}}
