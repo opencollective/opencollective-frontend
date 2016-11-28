@@ -175,8 +175,11 @@ describe("email.routes.test", () => {
   describe("unsubscribe", () => {
 
     const template = 'mailinglist.members';
-    const token = generateToken(usersData[1].email, groupData.slug, template);
-    const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[1].email)}/${groupData.slug}/${template}/${token}`;
+
+    const generateUnsubscribeUrl = (email) => {
+      const token = generateToken(email, groupData.slug, template);
+      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${groupData.slug}/${template}/${token}`;
+    }
 
     it("returns an error if invalid token", () => {
       return request(app)
@@ -194,9 +197,11 @@ describe("email.routes.test", () => {
     return request(app)
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
       .then(() => {
-        const emailBody = spy.args[0][2];
-        expect(emailBody).to.contain(unsubscribeUrl);
-        expect(emailBody).to.contain("To unsubscribe from members@testcollective.opencollective.com");
+        for (const i in spy.args) {
+          const emailBody = spy.args[i][2];
+          expect(emailBody).to.contain(generateUnsubscribeUrl(spy.args[i][3].bcc));
+          expect(emailBody).to.contain("To unsubscribe from members@testcollective.opencollective.com");
+        }
       });
     });
 
@@ -208,7 +213,7 @@ describe("email.routes.test", () => {
       };
 
       return request(app)
-        .get(unsubscribeUrl)
+        .get(generateUnsubscribeUrl(users[0].email))
         .then(res => {
           console.log("res body", res.body);
           models.Notification.count({ where })
