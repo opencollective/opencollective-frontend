@@ -344,7 +344,7 @@ export default (Sequelize, DataTypes) => {
           username = tokens[0];
         }
         
-        username = slug(username).toLowerCase();
+        username = slug(username).toLowerCase().replace(/\./g,''); // no dot
 
         const plusIndex = username.indexOf('+');
         if (plusIndex !== -1) {
