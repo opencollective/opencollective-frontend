@@ -74,18 +74,18 @@ describe('user.models.test.js', () => {
         .tap(user => {
           expect(user.username).to.equal('xdamman')
         })
-        .then(() => User.create({ email: 'xdamman@gmail.com'}))
+        .then(() => User.create({ email: 'xavier.damman@gmail.com'}))
         .then(user => {
-          expect(user.username).to.equal('xdamman1')
+          expect(user.username).to.equal('xavierdamman')
         })
         .then(() => User.create({ twitterHandle: '@xdamman'}))
         .then(user => {
-          expect(user.username).to.equal('xdamman2')
+          expect(user.username).to.equal('xdamman1')
           expect(user.twitterHandle).to.equal('xdamman')
         })
         .then(() => User.create({ firstName: 'Xavier', lastName: 'Damman'}))
         .then(user => {
-          expect(user.username).to.equal('xavierdamman')
+          expect(user.username).to.equal('xavierdamman1')
         })
         .then(() => User.create({'username': 'hélène & les g.arçons'}))
         .then(user => {
