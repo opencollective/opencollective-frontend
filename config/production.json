@@ -7,6 +7,9 @@
       "logging": false,
       "dialectOptions": {
         "ssl": true
+      },
+      "pool": {
+        "max": 15
       }
     }
   },
