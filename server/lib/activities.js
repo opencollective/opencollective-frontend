@@ -152,7 +152,6 @@ export default {
     let interval = '';
     let recurringAmount = null;
     let currency = '';
-    let tags = [];
     let description = '';
     let userTwitter = '';
     let groupTwitter = '';
@@ -189,7 +188,6 @@ export default {
       ({ amount } = activity.data.transaction);
       recurringAmount = amount + (interval ? `/${interval}` : '');
       ({ currency } = activity.data.transaction);
-      tags = JSON.stringify(activity.data.transaction.tags);
       ({ description } = activity.data.transaction);
     }
 
@@ -221,7 +219,7 @@ export default {
           }
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
         } else if (activity.data.transaction.isExpense) {
-          return `New Expense: ${userString} submitted a ${tags} expense to ${group}: ${currency} ${amount} for ${description}!`
+          return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${description}!`
         }
         break;
 

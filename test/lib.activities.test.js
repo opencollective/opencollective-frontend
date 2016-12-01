@@ -85,7 +85,7 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.GROUP_TRANSACTION_CREATED} expense`, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[13], 'slack');
-      expect(actual).to.equal('New Expense: someone submitted a undefined expense to <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for pizza!');
+      expect(actual).to.equal('New Expense: someone submitted an expense to <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for pizza!');
     });
 
     it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
