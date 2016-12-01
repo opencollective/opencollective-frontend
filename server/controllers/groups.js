@@ -69,10 +69,13 @@ export const getUsers = (req, res, next) => {
   const tiers = _.groupBy(req.group.tiers, 'name');
 
   const _isActive = (backer) => {
-    if (tiers[backer.tier] && tiers[backer.tier].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
-      return false
-    else
-      return true;
+    if (tiers[backer.tier]) {
+      if (tiers[backer.tier][0].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
+        return false;
+      if (now.diff(moment(backer.lastDonation), 'days') > 365)
+        return false;
+    }
+    return true;
   }
 
   auth.canEditGroup(req, res, (e, canEditGroup) => {
