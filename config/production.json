@@ -4,13 +4,14 @@
       "port": 5432,
       "dialect": "postgres",
       "protocol": "postgres",
-      "logging": false,
+      "logging": true,
       "dialectOptions": {
         "ssl": true
       },
       "pool": {
         "max": 15
-      }
+      },
+      "benchmark": true
     }
   },
   "host": {
