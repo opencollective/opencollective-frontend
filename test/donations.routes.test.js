@@ -148,7 +148,6 @@ describe('donations.routes.test.js', () => {
 
       it('THEN gets first page', () => {
         const donations = response.body;
-        console.log("donations", donations);
         expect(donations.length).to.equal(per_page);
         expect(donations[0].id).to.equal(1);
 

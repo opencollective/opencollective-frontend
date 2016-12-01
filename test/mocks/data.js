@@ -612,7 +612,7 @@ export default {
     "category": "Engineering",
     "amount": 12000,
     "currency": "USD",
-    "paypalEmail": "uSerpaypal@gmail.com",
+    "paypalEmail": "newPaypal2@gmail.com",
     "incurredAt": "2016-03-06 UTC+0300",
     "payoutMethod": "paypal",
     "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
@@ -626,5 +626,15 @@ export default {
     "paypalEmail": "Userpaypal2@gmail.com",
     "incurredAt": "2016-03-09 UTC+0300",
     "payoutMethod": "manual"
+  },
+  "expense3": {
+    "title": "Lunch with Jenn",
+    "notes": "Some very long and super interesting extra notes for the whole world to see",
+    "category": "Engineering",
+    "amount": 12000,
+    "currency": "USD",
+    "incurredAt": "2016-03-06 UTC+0300",
+    "payoutMethod": "paypal",
+    "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
   }
 }
