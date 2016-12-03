@@ -156,6 +156,8 @@ export default (Sequelize, DataTypes) => {
         } else {
           // populate netAmountInGroupCurrency for "Add Funds" and Expenses
           transaction.netAmountInGroupCurrency = transaction.amount*100;
+          // set the currency to be group's currency, if not specified
+          transaction.currency = transaction.currency || group.currency;
         }
         return Transaction.create(transaction);
       },
