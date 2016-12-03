@@ -202,7 +202,6 @@ const processTiers = (tiers) => {
 }
 
 const processGroup = (group) => {
-  const d = new Date;
   const promises = [
     group.getBalance(endDate),
     group.getBalance(startDate),
