@@ -62,6 +62,7 @@ handlebars.registerHelper('moment', (value, props) => {
 
 handlebars.registerHelper('currency', (value, props) => {
   const { currency, precision } = props.hash;
+  if (!currency) return value;
   value = value/100; // converting cents
 
   return value.toLocaleString(currency, {
