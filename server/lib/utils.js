@@ -164,7 +164,7 @@ export const getTier = (user, tiers) => {
 
   // We order the tiers by start range DESC
   tiers.sort((a,b) => {
-    return a.range[0] < b.range[0];
+    return b.range[0] - a.range[0];
   });
 
   // We get the first tier for which the totalDonations is higher than the minimum amount for that tier

@@ -67,7 +67,7 @@ export default {
       "title": "Backers",
       "description": "One time tier",
       "range": [0, 100],
-      "button": "Become a sponsor",
+      "button": "Become a backer",
       "interval": "one-time"
     }, {
       "name": "sponsor",
@@ -75,7 +75,7 @@ export default {
       "description": "Monthly tier",
       "range": [50, 10000],
       "interval": "monthly",
-      "button": "Become a member"
+      "button": "Become a sponsor"
     }],
     "hostFeePercent": 10,
     "tags": ["open source", "test"],
