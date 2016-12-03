@@ -35,7 +35,9 @@ const createTransactions = () => {
     updatedAt: '2016-05-07 19:52:21.203+00'
   }];
 
-  return models.Transaction.createMany(transactions);
+  return group
+    .addUserWithRole(users[3], roles.BACKER)
+    .then(() => models.Transaction.createMany(transactions));
 };
 
 describe('usergroup.routes.test.js', () => {
@@ -55,8 +57,7 @@ describe('usergroup.routes.test.js', () => {
   beforeEach((done) => {
     const promises = [group.addUserWithRole(users[0], roles.HOST),
                       group.addUserWithRole(users[1], roles.MEMBER),
-                      group.addUserWithRole(users[2], roles.BACKER),
-                      group.addUserWithRole(users[3], roles.BACKER)
+                      group.addUserWithRole(users[2], roles.BACKER)
                       ];
     Promise.all(promises).then(() => done() );
   });
@@ -431,9 +432,9 @@ describe('usergroup.routes.test.js', () => {
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
           expect(getValue(0, "tier")).to.equal('"core contributor"');
-          expect(getValue(1, "tier")).to.equal('"backer"');
+          expect(getValue(1, "tier")).to.equal('"sponsor"');
           expect(getValue(2, "tier")).to.equal('"host"');
-          expect(getValue(3, "tier")).to.equal('"sponsor"');
+          expect(getValue(3, "tier")).to.equal('"backer"');
           expect(headers).to.not.contain('"email"');
         })
         .end(done);
