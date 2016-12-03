@@ -8,6 +8,7 @@ import templates from './emailTemplates';
 import activities from '../constants/activities';
 import {isEmailInternal} from './utils';
 import crypto from 'crypto';
+import fs from 'fs';
 
 const debug = debugLib('email');
 
@@ -16,8 +17,16 @@ const render = (template, data) => {
     data = _.merge({}, data);
     delete data.config;
     data.config = { host: config.host };
-    debug(`Preview email template: http://localhost:3060/templates/email/${template}?data=${encodeURIComponent(JSON.stringify(data))}`);
-    return juice(templates[template](data));
+    const html = juice(templates[template](data));
+
+    // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
+    if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+      const filepath = `/tmp/${template}.${data.group && data.group.slug}.html`;
+      const script = `<script>data=${JSON.stringify(data)};</script>`;
+      fs.writeFileSync(filepath, `${script}\n\n${html}`);
+      console.log(`Preview email template: file://${filepath}`);
+    }
+    return html;
 };
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
@@ -55,7 +64,7 @@ const sendMessage = (recipients, subject, html, options) => {
   if (!_.isArray(recipients)) recipients = [ recipients ];
 
   recipients = recipients.filter(recipient => {
-    if (!recipient.match(/.+@.+\..+/)) {
+    if (!recipient || !recipient.match(/.+@.+\..+/)) {
       debug(`${recipient} is an invalid email address, skipping`);
       return false;
     }
