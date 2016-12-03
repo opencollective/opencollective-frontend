@@ -14,6 +14,7 @@ const {
   Donation,
   Group,
   Subscription,
+  Transaction,
   User,
   PaymentMethod
 } = models;
@@ -235,7 +236,19 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    sendInvoice: ['createTransaction', (cb, results) => {
+    countTransactions: ['createTransaction', (cb, results) => {
+      const donation = results.fetchDonation;
+      Transaction.count({
+        DonationId: donation.id
+      })
+      .then(numTransactions => cb(null, numTransactions))
+      .catch(cb) 
+    }],
+
+    sendInvoice: ['countTransactions', (cb, results) => {
+      if (results.countTransactions === 1) {
+        return cb();
+      }
       const donation = results.fetchDonation;
       const transaction = results.createTransaction;
       // We only send an invoice for donations > $10 equivalent
