@@ -10,7 +10,7 @@ import queries from '../lib/queries';
 import groupBy from 'lodash/collection/groupBy';
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
-import {getTier } from '../lib/utils';
+import {getTier, isBackerActive, capitalize, pluralize } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 
@@ -261,6 +261,39 @@ export default function(Sequelize, DataTypes) {
           return ids;
         });
       },
+
+      /**
+       * returns the tiers with their users
+       * e.g. group.tiers = [
+       *  { name: 'core contributor', users: [ {UserObject} ], range: [], ... },
+       *  { name: 'backer', users: [ {UserObject}, {UserObject} ], range: [], ... }
+       * ]
+       */
+      getTiersWithUsers(options = { active: false, attributes: ['id','username', 'avatar','firstDonation', 'lastDonation','totalDonations','website'] }) {
+        const tiers = _.clone(this.tiers);
+        return queries.getUsersFromGroupWithTotalDonations(this.id, options.until)
+          .then(users => {
+            if (!tiers) return [ { name: 'backer', title: 'Backers', range: [0, Infinity], users: users.map(u => _.pick(u,options.attributes)) } ];
+            const tierIndex = {};
+            tiers.map((tier, index) => {
+              tierIndex[tier.name] = index;
+              tiers[index].title = tier.title || capitalize(pluralize(tier.name));
+              tiers[index].users = [];
+            });
+            users.map(user => {
+              user.tier = getTier(user, tiers);
+              user.avatar = user.avatar || `/static/images/users/avatar-02.svg`;
+              if (tierIndex[user.tier] === undefined) {
+                tierIndex[user.tier] = tiers.length;
+                tiers.push({ name: user.tier, title: capitalize(pluralize(user.tier)), users: [], range: [0, Infinity] });
+              }
+              if (!options.active || isBackerActive(user, tiers))
+                tiers[tierIndex[user.tier]].users.push(_.pick(user,options.attributes));
+            });
+            return tiers;
+          });
+      },
+
       hasUserWithRole(userId, expectedRoles, cb) {
         this
           .getUsers({
@@ -380,7 +413,7 @@ export default function(Sequelize, DataTypes) {
           ],
           where: {
             GroupId: this.id,
-            createdAt: { $lt: until }
+            createdAt: { $lte: until }
           }
         })
         .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
@@ -462,7 +495,7 @@ export default function(Sequelize, DataTypes) {
               amount: {
                 $gt: 0
               },
-              createdAt: { $lt: until }
+              createdAt: { $lte: until }
             }
           })
         .then((result) => {
