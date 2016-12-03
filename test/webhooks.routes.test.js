@@ -340,6 +340,13 @@ describe('webhooks.routes.test.js', () => {
               expect(transaction.Subscription.isActive).to.be.equal(true);
               expect(transaction.Subscription).to.have.property('activatedAt');
               expect(transaction.Subscription.interval).to.be.equal('month');
+
+              expect(emailSendSpy.callCount).to.equal(3);
+              expect(emailSendSpy.secondCall.args[0])
+              expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
+              expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.true;
+              expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
+              expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
             });
 
             done();
@@ -350,13 +357,12 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('successfully sends out an invoice by email to donor', () => {
-      expect(emailSendSpy.callCount).to.equal(3);
+      expect(emailSendSpy.callCount).to.equal(2);
       expect(emailSendSpy.secondCall.args[0])
       expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
       expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.true;
-      expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-      expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
-    })
+      expect(emailSendSpy.secondCall.args[1]).to.equal(stripeEmail);
+    });
   });
 
   it('returns 200 if the event is not livemode in production', (done) => {
