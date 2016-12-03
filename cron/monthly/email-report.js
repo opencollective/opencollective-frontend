@@ -7,9 +7,18 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-
+import { isBackerActive } from '../../server/lib/utils';
 import models from '../../server/models';
 import emailLib from '../../server/lib/email';
+
+const d = new Date;
+d.setMonth(d.getMonth() - 1);
+const month = moment(d).format('MMMM');
+
+const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
+const endDate = new Date(d.getFullYear(), d.getMonth()+1, 0);
+
+console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
 
@@ -23,9 +32,6 @@ const processGroups = (groups) => {
     return Promise.map(groups, processGroup);
 };
 
-const d = new Date;
-d.setMonth(d.getMonth() - 1);
-const month = moment(d).format('MMMM');
 
 const init = () => {
 
@@ -37,13 +43,14 @@ const init = () => {
           'slug',
           'name',
           'currency',
+          'tiers',
           'tags'
       ],
       include: [ { model: models.Transaction, required: true }]
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.limit = 10;
+    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf']} };
 
   Group.findAll(query)
   .tap(groups => {
@@ -91,10 +98,12 @@ const generateDonationsString = (backer, donations) => {
     return;
   }
   const donationsArray = [];
+  donations = donations.filter(donation => (donation.amount > 0));
   let donationsString;
-  donations.map(donation => {
+  for (let i=0; i<Math.min(3, donations.length); i++) {
+    const donation = donations[i];
     donationsArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);
-  });
+  }
   donationsString = donationsArray.join(', ');
   donationsString = donationsString.replace(/,([^, ]*)$/,' and $1');
   return donationsString;
@@ -112,36 +121,116 @@ const processBacker = (backer, startDate, endDate, tags) => {
     })
 };
 
+const rank = (user) => {
+  if (user.isNew) return 1;
+  if (user.isLost) return 2;
+  return 3;
+};
+
+const processTiers = (tiers) => {
+
+  const userids = {};
+  const stats = { backers: {} };
+
+  stats.backers.lastMonth = 0;
+  stats.backers.previousMonth = 0;
+  stats.backers.new = 0;
+  stats.backers.lost = 0;
+
+  // We only keep the tiers that have at least one user
+  tiers = tiers.filter(tier => tier.users.length > 0 && tier.name != 'host' && tier.name != 'core contributor');
+
+  // We sort tiers by number of users ASC
+  tiers.sort((a,b) => b.range[0] - a.range[0]);
+
+  tiers = tiers.map(tier => {
+
+    let index = 0
+    debug("> processing tier ", tier.name);
+
+    // We sort users by total donations DESC
+    tier.users.sort((a,b) => b.totalDonations - a.totalDonations );
+
+    tier.users = tier.users.filter(u => {
+      if (userids[u.id]) {
+        debug(">>> user ", u.username, "is a duplicate");
+        return false;
+      }
+      userids[u.id] = true;
+
+      u.index = index++;
+      u.activeLastMonth = isBackerActive(u, tiers, endDate);
+      u.activePreviousMonth = (u.firstDonation < startDate) && isBackerActive(u, tiers, startDate);
+
+      if (tier.name.match(/sponsor/i))
+        u.isSponsor = true;
+      if (u.firstDonation > startDate) {
+        u.isNew = true;
+        stats.backers.new++;
+      }
+      if (u.activePreviousMonth && !u.activeLastMonth) {
+        u.isLost = true;
+        stats.backers.lost++;
+      }
+
+      debug("----------- ", u.username, "----------");
+      debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
+      debug("totalDonations", u.totalDonations/100);
+      debug("active last month?", u.activeLastMonth);
+      debug("active previous month?", u.activePreviousMonth);
+      debug("is new?", u.isNew === true);
+      debug("is lost?", u.isLost === true);
+      if (u.activePreviousMonth)
+        stats.backers.previousMonth++;
+      if (u.activeLastMonth) {
+        stats.backers.lastMonth++;
+        return true;
+      } else if (u.isLost) {
+        return true;
+      }
+    });
+
+    tier.users.sort((a, b) => {
+      if (rank(a) > rank(b)) return 1;
+      if (rank(a) < rank(b)) return -1;
+      return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
+    });
+
+    return tier;
+  });
+  return { stats, tiers};
+}
+
 const processGroup = (group) => {
   const d = new Date;
-  const startDate = new Date(d.getFullYear(), d.getMonth() -1, 1);
-  const endDate = new Date(d.getFullYear(), d.getMonth(), 0);
-  debug(`Processing ${group.name}`, moment(startDate).format('MM/DD'), moment(endDate).format('MM/DD'));
   const promises = [
     group.getBalance(endDate),
     group.getBalance(startDate),
-    group.getBackersCount(endDate),
-    group.getBackersCount(startDate),
     group.getExpenses(null, startDate, endDate),
     group.getRelatedGroups(3),
-    getTopBackers(startDate, endDate, group.tags)
+    getTopBackers(startDate, endDate, group.tags),
+    group.getTiersWithUsers({ attributes: ['id','username','name', 'avatar','firstDonation','lastDonation','totalDonations','tier'], until: endDate })
   ];
 
   let emailData = {};
 
   return Promise.all(promises)
           .then(results => {
+            console.log('***', group.name, '***');
             const data = { config: { host: config.host }, month, group: {} };
+            const res = processTiers(results[5]);
             data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
-            data.group.balance = results[0];
-            data.group.previousBalance = results[1];
-            data.group.balanceDelta = results[0] - results[1];
-            data.group.backersCount = results[2];
-            data.group.backersCountDelta = results[2] - results[3];
-            data.group.expenses = results[4].map(e => _.pick(e.dataValues, ['id', 'description', 'status', 'createdAt','netAmountInGroupCurrency','currency']));
-            data.group.related = results[5];
-            data.topBackers = _.filter(results[6], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
+            data.group.tiers = res.tiers;
+            data.group.stats = res.stats;
+            data.group.stats.balance = results[0];
+            data.group.stats.previousBalance = results[1];
+            data.group.stats.balanceDelta = results[0] - results[1];
+            data.group.stats.positiveBalanceDelta = (data.group.stats.balanceDelta >= 0);
+            data.group.expenses = results[2].map(e => _.pick(e.dataValues, ['id', 'description', 'status', 'createdAt','netAmountInGroupCurrency','currency']));
+            data.group.related = results[3];
+            data.topBackers = _.filter(results[4], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
             emailData = data;
+            console.log(data.group.stats);
             return group;
           })
           .then(getRecipients)
@@ -163,7 +252,6 @@ const getRecipients = (group) => {
 
 const sendEmail = (recipients, data) => {
   if (recipients.length === 0) return;
-  debug(`Preview email template: http://localhost:3060/templates/email/group.monthlyreport?data=${encodeURIComponent(JSON.stringify(data))}`);
   return Promise.map(recipients, recipient => {
     debug("Sending email to ", recipient.email);
     return emailLib.send('group.monthlyreport', recipient.email, data);
