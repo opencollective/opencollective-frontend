@@ -5,7 +5,10 @@
     "username": "PG_USERNAME",
     "password": "PG_PASSWORD",
     "options": {
-      "host": "PG_HOST"
+      "host": "PG_HOST",
+      "pool": {
+        "max": "PG_MAX_CONNECTIONS"
+      }
     }
   },
   "keys": {
