@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.changeColumn('Groups', 'mission', { type: DataTypes.STRING(125) })
+    return queryInterface.changeColumn('Groups', 'mission', { type: DataTypes.STRING(128) })
   },
 
   down: function (queryInterface, Sequelize) {
