@@ -1,7 +1,10 @@
 <style>
 .CollectiveCards {
   overflow: hidden;
-}  
+  display: inline-block;
+  height: 268px;
+}
+
 .CollectiveCard {
   vertical-align: top;
   position: relative;
@@ -13,7 +16,6 @@
   background-color: #ffffff;
   box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
   margin: 0px 6px 8px 2px;
-  float: left;
   overflow: hidden;
   text-decoration: none !important;
 }
@@ -27,8 +29,7 @@
   background-position: center;
 }
 .CollectiveCard-head img {
-  height: 55%;
-  margin: 25px auto;
+  margin: 20px auto;
 }
 .CollectiveCard-name, .CollectiveCard-description {
   overflow: hidden;
@@ -76,13 +77,6 @@
   color: #a8afb3;
   text-transform: uppercase;
 }
-
-.tdline {
-  border-bottom: 1px solid #7A7B82;
-  width: 40%;
-  height: 20px;
-}
-
 th {
   padding: 10px;
   font-weight: normal;
@@ -101,33 +95,33 @@ th {
 </table>
 
 <div class="CollectiveCards">
-  {{#each relatedGroups}}
-  <div class="CollectiveCard">
-    <a href="{{config.host.website}}/{{slug}}">
-      <div>
-        <div class='CollectiveCard-head' style="background-image:url('{{resizeImage backgroundImage width=320}}');{{#if settings.style.hero.cover.background}}background-color:{{settings.style.hero.cover.background}};{{/if}}">
-          <center><img src="{{resizeImage logo width=240}}" /></center>
-        </div>
-        <div class='CollectiveCard-body'>
-          <div class='CollectiveCard-name'>{{name}}</div>
-          <div class='CollectiveCard-description'>We are on a mission to {{mission}}</div>
-        </div>
-        <div class='CollectiveCard-footer'>
-          <div class='clearfix mt2'>
-            <div class='CollectiveCard-metric'>
-              <div class='CollectiveCard-metric-value'>{{contributorsCount}}</div>
-              <div class='CollectiveCard-metric-label'>contributors</div>
-            </div>
-            <div class='CollectiveCard-metric'>
-              <div class='CollectiveCard-metric-value'>{{currency yearlyIncome currency=currency precision=0}}</div>
-              <div class='CollectiveCard-metric-label'>annual budget</div>
-            </div>
+{{#each relatedGroups}}
+<div class="CollectiveCard">
+  <a href="{{config.host.website}}/{{slug}}">
+    <div>
+      <div class='CollectiveCard-head' style="background-image:url('{{resizeImage backgroundImage width=320}}');{{#if settings.style.hero.cover.background}}background-color:{{settings.style.hero.cover.background}};{{/if}}">
+        <center><img src="{{resizeImage logo width=240}}" height="64" /></center>
+      </div>
+      <div class='CollectiveCard-body'>
+        <div class='CollectiveCard-name'>{{name}}</div>
+        <div class='CollectiveCard-description'>We are on a mission to {{mission}}</div>
+      </div>
+      <div class='CollectiveCard-footer'>
+        <div class='clearfix mt2'>
+          <div class='CollectiveCard-metric'>
+            <div class='CollectiveCard-metric-value'>{{contributorsCount}}</div>
+            <div class='CollectiveCard-metric-label'>contributors</div>
+          </div>
+          <div class='CollectiveCard-metric'>
+            <div class='CollectiveCard-metric-value'>{{currency yearlyIncome currency=currency precision=0}}</div>
+            <div class='CollectiveCard-metric-label'>annual budget</div>
           </div>
         </div>
       </div>
-    </a>
-  </div>
-  {{/each}}
+    </div>
+  </a>
+</div>
+{{/each}}
 </div>
 
 {{/if}}

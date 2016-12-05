@@ -1,13 +1,9 @@
-Subject: {{group.name}} collective {{month}} report
+Subject: {{{capitalize group.name}}} Collective {{month}} report
+Text: {{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}} -{{group.stats.backers.lost}}).<br>Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currency group.stats.totalDonations currency=group.currency}}} {{{currency group.stats.totalExpenses currency=group.currency}}})
 
 {{> header}}
 
 <style>
-
-h1 {
-  font-weight:normal;
-}
-
 h2 {
   margin-top: 30px;
   color:#75cc1f;
@@ -34,10 +30,10 @@ ul li {
 .delta {
   color: #7A7B82;
 }
-.new {
+.positive {
   color: #66C71A;
 }
-.lost {
+.negative {
   color: red;
 }
 .label {
@@ -46,12 +42,6 @@ ul li {
 .reimbursed {
   color: #7A7B82;
 }
-.tdline {
-  border-bottom: 1px solid #DDE1E4; /* #7A7B82; */
-  width: 40%;
-  height: 20px;
-}
-
 th {
   padding: 10px;
   font-weight: normal;
@@ -63,11 +53,10 @@ th {
 
 <div style="font-size:10pt">
 
-<h1>{{group.name}} {{month}} report</h1>
-
-<p>Hi!<br />
-We have so much great news this month, we could barely wait to share them with you! Please remember, don't hesitate to send us your feedback by replying to this email, we thrive on feedback! ❤️ ❤️</p>
-But first, your monthly stats (you can always visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}">{{group.publicUrl}}</a></p>
+<p>Hi {{recipient.firstName}}!<br />
+We have lots of good news this month, we could barely wait to share them with you!<br />
+But first, your monthly stats (visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{group.publicUrl}})</a>.<br />
+And please don't hesitate to send us feedback - just reply to this email! We love to hear from you! ❤️❤️</p>
 
 <center>
 <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -77,22 +66,21 @@ But first, your monthly stats (you can always visit your collective page to get 
     <td align="center"><span class="counter">{{group.stats.backers.lastMonth}}</span></td>
   </tr>
   <tr>
-    <td align="center"><span class="label">current balance</span></td>
+    <td align="center" nowrap><span class="label">current balance</span></td>
     <td></td>
     <td align="center" nowrap><span class="label">total backers</span></td>
   </tr>
   <tr>
     <td align="center">
-      {{#if group.stats.positiveBalanceDelta }}
-        <span class="new">
-      {{else}}
-        <span class="lost">
-      {{/if}}
-      ({{{sign group.stats.balanceDelta}}}{{{currency group.stats.balanceDelta currency=group.currency}}})
+      <span class="positive">(+{{{currency group.stats.totalDonations currency=group.currency}}})</span><br />
+      <span class="negative">({{{currency group.stats.totalExpenses currency=group.currency}}})</span>
       </span>
     </td>
     <td></td>
-    <td align="center"><span class="new">(+{{group.stats.backers.new}})</span> <span class="lost">(-{{group.stats.backers.lost}})</span></td>
+    <td align="center">
+      <span class="positive">(+{{group.stats.backers.new}})</span><br />
+      <span class="negative">(-{{group.stats.backers.lost}})</span>
+    </td>
   </tr>
 </table>
 
@@ -104,7 +92,7 @@ But first, your monthly stats (you can always visit your collective page to get 
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
 </table>
   {{#each users}}
-    <a href="{{@root.config.host.website}}/{{username}}" class="{{../name}}">
+    <a href="{{@root.config.host.website}}/{{username}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
       {{#if isSponsor}}
         <img src={{resizeImage avatar height=48}} height="48" alt="{{name}}" border="0" />
       {{else}}
@@ -121,6 +109,9 @@ But first, your monthly stats (you can always visit your collective page to get 
     </a>
   {{/each}}
 {{/each}}
+
+{{> relatedgroups}}
+
 </center>
 
 <h2>Expenses</h2>
@@ -129,12 +120,12 @@ But first, your monthly stats (you can always visit your collective page to get 
 {{#each group.expenses}}
   <tr>
     <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
-    <td align="right" valign="top" nowrap>{{{currency netAmountInGroupCurrency currency=currency}}}</td>
-    <td valign="top" width="100%"><a href="{{@root.config.host.app}}/groups/{{@root.group.id}}/expenses/{{id}}">{{description}}</a></td>
+    <td align="right" valign="top" nowrap class="negative">{{{currency netAmountInGroupCurrency currency=currency}}}</td>
+    <td valign="top" width="100%"><a href="{{@root.config.host.app}}/groups/{{@root.group.id}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{description}}</a></td>
     <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
   </tr>
 {{else}}
-  No expense submitted. <a href="{{@root.group.publicUrl}}/expenses/new">Submit an expense</a>
+  No expense submitted. <a href="{{@root.group.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a>
 {{/each}}
 </table>
 
@@ -142,41 +133,32 @@ But first, your monthly stats (you can always visit your collective page to get 
 <h2>Recent sponsor activity on Open Collective</h2>
 <ul>
 {{#each topBackers}}
-  <li><a href="{{website}}">{{name}}</a> gave {{{donationsString}}}</li>
+  <li><a href="{{website}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{name}}</a> gave {{{donationsString}}}</li>
 {{/each}}
 </ul>
 {{/if}}
 
-{{#if group.related}}
-  <h2>Check out similar collectives</h2>
-  <ul>
-  {{#each group.related}}
-    <li><a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport">{{name}}</a>, on a mission to {{mission}} [<a href="{{publicUrl}}?utm_source=email&utm_campaign=monthlyreport#support">support them!</a>]</li>
-  {{/each}}
-  </ul>
-{{/if}}
-
-
-
 <h2>🚨🚨 Sponsors Offers 🚨🚨</h2>
 
-<p>We are excited to announce two great offers for the projects on the Open Source Collective! </p>
+<p>We are excited to announce 3 great offers for the projects on the Open Source Collective! </p>
 
-<p><a href="https://www.getcroissant.com/">Croissant</a> is offering a <b>free week</b> + 20% off the first 3 months.  <a href="http://blog.getcroissant.com/blog/2016/11/16/changing-the-world-one-repository-at-a-time">Find out</a> why they support Open Source and use the code <b>HELLOCOLLECTIVE</b> on the third step of the signup process. <a href="https://twitter.com/GetCroissant">Tweet</a> them your appreciation! </p>
+<p><a href="https://www.getcroissant.com/?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Croissant</a> is offering a <b>free week</b> + 20% off the first 3 months.  <a href="http://blog.getcroissant.com/blog/2016/11/16/changing-the-world-one-repository-at-a-time?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Find out</a> why they support Open Source and use the code <b>HELLOCOLLECTIVE</b> on the third step of the signup process. <a href="https://twitter.com/GetCroissant?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Tweet</a> them your appreciation! </p>
 <p> </p>
-<p><a href="https://community.algolia.com/">Algolia</a> is grateful for the work that you do and wants to invite all of you to try out their<a href="https://community.algolia.com/docsearch/"> </a><a href="https://community.algolia.com/docsearch/">DocSearch project</a> for adding a really 👌 search to your documentation. Better search means fewer duplicate issues or support tickets from users \o/. It's free for Open Source Software and Algolia will do 90% of the work to get you up and running,<a href="https://community.algolia.com/docsearch/"> </a><a href="https://community.algolia.com/docsearch/">just fill out this form</a> to get started. If you have any questions or need support (about anything search-related, really!),<a href="https://discourse.algolia.com"> </a><a href="https://discourse.algolia.com">log on to their Discourse forum</a> and post in the DocSearch category with the #opencollective tag. Read more about why they do this <a href="https://stories.algolia.com/why-were-backing-opencollective-and-webpack-39e39838f18a#.iagl7sfu1">here</a>! </p>
+<p><a href="https://community.algolia.com/?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Algolia</a> is grateful for the work that you do and wants to invite all of you to try out their <a href="https://community.algolia.com/docsearch/?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">DocSearch project</a> for adding a really 👌 search to your documentation. Better search means fewer duplicate issues or support tickets from users \o/. It's free for Open Source Software and Algolia will do 90% of the work to get you up and running, <a href="https://community.algolia.com/docsearch/">just fill out this form</a> to get started. If you have any questions or need support (about anything search-related, really!), <a href="https://discourse.algolia.com?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">log on to their Discourse forum</a> and post in the DocSearch category with the #opencollective tag. Read more about why they do this <a href="https://stories.algolia.com/why-were-backing-opencollective-and-webpack-39e39838f18a#.iagl7sfu1?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">here</a>! </p>
+<p> </p>
+<p><a href="http://hackerparadise.org?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Hacker Paradise</a> is offering <b>$100 off</b> their <a href="http://www.hackerparadise.org/blog/2016/11/01/south-america-housing-coworking/?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">upcoming trip to South America</a> ✈️ (simply mention Open Source Collective when registering). You can also apply to get one of their 2 <a href="http://www.hackerparadise.org/blog/2016/11/17/open-source-fellowship/?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Open Source Fellowships</a> to spend a month working on your open source project in South America, expenses paid!</p>
 
 <h2>Blog posts</h2>
-<p>Together we crowdfunded a yearly budget of over $100,000 for Open Source (and we are only getting started!). Help us share this <a href="https://medium.com/open-collective/together-we-crowdfunded-a-yearly-budget-of-over-100-000-for-open-source-a77502fd74da#.y902opkkp">blog post</a>! </p>
+<p>Together we crowdfunded an annual budget of over $100,000 for Open Source (and we are only getting started 💰💸!). Help us share this <a href="https://medium.com/open-collective/together-we-crowdfunded-a-yearly-budget-of-over-100-000-for-open-source-a77502fd74da#.y902opkkp?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">blog post</a>! </p>
 
 <h2>Featured Collectives:</h2>
-<p>Welcome <a href="https://opencollective.com/betweenthewires">Between the Wires</a> to Open Collective! Vivian and Preethi are offering a behind the scenes glance at the creation of developer products to inspire and educate.They are just launching a campaign to raise $5,000 for doing 20+ more interviews in 2017. Check out their launch post and great interviews <a href="https://betweenthewires.org/our-opencollective-campaign-65e60f2fcd0c?gi=6f20be4118f2#.59gva04l6">here</a> and help them reach their goal!</p>
+<p>Welcome <a href="https://opencollective.com/betweenthewires?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Between the Wires</a> to Open Collective! Vivian and Preethi are offering a behind the scenes glance at the creation of developer products to inspire and educate.They are just launching a campaign to raise $5,000 for doing 20+ more interviews in 2017. Check out their launch post and great interviews <a href="https://betweenthewires.org/our-opencollective-campaign-65e60f2fcd0c?gi=6f20be4118f2#.59gva04l6?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">here</a> and help them reach their goal!</p>
 
-<p><a href="https://opencollective.com/sfartandfilm">SF Art and Film</a> has been connecting teenagers with the arts for many years and asks you to support them in this goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible.</p>
+<p><a href="https://opencollective.com/sfartandfilm?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">SF Art and Film</a> has been connecting teenagers with the arts for many years and asks you to support them in this goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible.</p>
 
-<p>Welcome <a href="https://opencollective.com/opensourcedesign">Open Source Design</a>! We are thrilled to have you on board our first design collective. Do you care about design in open source? 👉You can now fund it!</p>
+<p>Welcome <a href="https://opencollective.com/opensourcedesign?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Open Source Design</a>! We are thrilled to have you on board our first design collective. Do you care about design in open source? 👉You can now fund it!</p>
 
-<p>🎉Congrats <a href="https://twitter.com/mxstbr">Max Stoiber</a> from <a href="https://opencollective.com/react-boilerplate">React Boilerplate</a> for being <a href="https://twitter.com/mxstbr/status/795555176203620353">featured on Forbes Austria</a> about your Open Source work!  </p>
+<p>🎉Congrats <a href="https://twitter.com/mxstbr">Max Stoiber</a> from <a href="https://opencollective.com/react-boilerplate?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">React Boilerplate</a> for being <a href="https://twitter.com/mxstbr/status/795555176203620353?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">featured on Forbes Austria</a> about your Open Source work!  </p>
 
 <h2>Changelog</h2>
 <p>You can now add a widget to your company or personal website to show the collectives that you are supporting. Simply add the following line of code:</p> <p><code>&lt;script src="https://opencollective.com/:username/widget.js"&gt;&lt;/script&gt;</code></p>
@@ -185,7 +167,7 @@ But first, your monthly stats (you can always visit your collective page to get 
 
 <h2>Don't forget</h2>
 <ul>
-  <li><b>Twitter</b> You can link your collective to your twitter account to automatically thank your backers/sponsors. <a href="{{group.publicUrl}}/connect/twitter">Deets here</a> (it's still a bit ugly but it works!)</li>
+  <li><b>Twitter</b> You can link your collective to your twitter account to automatically thank your backers/sponsors. <a href="{{group.publicUrl}}/connect/twitter?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Deets here</a> (it's still a bit ugly but it works!)</li>
   <li><b>Slack</b> Don't forget to send Pia (pia@opencollective.com) your slack webhook url if you'd like to receive notifications for new donations/expenses in your slack channel.</li>
 </ul>
 
