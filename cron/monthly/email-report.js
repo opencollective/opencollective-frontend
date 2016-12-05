@@ -50,7 +50,8 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf']} };
+    query.where = { slug: {$in: ['webpack']} };
+    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
 
   Group.findAll(query)
   .tap(groups => {
@@ -203,12 +204,13 @@ const processTiers = (tiers) => {
 
 const processGroup = (group) => {
   const promises = [
-    group.getBalance(endDate),
-    group.getBalance(startDate),
-    group.getExpenses(null, startDate, endDate),
-    group.getRelatedGroups(3),
     getTopBackers(startDate, endDate, group.tags),
-    group.getTiersWithUsers({ attributes: ['id','username','name', 'avatar','firstDonation','lastDonation','totalDonations','tier'], until: endDate })
+    group.getTiersWithUsers({ attributes: ['id','username','name', 'avatar','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    group.getBalance(endDate),
+    group.getTotalTransactions(startDate, endDate, 'donation'),
+    group.getTotalTransactions(startDate, endDate, 'expense'),
+    group.getExpenses(null, startDate, endDate),
+    group.getRelatedGroups(3)
   ];
 
   let emailData = {};
@@ -217,23 +219,23 @@ const processGroup = (group) => {
           .then(results => {
             console.log('***', group.name, '***');
             const data = { config: { host: config.host }, month, group: {} };
-            const res = processTiers(results[5]);
+            data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
+            const res = processTiers(results[1]);
             data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
             data.group.tiers = res.tiers;
             data.group.stats = res.stats;
-            data.group.stats.balance = results[0];
-            data.group.stats.previousBalance = results[1];
-            data.group.stats.balanceDelta = results[0] - results[1];
-            data.group.stats.positiveBalanceDelta = (data.group.stats.balanceDelta >= 0);
-            data.group.expenses = results[2].map(e => _.pick(e.dataValues, ['id', 'description', 'status', 'createdAt','netAmountInGroupCurrency','currency']));
-            data.group.related = results[3];
-            data.topBackers = _.filter(results[4], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
+            data.group.stats.balance = results[2];
+            data.group.stats.totalDonations = results[3];
+            data.group.stats.totalExpenses = results[4];
+            data.group.expenses = results[5];
+            data.relatedGroups = results[6];
             emailData = data;
             console.log(data.group.stats);
             return group;
           })
           .then(getRecipients)
           .then(recipients => sendEmail(recipients, emailData))
+          .then(console.log)
           .catch(e => {
             console.error("Error in processing group", group.slug, e);
           });
@@ -253,6 +255,7 @@ const sendEmail = (recipients, data) => {
   if (recipients.length === 0) return;
   return Promise.map(recipients, recipient => {
     debug("Sending email to ", recipient.email);
+    data.recipient = recipient;
     return emailLib.send('group.monthlyreport', recipient.email, data);
   });
 }

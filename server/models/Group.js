@@ -465,22 +465,40 @@ export default function(Sequelize, DataTypes) {
           .then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
       },
 
-      getTotalDonations() {
+
+      getTotalDonations(startDate, endDate) {
+        endDate = endDate || new Date;
+        const where = {
+          amount: { $gt: 0 },
+          createdAt: { $lte: endDate },
+          GroupId: this.id
+        };
+        if (startDate) where.createdAt.$gte = startDate;
         return models.Transaction.find({
-            attributes: [
-              [Sequelize.fn('SUM', Sequelize.col('amount')), 'donationTotal']
-            ],
-            where: {
-              GroupId: this.id,
-              amount: {
-                $gt: 0
-              }
-            }
-          })
-          .then((result) => {
-            const json = result.toJSON();
-            return Promise.resolve(Number(json.donationTotal));
-          })
+          attributes: [
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
+          ],
+          where
+        })
+        .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+      },
+
+      getTotalTransactions(startDate, endDate, type) {
+        endDate = endDate || new Date;
+        const where = {
+          createdAt: { $lte: endDate },
+          GroupId: this.id
+        };
+        if (startDate) where.createdAt.$gte = startDate;
+        if (type === 'donation') where.amount = { $gt: 0 };
+        if (type === 'expense') where.amount = { $lt: 0 };
+        return models.Transaction.find({
+          attributes: [
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 0), 'total']
+          ],
+          where
+        })
+        .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
       },
 
       getBackersCount(until) {
