@@ -417,7 +417,6 @@ describe('users.routes.test.js', () => {
         })
         .end((err, res) => {
           const { body } = res;
-          console.log("body", body);
           expect(body.success).to.equal(true);
           models.User.auth(user.email, newPassword, e => {
             expect(e).to.not.exist;

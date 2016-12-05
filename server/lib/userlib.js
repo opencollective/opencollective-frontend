@@ -22,13 +22,9 @@ export default {
       });
   },
 
-  fetchAvatar(user) {
-    if (user.avatar) {
-      return Promise.resolve(user);
-    }
-    return this.getUserData(user.email)
-      .tap(userData => user.avatar = userData && userData.avatar)
-      .then(() => user);
+  fetchAvatar(email) {
+    return this.getUserData(email)
+      .then(userData => userData && userData.avatar ? userData.avatar : null)
   },
 
   getUserData(email) {

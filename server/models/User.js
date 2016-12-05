@@ -4,13 +4,17 @@
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import errors from '../lib/errors';
-import {decrypt, encrypt} from '../lib/utils';
 import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
-import queries from '../lib/queries';
 import slug from 'slug';
+
+import {decrypt, encrypt} from '../lib/utils';
+import errors from '../lib/errors';
+import queries from '../lib/queries';
+import userLib from '../lib/userlib';
+import knox from '../gateways/knox';
+import imageUrlToAmazonUrl from '../lib/imageUrlToAmazonUrl';
 
 /**
  * Constants.
@@ -331,7 +335,54 @@ export default (Sequelize, DataTypes) => {
             UserId: this.id
           }
         });
-      }
+      },
+
+      updateWhiteListedAttributes(attributes) {
+
+        let update = false;
+        const allowedFields = 
+          [ 'firstName',
+            'lastName',
+            'description',
+            'longDescription',
+            'twitterHandle',
+            'website',
+            'avatar',
+            'paypalEmail'];
+
+        if (attributes.name) {
+          const nameTokens = attributes.name.split(' ');
+          this.firstName = nameTokens.shift();
+          this.lastName = nameTokens.join(' ');
+          update = true;
+        }
+
+        return Promise.map(allowedFields, prop => {
+          if (attributes[prop]) {
+            this[prop] = attributes[prop];
+            update = true;
+          }
+        })
+        .then(() => this.avatar || userLib.fetchAvatar(this.email))
+        .then(avatar => {
+          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
+            return Promise.promisify(imageUrlToAmazonUrl)(knox, avatar)
+              .then((aws_src, error) => {
+                this.avatar = error ? this.avatar : aws_src;
+                update = true;
+              });
+          } else {
+            Promise.resolve();
+          }
+        })
+        .then(() => {
+          if (update) {
+            return this.save();
+          } else {
+            return this
+          }
+        })
+      },
 
     },
 
