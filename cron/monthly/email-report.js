@@ -50,8 +50,8 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['webpack']} };
-    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
+    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
+    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin']} };
 
   Group.findAll(query)
   .tap(groups => {
@@ -235,7 +235,6 @@ const processGroup = (group) => {
           })
           .then(getRecipients)
           .then(recipients => sendEmail(recipients, emailData))
-          .then(console.log)
           .catch(e => {
             console.error("Error in processing group", group.slug, e);
           });
@@ -254,7 +253,6 @@ const getRecipients = (group) => {
 const sendEmail = (recipients, data) => {
   if (recipients.length === 0) return;
   return Promise.map(recipients, recipient => {
-    debug("Sending email to ", recipient.email);
     data.recipient = recipient;
     return emailLib.send('group.monthlyreport', recipient.email, data);
   });

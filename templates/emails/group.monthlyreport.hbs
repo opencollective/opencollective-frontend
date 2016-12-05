@@ -1,5 +1,4 @@
-Subject: {{{capitalize group.name}}} Collective {{month}} report
-Text: {{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}} -{{group.stats.backers.lost}}).<br>Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currency group.stats.totalDonations currency=group.currency}}} {{{currency group.stats.totalExpenses currency=group.currency}}})
+Subject: {{{capitalize group.name}}} Collective {{month}} Report
 
 {{> header}}
 
@@ -51,11 +50,14 @@ th {
 }
 </style>
 
-<div style="font-size:10pt">
+<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currency group.stats.totalDonations currency=group.currency}}}{{#if group.stats.totalExpenses}}, {{{currency group.stats.totalExpenses currency=group.currency}}}{{/if}}) &nbsp; | &nbsp; 
+  {{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}}{{#if group.stats.backers.lost}}, -{{group.stats.backers.lost}}{{/if}}) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+</div>
 
+<div>
 <p>Hi {{recipient.firstName}}!<br />
-We have lots of good news this month, we could barely wait to share them with you!<br />
-But first, your monthly stats (visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{group.publicUrl}})</a>.<br />
+We have lots of good news this month, we could barely wait to share them with you! But first, your monthly stats (visit your collective page to get the latest up to date data: <a href="{{group.publicUrl}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{group.publicUrl}})</a>.<br />
 And please don't hesitate to send us feedback - just reply to this email! We love to hear from you! ❤️❤️</p>
 
 <center>
@@ -73,13 +75,12 @@ And please don't hesitate to send us feedback - just reply to this email! We lov
   <tr>
     <td align="center">
       <span class="positive">(+{{{currency group.stats.totalDonations currency=group.currency}}})</span><br />
-      <span class="negative">({{{currency group.stats.totalExpenses currency=group.currency}}})</span>
-      </span>
+      <span class="negative">&nbsp;{{#if group.stats.totalExpenses}}({{{currency group.stats.totalExpenses currency=group.currency}}}){{/if}}&nbsp;</span>
     </td>
     <td></td>
     <td align="center">
       <span class="positive">(+{{group.stats.backers.new}})</span><br />
-      <span class="negative">(-{{group.stats.backers.lost}})</span>
+      <span class="negative">&nbsp;{{#if group.stats.backers.lost}}(-{{group.stats.backers.lost}}){{/if}}&nbsp;</span>
     </td>
   </tr>
 </table>
@@ -125,9 +126,10 @@ And please don't hesitate to send us feedback - just reply to this email! We lov
     <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
   </tr>
 {{else}}
-  No expense submitted. <a href="{{@root.group.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a>
+  No expense submitted. 
 {{/each}}
 </table>
+<p><a href="{{@root.group.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a></p>
 
 {{#if topBackers}}
 <h2>Recent sponsor activity on Open Collective</h2>
