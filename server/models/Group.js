@@ -427,19 +427,19 @@ export default function(Sequelize, DataTypes) {
           3) All inactive monthly subscriptions that have contributed in the past
         */
         return Sequelize.query(`
+          WITH "activeMonthlySubscriptions" as (
+            SELECT DISTINCT t."SubscriptionId", t."netAmountInGroupCurrency"
+            FROM "Transactions" t
+            LEFT JOIN "Subscriptions" s
+            ON s.id = t."SubscriptionId"
+            WHERE t."GroupId"=:GroupId
+              AND s."isActive" IS TRUE
+              AND s.interval = 'month'
+              AND s."deletedAt" IS NULL
+          )
           SELECT
             (SELECT
-             COALESCE(SUM( t."netAmountInGroupCurrency"*12),0)
-              FROM "Subscriptions" s
-              LEFT JOIN "Transactions" t
-              ON (s.id = t."SubscriptionId"
-                AND t.id = (SELECT MAX(id) from "Transactions" t where t."SubscriptionId" = s.id))
-              WHERE "GroupId" = :GroupId
-                AND t.amount > 0
-                AND t."deletedAt" IS NULL
-                AND s.interval = 'month'
-                AND s."isActive" IS TRUE
-                AND s."deletedAt" IS NULL)
+              COALESCE(SUM("netAmountInGroupCurrency"*12),0) FROM "activeMonthlySubscriptions")
             +
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t

@@ -95,8 +95,15 @@ export const getOrCreateUser = (req, res, next) => {
 
   // If already logged in, proceed
   if (req.remoteUser) {
-    req.user = req.remoteUser;
-    return next();
+    if (req.body.expense) {
+      const {name, paypalEmail} = req.body.expense;
+      return req.remoteUser.updateWhiteListedAttributes({ name, paypalEmail })
+        .then(user => req.user = user)
+        .then(() => next())
+    } else {
+      req.user = req.remoteUser;
+      return next()
+    }
   }
 
   let name, email, paypalEmail;

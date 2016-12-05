@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import groupBy from 'lodash/collection/groupBy';
 import async from 'async';
-import userlib from '../lib/userlib';
+import userLib from '../lib/userlib';
 import { generateURLSafeToken, getTier } from '../lib/utils';
-import imageUrlToAmazonUrl from '../lib/imageUrlToAmazonUrl';
 import constants from '../constants/activities';
 import roles from '../constants/roles';
 import sequelize from 'sequelize';
@@ -13,7 +12,6 @@ import emailLib from '../lib/email';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
-import knox from '../gateways/knox';
 import moment from 'moment-timezone';
 
 const {
@@ -78,84 +76,31 @@ export const updateAvatar = (req, res, next) => {
  */
 export const updateUser = (req, res, next) => {
 
-  const _updateUser = () => {
-    async.auto({
-      updateFields: (cb) => {
-        ['firstName',
-        'lastName',
-        'description',
-        'longDescription',
-        'twitterHandle',
-        'website',
-        'avatar'
-        ].forEach((prop) => {
-          if (req.required.user[prop]) {
-            req.user[prop] = req.required.user[prop];
-          }
-
-          // Split user.name into user.firstName and user.lastName
-          if (req.required.user.name) {
-            const nameTokens = req.required.user.name.split(' ');
-            req.user.firstName = nameTokens.shift();
-            req.user.lastName = nameTokens.join(' ');
-            delete req.required.user.name;
-          }
-
-        });
-
-        cb(null, req.user);
-      },
-
-      fetchUserAvatar: ['updateFields', (cb, results) => {
-        userlib.fetchAvatar(results.updateFields).tap(user => {
-          const { avatar } = user;
-          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
-            imageUrlToAmazonUrl(knox, avatar, (error, aws_src) => {
-              user.avatar = error ? user.avatar : aws_src;
-              cb(null, user);
-            });
-          } else {
-            cb(null, user);
-          }
-        })
-        .catch(cb);
-      }],
-
-      update: ['fetchUserAvatar', (cb, results) => {
-        const user = results.fetchUserAvatar;
-
-        user.updatedAt = new Date();
-        user
-          .save()
-          .then(u => cb(null, u.info))
-          .catch(cb);
-      }]
-    }, (err, results) => {
-      if (err) return next(err);
-      res.send(results.update);
-    });
+  if (req.remoteUser && req.remoteUser.id === req.user.id) {
+    return req.remoteUser.updateWhiteListedAttributes(req.required.user)
+      .then(user => res.send(user.info))
+      .catch(next)
   }
-
-  if (req.remoteUser && req.remoteUser.id === req.user.id)
-    return _updateUser();
 
   if (req.user.hasPassword()) {
     return next(new errors.BadRequest('Can\'t update user with password from this route'));
   }
 
-  models.Donation.findOne({
+  return models.Donation.findOne({
     where: {
       UserId: req.user.id,
       updatedAt: {
         $gt: moment().add(-10, 'minutes').format()
       }
-    }
+    },
+    include: { model: User }
   })
   .tap(donation => {
     if (!donation) {
       return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
     }
-    _updateUser();
+    return donation.User.updateWhiteListedAttributes(req.required.user)
+      .then(user => res.send(user.info))
   })
   .catch(next);
 
@@ -174,12 +119,12 @@ export const getSocialMediaAvatars = (req, res, next) => {
   userData.email = req.user.email;
   userData.ip = req.ip;
 
-  userlib.resolveUserAvatars(userData, (err, results) => {
+  userLib.resolveUserAvatars(userData, (err, results) => {
     res.send(results);
   });
 };
 
-export const _create = user => userlib.fetchInfo(user)
+export const _create = user => userLib.fetchInfo(user)
   .then(user => User.create(user))
   .tap(dbUser => Activity.create({
     type: constants.USER_CREATED,

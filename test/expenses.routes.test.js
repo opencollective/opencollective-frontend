@@ -17,11 +17,13 @@ const preapprovalDetailsMock = Object.assign({}, paypalMock.adaptive.preapproval
 const application = utils.data('application');
 const expense = utils.data('expense1');
 const expense2 = utils.data('expense2');
+const expense3 = utils.data('expense3');
 const {
   Activity,
   Expense,
   Transaction,
-  PaymentMethod
+  PaymentMethod,
+  User
 } = models;
 
 describe('expenses.routes.test.js', () => {
@@ -185,6 +187,14 @@ describe('expenses.routes.test.js', () => {
           it('THEN expense belongs to the group', () => expect(actualExpense.GroupId).to.be.equal(group.id));
 
           it('THEN expense belongs to the user', () => expect(actualExpense.UserId).to.be.equal(member.id));
+
+          it('THEN expense updated PayPal email of the user', (done) => {
+            User.findById(actualExpense.UserId)
+            .then(user => {
+              expect(user.paypalEmail).to.be.equal(expense.paypalEmail.toLowerCase())
+              done();
+            });
+          });
 
           it('THEN a group.expense.created activity is created', () =>
             expectExpenseActivity('group.expense.created', actualExpense.id));
@@ -852,7 +862,7 @@ describe('expenses.routes.test.js', () => {
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({expense, api_key: application.api_key})
+        .send({expense: expense3, api_key: application.api_key})
         .expect(200))
       .then(res => res.body);
   }

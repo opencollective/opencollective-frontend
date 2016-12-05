@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "0.0.191",
+  "version": "0.0.192",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -128,9 +128,9 @@
     "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute",
     "install:debs": "bash scripts/install_apt_get_debs.sh",
-    "cron:daily": "babel-node cron/daily/update-contributions.js",
-    "cron:weekly": "babel-node cron/weekly/slack-report.js",
-    "cron:monthly": "babel-node cron/monthly/email-report.js && babel-node cron/monthly/slack-report.js"
+    "cron:daily": "PG_MAX_CONNECTIONS=1 babel-node cron/daily/update-contributions.js",
+    "cron:weekly": "PG_MAX_CONNECTIONS=1 babel-node cron/weekly/slack-report.js",
+    "cron:monthly": "PG_MAX_CONNECTIONS=1 babel-node cron/monthly/email-report.js && babel-node cron/monthly/slack-report.js"
   },
   "license": "MIT",
   "repository": {

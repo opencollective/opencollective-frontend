@@ -9,14 +9,19 @@ import { database as config } from 'config';
  */
 console.log(`Connecting to postgres://${config.options.host}/${config.database}`);
 
+// If we launch the process with DEBUG=psql, we log the postgres queries
+if (process.env.DEBUG && process.env.DEBUG.match(/psql/)) {
+  config.options.logging = true;
+}
+
 if (config.options.logging) {
   if (process.env.NODE_ENV === 'production') {
     config.options.logging = (query, executionTime) => {
       console.log(query.slice(0, 100), '|', executionTime, 'ms');
     }
   } else {
-    config.options.logging = (query) => {
-      console.log('\n-------------------- <query> --------------------\n',query,'\n-------------------- </query> --------------------\n');
+    config.options.logging = (query, executionTime) => {
+      console.log(`\n-------------------- <query> --------------------\n`,query,`\n-------------------- </query executionTime="${executionTime}"> --------------------\n`);
     }
   }
 }

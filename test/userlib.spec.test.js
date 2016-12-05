@@ -38,41 +38,23 @@ describe("userlib", () => {
   afterEach(() => sandbox.restore() );
 
   it("doesn't call clearbit if email invalid", () =>
-    userlib.fetchAvatar({email: "email.com"})
+    userlib.fetchAvatar('email.com')
       .then(() => expect(stub.called).to.be.false));
 
   it("can't fetch the avatar of an unknown email", () =>
-    userlib.fetchAvatar(userData1).then(user => {
+    userlib.fetchAvatar(userData1.email).then(avatar => {
       expect(userlib.memory).to.have.property(userData1.email);
       expect(stub.callCount).to.equal(1);
-      expect(user).to.deep.equal(userData1);
+      expect(avatar).to.equal(null);
     }));
 
   it("only calls clearbit server once for an email not found", () =>
-    userlib.fetchAvatar(userData1)
-      .then(() => userlib.fetchAvatar(userData1))
-      .then(user => {
+    userlib.fetchAvatar(userData1.email)
+      .then(() => userlib.fetchAvatar(userData1.email))
+      .then(avatar => {
         expect(stub.callCount).to.equal(1);
-        expect(user.avatar).to.be.falsy;
-        expect(user).to.deep.equal(userData1);
+        expect(avatar).to.be.falsy;
+        expect(avatar).to.equal(null);
     }));
-
-  it("fetches the avatar of a known email and only updates the user.avatar", () =>
-    userlib.fetchAvatar(userData3).then(user => {
-      expect(Object.keys(user).length).to.equal(Object.keys(userData3).length);
-      expect(user.name).to.equal(userData3.name);
-      expect(user.avatar).to.equal('https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764');
-      expect(user.name);
-    }));
-
-  it("doesn't fetch the avatar if one has already been provided", () => {
-    userData3.avatar = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764';
-    const currentCallCount = stub.callCount;
-    return userlib.fetchAvatar(userData3).then(user => {
-      expect(stub.callCount).to.equal(currentCallCount);
-      expect(user).to.deep.equal(userData3);
-    });
-  });
-
 
 });

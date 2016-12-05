@@ -50,7 +50,6 @@ describe('paymentMethods.routes.test.js', () => {
     });
 
     it('successfully get a user\'s paymentMethod', (done) => {
-      console.log("Call ", `/users/${user.id}/payment-methods?api_key=${application.api_key}`);
       request(app)
         .get(`/users/${user.id}/payment-methods?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)

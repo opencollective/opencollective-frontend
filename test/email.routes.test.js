@@ -214,13 +214,8 @@ describe("email.routes.test", () => {
 
       return request(app)
         .get(generateUnsubscribeUrl(users[0].email))
-        .then(res => {
-          console.log("res body", res.body);
-          models.Notification.count({ where })
-          .then(count => {
-            expect(count).to.equal(0);
-          });
-      });
+        .then(() => models.Notification.count({ where }))
+        .then(count => expect(count).to.equal(0))
     });
 
     it("fails to unsubscribe if already unsubscribed", () => {
