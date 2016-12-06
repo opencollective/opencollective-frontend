@@ -8,6 +8,7 @@ import templates from './emailTemplates';
 import activities from '../constants/activities';
 import {isEmailInternal} from './utils';
 import crypto from 'crypto';
+import fs from 'fs';
 
 const debug = debugLib('email');
 
@@ -16,8 +17,16 @@ const render = (template, data) => {
     data = _.merge({}, data);
     delete data.config;
     data.config = { host: config.host };
-    debug(`Preview email template: http://localhost:3060/templates/email/${template}?data=${encodeURIComponent(JSON.stringify(data))}`);
-    return juice(templates[template](data));
+    const html = juice(templates[template](data));
+
+    // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
+    if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+      const filepath = `/tmp/${template}.${data.group && data.group.slug}.html`;
+      const script = `<script>data=${JSON.stringify(data)};</script>`;
+      fs.writeFileSync(filepath, `${html}\n\n${script}`);
+      console.log(`Preview email template: file://${filepath}`);
+    }
+    return html;
 };
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
@@ -29,33 +38,34 @@ const generateUnsubscribeToken = (email, groupSlug, type) => {
 /*
  * Gets the body from a string (usually a template)
  */
-const getBody = str => str.split('\n').slice(2).join('\n');
-
-/*
- * Appends appropriate prefix and cleans up subject
- */
-const getSubject = str => {
-    let subj = '';
-    if (process.env.NODE_ENV === 'staging') {
-      subj += '[STAGING] ';
-    } else if (process.env.NODE_ENV !== 'production'){
-      subj += '[TESTING] ';
+const getTemplateAttributes = (str) => {
+  let index = 0;
+  const lines = str.split('\n');
+  const attributes = {};
+  let tokens;
+  do {
+    tokens = lines[index++].match(/^([a-z]+):(.+)/i);
+    if (tokens) {
+      attributes[tokens[1].toLowerCase()] = tokens[2].replace(/<br( \/)?>/g,'\n').trim();
     }
-    subj += str.split('\n')[0].replace(/^Subject: ?/i, '');
-    return subj;
+  } while (tokens);
+
+  console.log("attributes", attributes);
+
+  attributes.body = lines.slice(index).join('\n').trim();
+  return attributes;
 };
 
 /*
  * sends an email message to a recipient with given subject and body
  */
-const sendMessage = (recipients, subject, html, options) => {
-  options = options || {};
-  debug("email: ", recipients, subject);
+const sendMessage = (recipients, subject, html, options = {}) => {
+  options.bcc = options.bcc || `ops@opencollective.com`;
 
   if (!_.isArray(recipients)) recipients = [ recipients ];
 
   recipients = recipients.filter(recipient => {
-    if (!recipient.match(/.+@.+\..+/)) {
+    if (!recipient || !recipient.match(/.+@.+\..+/)) {
       debug(`${recipient} is an invalid email address, skipping`);
       return false;
     }
@@ -68,9 +78,15 @@ const sendMessage = (recipients, subject, html, options) => {
     }
   });
 
+  if (process.env.NODE_ENV === 'staging') {
+    subject = `[STAGING] ${subject}`;
+  } else if (process.env.NODE_ENV !== 'production'){
+    subject = `[TESTING] ${subject}`;
+  }
+
   debug(`sending email to ${recipients.join(', ')}`);
   if (recipients.length === 0) {
-    debug("No recipient to send to, only sending to ops");
+    debug("No recipient to send to, only sending to bcc", options.bcc);
   }
 
   if (config.mailgun.user) {
@@ -83,13 +99,15 @@ const sendMessage = (recipients, subject, html, options) => {
     });
 
     return new Promise((resolve, reject) => {
-      mailgun.sendMail({
-        from: options.from || config.email.from,
-        to: recipients.join(', '),
-        bcc: `ops@opencollective.com,${options.bcc}`,
-        subject,
-        html
-      }, (err, info) => {
+      let to;
+      if (recipients.length > 0) {
+        to = recipients.join(', ');
+      }
+      const from = options.from || config.email.from;
+      const bcc = options.bcc;
+      const text = options.text;
+      debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
+      mailgun.sendMail({ from, to, bcc, subject, text, html }, (err, info) => {
         if (err) {
           return reject(err);
         } else {
@@ -113,16 +131,12 @@ const getNotificationLabel = (template, recipient) => {
   }
 
   return notificationTypeLabels[template];
-
 };
 
 /*
  * Given a template, recipient and data, generates email.
  */
-
-const generateEmailFromTemplate = (template, recipient, data, options) => {
-
-  options = options || {};
+const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
 
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
@@ -177,9 +191,13 @@ const generateEmailFromTemplate = (template, recipient, data, options) => {
  * Given a template, recipient and data, generates email and sends it.
  * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
-const generateEmailFromTemplateAndSend = (template, recipient, data, options) => {
+const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
   return generateEmailFromTemplate(template, recipient, data, options)
-    .then(templateString => emailLib.sendMessage(recipient, getSubject(templateString), getBody(templateString), options));
+    .then(templateString => {
+      const attributes = getTemplateAttributes(templateString);
+      options.text = attributes.text;
+      return emailLib.sendMessage(recipient, attributes.subject, attributes.body, options)
+    });
 };
 
 /*
@@ -198,8 +216,7 @@ const sendMessageFromActivity = (activity, notification) => {
 
 const emailLib = {
   render,
-  getBody,
-  getSubject,
+  getTemplateAttributes,
   sendMessage,
   generateEmailFromTemplate,
   send: generateEmailFromTemplateAndSend,

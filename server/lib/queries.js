@@ -179,23 +179,20 @@ const getTopSponsors = () => {
 /**
  * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
  */
-const getUsersFromGroupWithTotalDonations = (GroupIds) => {
+const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
+  const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
+
   const groupids = (typeof GroupIds === 'number') ? [GroupIds] : GroupIds;
   return sequelize.query(`
-    WITH total_donations AS (
+    WITH stats AS (
       SELECT
         max("UserId") as "UserId",
-        SUM(amount) as amount
-      FROM "Donations" d
-      WHERE d."GroupId" IN (:groupids) AND d.amount >= 0
-      GROUP BY "UserId"
-    ), last_donation AS (
-      SELECT
-        max("UserId") as "UserId",
-        max("updatedAt") as "updatedAt"
+        SUM("amountInTxnCurrency") as "totalDonations",
+        max("createdAt") as "lastDonation",
+        min("createdAt") as "firstDonation"
       FROM "Transactions" t
-      WHERE t."GroupId" IN (:groupids) AND t.amount >= 0
-      GROUP BY "UserId"
+      WHERE t."GroupId" IN (:groupids) AND t.amount >= 0 ${untilCondition('t')}
+      GROUP BY t."UserId"
     )
     SELECT
       max(u.id) as id,
@@ -209,14 +206,14 @@ const getUsersFromGroupWithTotalDonations = (GroupIds) => {
       max(u.website) as website,
       max(u.email) as email,
       max(u."twitterHandle") as "twitterHandle",
-      max(td.amount) as "totalDonations",
-      max(ld."updatedAt") as "lastDonation"
+      max(s."totalDonations") as "totalDonations",
+      max(s."firstDonation") as "firstDonation",
+      max(s."lastDonation") as "lastDonation"
     FROM "Users" u
-    LEFT JOIN total_donations td ON u.id = td."UserId"
+    LEFT JOIN stats s ON u.id = s."UserId"
     LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
-    LEFT JOIN last_donation ld on ld."UserId" = ug."UserId"
     WHERE ug."GroupId" IN (:groupids)
-    AND ug."deletedAt" IS NULL
+    AND ug."deletedAt" IS NULL ${untilCondition('ug')}
     GROUP BY u.id
     ORDER BY "totalDonations" DESC, "createdAt" ASC
   `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.

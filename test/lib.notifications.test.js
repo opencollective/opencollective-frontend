@@ -72,7 +72,7 @@ describe('lib.notifications.test.js', () => {
   });
 
   it('sends a new `group.expense.created` email notification', done => {
-    let subject, body;
+    let emailAttributes;
     const expense = utils.data('expense1');
 
     const templateData = {
@@ -86,8 +86,7 @@ describe('lib.notifications.test.js', () => {
 
     emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
       .then(template => {
-        subject = emailLib.getSubject(template);
-        body = emailLib.getBody(template);
+        emailAttributes = emailLib.getTemplateAttributes(template);
       })
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)
@@ -113,8 +112,8 @@ describe('lib.notifications.test.js', () => {
         setTimeout(() => {
           const options = nm.sendMail.lastCall.args[0];
           expect(options.to).to.equal(user.email);
-          expect(options.subject).to.equal(subject);
-          expect(options.html).to.equal(body);
+          expect(options.subject).to.equal(`[TESTING] ${emailAttributes.subject}`);
+          expect(options.html).to.equal(emailAttributes.body);
           done();
         }, 1000);
       });

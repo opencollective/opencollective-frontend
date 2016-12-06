@@ -16,31 +16,28 @@ let users, group;
 /**
  * Functions
  */
-const createDonationsAndTransaction = () => {
-  const donations = [{
+const createTransactions = () => {
+
+  const transactions = [{
     UserId: users[2].id,
     GroupId: group.id,
-    amount: 2000
+    amount: 2000,
+    amountInTxnCurrency: 2000,
+    createdAt: '2016-05-07 19:52:21.203+00',
+    updatedAt: '2016-05-07 19:52:21.203+00'
   },
   {
     UserId: users[3].id,
     GroupId: group.id,
-    amount: 10000
-  }];
-
-  const transaction = {
-    UserId: users[2].id,
-    GroupId: group.id,
-    amount: 2000,
-    DonationId: 1,
+    amount: 10000,
+    amountInTxnCurrency: 10000,
     createdAt: '2016-05-07 19:52:21.203+00',
     updatedAt: '2016-05-07 19:52:21.203+00'
-  };
+  }];
 
   return group
     .addUserWithRole(users[3], roles.BACKER)
-    .then(() => Promise.all(donations.map(d => models.Donation.create(d))))
-    .then(() => models.Transaction.create(transaction));
+    .then(() => models.Transaction.createMany(transactions));
 };
 
 describe('usergroup.routes.test.js', () => {
@@ -54,12 +51,14 @@ describe('usergroup.routes.test.js', () => {
 
   // Create group.
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
+    
 
   // Add the host and a backer to the group.
   beforeEach((done) => {
     const promises = [group.addUserWithRole(users[0], roles.HOST),
                       group.addUserWithRole(users[1], roles.MEMBER),
-                      group.addUserWithRole(users[2], roles.BACKER)];
+                      group.addUserWithRole(users[2], roles.BACKER)
+                      ];
     Promise.all(promises).then(() => done() );
   });
 
@@ -388,7 +387,7 @@ describe('usergroup.routes.test.js', () => {
    */
   describe('/groups/:slug/users', () => {
 
-    beforeEach(createDonationsAndTransaction);
+    beforeEach(createTransactions);
 
     it('get the list of users with their corresponding tier', () =>
       request(app)
@@ -397,6 +396,7 @@ describe('usergroup.routes.test.js', () => {
         .toPromise()
         .tap(res => {
           const users = res.body;
+          expect(users).to.have.length(4);
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('core contributor');
           expect(users[1].tier).to.equal('sponsor');
@@ -411,6 +411,7 @@ describe('usergroup.routes.test.js', () => {
         .expect(200)
         .expect((res) => {
           const users = res.body;
+          expect(users).to.have.length(3);
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(users[0].tier).to.equal('core contributor');
         })

@@ -3,9 +3,8 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import {appendTier, defaultHostId, getLinkHeader, getRequestedUrl} from '../lib/utils';
+import {appendTier, defaultHostId, getLinkHeader, getRequestedUrl, isBackerActive} from '../lib/utils';
 import Promise from 'bluebird';
-import moment from 'moment';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
 import emailLib from '../lib/email';
@@ -65,24 +64,11 @@ const _getUsersData = (group) => {
 
 export const getUsers = (req, res, next) => {
 
-  const now = moment();
-  const tiers = _.groupBy(req.group.tiers, 'name');
-
-  const _isActive = (backer) => {
-    if (tiers[backer.tier]) {
-      if (tiers[backer.tier][0].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
-        return false;
-      if (now.diff(moment(backer.lastDonation), 'days') > 365)
-        return false;
-    }
-    return true;
-  }
-
   auth.canEditGroup(req, res, (e, canEditGroup) => {
     let promise = _getUsersData(req.group);
 
     if (req.query.filter && req.query.filter === 'active') {
-      promise = promise.filter(backer => _isActive(backer));
+      promise = promise.filter(backer => isBackerActive(backer, req.group.tiers));
     }
 
     return promise
@@ -101,8 +87,7 @@ export const getUsers = (req, res, next) => {
 export const getUsersWithEmail = (req, res, next) => {
   let promise = _getUsersData(req.group);
   if (req.query.filter && req.query.filter === 'active') {
-    const now = moment();
-    promise = promise.filter(backer => now.diff(moment(backer.lastDonation), 'days') <= 90);
+    promise = promise.filter(backer => isBackerActive(backer, req.group.tiers));
   }
   return promise
   .then(backers => res.send(backers))

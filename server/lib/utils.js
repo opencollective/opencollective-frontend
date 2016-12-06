@@ -2,6 +2,8 @@ import Url from 'url';
 import config from 'config';
 import crypto from 'crypto';
 import base64url from 'base64url';
+import moment from 'moment';
+import _ from 'lodash';
 
 /**
  * Encrypt with resetPasswordSecret
@@ -157,9 +159,12 @@ export const getTier = (user, tiers) => {
 
   if (!tiers || !user.totalDonations) return defaultTier;
 
+  // we make a copy of tiers before we sort it
+  tiers = _.clone(tiers);
+
   // We order the tiers by start range DESC
   tiers.sort((a,b) => {
-    return a.range[0] < b.range[0];
+    return b.range[0] - a.range[0];
   });
 
   // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
@@ -179,6 +184,18 @@ export const appendTier = (backers, tiers) => {
   });
   return backers;
 };
+
+/**
+ * Returns whether the backer is still an active member of its tier
+ */
+export const isBackerActive = (backer, tiers, until) => {
+  tiers = _.groupBy(tiers, 'name'); // this makes a copy
+  const now = moment(until);
+  if (tiers[backer.tier] && tiers[backer.tier][0].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
+    return false
+  else
+    return true;
+}
 
 /**
  * Default host id, set this for new groups created through Github
@@ -217,11 +234,17 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
+export function pluralize(str) {
+  return `${str}s`.replace(/s+$/,'s');
+}
+
 export function resizeImage(imageUrl, { width, height, query }) {
   if (!imageUrl) return null;
+  if (imageUrl[0] === '/') imageUrl = `https://opencollective.com${imageUrl}`;
+
   let queryurl = '';
   if (query) {
-    queryurl = encodeURIComponent(query);
+    queryurl = `&query=${encodeURIComponent(query)}`;
   } else {
     if (width) queryurl += `&width=${width}`;
     if (height) queryurl += `&height=${height}`;

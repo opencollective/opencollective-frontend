@@ -16,7 +16,19 @@ describe('Group model', () => {
     slug: 'tipbox',
     name: 'tipbox',
     currency: 'USD',
-    tags: ['#brusselstogether']
+    tags: ['#brusselstogether'],
+    tiers: [
+      { 
+        name: 'backer',
+        range: [2, 100],
+        interval: 'monthly'
+      },
+      { 
+        name: 'sponsor',
+        range: [100, 100000],
+        interval: 'yearly'
+      }
+    ]
   };
 
   const users = [{
@@ -46,14 +58,25 @@ describe('Group model', () => {
   },{
     createdAt: new Date('2016-06-15'),
     amount: 250,
-    netAmountInGroupCurrency: 25000,
+    amountInTxnCurrency: 25000,
+    netAmountInGroupCurrency: 22500,
     currency: 'USD',
     type: 'donation',
     UserId: 1
   },{
     createdAt: new Date('2016-07-16'),
     amount: 500,
-    netAmountInGroupCurrency: 50000,
+    amountInTxnCurrency: 50000,
+    netAmountInGroupCurrency: 45000,
+    currency: 'USD',
+    type: 'donation',
+    UserId: 1
+  },
+  {
+    createdAt: new Date('2016-08-18'),
+    amount: 500,
+    amountInTxnCurrency: 50000,
+    netAmountInGroupCurrency: 45000,
     currency: 'USD',
     type: 'donation',
     UserId: 2
@@ -63,9 +86,10 @@ describe('Group model', () => {
   before(() => utils.resetTestDB());
 
   before(() => Group.create(groupData)
-    .tap(g => group = g)
-    .tap(() => User.createMany(users))
-    .tap(() => Transaction.createMany(transactions, { GroupId: group.id })));
+    .then(g => group = g)
+    .then(() => User.createMany(users))
+    .then(() => group.addUserWithRole({ id: 1 }, 'BACKER'))
+    .then(() => Transaction.createMany(transactions, { GroupId: group.id })));
 
   it('returns a default logo if no logo', () => {
     expect(group.logo).to.contain('/static/images/1px.png');
@@ -158,5 +182,18 @@ describe('Group model', () => {
       expect(relatedGroups[0].settings.style.hero).to.have.property('cover');
       done();
     })
+  });
+
+  it('get the tiers with users', (done) => {
+    group.getTiersWithUsers()
+      .then(tiers => {
+        expect(tiers).to.have.length(groupData.tiers.length);
+        expect(tiers[1].users).to.have.length(1);
+        const sponsor = tiers[1].users[0];
+        expect(parseInt(sponsor.totalDonations, 10)).to.equal(transactions[2].amountInTxnCurrency + transactions[3].amountInTxnCurrency);
+        expect(new Date(sponsor.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
+        expect(new Date(sponsor.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
+        done();
+      });
   });
 });

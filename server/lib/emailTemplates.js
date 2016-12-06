@@ -1,7 +1,7 @@
 import fs from 'fs';
 import moment from 'moment';
 import handlebars from 'handlebars';
-import { resizeImage } from './utils';
+import { resizeImage, capitalize } from './utils';
 
 /*
 * Loads all the email templates
@@ -62,6 +62,7 @@ handlebars.registerHelper('moment', (value, props) => {
 
 handlebars.registerHelper('currency', (value, props) => {
   const { currency, precision } = props.hash;
+  if (!currency) return value;
   value = value/100; // converting cents
 
   return value.toLocaleString(currency, {
@@ -73,6 +74,7 @@ handlebars.registerHelper('currency', (value, props) => {
 });
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
+handlebars.registerHelper('capitalize', (str) => capitalize(str));
 
 handlebars.registerHelper('encodeURIComponent', (str) => {
   return encodeURIComponent(str);
