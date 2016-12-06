@@ -322,7 +322,7 @@ export default (Sequelize, DataTypes) => {
         return Sequelize.models.Transaction.findAll({
           where: {
             UserId: this.id,
-            createdAt: { $gte: since || 0, $lte: until || new Date}
+            createdAt: { $gte: since || 0, $lt: until || new Date}
           },
           order: [ ['amount','DESC'] ],
           include: [ { model: Sequelize.models.Group, where: { tags: { $contains: tags } } } ]
