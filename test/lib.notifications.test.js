@@ -72,7 +72,7 @@ describe('lib.notifications.test.js', () => {
   });
 
   it('sends a new `group.expense.created` email notification', done => {
-    let emailAttributes, body;
+    let emailAttributes;
     const expense = utils.data('expense1');
 
     const templateData = {
