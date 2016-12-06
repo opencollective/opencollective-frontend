@@ -50,7 +50,7 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['qubes-os']} };
+    query.where = { slug: {$in: ['preact', 'qubes-os']} };
     // query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
 
   Group.findAll(query)
