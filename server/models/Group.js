@@ -396,7 +396,7 @@ export default function(Sequelize, DataTypes) {
         endDate = endDate || new Date;
         const where = {
           amount: { $lt: 0 },
-          createdAt: { $lte: endDate },
+          createdAt: { $lt: endDate },
           GroupId: this.id
         };
         if (status) where.status = status;
@@ -413,7 +413,7 @@ export default function(Sequelize, DataTypes) {
           ],
           where: {
             GroupId: this.id,
-            createdAt: { $lte: until }
+            createdAt: { $lt: until }
           }
         })
         .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
@@ -470,7 +470,7 @@ export default function(Sequelize, DataTypes) {
         endDate = endDate || new Date;
         const where = {
           amount: { $gt: 0 },
-          createdAt: { $lte: endDate },
+          createdAt: { $lt: endDate },
           GroupId: this.id
         };
         if (startDate) where.createdAt.$gte = startDate;
@@ -486,7 +486,7 @@ export default function(Sequelize, DataTypes) {
       getTotalTransactions(startDate, endDate, type) {
         endDate = endDate || new Date;
         const where = {
-          createdAt: { $lte: endDate },
+          createdAt: { $lt: endDate },
           GroupId: this.id
         };
         if (startDate) where.createdAt.$gte = startDate;
@@ -513,7 +513,7 @@ export default function(Sequelize, DataTypes) {
               amount: {
                 $gt: 0
               },
-              createdAt: { $lte: until }
+              createdAt: { $lt: until }
             }
           })
         .then((result) => {

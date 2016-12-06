@@ -16,7 +16,7 @@ d.setMonth(d.getMonth() - 1);
 const month = moment(d).format('MMMM');
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
-const endDate = new Date(d.getFullYear(), d.getMonth()+1, 0);
+const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
 
 console.log("startDate", startDate,"endDate", endDate);
 
@@ -50,8 +50,8 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
-    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin']} };
+    query.where = { slug: {$in: ['preact', 'qubes-os']} };
+    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
 
   Group.findAll(query)
   .tap(groups => {
