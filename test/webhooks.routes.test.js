@@ -142,7 +142,7 @@ describe('webhooks.routes.test.js', () => {
     // Nock for retrieving charge
     beforeEach(() => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/_00000000000000')
+        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
         .reply(200, stripeMock.charges.create);
     });
 
@@ -292,7 +292,7 @@ describe('webhooks.routes.test.js', () => {
         .catch(done);
     });
 
-    it('should create a second transaction after the first webhook', done => {
+    it('fail to create a second transaction with the same charge id', done => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get(`/v1/events/${webhookEvent.id}`)
         .reply(200,
@@ -301,8 +301,35 @@ describe('webhooks.routes.test.js', () => {
             type: 'invoice.payment_succeeded'
           })
         );
-      nocks['charge.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/_00000000000000')
+
+      request(app)
+        .post('/webhooks/stripe')
+        .send(webhookEvent)
+        .expect(400, {
+          error: {
+            code: 400,
+            type: 'bad_request',
+            message: 'This chargeId: ch_17KUJnBgJgc4Ba6uvdu1hxm4 already exists.'
+          }
+        })
+        .end(done)
+    });
+
+    it('should create a second transaction after the first webhook with different chargeid', done => {
+      const newWebhookEvent = _.cloneDeep(webhookEvent);
+      newWebhookEvent.data.object.charge = 'ch_charge2';
+      newWebhookEvent.id = 'evt_0002';
+
+      nocks['events2.retrieve'] = nock(STRIPE_URL)
+        .get(`/v1/events/${newWebhookEvent.id}`)
+        .reply(200,
+          _.extend({},
+            newWebhookEvent, {
+            type: 'invoice.payment_succeeded'
+          })
+        );
+      nocks['charge2.retrieve'] = nock(STRIPE_URL)
+        .get('/v1/charges/ch_charge2')
         .reply(200, stripeMock.charges.create);
 
       nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
@@ -311,7 +338,7 @@ describe('webhooks.routes.test.js', () => {
 
       request(app)
         .post('/webhooks/stripe')
-        .send(webhookEvent)
+        .send(newWebhookEvent)
         .expect(200)
         .end(err => {
           expect(err).to.not.exist;
