@@ -45,8 +45,7 @@ const stubStripe = () => {
 };
 
 
-describe.only('webhooks.routes.test.js', () => {
-  // nock.recorder.rec();
+describe('webhooks.routes.test.js', () => {
   const nocks = {};
   let sandbox, user, paymentMethod, group, donation, emailSendSpy;
 
@@ -317,7 +316,7 @@ describe.only('webhooks.routes.test.js', () => {
     });
 
     it('should create a second transaction after the first webhook with different chargeid', done => {
-      const newWebhookEvent = _.extend({}, webhookEvent);
+      const newWebhookEvent = _.cloneDeep(webhookEvent);
       newWebhookEvent.data.object.charge = 'ch_charge2';
       newWebhookEvent.id = 'evt_0002';
 
