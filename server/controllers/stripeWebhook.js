@@ -3,7 +3,7 @@ import _ from 'lodash';
 import activities from '../constants/activities';
 import {planId} from '../lib/utils';
 import {appStripe, extractFees} from '../gateways/stripe';
-import models from '../models';
+import models, {sequelize} from '../models';
 import errors from '../lib/errors';
 import {type} from '../constants/transactions';
 import emailLib from '../lib/email';
@@ -120,7 +120,28 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb)
     }],
 
-    fetchPaymentMethod: ['fetchDonation', (cb, results) => {
+    confirmUniqueChargeId: ['fetchDonation', (cb, results) => {
+      const chargeId = results.fetchEvent.event.data.object.charge;
+      const donationId = results.fetchDonation.id;
+      sequelize.query(`
+        SELECT * FROM "Transactions"
+        WHERE 
+          "DonationId" = ${donationId} AND
+          CAST(data->'charge'->'id' AS TEXT) like '%${chargeId}%'
+        `.replace(/\s\s+/g, ' '),
+        {
+          model: Transaction
+        })
+      .then(t => {
+        if (t.length > 0) {
+          cb(new errors.BadRequest(`This chargeId: ${chargeId} already exists.`))
+        } else {
+          cb(null, true);
+        }
+      })
+    }],
+
+    fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
       const userId = results.fetchDonation.UserId;
       const { customer } = results.fetchEvent.event.data.object;
 
