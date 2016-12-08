@@ -3,7 +3,7 @@
 
 set -e
 
-APT_PACKAGES=(google-chrome-stable subversion)
+APT_PACKAGES=(google-chrome-stable)
 APT_CACHE=~/cache/apt
 
 # Work from the directory CI will cache

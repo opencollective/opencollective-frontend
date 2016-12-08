@@ -155,7 +155,7 @@ setRepoDir() {
       fi
       REPO_DIR=${!REPO_DIR_VAR_NAME}
     else
-      REPO_DIR="$HOME/$REPO_NAME"
+      REPO_DIR="$HOME/cache/$REPO_NAME"
     fi
   fi
 }
@@ -166,25 +166,14 @@ install() {
   else
     echo "Checking out $REPO_NAME into $REPO_DIR"
     # use Github SVN export to avoid fetching git history, faster
-    REPO_SVN=https://github.com/OpenCollective/${REPO_NAME}/trunk
-    svn export ${REPO_SVN} ${REPO_DIR}
+    TARBALL=https://codeload.github.com/OpenCollective/${REPO_NAME}/tar.gz/master
+    curl -o archive.tgz $TARBALL
+    tar -xzf archive.tgz
+    mv ${REPO_NAME}-master ${REPO_DIR}
     cd ${REPO_DIR}
     echo "Performing NPM install"
-    START=$(date +%s)
     npm install
-    END=$(date +%s)
-    echo "Executed NPM install in $(($END - $START)) seconds"
-    linkRepoNmToCache
   fi
-}
-
-linkRepoNmToCache() {
-  REPO_NM="${REPO_DIR}/node_modules/"
-  CACHE_DIR="${HOME}/cache/"
-  [ -d ${CACHE_DIR} ] || mkdir ${CACHE_DIR}
-  REPO_NM_CACHE="${CACHE_DIR}/${REPO_NAME}_node_modules"
-  echo "Linking ${REPO_NM_CACHE} -> ${REPO_NM}"
-  ln -s ${REPO_NM} ${REPO_NM_CACHE}
 }
 
 setPgDatabase() {
