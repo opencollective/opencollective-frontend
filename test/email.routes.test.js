@@ -119,6 +119,21 @@ describe("email.routes.test", () => {
       });
   });
 
+
+  it("forwards emails sent to expense@:slug.opencollective.com", () => {
+
+    const spy = sandbox.spy(emailLib, 'sendMessage');
+
+    return request(app)
+      .post('/webhooks/mailgun')
+      .send(Object.assign({}, webhookBody, {recipient: 'expense@testcollective.opencollective.com'}))
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(spy.args[0][0]).to.equal('ops+expense@opencollective.com');
+        expect(spy.args[0][1]).to.equal(webhookBody.subject);
+      });
+  });
+
   it("forwards the email for approval to the core members", () => {
     const spy = sandbox.spy(emailLib, 'send');
 

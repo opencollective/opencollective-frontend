@@ -163,6 +163,17 @@ export const webhook = (req, res, next) => {
     return res.send('Email already processed, skipping');
   }
 
+  // If an email is sent to expense@:slug.opencollective.com
+  // we forward it to ops+expense@opencollective.com
+  if (list.match(/^expenses?$/i)) {
+   return emailLib.sendMessage('ops+expense@opencollective.com', email.subject, body, { from: email.from })
+    .then(() => res.send('ok'))
+    .catch(e => {
+      console.error("Error: ", e);
+      next(e);
+    });
+  }
+
   // If an email is sent to info@:slug.opencollective.com,
   // we simply forward it to members who subscribed to that list
   if (list === 'info') {
