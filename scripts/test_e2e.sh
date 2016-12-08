@@ -155,6 +155,7 @@ setRepoDir() {
       fi
       REPO_DIR=${!REPO_DIR_VAR_NAME}
     else
+      mkdir -p "$HOME/cache"
       REPO_DIR="$HOME/cache/$REPO_NAME"
     fi
   fi
