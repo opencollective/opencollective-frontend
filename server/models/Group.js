@@ -57,7 +57,12 @@ export default function(Sequelize, DataTypes) {
       allowNull: false
     },
 
-    mission: DataTypes.STRING(100),
+    mission: {
+      type: DataTypes.STRING(100),
+      get() {
+        return this.getDataValue('mission').trim();
+      }
+    },
 
     description: DataTypes.STRING, // max 95 characters
 

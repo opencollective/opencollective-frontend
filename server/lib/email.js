@@ -94,6 +94,11 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     subject = `[TESTING] ${subject}`;
   }
 
+  if (process.env.ONLY) {
+    debug("Only sending email to ", process.env.ONLY);
+    recipients = [process.env.ONLY];
+  }
+
   debug(`sending email to ${recipients.join(', ')}`);
   if (recipients.length === 0) {
     debug("No recipient to send to, only sending to bcc", options.bcc);
