@@ -60,8 +60,6 @@ const getTemplateAttributes = (str) => {
     }
   } while (tokens);
 
-  console.log("attributes", attributes);
-
   attributes.body = lines.slice(index).join('\n').trim();
   return attributes;
 };
