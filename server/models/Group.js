@@ -60,7 +60,7 @@ export default function(Sequelize, DataTypes) {
     mission: {
       type: DataTypes.STRING(100),
       get() {
-        return this.getDataValue('mission').trim();
+        return (this.getDataValue('mission') || '').trim();
       }
     },
 
