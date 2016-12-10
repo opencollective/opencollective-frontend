@@ -13,7 +13,7 @@ import fs from 'fs';
 const debug = debugLib('email');
 
 const render = (template, data) => {
-  let text, html, filepath;
+  let text, filepath;
   data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
   data = _.merge({}, data);
   delete data.config;
@@ -22,7 +22,7 @@ const render = (template, data) => {
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
-  html = juice(templates[template](data));
+  const html = juice(templates[template](data));
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
