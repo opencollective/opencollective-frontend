@@ -51,13 +51,16 @@ export function setupModels(client) {
     'Comment',
     'ConnectedAccount',
     'Donation',
+    'Event',
     'Expense',
     'Group',
     'Notification',
     'PaymentMethod',
+    'Response',
     'Session',
     'StripeAccount',
     'Subscription',
+    'Tier',
     'Transaction',
     'User',
     'UserGroup'
@@ -142,6 +145,24 @@ export function setupModels(client) {
   // PaymentMethod
   m.Donation.belongsTo(m.PaymentMethod);
   m.PaymentMethod.hasMany(m.Donation);
+
+  // Event
+  m.Event.belongsTo(m.Group);
+  m.Group.hasMany(m.Event);
+
+  // Tier
+  m.Tier.belongsTo(m.Event);
+  m.Event.hasMany(m.Tier);
+
+  // Response
+  m.Response.belongsTo(m.Event);
+  m.Response.belongsTo(m.Tier);
+  m.Response.belongsTo(m.Group);
+  m.Response.belongsTo(m.User);
+  m.Event.hasMany(m.Response);
+  m.Tier.hasMany(m.Response);
+  m.Group.hasMany(m.Response);
+  m.User.hasMany(m.Response);
 
   return m;
 }
