@@ -1,0 +1,32 @@
+{
+  "name": "opencollective-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "react-scripts": "0.4.1"
+  },
+  "dependencies": {
+    "apollo-client": "^0.5.6",
+    "eslint-plugin-flowtype": "^2.29.1",
+    "glamor": "^2.20.12",
+    "graphql-tag": "^0.1.13",
+    "lodash": "^4.17.2",
+    "payment": "^2.1.4",
+    "react": "^15.3.1",
+    "react-apollo": "^0.5.4",
+    "react-bootstrap": "^0.30.7",
+    "react-dom": "^15.3.1",
+    "react-gmaps": "^1.5.0",
+    "react-router": "^2.8.0",
+    "react-scrollchor": "^2.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "./node_modules/react-scripts/config/eslint.js"
+  }
+}
