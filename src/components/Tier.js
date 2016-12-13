@@ -51,33 +51,27 @@ const styles = {
 class Tier extends React.Component {
 
   static propTypes = {
-    name: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string,
-    amount: React.PropTypes.number,
-    currency: React.PropTypes.string,
-    max: React.PropTypes.number,
-    left: React.PropTypes.number,
-    onChange: React.PropTypes.func,
-    onClick: React.PropTypes.func
+    tier: React.PropTypes.object.isRequired,
+    onChange: React.PropTypes.func, // onChange(response{quantity, amount, tier})
+    onClick: React.PropTypes.func // onClick(response{quantity, amount, tier})
   }
 
   constructor(props) {
     super(props);
-    this.state = { qt: 1, amount: props.amount };
+    this.tier = props.tier;
+    this.state = { quantity: 1, amount: this.tier.amount, tier: this.tier };
     this.onChange = this.props.onChange || function() {}; 
     this.onChange(this.state);
   }
 
-  handleTicketsChange(qt) {
-    const newState = { qt, amount: qt * this.props.amount };
-    this.setState(newState);
-    this.tier = Object.assign({}, this.tier, newState);
-    this.onChange(newState);
+  handleTicketsChange(quantity) {
+    const response = { quantity, amount: quantity * this.props.tier.amount, tier: this.tier };
+    this.setState(response);
+    this.onChange(response);
   }
 
   render() {
-    const { name, description, amount, currency, max, left } = this.props;
-    this.tier = this.props;
+    const { name, description, amount, currency, max, left } = this.props.tier;
 
     return (
       <div className={styles.tier}>
@@ -88,7 +82,7 @@ class Tier extends React.Component {
         <p className={styles.description}>{description}</p>
         <div id="actions" className={styles.actions}>
           <Button id="btnTicketsCtrl"><TicketsCtlr value={1} onChange={(value) => this.handleTicketsChange(value)} /></Button>
-          <Button className="blue" label={`get ticket${this.state.qt > 1 ? 's' : ''}`} onClick={() => this.props.onClick(this.tier)} />
+          {this.props.onClick && <Button className="blue" label={`get ticket${this.state.quantity > 1 ? 's' : ''}`} onClick={() => this.props.onClick(this.state)} />}
         </div>
       </div>
     );

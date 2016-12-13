@@ -1,7 +1,6 @@
 import React from 'react';
 import Payment from 'payment';
 import { Row, Col, FormGroup, ControlLabel, Button, Alert } from 'react-bootstrap';
-// import { Bert } from 'meteor/themeteorchef:bert';
 import { getStripeToken } from '../lib/stripe';
 
 class CreditCardForm extends React.Component {
@@ -18,6 +17,7 @@ class CreditCardForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.resetCard = this.resetCard.bind(this);
     
+    // eslint-disable-next-line
     Stripe.setPublishableKey(this.props.stripePublishableKey);
     console.log("setting stripePublishableKey",this.props.stripePublishableKey);
 
@@ -140,9 +140,8 @@ class CreditCardForm extends React.Component {
     Payment.formatCardCVC(cvc);
   }
 
-
   renderCard() {
-    const { number, exp_month, exp_year, cvc, token, error } = this.state;
+    const { number, exp_month, exp_year, cvc, token } = this.state;
     return number ? (<Alert bsStyle="info">
       <h5>{ number }</h5>
       <p className="exp-cvc">
@@ -151,7 +150,7 @@ class CreditCardForm extends React.Component {
       </p>
       <em>{ token }</em>
     </Alert>) : '';
-  }  
+  }
 
   render() {
     return (

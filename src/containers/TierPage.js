@@ -36,8 +36,8 @@ class TierPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { qt: 0, amount : 0 };
-    this.api = new api();
+    this.state = { quantity: 0, amount : 0 };
+    this.api = new api(this);
     this.actions = {
       rsvp: (user) => this.rsvp(user)
     }
@@ -49,7 +49,7 @@ class TierPage extends React.Component {
       collectiveid: this.tier.collective.id,
       eventid: this.tier.event.id,
       tierid: this.tier.id,
-      qt: this.state.qt
+      quantity: this.state.quantity
     })
   }
 

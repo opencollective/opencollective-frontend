@@ -3,26 +3,32 @@ import colors from '../constants/colors';
 import TicketsCtlr from './TicketsCtlr';
 import Button from './Button';
 import _ from 'lodash';
-import api from '../lib/api';
 import { isValidEmail } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
+import { css } from 'glamor';
+
+const styles = {
+  SignInUp: css({
+    margin: '0px auto',
+    maxWidth: '400px'
+  })
+}
 
 class SignInUp extends React.Component {
 
   static propTypes = {
-    className: React.PropTypes.string,
-    next: React.PropTypes.string,
     label: React.PropTypes.string,
+    onClick: React.PropTypes.func, // onClick(user)
+    emailOnly: React.PropTypes.bool,
     requireCreditCard: React.PropTypes.bool,
     stripePublishableKey: React.PropTypes.string,
-    onClick: React.PropTypes.func
+    className: React.PropTypes.string
   }
 
   constructor(props) {
     super(props);
-    this.state = { signin: true, signup: true, form: {} };
-    this.api = new api();
-
+    this.state = { form: {} };
+    this.user = {};
     this.renderInputField = this.renderInputField.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -53,27 +59,12 @@ class SignInUp extends React.Component {
         description: ''
       }
     ];
-
-  }
-
-  async signInUp(email) {
-    if (!isValidEmail(email)) return;
-
-    this.user = await this.api.getUserByEmail(email);
-    if (!this.user) {
-      this.setState({ signup: true });
-    }
-    console.log("user: ", this.user);
   }
 
   handleChange(fieldname, value) {
-    console.log("New value for ", fieldname, value);
     this.state.form[fieldname] = value;
-    switch (fieldname) {
-      case 'email':
-        this.signInUp(value);
-        break;
-    }
+    if (fieldname === 'email' && isValidEmail(value))
+      this.setState({ valid: true });
   }
 
   renderInputField(field) {
@@ -89,19 +80,9 @@ class SignInUp extends React.Component {
     );
   }
 
-  async addCreditCardToUser(card) {
-    card.number = String(card.number).substr(-4);
-    delete card.cvc;
-    const res = await this.api.addCreditCardToUser(this.user, card);
-  }
-
-  async handleClick(card) {
-    if (!this.user) {
-      this.user = await this.api.createUser(this.state.form);
-    }
-    if (card) {
-      this.addCreditCardToUser(card);
-    }
+  handleClick(card) {
+    this.user = this.state.form;
+    this.user.card = card;
     this.props.onClick(this.user);
   }
 
@@ -111,8 +92,8 @@ class SignInUp extends React.Component {
     const showCreditCardForm = this.props.requireCreditCard && (!this.user || !this.user.creditCards);
 
     return (
-      <div className="SignInUp">
-        <style jsx>{`
+      <div className={styles.SignInUp}>
+        <style>{`
           .field {
             display: flex;
             flex-direction: column;
@@ -137,7 +118,7 @@ class SignInUp extends React.Component {
           description
         })
         }
-        {this.state.signup && 
+        {!this.props.emailOnly && 
           <div className="signup">
             {this.fields.map(this.renderInputField)}
           </div>
@@ -154,7 +135,7 @@ class SignInUp extends React.Component {
         }
         {!showCreditCardForm &&
         <div id="actions" className="actions">
-          <Button className="blue" label={this.props.label} onClick={this.handleClick} />
+          <Button className={`${this.state.valid ? 'blue' : 'disabled' }`} label={this.props.label} onClick={this.handleClick} />
         </div>}
       </div>
     );

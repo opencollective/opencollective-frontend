@@ -65,11 +65,11 @@ class Tier extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { qt: 1, amount: props.tier.amount };
+    this.state = { quantity: 1, amount: props.tier.amount };
   }
 
-  handleTicketsChange(qt) {
-    this.setState({ qt, amount: qt * this.props.tier.amount });
+  handleTicketsChange(quantity) {
+    this.setState({ quantity, amount: quantity * this.props.tier.amount });
   }
 
   render() {
@@ -84,7 +84,7 @@ class Tier extends React.Component {
         <p className={styles.description}>{tier.description}</p>
         <div id="actions" className={styles.actions}>
           <Button id="btnTicketsCtrl"><TicketsCtlr value={1} onChange={(value) => this.handleTicketsChange(value)} /></Button>
-          <Button className="blue" label={`get ticket${this.state.qt > 1 ? 's' : ''}`} />
+          <Button className="blue" label={`get ticket${this.state.quantity > 1 ? 's' : ''}`} />
         </div>
       </div>
     );

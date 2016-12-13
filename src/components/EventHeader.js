@@ -1,7 +1,5 @@
 import React from 'react';
 import { css } from 'glamor';
-import Button from './Button';
-import HashLink from 'react-scrollchor';
 
 const styles = {
   cover: css({
@@ -31,12 +29,6 @@ const styles = {
   }),
   title: css({
     fontSize: '16px'
-  }),
-  actions: css({
-    display: 'flex',
-    width: '100%',
-    justifyContent: 'center',
-    height: '40px' 
   })
 }
 
@@ -50,7 +42,7 @@ class EventHeader extends React.Component {
   }
 
   render() {
-    const { title, description, logo, backgroundImage } = this.props;
+    const { title, logo, backgroundImage } = this.props;
 
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
@@ -65,12 +57,6 @@ class EventHeader extends React.Component {
             <img src={logo} className={styles.logo} />
             <h1 className={styles.title}>{title}</h1>
           </div>
-        </div>
-        <div className={styles.actions}>
-          <Button className="" label="interested" />
-          <Button className="whiteblue">
-            <HashLink to="#tickets">get ticket</HashLink>
-          </Button>
         </div>
       </div>
     );

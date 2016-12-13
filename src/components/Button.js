@@ -22,6 +22,7 @@ const styles = {
     },
     '& label': {
       padding: '10px',
+      cursor: 'pointer'
     },
     '& .whiteblue, & .whiteblue a': {
       color: colors.blue,
@@ -31,6 +32,13 @@ const styles = {
       color: 'white',
       borderColor: colors.blue,
       background: colors.blue
+    },
+    '& a': {
+      display: 'block',
+      width: '100%',
+      height: '100%',
+      textAlign: 'center',
+      lineHeight: '36px'
     }
   })
 };
