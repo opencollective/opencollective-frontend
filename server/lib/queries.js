@@ -201,7 +201,7 @@ const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
       max(u."firstName") as "firstName",
       max(u."lastName") as "lastName",
       max(u.username) as username,
-      max(ug.role) as role,
+      ug.role as role,
       max(u.avatar) as avatar,
       max(u.website) as website,
       max(u.email) as email,
@@ -214,7 +214,7 @@ const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
     LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
     WHERE ug."GroupId" IN (:groupids)
     AND ug."deletedAt" IS NULL ${untilCondition('ug')}
-    GROUP BY u.id
+    GROUP BY ug.role, u.id
     ORDER BY "totalDonations" DESC, "createdAt" ASC
   `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
