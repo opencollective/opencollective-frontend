@@ -267,7 +267,7 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     sendInvoice: ['countTransactions', (cb, results) => {
-      if (results.countTransactions === 1) {
+      if (results.countTransactions <= 1) {
         return cb();
       }
       const donation = results.fetchDonation;
