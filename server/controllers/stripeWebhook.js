@@ -217,7 +217,16 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    createTransaction: ['retrieveBalance', (cb, results) => {
+    countTransactions: ['retrieveCharge', (cb, results) => {
+      const donation = results.fetchDonation;
+      Transaction.count({
+        DonationId: donation.id
+      })
+      .then(numTransactions => cb(null, numTransactions))
+      .catch(cb) 
+    }],
+
+    createTransaction: ['retrieveBalance', 'countTransactions', (cb, results) => {
       const donation = results.fetchDonation;
       const subscription = donation.Subscription;
       const { stripeSubscription } = results.fetchEvent;
@@ -257,17 +266,8 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    countTransactions: ['createTransaction', (cb, results) => {
-      const donation = results.fetchDonation;
-      Transaction.count({
-        DonationId: donation.id
-      })
-      .then(numTransactions => cb(null, numTransactions))
-      .catch(cb) 
-    }],
-
-    sendInvoice: ['countTransactions', (cb, results) => {
-      if (results.countTransactions <= 1) {
+    sendInvoice: ['createTransaction', (cb, results) => {
+      if (results.countTransactions === 0) {
         return cb();
       }
       const donation = results.fetchDonation;
