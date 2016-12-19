@@ -180,6 +180,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   data.notificationTypeLabel = getNotificationLabel(template, recipient);
   data.config = config;
+  data.utm = `utm_source=opencollective&utm_campaign=${template}&utm_medium=email`;
 
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));

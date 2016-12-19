@@ -1,0 +1,62 @@
+Subject: Your year on Open Collective
+
+{{> header}}
+
+<style>
+  .host {
+    margin: 20px 0px;
+  }
+</style>
+
+<p>
+Hi {{recipient.firstName}}!
+
+<p>
+2016 reaches its end 🎉. Let's be frank, we can't wait for this year to be over.
+</p>
+
+<p>
+It's been a heck of a year. But as we say: "never waste a crisis".
+Crisis are opportunities to change, opportunities to reinvent the way we want to live and work together, for the better 🌱
+</p>
+
+<p>
+We believe that the world is moving away from the old top down hierarchies, from zero sum game markets that demanded us to compete with each others.
+We believe that we need to reinvent how we work together, how our communities can give everyone the opportunity to join and contribute their talent in a bottom up fashion. To achieve that, we believe that we need a new form of association for this new bottom up world 🌎. We call them Open Collectives.
+</p>
+
+<p>
+We would like to thank you for the contributions that you made this year to build this future.
+</p>
+
+<p>
+In 2016 you have contributed a total of {{stats.totalDonationsString}} to {{stats.totalCollectives}} collectives.
+</p>
+
+<div>
+{{#each hosts}}
+<div class="host">
+<a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a>
+  {{#each collectives}}
+    <li>{{{currency totalDonations currency=currency}}} to <a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a><br />
+    </li>
+  {{/each}}
+  + {{{currency totalDonations currency=currency}}} to the host
+</div>
+{{/each}}
+</div>
+
+<p>
+Tweet those stats!
+</p>
+
+<p>
+- The Open Collective core contributors
+@AseemSood_, @PiaMancini, @xdamman
+</p>
+
+<p>
+Don't forget: we are an open collective ourselves and our code is under MIT license. We welcome contributions of any kind!
+</p>
+
+{{>footer}}

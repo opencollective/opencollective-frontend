@@ -18,6 +18,7 @@ const templateNames = [
   'group.expense.created',
   'group.donation.created',
   'group.monthlyreport',
+  'group.yearlyreport',
   'thankyou',
   'thankyou.wwcode',
   'thankyou.brusselstogether',
