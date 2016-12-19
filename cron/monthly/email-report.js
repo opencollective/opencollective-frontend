@@ -98,16 +98,20 @@ const generateDonationsString = (backer, donations) => {
     debug(`Skipping ${backer.name} because it doesn't have a name (${backer.username})`);
     return;
   }
-  const donationsArray = [];
+  const donationsTextArray = [], donationsHTMLArray = [];
   donations = donations.filter(donation => (donation.amount > 0));
-  let donationsString;
   for (let i=0; i<Math.min(3, donations.length); i++) {
     const donation = donations[i];
-    donationsArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);
+    donationsHTMLArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);
+    donationsTextArray.push(`${formatCurrency(donation.amount,donation.currency)} to https://opencollective.com/${donation.Group.slug}`);
   }
-  donationsString = donationsArray.join(', ');
-  donationsString = donationsString.replace(/,([^, ]*)$/,' and $1');
-  return donationsString;
+  const joinStringArray = (arr) => {
+    return arr.join(', ').replace(/,([^, ]*)$/,' and $1');
+  }
+  return {
+    html: joinStringArray(donationsHTMLArray),
+    text: joinStringArray(donationsTextArray)
+  };
 };
 
 const processBacker = (backer, startDate, endDate, tags) => {
@@ -219,7 +223,7 @@ const processGroup = (group) => {
           .then(results => {
             console.log('***', group.name, '***');
             const data = { config: { host: config.host }, month, group: {} };
-            data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.indexOf(group.slug) === -1)); // we omit own backers
+            data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(group.slug) === -1)); // we omit own backers
             const res = processTiers(results[1]);
             data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
             data.group.tiers = res.tiers;
@@ -254,6 +258,10 @@ const sendEmail = (recipients, data) => {
   if (recipients.length === 0) return;
   return Promise.map(recipients, recipient => {
     data.recipient = recipient;
+    if (process.env.ONLY && recipient.email !== process.env.ONLY) {
+      debug("Skipping ", recipient.email);
+      return Promise.resolve();
+    }
     return emailLib.send('group.monthlyreport', recipient.email, data);
   });
 }

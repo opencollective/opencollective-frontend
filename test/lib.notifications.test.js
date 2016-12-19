@@ -86,7 +86,7 @@ describe('lib.notifications.test.js', () => {
 
     emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
       .then(template => {
-        emailAttributes = emailLib.getTemplateAttributes(template);
+        emailAttributes = emailLib.getTemplateAttributes(template.html);
       })
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)

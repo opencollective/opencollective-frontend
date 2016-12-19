@@ -96,8 +96,8 @@ th {
 
 <div class="CollectiveCards">
 {{#each relatedGroups}}
-<div class="CollectiveCard">
-  <a href="{{config.host.website}}/{{slug}}">
+<a href="{{publicUrl}}">
+  <div class="CollectiveCard">
     <div>
       <div class='CollectiveCard-head' style="background-image:url('{{resizeImage backgroundImage width=320}}');{{#if settings.style.hero.cover.background}}background-color:{{settings.style.hero.cover.background}};{{/if}}">
         <center><img src="{{resizeImage logo width=240}}" height="64" /></center>
@@ -119,8 +119,8 @@ th {
         </div>
       </div>
     </div>
-  </a>
-</div>
+  </div>
+</a>
 {{/each}}
 </div>
 
