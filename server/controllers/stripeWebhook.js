@@ -220,10 +220,10 @@ export default function stripeWebhook(req, res, next) {
     countTransactions: ['retrieveCharge', (cb, results) => {
       const donation = results.fetchDonation;
       Transaction.count({
-        DonationId: donation.id
+        where: {
+          DonationId: donation.id
+        }
       })
-      // TODO: remove once double email bug is fixed
-      .tap(numTransactions => console.error(`Number of txns found for ${donation.id}: ${numTransactions}`))
       .then(numTransactions => cb(null, numTransactions))
       .catch(cb) 
     }],
