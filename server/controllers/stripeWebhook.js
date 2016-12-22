@@ -1,3 +1,4 @@
+
 import async from 'async';
 import _ from 'lodash';
 import activities from '../constants/activities';
@@ -127,7 +128,8 @@ export default function stripeWebhook(req, res, next) {
         SELECT * FROM "Transactions"
         WHERE 
           "DonationId" = ${donationId} AND
-          CAST(data->'charge'->'id' AS TEXT) like '%${chargeId}%'
+          CAST(data->'charge'->'id' AS TEXT) like '%${chargeId}%' AND
+          "deletedAt" IS NULL
         `.replace(/\s\s+/g, ' '),
         {
           model: Transaction
