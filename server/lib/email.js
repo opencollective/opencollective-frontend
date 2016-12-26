@@ -21,7 +21,8 @@ const render = (template, data) => {
 
     // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
     if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-      const filepath = `/tmp/${template}.${data.group && data.group.slug}.html`;
+      const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
+      const filepath = `/tmp/${template}.${slug}.html`;
       const script = `<script>data=${JSON.stringify(data)};</script>`;
       fs.writeFileSync(filepath, `${html}\n\n${script}`);
       console.log(`Preview email template: file://${filepath}`);

@@ -8,7 +8,7 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import { isBackerActive } from '../../server/lib/utils';
+import { isBackerActive, getTier } from '../../server/lib/utils';
 import emailLib from '../../server/lib/email';
 
 const d = new Date;
@@ -19,7 +19,7 @@ console.log("startDate", startDate, "endDate", endDate);
 
 const debug = debugLib('yearlyreport');
 
-const query = `
+const GetUserTransactionsQuery = `
 with "UserTransactions" as (
   SELECT
     "GroupId",
@@ -36,85 +36,76 @@ SELECT
   ut.*,
   host.username as "hostSlug",
   CONCAT(host."firstName", ' ', host."lastName") as "hostName",
-  host.avatar as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription",
+  host.avatar as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
   g.slug, g.name, g.mission, g.logo, g."backgroundImage", g."twitterHandle", g.settings, g.data 
 FROM "UserTransactions" ut 
 LEFT JOIN "Groups" g ON ut."GroupId" = g.id
 LEFT JOIN "UserGroups" ug ON ut."GroupId" = ug."GroupId" AND ug.role='HOST'
 LEFT JOIN "Users" host ON ug."UserId" = host.id`;
 
-const formatArrayToString = (arr) => {
-  return arr.join(', ').replace(/, ([^, ]*)$/,' and $1');
-}
-
-const formatCurrency = (amount, currency, precision) => {
-  amount = amount/100; // converting cents
-
-  return amount.toLocaleString(currency, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits : precision || 0,
-    maximumFractionDigits : precision || 0
-  });  
-}
-
 const processUser = (user) => {
-  return sequelize.query(query, {
+  return sequelize.query(GetUserTransactionsQuery, {
     type: sequelize.QueryTypes.SELECT,
     replacements: { userid: user.id }
   })
   .then(rows => {
-    const hosts = { opencollective: {}, stripe: {} };
+    const hosts = { opencollective: { name: 'Platform fees'}, stripe: { name: 'Credit Card Processing Fees (Stripe)' } };
     const totalCollectives = rows.length;
     const totalDonations = {};
     rows.forEach(row => {
       if (typeof hosts[row.hostSlug] === 'undefined') {
         hosts[row.hostSlug] = {
           slug: row.hostSlug,
-          name: row.hostName,
+          name: row.hostName.trim() || row.hostSlug,
           logo: row.hostLogo,
           twitterHandle: row.hostTwitterHandle,
-          description: row.hostDescription,
+          description: row.hostDescription || row.hostMission,
           collectives: {}
         };
       }
       hosts[row.hostSlug].collectives[row.slug] = {
         slug: row.slug,
-        name: row.name,
+        name: row.name || row.slug,
         mission: row.mission,
         logo: row.logo,
         backgroundImage: row.backgroundImage,
         twitterHandle: row.twitterHandle,
         settings: row.settings,
         data: row.data,
-        totalDonations: row.amountInTxnCurrency,
+        totalDonations: Number(row.amountInTxnCurrency),
         currency: row.txnCurrency
       };
 
+      hosts[row.hostSlug].collectives[row.slug].tier = getTier({ totalDonations: Number(row.amountInTxnCurrency)}, row.tiers);
+
       _.set(totalDonations, row.txnCurrency, 0);
-      _.set(hosts, [row.hostSlug, 'totalDonations', row.txnCurrency], 0);
-      _.set(hosts, ['stripe', 'totalDonations', row.txnCurrency], 0);
-      _.set(hosts, ['opencollective', 'totalDonations', row.txnCurrency], 0);
+      _.set(hosts, [row.hostSlug, 'totalFees', row.txnCurrency], 0);
+      _.set(hosts, ['stripe', 'totalFees', row.txnCurrency], 0);
+      _.set(hosts, ['opencollective', 'totalFees', row.txnCurrency], 0);
 
       totalDonations[row.txnCurrency] += Number(row.amountInTxnCurrency);
-      hosts[row.hostSlug]['totalDonations'][row.txnCurrency] += Number(row.hostFeeInTxnCurrency);
-      hosts['opencollective']['totalDonations'][row.txnCurrency] += Number(row.platformFeeInTxnCurrency);
-      hosts['stripe']['totalDonations'][row.txnCurrency] += Number(row.paymentProcessorFeeInTxnCurrency);
+      hosts[row.hostSlug]['totalFees'][row.txnCurrency] += Number(row.hostFeeInTxnCurrency);
+      hosts['opencollective']['totalFees'][row.txnCurrency] += Number(row.platformFeeInTxnCurrency);
+      hosts['stripe']['totalFees'][row.txnCurrency] += Number(row.paymentProcessorFeeInTxnCurrency);
     })
 
-    const totalDonationsArray = [];
-    for (const currency in totalDonations) {
-      totalDonationsArray.push(formatCurrency(totalDonations[currency], currency));
-    }
-    const totalDonationsString = formatArrayToString(totalDonationsArray);
+    const fees = {
+      stripe: hosts['stripe'].totalFees,
+      opencollective: hosts['opencollective'].totalFees,
+    };
+
+    delete hosts['stripe'];
+    delete hosts['opencollective'];
 
     return {
-      stats: { totalCollectives, totalDonations, totalDonationsString },
+      stats: { totalCollectives, totalDonations },
+      fees,
       hosts
     }
   })
   .then(data => {
     data.recipient = user;
+    console.log("data hosts['adminwwc']", data.hosts['adminwwc']);
     return emailLib.send('group.yearlyreport', user.email, data);
   })
 };

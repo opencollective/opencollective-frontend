@@ -3,9 +3,56 @@ Subject: Your year on Open Collective
 {{> header}}
 
 <style>
-  .host {
-    margin: 20px 0px;
-  }
+.host {
+  margin: 20px 0px;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  vertical-align: top;
+}
+th a {
+  color: #7A7B82;
+  text-decoration: none;
+}
+.host .CollectiveCard {
+  margin: 0px 6px 16px 2px;
+}
+.stats { 
+  border-radius: 30px;
+  max-width: 300px;
+  margin: 10px auto;
+  box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
+  padding: 10px;
+  text-align: center;
+}
+.stats .button {
+  color: white;
+  background: #75cc1f;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  text-transform: uppercase;
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  margin-top: 40px;
+  box-sizing: border-box;
+  max-width: 350px;
+  height: 55px;
+  width: 100%;
+  border-radius: 100px;
+  line-height: 1.75;
+}
+.largeEmoji {
+  margin: 15px;
+  font-size: 64px;
+}
 </style>
 
 <p>
@@ -16,7 +63,7 @@ Hi {{recipient.firstName}}!
 </p>
 
 <p>
-It's been a heck of a year. But as we say: "never waste a crisis".
+It's been a heck of a year all over the world. But as we say: "never let a good crisis go to waste".
 Crisis are opportunities to change, opportunities to reinvent the way we want to live and work together, for the better 🌱
 </p>
 
@@ -29,34 +76,39 @@ We believe that we need to reinvent how we work together, how our communities ca
 We would like to thank you for the contributions that you made this year to build this future.
 </p>
 
-<p>
-In 2016 you have contributed a total of {{stats.totalDonationsString}} to {{stats.totalCollectives}} collectives.
-</p>
+<div class="stats">
+  <div class="largeEmoji">🎁</div>
+  <p>In 2016 you have contributed a total of {{{formatCurrencyObject stats.totalDonations}}} to {{stats.totalCollectives}} collectives.</p>
+  <a href="https://twitter.com/intent/tweet?text=🎁 In 2016, I have contributed a total of {{{formatCurrencyObject stats.totalDonations}}} to {{stats.totalCollectives}} collectives&url=https://opencollective.com/{{recipient.username}}">
+  <div class="button">Tweet those stats!</div></a>
+</div>
 
 <div>
 {{#each hosts}}
 <div class="host">
-<a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a>
+  <table width="100%" height=30>
+  <tr>
+    <td class="tdline"></td>
+    <th rowspan=2 nowrap><a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a></th>
+    <td class="tdline"></td>
+  </tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+
   {{#each collectives}}
-    <li>{{{currency totalDonations currency=currency}}} to <a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a><br />
-    </li>
+    {{>collectivecard}}
   {{/each}}
-  + {{{currency totalDonations currency=currency}}} to the host
 </div>
 {{/each}}
 </div>
 
 <p>
-Tweet those stats!
+- The Open Collective core contributors<br />
+<a href="https://twitter.com/AseemSood_">Aseem</a>, <a href="https://twitter.com/PiaMancini">Pia</a> and <a href="https://twitter.com/xdamman">Xavier</a>
 </p>
 
 <p>
-- The Open Collective core contributors
-@AseemSood_, @PiaMancini, @xdamman
-</p>
-
-<p>
-Don't forget: we are an open collective ourselves and our code is under MIT license. We welcome contributions of any kind!
+Don't forget: we are an open collective ourselves and <a href="https://github.com/opencollective/opencollective">our code is under MIT license</a>. We welcome contributions of any kind!
 </p>
 
 {{>footer}}

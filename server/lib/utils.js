@@ -251,3 +251,30 @@ export function resizeImage(imageUrl, { width, height, query }) {
   }
   return `${config.host.website}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
+
+export function formatArrayToString(arr) {
+  return arr.join(', ').replace(/, ([^, ]*)$/,' and $1');
+}
+
+export function formatCurrency(amount, currency, precision) {
+  amount = amount/100; // converting cents
+
+  return amount.toLocaleString(currency, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits : precision || 0,
+    maximumFractionDigits : precision || 0
+  });  
+}
+
+/**
+ * @PRE: { USD: 1000, EUR: 6000 }
+ * @POST: "$10 and €60"
+ */
+export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
+  const array = [];
+  for (const currency in currencyObj) {
+    array.push(formatCurrency(currencyObj[currency], currency, options.precision));
+  }
+  return formatArrayToString(array);
+}
