@@ -19,6 +19,7 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.yearlyreport',
+  'group.monthlyreport.text',
   'thankyou',
   'thankyou.wwcode',
   'thankyou.brusselstogether',
@@ -34,6 +35,7 @@ const templatesPath = `${__dirname}/../../templates`;
 // Register partials
 const header = fs.readFileSync(`${templatesPath}/partials/header.hbs`, 'utf8');
 const footer = fs.readFileSync(`${templatesPath}/partials/footer.hbs`, 'utf8');
+const footertxt = fs.readFileSync(`${templatesPath}/partials/footer.text.hbs`, 'utf8');
 const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.hbs`, 'utf8');
 const toplogo = fs.readFileSync(`${templatesPath}/partials/toplogo.hbs`, 'utf8');
 const relatedgroups = fs.readFileSync(`${templatesPath}/partials/relatedgroups.hbs`, 'utf8');
@@ -41,6 +43,7 @@ const collectivecard = fs.readFileSync(`${templatesPath}/partials/collectivecard
 
 handlebars.registerPartial('header', header);
 handlebars.registerPartial('footer', footer);
+handlebars.registerPartial('footer.text', footertxt);
 handlebars.registerPartial('subscriptions', subscriptions);
 handlebars.registerPartial('toplogo', toplogo);
 handlebars.registerPartial('collectivecard', collectivecard);

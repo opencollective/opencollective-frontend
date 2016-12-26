@@ -13,21 +13,32 @@ import fs from 'fs';
 const debug = debugLib('email');
 
 const render = (template, data) => {
-    data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
-    data = _.merge({}, data);
-    delete data.config;
-    data.config = { host: config.host };
-    const html = juice(templates[template](data));
 
-    // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
-    if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-      const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
-      const filepath = `/tmp/${template}.${slug}.html`;
-      const script = `<script>data=${JSON.stringify(data)};</script>`;
-      fs.writeFileSync(filepath, `${html}\n\n${script}`);
+  let text, filepath;
+  data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
+  data = _.merge({}, data);
+  delete data.config;
+  data.config = { host: config.host };
+
+  if (templates[`${template}.text`]) {
+    text = templates[`${template}.text`](data);
+  }
+  const html = juice(templates[template](data));
+  const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
+
+  // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    filepath = `/tmp/${template}.${slug}.html`;
+    const script = `<script>data=${JSON.stringify(data)};</script>`;
+    fs.writeFileSync(filepath, `${html}\n\n${script}`);
+    console.log(`Preview email template: file://${filepath}`);
+    if (text) {
+      filepath = `/tmp/${template}.${slug}.txt`;
+      fs.writeFileSync(filepath, text);
       console.log(`Preview email template: file://${filepath}`);
     }
-    return html;
+  }
+  return {text, html};
 };
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
@@ -50,8 +61,6 @@ const getTemplateAttributes = (str) => {
       attributes[tokens[1].toLowerCase()] = tokens[2].replace(/<br( \/)?>/g,'\n').trim();
     }
   } while (tokens);
-
-  console.log("attributes", attributes);
 
   attributes.body = lines.slice(index).join('\n').trim();
   return attributes;
@@ -83,6 +92,11 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     subject = `[STAGING] ${subject}`;
   } else if (process.env.NODE_ENV !== 'production'){
     subject = `[TESTING] ${subject}`;
+  }
+
+  if (process.env.ONLY) {
+    debug("Only sending email to ", process.env.ONLY);
+    recipients = [process.env.ONLY];
   }
 
   debug(`sending email to ${recipients.join(', ')}`);
@@ -123,6 +137,8 @@ const sendMessage = (recipients, subject, html, options = {}) => {
 };
 
 const getNotificationLabel = (template, recipient) => {
+
+  template = template.replace('.text', '');
 
   const notificationTypeLabels = {
     'group.monthlyreport': 'monthly reports',
@@ -195,9 +211,9 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
   return generateEmailFromTemplate(template, recipient, data, options)
-    .then(templateString => {
-      const attributes = getTemplateAttributes(templateString);
-      options.text = attributes.text;
+    .then(renderedTemplate => {
+      const attributes = getTemplateAttributes(renderedTemplate.html);
+      options.text = renderedTemplate.text;
       return emailLib.sendMessage(recipient, attributes.subject, attributes.body, options)
     });
 };

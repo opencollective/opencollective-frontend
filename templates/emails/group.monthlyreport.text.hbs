@@ -1,0 +1,80 @@
+Hi {{recipient.firstName}}!
+
+We have lots of good news this month, we could barely wait to share them with you! But first, your monthly stats (visit your collective page to get the latest up to date data: {{group.publicUrl}}).
+And please don't hesitate to send us feedback - just reply to this email! We love to hear from you! ❤️❤️
+
+Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currency group.stats.totalDonations currency=group.currency}}}{{#if group.stats.totalExpenses}}, {{{currency group.stats.totalExpenses currency=group.currency}}}{{/if}}) 
+{{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}}{{#if group.stats.backers.lost}}, -{{group.stats.backers.lost}}{{/if}}) 
+
+
+# Related Collectives
+
+{{#each relatedGroups}}
+{{publicUrl}}
+{{contributorsCount}} contributors, {{currency yearlyIncome currency=currency precision=0}} annual budget
+{{{capitalize mission}}}
+
+{{/each}}
+
+# Expenses
+
+{{#each group.expenses}}
+- {{{moment createdAt format="MM/DD"}}} {{{currency netAmountInGroupCurrency currency=currency}}} {{description}} [{{toLowerCase status}}]
+{{else}}
+No expense submitted. 
+{{/each}}
+Go to {{@root.group.publicUrl}}/expenses to submit a new expense.
+
+
+{{#if topBackers}}
+# Recent sponsor activity on Open Collective
+
+{{#each topBackers}}
+- {{name}} gave {{{donationsString.text}}}
+{{/each}}
+{{/if}}
+
+
+# 🚨🚨 Sponsors Offers 🚨🚨
+
+We are excited to announce 3 great offers for the projects on the Open Source Collective!
+
+Croissant (https://www.getcroissant.com) is offering a free week + 20% off the first 3 months. Find out why they support Open Source and use the code HELLOCOLLECTIVE on the third step of the signup process. 
+http://blog.getcroissant.com/blog/2016/11/16/changing-the-world-one-repository-at-a-time
+ 
+Algolia (https://community.algolia.com/) is grateful for the work that you do and wants to invite all of you to try out their DocSearch project for adding a really 👌 search to your documentation. Better search means fewer duplicate issues or support tickets from users \o/. It's free for Open Source Software and Algolia will do 90% of the work to get you up and running, just fill out this form to get started: https://community.algolia.com/docsearch/. If you have any questions or need support (about anything search-related, really!), log on to their Discourse forum (https://discourse.algolia.com) and post in the DocSearch category with the #opencollective tag. Read more about why they do this: https://stories.algolia.com/why-were-backing-opencollective-and-webpack-39e39838f18a#.iagl7sfu1
+ 
+Hacker Paradise (http://hackerparadise.org) is offering $100 off their upcoming trip to South America (http://www.hackerparadise.org/blog/2016/11/01/south-america-housing-coworking/) ✈️ (simply mention Open Source Collective when registering). You can also apply to get one of their 2 Open Source Fellowships to spend a month working on your open source project in South America, expenses paid! More info: http://www.hackerparadise.org/blog/2016/11/17/open-source-fellowship/
+
+
+# Blog posts
+
+Together we crowdfunded an annual budget of over $100,000 for Open Source (and we are only getting started 💰💸!). Help us share this blog post: https://medium.com/open-collective/together-we-crowdfunded-a-yearly-budget-of-over-100-000-for-open-source-a77502fd74da#.y902opkkp 
+
+
+# Featured Collectives:
+
+- Welcome Between the Wires (https://opencollective.com/betweenthewires) to Open Collective! Vivian and Preethi are offering a behind the scenes glance at the creation of developer products to inspire and educate.They are just launching a campaign to raise $5,000 for doing 20+ more interviews in 2017. Check out their launch post and great interviews https://betweenthewires.org/our-opencollective-campaign-65e60f2fcd0c?gi=6f20be4118f2#.59gva04l6 and help them reach their goal!
+
+- SF Art and Film (https://opencollective.com/sfartandfilm) has been connecting teenagers with the arts for many years and asks you to support them in this goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible.
+
+- Welcome Open Source Design (https://opencollective.com/opensourcedesign)! We are thrilled to have you on board our first design collective. Do you care about design in open source? 👉You can now fund it!
+
+- 🎉Congrats Max Stoiber from React Boilerplate (https://opencollective.com/react-boilerplate) for being featured on Forbes Austria about your Open Source work!
+https://twitter.com/mxstbr/status/795555176203620353  
+
+
+# Changelog
+
+You can now add a widget to your company or personal website to show the collectives that you are supporting. Simply add the following line of code: 
+<script src="https://opencollective.com/:username/widget.js"></script>
+This is how it looks: https://cl.ly/1J0Q300v2T12/Screen%20Shot%202016-12-01%20at%204.23.41%20PM.png"
+
+
+# Don't forget
+
+- Twitter You can link your collective to your twitter account to automatically thank your backers/sponsors. 
+{{group.publicUrl}}/connect/twitter (it's still a bit ugly but it works!)
+- Slack Don't forget to send Pia (pia@opencollective.com) your slack webhook url if you'd like to receive notifications for new donations/expenses in your slack channel.
+
+{{>footer.text}}
