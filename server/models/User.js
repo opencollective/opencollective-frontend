@@ -458,6 +458,9 @@ export default (Sequelize, DataTypes) => {
         return User.suggestUsername(instance).then(username => {
           return instance.setDataValue('username', username);
         });
+      },
+      afterCreate: (instance) => {
+        return Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id });
       }
     }
   });

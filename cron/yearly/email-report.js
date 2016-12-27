@@ -142,25 +142,37 @@ const processUser = (user) => {
   })
   .then(data => {
     data.recipient = user;
-    return emailLib.send('group.yearlyreport', user.email, data);
+    return emailLib.send('user.yearlyreport', user.email, data);
   })
   .catch(console.error);
 };
 
 const processUsers = (users) => {
+  console.log("Processing ", users.length, "users");
   return Promise.map(users, processUser);
 };
+
+const getRecipients = () => {
+  const where = {};
+
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    where.username = { $in : ['4sa1da2','xdamman','asood','piamancini','digitalocean','auth0','timberio','mrlnmarce'] };
+  }
+
+  return models.Notification.findAll({
+    where: {
+      channel: 'email',
+      type: 'user.yearlyreport'
+    },
+    include: [{ model: models.User, where }]
+  }).then(results => results.map(r => r.User.dataValues));
+}
 
 const init = () => {
 
   const startTime = new Date;
 
-  let query = {};
-  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    query = { where: { username: { $in : ['4sa1da2','xdamman','asood','piamancini','digitalocean','auth0','timberio','mrlnmarce'] } } };
-  }
-
-  models.User.findAll(query)
+  getRecipients()
   .then(processUsers)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
