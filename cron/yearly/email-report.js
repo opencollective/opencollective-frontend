@@ -155,11 +155,12 @@ const init = () => {
 
   const startTime = new Date;
 
-  models.User.findAll({
-    where: {
-      username: { $in : ['4sa1da2','xdamman','asood','piamancini','digitalocean','auth0','timberio','mrlnmarce'] }
-    }
-  })
+  let query = {};
+  if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+    query = { where: { username: { $in : ['4sa1da2','xdamman','asood','piamancini','digitalocean','auth0','timberio','mrlnmarce'] } } };
+  }
+
+  models.User.findAll(query)
   .then(processUsers)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
