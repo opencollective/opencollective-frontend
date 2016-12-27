@@ -5,7 +5,6 @@ process.env.PORT = 3066;
 import models, {sequelize} from '../../server/models';
 import _ from 'lodash';
 import Promise from 'bluebird';
-import debugLib from 'debug';
 import { formatCurrency, formatArrayToString, getTier, formatCurrencyObject } from '../../server/lib/utils';
 import emailLib from '../../server/lib/email';
 
