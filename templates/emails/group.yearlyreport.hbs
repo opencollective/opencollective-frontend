@@ -1,0 +1,124 @@
+Subject: 🏅Your year on Open Collective
+
+{{> header}}
+
+<style>
+.host {
+  margin: 20px 0px;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  vertical-align: top;
+}
+th a {
+  color: #7A7B82;
+  text-decoration: none;
+}
+.host .CollectiveCard {
+  margin: 0px 6px 16px 2px;
+}
+.stats { 
+  border-radius: 30px;
+  max-width: 300px;
+  margin: 10px auto;
+  box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.1);
+  border: 1px solid rgba(45, 77, 97, 0.1);
+  padding: 10px;
+  text-align: center;
+}
+.stats .btn {
+  width: 100%;
+  background: #80d823;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  display: inline-block;
+  padding: .75rem 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 700;
+  min-width: 150px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  color: #fff;
+  text-decoration: none;
+}
+
+.largeEmoji {
+  margin: 15px;
+  font-size: 64px;
+}
+</style>
+
+
+<div class="stats">
+  <div class="largeEmoji">🎁</div>
+  <p>{{tweet.text}}<br />
+  <a href="https://opencollective.com/{{recipient.username}}?{{utm}}">https://opencollective.com/{{recipient.username}}</a></p>
+  <a href="{{tweet.url}}"><div class="btn">Tweet this!</div></a>
+</div>
+
+
+<p>
+Hi {{recipient.firstName}}!
+
+<p>
+2016 is finally ending 🎉 and frankly, we can't wait for this year to be over 😱.
+</p>
+
+<p>
+It's been a heck of a year all over the world, but as we say: "never let a good crisis go to waste".
+</p>
+
+<p>
+Crisis are opportunities to change, opportunities to reinvent the way we live and work together, for the better 🌱.
+</p>
+
+<p>
+We believe in communities. We believe that they are the best positioned to give everyone the opportunity to learn and give back to the world 🌎.
+</p>
+
+<p>
+To enable those communities to sustain themselves and thrive, we need <a href="https://medium.com/open-collective/a-new-form-of-association-for-the-internet-generation-part-1-6d6c4f5dd27f#.4g68ud9jj">a new form of association</a> that would be open and transparent by design. We call them "open collectives". In 2016, we created 155 of them and together, they already have a yearly budget of more than $350k 💰💰💰.
+</p>
+
+<p>
+We would like to thank you for the contributions that you made this year to help us build this future 🙏.
+</p>
+
+<div>
+{{#each hosts}}
+{{#if name}}
+<div class="host">
+  <table width="100%" height=30>
+  <tr>
+    <td class="tdline"></td>
+    <th rowspan=2 nowrap><a href="{{@root.config.host.website}}/{{slug}}?{{@root.utm}}">{{name}}</a></th>
+    <td class="tdline"></td>
+  </tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+{{/if}}
+<center>
+  {{#each collectives}}
+    {{>collectivecard}}
+  {{/each}}
+</center>
+</div>
+{{/each}}
+</div>
+
+<p>
+<b>📍Don't forget:</b><br />
+- You can discover other great collectives to support on <a href="https://opencollective.com/discover?{{utm}}">https://opencollective.com/discover</a><br />
+- You can manage your subscriptions on <a href="https://opencollective.com/subscriptions?{{utm}}">https://opencollective.com/subscriptions</a><br />
+- We are an open collective ourselves and <a href="https://github.com/opencollective/opencollective">our code is available on Github</a> under MIT license. We welcome contributions of any kind! 😊
+</p> 
+
+<p>
+- The Open Collective core contributors<br />
+<a href="https://twitter.com/AseemSood_">Aseem</a>, <a href="https://twitter.com/PiaMancini">Pia</a> and <a href="https://twitter.com/xdamman">Xavier</a>
+</p>
+
+{{>footer}}

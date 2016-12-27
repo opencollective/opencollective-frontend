@@ -1,7 +1,7 @@
 import fs from 'fs';
 import moment from 'moment';
 import handlebars from 'handlebars';
-import { resizeImage, capitalize } from './utils';
+import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
 
 /*
 * Loads all the email templates
@@ -18,6 +18,8 @@ const templateNames = [
   'group.expense.created',
   'group.donation.created',
   'group.monthlyreport',
+  'group.yearlyreport',
+  'group.yearlyreport.text',
   'group.monthlyreport.text',
   'thankyou',
   'thankyou.wwcode',
@@ -38,12 +40,14 @@ const footertxt = fs.readFileSync(`${templatesPath}/partials/footer.text.hbs`, '
 const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.hbs`, 'utf8');
 const toplogo = fs.readFileSync(`${templatesPath}/partials/toplogo.hbs`, 'utf8');
 const relatedgroups = fs.readFileSync(`${templatesPath}/partials/relatedgroups.hbs`, 'utf8');
+const collectivecard = fs.readFileSync(`${templatesPath}/partials/collectivecard.hbs`, 'utf8');
 
 handlebars.registerPartial('header', header);
 handlebars.registerPartial('footer', footer);
 handlebars.registerPartial('footer.text', footertxt);
 handlebars.registerPartial('subscriptions', subscriptions);
 handlebars.registerPartial('toplogo', toplogo);
+handlebars.registerPartial('collectivecard', collectivecard);
 handlebars.registerPartial('relatedgroups', relatedgroups);
 
 handlebars.registerHelper('sign', (value) => {
@@ -78,10 +82,13 @@ handlebars.registerHelper('currency', (value, props) => {
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
 handlebars.registerHelper('capitalize', (str) => capitalize(str));
+handlebars.registerHelper('pluralize', (str, props) => pluralize(str, props.hash.n || props.hash.count));
 
 handlebars.registerHelper('encodeURIComponent', (str) => {
   return encodeURIComponent(str);
 });
+
+handlebars.registerHelper('formatCurrencyObject', (obj, props) => formatCurrencyObject(obj, props.hash));
 
 handlebars.registerHelper('debug', console.log);
 

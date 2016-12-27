@@ -13,6 +13,7 @@ import fs from 'fs';
 const debug = debugLib('email');
 
 const render = (template, data) => {
+
   let text, filepath;
   data.logoNotSvg = data.group && data.group.logo && !data.group.logo.endsWith('.svg');
   data = _.merge({}, data);
@@ -23,15 +24,16 @@ const render = (template, data) => {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
+  const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-    filepath = `/tmp/${template}.${data.group && data.group.slug}.html`;
+    filepath = `/tmp/${template}.${slug}.html`;
     const script = `<script>data=${JSON.stringify(data)};</script>`;
     fs.writeFileSync(filepath, `${html}\n\n${script}`);
     console.log(`Preview email template: file://${filepath}`);
     if (text) {
-      filepath = `/tmp/${template}.${data.group && data.group.slug}.txt`;
+      filepath = `/tmp/${template}.${slug}.txt`;
       fs.writeFileSync(filepath, text);
       console.log(`Preview email template: file://${filepath}`);
     }
@@ -195,6 +197,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   data.unsubscribeUrl = `${config.host.website}/api/services/email/unsubscribe/${encodeURIComponent(options.bcc || recipient)}/${slug}/${options.type || template}/${generateUnsubscribeToken(options.bcc || recipient, slug, options.type || template)}`;
   data.notificationTypeLabel = getNotificationLabel(template, recipient);
   data.config = config;
+  data.utm = `utm_source=opencollective&utm_campaign=${template}&utm_medium=email`;
 
   if (!templates[template]) {
     return Promise.reject(new Error("Invalid email template"));

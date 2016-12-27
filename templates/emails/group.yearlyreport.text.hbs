@@ -1,0 +1,36 @@
+Hi {{recipient.firstName}}!
+
+2016 is finally ending 🎉 and frankly, we can't wait for this year to be over 😱.
+
+It's been a heck of a year all over the world, but as we say: "never let a good crisis go to waste".
+
+Crisis are opportunities to change, opportunities to reinvent the way we live and work together, for the better 🌱.
+
+We believe in communities. We believe that they are the best positioned to give everyone the opportunity to learn and give back to the world 🌎.
+
+To enable those communities to sustain themselves and thrive, we need a new form of association that would be open and transparent by design. We call them "open collectives". In 2016, we created 155 of them and together, they already have a yearly budget of more than $350k 💰💰💰.
+
+We would like to thank you for the contributions that you made this year to help us build this future 🙏.
+
+In 2016 you have contributed to {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}:
+{{#each hosts}}
+{{name}}
+  {{#each collectives}}
+  {{{currency totalDonations currency=currency}}} to {{name}} https://opencollective.com/{{slug}}
+  {{/each}}
+
+{{/each}}
+>>> Tweet those stats <<<
+{{{tweet.url}}}
+
+
+Don't forget:
+- You can manage your subscriptions here: https://opencollective.com/subscriptions
+- You can discover other great collectives to support here: https://opencollective.com/discover
+- We are an open collective ourselves and our code is under MIT license. We welcome contributions of any kind! 😊 https://github.com/opencollective/opencollective
+
+
+- The Open Collective core contributors
+@AseemSood_, @PiaMancini, @xdamman
+
+{{>footer.text}}

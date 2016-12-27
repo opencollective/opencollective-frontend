@@ -234,7 +234,8 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-export function pluralize(str) {
+export function pluralize(str, count) {
+  if (count <= 1) return str;
   return `${str}s`.replace(/s+$/,'s');
 }
 
@@ -250,4 +251,31 @@ export function resizeImage(imageUrl, { width, height, query }) {
     if (height) queryurl += `&height=${height}`;
   }
   return `${config.host.website}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+}
+
+export function formatArrayToString(arr) {
+  return arr.join(', ').replace(/, ([^,]*)$/,' and $1');
+}
+
+export function formatCurrency(amount, currency, precision = 0) {
+  amount = amount/100; // converting cents
+
+  return amount.toLocaleString(currency, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits : precision,
+    maximumFractionDigits : precision
+  });  
+}
+
+/**
+ * @PRE: { USD: 1000, EUR: 6000 }
+ * @POST: "$10 and €60"
+ */
+export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
+  const array = [];
+  for (const currency in currencyObj) {
+    array.push(formatCurrency(currencyObj[currency], currency, options.precision));
+  }
+  return formatArrayToString(array);
 }
