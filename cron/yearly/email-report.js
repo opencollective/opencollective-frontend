@@ -4,8 +4,6 @@ process.env.PORT = 3066;
 
 import models, {sequelize} from '../../server/models';
 import _ from 'lodash';
-import moment from 'moment';
-import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import { formatCurrency, formatArrayToString, getTier, formatCurrencyObject } from '../../server/lib/utils';
@@ -16,8 +14,6 @@ const startDate = new Date(`${d.getFullYear()}`);
 const endDate = new Date(`${d.getFullYear()+1}`);
 
 console.log("startDate", startDate, "endDate", endDate);
-
-const debug = debugLib('yearlyreport');
 
 const GetUserTransactionsQuery = `
 with "UserTransactions" as (
