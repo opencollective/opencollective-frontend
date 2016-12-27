@@ -1,7 +1,7 @@
 import fs from 'fs';
 import moment from 'moment';
 import handlebars from 'handlebars';
-import { resizeImage, capitalize, formatCurrencyObject } from './utils';
+import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
 
 /*
 * Loads all the email templates
@@ -19,6 +19,7 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.yearlyreport',
+  'group.yearlyreport.text',
   'group.monthlyreport.text',
   'thankyou',
   'thankyou.wwcode',
@@ -81,6 +82,7 @@ handlebars.registerHelper('currency', (value, props) => {
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));
 handlebars.registerHelper('capitalize', (str) => capitalize(str));
+handlebars.registerHelper('pluralize', (str, props) => pluralize(str, props.hash.n || props.hash.count));
 
 handlebars.registerHelper('encodeURIComponent', (str) => {
   return encodeURIComponent(str);

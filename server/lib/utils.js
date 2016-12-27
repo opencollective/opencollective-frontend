@@ -234,7 +234,8 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-export function pluralize(str) {
+export function pluralize(str, count) {
+  if (count <= 1) return str;
   return `${str}s`.replace(/s+$/,'s');
 }
 
@@ -253,17 +254,17 @@ export function resizeImage(imageUrl, { width, height, query }) {
 }
 
 export function formatArrayToString(arr) {
-  return arr.join(', ').replace(/, ([^, ]*)$/,' and $1');
+  return arr.join(', ').replace(/, ([^,]*)$/,' and $1');
 }
 
-export function formatCurrency(amount, currency, precision) {
+export function formatCurrency(amount, currency, precision = 0) {
   amount = amount/100; // converting cents
 
   return amount.toLocaleString(currency, {
     style: 'currency',
     currency,
-    minimumFractionDigits : precision || 0,
-    maximumFractionDigits : precision || 0
+    minimumFractionDigits : precision,
+    maximumFractionDigits : precision
   });  
 }
 
