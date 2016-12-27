@@ -18,8 +18,6 @@ const templateNames = [
   'group.expense.created',
   'group.donation.created',
   'group.monthlyreport',
-  'group.yearlyreport',
-  'group.yearlyreport.text',
   'group.monthlyreport.text',
   'thankyou',
   'thankyou.wwcode',
@@ -28,7 +26,9 @@ const templateNames = [
   'thankyou.fr',
   'thankyou.laprimaire',
   'user.forgot.password',
-  'user.new.token'
+  'user.new.token',
+  'user.yearlyreport',
+  'user.yearlyreport.text'
 ];
 
 const templatesPath = `${__dirname}/../../templates`;

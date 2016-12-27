@@ -100,6 +100,17 @@ describe('user.models.test.js', () => {
           expect(user.username).to.equal('xdamman')
         })
     })
+
+    it('creates a user and subscribes it to user.yearlyreport', () => {
+      return User
+        .create({email: 'xdamman+opencollective@gmail.com'})
+        .tap(user => {
+          models.Notification.findOne({ UserId: user.id }).then(notification => {
+            expect(notification.channel).to.equal('email');
+            expect(notification.type).to.equal('user.yearlyreport');
+          })
+        })
+    })
     
   });
 
