@@ -38,6 +38,13 @@ const render = (template, data) => {
       console.log(`Preview email template: file://${filepath}`);
     }
   }
+
+  // When in development mode, we log the data used to compile the template
+  // (useful to get login token without sending an email)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Rendering ${template} with data`, data);
+  }
+
   return {text, html};
 };
 
