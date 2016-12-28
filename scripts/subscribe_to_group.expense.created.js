@@ -23,8 +23,7 @@ const init = () => {
       where: {
         role: 'MEMBER'
       },
-      order: [['id', 'ASC']],
-      limit: 20
+      order: [['id', 'ASC']]
   };
 
   UserGroup.findAll(query)
