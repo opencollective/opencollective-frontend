@@ -227,7 +227,12 @@ const sendMessageFromActivity = (activity, notification) => {
     case activities.GROUP_TRANSACTION_CREATED:
       return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
     case activities.GROUP_EXPENSE_CREATED:
-      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, activity.data);
+      const data = activity.data;
+      data.actions = {
+        approve: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/approve`),
+        reject: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/reject`)
+      };
+      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, data);
     default:
       return Promise.resolve();
   }
