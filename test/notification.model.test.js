@@ -124,7 +124,7 @@ describe("notification.model.test.js", () => {
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('automatically subscribe new members to `group.transaction.created` and `group.monthlyreport` events', () =>
+  it('automatically subscribe new members to `group.transaction.created`, `group.expense.created` and `group.monthlyreport` events', () =>
     request(app)
       .post('/groups')
       .send({
@@ -138,7 +138,7 @@ describe("notification.model.test.js", () => {
       .tap(res => {
         const notifications = res.rows;
         const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([ 'group.expense.created', 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
+        expect(types).to.deep.equal([ 'group.expense.created', 'group.expense.created', 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
       })
-      .tap(res => expect(res.count).to.equal(5)));
+      .tap(res => expect(res.count).to.equal(6)));
 });
