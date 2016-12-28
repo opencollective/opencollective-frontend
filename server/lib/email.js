@@ -151,6 +151,7 @@ const getNotificationLabel = (template, recipient) => {
     'group.monthlyreport': 'monthly reports',
     'user.yearlyreport': 'yearly reports',
     'group.transaction.created': 'notifications of new transactions for this collective',
+    'group.expense.created': 'notifications of new expenses submitted to this collective',
     'email.approve': 'notifications of new emails pending approval',
     'email.message': recipient
   }
