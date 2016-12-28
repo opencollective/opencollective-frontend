@@ -325,6 +325,7 @@ export default function(Sequelize, DataTypes) {
             notifications.push({type:activities.GROUP_EXPENSE_CREATED});
             break;
           case roles.MEMBER:
+            notifications.push({type:activities.GROUP_EXPENSE_CREATED});
             notifications.push({type:'group.monthlyreport'});
             break;
         }
