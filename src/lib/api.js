@@ -48,14 +48,8 @@ class Api {
     return this.makeRequest('mock', this.user);
   }
 
-  interested(data) {
-    data.status = 'interested';
-    console.log("api> rsvp ", data);
-    return this.makeRequest('mock', true);
-  }
-
-  rsvp(data) {
-    console.log("api> rsvp ", data);
+  saveResponse(response) {
+    console.log("api> saving user response ", response);
     return this.makeRequest('mock', true);
   }
 

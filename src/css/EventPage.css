@@ -1,0 +1,15 @@
+body {
+  font-family: 'montserratlight';
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'montserratlight';
+  src: url('../fonts/montserrat/montserrat-light-webfont.eot');
+  src: url('../fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),
+    url('../fonts/montserrat/montserrat-light-webfont.woff') format('woff'),
+    url('../fonts/montserrat/montserrat-light-webfont.ttf') format('truetype'),
+    url('../fonts/montserrat/montserrat-light-webfont.svg#montserratlight') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -34,6 +34,7 @@ class NotificationBar extends React.Component {
         }
 
         .loading .oc-progress-bar {
+          position:fixed;
           bottom: 0;
           top: auto;
         }

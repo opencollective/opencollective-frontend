@@ -15,7 +15,7 @@ class TopBar extends React.Component {
         .TopBar .logo {
           margin: 10px;
         }
-        .logo.loading {
+        .loading .logo {
           animation: oc-rotate 0.8s infinite linear;
         }
         @keyframes oc-rotate {

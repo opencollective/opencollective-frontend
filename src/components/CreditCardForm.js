@@ -1,7 +1,9 @@
 import React from 'react';
 import Payment from 'payment';
-import { Row, Col, FormGroup, ControlLabel, Button, Alert } from 'react-bootstrap';
-import { getStripeToken } from '../lib/stripe';
+import { Row, Col, FormGroup, ControlLabel, Alert } from 'react-bootstrap';
+import { getStripeToken, isValidCard } from '../lib/stripe';
+import Button from './Button';
+import _ from 'lodash';
 
 class CreditCardForm extends React.Component {
 
@@ -14,8 +16,7 @@ class CreditCardForm extends React.Component {
   constructor(props) {
     super(props);
     this.setCardType = this.setCardType.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.resetCard = this.resetCard.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     
     // eslint-disable-next-line
     Stripe.setPublishableKey(this.props.stripePublishableKey);
@@ -30,37 +31,37 @@ class CreditCardForm extends React.Component {
     };
   }
 
-  resetCard() {
-    this.setState({ number: null, exp_month: null, exp_year: null, cvc: null, token: null });
-  }
+  handleChange(fieldname, value) {
 
-  handleSubmit(event) {
-    event.preventDefault();
-    this.resetCard();
+    const field = {};
+    field[fieldname] = value;
+    this.setState({ field });
 
-    const { refs } = this;
-    const number = refs.number.value;
-    const expiration = refs.expiration.value.split('/');
-    const exp_month = parseInt(expiration[0], 10);
-    const exp_year = parseInt(expiration[1], 10);
-    const cvc = refs.cvc.value;
-    const card = { number, exp_month, exp_year, cvc };
+    if (fieldname === 'expiration') {
+      const expiration = value.split('/');
+      this.state.form.exp_month = parseInt(expiration[0], 10);
+      this.state.form.exp_year = parseInt(expiration[1], 10);
+    }
 
-    getStripeToken(card)
-      .then((token) => {
-        card.token = token;
-        this.setState(card);
-        this.props.onCardAdded(card);
-      }).catch((error) => {
-        this.setState(Object.assign(this.state, { error }));
-        console.error("getStripeToken error", error);
-      });
+    const { card } = this.state;
+
+    if (isValidCard(card)) {
+      console.log("card is valid", card);
+      getStripeToken(card)
+        .then((token) => {
+          card.token = token;
+          this.setState(card);
+          this.props.onCardAdded(card);
+        }).catch((error) => {
+          this.setState(Object.assign(this.state, { error }));
+          console.error("getStripeToken error", error);
+        });
+    }
   }
 
   setCardType(event) {
     const type = Payment.fns.cardType(event.target.value);
     const cards = document.querySelectorAll('[data-brand]');
-    console.log("setCardType", type);
 
     [].forEach.call(cards, (element) => {
       if (element.getAttribute('data-brand') === type) {
@@ -86,6 +87,8 @@ class CreditCardForm extends React.Component {
     const { error } = this.state;
     const { addCardLabel, number, expiration, cvc } = this.props;
 
+    const debouncedHandleEvent = _.debounce(this.handleChange, 500);
+
     return (<form ref="CardForm" className="CardForm" onSubmit={ this.handleSubmit }>
       <Row>
         <Col xs={ 12 }>
@@ -97,6 +100,7 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="number"
               value={number}
+              onChange={(event) => debouncedHandleEvent('number', event.target.value)}
               placeholder="Card Number"
             />
           </FormGroup>
@@ -111,6 +115,7 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="expiration"
               value={expiration}
+              onChange={(event) => debouncedHandleEvent('expiration', event.target.value)}
               placeholder="MM/YYYY"
             />
           </FormGroup>
@@ -123,18 +128,19 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="cvc"
               value={cvc}
+              onChange={(event) => debouncedHandleEvent('cvc', event.target.value)}
               placeholder="CVC"
             />
           </FormGroup>
         </Col>
       </Row>
       {error && <Alert bsStyle="warning">{error}</Alert>}
-      <Button type="submit" bsStyle="success" block>{addCardLabel || 'Add Card'}</Button>
+      <Button type="submit" className='green'>{addCardLabel || 'Add Card'}</Button>
     </form>);
   }
 
   componentDidMount() {
-    const { number, expiration, cvc } = this.refs;
+    const { number, expiration, cvc } = this.state;
     Payment.formatCardNumber(number);
     Payment.formatCardExpiry(expiration);
     Payment.formatCardCVC(cvc);

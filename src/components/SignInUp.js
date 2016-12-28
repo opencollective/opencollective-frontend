@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { isValidEmail } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
 import { css } from 'glamor';
+import '../css/forms.css';
 
 const styles = {
   SignInUp: css({
@@ -18,8 +19,9 @@ class SignInUp extends React.Component {
 
   static propTypes = {
     label: React.PropTypes.string,
-    onClick: React.PropTypes.func, // onClick(user)
+    onSubmit: React.PropTypes.func, // onSubmit(user)
     emailOnly: React.PropTypes.bool,
+    showLabels: React.PropTypes.bool,
     requireCreditCard: React.PropTypes.bool,
     stripePublishableKey: React.PropTypes.string,
     className: React.PropTypes.string
@@ -30,7 +32,8 @@ class SignInUp extends React.Component {
     this.state = { form: {} };
     this.user = {};
     this.renderInputField = this.renderInputField.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCardAdded = this.handleCardAdded.bind(this);
     this.handleChange = this.handleChange.bind(this);
 
     this.fields = [
@@ -73,17 +76,25 @@ class SignInUp extends React.Component {
 
     return (
       <div className="field" key={field.name} >
-        <label>{field.label}</label>
-        <input type="text" name="{field.name}" placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
+        {this.props.showLabels && <label>{field.label}</label>}
+        <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
         <span className="description">{field.description}</span>
-      </div>          
+      </div>
     );
   }
 
-  handleClick(card) {
-    this.user = this.state.form;
+  handleCardAdded(card) {
     this.user.card = card;
-    this.props.onClick(this.user);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    this.user = this.state.form;
+    this.props.onSubmit(this.user);
+  }
+
+  componentDidMount() {
+    this.refs.email.focus();
   }
 
   render() {
@@ -111,6 +122,7 @@ class SignInUp extends React.Component {
             color: ${colors.darkgray};
           }
         `}</style>
+        <form onSubmit={this.handleSubmit}>
         {this.renderInputField({
           name: 'email',
           label: 'Email:',
@@ -126,7 +138,7 @@ class SignInUp extends React.Component {
         {showCreditCardForm &&
           <CreditCardForm
             addCardLabel={this.props.label}
-            onCardAdded={this.handleClick}
+            onCardAdded={this.handleCardAdded}
             stripePublishableKey={this.props.stripePublishableKey}
             number="4242424242424242"
             expiration="11/2020"
@@ -135,11 +147,16 @@ class SignInUp extends React.Component {
         }
         {!showCreditCardForm &&
         <div id="actions" className="actions">
-          <Button className={`${this.state.valid ? 'blue' : 'disabled' }`} label={this.props.label} onClick={this.handleClick} />
+          <Button type="submit" className={`${!this.state.valid ? 'green' : 'disabled' }`} label={this.props.label} />
         </div>}
+        </form>
       </div>
     );
   }
+}
+
+SignInUp.defaultProps = {
+  showLabels: true
 }
 
 export default SignInUp;

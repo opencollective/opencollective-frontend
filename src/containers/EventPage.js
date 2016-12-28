@@ -13,6 +13,9 @@ import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
 import TopBar from '../components/TopBar';
 import GetTicketForm from '../components/GetTicketForm';
+import InterestedForm from '../components/InterestedForm';
+
+import '../css/EventPage.css';
 
 const styles = {
   EventPage: css({
@@ -35,6 +38,9 @@ const styles = {
   map: css({
     border: '1px solid #eee',
     height: '300px'
+  }),
+  tier: css({
+    margin: '40px auto'
   })
 };
 
@@ -50,8 +56,9 @@ class EventPage extends React.Component {
     this.updateResponse = this.updateResponse.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
     this.handleGetTicketClick = this.handleGetTicketClick.bind(this);
+    this.rsvp = this.rsvp.bind(this);
 
-    const actions = [
+    this.defaultActions = [
       {
         label: 'interested',
         onClick: this.setInterested
@@ -67,7 +74,7 @@ class EventPage extends React.Component {
       showInterestedForm: false,
       response: {},
       api: { status: 'idle' },
-      actions
+      actions: this.defaultActions
     };
 
     setTimeout(() => {
@@ -80,26 +87,39 @@ class EventPage extends React.Component {
     });
   }
 
-  async setInterested(user, event) {
-    if (!user) {
+  async setInterested(response) {
+    if (!this.user) {
       this.setState({ showInterestedForm: !this.state.showInterestedForm });
       return;
     }
     this.setState({ showInterestedForm: false });
-    await this.api.interested({
-      userid: user.id,
-      eventid: event.id
-    });
+    this.saveResponse(response);
   }
 
-  async rsvp(response) {
+  rsvp(response) {
     this.setState({ view: 'ticketConfirmed' });
-    await this.api.rsvp(response);
+    this.saveResponse(response);
   }
 
   changeView(view) {
-    this.setState({view});
+    let actions;
+    switch(view) {
+      case 'GetTicket':
+        actions = [{
+          label: 'Get another ticket',
+          onClick: this.resetResponse
+        }];
+        break;
+      default:
+        actions = this.defaultActions;
+        break;
+    }
+    this.setState({view, actions});
     window.scrollTo(0,0);
+  }
+
+  async saveResponse(response) {
+    await this.api.saveResponse(response);
   }
 
   updateResponse(response) {
@@ -112,12 +132,7 @@ class EventPage extends React.Component {
   }
 
   handleGetTicketClick(response) {
-    const actions = this.state.actions;
-    actions[1] = {
-      label: 'Get another ticket',
-      onClick: this.resetResponse
-    };
-    this.setState({ response, actions });
+    this.setState({ response, showInterestedForm: false });
     this.changeView('GetTicket');
   }
 
@@ -129,7 +144,6 @@ class EventPage extends React.Component {
     }
     return (
       <div className={styles.EventPage}>
-   
         <TopBar className={this.state.api.status} /> 
 
         <NotificationBar status={this.state.api.status} error={this.state.api.error} />
@@ -141,14 +155,14 @@ class EventPage extends React.Component {
           />
 
         <ActionBar actions={this.state.actions} />
-        {this.state.showInterestedForm && 
-          <SignInUp label="I'm interested" emailOnly={true} onClick={(user) => this.setInterested(user, event)} />
+        {this.state.showInterestedForm &&
+          <InterestedForm event={Event} onSubmit={(response) => this.saveResponse(response)} />
         }
 
         {this.state.view == 'GetTicket' && 
           <GetTicketForm
             onCancel={this.resetResponse}
-            onClick={this.rsvp}
+            onSubmit={this.rsvp}
             quantity={this.state.response.quantity}
             tier={this.state.response.tier || Event.tiers[0]}
             />
@@ -163,7 +177,10 @@ class EventPage extends React.Component {
 
               <div id="tickets">
                 {Event.tiers.map((tier) =>
-                  <Tier tier={tier}
+                  <Tier
+                    key={tier.id}
+                    className={styles.tier}
+                    tier={tier}
                     onChange={(response) => this.updateResponse(response)}
                     onClick={(response) => this.handleGetTicketClick(response)}
                     />

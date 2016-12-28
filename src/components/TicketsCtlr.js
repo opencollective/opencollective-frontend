@@ -18,7 +18,7 @@ const styles = {
       color: colors.darkgray,
       textTransform: 'uppercase',
       fontWeight: 'bold',
-      fontSize: '12px',
+      fontSize: '17px'
     },
     '& .btn': {
       display: 'flex',
@@ -26,6 +26,7 @@ const styles = {
       alignItems: 'center',
       width: '30px',
       height: '100%',
+      fontSize: '17px',
       cursor: 'pointer'
     }
   })

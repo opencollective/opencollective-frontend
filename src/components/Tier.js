@@ -11,7 +11,7 @@ const styles = {
     width: '100%',
     maxWidth: '400px',
     border: `1px solid ${colors.lightgray}`,
-    margin: '10px',
+    margin: '10px auto',
     color: colors.black
   }),
   header: css({
@@ -31,7 +31,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    height: '40px'
+    height: '60px'
   }),
   btn: css({
     display: 'flex',
@@ -52,6 +52,8 @@ class Tier extends React.Component {
 
   static propTypes = {
     tier: React.PropTypes.object.isRequired,
+    className: React.PropTypes.string,
+    quantity: React.PropTypes.number,
     onChange: React.PropTypes.func, // onChange(response{quantity, amount, tier})
     onClick: React.PropTypes.func // onClick(response{quantity, amount, tier})
   }
@@ -59,7 +61,8 @@ class Tier extends React.Component {
   constructor(props) {
     super(props);
     this.tier = props.tier;
-    this.state = { quantity: 1, amount: this.tier.amount, tier: this.tier };
+    this.quantity = props.quantity || 1;
+    this.state = { quantity: this.quantity, amount: this.quantity * this.tier.amount, tier: this.tier };
     this.onChange = this.props.onChange || function() {}; 
     this.onChange(this.state);
   }
@@ -74,15 +77,17 @@ class Tier extends React.Component {
     const { name, description, amount, currency, max, left } = this.props.tier;
 
     return (
-      <div className={styles.tier}>
-        <div className={styles.header}>
-          <div className={styles.title} >{name}</div>
-          <div className={styles.title} >{formatCurrency(this.state.amount, currency)}</div>
-        </div>
-        <p className={styles.description}>{description}</p>
-        <div id="actions" className={styles.actions}>
-          <Button id="btnTicketsCtrl"><TicketsCtlr value={1} onChange={(value) => this.handleTicketsChange(value)} /></Button>
-          {this.props.onClick && <Button className="blue" label={`get ticket${this.state.quantity > 1 ? 's' : ''}`} onClick={() => this.props.onClick(this.state)} />}
+      <div className={this.props.className}>
+        <div className={styles.tier}>
+          <div className={styles.header}>
+            <div className={styles.title} >{name}</div>
+            <div className={styles.title} >{formatCurrency(this.state.amount, currency)}</div>
+          </div>
+          <p className={styles.description}>{description}</p>
+          <div id="actions" className={styles.actions}>
+            <Button id="btnTicketsCtrl"><TicketsCtlr value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} /></Button>
+            {this.props.onClick && <Button className="blue" label={`get ticket${this.state.quantity > 1 ? 's' : ''}`} onClick={() => this.props.onClick(this.state)} />}
+          </div>
         </div>
       </div>
     );
