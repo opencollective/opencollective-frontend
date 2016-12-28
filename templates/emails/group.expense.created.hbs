@@ -2,6 +2,27 @@ Subject: {{group.name}}: {{{currency expense.amount currency=expense.currency}}}
 
 {{> header}}
 
+<style>
+.btn {
+  color: #fff;
+  background: #80d823;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  display: inline-block;
+  padding: .75rem 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 700;
+  min-width: 150px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.btn.red {
+  background: #dd2663;
+}
+</style>
+
 <center>
   <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
   <div>{{expense.title}}</div>
@@ -12,7 +33,11 @@ Subject: {{group.name}}: {{{currency expense.amount currency=expense.currency}}}
   </a>
 
   <br /><br />
-  <a href="{{config.host.webapp}}/groups/{{group.id}}/expenses/{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on OpenCollective to approve or reject it</a>
+  <a href="{{actions.approve}}"><div class="btn">APPROVE</div></a>
+  <a href="{{actions.reject}}"><div class="btn red">REJECT</div></a>
+
+  <br /><br />
+  <a href="{{config.host.webapp}}/groups/{{group.id}}/expenses/{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on the OpenCollective app</a>
 
 </center>
 

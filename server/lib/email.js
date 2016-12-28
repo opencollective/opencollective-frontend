@@ -38,6 +38,13 @@ const render = (template, data) => {
       console.log(`Preview email template: file://${filepath}`);
     }
   }
+
+  // When in development mode, we log the data used to compile the template
+  // (useful to get login token without sending an email)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Rendering ${template} with data`, data);
+  }
+
   return {text, html};
 };
 
@@ -223,11 +230,16 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options = {
  * Given an activity, it sends out an email to the right people and right template
  */
 const sendMessageFromActivity = (activity, notification) => {
+  const data = activity.data;
   switch (activity.type) {
     case activities.GROUP_TRANSACTION_CREATED:
-      return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, activity.data);
+      return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, data);
     case activities.GROUP_EXPENSE_CREATED:
-      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, activity.data);
+      data.actions = {
+        approve: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/approve`),
+        reject: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/reject`)
+      };
+      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, data);
     default:
       return Promise.resolve();
   }
