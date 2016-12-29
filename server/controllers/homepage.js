@@ -29,8 +29,8 @@ export default (req, res, next) => {
     getTotalCollectives(),
     getTotalDonors(),
     queries.getTotalAnnualBudget(),
-    models.Group.getGroupsSummaryByTag('open source', 3, [], 1000, true),
-    models.Group.getGroupsSummaryByTag('meetup', 3, [], 1000, true),
+    models.Group.getGroupsSummaryByTag('open source', 3, [], 100000, true),
+    models.Group.getGroupsSummaryByTag('meetup', 3, [], 100000, true),
     queries.getTopSponsors()
   ])
   .then(results => {
