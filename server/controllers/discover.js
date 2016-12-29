@@ -8,7 +8,7 @@ export default (req, res, next) => {
     !show || show === 'all' ? '' : show,
     12,
     [],
-    100,
+    10000,
     false,
     'g."createdAt"',
     sort === 'newest' ? 'desc' : 'asc',

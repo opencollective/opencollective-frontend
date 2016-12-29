@@ -106,10 +106,10 @@ const getTopBackers = (since, until, tags, limit) => {
 /**
  * Get top collectives based on total donations
  */
-const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, orderBy, orderDir, offset) => {
+const getGroupsByTag = (tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
   let tagClause = '';
   let excludeClause = '';
-  let minTotalDonationClause = '';
+  let minTotalDonationInCentsClause = '';
   let orderClause = 'BY t."totalDonations"';
   const orderDirection = (orderDir === 'asc') ? 'ASC' : 'DESC';
   if (orderBy) {
@@ -120,10 +120,10 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
   if (excludeList && excludeList.length > 0) {
     excludeClause = `AND g.id not in (${excludeList})`;
   }
-  if (minTotalDonation && minTotalDonation > 0) {
-    minTotalDonationClause = `t."totalDonations" >= ${minTotalDonation} AND`
+  if (minTotalDonationInCents && minTotalDonationInCents > 0) {
+    minTotalDonationInCentsClause = `t."totalDonations" >= ${minTotalDonationInCents} AND`
   } else {
-    minTotalDonationClause = ''
+    minTotalDonationInCentsClause = ''
   }
 
   if (tag) {
@@ -136,7 +136,7 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonation, randomOrder, 
     )
     SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.currency, g.settings, g.data, t."totalDonations", t.collectives
     FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
-    WHERE ${minTotalDonationClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
+    WHERE ${minTotalDonationInCentsClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
