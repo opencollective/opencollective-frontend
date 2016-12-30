@@ -4,7 +4,6 @@ import activities from '../constants/activities';
 import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
 import {getLinkHeader, getRequestedUrl} from '../lib/utils';
-import roles from '../constants/roles';
 import {createFromPaidExpense as createTransaction} from '../lib/transactions';
 import {getPreapprovalDetails as gpd} from './paypal';
 import payExpense from '../lib/payExpense';
@@ -149,69 +148,13 @@ export const setApprovalStatus = (req, res, next) => {
       if (req.required.approved === false) {
         return expense.setRejected(user.id)
           .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
-      }
-      if (expense.payoutMethod === 'manual') {
-        return models.Group.findById(expense.GroupId)
-          .then(group => group.getBalance())
-          .then(checkIfEnoughFunds(expense))
-          .then(() => expense.setApproved(user.id))
-          .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
       } else {
-         return models.UserGroup.findOne({
-          where: {
-            GroupId: expense.GroupId,
-            role: roles.HOST
-          }
-        })
-        .then(userGroup => fetchPaymentMethod(userGroup.UserId))
-        .then(paymentMethod => getPreapprovalDetails(paymentMethod.token))
-        .tap(d => preapprovalDetails = d)
-        .then(checkIfEnoughFunds(expense))
-        .then(() => expense.setApproved(user.id))
-        .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_APPROVED))
+        return expense.setApproved(user.id)
+          .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_APPROVED))
       }
     })
     .then(() => res.send({success: true}))
-    .catch(err => next(formatError(err, preapprovalDetails)));
-
-  function fetchPaymentMethod(UserId) {
-    return models.PaymentMethod.findOne({
-      where: {
-        service: 'paypal',
-        UserId
-      }
-    })
-    .then(paymentMethod => {
-      if (!paymentMethod || !paymentMethod.token) {
-        return new errors.BadRequest("You can't approve an expense without linking your PayPal account");
-      }
-      return paymentMethod;
-    });
-  }
-
-  function checkIfEnoughFunds(expense) {
-    const txAmount = expense.amount/100;
-    if (expense.payoutMethod === 'manual') {
-      return balance => {
-        if (balance >= expense.amount) {
-          return Promise.resolve();
-        } else {
-          return Promise.reject(new errors.BadRequest(`Not enough funds in this collective to approve this request. Please add funds first.`));
-        }
-      }
-    } else {
-      return details => {
-        const maxAmount = Number(details.maxTotalAmountOfAllPayments) - Number(details.curPaymentsAmount);
-        const currency = details.currencyCode;
-
-        if (Math.abs(txAmount) > maxAmount) {
-          return Promise.reject(new errors.BadRequest(`Not enough funds (${maxAmount} ${currency} left) to approve expense.`));
-        }
-        return Promise.resolve();
-      };
-    }
-
-  }
+    .catch(next());
 };
 
 /**
@@ -225,6 +168,11 @@ export const pay = (req, res, next) => {
   let paymentMethod, email, paymentResponse, preapprovalDetails;
 
   assertExpenseStatus(expense, status.APPROVED)
+    // check that a group's balance is greater than the expense
+    .then(() => models.Group.findById(expense.GroupId))
+    .then(group => group.getBalance())
+    .then(balance => checkIfEnoughFundsInGroup(expense, balance))
+    // get payment method of group's host and make sure the logged in user is the host
     .then(() => isManual ? null : getPaymentMethod())
     .tap(m => paymentMethod = m)
     .then(getBeneficiaryEmail)
@@ -237,6 +185,14 @@ export const pay = (req, res, next) => {
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponse)));
+
+  function checkIfEnoughFundsInGroup(expense, balance) {
+    if (balance >= expense.amount) {
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new errors.BadRequest(`Not enough funds in this collective to pay this request. Please add funds first.`));
+    }
+  }
 
   function getPaymentMethod() {
     // Use first paymentMethod found
