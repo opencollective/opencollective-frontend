@@ -141,7 +141,6 @@ export const update = (req, res, next) => {
 export const setApprovalStatus = (req, res, next) => {
   const user = req.remoteUser || req.user;
   const { expense } = req;
-  let preapprovalDetails;
 
   assertExpenseStatus(expense, status.PENDING)
     .then(() => {
@@ -154,7 +153,7 @@ export const setApprovalStatus = (req, res, next) => {
       }
     })
     .then(() => res.send({success: true}))
-    .catch(next());
+    .catch(next);
 };
 
 /**
@@ -172,7 +171,6 @@ export const pay = (req, res, next) => {
     .then(() => models.Group.findById(expense.GroupId))
     .then(group => group.getBalance())
     .then(balance => checkIfEnoughFundsInGroup(expense, balance))
-    // get payment method of group's host and make sure the logged in user is the host
     .then(() => isManual ? null : getPaymentMethod())
     .tap(m => paymentMethod = m)
     .then(getBeneficiaryEmail)
