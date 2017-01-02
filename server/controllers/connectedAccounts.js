@@ -42,7 +42,8 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         .then(u => u || User.create({
           name: data.profile.displayName,
           avatar,
-          email: emails[0]
+          email: emails[0],
+          username: data.profile.username
         }))
         .tap(u => user = u)
         .tap(user => attrs.UserId = user.id)
