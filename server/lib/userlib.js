@@ -1,6 +1,7 @@
 import url from 'url';
 import Promise from 'bluebird';
 import clearbit from '../gateways/clearbit';
+import { sequelize } from '../models';
 
 export default {
 
@@ -113,5 +114,55 @@ export default {
       console.error('Clearbit error', err);
       return cb(err);
     });
-  }
+  },
+
+  /*
+   * If there is a username suggested, we'll check that it's valid or increase it's count
+   * Otherwise, we'll suggest something.
+   */
+
+  checkOrSuggestUsername(user) {
+    // generate potential usernames
+    const potentialUserNames = [
+      user.username,
+      user.suggestedUsername,
+      user.twitterHandle ? user.twitterHandle.replace(/@/g, '') : null,
+      user.name ? user.name.replace(/ /g, '') : null,
+      user.email ? user.email.split(/@|\+/)[0] : null]
+      .filter(username => username ? true : false) // filter out any nulls
+      .map(username => username.toLowerCase(/\./g,'')) // lowercase them all
+      // remove any '+' signs
+      .map(username => username.indexOf('+') !== -1 ? username.substr(0, username.indexOf('+')) : username);
+
+    // In theory, this should never happen because we already have an email
+    // TODO: add a random username to make sure that every user has a username
+    if (potentialUserNames.length === 0) {
+      console.error(`No potential username found for user: ${user.email}`);
+      return Promise.resolve()
+    }
+
+    // fetch any matching usernames or slugs for the top choice in the list above
+    return sequelize.query(`
+        SELECT username as username FROM "Users" where username like '${potentialUserNames[0]}%'
+        UNION ALL
+        SELECT slug as username FROM "Groups" where slug like '${potentialUserNames[0]}%'
+      `, {
+        type: sequelize.QueryTypes.SELECT
+      })
+    .then(userObjectList => userObjectList.map(user => user.username))
+    .then(usernameList => this.usernameSuggestionHelper(potentialUserNames[0], usernameList, 0));
+  },
+
+  /*
+   * Checks a given username in a list and if found, increments count and recursively checks again
+   */
+  usernameSuggestionHelper(usernameToCheck, usernameList, count) {
+    const username = count > 0 ? `${usernameToCheck}${count}` : usernameToCheck;
+    if (usernameList.indexOf(username) === -1) {
+      return username;
+    } else {
+      return this.usernameSuggestionHelper(`${usernameToCheck}`, usernameList, count+1);
+    }
+  },
+    
 };

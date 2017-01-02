@@ -78,6 +78,7 @@ describe('user.models.test.js', () => {
         .then(user => {
           expect(user.username).to.equal('xavierdamman')
         })
+        .then(() => User.create({email: 'xdamman2@gmail.com'}))
         .then(() => User.create({ twitterHandle: '@xdamman'}))
         .then(user => {
           expect(user.username).to.equal('xdamman1')
