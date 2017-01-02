@@ -454,10 +454,14 @@ export default (Sequelize, DataTypes) => {
       beforeCreate: (instance) => {
         // If we explicitly specify a username before creating a user,
         // we should rather return an error if it's not available
-        if (instance.getDataValue('username')) return;
-        return User.suggestUsername(instance).then(username => {
-          return instance.setDataValue('username', username);
-        });
+        if (!instance.username) {
+          return User.suggestUsername(instance)
+            .then(username => {
+              instance.username = username;
+              return Promise.resolve();
+            })
+        }
+        return Promise.resolve();
       },
       afterCreate: (instance) => {
         return Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id });
