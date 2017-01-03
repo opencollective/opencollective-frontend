@@ -43,7 +43,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
           name: data.profile.displayName,
           avatar,
           email: emails[0],
-          username: data.profile.username
+          suggestedUsername: data.profile.username
         }))
         .tap(u => user = u)
         .tap(user => attrs.UserId = user.id)

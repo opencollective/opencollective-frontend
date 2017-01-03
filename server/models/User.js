@@ -388,30 +388,6 @@ export default (Sequelize, DataTypes) => {
 
     classMethods: {
 
-      suggestUsername: (user) => {
-        let username = user.username || user.twitterHandle || user.name.replace(/ /g,'');
-        if (!username && user.email) {
-          const tokens = user.email.split(/@|\+/);
-          username = tokens[0];
-        }
-        
-        username = slug(username).toLowerCase().replace(/\./g,''); // no dot
-
-        const plusIndex = username.indexOf('+');
-        if (plusIndex !== -1) {
-          username = username.substr(0,plusIndex);
-        }
-
-        if (!username) return Promise.resolve();
-
-        const where = { username: { $like: `${username}%`} };
-        if (user.id) where.id = { $ne: user.id };
-
-        return User.count({ where }).then(count => {
-          return (count === 0) ? username : `${username}${count}`;
-        });
-      },
-
       createMany: (users, defaultValues = {}) => {
         return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), {concurrency: 1});
       },
@@ -452,16 +428,15 @@ export default (Sequelize, DataTypes) => {
 
     hooks: {
       beforeCreate: (instance) => {
-        // If we explicitly specify a username before creating a user,
-        // we should rather return an error if it's not available
         if (!instance.username) {
-          return User.suggestUsername(instance)
+          return userLib.suggestUsername(instance)
             .then(username => {
               instance.username = username;
               return Promise.resolve();
             })
-        }
+        } 
         return Promise.resolve();
+
       },
       afterCreate: (instance) => {
         return Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id });
