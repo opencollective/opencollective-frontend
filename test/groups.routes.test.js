@@ -144,6 +144,39 @@ describe('groups.routes.test.js', () => {
         });
     });
 
+
+    it('successfully create a group and attach it to a host', (done) => {
+
+      const users = [
+            _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
+            _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
+
+      const g = Object.assign(publicGroupData, {users})
+      g.HostId = user.id;
+
+      request(app)
+        .post('/groups')
+        .send({
+          api_key: application.api_key,
+          group: g
+        })
+        .expect(200)
+        .end((e) => {
+          expect(e).to.not.exist;
+
+          Promise.all([
+            models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
+            models.UserGroup.count({where: { role: roles.MEMBER }}),
+            models.Group.find({where: { slug: g.slug }})
+            ])
+          .then(results => {
+            expect(results[0].GroupId).to.equal(1);
+            expect(results[1]).to.equal(2);
+            expect(results[2].lastEditedByUserId).to.equal(2);
+            done();
+          })
+        });
+    });
   });
 
   /**

@@ -9,7 +9,7 @@ export default {
    */
   formatMessageForPrivateChannel: (activity, format) => {
 
-    let userString = '';
+    let userString = '', hostString = '';
     let userId;
     let groupName = '';
     let publicUrl = '';
@@ -36,6 +36,11 @@ export default {
     if (activity.data.group) {
       groupName = activity.data.group.name;
       ({ publicUrl } = activity.data.group);
+    }
+
+    // get host data
+    if (activity.data.host) {
+      hostString = `on ${getUserString(format, activity.data.host, true)}`;
     }
 
     // get donation data
@@ -128,7 +133,7 @@ export default {
         return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${group}`;
 
       case activities.GROUP_CREATED:
-        return `New group created: ${group} by ${userString}`;
+        return `New collective created by ${userString}: ${group} ${hostString}`;
 
       case activities.GROUP_USER_ADDED:
         return `New user: ${userString} (UserId: ${userId}) added to group: ${group}`;
@@ -145,7 +150,7 @@ export default {
    */
   formatMessageForPublicChannel: (activity, format) => {
 
-    let userString = '';
+    let userString = '', hostString  = '';
     let groupName = '';
     let publicUrl = '';
     let amount = null;
@@ -169,6 +174,11 @@ export default {
       groupName = activity.data.group.name;
       ({ publicUrl } = activity.data.group);
       groupTwitter = activity.data.group.twitterHandle;
+    }
+
+    // get host data
+    if (activity.data.host) {
+      hostString = `on ${getUserString(format, activity.data.host)}`;
     }
 
     // get donation data
@@ -244,7 +254,7 @@ export default {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!${tweetThis}`;
 
       case activities.GROUP_CREATED:
-        return `New group created: ${group} by ${userString}`;
+        return `New collective created by ${userString}: ${group} ${hostString}`;
 
       default:
         return '';

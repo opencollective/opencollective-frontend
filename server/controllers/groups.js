@@ -308,16 +308,23 @@ export const create = (req, res, next) => {
         }
       })
     })
-    .tap(g => Activity.create({
+    .tap(g => {
+      // if there is a host id provided, we add the collective to the host
+      if (group.HostId) {
+        return User.findOne({ where: { id: group.HostId }}).tap(host => _addUserToGroup(g, host, {role: roles.HOST, remoteUser: creator}))
+      }
+    })
+    .then(host => Activity.create({
       type: activities.GROUP_CREATED,
       UserId: creator.id,
-      GroupId: g.id,
+      GroupId: host && host.id,
       data: {
-        group: g.info,
+        group: createdGroup.info,
+        host: host && host.info,
         user: creator.info
       }
     }))
-    .then((group) => sendConfirmationEmail(creator, group))
+    .then(() => sendConfirmationEmail(creator, createdGroup))
     .then(() => res.send(createdGroup.info))
     .catch(next);
 };
