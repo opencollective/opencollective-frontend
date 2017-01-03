@@ -24,7 +24,7 @@ export default (Sequelize, activity) => {
       return Sequelize.models.Notification.findAll({
         include: {
           model: Sequelize.models.User,
-          attributes: ['email']
+          attributes: ['id', 'email']
         },
         where: {
           type: [
