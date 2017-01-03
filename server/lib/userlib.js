@@ -121,7 +121,7 @@ export default {
    * Otherwise, we'll suggest something.
    */
 
-  checkOrSuggestUsername(user) {
+  suggestUsername(user) {
     // generate potential usernames
     const potentialUserNames = [
       user.username,

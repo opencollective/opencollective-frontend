@@ -429,7 +429,7 @@ export default (Sequelize, DataTypes) => {
     hooks: {
       beforeCreate: (instance) => {
         if (!instance.username) {
-          return userLib.checkOrSuggestUsername(instance)
+          return userLib.suggestUsername(instance)
             .then(username => {
               instance.username = username;
               return Promise.resolve();
