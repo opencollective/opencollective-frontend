@@ -74,7 +74,7 @@ export const resetTestDatabase = function(req, res, next) {
           {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
         ],
         currency: 'EUR',
-        isPublic: true
+        isActive: true
       })
       .then(group => cb(null, group))
       .catch(cb);

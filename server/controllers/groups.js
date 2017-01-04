@@ -379,7 +379,7 @@ export const createFromGithub = (req, res, next) => {
       if (existingGroup) {
         group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Group.create(Object.assign({}, group, {deletedAt: new Date(), isPublic: true, lastEditedByUserId: creator.id}));
+      return Group.create(Object.assign({}, group, {lastEditedByUserId: creator.id}));
     })
     .tap(g => dbGroup = g)
     .tap(() => Activity.create({
@@ -468,7 +468,7 @@ export const update = (req, res, next) => {
     'image',
     'backgroundImage',
     'expensePolicy',
-    'isPublic'
+    'isActive'
   ];
 
   const updatedGroupAttrs = _.pick(req.required.group, whitelist);
