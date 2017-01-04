@@ -41,7 +41,7 @@ const render = (template, data) => {
 
   // When in development mode, we log the data used to compile the template
   // (useful to get login token without sending an email)
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && process.env.DEBUG && process.env.DEBUG.match(/email/)) {
     console.log(`Rendering ${template} with data`, data);
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "0.0.210",
+  "version": "0.0.211",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
