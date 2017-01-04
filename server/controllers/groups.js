@@ -317,7 +317,7 @@ export const create = (req, res, next) => {
     .then(host => Activity.create({
       type: activities.GROUP_CREATED,
       UserId: creator.id,
-      GroupId: host && host.id,
+      GroupId: createdGroup.id,
       data: {
         group: createdGroup.info,
         host: host && host.info,
