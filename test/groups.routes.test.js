@@ -144,6 +144,10 @@ describe('groups.routes.test.js', () => {
             expect(results[2].lastEditedByUserId).to.equal(2);
             done();
           })
+          .catch(e => {
+            console.log(">>> error", e);
+            done();
+          })
         });
     });
 
