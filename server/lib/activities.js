@@ -133,7 +133,7 @@ export default {
         return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${group}`;
 
       case activities.GROUP_CREATED:
-        return `New collective created by ${userString}: ${group} ${hostString}`;
+        return `New collective created by ${userString}: ${group} ${hostString}`.trim();
 
       case activities.GROUP_USER_ADDED:
         return `New user: ${userString} (UserId: ${userId}) added to group: ${group}`;
@@ -254,7 +254,7 @@ export default {
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!${tweetThis}`;
 
       case activities.GROUP_CREATED:
-        return `New collective created by ${userString}: ${group} ${hostString}`;
+        return `New collective created by ${userString}: ${group} ${hostString}`.trim();
 
       default:
         return '';

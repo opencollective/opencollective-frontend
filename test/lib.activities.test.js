@@ -51,7 +51,7 @@ describe('lib.activities.test.js', () => {
 
     it (constants.GROUP_CREATED, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[19], 'slack');
-      expect(actual).to.equal('New group created: <https://opencollective.com/blah|Blah> by someone (jussi@kuohujoki.fi)');
+      expect(actual).to.equal('New collective created by someone (jussi@kuohujoki.fi): <https://opencollective.com/blah|Blah>');
     });
 
     it (constants.GROUP_USER_ADDED, () => {
@@ -105,7 +105,7 @@ describe('lib.activities.test.js', () => {
 
     it (constants.GROUP_CREATED, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[19], 'slack');
-      expect(actual).to.equal('New group created: <https://opencollective.com/blah|Blah> by someone');
+      expect(actual).to.equal('New collective created by someone: <https://opencollective.com/blah|Blah>');
     });
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
