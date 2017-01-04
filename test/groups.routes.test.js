@@ -130,24 +130,18 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('twitterHandle');
           expect(res.body).to.have.property('website');
 
-          Promise.all([
+          return Promise.all([
             models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
             models.UserGroup.count({where: { role: roles.MEMBER }}),
             models.Group.find({where: { slug: g.slug }})
             ])
           .then(results => {
-            console.log(">>> results[0].GroupId",results[0].GroupId);
-            console.log(">>> results[1]",results[1]);
-            console.log(">>> results[2].lastEditedByUserId",results[2].lastEditedByUserId);
             expect(results[0].GroupId).to.equal(1);
             expect(results[1]).to.equal(2);
             expect(results[2].lastEditedByUserId).to.equal(2);
             done();
           })
-          .catch(e => {
-            console.log(">>> error", e);
-            done();
-          })
+          .catch(done);
         });
     });
 

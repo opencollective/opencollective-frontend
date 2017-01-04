@@ -292,7 +292,7 @@ export const create = (req, res, next) => {
     .create(group)
     .tap(g => createdGroup = g)
     .tap(g => {
-      return Promise.map(users, user => {
+      return Promise.each(users, user => {
         if (user.email) {
           return User.findOne({where: { email: user.email.toLowerCase() }})
           .then(u => u || User.create(user))
