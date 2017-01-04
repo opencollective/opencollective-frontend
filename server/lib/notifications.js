@@ -21,20 +21,27 @@ export default (Sequelize, activity) => {
       if (!activity.GroupId || !activity.type) {
         return Promise.resolve([]);
       }
+      const where = {
+        type: [
+          activityType.ACTIVITY_ALL,
+          activity.type
+        ],
+        channel: ['gitter', 'slack', 'twitter', 'email'],
+        active: true
+      };
+
+      if (activity.type === activityType.GROUP_CREATED) {
+        where.UserId = activity.data.host.id;
+      } else {
+        where.GroupId = activity.GroupId;
+      }
+
       return Sequelize.models.Notification.findAll({
         include: {
           model: Sequelize.models.User,
           attributes: ['id', 'email']
         },
-        where: {
-          type: [
-            activityType.ACTIVITY_ALL,
-            activity.type
-          ],
-          GroupId: activity.GroupId,
-          channel: ['gitter', 'slack', 'twitter', 'email'],
-          active: true
-        }
+        where
       })
     })
     .then(notifConfigs =>
