@@ -100,11 +100,11 @@ describe('groups.routes.test.js', () => {
     it('successfully create a group, while assigning the users as members', (done) => {
 
       const users = [
-            _.assign(_.omit(userData, 'password'), {role: roles.HOST}),
             _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
             _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
 
-      const g = Object.assign(publicGroupData, {users})
+      const g = Object.assign({}, publicGroupData, {users})
+      g.HostId = user.id;
 
       request(app)
         .post('/groups')
@@ -138,45 +138,12 @@ describe('groups.routes.test.js', () => {
           .then(results => {
             expect(results[0].GroupId).to.equal(1);
             expect(results[1]).to.equal(2);
-            expect(results[2].lastEditedByUserId).to.equal(1);
-            done();
-          })
-        });
-    });
-
-
-    it('successfully create a group and attach it to a host', (done) => {
-
-      const users = [
-            _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
-            _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
-
-      const g = Object.assign(publicGroupData, {users})
-      g.HostId = user.id;
-
-      request(app)
-        .post('/groups')
-        .send({
-          api_key: application.api_key,
-          group: g
-        })
-        .expect(200)
-        .end((e) => {
-          expect(e).to.not.exist;
-
-          Promise.all([
-            models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
-            models.UserGroup.count({where: { role: roles.MEMBER }}),
-            models.Group.find({where: { slug: g.slug }})
-            ])
-          .then(results => {
-            expect(results[0].GroupId).to.equal(1);
-            expect(results[1]).to.equal(2);
             expect(results[2].lastEditedByUserId).to.equal(2);
             done();
           })
         });
     });
+
   });
 
   /**
@@ -317,12 +284,12 @@ describe('groups.routes.test.js', () => {
     });
 
     // Create the public group with user.
-    beforeEach((done) => {
+    beforeEach('create public group with host', (done) => {
       request(app)
         .post('/groups')
         .send({
           api_key: application.api_key,
-          group: Object.assign(publicGroupData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
+          group: Object.assign({}, publicGroupData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -577,12 +544,12 @@ describe('groups.routes.test.js', () => {
     };
 
     // Create the group with user.
-    beforeEach((done) => {
+    beforeEach('create public group with host', (done) => {
       request(app)
         .post('/groups')
         .send({
           api_key: application.api_key,
-          group: publicGroupData
+          group: Object.assign({}, publicGroupData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
         })
         .expect(200)
         .end((e, res) => {
