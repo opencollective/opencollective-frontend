@@ -270,7 +270,7 @@ export const deleteUser = (req, res, next) => {
 export const create = (req, res, next) => {
   const { group } = req.required;
   const { users = [] } = group;
-  let createdGroup, creator;
+  let createdGroup, creator, host;
 
   if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a group');
 
@@ -311,10 +311,13 @@ export const create = (req, res, next) => {
     .tap(g => {
       // if there is a host id provided, we add the collective to the host
       if (group.HostId) {
-        return User.findOne({ where: { id: group.HostId }}).tap(host => _addUserToGroup(g, host, {role: roles.HOST, remoteUser: creator}))
+        return User.findOne({ where: { id: group.HostId }}).tap(h => {
+          host = h;
+          _addUserToGroup(g, host, {role: roles.HOST, remoteUser: creator})
+        })
       }
     })
-    .then(host => Activity.create({
+    .then(() => Activity.create({
       type: activities.GROUP_CREATED,
       UserId: creator.id,
       GroupId: createdGroup.id,
