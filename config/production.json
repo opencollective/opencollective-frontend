@@ -9,7 +9,8 @@
         "ssl": true
       },
       "pool": {
-        "max": 15
+        "min": 10,
+        "max": 25
       },
       "benchmark": true
     }
