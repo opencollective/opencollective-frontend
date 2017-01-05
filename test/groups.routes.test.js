@@ -129,6 +129,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('updatedAt');
           expect(res.body).to.have.property('twitterHandle');
           expect(res.body).to.have.property('website');
+          expect(res.body).to.have.property('isActive', false);
 
           return Promise.all([
             models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
@@ -233,7 +234,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('description');
           expect(res.body).to.have.property('longDescription');
           expect(res.body).to.have.property('expensePolicy', 'expense policy');
-          expect(res.body).to.have.property('isPublic', true);
+          expect(res.body).to.have.property('isActive', false);
           expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
         })
         .then(() => ConnectedAccount.findOne({where: {username: 'asood123'}}))
@@ -290,7 +291,7 @@ describe('groups.routes.test.js', () => {
         .post('/groups')
         .send({
           api_key: application.api_key,
-          group: Object.assign({}, publicGroupData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
+          group: Object.assign({}, publicGroupData, { isActive: true, slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -331,7 +332,7 @@ describe('groups.routes.test.js', () => {
         .expect(404)
     );
 
-    it('successfully get a group if it is public', (done) => {
+    it('successfully get a group', (done) => {
       request(app)
         .get(`/groups/${publicGroup.id}?api_key=${application.api_key}`)
         .expect(200)
@@ -339,7 +340,7 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', publicGroup.id);
           expect(res.body).to.have.property('name', publicGroup.name);
-          expect(res.body).to.have.property('isPublic', true);
+          expect(res.body).to.have.property('isActive', true);
           expect(res.body).to.have.property('stripeAccount');
           expect(res.body).to.have.property('yearlyIncome');
           expect(res.body).to.have.property('backersCount');
@@ -359,7 +360,7 @@ describe('groups.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('id', publicGroup.id);
           expect(res.body).to.have.property('name', publicGroup.name);
-          expect(res.body).to.have.property('isPublic', true);
+          expect(res.body).to.have.property('isActive', true);
           expect(res.body).to.have.property('stripeAccount');
           expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
@@ -539,7 +540,7 @@ describe('groups.routes.test.js', () => {
       image: 'http://opencollective.com/assets/image.jpg',
       backgroundImage: 'http://opencollective.com/assets/backgroundImage.png',
       expensePolicy: 'expense policy',
-      isPublic: true,
+      isActive: true,
       settings: { lang: 'fr' },
       otherprop: 'value'
     };
@@ -658,7 +659,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('image', groupNew.image);
           expect(res.body).to.have.property('backgroundImage', groupNew.backgroundImage);
           expect(res.body).to.have.property('expensePolicy', groupNew.expensePolicy);
-          expect(res.body).to.have.property('isPublic', groupNew.isPublic);
+          expect(res.body).to.have.property('isActive', groupNew.isActive);
           expect(res.body).to.not.have.property('otherprop');
           expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
           expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());

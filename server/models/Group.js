@@ -136,9 +136,9 @@ export default function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     },
 
-    isPublic: {
+    isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true
+      defaultValue: false
     },
 
     slug: {
@@ -212,7 +212,7 @@ export default function(Sequelize, DataTypes) {
           expensePolicy: this.expensePolicy,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
-          isPublic: this.isPublic,
+          isActive: this.isActive,
           slug: this.slug,
           tiers: this.tiers,
           settings: this.settings,

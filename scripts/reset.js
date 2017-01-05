@@ -23,7 +23,7 @@ exec('make dropdb && make database')
 .then(() => models.Group.create({
   name: 'OpenCollective Demo',
   description: 'OpenCollective Demo group',
-  isPublic: true,
+  isActive: true,
   slug: 'opencollective',
   mission: 'demo open collective'
 }))
@@ -43,7 +43,7 @@ exec('make dropdb && make database')
 .then(() => models.Group.create({
   name: 'OpenCollective Demo with stripe',
   description: 'OpenCollective Demo group with stripe',
-  isPublic: true,
+  isActive: true,
   slug: 'oc-stripe',
   mission: 'oc with stripe'
 }))
