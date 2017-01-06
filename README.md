@@ -21,4 +21,5 @@ But, let's go step by step and for now the goal is to release the ability for a 
 - [ ] Implement the flow to register to a paid event
 - [ ] Implement the flow to register for a password protected ticket
 - [ ] Implement the flow for creating/editing an event
+- [ ] Add tests with Jest
 - [ ] Find a solution for Server Side Rendering (SSR)
