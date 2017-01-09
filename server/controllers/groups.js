@@ -127,11 +127,11 @@ export const getTransactions = (req, res, next) => {
     GroupId: req.group.id
   };
 
-  if (req.query.donation) {
+  if (req.query.donation || req.query.type === 'donations') {
     where.amount = {
       $gt: 0
     };
-  } else if (req.query.expense) {
+  } else if (req.query.expense || req.query.type === 'expenses') {
     where.amount = {
       $lt: 0
     };
