@@ -397,7 +397,7 @@ describe('donations.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('GroupId', group2.id);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('amount', CHARGE*100);
-            expect(res.rows[0]).to.have.property('title', `Donation to ${group2.name}`);
+            expect(res.rows[0]).to.have.property('title', data.description);
             done();
           })
           .catch(done);

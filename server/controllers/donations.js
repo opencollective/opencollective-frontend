@@ -71,7 +71,7 @@ const stripeDonation = (req, res, next) => {
   }
 
   let paymentMethod;
-  let title = `Donation to ${group.name}`;
+  let title = payment.description || `Donation to ${group.name}`;
 
   // fetch Stripe Account and get or create Payment Method
   return Promise.props({
@@ -96,7 +96,7 @@ const stripeDonation = (req, res, next) => {
   // (this needs to happen first, because of hook on Donation model)
   .then(() => {
     if (isSubscription) {
-      title = capitalize(`${interval}ly donation to ${group.name}`);
+      title = payment.description || capitalize(`${interval}ly donation to ${group.name}`);
       return models.Subscription.create({
         amount: amountFloat,
         currency,
@@ -171,7 +171,7 @@ const paypalDonation = (req, res, next) => {
           type: 'payment',
           amount: amountFloat,
           currency,
-          description: `Donation to ${group.name}`,
+          description: payment.description || `Donation to ${group.name}`,
           tags: ['Donation'],
           comment: distribution,
           // In paranoid mode, the deleted transactions are not visible
