@@ -50,8 +50,7 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['preact', 'qubes-os']} };
-    // query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
+    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
 
   Group.findAll(query)
   .tap(groups => {
@@ -95,11 +94,15 @@ const formatCurrency =  (amount, currency) => {
 
 const generateDonationsString = (backer, donations) => {
   if (!backer.name) {
-    debug(`Skipping ${backer.name} because it doesn't have a name (${backer.username})`);
+    debug(`Skipping ${backer.username} because it doesn't have a name (${backer.name})`);
     return;
   }
   const donationsTextArray = [], donationsHTMLArray = [];
   donations = donations.filter(donation => (donation.amount > 0));
+  if (donations.length === 0) {
+    debug(`Skipping ${backer.name} because there is no donation`);
+    return;
+  }
   for (let i=0; i<Math.min(3, donations.length); i++) {
     const donation = donations[i];
     donationsHTMLArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);

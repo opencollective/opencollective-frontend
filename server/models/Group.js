@@ -229,6 +229,7 @@ export default function(Sequelize, DataTypes) {
           id: this.id,
           createdAt: this.createdAt,
           name: this.name,
+          slug: this.slug,
           logo: this.logo,
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
