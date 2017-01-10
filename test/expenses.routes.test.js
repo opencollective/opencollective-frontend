@@ -21,6 +21,7 @@ const expense3 = utils.data('expense3');
 const {
   Activity,
   Expense,
+  Notification,
   Transaction,
   PaymentMethod,
   User
@@ -429,6 +430,8 @@ describe('expenses.routes.test.js', () => {
               approveReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
             });
 
+            beforeEach(() => Notification.create({type: 'group.expense.approved', GroupId: 1, UserId: host.id}));
+
             describe('WHEN not authenticated', () =>
               it('THEN returns 401 unauthorized', () => approveReq.expect(401)));
 
@@ -439,22 +442,23 @@ describe('expenses.routes.test.js', () => {
               });
 
               describe('WHEN sending approved: false', () => {
-                beforeEach(() => setExpenseApproval(false));
 
-                it('THEN returns status: REJECTED', () => expectApprovalStatus('REJECTED'));
+                it('THEN returns status: REJECTED', () => expectApprovalStatus(approveReq.send({approved: false}), 'REJECTED'));
               });
 
               describe('WHEN sending approved: true', () => {
 
-                beforeEach(() => setExpenseApproval(true));
-                it('THEN returns status: APPROVED', () => expectApprovalStatus('APPROVED'));
+                it('THEN returns status: APPROVED', done => {
+                  expectApprovalStatus(approveReq.send({approved: true}), 'APPROVED')
+                  .tap(() => expectExpenseActivity('group.expense.approved', actualExpense.id))
+                  .tap(() => {
+                    expect(emailSendMessageSpy.lastCall.args[1]).to.contain(`New expense approved on`);
+                    done();
+                  })
+                });
               });
 
-              const setExpenseApproval = approved => {
-                approveReq = approveReq.send({approved});
-              };
-
-              const expectApprovalStatus = approvalStatus =>
+              const expectApprovalStatus = (approveReq, approvalStatus) =>
                 approveReq
                   .expect(200)
                   .then(() => Expense.findAndCountAll())

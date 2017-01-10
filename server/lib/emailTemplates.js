@@ -15,6 +15,7 @@ const templateNames = [
   'email.message',
   'github.signup',
   'group.created',
+  'group.expense.approved.for.host',
   'group.expense.created',
   'group.donation.created',
   'group.monthlyreport',
