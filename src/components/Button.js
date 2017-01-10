@@ -6,7 +6,7 @@ const styles = {
   btn: css({
     width: '100%',
     maxWidth: '400px',
-    '-webkitAppearance': 'none',
+    WebkitAppearance: 'none',
     background: 'transparent',
     fontFamily: 'montserratlight',
     fontWeight: 'bold',

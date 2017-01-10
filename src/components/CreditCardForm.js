@@ -18,9 +18,11 @@ class CreditCardForm extends React.Component {
     this.setCardType = this.setCardType.bind(this);
     this.handleChange = this.handleChange.bind(this);
     
-    // eslint-disable-next-line
-    Stripe.setPublishableKey(this.props.stripePublishableKey);
-    console.log("setting stripePublishableKey",this.props.stripePublishableKey);
+    if (typeof Stripe !== 'undefined') {
+      // eslint-disable-next-line
+      Stripe.setPublishableKey(this.props.stripePublishableKey);
+      console.log("setting stripePublishableKey",this.props.stripePublishableKey);
+    }
 
     this.state = {
       number: null,
@@ -89,7 +91,7 @@ class CreditCardForm extends React.Component {
 
     const debouncedHandleEvent = _.debounce(this.handleChange, 500);
 
-    return (<form ref="CardForm" className="CardForm" onSubmit={ this.handleSubmit }>
+    return (<div ref="CardForm" className="CardForm">
       <Row>
         <Col xs={ 12 }>
           <FormGroup>
@@ -136,14 +138,14 @@ class CreditCardForm extends React.Component {
       </Row>
       {error && <Alert bsStyle="warning">{error}</Alert>}
       <Button type="submit" className='green'>{addCardLabel || 'Add Card'}</Button>
-    </form>);
+    </div>);
   }
 
   componentDidMount() {
     const { number, expiration, cvc } = this.state;
-    Payment.formatCardNumber(number);
-    Payment.formatCardExpiry(expiration);
-    Payment.formatCardCVC(cvc);
+    number && Payment.formatCardNumber(number);
+    expiration && Payment.formatCardExpiry(expiration);
+    cvc && Payment.formatCardCVC(cvc);
   }
 
   renderCard() {
