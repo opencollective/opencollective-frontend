@@ -238,8 +238,8 @@ function createActivity(expense, type) {
     UserId: expense.User.id,
     GroupId: expense.Group.id,
     data: {
-      group: expense.Group.info,
-      user: expense.User.info,
+      group: expense.Group.minimal,
+      user: expense.User.minimal,
       expense: expense.info
     }
   });
