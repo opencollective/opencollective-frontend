@@ -228,7 +228,7 @@ export default {
         }
       },
       {
-        "type": "group.transaction.paid",
+        "type": "group.expense.paid",
         "userId": 3,
         "GroupId": 1,
         "data": {

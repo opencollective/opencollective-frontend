@@ -39,12 +39,12 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponse, p
     // end TODO remove #postmigration
   })
   .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
-  .then(t => createNewTransactionActivity(t, paymentResponse, preapprovalDetails));
+  .then(t => createPaidExpenseActivity(t, paymentResponse, preapprovalDetails));
 }
 
-function createNewTransactionActivity(transaction, paymentResponse, preapprovalDetails) {
+function createPaidExpenseActivity(transaction, paymentResponse, preapprovalDetails) {
   const payload = {
-    type: constants.activities.GROUP_TRANSACTION_PAID,
+    type: constants.activities.GROUP_EXPENSE_PAID,
     UserId: transaction.UserId,
     GroupId: transaction.GroupId,
     TransactionId: transaction.id,
@@ -59,8 +59,8 @@ function createNewTransactionActivity(transaction, paymentResponse, preapprovalD
     payload.data.preapprovalDetails = preapprovalDetails;
   }
   return transaction.getUser()
-    .tap(user => payload.data.user = user.info)
+    .tap(user => payload.data.user = user.minimal)
     .then(() => transaction.getGroup())
-    .tap(group => payload.data.group = group.info)
+    .tap(group => payload.data.group = group.minimal)
     .then(() => models.Activity.create(payload));
 }

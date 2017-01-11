@@ -183,8 +183,8 @@ export default (Sequelize, DataTypes) => {
             UserId: transaction.UserId,
             data: {
               transaction: transaction.get(),
-              user: transaction.User && transaction.User.info,
-              group: transaction.Group && transaction.Group.info
+              user: transaction.User && transaction.User.minimal,
+              group: transaction.Group && transaction.Group.minimal
             }
           };
           if (transaction.User) {

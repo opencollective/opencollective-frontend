@@ -96,7 +96,7 @@ Types:
       UserId: the one who initiate the delete
       GroupId:
       TransactionId:
-  - activities.GROUP_TRANSACTION_PAID
+  - activities.GROUP_EXPENSE_PAID
       data: group, transaction, user (the caller), pay (paypal payload)
       UserId:
       GroupId:

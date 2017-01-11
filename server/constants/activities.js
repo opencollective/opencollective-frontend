@@ -15,13 +15,16 @@ export default {
   GROUP_EXPENSE_UPDATED: 'group.expense.updated',
   GROUP_EXPENSE_REJECTED: 'group.expense.rejected',
   GROUP_EXPENSE_APPROVED: 'group.expense.approved',
+  GROUP_EXPENSE_PAID: 'group.expense.paid',
   GROUP_TRANSACTION_CREATED: 'group.transaction.created',
-  GROUP_TRANSACTION_PAID: 'group.transaction.paid',
   GROUP_USER_ADDED: 'group.user.added',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',
   USER_CREATED: 'user.created',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
-  GROUP_MONTHLY: 'group.monthly'
+  GROUP_MONTHLY: 'group.monthly',
+
+  // Not used anymore, leaving for historical reference
+  GROUP_TRANSACTION_PAID: 'group.transaction.paid', // replaced with GROUP_EXPENSE_PAID
 };
