@@ -647,7 +647,7 @@ describe('expenses.routes.test.js', () => {
 
                 function expectTransactionPaidActivity(group, user, transaction) {
                   return Activity
-                    .findOne({ where: { type: 'group.transaction.paid' }})
+                    .findOne({ where: { type: 'group.expense.paid' }})
                     .tap(activity => {
                       expect(activity.UserId).to.be.equal(user.id);
                       expect(activity.GroupId).to.be.equal(group.id);
@@ -778,7 +778,7 @@ describe('expenses.routes.test.js', () => {
 
                 function expectTransactionPaidActivity(group, user, transaction) {
                   return Activity
-                    .findOne({ where: { type: 'group.transaction.paid' }})
+                    .findOne({ where: { type: 'group.expense.paid' }})
                     .tap(activity => {
                       expect(activity.UserId).to.be.equal(user.id);
                       expect(activity.GroupId).to.be.equal(group.id);

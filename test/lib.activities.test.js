@@ -14,7 +14,7 @@ describe('lib.activities.test.js', () => {
       expect(actual).to.equal('New Donation: someone (john@doe.com) gave USD 10.42 to <https://opencollective.com/pubquiz|Pub quiz>!');
     });
 
-    it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
+    it (`${constants.GROUP_EXPENSE_PAID} expense paid`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[14], 'slack');
       expect(actual).to.equal('Expense paid on <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for \'pizza\' (150 USD remaining on preapproval key)');
     });
@@ -88,7 +88,7 @@ describe('lib.activities.test.js', () => {
       expect(actual).to.equal('New Expense: someone submitted an expense to <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for pizza!');
     });
 
-    it (`${constants.GROUP_TRANSACTION_PAID} expense paid`, () => {
+    it (`${constants.GROUP_EXPENSE_PAID} expense paid`, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[14], 'slack');
       expect(actual).to.equal('Expense paid on <https://opencollective.com/pubquiz|Pub quiz>: USD -12.98 for \'pizza\'');
     });
