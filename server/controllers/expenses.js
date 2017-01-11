@@ -179,7 +179,7 @@ export const pay = (req, res, next) => {
     .tap(r => paymentResponse = r)
     .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetails = d)
-    .then(() => createTransaction(paymentMethod, expense, paymentResponse, preapprovalDetails, user.id))
+    .then(() => createTransaction(paymentMethod, expense, paymentResponse, preapprovalDetails, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponse)));

@@ -27,7 +27,7 @@ const {
 } = models;
 
 describe('expenses.routes.test.js', () => {
-  let sandbox, host, member, otherUser, group, emailSendMessageSpy;
+  let sandbox, host, member, otherUser, expenseFiler, group, emailSendMessageSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -45,6 +45,8 @@ describe('expenses.routes.test.js', () => {
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
 
   beforeEach(() => models.User.create(utils.data('user3')).tap(u => otherUser = u));
+
+  beforeEach(() => models.User.create(utils.data('user4')).tap(u => expenseFiler = u));
 
   beforeEach(() => group.addUserWithRole(host, roles.HOST));
 
@@ -225,8 +227,8 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#list', () => {
-            beforeEach('create expense', () => createExpense(group, host));
-            beforeEach('create expense 2', () => createExpense(group, host));
+            beforeEach('create expense', () => createExpense(group, expenseFiler));
+            beforeEach('create expense 2', () => createExpense(group, expenseFiler));
             beforeEach('create 1 comment', () => models.Comment.createMany([utils.data('comments')[0]], { UserId: 1, GroupId: group.id, ExpenseId: 1 }));
             beforeEach('create many comments', () => models.Comment.createMany(utils.data('comments'), { UserId: 1, GroupId: group.id, ExpenseId: 2 }));
             it('ttt THEN returns 200', () => request(app)
@@ -623,7 +625,7 @@ describe('expenses.routes.test.js', () => {
                     });
 
                     it('THEN creates a transaction paid activity', () =>
-                      expectTransactionPaidActivity(group, host, transaction)
+                      expectTransactionPaidActivity(group, member, transaction)
                         .tap(activity => expect(activity.data.paymentResponse).to.deep.equal(payMock)));
                   });
                 });
@@ -636,7 +638,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('status', 'REIMBURSED');
-                  expect(transaction).to.have.property('UserId', host.id);
+                  expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
                   // end TODO remove #postmigration
                 }
@@ -829,8 +831,7 @@ describe('expenses.routes.test.js', () => {
     let group, user;
     return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
       .tap(g => group = g)
-      .then(() => u ? u : models.User.create(utils.data('user4'))
-        .tap(user => group.addUserWithRole(user, roles.HOST)))
+      .then(() => u ? u : expenseFiler)
       .tap(u => user = u)
       .then(() => request(app)
         .post(`/groups/${group.id}/expenses`)
