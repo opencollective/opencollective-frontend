@@ -108,7 +108,7 @@ export default {
       case activities.CONNECTED_ACCOUNT_CREATED:
         return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
 
-      case activities.GROUP_TRANSACTION_PAID: {
+      case activities.GROUP_EXPENSE_PAID: {
         const details = activity.data.preapprovalDetails;
         let remainingClause = '';
         if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
@@ -242,7 +242,7 @@ export default {
       case activities.GROUP_EXPENSE_APPROVED:
         return `Expense approved: ${currency} ${amount} for ${title} in ${group}!`
 
-      case activities.GROUP_TRANSACTION_PAID:
+      case activities.GROUP_EXPENSE_PAID:
         return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
 
       case activities.SUBSCRIPTION_CONFIRMED:

@@ -190,7 +190,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   }
 
   if (template === 'group.transaction.created') {
-    template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.created';
+    template = (data.transaction.amount > 0) ? 'group.donation.created' : 'group.expense.paid';
     if (data.user && data.user.twitterHandle) {
       const groupMention = (data.group.twitterHandle) ? `@${data.group.twitterHandle}` : data.group.name;
       const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${groupMention} https://opencollective.com/${data.group.slug} 🎉😊`;

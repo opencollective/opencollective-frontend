@@ -17,6 +17,7 @@ const templateNames = [
   'group.created',
   'group.expense.approved.for.host',
   'group.expense.created',
+  'group.expense.paid',
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
