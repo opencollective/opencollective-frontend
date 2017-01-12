@@ -33,7 +33,7 @@ createdb "${LOCALDBNAME}"
 
 if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
   PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
-  echo "Dumping ${PG_URL}"
+  echo "Dumping ${ENV} database"
   pg_dump -O -F t "${PG_URL}" > "${DBDUMPS_DIR}${FILENAME}"
 fi
 
