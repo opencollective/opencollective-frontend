@@ -424,7 +424,7 @@ export const createFromGithub = (req, res, next) => {
                 return ca.getUser();
               }
             })
-            .then(user => user || User.create(Object.assign(userAttr, {suggestedUsername: contributor})))
+            .then(user => user || User.create(Object.assign(userAttr)))
             .then(user => contributorUser = user)
             .then(() => fetchGithubUser(contributor))
             .tap(json => {
