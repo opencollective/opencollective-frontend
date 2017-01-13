@@ -14,7 +14,7 @@ const done = (err) => {
 }
 
 function run() {
-  let inActiveSubscriptionCount = 0;
+  let inactiveSubscriptionCount = 0;
   let sumAmount = 0;
   return models.Donation.findAll({
     where: { 
@@ -50,7 +50,7 @@ function run() {
       .catch(err => {
         if (err.type === 'StripeInvalidRequestError') {
           console.log('Stripe Subscription not found');
-          inActiveSubscriptionCount +=1;
+          inactiveSubscriptionCount +=1;
           if (donation.currency === 'USD' || donation.currency === 'EUR') {
             sumAmount += donation.amount;
           }
@@ -64,7 +64,7 @@ function run() {
         }
       })
   })
-  .then(() => console.log("Subscriptions marked inActive: ", inActiveSubscriptionCount))
+  .then(() => console.log("Subscriptions marked inactive: ", inactiveSubscriptionCount))
   .then(() => console.log("Total amount reduced per month (in ~USD): ", sumAmount))
   .then(() => done())
   .catch(done)
