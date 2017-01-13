@@ -126,6 +126,7 @@ export default {
     const potentialUserNames = [
       user.username,
       user.suggestedUsername,
+      user.avatar ? this.getUsernameFromGithubURL(user.avatar) : null,
       user.twitterHandle ? user.twitterHandle.replace(/@/g, '') : null,
       user.name ? user.name.replace(/ /g, '') : null,
       user.email ? user.email.split(/@|\+/)[0] : null]
@@ -164,5 +165,20 @@ export default {
       return this.usernameSuggestionHelper(`${usernameToCheck}`, usernameList, count+1);
     }
   },
+
+  /*
+   * Extract username from github avatar url
+   * Needed to get usernames for github signups
+   */ 
+  getUsernameFromGithubURL(url) {
+    const githubUrl = 'avatars.githubusercontent.com/';
+    if (url && url.indexOf(githubUrl) !== -1) {
+      const tokens = url.split(githubUrl);
+      if (tokens.length === 2 && tokens[1] !== '') {
+        return tokens[1];
+      }
+    }
+    return null;
+  }
     
 };
