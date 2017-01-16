@@ -1,5 +1,7 @@
 import serverStatus from 'express-server-status';
+import GraphHTTP from 'express-graphql'
 
+import schema from './schema';
 import * as activities from './controllers/activities';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
@@ -75,6 +77,16 @@ export default (app) => {
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
   app.param('commentid', params.commentid);
+
+  /**
+   * GraphQL
+   */
+  app.use('/graphql', GraphHTTP({
+    schema: schema,
+    rootValue: { remoteUser: (args, request) => request.remoteUser }, // passes in logged in user
+    pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
+    graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging'
+  }));
 
   /**
    * Homepage
