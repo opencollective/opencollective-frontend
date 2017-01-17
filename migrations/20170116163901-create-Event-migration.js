@@ -13,7 +13,7 @@ module.exports = {
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
 
-        creatorId: {
+        createdById: {
           type: DataTypes.INTEGER,
           references: {
             model: 'Users',

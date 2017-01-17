@@ -195,7 +195,7 @@ export const EventType = new GraphQLObjectType({
       createdBy: {
         type: UserType,
         resolve(event) {
-          return models.User.findById(event.creatorId)
+          return models.User.findById(event.createdById)
         }
       },
       group: {

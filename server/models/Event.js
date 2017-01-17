@@ -7,7 +7,7 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    creatorId: {
+    createdById: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
