@@ -1,4 +1,4 @@
-Subject: Your Open Collective is on its way...
+Subject: {{group.name}}: Your Collective is live! 
 
 {{> header}}
 
@@ -8,13 +8,24 @@ Subject: Your Open Collective is on its way...
 <p>Hi!</p>
 {{/if}}
 
-<p> Thanks for signing up your GitHub repository: {{group.name}}. We are reviewing new requests as fast as we can. </p>
+<p> Thanks for signing up on Open Collective! Your collective is now live: <a href="{{config.host.website}}/{group.slug}">{{group.name}}</a>. While you wait for approval to start receiving donations, here's a quick guide to make the most out of it: </p>
 
-<p>While you wait, check out other <a href="https://opencollective.com/opensource">open source collectives</a> and see how they are spending the money they have raised.</p>
+<ol type="1">
+<li><strong>Make your collective your own.</strong> Login and hover over elements to edit them. </li>
+
+<li><strong>Add backers/sponsors to Github/Website.</strong> We'll submit a PR to your README to add backers & sponsors. Instructions to add your backers to a website here (LINK).
+
+<li><strong>Start tracking expenses.</strong> Submit expenses so others can see your costs. It helps to raise awareness (and later, money).
+
+<li><strong>Spread the word.</strong> If you have a twitter account, you can connect it to your collective and automatically thank your backers. <a href="https://github.com/OpenCollective/OpenCollective/wiki/Twitter">Instructions</a>
+
+</ol>
+
+<p>Btw, if you are looking for inspiration, check out some of the <a href="https://opencollective.com/opensource">other successful collectives</a> and see how they are spending the money they have raised.</p>
 
 <p>Stay tuned for updates.</p>
 
-<p>Warmly,</p>
+<p>Cheers,</p>
 
 <p>
   – Team Open Collective
