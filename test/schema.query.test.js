@@ -10,6 +10,17 @@ import models from '../server/models';
 describe.only('Query Tests', () => {
   let host, member, otherUser, group1, group2, group3, event1, event2, event3, tier1, tier2, tier3;
 
+  /* SETUP
+    group1: 2 events
+      event1: 2 tiers
+        tier1: 2 responses
+        tier2: 1 response
+      event2: 1 tier
+        tier3: no response
+    group2: 1 event
+      event3: no tiers
+    group3: no events
+  */
 
   beforeEach(() => utils.resetTestDB());
 
@@ -220,6 +231,7 @@ describe.only('Query Tests', () => {
             }
           `;
           const result = await graphql(schema, query);
+          console.log(result);
           expect(result).to.deep.equal({
             data: {
               getEvents: [
