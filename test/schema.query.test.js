@@ -7,8 +7,8 @@ import * as utils from './utils';
 import models from '../server/models';
 
 
-describe.only('Query Tests', () => {
-  let host, member, otherUser, group1, group2, group3, event1, event2, event3, tier1, tier2, tier3;
+describe('Query Tests', () => {
+  let user1, user2, user3, group1, group2, group3, event1, event2, event3, tier1, tier2, tier3;
 
   /* SETUP
     group1: 2 events
@@ -24,11 +24,11 @@ describe.only('Query Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => host = u));
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => otherUser = u));
+  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
 
@@ -39,15 +39,15 @@ describe.only('Query Tests', () => {
   describe('Root query tests', () => {
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { CreatorId: member.id, GroupId: group1.id }))
+      Object.assign(utils.data('event1'), { createdById: user1.id, GroupId: group1.id }))
       .tap(e => event1 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { CreatorId: member.id, GroupId: group1.id }))
+      Object.assign(utils.data('event2'), { createdById: user1.id, GroupId: group1.id }))
       .tap(e => event2 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { CreatorId: host.id, GroupId: group2.id }))
+      Object.assign(utils.data('event2'), { createdById: user2.id, GroupId: group2.id }))
       .tap(e => event2 = e));
 
     describe('throws an error', () => {
@@ -184,7 +184,7 @@ describe.only('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier1.id, 
             GroupId: group1.id, 
-            UserId: host.id 
+            UserId: user2.id 
           })));
 
         beforeEach(() => models.Response.create(
@@ -192,7 +192,7 @@ describe.only('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier1.id, 
             GroupId: group1.id, 
-            UserId: otherUser.id 
+            UserId: user3.id 
           })));
 
         beforeEach(() => models.Response.create(
@@ -200,7 +200,7 @@ describe.only('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier2.id, 
             GroupId: group1.id, 
-            UserId: otherUser.id 
+            UserId: user3.id 
           })));
         
         it('when given only a group slug', async () => {
@@ -231,19 +231,68 @@ describe.only('Query Tests', () => {
             }
           `;
           const result = await graphql(schema, query);
-          console.log(result);
           expect(result).to.deep.equal({
             data: {
               getEvents: [
                 {
-                  description: "January monthly meetup",
                   id: 1,
-                  name: "January meetup"
+                  name: "January meetup",
+                  "description":"January monthly meetup",
+                  "createdBy": {
+                    "id":1,
+                    "name":"Phil Mod"
+                  },
+                  "tiers": [
+                    {
+                      "id":1,
+                      "name":"Free tier",
+                      "description":"free tickets for all",
+                      "responses": [
+                        {
+                          "id":1,
+                          "status":"INTERESTED",
+                          "user": {
+                            "id":2,
+                            "name":
+                            "Anish Bas"
+                          }
+                        },
+                        {
+                          "id":2,
+                          "status":"YES",
+                          "user": {
+                            "id":3,
+                            "name":"Xavier Damman"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id":2,
+                      "name":"paid tier",
+                      "description":"$20 ticket",
+                      "responses": [
+                        {
+                          "id":3,
+                          "status":"NO",
+                          "user": {
+                            "id":3,
+                            "name":"Xavier Damman"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
-                  description: "February monthly meetup",
-                  id: 2,
-                  name: "Feb meetup"               
+                  "id":2,
+                  "name":"Feb meetup",
+                  "description":"February monthly meetup",
+                  "createdBy": {
+                    "id":1,
+                    "name":"Phil Mod"
+                  },
+                  "tiers":[]
                 }
               ]
             }
