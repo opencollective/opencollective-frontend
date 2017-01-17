@@ -1,6 +1,6 @@
 import {
-  GraphQLInt,
   GraphQLList,
+  GraphQLNonNull,
   GraphQLString
 } from 'graphql';
 
@@ -14,52 +14,25 @@ const queries = {
   /*
    * Given a group slug and an event slug, returns the event
    */
-  getEvent: {
+  getEvents: {
     type: new GraphQLList(EventType),
     args: {
       slug: {
-        type: GraphQLString
+        type: GraphQLString,
+        description: 'Event slug. If omitted, we return all events from that groupSlug'
       },
       groupSlug: {
-        type: GraphQLString
+        type: new GraphQLNonNull(GraphQLString)
       }
     },
     resolve(_, args) {
+      const groupSlug = args.groupSlug;
+      delete args.groupSlug; // TODO: figure out why _.omit doesn't work in this resolver. 
       return models.Event.findAll({
-        where: {
-          slug: args.slug
-        },
+        where: args,
         include: [{
           model: models.Group,
-          where: { slug: args.groupSlug }
-        }]
-      })
-    }
-  },
-
-  /*
-   * Given a group slug, returns all events for that group
-   */
-  getAllEventsForGroup: {
-    type: new GraphQLList(EventType),
-    args: {
-      groupId: {
-        type: GraphQLInt
-      },
-      groupSlug: {
-        type: GraphQLString
-      }
-    },
-    resolve(_, args) {
-      return models.Event.findAll({
-        include: [{
-          model: models.Group,
-          where: { 
-            $or: {
-              slug: args.groupSlug,
-              id: args.groupId
-            }
-          }
+          where: { slug: groupSlug }
         }]
       })
     }

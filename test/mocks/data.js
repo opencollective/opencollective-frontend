@@ -636,5 +636,52 @@ export default {
     "incurredAt": "2016-03-06 UTC+0300",
     "payoutMethod": "paypal",
     "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
+  },
+
+  "event1": {
+    name: "January meetup",
+    slug: "jan-meetup",
+    description: "January monthly meetup",
+    startsAt: "2017-01-06 UTC+0300",
+    endsAt: "2017-01-07 UTC+300",
+  },
+
+  "event2": {
+    name: "Feb meetup",
+    slug: "feb-meetup",
+    description: "February monthly meetup",
+    startsAt: "2017-02-06 UTC+0300",
+    endsAt: "2017-02-07 UTC+300"
+  },
+
+  "tier1": {
+    name: "Free tier",
+    description: "free tickets for all",
+    amount: 0,
+    currency: "USD",
+    quantity: 10,
+  },
+
+  "tier2": {
+    name: "paid tier",
+    description: "$20 ticket",
+    amount: 2000,
+    currency: "USD",
+    quantity: 100
+  },
+
+  "response1": {
+    status: "INTERESTED",
+    quantity: 1,
+  },
+
+  "response2": {
+    status: "YES",
+    quantity: 2,
+  },
+
+  "response3": {
+    status: "NO",
+    quantity: 2
   }
 }

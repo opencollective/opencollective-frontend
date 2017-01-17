@@ -80,6 +80,11 @@
     "twitter": "1.3.0"
   },
   "devDependencies": {
+    "babel-core": "6.14.0",
+    "babel-loader": "^6.2.10",
+    "babel-polyfill": "6.20.0",
+    "babel-preset-es2015": "6.9.0",
+    "babel-preset-stage-0": "6.5.0",
     "chai": "3.5.0",
     "chance": "0.8.0",
     "cheerio": "0.19.0",
@@ -108,7 +113,7 @@
     "nsp": "nsp check",
     "pretest": "npm run hint",
     "test": "npm run test:unit",
-    "test:unit": "mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
+    "test:unit": "mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
     "test:cover": "istanbul cover _mocha -- -R spec test",
     "test:e2e": "npm run test:e2e:exec api:run website:run website:testE2E app:run app:testE2E",
     "test:e2e:exec": "bash scripts/test_e2e.sh",
