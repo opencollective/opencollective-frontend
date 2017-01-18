@@ -8,7 +8,7 @@ import models from '../server/models';
 
 
 describe('Query Tests', () => {
-  let user1, user2, user3, group1, group2, group3, event1, event2, event3, tier1, tier2, tier3;
+  let user1, user2, user3, group1, group2, group3, event1, event2, tier1, tier2, tier3;
 
   /* SETUP
     group1: 2 events
@@ -18,7 +18,7 @@ describe('Query Tests', () => {
       event2: 1 tier
         tier3: no response
     group2: 1 event
-      event3: no tiers
+      event3: no tiers // event3 not declared above due to linting
     group3: no events
   */
 
@@ -47,15 +47,15 @@ describe('Query Tests', () => {
       .tap(e => event2 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdById: user2.id, GroupId: group2.id }))
-      .tap(e => event2 = e));
+      Object.assign(utils.data('event2'), { createdById: user2.id, GroupId: group2.id })));
+      //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
 
     describe('throws an error', () => {
 
       it('when given only an existing event slug', async () => {
         const query = `
           query getOneEvent {
-            getEvents(slug: "jan-meetup") {
+            getEvents(slug: "${event1.slug}") {
               id,
               name,
               description
@@ -91,7 +91,7 @@ describe('Query Tests', () => {
       it('when given an existing group slug when it has no events', async () => {
         const query = `
           query getOneEvent {
-            getEvents(groupSlug: "meetups") {
+            getEvents(groupSlug: "${group3.slug}") {
               id,
               name,
               description
@@ -138,7 +138,7 @@ describe('Query Tests', () => {
         it('when given only a group slug', async () => {
           const query = `
             query getOneEvent {
-              getEvents(groupSlug: "scouts") {
+              getEvents(groupSlug: "${group1.slug}") {
                 id,
                 name,
                 description
@@ -165,7 +165,7 @@ describe('Query Tests', () => {
         });
       });
 
-      describe('returns multiple events with associations', () => {
+      describe('returns multiple events with tiers and responses', () => {
 
         beforeEach(() => models.Tier.create(
           Object.assign(utils.data('tier1'), { EventId: event1.id }))
@@ -206,7 +206,7 @@ describe('Query Tests', () => {
         it('when given only a group slug', async () => {
           const query = `
             query getOneEvent {
-              getEvents(groupSlug: "scouts") {
+              getEvents(groupSlug: "${group1.slug}") {
                 id,
                 name,
                 description,
@@ -244,40 +244,39 @@ describe('Query Tests', () => {
                   },
                   "tiers": [
                     {
-                      "id":1,
-                      "name":"Free tier",
+                      "id": 1,
+                      "name": tier1.name,
                       "description":"free tickets for all",
                       "responses": [
                         {
-                          "id":1,
-                          "status":"INTERESTED",
+                          "id": 1,
+                          "status": "INTERESTED",
                           "user": {
-                            "id":2,
-                            "name":
-                            "Anish Bas"
+                            "id": 2,
+                            "name": "Anish Bas"
                           }
                         },
                         {
-                          "id":2,
-                          "status":"YES",
+                          "id": 2,
+                          "status": "YES",
                           "user": {
-                            "id":3,
-                            "name":"Xavier Damman"
+                            "id": 3,
+                            "name": "Xavier Damman"
                           }
                         }
                       ]
                     },
                     {
-                      "id":2,
-                      "name":"paid tier",
-                      "description":"$20 ticket",
+                      "id": 2,
+                      "name": tier2.name,
+                      "description": "$20 ticket",
                       "responses": [
                         {
-                          "id":3,
-                          "status":"NO",
+                          "id": 3,
+                          "status": "NO",
                           "user": {
-                            "id":3,
-                            "name":"Xavier Damman"
+                            "id": 3,
+                            "name": "Xavier Damman"
                           }
                         }
                       ]
@@ -285,14 +284,21 @@ describe('Query Tests', () => {
                   ]
                 },
                 {
-                  "id":2,
-                  "name":"Feb meetup",
-                  "description":"February monthly meetup",
+                  "id": 2,
+                  "name": "Feb meetup",
+                  "description": "February monthly meetup",
                   "createdBy": {
-                    "id":1,
-                    "name":"Phil Mod"
+                    "id": 1,
+                    "name": "Phil Mod"
                   },
-                  "tiers":[]
+                  "tiers":[
+                    {
+                      id: 3,
+                      name: tier3.name,
+                      description: tier3.description,
+                      responses: []
+                    }
+                  ]
                 }
               ]
             }
