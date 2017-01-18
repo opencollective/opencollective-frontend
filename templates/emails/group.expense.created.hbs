@@ -26,12 +26,8 @@ Subject: New expense on {{group.name}}: {{{currency expense.amount currency=expe
 <center>
   <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
   <div>{{expense.title}}</div>
-  <div>From: {{user.name}}</div>
-  {{#if user.paypalEmail}}
+  <div>Submitted by: {{user.name}}</div>
   <div>Paypal Email: {{user.paypalEmail}}</div>
-  {{else}}
-  <div>Paypal Email: {{user.email}}</div>
-  {{/if}}
   <p><font color="#999">{{expense.notes}}</font></p>
 
   <a href="{{config.host.website}}/{group.slug}/expenses#exp{{expense.id}}" style="color:#7fadf2">
