@@ -1,4 +1,4 @@
-Subject: Expense paid on {{group.name}}: {{{currency expense.amount currency=expense.currency}}} for {{expense.title}} by {{user.username}}
+Subject: Expense paid on {{group.name}}: {{{currency transaction.amount currency=transaction.currency}}} for {{transaction.description}}
 
 {{> header}}
 
@@ -25,9 +25,10 @@ Subject: Expense paid on {{group.name}}: {{{currency expense.amount currency=exp
 
 <center>
   <h3> Hi there! Just a note to let you know that an expense was paid in {{group.name}}. </h3>
-  <h2>{{{currency expense.amount currency=expense.currency}}}</h2>
-  <div>{{expense.title}}</div>
-  <p><font color="#999">{{expense.notes}}</font></p>
+  <h2>{{{currency transaction.amount currency=transaction.currency}}}</h2>
+  <div>{{transaction.description}}</div>
+  <div>To: {{user.name}}</div>
+  <div>Paypal email: {{user.paypalEmail}}</div>
 
   <br /><br />
   <a href="{{config.host.website}}/{group.slug}/expenses" style="color:#7fadf2;text-decoration:none;">View this expense on the Open Collective website</a>

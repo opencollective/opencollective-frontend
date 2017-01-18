@@ -20,11 +20,17 @@ const render = (template, data) => {
   delete data.config;
   data.config = { host: config.host };
 
+  // sets paypalEmail for purpose of email templates
+  if (data.user) {
+    data.user.paypalEmail = data.user.paypalEmail || data.user.email;
+  }
+
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
   const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
+
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
