@@ -243,6 +243,7 @@ export default function(Sequelize, DataTypes) {
           id: this.id,
           name: this.name,
           logo: this.logo,
+          slug: this.slug,
           publicUrl: this.publicUrl,
           mission: this.mission,
           isSupercollective: this.isSupercollective
