@@ -30,7 +30,7 @@ Subject: New expense on {{group.name}}: {{{currency expense.amount currency=expe
   <div>Paypal Email: {{user.paypalEmail}}</div>
   <p><font color="#999">{{expense.notes}}</font></p>
 
-  <a href="{{config.host.website}}/{group.slug}/expenses#exp{{expense.id}}" style="color:#7fadf2">
+  <a href="{{config.host.website}}/{{group.slug}}/expenses#exp{{expense.id}}" style="color:#7fadf2">
     <img src="https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{expense.attachment}}" width="100%" />
   </a>
 
@@ -39,7 +39,7 @@ Subject: New expense on {{group.name}}: {{{currency expense.amount currency=expe
   <a href="{{actions.reject}}"><div class="btn red">REJECT</div></a>
 
   <br /><br />
-  <a href="{{config.host.website}}/{group.slug}/expenses#exp{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on the Open Collective website</a>
+  <a href="{{config.host.website}}/{{group.slug}}/expenses#exp{{expense.id}}" style="color:#7fadf2;text-decoration:none;">View this expense on the Open Collective website</a>
 
 </center>
 
