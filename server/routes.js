@@ -1,7 +1,7 @@
 import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql'
 
-import schema from './schema';
+import schema from './graphql/schema';
 import * as activities from './controllers/activities';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';

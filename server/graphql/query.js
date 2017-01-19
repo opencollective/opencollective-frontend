@@ -17,7 +17,7 @@ const queries = {
   getEvents: {
     type: new GraphQLList(EventType),
     args: {
-      slug: {
+      eventSlug: {
         type: GraphQLString,
         description: 'Event slug. If omitted, we return all events from that groupSlug'
       },
@@ -27,9 +27,13 @@ const queries = {
     },
     resolve(_, args) {
       const groupSlug = args.groupSlug;
-      delete args.groupSlug; // TODO: figure out why _.omit doesn't work in this resolver. 
+      delete args.groupSlug; // TODO: figure out why _.omit doesn't work in this resolver.
+      const where = {};
+      if (args.eventSlug) {
+        where.slug = eventSlug;
+      } 
       return models.Event.findAll({
-        where: args,
+        where,
         include: [{
           model: models.Group,
           where: { slug: groupSlug }
