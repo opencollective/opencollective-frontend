@@ -104,7 +104,7 @@
     "sinon": "1.10.3",
     "supertest": "1.2.0",
     "supertest-as-promised": "3.1.0",
-    "webpack": "2.1.0-beta"
+    "webpack": "2.2.0"
   },
   "scripts": {
     "start": "node ./dist/index.js",
