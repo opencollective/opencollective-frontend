@@ -26,8 +26,6 @@ const queries = {
       }
     },
     resolve(_, args) {
-      const groupSlug = args.groupSlug;
-      delete args.groupSlug; // TODO: figure out why _.omit doesn't work in this resolver.
       const where = {};
       if (args.eventSlug) {
         where.slug = args.eventSlug;
@@ -36,7 +34,7 @@ const queries = {
         where,
         include: [{
           model: models.Group,
-          where: { slug: groupSlug }
+          where: { slug: args.groupSlug }
         }]
       })
     }

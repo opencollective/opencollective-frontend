@@ -39,15 +39,15 @@ describe('Query Tests', () => {
   describe('Root query tests', () => {
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { createdById: user1.id, GroupId: group1.id }))
+      Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
       .tap(e => event1 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdById: user1.id, GroupId: group1.id }))
+      Object.assign(utils.data('event2'), { createdByUserId: user1.id, GroupId: group1.id }))
       .tap(e => event2 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdById: user2.id, GroupId: group2.id })));
+      Object.assign(utils.data('event2'), { createdByUserId: user2.id, GroupId: group2.id })));
       //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
 
     describe('throws an error', () => {
@@ -55,7 +55,7 @@ describe('Query Tests', () => {
       it('when given only an existing event slug', async () => {
         const query = `
           query getOneEvent {
-            getEvents(slug: "${event1.slug}") {
+            getEvents(eventSlug: "${event1.slug}") {
               id,
               name,
               description
@@ -112,7 +112,7 @@ describe('Query Tests', () => {
       it('when given an event slug and groupSlug', async () => {
         const query = `
           query getOneEvent {
-            getEvents(groupSlug: "scouts", slug:"jan-meetup") {
+            getEvents(groupSlug: "scouts", eventSlug:"jan-meetup") {
               id,
               name,
               description
@@ -210,7 +210,7 @@ describe('Query Tests', () => {
                 id,
                 name,
                 description,
-                createdBy {
+                createdByUser {
                   id,
                   name
                 }
@@ -238,7 +238,7 @@ describe('Query Tests', () => {
                   id: 1,
                   name: "January meetup",
                   "description":"January monthly meetup",
-                  "createdBy": {
+                  "createdByUser": {
                     "id":1,
                     "name":"Phil Mod"
                   },
@@ -287,7 +287,7 @@ describe('Query Tests', () => {
                   "id": 2,
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
-                  "createdBy": {
+                  "createdByUser": {
                     "id": 1,
                     "name": "Phil Mod"
                   },
