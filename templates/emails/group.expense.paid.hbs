@@ -1,4 +1,4 @@
-Subject: Expense paid on {{group.name}}: {{{currency transaction.amount currency=transaction.currency}}} for {{transaction.description}}
+Subject: Expense paid on {{group.name}}: {{{currency transaction.netAmountInGroupCurrency currency=transaction.currency}}} for {{transaction.description}}
 
 {{> header}}
 
@@ -25,7 +25,7 @@ Subject: Expense paid on {{group.name}}: {{{currency transaction.amount currency
 
 <center>
   <h3> Hi there! Just a note to let you know that an expense was paid in {{group.name}}. </h3>
-  <h2>{{{currency transaction.amount currency=transaction.currency}}}</h2>
+  <h2>{{{currency transaction.netAmountInGroupCurrency currency=transaction.currency}}}</h2>
   <div>{{transaction.description}}</div>
   <div>To: {{user.name}}</div>
   <div>Paypal email: {{user.paypalEmail}}</div>
