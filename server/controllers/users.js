@@ -82,7 +82,7 @@ export const updateUser = (req, res, next) => {
   }
 
   if (!req.user.hasMissingInfo()) {
-    return next(new errors.BadRequest('Can\'t update user that has already provided their information'));
+    return next(new errors.BadRequest('Can\'t update user that already has provided their information'));
   }
 
   return models.Donation.findOne({
@@ -108,7 +108,7 @@ export const updateUser = (req, res, next) => {
 /*
  * End point for social media avatar lookup from the public donation page
  */
-export const getSocialMediaAvatars = (req, res, next) => {
+export const getSocialMediaAvatars = (req, res) => {
   const { userData } = req.body;
   userData.email = req.user.email;
   userData.ip = req.ip;
