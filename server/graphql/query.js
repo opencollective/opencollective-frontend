@@ -30,7 +30,7 @@ const queries = {
       delete args.groupSlug; // TODO: figure out why _.omit doesn't work in this resolver.
       const where = {};
       if (args.eventSlug) {
-        where.slug = eventSlug;
+        where.slug = args.eventSlug;
       } 
       return models.Event.findAll({
         where,
