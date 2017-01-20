@@ -356,7 +356,7 @@ export const paypalCallback = (req, res, next) => {
     if (err) return next(err);
     const user = results.getOrCreateUser;
 
-    res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${user.info.hasFullAccount}`);
+    res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${!user.hasMissingInfo()}`);
   });
 
 };
