@@ -496,8 +496,8 @@ describe('users.routes.test.js', () => {
    * Update user (without authentication)
    */
   describe('#update user from public donation page', () => {
-    let userWithPassword;
-    let userWithoutPassword;
+    let userWithInfo;
+    let userWithoutAvatar;
 
     const newUser = {
       firstName: 'Aseem',
@@ -526,27 +526,28 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() =>
       models.User.create({
-        email: 'withpassword@example.com',
-        password: 'password'
+        email: 'userwithinfo@example.com',
+        firstName: 'Xavier',
+        avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg'
       })
-      .tap(u => userWithPassword = u));
+      .tap(u => userWithInfo = u));
 
     beforeEach(() =>
       models.User.create({
         email: 'xdamman@gmail.com' // will have twitter avatar
       })
-      .tap(u => userWithoutPassword = u));
+      .tap(u => userWithoutAvatar = u));
 
-    it('fails if the user already has a password', done => {
+    it('fails if the user already has a firstName and avatar set', done => {
       // only users with a recent donation can be edited
       models.Donation.create({
-          UserId: userWithPassword.id,
+          UserId: userWithInfo.id,
           currency: 'USD',
           amount: 100
         })
         .then(() => {
           request(app)
-            .put(`/users/${userWithPassword.id}`)
+            .put(`/users/${userWithInfo.id}`)
             .send({
               user: newUser,
               api_key: application.api_key
@@ -554,29 +555,29 @@ describe('users.routes.test.js', () => {
             .end((e,res) => {
               expect(res.statusCode).to.equal(400);
               expect(res.body.error.type).to.equal('bad_request');
-              expect(res.body.error.message).to.equal('Can\'t update user with password from this route');
+              expect(res.body.error.message).to.equal('Can\'t update user that already has provided their information');
               done();
             });
         });
     });
 
-    it('successfully updates a user without a password', done => {
+    it('successfully updates a user without an avatar', done => {
       // only users with a recent donation can be edited
       models.Donation.create({
-          UserId: userWithoutPassword.id,
+          UserId: userWithoutAvatar.id,
           currency: 'USD',
           amount: 100
         })
         .then(() => {
           request(app)
-            .put(`/users/${userWithoutPassword.id}`)
+            .put(`/users/${userWithoutAvatar.id}`)
             .send({
               user: newUser,
               api_key: application.api_key
             })
             .end((e, res) => {
               expect(e).to.not.exist;
-              expect(res.body).to.have.property('id', userWithoutPassword.id);
+              expect(res.body).to.have.property('id', userWithoutAvatar.id);
               expect(res.body).to.have.property('firstName', newUser.firstName);
               expect(res.body).to.have.property('lastName', newUser.lastName);
               expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);

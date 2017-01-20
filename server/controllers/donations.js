@@ -52,7 +52,6 @@ const stripeDonation = (req, res, next) => {
   const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
   const currency = payment.currency || group.currency;
   const isSubscription = _.contains(['month', 'year'], interval);
-  const hasFullAccount = false; // Used to specify if a user has a real account
 
   if (interval && !isSubscription) {
     return next(new errors.BadRequest('Interval should be month or year.'));
@@ -116,7 +115,7 @@ const stripeDonation = (req, res, next) => {
       PaymentMethodId: paymentMethod.id,
       SubscriptionId: subscription && subscription.id
     }))
-  .then(() => res.send({success: true, user: req.user.info, hasFullAccount: hasFullAccount}))
+  .then(() => res.send({success: true, user: req.user.info }))
   .catch(next);
 };
 export {stripeDonation as stripe};
@@ -357,7 +356,7 @@ export const paypalCallback = (req, res, next) => {
     if (err) return next(err);
     const user = results.getOrCreateUser;
 
-    res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${user.info.hasFullAccount}`);
+    res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${!user.hasMissingInfo()}`);
   });
 
 };
