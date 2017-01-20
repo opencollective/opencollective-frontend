@@ -99,9 +99,12 @@
     "mocha-circleci-reporter": "0.0.2",
     "nock": "2.18.2",
     "nsp": "2.6.1",
+    "react": "0.14.8",
+    "react-dom": "0.14.8",
     "sinon": "1.10.3",
     "supertest": "1.2.0",
-    "supertest-as-promised": "3.1.0"
+    "supertest-as-promised": "3.1.0",
+    "webpack": "2.1.0-beta"
   },
   "scripts": {
     "start": "node ./dist/index.js",
