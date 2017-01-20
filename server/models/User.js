@@ -193,7 +193,6 @@ export default (Sequelize, DataTypes) => {
           website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
-          hasFullAccount: this.hasPassword(),
           paypalEmail: this.paypalEmail
         };
       },
@@ -271,8 +270,8 @@ export default (Sequelize, DataTypes) => {
         });
       },
 
-      hasPassword() {
-        return _.isString(this.password_hash);
+      hasMissingInfo() {
+        return !(this.firstName && this.avatar);
       },
 
       encryptId() {

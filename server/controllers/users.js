@@ -70,8 +70,7 @@ export const updateAvatar = (req, res, next) => {
 /*
  * Update user info.
  * @PRE: user is logged in
- *       OR user doesn't have a password yet
- *       and has done a donation in the past 10mn
+ *       OR user has some missing info and has done a donation in the past 10mn
  *       (to allow updates from the public donation page)
  */
 export const updateUser = (req, res, next) => {
@@ -82,8 +81,8 @@ export const updateUser = (req, res, next) => {
       .catch(next)
   }
 
-  if (req.user.hasPassword()) {
-    return next(new errors.BadRequest('Can\'t update user with password from this route'));
+  if (!req.user.hasMissingInfo()) {
+    return next(new errors.BadRequest('Can\'t update user that has already provided their information'));
   }
 
   return models.Donation.findOne({
@@ -108,13 +107,8 @@ export const updateUser = (req, res, next) => {
 
 /*
  * End point for social media avatar lookup from the public donation page
- * Only works if password is null, as an extra precaution
  */
 export const getSocialMediaAvatars = (req, res, next) => {
-  if (req.user.hasPassword()) {
-    return next(new errors.BadRequest('Can\'t lookup user avatars with password from this route'));
-  }
-
   const { userData } = req.body;
   userData.email = req.user.email;
   userData.ip = req.ip;
