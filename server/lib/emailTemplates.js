@@ -43,6 +43,7 @@ const subscriptions = fs.readFileSync(`${templatesPath}/partials/subscriptions.h
 const toplogo = fs.readFileSync(`${templatesPath}/partials/toplogo.hbs`, 'utf8');
 const relatedgroups = fs.readFileSync(`${templatesPath}/partials/relatedgroups.hbs`, 'utf8');
 const collectivecard = fs.readFileSync(`${templatesPath}/partials/collectivecard.hbs`, 'utf8');
+const renewalnotice = fs.readFileSync(`${templatesPath}/partials/renewalnotice.hbs`, 'utf8');
 
 handlebars.registerPartial('header', header);
 handlebars.registerPartial('footer', footer);
@@ -51,6 +52,7 @@ handlebars.registerPartial('subscriptions', subscriptions);
 handlebars.registerPartial('toplogo', toplogo);
 handlebars.registerPartial('collectivecard', collectivecard);
 handlebars.registerPartial('relatedgroups', relatedgroups);
+handlebars.registerPartial('renewalnotice', renewalnotice);
 
 handlebars.registerHelper('sign', (value) => {
   if (value >= 0) return '+';
