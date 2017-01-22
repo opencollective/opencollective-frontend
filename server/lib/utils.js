@@ -283,14 +283,14 @@ export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
 /**
  * Calculates the 1st of next month
  * input: date
- * output: 1st of following month
+ * output: 1st of following month, needs to be in Unix time and in seconds (not ms)
  */
 export function getSubscriptionTrialEndDate(date, interval) {
   date.setDate(1);
   if (interval === 'month') {
-    return date.setMonth(date.getMonth() + 1); // set to 1st of next month
+    return Math.floor(date.setMonth(date.getMonth() + 1)/1000); // set to 1st of next month
   } else if (interval === 'year') {
-    return date.setMonth(date.getMonth() + 12); // set to 1st of next year's same month
+    return Math.floor(date.setMonth(date.getMonth() + 12)/1000); // set to 1st of next year's same month
   } else {
     return null;
   }
