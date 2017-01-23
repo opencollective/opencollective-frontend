@@ -27,7 +27,7 @@ const STRIPE_TOKEN = 'superStripeToken';
 /*
  * Tests
  */
-describe.only('lib.donation.test.js', () => {
+describe('lib.donation.test.js', () => {
   let sandbox, processDonationSpy, emailSendMessageSpy, emailSendSpy;
 
   before(() => {
