@@ -2,9 +2,8 @@ import * as stripe from '../gateways/stripe';
 import * as transactions from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from './email';
-import { getSubscriptionTrialEndDate } from './utils';
 
-export const processDonation = (Sequelize, donation) => {
+export function processDonation(Sequelize, donation) {
 
   const services = {
 
@@ -32,7 +31,7 @@ export const processDonation = (Sequelize, donation) => {
                   groupId: group.id,
                   groupName: group.name,
                   paymentMethodId: paymentMethod.id,
-                  description: `OpenCollective: ${group.slug}`
+                  description: `https://opencollective.com/${group.slug}`
                 }
               }))
           .then(stripeSubscription => subscription.update({ stripeSubscriptionId: stripeSubscription.id }))
@@ -151,4 +150,20 @@ export const processDonation = (Sequelize, donation) => {
          Error: ${err}<br><br>Donation: ${JSON.stringify(donation.info)}`
         )
     });
-};
+}
+
+/**
+ * Calculates the 1st of next month
+ * input: date
+ * output: 1st of following month, needs to be in Unix time and in seconds (not ms)
+ */
+function getSubscriptionTrialEndDate(date, interval) {
+  date.setDate(1);
+  if (interval === 'month') {
+    return Math.floor(date.setMonth(date.getMonth() + 1)/1000); // set to 1st of next month
+  } else if (interval === 'year') {
+    return Math.floor(date.setMonth(date.getMonth() + 12)/1000); // set to 1st of next year's same month
+  } else {
+    return null;
+  }
+}
