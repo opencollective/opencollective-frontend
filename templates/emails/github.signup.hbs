@@ -2,22 +2,34 @@ Subject: {{group.name}}: Your Collective is live!
 
 {{> header}}
 
+<style>
+ol {
+  padding: 0px 20px 5px;
+}
+li {
+  margin: 15px 0px;
+  line-height: 1.4;
+}
+</style>
+
 {{#if firstName}}
 <p>Dear {{firstName}},</p>
 {{else}}
 <p>Hi!</p>
 {{/if}}
 
-<p> Thanks for signing up on Open Collective! Your collective has been created: <a href="{{config.host.website}}/{group.slug}">{{group.name}}</a>. While you wait for approval to start receiving donations, here's a quick guide to customize your collective and make the most out of it: </p>
+<p>Thanks for signing up on Open Collective! Your collective has been created: <a href="{{config.host.website}}/{{group.slug}}">{{group.name}}</a>.</p>
+
+<p>While you wait for approval to start receiving donations, here's a quick guide to customize your collective and make the most out of it: </p>
 
 <ol type="1">
-<li><strong>Make your collective your own.</strong> Login and hover over elements to edit them. </li>
+<li><strong>Make your collective your own.</strong> <a href="{{config.host.website}}/login">Login</a> and hover over elements to edit them. </li>
 
-<li><strong>Add backers/sponsors to Github/Website.</strong> We'll submit a PR to your README to add backers & sponsors. Instructions to add your backers to a website <a href="https://github.com/OpenCollective/OpenCollective/wiki/Website-banner">here</a>.
+<li><strong>Add backers/sponsors to Github/Website.</strong> We'll submit a PR to your README to add backers & sponsors. Instructions to add your backers to your website <a href="https://github.com/OpenCollective/OpenCollective/wiki/Website-banner">here</a>.
 
-<li><strong>Start tracking expenses.</strong> Submit expenses so others can see your costs. It helps to raise awareness (and later, money).
+<li><strong>Start tracking expenses.</strong> Submit expenses on <a href="{{config.host.website}}/{{group.slug}}/expenses">{{config.host.website}}/{{group.slug}}/expenses</a> so others can see your costs. It helps to raise awareness (and later, money).
 
-<li><strong>Spread the word.</strong> If you have a twitter account, you can connect it to your collective and automatically thank your backers. <a href="https://github.com/OpenCollective/OpenCollective/wiki/Twitter">Instructions</a>
+<li><strong>Spread the word.</strong> You can <a href="{{config.host.website}}/{{group.slug}}/connect/twitter">connect your Twitter account to your collective</a> and automatically thank your backers. You can also <a href="https://github.com/OpenCollective/OpenCollective/wiki/Slack-and-Gitter">connect your Slack channel</a>.
 
 </ol>
 
