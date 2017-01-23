@@ -336,7 +336,7 @@ describe('lib.donation.test.js', () => {
             `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
             `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
             `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`
+            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
           ].join('&');
 
           nocks['subscriptions.create'] = nock(STRIPE_URL)

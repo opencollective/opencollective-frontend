@@ -3,7 +3,27 @@ import * as transactions from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from './email';
 
-export function processDonation(Sequelize, donation) {
+/**
+ * Calculates the 1st of next month
+ * input: date
+ * output: 1st of following month, needs to be in Unix time and in seconds (not ms)
+ */
+export const getSubscriptionTrialEndDate = (date, interval) => {
+  date.setDate(1);
+  if (interval === 'month') {
+    return Math.floor(date.setMonth(date.getMonth() + 1)/1000); // set to 1st of next month
+  } else if (interval === 'year') {
+    return Math.floor(date.setMonth(date.getMonth() + 12)/1000); // set to 1st of next year's same month
+  } else {
+    return null;
+  }
+}
+
+/*
+ * Processes each donation
+ */
+
+export const processDonation = (Sequelize, donation) => {
 
   const services = {
 
@@ -150,20 +170,4 @@ export function processDonation(Sequelize, donation) {
          Error: ${err}<br><br>Donation: ${JSON.stringify(donation.info)}`
         )
     });
-}
-
-/**
- * Calculates the 1st of next month
- * input: date
- * output: 1st of following month, needs to be in Unix time and in seconds (not ms)
- */
-function getSubscriptionTrialEndDate(date, interval) {
-  date.setDate(1);
-  if (interval === 'month') {
-    return Math.floor(date.setMonth(date.getMonth() + 1)/1000); // set to 1st of next month
-  } else if (interval === 'year') {
-    return Math.floor(date.setMonth(date.getMonth() + 12)/1000); // set to 1st of next year's same month
-  } else {
-    return null;
-  }
 }
