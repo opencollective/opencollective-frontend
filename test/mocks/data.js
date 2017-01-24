@@ -644,6 +644,10 @@ export default {
     description: "January monthly meetup",
     startsAt: "2017-01-06 UTC+0300",
     endsAt: "2017-01-07 UTC+300",
+    locationString: "Balanced NYC",
+    address: "547 Broadway, NY 10012",
+    backgroundImage: "http://opencollective.com/backgroundimage.png",
+    maxQuantity: 200
   },
 
   "event2": {
@@ -651,7 +655,9 @@ export default {
     slug: "feb-meetup",
     description: "February monthly meetup",
     startsAt: "2017-02-06 UTC+0300",
-    endsAt: "2017-02-07 UTC+300"
+    endsAt: "2017-02-07 UTC+300",
+    locationString: "Puck Fair",
+    address: "505 Broadway, NY 10012",
   },
 
   "tier1": {
@@ -659,7 +665,7 @@ export default {
     description: "free tickets for all",
     amount: 0,
     currency: "USD",
-    quantity: 10,
+    maxQuantity: 10,
   },
 
   "tier2": {
@@ -667,17 +673,19 @@ export default {
     description: "$20 ticket",
     amount: 2000,
     currency: "USD",
-    quantity: 100
+    maxQuantity: 100
   },
 
   "response1": {
     status: "INTERESTED",
     quantity: 1,
+    description: "I work on bitcoin"
   },
 
   "response2": {
     status: "YES",
     quantity: 2,
+    description: "I have been working on open source for over a decade"
   },
 
   "response3": {
