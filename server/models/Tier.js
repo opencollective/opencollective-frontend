@@ -36,7 +36,7 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    quantity: {
+    maxQuantity: {
       type: DataTypes.INTEGER,
       min: 0
     },

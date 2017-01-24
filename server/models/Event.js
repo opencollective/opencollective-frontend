@@ -1,3 +1,7 @@
+
+const DEFAULT_BACKGROUND_IMG = '/static/images/collectives/default-header-bg.jpg';
+
+
 export default function(Sequelize, DataTypes) {
 
   const Event = Sequelize.define('Event', {
@@ -42,7 +46,7 @@ export default function(Sequelize, DataTypes) {
       min: 0
     },
 
-    quantity: {
+    maxQuantity: {
       type: DataTypes.INTEGER
     },
 
@@ -51,6 +55,15 @@ export default function(Sequelize, DataTypes) {
     description: DataTypes.TEXT,
 
     locationString: DataTypes.STRING,
+
+    address: DataTypes.STRING,
+
+    backgroundImage: {
+      type: DataTypes.STRING,
+      get() {
+        return this.getDataValue('backgroundImage') || `${config.host.website}${DEFAULT_BACKGROUND_IMG}`;
+      }
+    },
 
     slug: DataTypes.STRING,
 
