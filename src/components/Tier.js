@@ -52,7 +52,7 @@ class Tier extends React.Component {
 
   static propTypes = {
     tier: React.PropTypes.object.isRequired,
-    className: React.PropTypes.object,
+    className: React.PropTypes.string,
     quantity: React.PropTypes.number,
     onChange: React.PropTypes.func, // onChange(response{quantity, amount, tier})
     onClick: React.PropTypes.func // onClick(response{quantity, amount, tier})

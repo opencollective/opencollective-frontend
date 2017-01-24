@@ -14,60 +14,10 @@ import NotificationBar from '../components/NotificationBar';
 import TopBar from '../components/TopBar';
 import GetTicketForm from '../components/GetTicketForm';
 import InterestedForm from '../components/InterestedForm';
+import Responses from '../components/Responses';
 import colors from '../constants/colors';
-
+import { filterCollection } from '../lib/utils';
 import '../css/EventPage.css';
-
-const styles = {
-  EventPage: css({
-    position: 'relative',
-    '& a': {
-      textDecoration: 'none'
-    },
-    '& section': {
-      margin: '60px 0px',
-    },
-    '& h1': {
-      margin: '40px 0px 20px',
-      fontFamily: 'montserratlight',
-      fontSize: '20pt',
-      fontWeight: 'bold'
-    }
-  }),
-  content: css({
-    maxWidth: 960,
-    margin: '0 auto'
-  }),
-  description: css({
-    margin: '1rem'
-  }),
-  getTicketForm: css({
-    margin: '20px auto',
-    maxWidth: '400px'
-  }),
-  map: css({
-    border: '1px solid #eee',
-    height: '300px'
-  }),
-  tier: css({
-    margin: '40px auto'
-  }),
-  location: css({
-    textAlign: 'center',
-    '& .description': {
-      margin: '30px 10px'
-    },
-    '& .name': {
-      fontSize: '16pt',
-      fontFamily: 'montserratlight',
-      margin: '5px 0px'
-    },
-    '& .address': {
-      color: colors.darkgray,
-      fontFamily: 'lato'
-    }
-  })
-};
 
 class EventPage extends React.Component {
 
@@ -95,7 +45,7 @@ class EventPage extends React.Component {
     ];
 
     this.state = {
-      view: 'event',
+      view: 'default',
       showInterestedForm: false,
       response: {},
       api: { status: 'idle' },
@@ -153,7 +103,7 @@ class EventPage extends React.Component {
 
   resetResponse() {
     this.setState({ response: {} });
-    this.changeView('event');
+    this.changeView('default');
   }
 
   handleGetTicketClick(response) {
@@ -167,8 +117,15 @@ class EventPage extends React.Component {
     if (this.props.data.loading) {
       return (<div>Loading</div>)
     }
+
+    const going = filterCollection(Event.responses, {'status':'confirmed'});
+    const interested = filterCollection(Event.responses, {'status':'interested'});
+    let responsesTitle = `${going.length} people going`;
+    if (interested.length > 0)
+      responsesTitle += ` – ${interested.length} interested`;
+
     return (
-      <div className={styles.EventPage}>
+      <div className="EventPage">
         <TopBar className={this.state.api.status} /> 
 
         <NotificationBar status={this.state.api.status} error={this.state.api.error} />
@@ -193,10 +150,10 @@ class EventPage extends React.Component {
             />
         }
 
-        {this.state.view == 'event' &&
+        {this.state.view == 'default' &&
           <div>
-            <div className={styles.content} >
-              <div className={styles.description} >
+            <div className="content" >
+              <div className="eventDescription" >
                 {Event.description}
               </div>
 
@@ -204,7 +161,7 @@ class EventPage extends React.Component {
                 {Event.tiers.map((tier) =>
                   <Tier
                     key={tier.id}
-                    className={styles.tier}
+                    className="tier"
                     tier={tier}
                     onChange={(response) => this.updateResponse(response)}
                     onClick={(response) => this.handleGetTicketClick(response)}
@@ -213,18 +170,25 @@ class EventPage extends React.Component {
               </div>
             </div>
 
-            <section id="location" className={styles.location}>
+            <section id="location" className="location">
               <div className="description">
                 <h1>Location</h1>
                 <div className="name">{Event.location}</div>
-                <div className="address">{Event.address}</div>
+                <div className="address" style={{color: colors.darkgray}}>{Event.address}</div>
               </div>
-              <div className={styles.map}>
-                <Map lat={Event.lat} lng={Event.lng} className={styles.map} />
+              <div className="map">
+                <Map lat={Event.lat} lng={Event.lng} />
               </div>
             </section>
+
+            <section id="responses">
+              <h1>{responsesTitle}</h1>
+              <Responses responses={Event.responses} />
+            </section>
+
           </div>
         }
+
       </div>
     )
   }
@@ -255,6 +219,19 @@ const FeedQuery = gql`query Event {
       mission,
       backgroundImage,
       logo
+    },
+    responses {
+      quantity,
+      status,
+      description,
+      user {
+        name,
+        avatar,
+        bio
+      },
+      tier {
+        name
+      }
     }
   }
 }`

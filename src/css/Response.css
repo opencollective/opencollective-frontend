@@ -1,0 +1,28 @@
+.Response {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 10px;
+  max-width: 300px;
+  float: left;
+}
+ 
+.Response img {
+  float: left;
+  width: 45px;
+  border-radius: 50%;
+}
+
+.bubble {
+    padding: 10px;
+}
+
+.name {
+    font-family: 'montserratlight';
+    font-size: 17px;
+}
+
+.description {
+  font-family: 'lato';
+  font-size: 14px;
+}

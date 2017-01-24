@@ -19,3 +19,65 @@ body {
   font-weight: normal;
   font-style: normal;
 }
+
+.EventPage {
+  position: relative;
+}
+
+a {
+  text-decoration: none;
+}
+
+section {
+  margin: 60px 0px;
+}
+
+h1 {
+  text-align: center;
+  margin: 40px 0px 20px;
+  font-family: 'montserratlight';
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.content {
+    max-width: 960px;
+    padding: 5px;
+    margin: 0 auto;
+}
+
+.eventDescription {
+    margin: 1rem;
+}
+
+.getTicketForm {
+  margin: 20px auto;
+  max-width: 400px;
+}
+
+.map {
+  border: 1px solid #eee;
+  height: 300px;
+}
+
+.tier {
+  margin: 40px auto;
+}
+
+.location {
+  text-align: center;
+}
+
+.location .description {
+    margin: 30px 10px;
+};
+
+.location .name {
+  font-size: 16px;
+  font-family: 'montserratlight';
+  margin: 5px 0px;
+};
+
+.location .address {
+  font-family: 'lato';
+}
