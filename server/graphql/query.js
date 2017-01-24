@@ -14,7 +14,7 @@ const queries = {
   /*
    * Given a collective slug and an event slug, returns the event
    */
-  getEvents: {
+  getEvent: {
     type: new GraphQLList(EventType),
     args: {
       eventSlug: {
