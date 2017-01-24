@@ -289,148 +289,381 @@ describe('lib.donation.test.js', () => {
     describe('Recurring donation', () => {
 
       const customerId = stripeMock.customers.create.id;
-      const planId = generatePlanId({
-        currency: CURRENCY,
-        interval: 'month',
-        amount: 1000
-      });
 
-      const plan = _.extend({}, stripeMock.plans.create, {
-        amount: 1000,
-        interval: 'month',
-        name: planId,
-        id: planId
-      });
+      const createDonation = (interval) => {
+        let pm;
+        return models.PaymentMethod.create({
+          number: 'blah',
+          token: STRIPE_TOKEN,
+          service: 'stripe'
+          })
+        .tap(paymentMethod => pm = paymentMethod)
+        .then(() => models.Subscription.create({
+          interval,
+          currency: CURRENCY,
+          amount: 10.99
+        }))
+        .then(subscription => models.Donation.create({
+          amount: 1099,
+          currency: CURRENCY,
+          SubscriptionId: subscription.id,
+          PaymentMethodId: pm.id,
+          UserId: user.id,
+          GroupId: group.id,
+          createdAt: '2017-01-22T15:01:22.827-07:00'
+        }));
+      };
 
-      beforeEach(() => {
-        nocks['plans.create'] = nock(STRIPE_URL)
-          .post('/v1/plans')
-          .reply(200, plan);
+      describe('monthly', () => {
+        const planId = generatePlanId({
+          currency: CURRENCY,
+          interval: 'month',
+          amount: 1099
+        });
 
-        const params = [
-          `plan=${planId}`,
-          'application_fee_percent=5',
-          `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-          `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
-          `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-          `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`
-        ].join('&');
-
-      nocks['subscriptions.create'] = nock(STRIPE_URL)
-        .post(`/v1/customers/${customerId}/subscriptions`, params)
-        .reply(200, stripeMock.subscriptions.create);
-      });
-
-      describe('plan does not exist', () => {
-        beforeEach(() => {
-          nocks['plans.retrieve'] = nock(STRIPE_URL)
-            .get(`/v1/plans/${planId}`)
-            .reply(200, {
-              error: stripeMock.plans.create_not_found
-            });
+        const plan = _.extend({}, stripeMock.plans.create, {
+          amount: 1099,
+          interval: 'month',
+          name: planId,
+          id: planId
         });
 
         beforeEach(() => {
-          let pm;
-          return models.PaymentMethod.create({
-            number: 'blah',
-            token: STRIPE_TOKEN,
-            service: 'stripe'
-            })
-          .tap(paymentMethod => pm = paymentMethod)
-          .then(() => models.Subscription.create({
-            interval: 'month',
-            currency: CURRENCY,
-            amount: 10
-          }))
-          .then(subscription => models.Donation.create({
-            amount: 1000,
-            currency: CURRENCY,
-            SubscriptionId: subscription.id,
-            PaymentMethodId: pm.id,
-            UserId: user.id,
-            GroupId: group.id
-          }));
+          const params = [
+            `plan=${planId}`,
+            'application_fee_percent=5',
+            'trial_end=1485986482',
+            `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+            `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
+            `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
+            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
+          ].join('&');
+
+          nocks['subscriptions.create'] = nock(STRIPE_URL)
+            .post(`/v1/customers/${customerId}/subscriptions`, params)
+            .reply(200, stripeMock.subscriptions.create);
         });
 
-        it('creates a plan if it doesn\'t exist', () => {
-          expect(nocks['plans.retrieve'].isDone()).to.be.true;
-          expect(nocks['plans.create'].isDone()).to.be.true;
-        });
-
-        it('creates a subscription', () => {
-          expect(nocks['subscriptions.create'].isDone()).to.be.true;
-        });
-
-        it('successfully adds the user as a backer', (done) => {
-          group
-            .getUsers()
-            .then((users) => {
-              expect(users).to.have.length(2);
-              const backer = _.find(users, {email: user.email});
-              expect(backer.UserGroup.role).to.equal(roles.BACKER);
-              done();
-            })
-            .catch(done);
-        });
-      });
-
-      describe('plan exists', () => {
         beforeEach(() => {
-          nocks['plans.retrieve'] = nock(STRIPE_URL)
-            .get(`/v1/plans/${planId}`)
+          nocks['plans.create'] = nock(STRIPE_URL)
+            .post('/v1/plans')
             .reply(200, plan);
         });
 
+        describe('plan does not exist', () => {
+
+          beforeEach(() => {
+            nocks['plans.retrieve'] = nock(STRIPE_URL)
+              .get(`/v1/plans/${planId}`)
+              .reply(200, {
+                error: stripeMock.plans.create_not_found
+              });
+          });
+
+          beforeEach(() => createDonation('month'));
+        
+          it('successfully creates a Stripe customer', () => {
+            expect(nocks['customers.create'].isDone()).to.be.true;
+          });
+
+          it('successfully makes a Stripe charge', () => {
+            expect(nocks['charges.create'].isDone()).to.be.true;
+          });
+
+          it('successfully gets a Stripe balance', () => {
+            expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+          });
+
+          it('successfully creates a transaction in the database', (done) => {
+            models.Transaction
+              .findAndCountAll({})
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
+                expect(res.rows[0]).to.have.property('currency', CURRENCY);
+                expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
+                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+                expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+                expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+                expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
+                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                done();
+              })
+              .catch(done);
+          });
+
+          it('creates a plan', () => {
+            expect(nocks['plans.retrieve'].isDone()).to.be.true;
+            expect(nocks['plans.create'].isDone()).to.be.true;
+          });
+
+          it('creates a subscription', () => {
+            expect(nocks['subscriptions.create'].isDone()).to.be.true;
+          });
+
+          it('successfully adds the user as a backer', (done) => {
+            group
+              .getUsers()
+              .then((users) => {
+                expect(users).to.have.length(2);
+                const backer = _.find(users, {email: user.email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+          });
+        });
+
+        describe('plan exists', () => {
+          beforeEach(() => {
+            nocks['plans.retrieve'] = nock(STRIPE_URL)
+              .get(`/v1/plans/${planId}`)
+              .reply(200, plan);
+          });
+
+          beforeEach(() => createDonation('month'));
+
+          it('successfully creates a Stripe customer', () => {
+            expect(nocks['customers.create'].isDone()).to.be.true;
+          });
+
+          it('successfully makes a Stripe charge', () => {
+            expect(nocks['charges.create'].isDone()).to.be.true;
+          });
+
+          it('successfully gets a Stripe balance', () => {
+            expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+          });
+
+          it('successfully creates a transaction in the database', (done) => {
+            models.Transaction
+              .findAndCountAll({})
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
+                expect(res.rows[0]).to.have.property('currency', CURRENCY);
+                expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
+                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+                expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+                expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+                expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
+                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                done();
+              })
+              .catch(done);
+          });
+
+          it('uses the existing plan', () => {
+            expect(nocks['plans.create'].isDone()).to.be.false;
+            expect(nocks['plans.retrieve'].isDone()).to.be.true;
+          });
+
+          it('creates a subscription', () => {
+            expect(nocks['subscriptions.create'].isDone()).to.be.true;
+          });
+
+          it('successfully adds the user as a backer', (done) => {
+            group
+              .getUsers()
+              .then((users) => {
+                expect(users).to.have.length(2);
+                const backer = _.find(users, {email: user.email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+          });
+
+          it('successfully sends out an email to donor', () => {
+            expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
+            expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
+          });
+        });
+      });
+
+      describe('annually', () => {
+        const planId = generatePlanId({
+          currency: CURRENCY,
+          interval: 'year',
+          amount: 1099
+        });
+
+        const plan = _.extend({}, stripeMock.plans.create, {
+          amount: 1099,
+          interval: 'year',
+          name: planId,
+          id: planId
+        });
+
         beforeEach(() => {
-          let pm;
-          return models.PaymentMethod.create({
-            number: 'blah',
-            token: STRIPE_TOKEN,
-            service: 'stripe'
-            })
-          .tap(paymentMethod => pm = paymentMethod)
-          .then(() => models.Subscription.create({
-            interval: 'month',
-            currency: CURRENCY,
-            amount: 10
-          }))
-          .then(subscription => models.Donation.create({
-            amount: 1000,
-            currency: CURRENCY,
-            SubscriptionId: subscription.id,
-            PaymentMethodId: pm.id,
-            UserId: user.id,
-            GroupId: group.id
-          }));
+          const params = [
+            `plan=${planId}`,
+            'application_fee_percent=5',
+            'trial_end=1514844082',
+            `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+            `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
+            `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
+            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
+          ].join('&');
+
+          nocks['subscriptions.create'] = nock(STRIPE_URL)
+            .post(`/v1/customers/${customerId}/subscriptions`, params)
+            .reply(200, stripeMock.subscriptions.create);
         });
 
-        it('uses the existing plan', () => {
-          expect(nocks['plans.create'].isDone()).to.be.false;
-          expect(nocks['plans.retrieve'].isDone()).to.be.true;
+        beforeEach(() => {
+          nocks['plans.create'] = nock(STRIPE_URL)
+            .post('/v1/plans')
+            .reply(200, plan);
         });
 
-        it('creates a subscription', () => {
-          expect(nocks['subscriptions.create'].isDone()).to.be.true;
+        describe('plan does not exist', () => {
+
+          beforeEach(() => {
+            nocks['plans.retrieve'] = nock(STRIPE_URL)
+              .get(`/v1/plans/${planId}`)
+              .reply(200, {
+                error: stripeMock.plans.create_not_found
+              });
+          });
+
+          beforeEach(() => createDonation('year'));
+        
+          it('successfully creates a Stripe customer', () => {
+            expect(nocks['customers.create'].isDone()).to.be.true;
+          });
+
+          it('successfully makes a Stripe charge', () => {
+            expect(nocks['charges.create'].isDone()).to.be.true;
+          });
+
+          it('successfully gets a Stripe balance', () => {
+            expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+          });
+
+          it('successfully creates a transaction in the database', (done) => {
+            models.Transaction
+              .findAndCountAll({})
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
+                expect(res.rows[0]).to.have.property('currency', CURRENCY);
+                expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
+                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+                expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+                expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+                expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
+                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                done();
+              })
+              .catch(done);
+          });
+
+          it('creates a plan', () => {
+            expect(nocks['plans.retrieve'].isDone()).to.be.true;
+            expect(nocks['plans.create'].isDone()).to.be.true;
+          });
+
+          it('creates a subscription', () => {
+            expect(nocks['subscriptions.create'].isDone()).to.be.true;
+          });
+
+          it('successfully adds the user as a backer', (done) => {
+            group
+              .getUsers()
+              .then((users) => {
+                expect(users).to.have.length(2);
+                const backer = _.find(users, {email: user.email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+          });
         });
 
-        it('successfully adds the user as a backer', (done) => {
-          group
-            .getUsers()
-            .then((users) => {
-              expect(users).to.have.length(2);
-              const backer = _.find(users, {email: user.email});
-              expect(backer.UserGroup.role).to.equal(roles.BACKER);
-              done();
-            })
-            .catch(done);
-        });
+        describe('plan exists', () => {
+          beforeEach(() => {
+            nocks['plans.retrieve'] = nock(STRIPE_URL)
+              .get(`/v1/plans/${planId}`)
+              .reply(200, plan);
+          });
 
-        it('successfully sends out an email to donor', () => {
-          expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
-          expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
-        })
-      })
+          beforeEach(() => createDonation('year'));
+
+          it('successfully creates a Stripe customer', () => {
+            expect(nocks['customers.create'].isDone()).to.be.true;
+          });
+
+          it('successfully makes a Stripe charge', () => {
+            expect(nocks['charges.create'].isDone()).to.be.true;
+          });
+
+          it('successfully gets a Stripe balance', () => {
+            expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+          });
+
+          it('successfully creates a transaction in the database', (done) => {
+            models.Transaction
+              .findAndCountAll({})
+              .then((res) => {
+                expect(res.count).to.equal(1);
+                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
+                expect(res.rows[0]).to.have.property('currency', CURRENCY);
+                expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
+                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+                expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+                expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+                expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+                expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
+                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                done();
+              })
+              .catch(done);
+          });
+
+          it('uses the existing plan', () => {
+            expect(nocks['plans.create'].isDone()).to.be.false;
+            expect(nocks['plans.retrieve'].isDone()).to.be.true;
+          });
+
+          it('creates a subscription', () => {
+            expect(nocks['subscriptions.create'].isDone()).to.be.true;
+          });
+
+          it('successfully adds the user as a backer', (done) => {
+            group
+              .getUsers()
+              .then((users) => {
+                expect(users).to.have.length(2);
+                const backer = _.find(users, {email: user.email});
+                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                done();
+              })
+              .catch(done);
+          });
+
+          it('successfully sends out an email to donor', () => {
+            expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
+            expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
+          });
+        });
+      });
+
 
     });
 
@@ -484,7 +717,7 @@ describe('lib.donation.test.js', () => {
         done();
       });
 
-    })
+    });
 
   });
 });

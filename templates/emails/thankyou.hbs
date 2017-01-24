@@ -22,6 +22,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
     <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your donation helps us continue our activities.</p>
   {{/if}}
+  {{> charge_date_notice}}
 {{else}}
 <p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
   Your gift will help us continue our activities.</p>

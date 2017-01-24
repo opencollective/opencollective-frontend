@@ -167,30 +167,6 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb)
     }],
 
-    activateSubscription: ['fetchPaymentMethod', (cb, results) => {
-      const subscription = results.fetchDonation.Subscription;
-      // If the subscription is not active, we will activate it
-      if (!subscription.isActive) {
-        return subscription.activate()
-          .then(subscription => {
-            return Activity.create({
-              type: activities.SUBSCRIPTION_CONFIRMED,
-              data: {
-                event: results.fetchEvent.event,
-                group: results.fetchDonation.Group,
-                user: results.fetchDonation.User,
-                donation: results.fetchDonation,
-                subscription
-              }
-            });
-          })
-          .then(() => cb())
-          .catch(cb);
-      } else {
-        return cb();
-      }
-    }],
-
     retrieveCharge: ['fetchPaymentMethod', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       appStripe.charges.retrieve(chargeId, {
@@ -219,18 +195,7 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    countTransactions: ['retrieveCharge', (cb, results) => {
-      const donation = results.fetchDonation;
-      Transaction.count({
-        where: {
-          DonationId: donation.id
-        }
-      })
-      .then(numTransactions => cb(null, numTransactions))
-      .catch(cb) 
-    }],
-
-    createTransaction: ['retrieveBalance', 'countTransactions', (cb, results) => {
+    createTransaction: ['retrieveBalance', (cb, results) => {
       const donation = results.fetchDonation;
       const subscription = donation.Subscription;
       const { stripeSubscription } = results.fetchEvent;
@@ -271,9 +236,6 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     sendInvoice: ['createTransaction', (cb, results) => {
-      if (results.countTransactions === 0) {
-        return cb();
-      }
       const donation = results.fetchDonation;
       const transaction = results.createTransaction;
       // We only send an invoice for donations > $10 equivalent

@@ -96,21 +96,23 @@ describe('webhooks.routes.test.js', () => {
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
+
+    /*
+     * This section of beforeEach calls is for original donation to succeed.
+     */
     const planId = generatePlanId({
       amount: STRIPE_SUBSCRIPTION_CHARGE,
       interval: INTERVAL,
       currency: CURRENCY
     });
 
-    // Nock for customers.create.
-    beforeEach(() => {
+    beforeEach('Nock for customers.create', () => {
       nocks['customers.create'] = nock(STRIPE_URL)
         .post('/v1/customers')
         .reply(200, stripeMock.customers.create);
     });
 
-    // Nock for plans.retrieve.
-    beforeEach(() => {
+    beforeEach('Nock for plans.retrieve', () => {
       const plan = _.extend({}, stripeMock.plans.create, {
         amount: STRIPE_SUBSCRIPTION_CHARGE,
         interval: INTERVAL,
@@ -123,38 +125,56 @@ describe('webhooks.routes.test.js', () => {
         .reply(200, plan);
     });
 
-    // Nock for subscriptions.create.
-    beforeEach(() => {
+    beforeEach('Nock for charges.create', () => {
+      const params = [
+        `amount=${STRIPE_SUBSCRIPTION_CHARGE}`,
+        `currency=${CURRENCY}`,
+        `customer=${stripeMock.customers.create.id}`,
+        `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
+        'application_fee=1750',
+        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
+        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(stripeEmail)}`,
+        `${encodeURIComponent('metadata[paymentMethodId]')}=1`
+      ].join('&');
+
+      nocks['charges.create'] = nock(STRIPE_URL)
+        .post('/v1/charges', params)
+        .reply(200, stripeMock.charges.create);
+    });
+
+    
+    beforeEach('Nock for subscriptions.create', () => {
       const params = [
         `plan=${planId}`,
         'application_fee_percent=5',
+        'trial_end=1485986482827',
         `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
         `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
         `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`
+        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
       ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
+        .filteringRequestBody(/trial_end=[^&]*/g, 'trial_end=1485986482827')
         .post(`/v1/customers/${customerId}/subscriptions`, params)
         .reply(200, webhookSubscription);
     });
 
-    // Nock for retrieving charge
-    beforeEach(() => {
+    beforeEach('Nock for retrieving charge', () => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
         .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
         .reply(200, stripeMock.charges.create);
     });
 
-    // Nock for retrieving balance transaction
-    beforeEach(() => {
+    beforeEach('nock for retrieving balance transaction', () => {
       nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
         .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
         .reply(200, stripeMock.balance);
     });
 
-    // Make the donation
-    beforeEach((done) => {
+    // Now we make the donation using above beforeEach calls
+    beforeEach('Make the donation', (done) => {
       const payment = {
         stripeToken: STRIPE_TOKEN,
         amount: webhookSubscription.amount / 100,
@@ -177,8 +197,10 @@ describe('webhooks.routes.test.js', () => {
         });
     });
 
-    // Find the donation
-    beforeEach((done) => {
+    /*
+     * Next beforeEach calls confirm that donation went through
+     */
+    beforeEach('Find donation', (done) => {
       models.Donation.findAndCountAll({
           include: [
             {
@@ -195,8 +217,7 @@ describe('webhooks.routes.test.js', () => {
         .catch(done);
     });
 
-    // Find the paymentMethod
-    beforeEach((done) => {
+    beforeEach('Find paymentMethod', (done) => {
       models.PaymentMethod.findAndCountAll({
         where: {
           UserId: donation.UserId
@@ -209,9 +230,22 @@ describe('webhooks.routes.test.js', () => {
         .catch(done);
     });
 
-    /**
-     * Send webhook
+    /*
+     * These beforeEach calls are setting up for webhook
      */
+    beforeEach('Nock for retrieving charge', () => {
+      nocks['charge.retrieve2'] = nock(STRIPE_URL)
+        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4_2')
+        .reply(200, Object.assign({}, stripeMock.charges.create, {balance_transaction: 'txn_165j8oIqnMN1wWwOKlPn1D4_2' }));
+    });
+
+    beforeEach('Nock for retrieving balance transaction', () => {
+      nocks['balance.retrieveTransaction2'] = nock(STRIPE_URL)
+        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4_2')
+        .reply(200, stripeMock.balance);
+    });
+
+    // Now we send the webhook
     beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get(`/v1/events/${webhookEvent.id}`)
@@ -233,14 +267,14 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('successfully gets a Stripe charge', () => {
-      expect(nocks['charge.retrieve'].isDone()).to.be.true;
+      expect(nocks['charge.retrieve2'].isDone()).to.be.true;
     });
 
     it('successfully gets a Stripe balance', () => {
-      expect(nocks['balance.retrieveTransaction'].isDone()).to.be.true;
+      expect(nocks['balance.retrieveTransaction2'].isDone()).to.be.true;
     });
 
-    it('adds the first transaction', (done) => {
+    it('adds a transaction', (done) => {
       models.Transaction.findAndCountAll({
         where: {
           DonationId: donation.id
@@ -252,25 +286,24 @@ describe('webhooks.routes.test.js', () => {
         ]
       })
       .tap((res) => {
-        expect(res.count).to.equal(1);
-        res.rows.forEach((transaction) => {
-          expect(transaction.DonationId).to.be.equal(donation.id);
-          expect(transaction.GroupId).to.be.equal(donation.GroupId);
-          expect(transaction.UserId).to.be.equal(donation.UserId);
-          expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-          expect(transaction.currency).to.be.equal(CURRENCY);
-          expect(transaction.type).to.be.equal(type.DONATION);
-          expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
-          expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-          expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
-          expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
-          expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
-          expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-          expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875)
-          expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
-          expect(transaction.Subscription.isActive).to.be.equal(true);
-          expect(transaction.Subscription).to.have.property('activatedAt');
-        });
+        expect(res.count).to.equal(2);
+        const transaction = res.rows[1];
+        expect(transaction.DonationId).to.be.equal(donation.id);
+        expect(transaction.GroupId).to.be.equal(donation.GroupId);
+        expect(transaction.UserId).to.be.equal(donation.UserId);
+        expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
+        expect(transaction.currency).to.be.equal(CURRENCY);
+        expect(transaction.type).to.be.equal(type.DONATION);
+        expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+        expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+        expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
+        expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+        expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+        expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
+        expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875)
+        expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+        expect(transaction.Subscription.isActive).to.be.equal(true);
+        expect(transaction.Subscription).to.have.property('activatedAt');
         done();
       })
       .catch(done);
@@ -293,14 +326,11 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('fail to create a second transaction with the same charge id', done => {
+      const anotherWebhookEvent = _.cloneDeep(webhookEvent);
+      anotherWebhookEvent.data.object.charge = 'ch_17KUJnBgJgc4Ba6uvdu1hxm4';
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get(`/v1/events/${webhookEvent.id}`)
-        .reply(200,
-          _.extend({},
-            webhookEvent, {
-            type: 'invoice.payment_succeeded'
-          })
-        );
+        .reply(200, anotherWebhookEvent);
 
       request(app)
         .post('/webhooks/stripe')
@@ -348,33 +378,31 @@ describe('webhooks.routes.test.js', () => {
             ]
           })
           .tap(res => {
-            expect(res.count).to.be.equal(2); // second transaction
-            res.rows.forEach((transaction) => {
-              expect(transaction.GroupId).to.be.equal(donation.GroupId);
-              expect(transaction.UserId).to.be.equal(donation.UserId);
-              expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-              expect(transaction.currency).to.be.equal(CURRENCY);
-              expect(transaction.type).to.be.equal(type.DONATION);
-              expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+            expect(res.count).to.be.equal(3); // third transaction
+            const transaction = res.rows[2];
+            expect(transaction.GroupId).to.be.equal(donation.GroupId);
+            expect(transaction.UserId).to.be.equal(donation.UserId);
+            expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
+            expect(transaction.currency).to.be.equal(CURRENCY);
+            expect(transaction.type).to.be.equal(type.DONATION);
+            expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
 
-              expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
-              expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-              expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
-              expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
-              expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
-              expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-              expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875);
-              expect(transaction.Subscription.isActive).to.be.equal(true);
-              expect(transaction.Subscription).to.have.property('activatedAt');
-              expect(transaction.Subscription.interval).to.be.equal('month');
+            expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
+            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
+            expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
+            expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
+            expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
+            expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875);
+            expect(transaction.Subscription.isActive).to.be.equal(true);
+            expect(transaction.Subscription).to.have.property('activatedAt');
+            expect(transaction.Subscription.interval).to.be.equal('month');
 
-              expect(emailSendSpy.callCount).to.equal(3);
-              expect(emailSendSpy.secondCall.args[0])
-              expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
-              expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.true;
-              expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-              expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
-            });
+            expect(emailSendSpy.callCount).to.equal(4);
+            expect(emailSendSpy.thirdCall.args[0])
+            expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
+            expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
+            expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
 
             done();
           })
@@ -384,11 +412,11 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('successfully sends out an invoice by email to donor', () => {
-      expect(emailSendSpy.callCount).to.equal(2);
-      expect(emailSendSpy.secondCall.args[0])
-      expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
-      expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.true;
-      expect(emailSendSpy.secondCall.args[1]).to.equal(stripeEmail);
+      expect(emailSendSpy.callCount).to.equal(3);
+      expect(emailSendSpy.thirdCall.args[0])
+      expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
+      expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
+      expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
     });
   });
 

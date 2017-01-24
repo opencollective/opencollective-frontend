@@ -3,6 +3,26 @@ import * as transactions from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from './email';
 
+/**
+ * Calculates the 1st of next month
+ * input: date
+ * output: 1st of following month, needs to be in Unix time and in seconds (not ms)
+ */
+export const getSubscriptionTrialEndDate = (date, interval) => {
+  date.setDate(1);
+  if (interval === 'month') {
+    return Math.floor(date.setMonth(date.getMonth() + 1)/1000); // set to 1st of next month
+  } else if (interval === 'year') {
+    return Math.floor(date.setMonth(date.getMonth() + 12)/1000); // set to 1st of next year's same month
+  } else {
+    return null;
+  }
+}
+
+/*
+ * Processes each donation
+ */
+
 export const processDonation = (Sequelize, donation) => {
 
   const services = {
@@ -26,14 +46,16 @@ export const processDonation = (Sequelize, donation) => {
               paymentMethod.customerId,
               { plan: plan.id,
                 application_fee_percent: transactions.OC_FEE_PERCENT,
+                trial_end: getSubscriptionTrialEndDate(donation.createdAt, subscription.interval),
                 metadata: {
                   groupId: group.id,
                   groupName: group.name,
                   paymentMethodId: paymentMethod.id,
-                  description: `OpenCollective: ${group.slug}`
+                  description: `https://opencollective.com/${group.slug}`
                 }
               }))
-          .then(stripeSubscription => subscription.update({stripeSubscriptionId: stripeSubscription.id}));
+          .then(stripeSubscription => subscription.update({ stripeSubscriptionId: stripeSubscription.id }))
+          .then(subscription => subscription.activate())
       };
 
       const createChargeAndTransaction = (groupStripeAccount) => {
@@ -97,23 +119,20 @@ export const processDonation = (Sequelize, donation) => {
 
         .tap(customer => paymentMethod.customerId ? null : paymentMethod.update({customerId: customer.id}))
 
-        .then(() => {
-          if (subscription) {
-            return createSubscription(groupStripeAccount, subscription, donation, paymentMethod, group);
-          } else {
-            return createChargeAndTransaction(groupStripeAccount, donation, paymentMethod, group, user);
-          }
-        })
+        // both one-time and subscriptions get charged immediately
+        .then(() => createChargeAndTransaction(groupStripeAccount, donation, paymentMethod, group, user))
+
+        // if this is a subscription, we create it now on Stripe
+        .then(() => subscription ? createSubscription(groupStripeAccount, subscription, donation, paymentMethod, group) : null)
 
         // add user to the group
-        // TODO: this should happen in webhooks for subscriptions
-        // because that's when the transaction is created. Future refactor
         .then(() => group.findOrAddUserWithRole(user, roles.BACKER))
 
         // Mark donation row as processed
         .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
-        .then(() => group.getRelatedGroups(2, 0))
+
         // send out confirmation email
+        .then(() => group.getRelatedGroups(2, 0))
         .then((relatedGroups) => emailLib.send(
           'thankyou',
           user.email,
@@ -151,4 +170,4 @@ export const processDonation = (Sequelize, donation) => {
          Error: ${err}<br><br>Donation: ${JSON.stringify(donation.info)}`
         )
     });
-};
+}
