@@ -66,6 +66,12 @@ export const UserType = new GraphQLObjectType({
           return user.email;
         }
       },
+      description: {
+        type: GraphQLString,
+        resolve(user) {
+          return user.description
+        }
+      },
       isOrganization: {
         type: GraphQLBoolean,
         resolve(user) {
@@ -192,6 +198,12 @@ export const EventType = new GraphQLObjectType({
           return event.description
         }
       },
+      backgroundImage: {
+        type: GraphQLString,
+        resolve(event) {
+          return event.backgroundImage;
+        }
+      },
       createdByUser: {
         type: UserType,
         resolve(event) {
@@ -210,10 +222,18 @@ export const EventType = new GraphQLObjectType({
           return event.slug;
         }
       },
-      locationString: {
+      location: {
         type: GraphQLString,
+        description: 'Name of the location. Ex: Puck Fair restaurant',
         resolve(event) {
           return event.locationString;
+        }
+      },
+      address: {
+        type: GraphQLString,
+        description: 'Ex: 525 Broadway, NY 10012',
+        resolve(event) {
+          return event.address;
         }
       },
       startsAt: {
@@ -238,6 +258,12 @@ export const EventType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(event) {
           return event.currency;
+        }
+      },
+      maxQuantity: {
+        type: GraphQLInt,
+        resolve(event) {
+          return event.maxQuantity;
         }
       },
       tiers: {
@@ -292,10 +318,21 @@ export const TierType = new GraphQLObjectType({
           return tier.currency;
         }
       },
-      quantity: {
+      maxQuantity: {
         type: GraphQLInt,
         resolve(tier) {
-          return tier.quantity;
+          return tier.maxQuantity;
+        }
+      },
+      availableQuantity: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return models.Response.sum('quantity', { 
+            where: {
+              TierId: tier.id
+            }
+          })
+          .then(usedQuantity => usedQuantity ? tier.maxQuantity - usedQuantity : tier.maxQuantity );
         }
       },
       password: {
@@ -353,6 +390,12 @@ export const ResponseType = new GraphQLObjectType({
         type: UserType,
         resolve(response) {
           return response.getUser();
+        }
+      },
+      description: {
+        type: GraphQLString,
+        resolve(response) {
+          return response.description;
         }
       },
       collective: {
