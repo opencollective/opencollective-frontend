@@ -1,6 +1,5 @@
 import React from 'react';
 import colors from '../constants/colors';
-import TicketsCtlr from './TicketsCtlr';
 import Button from './Button';
 import _ from 'lodash';
 import { isValidEmail } from '../lib/utils';

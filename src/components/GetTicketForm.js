@@ -6,7 +6,8 @@ import SignInUp from './SignInUp';
 const styles = {
   getTicketForm: css({
     maxWidth: '400px',
-    margin: '20px auto'
+    margin: '20px auto',
+    padding: '0px 5px'
   })
 };
 

@@ -52,7 +52,7 @@ class Tier extends React.Component {
 
   static propTypes = {
     tier: React.PropTypes.object.isRequired,
-    className: React.PropTypes.string,
+    className: React.PropTypes.object,
     quantity: React.PropTypes.number,
     onChange: React.PropTypes.func, // onChange(response{quantity, amount, tier})
     onClick: React.PropTypes.func // onClick(response{quantity, amount, tier})
@@ -64,7 +64,6 @@ class Tier extends React.Component {
     this.quantity = props.quantity || 1;
     this.state = { quantity: this.quantity, amount: this.quantity * this.tier.amount, tier: this.tier };
     this.onChange = this.props.onChange || function() {}; 
-    this.onChange(this.state);
   }
 
   handleTicketsChange(quantity) {

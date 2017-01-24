@@ -14,6 +14,7 @@ import NotificationBar from '../components/NotificationBar';
 import TopBar from '../components/TopBar';
 import GetTicketForm from '../components/GetTicketForm';
 import InterestedForm from '../components/InterestedForm';
+import colors from '../constants/colors';
 
 import '../css/EventPage.css';
 
@@ -22,6 +23,15 @@ const styles = {
     position: 'relative',
     '& a': {
       textDecoration: 'none'
+    },
+    '& section': {
+      margin: '60px 0px',
+    },
+    '& h1': {
+      margin: '40px 0px 20px',
+      fontFamily: 'montserratlight',
+      fontSize: '20pt',
+      fontWeight: 'bold'
     }
   }),
   content: css({
@@ -41,6 +51,21 @@ const styles = {
   }),
   tier: css({
     margin: '40px auto'
+  }),
+  location: css({
+    textAlign: 'center',
+    '& .description': {
+      margin: '30px 10px'
+    },
+    '& .name': {
+      fontSize: '16pt',
+      fontFamily: 'montserratlight',
+      margin: '5px 0px'
+    },
+    '& .address': {
+      color: colors.darkgray,
+      fontFamily: 'lato'
+    }
   })
 };
 
@@ -188,9 +213,16 @@ class EventPage extends React.Component {
               </div>
             </div>
 
-            <div className={styles.map}>
-              <Map lat={Event.lat} lng={Event.lng} className={styles.map} />
-            </div>
+            <section id="location" className={styles.location}>
+              <div className="description">
+                <h1>Location</h1>
+                <div className="name">{Event.location}</div>
+                <div className="address">{Event.address}</div>
+              </div>
+              <div className={styles.map}>
+                <Map lat={Event.lat} lng={Event.lng} className={styles.map} />
+              </div>
+            </section>
           </div>
         }
       </div>
@@ -203,6 +235,8 @@ const FeedQuery = gql`query Event {
     id,
     name,
     description,
+    location,
+    address,
     lat,
     lng,
     backgroundImage,
