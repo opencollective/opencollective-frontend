@@ -100,69 +100,69 @@ export const UserType = new GraphQLObjectType({
   }
 });
 
-export const GroupType = new GraphQLObjectType({
-  name: 'Group',
-  description: 'This represents a Group',
+export const CollectiveType = new GraphQLObjectType({
+  name: 'Collective',
+  description: 'This represents a Collective',
   fields: () => {
     return {
       id: {
         type: GraphQLInt,
-        resolve(group) {
-          return group.id;
+        resolve(collective) {
+          return collective.id;
         }
       },
       name: {
         type: GraphQLString,
-        resolve(group) {
-          return group.name;
+        resolve(collective) {
+          return collective.name;
         }
       },
       description: {
         type: GraphQLString,
-        resolve(group) {
-          return group.description;
+        resolve(collective) {
+          return collective.description;
         }
       },
       longDescription: {
         type: GraphQLString,
-        resolve(group) {
-          return group.longDescription;
+        resolve(collective) {
+          return collective.longDescription;
         }
       },
       mission: {
         type: GraphQLString,
-        resolve(group) {
-          return group.mission;
+        resolve(collective) {
+          return collective.mission;
         }
       },
       currency: {
         type: GraphQLString,
-        resolve(group) {
-          return group.currency;
+        resolve(collective) {
+          return collective.currency;
         }
       },
       logo: {
         type: GraphQLString,
-        resolve(group) {
-          return group.logo;
+        resolve(collective) {
+          return collective.logo;
         }
       },
       backgroundImage: {
         type: GraphQLString,
-        resolve(group) {
-          return group.backgroundImage;
+        resolve(collective) {
+          return collective.backgroundImage;
         }
       },
       slug: {
         type: GraphQLString,
-        resolve(group) {
-          return group.slug;
+        resolve(collective) {
+          return collective.slug;
         }
       },
       events: {
         type: new GraphQLList(EventType),
-        resolve(group) {
-          return group.getEvents();
+        resolve(collective) {
+          return collective.getEvents();
         }
       }
     }
@@ -198,8 +198,8 @@ export const EventType = new GraphQLObjectType({
           return models.User.findById(event.createdByUserId)
         }
       },
-      group: {
-        type: GroupType,
+      collective: {
+        type: CollectiveType,
         resolve(event) {
           return event.getGroup();
         }
@@ -355,8 +355,8 @@ export const ResponseType = new GraphQLObjectType({
           return response.getUser();
         }
       },
-      group: {
-        type: GroupType,
+      collective: {
+        type: CollectiveType,
         resolve(response) {
           return response.getGroup();
         }

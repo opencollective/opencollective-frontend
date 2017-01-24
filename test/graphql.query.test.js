@@ -55,7 +55,7 @@ describe('Query Tests', () => {
       it('when given only an existing event slug', async () => {
         const query = `
           query getOneEvent {
-            getEvents(eventSlug: "${event1.slug}") {
+            getEvent(eventSlug: "${event1.slug}") {
               id,
               name,
               description
@@ -64,7 +64,7 @@ describe('Query Tests', () => {
         `;
         const result = await graphql(schema, query);
         expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal('Field \"getEvents\" argument \"groupSlug\" of type \"String!\" is required but not provided.');
+        expect(result.errors[0].message).to.equal('Field \"getEvent\" argument \"collectiveSlug\" of type \"String!\" is required but not provided.');
       })
     })
 
@@ -72,8 +72,8 @@ describe('Query Tests', () => {
 
       it('when given a non-existent slug', async () => {
         const query = `
-          query getOneEvent {
-            getEvents(groupSlug: "non-existent-slug") {
+          query getMultipleEvents {
+            getEvents(collectiveSlug: "non-existent-slug") {
               id,
               name,
               description
@@ -88,10 +88,10 @@ describe('Query Tests', () => {
         });
       });
 
-      it('when given an existing group slug when it has no events', async () => {
+      it('when given an existing collective slug when it has no events', async () => {
         const query = `
-          query getOneEvent {
-            getEvents(groupSlug: "${group3.slug}") {
+          query getMultipleEvents {
+            getEvents(collectiveSlug: "${group3.slug}") {
               id,
               name,
               description
@@ -109,10 +109,10 @@ describe('Query Tests', () => {
 
     describe('returns event(s)', () => {
 
-      it('when given an event slug and groupSlug', async () => {
+      it('when given an event slug and collectiveSlug', async () => {
         const query = `
           query getOneEvent {
-            getEvents(groupSlug: "scouts", eventSlug:"jan-meetup") {
+            getEvent(collectiveSlug: "scouts", eventSlug:"jan-meetup") {
               id,
               name,
               description
@@ -122,23 +122,21 @@ describe('Query Tests', () => {
         const result = await graphql(schema, query);
         expect(result).to.deep.equal({
           data: {
-            getEvents: [
-              {
-                description: "January monthly meetup",
-                id: 1,
-                name: "January meetup",
-              }
-            ]
+            getEvent: {
+              description: "January monthly meetup",
+              id: 1,
+              name: "January meetup",
+            }            
           }
         });
       });
 
       describe('returns multiple events', () => {
         
-        it('when given only a group slug', async () => {
+        it('when given only a collective slug', async () => {
           const query = `
-            query getOneEvent {
-              getEvents(groupSlug: "${group1.slug}") {
+            query getMultipleEvents {
+              getEvents(collectiveSlug: "${group1.slug}") {
                 id,
                 name,
                 description
@@ -203,10 +201,10 @@ describe('Query Tests', () => {
             UserId: user3.id 
           })));
         
-        it('when given only a group slug', async () => {
+        it('when given only a collective slug', async () => {
           const query = `
             query getOneEvent {
-              getEvents(groupSlug: "${group1.slug}") {
+              getEvents(collectiveSlug: "${group1.slug}") {
                 id,
                 name,
                 description,

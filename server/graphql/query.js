@@ -12,29 +12,44 @@ import models from '../models';
 
 const queries = {
   /*
-   * Given a group slug and an event slug, returns the event
+   * Given a collective slug and an event slug, returns the event
    */
-  getEvents: {
-    type: new GraphQLList(EventType),
+  getEvent: {
+    type: EventType,
     args: {
       eventSlug: {
-        type: GraphQLString,
-        description: 'Event slug. If omitted, we return all events from that groupSlug'
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Event slug'
       },
-      groupSlug: {
+      collectiveSlug: {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
     resolve(_, args) {
-      const where = {};
-      if (args.eventSlug) {
-        where.slug = args.eventSlug;
-      } 
-      return models.Event.findAll({
-        where,
+      return models.Event.findOne({
+        where: { slug: args.eventSlug },
         include: [{
           model: models.Group,
-          where: { slug: args.groupSlug }
+          where: { slug: args.collectiveSlug }
+        }]
+      })
+    }
+  },
+  /*
+   * Given a collective slug, returns the events
+   */
+  getEvents: {
+    type: new GraphQLList(EventType),
+    args: {
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString)
+      }
+    },
+    resolve(_, args) {
+      return models.Event.findAll({
+        include: [{
+          model: models.Group,
+          where: { slug: args.collectiveSlug }
         }]
       })
     }
