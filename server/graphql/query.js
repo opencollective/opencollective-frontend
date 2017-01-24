@@ -12,16 +12,16 @@ import models from '../models';
 
 const queries = {
   /*
-   * Given a group slug and an event slug, returns the event
+   * Given a collective slug and an event slug, returns the event
    */
   getEvents: {
     type: new GraphQLList(EventType),
     args: {
       eventSlug: {
         type: GraphQLString,
-        description: 'Event slug. If omitted, we return all events from that groupSlug'
+        description: 'Event slug. If omitted, we return all events from that collectiveSlug'
       },
-      groupSlug: {
+      collectiveSlug: {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
@@ -34,7 +34,7 @@ const queries = {
         where,
         include: [{
           model: models.Group,
-          where: { slug: args.groupSlug }
+          where: { slug: args.collectiveSlug }
         }]
       })
     }
