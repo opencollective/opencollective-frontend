@@ -18,7 +18,7 @@ const queries = {
     type: EventType,
     args: {
       eventSlug: {
-        type: GraphQLString,
+        type: new GraphQLNonNull(GraphQLString),
         description: 'Event slug'
       },
       collectiveSlug: {
