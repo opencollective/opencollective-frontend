@@ -1,7 +1,9 @@
 import * as stripe from '../gateways/stripe';
 import * as transactions from '../constants/transactions';
+import activities from '../constants/activities';
 import roles from '../constants/roles';
 import emailLib from './email';
+import models from '../models';
 
 /**
  * Calculates the 1st of next month
@@ -56,6 +58,15 @@ export const processDonation = (Sequelize, donation) => {
               }))
           .then(stripeSubscription => subscription.update({ stripeSubscriptionId: stripeSubscription.id }))
           .then(subscription => subscription.activate())
+          .then(subscription => models.Activity.create({
+              type: activities.SUBSCRIPTION_CONFIRMED,
+              data: {
+                group: group.minimal,
+                user: user.minimal,
+                donation: donation,
+                subscription
+              }
+            }));
       };
 
       const createChargeAndTransaction = (groupStripeAccount) => {
