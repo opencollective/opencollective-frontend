@@ -1,6 +1,7 @@
 import React from 'react';
 import { css } from 'glamor';
 import colors from '../constants/colors';
+import star from '../images/icons/star.svg';
 
 const styles = {
   btn: css({
@@ -28,6 +29,10 @@ const styles = {
       height: '100%',
       border: `2px solid`,
       borderColor: colors.lightgray
+    },
+    '& img': {
+      height: '16px',
+      margin: '0 5px'
     },
     '& label': {
       padding: '0px',
@@ -62,18 +67,25 @@ const styles = {
   })
 };
 
+const icons = {
+  star
+};
+
 class Button extends React.Component {
 
   static propTypes = {
     label: React.PropTypes.string,
     type: React.PropTypes.string, // e.g. type="submit"
     onClick: React.PropTypes.func,
-    className: React.PropTypes.string
+    className: React.PropTypes.string,
+    icon: React.PropTypes.string,
+    style: React.PropTypes.object
   }
 
   render() {
     return (
-      <button type={this.props.type} className={`${styles.btn} ${this.props.className}`} onClick={this.props.onClick} >
+      <button type={this.props.type} style={this.props.style} className={`${styles.btn} ${this.props.className}`} onClick={this.props.onClick} >
+        {this.props.icon && <img src={icons[this.props.icon]} />}
         {this.props.label && <label className={styles.label}>{this.props.label}</label>}
         {this.props.children}
       </button>

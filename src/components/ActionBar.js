@@ -1,24 +1,7 @@
 import React from 'react';
-import { css } from 'glamor';
 import Button from './Button';
 import colors from '../constants/colors';
-
-const styles = {
-  actions: css({
-    display: 'flex',
-    width: '100%',
-    justifyContent: 'center',
-    height: '60px',
-    boxShadow: '0px 2px 4px rgba(0,0,0,.1)',
-    '& button': {
-      border: '1px solid transparent',
-      borderRight: `1px solid ${colors.lightgray}`
-    },
-    '& button:first-of-type ': {
-      borderLeft: `1px solid ${colors.lightgray}`
-    }
-  })
-}
+import '../css/ActionBar.css';
 
 class ActionBar extends React.Component {
 
@@ -28,11 +11,17 @@ class ActionBar extends React.Component {
 
   render() {
     return (
-      <div className={styles.actions}>
+      <div className="ActionBar">
         {this.props.actions.map((action, index) =>
-          <Button key={`actionItem${index}`} className={action.className} label={action.label} onClick={() => action.onClick()}>
-          {action.component}
-          </Button> 
+          <Button
+            key={`actionItem${index}`}
+            style={{borderColor: colors.lightgray}}
+            className={action.className}
+            style={action.className === 'selected' ? { color: colors.green } : {}}
+            label={action.label}
+            icon={action.icon}
+            onClick={() => action.onClick()}
+            >{action.component}</Button> 
         )}
       </div>
     )

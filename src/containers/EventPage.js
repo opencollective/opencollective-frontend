@@ -36,6 +36,8 @@ class EventPage extends React.Component {
     this.defaultActions = [
       {
         label: 'interested',
+        // className: 'selected', 
+        // icon: 'star',
         onClick: this.setInterested
       },
       {
@@ -113,11 +115,18 @@ class EventPage extends React.Component {
 
   render () {
     console.log("new state:", this.state, this.state.response);
-    const { Event } = this.props.data;
+    const { getEvent, error } = this.props.data;
+
+    if ( error ) {
+      console.error(error.message);
+      return (<div>GraphQL error</div>)
+    }
+
     if (this.props.data.loading) {
       return (<div>Loading</div>)
     }
 
+    const Event = getEvent;
     const going = filterCollection(Event.responses, {'status':'confirmed'});
     const interested = filterCollection(Event.responses, {'status':'interested'});
     let responsesTitle = `${going.length} people going`;
@@ -195,22 +204,18 @@ class EventPage extends React.Component {
 }
 
 const FeedQuery = gql`query Event {
-  Event(id:"ciwidswi31qwy0145gdniopt8") {
+  getEvent(collectiveSlug: "opencollective", eventSlug: "jan-meetup") {
     id,
     name,
     description,
-    location,
-    address,
-    lat,
-    lng,
-    backgroundImage,
+    locationString,
     tiers {
       id,
       name,
       description,
       amount,
       currency,
-      maxQuantity
+      quantity
     },
     collective {
       id,
@@ -223,11 +228,9 @@ const FeedQuery = gql`query Event {
     responses {
       quantity,
       status,
-      description,
       user {
         name,
-        avatar,
-        bio
+        avatar
       },
       tier {
         name

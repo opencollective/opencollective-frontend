@@ -1,5 +1,4 @@
 import React from 'react';
-import { css } from 'glamor';
 import logo from '../logo.svg';
 
 class NotificationBar extends React.Component {

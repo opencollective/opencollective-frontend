@@ -8,25 +8,26 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
 import './index.css'
 
-const networkInterface = createNetworkInterface('https://api.graph.cool/simple/v1/ciwic323g06pa0122uhnf0ljz')
+// const networkInterface = createNetworkInterface('https://api.graph.cool/simple/v1/ciwic323g06pa0122uhnf0ljz')
+const networkInterface = createNetworkInterface('http://localhost:3060/graphql?api_key=dvl-1510egmf4a23d80342403fb599qd')
 
 // The x-graphcool-source header is to let the server know that the example app has started.
 // (Not necessary for normal projects)
-networkInterface.use([{
-  applyMiddleware (req, next) {
-    if (!req.options.headers) {
-      // Create the header object if needed.
-      req.options.headers = {}
-    }
-    req.options.headers['x-graphcool-source'] = 'example:react-apollo-instagram'
+// networkInterface.use([{
+//   applyMiddleware (req, next) {
+//     if (!req.options.headers) {
+//       // Create the header object if needed.
+//       req.options.headers = {}
+//     }
+//     req.options.headers['x-graphcool-source'] = 'example:react-apollo-instagram'
 
-    // get the authentication token from local storage if it exists
-    if (localStorage.getItem('graphcoolToken')) {
-      req.options.headers.authorization = `Bearer ${localStorage.getItem('graphcoolToken')}`
-    }
-    next()
-  },
-}])
+//     // get the authentication token from local storage if it exists
+//     if (localStorage.getItem('graphcoolToken')) {
+//       req.options.headers.authorization = `Bearer ${localStorage.getItem('graphcoolToken')}`
+//     }
+//     next()
+//   },
+// }])
 
 const client = new ApolloClient({ networkInterface })
 
