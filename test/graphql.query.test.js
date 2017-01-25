@@ -208,6 +208,11 @@ describe('Query Tests', () => {
                 id,
                 name,
                 description,
+                location,
+                address,
+                backgroundImage,
+                lat,
+                long,
                 createdByUser {
                   id,
                   name
@@ -216,9 +221,12 @@ describe('Query Tests', () => {
                   id,
                   name,
                   description,
+                  maxQuantity,
+                  availableQuantity,
                   responses {
                     id,
                     status,
+                    description,
                     user {
                       id,
                       name
@@ -236,6 +244,11 @@ describe('Query Tests', () => {
                   id: 1,
                   name: "January meetup",
                   "description":"January monthly meetup",
+                  "location": "Balanced NYC",
+                  "address": "547 Broadway, NY 10012",
+                  "backgroundImage": "http://opencollective.com/backgroundimage.png",
+                  "lat": 39.807222,
+                  "long": -76.984722,
                   "createdByUser": {
                     "id":1,
                     "name":"Phil Mod"
@@ -245,18 +258,22 @@ describe('Query Tests', () => {
                       "id": 1,
                       "name": tier1.name,
                       "description":"free tickets for all",
+                      "maxQuantity": 10,
+                      "availableQuantity": 7,
                       "responses": [
                         {
                           "id": 1,
                           "status": "INTERESTED",
+                          "description": "I work on bitcoin",
                           "user": {
                             "id": 2,
                             "name": "Anish Bas"
-                          }
+                          },
                         },
                         {
                           "id": 2,
                           "status": "YES",
+                          "description": "I have been working on open source for over a decade",
                           "user": {
                             "id": 3,
                             "name": "Xavier Damman"
@@ -268,10 +285,13 @@ describe('Query Tests', () => {
                       "id": 2,
                       "name": tier2.name,
                       "description": "$20 ticket",
+                      "maxQuantity": 100,
+                      "availableQuantity": 98,
                       "responses": [
                         {
                           "id": 3,
                           "status": "NO",
+                          "description": null,
                           "user": {
                             "id": 3,
                             "name": "Xavier Damman"
@@ -285,6 +305,11 @@ describe('Query Tests', () => {
                   "id": 2,
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
+                  "address": "505 Broadway, NY 10012",
+                  "backgroundImage": "http://localhost:3000/static/images/collectives/default-header-bg.jpg",
+                  "location": "Puck Fair",
+                  "lat": null,
+                  "long": null,
                   "createdByUser": {
                     "id": 1,
                     "name": "Phil Mod"
@@ -294,6 +319,8 @@ describe('Query Tests', () => {
                       id: 3,
                       name: tier3.name,
                       description: tier3.description,
+                      "maxQuantity": 10,
+                      "availableQuantity": 10,
                       responses: []
                     }
                   ]

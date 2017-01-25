@@ -69,6 +69,10 @@ export default function(Sequelize, DataTypes) {
       min: 0
     },
 
+    description: {
+      type: DataTypes.STRING,
+    },
+    
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
