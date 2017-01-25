@@ -1,6 +1,7 @@
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
@@ -226,7 +227,7 @@ export const EventType = new GraphQLObjectType({
         type: GraphQLString,
         description: 'Name of the location. Ex: Puck Fair restaurant',
         resolve(event) {
-          return event.locationString;
+          return event.locationName;
         }
       },
       address: {
@@ -234,6 +235,18 @@ export const EventType = new GraphQLObjectType({
         description: 'Ex: 525 Broadway, NY 10012',
         resolve(event) {
           return event.address;
+        }
+      },
+      lat: {
+        type: GraphQLFloat,
+        resolve(event) {
+          return event.geoLocationLatLong ? event.geoLocationLatLong.coordinates[0] : null;
+        }
+      },
+      long: {
+        type: GraphQLFloat,
+        resolve(event) {
+          return event.geoLocationLatLong ? event.geoLocationLatLong.coordinates[1] : null;
         }
       },
       startsAt: {

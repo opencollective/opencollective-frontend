@@ -211,6 +211,8 @@ describe('Query Tests', () => {
                 location,
                 address,
                 backgroundImage,
+                lat,
+                long,
                 createdByUser {
                   id,
                   name
@@ -245,6 +247,8 @@ describe('Query Tests', () => {
                   "location": "Balanced NYC",
                   "address": "547 Broadway, NY 10012",
                   "backgroundImage": "http://opencollective.com/backgroundimage.png",
+                  "lat": 39.807222,
+                  "long": -76.984722,
                   "createdByUser": {
                     "id":1,
                     "name":"Phil Mod"
@@ -304,6 +308,8 @@ describe('Query Tests', () => {
                   "address": "505 Broadway, NY 10012",
                   "backgroundImage": "http://localhost:3000/static/images/collectives/default-header-bg.jpg",
                   "location": "Puck Fair",
+                  "lat": null,
+                  "long": null,
                   "createdByUser": {
                     "id": 1,
                     "name": "Phil Mod"

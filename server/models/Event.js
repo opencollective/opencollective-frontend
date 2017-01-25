@@ -54,9 +54,11 @@ export default function(Sequelize, DataTypes) {
 
     description: DataTypes.TEXT,
 
-    locationString: DataTypes.STRING,
+    locationName: DataTypes.STRING,
 
     address: DataTypes.STRING,
+
+    geoLocationLatLong: DataTypes.GEOMETRY('POINT'),
 
     backgroundImage: {
       type: DataTypes.STRING,

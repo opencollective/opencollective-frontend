@@ -644,10 +644,11 @@ export default {
     description: "January monthly meetup",
     startsAt: "2017-01-06 UTC+0300",
     endsAt: "2017-01-07 UTC+300",
-    locationString: "Balanced NYC",
+    locationName: "Balanced NYC",
     address: "547 Broadway, NY 10012",
     backgroundImage: "http://opencollective.com/backgroundimage.png",
-    maxQuantity: 200
+    maxQuantity: 200,
+    geoLocationLatLong: { type: 'Point', coordinates: [39.807222,-76.984722]}
   },
 
   "event2": {
@@ -656,7 +657,7 @@ export default {
     description: "February monthly meetup",
     startsAt: "2017-02-06 UTC+0300",
     endsAt: "2017-02-07 UTC+300",
-    locationString: "Puck Fair",
+    locationName: "Puck Fair",
     address: "505 Broadway, NY 10012",
   },
 
