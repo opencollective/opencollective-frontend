@@ -31,6 +31,9 @@ fi
 echo "Creating ${LOCALDBNAME}"
 createdb "${LOCALDBNAME}"
 
+# Add POSTGIS extension
+psql "${LOCALDBNAME}" -c "CREATE EXTENSION POSTGIS;"
+
 if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
   PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
   echo "Dumping ${ENV} database"
