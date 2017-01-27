@@ -138,9 +138,8 @@ export function setupModels(client) {
   m.Donation.hasMany(m.Transaction);
 
   // Subscription
-  m.Transaction.belongsTo(m.Subscription);
-  m.Subscription.hasMany(m.Transaction);
   m.Donation.belongsTo(m.Subscription);
+  m.Subscription.hasOne(m.Donation);
 
   // PaymentMethod
   m.Donation.belongsTo(m.PaymentMethod);

@@ -1,24 +1,36 @@
 import nock from 'nock';
-import app from '../server/index';
-import jwt from 'jsonwebtoken';
+import sinon from 'sinon';
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
 import config from 'config';
+import jwt from 'jsonwebtoken';
+import Promise from 'bluebird';
+
+import app from '../server/index';
 import * as utils from '../test/utils';
 import stripeMock from './mocks/stripe';
-import Promise from 'bluebird';
 import models from '../server/models';
 import roles from '../server/constants/roles';
+import * as donationsLib from '../server/lib/donations';
+
 
 const application = utils.data('application');
 
 const STRIPE_URL = 'https://api.stripe.com:443';
-const transactionsData = utils.data('transactions1').transactions;
+const donationsData = utils.data('donations');
 
 describe('subscriptions.routes.test.js', () => {
-  let group;
-  let user;
-  let paymentMethod;
+  let group, user, paymentMethod, sandbox;
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+  });
+
+  after(() => sandbox.restore());
+
+  beforeEach(() => {
+    sandbox.stub(donationsLib, 'processDonation');
+  });
 
   beforeEach(() => utils.resetTestDB());
 
@@ -39,19 +51,23 @@ describe('subscriptions.routes.test.js', () => {
   // Create a paymentMethod.
   beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => paymentMethod = c));
 
+  afterEach(() => {
+    utils.clearbitStubAfterEach(sandbox);
+  });
+
   /**
    * Get the subscriptions of a user
    */
   describe('#getAll', () => {
-    // Create transactions for group1.
+    // Create donation for group1.
     beforeEach(() =>
-      Promise.map(transactionsData, transaction =>
+      Promise.map(donationsData, donation =>
         models.Subscription.create(utils.data('subscription1'))
-          .then(subscription => models.Transaction.createFromPayload({
-            transaction,
-            user,
-            group,
-            subscription
+          .then(subscription => models.Donation.create({
+            ...donation,
+            UserId: user.id,
+            GroupId: group.id,
+            SubscriptionId: subscription.id
           })
         ))
     );
@@ -75,11 +91,11 @@ describe('subscriptions.routes.test.js', () => {
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
-          expect(res.body.length).to.be.equal(transactionsData.length);
+          expect(res.body.length).to.be.equal(donationsData.length);
           res.body.forEach(sub => {
             expect(sub).to.be.have.property('stripeSubscriptionId')
-            expect(sub).to.be.have.property('Transactions')
-            expect(sub.Transactions[0]).to.be.have.property('Group')
+            expect(sub).to.be.have.property('Donation')
+            expect(sub.Donation).to.be.have.property('Group')
           });
           done();
         });
@@ -92,21 +108,21 @@ describe('subscriptions.routes.test.js', () => {
   describe('#cancel', () => {
 
     const subscription = utils.data('subscription1');
-    let transaction;
+    let donation;
     const nocks = {};
 
-    beforeEach((done) => {
-      models.Subscription.create(subscription)
-      .then(subscription => models.Transaction.createFromPayload({
-         transaction: transactionsData[0],
-        user,
-        group,
-        subscription,
-        paymentMethod
-      }))
-      .tap(t => transaction = t)
-      .then(() => done())
-      .catch(done)
+
+    beforeEach(() => {
+      return models.Subscription.create(subscription)
+        .then(sub => models.Donation.create({
+          ...donationsData[0],
+          UserId: user.id,
+          GroupId: group.id,
+          PaymentMethodId: paymentMethod.id,
+          SubscriptionId: sub.id
+        }))
+        .tap(d => donation = d)
+        .catch()
     });
 
     beforeEach(() => {
@@ -119,7 +135,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('fails if if no authorization provided', (done) => {
       request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .expect(401, {
           error: {
             code: 401,
@@ -142,7 +158,7 @@ describe('subscriptions.routes.test.js', () => {
       });
 
       request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${expiredToken}`)
         .end((err, res) => {
           expect(res.body.error.code).to.be.equal(401);
@@ -160,7 +176,7 @@ describe('subscriptions.routes.test.js', () => {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'No subscription found with id 12345'
+            message: 'No subscription found with id 12345. Please contact support@opencollective.com for help.'
           }
         })
         .end(done);
@@ -168,7 +184,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('cancels the subscription', (done) => {
        request(app)
-        .post(`/subscriptions/${transaction.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
@@ -181,16 +197,16 @@ describe('subscriptions.routes.test.js', () => {
               const sub = subscriptions[0];
               expect(sub.isActive).to.be.false;
               expect(sub.deactivatedAt).to.be.ok;
-              done();
             })
             .then(() => models.Activity.findOne({where: {type: 'subscription.canceled'}}))
             .then(activity => {
               expect(activity).to.be.defined;
               expect(activity.GroupId).to.be.equal(group.id);
               expect(activity.UserId).to.be.equal(user.id);
-              expect(activity.data.subscription.id).to.be.equal(transaction.SubscriptionId);
+              expect(activity.data.subscription.id).to.be.equal(donation.SubscriptionId);
               expect(activity.data.group.id).to.be.equal(group.id);
               expect(activity.data.user.id).to.be.equal(user.id);
+              done();
             })
             .catch(done);
         });

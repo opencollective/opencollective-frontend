@@ -1,5 +1,4 @@
 import Stripe from 'stripe';
-import async from 'async';
 import models from '../models';
 import errors from '../lib/errors';
 import activities from '../constants/activities';
@@ -8,19 +7,20 @@ import activities from '../constants/activities';
  * Get subscriptions of a user
  */
 export const getAll = (req, res, next) => {
-  models.Subscription.findAll({
-    include: [
-      {
-        model: models.Transaction,
-        where: {
-          UserId: req.remoteUser.id
-        },
-        include: [{ model: models.Group },
-                  { model: models.User }]
+  return models.Subscription.findAll({
+    include: [{
+      model: models.Donation,
+      where: {
+        UserId: req.remoteUser.id
       },
-    ]
+      include: [
+        { model: models.Transaction },
+        { model: models.Group },
+        { model: models.User }
+      ]
+    }]
   })
-  .then((subscriptions) => res.send(subscriptions))
+  .then(subscriptions => res.send(subscriptions))
   .catch(next)
 };
 
@@ -30,86 +30,50 @@ export const getAll = (req, res, next) => {
 export const cancel = (req, res, next) => {
   const { subscriptionid } = req.params;
 
-  async.auto({
-    findSubscriptionsOptions: (cb) => {
-      models.Transaction.find({
-        include: [
-          { model: models.Group },
-          { model: models.PaymentMethod },
-          { model: models.User },
-          {
-            model: models.Subscription,
-            where: {
-              id: subscriptionid
-            }
-          },
-          ]
-      })
-      .then(t => {
+  let donation;
 
-        if (!t || !t.Subscription) {
-          return cb(new errors.BadRequest(`No subscription found with id ${subscriptionid}`));
+  // fetch subscription (through Donation)
+  return models.Donation.find({
+    include: [
+      { model: models.Group },
+      { model: models.PaymentMethod },
+      { model: models.User },
+      { model: models.Subscription,
+        where: {
+          id: subscriptionid
         }
+      }]
+  })
+  .tap(d => donation = d)
+  .then(d => d ? Promise.resolve() : 
+      Promise.reject(new errors.BadRequest(`No subscription found with id ${subscriptionid}. Please contact support@opencollective.com for help.`)))
 
-        return t.Group.getStripeAccount()
-          .then((stripeAccount) => {
-            cb(null, {
-              stripeSecret: stripeAccount.accessToken,
-              customerId: t.PaymentMethod.customerId,
-              subscriptionId: t.Subscription.stripeSubscriptionId,
-              subscription: t.Subscription,
-              group: t.Group,
-              user: t.User
-            });
-          });
-      })
-      .catch(cb);
-    },
+  // get stripe account for accessToken
+  .then(() => donation.Group.getStripeAccount())
 
-    cancelOnStripe: ['findSubscriptionsOptions', (cb, results) => {
-      const options = results.findSubscriptionsOptions;
-      const stripe = Stripe(options.stripeSecret);
+  // cancel subscription on Stripe
+  .then(stripeAccount => {
+    const stripe = Stripe(stripeAccount.accessToken)
 
-      stripe.customers.cancelSubscription(
-        options.customerId,
-        options.subscriptionId,
-        cb
-      );
-    }],
+    return stripe.customers.cancelSubscription(
+      donation.PaymentMethod.customerId,
+      donation.Subscription.stripeSubscriptionId)
+  })
 
-    deactivateSubscription: ['cancelOnStripe', (cb, results) => {
-      const { subscription } = results.findSubscriptionsOptions;
+  // deactivate Subscription on our end
+  .then(() => donation.Subscription.deactivate())
 
-      subscription.isActive = false;
-      subscription.deactivatedAt = new Date();
-
-      subscription.save()
-        .then(() => cb())
-        .catch(cb);
-    }],
-
-    createActivity: ['deactivateSubscription', (cb, results) => {
-      const options = results.findSubscriptionsOptions;
-      const { subscription } = options;
-      const { group } = options;
-      const { user } = options;
-      models.Activity.create({
+  // createActivity
+  .then(() => models.Activity.create({
         type: activities.SUBSCRIPTION_CANCELED,
-        GroupId: group.id,
-        UserId: user.id,
+        GroupId: donation.Group.id,
+        UserId: donation.User.id,
         data: {
-          subscription: subscription,
-          group: group.info,
-          user: user.info
+          subscription: donation.Subscription,
+          group: donation.Group.minimal,
+          user: donation.User.minimal
         }
-      })
-        .then(() => cb())
-        .catch(cb);
-    }],
-  }, (err) => {
-    if (err) return next(err);
-
-    res.send({ success: true });
-  });
-
+      }))
+  .then(() => res.send({ success: true }))
+  .catch(next)
 };
