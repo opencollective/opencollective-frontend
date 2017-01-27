@@ -367,7 +367,7 @@ describe('groups.routes.test.js', () => {
         });
     });
 
-    describe('Transactions/Activities/Budget', () => {
+    describe('Transactions/Budget', () => {
 
       let group2;
       const transactions = [];
@@ -407,11 +407,17 @@ describe('groups.routes.test.js', () => {
       // Create a subscription for PublicGroup.
       beforeEach(() => models.Subscription
         .create(utils.data('subscription1'))
-        .then(subscription => models.Transaction.createFromPayload({
-            transaction: transactionsData[7],
+        .then(subscription => models.Donation.create({
+          amount: 999,
+          currency: 'USD',
+          UserId: user.id,
+          GroupId: publicGroup.id,
+          SubscriptionId: subscription.id
+        }))
+        .then(donation => models.Transaction.createFromPayload({
+            transaction: Object.assign({}, transactionsData[7], { DonationId: donation.id}),
             user,
             group: publicGroup,
-            subscription
           })));
 
       it('successfully get a group with remaining budget and yearlyIncome', (done) => {
@@ -426,7 +432,6 @@ describe('groups.routes.test.js', () => {
             const g = res.body;
             expect(g).to.have.property('balance', parseInt((totDonations*100 + totTransactions*100 + transactionsData[7].amount*100 + transactionsData[8].amount*100).toFixed(0), 10));
             expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount)*100);
-            expect(g).to.not.have.property('activities');
             done();
           });
       });

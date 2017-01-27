@@ -10,7 +10,7 @@ const paymentMethodData1 = utils.data('paymentMethod1');
 const transactionsData = utils.data('transactions1').transactions;
 const application = utils.data('application');
 
-describe('profile.routes.test.js', () => {
+describe('discover', () => {
 
   let group1, group2, paymentMethod1;
 

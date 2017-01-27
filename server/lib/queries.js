@@ -32,9 +32,10 @@ const getTotalAnnualBudget = () => {
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()} * 12),0)
       FROM "Subscriptions" s
+      LEFT JOIN "Donations" d ON s.id = d."SubscriptionId"
       LEFT JOIN "Transactions" t
-      ON (s.id = t."SubscriptionId"
-        AND t.id = (SELECT MAX(id) from "Transactions" t where t."SubscriptionId" = s.id))
+      ON (s.id = d."SubscriptionId"
+        AND t.id = (SELECT MAX(id) from "Transactions" t where t."DonationId" = d.id))
       WHERE t.amount > 0 AND t."GroupId" != 1
         AND t."deletedAt" IS NULL
         AND s.interval = 'month'
@@ -43,14 +44,16 @@ const getTotalAnnualBudget = () => {
     +
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
-      LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+      LEFT JOIN "Donations" d ON t."DonationId" = d.id
+      LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."GroupId" != 1
         AND t."deletedAt" IS NULL
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
     +
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
-      LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
+      LEFT JOIN "Donations" d on t."DonationId" = d.id
+      LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."GroupId" != 1
         AND t."deletedAt" IS NULL
         AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)

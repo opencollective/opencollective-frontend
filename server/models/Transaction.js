@@ -137,13 +137,12 @@ export default (Sequelize, DataTypes) => {
         }).catch(console.error);
       },
 
-      createFromPayload({ transaction, user, group, subscription, paymentMethod }) {
+      createFromPayload({ transaction, user, group, paymentMethod }) {
 
         // attach other objects manually. Needed for afterCreate hook to work properly
         transaction.UserId = user && user.id;
         transaction.GroupId = group && group.id;
         transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
-        transaction.SubscriptionId = subscription ? subscription.id : null;
 
         if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
           // populate netAmountInGroupCurrency for donations
