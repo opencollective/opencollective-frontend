@@ -436,10 +436,10 @@ export default function(Sequelize, DataTypes) {
         */
         return Sequelize.query(`
           WITH "activeMonthlySubscriptions" as (
-            SELECT DISTINCT t."SubscriptionId", t."netAmountInGroupCurrency"
+            SELECT DISTINCT d."SubscriptionId", t."netAmountInGroupCurrency"
             FROM "Transactions" t
-            LEFT JOIN "Subscriptions" s
-            ON s.id = t."SubscriptionId"
+            LEFT JOIN "Donations" d ON d.id = t."DonationId"
+            LEFT JOIN "Subscriptions" s ON s.id = d."SubscriptionId"
             WHERE t."GroupId"=:GroupId
               AND s."isActive" IS TRUE
               AND s.interval = 'month'
@@ -451,16 +451,18 @@ export default function(Sequelize, DataTypes) {
             +
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
-              LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-              WHERE "GroupId" = :GroupId
+              LEFT JOIN "Donations" d ON t."DonationId" = d.id
+              LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
+              WHERE t."GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
             +
             (SELECT
               COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
-              LEFT JOIN "Subscriptions" s ON t."SubscriptionId" = s.id
-              WHERE "GroupId" = :GroupId
+              LEFT JOIN "Donations" d ON t."DonationId" = d.id
+              LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
+              WHERE t."GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)

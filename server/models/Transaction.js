@@ -12,9 +12,8 @@ export default (Sequelize, DataTypes) => {
 
   const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
-    description: DataTypes.STRING, // delete #postmigration
+    description: DataTypes.STRING,
     amount: DataTypes.FLOAT, // TODO: change to INTEGER and rename to donationAmount
-    vat: DataTypes.FLOAT, // delete #postmigration
     currency: { // TODO: #postmigration rename to donationCurrency
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -24,10 +23,6 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-    tags: DataTypes.ARRAY(DataTypes.STRING),
-    status: DataTypes.STRING, // delete #postmigration
-    comment: DataTypes.STRING, // delete #postmigration
-    link: DataTypes.STRING, // delete #postmigration
 
     // stores the currency that the transaction happened in (currency of the host)
     txnCurrency: {
@@ -66,22 +61,6 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
-      preview() {
-        if (!this.link) return {};
-
-        if (this.link.match(/\.pdf$/)) {
-          return {
-            src: 'https://opencollective.com/static/images/mime-pdf.png',
-            width: '100px'
-          };
-        } else {
-          return {
-            src: `https://res.cloudinary.com/opencollective/image/fetch/w_640/${this.link}`,
-            width: '100%'
-          };
-        }
-      },
-
       isDonation() {
         return this.amount > 0;
       },
@@ -97,12 +76,7 @@ export default (Sequelize, DataTypes) => {
           type: this.type,
           description: this.description,
           amount: this.amount,
-          vat: this.vat,
           currency: this.currency,
-          tags: this.tags,
-          status: this.status,
-          comment: this.comment,
-          link: this.link,
           createdAt: this.createdAt,
           UserId: this.UserId,
           GroupId: this.GroupId,
@@ -137,13 +111,12 @@ export default (Sequelize, DataTypes) => {
         }).catch(console.error);
       },
 
-      createFromPayload({ transaction, user, group, subscription, paymentMethod }) {
+      createFromPayload({ transaction, user, group, paymentMethod }) {
 
         // attach other objects manually. Needed for afterCreate hook to work properly
         transaction.UserId = user && user.id;
         transaction.GroupId = group && group.id;
         transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
-        transaction.SubscriptionId = subscription ? subscription.id : null;
 
         if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
           // populate netAmountInGroupCurrency for donations

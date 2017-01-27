@@ -50,6 +50,12 @@ export default (Sequelize, DataTypes) => {
         this.activatedAt = new Date();
 
         return this.save();
+      },
+      deactivate() {
+        this.isActive = false;
+        this.deactivatedAt = new Date();
+
+        return this.save();
       }
     }
   });

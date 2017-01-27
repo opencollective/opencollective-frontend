@@ -197,7 +197,6 @@ export default function stripeWebhook(req, res, next) {
 
     createTransaction: ['retrieveBalance', (cb, results) => {
       const donation = results.fetchDonation;
-      const subscription = donation.Subscription;
       const { stripeSubscription } = results.fetchEvent;
       const user = donation.User || {};
       const group = donation.Group || {};
@@ -228,8 +227,7 @@ export default function stripeWebhook(req, res, next) {
         transaction: newTransaction,
         user,
         group,
-        paymentMethod,
-        subscription
+        paymentMethod
       })
       .then(t => cb(null, t))
       .catch(cb);

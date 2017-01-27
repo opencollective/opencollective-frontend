@@ -122,6 +122,7 @@ export {stripeDonation as stripe};
 // leaving for legacy. Delete after frontend updates
 export {stripeDonation as post};
 
+
 const paypalDonation = (req, res, next) => {
   const { group } = req;
   const { payment } = req.required;

@@ -99,7 +99,6 @@ describe('transactions.routes.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('vat', transactionsData[0].vat);
           expect(res.body).to.have.property('GroupId', publicGroup.id);
           expect(res.body).to.have.property('UserId', user.id); // ...
           done();

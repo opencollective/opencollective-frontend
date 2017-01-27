@@ -641,7 +641,6 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('amount', -expense.amount/100);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
-                  expect(transaction).to.have.property('status', 'REIMBURSED');
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
                   // end TODO remove #postmigration
@@ -772,7 +771,6 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('amount', -expense.amount/100);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
-                  expect(transaction).to.have.property('status', 'REIMBURSED');
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
                   // end TODO remove #postmigration
