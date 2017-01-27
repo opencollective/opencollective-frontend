@@ -159,7 +159,7 @@ export default (app) => {
 
   // TODO: Remove #postmigration after frontend migrates to POST /groups/:groupid/donations/*
   app.post('/groups/:groupid/payments', required('payment'), mw.getOrCreateUser, donations.post); // Make a payment/donation.
-  app.post('/groups/:groupid/payments/paypal', required('payment'), donations.paypal); // Make a payment/donation.
+  // app.post('/groups/:groupid/payments/paypal', required('payment'), donations.paypal); // Make a payment/donation.
 
   app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
@@ -208,8 +208,8 @@ export default (app) => {
    */
   app.get('/groups/:groupid/donations', mw.paginate(), mw.sorting({key: 'processedAt', dir: 'DESC'}), donations.list); // Callback after a payment
   app.post('/groups/:groupid/donations', required('payment'), mw.getOrCreateUser, donations.post); // Make a stripe donation.
-  app.post('/groups/:groupid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
-  app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
+  // app.post('/groups/:groupid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
+  // app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
    * Activities.

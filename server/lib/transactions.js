@@ -28,14 +28,12 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponse, p
     // TODO expense currency might be different from group currency, how to convert?
     netAmountInGroupCurrency: -expense.amount,
     ExpenseId: expense.id,
-    // TODO remove #postmigration, info redundant with joined tables?
     type: expenseType,
-    amount: -expense.amount/100,
+    amount: -expense.amount,
     currency: expense.currency,
     description: expense.title,
     UserId,
     GroupId: expense.GroupId,
-    // end TODO remove #postmigration
   })
   .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
   .then(t => createPaidExpenseActivity(t, paymentResponse, preapprovalDetails));

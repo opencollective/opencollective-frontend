@@ -148,7 +148,7 @@ export const resetTestDatabase = function(req, res, next) {
         UserId: results.createBacker.id
       })
       .then(donation => models.Transaction.create({
-        amount: 1,
+        amount: 100,
         currency: "EUR",
         UserId: results.createBacker.id,
         DonationId: donation.id
@@ -167,7 +167,7 @@ export const resetTestDatabase = function(req, res, next) {
         UserId: results.createBacker2.id
       })
       .then(donation => models.Transaction.create({
-        amount: 2,
+        amount: 200,
         currency: "EUR",
         UserId: results.createBacker2.id,
         DonationId: donation.id
