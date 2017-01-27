@@ -33,7 +33,6 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponse, p
     amount: -expense.amount/100,
     currency: expense.currency,
     description: expense.title,
-    status: 'REIMBURSED',
     UserId,
     GroupId: expense.GroupId,
     // end TODO remove #postmigration
