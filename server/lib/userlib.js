@@ -1,5 +1,6 @@
 import url from 'url';
 import Promise from 'bluebird';
+import slug from 'slug';
 import clearbit from '../gateways/clearbit';
 import { sequelize } from '../models';
 
@@ -131,7 +132,7 @@ export default {
       user.name ? user.name.replace(/ /g, '') : null,
       user.email ? user.email.split(/@|\+/)[0] : null]
       .filter(username => username ? true : false) // filter out any nulls
-      .map(username => username.toLowerCase(/\./g,'')) // lowercase them all
+      .map(username => slug(username).toLowerCase(/\./g,'')) // lowercase them all
       // remove any '+' signs
       .map(username => username.indexOf('+') !== -1 ? username.substr(0, username.indexOf('+')) : username);
 
