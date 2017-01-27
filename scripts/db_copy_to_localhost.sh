@@ -23,6 +23,14 @@ if [[ ! -d ${DBDUMPS_DIR} ]]; then
   mkdir -p "${DBDUMPS_DIR}"
 fi
 
+if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
+  PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
+  echo "Dumping ${ENV} database"
+  pg_dump -O -F t "${PG_URL}" > "${DBDUMPS_DIR}${FILENAME}"
+fi
+
+echo "DB dump saved in ${DBDUMPS_DIR}${FILENAME}"
+
 if psql "${LOCALDBNAME}" -c '\q' 2>/dev/null; then
   echo "Dropping ${LOCALDBNAME}"
   dropdb "${LOCALDBNAME}"
@@ -34,13 +42,7 @@ createdb "${LOCALDBNAME}"
 # Add POSTGIS extension
 psql "${LOCALDBNAME}" -c "CREATE EXTENSION POSTGIS;"
 
-if [[ ! -s ${DBDUMPS_DIR}${FILENAME} ]]; then
-  PG_URL=`heroku config:get PG_URL -a "opencollective-${ENV}-api"`
-  echo "Dumping ${ENV} database"
-  pg_dump -O -F t "${PG_URL}" > "${DBDUMPS_DIR}${FILENAME}"
-fi
 
-echo "DB dump saved in ${DBDUMPS_DIR}${FILENAME}"
 
 # The first time we run it, we will trigger FK constraints errors
 set +e
