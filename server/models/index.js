@@ -1,8 +1,13 @@
 /**
  * Dependencies.
  */
+import pg from 'pg';
 import Sequelize from 'sequelize';
 import { database as config } from 'config';
+
+// this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
+// like in case of the key totalDonations and raw query (like User.getTopBackers())
+pg.defaults.parseInt8 = true;
 
 /**
  * Database connection.

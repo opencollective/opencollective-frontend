@@ -5,21 +5,21 @@ module.exports = {
     return queryInterface.sequelize.query('update "Transactions" SET amount = amount*100')
       .then(() => queryInterface.sequelize.query('update "Subscriptions" SET amount = amount*100'))
       .then(() => queryInterface.changeColumn('Transactions', 'amount', {
-        Sequelize.INTEGER
+        type: Sequelize.INTEGER
       }))
       .then(() => queryInterface.changeColumn('Subscriptions', 'amount', {
-        Sequelize.INTEGER
+        type: Sequelize.INTEGER
       }))
   },
 
   down: function (queryInterface, Sequelize) {
     return queryInterface.changeColumn('Transactions', 'amount', {
-        Sequelize.FLOAT
-      }))
+        type: Sequelize.FLOAT
+      })
       .then(() => queryInterface.changeColumn('Subscriptions', 'amount', {
-        Sequelize.FLOAT
+        type: Sequelize.FLOAT
       }))
-      .then(() => queryInterface.sequelize.query('update "Transactions" SET amount = amount/100')
+      .then(() => queryInterface.sequelize.query('update "Transactions" SET amount = amount/100'))
       .then(() => queryInterface.sequelize.query('update "Subscriptions" SET amount = amount/100'))
   }
 };

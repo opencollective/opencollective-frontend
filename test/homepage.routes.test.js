@@ -25,7 +25,7 @@ describe('homepage.routes.test.js', () => {
       .tap(p => paymentMethod = p)
       .then(() => {
         return models.Transaction.create({
-          amount:1000,
+          amount:100000,
           PaymentMethodId: paymentMethod.id,
           GroupId: group.id,
           UserId: user.id

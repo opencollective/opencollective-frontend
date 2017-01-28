@@ -45,7 +45,7 @@ const stubStripe = () => {
 };
 
 
-describe('webhooks.routes.test.js', () => {
+describe.only('webhooks.routes.test.js', () => {
   const nocks = {};
   let sandbox, user, paymentMethod, group, donation, emailSendSpy;
 
@@ -302,7 +302,7 @@ describe('webhooks.routes.test.js', () => {
         expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
         expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
         expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875)
-        expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+        expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Donation.Subscription.isActive).to.be.equal(true);
         expect(transaction.Donation.Subscription).to.have.property('activatedAt');
         done();
@@ -389,7 +389,7 @@ describe('webhooks.routes.test.js', () => {
             expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
             expect(transaction.currency).to.be.equal(CURRENCY);
             expect(transaction.type).to.be.equal(type.DONATION);
-            expect(transaction.amount).to.be.equal(webhookSubscription.amount / 100);
+            expect(transaction.amount).to.be.equal(webhookSubscription.amount);
 
             expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
             expect(res.rows[0]).to.have.property('txnCurrency', 'USD');

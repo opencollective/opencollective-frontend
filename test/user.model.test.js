@@ -144,7 +144,7 @@ describe('user.models.test.js', () => {
     const users = [ utils.data('user1'), utils.data('user2') ];
     const transactions = [{
       createdAt: new Date('2016-06-14'),
-      amount: 100,
+      amount: 10000,
       netAmountInGroupCurrency: 10000,
       currency: 'USD',
       type: 'donation',
@@ -152,7 +152,7 @@ describe('user.models.test.js', () => {
       GroupId: 1
     },{
       createdAt: new Date('2016-06-15'),
-      amount: 150,
+      amount: 15000,
       netAmountInGroupCurrency: 15000,
       currency: 'USD',
       type: 'donation',
@@ -160,7 +160,7 @@ describe('user.models.test.js', () => {
       GroupId: 2
     },{
       createdAt: new Date('2016-07-15'),
-      amount: 250,
+      amount: 25000,
       netAmountInGroupCurrency: 25000,
       currency: 'USD',
       type: 'donation',
@@ -168,7 +168,7 @@ describe('user.models.test.js', () => {
       GroupId: 1
     },{
       createdAt: new Date('2016-07-16'),
-      amount: 500,
+      amount: 50000,
       netAmountInGroupCurrency: 50000,
       currency: 'USD',
       type: 'donation',
@@ -187,7 +187,7 @@ describe('user.models.test.js', () => {
         .then(backers => {
           backers = backers.map(g => g.dataValues);
           expect(backers.length).to.equal(2);
-          expect(backers[0].totalDonations).to.equal(750);
+          expect(backers[0].totalDonations).to.equal(75000);
           expect(backers[0]).to.have.property('firstName');
           expect(backers[0]).to.have.property('avatar');
           expect(backers[0]).to.have.property('website');
@@ -200,7 +200,7 @@ describe('user.models.test.js', () => {
         .then(backers => {
           backers = backers.map(g => g.dataValues);
           expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(250);
+          expect(backers[0].totalDonations).to.equal(25000);
         });
     });
 
@@ -209,7 +209,7 @@ describe('user.models.test.js', () => {
         .then(backers => {
           backers = backers.map(g => g.dataValues);
           expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(100);
+          expect(backers[0].totalDonations).to.equal(10000);
         });
     });
 

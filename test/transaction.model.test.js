@@ -25,7 +25,7 @@ describe('transaction model', () => {
 
   it('isExpense is true if the amount is negative', done => {
     Transaction.create({
-      amount: -10
+      amount: -1000
     })
     .then(transaction => {
       expect(transaction.info.isExpense).to.be.true;
@@ -38,7 +38,7 @@ describe('transaction model', () => {
   it('get the host', (done) => {
     Transaction.create({
       GroupId: group.id,
-      amount: 100
+      amount: 10000
     })
     .then(transaction => transaction.getHost())
     .then(host => {
@@ -49,7 +49,7 @@ describe('transaction model', () => {
 
   it('isDonation is true when amount is > 0', done => {
     Transaction.create({
-      amount: 0.1
+      amount: 10
     })
     .then(transaction => {
       expect(transaction.info.isDonation).to.be.true;

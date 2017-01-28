@@ -430,8 +430,8 @@ describe('groups.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             const g = res.body;
-            expect(g).to.have.property('balance', parseInt((totDonations*100 + totTransactions*100 + transactionsData[7].amount*100 + transactionsData[8].amount*100).toFixed(0), 10));
-            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount)*100);
+            expect(g).to.have.property('balance', parseInt((totDonations + totTransactions + transactionsData[7].amount + transactionsData[8].amount).toFixed(0), 10));
+            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount));
             done();
           });
       });

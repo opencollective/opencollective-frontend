@@ -253,7 +253,7 @@ describe('lib.donation.test.js', () => {
             expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
-            expect(res.rows[0]).to.have.property('amount', CHARGE);
+            expect(res.rows[0]).to.have.property('amount', CHARGE*100);
             expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
             expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
             expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
@@ -383,7 +383,7 @@ describe('lib.donation.test.js', () => {
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
-                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amount', CHARGE*100);
                 expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
                 expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
                 expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
@@ -448,7 +448,7 @@ describe('lib.donation.test.js', () => {
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
-                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amount', CHARGE*100);
                 expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
                 expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
                 expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
@@ -558,7 +558,7 @@ describe('lib.donation.test.js', () => {
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
-                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amount', CHARGE*100);
                 expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
                 expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
                 expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
@@ -623,7 +623,7 @@ describe('lib.donation.test.js', () => {
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
-                expect(res.rows[0]).to.have.property('amount', CHARGE);
+                expect(res.rows[0]).to.have.property('amount', CHARGE*100);
                 expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
                 expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
                 expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 7000);
