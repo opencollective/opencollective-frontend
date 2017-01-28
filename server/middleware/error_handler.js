@@ -21,7 +21,8 @@ const sendErrorByEmail = (req, err) => {
   emailLib.sendMessage(
     'server-errors@opencollective.com',
     `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
-    errorHTML)
+    errorHTML,
+    {bcc: ' '})
   .catch(console.error);
 };
 

@@ -40,7 +40,8 @@ export const format = (format) => {
           data = _.map(data, (row) => {
             if (row.createdAt)
               row.createdAt = moment(row.createdAt).format("YYYY-MM-DD HH:mm");
-
+            if (row.totalDonations)
+              row.totalDonations = (row.totalDonations/100).toFixed(2); // convert from cents
             return row;
           });
           const fields = (data.length > 0) ? Object.keys(data[0]) : [];
