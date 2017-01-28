@@ -45,7 +45,7 @@ const stubStripe = () => {
 };
 
 
-describe.only('webhooks.routes.test.js', () => {
+describe('webhooks.routes.test.js', () => {
   const nocks = {};
   let sandbox, user, paymentMethod, group, donation, emailSendSpy;
 
