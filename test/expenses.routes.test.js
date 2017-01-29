@@ -588,7 +588,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 120}})
+                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
                     .expect(200);
                 })
 
@@ -638,7 +638,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   // TODO remove #postmigration, info redundant with joined tables?
-                  expect(transaction).to.have.property('amount', -expense.amount/100);
+                  expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
@@ -742,7 +742,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 100}})
+                    .send({ api_key: application.api_key, transaction: {amount: 10000}})
                     .expect(200);
                 })
 
@@ -768,7 +768,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -3737);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   // TODO remove #postmigration, info redundant with joined tables?
-                  expect(transaction).to.have.property('amount', -expense.amount/100);
+                  expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);

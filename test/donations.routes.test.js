@@ -473,7 +473,7 @@ describe('donations.routes.test.js', () => {
             const subscription = res.rows[0];
 
             expect(res.count).to.equal(1);
-            expect(subscription).to.have.property('amount', data.amount);
+            expect(subscription).to.have.property('amount', data.amount*100);
             expect(subscription).to.have.property('interval', 'month');
             expect(subscription).to.have.property('data');
             expect(subscription).to.have.property('isActive', false);

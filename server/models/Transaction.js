@@ -13,8 +13,8 @@ export default (Sequelize, DataTypes) => {
   const Transaction = Sequelize.define('Transaction', {
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING,
-    amount: DataTypes.FLOAT, // TODO: change to INTEGER and rename to donationAmount
-    currency: { // TODO: #postmigration rename to donationCurrency
+    amount: DataTypes.INTEGER,
+    currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
       set(val) {
@@ -35,8 +35,7 @@ export default (Sequelize, DataTypes) => {
     },
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
-    // txnCurrencyFxRate = amount*100/amountInTxnCurrency
-    // TODO: #postmigration update comment above to remove 100
+    // txnCurrencyFxRate = amount/amountInTxnCurrency
     txnCurrencyFxRate: DataTypes.FLOAT,
 
     // amount in currency of the host
@@ -128,7 +127,7 @@ export default (Sequelize, DataTypes) => {
               *transaction.txnCurrencyFxRate);
         } else {
           // populate netAmountInGroupCurrency for "Add Funds" and Expenses
-          transaction.netAmountInGroupCurrency = transaction.amount*100;
+          transaction.netAmountInGroupCurrency = transaction.amount;
           // set the currency to be group's currency, if not specified
           transaction.currency = transaction.currency || group.currency;
         }

@@ -210,7 +210,7 @@ export default function stripeWebhook(req, res, next) {
       const newTransaction = {
         type: type.DONATION,
         DonationId: donation.id,
-        amount: stripeSubscription.amount / 100,
+        amount: stripeSubscription.amount,
         currency: stripeSubscription.currency,
         txnCurrency: balanceTransaction.currency,
         amountInTxnCurrency: balanceTransaction.amount,
@@ -219,8 +219,7 @@ export default function stripeWebhook(req, res, next) {
         platformFeeInTxnCurrency: fees.applicationFee,
         paymentProcessorFeeInTxnCurrency: fees.stripeFee,
         data: {charge, balanceTransaction},
-        description: 'Recurring subscription', // remove #postmigration
-        tags: ['Donation'], // remove #postmigration
+        description: `${donation.Subscription.interval}ly recurring subscription`,
       };
 
       models.Transaction.createFromPayload({

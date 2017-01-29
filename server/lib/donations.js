@@ -40,7 +40,7 @@ export const processDonation = (Sequelize, donation) => {
         return stripe.getOrCreatePlan(
             groupStripeAccount,
             { interval: subscription.interval,
-              amount: donation.amount, // needs to be in INT
+              amount: donation.amount,
               currency: donation.currency
             })
           .then(plan => stripe.createSubscription(
@@ -101,7 +101,7 @@ export const processDonation = (Sequelize, donation) => {
             payload.transaction = {
               type: transactions.type.DONATION,
               DonationId: donation.id,
-              amount: donation.amount / 100, // in Float
+              amount: donation.amount,
               currency: donation.currency,
               txnCurrency: balanceTransaction.currency,
               amountInTxnCurrency: balanceTransaction.amount,

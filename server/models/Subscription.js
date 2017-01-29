@@ -3,7 +3,7 @@ export default (Sequelize, DataTypes) => {
   const Subscription = Sequelize.define('Subscription', {
 
     amount: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.INTEGER,
       validate: { min: 0 }
     },
 
@@ -32,8 +32,6 @@ export default (Sequelize, DataTypes) => {
       defaultValue: false
     },
 
-    // The subscription.plan.amount is not on the same scale as our amount. Stripe
-    // show 10$ as 1000 USD. In our db we save 10$ as 10 USD.
     data: DataTypes.JSON,
 
     stripeSubscriptionId: DataTypes.STRING,

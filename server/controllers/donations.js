@@ -1,11 +1,5 @@
 import Promise from 'bluebird';
-import roles from '../constants/roles';
 import _ from 'lodash';
-import config from 'config';
-import async from 'async';
-import * as users from '../controllers/users';
-import * as paypal from '../gateways/paypal';
-import activities from '../constants/activities';
 import models from '../models';
 import errors from '../lib/errors';
 import {getLinkHeader, getRequestedUrl, capitalize} from '../lib/utils';
@@ -30,17 +24,6 @@ export const list = (req, res, next) => {
     .catch(next);
 };
 
-const getOrCreateUser = (attributes, cb) => {
-   return models.User.findOne({
-      where: {
-        email: attributes.email
-      }
-    })
-    .then(user => user || users._create(attributes))
-    .then(user => cb(null, user))
-    .catch(cb);
-};
-
 const stripeDonation = (req, res, next) => {
 
   const { payment } = req.required;
@@ -48,8 +31,7 @@ const stripeDonation = (req, res, next) => {
   const { group } = req;
   const { interval } = payment;
 
-  const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
-  const amountInt = parseInt(amountFloat * 100, 10); // TODO: clean this up when we switch all amounts to INTEGER
+  const amount = parseInt(payment.amount * 100, 10);
   const currency = payment.currency || group.currency;
   const isSubscription = _.contains(['month', 'year'], interval);
 
@@ -61,11 +43,11 @@ const stripeDonation = (req, res, next) => {
     return next(new errors.BadRequest('Stripe Token missing.'));
   }
 
-  if (!amountFloat) {
+  if (!amount) {
     return next(new errors.BadRequest('Payment Amount missing.'));
   }
 
-  if (amountInt < 50) {
+  if (amount < 50) {
     return next(new errors.BadRequest('Payment amount must be at least $0.50'));
   }
 
@@ -97,7 +79,7 @@ const stripeDonation = (req, res, next) => {
     if (isSubscription) {
       title = payment.description || capitalize(`${interval}ly donation to ${group.name}`);
       return models.Subscription.create({
-        amount: amountFloat,
+        amount,
         currency,
         interval
       })
@@ -110,7 +92,7 @@ const stripeDonation = (req, res, next) => {
       UserId: user.id,
       GroupId: group.id,
       currency: currency,
-      amount: amountInt,
+      amount,
       title,
       PaymentMethodId: paymentMethod.id,
       SubscriptionId: subscription && subscription.id
@@ -123,11 +105,12 @@ export {stripeDonation as stripe};
 export {stripeDonation as post};
 
 
+/*
 const paypalDonation = (req, res, next) => {
   const { group } = req;
   const { payment } = req.required;
   const currency = payment.currency || group.currency;
-  const amountFloat = payment.amount; // TODO: clean this up when we switch all amounts to INTEGER
+  const amount = parseInt(payment.amount * 100, 10);
   const { interval } = payment;
   const isSubscription = _.contains(['month', 'year'], interval);
   const distribution = payment.distribution ? JSON.stringify({distribution: payment.distribution}) : '';
@@ -136,7 +119,7 @@ const paypalDonation = (req, res, next) => {
     return next(new errors.BadRequest('Interval should be month or year.'));
   }
 
-  if (!amountFloat) {
+  if (!payment.amount) {
     return next(new errors.BadRequest('Payment Amount missing.'));
   }
 
@@ -151,7 +134,7 @@ const paypalDonation = (req, res, next) => {
     createSubscription: ['getConnectedAccount', (cb) => {
       if (isSubscription) {
         models.Subscription.create({
-            amount: amountFloat,
+            amount,
             currency,
             interval
           })
@@ -169,7 +152,7 @@ const paypalDonation = (req, res, next) => {
         group,
         transaction: {
           type: 'payment',
-          amount: amountFloat,
+          amount,
           currency,
           description: payment.description || `Donation to ${group.name}`,
           tags: ['Donation'],
@@ -361,3 +344,4 @@ export const paypalCallback = (req, res, next) => {
   });
 
 };
+*/
