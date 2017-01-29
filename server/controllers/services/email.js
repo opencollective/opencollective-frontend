@@ -58,8 +58,8 @@ const fetchSubscribers = (groupSlug, type) => {
 // TODO: move to emailLib.js
 const sendEmailToList = (to, email) => {
   const tokens = to.match(/(.+)@(.+)\.opencollective\.com/i);
-  const list = tokens[1].toLowerCase();
-  const slug = tokens[2].toLowerCase();
+  const list = tokens[1];
+  const slug = tokens[2];
   const type = `mailinglist.${list}`;
   email.from = email.from || `${slug} collective <info@${slug}.opencollective.com>`;
   email.group = email.group || { slug }; // used for the unsubscribe url
@@ -150,8 +150,8 @@ export const webhook = (req, res, next) => {
   const { recipient } = email;
 
   const tokens = recipient.match(/(.+)@(.+)\.opencollective\.com/i);
-  const list = tokens[1].toLowerCase();
-  const slug = tokens[2].toLowerCase();
+  const list = tokens[1];
+  const slug = tokens[2];
 
   const body = email['body-html'] || email['body-plain'];
 
