@@ -4,6 +4,7 @@ import {
 } from 'graphql';
 
 import query from './queries';
+import mutation from './mutations';
 
 const Query = new GraphQLObjectType({
   name: 'Query',
@@ -13,8 +14,17 @@ const Query = new GraphQLObjectType({
   }
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'This is the root mutation',
+  fields: () => {
+    return mutation
+  }
+})
+
 const Schema = new GraphQLSchema({
-  query: Query
+  query: Query,
+  mutation: Mutation
 });
 
 export default Schema
