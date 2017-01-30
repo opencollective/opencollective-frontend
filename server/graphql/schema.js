@@ -3,7 +3,7 @@ import {
   GraphQLSchema,
 } from 'graphql';
 
-import query from './query';
+import query from './queries';
 
 const Query = new GraphQLObjectType({
   name: 'Query',
@@ -14,7 +14,7 @@ const Query = new GraphQLObjectType({
 });
 
 const Schema = new GraphQLSchema({
-  query: Query,
+  query: Query
 });
 
 export default Schema
