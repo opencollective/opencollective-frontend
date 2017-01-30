@@ -7,19 +7,12 @@ import * as utils from './utils';
 import models from '../server/models';
 
 
-describe.only('Mutation Tests', () => {
-  let user1, user2, user3, group1, group2, group3, event1, event2, tier1, tier2, tier3;
+describe('Mutation Tests', () => {
+  let user1, user2, group1, event1, tier1;
 
   /* SETUP
     group1: 2 events
-      event1: 2 tiers
-        tier1: 2 responses
-        tier2: 1 response
-      event2: 1 tier
-        tier3: no response
-    group2: 1 event
-      event3: no tiers // event3 not declared above due to linting
-    group3: no events
+      event1: 1 tier
   */
 
   beforeEach(() => utils.resetTestDB());
@@ -28,13 +21,7 @@ describe.only('Mutation Tests', () => {
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
-
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
-
-  beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
-
-  beforeEach(() => models.Group.create(utils.data('group4')).tap(g => group3 = g));
 
   describe('createResponse tests', () => {
 
@@ -42,25 +29,9 @@ describe.only('Mutation Tests', () => {
       Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
       .tap(e => event1 = e));
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdByUserId: user1.id, GroupId: group1.id }))
-      .tap(e => event2 = e));
-
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdByUserId: user2.id, GroupId: group2.id })));
-      //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
-
     beforeEach(() => models.Tier.create(
       Object.assign(utils.data('tier1'), { EventId: event1.id }))
       .tap(t => tier1 = t));
-
-    beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('tier2'), { EventId: event1.id }))
-      .tap(t => tier2 = t));
-
-    beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('tier1'), { EventId: event2.id }))
-      .tap(t => tier3 = t));
 
     describe('throws an error', () => {
 
@@ -287,7 +258,7 @@ describe.only('Mutation Tests', () => {
               },
               "user": {
                 "email": "newuser@email.com",
-                "id": 4
+                "id": 3
               },
               "collective": {
                 "id": 1,
