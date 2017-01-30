@@ -61,17 +61,17 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[21], 'slack');
-      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
+      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 12.34 for for pizza!');
     });
 
     it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[22], 'slack');
-      expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
+      expect(actual).to.equal('Expense rejected: EUR 12.34 for for pizza in <blah.com|Blah> by userId: 2!');
     });
 
     it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[23], 'slack');
-      expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah> by userId: 2!');
+      expect(actual).to.equal('Expense approved: EUR 12.34 for for pizza in <blah.com|Blah> by userId: 2!');
     });
 
   });
@@ -110,17 +110,17 @@ describe('lib.activities.test.js', () => {
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[21], 'slack');
-      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 0.1234 for for pizza!');
+      expect(actual).to.equal('New Expense: someone submitted an expense to <blah.com|Blah>: EUR 12.34 for for pizza!');
     });
 
     it (`${constants.GROUP_EXPENSE_REJECTED}`, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[22], 'slack');
-      expect(actual).to.equal('Expense rejected: EUR 0.1234 for for pizza in <blah.com|Blah>!');
+      expect(actual).to.equal('Expense rejected: EUR 12.34 for for pizza in <blah.com|Blah>!');
     });
 
     it (`${constants.GROUP_EXPENSE_APPROVED}`, () => {
       const actual = activitiesLib.formatMessageForPublicChannel(activitiesData[23], 'slack');
-      expect(actual).to.equal('Expense approved: EUR 0.1234 for for pizza in <blah.com|Blah>!');
+      expect(actual).to.equal('Expense approved: EUR 12.34 for for pizza in <blah.com|Blah>!');
     });
 
   });
