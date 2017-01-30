@@ -57,7 +57,7 @@ export default {
 
     // get transaction data
     if (activity.data.transaction) {
-      ({ amount } = activity.data.transaction);
+      amount = activity.data.transaction.amount/100;
       recurringAmount = amount + (interval ? `/${interval}` : '');
       ({ currency } = activity.data.transaction);
       ({ description } = activity.data.transaction);
@@ -195,7 +195,7 @@ export default {
 
     // get transaction data
     if (activity.data.transaction) {
-      ({ amount } = activity.data.transaction);
+      amount = activity.data.transaction.amount/100;
       recurringAmount = amount + (interval ? `/${interval}` : '');
       ({ currency } = activity.data.transaction);
       ({ description } = activity.data.transaction);

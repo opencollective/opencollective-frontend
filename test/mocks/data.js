@@ -196,7 +196,7 @@ export default {
             },
           "transaction": {
             "isDonation": true,
-            "amount":10.42,
+            "amount":1042,
             "currency": "USD"
             },
           "group": {
@@ -216,7 +216,7 @@ export default {
             },
           "transaction": {
             "isExpense": true,
-            "amount":-12.98,
+            "amount":-1298,
             "currency": "USD",
             "description": "pizza"
             },
@@ -237,7 +237,7 @@ export default {
             },
           "transaction": {
             "isExpense": true,
-            "amount":-12.98,
+            "amount":-1298,
             "currency": "USD",
             "description": "pizza"
             },
@@ -267,7 +267,7 @@ export default {
             "email":"jussi@kuohujoki.fi"
           },
           "transaction": {
-            "amount": 12.34,
+            "amount": 1234,
             "currency": "EUR"
           },
           "group": {
@@ -361,7 +361,7 @@ export default {
             "publicUrl": "blah.com"
           },
           "expense": {
-            "amount": 12.34,
+            "amount": 1234,
             "currency": "EUR",
             "title": "for pizza"
           }
@@ -379,7 +379,7 @@ export default {
             "publicUrl": "blah.com"
           },
           "expense": {
-            "amount": 12.34,
+            "amount": 1234,
             "currency": "EUR",
             "title": "for pizza",
             "lastEditedById": 2
@@ -398,7 +398,7 @@ export default {
             "publicUrl": "blah.com"
           },
           "expense": {
-            "amount": 12.34,
+            "amount": 1234,
             "currency": "EUR",
             "title": "for pizza",
             "lastEditedById": 2
