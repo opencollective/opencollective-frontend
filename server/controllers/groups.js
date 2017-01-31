@@ -411,7 +411,7 @@ export const createFromGithub = (req, res, next) => {
             provider: 'github'
           };
           const userAttr = {
-            avatar: `http://avatars.githubusercontent.com/${contributor}`
+            avatar: `https://avatars.githubusercontent.com/${contributor}`
           };
           let connectedAccount, contributorUser;
           return ConnectedAccount.findOne({where: caAttr})
