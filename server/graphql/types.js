@@ -340,12 +340,7 @@ export const TierType = new GraphQLObjectType({
       availableQuantity: {
         type: GraphQLInt,
         resolve(tier) {
-          return models.Response.sum('quantity', { 
-            where: {
-              TierId: tier.id
-            }
-          })
-          .then(usedQuantity => usedQuantity ? tier.maxQuantity - usedQuantity : tier.maxQuantity );
+          return tier.availableQuantity()
         }
       },
       password: {

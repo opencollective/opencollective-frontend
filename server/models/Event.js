@@ -50,7 +50,10 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.INTEGER
     },
 
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
     description: DataTypes.TEXT,
 
@@ -67,7 +70,10 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    slug: DataTypes.STRING,
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
     startsAt: {
       type: DataTypes.DATE,

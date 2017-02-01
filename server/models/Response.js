@@ -15,7 +15,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     GroupId: {
@@ -25,7 +26,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     TierId: {
@@ -35,7 +37,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     EventId: {
@@ -45,7 +48,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     confirmedAt: {
