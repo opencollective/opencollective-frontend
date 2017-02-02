@@ -1,5 +1,6 @@
 import nock from 'nock';
 import sinon from 'sinon';
+import nodemailer from 'nodemailer';
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
 import config from 'config';
@@ -108,9 +109,29 @@ describe('subscriptions.routes.test.js', () => {
   describe('#cancel', () => {
 
     const subscription = utils.data('subscription1');
-    let donation;
+    let donation, nm;
     const nocks = {};
 
+    // create a fake nodemailer transport
+    beforeEach(() => {
+      config.mailgun.user = 'xxxxx';
+      config.mailgun.password = 'password';
+
+      nm = nodemailer.createTransport({
+            name: 'testsend',
+            service: 'Mailgun',
+            sendMail (data, callback) {
+                callback();
+            },
+            logger: false
+          });
+      sinon.stub(nodemailer, 'createTransport', () => nm);
+    });
+
+    // stub the transport
+    beforeEach(() => sinon.stub(nm, 'sendMail', (object, cb) => cb(null, object)));
+
+    afterEach(() => nm.sendMail.restore());
 
     beforeEach(() => {
       return models.Subscription.create(subscription)
@@ -188,6 +209,7 @@ describe('subscriptions.routes.test.js', () => {
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
+
           expect(err).to.not.exist;
           expect(res.body.success).to.be.true;
           expect(nocks['subscriptions.delete'].isDone()).to.be.true;
@@ -206,6 +228,12 @@ describe('subscriptions.routes.test.js', () => {
               expect(activity.data.subscription.id).to.be.equal(donation.SubscriptionId);
               expect(activity.data.group.id).to.be.equal(group.id);
               expect(activity.data.user.id).to.be.equal(user.id);
+            })
+            .then(() => {
+              const subject = nm.sendMail.lastCall.args[0].subject;
+              const html = nm.sendMail.lastCall.args[0].html;
+              expect(subject).to.contain('Subscription canceled to Scouts');
+              expect(html).to.contain('€20/month has been canceled');
               done();
             })
             .catch(done);
