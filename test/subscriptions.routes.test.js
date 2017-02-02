@@ -133,6 +133,13 @@ describe('subscriptions.routes.test.js', () => {
 
     afterEach(() => nm.sendMail.restore());
 
+    afterEach(() => {
+      config.mailgun.user = '';
+      config.mailgun.password = '';
+      nodemailer.createTransport.restore();
+    });
+
+
     beforeEach(() => {
       return models.Subscription.create(subscription)
         .then(sub => models.Donation.create({
