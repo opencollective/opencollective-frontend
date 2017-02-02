@@ -20,7 +20,10 @@ function run() {
     where: { 
       SubscriptionId: {
         $ne: null
-      } 
+      },
+      PaymentMethodId: {
+        $ne: null
+      }
     },
     include: [
       { model: models.Subscription,
