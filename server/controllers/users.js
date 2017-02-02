@@ -118,8 +118,9 @@ export const getSocialMediaAvatars = (req, res) => {
   });
 };
 
-export const _create = user => userLib.fetchInfo(user)
-  .then(user => User.create(user))
+  // TODO: reenable asynchronously
+  // userLib.fetchInfo(user)
+export const _create = (user) => User.create(user)
   .tap(dbUser => Activity.create({
     type: constants.USER_CREATED,
     UserId: dbUser.id,
