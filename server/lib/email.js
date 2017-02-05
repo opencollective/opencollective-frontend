@@ -252,6 +252,8 @@ const sendMessageFromActivity = (activity, notification) => {
         viewExpenseUrl: notification.User.generateLoginLink(`/${data.group.slug}/transactions/expenses#exp${data.expense.id}`)
       }
       return generateEmailFromTemplateAndSend('group.expense.approved.for.host', notification.User.email, data);
+    case activities.GROUP_CREATED:
+      return generateEmailFromTemplateAndSend('group.created', notification.User.email, data);
     default:
       return Promise.resolve();
   }
