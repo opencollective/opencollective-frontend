@@ -171,8 +171,6 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    /*
-    TODO: bring back when we reenable clearbit for new account creation
     it('successfully create a user with just an email and auto prefills firstName, lastName, twitter, avatar', (done) => {
       request(app)
         .post('/users')
@@ -193,7 +191,6 @@ describe('users.routes.test.js', () => {
             .catch(done);
         });
     });
-    */
 
     it('successfully creates a user with a referrer', (done) => {
       models.User.create(utils.data('user2'))
@@ -537,7 +534,7 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() =>
       models.User.create({
-        email: 'xdamman@gmail.com' // will have twitter avatar
+        email: 'random1@gmail.com'
       })
       .tap(u => userWithoutAvatar = u));
 
@@ -585,8 +582,6 @@ describe('users.routes.test.js', () => {
               expect(res.body).to.have.property('lastName', newUser.lastName);
               expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
               expect(res.body).to.have.property('website', newUser.website);
-              expect(res.body).to.have.property('avatar').to.contain('.amazonaws.com/');
-              expect(res.body).to.have.property('avatar').to.contain(config.aws.s3.bucket);
               done();
             });
         });
