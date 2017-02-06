@@ -538,7 +538,7 @@ describe('groups.routes.test.js', () => {
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
-            expect(res.body.length).to.equal(2);
+            expect(res.body.length).to.equal(3);
             done();
           });
       });
