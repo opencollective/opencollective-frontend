@@ -534,7 +534,7 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() =>
       models.User.create({
-        email: 'xdamman1@gmail.com' // will have twitter avatar
+        email: 'random1@gmail.com'
       })
       .tap(u => userWithoutAvatar = u));
 
