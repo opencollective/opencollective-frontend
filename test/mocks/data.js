@@ -79,7 +79,8 @@ export default {
     }],
     "hostFeePercent": 10,
     "tags": ["open source", "test"],
-    "isSupercollective": false
+    "isSupercollective": false,
+    "isActive": true
   },
 
   "group2": {
@@ -107,7 +108,8 @@ export default {
     }],
     "hostFeePercent": 0,
     "tags": ["meetup", "test"],
-    "isSupercollective": false
+    "isSupercollective": false,
+    "isActive": true
   },
 
   "group3": {
