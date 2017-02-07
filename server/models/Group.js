@@ -553,8 +553,8 @@ export default function(Sequelize, DataTypes) {
           });
       },
 
-      getRelatedGroups(limit=3, minTotalDonationInCents=10000) {
-        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true);
+      getRelatedGroups(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
+        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
       },
 
       hasHost() {

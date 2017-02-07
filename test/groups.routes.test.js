@@ -129,7 +129,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('updatedAt');
           expect(res.body).to.have.property('twitterHandle');
           expect(res.body).to.have.property('website');
-          expect(res.body).to.have.property('isActive', false);
+          expect(res.body).to.have.property('isActive', true);
 
           return Promise.all([
             models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
