@@ -1,17 +1,17 @@
 Hi {{recipient.firstName}}!
 
-We got so excited about 2016 ending that we missed sending December report on time! 🙊
-Better late than never, here are your monthly stats as of December 31st: 
+We hope you had a great start of the year! We are grateful and humbled by how much support the collectives are getting. <3
+
+As usual, let’s start with your monthly stats:
 
 Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currency group.stats.totalDonations currency=group.currency}}}{{#if group.stats.totalExpenses}}, {{{currency group.stats.totalExpenses currency=group.currency}}}{{/if}}) 
 {{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}}{{#if group.stats.backers.lost}}, -{{group.stats.backers.lost}}{{/if}}) 
 
 
-# Related Collectives
+# New Related Collectives
 
 {{#each relatedGroups}}
 {{publicUrl}}
-{{contributorsCount}} contributors, {{currency yearlyIncome currency=currency precision=0}} annual budget
 {{{capitalize mission}}}
 
 {{/each}}
@@ -23,6 +23,7 @@ Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currenc
 {{else}}
 No expense submitted. 
 {{/each}}
+
 Go to {{@root.group.publicUrl}}/expenses to submit a new expense.
 
 
@@ -37,43 +38,29 @@ Go to {{@root.group.publicUrl}}/expenses to submit a new expense.
 
 # Changelog
 
-You probably noticed that we redesigned your collective’s page. We decided to put the expenses and donations at the top to emphasis the financial transparency aspect of Open Collective and embrace the fact that in order to do great things together, we need money to fund them. We wrote about it here: https://medium.com/open-collective/meet-the-open-source-design-collective-96e81261f76#.neu5eimgr
+Request Money:
+Sometimes you want to send a backer or a sponsor a specific link for a donation, or you want to do a special subscription deal or sell tickets to a meetup. We released a new feature to generate a specific URL for this and you can find it in your transactions page: {{group.publicUrl}}/transactions
 
-# Featured Collectives
+We’ve changed the way your backers are charged.
+We now charge recurring monthly subscriptions on 1st of every month. The goal is to help you better manage your budget. Instead of getting donations randomly throughout the month, you will start the month with a minimum budget that will get improved with any new donations during the month. We would also like to eventually move to charging a single payment for multiple monthly donations from the same user. Fewer transactions means less fees going towards payment processors and more for your collective! Stay tuned for updates on that in the near future.
 
-We have many new and exciting collectives on board, we’ll just mention a few of the latest ones and welcome everyone to this community! 
 
-- Telescope is on a mission to create the easiest way to build modern web apps.
-https://opencollective.com/telescope
+# Featured Collective
 
-- Magit is on a mission to make version control at the speed of thought possible with Git.
-https://opencollective.com/Magit
-
-- Redux-saga is on a mission to bring ease for side effects management in Redux applications.
-https://opencollective.com/redux-saga
-
-- VeganizerBXL is on a mission to make Brussels more vegan-friendly
-https://opencollective.com/veganizerbxl
-
-- Special welcome to WWCodeKyiv (https://opencollective.com/wwcodekyiv) and Open Labs Hackerspace (https://opencollective.com/openlabs) our first Ukrainian and Albanian collectives! 
+We created a collective https://opencollective.com/NoMuslimBan to raise money to support #NoMuslimBan and shared an email address (expenses@NoMuslimBan.opencollective.com) to reimburse any immigration-related receipts. First use of that money: send 10 pizzas to the lawyers working hard and late into the night at JFK. Kudos to the delivery guy who made it happen amidst the chaos!! You can help us use the money by asking anyone who took part of the protest to file the expenses they had to the collective. A lot of people want to help cover them!
 
 
 # Read & Listen
 
-Check out our end of year wrap up blog post (and what’s on the works for 2017): https://medium.com/open-collective/2016-on-open-collective-7677e352fd22#.8rl8hf1mh
+Read Xavier’s blog post From Firms to Collectives. Moving beyond the old model of private firms to create economic value together.
+https://medium.com/open-collective/from-firms-to-collectives-c139ae27a4ee#.5z8py49ic
 
-Aseem kicked off a new series of blog posts to showcase collectives with Open Source Design. Stay tuned for more to come!
-https://medium.com/open-collective/meet-the-open-source-design-collective-96e81261f76#.agc4sypg6
+We were invited to Changelog and Pia had a long chat about Open Collective and creating a healthy ecosystem to support Open Source for the future. https://changelog.com/podcast/234
 
-Watch Pia and Kent C. Dodds chat about Open Collective. 
-https://www.youtube.com/watch?v=f7VdzbHbl78&feature=youtu.be
 
-Open Collective was invited to do a Changelog podcast! Hot off the presses you can listen to it here.
-https://changelog.com/podcast/234
+# Don't forget
 
-# Open Issues
+Let us know if you want to receive an email when your collective receives a new donation or someone files an expense! We are very mindful of everyone’s inbox so we don’t do this by default. 
 
-We have an ongoing issue about a new feature we are building to support selling tickets for events through your collective. Jump in, we’d love to hear your thoughts on this. 
-https://github.com/OpenCollective/OpenCollective/issues/177
 
 {{>footer.text}}

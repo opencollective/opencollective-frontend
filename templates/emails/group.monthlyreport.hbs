@@ -8,19 +8,18 @@ h2 {
   color:#75cc1f;
   font-weight:normal;
 }
-
 h3 {
   font-weight: normal;
   font-size: 14px;
   margin-bottom: 20px;
 }
-
 ul {
   padding-left: 20px;
 }
-
 ul li {
   margin: 5px 0px;
+  line-height: 1.4;
+  font-size: 12pt;
 }
 .counter {
   font-size: 36px;
@@ -36,7 +35,6 @@ ul li {
   color: red;
 }
 .label {
-
 }
 .reimbursed {
   color: #7A7B82;
@@ -57,8 +55,8 @@ th {
 
 <div>
 <p>Hi {{recipient.firstName}}!<br />
-We got so excited about 2016 ending that we missed sending December report on time! 🙊 <br/>
-Better late than never, here are your monthly stats as of December 31st: 
+We hope you had a great start of the year! We are grateful and humbled by how much support the collectives are getting. ❤️<br />
+As usual, let’s start with your monthly stats:
 </p>
 
 <center>
@@ -88,6 +86,7 @@ Better late than never, here are your monthly stats as of December 31st:
 
 {{#each group.tiers}}
 <table width="100%" height=30>
+  <tr><td colspan="3" height="10">&nbsp;</td></tr>
   <tr>
     <td class="tdline"></td><th rowspan=2 nowrap>{{title}}</th><td class="tdline"></td>
   </tr>
@@ -144,34 +143,29 @@ Better late than never, here are your monthly stats as of December 31st:
 
 <h2>Changelog</h2>
 
-<p>You probably noticed that we redesigned your collective’s page. We decided to put the expenses and donations at the top to emphasis the financial transparency aspect of Open Collective and embrace the fact that in order to do great things together, we need money to fund them. We wrote about it <a href="https://medium.com/open-collective/meet-the-open-source-design-collective-96e81261f76#.neu5eimgr?{{utm}}">here</a>! </p>
+<ul>
+<li><b>Request Money:</b> 
+Sometimes you want to send a backer or a sponsor a specific link for a donation, or you want to do a special subscription deal or sell tickets to a meetup. We released a new feature to generate a specific URL for this and you can find it in your transactions page:
+<center><img style="width:100%;" src="https://cl.ly/2i1o370V3C3S/Screen%20Shot%202017-02-06%20at%2011.21.13%20PM.png" /></center>
+</li> 
+<li><b>We’ve changed the way your backers are charged:</b> 
+We now charge recurring monthly subscriptions on 1st of every month. The goal is to help you better manage your budget. Instead of getting donations randomly throughout the month, you will start the month with a minimum budget that will get improved with any new donations during the month. We would also like to eventually move to charging a single payment for multiple monthly donations from the same user. Fewer transactions means less fees going towards payment processors and more for your collective! Stay tuned for updates on that in the near future.
+</li>
+</ul>
 
 <h2>Featured Collectives</h2>
 
-<p>We have many new and exciting collectives on board, we’ll just mention a few of the latest ones and welcome everyone to this community! </p>
+<p>We created a collective <a href="https://opencollective.com/NoMuslimBan?{{utm}}">#NoMuslimBan</a> to raise money to support immigration efforts and shared an email address (expenses@NoMuslimBan.opencollective.com) to reimburse any immigration-related receipts. First use of that money: send 10 pizzas to the lawyers working hard and late into the night at JFK. Kudos to the delivery guy who made it happen amidst the chaos!! You can help us use the money by asking anyone who took part of the protest to file the expenses they had to the collective. A lot of people want to help cover them!
 
-<ul>
-  <li><a href="https://opencollective.com/telescope?{{utm}}">Telescope</a> is on a mission to create the easiest way to build modern web apps.
-  <li><a href="https://opencollective.com/magit?{{utm}}">Magit</a> is on a mission to make version control at the speed of thought possible with Git.</li>
-  <li><a href="https://opencollective.com/redux-saga?{{utm}}">Redux-saga</a> is on a mission to bring ease for side effects management in Redux applications.</li>
-  <li><a href="https://opencollective.com/veganizerbxl?{{utm}}">VeganizerBXL</a> is on a mission to make Brussels more vegan-friendly</li>
-  <li>Special welcome to <a href="https://opencollective.com/wwcodekyiv?{{utm}}">WWCodeKyiv</a> and <a href="https://opencollective.com/openlabs?{{utm}}">Open Labs Hackerspace</a> our first Ukrainian and Albanian collectives! </li>
-</ul>
+<center><img width="320" src="https://cl.ly/0t2J3n1d3F3Z/IMG_1401.JPG" /></center>
+</p>
+
 
 <h2>Read & Listen</h2>
 
-<p>Check out our <a href="https://medium.com/open-collective/2016-on-open-collective-7677e352fd22#.8rl8hf1mh?{{utm}}">end of year wrap up blog post</a> (and what’s in the works for 2017)</p>
+<p>Read Xavier’s blog post <a href="https://medium.com/open-collective/from-firms-to-collectives-c139ae27a4ee#.5z8py49ic?{{utm}}">From Firms to Collectives</a>. Moving beyond the old model of private firms to create economic value together.</p>
 
-<p>Aseem kicked off <a href="https://medium.com/open-collective/meet-the-open-source-design-collective-96e81261f76#.agc4sypg6?{{utm}}">a new series of blog posts to showcase collectives with Open Source Design</a>. Stay tuned for more to come.</p>
-
-<p><a href="https://www.youtube.com/watch?v=f7VdzbHbl78&feature=youtu.be">Watch to Pia and Kent C. Dodds</a> chat about Open Collective.</p>
-
-<p><a href="https://changelog.com/podcast/234">Open Collective was invited to do a Changelog podcast! Hot off the presses, you can listen to it here.<p>  
-
-<h2>Open Issues</h2>
-
-<p>We have an <a href="https://github.com/OpenCollective/OpenCollective/issues/177?{{utm}}">ongoing issue</a> about a new feature we are building to support selling tickets for events through your collective. Jump in, we’d love to hear your thoughts on this. 
-</p>
+<p>We were invited to <a href="https://changelog.com/podcast/234">Changelog</a> and Pia had a long chat about Open Collective and creating a healthy ecosystem to support.<p>  
 
 </div>
 
