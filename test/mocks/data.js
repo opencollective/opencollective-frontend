@@ -142,7 +142,8 @@ export default {
       logo: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
       currency: 'EUR',
       settings: { "style": { "hero": { "cover": { "background": "rgb(36,189,213)" } } } },
-      tags: ['#brusselstogether']
+      tags: ['#brusselstogether'],
+      isActive: true
     },
     {
       name: 'Refugees Got Talent',
@@ -150,7 +151,8 @@ export default {
       mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
       logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
-      tags: ['#brusselstogether']
+      tags: ['#brusselstogether'],
+      isActive: true
     },
     {
       name: 'Brussels Smart City',
@@ -159,7 +161,8 @@ export default {
       logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
-      backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg'
+      backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg',
+      isActive: true
     }
   ],
 
