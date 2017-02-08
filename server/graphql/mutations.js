@@ -7,7 +7,8 @@ import {
 import models from '../models';
 
 import {
-  ResponseType
+  ResponseType,
+  ResponseInputType
 } from './types';
 
 // import { hasRole } from '../middleware/security/auth';
@@ -17,61 +18,39 @@ const mutations = {
   createResponse: {
     type: ResponseType,
     args: {
-      userEmail: {
-        type: new GraphQLNonNull(GraphQLString),
-      },
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      },
-      tierId: {
-        type: new GraphQLNonNull(GraphQLInt)
-      },
-      eventSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      },
-      quantity: {
-        type: new GraphQLNonNull(GraphQLInt)
-      },
-      confirmedAt: {
-        type: GraphQLString
-      },
-      status: {
-        // TODO: switch to enum type
-        type: new GraphQLNonNull(GraphQLString)
-      },
-      description: {
-        type: GraphQLString
+      response: {
+        type: ResponseInputType
       }
     },
     resolve(_, args) {
 
       let tier, user;
-
-      args.userEmail = args.userEmail.toLowerCase();
+      const response = args.response;
+      const email = response.user.email.toLowerCase();
       return models.Tier.findOne({
         where: {
-          id: args.tierId,
+          id: response.tier.id,
         },
         include: [{
           model: models.Event,
           where: {
-            slug: args.eventSlug
+            slug: response.event.slug
           },
           include: [{
             model: models.Group,
             where: {
-              slug: args.collectiveSlug
+              slug: response.group.slug
             }
           }]
         }]
       })
       .then(t => {
         if (!t) {
-          throw new Error(`No tier found with tierId:${args.tierId} for eventSlug:${args.eventSlug} in collectiveSlug:${args.collectiveSlug}`);
+          throw new Error(`No tier found with tierId:${response.tier.id} for eventSlug:${response.event.slug} in collectiveSlug:${response.group.slug}`);
         }
         tier = t;
       })
-      .then(() => tier.checkAvailableQuantity(args.quantity))
+      .then(() => tier.checkAvailableQuantity(response.quantity))
       .tap(console.log)
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
@@ -79,24 +58,22 @@ const mutations = {
       .then(() => models.User.findOne({
         where: {
           $or: {
-            email: args.userEmail,
-            paypalEmail: args.userEmail
+            email,
+            paypalEmail: email
           }
         }
       }))
-      .then(u => u || models.User.create({
-        email: args.userEmail
-      }))
+      .then(u => u || models.User.create({ email }))
       .tap(u => user = u)
       .then(() => models.Response.create({
         UserId: user.id,
         GroupId: tier.Event.Group.id,
         EventId: tier.Event.id,
         TierId: tier.id,
-        confirmedAt: args.confirmedAt,
-        quantity: args.quantity,
-        status: args.status,
-        description: args.description
+        confirmedAt: response.confirmedAt,
+        quantity: response.quantity,
+        status: response.status,
+        description: response.description
       }))
     }
   }
