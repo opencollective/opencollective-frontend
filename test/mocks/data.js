@@ -501,7 +501,6 @@ export default {
         "description": "Donation to that great project",
         "amount": 999,
         "currency": "USD",
-        "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
         "description": "Donation to that great project",
