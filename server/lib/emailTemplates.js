@@ -22,6 +22,7 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
+  'subscription.canceled',
   'thankyou',
   'thankyou.wwcode',
   'thankyou.brusselstogether',

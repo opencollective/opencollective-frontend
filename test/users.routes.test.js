@@ -534,7 +534,7 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() =>
       models.User.create({
-        email: 'xdamman@gmail.com' // will have twitter avatar
+        email: 'random1@gmail.com'
       })
       .tap(u => userWithoutAvatar = u));
 
@@ -582,8 +582,6 @@ describe('users.routes.test.js', () => {
               expect(res.body).to.have.property('lastName', newUser.lastName);
               expect(res.body).to.have.property('twitterHandle', newUser.twitterHandle);
               expect(res.body).to.have.property('website', newUser.website);
-              expect(res.body).to.have.property('avatar').to.contain('.amazonaws.com/');
-              expect(res.body).to.have.property('avatar').to.contain(config.aws.s3.bucket);
               done();
             });
         });

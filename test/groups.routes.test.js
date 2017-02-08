@@ -151,7 +151,7 @@ describe('groups.routes.test.js', () => {
         expect(response).to.have.property('updatedAt');
         expect(response).to.have.property('twitterHandle');
         expect(response).to.have.property('website');
-        expect(response).to.have.property('isActive', false);
+        expect(response).to.have.property('isActive', true);
       });
 
       it('assigns the users as members', () => {
@@ -453,7 +453,7 @@ describe('groups.routes.test.js', () => {
             expect(e).to.not.exist;
             const g = res.body;
             expect(g).to.have.property('balance', parseInt((totDonations + totTransactions + transactionsData[7].amount + transactionsData[8].amount).toFixed(0), 10));
-            expect(g).to.have.property('yearlyIncome', (totDonations + transactionsData[7].amount * 12 + transactionsData[8].amount));
+            expect(g).to.have.property('yearlyIncome', (transactionsData[7].amount + transactionsData[7].amount * 12)); // one is a single payment and other is a subscription
             done();
           });
       });

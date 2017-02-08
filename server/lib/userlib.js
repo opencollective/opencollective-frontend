@@ -10,20 +10,6 @@ export default {
 
   clearbit,
 
-  fetchInfo(user) {
-    return this.getUserData(user.email)
-      .then(userData => {
-        if (userData) {
-          user.firstName = user.firstName || userData.name.givenName;
-          user.lastName = user.lastName || userData.name.familyName;
-          user.avatar = user.avatar || userData.avatar;
-          user.twitterHandle = user.twitterHandle || userData.twitter.handle;
-          user.website = user.website || userData.site;
-        }
-        return user;
-      });
-  },
-
   fetchAvatar(email) {
     return this.getUserData(email)
       .then(userData => userData && userData.avatar ? userData.avatar : null)
@@ -180,6 +166,24 @@ export default {
       }
     }
     return null;
+  },
+
+  updateUserInfoFromClearbit(user) {
+    if (!user.email) {
+      return Promise.resolve();
+    } 
+    return this.getUserData(user.email)
+      .then(userData => {
+        if (userData) {
+          user.firstName = user.firstName || userData.name.givenName;
+          user.lastName = user.lastName || userData.name.familyName;
+          user.avatar = user.avatar || userData.avatar;
+          user.twitterHandle = user.twitterHandle || userData.twitter.handle;
+          user.website = user.website || userData.site;
+          return user.save();
+        } else {
+          return Promise.resolve();
+        }
+      });
   }
-    
 };
