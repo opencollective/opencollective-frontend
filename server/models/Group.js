@@ -456,6 +456,7 @@ export default function(Sequelize, DataTypes) {
               WHERE t."GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
+                AND t."createdAt" > (current_date - INTERVAL '12 months')
                 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
             +
             (SELECT
@@ -465,6 +466,7 @@ export default function(Sequelize, DataTypes) {
               WHERE t."GroupId" = :GroupId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
+                AND t."createdAt" > (current_date - INTERVAL '12 months')
                 AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
             "yearlyIncome"
           `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
