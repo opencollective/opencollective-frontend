@@ -14,6 +14,7 @@ const templateNames = [
   'email.approve',
   'email.message',
   'github.signup',
+  'group.confirm',
   'group.created',
   'group.expense.approved.for.host',
   'group.expense.created',
@@ -63,6 +64,11 @@ handlebars.registerHelper('sign', (value) => {
 handlebars.registerHelper('toLowerCase', (str) => {
   if (!str) return '';
   return str.toLowerCase();
+});
+
+handlebars.registerHelper('json', (obj) => {
+  if (!obj) return '';
+  return JSON.stringify(obj);
 });
 
 handlebars.registerHelper('moment', (value, props) => {

@@ -257,6 +257,9 @@ const sendMessageFromActivity = (activity, notification) => {
       }
       return generateEmailFromTemplateAndSend('group.expense.approved.for.host', userEmail, data);
 
+    case activities.GROUP_CREATED:
+      return generateEmailFromTemplateAndSend('group.created', userEmail, data);
+
     case activities.SUBSCRIPTION_CANCELED:
       return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data);
 

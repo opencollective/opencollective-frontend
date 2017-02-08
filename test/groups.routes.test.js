@@ -97,53 +97,76 @@ describe('groups.routes.test.js', () => {
         })
     });
 
-    it('successfully create a group, while assigning the users as members', (done) => {
+    describe('successfully create a group', () => {
+      let response, group;
 
-      const users = [
-            _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
-            _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
+      beforeEach('subscribe host to group.created notification', () => models.Notification.create({UserId: user.id, type: 'group.created', channel: 'email'}));
 
-      const g = Object.assign({}, publicGroupData, {users})
-      g.HostId = user.id;
+      beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
+      beforeEach('create the collective', (done) => {
+        const users = [
+              _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
+              _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
 
-      request(app)
-        .post('/groups')
-        .send({
-          api_key: application.api_key,
-          group: g
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('id');
-          expect(res.body).to.have.property('name');
-          expect(res.body).to.have.property('mission');
-          expect(res.body).to.have.property('description');
-          expect(res.body).to.have.property('longDescription');
-          expect(res.body).to.have.property('logo');
-          expect(res.body).to.have.property('video');
-          expect(res.body).to.have.property('image');
-          expect(res.body).to.have.property('backgroundImage');
-          expect(res.body).to.have.property('expensePolicy');
-          expect(res.body).to.have.property('createdAt');
-          expect(res.body).to.have.property('updatedAt');
-          expect(res.body).to.have.property('twitterHandle');
-          expect(res.body).to.have.property('website');
-          expect(res.body).to.have.property('isActive', true);
+        group = Object.assign({}, publicGroupData, {users})
+        group.HostId = user.id;
 
-          return Promise.all([
-            models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
-            models.UserGroup.count({where: { role: roles.MEMBER }}),
-            models.Group.find({where: { slug: g.slug }})
-            ])
-          .then(results => {
-            expect(results[0].GroupId).to.equal(1);
-            expect(results[1]).to.equal(2);
-            expect(results[2].lastEditedByUserId).to.equal(2);
+        request(app)
+          .post('/groups')
+          .send({
+            api_key: application.api_key,
+            group
+          })
+          .expect(200)
+          .end((e, res) => {
+            expect(e).to.not.exist;
+            response = res.body;
             done();
           })
-          .catch(done);
+      });
+
+      afterEach('restore emailLib', () => emailLib.sendMessageFromActivity.restore());
+
+      it('sends an email to the host', () => {
+        const activity = emailLib.sendMessageFromActivity.args[0][0];
+        expect(activity.type).to.equal('group.created');
+        expect(activity.data).to.have.property('group');
+        expect(activity.data).to.have.property('host');
+        expect(activity.data).to.have.property('user');
+        expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(user.email);
+      });
+
+      it('returns the attributes of the collective', () => {
+        expect(response).to.have.property('id');
+        expect(response).to.have.property('name');
+        expect(response).to.have.property('mission');
+        expect(response).to.have.property('description');
+        expect(response).to.have.property('longDescription');
+        expect(response).to.have.property('logo');
+        expect(response).to.have.property('video');
+        expect(response).to.have.property('image');
+        expect(response).to.have.property('backgroundImage');
+        expect(response).to.have.property('expensePolicy');
+        expect(response).to.have.property('createdAt');
+        expect(response).to.have.property('updatedAt');
+        expect(response).to.have.property('twitterHandle');
+        expect(response).to.have.property('website');
+        expect(response).to.have.property('isActive', true);
+      });
+
+      it('assigns the users as members', () => {
+        return Promise.all([
+          models.UserGroup.findOne({where: { UserId: user.id, role: roles.HOST }}),
+          models.UserGroup.count({where: { role: roles.MEMBER }}),
+          models.Group.find({where: { slug: group.slug }})
+          ])
+        .then(results => {
+          expect(results[0].GroupId).to.equal(1);
+          expect(results[1]).to.equal(2);
+          expect(results[2].lastEditedByUserId).to.equal(2);
         });
+      });
+
     });
 
   });
@@ -205,7 +228,6 @@ describe('groups.routes.test.js', () => {
       beforeEach(() => sinon.spy(emailLib, 'send'));
 
       afterEach(() => emailLib.send.restore());
-
 
       it('assigns contributors as users with connectedAccounts', () =>
         request(app)
@@ -516,7 +538,7 @@ describe('groups.routes.test.js', () => {
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
-            expect(res.body.length).to.equal(2);
+            expect(res.body.length).to.equal(3);
             done();
           });
       });
