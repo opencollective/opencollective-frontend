@@ -573,7 +573,7 @@ export default function(Sequelize, DataTypes) {
         if (this.isSupercollective &&
           this.settings.superCollectiveTag &&
           this.settings.superCollectiveTag.length > 0) {
-          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 100, [this.id], 0, false);
+          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 10000, [this.id], 0, false);
         }
         return Promise.resolve();
       }
