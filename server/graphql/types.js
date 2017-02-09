@@ -191,7 +191,7 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.getEvents();
         }
       },
-      stripePublishablekey: {
+      stripePublishableKey: {
         type: GraphQLString,
         resolve(collective) {
           return collective.getStripeAccount()
