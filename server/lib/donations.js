@@ -173,13 +173,5 @@ export const processDonation = (Sequelize, donation) => {
         return services[donation.PaymentMethod.service](donation)
       }
     })
-    .catch(err => {
-      console.error(`Error while processing donation id: ${donation.id}`, err);
-      return emailLib.sendMessage(
-        'server-errors@opencollective.com, support@opencollective.com',
-        `Failed to process donation id: ${donation.id}`,
-        `Oops I couldn't process this donation<br><br>Please email this user directly and let them know.<br>
-         Error: ${err}<br><br>Donation: ${JSON.stringify(donation.info)}`
-        )
-    });
+    .catch(err);
 }

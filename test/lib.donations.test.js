@@ -667,57 +667,5 @@ describe('lib.donation.test.js', () => {
 
     });
 
-    describe('Payment errors', () => {
-
-      beforeEach(() => {
-        nock.cleanAll();
-        nocks['customers.create'] = nock(STRIPE_URL)
-          .post('/v1/customers')
-          .reply(200, stripeMock.customers.create);
-      });
-
-      // Nock for charges.create.
-      beforeEach(() => {
-        const params = [
-          `amount=${CHARGE * 100}`,
-          `currency=${CURRENCY}`,
-          `customer=${stripeMock.customers.create.id}`,
-          `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
-          'application_fee=54',
-          `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-          `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
-          `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
-          `${encodeURIComponent('metadata[paymentMethodId]')}=1`
-        ].join('&');
-
-        nocks['charges.create'] = nock(STRIPE_URL)
-          .post('/v1/charges', params)
-          .replyWithError(stripeMock.charges.createError);
-      });
-
-      beforeEach(() => {
-        return models.PaymentMethod.create({
-          number: 'blah',
-          token: STRIPE_TOKEN,
-          service: 'stripe',
-          })
-        .then(pm => models.Donation.create({
-          amount: CHARGE * 100,
-          currency: CURRENCY,
-          SubscriptionId: null,
-          PaymentMethodId: pm.id,
-          UserId: user.id,
-          GroupId: group.id
-        }));
-      });
-
-      it('fails paying because of a paymentMethod declined', (done) => {
-        expect(emailSendMessageSpy.lastCall.args[0]).to.contain('server-errors@opencollective.com');
-        expect(emailSendMessageSpy.lastCall.args[1]).to.contain('Failed to process donation');
-        done();
-      });
-
-    });
-
   });
 });
