@@ -2,7 +2,7 @@ import filter from 'lodash/filter';
 import values from 'lodash/values';
 
 function isValidEmail(email) {
-  return (email.match(/.+@.+\..+/));
+  return Boolean(email.match(/.+@.+\..+/));
 }
 
 function formatCurrency(amount, currency = 'USD') {

@@ -5,7 +5,7 @@ const styles = {
   cover: css({
     width: '100%',
     height: '400px',
-    padding: '10px',
+    padding: '50px 10px 10px 10px',
     color: 'white',
     textAlign: 'center',
     position: 'relative'
@@ -28,7 +28,7 @@ const styles = {
     position: 'relative'
   }),
   title: css({
-    fontSize: '16px'
+    fontSize: '44px'
   })
 }
 

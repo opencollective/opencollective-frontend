@@ -17,25 +17,18 @@ const styles = {
 class InterestedForm extends React.Component {
 
   static propTypes = {
-    event: React.PropTypes.object.isRequired,
     onSubmit: React.PropTypes.func
   }
 
   constructor(props) {
     super(props);
-    this.event = props.event;
     this.onSubmit = props.onSubmit;
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(user) {
-    const response = {
-      status: 'interested',
-      user,
-      event: this.event
-    };
-    this.onSubmit(response);
+    this.onSubmit(user);
   }
 
   render() {

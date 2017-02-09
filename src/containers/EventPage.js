@@ -18,6 +18,9 @@ import Responses from '../components/Responses';
 import colors from '../constants/colors';
 import { filterCollection } from '../lib/utils';
 import '../css/EventPage.css';
+import defaultBackgroundImage from '../images/defaultBackgroundImage.png';
+import { addEventData } from '../graphql/queries';
+import { addCreateResponseMutation } from '../graphql/mutations';
 
 class EventPage extends React.Component {
 
@@ -62,20 +65,31 @@ class EventPage extends React.Component {
       onChange: (apiStatus) => this.setState({ api: apiStatus }),
       delay: 5000
     });
+
   }
 
-  async setInterested(response) {
-    if (!this.user) {
+  /**
+   * If user is logged in, we directly create a response 
+   * Otherwise, we show the form to enter an email address
+   */
+  setInterested(user) {
+    if (user || this.user) {
+      this.setState({ showInterestedForm: false });
+      this.createResponse({
+        status: 'INTERESTED',
+        user
+      });
+      this.setState({ showInterestedForm: false });
+      return;
+    } else {
       this.setState({ showInterestedForm: !this.state.showInterestedForm });
       return;
     }
-    this.setState({ showInterestedForm: false });
-    this.saveResponse(response);
   }
 
   rsvp(response) {
     this.setState({ view: 'ticketConfirmed' });
-    this.saveResponse(response);
+    this.createResponse(response);
   }
 
   changeView(view) {
@@ -95,8 +109,33 @@ class EventPage extends React.Component {
     window.scrollTo(0,0);
   }
 
-  async saveResponse(response) {
-    await this.api.saveResponse(response);
+  async createResponse(response) {
+    response.tier = { id : response.tier && response.tier.id || 1 } // should remove default tier id
+    const ResponseInputType = {
+      group: { slug: this.event.collective.slug },
+      event: { slug: this.event.slug },
+      tier: response.tier,
+      quantity: response.quantity || 1, // should remove || 1
+      user: response.user,
+      status: response.status
+    };
+
+    this.setState( { status: 'loading' });
+    let result;
+    try {
+      result = await this.props.createResponse(ResponseInputType);
+      this.setState( { status: 'idle' });
+    } catch(err) {
+      console.error(">>> createResponse error: ", err);
+      this.error(err.graphQLErrors[0].message);
+    }
+  }
+
+  error(msg) {
+    this.setState( {status: 'error', error: msg });
+    setTimeout(() => {
+      this.setState( { status: 'idle', error: null });
+    }, 5000);
   }
 
   updateResponse(response) {
@@ -115,7 +154,7 @@ class EventPage extends React.Component {
 
   render () {
     console.log("new state:", this.state, this.state.response);
-    const { getEvent, error } = this.props.data;
+    const { Event, error } = this.props.data;
 
     if ( error ) {
       console.error(error.message);
@@ -126,7 +165,7 @@ class EventPage extends React.Component {
       return (<div>Loading</div>)
     }
 
-    const Event = getEvent;
+    this.event = Event;
     const going = filterCollection(Event.responses, {'status':'confirmed'});
     const interested = filterCollection(Event.responses, {'status':'interested'});
     let responsesTitle = `${going.length} people going`;
@@ -135,19 +174,19 @@ class EventPage extends React.Component {
 
     return (
       <div className="EventPage">
-        <TopBar className={this.state.api.status} /> 
+        <TopBar className={this.state.status} /> 
 
-        <NotificationBar status={this.state.api.status} error={this.state.api.error} />
+        <NotificationBar status={this.state.status} error={this.state.error} />
 
         <EventHeader
           logo={Event.collective.logo}
           title={Event.name}
-          backgroundImage={Event.backgroundImage || Event.collective.backgroundImage}
+          backgroundImage={Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage}
           />
 
         <ActionBar actions={this.state.actions} />
         {this.state.showInterestedForm &&
-          <InterestedForm event={Event} onSubmit={(response) => this.saveResponse(response)} />
+          <InterestedForm onSubmit={this.setInterested} />
         }
 
         {this.state.view == 'GetTicket' && 
@@ -203,42 +242,6 @@ class EventPage extends React.Component {
   }
 }
 
-const FeedQuery = gql`query Event {
-  getEvent(collectiveSlug: "opencollective", eventSlug: "jan-meetup") {
-    id,
-    name,
-    description,
-    locationString,
-    tiers {
-      id,
-      name,
-      description,
-      amount,
-      currency,
-      quantity
-    },
-    collective {
-      id,
-      slug,
-      name,
-      mission,
-      backgroundImage,
-      logo
-    },
-    responses {
-      quantity,
-      status,
-      user {
-        name,
-        avatar
-      },
-      tier {
-        name
-      }
-    }
-  }
-}`
+const EventPageWithDataWithMutation = addCreateResponseMutation(addEventData(EventPage));
 
-const EventPageWithData = graphql(FeedQuery)(EventPage)
-
-export default EventPageWithData
+export default EventPageWithDataWithMutation;

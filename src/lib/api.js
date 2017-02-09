@@ -46,7 +46,6 @@ class Api {
     }
   }
 
-
   makeRequest(endpoint, result, error) {
     this.onChange({ status: 'loading' });
     
@@ -81,9 +80,9 @@ class Api {
     return this.makeRequest('mock', this.user);
   }
 
-  saveResponse(response) {
+  async saveResponse(response) {
     console.log("api> saving user response ", response);
-    return this.makeRequest('mock', true);
+    return response;
   }
 
 }

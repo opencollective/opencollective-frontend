@@ -13,7 +13,6 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '17px',
     padding: '0',
-    cursor: 'pointer',
     height: '60px',
     border: '1px solid transparent',
     textTransform: 'uppercase',
@@ -34,10 +33,9 @@ const styles = {
       height: '16px',
       margin: '0 5px'
     },
-    '& label': {
+    '& .label': {
       padding: '0px',
-      margin: '0px',
-      cursor: 'pointer'
+      margin: '0px'
     },
     '&.whiteblue, &.whiteblue a': {
       color: colors.blue,
@@ -60,6 +58,10 @@ const styles = {
       borderColor: colors.green,
       background: colors.green
     },
+    '&[disabled]': {
+      borderColor: colors.disabled,
+      background: colors.disabled
+    },
     '&[type=submit]': {
       height: '40px',
       borderRadius: '20px'
@@ -75,6 +77,7 @@ class Button extends React.Component {
 
   static propTypes = {
     label: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
     type: React.PropTypes.string, // e.g. type="submit"
     onClick: React.PropTypes.func,
     className: React.PropTypes.string,
@@ -82,11 +85,20 @@ class Button extends React.Component {
     style: React.PropTypes.object
   }
 
+  onClick() {
+    !this.props.disabled && this.props.onClick && this.props.onClick();
+  }
+
   render() {
     return (
-      <button type={this.props.type} style={this.props.style} className={`${styles.btn} ${this.props.className}`} onClick={this.props.onClick} >
+      <button 
+        type={this.props.type}
+        disabled={this.props.disabled}
+        style={this.props.style}
+        className={`${styles.btn} ${this.props.className}`}
+        onClick={this.onClick.bind(this)} >
         {this.props.icon && <img src={icons[this.props.icon]} />}
-        {this.props.label && <label className={styles.label}>{this.props.label}</label>}
+        {this.props.label && <span className={styles.label}>{this.props.label}</span>}
         {this.props.children}
       </button>
     );

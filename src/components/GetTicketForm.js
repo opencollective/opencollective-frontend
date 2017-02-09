@@ -22,7 +22,12 @@ class GetTicketForm extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { response: {} };
+    const response = {
+      amount: this.props.tier.amount,
+      quantity: this.props.quantity,
+      tier: this.props.tier
+    };
+    this.state = { response };
     this.handleTicketChange = this.handleTicketChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -33,8 +38,9 @@ class GetTicketForm extends React.Component {
 
   handleSubmit(user) {
     const response = this.state.response;
+    response.status = 'YES';
     response.user = user;
-    this.onSubmit(response);
+    this.props.onSubmit(response);
   }
 
   render() {

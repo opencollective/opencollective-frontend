@@ -37,13 +37,13 @@ class SignInUp extends React.Component {
 
     this.fields = [
       {
-        name: 'firstname',
+        name: 'firstName',
         label: 'First name:',
         placeholder: '',
         description: ''
       },
       {
-        name: 'lastname',
+        name: 'lastName',
         label: 'Last name:',
         placeholder: '',
         description: ''
@@ -55,7 +55,7 @@ class SignInUp extends React.Component {
         description: 'Present yourself in 60 characters or less, if you can!'
       },
       {
-        name: 'twitter',
+        name: 'twitterHandle',
         label: 'Twitter:',
         placeholder: '@xdamman',
         description: ''
@@ -65,8 +65,9 @@ class SignInUp extends React.Component {
 
   handleChange(fieldname, value) {
     this.state.form[fieldname] = value;
-    if (fieldname === 'email' && isValidEmail(value))
-      this.setState({ valid: true });
+    if (fieldname === 'email') {
+      this.setState({ valid: isValidEmail(value) })
+    }
   }
 
   renderInputField(field) {
@@ -146,7 +147,7 @@ class SignInUp extends React.Component {
         }
         {!showCreditCardForm &&
         <div id="actions" className="actions">
-          <Button type="submit" className={`${!this.state.valid ? 'green' : 'disabled' }`} label={this.props.label} />
+          <Button type="submit" disabled={!this.state.valid} className="green" label={this.props.label} />
         </div>}
         </form>
       </div>
