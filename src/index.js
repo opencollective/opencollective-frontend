@@ -8,13 +8,13 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client'
 import { ApolloProvider } from 'react-apollo'
 import './index.css'
 
-let { API_URL, API_KEY } = process.env;
+let { REACT_APP_API_URL, REACT_APP_API_KEY } = process.env;
 if (process.env.NODE_ENV === 'development') {
-  API_URL = 'http://localhost:3060';
-  API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
+  REACT_APP_API_URL = 'http://localhost:3060';
+  REACT_APP_API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
 }
 
-const networkInterface = createNetworkInterface({ uri: `${API_URL}/graphql?api_key=${API_KEY}` })
+const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}` })
 
 // The x-graphcool-source header is to let the server know that the example app has started.
 // (Not necessary for normal projects)
