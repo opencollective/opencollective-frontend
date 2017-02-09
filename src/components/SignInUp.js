@@ -156,7 +156,8 @@ class SignInUp extends React.Component {
 }
 
 SignInUp.defaultProps = {
-  showLabels: true
+  showLabels: true,
+  stripePublishableKey: 'pk_test_5aBB887rPuzvWzbdRiSzV3QB'
 }
 
 export default SignInUp;

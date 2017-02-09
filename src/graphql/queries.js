@@ -22,7 +22,8 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
       name,
       mission,
       backgroundImage,
-      logo
+      logo,
+      stripePublishableKey
     },
     responses {
       quantity,

@@ -17,6 +17,7 @@ class GetTicketForm extends React.Component {
     onCancel: React.PropTypes.func.isRequired,
     onSubmit: React.PropTypes.func.isRequired,
     quantity: React.PropTypes.number.isRequired,
+    stripePublishableKey: React.PropTypes.string,
     tier: React.PropTypes.object.isRequired
   }
 
@@ -49,7 +50,12 @@ class GetTicketForm extends React.Component {
     return (
       <div className={styles.getTicketForm}>
         <Tier tier={tier} quantity={this.props.quantity} onChange={this.handleTicketChange} />
-        <SignInUp label={label} onSubmit={this.handleSubmit} requireCreditCard={(this.state.response.amount > 0)} />
+        <SignInUp
+          label={label}
+          onSubmit={this.handleSubmit}
+          requireCreditCard={(this.state.response.amount > 0)}
+          stripePublishableKey={this.props.stripePublishableKey}
+          />
       </div>
     );
   }
