@@ -70,7 +70,7 @@ You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`
 Feel free to modify `scripts/create_user_and_group.js` to create your own user/group.
 
 ## Documentation
-http://docs.opencollective.apiary.io/
+WIP
 
 ## Deployment
 
