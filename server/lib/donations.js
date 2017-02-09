@@ -173,5 +173,4 @@ export const processDonation = (Sequelize, donation) => {
         return services[donation.PaymentMethod.service](donation)
       }
     })
-    .catch(err);
 }
