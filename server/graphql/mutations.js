@@ -20,6 +20,8 @@ const mutations = {
     },
     resolve(_, args) {
 
+      console.log(JSON.stringify(args.response));
+
       let tier, user;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
@@ -71,7 +73,7 @@ const mutations = {
         description: response.description
       }))
       .then(responseModel => {
-        if (response.paymentToken && tier.amount > 0) {
+        if (response.user.card && response.user.card.token && tier.amount > 0) {
           return tier.Group.getStripeAccount()
           .then(stripeAccount => {
             if (!stripeAccount || !stripeAccount.accessToken) {
@@ -83,7 +85,7 @@ const mutations = {
             }
           })
           .then(() => models.PaymentMethod.getOrCreate({
-            token: response.paymentToken,
+            token: response.user.card.token,
             service: 'stripe',
             UserId: user.id 
           }))
@@ -91,14 +93,14 @@ const mutations = {
             UserId: user.id,
             GroupId: tier.Event.Group.id,
             currency: tier.currency,
-            amount: tier.amount,
+            amount: tier.amount * responseModel.quantity,
             title: `${tier.Event.name} - ${tier.name}`,
             PaymentMethodId: paymetMethod.id,
           }));
         } else {
           Promise.resolve();
         }
-      });
+      })
     }
   }
 }

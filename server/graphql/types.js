@@ -8,7 +8,9 @@ import {
   GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLString,
-  GraphQLScalarType
+  GraphQLScalarType,
+  Kind,
+  GraphQLError
 } from 'graphql';
 
 import models from '../models';
@@ -29,14 +31,37 @@ const nonZeroPositiveIntValue = (value) => {
 
 const nonZeroPositiveIntType = new GraphQLScalarType({
   name: 'nonZeroPositiveInt',
-  serialize: nonZeroPositiveIntValue,
-  parseValue: nonZeroPositiveIntValue,
+  serialize: value => value,
+  parseValue: value => value,
   parseLiteral(ast) {
     if (ast.kind === Kind.INT) {
       return nonZeroPositiveIntValue(parseInt(ast.value, 10));
     }
-    return null;
+    throw new GraphQLError('Query error: must be an int greater than 0', [ast]);
   }
+});
+
+const EmailType = new GraphQLScalarType({
+    name: 'Email',
+    serialize: value => {
+      return value;
+    },
+    parseValue: value => {
+      return value;
+    },
+    parseLiteral: ast => {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError('Query error: Can only parse strings got a: ' + ast.kind, [ast]);
+      }
+
+      // Regex taken from: http://stackoverflow.com/a/46181/761555
+      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+      if(!re.test(ast.value)) {
+        throw new GraphQLError('Query error: Not a valid Email', [ast]);
+      }
+
+      return ast.value;
+    }
 });
 
 export const UserType = new GraphQLObjectType({
@@ -408,7 +433,7 @@ export const UserInputType = new GraphQLInputObjectType({
   description: 'Input type for UserType',
   fields: () => ({
       id: { type: GraphQLInt },
-      email: { type: new GraphQLNonNull(GraphQLString) },
+      email: { type: new GraphQLNonNull(EmailType) },
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
@@ -484,13 +509,12 @@ export const ResponseInputType = new GraphQLInputObjectType({
   description: 'Input type for ResponseType',
   fields: () => ({
     id: { type: GraphQLInt },
-    quantity: { type: new GraphQLNonNull(nonZeroPositiveIntType) },
+    quantity: { type: new GraphQLNonNull(GraphQLInt) },
     user: { type: new GraphQLNonNull(UserInputType) },
     group: { type: new GraphQLNonNull(GroupInputType) },
     tier: { type: new GraphQLNonNull(TierInputType) },
     event: { type: new GraphQLNonNull(EventAttributesInputType) },
-    status: { type: new GraphQLNonNull(GraphQLString) },
-    paymentToken: { type: GraphQLString }
+    status: { type: new GraphQLNonNull(GraphQLString) }
   })
 })
 
