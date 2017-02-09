@@ -36,6 +36,7 @@ export const processDonation = (Sequelize, donation) => {
       const user = donation.User;
       const paymentMethod = donation.PaymentMethod;
       const subscription = donation.Subscription;
+      const eventResponse = donation.Response;
 
       const createSubscription = (groupStripeAccount) => {
         return stripe.getOrCreatePlan(
@@ -143,19 +144,38 @@ export const processDonation = (Sequelize, donation) => {
         // Mark donation row as processed
         .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
 
+        .then(() => eventResponse ? eventResponse.update({confirmedAt: new Date()}) : Promise.resolve())
+
         // send out confirmation email
-        .then(() => group.getRelatedGroups(2, 0))
-        .then((relatedGroups) => emailLib.send(
-          'thankyou',
-          user.email,
-          { donation: donation.info,
-            user: user.info,
-            group: group.info,
-            relatedGroups,
-            interval: subscription && subscription.interval,
-            firstPayment: true,
-            subscriptionsLink: user.generateLoginLink('/subscriptions')
-          }));
+        .then(() => {
+          if (eventResponse) {
+            return emailLib.send(
+              'ticket.confirmed',
+              user.email,
+              { donation: donation.info,
+                user: user.info,
+                group: group.info,
+                response: response.info,
+                event: event.info,
+                tier: tier.info
+              })
+          } else {
+            // normal donation
+            return group.getRelatedGroups(2, 0)
+            .then((relatedGroups) => emailLib.send(
+              'thankyou',
+              user.email,
+              { donation: donation.info,
+                user: user.info,
+                group: group.info,
+                relatedGroups,
+                interval: subscription && subscription.interval,
+                firstPayment: true,
+                subscriptionsLink: user.generateLoginLink('/subscriptions')
+              }));
+          }
+        })
+        
       }
     };
 
@@ -163,7 +183,13 @@ export const processDonation = (Sequelize, donation) => {
     include: [{ model: Sequelize.models.User },
               { model: Sequelize.models.Group },
               { model: Sequelize.models.PaymentMethod },
-              { model: Sequelize.models.Subscription }]
+              { model: Sequelize.models.Subscription },
+              { model: Sequelize.models.Response, 
+                include: [{ 
+                  model: Sequelize.models.Event,
+                  model: Sequelize.models.Tier
+                }] 
+              }]
     })
     .then(donation => {
       if (!donation.PaymentMethod || donation.PaymentMethod.service === 'paypal') {

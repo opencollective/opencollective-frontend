@@ -70,6 +70,16 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    ResponseId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Responses',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
     isProcessed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false

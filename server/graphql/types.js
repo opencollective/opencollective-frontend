@@ -7,7 +7,8 @@ import {
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+  GraphQLScalarType
 } from 'graphql';
 
 import models from '../models';
@@ -19,6 +20,22 @@ export const ResponseStatusType = new GraphQLEnumType({
     INTERESTED: { value: 'INTERESTED' },
     YES: { value: 'YES' },
     NO: { value: 'NO' }
+  }
+});
+
+const nonZeroPositiveIntValue = (value) => {
+  value => value > 0 ? value : null
+}
+
+const nonZeroPositiveIntType = new GraphQLScalarType({
+  name: 'nonZeroPositiveInt',
+  serialize: nonZeroPositiveIntValue,
+  parseValue: nonZeroPositiveIntValue,
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return nonZeroPositiveIntValue(parseInt(ast.value, 10));
+    }
+    return null;
   }
 });
 
@@ -172,6 +189,13 @@ export const CollectiveType = new GraphQLObjectType({
         type: new GraphQLList(EventType),
         resolve(collective) {
           return collective.getEvents();
+        }
+      },
+      stripePublishablekey: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.getStripeAccount()
+          .then(stripeAccount => stripeAccount && stripeAccount.stripePublishablekey)
         }
       }
     }
@@ -460,12 +484,13 @@ export const ResponseInputType = new GraphQLInputObjectType({
   description: 'Input type for ResponseType',
   fields: () => ({
     id: { type: GraphQLInt },
-    quantity: { type: new GraphQLNonNull(GraphQLInt) },
+    quantity: { type: new GraphQLNonNull(nonZeroPositiveIntType) },
     user: { type: new GraphQLNonNull(UserInputType) },
     group: { type: new GraphQLNonNull(GroupInputType) },
     tier: { type: new GraphQLNonNull(TierInputType) },
     event: { type: new GraphQLNonNull(EventAttributesInputType) },
     status: { type: new GraphQLNonNull(GraphQLString) },
+    paymentToken: { type: GraphQLString }
   })
 })
 
@@ -531,3 +556,4 @@ export const ResponseType = new GraphQLObjectType({
     }
   }
 });
+

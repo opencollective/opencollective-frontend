@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import models from '../models';
 
 import {
@@ -45,7 +47,6 @@ const mutations = {
         tier = t;
       })
       .then(() => tier.checkAvailableQuantity(response.quantity))
-      .tap(console.log)
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
@@ -69,6 +70,35 @@ const mutations = {
         status: response.status,
         description: response.description
       }))
+      .then(responseModel => {
+        if (response.paymentToken && tier.amount > 0) {
+          return tier.Group.getStripeAccount()
+          .then(stripeAccount => {
+            if (!stripeAccount || !stripeAccount.accessToken) {
+              return Promise.reject(new Error(`The host for the collective slug ${tier.Group.slug} has no Stripe account set up`));
+            } else if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+              return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+            } else {
+              return Promise.resolve();
+            }
+          })
+          .then(() => models.PaymentMethod.getOrCreate({
+            token: response.paymentToken,
+            service: 'stripe',
+            UserId: user.id 
+          }))
+          .then(paymetMethod => models.Donation.create({
+            UserId: user.id,
+            GroupId: tier.Event.Group.id,
+            currency: tier.currency,
+            amount: tier.amount,
+            title: `${tier.Event.name} - ${tier.name}`,
+            PaymentMethodId: paymetMethod.id,
+          }));
+        } else {
+          Promise.resolve();
+        }
+      });
     }
   }
 }
