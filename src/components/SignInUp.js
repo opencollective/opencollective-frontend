@@ -89,7 +89,7 @@ class SignInUp extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.user = this.state.form;
+    this.user = Object.assign(this.user, this.state.form);
     this.props.onSubmit(this.user);
   }
 
@@ -142,7 +142,6 @@ class SignInUp extends React.Component {
             stripePublishableKey={this.props.stripePublishableKey}
             number="4242424242424242"
             expiration="11/2020"
-            cvc="111"
             />
         }
         {!showCreditCardForm &&

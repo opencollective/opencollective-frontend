@@ -25,35 +25,50 @@ class CreditCardForm extends React.Component {
     }
 
     this.state = {
-      number: null,
-      exp_month: null,
-      exp_year: null,
-      cvc: null,
-      token: null,
+      error: null,
+      card: {
+        number: this.props.number,
+        exp_month: null,
+        exp_year: null,
+        cvc: null
+      }
     };
+
+    const expiration = this.props.expiration;
+    if (expiration) {
+      const tokens = expiration.split('/');
+      this.state.card.exp_month = Number(tokens[0]);
+      this.state.card.exp_year = Number(tokens[1]);
+    }
+  }
+
+  componentDidMount() {
+    Payment.formatCardNumber(this.refs.number);
+    Payment.formatCardExpiry(this.refs.expiration);
   }
 
   handleChange(fieldname, value) {
 
+    if (!value) return;
+
     const field = {};
     field[fieldname] = value;
-    this.setState({ field });
+    const card = Object.assign({}, this.state.card, field);
 
     if (fieldname === 'expiration') {
       const expiration = value.split('/');
-      this.state.form.exp_month = parseInt(expiration[0], 10);
-      this.state.form.exp_year = parseInt(expiration[1], 10);
+      card.exp_month = parseInt(expiration[0], 10);
+      card.exp_year = parseInt(expiration[1], 10);
     }
 
-    const { card } = this.state;
+    this.setState({ card });
 
     if (isValidCard(card)) {
-      console.log("card is valid", card);
       getStripeToken(card)
         .then((token) => {
           card.token = token;
-          this.setState(card);
-          this.props.onCardAdded(card);
+          this.setState({ card });
+          this.props.onCardAdded(Object.assign({}, card, { number: card.number.substr(12) } ));
         }).catch((error) => {
           this.setState(Object.assign(this.state, { error }));
           console.error("getStripeToken error", error);
@@ -129,7 +144,6 @@ class CreditCardForm extends React.Component {
               className="form-control text-center"
               type="text"
               ref="cvc"
-              value={cvc}
               onChange={(event) => debouncedHandleEvent('cvc', event.target.value)}
               placeholder="CVC"
             />
@@ -139,13 +153,6 @@ class CreditCardForm extends React.Component {
       {error && <Alert bsStyle="warning">{error}</Alert>}
       <Button type="submit" className='green'>{addCardLabel || 'Add Card'}</Button>
     </div>);
-  }
-
-  componentDidMount() {
-    const { number, expiration, cvc } = this.state;
-    number && Payment.formatCardNumber(number);
-    expiration && Payment.formatCardExpiry(expiration);
-    cvc && Payment.formatCardCVC(cvc);
   }
 
   renderCard() {
