@@ -26,7 +26,7 @@ const mutations = {
 
       let tier, user;
       const response = args.response;
-      const email = response.user.email.toLowerCase();
+      response.user.email = response.user.email.toLowerCase();
       return models.Tier.findOne({
         where: {
           id: response.tier.id,
@@ -58,12 +58,12 @@ const mutations = {
       .then(() => models.User.findOne({
         where: {
           $or: {
-            email,
-            paypalEmail: email
+            email: response.user.email,
+            paypalEmail: response.user.email
           }
         }
       }))
-      .then(u => u || models.User.create({ email }))
+      .then(u => u || models.User.create(response.user))
       .tap(u => user = u)
       .then(() => models.Response.create({
         UserId: user.id,

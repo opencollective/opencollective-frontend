@@ -379,15 +379,21 @@ export const TierType = new GraphQLObjectType({
   }
 });
 
-
 export const UserInputType = new GraphQLInputObjectType({
   name: 'UserInputType',
   description: 'Input type for UserType',
   fields: () => ({
-    id: { type: GraphQLInt},
-    email: { type: GraphQLString },
-    firstName: { type: GraphQLString },
-    lastName: { type: GraphQLString }
+      id: { type: GraphQLInt },
+      email: { type: new GraphQLNonNull(GraphQLString) },
+      firstName: { type: GraphQLString },
+      lastName: { type: GraphQLString },
+      name: { type: GraphQLString },
+      avatar: { type: GraphQLString },
+      username: { type: GraphQLString },
+      description: { type: GraphQLString },
+      twitterHandle: { type: GraphQLString },
+      website: { type: GraphQLString },
+      paypalEmail: { type: GraphQLString }
   })
 });
 

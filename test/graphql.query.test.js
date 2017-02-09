@@ -306,7 +306,7 @@ describe('Query Tests', () => {
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
                   "address": "505 Broadway, NY 10012",
-                  "backgroundImage": "http://localhost:3000/static/images/collectives/default-header-bg.jpg",
+                  "backgroundImage": null,
                   "location": "Puck Fair",
                   "lat": null,
                   "long": null,

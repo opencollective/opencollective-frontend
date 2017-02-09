@@ -38,7 +38,7 @@ describe('Mutation Tests', () => {
       it('when missing all required fields', async () => {
         const query = `
           mutation createResponse {
-            createResponse(description:"blah") {
+            createResponse(response: {description:"blah"}) {
               id,
               status
               event {
@@ -53,13 +53,13 @@ describe('Mutation Tests', () => {
           }
         `;
         const result = await graphql(schema, query);
-        expect(result.errors.length).to.equal(6);
-        expect(result.errors[0].message).to.contain('userEmail');
-        expect(result.errors[1].message).to.contain('collectiveSlug');
-        expect(result.errors[2].message).to.contain('tierId');
-        expect(result.errors[3].message).to.contain('eventSlug');
-        expect(result.errors[4].message).to.contain('quantity');
-        expect(result.errors[5].message).to.contain('status');
+        expect(result.errors.length).to.equal(1);
+        expect(result.errors[0].message).to.contain('group');
+        expect(result.errors[0].message).to.contain('event');
+        expect(result.errors[0].message).to.contain('tier');
+        expect(result.errors[0].message).to.contain('user');
+        expect(result.errors[0].message).to.contain('quantity');
+        expect(result.errors[0].message).to.contain('status');
       });
 
       describe('when collective/event/tier doesn\'t exist', () => {
@@ -67,7 +67,7 @@ describe('Mutation Tests', () => {
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(userEmail:"${user1.email}", collectiveSlug:"doesNotExist", eventSlug:"${event1.slug}", tierId:1, status:"YES", quantity:1) {
+              createResponse(response: { user: { email: "${user1.email}" }, group: { slug: "doesNotExist" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -81,7 +81,7 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const result = await graphql(schema, query);
+          const result = await graphql(schema, query)
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal('No tier found with tierId:1 for eventSlug:jan-meetup in collectiveSlug:doesNotExist');
         });
@@ -89,7 +89,7 @@ describe('Mutation Tests', () => {
         it('when event doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(userEmail:"user@email.com", collectiveSlug:"${group1.slug}", eventSlug:"doesNotExist", tierId:1, status:"YES", quantity:1) {
+              createResponse(response: { user: { email:"user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -111,7 +111,7 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(userEmail:"user@email.com", collectiveSlug:"${group1.slug}", eventSlug:"${event1.slug}", tierId:1002, status:"YES", quantity:1) {
+              createResponse(response: { user: { email: "user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -135,7 +135,7 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createResponse {
-              createResponse(userEmail:"user@email.com", collectiveSlug:"${group1.slug}", eventSlug:"${event1.slug}", tierId:1, status:"YES", quantity:101) {
+              createResponse(response: { user: { email: "user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
                 id,
                 status
                 event {
@@ -160,7 +160,7 @@ describe('Mutation Tests', () => {
       it('from an existing user', async () => {
         const query = `
           mutation createResponse {
-            createResponse(userEmail:"${user2.email}", collectiveSlug:"${group1.slug}", eventSlug:"${event1.slug}", tierId:1, status:"YES", quantity:2) {
+            createResponse(response: { user: { email: "${user2.email}" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
               id,
               status,
               user {
@@ -216,7 +216,7 @@ describe('Mutation Tests', () => {
       it('from a new user', async () => {
         const query = `
           mutation createResponse {
-            createResponse(userEmail:"newuser@email.com", collectiveSlug:"${group1.slug}", eventSlug:"${event1.slug}", tierId:1, status:"YES", quantity:2) {
+            createResponse(response: { user: { email: "newuser@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
               id,
               status,
               user {
