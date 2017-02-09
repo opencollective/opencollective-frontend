@@ -1,7 +1,3 @@
-import config from 'config';
-
-const DEFAULT_BACKGROUND_IMG = '/static/images/collectives/default-header-bg.jpg';
-
 export default function(Sequelize, DataTypes) {
 
   const Event = Sequelize.define('Event', {

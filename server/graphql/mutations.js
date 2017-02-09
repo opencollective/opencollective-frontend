@@ -1,9 +1,3 @@
-import {
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLInt
-} from 'graphql';
-
 import models from '../models';
 
 import {
