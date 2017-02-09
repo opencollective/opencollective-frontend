@@ -91,7 +91,7 @@ export default function(Sequelize, DataTypes) {
     backgroundImage: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('backgroundImage') || `${config.host.website}${DEFAULT_BACKGROUND_IMG}`;
+        return this.getDataValue('backgroundImage');
       }
     },
 

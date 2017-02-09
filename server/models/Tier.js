@@ -14,10 +14,14 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
     description: DataTypes.STRING,
 
@@ -71,6 +75,28 @@ export default function(Sequelize, DataTypes) {
   }, {
     paranoid: true,
 
+    instanceMethods: {
+      availableQuantity() {
+        return Sequelize.models.Response.sum('quantity', { 
+            where: {
+              TierId: this.id
+            }
+          })
+          .then(usedQuantity => {
+            if (this.maxQuantity && usedQuantity) {
+              return this.maxQuantity - usedQuantity;
+            } else if (this.maxQuantity) {
+              return this.maxQuantity;
+            } else {
+              return -1; // means there was no maxQuantity set, so infinite availability
+            }
+          })
+      },
+      checkAvailableQuantity(quantityNeeded) {
+        return this.availableQuantity()
+        .then(available => ((available === -1) || (available - quantityNeeded >= 0)))
+      }
+    }
   });
 
   return Tier;

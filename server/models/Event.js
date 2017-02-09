@@ -1,7 +1,3 @@
-import config from 'config';
-
-const DEFAULT_BACKGROUND_IMG = '/static/images/collectives/default-header-bg.jpg';
-
 export default function(Sequelize, DataTypes) {
 
   const Event = Sequelize.define('Event', {
@@ -50,7 +46,10 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.INTEGER
     },
 
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
     description: DataTypes.TEXT,
 
@@ -63,11 +62,14 @@ export default function(Sequelize, DataTypes) {
     backgroundImage: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('backgroundImage') || `${config.host.website}${DEFAULT_BACKGROUND_IMG}`;
+        return this.getDataValue('backgroundImage');
       }
     },
 
-    slug: DataTypes.STRING,
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
     startsAt: {
       type: DataTypes.DATE,
