@@ -48,6 +48,7 @@ const getTotalAnnualBudget = () => {
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."GroupId" != 1
         AND t."deletedAt" IS NULL
+        AND t."createdAt" > (current_date - INTERVAL '12 months') 
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
     +
     (SELECT
@@ -56,6 +57,7 @@ const getTotalAnnualBudget = () => {
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."GroupId" != 1
         AND t."deletedAt" IS NULL
+        AND t."createdAt" > (current_date - INTERVAL '12 months')
         AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
     "yearlyIncome"
   `, {
