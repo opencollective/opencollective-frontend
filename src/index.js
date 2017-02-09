@@ -16,24 +16,6 @@ if (process.env.NODE_ENV === 'development') {
 
 const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}` })
 
-// The x-graphcool-source header is to let the server know that the example app has started.
-// (Not necessary for normal projects)
-// networkInterface.use([{
-//   applyMiddleware (req, next) {
-//     if (!req.options.headers) {
-//       // Create the header object if needed.
-//       req.options.headers = {}
-//     }
-//     req.options.headers['x-graphcool-source'] = 'example:react-apollo-instagram'
-
-//     // get the authentication token from local storage if it exists
-//     if (localStorage.getItem('graphcoolToken')) {
-//       req.options.headers.authorization = `Bearer ${localStorage.getItem('graphcoolToken')}`
-//     }
-//     next()
-//   },
-// }])
-
 const client = new ApolloClient({ networkInterface })
 
 ReactDOM.render((
