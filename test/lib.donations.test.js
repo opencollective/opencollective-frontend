@@ -210,22 +210,6 @@ describe('lib.donation.test.js', () => {
           UserId: user.id,
           GroupId: group.id
         }))
-        .tap(pm => models.Donation.create({
-          amount: CHARGE * 100,
-          currency: 'EUR',
-          SubscriptionId: null,
-          PaymentMethodId: pm.id,
-          UserId: user.id,
-          GroupId: 2
-        }))
-        .tap(pm => models.Donation.create({
-          amount: CHARGE * 150,
-          currency: 'EUR',
-          SubscriptionId: null,
-          PaymentMethodId: pm.id,
-          UserId: user.id,
-          GroupId: 3
-        }));
       });
 
       it('successfully creates a Stripe customer', () => {
