@@ -1,0 +1,17 @@
+.logo {
+  position: absolute;
+  bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.logo img {
+  width: 90%;
+  max-width: 200px;
+}
+
+.shrug {
+  font-size: 36px;
+  text-align: center;
+  color: #46B0ED;
+}

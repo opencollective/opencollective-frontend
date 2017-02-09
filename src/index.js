@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
   API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
 }
 
-const networkInterface = createNetworkInterface(`${API_URL}/graphql?api_key=${API_KEY}`)
+const networkInterface = createNetworkInterface({ uri: `${API_URL}/graphql?api_key=${API_KEY}` })
 
 // The x-graphcool-source header is to let the server know that the example app has started.
 // (Not necessary for normal projects)
@@ -39,8 +39,7 @@ const client = new ApolloClient({ networkInterface })
 ReactDOM.render((
   <ApolloProvider client={client}>
     <Router history={browserHistory}>
-      <Route path='/' component={EventPage} />
-      <Route path='/events/:eventid/tickets/:tierid' component={TierPage} />
+      <Route path='/:collectiveSlug/events/:eventSlug' component={EventPage} />
     </Router>
   </ApolloProvider>
   ),

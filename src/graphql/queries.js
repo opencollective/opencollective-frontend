@@ -1,8 +1,8 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-const getEventQuery = gql`query Event {
-  Event(collectiveSlug: "opencollective", eventSlug: "jan-meetup") {
+const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: String!) {
+  Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
     id,
     slug,
     name,
