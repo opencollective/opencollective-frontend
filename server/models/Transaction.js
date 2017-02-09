@@ -173,7 +173,7 @@ export default (Sequelize, DataTypes) => {
 
     hooks: {
       afterCreate: (transaction) => {
-        return Transaction.createActivity(transaction);
+        Transaction.createActivity(transaction); // intentionally no return statement, needs to be async
       }
     }
   });

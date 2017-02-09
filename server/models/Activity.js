@@ -16,7 +16,7 @@ export default function(Sequelize, DataTypes) {
 
     hooks: {
       afterCreate(activity) {
-        return notify(Sequelize, activity);
+        notify(Sequelize, activity); // intentionally no return statement, needs to be async
       }
     }
   });
