@@ -127,13 +127,17 @@ describe('groups.routes.test.js', () => {
 
       afterEach('restore emailLib', () => emailLib.sendMessageFromActivity.restore());
 
-      it('sends an email to the host', () => {
-        const activity = emailLib.sendMessageFromActivity.args[0][0];
-        expect(activity.type).to.equal('group.created');
-        expect(activity.data).to.have.property('group');
-        expect(activity.data).to.have.property('host');
-        expect(activity.data).to.have.property('user');
-        expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(user.email);
+      it('sends an email to the host', done => {
+        setTimeout(() => {
+          const activity = emailLib.sendMessageFromActivity.args[0][0];
+          expect(activity.type).to.equal('group.created');
+          expect(activity.data).to.have.property('group');
+          expect(activity.data).to.have.property('host');
+          expect(activity.data).to.have.property('user');
+          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(user.email);
+          done();
+        }, 200);
+
       });
 
       it('returns the attributes of the collective', () => {
