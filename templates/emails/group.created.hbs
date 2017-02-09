@@ -1,41 +1,31 @@
-Subject: Please confirm the creation of your {{group.name}} collective
+Subject: New collective pending {{group.name}}
 
 {{> header}}
 
 <style>
-.btn {
-  background: #dde1e4;
-  background-color: #80d823;
-  border: 1px solid transparent;
-  border-radius: 28px;
-  display: inline-block;
-  padding: .75rem 1rem;
-  text-transform: uppercase;
-  text-align: center;
-  font-weight: 700;
-  min-width: 150px;
-  box-sizing: border-box;
-  vertical-align: middle;
-}
-
-.btn a {
-  color: #fff;
-  text-decoration: none;
-}
+  th { text-align: left; }
 </style>
 
-<center>
-  <h1>Almost done!</h1>
-  <p>Confirm your email address to activate your {{group.name}} collective</p>
-  <div class="btn"><a href="{{confirmation_url}}">Confirm</a></div>
-</center>
+<h2>Creator</h2>
+<table>
+  <tr><th>Name</th><td>{{user.name}}</td></tr>
+  <tr><th>Email</th><td>{{user.email}}</td></tr>
+  <tr><th>Website</th><td>{{user.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{user.twitterHandle}}</td></tr>
+</table>
 
-<div itemscope itemtype="http://schema.org/EmailMessage">
-  <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
-    <link itemprop="url" content="{{loginLink}}"/>
-    <meta itemprop="name" content="confirm"/>
-  </div>
-  <meta itemprop="description" content="Confirm the creation of your collective"/>
-</div>
+<h2>Collective</h2>
+<table>
+  <tr><th>Name</th><td>{{group.name}}</td></tr>
+  <tr><th>Website</th><td>{{group.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{group.twitterHandle}}</td></tr>
+  <tr><th>Description</th><td>{{group.description}}</td></tr>
+  <tr><th>Tags</th><td>{{{json group.tags}}}</td></tr>
+  <tr><th>Settings</th><td>{{{json group.settings}}}</td></tr>
+</table>
+
+<p>
+Please send an email to info@opencollective.com to confirm the creation of this collective.
+</p>
 
 {{> footer}}

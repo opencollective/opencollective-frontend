@@ -84,7 +84,7 @@ const getTopBackers = (startDate, endDate, tags) => {
 };
 
 const formatCurrency =  (amount, currency) => {
-  return amount.toLocaleString(currency, {
+  return (amount / 100).toLocaleString(currency, {
     style: 'currency',
     currency,
     minimumFractionDigits : 0,
@@ -217,7 +217,7 @@ const processGroup = (group) => {
     group.getTotalTransactions(startDate, endDate, 'donation'),
     group.getTotalTransactions(startDate, endDate, 'expense'),
     group.getExpenses(null, startDate, endDate),
-    group.getRelatedGroups(3)
+    group.getRelatedGroups(3, 0, 'g."createdAt"', 'DESC')
   ];
 
   let emailData = {};

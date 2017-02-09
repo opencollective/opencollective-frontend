@@ -438,7 +438,8 @@ export default (Sequelize, DataTypes) => {
 
       },
       afterCreate: (instance) => {
-        return Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id });
+        Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id })
+          .then(() => userLib.updateUserInfoFromClearbit(instance));
       }
     }
   });

@@ -238,20 +238,31 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options = {
  */
 const sendMessageFromActivity = (activity, notification) => {
   const data = activity.data;
+  const userEmail = notification && notification.User ? notification.User.email : activity.data.user.email;
+
   switch (activity.type) {
     case activities.GROUP_TRANSACTION_CREATED:
-      return generateEmailFromTemplateAndSend('group.transaction.created', notification.User.email, data);
+      return generateEmailFromTemplateAndSend('group.transaction.created', userEmail, data);
+
     case activities.GROUP_EXPENSE_CREATED:
       data.actions = {
         approve: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/approve`),
         reject: notification.User.generateLoginLink(`/${data.group.slug}/expenses/${data.expense.id}/reject`)
       };
-      return generateEmailFromTemplateAndSend('group.expense.created', notification.User.email, data);
+      return generateEmailFromTemplateAndSend('group.expense.created', userEmail, data);
+
     case activities.GROUP_EXPENSE_APPROVED:
       data.actions = {
         viewExpenseUrl: notification.User.generateLoginLink(`/${data.group.slug}/transactions/expenses#exp${data.expense.id}`)
       }
-      return generateEmailFromTemplateAndSend('group.expense.approved.for.host', notification.User.email, data);
+      return generateEmailFromTemplateAndSend('group.expense.approved.for.host', userEmail, data);
+
+    case activities.GROUP_CREATED:
+      return generateEmailFromTemplateAndSend('group.created', userEmail, data);
+
+    case activities.SUBSCRIPTION_CANCELED:
+      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data);
+
     default:
       return Promise.resolve();
   }

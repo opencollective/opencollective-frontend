@@ -11,11 +11,23 @@ import activityType from '../constants/activities';
 export default (Sequelize, activity) => {
   // publish everything to our private channel
   return publishToSlackPrivateChannel(activity)
+
     // publish a filtered version to our public channel
     .then(() => publishToSlack(activity, config.slack.webhookUrl,
       {
         channel: config.slack.publicActivityChannel
       }))
+  
+    // process certain types of notifications without a notification entry
+    // like subscription cancellation emails
+    // TODO: add donation confirmation emails to this flow as well.
+    .then(() => {
+      if (activity.type === activityType.SUBSCRIPTION_CANCELED) {
+        return emailLib.sendMessageFromActivity(activity)
+      }
+      return Promise.resolve();
+    })
+
     // process notification entries
     .then(() => {
       if (!activity.GroupId || !activity.type) {
