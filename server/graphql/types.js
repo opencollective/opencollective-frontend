@@ -9,9 +9,10 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLScalarType,
-  Kind,
   GraphQLError
 } from 'graphql';
+
+import { Kind } from 'graphql/language';
 
 import models from '../models';
 
@@ -25,11 +26,9 @@ export const ResponseStatusType = new GraphQLEnumType({
   }
 });
 
-const nonZeroPositiveIntValue = (value) => {
-  value => value > 0 ? value : null
-}
+const nonZeroPositiveIntValue = (value) => value > 0 ? value : null;
 
-const nonZeroPositiveIntType = new GraphQLScalarType({
+const NonZeroPositiveIntType = new GraphQLScalarType({
   name: 'nonZeroPositiveInt',
   serialize: value => value,
   parseValue: value => value,
@@ -37,7 +36,7 @@ const nonZeroPositiveIntType = new GraphQLScalarType({
     if (ast.kind === Kind.INT) {
       return nonZeroPositiveIntValue(parseInt(ast.value, 10));
     }
-    throw new GraphQLError('Query error: must be an int greater than 0', [ast]);
+    throw new GraphQLError('Query error: must be an Integer greater than 0', [ast]);
   }
 });
 
@@ -428,6 +427,17 @@ export const TierType = new GraphQLObjectType({
   }
 });
 
+export const CardInputType = new GraphQLInputObjectType({
+  name: 'CardInputType',
+  description: 'Input type for Card',
+  fields: () => ({
+    token: { type: new GraphQLNonNull(GraphQLString)},
+    expMonth: { type: new GraphQLNonNull(GraphQLInt)},
+    expYear: { type: new GraphQLNonNull(GraphQLInt)},
+    cvc: { type: new GraphQLNonNull(GraphQLInt)}
+  })
+});
+
 export const UserInputType = new GraphQLInputObjectType({
   name: 'UserInputType',
   description: 'Input type for UserType',
@@ -442,7 +452,8 @@ export const UserInputType = new GraphQLInputObjectType({
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString }
+      paypalEmail: { type: GraphQLString },
+      card: { type: CardInputType }
   })
 });
 
@@ -509,7 +520,7 @@ export const ResponseInputType = new GraphQLInputObjectType({
   description: 'Input type for ResponseType',
   fields: () => ({
     id: { type: GraphQLInt },
-    quantity: { type: new GraphQLNonNull(GraphQLInt) },
+    quantity: { type: new GraphQLNonNull(NonZeroPositiveIntType) },
     user: { type: new GraphQLNonNull(UserInputType) },
     group: { type: new GraphQLNonNull(GroupInputType) },
     tier: { type: new GraphQLNonNull(TierInputType) },

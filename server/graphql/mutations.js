@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import models from '../models';
 
 import {
@@ -25,6 +23,8 @@ const mutations = {
       let tier, user;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
+
+      // find the tier, event and group combo
       return models.Tier.findOne({
         where: {
           id: response.tier.id,
@@ -48,10 +48,13 @@ const mutations = {
         }
         tier = t;
       })
+
+      // check for available quantity
       .then(() => tier.checkAvailableQuantity(response.quantity))
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
+      // find or create user
       .then(() => models.User.findOne({
         where: {
           $or: {
@@ -62,6 +65,8 @@ const mutations = {
       }))
       .then(u => u || models.User.create(response.user))
       .tap(u => user = u)
+
+      // create response
       .then(() => models.Response.create({
         UserId: user.id,
         GroupId: tier.Event.Group.id,
@@ -72,13 +77,15 @@ const mutations = {
         status: response.status,
         description: response.description
       }))
+
+      // record payment, if needed
       .then(responseModel => {
         if (response.user.card && response.user.card.token && tier.amount > 0) {
-          return tier.Group.getStripeAccount()
+          return tier.Event.Group.getStripeAccount()
           .then(stripeAccount => {
             if (!stripeAccount || !stripeAccount.accessToken) {
-              return Promise.reject(new Error(`The host for the collective slug ${tier.Group.slug} has no Stripe account set up`));
-            } else if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
+              return Promise.reject(new Error(`The host for the collective slug ${tier.Event.Group.slug} has no Stripe account set up`));
+            } else if (process.env.NODE_ENV !== 'production' && (stripeAccount.accessToken.indexOf('live') !== -1)) {
               return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
             } else {
               return Promise.resolve();
@@ -96,9 +103,11 @@ const mutations = {
             amount: tier.amount * responseModel.quantity,
             title: `${tier.Event.name} - ${tier.name}`,
             PaymentMethodId: paymetMethod.id,
-          }));
+            ResponseId: responseModel.id
+          }))
+          .then(() => responseModel);
         } else {
-          Promise.resolve();
+          return Promise.resolve(responseModel);
         }
       })
     }

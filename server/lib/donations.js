@@ -155,9 +155,9 @@ export const processDonation = (Sequelize, donation) => {
               { donation: donation.info,
                 user: user.info,
                 group: group.info,
-                response: response.info,
-                event: event.info,
-                tier: tier.info
+                response: eventResponse.info,
+                event: eventResponse.Event.info,
+                tier: eventResponse.Tier.info
               })
           } else {
             // normal donation
@@ -185,10 +185,8 @@ export const processDonation = (Sequelize, donation) => {
               { model: Sequelize.models.PaymentMethod },
               { model: Sequelize.models.Subscription },
               { model: Sequelize.models.Response, 
-                include: [{ 
-                  model: Sequelize.models.Event,
-                  model: Sequelize.models.Tier
-                }] 
+                include: [{ model: Sequelize.models.Event },
+                          { model: Sequelize.models.Tier }]
               }]
     })
     .then(donation => {
