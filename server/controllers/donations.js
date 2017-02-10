@@ -1,9 +1,8 @@
-import Promise from 'bluebird';
 import _ from 'lodash';
 
 import models from '../models';
 import errors from '../lib/errors';
-import {getLinkHeader, getRequestedUrl, capitalize} from '../lib/utils';
+import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import { createPayment } from '../lib/payments';
 
 /**

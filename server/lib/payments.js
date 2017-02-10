@@ -88,7 +88,3 @@ export const createPayment = (payload) => {
       ResponseId: response && response.id
     }));
 }
-
-export const processPayment = (Sequelize, donation) => {
-
-}

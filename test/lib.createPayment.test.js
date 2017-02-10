@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import app from '../server/index';
 import { expect } from 'chai';
 import request from 'supertest';
@@ -350,49 +349,8 @@ describe('lib.createPayment.test.js', () => {
               })
               .catch(done);
           });
-
         });
-
-
-      });
-
-    });
-
-
-
-
-    /*
-    describe('Payment errors', () => {
-
-      it('fails if the accessToken contains live', (done) => {
-        const payment = {
-          stripeToken: STRIPE_TOKEN,
-          amount: CHARGE,
-          currency: CURRENCY
-        };
-
-        models.StripeAccount.create({ accessToken: 'sk_live_abc'})
-        .then((account) => user.setStripeAccount(account))
-        .then(() => {
-          request(app)
-            .post(`/groups/${group.id}/payments`)
-            .set('Authorization', `Bearer ${user.jwt()}`)
-            .send({
-              api_key: application.api_key,
-              payment
-            })
-            .expect(400, {
-              error: {
-                code: 400,
-                type: 'bad_request',
-                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
-              }
-            })
-            .end(done);
-        })
       });
     });
-
-    */
   });
 });
