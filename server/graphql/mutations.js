@@ -1,4 +1,5 @@
 import models from '../models';
+import { createPayment } from '../lib/payments';
 
 import {
   ResponseType,
@@ -81,30 +82,17 @@ const mutations = {
       // record payment, if needed
       .then(responseModel => {
         if (response.user.card && response.user.card.token && tier.amount > 0) {
-          return tier.Event.Group.getStripeAccount()
-          .then(stripeAccount => {
-            if (!stripeAccount || !stripeAccount.accessToken) {
-              return Promise.reject(new Error(`The host for the collective slug ${tier.Event.Group.slug} has no Stripe account set up`));
-            } else if (process.env.NODE_ENV !== 'production' && (stripeAccount.accessToken.indexOf('live') !== -1)) {
-              return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
-            } else {
-              return Promise.resolve();
+          return createPayment({
+            user,
+            group: tier.Event.Group,
+            response: responseModel,
+            payment: {
+              token: response.user.card.token,
+              amount: tier.amount * responseModel.quantity,
+              currency: tier.currency,
+              description: `${tier.Event.name} - ${tier.name}`,
             }
           })
-          .then(() => models.PaymentMethod.getOrCreate({
-            token: response.user.card.token,
-            service: 'stripe',
-            UserId: user.id 
-          }))
-          .then(paymetMethod => models.Donation.create({
-            UserId: user.id,
-            GroupId: tier.Event.Group.id,
-            currency: tier.currency,
-            amount: tier.amount * responseModel.quantity,
-            title: `${tier.Event.name} - ${tier.name}`,
-            PaymentMethodId: paymetMethod.id,
-            ResponseId: responseModel.id
-          }))
           .then(() => responseModel);
         } else {
           return Promise.resolve(responseModel);

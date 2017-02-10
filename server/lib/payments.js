@@ -9,6 +9,7 @@ export const createPayment = (payload) => {
   const { 
     user,
     group,
+    response,
     payment
   } = payload;
 
@@ -83,7 +84,8 @@ export const createPayment = (payload) => {
       amount,
       title,
       PaymentMethodId: paymentMethod.id,
-      SubscriptionId: subscription && subscription.id
+      SubscriptionId: subscription && subscription.id,
+      ResponseId: response && response.id
     }));
 }
 
