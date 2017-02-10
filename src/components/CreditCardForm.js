@@ -47,16 +47,14 @@ class CreditCardForm extends React.Component {
     Payment.formatCardExpiry(this.refs.expiration);
   }
 
-  handleChange(fieldname, value) {
-
-    if (!value) return;
+  handleChange(fieldname) {
 
     const field = {};
-    field[fieldname] = value;
+    field[fieldname] = this.refs[fieldname].value;
     const card = Object.assign({}, this.state.card, field);
 
     if (fieldname === 'expiration') {
-      const expiration = value.split('/');
+      const expiration = this.refs[fieldname].value.split('/');
       card.exp_month = parseInt(expiration[0], 10);
       card.exp_year = parseInt(expiration[1], 10);
     }
@@ -66,9 +64,13 @@ class CreditCardForm extends React.Component {
     if (isValidCard(card)) {
       getStripeToken(card)
         .then((token) => {
-          card.token = token;
-          this.setState({ card });
-          this.props.onCardAdded(Object.assign({}, card, { number: card.number.substr(12) } ));
+          const sanitizedCard = {
+            number: card.number.replace(/ /g, '').substr(-4),
+            expMonth: card.exp_month,
+            expYear: card.exp_year,
+            token
+          };
+          this.props.onCardAdded(sanitizedCard);
         }).catch((error) => {
           this.setState(Object.assign(this.state, { error }));
           console.error("getStripeToken error", error);
@@ -117,7 +119,7 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="number"
               value={number}
-              onChange={(event) => debouncedHandleEvent('number', event.target.value)}
+              onChange={(event) => debouncedHandleEvent('number')}
               placeholder="Card Number"
             />
           </FormGroup>
@@ -132,7 +134,7 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="expiration"
               value={expiration}
-              onChange={(event) => debouncedHandleEvent('expiration', event.target.value)}
+              onChange={(event) => debouncedHandleEvent('expiration')}
               placeholder="MM/YYYY"
             />
           </FormGroup>
@@ -144,7 +146,7 @@ class CreditCardForm extends React.Component {
               className="form-control text-center"
               type="text"
               ref="cvc"
-              onChange={(event) => debouncedHandleEvent('cvc', event.target.value)}
+              onChange={(event) => debouncedHandleEvent('cvc')}
               placeholder="CVC"
             />
           </FormGroup>

@@ -140,8 +140,8 @@ class SignInUp extends React.Component {
             addCardLabel={this.props.label}
             onCardAdded={this.handleCardAdded}
             stripePublishableKey={this.props.stripePublishableKey}
-            number="4242424242424242"
-            expiration="11/2020"
+            number={process.env.NODE_ENV === 'development' ? '4242424242424242' : undefined}
+            expiration={process.env.NODE_ENV === 'development' ? '11/2020' : undefined}
             />
         }
         {!showCreditCardForm &&
