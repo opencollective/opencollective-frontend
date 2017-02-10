@@ -183,7 +183,7 @@ describe('lib.createPayment.test.js', () => {
               currency: CURRENCY
             }
           }))
-          .catch(err => expect(err.message).to.equal('You can\'t use a Stripe live key on development'));
+          .catch(err => expect(err.message).to.contain('You can\'t use a Stripe live key'));
         });
       });
 
