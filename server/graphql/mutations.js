@@ -19,8 +19,6 @@ const mutations = {
     },
     resolve(_, args) {
 
-      console.log(JSON.stringify(args.response));
-
       let tier, user;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
