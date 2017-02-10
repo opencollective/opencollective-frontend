@@ -8,6 +8,8 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
     name,
     description,
     location,
+    lat,
+    long,
     tiers {
       id,
       name,
