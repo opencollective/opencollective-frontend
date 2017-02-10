@@ -434,7 +434,7 @@ export const CardInputType = new GraphQLInputObjectType({
     token: { type: new GraphQLNonNull(GraphQLString)},
     expMonth: { type: new GraphQLNonNull(GraphQLInt)},
     expYear: { type: new GraphQLNonNull(GraphQLInt)},
-    cvc: { type: new GraphQLNonNull(GraphQLInt)}
+    number: { type: new GraphQLNonNull(GraphQLInt)}
   })
 });
 
