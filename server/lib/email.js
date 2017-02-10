@@ -177,6 +177,8 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
       template += '.ispcwa';
     if (data.group.slug === 'brusselstogether')
       template = 'thankyou.brusselstogether';
+    if (data.group.slug === 'sustainoss')
+      template = 'thankyou.sustainoss';
     if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.group.slug)) {
       template += '.fr';
 

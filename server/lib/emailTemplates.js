@@ -24,6 +24,7 @@ const templateNames = [
   'group.monthlyreport.text',
   'subscription.canceled',
   'thankyou',
+  'thankyou.sustain',
   'thankyou.wwcode',
   'thankyou.brusselstogether',
   'thankyou.ispcwa',

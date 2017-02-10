@@ -1,0 +1,64 @@
+{{#if interval }}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+{{else}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+{{/if}}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if user.name}}
+<p>Dear {{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+{{#if interval}}
+  {{#if firstPayment }}
+    <p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us make this conversation happen!</p>
+  {{else}}
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
+      Your donation helps us continue our activities.</p>
+  {{/if}}
+  {{> charge_date_notice}}
+{{else}}
+<p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+  If you made a $50 donation for a ticket, we look forward to meeting you! We will be emailing details shortly. You do not have to worry about bringing a ticket but do save this email just in case.</p>
+{{/if}}
+
+<p>Next steps:
+<ul>
+  <li>You can follow our activities and how we will be spending the money on our open collective page:
+  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.</li>
+  <li>Follow us on <a href="https://twitter.com/sustainoss">Twitter</a></li>
+  <li>Open Source with us on <a href="https://github.com/sustainers">GitHub</a></li>
+  <li><a href="https://slack.opencollective.com">Slack</a> with us.</li>
+ </p>
+ 
+ <p>If you have any questions feel free to contact us:
+ Chad Whitacre: chad@gratipay.com
+ Justin Dorfman: jdorfman@stickermule.com
+ Pia Mancini: pia@opencollective.com
+ </p>
+
+{{> subscriptions}}
+
+<p>Warmly,</p>
+
+<p>
+  – The {{group.name}} open collective
+</p>
+
+{{> relatedgroups}}
+
+{{> footer}}
+
+<p style="text-align:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;box-sizing:border-box;font-size:12px;color:#999;">
+OpenCollective, Inc.<br />
+EIN: 47-3896707<br />
+340 S LEMON AVE #3717<br />
+Walnut CA 91789<br />
+USA
+</p>
