@@ -1,5 +1,6 @@
 import models from '../models';
 import { createPayment } from '../lib/payments';
+import emailLib from '../lib/email';
 
 import {
   ResponseType,
@@ -105,7 +106,16 @@ const mutations = {
           })
           .then(() => responseModel);
         } else {
-          return Promise.resolve(responseModel);
+          return emailLib.send(
+            'ticket.confirmed',
+            user.email,
+            { user: user.info,
+              group: group.info,
+              response: eventResponse.info,
+              event: eventResponse.Event.info,
+              tier: eventResponse.Tier.info
+            })
+           .then(() => Promise.resolve(responseModel));
         }
       })
     }
