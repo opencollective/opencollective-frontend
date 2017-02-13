@@ -114,7 +114,7 @@ let subscriptions, tags;
     })
   )
   .tap(s => subscriptions = s)
-  .then(subscriptions => Group.getGroupsSummaryByTag(tags, 3, null, 0, false, 'g."createdAt"', 'DESC'))
+  .then(() => Group.getGroupsSummaryByTag(tags, 3, null, 0, false, 'g."createdAt"', 'DESC'))
   .then(relatedGroups => {
     return {
       config: { host: config.host },
