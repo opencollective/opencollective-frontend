@@ -96,6 +96,32 @@ export default function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
+
+    getterMethods: {
+      info() {
+        return {
+          id: this.id,
+          createdByUserId: this.createdByUserId,
+          GroupId: this.GroupId,
+          currency: this.currency,
+          maxAmount: this.maxAmount,
+          maxQuantity: this.maxQuantity,
+          name: this.name,
+          description: this.description,
+          locationName: this.locationName,
+          address: this.address,
+          geoLocationLatLong: this.geoLocationLatLong,
+          backgroundImage: this.backgroundImage,
+          slug: this.slug,
+          startsAt: this.startsAt,
+          endsAt: this.endsAt,
+          status: this.status,
+          confirmedAt: this.confirmedAt,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        }
+      }
+    }
   });
 
   return Event;

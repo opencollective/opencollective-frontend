@@ -75,6 +75,24 @@ export default function(Sequelize, DataTypes) {
   }, {
     paranoid: true,
 
+    getterMethods: {
+      info() {
+        return {
+          id: this.id,
+          EventId: this.EventId,
+          name: this.name,
+          description: this.description,
+          amount: this.amount,
+          currency: this.currency,
+          maxQuantity: this.maxQuantity,
+          startsAt: this.startsAt,
+          endsAt: this.endsAt,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        }
+      }
+    },
+
     instanceMethods: {
       availableQuantity() {
         return Sequelize.models.Response.sum('quantity', { 
@@ -88,13 +106,13 @@ export default function(Sequelize, DataTypes) {
             } else if (this.maxQuantity) {
               return this.maxQuantity;
             } else {
-              return -1; // means there was no maxQuantity set, so infinite availability
+              return Infinity;
             }
           })
       },
       checkAvailableQuantity(quantityNeeded) {
         return this.availableQuantity()
-        .then(available => ((available === -1) || (available - quantityNeeded >= 0)))
+        .then(available => (available - quantityNeeded >= 0))
       }
     }
   });

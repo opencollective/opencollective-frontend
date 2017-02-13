@@ -7,8 +7,12 @@ import {
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+  GraphQLScalarType,
+  GraphQLError
 } from 'graphql';
+
+import { Kind } from 'graphql/language';
 
 import models from '../models';
 
@@ -20,6 +24,43 @@ export const ResponseStatusType = new GraphQLEnumType({
     YES: { value: 'YES' },
     NO: { value: 'NO' }
   }
+});
+
+const nonZeroPositiveIntValue = (value) => value > 0 ? value : null;
+
+const NonZeroPositiveIntType = new GraphQLScalarType({
+  name: 'nonZeroPositiveInt',
+  serialize: value => value,
+  parseValue: value => value,
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return nonZeroPositiveIntValue(parseInt(ast.value, 10));
+    }
+    throw new GraphQLError('Query error: must be an Integer greater than 0', [ast]);
+  }
+});
+
+const EmailType = new GraphQLScalarType({
+    name: 'Email',
+    serialize: value => {
+      return value;
+    },
+    parseValue: value => {
+      return value;
+    },
+    parseLiteral: ast => {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`);
+      }
+
+      // Regex taken from: http://stackoverflow.com/a/46181/761555
+      const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+      if (!re.test(ast.value)) {
+        throw new GraphQLError(`Query error: Not a valid Email ${[ast]}`);
+      }
+
+      return ast.value;
+    }
 });
 
 export const UserType = new GraphQLObjectType({
@@ -172,6 +213,13 @@ export const CollectiveType = new GraphQLObjectType({
         type: new GraphQLList(EventType),
         resolve(collective) {
           return collective.getEvents();
+        }
+      },
+      stripePublishableKey: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.getStripeAccount()
+          .then(stripeAccount => stripeAccount && stripeAccount.stripePublishablekey)
         }
       }
     }
@@ -343,6 +391,8 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier) {
           return tier.availableQuantity()
+          // graphql doesn't like infinity value
+          .then(availableQuantity => availableQuantity === Infinity ? 10000000 : availableQuantity);
         }
       },
       password: {
@@ -379,12 +429,23 @@ export const TierType = new GraphQLObjectType({
   }
 });
 
+export const CardInputType = new GraphQLInputObjectType({
+  name: 'CardInputType',
+  description: 'Input type for Card',
+  fields: () => ({
+    token: { type: new GraphQLNonNull(GraphQLString)},
+    expMonth: { type: new GraphQLNonNull(GraphQLInt)},
+    expYear: { type: new GraphQLNonNull(GraphQLInt)},
+    number: { type: new GraphQLNonNull(GraphQLInt)}
+  })
+});
+
 export const UserInputType = new GraphQLInputObjectType({
   name: 'UserInputType',
   description: 'Input type for UserType',
   fields: () => ({
       id: { type: GraphQLInt },
-      email: { type: new GraphQLNonNull(GraphQLString) },
+      email: { type: new GraphQLNonNull(EmailType) },
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
@@ -393,7 +454,8 @@ export const UserInputType = new GraphQLInputObjectType({
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString }
+      paypalEmail: { type: GraphQLString },
+      card: { type: CardInputType }
   })
 });
 
@@ -460,12 +522,12 @@ export const ResponseInputType = new GraphQLInputObjectType({
   description: 'Input type for ResponseType',
   fields: () => ({
     id: { type: GraphQLInt },
-    quantity: { type: new GraphQLNonNull(GraphQLInt) },
+    quantity: { type: new GraphQLNonNull(NonZeroPositiveIntType) },
     user: { type: new GraphQLNonNull(UserInputType) },
     group: { type: new GraphQLNonNull(GroupInputType) },
     tier: { type: new GraphQLNonNull(TierInputType) },
     event: { type: new GraphQLNonNull(EventAttributesInputType) },
-    status: { type: new GraphQLNonNull(GraphQLString) },
+    status: { type: new GraphQLNonNull(GraphQLString) }
   })
 })
 
@@ -531,3 +593,4 @@ export const ResponseType = new GraphQLObjectType({
     }
   }
 });
+

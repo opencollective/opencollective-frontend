@@ -52,6 +52,7 @@ export default {
     // get subscription data
     if (activity.data.subscription) {
       ({ interval } = activity.data.subscription);
+      amount = amount || activity.data.subscription.amount/100;
       recurringAmount = amount + (interval ? `/${interval}` : '');
     }
 
@@ -190,6 +191,7 @@ export default {
     // get subscription data
     if (activity.data.subscription) {
       ({ interval } = activity.data.subscription);
+      amount = amount || activity.data.subscription.amount/100;
       recurringAmount = amount + (interval ? `/${interval}` : '');
     }
 

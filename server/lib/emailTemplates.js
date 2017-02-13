@@ -25,6 +25,7 @@ const templateNames = [
   'group.monthlyreport',
   'group.monthlyreport.text',
   'subscription.canceled',
+  'ticket.confirmed',
   'thankyou',
   'thankyou.sustain',
   'thankyou.wwcode',

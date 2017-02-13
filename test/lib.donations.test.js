@@ -6,7 +6,7 @@ import chanceLib from 'chance';
 import request from 'supertest';
 import app from '../server/index';
 import * as utils from '../test/utils';
-import * as donationsLib from '../server/lib/donations';
+import * as paymentsLib from '../server/lib/payments';
 import { planId as generatePlanId } from '../server/lib/utils.js';
 import * as constants from '../server/constants/transactions';
 import emailLib from '../server/lib/email';
@@ -28,7 +28,7 @@ const STRIPE_TOKEN = 'superStripeToken';
  * Tests
  */
 describe('lib.donation.test.js', () => {
-  let sandbox, processDonationSpy, emailSendSpy;
+  let sandbox, processPaymentSpy, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -37,7 +37,7 @@ describe('lib.donation.test.js', () => {
   after(() => sandbox.restore());
 
   before(() => {
-    processDonationSpy = sinon.spy(donationsLib, 'processDonation');
+    processPaymentSpy = sinon.spy(paymentsLib, 'processPayment');
   });
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('lib.donation.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => processDonationSpy.reset());
+  beforeEach(() => processPaymentSpy.reset());
 
   // Create a stub for clearbit
   beforeEach((done) => {
@@ -58,7 +58,7 @@ describe('lib.donation.test.js', () => {
     utils.clearbitStubAfterEach(sandbox);
   });
 
-  after(() => processDonationSpy.restore());
+  after(() => processPaymentSpy.restore());
 
   describe('No payment method', () => {
     beforeEach('create a donation', () => {

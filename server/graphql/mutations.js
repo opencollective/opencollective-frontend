@@ -1,4 +1,5 @@
 import models from '../models';
+import { createPayment } from '../lib/payments';
 
 import {
   ResponseType,
@@ -21,6 +22,8 @@ const mutations = {
       let tier, user;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
+
+      // find the tier, event and group combo
       return models.Tier.findOne({
         where: {
           id: response.tier.id,
@@ -44,11 +47,25 @@ const mutations = {
         }
         tier = t;
       })
+
+      // check for available quantity
       .then(() => tier.checkAvailableQuantity(response.quantity))
-      .tap(console.log)
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
+      // make sure if it's paid tier, we have a card attached
+      .then(() => {
+        if (tier.amount > 0) {
+          if (response.user.card && response.user.card.token) {
+            return Promise.resolve();
+          } else {
+            return Promise.reject(new Error(`This tier requires a payment method`));
+          }
+        }
+        return Promise.resolve();
+      })
+
+      // find or create user
       .then(() => models.User.findOne({
         where: {
           $or: {
@@ -59,6 +76,8 @@ const mutations = {
       }))
       .then(u => u || models.User.create(response.user))
       .tap(u => user = u)
+
+      // create response
       .then(() => models.Response.create({
         UserId: user.id,
         GroupId: tier.Event.Group.id,
@@ -69,6 +88,26 @@ const mutations = {
         status: response.status,
         description: response.description
       }))
+
+      // record payment, if needed
+      .then(responseModel => {
+        if (tier.amount > 0) {
+          return createPayment({
+            user,
+            group: tier.Event.Group,
+            response: responseModel,
+            payment: {
+              token: response.user.card.token,
+              amount: tier.amount * responseModel.quantity,
+              currency: tier.currency,
+              description: `${tier.Event.name} - ${tier.name}`,
+            }
+          })
+          .then(() => responseModel);
+        } else {
+          return Promise.resolve(responseModel);
+        }
+      })
     }
   }
 }

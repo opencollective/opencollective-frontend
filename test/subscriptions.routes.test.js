@@ -12,7 +12,7 @@ import * as utils from '../test/utils';
 import stripeMock from './mocks/stripe';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import * as donationsLib from '../server/lib/donations';
+import * as paymentsLib from '../server/lib/payments';
 
 
 const application = utils.data('application');
@@ -30,7 +30,7 @@ describe('subscriptions.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(donationsLib, 'processDonation');
+    sandbox.stub(paymentsLib, 'processPayment');
   });
 
   beforeEach(() => utils.resetTestDB());

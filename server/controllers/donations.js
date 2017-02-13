@@ -1,8 +1,9 @@
-import Promise from 'bluebird';
 import _ from 'lodash';
+
 import models from '../models';
 import errors from '../lib/errors';
-import {getLinkHeader, getRequestedUrl, capitalize} from '../lib/utils';
+import {getLinkHeader, getRequestedUrl} from '../lib/utils';
+import { createPayment } from '../lib/payments';
 
 /**
  * Get donations
@@ -29,76 +30,24 @@ const stripeDonation = (req, res, next) => {
   const { payment } = req.required;
   const { user } = req;
   const { group } = req;
-  const { interval } = payment;
+  const { interval, stripeToken, description } = payment;
 
   const amount = parseInt(payment.amount * 100, 10);
   const currency = payment.currency || group.currency;
-  const isSubscription = _.contains(['month', 'year'], interval);
 
-  if (interval && !isSubscription) {
-    return next(new errors.BadRequest('Interval should be month or year.'));
-  }
-
-  if (!payment.stripeToken) {
-    return next(new errors.BadRequest('Stripe Token missing.'));
-  }
-
-  if (!amount) {
-    return next(new errors.BadRequest('Payment Amount missing.'));
-  }
-
-  if (amount < 50) {
-    return next(new errors.BadRequest('Payment amount must be at least $0.50'));
-  }
-
-  let paymentMethod;
-  let title = payment.description || `Donation to ${group.name}`;
-
-  // fetch Stripe Account and get or create Payment Method
-  return Promise.props({
-    stripeAccount: req.group.getStripeAccount(),
-    paymentMethod: models.PaymentMethod.getOrCreate({
-      token: payment.stripeToken,
-      service: 'stripe',
-      UserId: user.id })
-    })
-  .then(results => {
-    const stripeAccount = results.stripeAccount;
-    if (!stripeAccount || !stripeAccount.accessToken) {
-      return Promise.reject(new errors.BadRequest(`The host for the collective slug ${req.group.slug} has no Stripe account set up`));
-    } else if (process.env.NODE_ENV !== 'production' && _.contains(stripeAccount.accessToken, 'live')) {
-      return Promise.reject(new errors.BadRequest(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
-    } else {
-      paymentMethod = results.paymentMethod;
-      return Promise.resolve();
-    }
-  })
-  // create a new subscription
-  // (this needs to happen first, because of hook on Donation model)
-  .then(() => {
-    if (isSubscription) {
-      title = payment.description || capitalize(`${interval}ly donation to ${group.name}`);
-      return models.Subscription.create({
-        amount,
-        currency,
-        interval
-      })
-    } else {
-      return Promise.resolve();
-    }
-  })
-  // create a new donation
-  .then(subscription => models.Donation.create({
-      UserId: user.id,
-      GroupId: group.id,
-      currency: currency,
+  return createPayment({
+    user,
+    group,
+    payment: {
+      token: stripeToken,
       amount,
-      title,
-      PaymentMethodId: paymentMethod.id,
-      SubscriptionId: subscription && subscription.id
-    }))
+      currency,
+      description,
+      interval
+    }
+  })
   .then(() => res.send({success: true, user: req.user.info }))
-  .catch(next);
+  .catch(err => next(new errors.BadRequest(err.message)))
 };
 export {stripeDonation as stripe};
 // leaving for legacy. Delete after frontend updates

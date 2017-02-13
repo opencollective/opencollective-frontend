@@ -92,6 +92,24 @@ export default function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
+
+    getterMethods: {
+      info() {
+        return {
+          id: this.id,
+          UserId: this.UserId,
+          GroupId: this.GroupId,
+          EventId: this.EventId,
+          TierId: this.TierId,
+          quantity: this.quantity,
+          description: this.description,
+          status: this.status,
+          confirmedAt: this.confirmedAt,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        }
+      }
+    }
   });
 
   return Response;

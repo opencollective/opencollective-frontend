@@ -5,7 +5,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import * as donationsLib from '../server/lib/donations';
+import * as paymentsLib from '../server/lib/payments';
 import models from '../server/models';
 
 const CHARGE = 10.99;
@@ -15,6 +15,13 @@ const EMAIL = 'paypal@email.com';
 const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
+
+/*
+ * TODO: simplify these tests. 
+ * Originally, all the business logic of creating a payment was in 
+ * donations controller. Now, it's in a separate library lib/payments
+ * that's being tested independently. 
+ */
 
 describe('donations.routes.test.js', () => {
   let user, group, group2, sandbox;
@@ -26,7 +33,7 @@ describe('donations.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(donationsLib, 'processDonation');
+    sandbox.stub(paymentsLib, 'processPayment');
   });
 
   beforeEach(() => utils.resetTestDB());
