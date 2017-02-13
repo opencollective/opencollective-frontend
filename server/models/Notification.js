@@ -39,7 +39,7 @@ export default function(Sequelize, DataTypes) {
 
     classMethods: {
       createMany: (notifications, defaultValues) => {
-        return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
+        return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
       }
     }
 
