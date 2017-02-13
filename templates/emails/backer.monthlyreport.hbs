@@ -1,0 +1,37 @@
+Subject: {{month}} Report
+
+{{> header}}
+
+<p>Hi {{recipient.firstName}}!</p>
+
+<p>We are starting this new monthly email to keep you posted on the latest activities of the collectives that you are supporting.
+Let us know if you like this and don't hesitate if you have any feedback / ideas. Just reply to this email! :)
+</p>
+
+<h2>Active subscriptions</h2>
+<table>
+  {{#each subscriptions}}
+<tr><td>
+{{> collectivecard group}}
+
+</td><td width="10">&nbsp;</td><td valign="top">
+<a href="{{group.publicUrl}}?{{utm}}">{{group.name}}</a>
+<p>
+Backers: {{group.stats.backers.lastMonth}} (<span class="positive">+{{group.stats.backers.new}}</span>{{#if group.stats.backers.lost}}, <span class="negative">-{{group.stats.backers.lost}}</span>{{/if}})<br />
+<span class="label">Current balance:</span> {{{currency group.stats.balance currency=currency}}} (<span class="positive">+{{{currency group.stats.totalDonations currency=currency}}}</span>{{#if group.stats.totalExpenses}}, <span class="negative">{{{currency group.stats.totalExpenses currency=currency}}}</span>{{/if}}) <br />
+</p>
+<p>
+<span class="label">Your contribution:</span> {{currency amount currency=currency}} per {{interval}}<br />
+<span class="label">Member since:</span> {{{moment createdAt}}}<br />
+</p>
+</td></tr>
+<tr><td colspan="2" height="10">&nbsp;</td></tr>
+</li>
+{{/each}}
+</table>
+</ul>
+<p>If you'd like to cancel any of your subscriptions, you can do so on <a href="{{manageSubscriptionsUrl}}?{{utm}}">https://opencollective.com/subscriptions</a></p>
+
+{{> relatedgroups}}
+
+{{>footer}}

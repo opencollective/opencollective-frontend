@@ -10,6 +10,8 @@ import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './util
 const templates = {};
 
 const templateNames = [
+  'backer.monthlyreport',
+  'backer.monthlyreport.text',
   'comment.approve',
   'email.approve',
   'email.message',
@@ -81,7 +83,7 @@ handlebars.registerHelper('moment', (value, props) => {
 
 handlebars.registerHelper('currency', (value, props) => {
   const { currency, precision } = props.hash;
-  if (!currency) return value;
+  if (!currency) return value / 100;
   value = value/100; // converting cents
 
   return value.toLocaleString(currency, {

@@ -4,6 +4,9 @@ import crypto from 'crypto';
 import base64url from 'base64url';
 import moment from 'moment';
 import _ from 'lodash';
+import debugLib from 'debug';
+
+const debug = debugLib('utils');
 
 /**
  * Encrypt with resetPasswordSecret
@@ -196,6 +199,102 @@ export const isBackerActive = (backer, tiers, until) => {
   else
     return true;
 }
+
+
+/**
+ * Returns stats for each tier compared to previousMonth
+ * 
+ * @PRE:
+ *  - tiers: array of Tier: [ { name, interval, users: [ { id, totalDonations, firstDonation, lastDonation } ] } ]
+ *  - startDate, endDate: boundaries for lastMonth
+ * 
+ * @POST: { stats, tiers }
+ *  - stats.backers.lastMonth: number of backers who were active by endDate
+ *  - stats.backers.previousMonth: number of backers who were active by startDate
+ *  - stats.backers.new: the number of backers whose first donation was after startDate
+ *  - stats.backers.lost: the number of backers who were active before startDate, but stopped being active
+ *  - tiers: tiers with users sorted by totalDonations
+ */
+export const getTiersStats = (tiers, startDate, endDate) => {
+
+  const userids = {};
+  const stats = { backers: {} };
+
+  const rank = (user) => {
+    if (user.isNew) return 1;
+    if (user.isLost) return 2;
+    return 3;
+  };
+
+  stats.backers.lastMonth = 0;
+  stats.backers.previousMonth = 0;
+  stats.backers.new = 0;
+  stats.backers.lost = 0;
+
+  // We only keep the tiers that have at least one user
+  tiers = tiers.filter(tier => tier.users.length > 0 && tier.name != 'host' && tier.name != 'core contributor');
+
+  // We sort tiers by number of users ASC
+  tiers.sort((a,b) => b.range[0] - a.range[0]);
+
+  tiers = tiers.map(tier => {
+
+    let index = 0
+    debug("> processing tier ", tier.name);
+
+    // We sort users by total donations DESC
+    tier.users.sort((a,b) => b.totalDonations - a.totalDonations );
+
+    tier.users = tier.users.filter(u => {
+      if (userids[u.id]) {
+        debug(">>> user ", u.username, "is a duplicate");
+        return false;
+      }
+      userids[u.id] = true;
+
+      u.index = index++;
+      u.activeLastMonth = isBackerActive(u, tiers, endDate);
+      u.activePreviousMonth = (u.firstDonation < startDate) && isBackerActive(u, tiers, startDate);
+
+      if (tier.name.match(/sponsor/i))
+        u.isSponsor = true;
+      if (u.firstDonation > startDate) {
+        u.isNew = true;
+        stats.backers.new++;
+      }
+      if (u.activePreviousMonth && !u.activeLastMonth) {
+        u.isLost = true;
+        stats.backers.lost++;
+      }
+
+      debug("----------- ", u.username, "----------");
+      debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
+      debug("totalDonations", u.totalDonations/100);
+      debug("active last month?", u.activeLastMonth);
+      debug("active previous month?", u.activePreviousMonth);
+      debug("is new?", u.isNew === true);
+      debug("is lost?", u.isLost === true);
+      if (u.activePreviousMonth)
+        stats.backers.previousMonth++;
+      if (u.activeLastMonth) {
+        stats.backers.lastMonth++;
+        return true;
+      } else if (u.isLost) {
+        return true;
+      }
+    });
+
+    tier.users.sort((a, b) => {
+      if (rank(a) > rank(b)) return 1;
+      if (rank(a) < rank(b)) return -1;
+      return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
+    });
+
+    return tier;
+  });
+  return { stats, tiers};
+}
+
 
 /**
  * Default host id, set this for new groups created through Github

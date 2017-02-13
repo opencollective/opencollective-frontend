@@ -7,7 +7,7 @@ import moment from 'moment';
 import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import { isBackerActive } from '../../server/lib/utils';
+import { getTiersStats } from '../../server/lib/utils';
 import models from '../../server/models';
 import emailLib from '../../server/lib/email';
 
@@ -129,86 +129,6 @@ const processBacker = (backer, startDate, endDate, tags) => {
     })
 };
 
-const rank = (user) => {
-  if (user.isNew) return 1;
-  if (user.isLost) return 2;
-  return 3;
-};
-
-const processTiers = (tiers) => {
-
-  const userids = {};
-  const stats = { backers: {} };
-
-  stats.backers.lastMonth = 0;
-  stats.backers.previousMonth = 0;
-  stats.backers.new = 0;
-  stats.backers.lost = 0;
-
-  // We only keep the tiers that have at least one user
-  tiers = tiers.filter(tier => tier.users.length > 0 && tier.name != 'host' && tier.name != 'core contributor');
-
-  // We sort tiers by number of users ASC
-  tiers.sort((a,b) => b.range[0] - a.range[0]);
-
-  tiers = tiers.map(tier => {
-
-    let index = 0
-    debug("> processing tier ", tier.name);
-
-    // We sort users by total donations DESC
-    tier.users.sort((a,b) => b.totalDonations - a.totalDonations );
-
-    tier.users = tier.users.filter(u => {
-      if (userids[u.id]) {
-        debug(">>> user ", u.username, "is a duplicate");
-        return false;
-      }
-      userids[u.id] = true;
-
-      u.index = index++;
-      u.activeLastMonth = isBackerActive(u, tiers, endDate);
-      u.activePreviousMonth = (u.firstDonation < startDate) && isBackerActive(u, tiers, startDate);
-
-      if (tier.name.match(/sponsor/i))
-        u.isSponsor = true;
-      if (u.firstDonation > startDate) {
-        u.isNew = true;
-        stats.backers.new++;
-      }
-      if (u.activePreviousMonth && !u.activeLastMonth) {
-        u.isLost = true;
-        stats.backers.lost++;
-      }
-
-      debug("----------- ", u.username, "----------");
-      debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
-      debug("totalDonations", u.totalDonations/100);
-      debug("active last month?", u.activeLastMonth);
-      debug("active previous month?", u.activePreviousMonth);
-      debug("is new?", u.isNew === true);
-      debug("is lost?", u.isLost === true);
-      if (u.activePreviousMonth)
-        stats.backers.previousMonth++;
-      if (u.activeLastMonth) {
-        stats.backers.lastMonth++;
-        return true;
-      } else if (u.isLost) {
-        return true;
-      }
-    });
-
-    tier.users.sort((a, b) => {
-      if (rank(a) > rank(b)) return 1;
-      if (rank(a) < rank(b)) return -1;
-      return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
-    });
-
-    return tier;
-  });
-  return { stats, tiers};
-}
-
 const processGroup = (group) => {
   const promises = [
     getTopBackers(startDate, endDate, group.tags),
@@ -227,7 +147,7 @@ const processGroup = (group) => {
             console.log('***', group.name, '***');
             const data = { config: { host: config.host }, month, group: {} };
             data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(group.slug) === -1)); // we omit own backers
-            const res = processTiers(results[1]);
+            const res = getTiersStats(results[1], startDate, endDate);
             data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
             data.group.tiers = res.tiers;
             data.group.stats = res.stats;
