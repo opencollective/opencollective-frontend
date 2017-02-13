@@ -10,12 +10,12 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 <p>Hi!</p>
 {{/if}}
 
-<p> We are excited that you'll be joining us at {{ event.name }} on {{ event.startsAt }} at {{ event.locationName }} </p>
+<p>We are excited that you'll be joining us at {{ event.name }} on {{ event.startsAt }} at {{ event.locationName }}. </p>
 
-<p> This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}. </p>
+<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}. </p>
 
 <p>In case you didn't know, we manage our budget transparently. You can follow our future activities and how we will be spending this money on our open collective page:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{group.slug}}?{{utm}}">https://opencollective.com/{{group.slug}}</a>.
 </p>
 
 {{> subscriptions}}
@@ -27,11 +27,3 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 </p>
 
 {{> footer}}
-
-<p style="text-align:center;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;box-sizing:border-box;font-size:12px;color:#999;">
-OpenCollective, Inc.<br />
-EIN: 47-3896707<br />
-340 S LEMON AVE #3717<br />
-Walnut CA 91789<br />
-USA
-</p>

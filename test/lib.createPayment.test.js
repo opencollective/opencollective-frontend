@@ -170,7 +170,7 @@ describe('lib.createPayment.test.js', () => {
 
         });
 
-        it('if stipe has live key and not in production', () => {
+        it('if stripe has live key and not in production', () => {
           return models.StripeAccount.create({ accessToken: 'sk_live_abc'})
           .then((account) => user.setStripeAccount(account))
           .then(() => paymentsLib.createPayment({

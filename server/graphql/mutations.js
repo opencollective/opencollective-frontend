@@ -53,6 +53,18 @@ const mutations = {
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
+      // make sure if it's paid tier, we have a card attached
+      .then(() => {
+        if (tier.amount > 0) {
+          if (response.user.card && response.user.card.token) {
+            return Promise.resolve();
+          } else {
+            return Promise.reject(new Error(`This tier requires a payment method`));
+          }
+        }
+        return Promise.resolve();
+      })
+
       // find or create user
       .then(() => models.User.findOne({
         where: {
@@ -79,7 +91,7 @@ const mutations = {
 
       // record payment, if needed
       .then(responseModel => {
-        if (response.user.card && response.user.card.token && tier.amount > 0) {
+        if (tier.amount > 0) {
           return createPayment({
             user,
             group: tier.Event.Group,

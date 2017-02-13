@@ -16,6 +16,13 @@ const application = utils.data('application');
 const userData = utils.data('user3');
 const groupData = utils.data('group2');
 
+/*
+ * TODO: simplify these tests. 
+ * Originally, all the business logic of creating a payment was in 
+ * donations controller. Now, it's in a separate library lib/payments
+ * that's being tested independently. 
+ */
+
 describe('donations.routes.test.js', () => {
   let user, group, group2, sandbox;
 
