@@ -28,14 +28,11 @@ const paidExpense = { where : { status: expenseStatus.PAID } };
 const excludeOcTeam = { where: {
   UserId: {
     $notIn: [
-      1,  // arnaudbenard
       2,  // xdamman
-      7,  // maru
       8,  // aseem
       30, // pmancini
       40, // opencollective
       41, // asood123
-      80  // Maru Lango
     ]
   },
   GroupId: {
@@ -74,7 +71,7 @@ Promise.props({
 
   donationAmount: Transaction
     .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
-    .map(row => `${row.SUM} ${row.currency}`),
+    .map(row => `${row.SUM/100} ${row.currency}`),
 
   stripeReceivedCount: Activity.count(_.merge({}, createdLastWeek, stripeReceived)),
 
@@ -169,7 +166,7 @@ function reportString(results) {
 \`\`\`
 * Donations:
   - ${results.donationCount} donations received${displayTotals(results.donationAmount)}
-  - ${results.stripeReceivedCount} donations received via Stripe
+  - ${results.stripeReceivedCount} donations received via Stripe Webhook (only recurring)
   - ${results.paypalReceivedCount} donations received via PayPal
 * Expenses:
   - ${results.pendingExpenseCount} pending expenses${displayTotals(results.pendingExpenseAmount)}
