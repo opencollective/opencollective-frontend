@@ -15,7 +15,7 @@ import * as paymentsLib from '../server/lib/payments';
 const application = utils.data('application');
 
 describe('Mutation Tests', () => {
-  let user1, user2, group1, event1, tier1, tier2;
+  let user1, user2, group1, event1, tier1;
   let sandbox, createPaymentStub;
 
   /* SETUP
@@ -90,8 +90,7 @@ describe('Mutation Tests', () => {
       .tap(t => tier1 = t));
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('tier2'), { EventId: event1.id }))
-      .tap(t => tier2 = t));
+      Object.assign(utils.data('tier2'), { EventId: event1.id })));
 
     describe('throws an error', () => {
 
