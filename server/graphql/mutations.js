@@ -1,6 +1,7 @@
 import models from '../models';
 import { createPayment } from '../lib/payments';
 import emailLib from '../lib/email';
+import responseStatus from '../constants/response_status';
 
 import {
   ResponseType,
@@ -20,17 +21,14 @@ const mutations = {
     },
     resolve(_, args) {
 
-      let tier, user;
+      let tier, user, event;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
+      let queryPromise;
 
-      // find the tier, event and group combo
-      return models.Tier.findOne({
-        where: {
-          id: response.tier.id,
-        },
-        include: [{
-          model: models.Event,
+      // if "Interested", no tier needed
+      if (response.status === responseStatus.INTERESTED) {
+        queryPromise = models.Event.findOne({
           where: {
             slug: response.event.slug
           },
@@ -40,31 +38,59 @@ const mutations = {
               slug: response.group.slug
             }
           }]
-        }]
-      })
-      .then(t => {
-        if (!t) {
-          throw new Error(`No tier found with tierId:${response.tier.id} for eventSlug:${response.event.slug} in collectiveSlug:${response.group.slug}`);
-        }
-        tier = t;
-      })
+        })
+        .then(ev => {
+          if (!ev) {
+            throw new Error(`No event found with slug: ${response.event.slug} in collective: ${response.group.slug}`)
+          }
+          event = ev;
+        })
+      } else {
+        // For all other statuses, need a tier
+        queryPromise = models.Tier.findOne({
+          where: {
+            id: response.tier.id,
+          },
+          include: [{
+            model: models.Event,
+            where: {
+              slug: response.event.slug
+            },
+            include: [{
+              model: models.Group,
+              where: {
+                slug: response.group.slug
+              }
+            }]
+          }]
+        })
+        .then(t => {
+          if (!t) {
+            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.group.slug}`);
+          }
+          tier = t;
+          event = t.Event;
+        })
 
-      // check for available quantity
-      .then(() => tier.checkAvailableQuantity(response.quantity))
-      .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
+        // check for available quantity
+        .then(() => tier.checkAvailableQuantity(response.quantity))
+        .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
-      // make sure if it's paid tier, we have a card attached
-      .then(() => {
-        if (tier.amount > 0) {
-          if (response.user.card && response.user.card.token) {
-            return Promise.resolve();
-          } else {
-            return Promise.reject(new Error(`This tier requires a payment method`));
+        // make sure if it's paid tier, we have a card attached
+        .then(() => {
+          if (tier.amount > 0) {
+            if (response.user.card && response.user.card.token) {
+              return Promise.resolve();
+            } else {
+              return Promise.reject(new Error(`This tier requires a payment method`));
+            }
           }
-        }
-        return Promise.resolve();
-      })
+          return Promise.resolve();
+        })
+      }
+
+      return queryPromise
 
       // find or create user
       .then(() => models.User.findOne({
@@ -81,41 +107,46 @@ const mutations = {
       // create response
       .then(() => models.Response.create({
         UserId: user.id,
-        GroupId: tier.Event.Group.id,
-        EventId: tier.Event.id,
-        TierId: tier.id,
+        GroupId: event.Group.id,
+        EventId: event.id,
+        TierId: tier && tier.id,
         confirmedAt: response.confirmedAt,
-        quantity: response.quantity,
+        quantity: response.quantity || 0,
         status: response.status,
         description: response.description
       }))
 
       // record payment, if needed
       .then(responseModel => {
-        if (tier.amount > 0) {
+
+        if (tier && tier.amount > 0 && response.status === responseStatus.YES) {
           return createPayment({
             user,
-            group: tier.Event.Group,
+            group: event.Group,
             response: responseModel,
             payment: {
               token: response.user.card.token,
               amount: tier.amount * responseModel.quantity,
               currency: tier.currency,
-              description: `${tier.Event.name} - ${tier.name}`,
+              description: `${event.name} - ${tier.name}`,
             }
           })
           .then(() => responseModel);
         } else {
-          return emailLib.send(
-            'ticket.confirmed',
-            user.email,
-            { user: user.info,
-              group: group.info,
-              response: eventResponse.info,
-              event: eventResponse.Event.info,
-              tier: eventResponse.Tier.info
-            })
-           .then(() => Promise.resolve(responseModel));
+          if (response.status !== responseStatus.INTERESTED) {
+            return emailLib.send(
+              'ticket.confirmed',
+              user.email,
+              { user: user.info,
+                group: event.Group.info,
+                response: responseModel.info,
+                event: event.info,
+                tier: tier && tier.info
+              })
+             .then(() => Promise.resolve(responseModel));
+           } else {
+            return Promise.resolve(responseModel);
+           }
         }
       })
     }
