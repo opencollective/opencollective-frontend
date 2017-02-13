@@ -5,7 +5,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import * as donationsLib from '../server/lib/donations';
+import * as paymentsLib from '../server/lib/payments';
 import models from '../server/models';
 
 const CHARGE = 10.99;
@@ -26,7 +26,7 @@ describe('donations.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(donationsLib, 'processDonation');
+    sandbox.stub(paymentsLib, 'processPayment');
   });
 
   beforeEach(() => utils.resetTestDB());

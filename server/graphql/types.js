@@ -391,6 +391,8 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier) {
           return tier.availableQuantity()
+          // graphql doesn't like infinity value
+          .then(availableQuantity => availableQuantity === Infinity ? 10000000 : availableQuantity);
         }
       },
       password: {

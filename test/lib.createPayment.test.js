@@ -5,7 +5,6 @@ import sinon from 'sinon';
 
 import models from '../server/models';
 import * as utils from '../test/utils';
-import * as donationsLib from '../server/lib/donations';
 import * as paymentsLib from '../server/lib/payments';
 import roles from '../server/constants/roles';
 
@@ -28,7 +27,7 @@ describe('lib.createPayment.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(donationsLib, 'processDonation');
+    sandbox.stub(paymentsLib, 'processPayment');
   });
 
   beforeEach(() => utils.resetTestDB());

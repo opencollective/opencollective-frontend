@@ -1,5 +1,5 @@
-import {processDonation} from '../lib/donations';
-import {type} from '../constants/transactions';
+import { processPayment } from '../lib/payments';
+import { type } from '../constants/transactions';
 
 const donationType = type.DONATION;
 
@@ -122,7 +122,7 @@ export default function(Sequelize, DataTypes) {
 
     hooks: {
       afterCreate: function(donation) {
-        return processDonation(Sequelize, donation);
+        return processPayment(Sequelize, donation);
       }
     }
   });
