@@ -438,7 +438,7 @@ export default (Sequelize, DataTypes) => {
 
       },
       afterCreate: (instance) => {
-        Sequelize.models.Notification.create({ channel: 'email', type: 'user.yearlyreport', UserId: instance.id })
+        Sequelize.models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
           .then(() => userLib.updateUserInfoFromClearbit(instance));
       }
     }

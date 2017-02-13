@@ -149,17 +149,23 @@ const sendMessage = (recipients, subject, html, options = {}) => {
   }
 };
 
+/**
+ * Get the label to unsubscribe from the email notification
+ * Shown in the footer of the email following "To unsubscribe from "
+ */
 const getNotificationLabel = (template, recipient) => {
 
   template = template.replace('.text', '');
 
   const notificationTypeLabels = {
-    'group.monthlyreport': 'monthly reports',
-    'user.yearlyreport': 'yearly reports',
-    'group.transaction.created': 'notifications of new transactions for this collective',
-    'group.expense.created': 'notifications of new expenses submitted to this collective',
+    'backer.monthlyreport': 'monthly reports for backers',
     'email.approve': 'notifications of new emails pending approval',
-    'email.message': recipient
+    'email.message': recipient,
+    'group.donation.created': 'notifications of new donations for this collective',
+    'group.expense.created': 'notifications of new expenses submitted to this collective',
+    'group.monthlyreport': 'monthly reports for collectives',
+    'group.transaction.created': 'notifications of new transactions for this collective',
+    'user.yearlyreport': 'yearly reports'
   }
 
   return notificationTypeLabels[template];

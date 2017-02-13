@@ -1,4 +1,4 @@
-Subject: New donation to {{group.name}}: {{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}} from {{user.name}}
+Subject: New donation to {{group.name}}: {{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}}{{#if user.name}} from {{user.name}}{{/if}}
 
 {{> header}}
 
@@ -16,8 +16,8 @@ Subject: New donation to {{group.name}}: {{{currency transaction.amountInTxnCurr
 
   <br /><br />
   {{#if tweet}}
-    {{tweet.text}}<br />
-    <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}">Tweet this!</a>
+    {{tweet.text}}<br />      
+    <a href="https://twitter.com/intent/tweet?status={{tweet.encoded}}"><div class="btn">Thank that person!</div></a>
   {{/if}}
 
 </center>
