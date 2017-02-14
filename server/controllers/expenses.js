@@ -257,12 +257,12 @@ function formatError(err, paypalResponse) {
     if (paypalResponse.error instanceof Array) {
       const { message } = paypalResponse.error[0];
       return new errors.BadRequest(message);
-    } else if (paypalResponse instanceof String) {
-      if (paypalResponse.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !== -1) {
-        return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
-      } else {
-        return new errors.BadRequest(paypalResponse)
-      }
+    }
+  } else {
+    if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
+      return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
+    } else {
+      return new errors.BadRequest(err.message)
     }
   }
   return err;
