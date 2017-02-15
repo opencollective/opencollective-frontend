@@ -1,7 +1,26 @@
+html {
+  font-size: 62.5%;
+  height: 100%;
+}
+
+@media(max-width: 600px) {
+  html {
+    font-size: 55%;
+  }
+}
+
 body {
+  height: 100%;
   font-family: 'montserratlight';
   font-weight: 400;
+  font-size: 14px;
+  font-size: 1.4rem;
 }
+
+#root {
+  height: 100%;
+}
+
 @font-face {
   font-family: 'montserratlight';
   src: url('../fonts/montserrat/montserrat-light-webfont.eot');
@@ -22,6 +41,13 @@ body {
 
 .EventPage {
   position: relative;
+  height: 100%;
+}
+
+@media(max-width: 600px) {
+  .showModal .EventPage {
+    display: none;
+  }
 }
 
 a {
@@ -36,7 +62,7 @@ h1 {
   text-align: center;
   margin: 40px 0px 20px;
   font-family: 'montserratlight';
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: bold;
 }
 
@@ -58,6 +84,16 @@ h1 {
 .map {
   border: 1px solid #eee;
   height: 300px;
+  position: relative;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0);
 }
 
 .tier {
@@ -73,7 +109,7 @@ h1 {
 };
 
 .location .name {
-  font-size: 16px;
+  font-size: 1.6rem;
   font-family: 'montserratlight';
   margin: 5px 0px;
 };

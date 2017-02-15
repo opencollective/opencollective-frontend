@@ -7,7 +7,10 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
     slug,
     name,
     description,
+    startsAt,
+    endsAt,
     location,
+    address,
     lat,
     long,
     tiers {

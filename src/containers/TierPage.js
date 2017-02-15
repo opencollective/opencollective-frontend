@@ -7,6 +7,7 @@ import EventHeader from '../components/EventHeader';
 import Tier from '../components/Tier';
 import SignInUp from '../components/SignInUp';
 import { formatCurrency } from '../lib/utils';
+import { injectIntl } from 'react-intl';
 import api from '../lib/api';
 
 const styles = {
@@ -117,4 +118,4 @@ const FeedQuery = gql`query tier {
 
 const TierPageWithData = graphql(FeedQuery)(TierPage)
 
-export default TierPageWithData
+export default injectIntl(TierPageWithData);

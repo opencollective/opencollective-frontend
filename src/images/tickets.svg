@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="369px" height="169px" viewBox="0 0 369 169" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>:: ticket</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="345" height="145"></rect>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="6" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.180392157   0 0 0 0 0.301960784   0 0 0 0 0.380392157  0 0 0 0.3 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <path d="M323,137 L21,137 C21,129.820298 15.1797017,124 8,124 L8,21 C15.1797017,21 21,15.1797017 21,8 L324,8 C324,15.1797017 329.820298,21 337,21 L337,124.03789 C336.669958,124.012783 336.336472,124 336,124 C328.820298,124 323,129.820298 323,137 Z" id="path-3"></path>
+        <mask id="mask-4" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="329" height="129" fill="white">
+            <use xlink:href="#path-3"></use>
+        </mask>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ticket-aquired" transform="translate(-320.000000, -248.000000)">
+            <g id="::-Tickets" transform="translate(332.000000, 218.000000)">
+                <g id="::-ticket" transform="translate(0.000000, 41.000000)">
+                    <g id="Rectangle-20">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                        <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    </g>
+                    <use id="Combined-Shape" stroke="#46B0ED" mask="url(#mask-4)" stroke-width="2" fill="#FFFFFF" opacity="0.429999977" xlink:href="#path-3"></use>
+                    <g id="::-quantity" transform="translate(0.000000, 111.000000)"></g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -3,6 +3,7 @@ import { css } from 'glamor';
 import colors from '../constants/colors';
 import TicketsCtlr from './TicketsCtlr';
 import Button from './Button';
+import { injectIntl } from 'react-intl';
 
 const styles = {
   tier: css({
@@ -79,7 +80,7 @@ class Tier extends React.Component {
       <div className={styles.tier}>
         <div className={styles.header}>
           <div className={styles.title} >{tier.name}</div>
-          <div className={styles.title} >{formatCurrency(this.state.amount)}</div>
+          <div className={styles.title} >{formatCurrency(this.state.amount, this.props.currency, this.props.intl)}</div>
         </div>
         <p className={styles.description}>{tier.description}</p>
         <div id="actions" className={styles.actions}>
@@ -91,4 +92,4 @@ class Tier extends React.Component {
   }
 }
 
-export default Tier;
+export default injectIntl(Tier);

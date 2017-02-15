@@ -20,7 +20,6 @@ const styles = {
   }),
   logo: css({
     width: '75px',
-    borderRadius: '50%',
     margin: '20px auto',
     display: 'block'
   }),

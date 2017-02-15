@@ -10,7 +10,8 @@ class CreditCardForm extends React.Component {
   static propTypes = {
     stripePublishableKey: React.PropTypes.string.isRequired,
     onCardAdded: React.PropTypes.func,
-    addCardLabel: React.PropTypes.string
+    addCardLabel: React.PropTypes.string,
+    disabled: React.PropTypes.bool
   }
 
   constructor(props) {
@@ -153,7 +154,7 @@ class CreditCardForm extends React.Component {
         </Col>
       </Row>
       {error && <Alert bsStyle="warning">{error}</Alert>}
-      <Button type="submit" className='green'>{addCardLabel || 'Add Card'}</Button>
+      <Button type="submit" className='green' disabled={this.props.disabled} >{addCardLabel || 'Add Card'}</Button>
     </div>);
   }
 
@@ -186,7 +187,7 @@ class CreditCardForm extends React.Component {
         .CreditCardForm li {
           float: left;
           color: #aaa;
-          font-size: 26px;
+          font-size: 2.6rem;
         }
 
         .CreditCardForm li:not(:last-child) {

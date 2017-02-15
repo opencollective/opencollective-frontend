@@ -76,7 +76,7 @@ const icons = {
 class Button extends React.Component {
 
   static propTypes = {
-    label: React.PropTypes.string,
+    label: React.PropTypes.object,
     disabled: React.PropTypes.bool,
     type: React.PropTypes.string, // e.g. type="submit"
     onClick: React.PropTypes.func,

@@ -2,6 +2,7 @@ import React from 'react';
 import { css } from 'glamor';
 import Tier from './Tier';
 import SignInUp from './SignInUp';
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
   getTicketForm: css({
@@ -45,7 +46,7 @@ class GetTicketForm extends React.Component {
   }
 
   render() {
-    const label = (this.state.response.quantity > 1) ? 'Get those tickets!' : 'Get this ticket';
+    const label = (<FormattedMessage id='GetTicketForm.submit' values={{quantity: this.state.response.quantity}} defaultMessage={`{quantity, plural, one {Get this ticket} other {Get those tickets}}`} />);
     const tier = this.props.tier;
     return (
       <div className={styles.getTicketForm}>

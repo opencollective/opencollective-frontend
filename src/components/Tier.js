@@ -5,6 +5,7 @@ import colors from '../constants/colors';
 import TicketsCtlr from './TicketsCtlr';
 import Button from './Button';
 import { formatCurrency } from '../lib/utils';
+import { injectIntl, FormattedMessage } from 'react-intl';
 
 const styles = {
   tier: css({
@@ -73,19 +74,19 @@ class Tier extends React.Component {
   }
 
   render() {
-    const { name, description, amount, currency, max, left } = this.props.tier;
+    const { name, description, currency } = this.props.tier;
 
     return (
       <div className={this.props.className}>
         <div className={styles.tier}>
           <div className={styles.header}>
             <div className={styles.title} >{name}</div>
-            <div className={styles.title} >{formatCurrency(this.state.amount, currency)}</div>
+            <div className={styles.title} >{formatCurrency(this.state.amount, currency, this.props.intl)}</div>
           </div>
           <p className={styles.description}>{description}</p>
           <div id="actions" className={styles.actions}>
             <Button id="btnTicketsCtrl"><TicketsCtlr value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} /></Button>
-            {this.props.onClick && <Button className="blue" label={`get ticket${this.state.quantity > 1 ? 's' : ''}`} onClick={() => this.props.onClick(this.state)} />}
+            {this.props.onClick && <Button className="blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
           </div>
         </div>
       </div>
@@ -93,4 +94,4 @@ class Tier extends React.Component {
   }
 }
 
-export default Tier;
+export default injectIntl(Tier);

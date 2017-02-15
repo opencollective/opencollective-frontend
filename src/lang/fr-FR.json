@@ -1,0 +1,7 @@
+{
+  "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
+  "event.responses.title.interested": "{n} interested",
+  "TicketsConfirmed.ticketsAcquired": "{quantity, plural, one {ticket réservé} other {tickets réservés}}!",
+  "TicketsConfirmed.tickets": "{quantity} {quantity, plural, one {ticket} other {tickets}}",
+  "utils.free": "gratuit"
+}

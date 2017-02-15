@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventPage from './containers/EventPage';
-import TierPage from './containers/TierPage'
 
-import { Router, Route, browserHistory } from 'react-router'
-import ApolloClient, { createNetworkInterface } from 'apollo-client'
-import { ApolloProvider } from 'react-apollo'
-import './index.css'
+import { Router, Route, browserHistory } from 'react-router';
+import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
+import { ApolloProvider } from 'react-apollo';
+import schemaString from './graphql/schemas';
+
+import './index.css';
 
 let { REACT_APP_API_URL, REACT_APP_API_KEY } = process.env;
 if (process.env.NODE_ENV === 'development') {
@@ -14,9 +16,17 @@ if (process.env.NODE_ENV === 'development') {
   REACT_APP_API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
 }
 
-const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}` })
-
-const client = new ApolloClient({ networkInterface })
+let client;
+if (process.env.NODE_ENV === 'test') {
+  // Make a GraphQL schema with no resolvers
+  const schema = makeExecutableSchema({ typeDefs: schemaString });
+  // Add mocks, modifies schema in place
+  addMockFunctionsToSchema({ schema });
+}
+else {
+  const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}` })
+  client = new ApolloClient({ networkInterface })
+}
 
 ReactDOM.render((
   <ApolloProvider client={client}>

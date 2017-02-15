@@ -2,10 +2,11 @@ import React from 'react';
 import colors from '../constants/colors';
 import Button from './Button';
 import _ from 'lodash';
-import { isValidEmail } from '../lib/utils';
+import { isValidEmail, capitalize } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
 import { css } from 'glamor';
 import '../css/forms.css';
+import { FormattedMessage } from 'react-intl';
 
 const styles = {
   SignInUp: css({
@@ -17,7 +18,7 @@ const styles = {
 class SignInUp extends React.Component {
 
   static propTypes = {
-    label: React.PropTypes.string,
+    label: React.PropTypes.object,
     onSubmit: React.PropTypes.func, // onSubmit(user)
     emailOnly: React.PropTypes.bool,
     showLabels: React.PropTypes.bool,
@@ -28,8 +29,7 @@ class SignInUp extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { form: {} };
-    this.user = {};
+    this.state = { user: {} };
     this.renderInputField = this.renderInputField.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleCardAdded = this.handleCardAdded.bind(this);
@@ -38,25 +38,25 @@ class SignInUp extends React.Component {
     this.fields = [
       {
         name: 'firstName',
-        label: 'First name:',
+        label: 'first name',
         placeholder: '',
         description: ''
       },
       {
         name: 'lastName',
-        label: 'Last name:',
+        label: 'last name',
         placeholder: '',
         description: ''
       },
       {
         name: 'description',
-        label: 'One liner:',
+        label: 'one liner',
         placeholder: '',
         description: 'Present yourself in 60 characters or less, if you can!'
       },
       {
         name: 'twitterHandle',
-        label: 'Twitter:',
+        label: 'twitter',
         placeholder: '@xdamman',
         description: ''
       }
@@ -64,10 +64,9 @@ class SignInUp extends React.Component {
   }
 
   handleChange(fieldname, value) {
-    this.state.form[fieldname] = value;
-    if (fieldname === 'email') {
-      this.setState({ valid: isValidEmail(value) })
-    }
+    const user = this.state.user;
+    user[fieldname] = value;
+    this.setState( { user });
   }
 
   renderInputField(field) {
@@ -76,21 +75,21 @@ class SignInUp extends React.Component {
 
     return (
       <div className="field" key={field.name} >
-        {this.props.showLabels && <label>{field.label}</label>}
+        {this.props.showLabels && <label><FormattedMessage id={`signinup.${field.name}.label`} defaultMessage={capitalize(field.label)} /></label>}
         <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
-        <span className="description">{field.description}</span>
+        <span className="description"><FormattedMessage id={`signinup.${field.name}.description`} defaultMessage={field.description || ' '} /></span>
       </div>
     );
   }
 
   handleCardAdded(card) {
-    this.user.card = card;
+    this.state.user.card = card;
+    this.setState({ user: this.state.user });
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    this.user = Object.assign(this.user, this.state.form);
-    this.props.onSubmit(this.user);
+    this.props.onSubmit(this.state.user);
   }
 
   componentDidMount() {
@@ -98,9 +97,11 @@ class SignInUp extends React.Component {
   }
 
   render() {
-    const { name, description, amount, currency, max, left } = this.props;
+    const { description } = this.props;
 
-    const showCreditCardForm = this.props.requireCreditCard && (!this.user || !this.user.creditCards);
+    const showCreditCardForm = this.props.requireCreditCard && !this.state.user.creditCards;
+
+    const isFormValid = isValidEmail(this.state.user.email) && (!this.props.requireCreditCard || this.state.user.card);
 
     return (
       <div className={styles.SignInUp}>
@@ -118,14 +119,14 @@ class SignInUp extends React.Component {
           }
           .field .description {
             clear: left;
-            font-size: 12px;
+            font-size: 1.2rem;
             color: ${colors.darkgray};
           }
         `}</style>
         <form onSubmit={this.handleSubmit}>
         {this.renderInputField({
           name: 'email',
-          label: 'Email:',
+          label: 'Email',
           placeholder: 'youare@wesome.com',
           description
         })
@@ -142,11 +143,12 @@ class SignInUp extends React.Component {
             stripePublishableKey={this.props.stripePublishableKey}
             number={process.env.NODE_ENV === 'development' ? '4242424242424242' : undefined}
             expiration={process.env.NODE_ENV === 'development' ? '11/2020' : undefined}
+            disabled={!isFormValid}
             />
         }
         {!showCreditCardForm &&
         <div id="actions" className="actions">
-          <Button type="submit" disabled={!this.state.valid} className="green" label={this.props.label} />
+          <Button type="submit" disabled={!isFormValid} className="green" label={this.props.label} />
         </div>}
         </form>
       </div>
