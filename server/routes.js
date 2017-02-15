@@ -186,7 +186,9 @@ export default (app) => {
   /**
    * Expenses
    */
-  app.get('/groups/:groupid/expenses', mw.paginate(), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+   // TODO: Built a better frontend and remove hack 
+   // mw.paginate({default: 50}) is a hack to unblock hosts from finding expenses that have more than 20 expenses
+  app.get('/groups/:groupid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
   app.get('/groups/:groupid/expenses/:expenseid', expenses.getOne); // Get an expense.
   app.post('/groups/:groupid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
   app.put('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
