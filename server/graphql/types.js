@@ -26,20 +26,6 @@ export const ResponseStatusType = new GraphQLEnumType({
   }
 });
 
-const nonZeroPositiveIntValue = (value) => value > 0 ? value : null;
-
-const NonZeroPositiveIntType = new GraphQLScalarType({
-  name: 'nonZeroPositiveInt',
-  serialize: value => value,
-  parseValue: value => value,
-  parseLiteral(ast) {
-    if (ast.kind === Kind.INT) {
-      return nonZeroPositiveIntValue(parseInt(ast.value, 10));
-    }
-    throw new GraphQLError('Query error: must be an Integer greater than 0', [ast]);
-  }
-});
-
 const EmailType = new GraphQLScalarType({
     name: 'Email',
     serialize: value => {
