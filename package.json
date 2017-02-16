@@ -39,7 +39,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "now-start": "serve -s build",
+    "now-start": "cd build && serve -s",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
