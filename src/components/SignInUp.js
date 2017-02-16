@@ -6,7 +6,7 @@ import { isValidEmail, capitalize } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
 import { css } from 'glamor';
 import '../css/forms.css';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 const styles = {
   SignInUp: css({
@@ -35,30 +35,32 @@ class SignInUp extends React.Component {
     this.handleCardAdded = this.handleCardAdded.bind(this);
     this.handleChange = this.handleChange.bind(this);
 
+    this.messages = defineMessages({
+      'email.label': { id: 'signinup.email.label', defaultMessage: 'email' },
+      'firstName.label': { id: 'signinup.firstName.label', defaultMessage: 'first name' },
+      'lastName.label': { id: 'signinup.lastName.label', defaultMessage: 'last name' },
+      'description.label': { id: 'signinup.description.label', defaultMessage: 'one liner' },
+      'description.description': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
+      'twitterHandle.label': { id: 'signinup.twitterHandle.label', defaultMessage: 'twitter' },
+      'twitterHandle.description': { id: 'signinup.twitterHandle.description', defaultMessage: '@xdamman' }
+    });
+
     this.fields = [
       {
         name: 'firstName',
-        label: 'first name',
-        placeholder: '',
-        description: ''
+        placeholder: ''
       },
       {
         name: 'lastName',
-        label: 'last name',
-        placeholder: '',
-        description: ''
+        placeholder: ''
       },
       {
         name: 'description',
-        label: 'one liner',
-        placeholder: '',
-        description: 'Present yourself in 60 characters or less, if you can!'
+        placeholder: ''
       },
       {
         name: 'twitterHandle',
-        label: 'twitter',
-        placeholder: '@xdamman',
-        description: ''
+        placeholder: '@xdamman'
       }
     ];
   }
@@ -72,12 +74,13 @@ class SignInUp extends React.Component {
   renderInputField(field) {
 
     const debouncedHandleEvent = _.debounce(this.handleChange, 500);
+    const { intl } = this.props;
 
     return (
       <div className="field" key={field.name} >
-        {this.props.showLabels && <label><FormattedMessage id={`signinup.${field.name}.label`} defaultMessage={capitalize(field.label)} /></label>}
+        {this.props.showLabels && this.messages[`${field.name}.label`] && <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>}
         <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
-        <span className="description"><FormattedMessage id={`signinup.${field.name}.description`} defaultMessage={field.description || ' '} /></span>
+        {this.messages[`${field.name}.description`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.description`])}</span>}
       </div>
     );
   }
@@ -161,4 +164,4 @@ SignInUp.defaultProps = {
   stripePublishableKey: 'pk_test_5aBB887rPuzvWzbdRiSzV3QB'
 }
 
-export default SignInUp;
+export default injectIntl(SignInUp);

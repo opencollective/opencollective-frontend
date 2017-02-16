@@ -11,13 +11,12 @@
             <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
         </filter>
     </defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="black" fill-rule="evenodd">
         <g id="event-page-guest" transform="translate(-574.000000, -575.000000)">
             <g id="::-nav-bar" transform="translate(0.000000, 550.000000)">
                 <g id="::-bg">
                     <g id="bg">
-                        <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
-                        <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                        <use fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" xlink:href="#path-1"></use>
                     </g>
                 </g>
                 <g id="::-interested" transform="translate(573.000000, 21.000000)" fill="#75CC1F">

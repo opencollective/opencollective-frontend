@@ -249,9 +249,11 @@ class Event extends React.Component {
                   <div className="name">{Event.location}</div>
                   <div className="address" style={{color: colors.darkgray}}>{Event.address}</div>
                 </div>
-                <div className="map">
-                  <Map lat={Event.lat} lng={Event.long} />
-                </div>
+                { Event.lat && Event.long &&
+                  <div className="map">
+                    <Map lat={Event.lat} lng={Event.long} />
+                  </div>
+                }
               </section>
 
               { Event.responses.length > 0 &&

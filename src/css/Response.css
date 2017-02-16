@@ -5,6 +5,7 @@
   margin: 10px;
   max-width: 300px;
   float: left;
+  position: relative;
 }
  
 .Response img {
@@ -25,4 +26,12 @@
 .description {
   font-family: 'lato';
   font-size: 1.4rem;
+}
+
+.star {
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  top: 45px;
+  left: 0;
 }

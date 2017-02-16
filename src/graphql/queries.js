@@ -33,9 +33,12 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
     responses {
       quantity,
       status,
+      description,
       user {
         name,
-        avatar
+        avatar,
+        twitterHandle,
+        description
       },
       tier {
         name
