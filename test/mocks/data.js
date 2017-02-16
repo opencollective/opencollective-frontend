@@ -660,7 +660,7 @@ export default {
   },
 
   "response3": {
-    status: "NO",
+    status: "YES",
     quantity: 2
   }
 }

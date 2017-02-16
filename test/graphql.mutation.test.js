@@ -115,7 +115,6 @@ describe('Mutation Tests', () => {
         expect(result.errors[0].message).to.contain('group');
         expect(result.errors[0].message).to.contain('event');
         expect(result.errors[0].message).to.contain('user');
-        expect(result.errors[0].message).to.contain('quantity');
         expect(result.errors[0].message).to.contain('status');
       });
 

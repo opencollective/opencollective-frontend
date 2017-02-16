@@ -290,7 +290,7 @@ describe('Query Tests', () => {
                       "responses": [
                         {
                           "id": 3,
-                          "status": "NO",
+                          "status": "YES",
                           "description": null,
                           "user": {
                             "id": 3,
