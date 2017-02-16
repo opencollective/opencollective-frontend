@@ -16,6 +16,8 @@ if (process.env.NODE_ENV === 'development') {
   REACT_APP_API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
 }
 
+console.log("Using API at ", REACT_APP_API_URL);
+
 let client;
 if (process.env.NODE_ENV === 'test') {
   // Make a GraphQL schema with no resolvers
