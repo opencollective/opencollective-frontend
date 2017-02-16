@@ -5,14 +5,12 @@ import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
 import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import {createFromPaidExpense as createTransaction} from '../lib/transactions';
-import {getPreapprovalDetails as gpd} from './paypal';
+import { getPreapprovalDetails } from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
 import sequelize from 'sequelize';
 import models from '../models';
 import * as auth from '../middleware/security/auth';
-
-const getPreapprovalDetails = Promise.promisify(gpd);
 
 /**
  * Create an expense.
@@ -164,7 +162,7 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponse, preapprovalDetails;
+  let paymentMethod, email, paymentResponses, preapprovalDetails;
 
   assertExpenseStatus(expense, status.APPROVED)
     // check that a group's balance is greater than the expense
@@ -176,13 +174,13 @@ export const pay = (req, res, next) => {
     .then(getBeneficiaryEmail)
     .tap(e => email = e)
     .then(() => isManual ? null : pay())
-    .tap(r => paymentResponse = r)
+    .tap(r => paymentResponses = r)
     .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetails = d)
-    .then(() => createTransaction(paymentMethod, expense, paymentResponse, preapprovalDetails, expense.UserId))
+    .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetails, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
-    .catch(err => next(formatError(err, paymentResponse)));
+    .catch(err => next(formatError(err, paymentResponses)));
 
   function checkIfEnoughFundsInGroup(expense, balance) {
     if (balance >= expense.amount) {
@@ -253,7 +251,7 @@ function createActivity(expense, type) {
 
 function formatError(err, paypalResponse) {
   if (paypalResponse) {
-    console.error('PayPal error', JSON.stringify(paypalResponse));
+    console.error('PayPal error', JSON.stringify(err));
     if (paypalResponse.error instanceof Array) {
       const { message } = paypalResponse.error[0];
       return new errors.BadRequest(message);

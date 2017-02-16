@@ -3,7 +3,7 @@ import config from 'config';
 import moment from 'moment';
 import models from '../models';
 import errors from '../lib/errors';
-import paypalAdaptive from '../gateways/paypalAdaptive';
+import { getPreapprovalDetails } from '../gateways/paypalAdaptive';
 
 const {
   Activity,
@@ -11,30 +11,14 @@ const {
 } = models;
 
 /**
- * Get Preapproval Details.
- */
-export const getPreapprovalDetails = function(preapprovalKey, callback) {
-  const payload = {
-    requestEnvelope: {
-      errorLanguage:  'en_US',
-      detailLevel:    'ReturnAll'
-    },
-    preapprovalKey
-  };
-
-  callPaypal('preapprovalDetails', payload, callback);
-};
-
-/**
  * Get preapproval details route
  */
 export const getDetails = function(req, res, next) {
   const preapprovalKey = req.params.preapprovalkey;
 
-  getPreapprovalDetails(preapprovalKey, (err, response) => {
-    if (err) return next(err);
-    res.json(response);
-  });
+  return getPreapprovalDetails(preapprovalKey)
+    .then(paypalResponse => res.json(paypalResponse))
+    .catch(next);
 };
 
 /**
@@ -71,16 +55,15 @@ export const getPreapprovalKey = function(req, res, next) {
             .catch(cbEach);
         }
 
-        getPreapprovalDetails(paymentMethod.token, (err, response) => {
-          if (err) return cbEach(err);
+        getPreapprovalDetails(paymentMethod.token)
+        .then(response => {
           if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {
             paymentMethod.destroy()
-              .then(() => cbEach())
-              .catch(cbEach);
-          } else {
-            cbEach();
-          }
-        });
+              .then(cbEach)
+              .catch(cbEach)
+            }
+        })
+        .catch(cbEach)
       }, cb);
     }],
 
@@ -159,17 +142,13 @@ export const confirmPreapproval = function(req, res, next) {
     }],
 
     callPaypal: [function(cb) {
-      getPreapprovalDetails(req.params.preapprovalkey, (err, response) => {
-        if (err) {
-          return cb(err);
-        }
-
+      getPreapprovalDetails(req.params.preapprovalkey)
+      .then(response => { 
         if (response.approved === 'false') {
           return cb(new errors.BadRequest('This preapprovalkey is not approved yet.'));
         }
-
-        cb(null, response);
-      });
+      })
+      .catch(cb)
     }],
 
     updatePaymentMethod: ['callPaypal', 'getPaymentMethod', 'checkPaymentMethod', function(cb, results) {
@@ -220,18 +199,3 @@ export const confirmPreapproval = function(req, res, next) {
   });
 
 };
-
-function callPaypal(endpointName, payload, callback) {
-  console.log(`calling PayPal ${endpointName} with payload:`, payload); // leave this in permanently to help with paypal debugging
-  paypalAdaptive[endpointName](payload, (err, res) => {
-    console.log("PayPal response: ", res);
-    if (err) {
-      console.log(`PayPal ${endpointName} error: `, err);
-      if (res.error && res.error[0] && res.error[0].parameter) {
-        console.log("PayPal error.parameter: ", res.error[0].parameter); // this'll give us more details on the error
-      }
-      callback(new Error(res.error[0].message));
-    }
-    callback(null, res);
-  });
-}
