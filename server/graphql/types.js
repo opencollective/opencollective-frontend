@@ -15,28 +15,14 @@ import {
 import { Kind } from 'graphql/language';
 
 import models from '../models';
+import status from '../constants/response_status';
 
 export const ResponseStatusType = new GraphQLEnumType({
   name: 'Responses',
   values: {
-    PENDING: { value: 'PENDING' },
-    INTERESTED: { value: 'INTERESTED' },
-    YES: { value: 'YES' },
-    NO: { value: 'NO' }
-  }
-});
-
-const nonZeroPositiveIntValue = (value) => value > 0 ? value : null;
-
-const NonZeroPositiveIntType = new GraphQLScalarType({
-  name: 'nonZeroPositiveInt',
-  serialize: value => value,
-  parseValue: value => value,
-  parseLiteral(ast) {
-    if (ast.kind === Kind.INT) {
-      return nonZeroPositiveIntValue(parseInt(ast.value, 10));
-    }
-    throw new GraphQLError('Query error: must be an Integer greater than 0', [ast]);
+    PENDING: { value: status.PENDING },
+    INTERESTED: { value: status.INTERESTED },
+    YES: { value: status.YES },
   }
 });
 
@@ -521,11 +507,10 @@ export const ResponseInputType = new GraphQLInputObjectType({
   name: 'ResponseInputType',
   description: 'Input type for ResponseType',
   fields: () => ({
-    id: { type: GraphQLInt },
-    quantity: { type: new GraphQLNonNull(NonZeroPositiveIntType) },
+    quantity: { type: GraphQLInt },
     user: { type: new GraphQLNonNull(UserInputType) },
     group: { type: new GraphQLNonNull(GroupInputType) },
-    tier: { type: new GraphQLNonNull(TierInputType) },
+    tier: { type: TierInputType },
     event: { type: new GraphQLNonNull(EventAttributesInputType) },
     status: { type: new GraphQLNonNull(GraphQLString) }
   })

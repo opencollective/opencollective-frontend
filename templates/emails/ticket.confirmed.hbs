@@ -12,7 +12,7 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 
 <p>We are excited that you'll be joining us at {{ event.name }} on {{ event.startsAt }} at {{ event.locationName }}. </p>
 
-<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}. </p>
+<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}{{#if donation}}for a total of {{{currency donation.amount currency=donation.currency}}}{{/if}}. </p>
 
 <p>In case you didn't know, we manage our budget transparently. You can follow our future activities and how we will be spending this money on our open collective page:
   <a href="https://opencollective.com/{{group.slug}}?{{utm}}">https://opencollective.com/{{group.slug}}</a>.

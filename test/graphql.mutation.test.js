@@ -31,7 +31,6 @@ describe('Mutation Tests', () => {
 
   beforeEach(() => {
     createPaymentStub = sandbox.stub(paymentsLib, 'createPayment', () => Promise.resolve());
-    //processPaymentStub = sandbox.stub(paymentsLib, 'processPayment');
   });
 
   // Create a stub for clearbit
@@ -97,7 +96,7 @@ describe('Mutation Tests', () => {
       it('when missing all required fields', async () => {
         const query = `
           mutation createResponse {
-            createResponse(response: {description:"blah"}) {
+            createResponse(response: {}) {
               id,
               status
               event {
@@ -115,9 +114,7 @@ describe('Mutation Tests', () => {
         expect(result.errors.length).to.equal(1);
         expect(result.errors[0].message).to.contain('group');
         expect(result.errors[0].message).to.contain('event');
-        expect(result.errors[0].message).to.contain('tier');
         expect(result.errors[0].message).to.contain('user');
-        expect(result.errors[0].message).to.contain('quantity');
         expect(result.errors[0].message).to.contain('status');
       });
 
@@ -142,7 +139,7 @@ describe('Mutation Tests', () => {
           `;
           const result = await graphql(schema, query)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No tier found with tierId:1 for eventSlug:jan-meetup in collectiveSlug:doesNotExist');
+          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for event slug:jan-meetup in collective slug:doesNotExist');
         });
 
         it('when event doesn\'t exist', async () => {
@@ -164,7 +161,7 @@ describe('Mutation Tests', () => {
           `;
           const result = await graphql(schema, query);
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No tier found with tierId:1 for eventSlug:doesNotExist in collectiveSlug:scouts');
+          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for event slug:doesNotExist in collective slug:scouts');
         });
 
         it('when tier doesn\'t exist', async () => {
@@ -186,7 +183,7 @@ describe('Mutation Tests', () => {
           `;
           const result = await graphql(schema, query);
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(`No tier found with tierId:1002 for eventSlug:${event1.slug} in collectiveSlug:${group1.slug}`);
+          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for event slug:${event1.slug} in collective slug:${group1.slug}`);
         });
       });
 
@@ -238,140 +235,17 @@ describe('Mutation Tests', () => {
     });
 
     describe('creates a response', () => {
-      
-      describe('for a free tier', () => {
 
-        it('from an existing user', async () => {
-          const query = `
-            mutation createResponse {
-              createResponse(response: { user: { email: "${user2.email}" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
-                id,
-                status,
-                user {
-                  id,
-                  email
-                },
-                event {
-                  id
-                },
-                tier {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
-                  availableQuantity
-                },
-                collective {
-                  id,
-                  slug
-                }
-              }
-            }
-          `;
-          const result = await graphql(schema, query);
-          expect(result).to.deep.equal({
-            data: {
-              "createResponse": {
-                "event": {
-                  "id": 1
-                },
-                "id": 1,
-                "status": "YES",
-                "tier": {
-                  "availableQuantity": 8,
-                  "description": "free tickets for all",
-                  "id": 1,
-                  "maxQuantity": 10,
-                  "name": "Free tier"
-                },
-                "user": {
-                  "email": "xdam@opencollective.com",
-                  "id": 2
-                },
-                "collective": {
-                  "id": 1,
-                  "slug": "scouts"
-                }
-              }            
-            }
-          });
-        });
-
-        it('from a new user', async () => {
-          const query = `
-            mutation createResponse {
-              createResponse(response: { user: { email: "newuser@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
-                id,
-                status,
-                user {
-                  id,
-                  email
-                },
-                event {
-                  id
-                },
-                tier {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
-                  availableQuantity
-                },
-                collective {
-                  id,
-                  slug
-                }
-              }
-            }
-          `;
-          const result = await graphql(schema, query);
-          expect(result).to.deep.equal({
-            data: {
-               "createResponse": {
-                "event": {
-                  "id": 1
-                },
-                "id": 1,
-                "status": "YES",
-                "tier": {
-                  "availableQuantity": 8,
-                  "description": "free tickets for all",
-                  "id": 1,
-                  "maxQuantity": 10,
-                  "name": "Free tier"
-                },
-                "user": {
-                  "email": "newuser@email.com",
-                  "id": 3
-                },
-                "collective": {
-                  "id": 1,
-                  "slug": "scouts"
-                }
-              }            
-            }
-          });
-        });        
-      });
-
-      describe('for a paid tier', () => {
+      describe('for INTERESTED status', () => {
 
         it('from an existing user', async () => {
           const query = `
             mutation createResponse {
               createResponse(response: { 
-                user: { 
-                  email: "${user2.email}",
-                  card: {
-                    token: "tok_stripe",
-                    expMonth: 11,
-                    expYear: 2020,
-                    number: 4242
-                  }
-                }, 
+                user: { email: "${user2.email}" }, 
                 group: { slug: "${group1.slug}" }, 
                 event: { slug: "${event1.slug}" }, 
-                tier: { id: 2 }, status:"YES", quantity:2 
+                status:"INTERESTED"
               }) {
                 id,
                 status,
@@ -404,14 +278,8 @@ describe('Mutation Tests', () => {
                   "id": 1
                 },
                 "id": 1,
-                "status": "YES",
-                "tier": {
-                  "availableQuantity": 98,
-                  "description": "$20 ticket",
-                  "id": 2,
-                  "maxQuantity": 100,
-                  "name": "paid tier"
-                },
+                "status": "INTERESTED",
+                "tier": null,
                 "user": {
                   "email": "xdam@opencollective.com",
                   "id": 2
@@ -423,97 +291,288 @@ describe('Mutation Tests', () => {
               }            
             }
           });
-          expect(createPaymentStub.callCount).to.equal(1);
-          expect(createPaymentStub.firstCall.args[0].user.id).to.equal(2);
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
-          expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-            token: 'tok_stripe',
-            amount: 4000,
-            currency: 'USD',
-            description: 'January meetup - paid tier'
-          });
         });
+      });
 
-        it('from an existing user', async () => {
-          const query = `
-            mutation createResponse {
-              createResponse(response: { 
-                user: { 
-                  email: "newuser@email.com",
-                  card: {
-                    token: "tok_stripe",
-                    expMonth: 11,
-                    expYear: 2020,
-                    number: 4242
+      describe('for YES status', () => {
+
+        describe('in a free tier ', () => {
+
+          it('from an existing user', async () => {
+            const query = `
+              mutation createResponse {
+                createResponse(response: { user: { email: "${user2.email}" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
+                  id,
+                  status,
+                  user {
+                    id,
+                    email
+                  },
+                  event {
+                    id
+                  },
+                  tier {
+                    id,
+                    name,
+                    description,
+                    maxQuantity,
+                    availableQuantity
+                  },
+                  collective {
+                    id,
+                    slug
                   }
-                }, 
-                group: { slug: "${group1.slug}" }, 
-                event: { slug: "${event1.slug}" }, 
-                tier: { id: 2 }, status:"YES", quantity:2 
-              }) {
-                id,
-                status,
-                user {
-                  id,
-                  email
-                },
-                event {
-                  id
-                },
-                tier {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
-                  availableQuantity
-                },
-                collective {
-                  id,
-                  slug
                 }
               }
-            }
-          `;
-          const result = await graphql(schema, query);
-          expect(result).to.deep.equal({
-            data: {
-              "createResponse": {
-                "event": {
-                  "id": 1
-                },
-                "id": 1,
-                "status": "YES",
-                "tier": {
-                  "availableQuantity": 98,
-                  "description": "$20 ticket",
-                  "id": 2,
-                  "maxQuantity": 100,
-                  "name": "paid tier"
-                },
-                "user": {
-                  "email": "newuser@email.com",
-                  "id": 3
-                },
-                "collective": {
+            `;
+            const result = await graphql(schema, query);
+            expect(result).to.deep.equal({
+              data: {
+                "createResponse": {
+                  "event": {
+                    "id": 1
+                  },
                   "id": 1,
-                  "slug": "scouts"
-                }
-              }            
-            }
+                  "status": "YES",
+                  "tier": {
+                    "availableQuantity": 8,
+                    "description": "free tickets for all",
+                    "id": 1,
+                    "maxQuantity": 10,
+                    "name": "Free tier"
+                  },
+                  "user": {
+                    "email": "xdam@opencollective.com",
+                    "id": 2
+                  },
+                  "collective": {
+                    "id": 1,
+                    "slug": "scouts"
+                  }
+                }            
+              }
+            });
           });
-          expect(createPaymentStub.callCount).to.equal(1);
-          expect(createPaymentStub.firstCall.args[0].user.id).to.equal(3);
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
-          expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-            token: 'tok_stripe',
-            amount: 4000,
-            currency: 'USD',
-            description: 'January meetup - paid tier'
+
+          it('from a new user', async () => {
+            const query = `
+              mutation createResponse {
+                createResponse(response: { user: { email: "newuser@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
+                  id,
+                  status,
+                  user {
+                    id,
+                    email
+                  },
+                  event {
+                    id
+                  },
+                  tier {
+                    id,
+                    name,
+                    description,
+                    maxQuantity,
+                    availableQuantity
+                  },
+                  collective {
+                    id,
+                    slug
+                  }
+                }
+              }
+            `;
+            const result = await graphql(schema, query);
+            expect(result).to.deep.equal({
+              data: {
+                 "createResponse": {
+                  "event": {
+                    "id": 1
+                  },
+                  "id": 1,
+                  "status": "YES",
+                  "tier": {
+                    "availableQuantity": 8,
+                    "description": "free tickets for all",
+                    "id": 1,
+                    "maxQuantity": 10,
+                    "name": "Free tier"
+                  },
+                  "user": {
+                    "email": "newuser@email.com",
+                    "id": 3
+                  },
+                  "collective": {
+                    "id": 1,
+                    "slug": "scouts"
+                  }
+                }            
+              }
+            });
+          });        
+        });
+
+        describe('in a paid tier', () => {
+
+          it('from an existing user', async () => {
+            const query = `
+              mutation createResponse {
+                createResponse(response: { 
+                  user: { 
+                    email: "${user2.email}",
+                    card: {
+                      token: "tok_stripe",
+                      expMonth: 11,
+                      expYear: 2020,
+                      number: 4242
+                    }
+                  }, 
+                  group: { slug: "${group1.slug}" }, 
+                  event: { slug: "${event1.slug}" }, 
+                  tier: { id: 2 }, status:"YES", quantity:2 
+                }) {
+                  id,
+                  status,
+                  user {
+                    id,
+                    email
+                  },
+                  event {
+                    id
+                  },
+                  tier {
+                    id,
+                    name,
+                    description,
+                    maxQuantity,
+                    availableQuantity
+                  },
+                  collective {
+                    id,
+                    slug
+                  }
+                }
+              }
+            `;
+            const result = await graphql(schema, query);
+            expect(result).to.deep.equal({
+              data: {
+                "createResponse": {
+                  "event": {
+                    "id": 1
+                  },
+                  "id": 1,
+                  "status": "YES",
+                  "tier": {
+                    "availableQuantity": 98,
+                    "description": "$20 ticket",
+                    "id": 2,
+                    "maxQuantity": 100,
+                    "name": "paid tier"
+                  },
+                  "user": {
+                    "email": "xdam@opencollective.com",
+                    "id": 2
+                  },
+                  "collective": {
+                    "id": 1,
+                    "slug": "scouts"
+                  }
+                }            
+              }
+            });
+            expect(createPaymentStub.callCount).to.equal(1);
+            expect(createPaymentStub.firstCall.args[0].user.id).to.equal(2);
+            expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
+            expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
+            expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+              token: 'tok_stripe',
+              amount: 4000,
+              currency: 'USD',
+              description: 'January meetup - paid tier'
+            });
+          });
+
+          it('from an existing user', async () => {
+            const query = `
+              mutation createResponse {
+                createResponse(response: { 
+                  user: { 
+                    email: "newuser@email.com",
+                    card: {
+                      token: "tok_stripe",
+                      expMonth: 11,
+                      expYear: 2020,
+                      number: 4242
+                    }
+                  }, 
+                  group: { slug: "${group1.slug}" }, 
+                  event: { slug: "${event1.slug}" }, 
+                  tier: { id: 2 }, status:"YES", quantity:2 
+                }) {
+                  id,
+                  status,
+                  user {
+                    id,
+                    email
+                  },
+                  event {
+                    id
+                  },
+                  tier {
+                    id,
+                    name,
+                    description,
+                    maxQuantity,
+                    availableQuantity
+                  },
+                  collective {
+                    id,
+                    slug
+                  }
+                }
+              }
+            `;
+            const result = await graphql(schema, query);
+            expect(result).to.deep.equal({
+              data: {
+                "createResponse": {
+                  "event": {
+                    "id": 1
+                  },
+                  "id": 1,
+                  "status": "YES",
+                  "tier": {
+                    "availableQuantity": 98,
+                    "description": "$20 ticket",
+                    "id": 2,
+                    "maxQuantity": 100,
+                    "name": "paid tier"
+                  },
+                  "user": {
+                    "email": "newuser@email.com",
+                    "id": 3
+                  },
+                  "collective": {
+                    "id": 1,
+                    "slug": "scouts"
+                  }
+                }            
+              }
+            });
+            expect(createPaymentStub.callCount).to.equal(1);
+            expect(createPaymentStub.firstCall.args[0].user.id).to.equal(3);
+            expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
+            expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
+            expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+              token: 'tok_stripe',
+              amount: 4000,
+              currency: 'USD',
+              description: 'January meetup - paid tier'
+            });
           });
         });
       });
+
     }); 
   });
 });
