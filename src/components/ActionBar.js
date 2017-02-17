@@ -13,21 +13,23 @@ class ActionBar extends React.Component {
   render() {
     return (
       <div className="ActionBar">
-        <div className="info">
-          {this.props.info}
-        </div>
-        <div className="buttons">
-        {this.props.actions.map((action, index) =>
-          <Button
-            key={`actionItem${index}`}
-            style={{borderColor: colors.lightgray}}
-            className={action.className}
-            style={action.className === 'selected' ? { color: colors.green } : {}}
-            label={action.label}
-            icon={action.icon}
-            onClick={() => action.onClick()}
-            >{action.component}</Button> 
-        )}
+        <div className="content">
+          <div className="info">
+            {this.props.info}
+          </div>
+          <div className="buttons">
+          {this.props.actions.map((action, index) =>
+            <Button
+              key={`actionItem${index}`}
+              style={{borderColor: colors.lightgray}}
+              className={action.className}
+              style={action.className === 'selected' ? { color: colors.green } : {}}
+              label={action.label}
+              icon={action.icon}
+              onClick={() => action.onClick()}
+              >{action.component}</Button> 
+          )}
+          </div>
         </div>
       </div>
     )

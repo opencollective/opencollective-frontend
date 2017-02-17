@@ -1,17 +1,23 @@
 .ActionBar {
-  display: flex;
-  flex-direction: row;
   box-shadow: 0px 2px 4px rgba(0,0,0,.1);
+}
+
+.ActionBar .content {
+  display: flex;
+  padding: 0;
+  flex-direction: row;
 }
 
 .ActionBar .info {
   float: left;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
   font-size: 1.2rem;
   height: 60px;
+  border-left: 1px solid #E6E6E6;
   border-right: 1px solid #E6E6E6;
 }
 
@@ -28,16 +34,12 @@
 }
 
 .ActionBar .buttons button {
-  border: 1px solid transparent;
-  border-right: 1px solid;
-}
-
-.ActionBar .buttons button:first-of-type {
   border-right: 1px solid #E6E6E6;
+  cursor: pointer;
 }
 
 @media(max-width: 600px) {
-  .ActionBar {
+  .ActionBar .content {
     flex-direction: column;
   }
   .ActionBar .info {

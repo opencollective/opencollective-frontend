@@ -13,7 +13,7 @@ const styles = {
   InterestedForm: css({
     width: '100%',
     background: 'white',
-    maxWidth: '620px',
+    maxWidth: '500px',
     boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
     borderRadius: '0px 0px 10px 10px',
     margin: '0px auto 40px auto',

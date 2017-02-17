@@ -41,8 +41,7 @@ class SignInUp extends React.Component {
       'lastName.label': { id: 'signinup.lastName.label', defaultMessage: 'last name' },
       'description.label': { id: 'signinup.description.label', defaultMessage: 'one liner' },
       'description.description': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
-      'twitterHandle.label': { id: 'signinup.twitterHandle.label', defaultMessage: 'twitter' },
-      'twitterHandle.description': { id: 'signinup.twitterHandle.description', defaultMessage: '@xdamman' }
+      'twitterHandle.label': { id: 'signinup.twitterHandle.label', defaultMessage: 'twitter' }
     });
 
     this.fields = [

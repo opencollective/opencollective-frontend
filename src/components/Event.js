@@ -63,13 +63,6 @@ class Event extends React.Component {
     });
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      // this.setState({api: { status: 'error', error: "API is unreachable, please try again later"}});
-      this.setState({response: { event: this.event, quantity: 2, tier: this.event.tiers[0], status: 'YES', user: { email: 'xdamman@gmail.com' } } })
-    }, 2000);
-  }
-
   /**
    * If user is logged in, we directly create a response 
    * Otherwise, we show the form to enter an email address
