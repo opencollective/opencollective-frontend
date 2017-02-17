@@ -190,11 +190,11 @@ class Event extends React.Component {
     const interested = filterCollection(Event.responses, {'status':'INTERESTED'});
 
     const info = (
-      <div>
+      <HashLink to="#location">
         <FormattedDate value={Event.startsAt} day='numeric' month='short' year='2-digit' />&nbsp;•&nbsp;
         <FormattedTime value={Event.startsAt}  />&nbsp;•&nbsp;
         {Event.location}
-      </div>
+      </HashLink>
     );
 
     return (
