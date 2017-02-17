@@ -19,7 +19,7 @@ import { addEventData } from '../graphql/queries';
 import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 
 class Event extends React.Component {
 
@@ -56,7 +56,7 @@ class Event extends React.Component {
       api: { status: 'idle' },
       actions: this.defaultActions
     };
-    
+
     this.api = new Api({
       onChange: (apiStatus) => this.setState({ api: apiStatus }),
       delay: 5000
@@ -189,6 +189,14 @@ class Event extends React.Component {
     const going = filterCollection(Event.responses, {'status':'YES'});
     const interested = filterCollection(Event.responses, {'status':'INTERESTED'});
 
+    const info = (
+      <div>
+        <FormattedDate value={Event.startsAt} day='numeric' month='short' year='2-digit' />&nbsp;•&nbsp;
+        <FormattedTime value={Event.startsAt}  />&nbsp;•&nbsp;
+        {Event.location}
+      </div>
+    );
+
     return (
       <div>
         <TicketsConfirmed
@@ -208,7 +216,11 @@ class Event extends React.Component {
             backgroundImage={Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage}
             />
 
-          <ActionBar actions={this.state.actions} />
+          <ActionBar
+            actions={this.state.actions}
+            info={info}
+            />
+
           {this.state.showInterestedForm &&
             <InterestedForm onSubmit={this.setInterested} />
           }
