@@ -589,6 +589,26 @@ describe('expenses.routes.test.js', () => {
                 }));
               });
 
+              describe('WHEN group has sufficient funds for expense but not for fees', () => {
+
+                // add just enough money that fees can't be paid
+                beforeEach('create a transaction', () => {
+                  return request(app)
+                    .post(`/groups/${group.id}/transactions`)
+                    .set('Authorization', `Bearer ${host.jwt()}`)
+                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
+                    .expect(200);
+                })
+
+                it('THEN returns 400', () => payReq.expect(400, {
+                  error: {
+                    code: 400,
+                    type: 'bad_request',
+                    message: 'Not enough funds in this collective to pay this request. Please add funds first.',
+                  }
+                }));
+              })
+
               describe('WHEN group has sufficient funds', () => {
                 
                 // add some money, so collective has some funds
@@ -596,7 +616,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
+                    .send({ api_key: application.api_key, transaction: {amount: 12500}})
                     .expect(200);
                 })
 

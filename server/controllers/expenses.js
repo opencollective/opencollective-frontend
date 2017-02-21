@@ -183,7 +183,9 @@ export const pay = (req, res, next) => {
     .catch(err => next(formatError(err, paymentResponses)));
 
   function checkIfEnoughFundsInGroup(expense, balance) {
-    if (balance >= expense.amount) {
+    const estimatedFees = isManual ? 0 : expense.amount*.029 + 31; // 2.9% + 30 is a typical fee. Adding 1 cent for rounding
+
+    if (balance >= (expense.amount + estimatedFees)) { 
       return Promise.resolve();
     } else {
       return Promise.reject(new errors.BadRequest(`Not enough funds in this collective to pay this request. Please add funds first.`));
