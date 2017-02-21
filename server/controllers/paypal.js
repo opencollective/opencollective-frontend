@@ -3,7 +3,7 @@ import config from 'config';
 import moment from 'moment';
 import models from '../models';
 import errors from '../lib/errors';
-import { getPreapprovalDetails } from '../gateways/paypalAdaptive';
+import { getPreapprovalDetails, getPreapproval } from '../gateways/paypalAdaptive';
 
 const {
   Activity,
@@ -95,7 +95,9 @@ export const getPreapprovalKey = function(req, res, next) {
     }],
 
     callPaypal: ['createPayload', function(cb, results) {
-      paypalAdaptive.preapproval(results.createPayload, cb);
+      getPreapproval(results.createPayload)
+      .then(response => cb(null, response))
+      .catch(cb)
     }],
 
     updatePaymentMethod: ['createPaymentMethod', 'createPayload', 'callPaypal', function(cb, results) {

@@ -37,7 +37,7 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
 
 
   return models.Transaction.create({
-    netAmountInGroupCurrency: -expense.amount + fees,
+    netAmountInGroupCurrency: -1* (expense.amount + fees),
     amountInTxnCurrency: -expense.amount,
     paymentProcessorFeeInTxnCurrency: fees,
     txnCurrency,
