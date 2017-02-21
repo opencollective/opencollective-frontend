@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
+import { isUUID } from '../lib/utils';
 
 const {
   User,
@@ -11,15 +12,20 @@ const {
 } = models;
 
 /**
- * Parse id.
+ * Parse id or uuid and returns the where condition to get the element
+ * @POST: { uuid: String } or { id: Int }
  */
 const parseId = (param) => {
+  if (isUUID(param)) {
+    return Promise.resolve({ uuid: param });
+  }
+
   const id = parseInt(param);
 
   if (_.isNaN(id)) {
     return Promise.reject(new errors.BadRequest('This is not a correct id.'))
   } else {
-    return Promise.resolve(id);
+    return Promise.resolve({ id });
   }
 };
 
@@ -57,7 +63,7 @@ export function groupid(req, res, next, groupIdOrSlug) {
  */
 export function commentid(req, res, next, commentid) {
   parseId(commentid)
-    .then(id => Comment.findById(id))
+    .then(where => Comment.findOne({where}))
     .then((comment) => {
       if (!comment) {
         return next(new errors.NotFound(`Comment '${commentid}' not found`));
@@ -74,7 +80,7 @@ export function commentid(req, res, next, commentid) {
  */
 export function transactionid(req, res, next, transactionid) {
   parseId(transactionid)
-    .then(id => Transaction.findById(id))
+    .then(where => Transaction.findOne({where}))
     .then((transaction) => {
       if (!transaction) {
         return next(new errors.NotFound(`Transaction '${transactionid}' not found`));
@@ -91,9 +97,9 @@ export function transactionid(req, res, next, transactionid) {
  */
 export function paranoidtransactionid(req, res, next, id) {
   parseId(id)
-    .then(id => {
+    .then(where => {
       return Transaction.findOne({
-        where: { id },
+        where,
         paranoid: false
       });
     })
@@ -118,8 +124,8 @@ export function expenseid(req, res, next, expenseid) {
     NotFoundInGroup = `in group ${req.params.groupid}`;
   }
   parseId(expenseid)
-    .then(id => Expense.findOne({
-      where: Object.assign({}, { id }, queryInGroup),
+    .then(where => Expense.findOne({
+      where: Object.assign({}, where, queryInGroup),
       include: [
         { model: models.Group },
         { model: models.User }
