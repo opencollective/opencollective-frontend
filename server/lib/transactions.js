@@ -37,15 +37,17 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
   // We assume that all expenses are in Group currency
   // (otherwise, ledger breaks with a triple currency conversion)
 
+  const amount = -1*(expense.amount + fees);
+
   return models.Transaction.create({
-    netAmountInGroupCurrency: -1* (expense.amount + fees),
-    amountInTxnCurrency: -expense.amount,
+    netAmountInGroupCurrency: amount,
+    amountInTxnCurrency: amount,
     paymentProcessorFeeInTxnCurrency: fees,
     txnCurrency,
     txnCurrencyFxRate: 1,
     ExpenseId: expense.id,
     type: expenseType,
-    amount: -expense.amount,
+    amount: amount,
     currency: expense.currency,
     description: expense.title,
     UserId,

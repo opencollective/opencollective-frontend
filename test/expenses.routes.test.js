@@ -648,13 +648,13 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('amountInTxnCurrency', -12000)
+                  expect(transaction).to.have.property('amountInTxnCurrency', -12378)
                   expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
                   expect(transaction).to.have.property('txnCurrency', expense.currency);
                   expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
-                  expect(transaction).to.have.property('amount', -expense.amount);
+                  expect(transaction).to.have.property('amount', -1*(expense.amount + transaction.paymentProcessorFeeInTxnCurrency));
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
