@@ -640,20 +640,25 @@ describe('expenses.routes.test.js', () => {
 
                     it('THEN creates a transaction paid activity', () =>
                       expectTransactionPaidActivity(group, member, transaction)
-                        .tap(activity => expect(activity.data.paymentResponse).to.deep.equal(payMock)));
+                        .tap(activity => expect(activity.data.paymentResponses).to.deep.equal({ 
+                          createPaymentResponse: payMock, 
+                          executePaymentResponse: executePaymentMock 
+                        })));
                   });
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
+                  expect(transaction).to.have.property('amountInTxnCurrency', -12000)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
+                  expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
+                  expect(transaction).to.have.property('txnCurrency', expense.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
-                  // TODO remove #postmigration, info redundant with joined tables?
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
-                  // end TODO remove #postmigration
                 }
 
                 function expectTransactionPaidActivity(group, user, transaction) {
@@ -778,19 +783,21 @@ describe('expenses.routes.test.js', () => {
 
                   it('THEN creates a transaction paid activity', () =>
                     expectTransactionPaidActivity(group, host, transaction)
-                      .tap(activity => expect(activity.data.paymentResponse).to.be.undefined));
+                      .tap(activity => expect(activity.data.paymentResponses).to.be.undefined));
                 });
 
                 function expectTransactionCreated(expense, transaction) {
+                  expect(transaction).to.have.property('amountInTxnCurrency', -3737)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 0)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -3737);
+                  expect(transaction).to.have.property('txnCurrency', expense.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
-                  // TODO remove #postmigration, info redundant with joined tables?
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
-                  // end TODO remove #postmigration
                 }
 
                 function expectTransactionPaidActivity(group, user, transaction) {
