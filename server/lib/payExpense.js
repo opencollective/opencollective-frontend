@@ -1,7 +1,7 @@
 import config from 'config';
 import uuid from 'node-uuid';
 import errors from './errors';
-import { pay, executePayment } from '../gateways/paypalAdaptive';
+import paypalAdaptive from '../gateways/paypalAdaptive';
 
 const services = {
   paypal: (group, expense, email, preapprovalKey) => {
@@ -33,9 +33,9 @@ const services = {
       }
     };
 
-    return pay(payload)
+    return paypalAdaptive.pay(payload)
     .tap(payResponse => createPaymentResponse = payResponse)
-    .then(payResponse => executePayment(payResponse.payKey))
+    .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
     .then(executePaymentResponse => {
       return { createPaymentResponse, executePaymentResponse}
     });

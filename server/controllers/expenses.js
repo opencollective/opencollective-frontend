@@ -5,7 +5,7 @@ import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
 import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import {createFromPaidExpense as createTransaction} from '../lib/transactions';
-import { getPreapprovalDetails } from '../gateways/paypalAdaptive';
+import paypalAdaptive from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
 import sequelize from 'sequelize';
@@ -162,7 +162,7 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponses, preapprovalDetails;
+  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse;
 
   assertExpenseStatus(expense, status.APPROVED)
     // check that a group's balance is greater than the expense
@@ -175,9 +175,9 @@ export const pay = (req, res, next) => {
     .tap(e => email = e)
     .then(() => isManual ? null : pay())
     .tap(r => paymentResponses = r)
-    .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
-    .tap(d => preapprovalDetails = d)
-    .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetails, expense.UserId))
+    .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
+    .tap(d => preapprovalDetailsResponse = d)
+    .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponses)));
@@ -249,19 +249,10 @@ function createActivity(expense, type) {
   });
 }
 
-function formatError(err, paypalResponse) {
-  if (paypalResponse) {
-    console.error('PayPal error', JSON.stringify(err));
-    if (paypalResponse.error instanceof Array) {
-      const { message } = paypalResponse.error[0];
-      return new errors.BadRequest(message);
-    }
+function formatError(err) {
+  if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
+    return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
   } else {
-    if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
-      return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
-    } else {
-      return new errors.BadRequest(err.message)
-    }
+    return new errors.BadRequest(err.message)
   }
-  return err;
 }

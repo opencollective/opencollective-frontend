@@ -6,12 +6,16 @@ import errors from '../lib/errors';
 const expenseType = type.EXPENSE;
 
 export function createFromPaidExpense(paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
-  let createPaymentResponse, executePaymentResponse;
+  let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
 
   if (paymentResponses) {
 
     createPaymentResponse = paymentResponses.createPaymentResponse;
     executePaymentResponse = paymentResponses.executePaymentResponse;
+
+    senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
+    txnCurrency = senderFees.code;
+    fees = senderFees.amount*100 // paypal sends this in float
 
     switch (executePaymentResponse.paymentExecStatus) {
       case 'COMPLETED':
@@ -30,11 +34,8 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
     }
   }
 
-  const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-
-  const txnCurrency = senderFees.code;
-  const fees = senderFees.amount*100 // paypal sends this in float
-
+  // We assume that all expenses are in Group currency
+  // (otherwise, ledger breaks with a triple currency conversion)
 
   return models.Transaction.create({
     netAmountInGroupCurrency: -1* (expense.amount + fees),

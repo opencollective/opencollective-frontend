@@ -3,7 +3,7 @@ import config from 'config';
 import moment from 'moment';
 import models from '../models';
 import errors from '../lib/errors';
-import { getPreapprovalDetails, getPreapproval } from '../gateways/paypalAdaptive';
+import paypalAdaptive from '../gateways/paypalAdaptive';
 
 const {
   Activity,
@@ -16,13 +16,14 @@ const {
 export const getDetails = function(req, res, next) {
   const preapprovalKey = req.params.preapprovalkey;
 
-  return getPreapprovalDetails(preapprovalKey)
+  return paypalAdaptive.preapprovalDetails(preapprovalKey)
     .then(paypalResponse => res.json(paypalResponse))
     .catch(next);
 };
 
 /**
  * Get a preapproval key for a user.
+ * TODO: remove async and simplify with promises #promisify
  */
 export const getPreapprovalKey = function(req, res, next) {
   // TODO: This return and cancel URL doesn't work - no routes right now.
@@ -55,11 +56,11 @@ export const getPreapprovalKey = function(req, res, next) {
             .catch(cbEach);
         }
 
-        getPreapprovalDetails(paymentMethod.token)
+        paypalAdaptive.preapprovalDetails(paymentMethod.token)
         .then(response => {
           if (response.approved === 'false' || new Date(response.endingDate) < new Date()) {
             paymentMethod.destroy()
-              .then(cbEach)
+              .then(() => cbEach())
               .catch(cbEach)
             }
         })
@@ -95,7 +96,7 @@ export const getPreapprovalKey = function(req, res, next) {
     }],
 
     callPaypal: ['createPayload', function(cb, results) {
-      getPreapproval(results.createPayload)
+      paypalAdaptive.preapproval(results.createPayload)
       .then(response => cb(null, response))
       .catch(cb)
     }],
@@ -117,6 +118,7 @@ export const getPreapprovalKey = function(req, res, next) {
 
 /**
  * Confirm a preapproval.
+ * TODO: remove async and simplify with promises #promisify
  */
 export const confirmPreapproval = function(req, res, next) {
 
@@ -144,11 +146,12 @@ export const confirmPreapproval = function(req, res, next) {
     }],
 
     callPaypal: [function(cb) {
-      getPreapprovalDetails(req.params.preapprovalkey)
+      paypalAdaptive.preapprovalDetails(req.params.preapprovalkey)
       .then(response => { 
         if (response.approved === 'false') {
           return cb(new errors.BadRequest('This preapprovalkey is not approved yet.'));
         }
+        cb(null, response);
       })
       .catch(cb)
     }],
