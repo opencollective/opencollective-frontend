@@ -30,6 +30,7 @@ describe('transaction model', () => {
     .then(transaction => {
       expect(transaction.info.isExpense).to.be.true;
       expect(transaction.info.isDonation).to.be.false;
+      expect(transaction.info.uuid).to.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
       done();
     })
     .catch(done);

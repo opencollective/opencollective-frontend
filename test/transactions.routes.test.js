@@ -189,6 +189,29 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
           expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
+          expect(transactionDetails.user).to.not.have.property('email');
+          expect(transactionDetails.user).to.not.have.property('paypalEmail');
+          expect(transactionDetails.host).to.not.have.property('email');
+          done();
+        });
+    });
+
+    it('get the transaction details by uuid', (done) => {
+      request(app)
+        .get(`/transactions/${transaction.uuid}?api_key=${application.api_key}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          const transactionDetails = res.body;
+          expect(transactionDetails).to.have.property('host');
+          expect(transactionDetails.user).to.not.have.property('email');
+          expect(transactionDetails.user).to.not.have.property('paypalEmail');
+          expect(transactionDetails.host).to.not.have.property('email');
+          expect(transactionDetails.description).to.equal(transaction.description);
+          expect(transactionDetails.host.username).to.equal(user.username);
+          expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
+          expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
+          expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
           done();
         });
     });

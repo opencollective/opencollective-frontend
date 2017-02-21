@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import activities from '../constants/activities';
+import uuid from 'uuid';
 
 /*
  * Transaction model
@@ -33,6 +34,8 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
+
+    uuid: DataTypes.STRING,
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
     // txnCurrencyFxRate = amount/amountInTxnCurrency
@@ -72,6 +75,7 @@ export default (Sequelize, DataTypes) => {
       info() {
         return {
           id: this.id,
+          uuid: this.uuid,
           type: this.type,
           description: this.description,
           amount: this.amount,
@@ -172,6 +176,10 @@ export default (Sequelize, DataTypes) => {
     },
 
     hooks: {
+      beforeCreate: (transaction) => {
+        transaction.uuid = uuid.v4();
+      },
+
       afterCreate: (transaction) => {
         Transaction.createActivity(transaction); // intentionally no return statement, needs to be async
       }
