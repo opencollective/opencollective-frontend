@@ -10,11 +10,13 @@ import schemaString from './graphql/schemas';
 
 import './index.css';
 
-let API_URL, API_KEY;
+let API_URL = process.env.REACT_APP_API_URL, API_KEY;
 switch (process.env.NODE_ENV) {
   case 'production':
+    API_URL = API_URL || `https://opencollective.com/api`;
+    break;
   case 'staging':
-    API_URL = '/api';
+    API_URL = API_URL || `https://staging.opencollective.com/api`;
     break;
   default:
     API_URL = 'http://localhost:3060';
