@@ -183,7 +183,7 @@ export const pay = (req, res, next) => {
     .catch(err => next(formatError(err, paymentResponses)));
 
   function checkIfEnoughFundsInGroup(expense, balance) {
-    const estimatedFees = isManual ? 0 : expense.amount*.029 + 31; // 2.9% + 30 is a typical fee. Adding 1 cent for rounding
+    const estimatedFees = isManual ? 0 : Math.ceil(expense.amount*.029 + 30); // 2.9% + 30 is a typical fee.
 
     if (balance >= (expense.amount + estimatedFees)) { 
       return Promise.resolve();
