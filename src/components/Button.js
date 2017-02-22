@@ -11,9 +11,9 @@ const styles = {
     background: 'transparent',
     fontFamily: 'montserratlight',
     fontWeight: 'bold',
-    fontSize: '17px',
+    fontSize: '1.7rem',
     padding: '0',
-    height: '60px',
+    height: '6rem',
     border: '1px solid transparent',
     textTransform: 'uppercase',
     color: colors.darkgray,
@@ -30,8 +30,8 @@ const styles = {
       borderColor: colors.lightgray
     },
     '& img': {
-      height: '16px',
-      margin: '0 5px'
+      height: '1.6rem',
+      margin: '0 0.5rem'
     },
     '& .label': {
       padding: '0px',
@@ -51,7 +51,7 @@ const styles = {
       width: '100%',
       height: '100%',
       textAlign: 'center',
-      lineHeight: '54px'
+      lineHeight: '5.4rem'
     },
     '&.green': {
       color: 'white',
@@ -63,8 +63,8 @@ const styles = {
       background: colors.disabled
     },
     '&[type=submit]': {
-      height: '40px',
-      borderRadius: '20px'
+      height: '4rem',
+      borderRadius: '2rem'
     }
   })
 };

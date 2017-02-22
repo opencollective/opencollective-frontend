@@ -18,15 +18,15 @@ const styles = {
       color: colors.darkgray,
       textTransform: 'uppercase',
       fontWeight: 'bold',
-      fontSize: '17px'
+      fontSize: '1.7rem'
     },
     '& .btn': {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      width: '30px',
+      width: '3rem',
       height: '100%',
-      fontSize: '17px',
+      fontSize: '1.7rem',
       cursor: 'pointer'
     }
   })

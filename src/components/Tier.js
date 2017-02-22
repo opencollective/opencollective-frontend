@@ -11,34 +11,39 @@ const styles = {
   tier: css({
     width: '100%',
     maxWidth: '400px',
+    minHeight: '12rem',
+    position: 'relative',
     border: `1px solid ${colors.lightgray}`,
-    margin: '10px auto',
+    margin: '1rem auto',
     color: colors.black
   }),
   header: css({
-    margin: '10px',
+    margin: '1rem',
     display: 'flex',
     justifyContent: 'space-between'
   }),
   title: css({
-    fontSize: '14px'
+    fontSize: '1.4rem'
   }),
   description: css({
-    margin: '10px',
+    margin: '1rem',
     color: colors.darkgray,
-    fontSize: '12px'
+    fontSize: '1.2rem'
   }),
   actions: css({
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    height: '60px'
+    height: '6rem',
+    position: 'absolute',
+    bottom: '0',
+    width: '100%'
   }),
   btn: css({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: '12px',
+    fontSize: '1.2rem',
     fontWeight: 'bold',
     width: '100%',
     textTransform: 'uppercase',

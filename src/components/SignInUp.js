@@ -91,6 +91,7 @@ class SignInUp extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    this.state.user.email = this.state.user.email.trim().toLowerCase();
     this.props.onSubmit(this.state.user);
   }
 
