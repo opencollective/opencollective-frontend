@@ -35,13 +35,16 @@
     "react-script-loader": "^0.0.1",
     "react-scripts": "^0.8.4",
     "react-scrollchor": "^2.2.0",
+    "request": "^2.79.0",
     "serve": "^3.3.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node build/index.js",
+    "dev": "react-scripts start",
     "now-start": "cd build && serve -s",
+    "build": "react-scripts build && npm run build:server",
+    "build:server": "./node_modules/.bin/babel -D ./index.js -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
-    "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
