@@ -30,7 +30,7 @@
   display: flex;
   width: 100%;
   justify-content: center;
-  height: 60px;
+  height: 6rem;
 }
 
 .ActionBar .buttons button {

@@ -15,6 +15,7 @@ const styles = {
     position: 'relative',
     border: `1px solid ${colors.lightgray}`,
     margin: '1rem auto',
+    paddingBottom: '6rem',
     color: colors.black
   }),
   header: css({

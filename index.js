@@ -29,7 +29,6 @@ req
     .pipe(res);
 });
 
-console.log("static folder", path.join(__dirname, `static`));
 app.use('/static', express.static(path.join(__dirname, `static`), { maxAge: '1d' }));
 
 app.use('/favicon.*', (req, res) => {

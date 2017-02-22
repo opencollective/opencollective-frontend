@@ -252,7 +252,7 @@ class Event extends React.Component {
                 <div className="description">
                   <h1>Location</h1>
                   <div className="name">{Event.location}</div>
-                  <div className="address" style={{color: colors.darkgray}}>{Event.address}</div>
+                  <div className="address" style={{color: colors.darkgray}}><a href={`http://maps.apple.com/?q=${Event.lat},{Event.long}`} target="_blank">{Event.address}</a></div>
                 </div>
                 { Event.lat && Event.long &&
                   <div className="map">

@@ -5,7 +5,8 @@ class Map extends React.Component {
 
   static propTypes = {
     lat: React.PropTypes.number,
-    lng: React.PropTypes.number
+    lng: React.PropTypes.number,
+    address: React.PropTypes.string
   }
 
   onMapCreated(map) {
@@ -33,7 +34,7 @@ class Map extends React.Component {
             lng={lng}
             draggable={false} />
         </Gmaps>
-        <div className="map-overlay"></div>
+        <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${lng}`} target="_blank"></a>
       </div>
     );
   }
