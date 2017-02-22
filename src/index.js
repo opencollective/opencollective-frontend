@@ -26,7 +26,8 @@ if (process.env.NODE_ENV === 'test') {
   addMockFunctionsToSchema({ schema });
 }
 else {
-  const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}` })
+  const api_key_param = (REACT_APP_API_KEY) ? `api_key=${REACT_APP_API_KEY}` : '';
+  const networkInterface = createNetworkInterface({ uri: `${REACT_APP_API_URL}/graphql?${api_key_param}` })
   client = new ApolloClient({ networkInterface })
 }
 
