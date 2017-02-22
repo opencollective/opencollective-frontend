@@ -203,11 +203,13 @@ class Event extends React.Component {
 
           <NotificationBar status={this.state.status} error={this.state.error} />
 
-          <EventHeader
-            logo={Event.collective.logo}
-            title={Event.name}
-            backgroundImage={Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage}
-            />
+          {this.state.view === 'default' &&
+            <EventHeader
+              logo={Event.collective.logo}
+              title={Event.name}
+              backgroundImage={Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage}
+              />
+          }
 
           <ActionBar
             actions={this.state.actions}
