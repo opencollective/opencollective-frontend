@@ -1,6 +1,6 @@
 {
   "name": "opencollective-frontend",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "dependencies": {
     "apollo-client": "^0.5.6",
