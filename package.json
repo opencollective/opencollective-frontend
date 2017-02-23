@@ -117,7 +117,7 @@
     "hint": "eslint '**/*.js' --quiet",
     "nsp": "nsp check",
     "pretest": "npm run hint",
-    "test": "npm run test:unit",
+    "test": "npm run test:unit && npm run coverage",
     "test:unit": "nyc mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
     "test:e2e": "npm run test:e2e:exec api:run website:run website:testE2E app:run app:testE2E",
     "test:e2e:exec": "bash scripts/test_e2e.sh",
