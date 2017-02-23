@@ -14,7 +14,7 @@ dbdumps
 test-results.xml
 dist
 yarn.lock
-
+.nyc_output
 temp.js
 tempStripe.js
 
@@ -30,3 +30,4 @@ output/
 
 # JetBrains
 *.iml
+
