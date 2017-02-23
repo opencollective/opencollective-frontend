@@ -182,7 +182,8 @@ describe('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier1.id, 
             GroupId: group1.id, 
-            UserId: user2.id 
+            UserId: user2.id,
+            confirmedAt: new Date()
           })));
 
         beforeEach(() => models.Response.create(
@@ -190,7 +191,19 @@ describe('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier1.id, 
             GroupId: group1.id, 
-            UserId: user3.id 
+            UserId: user3.id,
+            confirmedAt: new Date()
+          })));
+
+        // this response shouldn't show up in the query
+        // because it's not confirmed
+        beforeEach(() => models.Response.create(
+          Object.assign(utils.data('response2'), { 
+            EventId: event1.id, 
+            TierId: tier1.id, 
+            GroupId: group1.id, 
+            UserId: user1.id,
+            confirmedAt: null
           })));
 
         beforeEach(() => models.Response.create(
@@ -198,7 +211,8 @@ describe('Query Tests', () => {
             EventId: event1.id, 
             TierId: tier2.id, 
             GroupId: group1.id, 
-            UserId: user3.id 
+            UserId: user3.id,
+            confirmedAt: new Date()
           })));
         
         it('when given only a collective slug', async () => {
@@ -289,7 +303,7 @@ describe('Query Tests', () => {
                       "availableQuantity": 98,
                       "responses": [
                         {
-                          "id": 3,
+                          "id": 4,
                           "status": "YES",
                           "description": null,
                           "user": {

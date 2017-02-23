@@ -30,7 +30,12 @@ describe('Mutation Tests', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    createPaymentStub = sandbox.stub(paymentsLib, 'createPayment', () => Promise.resolve());
+    createPaymentStub = sandbox.stub(paymentsLib, 'createPayment', 
+      () => {
+        // assumes payment goes through and marks Response as confirmedAt
+        return models.Response.findAll()
+        .map(response => response.update({ confirmedAt: new Date() }))
+      });
   });
 
   // Create a stub for clearbit
@@ -296,7 +301,7 @@ describe('Mutation Tests', () => {
 
       describe('for YES status', () => {
 
-        describe('in a free tier ', () => {
+        describe('in a free tier', () => {
 
           it('from an existing user', async () => {
             const query = `
