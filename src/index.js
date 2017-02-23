@@ -24,8 +24,6 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-console.log("Using API at ", API_URL);
-
 let client;
 if (process.env.NODE_ENV === 'test') {
   // Make a GraphQL schema with no resolvers

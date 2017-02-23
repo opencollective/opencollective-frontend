@@ -40,11 +40,14 @@ class Response extends React.Component {
     const { intl, response } = this.props;
     const { user, description, status } = response;
 
-    user.avatar = user.avatar || this.pickAvatar(user.name);
+    const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.email && user.email.substr(0, user.email.indexOf('@'));
+
+    if (!name) return (<div/>);
+
+    user.avatar = user.avatar || this.pickAvatar(name);
 
     const linkTo = `https://opencollective.com/${user.username}`;
-    console.log("Getting message for ", status, this.messages[status], this.messages);
-    const title = intl.formatMessage(this.messages[status], { name: user.name });
+    const title = intl.formatMessage(this.messages[status], { name });
 
     return (
       <a href={linkTo} title={title} >
@@ -52,7 +55,7 @@ class Response extends React.Component {
           { status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" /> }
           <img src={user.avatar} />
           <div className="bubble">
-            <div className="name">{user.name}</div>
+            <div className="name">{name}</div>
             <div className="description" style={{color: colors.darkgray}}>{description || user.description}</div>
           </div>
         </div>

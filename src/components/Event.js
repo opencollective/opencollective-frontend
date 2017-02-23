@@ -70,12 +70,20 @@ class Event extends React.Component {
   async setInterested(user) {
     if (user || this.user) {
       this.setState({ showInterestedForm: false });
+      const tokens = user.email.substr(0, user.email.indexOf('@')).split('.');
+      user.firstName = tokens[0] || '';
+      user.lastName = tokens[1] || '';
+      const response = {
+        status: 'INTERESTED',
+        user
+      };
       try {
-        await this.createResponse({
-          status: 'INTERESTED',
-          user
-        });
-        this.setState({ showInterestedForm: false });
+        await this.createResponse(response);
+        this.event.responses.push(response);
+        const actions = this.state.actions;
+        actions[0].className = 'selected';
+        actions[0].icon = 'star';
+        this.setState({ actions, showInterestedForm: false });
       } catch (e) {
         this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.`);
       }
