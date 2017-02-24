@@ -62,8 +62,7 @@ export const getPreapprovalKey = function(req, res, next) {
             paymentMethod.destroy()
               .then(() => cbEach())
               .catch(cbEach)
-            }
-          else {
+          } else {
             cbEach();
           }
         })
