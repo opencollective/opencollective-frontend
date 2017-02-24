@@ -24,6 +24,7 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
+  'onetime',
   'subscription.canceled',
   'ticket.confirmed',
   'thankyou',
