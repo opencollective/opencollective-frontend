@@ -63,6 +63,9 @@ export const getPreapprovalKey = function(req, res, next) {
               .then(() => cbEach())
               .catch(cbEach)
             }
+          else {
+            cbEach();
+          }
         })
         .catch(cbEach)
       }, cb);
