@@ -1,5 +1,4 @@
 import config from 'config';
-import Promise from 'bluebird';
 import uuid from 'node-uuid';
 import errors from './errors';
 import paypalAdaptive from '../gateways/paypalAdaptive';
@@ -9,12 +8,12 @@ const services = {
     const uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;
     const baseUrl = config.host.webapp + uri;
     const amount = expense.amount/100;
+    let createPaymentResponse;
     const payload = {
-      requestEnvelope: {
-        errorLanguage: 'en_US',
-        detailLevel: 'ReturnAll'
-      },
-      actionType: 'PAY',
+      // Note: if we change this to 'PAY', payment will complete in one step
+      // but we won't get any info on fees or conversion rates.
+      // By creating payment, we get that info in the first response.
+      actionType: 'CREATE',
       // TODO does PayPal accept all the currencies that we support in our expenses?
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
@@ -34,20 +33,11 @@ const services = {
       }
     };
 
-    return new Promise((resolve, reject) => {
-      console.log("PayPal payment payload: ", payload); // leave this in permanently to help with paypal debugging
-      paypalAdaptive.pay(payload, (err, res) => {
-        console.log("PayPal response: ", res);
-        console.log("PayPal response paymentInfoList", res.paymentInfoList);
-        if (err) {
-          console.log("PayPal payment error: ", err);
-          if (res.error && res.error[0] && res.error[0].parameter) {
-            console.log("PayPal error.parameter: ", res.error[0].parameter); // this'll give us more details on the error
-          }
-          return reject(new Error(res.error[0].message));
-        }
-        resolve(res);
-      });
+    return paypalAdaptive.pay(payload)
+    .tap(payResponse => createPaymentResponse = payResponse)
+    .then(payResponse => paypalAdaptive.executePayment(payResponse.payKey))
+    .then(executePaymentResponse => {
+      return { createPaymentResponse, executePaymentResponse}
     });
   }
 };
