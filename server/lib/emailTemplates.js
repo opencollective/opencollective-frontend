@@ -10,6 +10,8 @@ import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './util
 const templates = {};
 
 const templateNames = [
+  'announcement',
+  'announcement.text',
   'backer.monthlyreport',
   'backer.monthlyreport.text',
   'comment.approve',
@@ -24,7 +26,6 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
-  'onetime',
   'subscription.canceled',
   'ticket.confirmed',
   'thankyou',

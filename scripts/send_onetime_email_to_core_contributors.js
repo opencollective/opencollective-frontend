@@ -51,7 +51,7 @@ const init = () => {
       replacements: { groupIds, role: roles.MEMBER }
     }))
   .tap(coreContributorsOfActiveGroups => console.log(`Core contributors found: ${JSON.stringify(coreContributorsOfActiveGroups)}`))
-  .then(coreContributorsOfActiveGroups => sendEmail(coreContributorsOfActiveGroups, {}))
+  .then(sendEmail)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
     console.log(`Total run time: ${timeLapsed}s`);
@@ -59,7 +59,8 @@ const init = () => {
   });
 }
 
-const sendEmail = (recipients, data) => {
+const sendEmail = (recipients) => {
+  const data = {};
   if (recipients.length === 0) return;
   return Promise.map(recipients, recipient => {
     data.recipient = recipient;
@@ -67,7 +68,7 @@ const sendEmail = (recipients, data) => {
       debug("Skipping ", recipient.email);
       return Promise.resolve();
     }
-    return emailLib.send('onetime', recipient.email, data);
+    return emailLib.send('announcement', recipient.email, data);
   });
 }
 
