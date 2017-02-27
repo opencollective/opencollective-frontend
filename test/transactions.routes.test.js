@@ -7,7 +7,7 @@ import request from 'supertest';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-
+import { type } from '../server/constants/transactions';
 const application = utils.data('application');
 const publicGroupData = utils.data('group1');
 const transactionsData = utils.data('transactions1').transactions;
@@ -184,6 +184,7 @@ describe('transactions.routes.test.js', () => {
           expect(e).to.not.exist;
           const transactionDetails = res.body;
           expect(transactionDetails).to.have.property('host');
+          expect(transactionDetails.type).to.equal(type.DONATION);
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.username).to.equal(user.username);
           expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);

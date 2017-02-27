@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import activities from '../constants/activities';
+import { type } from '../constants/transactions';
 
 /*
  * Transaction model
@@ -64,6 +65,7 @@ export default (Sequelize, DataTypes) => {
       info() {
         return {
           id: this.id,
+          uuid: this.uuid,
           type: this.type,
           description: this.description,
           amount: this.amount,
@@ -106,6 +108,7 @@ export default (Sequelize, DataTypes) => {
         transaction.UserId = user && user.id;
         transaction.GroupId = group && group.id;
         transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
+        transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
 
         if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
           // populate netAmountInGroupCurrency for donations
