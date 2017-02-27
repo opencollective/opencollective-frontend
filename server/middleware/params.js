@@ -76,14 +76,16 @@ export function commentid(req, res, next, commentid) {
 }
 
 /**
- * transactionid
+ * transactionuuid
  */
-export function transactionid(req, res, next, transactionid) {
-  parseId(transactionid)
-    .then(where => Transaction.findOne({where}))
+export function transactionuuid(req, res, next, transactionuuid) {
+  if (!isUUID(transactionuuid))
+    return next(new errors.BadRequest("Must provide transaction uuid"));
+
+  Transaction.findOne({where: { uuid: transactionuuid }})
     .then((transaction) => {
       if (!transaction) {
-        return next(new errors.NotFound(`Transaction '${transactionid}' not found`));
+        return next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));
       } else {
         req.transaction = transaction;
         next();

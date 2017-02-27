@@ -73,7 +73,7 @@ export default (app) => {
    */
   app.param('userid', params.userid);
   app.param('groupid', params.groupid);
-  app.param('transactionid', params.transactionid);
+  app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
   app.param('commentid', params.commentid);
@@ -177,7 +177,7 @@ export default (app) => {
    * Transactions (financial).
    */
   app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
-  app.get('/transactions/:transactionid', transactions.getOne); // Get the transaction details
+  app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
 
   // TODO remove #postmigration, replaced by POST /groups/:groupid/expenses
   app.post('/groups/:groupid/transactions', required('transaction'), auth.canEditGroup, groups.createTransaction); // Create a transaction for a group.

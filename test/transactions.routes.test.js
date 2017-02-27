@@ -176,9 +176,20 @@ describe('transactions.routes.test.js', () => {
         });
     });
 
-    it('get the transaction details with host info', (done) => {
+    it('cannot get the transaction details by id', (done) => {
       request(app)
         .get(`/transactions/${transaction.id}?api_key=${application.api_key}`)
+        .expect(400)
+        .end((e, res) => {
+          console.log(">>> RES", res.body);
+          expect(res.body.error.message).to.equal("Must provide transaction uuid");
+          done();
+        })
+    });
+
+    it('get the transaction details with host info', (done) => {
+      request(app)
+        .get(`/transactions/${transaction.uuid}?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
