@@ -7,7 +7,6 @@ import request from 'supertest';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import { type } from '../server/constants/transactions';
 const application = utils.data('application');
 const publicGroupData = utils.data('group1');
 const transactionsData = utils.data('transactions1').transactions;
