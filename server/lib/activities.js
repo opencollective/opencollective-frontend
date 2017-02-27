@@ -223,16 +223,19 @@ export default {
       // Currently used for both new donation and expense
       case activities.GROUP_TRANSACTION_CREATED:
 
-        if (activity.data.transaction.isDonation) {
-          if (userTwitter) {
-            tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
-            tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
-            tweetThis = ` [${tweetLink}]`;
-          }
-          return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
-        } else if (activity.data.transaction.isExpense) {
-          return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${description}!`
+        switch (activity.data.transaction.type) {
+          case 'DONATION':
+            if (userTwitter) {
+              tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
+              tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
+              tweetThis = ` [${tweetLink}]`;
+            }
+            return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
+
+          case 'EXPENSE':
+            return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${description}!`
         }
+
         break;
 
       case activities.GROUP_EXPENSE_CREATED:

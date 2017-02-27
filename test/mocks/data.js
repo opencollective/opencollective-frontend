@@ -220,7 +220,6 @@ export default {
             "email":"john@doe.com"
             },
           "transaction": {
-            "isExpense": true,
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
@@ -241,7 +240,6 @@ export default {
             "email":"john@doe.com"
             },
           "transaction": {
-            "isExpense": true,
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
@@ -528,7 +526,6 @@ export default {
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
       "GroupId": 1,
-      "isExpense": false,
       "isDonation": true
     },
 

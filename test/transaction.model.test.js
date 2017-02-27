@@ -23,13 +23,12 @@ describe('transaction model', () => {
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
 
-  it('isExpense is true if the amount is negative', done => {
+  it('type is EXPENSE if the amount is negative', done => {
     Transaction.create({
       amount: -1000
     })
     .then(transaction => {
-      expect(transaction.info.isExpense).to.be.true;
-      expect(transaction.info.isDonation).to.be.false;
+      expect(transaction.info.type).to.equal('EXPENSE');
       done();
     })
     .catch(done);
@@ -47,13 +46,12 @@ describe('transaction model', () => {
     })
   });
 
-  it('isDonation is true when amount is > 0', done => {
+  it('type is DONATION when amount is > 0', done => {
     Transaction.create({
       amount: 10
     })
     .then(transaction => {
-      expect(transaction.info.isDonation).to.be.true;
-      expect(transaction.info.isExpense).to.be.false;
+      expect(transaction.info.type).to.equal('DONATION');
       done();
     })
     .catch(done);

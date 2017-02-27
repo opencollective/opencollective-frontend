@@ -60,14 +60,6 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
-      isDonation() {
-        return this.amount > 0;
-      },
-
-      isExpense() {
-        return this.amount < 0;
-      },
-
       // Info.
       info() {
         return {
@@ -79,8 +71,6 @@ export default (Sequelize, DataTypes) => {
           createdAt: this.createdAt,
           UserId: this.UserId,
           GroupId: this.GroupId,
-          isExpense: this.isExpense,
-          isDonation: this.isDonation,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
           paymentProcessorFee: this.paymentProcessorFee,
