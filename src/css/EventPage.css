@@ -57,7 +57,8 @@ a {
 }
 
 section {
-  margin: 60px 0px;
+  margin: 3rem 0px;
+  overflow: hidden;
 }
 
 h1 {

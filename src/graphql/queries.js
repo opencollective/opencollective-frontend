@@ -37,6 +37,7 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
       user {
         name,
         avatar,
+        username,
         twitterHandle,
         description
       },
