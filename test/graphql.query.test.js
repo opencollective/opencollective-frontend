@@ -109,10 +109,10 @@ describe('Query Tests', () => {
 
     describe('returns event(s)', () => {
 
-      it('when given an event slug and collectiveSlug', async () => {
+      it('when given an event slug and collectiveSlug (case insensitive)', async () => {
         const query = `
           query getOneEvent {
-            Event(collectiveSlug: "scouts", eventSlug:"jan-meetup") {
+            Event(collectiveSlug: "Scouts", eventSlug:"Jan-Meetup") {
               id,
               name,
               description
