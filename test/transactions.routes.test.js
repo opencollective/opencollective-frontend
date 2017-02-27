@@ -184,7 +184,7 @@ describe('transactions.routes.test.js', () => {
           expect(e).to.not.exist;
           const transactionDetails = res.body;
           expect(transactionDetails).to.have.property('host');
-          expect(transactionDetails.type).to.equal(type.DONATION);
+          expect(transactionDetails.type).to.equal(transaction.type);
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.username).to.equal(user.username);
           expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
