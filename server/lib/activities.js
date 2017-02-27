@@ -1,6 +1,7 @@
 import activities from '../constants/activities';
 import flatten from 'flat';
 import currencies from '../constants/currencies';
+import { type } from '../constants/transactions';
 
 export default {
 
@@ -92,7 +93,7 @@ export default {
 
       // Currently used for both new donation and expense
       case activities.GROUP_TRANSACTION_CREATED:
-        if (activity.data.transaction.isDonation) {
+        if (activity.data.transaction.type === type.DONATION) {
           return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
         }
         break;
@@ -224,7 +225,7 @@ export default {
       case activities.GROUP_TRANSACTION_CREATED:
 
         switch (activity.data.transaction.type) {
-          case 'DONATION':
+          case type.DONATION:
             if (userTwitter) {
               tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
               tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
@@ -232,7 +233,7 @@ export default {
             }
             return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
 
-          case 'EXPENSE':
+          case type.EXPENSE:
             return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${description}!`
         }
 
