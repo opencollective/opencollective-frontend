@@ -27,10 +27,10 @@ const queries = {
     },
     resolve(_, args) {
       return models.Event.findOne({
-        where: { slug: args.eventSlug },
+        where: { slug: args.eventSlug.toLowerCase() },
         include: [{
           model: models.Group,
-          where: { slug: args.collectiveSlug }
+          where: { slug: args.collectiveSlug.toLowerCase() }
         }]
       })
     }
@@ -49,7 +49,7 @@ const queries = {
       return models.Event.findAll({
         include: [{
           model: models.Group,
-          where: { slug: args.collectiveSlug }
+          where: { slug: args.collectiveSlug.toLowerCase() }
         }]
       })
     }
