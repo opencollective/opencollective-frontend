@@ -43,14 +43,14 @@ const init = () => {
   .tap(groups => console.log(`Active groups found: ${groups.length}`))
   .map(group => group.id)
   .then(groupIds => sequelize.query(`
-    SELECT u.email, u."firstName", u."lastName" from "UserGroups" ug
+    SELECT distinct(u.email), u."firstName", u."lastName" from "UserGroups" ug
     LEFT JOIN "Users" u on ug."UserId" = u.id
     where ug.role = :role and ug."GroupId" IN (:groupIds)
     `, {
       type: sequelize.QueryTypes.SELECT,
       replacements: { groupIds, role: roles.MEMBER }
     }))
-  .tap(coreContributorsOfActiveGroups => console.log(`Core contributors found: ${JSON.stringify(coreContributorsOfActiveGroups)}`))
+  .tap(coreContributorsOfActiveGroups => console.log(`Core contributors found: ${coreContributorsOfActiveGroups.length}`))
   .then(sendEmail)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
