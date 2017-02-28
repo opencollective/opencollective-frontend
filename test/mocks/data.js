@@ -200,7 +200,7 @@ export default {
             "email":"john@doe.com"
             },
           "transaction": {
-            "isDonation": true,
+            "type": "DONATION",
             "amount":1042,
             "currency": "USD"
             },
@@ -220,7 +220,7 @@ export default {
             "email":"john@doe.com"
             },
           "transaction": {
-            "isExpense": true,
+            "type": "EXPENSE",
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
@@ -241,7 +241,7 @@ export default {
             "email":"john@doe.com"
             },
           "transaction": {
-            "isExpense": true,
+            "type": "EXPENSE",
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
@@ -272,6 +272,7 @@ export default {
             "email":"jussi@kuohujoki.fi"
           },
           "transaction": {
+            "type": "DONATION",
             "amount": 1234,
             "currency": "EUR"
           },
@@ -516,7 +517,7 @@ export default {
   "emailData": {
     "transaction": {
       "id": 1,
-      "type": "payment",
+      "type": "DONATION",
       "description": "Donation to Scouts d'Arlon",
       "amount": 10.99,
       "vat": null,
@@ -527,9 +528,7 @@ export default {
       "link": null,
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
-      "GroupId": 1,
-      "isExpense": false,
-      "isDonation": true
+      "GroupId": 1
     },
 
     "user": {

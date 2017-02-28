@@ -3,8 +3,6 @@ import {type} from '../constants/transactions';
 import models from '../models';
 import errors from '../lib/errors';
 
-const expenseType = type.EXPENSE;
-
 export function createFromPaidExpense(paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
   let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
 
@@ -44,7 +42,7 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
     txnCurrency,
     txnCurrencyFxRate: 1,
     ExpenseId: expense.id,
-    type: expenseType,
+    type: type.EXPENSE,
     amount: -expense.amount,
     currency: expense.currency,
     description: expense.title,

@@ -23,18 +23,6 @@ describe('transaction model', () => {
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
 
-  it('isExpense is true if the amount is negative', done => {
-    Transaction.create({
-      amount: -1000
-    })
-    .then(transaction => {
-      expect(transaction.info.isExpense).to.be.true;
-      expect(transaction.info.isDonation).to.be.false;
-      done();
-    })
-    .catch(done);
-  });
-
   it('get the host', (done) => {
     Transaction.create({
       GroupId: group.id,
@@ -45,18 +33,6 @@ describe('transaction model', () => {
       expect(host.id).to.equal(user.id);
       done();
     })
-  });
-
-  it('isDonation is true when amount is > 0', done => {
-    Transaction.create({
-      amount: 10
-    })
-    .then(transaction => {
-      expect(transaction.info.isDonation).to.be.true;
-      expect(transaction.info.isExpense).to.be.false;
-      done();
-    })
-    .catch(done);
   });
 
   it('createFromPayload creates a new Transaction', done => {
