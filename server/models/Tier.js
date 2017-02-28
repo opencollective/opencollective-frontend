@@ -97,7 +97,8 @@ export default function(Sequelize, DataTypes) {
       availableQuantity() {
         return Sequelize.models.Response.sum('quantity', { 
             where: {
-              TierId: this.id
+              TierId: this.id,
+              confirmedAt: { $ne: null }
             }
           })
           .then(usedQuantity => {

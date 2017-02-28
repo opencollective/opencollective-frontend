@@ -17,8 +17,8 @@ describe('paypal.preapproval.routes.test.js', () => {
   let user2;
 
   beforeEach(() => {
-    const stub = sinon.stub(paypalAdaptive, 'preapproval');
-    stub.yields(null, paypalMock.adaptive.preapproval);
+    sinon.stub(paypalAdaptive, 'preapproval', 
+      () => Promise.resolve(paypalMock.adaptive.preapproval));
   });
 
   afterEach(() => {
@@ -99,8 +99,8 @@ describe('paypal.preapproval.routes.test.js', () => {
           endingDate: date.toString()
         });
 
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(null, mock);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+          () => Promise.resolve(mock));
       };
 
       it('should delete if the date is past', () => {
@@ -127,8 +127,8 @@ describe('paypal.preapproval.routes.test.js', () => {
         const mock = paypalMock.adaptive.preapprovalDetails.created;
         expect(mock.approved).to.be.equal('false');
 
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+          () => Promise.resolve(mock));
       };
 
       it('should delete if not approved yet', () => {
@@ -171,8 +171,8 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal COMPLETED', () => {
 
       beforeEach(() => {
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(null, paypalMock.adaptive.preapprovalDetails.completed);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails',
+          () => Promise.resolve(paypalMock.adaptive.preapprovalDetails.completed));
       });
 
       afterEach(() => {
@@ -232,8 +232,8 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal CREATED', () => {
 
       beforeEach(() => {
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(null, paypalMock.adaptive.preapprovalDetails.created);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+          () => Promise.resolve(paypalMock.adaptive.preapprovalDetails.created));
       });
 
       afterEach(() => {
@@ -253,9 +253,8 @@ describe('paypal.preapproval.routes.test.js', () => {
     describe('Details from Paypal ERROR', () => {
 
       beforeEach(() => {
-        const mock = paypalMock.adaptive.preapprovalDetails.error;
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(mock.error, mock);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails', 
+          () => Promise.reject(paypalMock.adaptive.preapprovalDetails.error));
       });
 
       afterEach(() => {
@@ -274,9 +273,8 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     describe('Preapproval details', () => {
       beforeEach(() => {
-        const mock = paypalMock.adaptive.preapprovalDetails.created;
-        const stub = sinon.stub(paypalAdaptive, 'preapprovalDetails');
-        stub.yields(mock.error, mock);
+        sinon.stub(paypalAdaptive, 'preapprovalDetails',
+          () => Promise.resolve(paypalMock.adaptive.preapprovalDetails.created));
       });
 
       afterEach(() => {

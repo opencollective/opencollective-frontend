@@ -11,7 +11,8 @@ import paypalAdaptive from '../server/gateways/paypalAdaptive';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 
-const payMock = paypalMock.adaptive.payCompleted;
+const payMock = paypalMock.adaptive.pay;
+const executePaymentMock = paypalMock.adaptive.executePayment;
 const preapprovalDetailsMock = Object.assign({}, paypalMock.adaptive.preapprovalDetails.completed);
 
 const application = utils.data('application');
@@ -531,8 +532,9 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach(() => {
               sinon
-                .stub(paypalAdaptive, 'preapprovalDetails')
-                .yields(null, preapprovalDetailsMock);
+                .stub(paypalAdaptive, 'preapprovalDetails',
+                  () => Promise.resolve(preapprovalDetailsMock));
+
               return request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
@@ -557,12 +559,16 @@ describe('expenses.routes.test.js', () => {
                 payReq = payReq.set('Authorization', `Bearer ${host.jwt()}`);
               });
 
-              let payStub;
+              let payStub, executePaymentStub;
 
               beforeEach(() => {
-                payStub = sinon.stub(paypalAdaptive, 'pay', (data, cb) => {
-                  return cb(null, payMock);
-                });
+                payStub = sinon.stub(paypalAdaptive, 'pay', 
+                  () => Promise.resolve(payMock));
+              });
+
+              beforeEach(() => {
+                executePaymentStub = sinon.stub(paypalAdaptive, 'executePayment',
+                  () => Promise.resolve(executePaymentMock));
               });
 
               beforeEach(() => {
@@ -570,6 +576,8 @@ describe('expenses.routes.test.js', () => {
               });
 
               afterEach(() => payStub.restore());
+
+              afterEach(() => executePaymentStub.restore());
 
               describe('WHEN group has insufficient funds', () => {
                 it('THEN returns 400', () => payReq.expect(400, {
@@ -581,6 +589,26 @@ describe('expenses.routes.test.js', () => {
                 }));
               });
 
+              describe('WHEN group has sufficient funds for expense but not for fees', () => {
+
+                // add just enough money that fees can't be paid
+                beforeEach('create a transaction', () => {
+                  return request(app)
+                    .post(`/groups/${group.id}/transactions`)
+                    .set('Authorization', `Bearer ${host.jwt()}`)
+                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
+                    .expect(200);
+                })
+
+                it('THEN returns 400', () => payReq.expect(400, {
+                  error: {
+                    code: 400,
+                    type: 'bad_request',
+                    message: 'Not enough funds in this collective to pay this request. Please add funds first.',
+                  }
+                }));
+              })
+
               describe('WHEN group has sufficient funds', () => {
                 
                 // add some money, so collective has some funds
@@ -588,7 +616,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
+                    .send({ api_key: application.api_key, transaction: {amount: 12500}})
                     .expect(200);
                 })
 
@@ -619,7 +647,9 @@ describe('expenses.routes.test.js', () => {
                     beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
                     beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
 
-                    it('THEN calls PayPal', () => expect(payStub.called).to.be.true);
+                    it('THEN calls PayPal pay', () => expect(payStub.called).to.be.true);
+
+                    it('THEN calls PayPal executePayment', () => expect(executePaymentStub.called).to.be.true);
 
                     it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
@@ -630,20 +660,25 @@ describe('expenses.routes.test.js', () => {
 
                     it('THEN creates a transaction paid activity', () =>
                       expectTransactionPaidActivity(group, member, transaction)
-                        .tap(activity => expect(activity.data.paymentResponse).to.deep.equal(payMock)));
+                        .tap(activity => expect(activity.data.paymentResponses).to.deep.equal({ 
+                          createPaymentResponse: payMock, 
+                          executePaymentResponse: executePaymentMock 
+                        })));
                   });
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('netAmountInGroupCurrency', -12000);
+                  expect(transaction).to.have.property('amountInTxnCurrency', -12000)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
+                  expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
+                  expect(transaction).to.have.property('txnCurrency', expense.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
-                  // TODO remove #postmigration, info redundant with joined tables?
-                  expect(transaction).to.have.property('amount', -expense.amount);
+                  expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
-                  // end TODO remove #postmigration
                 }
 
                 function expectTransactionPaidActivity(group, user, transaction) {
@@ -710,29 +745,34 @@ describe('expenses.routes.test.js', () => {
                 payReq = payReq.set('Authorization', `Bearer ${host.jwt()}`);
               });
 
-              let payStub;
+              let payStub, executePaymentStub;
 
               beforeEach(() => {
-                payStub = sinon.stub(paypalAdaptive, 'pay', (data, cb) => {
-                  return cb(null, payMock);
-                });
+                payStub = sinon.stub(paypalAdaptive, 'pay', 
+                  () => Promise.resolve(payMock));
+              });
+
+              beforeEach(() => {
+                executePaymentStub = sinon.stub(paypalAdaptive, 'executePayment',
+                  () => Promise.resolve(executePaymentMock));
               });
 
               afterEach(() => payStub.restore());
 
+              afterEach(() => executePaymentStub.restore());
 
               beforeEach(() => {
                 payReq = payReq.send();
               });
 
               describe('WHEN group has insufficient funds', () => {
-              it('THEN returns 400', () => payReq.expect(400, {
-                  error: {
-                    code: 400,
-                    type: 'bad_request',
-                    message: 'Not enough funds in this collective to pay this request. Please add funds first.',
-                  }
-                }));
+                it('THEN returns 400', () => payReq.expect(400, {
+                    error: {
+                      code: 400,
+                      type: 'bad_request',
+                      message: 'Not enough funds in this collective to pay this request. Please add funds first.',
+                    }
+                  }));
               });
 
               describe('WHEN group has sufficient funds', () => {
@@ -753,7 +793,9 @@ describe('expenses.routes.test.js', () => {
                   beforeEach(() => expectTwo(Expense).tap(e => expense = e));
                   beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
 
-                  it('THEN does not call PayPal', () => expect(payStub.called).to.be.false);
+                  it('THEN does not call PayPal pay', () => expect(payStub.called).to.be.false);
+
+                  it('THEN does not call PayPal executePayment', () => expect(executePaymentStub.called).to.be.false);
 
                   it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
@@ -761,19 +803,21 @@ describe('expenses.routes.test.js', () => {
 
                   it('THEN creates a transaction paid activity', () =>
                     expectTransactionPaidActivity(group, host, transaction)
-                      .tap(activity => expect(activity.data.paymentResponse).to.be.undefined));
+                      .tap(activity => expect(activity.data.paymentResponses).to.be.undefined));
                 });
 
                 function expectTransactionCreated(expense, transaction) {
+                  expect(transaction).to.have.property('amountInTxnCurrency', -3737)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 0)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -3737);
+                  expect(transaction).to.have.property('txnCurrency', expense.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
-                  // TODO remove #postmigration, info redundant with joined tables?
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('GroupId', expense.GroupId);
-                  // end TODO remove #postmigration
                 }
 
                 function expectTransactionPaidActivity(group, user, transaction) {

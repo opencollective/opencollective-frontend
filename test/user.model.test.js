@@ -139,6 +139,38 @@ describe('user.models.test.js', () => {
 
   });
 
+  describe('#getName', () => {
+    const userForNameTesting = {email: 'userforNameTesting@email.com' };
+
+    it('returns null when neither firstName or lastName', () => {
+      User.create(Object.assign({}, userForNameTesting))
+      .then(user => {
+        expect(user.name).to.equal(null);
+      })
+    });
+
+    it('returns firstName when only firstName is present and no lastName', () => {
+      User.create(Object.assign({}, userForNameTesting, { firstName: 'aditi' }))
+      .then(user => {
+        expect(user.name).to.equal('aditi');
+      })
+    });
+
+    it('returns lastName when no firstName and only lastName', () => {
+      User.create(Object.assign({}, userForNameTesting, { lastName: 'patel' }))
+      .then(user => {
+        expect(user.name).to.equal('patel');
+      })
+    });
+
+    it('returns full name when both firstName and lastName are present', () => {
+      User.create(Object.assign({}, userForNameTesting, { firstName: 'aditi', lastName: 'patel' }))
+      .then(user => {
+        expect(user.name).to.equal('aditi patel');
+      })
+    }); 
+  })
+
   describe('class methods', () => {
 
     const users = [ utils.data('user1'), utils.data('user2') ];

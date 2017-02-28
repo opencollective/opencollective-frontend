@@ -134,8 +134,10 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const from = options.from || config.email.from;
       const bcc = options.bcc;
       const text = options.text;
+      const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
-      mailgun.sendMail({ from, to, bcc, subject, text, html }, (err, info) => {
+
+      mailgun.sendMail({ from, to, bcc, subject, text, html, headers }, (err, info) => {
         if (err) {
           return reject(err);
         } else {
@@ -237,6 +239,7 @@ const generateEmailFromTemplateAndSend = (template, recipient, data, options = {
     .then(renderedTemplate => {
       const attributes = getTemplateAttributes(renderedTemplate.html);
       options.text = renderedTemplate.text;
+      options.tag = template;
       return emailLib.sendMessage(recipient, attributes.subject, attributes.body, options)
     });
 };
