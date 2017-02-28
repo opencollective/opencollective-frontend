@@ -51,26 +51,22 @@ describe('lib/email', () => {
 
 
   it('sends the thankyou.fr email template', () => {
-    const paymentData = {
-      amount: 5000,
-      currency: 'EUR'
-     };
+
+    const template = 'thankyou';
 
     const data = {
-      donation: paymentData,
+      donation: { amount: 5000, currency: 'EUR'},
       interval: 'month',
       user: emailData.user,
-      group: {
-        name: "La Primaire",
-        slug: "laprimaire"
-      },
+      group: { name: "La Primaire", slug: "laprimaire" },
       config
     };
 
-    return emailLib.send('thankyou', data.user.email, data)
+    return emailLib.send(template, data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain('Merci pour votre donation de €50/mois à La Primaire');
+        expect(nm.sendMail.lastCall.args[0].headers['o:tag']).to.equal(template);
       });
   });
 
