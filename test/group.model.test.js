@@ -92,7 +92,7 @@ describe('Group model', () => {
     .then(() => Transaction.createMany(transactions, { GroupId: group.id })));
 
   it('returns a default logo if no logo', () => {
-    expect(group.logo).to.contain('/static/images/1px.png');
+    expect(group.logo).to.contain('/public/images/1px.png');
   });
 
   it('computes the balance ', () =>
