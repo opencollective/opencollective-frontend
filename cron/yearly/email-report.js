@@ -93,7 +93,7 @@ const processUser = (user) => {
         name: row.name || row.slug,
         mission: row.mission,
         logo: row.logo,
-        backgroundImage: row.backgroundImage || 'https://opencollective.com/static/images/collectives/default-header-bg.jpg',
+        backgroundImage: row.backgroundImage || 'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
         twitterHandle: row.twitterHandle,
         settings: row.settings,
         data: row.data,

@@ -14,8 +14,8 @@ import {getTier, isBackerActive, capitalize, pluralize } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 
-const DEFAULT_LOGO = '/static/images/1px.png';
-const DEFAULT_BACKGROUND_IMG = '/static/images/collectives/default-header-bg.jpg';
+const DEFAULT_LOGO = '/public/images/1px.png';
+const DEFAULT_BACKGROUND_IMG = '/public/images/collectives/default-header-bg.jpg';
 
 const getDefaultSettings = (group) => {
   return {
@@ -289,7 +289,7 @@ export default function(Sequelize, DataTypes) {
             });
             users.map(user => {
               user.tier = getTier(user, tiers);
-              user.avatar = user.avatar || `/static/images/users/avatar-02.svg`;
+              user.avatar = user.avatar || `/public/images/users/avatar-02.svg`;
               if (tierIndex[user.tier] === undefined) {
                 tierIndex[user.tier] = tiers.length;
                 tiers.push({ name: user.tier, title: capitalize(pluralize(user.tier)), users: [], range: [0, Infinity] });

@@ -375,7 +375,7 @@ export default (Sequelize, DataTypes) => {
         })
         .then(() => this.avatar || userLib.fetchAvatar(this.email))
         .then(avatar => {
-          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
+          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(knox.bucket) === -1) {
             return Promise.promisify(imageUrlToAmazonUrl)(knox, avatar)
               .then((aws_src, error) => {
                 this.avatar = error ? this.avatar : aws_src;
