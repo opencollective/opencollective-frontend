@@ -145,7 +145,8 @@
     "cron:daily": "PG_MAX_CONNECTIONS=1 babel-node cron/daily/update-contributions.js",
     "cron:weekly": "PG_MAX_CONNECTIONS=1 babel-node cron/weekly/slack-report.js",
     "cron:monthly": "PG_MAX_CONNECTIONS=1 babel-node cron/monthly/email-report.js && babel-node cron/monthly/slack-report.js",
-    "cron:yearly": "PG_MAX_CONNECTIONS=1 babel-node cron/yearly/email-report.js"
+    "cron:yearly": "PG_MAX_CONNECTIONS=1 babel-node cron/yearly/email-report.js",
+    "compile:email": "babel-node scripts/compile-email.js"
   },
   "license": "MIT",
   "repository": {

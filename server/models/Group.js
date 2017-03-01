@@ -15,7 +15,7 @@ import activities from '../constants/activities';
 import Promise from 'bluebird';
 
 const DEFAULT_LOGO = '/public/images/1px.png';
-const DEFAULT_BACKGROUND_IMG = '/public/images/collectives/default-header-bg.jpg';
+const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 
 const getDefaultSettings = (group) => {
   return {
