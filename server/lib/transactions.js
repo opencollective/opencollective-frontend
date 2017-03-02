@@ -3,11 +3,19 @@ import {type} from '../constants/transactions';
 import models from '../models';
 import errors from '../lib/errors';
 
-const expenseType = type.EXPENSE;
+export function createFromPaidExpense(paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
+  let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
 
-export function createFromPaidExpense(paymentMethod, expense, paymentResponse, preapprovalDetails, UserId) {
-  if (paymentResponse) {
-    switch (paymentResponse.paymentExecStatus) {
+  if (paymentResponses) {
+
+    createPaymentResponse = paymentResponses.createPaymentResponse;
+    executePaymentResponse = paymentResponses.executePaymentResponse;
+
+    senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
+    txnCurrency = senderFees.code;
+    fees = senderFees.amount*100 // paypal sends this in float
+
+    switch (executePaymentResponse.paymentExecStatus) {
       case 'COMPLETED':
         break;
 
@@ -17,18 +25,24 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponse, p
          * it creates a payKey that we can use to redirect the user to PayPal.com to manually approve that payment
          * TODO We should handle that case on the frontend
          */
-        throw new errors.BadRequest(`Please approve this payment manually on ${paymentResponse.paymentApprovalUrl}`);
+        throw new errors.BadRequest(`Please approve this payment manually on ${createPaymentResponse.paymentApprovalUrl}`);
 
       default:
         throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}`);
     }
   }
 
+  // We assume that all expenses are in Group currency
+  // (otherwise, ledger breaks with a triple currency conversion)
+
   return models.Transaction.create({
-    // TODO expense currency might be different from group currency, how to convert?
-    netAmountInGroupCurrency: -expense.amount,
+    netAmountInGroupCurrency: -1*(expense.amount + fees),
+    amountInTxnCurrency: -expense.amount,
+    paymentProcessorFeeInTxnCurrency: fees,
+    txnCurrency,
+    txnCurrencyFxRate: 1,
     ExpenseId: expense.id,
-    type: expenseType,
+    type: type.EXPENSE,
     amount: -expense.amount,
     currency: expense.currency,
     description: expense.title,
@@ -36,10 +50,10 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponse, p
     GroupId: expense.GroupId,
   })
   .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
-  .then(t => createPaidExpenseActivity(t, paymentResponse, preapprovalDetails));
+  .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
 
-function createPaidExpenseActivity(transaction, paymentResponse, preapprovalDetails) {
+function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {
   const payload = {
     type: constants.activities.GROUP_EXPENSE_PAID,
     UserId: transaction.UserId,
@@ -49,8 +63,8 @@ function createPaidExpenseActivity(transaction, paymentResponse, preapprovalDeta
       transaction: transaction.info
     }
   };
-  if (paymentResponse) {
-    payload.data.paymentResponse = paymentResponse;
+  if (paymentResponses) {
+    payload.data.paymentResponses = paymentResponses;
   }
   if (preapprovalDetails) {
     payload.data.preapprovalDetails = preapprovalDetails;

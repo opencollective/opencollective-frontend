@@ -2,6 +2,7 @@ import async from 'async';
 import config from 'config';
 import Sequelize from 'sequelize';
 import { setupModels } from '../models';
+import { type } from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from '../lib/email';
 import errors from '../lib/errors';
@@ -149,6 +150,7 @@ export const resetTestDatabase = function(req, res, next) {
       })
       .then(donation => models.Transaction.create({
         amount: 100,
+        type: type.DONATION,
         currency: "EUR",
         UserId: results.createBacker.id,
         DonationId: donation.id
@@ -168,6 +170,7 @@ export const resetTestDatabase = function(req, res, next) {
       })
       .then(donation => models.Transaction.create({
         amount: 200,
+        type: type.DONATION,
         currency: "EUR",
         UserId: results.createBacker2.id,
         DonationId: donation.id

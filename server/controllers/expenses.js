@@ -5,14 +5,12 @@ import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
 import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import {createFromPaidExpense as createTransaction} from '../lib/transactions';
-import {getPreapprovalDetails as gpd} from './paypal';
+import paypalAdaptive from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
 import sequelize from 'sequelize';
 import models from '../models';
 import * as auth from '../middleware/security/auth';
-
-const getPreapprovalDetails = Promise.promisify(gpd);
 
 /**
  * Create an expense.
@@ -164,7 +162,7 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponse, preapprovalDetails;
+  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse;
 
   assertExpenseStatus(expense, status.APPROVED)
     // check that a group's balance is greater than the expense
@@ -176,16 +174,18 @@ export const pay = (req, res, next) => {
     .then(getBeneficiaryEmail)
     .tap(e => email = e)
     .then(() => isManual ? null : pay())
-    .tap(r => paymentResponse = r)
-    .then(() => isManual ? null : getPreapprovalDetails(paymentMethod.token))
-    .tap(d => preapprovalDetails = d)
-    .then(() => createTransaction(paymentMethod, expense, paymentResponse, preapprovalDetails, expense.UserId))
+    .tap(r => paymentResponses = r)
+    .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
+    .tap(d => preapprovalDetailsResponse = d)
+    .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
-    .catch(err => next(formatError(err, paymentResponse)));
+    .catch(err => next(formatError(err, paymentResponses)));
 
   function checkIfEnoughFundsInGroup(expense, balance) {
-    if (balance >= expense.amount) {
+    const estimatedFees = isManual ? 0 : Math.ceil(expense.amount*.029 + 30); // 2.9% + 30 is a typical fee.
+
+    if (balance >= (expense.amount + estimatedFees)) { 
       return Promise.resolve();
     } else {
       return Promise.reject(new errors.BadRequest(`Not enough funds in this collective to pay this request. Please add funds first.`));
@@ -251,19 +251,10 @@ function createActivity(expense, type) {
   });
 }
 
-function formatError(err, paypalResponse) {
-  if (paypalResponse) {
-    console.error('PayPal error', JSON.stringify(paypalResponse));
-    if (paypalResponse.error instanceof Array) {
-      const { message } = paypalResponse.error[0];
-      return new errors.BadRequest(message);
-    }
+function formatError(err) {
+  if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
+    return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
   } else {
-    if (err.message.indexOf('The total amount of all payments exceeds the maximum total amount for all payments') !==-1) {
-      return new errors.BadRequest('Not enough funds in your existing Paypal preapproval. Please reapprove through https://app.opencollective.com.');
-    } else {
-      return new errors.BadRequest(err.message)
-    }
+    return new errors.BadRequest(err.message)
   }
-  return err;
 }

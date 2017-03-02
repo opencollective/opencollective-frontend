@@ -36,6 +36,21 @@ export default (Sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
 
+    name: {
+      type: DataTypes.VIRTUAL(DataTypes.STRING, ['firstName','lastName']),
+      get() {
+        const firstName = this.get('firstName');
+        const lastName = this.get('lastName');
+        if (firstName && lastName) {
+          return `${firstName} ${lastName}`;
+        } else if (firstName || lastName) {
+          return firstName || lastName;
+        } else {
+          return null;
+        }
+      }
+    },
+
     username: {
       type: DataTypes.STRING,
       unique: true,
@@ -170,10 +185,6 @@ export default (Sequelize, DataTypes) => {
     paranoid: true,
 
     getterMethods: {
-
-      name() {
-        return [this.firstName,this.lastName].join(' ').trim();
-      },
 
       // Info (private).
       info() {
@@ -364,7 +375,7 @@ export default (Sequelize, DataTypes) => {
         })
         .then(() => this.avatar || userLib.fetchAvatar(this.email))
         .then(avatar => {
-          if (avatar && avatar.indexOf('/static') !== 0 && avatar.indexOf(knox.bucket) === -1) {
+          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(knox.bucket) === -1) {
             return Promise.promisify(imageUrlToAmazonUrl)(knox, avatar)
               .then((aws_src, error) => {
                 this.avatar = error ? this.avatar : aws_src;

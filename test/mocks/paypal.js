@@ -9,11 +9,30 @@ export default {
       },
       "payKey": "AP-791807008W699005A",
       "paymentExecStatus": "CREATED",
+      "defaultFundingPlan": {
+        "fundingPlanId":"0",
+        "fundingAmount": {
+          "code":"EUR",
+          "amount":"15.56"
+        },
+        "backupFundingSource": {
+          "lastFourOfAccountNumber":"0035",
+          "type":"CREDITCARD"
+        },
+        "senderFees": {
+          "code":"USD",
+          "amount":"3.78"
+        },
+        "charge": [{
+          "charge":{"code":"USD","amount":"120.00"},
+          "fundingSource":{"type":"BALANCE"}
+        }]
+      },
       "httpStatusCode": 200,
       "paymentApprovalUrl": "https:\/\/www.sandbox.paypal.com\/cgi-bin\/webscr?cmd=_ap-payment&paykey=AP-791807008W699005A"
     },
 
-    "payCompleted": {
+    "executePayment": {
       "responseEnvelope": {
         "timestamp": "2015-07-12T15:52:32.827-07:00",
         "ack": "Success",
@@ -22,7 +41,7 @@ export default {
       },
       "payKey": "AP-8HL44700YF673952M",
       "paymentExecStatus": "COMPLETED",
-      "httpStatusCode": 200
+      "httpStatusCode":200,
     },
     "paymentDetails": {
 

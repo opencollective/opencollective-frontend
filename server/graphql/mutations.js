@@ -5,8 +5,11 @@ import responseStatus from '../constants/response_status';
 
 import {
   ResponseType,
-  ResponseInputType
 } from './types';
+
+import {
+  ResponseInputType
+} from './inputTypes';
 
 // import { hasRole } from '../middleware/security/auth';
 // import {HOST, MEMBER} from '../constants/roles';
@@ -21,14 +24,12 @@ const mutations = {
     },
     resolve(_, args) {
 
-      let tier, user, event;
+      let tier, user, event, responseModel, isPaidTier;
       const response = args.response;
       response.user.email = response.user.email.toLowerCase();
-      let queryPromise;
 
-      // if "Interested", no tier needed
-      if (response.status === responseStatus.INTERESTED) {
-        queryPromise = models.Event.findOne({
+      const recordInterested = () => {
+        return models.Event.findOne({
           where: {
             slug: response.event.slug
           },
@@ -45,9 +46,32 @@ const mutations = {
           }
           event = ev;
         })
-      } else {
-        // For all other statuses, need a tier
-        queryPromise = models.Tier.findOne({
+
+        // find or create user
+        .then(() => models.User.findOne({
+          where: {
+            $or: {
+              email: response.user.email,
+              paypalEmail: response.user.email
+            }
+          }
+        }))
+        .then(u => u || models.User.create(response.user))
+        .tap(u => user = u)
+
+        // create response
+        .then(() => models.Response.create({
+          UserId: user.id,
+          GroupId: event.Group.id,
+          EventId: event.id,
+          confirmedAt: new Date(),
+          status: response.status,
+          description: response.description
+        }));
+      }
+
+      const recordYes = () => {
+        return models.Tier.findOne({
           where: {
             id: response.tier.id,
           },
@@ -70,6 +94,7 @@ const mutations = {
           }
           tier = t;
           event = t.Event;
+          isPaidTier = tier.amount > 0;
         })
 
         // check for available quantity
@@ -78,62 +103,51 @@ const mutations = {
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
         // make sure if it's paid tier, we have a card attached
-        .then(() => {
+        .then(() => isPaidTier && !(response.user.card && response.user.card.token) ? 
+          Promise.reject(new Error(`This tier requires a payment method`)) : Promise.resolve())
+        
+        // find or create user
+        .then(() => models.User.findOne({
+          where: {
+            $or: {
+              email: response.user.email,
+              paypalEmail: response.user.email
+            }
+          }
+        }))
+        .then(u => u || models.User.create(response.user))
+        .tap(u => user = u)
+        
+        // create response
+        .then(() => models.Response.create({
+          UserId: user.id,
+          GroupId: event.Group.id,
+          EventId: event.id,
+          TierId: tier.id,
+          confirmedAt: isPaidTier ? null : new Date(),
+          quantity: response.quantity || 0,
+          status: response.status,
+          description: response.description
+        }))
+        .tap(rm => responseModel = rm)
+
+        // record payment, if needed
+        .then(responseModel => {
           if (tier.amount > 0) {
-            if (response.user.card && response.user.card.token) {
-              return Promise.resolve();
-            } else {
-              return Promise.reject(new Error(`This tier requires a payment method`));
-            }
-          }
-          return Promise.resolve();
-        })
-      }
-
-      return queryPromise
-
-      // find or create user
-      .then(() => models.User.findOne({
-        where: {
-          $or: {
-            email: response.user.email,
-            paypalEmail: response.user.email
-          }
-        }
-      }))
-      .then(u => u || models.User.create(response.user))
-      .tap(u => user = u)
-
-      // create response
-      .then(() => models.Response.create({
-        UserId: user.id,
-        GroupId: event.Group.id,
-        EventId: event.id,
-        TierId: tier && tier.id,
-        confirmedAt: response.confirmedAt,
-        quantity: response.quantity || 0,
-        status: response.status,
-        description: response.description
-      }))
-
-      // record payment, if needed
-      .then(responseModel => {
-
-        if (tier && tier.amount > 0 && response.status === responseStatus.YES) {
-          return createPayment({
-            user,
-            group: event.Group,
-            response: responseModel,
-            payment: {
-              token: response.user.card.token,
-              amount: tier.amount * responseModel.quantity,
-              currency: tier.currency,
-              description: `${event.name} - ${tier.name}`,
-            }
-          })
-          .then(() => responseModel);
-        } else {
-          if (response.status !== responseStatus.INTERESTED) {
+            // also sends out email 
+            return createPayment({
+              user,
+              group: event.Group,
+              response: responseModel,
+              payment: {
+                token: response.user.card.token,
+                amount: tier.amount * responseModel.quantity,
+                currency: tier.currency,
+                description: `${event.name} - ${tier.name}`,
+              }
+            })
+          } else {
+            // only send out email if no payment
             return emailLib.send(
               'ticket.confirmed',
               user.email,
@@ -142,13 +156,23 @@ const mutations = {
                 response: responseModel.info,
                 event: event.info,
                 tier: tier && tier.info
-              })
-             .then(() => Promise.resolve(responseModel));
-           } else {
-            return Promise.resolve(responseModel);
-           }
-        }
-      })
+              });
+          }
+        })
+        .then(() => Promise.resolve(responseModel))
+      }
+
+      switch (response.status) {
+        case responseStatus.INTERESTED:
+          return recordInterested();
+
+        case responseStatus.YES:
+          return recordYes();
+        
+        default:
+          throw new Error(`Unknown status ${response.status}`)
+      }
+
     }
   }
 }

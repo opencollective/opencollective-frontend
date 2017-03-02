@@ -10,6 +10,8 @@ import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './util
 const templates = {};
 
 const templateNames = [
+  'announcement',
+  'announcement.text',
   'backer.monthlyreport',
   'backer.monthlyreport.text',
   'comment.approve',
