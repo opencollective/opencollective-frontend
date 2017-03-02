@@ -41,7 +41,7 @@ export const getPreapprovalKey = function(req, res, next) {
     displayMaxTotalAmount: false,
     feesPayer: 'SENDER',
     maxAmountPerPayment: 2500.00, // PayPal claims this can go up to $10k without needing additional permissions from them.
-    maxTotalAmountOfAllPayments: 5000.00, // PayPal claims this isn't needed but Live errors out if we don't send it.
+    maxTotalAmountOfAllPayments: 2000.00, // PayPal claims this isn't needed but Live errors out if we don't send it.
     clientDetails: req.remoteUser.id
   };
 
