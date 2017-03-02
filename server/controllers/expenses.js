@@ -175,6 +175,8 @@ export const pay = (req, res, next) => {
     .tap(e => email = e)
     .then(() => isManual ? null : pay())
     .tap(r => paymentResponses = r)
+
+    // TODO: Remove preapprovalDetails call once the new paypal preapproval flow is solid
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
     .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
@@ -204,7 +206,9 @@ export const pay = (req, res, next) => {
     })
     .tap(paymentMethod => {
       if (!paymentMethod) {
-        throw new errors.BadRequest('This user has no confirmed paymentMethod linked with this service.');
+        throw new errors.BadRequest('No payment method found');
+      } else if (paymentMethod.endDate && (paymentMethod.endDate < new Date())) {
+        throw new errors.BadRequest('Payment method expired');
       }
     });
   }

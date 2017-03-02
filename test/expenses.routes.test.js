@@ -625,7 +625,7 @@ describe('expenses.routes.test.js', () => {
                     error: {
                       code: 400,
                       type: 'bad_request',
-                      message: 'This user has no confirmed paymentMethod linked with this service.',
+                      message: 'No payment method found',
                     }
                   }));
                 });

@@ -11,7 +11,7 @@ const { PaymentMethod } = models;
  */
 export default function getPaymentMethods(req, res, next) {
   const { filter } = req.query;
-  const query = _.extend({}, filter, { UserId: req.user.id });
+  const query = _.extend({}, filter, { UserId: req.user.id, confirmedAt: {$ne: null} });
 
   return PaymentMethod.findAll({ where: query })
   .then((response) => {

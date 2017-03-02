@@ -168,13 +168,17 @@ export default {
 
   "paymentMethod1": {
     "token": "PA-1B0110758V169653C",
-    "service": "paypal"
+    "service": "paypal",
+    "startDate": "2017-01-30T07:31:37.747Z",
+    "endDate": "2018-01-30T07:31:37.747Z",
+    "confirmedAt": "2017-01-30T07:31:37.747Z"
   },
 
   "paymentMethod2": {
     "token": "stripetoken123",
     "service": "stripe",
-    "customerId": "cus_123"
+    "customerId": "cus_123",
+    "confirmedAt": "2017-01-30T07:31:37.747Z"
   },
 
   "activities1": {
