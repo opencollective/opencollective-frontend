@@ -1,0 +1,175 @@
+<style>
+  .LeftSide, .RightSide {
+    float: left;
+    box-sizing: border-box;
+  }
+  .LeftSide { width: 64%;  }
+  .RightSide { width: 33%;  }
+  .Subscription {
+    height: 360px;
+    border-radius: 8px;
+    background-color: #fafcfd;
+    border: solid 1px #d5d7d9;
+    margin-bottom: 48px;
+  }
+  .Subscription:last-child {
+    margin-bottom: 0; 
+  }
+  .Subscription .LeftSide {
+    padding: 32px;
+    padding-right: 0;
+  }
+  .Subscription .LeftSide .Statistics b {
+    clear: both;
+    display: block;
+    font-family: Helvetica;
+    font-size: 12px;
+    font-weight: bold;
+    color: #494b4d;
+    margin-bottom: 8px;
+  }
+  .Subscription .LeftSide h1 {
+    font-family: Helvetica;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.3;
+    color: #494b4d;
+    margin-bottom: 4px;
+  }
+  .Subscription .LeftSide .Links {
+    margin-bottom: 18px;
+  }
+  .Subscription .LeftSide .Links a {
+    font-family: Helvetica;
+    font-size: 10px;
+    color: #3a9fe8;
+  }
+  .Subscription .LeftSide .Links span {
+    font-size: 10px;
+  }
+  .Subscription .LeftSide p {
+    font-family: Helvetica;
+    font-size: 12px;
+    line-height: 1.67;
+    color: #6d7073;
+    margin-bottom: 24px;
+    max-width: 200px;
+  }
+  .Subscription .LeftSide .Statistics .Statistic {
+    height: 36px;
+    margin-bottom: 24px;
+  }
+  .Statistic .Amount, .Statistic .Change {
+    float: left;
+  }
+  .Statistic .Amount {
+    font-family: Helvetica, sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #46b0ed;
+    border-right: 1px solid #d5d7d9;
+    padding-right: 8px;
+    margin-right: 8px;
+  }
+  .Statistic .Change {
+    padding-top: 4px;
+  }
+  .Statistic .PositiveChange {
+    font-family: Helvetica;
+    font-size: 11px;
+    font-weight: bold;
+    color: #59b300;
+    margin-bottom: 2px;
+  }
+  .Statistic .NegativeChange {
+    font-family: Helvetica;
+    font-size: 11px;
+    font-weight: bold;
+    color: #d0021b;
+  }
+  .Subscriptions .ShowCasedCard {
+    width: 200px;
+    height: 270px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+    border: solid 1px rgba(0, 0, 0, 0.1);
+    margin-top: 24px;
+    overflow: hidden;
+  }
+  .Subscriptions .ShowCasedCard .Top {
+    width: 200px;
+    height: 120px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding-top: 21px;
+    box-sizing: border-box;
+  }
+  .Subscriptions .ShowCasedCard  .Top .Logo {
+    height: 68px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin: 0 auto;
+  }
+  .Subscriptions .ShowCasedCard .Bottom {
+    width: 200px;
+    height: 150px;
+    border-top: 3px solid #46b0ed;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+  .Subscriptions .ShowCasedCard .Bottom p {
+    font-family: Helvetica;
+    font-size: 12px;
+    line-height: 1.83;
+    color: #6d7073;
+  }
+</style>
+
+<div class='Subscription'>
+  <div class='LeftSide'>
+    <h1>{{group.name}}</h1>
+    <div class='Links'>
+      <a href='{{group.website}}'>Website</a>
+      <span>&nbsp;|&nbsp;</span>
+      <a href='//opencollective.com/{{group.slug}}?{{@root.utm}}'>OpenCollective Page</a>
+    </div>
+    <p>You’re contributing <b>{{{currency amount currency=currency}}}</b> per {{interval}} since {{{moment createdAt}}}</p>
+    <div class='Statistics'>
+      <b>Total Backers</b>
+      <div class='Statistic TotalBackers'>
+        <div class='Amount'>{{group.stats.backers.lastMonth}}</div>
+        <div class='Change'>
+          <div class='PositiveChange'>+&nbsp;{{group.stats.backers.new}}</div>
+          <div class='NegativeChange'>-&nbsp;{{group.stats.backers.lost}}</div>
+        </div>
+      </div>
+      <b>Current Balance</b>
+      <div class='Statistic CurrentBalance'>
+        <div class='Amount'>{{{currency group.stats.balance currency=currency}}}</div>
+        <div class='Change'>
+          {{#if group.stats.totalDonations}}
+          <div class='PositiveChange'>+&nbsp;{{{currency group.stats.totalDonations currency=currency}}}</div>
+          {{/if}}
+          {{#if group.stats.totalExpenses}}
+          <div class='NegativeChange'>-&nbsp;{{{currency group.stats.totalExpenses currency=currency}}}</div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='RightSide'>
+    <a href='//opencollective.com/{{slug}}?{{@root.utm}}'>
+      <div class='ShowCasedCard'>
+        <div class='Top' style="background-image:url('{{resizeImage group.backgroundImage width=320 defaultImage="/static/images/collectives/default-header-bg.jpg"}}');{{#if group.settings.style.hero.cover.background}}background-color:{{group.settings.style.hero.cover.background}};{{/if}}">
+          <div class='Logo' style='background-image: url({{group.logo}})'></div>
+        </div>
+        <div class='Bottom'>
+          <p>{{group.mission}}</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>

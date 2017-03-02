@@ -339,8 +339,15 @@ export function pluralize(str, count) {
   return `${str}s`.replace(/s+$/,'s');
 }
 
-export function resizeImage(imageUrl, { width, height, query }) {
-  if (!imageUrl) return null;
+export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
+  if (!imageUrl) {
+    if (defaultImage) {
+      imageUrl = (defaultImage.substr(0,1) === '/') ? `${config.host.website}${defaultImage}` : defaultImage;
+    } else {
+      return null;
+    }
+  }
+
   if (imageUrl[0] === '/') imageUrl = `https://opencollective.com${imageUrl}`;
 
   let queryurl = '';

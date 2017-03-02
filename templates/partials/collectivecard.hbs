@@ -13,6 +13,7 @@
   margin: 0px 6px 8px 2px;
   overflow: hidden;
   text-decoration: none !important;
+  font-family: Helvetica, sans-serif;
 }
 .CollectiveCard-head {
   position: relative;
@@ -105,7 +106,7 @@
 <div class="CollectiveCard">
   <a href="https://opencollective.com/{{slug}}?{{@root.utm}}">
     <div>
-      <div class='CollectiveCard-head' style="background-image:url('{{resizeImage backgroundImage width=320}}');{{#if settings.style.hero.cover.background}}background-color:{{settings.style.hero.cover.background}};{{/if}}">
+      <div class='CollectiveCard-head' style="background-image:url('{{resizeImage backgroundImage width=320 defaultImage="/static/images/collectives/default-header-bg.jpg"}}');{{#if settings.style.hero.cover.background}}background-color:{{settings.style.hero.cover.background}};{{/if}}">
         <center><img src="{{resizeImage logo width=240}}" height="64" /></center>
       </div>
       <div class='CollectiveCard-body'>
@@ -113,10 +114,10 @@
         <div class='CollectiveCard-description'>{{mission}}</div>
       </div>
       {{#if totalDonations}}
-        <div class='SponsoredCard-footer'>
-          <div class='SponsoredCard-type'>{{tier}}</div>
-          <div class='SponsoredCard-amount'>{{{currency totalDonations currency=currency}}}</div>
-        </div>
+      <div class='SponsoredCard-footer'>
+        <div class='SponsoredCard-type'>{{tier}}</div>
+        <div class='SponsoredCard-amount'>{{{currency totalDonations currency=currency}}}</div>
+      </div>
       {{/if}}
       {{#if yearlyIncome}}
       <div class='CollectiveCard-footer'>

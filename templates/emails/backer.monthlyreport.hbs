@@ -1,37 +1,310 @@
-Subject: {{month}} Report
+Subject: {{{capitalize month}}} Report
 
-{{> header}}
+<style>
+  p {
+    font-family: Helvetica;
+    font-size: 14px;
+    line-height: 2;
+    color: #494b4d;
+  }
+  h1, h2, h3, h4, h5, h6, p { margin: 0; }
+  h1 {
+    font-family: Helvetica;
+    font-size: 24px;
+    font-weight: 600;
+    color: #494b4d;
+  }
+  h2 {
+    font-family: Helvetica;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.4;
+    color: #494b4d;
+  }
+  a {
+    color: #3a9fe8;
+    text-decoration: none;
+  }
+</style>
 
-<p>Hi {{recipient.firstName}}!</p>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  .MonthlyReport {
+    background-color: #eef2f5;
+    padding-bottom: 20px;
+    padding-top: 64px;
+    width: 100%;
+  }
+  .Wrapper {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .Wrapper > p {
+    margin-bottom: 60px;
+  }
+  .Wrapper > p, .Wrapper > a  {
+    font-family: Helvetica;
+    font-size: 10px;
+    line-height: 1.9;
+    text-align: center;
+    color: #919599;
+  }
+</style>
 
-<p>We are starting this new monthly email to keep you posted on the latest activities of the collectives that you are supporting.
-Let us know if you like this and don't hesitate if you have any feedback / ideas. Just reply to this email! :)
-</p>
+<style>
+  .Container {
+    width: 100%;
+    min-height: 200px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px 0 rgba(173, 176, 179, 0.6);
+    border-top: 8px solid #7fadf2;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+  .ContainerLogo {
+    display: block;
+    margin: 0 auto;
+    margin-top: -44px; /* (60-24) + 8border */
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 100%;
+    box-shadow: 0 1px 4px 0 rgba(173, 176, 179, 0.6);
+    background-image: url(https://opencollective.com/static/images/oc-logo-icon.svg);
+    background-repeat: no-repeat;
+    background-size: 48px;
+    background-position: center;
+  }
+  .ContainerLogoName {
+    width: 220px;
+    height: 32px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+    background-image: url(https://opencollective.com/static/images/emails/oc-logo-name.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin-top: 16px; /*opt*/
+  }
+</style>
 
-<h2>Active subscriptions</h2>
-<table>
-  {{#each subscriptions}}
-<tr><td>
-{{> collectivecard group}}
+<style>
+  .Section {
+    padding: 0 60px;
+  }
+  .Section.Intro {
+    padding-bottom: 68px;
+  }
+  .Section.Intro h2 {
+    margin-bottom: 12px;
+  }
+  .Section.Subscriptions {
+    border-top: 1px solid #d5d7d9;
+    padding-bottom: 48px;
+  }
+  .Section.Subscriptions > h1 {
+    margin-top: -14px;
+    background-color: white;
+    display: inline-block;
+    padding: 0 10px;
+    margin-left: -10px;
+  }
+  .Section.Subscriptions .Date {
+    text-transform: uppercase;
+    margin-top: 8px;
+    margin-bottom: 44px;
+    display: block;
+    height: 12px;
+    font-family: Helvetica;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: #aaaeb3;
+  }
+  .Section.Interest {
+    border-top: 1px solid #d5d7d9;
+    background-color: #fafcfd;
+    padding-top: 48px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .Section.Interest .Cards {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    height: 348px;
+    min-height: 300px;
+  }
+  .Section.Interest .Cards .CollectiveCard {
+    margin: 0 6px;
+    width: 180px !important;
+    height: auto;
+  }
+  .Section.Interest .Cards .CollectiveCard .CollectiveCard-head { height: 110px;  }
+  .Section.Interest .Cards .CollectiveCard .CollectiveCard-body { height: 164px;  }
+  .Section.Interest .Cards .CollectiveCard .CollectiveCard-name { margin-bottom: 16px;  }
+  .Section.Interest .CollectiveCard:last-child {
+    margin-right: 0 !important;
+  }
+  .Section.Interest .Cards.CardsCount-2  .CollectiveCard {
+    width: 230px !important;
+  }
+  .Section.Interest .Cards.CardsCount-2 .CollectiveCard:nth-child(2) {
+    float: right;
+  }
+  .Section.Interest .Cards.CardsCount-1 .CollectiveCard {
+      margin: 0 auto;
+      display: block;
+      width: 230px !important;
+  }
+  .Section.Interest .Cards.CardsCount-1 .CollectiveCard .Metric {
+    width: 50%;
+  }
+  .Section.Interest .Cards.CardsCount-1 .CollectiveCard {
+    width: 230px;
+    margin: 0 auto;
+    float: none;
+    margin-top: -4px;
+  }
+  .Section.Interest h3 {
+    font-family: Montserrat, Helvetica;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    color: #494b4d;
+  }
+  .Section.Notice {
+    background-color: #fafcfd;
+    padding-top: 48px;
+    padding-bottom: 68px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .Section.Notice p {
+    font-family: Helvetica;
+    font-size: 13px;
+    line-height: 1.46;
+    text-align: center;
+    color: #6d7073;
+  }
+  .Section.Notice > p {
+    margin-bottom: 8px;
+  }
+  .Section.Notice > p:last-child {
+    margin-bottom: 0;
+  }
+</style>
 
-</td><td width="10">&nbsp;</td><td valign="top">
-<a href="{{group.publicUrl}}?{{utm}}">{{group.name}}</a>
-<p>
-Backers: {{group.stats.backers.lastMonth}} (<span class="positive">+{{group.stats.backers.new}}</span>{{#if group.stats.backers.lost}}, <span class="negative">-{{group.stats.backers.lost}}</span>{{/if}})<br />
-<span class="label">Current balance:</span> {{{currency group.stats.balance currency=currency}}} (<span class="positive">+{{{currency group.stats.totalDonations currency=currency}}}</span>{{#if group.stats.totalExpenses}}, <span class="negative">{{{currency group.stats.totalExpenses currency=currency}}}</span>{{/if}}) <br />
-</p>
-<p>
-<span class="label">Your contribution:</span> {{currency amount currency=currency}} per {{interval}}<br />
-<span class="label">Member since:</span> {{{moment createdAt}}}<br />
-</p>
-</td></tr>
-<tr><td colspan="2" height="10">&nbsp;</td></tr>
-</li>
-{{/each}}
-</table>
-</ul>
-<p>If you'd like to cancel any of your subscriptions, you can do so on <a href="{{manageSubscriptionsUrl}}?{{utm}}">https://opencollective.com/subscriptions</a></p>
+<style>
+  @media (max-width:660px) {
+    .Wrapper {
+      max-width: 320px !important;
+    }
+    .Section.Intro {
+      padding: 0 16px !important;
+      padding-bottom: 48px !important;
+    }
+    .Section.Intro p {
+      font-size: 12px !important;
+      line-height: 2 !important;
+    }
+    .Section.Intro h1 {
+      font-size: 20px !important;
+      line-height: 1 !important;
+    }
+    .Section.Intro .Date {
+      font-size: 12px !important;
+      margin-bottom: 32px !important;
+    }
+    .Section.Subscriptions {
+      padding: 0 16px !important;
+      padding-bottom: 48px !important;
+    }
+    .Section.Notice {
+      padding-bottom: 60px !important;
+    }
+  }
+  @media (max-width:660px) {
+    .Section.Interest .Cards {
+      height: auto !important;
+    }
+    .Section.Interest .CollectiveCard {
+      display: block !important;
+      float: none !important;
+      margin: 0 auto !important;
+      margin-bottom: 24px !important;
+      width: 200px !important;
+    }
+    .Section.Interest a:last-child .CollectiveCard {
+      margin-bottom: 0 !important;
+    }
+  }
+</style>
 
-{{> relatedgroups}}
+<style>
+  @media (max-width:660px) {
+    .Subscription { height: auto !important; }
+    .Subscription .LeftSide, .Subscription .RightSide {
+      float: none !important;
+      width: auto !important;
+      margin: 0 auto !important;
+      margin-bottom: -24px !important;
+    }
+    .Subscription .LeftSide {
+      padding-bottom: 0 !important;
+      margin-bottom: -24px !important;
+    }
+    .Subscription .RightSide {
+      padding-top: 24px !important;
+    }
+    .ShowCasedCard {
+      display: block !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+  }
+</style>
 
-{{>footer}}
+<div class='MonthlyReport'>
+  <div class='Wrapper'>
+   <!-- <p>If you are having problems viewing this email, please <a href='{{fallbackUrl}}'>click here</a>.</p> -->
+    <div class='Container'>
+      <a class='ContainerLogo' href='//opencollective.com'></a>
+      <div class='ContainerLogoName'></div>
+      <div class='Section Intro'>
+        <h2>Hi {{recipient.firstName}}!</h2>
+        <p>We are starting this new monthly email to keep you posted on the latest activities of the collectives that you are supporting. Let us know if you like this and do not hesitate if you have any feedback or ideas. Just reply to this email!</p>
+      </div>
+      <div class='Section Subscriptions'>
+        <h1>Active Subscriptions</h1>
+        <span class='Date'>{{month}} {{year}}</span>
+        <div>
+          {{#each subscriptions}}
+            {{> mr-subscription}}
+          {{/each}}
+        </div>
+      </div>
+      {{#if relatedGroups.length}}
+      <div class='Section Interest'>
+        <h3>Collectives that might interest you:</h3>
+        <div class='Cards CardsCount-{{relatedGroups.length}}'>
+          {{#each relatedGroups}}
+            {{> collectivecard}}
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+      <div class='Section Notice'>
+        <p>For questions or feedback just reply to this email.</p>
+        <p>Tu unsubscribe from this digest, <a href='{{manageSubscriptionsUrl}}?{{utm}}'>click here</a>.</p>
+        <p>You can also follow us on <a href='//twitter.com/opencollect'>Twitter</a> or come chat with us on our public <a href='//opencollective.slack.com'>Slack Channel</a>.</p>
+      </div>
+      {{> mr-footer}}
+    </div>
+  </div>
+</div>
