@@ -2,7 +2,6 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import { type } from '../server/constants/transactions';
 import models from '../server/models';
 
 const {Transaction} = models;
@@ -24,12 +23,11 @@ describe('transaction model', () => {
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
 
-  it('type and uuid automatically generated', done => {
+  it('automatically generates uuid', done => {
     Transaction.create({
       amount: -1000
     })
     .then(transaction => {
-      expect(transaction.info.type).to.equal(type.EXPENSE);
       expect(transaction.info.uuid).to.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
       done();
     })
