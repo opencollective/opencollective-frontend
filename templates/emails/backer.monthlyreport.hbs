@@ -76,7 +76,7 @@ Subject: {{{capitalize month}}} Report
     background-color: #fff;
     border-radius: 100%;
     box-shadow: 0 1px 4px 0 rgba(173, 176, 179, 0.6);
-    background-image: url(https://opencollective.com/static/images/oc-logo-icon.svg);
+    background-image: url(https://opencollective.com/public/images/oc-logo-icon.png);
     background-repeat: no-repeat;
     background-size: 48px;
     background-position: center;
@@ -86,7 +86,7 @@ Subject: {{{capitalize month}}} Report
     height: 32px;
     margin: 0 auto;
     margin-bottom: 40px;
-    background-image: url(https://opencollective.com/static/images/emails/oc-logo-name.svg);
+    background-image: url(https://opencollective.com/public/images/emails/oc-logo-name.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -109,16 +109,14 @@ Subject: {{{capitalize month}}} Report
     padding-bottom: 48px;
   }
   .Section.Subscriptions > h1 {
-    margin-top: -14px;
+    margin: -14px 0 0 -10px;
     background-color: white;
     display: inline-block;
     padding: 0 10px;
-    margin-left: -10px;
   }
   .Section.Subscriptions .Date {
     text-transform: uppercase;
-    margin-top: 8px;
-    margin-bottom: 44px;
+    margin: 8px 0px 44px 0px;
     display: block;
     height: 12px;
     font-family: Helvetica;
@@ -301,7 +299,7 @@ Subject: {{{capitalize month}}} Report
       {{/if}}
       <div class='Section Notice'>
         <p>For questions or feedback just reply to this email.</p>
-        <p>Tu unsubscribe from this digest, <a href='{{manageSubscriptionsUrl}}?{{utm}}'>click here</a>.</p>
+        <p>To unsubscribe from this digest, <a href='{{manageSubscriptionsUrl}}?{{utm}}'>click here</a>.</p>
         <p>You can also follow us on <a href='//twitter.com/opencollect'>Twitter</a> or come chat with us on our public <a href='//opencollective.slack.com'>Slack Channel</a>.</p>
       </div>
       {{> mr-footer}}

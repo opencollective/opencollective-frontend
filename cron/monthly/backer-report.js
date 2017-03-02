@@ -44,7 +44,7 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    where.username = {$in: ['xdamman']};
+    where.username = {$in: ['xdamman','piamancini', 'aseem']};
 
   Notification.findAll(query)
   .then(results => results.map(r => r.User))
