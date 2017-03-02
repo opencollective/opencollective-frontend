@@ -12,6 +12,7 @@ export default (Sequelize, DataTypes) => {
   const { models } = Sequelize;
 
   const Transaction = Sequelize.define('Transaction', {
+    uuid: DataTypes.STRING(36),
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING,
     amount: DataTypes.INTEGER,
@@ -34,8 +35,6 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-
-    uuid: DataTypes.STRING,
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
     // txnCurrencyFxRate = amount/amountInTxnCurrency
