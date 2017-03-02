@@ -3,10 +3,6 @@ import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import { type } from '../server/constants/transactions';
-<<<<<<< HEAD
-=======
-
->>>>>>> 6512516bc82f6cf10eac079d979669ce5fb28225
 import models from '../server/models';
 
 const {Transaction} = models;
