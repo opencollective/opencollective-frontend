@@ -3,6 +3,10 @@ import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import { type } from '../server/constants/transactions';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6512516bc82f6cf10eac079d979669ce5fb28225
 import models from '../server/models';
 
 const {Transaction} = models;
@@ -24,12 +28,12 @@ describe('transaction model', () => {
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
 
-  it('auto generate a uuid', done => {
+  it('type and uuid automatically generated', done => {
     Transaction.create({
       amount: -1000
     })
     .then(transaction => {
-      expect(transaction.info.type).to.be.equal(type.DONATION);
+      expect(transaction.info.type).to.equal(type.EXPENSE);
       expect(transaction.info.uuid).to.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
       done();
     })
