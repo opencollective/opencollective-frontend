@@ -23,6 +23,17 @@ describe('transaction model', () => {
       .tap(g => group = g)
       .then(() => group.addUserWithRole(user, roles.HOST)));
 
+  it('automatically generates uuid', done => {
+    Transaction.create({
+      amount: -1000
+    })
+    .then(transaction => {
+      expect(transaction.info.uuid).to.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
+      done();
+    })
+    .catch(done);
+  });
+
   it('get the host', (done) => {
     Transaction.create({
       GroupId: group.id,

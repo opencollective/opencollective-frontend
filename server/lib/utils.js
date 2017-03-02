@@ -386,3 +386,7 @@ export function formatCurrencyObject(currencyObj, options = { precision: 0 }) {
   }
   return formatArrayToString(array);
 }
+
+export function isUUID(str) {
+  return (str.length === 36 && str.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i));
+}

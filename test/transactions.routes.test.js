@@ -175,14 +175,48 @@ describe('transactions.routes.test.js', () => {
         });
     });
 
-    it('get the transaction details with host info', (done) => {
+    it('cannot get the transaction details by id', (done) => {
       request(app)
         .get(`/transactions/${transaction.id}?api_key=${application.api_key}`)
+        .expect(400)
+        .end((e, res) => {
+          console.log(">>> RES", res.body);
+          expect(res.body.error.message).to.equal("Must provide transaction uuid");
+          done();
+        })
+    });
+
+    it('get the transaction details with host info', (done) => {
+      request(app)
+        .get(`/transactions/${transaction.uuid}?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
           const transactionDetails = res.body;
           expect(transactionDetails).to.have.property('host');
+          expect(transactionDetails.description).to.equal(transaction.description);
+          expect(transactionDetails.host.username).to.equal(user.username);
+          expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
+          expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
+          expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
+          expect(transactionDetails.user).to.not.have.property('email');
+          expect(transactionDetails.user).to.not.have.property('paypalEmail');
+          expect(transactionDetails.host).to.not.have.property('email');
+          done();
+        });
+    });
+
+    it('get the transaction details by uuid', (done) => {
+      request(app)
+        .get(`/transactions/${transaction.uuid}?api_key=${application.api_key}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          const transactionDetails = res.body;
+          expect(transactionDetails).to.have.property('host');
+          expect(transactionDetails.user).to.not.have.property('email');
+          expect(transactionDetails.user).to.not.have.property('paypalEmail');
+          expect(transactionDetails.host).to.not.have.property('email');
           expect(transactionDetails.type).to.equal(transaction.type);
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.username).to.equal(user.username);
