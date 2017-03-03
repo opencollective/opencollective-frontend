@@ -265,7 +265,7 @@ export const EventType = new GraphQLObjectType({
       endsAt: {
         type: GraphQLString,
         resolve(event) {
-          return event.startsAt
+          return event.endsAt
         }
       },
       maxAmount: {
