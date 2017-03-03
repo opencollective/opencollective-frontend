@@ -6,7 +6,7 @@ import { isValidEmail, capitalize } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
 import { css } from 'glamor';
 import '../css/forms.css';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 const styles = {
   SignInUp: css({

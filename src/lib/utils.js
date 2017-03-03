@@ -11,6 +11,16 @@ export function isValidEmail(email) {
   return Boolean(email.match(/.+@.+\..+/));
 }
 
+export function downloadContent(mimeType, filename, text) {
+  const element = document.createElement('a');
+  element.setAttribute('href', `data:${mimeType},${encodeURIComponent(text)}`);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
 export function formatCurrency(amount, currency = 'USD', intl) {
   if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
   amount = amount / 100;

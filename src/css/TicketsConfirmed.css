@@ -27,6 +27,7 @@
 }
 
 .TicketsConfirmed #ticket {
+  color: black;
   margin: 0 auto;
   width: 345px;
   height: 145px;

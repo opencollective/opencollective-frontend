@@ -233,7 +233,7 @@ class Event extends React.Component {
               onCancel={this.resetResponse}
               onSubmit={this.rsvp}
               quantity={this.state.response.quantity}
-              stripePublishableKey={this.event.stripePublishableKey}
+              stripePublishableKey={this.event.collective.stripePublishableKey}
               tier={this.state.response.tier || Event.tiers[0]}
               />
           }
