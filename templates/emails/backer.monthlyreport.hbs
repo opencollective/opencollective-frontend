@@ -298,9 +298,17 @@ Subject: {{{capitalize month}}} Report
       </div>
       {{/if}}
       <div class='Section Notice'>
+
+        <p>To manage your subscriptions, <a href="{{manageSubscriptionsUrl}}?{{utm}}">click here</a>.</p>
+
+        <p>
+        {{#if notificationTypeLabel}}
+        To unsubscribe from {{notificationTypeLabel}}, <a href="{{unsubscribeUrl}}">click here</a>.<br /><br />
+        {{/if}}
+        </p>
+
         <p>For questions or feedback just reply to this email.</p>
-        <p>To unsubscribe from this digest, <a href='{{manageSubscriptionsUrl}}?{{utm}}'>click here</a>.</p>
-        <p>You can also follow us on <a href='//twitter.com/opencollect'>Twitter</a> or come chat with us on our public <a href='//opencollective.slack.com'>Slack Channel</a>.</p>
+        <p>You can also follow us on <a href="https://twitter.com/opencollect">Twitter</a> or come chat with us on our public <a href="https://opencollective.slack.com">Slack Channel</a>.</p>
       </div>
       {{> mr-footer}}
     </div>
