@@ -25,7 +25,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
       const ext = mime.extension(contentType) || path.extname(src).substr(1);
       const filename = `/${name}_${uuid.v1()}.${ext}`;
 
-      const upload = new MultiPartUpload({
+    new MultiPartUpload({
         client: knox_client,
         objectName: filename,
         stream: request.get(src),
