@@ -135,6 +135,10 @@ const sendEmail = (recipient, data) => {
     debug("Skipping ", recipient.email);
     return Promise.resolve();
   }
+
+  // We don't send the monthly email if there is no active subscription
+  if (!data.subscriptions || data.subscriptions.length === 0) return;
+
   return emailLib.send('backer.monthlyreport', recipient.email, data);
 }
 
