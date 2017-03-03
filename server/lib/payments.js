@@ -246,6 +246,7 @@ export const processPayment = (Sequelize, donation) => {
               group: group.info,
               relatedGroups,
               interval: subscription && subscription.interval,
+              monthlyInterval: subscription && subscription.interval && (subscription.interval.indexOf('month') !== -1),
               firstPayment: true,
               subscriptionsLink: user.generateLoginLink('/subscriptions')
             }));
