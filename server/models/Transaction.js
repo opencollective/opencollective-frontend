@@ -79,7 +79,8 @@ export default (Sequelize, DataTypes) => {
           hostFee: this.hostFee,
           paymentProcessorFee: this.paymentProcessorFee,
           netAmountInGroupCurrency: this.netAmountInGroupCurrency,
-          amountInTxnCurrency: this.amountInTxnCurrency
+          amountInTxnCurrency: this.amountInTxnCurrency,
+          txnCurrency: this.txnCurrency
         };
       }
     },
