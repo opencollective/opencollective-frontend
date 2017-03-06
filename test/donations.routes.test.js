@@ -5,7 +5,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import * as paymentsLib from '../server/lib/payments';
+import paymentsLib from '../server/lib/payments';
 import models from '../server/models';
 
 const CHARGE = 10.99;
@@ -230,7 +230,7 @@ describe('donations.routes.test.js', () => {
 
     describe('Payment success by a group\'s user', () => {
 
-      beforeEach((done) => {
+      beforeEach('create a donation', (done) => {
         request(app)
           .post(`/groups/${group.id}/payments`)
           .set('Authorization', `Bearer ${user.jwt()}`)

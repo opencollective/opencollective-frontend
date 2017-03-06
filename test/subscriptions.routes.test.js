@@ -12,7 +12,7 @@ import * as utils from '../test/utils';
 import stripeMock from './mocks/stripe';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import * as paymentsLib from '../server/lib/payments';
+import paymentsLib from '../server/lib/payments';
 
 
 const application = utils.data('application');

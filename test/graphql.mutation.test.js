@@ -9,7 +9,7 @@ import app from '../server/index';
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import * as paymentsLib from '../server/lib/payments';
+import paymentsLib from '../server/lib/payments';
 
 
 const application = utils.data('application');

@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import models from '../server/models';
 import * as utils from '../test/utils';
-import * as paymentsLib from '../server/lib/payments';
+import paymentsLib from '../server/lib/payments';
 import roles from '../server/constants/roles';
 
 const AMOUNT = 1099;

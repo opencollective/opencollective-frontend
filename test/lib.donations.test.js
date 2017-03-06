@@ -6,7 +6,7 @@ import chanceLib from 'chance';
 import request from 'supertest';
 import app from '../server/index';
 import * as utils from '../test/utils';
-import * as paymentsLib from '../server/lib/payments';
+import paymentsLib from '../server/lib/payments';
 import { planId as generatePlanId } from '../server/lib/utils.js';
 import * as constants from '../server/constants/transactions';
 import emailLib from '../server/lib/email';
@@ -68,6 +68,7 @@ describe('lib.donation.test.js', () => {
         SubscriptionId: null,
         PaymentMethodId: null
       })
+      .then(paymentsLib.processPayment)
     });
 
     it('isProcessed and processedAt should not be false and null', done => {
@@ -92,7 +93,8 @@ describe('lib.donation.test.js', () => {
         currency: 'USD',
         SubscriptionId: null,
         PaymentMethodId: pm.id
-      }));
+      }))
+      .then(paymentsLib.processPayment);
     });
 
     it('isProcessed and processedAt should not be false and null', done => {
@@ -201,7 +203,7 @@ describe('lib.donation.test.js', () => {
           number: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
-          })
+        })
         .tap(pm => models.Donation.create({
           amount: CHARGE * 100,
           currency: CURRENCY,
@@ -210,6 +212,11 @@ describe('lib.donation.test.js', () => {
           UserId: user.id,
           GroupId: group.id
         }))
+        .then(paymentsLib.processPayment)
+        .then(transaction => {
+          expect(transaction.type).to.equal(constants.type.DONATION);
+          expect(transaction.currency).to.equal(CURRENCY);
+        });
       });
 
       it('successfully creates a Stripe customer', () => {
@@ -291,7 +298,8 @@ describe('lib.donation.test.js', () => {
           UserId: user.id,
           GroupId: group.id,
           createdAt: '2017-01-22T15:01:22.827-07:00'
-        }));
+        }))
+        .then(paymentsLib.processPayment);
       };
 
       describe('monthly', () => {

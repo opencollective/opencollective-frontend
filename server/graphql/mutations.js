@@ -1,5 +1,5 @@
 import models from '../models';
-import { createPayment } from '../lib/payments';
+import paymentsLib from '../lib/payments';
 import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
 
@@ -135,7 +135,7 @@ const mutations = {
         .then(responseModel => {
           if (tier.amount > 0) {
             // also sends out email 
-            return createPayment({
+            return paymentsLib.createPayment({
               user,
               group: event.Group,
               response: responseModel,

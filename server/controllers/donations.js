@@ -3,7 +3,7 @@ import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
 import {getLinkHeader, getRequestedUrl} from '../lib/utils';
-import { createPayment } from '../lib/payments';
+import paymentsLib from '../lib/payments';
 
 /**
  * Get donations
@@ -35,7 +35,7 @@ const stripeDonation = (req, res, next) => {
   const amount = parseInt(payment.amount * 100, 10);
   const currency = payment.currency || group.currency;
 
-  return createPayment({
+  return paymentsLib.createPayment({
     user,
     group,
     payment: {
@@ -46,7 +46,7 @@ const stripeDonation = (req, res, next) => {
       interval
     }
   })
-  .then(() => res.send({success: true, user: req.user.info }))
+  .then((transaction) => res.send({success: true, user: req.user.info, transaction: transaction && transaction.info }))
   .catch(err => next(new errors.BadRequest(err.message)))
 };
 export {stripeDonation as stripe};
