@@ -7,7 +7,7 @@ import MultiPartUpload from 'knox-mpu-alt'
 
 const SAMPLE = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764'
 
-describe.only('lib.imageUrlToAmazonUrl.js', () => {
+describe('lib.imageUrlToAmazonUrl.js', () => {
   describe('#Convert an external image url to a Amazon url', () => {
 
     before(() => {
