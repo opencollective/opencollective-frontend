@@ -34,7 +34,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
       MultiPartUpload.restore();
     })
 
-    it.only('successfully converts cloudfront.net url to amazon aws url', done => {
+    it('successfully converts cloudfront.net url to amazon aws url', done => {
       imageUrlToAmazonUrl(
         knox,
         SAMPLE,
