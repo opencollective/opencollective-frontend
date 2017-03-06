@@ -9,7 +9,6 @@ const SAMPLE = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4
 
 describe('lib.imageUrlToAmazonUrl.js', () => {
   describe('#Convert an external image url to a Amazon url', () => {
-    let multiPartStub;
 
     before(() => {
       sinon.stub(knox, 'put', () => {
@@ -28,7 +27,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     })
 
     before(() => {
-      multiPartStub = sinon.createStubInstance(MultiPartUpload)
+      sinon.createStubInstance(MultiPartUpload)
     });
 
     it('successfully converts cloudfront.net url to amazon aws url', done => {
@@ -36,7 +35,6 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
         knox,
         SAMPLE,
         (e, aws_src) => {
-          console.log(aws_src);
           expect(e).to.not.exist;
           expect(aws_src).to.contain('.amazonaws.com/');
           expect(aws_src).to.contain(config.aws.s3.bucket);
