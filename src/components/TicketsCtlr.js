@@ -47,7 +47,7 @@ class TicketsCtrl extends React.Component {
   }
 
   changeValue(delta) {
-    const newValue = this.state.value + delta;
+    const newValue = Math.max(this.state.value + delta, 1);
     this.setState({ value: newValue });
     this.props.onChange(newValue);
   }
