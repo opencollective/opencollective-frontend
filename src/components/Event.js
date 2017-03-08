@@ -192,8 +192,8 @@ class Event extends React.Component {
 
     const info = (
       <HashLink to="#location">
-        <FormattedDate value={Event.startsAt} day='numeric' month='long' />&nbsp;•&nbsp;
-        <FormattedTime value={Event.startsAt}  />&nbsp;•&nbsp;
+        <FormattedDate value={Event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+        <FormattedTime value={Event.startsAt}  />&nbsp; - &nbsp;
         {Event.location}
       </HashLink>
     );
