@@ -15,7 +15,8 @@
 
 .TicketsConfirmed .text {
   position: absolute;
-  bottom: 2rem;
+  bottom: 1rem;
+  max-width: 80%;
 }
 
 .TicketsConfirmed p {
@@ -72,3 +73,45 @@
   font-size: 1.2rem;
   color: #797D7F;
 }
+
+
+.react-add-to-calendar {
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+  position: relative;
+  display: inline-block;
+  margin: 1rem auto; }
+  .react-add-to-calendar__wrapper {
+    zoom: 1;
+    cursor: pointer; }
+  .react-add-to-calendar__button {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #aab9d4;
+    border-radius: 3px;
+    color: #000; }
+    .react-add-to-calendar__button--light {
+      background-color: #fff; }
+  .react-add-to-calendar__icon--right {
+    padding-left: 5px; }
+  .react-add-to-calendar__icon--left {
+    padding-right: 5px; }
+  .react-add-to-calendar__dropdown {
+    position: absolute;
+    top: 30px;
+    left: 1px;
+    width: 93%;
+    padding: 5px 0 5px 8px;
+    box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid #a8a8a8;
+    background-color: #fff;
+    text-align: left; }
+    .react-add-to-calendar__dropdown ul {
+      list-style: none;
+      padding: 0;
+      margin: 0; }
+      .react-add-to-calendar__dropdown ul li a {
+        color: #000;
+        text-decoration: none; }
+        .react-add-to-calendar__dropdown ul li a i {
+          padding-right: 10px; }

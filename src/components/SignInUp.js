@@ -145,7 +145,7 @@ class SignInUp extends React.Component {
             onCardAdded={this.handleCardAdded}
             stripePublishableKey={this.props.stripePublishableKey}
             number={process.env.NODE_ENV === 'development' ? '4242424242424242' : undefined}
-            expiration={process.env.NODE_ENV === 'development' ? '11/2020' : undefined}
+            expiration={process.env.NODE_ENV === 'development' ? '11/20' : undefined}
             disabled={!isFormValid}
             />
         }
