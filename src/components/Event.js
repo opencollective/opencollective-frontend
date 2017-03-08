@@ -51,8 +51,9 @@ class Event extends React.Component {
 
     this.state = {
       view: 'default',
+      modal: 'TicketsConfirmed',
       showInterestedForm: false,
-      response: {},
+      response: { user: { email: "xdamman@gmail.com" }, tier: { name: "free", amount: 0 }, quantity: 2 },
       api: { status: 'idle' },
       actions: this.defaultActions
     };

@@ -39,7 +39,7 @@ class CreditCardForm extends React.Component {
     if (expiration) {
       const tokens = expiration.split('/');
       this.state.card.exp_month = Number(tokens[0]);
-      this.state.card.exp_year = Number(tokens[1]);
+      this.state.card.exp_year = 2000 + Number(tokens[1]);
     }
   }
 
@@ -56,8 +56,8 @@ class CreditCardForm extends React.Component {
 
     if (fieldname === 'expiration') {
       const expiration = this.refs[fieldname].value.split('/');
-      card.exp_month = parseInt(expiration[0], 10);
-      card.exp_year = parseInt(expiration[1], 10);
+      card.exp_month = Number(expiration[0]);
+      card.exp_year = 2000 + Number(expiration[1]);
     }
 
     this.setState({ card });
@@ -120,7 +120,7 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="number"
               value={number}
-              onChange={(event) => debouncedHandleEvent('number')}
+              onChange={() => debouncedHandleEvent('number')}
               placeholder="Card Number"
             />
           </FormGroup>
@@ -135,8 +135,8 @@ class CreditCardForm extends React.Component {
               type="text"
               ref="expiration"
               value={expiration}
-              onChange={(event) => debouncedHandleEvent('expiration')}
-              placeholder="MM/YYYY"
+              onChange={() => debouncedHandleEvent('expiration')}
+              placeholder="MM/YY"
             />
           </FormGroup>
         </Col>
@@ -147,7 +147,7 @@ class CreditCardForm extends React.Component {
               className="form-control text-center"
               type="text"
               ref="cvc"
-              onChange={(event) => debouncedHandleEvent('cvc')}
+              onChange={() => debouncedHandleEvent('cvc')}
               placeholder="CVC"
             />
           </FormGroup>
