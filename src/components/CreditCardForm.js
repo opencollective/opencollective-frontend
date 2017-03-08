@@ -105,9 +105,9 @@ class CreditCardForm extends React.Component {
 
   renderCardForm() {
     const { error } = this.state;
-    const { addCardLabel, number, expiration, cvc } = this.props;
+    const { addCardLabel, number, expiration } = this.props;
 
-    const debouncedHandleEvent = _.debounce(this.handleChange, 500);
+    const debouncedHandleEvent = _.debounce(this.handleChange, 300);
 
     return (<div ref="CardForm" className="CardForm">
       <Row>
