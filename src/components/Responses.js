@@ -1,7 +1,6 @@
 import React from 'react';
 import Response from './Response';
-import colors from '../constants/colors';
-import '../css/Responses.css';
+import '../styles/Responses.css';
 
 class Responses extends React.Component {
 

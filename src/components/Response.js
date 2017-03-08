@@ -1,7 +1,6 @@
 import React from 'react';
 import colors from '../constants/colors';
-import '../css/Response.css';
-import ReactDOM from 'react-dom';
+import '../styles/Response.css';
 
 import { defineMessages, injectIntl } from 'react-intl';
 import star from '../images/icons/star.svg';

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/TicketsConfirmed.css';
+import '../styles/TicketsConfirmed.css';
 import Modal from './Modal';
 
 import { formatCurrency, downloadContent } from '../lib/utils';

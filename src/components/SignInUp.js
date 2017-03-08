@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { isValidEmail, capitalize } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
 import { css } from 'glamor';
-import '../css/forms.css';
+import '../styles/forms.css';
 import { defineMessages, injectIntl } from 'react-intl';
 
 const styles = {

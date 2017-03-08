@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from '../images/opencollectivelogo.svg';
-import '../css/NotFound.css';
+import '../styles/NotFound.css';
 
 export default () => {
   return (

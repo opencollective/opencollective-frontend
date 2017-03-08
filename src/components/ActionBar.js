@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from './Button';
 import colors from '../constants/colors';
-import '../css/ActionBar.css';
+import '../styles/ActionBar.css';
 
 class ActionBar extends React.Component {
 
