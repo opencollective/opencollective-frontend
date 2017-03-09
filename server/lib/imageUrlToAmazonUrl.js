@@ -25,7 +25,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
       const ext = mime.extension(contentType) || path.extname(src).substr(1);
       const filename = `/${name}_${uuid.v1()}.${ext}`;
 
-    new MultiPartUpload({
+    this.multiPartUpload({
         client: knox_client,
         objectName: filename,
         stream: request.get(src),
@@ -40,4 +40,12 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
   });
 }
 
-export default imageUrlToAmazonUrl;
+// separate function to make stubbing easier.
+function multiPartUpload(object, callback) {
+   new MultiPartUpload(object, callback);
+}
+
+export default {
+  imageUrlToAmazonUrl,
+  multiPartUpload
+}
