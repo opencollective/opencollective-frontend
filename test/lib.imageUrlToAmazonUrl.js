@@ -29,6 +29,11 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     });
 
     beforeEach(() => {
+      const s = stream.Readable();
+      s.write = function(){};
+      s.end = function(){
+        s.emit('response', {statusCode: 200, statusMessage: 'OK'});
+      }
       nocks['cloudfront.get'] = nock(imageUrl)
         .get('')
         .reply(200, s);
