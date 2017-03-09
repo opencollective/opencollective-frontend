@@ -1,4 +1,3 @@
-import config from 'config';
 import imageUrlLib from '../server/lib/imageUrlToAmazonUrl';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -7,7 +6,6 @@ import knox from 'knox';
 import uuid from 'node-uuid';
 import stream from 'stream';
 
-import MultiPartUpload from 'knox-mpu-alt';
 import amazonMockData from './mocks/amazon';
 
 const imageUrl = 'https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/1dca3d82-9c91-4d2a-8fc9-4a565c531764';
@@ -21,7 +19,6 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     let multiPartStub, knoxStub
 
     before(() => {
-      knoxStub = sinon.stub(knox, 'createClient', () => {});
       sinon.stub(uuid, 'v1', () => 'testuuid');
     
       multiPartStub = sinon.stub(imageUrlLib, 'multiPartUpload')
@@ -40,7 +37,6 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
     });
 
     after(() => {
-      knox.createClient.restore();
       uuid.v1.restore();
     })
 
@@ -54,7 +50,6 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
         imageUrl,
         (e, aws_src) => {
           expect(e).to.equal('Image not found');
-          expect(multiPartStub).to
         })
     });
 
