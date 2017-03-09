@@ -16,7 +16,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
   describe('#Convert an external image url to a Amazon url', () => {
     
     const nocks = {};
-    let multiPartStub, knoxStub
+    let multiPartStub
 
     before(() => {
       sinon.stub(uuid, 'v1', () => 'testuuid');
@@ -48,7 +48,7 @@ describe('lib.imageUrlToAmazonUrl.js', () => {
       imageUrlLib.imageUrlToAmazonUrl(
         knox,
         imageUrl,
-        (e, aws_src) => {
+        (e) => {
           expect(e).to.equal('Image not found');
         })
     });
