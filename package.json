@@ -72,6 +72,7 @@
     "querystring": "0.2.0",
     "request-as-curl": "0.1.0",
     "request-promise": "4.1.1",
+    "sanitize-html": "1.14.1",
     "sequelize": "3.28.0",
     "sequelize-cli": "2.5.1",
     "sequelize-temporal": "1.0.3",

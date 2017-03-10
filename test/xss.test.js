@@ -51,43 +51,43 @@ describe('XSS.test', () => {
 
   describe('middleware sanitizer test', () => {
     let req, next;
-    beforeEach(() => {
+    beforeEach(done => {
       req = {
-          body: {
-              test1: 'This is clean',
-              test2: 'This <script>var isNot=true;</script> isnt!',
-              test3: 'Im <b>technically</b> allowed.',
-              test4: null,
-              test5: 1,
-              test6: 'This &lt;shouldnt&gt; work'
-          }
+        body: {
+          test1: 'This is clean',
+          test2: 'This <script>var isNot=true;</script> isnt!',
+          test3: 'Im <b>technically</b> allowed.',
+          test4: null,
+          test5: 1,
+          test6: 'This &lt;shouldnt&gt; work'
+        }
       };
       next = sinon.spy();
+      done();
     });
 
-  it('should be defined', function() {
-      expect(middleware).to.exist;
-  });
+    it('should be defined', () => {
+        expect(middleware).to.exist;
+    });
 
-  it('should be a function', function() {
-      expect(middleware).to.be.a('function');
-  });
+    it('should be a function', () => {
+        expect(middleware).to.be.a('function');
+    });
 
-  it('should sanitize XSS from body', function() {
-      middleware()(req, {}, next);
-      expect(req.body.test1).to.equal('This is clean');
-      expect(req.body.test2).to.equal('This  isnt!');
-      expect(req.body.test3).to.equal('Im technically allowed.');
-      expect(req.body.test4).to.equal(null);
-      expect(req.body.test5).to.equal(1);
-      expect(req.body.test6).to.equal('This  work');
-  });
+    it('should sanitize XSS from body', () => {
+        middleware()(req, {}, next);
+        expect(req.body.test1).to.equal('This is clean');
+        expect(req.body.test2).to.equal('This  isnt!');
+        expect(req.body.test3).to.equal('Im technically allowed.');
+        expect(req.body.test4).to.equal(null);
+        expect(req.body.test5).to.equal(1);
+        expect(req.body.test6).to.equal('This  work');
+    });
 
-  it('should call next callback', function() {
-      middleware()(req, {}, next);
-      expect(next).calledOnce;
-  });
-
+    it('should call next callback', () => {
+        middleware()(req, {}, next);
+        expect(next).calledOnce;
+    });
   })
 
   describe('sanitizes user', () => {
