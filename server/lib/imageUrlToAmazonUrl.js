@@ -1,8 +1,8 @@
-export default imageUrlToAmazonUrl;
 import path from 'path';
 import uuid from 'node-uuid';
 import mime from 'mime';
 import request from 'request';
+import MultiPartUpload from 'knox-mpu-alt';
 
 /**
 * Takes an external image URL and returns a Amazon S3 URL with the
@@ -11,37 +11,41 @@ import request from 'request';
 * @param knox_client {Client} Knox `Client` instance e.g `app.knox`
 * @param src {String}
 * @param callback {Function}
-* 		@param error {Error|null}
-* 		@param aws_src {String}
+*     @param error {Error|null}
+*     @param aws_src {String}
 */
 function imageUrlToAmazonUrl(knox_client, src, callback) {
-	const options = {url: src, method: 'HEAD'};
-	request(options, (error, response) => {
-		if (error) return callback(error)
-		const contentLength = response.headers['content-length'];
-		const contentType = response.headers['content-type'];
-		if (contentLength) {
-			const name = path.basename(src).replace(/\W/g, ''); // remove non alphanumeric
-			const ext = mime.extension(contentType) || path.extname(src).substr(1);
-			const filename = `/${name}_${uuid.v1()}.${ext}`;
+  request.head(src, (error, response) => {
+    if (error) {
+      return callback(error);
+    }
+    const contentType = response.headers['content-type'];
+    if (response.statusCode === 200) {
+      const name = path.basename(src).replace(/\W/g, ''); // remove non alphanumeric
+      const ext = mime.extension(contentType) || path.extname(src).substr(1);
+      const filename = `/${name}_${uuid.v1()}.${ext}`;
 
-			const put = knox_client.put(filename, {
-				'Content-Length': contentLength,
-				'Content-Type': contentType,
-				'x-amz-acl': 'public-read'
-			});
+    this.multiPartUpload({
+        client: knox_client,
+        objectName: filename,
+        stream: request.get(src),
+        headers: {
+          'Content-Type': contentType,
+          'x-amz-acl': 'public-read'
+        }
+      }, (err, body) => err ? callback(err) : callback(null, body.Location));
+    } else {
+      callback(new Error('Image not found'));
+    }
+  });
+}
 
-			request.get(src).on('response', (response) => response.pipe(put));
+// separate function to make stubbing easier.
+function multiPartUpload(object, callback) {
+   new MultiPartUpload(object, callback);
+}
 
-			put.on('response', (response) => {
-				if (response.statusCode === 200) {
-					setImmediate(callback, (put.url) ? null : new Error('Upload Failed - s3 URL was not created'), put.url);
-				} else {
-					callback(new Error(`AWS Upload Failed - ${response.statusCode} ${response.statusMessage}`));
-				}
-			});
-		} else {
-			callback(new Error('Not found - missing header: Content-Length'));
-		}
-	});
+export default {
+  imageUrlToAmazonUrl,
+  multiPartUpload
 }
