@@ -8,14 +8,17 @@ import errorHandler from 'errorhandler';
 import passport from 'passport';
 import connectSessionSequelize from 'connect-session-sequelize';
 import session from 'express-session';
+import helmet from 'helmet';
 import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
 import { sequelize as db } from '../models';
+import sanitizer from '../middleware/sanitizer';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
+  app.use(helmet());
 
   // Body parser.
   app.use(bodyParser.json());
@@ -54,4 +57,5 @@ export default function(app) {
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(sanitizer());
 }
