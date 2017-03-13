@@ -25,6 +25,12 @@ describe('user.models.test.js', () => {
         .create({ firstName: userData.firstName, email: 'johndoe'})
         .catch(err => expect(err).to.exist));
 
+    it('fails if neither email or username is given', () => {
+      User
+        .create({ firstName: 'blah' })
+        .catch(err => expect(err).to.exist);
+    })
+
     it('successfully creates a user and lowercase email', () =>
       User
         .create({ firstName: userData.firstName, email: userData.email})

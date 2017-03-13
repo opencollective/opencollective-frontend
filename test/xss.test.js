@@ -91,6 +91,21 @@ describe('XSS.test', () => {
   })
 
   describe('sanitizes user', () => {
+    it('creates a user', (done) => {
+      request(app)
+        .post(`/users?api_key=${application.api_key}`)
+        .send({
+          user: {
+            email: "aseem@opencollective.com",
+          }
+        })
+        .end((err, res) => {
+          const { body } = res;
+          expect(body.email).to.equal('aseem@opencollective.com');
+          done();
+        });
+    });
+    
     it('name field', (done) => {
       request(app)
         .put(`/users/${user.id}?api_key=${application.api_key}`)

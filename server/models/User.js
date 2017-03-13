@@ -438,7 +438,9 @@ export default (Sequelize, DataTypes) => {
 
     hooks: {
       beforeCreate: (instance) => {
-        if (!instance.username) {
+        if (!instance.email && !instance.username) {
+          return Promise.reject(new Error('A user must have a username or email'));
+        } else if (!instance.username) {
           return userLib.suggestUsername(instance)
             .then(username => {
               instance.username = username;
