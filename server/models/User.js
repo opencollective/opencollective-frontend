@@ -14,7 +14,7 @@ import errors from '../lib/errors';
 import queries from '../lib/queries';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
-import imageUrlToAmazonUrl from '../lib/imageUrlToAmazonUrl';
+import imageUrlLib from '../lib/imageUrlToAmazonUrl';
 
 /**
  * Constants.
@@ -376,7 +376,7 @@ export default (Sequelize, DataTypes) => {
         .then(() => this.avatar || userLib.fetchAvatar(this.email))
         .then(avatar => {
           if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(knox.bucket) === -1) {
-            return Promise.promisify(imageUrlToAmazonUrl)(knox, avatar)
+            return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, avatar)
               .then((aws_src, error) => {
                 this.avatar = error ? this.avatar : aws_src;
                 update = true;
