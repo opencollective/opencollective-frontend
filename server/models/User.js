@@ -441,10 +441,13 @@ export default (Sequelize, DataTypes) => {
         if (!instance.username) {
           return userLib.suggestUsername(instance)
             .then(username => {
+              if (!username) {
+                return Promise.reject(new Error('A user must have a username'));
+              }
               instance.username = username;
               return Promise.resolve();
-            })
-        } 
+            });
+        }
         return Promise.resolve();
 
       },
