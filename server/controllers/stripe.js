@@ -62,19 +62,19 @@ export const authorize = (req, res, next) => {
  * Callback for the stripe OAuth
  */
 export const callback = (req, res, next) => {
-  const UserId = req.query.state;
+  const userId = req.query.state;
 
-  if (!UserId) {
+  if (!userId) {
     return next(new errors.BadRequest('No state in the callback'));
   }
-
   let host;
-  checkIfUserIsHost(UserId)
-    .then(() => models.User.findById(UserId))
+
+  checkIfUserIsHost(userId)
+    .then(() => models.User.findById(userId))
     .tap(h => host = h)
     .then(getToken(req.query.code))
     .then(createStripeAccount)
     .then(stripeAccount => host.setStripeAccount(stripeAccount))
-    .then(() => res.redirect(`${config.host.webapp}/?stripeStatus=success`))
+    .then(() => res.redirect(`${config.host.website}/${host.username}/settings?stripeStatus=success`))
     .catch(next);
 };
