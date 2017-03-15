@@ -616,6 +616,7 @@ export default {
     slug: "jan-meetup",
     description: "January monthly meetup",
     startsAt: "2017-01-06 UTC+0300",
+    timezone: "America/New_York",
     endsAt: "2017-01-07 UTC+300",
     locationName: "Balanced NYC",
     address: "547 Broadway, NY 10012",

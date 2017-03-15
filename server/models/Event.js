@@ -81,6 +81,8 @@ export default function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     },
 
+    timezone: DataTypes.TEXT,
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -115,6 +117,7 @@ export default function(Sequelize, DataTypes) {
           slug: this.slug,
           startsAt: this.startsAt,
           endsAt: this.endsAt,
+          timezone: this.timezone,
           status: this.status,
           confirmedAt: this.confirmedAt,
           createdAt: this.createdAt,

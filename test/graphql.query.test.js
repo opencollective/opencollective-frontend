@@ -115,7 +115,8 @@ describe('Query Tests', () => {
             Event(collectiveSlug: "Scouts", eventSlug:"Jan-Meetup") {
               id,
               name,
-              description
+              description,
+              timezone
             }
           }
         `;
@@ -126,6 +127,7 @@ describe('Query Tests', () => {
               description: "January monthly meetup",
               id: 1,
               name: "January meetup",
+              timezone: "America/New_York"
             }            
           }
         });

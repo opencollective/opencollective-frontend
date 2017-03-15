@@ -268,6 +268,12 @@ export const EventType = new GraphQLObjectType({
           return event.endsAt
         }
       },
+      timezone: {
+        type: GraphQLString,
+        resolve(event) {
+          return event.timezone
+        }
+      },
       maxAmount: {
         type: GraphQLInt,
         resolve(event) {
