@@ -10,6 +10,7 @@ const getEventQuery = gql`
       description,
       startsAt,
       endsAt,
+      timezone,
       location,
       address,
       lat,
@@ -47,6 +48,7 @@ const getEventQuery = gql`
         }
       }
     }
-  }`;
+  }
+`;
 
 export const addEventData = graphql(getEventQuery);
