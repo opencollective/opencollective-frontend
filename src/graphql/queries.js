@@ -1,51 +1,52 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: String!) {
-  Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
-    id,
-    slug,
-    name,
-    description,
-    startsAt,
-    endsAt,
-    location,
-    address,
-    lat,
-    long,
-    tiers {
-      id,
-      name,
-      description,
-      amount,
-      currency,
-      maxQuantity
-    },
-    collective {
+const getEventQuery = gql`
+  query Event($collectiveSlug: String!, $eventSlug: String!) {
+    Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
       id,
       slug,
       name,
-      mission,
-      backgroundImage,
-      logo,
-      stripePublishableKey
-    },
-    responses {
-      quantity,
-      status,
       description,
-      user {
+      startsAt,
+      endsAt,
+      location,
+      address,
+      lat,
+      long,
+      tiers {
+        id,
         name,
-        avatar,
-        username,
-        twitterHandle,
-        description
+        description,
+        amount,
+        currency,
+        maxQuantity
       },
-      tier {
-        name
+      collective {
+        id,
+        slug,
+        name,
+        mission,
+        backgroundImage,
+        logo,
+        stripePublishableKey
+      },
+      responses {
+        quantity,
+        status,
+        description,
+        user {
+          name,
+          avatar,
+          username,
+          twitterHandle,
+          description
+        },
+        tier {
+          name
+        }
       }
     }
-  }
-}`;
+  }`;
 
 export const addEventData = graphql(getEventQuery);

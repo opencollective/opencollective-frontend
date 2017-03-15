@@ -3,12 +3,13 @@ import colors from '../constants/colors';
 import '../styles/Response.css';
 
 import { defineMessages, injectIntl } from 'react-intl';
-import star from '../images/icons/star.svg';
 
-import avatar1 from '../images/avatar-01.svg';
-import avatar2 from '../images/avatar-02.svg';
-import avatar3 from '../images/avatar-03.svg';
-import avatar4 from '../images/avatar-04.svg';
+const star = '/static/images/icons/star.svg';
+
+const avatar1 = '/static/images/avatar-01.svg';
+const avatar2 = '/static/images/avatar-02.svg';
+const avatar3 = '/static/images/avatar-03.svg';
+const avatar4 = '/static/images/avatar-04.svg';
 
 const avatars = [avatar1, avatar2, avatar3, avatar4];
 

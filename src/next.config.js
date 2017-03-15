@@ -19,11 +19,6 @@ module.exports = {
       }
     ,
       {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loader: "file-loader?name=[name].[ext]"
-      }
-    ,
-      {
         test: /\.s(a|c)ss$/,
         use: ['babel-loader', 'raw-loader', 'postcss-loader',
           { loader: 'sass-loader',

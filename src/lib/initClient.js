@@ -16,7 +16,7 @@ function createClient (headers) {
     ssrMode: !process.browser,
     dataIdFromObject: result => result.id || null,
     networkInterface: createNetworkInterface({
-      uri: 'https://api.graph.cool/simple/v1/cixmkt2ul01q00122mksg82pn', // `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}`
+      uri: `${REACT_APP_API_URL}/graphql?api_key=${REACT_APP_API_KEY}`,
       opts: {
         credentials: 'same-origin'
         // Pass headers here if your graphql server requires them

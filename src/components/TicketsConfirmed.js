@@ -20,7 +20,7 @@ class TicketsConfirmed extends React.Component {
     const event = props.event;
     this.addToCalendarEvent = {
       title: event.name,
-      description: `${event.description}\n\n${window.location}`,
+      description: event.description,
       location: event.address,
       startTime: (new Date(event.startsAt)).toISOString(),
       endTime: (new Date(event.endsAt)).toISOString()

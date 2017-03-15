@@ -1,5 +1,6 @@
 import React from 'react';
-import logo from '../logo.svg';
+
+const logo = '/static/images/logo.svg';
 
 class TopBar extends React.Component {
 
