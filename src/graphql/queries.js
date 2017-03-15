@@ -9,6 +9,7 @@ const getEventQuery = gql`query Event($collectiveSlug: String!, $eventSlug: Stri
     description,
     startsAt,
     endsAt,
+    timezone,
     location,
     address,
     lat,
