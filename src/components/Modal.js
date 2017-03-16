@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/Modal.css';
 
 class Modal extends React.Component {
 
@@ -14,10 +13,80 @@ class Modal extends React.Component {
 
   render() {
 
-    document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
+    if (typeof document !== 'undefined')
+      document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
 
     return (
       <div className="Modal">
+        <style jsx>{`
+        .Modal-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.6);
+          z-index: 90;
+          display: none;
+        }
+
+        .showModal .Modal-overlay {
+          display: block;
+        }
+
+        .Modal-box {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          width: 500px;
+          max-width: 100%;
+          height: 450px;
+          max-height: 100%;
+          border-radius: 10px;
+          z-index: 100;
+        }
+
+        .Modal-box .TitleBar {
+          position: absolute;
+          top: 0;
+          font-size: 1.8rem;
+          line-height: 40px;
+          height: 40px;
+          color: white;
+          background: rgba(50,50,50,0.9);
+          width: 100%;
+          font-family: 'montserratlight';
+          text-align: center;
+          z-index: 100;
+        }
+
+        .Modal-box > .content {
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 4rem;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        }
+
+        @media(max-width: 500px) {
+          .Modal-box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: none;
+          }
+          .Modal-overlay {
+            background: white;
+          }
+        }
+        `}</style>
         <style>
           { this.props.show && `body { overflow: hidden; } .EventPage { filter: blur(3px); }` }
           { !this.props.show && `.TicketsConfirmed { display: none; }` }

@@ -7,6 +7,7 @@
   ],
   "plugins": [
     [
+      "styled-jsx/babel",      
       "module-resolver", {
         "root": ["."],
         "alias": {

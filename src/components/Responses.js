@@ -1,6 +1,5 @@
 import React from 'react';
 import Response from './Response';
-import '../styles/Responses.css';
 
 class Responses extends React.Component {
 
@@ -11,6 +10,12 @@ class Responses extends React.Component {
   render() {
     return (
       <div className="Responses" >
+        <style jsx>{`
+        .Responses {
+          max-width: 640px;
+          margin: 3rem auto 3rem;
+        }
+        `}</style>
         {this.props.responses.map((response, index) =>
           <Response key={`response${index}`} response={response} />
         )}

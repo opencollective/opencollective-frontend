@@ -14,7 +14,6 @@ const styles = {
       height: '100%',
       maxWidth: '400px',
       background: colors.lightgray,
-      padding: '10px',
       color: colors.darkgray,
       textTransform: 'uppercase',
       fontWeight: 'bold',

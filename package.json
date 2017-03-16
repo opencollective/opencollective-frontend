@@ -49,12 +49,13 @@
     "react-scrollchor": "^2.2.0",
     "request": "^2.79.0",
     "sass-loader": "^6.0.3",
-    "serve": "^3.3.1"
+    "serve": "^3.3.1",
+    "styled-jsx": "^0.5.7"
   },
   "scripts": {
     "dev": "node src/server.js",
     "build": "next build src",
-    "start": "NODE_ENV=production node server.js",
+    "start": "NODE_ENV=production node src/server.js",
     "build:server": "./node_modules/.bin/babel -D ./index.js -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
     "test": "react-scripts test --env=jsdom",

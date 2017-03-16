@@ -1,6 +1,5 @@
 import React from 'react';
 import colors from '../constants/colors';
-import '../styles/Response.css';
 
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -44,16 +43,55 @@ class Response extends React.Component {
 
     if (!name) return (<div/>);
 
-    user.avatar = user.avatar || this.pickAvatar(name);
+    const avatar = user.avatar || this.pickAvatar(name);
 
     const linkTo = `https://opencollective.com/${user.username}`;
     const title = intl.formatMessage(this.messages[status], { name });
 
     return (
       <a href={linkTo} title={title} >
+        <style jsx>{`
+        .Response {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          margin: 10px;
+          max-width: 300px;
+          float: left;
+          position: relative;
+        }
+        
+        img {
+          float: left;
+          width: 45px;
+          border-radius: 50%;
+        }
+
+        .bubble {
+            padding: 10px;
+        }
+
+        .name {
+            font-family: 'montserratlight';
+            font-size: 1.7rem;
+        }
+
+        .description {
+          font-family: 'lato';
+          font-size: 1.4rem;
+        }
+
+        .star {
+          width: 14px;
+          height: 14px;
+          position: absolute;
+          top: 45px;
+          left: 0;
+        }
+        `}</style>
         <div className="Response">
           { status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" /> }
-          <img src={user.avatar} />
+          <img src={avatar} />
           <div className="bubble">
             <div className="name">{name}</div>
             <div className="description" style={{color: colors.darkgray}}>{description || user.description}</div>
