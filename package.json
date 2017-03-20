@@ -20,7 +20,7 @@
     "babel-preset-stage-0": "6.5.0",
     "babel-register": "6.11.5",
     "base64url": "1.0.6",
-    "bcrypt": "0.8.7",
+    "bcrypt": "1.0.2",
     "bluebird": "3.4.0",
     "body-parser": "1.15.0",
     "child-process-promise": "1.1.0",
@@ -80,6 +80,7 @@
     "slug": "0.9.1",
     "stripe": "4.8.0",
     "twitter": "1.3.0",
+    "unicode": "0.6.1",
     "uuid": "3.0.1"
   },
   "devDependencies": {
