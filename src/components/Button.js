@@ -1,7 +1,8 @@
 import React from 'react';
 import { css } from 'glamor';
 import colors from '../constants/colors';
-import star from '../images/icons/star.svg';
+
+const star = '/static/images/icons/star.svg';
 
 const styles = {
   btn: css({

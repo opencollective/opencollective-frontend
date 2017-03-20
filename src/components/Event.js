@@ -1,8 +1,10 @@
 import React from 'react'
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import EventHeader from '../components/EventHeader';
 import ActionBar from '../components/ActionBar';
 import NotFound from '../components/NotFound';
-import Map from '../components/Map';
+import Location from '../components/Location';
 import Api from '../lib/api';
 import HashLink from 'react-scrollchor';
 import Tier from '../components/Tier';
@@ -11,19 +13,21 @@ import TopBar from '../components/TopBar';
 import GetTicketForm from '../components/GetTicketForm';
 import InterestedForm from '../components/InterestedForm';
 import Responses from '../components/Responses';
-import colors from '../constants/colors';
 import { filterCollection } from '../lib/utils';
-import '../css/EventPage.css';
-import defaultBackgroundImage from '../images/defaultBackgroundImage.png';
 import { addEventData } from '../graphql/queries';
 import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
+import Loading from '../components/Loading';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+
+const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
 class Event extends React.Component {
 
   static propTypes = {
+    collectiveSlug: React.PropTypes.string.required,
+    eventSlug: React.PropTypes.string.required,
     data: React.PropTypes.object,
   }
 
@@ -176,10 +180,14 @@ class Event extends React.Component {
       return (<div>GraphQL error</div>)
     }
 
-    console.log(">>> data", this.props.data);
-
     if (this.props.data.loading) {
-      return (<div>Loading</div>)
+      return (
+      <div>
+        <Header />
+        <TopBar className="loading" />
+        <Loading />
+        <Footer />
+      </div>);
     }
 
     if (!this.props.data.Event) {
@@ -200,6 +208,7 @@ class Event extends React.Component {
 
     return (
       <div>
+        <Header />
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
@@ -258,18 +267,12 @@ class Event extends React.Component {
                 </div>
               </div>
 
-              <section id="location" className="location">
-                <div className="description">
-                  <h1>Location</h1>
-                  <div className="name">{Event.location}</div>
-                  <div className="address" style={{color: colors.darkgray}}><a href={`http://maps.apple.com/?q=${Event.lat},{Event.long}`} target="_blank">{Event.address}</a></div>
-                </div>
-                { Event.lat && Event.long &&
-                  <div className="map">
-                    <Map lat={Event.lat} lng={Event.long} />
-                  </div>
-                }
-              </section>
+              <Location
+                location={Event.location}
+                address={Event.address}
+                lat={Event.lat}
+                long={Event.long}
+                />
 
               { Event.responses.length > 0 &&
                 <section id="responses">
@@ -290,6 +293,7 @@ class Event extends React.Component {
           }
 
         </div>
+        <Footer />
       </div>
     )
   }

@@ -2,9 +2,27 @@
   "presets": [
     "es2015",
     "stage-0",
+    "next/babel",
     "react"
   ],
   "plugins": [
+    [
+      "styled-jsx/babel",
+      "module-resolver", {
+        "root": ["."],
+        "alias": {
+          "styles": "./src/styles",
+          "markdown": "./src/markdown"
+        },
+        "cwd": "babelrc"
+    }],
+    "markdown-in-js/babel",
+    [
+      "wrap-in-js",
+      {
+        "extensions": ["css$", "scss$", "md$"]
+      }
+    ],
     ["react-intl", {
         "messagesDir": "./build/messages/"
     }]

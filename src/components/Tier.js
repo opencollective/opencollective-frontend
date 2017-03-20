@@ -24,12 +24,12 @@ const styles = {
     justifyContent: 'space-between'
   }),
   title: css({
-    fontSize: '1.4rem'
+    fontSize: '1.8rem'
   }),
   description: css({
     margin: '1rem',
     color: colors.darkgray,
-    fontSize: '1.2rem'
+    fontSize: '1.5rem'
   }),
   actions: css({
     display: 'flex',

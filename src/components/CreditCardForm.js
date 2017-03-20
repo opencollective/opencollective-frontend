@@ -110,6 +110,53 @@ class CreditCardForm extends React.Component {
     const debouncedHandleEvent = _.debounce(this.handleChange, 300);
 
     return (<div ref="CardForm" className="CardForm">
+      <style jsx>{`
+      .text-center {
+          text-align: center;
+      }
+      .CardForm {
+        padding-top: 1rem;
+        clear: both;
+      }
+      .form-control {
+          display: block;
+          width: 100%;
+          /*height: 34px;
+          padding: 6px 12px;*/
+          font-size: 14px;
+          line-height: 1.42857143;
+          color: #555;
+          background-color: #fff;
+          background-image: none;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+          transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+      }
+      .col-xs-12 {
+          width: 100%;
+          position: relative;
+          min-height: 1px;
+          padding-right: 15px;
+          padding-left: 15px;
+      }
+
+      .col-sm-4, .col-sm-5 {
+        float:left;
+      }
+
+      .form-group {
+          margin-bottom: 15px;
+      }
+
+      .col-xs-6 {
+          width: 50%;
+          position: relative;
+          min-height: 1px;
+          padding-right: 15px;
+          padding-left: 15px;
+      }
+      `}</style>
       <Row>
         <Col xs={ 12 }>
           <FormGroup>
