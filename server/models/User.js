@@ -433,6 +433,28 @@ export default (Sequelize, DataTypes) => {
 
       getTopBackers(since, until, tags, limit) {
         return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5);
+      },
+
+      findOrCreateByEmail(email, otherAttributes) {
+        return User.findOne({
+          where: {
+            $or: {
+              email,
+              paypalEmail: email
+            }
+          }
+        })
+        .then(user => user || Sequelize.models.User.create(Object.assign({}, { email }, otherAttributes)))
+      },
+
+      splitName(name) {
+        let firstName = null, lastName = null;
+        if (name) {
+          const tokens = name.split(' ');
+          firstName = tokens[0];
+          lastName = tokens.length > 1 ? tokens.slice(1).join(' ') : null;
+        }
+        return { firstName, lastName };
       }
     },
 

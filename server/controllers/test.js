@@ -1,11 +1,16 @@
 import async from 'async';
 import config from 'config';
 import Sequelize from 'sequelize';
-import { setupModels } from '../models';
+import models, { setupModels } from '../models';
 import { type } from '../constants/transactions';
 import roles from '../constants/roles';
 import emailLib from '../lib/email';
 import errors from '../lib/errors';
+
+const envsAndDatabases = {
+  development: 'opencollective_test',
+  circleci: 'circle_test'
+};
 
 /**
  * This resets the test-api database (and only the test-api database)
@@ -16,10 +21,10 @@ export const resetTestDatabase = function(req, res, next) {
   let databaseName;
   switch (process.env.NODE_ENV) {
     case 'circleci':
-      databaseName = 'circle_test';
+      databaseName = envsAndDatabases.circleci;
       break;
     case 'development':
-      databaseName = 'opencollective_test';
+      databaseName = envsAndDatabases.development;
       break;
     default:
       return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for reset API`));
@@ -222,6 +227,15 @@ export const resetTestDatabase = function(req, res, next) {
     }
   });
 };
+
+export const getTestUserLoginUrl = function(req, res, next) {
+  if (envsAndDatabases[process.env.NODE_ENV]) {
+    return models.User.findOne({where: {email: 'testuser@opencollective.com'}})
+    .then(user => res.redirect(user.generateLoginLink('')))
+    .catch(next)
+  }
+  return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for retreiving test API login token`));
+}
 
 export const generateTestEmail = function(req, res) {
   const { template } = req.params;

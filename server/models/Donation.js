@@ -49,6 +49,8 @@ export default function(Sequelize, DataTypes) {
 
     title: DataTypes.STRING,
 
+    notes: DataTypes.TEXT,
+
     SubscriptionId: {
       type: DataTypes.INTEGER,
       references: {

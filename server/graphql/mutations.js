@@ -140,7 +140,7 @@ const mutations = {
               group: event.Group,
               response: responseModel,
               payment: {
-                token: response.user.card.token,
+                stripeToken: response.user.card.token,
                 amount: tier.amount * responseModel.quantity,
                 currency: tier.currency,
                 description: `${event.name} - ${tier.name}`,

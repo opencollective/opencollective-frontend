@@ -25,33 +25,66 @@ export const list = (req, res, next) => {
     .catch(next);
 };
 
-const stripeDonation = (req, res, next) => {
+export const stripe = (req, res, next) => {
 
   const { payment } = req.required;
   const { user } = req;
   const { group } = req;
-  const { interval, stripeToken, description } = payment;
+  const { amount, interval, stripeToken, description, notes } = payment;
 
-  const amount = parseInt(payment.amount * 100, 10);
   const currency = payment.currency || group.currency;
 
   return paymentsLib.createPayment({
     user,
     group,
     payment: {
-      token: stripeToken,
+      stripeToken,
       amount,
       currency,
       description,
-      interval
+      interval,
+      notes
     }
   })
+  // returning transaction after processing payment because everything is synchronous for now.
   .then((transaction) => res.send({success: true, user: req.user.info, transaction: transaction && transaction.info }))
   .catch(err => next(new errors.BadRequest(err.message)))
 };
-export {stripeDonation as stripe};
-// leaving for legacy. Delete after frontend updates
-export {stripeDonation as post};
+
+/**
+ * Create a manual donation
+ */
+export const manual = (req, res, next) => {  
+  const { donation } = req.required;
+  const { remoteUser } = req;
+  const { group } = req;
+  const { amount, title, notes } = donation;
+
+  if (!amount || amount < 0) {
+    return Promise.reject(new Error('Amount must be greater than 0'));
+  }
+
+  let user = remoteUser;
+  let promise = Promise.resolve();
+
+  // if donation is on someone else's behalf, find or create that user
+  if (donation.email && donation.email !== remoteUser.email) {
+    promise = models.User.findOrCreateByEmail(donation.email, models.User.splitName(donation.name))
+    .tap(u => user = u)
+  }
+
+  return promise.then(() => models.Donation.create({
+      UserId: user.id,
+      GroupId: group.id,
+      currency: group.currency,
+      amount,
+      title,
+      notes
+    }))
+  .then(paymentsLib.processPayment)
+  .then(() => res.send({success: true}))
+  .catch(err => next(new errors.BadRequest(err.message)));
+};
 
 
 /*

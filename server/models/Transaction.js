@@ -122,11 +122,6 @@ export default (Sequelize, DataTypes) => {
                 - transaction.hostFeeInTxnCurrency
                 - transaction.paymentProcessorFeeInTxnCurrency)
               *transaction.txnCurrencyFxRate);
-        } else {
-          // populate netAmountInGroupCurrency for "Add Funds" and Expenses
-          transaction.netAmountInGroupCurrency = transaction.amount;
-          // set the currency to be group's currency, if not specified
-          transaction.currency = transaction.currency || group.currency;
         }
         return Transaction.create(transaction);
       },

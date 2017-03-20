@@ -1,30 +1,22 @@
-import _ from 'lodash';
 import app from '../server/index';
 import { expect } from 'chai';
-import request from 'supertest';
+import request from 'supertest-as-promised';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
 import paymentsLib from '../server/lib/payments';
 import models from '../server/models';
 
-const CHARGE = 10.99;
+const AMOUNT = 1099;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
-const EMAIL = 'paypal@email.com';
 const application = utils.data('application');
 const userData = utils.data('user3');
+const userData2 = utils.data('user2');
 const groupData = utils.data('group2');
 
-/*
- * TODO: simplify these tests. 
- * Originally, all the business logic of creating a payment was in 
- * donations controller. Now, it's in a separate library lib/payments
- * that's being tested independently. 
- */
-
 describe('donations.routes.test.js', () => {
-  let user, group, group2, sandbox;
+  let user, user2, group, sandbox, createPaymentStub, processPaymentStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -33,18 +25,18 @@ describe('donations.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(paymentsLib, 'processPayment');
+    createPaymentStub = sandbox.stub(paymentsLib, 'createPayment', () => Promise.resolve());
+    processPaymentStub = sandbox.stub(paymentsLib, 'processPayment', () => Promise.resolve());
   });
 
   beforeEach(() => utils.resetTestDB());
 
   // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
+
+  beforeEach('create a second user', () => models.User.create(userData2).tap(u => user2 = u));
 
   beforeEach('create group with user as first member', (done) => {
     request(app)
@@ -66,51 +58,7 @@ describe('donations.routes.test.js', () => {
       });
   });
 
-  beforeEach('create second group with user as first member', (done) => {
-    request(app)
-      .post('/groups')
-      .send({
-        api_key: application.api_key,
-        group: Object.assign(utils.data('group1'), { users: [{ email: user.email, role: roles.HOST}]}),
-        role: roles.HOST
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        models.Group
-          .findById(parseInt(res.body.id))
-          .tap((g) => {
-            group2 = g;
-            done();
-          })
-          .catch(done);
-      });
-  });
-
-  beforeEach('create stripe account', (done) => {
-    models.StripeAccount.create({
-      accessToken: 'abc'
-    })
-    .then((account) => user.setStripeAccount(account))
-    .tap(() => done())
-    .catch(done);
-  });
-
-  beforeEach('create paypal account', (done) => {
-    models.ConnectedAccount.create({
-      provider: 'paypal',
-      // Sandbox api keys
-      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
-    })
-    .then((account) => account.setUser(user))
-    .tap(() => done())
-    .catch(done);
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
+  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
 
   describe('#list', () => {
@@ -224,290 +172,291 @@ describe('donations.routes.test.js', () => {
   });
 
   /**
-   * Post a payment.
+   * Post a stripe payment
    */
-  describe('#postPayments', () => {
 
-    describe('Payment success by a group\'s user', () => {
+  describe('#createDonation', () => {
 
-      beforeEach('create a donation', (done) => {
-        request(app)
-          .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            api_key: application.api_key,
-            payment: {
-              stripeToken: STRIPE_TOKEN,
-              amount: CHARGE,
-              currency: CURRENCY,
-              email: user.email
-            }
-          })
-          .expect(200)
-          .end(done);
-      });
+    const payment = {
+      stripeToken: STRIPE_TOKEN,
+      amount: AMOUNT,
+      currency: CURRENCY,
+    }
 
-      it('successfully creates a paymentMethod with the UserId', (done) => {
-        models.PaymentMethod
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', user.id);
-            expect(res.rows[0]).to.have.property('token', STRIPE_TOKEN);
-            expect(res.rows[0]).to.have.property('service', 'stripe');
-            done();
-          })
-          .catch(done);
-      });
 
-      it('successfully creates a donation in the database', (done) => {
-        models.Donation
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', user.id);
-            expect(res.rows[0]).to.have.property('GroupId', group.id);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY);
-            expect(res.rows[0]).to.have.property('amount', CHARGE*100);
-            expect(res.rows[0]).to.have.property('title',
-              `Donation to ${group.name}`);
-            done();
-          })
-          .catch(done);
-      });
-
-    });
-
-    describe('Next payment success with a same stripe token', () => {
-
-      const CHARGE2 = 1.99;
-
-      beforeEach((done) => {
-        request(app)
-          .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            api_key: application.api_key,
-            payment: {
-              stripeToken: STRIPE_TOKEN,
-              amount: CHARGE,
-              currency: CURRENCY,
-              email: user.email
-            }
-          })
-          .expect(200)
-          .end(done);
-      });
-
-      beforeEach((done) => {
-        request(app)
-          .post(`/groups/${group.id}/payments`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            api_key: application.api_key,
-            payment: {
-              stripeToken: STRIPE_TOKEN,
-              amount: CHARGE2,
-              currency: CURRENCY,
-              email: user.email
-            }
-          })
-          .expect(200)
-          .end(done);
-      });
-
-      it('does not re-create a paymentMethod', (done) => {
-        models.PaymentMethod
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            done();
-          })
-          .catch(done);
-      });
-
-      it('successfully creates a donation in the database', (done) => {
-        models.Donation
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(2);
-            expect(res.rows[1]).to.have.property('amount', CHARGE2*100);
-            done();
-          })
-          .catch(done);
-      });
-
-    });
-
-    describe('Payment success by anonymous user', () => {
-
-      const data = {
-        stripeToken: STRIPE_TOKEN,
-        amount: CHARGE,
-        currency: CURRENCY,
-        description: 'super description',
-        tags: ['tag1', 'tag2'],
-        status: 'super status',
-        link: 'www.opencollective.com',
-        comment: 'super comment',
-        email: userData.email
-      };
-
-      beforeEach('successfully makes a anonymous payment', (done) => {
-        request(app)
-          .post(`/groups/${group2.id}/payments`)
-          .send({
-            api_key: application.api_key,
-            payment: data
-          })
-          .expect(200)
-          .end((e) => {
-            expect(e).to.not.exist;
-            done();
-          });
-      });
-
-      it('successfully creates a paymentMethod', (done) => {
-        models.PaymentMethod
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', 1);
-            done();
-          })
-          .catch(done);
-      });
-
-      it('successfully creates a user', (done) => {
-
-        models.User.findAndCountAll({
-          where: {
-              email: userData.email.toLowerCase()
-            }
+    describe('stripe donation', () => {
+      it('calls createPayment successfully when payment by a group\'s user', () => {
+        return request(app)
+        .post(`/groups/${group.id}/donations/stripe`)
+        .send({
+          api_key: application.api_key,
+          payment: Object.assign({}, payment, {email: user.email})
         })
-        .then((res) => {
-          expect(res.count).to.equal(1);
-          expect(res.rows[0]).to.have.property('email', userData.email.toLowerCase());
-          done();
+        .expect(200)
+        .toPromise()
+        .then(() => {
+          expect(createPaymentStub.callCount).to.equal(1);
+          expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
+          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
+            Object.assign({}, payment, {
+              description: undefined,
+              interval: undefined,
+              notes: undefined}));
         })
-        .catch(done)
-      })
+        .catch();
+      });
 
-      it('successfully creates a donation in the database', (done) => {
-        models.Donation
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', user.id);
-            expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY);
-            expect(res.rows[0]).to.have.property('amount', CHARGE*100);
-            expect(res.rows[0]).to.have.property('title', data.description);
-            done();
+      it('calls createPayment successfully when payment by a new, anonymous user', () => {
+        return request(app)
+        .post(`/groups/${group.id}/donations/stripe`)
+        .send({
+          api_key: application.api_key,
+          payment: Object.assign({}, payment, {email: 'anonymous@anon.com'})
+        })
+        .expect(200)
+        .then(() => {
+          expect(createPaymentStub.callCount).to.equal(1);
+          expect(createPaymentStub.firstCall.args[0].user.email).to.equal('anonymous@anon.com');
+          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
+            Object.assign({}, payment, {
+              description: undefined,
+              interval: undefined,
+              notes: undefined}));
+        })
+        .catch();
+      });
+
+      it('Payment success by an existing user in the database', () => {
+        return request(app)
+        .post(`/groups/${group.id}/donations/stripe`)
+        .send({
+          api_key: application.api_key,
+          payment: Object.assign({}, payment, {email: user2.email})
+        })
+        .expect(200)
+        .then(() => {
+          expect(createPaymentStub.callCount).to.equal(1);
+          expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user2.email);
+          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
+            Object.assign({}, payment, {
+              description: undefined,
+              interval: undefined,
+              notes: undefined}));
+        })
+        .catch();
+      });
+
+      it('Recurring payment success', () => {
+        return request(app)
+        .post(`/groups/${group.id}/donations/stripe`)
+        .send({
+          api_key: application.api_key,
+          payment: Object.assign({}, payment, {
+            email: user.email,
+            interval: 'month',
+            description: 'desc',
+            notes: 'long notes'
           })
-          .catch(done);
+        })
+        .expect(200)
+        .then(() => {
+          expect(createPaymentStub.callCount).to.equal(1);
+          expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
+          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
+            Object.assign({}, payment, {
+              description: 'desc',
+              interval: 'month',
+              notes: 'long notes'}));
+        })
+        .catch();
       });
 
     });
 
-    describe('Recurring payment success', () => {
+    describe('manual donation', () => {
 
-      const data = {
-        stripeToken: STRIPE_TOKEN,
-        amount: 10,
-        currency: CURRENCY,
-        interval: 'month',
-        link: 'www.opencollective.com',
-        email: EMAIL
-      };
+      describe('fails', () => {
 
-
-      beforeEach((done) => {
-        request(app)
-          .post(`/groups/${group2.id}/payments`)
-          .send({
-            api_key: application.api_key,
-            payment: data
+        it('when user is a MEMBER', () => {
+          return models.UserGroup.create({
+            UserId: user2.id,
+            GroupId: group.id,
+            role: roles.MEMBER
           })
-          .expect(200)
-          .end(e => {
-            expect(e).to.not.exist;
-            done();
+          .then(() => request(app)
+            .post(`/groups/${group.id}/donations/manual`)
+            .set('Authorization', `Bearer ${user2.jwt()}`)
+            .send({
+              api_key: application.api_key,
+              donation: Object.assign({}, payment, {
+                email: user2.email,
+              })
+            })
+            .expect(403));
           });
+
+        it('when user is a BACKER', () => {
+          return group.addUserWithRole(user2, roles.BACKER)
+          .then(() => request(app)
+            .post(`/groups/${group.id}/donations/manual`)
+            .set('Authorization', `Bearer ${user2.jwt()}`)
+            .send({
+              api_key: application.api_key,
+              donation: Object.assign({}, payment, {
+                email: user2.email,
+              })
+            })
+            .expect(403));
+        });
       });
 
-      it('successfully creates a paymentMethod', (done) => {
-        models.PaymentMethod
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', 2);
-            done();
-          })
-          .catch(done);
-      });
+      describe('with host authorization', () => {
 
-      it('successfully creates a donation in the database', (done) => {
-        models.Donation
-          .findAndCountAll({})
-          .then((res) => {
-            expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', 2);
-            expect(res.rows[0]).to.have.property('GroupId', group2.id);
-            expect(res.rows[0]).to.have.property('currency', CURRENCY);
-            expect(res.rows[0]).to.have.property('amount', data.amount*100);
-            expect(res.rows[0]).to.have.property('SubscriptionId');
-            expect(res.rows[0]).to.have.property('title', `Monthly donation to ${group2.name}`);
-            done();
-          })
-          .catch(done)
-      });
+        describe('fails when amount', () => {
+          it('is missing', () => {
+            request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  email: user.email,
+                  amount: null
+                })
+              })
+              .expect(400)
+          });
 
-      it('does not create a transaction', (done) => {
-        models.Transaction
-          .count({})
-          .then((res) => {
-            expect(res).to.equal(0);
-            done();
-          })
-          .catch(done);
-      });
+          it('is 0', () => {
+            request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  email: user.email,
+                  amount: 0
+                })
+              })
+              .expect(400)
+          });
+        });
 
-      it('creates a Subscription model', (done) => {
-        models.Subscription
-          .findAndCountAll({})
-          .then((res) => {
-            const subscription = res.rows[0];
+        describe('when amount is greater than 0', () => {
 
-            expect(res.count).to.equal(1);
-            expect(subscription).to.have.property('amount', data.amount*100);
-            expect(subscription).to.have.property('interval', 'month');
-            expect(subscription).to.have.property('data');
-            expect(subscription).to.have.property('isActive', false);
-            expect(subscription).to.have.property('currency', CURRENCY);
-            done();
-          })
-          .catch(done);
-      });
+          it('calls processPayment successfully when donation from host', () => {
+            request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  email: user.email,
+                  title: 'desc',
+                  notes: 'long notes'
+                })
+              })
+              .expect(200)
+              .then(() => {
+                expect(processPaymentStub.callCount).to.equal(1);
+                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                  UserId: user.id,
+                  GroupId: group.id,
+                  currency: group.currency,
+                  amount: AMOUNT,
+                  title: 'desc',
+                  notes: 'long notes',
+                });
+              })
+              .catch();
+          });
 
-      it('fails if the interval is not month or year', (done) => {
+          it('calls processPayment successfully when no email is sent with the donation', () => {
+            request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  title: 'desc',
+                  notes: 'long notes'
+                })
+              })
+              .expect(200)
+              .then(() => {
+                expect(processPaymentStub.callCount).to.equal(1);
+                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                  UserId: user.id,
+                  GroupId: group.id,
+                  currency: group.currency,
+                  amount: AMOUNT,
+                  title: 'desc',
+                  notes: 'long notes',
+                });
+              })
+              .catch();
+          });
 
-        request(app)
-          .post(`/groups/${group2.id}/payments`)
-          .send({
-            api_key: application.api_key,
-            payment: _.extend({}, data, {interval: 'something'})
-          })
-          .expect(400, {
-            error: {
-              code: 400,
-              type: 'bad_request',
-              message: 'Interval should be month or year.'
-            }
-          })
-          .end(done);
+          it('calls processPayment successfully when manual donation is from a new user but submitted by host', () => {
+            return request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  email: 'newuser@sponsor.com'
+                })
+              })
+              .expect(200)
+              .then(() => models.User.findOne({ 
+                where: { email: 'newuser@sponsor.com' }
+                }))
+              .then(newUser => {
+                expect(processPaymentStub.callCount).to.equal(1);
+                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                  UserId: newUser.id,
+                  GroupId: group.id,
+                  currency: group.currency,
+                  amount: AMOUNT,
+                  title: null,
+                  notes: null
+                });
+              })
+              .catch();
+          });
+
+          it('calls processPayment successfully when manual donation is from an existing user who is not the host but submitted by host', () => {
+            return request(app)
+              .post(`/groups/${group.id}/donations/manual`)
+              .set('Authorization', `Bearer ${user.jwt()}`)
+              .send({
+                api_key: application.api_key,
+                donation: Object.assign({}, payment, {
+                  email: user2.email,
+                })
+              })
+              .expect(200)
+              .then(() => {
+                expect(processPaymentStub.callCount).to.equal(1);
+                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                  UserId: user2.id,
+                  GroupId: group.id,
+                  currency: group.currency,
+                  amount: AMOUNT,
+                  title: null,
+                  notes: null
+                });
+              })
+              .catch();
+          });
+        });
       });
     });
+  });
 /*
   TODO: Reenable when we fix Paypal flow
 
@@ -812,35 +761,4 @@ describe('donations.routes.test.js', () => {
       });
     });
 */
-    describe('Payment errors', () => {
-
-      it('fails if the accessToken contains live', (done) => {
-        const payment = {
-          stripeToken: STRIPE_TOKEN,
-          amount: CHARGE,
-          currency: CURRENCY
-        };
-
-        models.StripeAccount.create({ accessToken: 'sk_live_abc'})
-        .then((account) => user.setStripeAccount(account))
-        .then(() => {
-          request(app)
-            .post(`/groups/${group.id}/payments`)
-            .set('Authorization', `Bearer ${user.jwt()}`)
-            .send({
-              api_key: application.api_key,
-              payment
-            })
-            .expect(400, {
-              error: {
-                code: 400,
-                type: 'bad_request',
-                message: `You can't use a Stripe live key on ${process.env.NODE_ENV}`
-              }
-            })
-            .end(done);
-        })
-      });
-    });
-  });
 });

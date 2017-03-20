@@ -559,13 +559,17 @@ export default function(Sequelize, DataTypes) {
         return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
       },
 
-      hasHost() {
+      getHost() {
         return Sequelize.models.UserGroup.find({
           where: {
             GroupId: this.id,
             role: roles.HOST
           }
-        })
+        });
+      },
+
+      hasHost() {
+        return this.getHost()
         .then(userGroup => Promise.resolve(!!userGroup));
       },
 

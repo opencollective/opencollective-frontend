@@ -17,6 +17,7 @@ import {appStripe} from '../server/gateways/stripe';
 const chance = chanceLib.Chance();
 const application = utils.data('application');
 const userData = utils.data('user3');
+const userData2 = utils.data('user2');
 const groupData = utils.data('group5');
 import stripeMock from './mocks/stripe';
 const STRIPE_URL = 'https://api.stripe.com:443';
@@ -27,8 +28,8 @@ const STRIPE_TOKEN = 'superStripeToken';
 /*
  * Tests
  */
-describe('lib.donation.test.js', () => {
-  let sandbox, processPaymentSpy, emailSendSpy;
+describe('lib.payments.processPayment.test.js', () => {
+  let user, user2, group, sandbox, processPaymentSpy, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -54,6 +55,33 @@ describe('lib.donation.test.js', () => {
     done();
   });
 
+  // Create a user.
+  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
+
+  // Create a user.
+  beforeEach('create a user', () => models.User.create(userData2).tap(u => user2 = u));
+
+  // Create a group.
+  beforeEach('create a group', (done) => {
+    request(app)
+      .post('/groups')
+      .send({
+        api_key: application.api_key,
+        group: Object.assign(groupData, { users: [{ email: 'member@group.com', role: roles.MEMBER}] })
+      })
+      .expect(200)
+      .end((e, res) => {
+        expect(e).to.not.exist;
+        models.Group
+          .findById(parseInt(res.body.id))
+          .then((g) => {
+            group = g;
+            done();
+          })
+          .catch(done);
+      });
+  });
+
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
   });
@@ -61,24 +89,104 @@ describe('lib.donation.test.js', () => {
   after(() => processPaymentSpy.restore());
 
   describe('No payment method', () => {
-    beforeEach('create a donation', () => {
-      return models.Donation.create({
-        amount: 100,
-        currency: 'USD',
-        SubscriptionId: null,
-        PaymentMethodId: null
-      })
-      .then(paymentsLib.processPayment)
-    });
+    let donation;
 
-    it('isProcessed and processedAt should not be false and null', done => {
-      models.Donation.findById(1)
+    describe('Donation given by the host', () => {
+
+      beforeEach(() => {
+        return models.Donation.create({
+          amount: 10000,
+          currency: 'USD',
+          UserId: user.id,
+          GroupId: group.id
+        })
+        .then(d => donation = d)
+        .then(paymentsLib.processPayment)
+        .catch(err => expect(err).to.not.exist);
+      });
+
+      it('creates a transaction', () => {
+        return models.Transaction.findAll()
+        .then(transactions => {
+          expect(transactions.length).to.equal(1);
+          expect(transactions[0]).to.contain({
+            type: constants.type.DONATION,
+            DonationId: donation.id,
+            amount: donation.amount,
+            currency: donation.currency,
+            txnCurrency: donation.currency,
+            amountInTxnCurrency: donation.amount,
+            txnCurrencyFxRate: 1,
+            platformFeeInTxnCurrency: 0,
+            paymentProcessorFeeInTxnCurrency: 0,
+            hostFeeInTxnCurrency: 0
+          })
+        })
+      });
+
+      it('isProcessed and processedAt should not be false and null', () => {
+        return models.Donation.findById(donation.id)
         .then(donation => {
           expect(donation.isProcessed).to.equal(true);
           expect(donation.processedAt).to.not.equal(null);
-          done();
         })
-    })
+      });
+    });
+
+    describe('Donation given by another user', () => {
+      beforeEach(() => {
+        return models.Donation.create({
+          amount: 10000,
+          currency: 'USD',
+          UserId: user2.id,
+          GroupId: group.id
+        })
+        .then(d => donation = d)
+        .then(paymentsLib.processPayment)
+        .catch(err => expect(err).to.not.exist);
+      });
+
+      it('creates a transaction', () => {
+        return models.Transaction.findAll()
+        .then(transactions => {
+          expect(transactions.length).to.equal(1);
+          expect(transactions[0]).to.contain({
+            type: constants.type.DONATION,
+            DonationId: donation.id,
+            amount: donation.amount,
+            currency: donation.currency,
+            txnCurrency: donation.currency,
+            amountInTxnCurrency: donation.amount,
+            txnCurrencyFxRate: 1,
+            platformFeeInTxnCurrency: 0,
+            paymentProcessorFeeInTxnCurrency: 0,
+            hostFeeInTxnCurrency: 500
+          })
+        })
+      });
+
+      it('adds the user as a backer', () => {
+        return models.UserGroup.findOne({
+          where: {
+            UserId: user2.id,
+            GroupId: group.id,
+            role: roles.BACKER
+          }
+        })
+        .then(userGroup => {
+          expect(userGroup).to.exist;
+        });
+      });
+
+      it('isProcessed and processedAt should not be false and null', () => {
+        return models.Donation.findById(donation.id)
+        .then(donation => {
+          expect(donation.isProcessed).to.equal(true);
+          expect(donation.processedAt).to.not.equal(null);
+        });
+      });
+
+    });
   });
 
   describe('Paypal payment method', () => {
@@ -109,7 +217,6 @@ describe('lib.donation.test.js', () => {
 
   describe('Stripe', () => {
 
-    let user, group;
     const nocks = {};
 
     const stubStripe = () => {
@@ -119,9 +226,6 @@ describe('lib.donation.test.js', () => {
       const stub = sinon.stub(appStripe.accounts, 'create');
       stub.yields(null, mock);
     };
-
-    // Create a user.
-    beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
 
     // Nock for customers.create.
     beforeEach(() => {
@@ -135,27 +239,6 @@ describe('lib.donation.test.js', () => {
       nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
         .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
         .reply(200, stripeMock.balance);
-    });
-
-    // Create a group.
-    beforeEach('create a group', (done) => {
-      request(app)
-        .post('/groups')
-        .send({
-          api_key: application.api_key,
-          group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}], tags: ['#brusselstogether'] })
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          models.Group
-            .findById(parseInt(res.body.id))
-            .then((g) => {
-              group = g;
-              done();
-            })
-            .catch(done);
-        });
     });
 
     beforeEach(() => {
@@ -257,7 +340,7 @@ describe('lib.donation.test.js', () => {
         group
           .getUsers()
           .then((users) => {
-            expect(users).to.have.length(2);
+            expect(users).to.have.length(3);
             const backer = _.find(users, {email: user.email});
             expect(backer.UserGroup.role).to.equal(roles.BACKER);
             done();
@@ -397,7 +480,7 @@ describe('lib.donation.test.js', () => {
             group
               .getUsers()
               .then((users) => {
-                expect(users).to.have.length(2);
+                expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();
@@ -462,7 +545,7 @@ describe('lib.donation.test.js', () => {
             group
               .getUsers()
               .then((users) => {
-                expect(users).to.have.length(2);
+                expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();
@@ -572,7 +655,7 @@ describe('lib.donation.test.js', () => {
             group
               .getUsers()
               .then((users) => {
-                expect(users).to.have.length(2);
+                expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();
@@ -637,7 +720,7 @@ describe('lib.donation.test.js', () => {
             group
               .getUsers()
               .then((users) => {
-                expect(users).to.have.length(2);
+                expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
                 expect(backer.UserGroup.role).to.equal(roles.BACKER);
                 done();

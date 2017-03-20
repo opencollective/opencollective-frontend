@@ -109,12 +109,7 @@ export const getOrCreateUser = (req, res, next) => {
 
   let name, email, paypalEmail;
 
-  // TODO remove #postmigration, replaced by req.body.expense
-  if (req.body.transaction) {
-    ({ email } = req.body.transaction);
-    ({ paypalEmail } = req.body.transaction);
-    ({ name } = req.body.transaction);
-  } else if (req.body.expense) {
+  if (req.body.expense) {
     ({ email } = req.body.expense);
     ({ paypalEmail } = req.body.expense);
     ({ name } = req.body.expense);
@@ -122,7 +117,6 @@ export const getOrCreateUser = (req, res, next) => {
     ({ name } = req.body.user);
     ({ email } = req.body.user);
   } else if (req.body.payment) {
-    // TODO remove #postmigration
     ({ email } = req.body.payment);
   } else if (req.body.email) {
     email = req.body.email; // used by /new_login_token

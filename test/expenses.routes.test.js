@@ -38,6 +38,9 @@ describe('expenses.routes.test.js', () => {
 
   after(() => sandbox.restore());
 
+  // Create a stub for clearbit
+  before(() => utils.clearbitStubBeforeEach(sandbox));
+
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => host = u));
@@ -596,7 +599,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 12000}})
+                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 12000}})
                     .expect(200);
                 })
 
@@ -616,7 +619,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 12500}})
+                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 12500}})
                     .expect(200);
                 })
 
@@ -782,7 +785,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {amount: 10000}})
+                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 10000}})
                     .expect(200);
                 })
 

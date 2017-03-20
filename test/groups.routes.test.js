@@ -23,7 +23,14 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('groups.routes.test.js', () => {
 
-  let user;
+  let user, sandbox;
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+    utils.clearbitStubBeforeEach(sandbox);
+  });
+
+  after(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 
@@ -347,7 +354,7 @@ describe('groups.routes.test.js', () => {
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
-          transaction: transactionsData[8]
+          transaction: Object.assign({}, transactionsData[8], { netAmountInGroupCurrency: transactionsData[8].amount})
         })
         .expect(200)
     );
@@ -419,7 +426,7 @@ describe('groups.routes.test.js', () => {
             .set('Authorization', `Bearer ${user.jwt()}`)
             .send({
               api_key: application.api_key,
-              transaction: _.extend({}, transaction, { approved: true })
+              transaction: _.extend({}, transaction, { netAmountInGroupCurrency: transaction.amount, approved: true })
             })
             .expect(200)
             .end((e, res) => {
@@ -441,7 +448,7 @@ describe('groups.routes.test.js', () => {
           SubscriptionId: subscription.id
         }))
         .then(donation => models.Transaction.createFromPayload({
-            transaction: Object.assign({}, transactionsData[7], { DonationId: donation.id}),
+            transaction: Object.assign({}, transactionsData[7], { netAmountInGroupCurrency: transactionsData[7].amount, DonationId: donation.id}),
             user,
             group: publicGroup,
           })));

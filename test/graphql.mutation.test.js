@@ -490,7 +490,7 @@ describe('Mutation Tests', () => {
             expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
             expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
             expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-              token: 'tok_stripe',
+              stripeToken: 'tok_stripe',
               amount: 4000,
               currency: 'USD',
               description: 'January meetup - paid tier'
@@ -569,7 +569,7 @@ describe('Mutation Tests', () => {
             expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
             expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
             expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-              token: 'tok_stripe',
+              stripeToken: 'tok_stripe',
               amount: 4000,
               currency: 'USD',
               description: 'January meetup - paid tier'

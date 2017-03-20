@@ -21,7 +21,7 @@ const createPayment = (payload) => {
   } = payload;
 
   const {
-    token,
+    stripeToken,
     amount,
     currency,
     description,
@@ -35,7 +35,7 @@ const createPayment = (payload) => {
     return Promise.reject(new Error('Interval should be month or year.'));
   }
 
-  if (!token) {
+  if (!stripeToken) {
     return Promise.reject(new Error('Stripe Token missing.'));
   }
 
@@ -51,7 +51,7 @@ const createPayment = (payload) => {
   return Promise.props({
       stripeAccount: group.getStripeAccount(),
       paymentMethod: models.PaymentMethod.getOrCreate({
-        token: token,
+        token: stripeToken,
         service: 'stripe',
         UserId: user.id
       })
@@ -257,6 +257,37 @@ const processPayment = (donation) => {
               }));
           }
       })
+    },
+    manual: (donation) => {
+      const group = donation.Group;
+      const user = donation.User;
+      let isUserHost;
+
+      const payload = {
+        user,
+        group,
+        transaction: {
+          type: transactions.type.DONATION,
+          DonationId: donation.id,
+          amount: donation.amount,
+          currency: donation.currency,
+          txnCurrency: donation.currency,
+          amountInTxnCurrency: donation.amount,
+          txnCurrencyFxRate: 1,
+          platformFeeInTxnCurrency: 0,
+          paymentProcessorFeeInTxnCurrency: 0,
+        }        
+      }
+
+      return group.getHost()
+      .then(host => host.UserId == user.id)
+      .tap(isHost => isUserHost = isHost)
+      .then(isUserHost => {
+        payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(group.hostFeePercent/100 * donation.amount);
+        return models.Transaction.createFromPayload(payload);
+      })
+      .then(() => !isUserHost ? group.findOrAddUserWithRole(user, roles.BACKER) : Promise.resolve())
+      .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
     }
   };
 
@@ -271,7 +302,9 @@ const processPayment = (donation) => {
       }]
     })
     .then(donation => {
-      if (!donation.PaymentMethod || donation.PaymentMethod.service === 'paypal') {
+      if (!donation.PaymentMethod) {
+        return services.manual(donation);
+      } else if (donation.PaymentMethod.service === 'paypal') {
         // for manual add funds and paypal, which isn't processed this way yet
         return donation.update({ isProcessed: true, processedAt: new Date() });
       } else {
