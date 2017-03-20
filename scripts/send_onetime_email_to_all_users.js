@@ -56,7 +56,7 @@ const sendEmail = (recipients) => {
       debug("Skipping ", recipient.email);
       return Promise.resolve();
     }
-    return emailLib.send('announcement', recipient.email, data);
+    return emailLib.send('announcement', recipient.email, data, { bcc: ' ' });
   });
 }
 
