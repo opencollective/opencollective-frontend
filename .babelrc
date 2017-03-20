@@ -7,18 +7,20 @@
   ],
   "plugins": [
     [
-      "styled-jsx/babel",      
+      "styled-jsx/babel",
       "module-resolver", {
         "root": ["."],
         "alias": {
-          "styles": "./src/styles"
+          "styles": "./src/styles",
+          "markdown": "./src/markdown"
         },
         "cwd": "babelrc"
     }],
+    "markdown-in-js/babel",
     [
       "wrap-in-js",
       {
-        "extensions": ["css$", "scss$"]
+        "extensions": ["css$", "scss$", "md$"]
       }
     ],
     ["react-intl", {

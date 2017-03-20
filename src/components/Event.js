@@ -11,7 +11,6 @@ import TopBar from '../components/TopBar';
 import GetTicketForm from '../components/GetTicketForm';
 import InterestedForm from '../components/InterestedForm';
 import Responses from '../components/Responses';
-import colors from '../constants/colors';
 import { filterCollection } from '../lib/utils';
 import { addEventData } from '../graphql/queries';
 import { addCreateResponseMutation } from '../graphql/mutations';
