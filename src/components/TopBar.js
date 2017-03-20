@@ -29,7 +29,7 @@ class TopBar extends React.Component {
           position: absolute;
           top: 0px;
           right: 20px;
-          padding-top: 15px;
+          padding-top: 10px;
         }
         ul {
           display: inline-block;

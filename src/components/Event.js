@@ -1,4 +1,6 @@
 import React from 'react'
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import EventHeader from '../components/EventHeader';
 import ActionBar from '../components/ActionBar';
 import NotFound from '../components/NotFound';
@@ -16,6 +18,7 @@ import { addEventData } from '../graphql/queries';
 import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
+import Loading from '../components/Loading';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -177,10 +180,14 @@ class Event extends React.Component {
       return (<div>GraphQL error</div>)
     }
 
-    console.log(">>> data", this.props.data);
-
     if (this.props.data.loading) {
-      return (<div>Loading</div>)
+      return (
+      <div>
+        <Header />
+        <TopBar className="loading" />
+        <Loading />
+        <Footer />
+      </div>);
     }
 
     if (!this.props.data.Event) {
@@ -201,6 +208,7 @@ class Event extends React.Component {
 
     return (
       <div>
+        <Header />
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
@@ -285,6 +293,7 @@ class Event extends React.Component {
           }
 
         </div>
+        <Footer />
       </div>
     )
   }

@@ -1,6 +1,5 @@
 import withData from '../lib/withData'
 import React from 'react'
-import Header from '../components/Header';
 import Event from '../components/Event';
 import { IntlProvider, addLocaleData } from 'react-intl';
 
@@ -25,7 +24,6 @@ class EventPage extends React.Component {
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <Header />
           <Event collectiveSlug={collectiveSlug} eventSlug={eventSlug} />
         </div>
       </IntlProvider>
