@@ -5,7 +5,9 @@ class Footer extends React.Component {
 
   componentDidMount() {
     const svg = this.refs.svg.getSVGDocument();
-    svg.querySelector('#logotype').style.fill = '#7a7b82';
+    if (svg) {
+      svg.querySelector('#logotype').style.fill = '#7a7b82';
+    }
   }
 
   render() {
