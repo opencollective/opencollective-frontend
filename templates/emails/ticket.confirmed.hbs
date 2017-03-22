@@ -10,7 +10,7 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 <p>Hi!</p>
 {{/if}}
 
-<p>We are excited that you'll be joining us at {{ event.name }} on {{ event.startsAt }} at {{ event.locationName }}. </p>
+<p>We are excited that you'll be joining us at {{ event.name }} on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ event.locationName }}. The event starts at {{ moment event.startsAt timezone=event.timezone format="h:mma" }}.</p>
 
 <p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}{{#if donation}} for a total of {{{currency donation.amount currency=donation.currency}}}{{/if}}. </p>
 

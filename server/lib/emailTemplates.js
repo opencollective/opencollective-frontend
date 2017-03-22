@@ -1,5 +1,6 @@
 import fs from 'fs';
-import moment from 'moment';
+import moment from 'moment-timezone';
+
 import handlebars from 'handlebars';
 import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
 
@@ -28,6 +29,7 @@ const templateNames = [
   'group.monthlyreport.text',
   'subscription.canceled',
   'ticket.confirmed',
+  'ticket.confirmed.sustainoss',
   'thankyou',
   'thankyou.sustain',
   'thankyou.wwcode',
@@ -82,10 +84,11 @@ handlebars.registerHelper('json', (obj) => {
 });
 
 handlebars.registerHelper('moment', (value, props) => {
-  if (props && props.hash.format)
-    return moment(value).format(props.hash.format);
-  else
-    return moment(value).format('MMMM Do YYYY');
+  const format = props && props.hash.format || 'MMMM Do YYYY';
+  const d = moment(value);
+  if (props && props.hash.timezone)
+      d.tz(props.hash.timezone);
+  return d.format(format);
 });
 
 handlebars.registerHelper('currency', (value, props) => {

@@ -1,0 +1,40 @@
+Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} confirmed for {{ event.name }}
+
+{{> header}}
+
+{{> toplogo}}
+
+{{#if user.name}}
+<p>Dear {{user.name}},</p>
+{{else}}
+<p>Hi!</p>
+{{/if}}
+
+<p>We are excited that you'll be joining us at <a href="https://sustainoss.org">{{ event.name }}</a> on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ event.locationName }}. The event starts at {{ moment event.startsAt timezone=event.timezone format="h:mma" }}.</p>
+
+<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}{{#if donation}} for a total of {{{currency donation.amount currency=donation.currency}}}{{/if}}. Thank you so much for being part of the first $ustainOSS Conversation!</p>
+
+<p>Next steps:
+<ul>
+  <li>Follow us on <a href="https://twitter.com/sustainoss">Twitter</a></li>
+  <li>Open Source with us on <a href="https://github.com/sustainers">GitHub</a></li>
+  <li><a href="https://slack.opencollective.com">Slack</a> with us</li>
+  <li>You can follow our activities and how we will be spending the money on our open collective page:
+  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a></li>
+ </p>
+ 
+ <p>If you have any questions feel free to contact us:<br />
+ Chad Whitacre: chad@gratipay.com<br />
+ Justin Dorfman: jdorfman@stickermule.com<br />
+ Pia Mancini: pia@opencollective.com<br />
+ </p>
+
+{{> subscriptions}}
+
+<p>Warmly,</p>
+
+<p>
+  – The {{group.name}} open collective
+</p>
+
+{{> footer}}

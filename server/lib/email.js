@@ -178,6 +178,11 @@ const getNotificationLabel = (template, recipient) => {
  */
 const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
 
+  if (template === 'ticket.confirmed') {
+    if (data.group.slug === 'sustainoss')
+      template += '.sustainoss';
+  }
+
   if (template === 'thankyou') {
     if (data.group.name.match(/WWCode/i))
       template += '.wwcode';
