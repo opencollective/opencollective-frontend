@@ -179,6 +179,8 @@ class Event extends React.Component {
 
     if (loading) return (<Loading />);
 
+    this.event = Event;
+
     if ( error ) {
       console.error(error.message);
       return (<Error message="GraphQL error" />)
