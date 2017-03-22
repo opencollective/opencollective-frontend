@@ -19,6 +19,7 @@ import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import Loading from '../components/Loading';
+import Error from '../components/Error';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -178,11 +179,9 @@ class Event extends React.Component {
 
     if (loading) return (<Loading />);
 
-    this.event = Event;
-
     if ( error ) {
       console.error(error.message);
-      return (<div>GraphQL error</div>)
+      return (<Error message="GraphQL error" />)
     }
 
     if (!loading && !this.props.data.Event) {

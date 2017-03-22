@@ -17,7 +17,6 @@ class TicketsConfirmed extends React.Component {
   constructor(props) {
     super(props);
     const event = props.event;
-    if (!event) return false;
     this.addToCalendarEvent = {
       title: event.name,
       description: event.description,
@@ -30,8 +29,6 @@ class TicketsConfirmed extends React.Component {
   render() {
     const { event, response, intl } = this.props;
     
-    if (!event) return (<div />);
-
     return (
       <Modal onClose={this.props.onClose} show={this.props.show} className="TicketsConfirmed" title={(<FormattedMessage id="TicketsConfirmed.ticketsAcquired" values={{quantity: response.quantity}} defaultMessage='{quantity, plural, one {ticket} other {tickets}} acquired!' />)} >
       <div className="TicketsConfirmed">

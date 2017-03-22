@@ -23,7 +23,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { title } = this.props;
+    const { title, className } = this.props;
     return (
     <header>
 
@@ -180,7 +180,7 @@ class Header extends React.Component {
 
       `}
       </style>
-      <TopBar />
+      <TopBar className={className} />
     </header>
     );
   }

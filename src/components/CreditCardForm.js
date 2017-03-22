@@ -119,7 +119,7 @@ class CreditCardForm extends React.Component {
         padding-top: 1rem;
         clear: both;
       }
-      :global(.form-control {
+      :global(.form-control) {
         display: block;
         width: 100%;
         font-size: 14px;
@@ -197,18 +197,6 @@ class CreditCardForm extends React.Component {
       {error && <div className="warning">{error}</div>}
       <Button type="submit" className='green' disabled={this.props.disabled} >{addCardLabel || 'Add Card'}</Button>
     </div>);
-  }
-
-  renderCard() {
-    const { number, exp_month, exp_year, cvc, token } = this.state;
-    return number ? (<div className="info">
-      <h5>{ number }</h5>
-      <p className="exp-cvc">
-        <span>{ exp_month }/{ exp_year }</span>
-        <span>{ cvc }</span>
-      </p>
-      <em>{ token }</em>
-    </div>) : '';
   }
 
   render() {
