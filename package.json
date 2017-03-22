@@ -57,7 +57,7 @@
   "scripts": {
     "dev": "node src/server.js",
     "build": "next build src",
-    "start": "NODE_ENV=production node src/server.js",
+    "start": "node src/server.js",
     "build:server": "./node_modules/.bin/babel -D ./index.js -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
     "test": "react-scripts test --env=jsdom",
