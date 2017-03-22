@@ -20,7 +20,7 @@ export default (Component) => (
             <Component {...props} />
           </ApolloProvider>
         )
-        await getDataFromTree(app)
+        await getDataFromTree(app);
       }
 
       return {
@@ -36,7 +36,6 @@ export default (Component) => (
     constructor (props) {
       super(props);
       this.client = initClient(this.props.headers);
-      this.store = this.props.initialState;
     }
 
     render () {

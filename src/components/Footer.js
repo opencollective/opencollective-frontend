@@ -3,14 +3,13 @@ import React from 'react';
 
 class Footer extends React.Component {
 
-  componentDidMount() {
-    const svg = this.refs.svg.getSVGDocument();
+  render() {
+
+    const svg = this.refs.svg && this.refs.svg.getSVGDocument();
     if (svg) {
       svg.querySelector('#logotype').style.fill = '#7a7b82';
     }
-  }
 
-  render() {
     return (
       <div className="Footer">
         <style jsx>{`
@@ -19,6 +18,10 @@ class Footer extends React.Component {
           margin-top: 2rem;
           padding: 0rem 1rem;
           overflow: hidden;
+          position: absolute;
+          bottom: 0;
+          height: 7.5rem;
+          width: 100%;
         }
         .container {
           padding: 2rem;
