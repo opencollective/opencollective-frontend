@@ -3,7 +3,8 @@ const { parse } = require('url')
 const next = require('next')
 const pathMatch = require('path-match')
 
-const dev = process.env.NODE_ENV !== 'production';
+const env = process.env.NODE_ENV || "development";
+const dev = (env === 'development');
 const app = next({ dev, dir: 'src' });
 const handle = app.getRequestHandler();
 const route = pathMatch();
