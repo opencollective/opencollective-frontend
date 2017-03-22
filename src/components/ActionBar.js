@@ -15,16 +15,16 @@ class ActionBar extends React.Component {
         <style jsx>{`
         .ActionBar {
           box-shadow: 0px 2px 4px rgba(0,0,0,.1);
+          border-top: 1px solid #E6E6E6;
+          border-bottom: 1px solid #E6E6E6;
         }
 
-        
         .content {
           display: flex;
           padding: 0;
           flex-direction: row;
         }
 
-        
         .info {
           float: left;
           width: 100%;
@@ -38,13 +38,11 @@ class ActionBar extends React.Component {
           border-right: 1px solid #E6E6E6;
         }
 
-        
         .info :global(a) {
           color: #797d80;
           text-decoration: none;
         }
 
-        
         .buttons {
           display: flex;
           width: 100%;
@@ -52,18 +50,17 @@ class ActionBar extends React.Component {
           height: 6rem;
         }
 
-        
         .buttons :global(button) {
           border-right: 1px solid #E6E6E6;
           cursor: pointer;
         }
 
         @media(max-width: 600px) {
-          
+
           .content {
             flex-direction: column;
           }
-          
+
           .info {
             border-bottom: 1px solid #E6E6E6;
             border-right: none;

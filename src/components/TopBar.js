@@ -67,6 +67,12 @@ class TopBar extends React.Component {
           margin-right: 0;
           padding-right: 0;          
         }
+
+        @media(max-width: 380px) {
+          ul {
+            display: none;
+          }
+        }
         `}</style>
         <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
         <div className="nav">

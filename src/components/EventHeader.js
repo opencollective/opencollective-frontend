@@ -47,6 +47,7 @@ class EventHeader extends React.Component {
         h1 {
           font-size: 4rem;
           color: white;
+          line-height: 1.5;
         }
         `}</style>
         <div className="cover">
