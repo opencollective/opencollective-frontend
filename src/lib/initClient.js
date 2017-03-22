@@ -3,22 +3,22 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client'
 let apolloClient = null
 
 
-let { REACT_APP_API_URL, REACT_APP_API_KEY } = process.env;
+let { API_URL, API_KEY } = process.env;
 switch (process.env.NODE_ENV) {
   case 'development':
-    REACT_APP_API_URL = 'http://localhost:3060';
-    REACT_APP_API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
+    API_URL = 'http://localhost:3060';
+    API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
     break;
   case 'production':
-    REACT_APP_API_URL = 'https://opencollective.com/api';
+    API_URL = 'https://opencollective.com/api';
     break;
   case 'staging':
-    REACT_APP_API_URL = 'https://staging.opencollective.com/api';
+    API_URL = 'https://staging.opencollective.com/api';
     break;
 }
 
-const api_key_param = (REACT_APP_API_KEY) ? `?api_key=${REACT_APP_API_KEY}` : '';
-const uri = `${REACT_APP_API_URL}/graphql${api_key_param}`;
+const api_key_param = (API_KEY) ? `?api_key=${API_KEY}` : '';
+const uri = `${API_URL}/graphql${api_key_param}`;
 
 function createClient (headers) {
   return new ApolloClient({
