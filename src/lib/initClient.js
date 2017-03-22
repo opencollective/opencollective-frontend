@@ -2,9 +2,12 @@ import ApolloClient, { createNetworkInterface } from 'apollo-client'
 
 let apolloClient = null
 
+const env = process.env.NODE_ENV || "development";
+
+console.log(">>> env", env);
 
 let { API_URL, API_KEY } = process.env;
-switch (process.env.NODE_ENV) {
+switch (env) {
   case 'development':
     API_URL = 'http://localhost:3060';
     API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';

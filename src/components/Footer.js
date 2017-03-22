@@ -16,11 +16,10 @@ class Footer extends React.Component {
         .Footer {
           background-color: #303233;
           margin-top: 2rem;
-          padding: 0rem 1rem;
           overflow: hidden;
           position: absolute;
           bottom: 0;
-          height: 7.5rem;
+          min-height: 7.5rem;
           width: 100%;
         }
         .container {
@@ -33,13 +32,13 @@ class Footer extends React.Component {
           margin: 0 auto;
         }
         .logo {
-          padding-top: 0.8rem;
+          padding-top: 0.5rem;
         }
         ul {
           list-style: none;
           margin: 0;
-          white-space: pre;
           padding-left: 0;
+          text-align: center;
         }
         li {
           display: inline-block;
@@ -48,10 +47,19 @@ class Footer extends React.Component {
           opacity: 0.5;
           color: white;
           font-size: 1.2rem;
+          font-weight: 300;
           font-family: Montserrat,sans-serif;
           text-decoration: none;
           padding: 1rem;
           display: block;
+        }
+        @media(max-width: 600px) {
+          .container {
+            flex-direction: column;
+          }
+          .logo {
+            padding: 1rem;
+          }
         }
         :global(svg #logotype) {
           fill: red;

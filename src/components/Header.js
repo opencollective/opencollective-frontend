@@ -70,6 +70,7 @@ class Header extends React.Component {
         font-weight: 400;
         font-size: 14px;
         font-size: 1.4rem;
+        overflow-x: hidden;
       }
 
       body > div:first-child {

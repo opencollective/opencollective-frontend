@@ -20,8 +20,6 @@ app.prepare()
       handle(req, res)
       return
     }
-    console.log("params", params);
-    console.log("pathname", pathname);
 
     app.render(req, res, '/event', params)
   })

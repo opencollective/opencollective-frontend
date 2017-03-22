@@ -6,7 +6,6 @@ import EventHeader from '../components/EventHeader';
 import ActionBar from '../components/ActionBar';
 import NotFound from '../components/NotFound';
 import Location from '../components/Location';
-import Api from '../lib/api';
 import HashLink from 'react-scrollchor';
 import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
@@ -63,10 +62,6 @@ class Event extends React.Component {
       actions: this.defaultActions
     };
 
-    this.api = new Api({
-      onChange: (apiStatus) => this.setState({ api: apiStatus }),
-      delay: 5000
-    });
   }
 
   /**
