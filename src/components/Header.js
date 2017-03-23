@@ -73,6 +73,13 @@ class Header extends React.Component {
         overflow-x: hidden;
       }
 
+      body.showModal {
+        overflow: hidden;
+      }
+      body.showModal .EventPage {
+        filter: blur(3px); background: rgba(0,0,0,0.6);
+      }
+
       body > div:first-child {
         position: relative;
         min-height: 100%;

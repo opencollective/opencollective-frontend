@@ -56,20 +56,16 @@ class Event extends React.Component {
 
     this.state = {
       view: 'default',
+      modal: 'TicketsConfirmed',
       showInterestedForm: false,
-      response: {},
+        response: {
+          user: { email: "etienne@gmail.com"},
+          tier: this.event && this.event.tiers[0],
+          quantity: 2
+        },
       api: { status: 'idle' },
       actions: this.defaultActions
     };
-
-    // To test confirmation screen, uncomment the following:
-    // this.state.modal = "TicketsConfirmed";
-    // this.state.response = {
-    //   user: { email: "etienne@gmail.com"},
-    //   tier: this.event && this.event.tiers[0],
-    //   quantity: 2
-    // };
-
   }
 
   /**
@@ -177,7 +173,7 @@ class Event extends React.Component {
   }
 
   render () {
-    console.log("new state:", this.state, this.state.response);
+    console.log("new state:", this.state, "data", this.props.data);
     const { Event, error, loading } = this.props.data;
 
     if (loading) return (<Loading />);
@@ -206,12 +202,12 @@ class Event extends React.Component {
 
     return (
       <div>
-
+{/*
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
           event={this.event}
-          response={this.state.response} />
+          response={this.state.response} />*/}
 
         <Header
           title={this.event.name}

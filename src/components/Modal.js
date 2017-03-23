@@ -16,8 +16,12 @@ class Modal extends React.Component {
     if (typeof document !== 'undefined')
       document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
 
+    const style = {
+      display: this.props.show ? 'block' : 'none'
+    };
+
     return (
-      <div className="Modal">
+      <div className="Modal" style={style}>
         <style jsx>{`
         .Modal-overlay {
           position: absolute;
@@ -83,10 +87,6 @@ class Modal extends React.Component {
           }
         }
         `}</style>
-        <style>
-          { this.props.show && `body { overflow: hidden; } .EventPage { filter: blur(3px); background: rgba(0,0,0,0.6);}` }
-          { !this.props.show && `.TicketsConfirmed { display: none; }` }
-        </style>
         <div className={`Modal-box ${this.props.className}`}>
           <div className="TitleBar">{this.props.title}</div>
           <div className="content">
