@@ -1,29 +1,28 @@
 import React from 'react';
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
 
 export default () => {
   return (
     <div className="NotFound">
       <style jsx>{`
-      .NotFound .logo {
-        position: absolute;
-        bottom: 10px;
+      h1 {
         text-align: center;
-        width: 100%;
       }
-      .NotFound .logo img {
-        width: 90%;
-        max-width: 200px;
-      }
-      .NotFound .shrug {
+      .shrug {
         font-size: 3.6rem;
         text-align: center;
         color: #46B0ED;
       }
       `}
       </style>
-      <h1>Event Not Found</h1>
-      <div className="shrug">¯\_(ツ)_/¯ </div>
-      <div className="logo"><img src="/static/images/opencollectivelogo.svg" /></div>
+      <Header />
+      <Body>
+        <h1>Event Not Found</h1>
+        <div className="shrug">¯\_(ツ)_/¯ </div>
+      </Body>
+      <Footer />
     </div>
   )
 }

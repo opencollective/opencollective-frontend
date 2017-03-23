@@ -1,5 +1,5 @@
 import React from 'react';
-const logo = '/static/images/logo.svg';
+const logo = '/static/images/opencollective-icon.svg';
 
 class NotificationBar extends React.Component {
 

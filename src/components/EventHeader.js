@@ -1,35 +1,4 @@
 import React from 'react';
-import { css } from 'glamor';
-
-const styles = {
-  cover: css({
-    width: '100%',
-    height: '400px',
-    padding: '50px 10px 10px 10px',
-    color: 'white',
-    textAlign: 'center',
-    position: 'relative'
-  }),
-  backgroundCover: css({
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    filter: 'brightness(50%)'
-  }),
-  logo: css({
-    width: '75px',
-    margin: '20px auto',
-    display: 'block'
-  }),
-  content: css({
-    position: 'relative'
-  }),
-  title: css({
-    fontSize: '44px'
-  })
-}
 
 class EventHeader extends React.Component {
 
@@ -49,12 +18,43 @@ class EventHeader extends React.Component {
     };
 
     return (
-      <div className={styles.header}>
-        <div className={styles.cover}>
-          <div className={styles.backgroundCover} style={style} />
-          <div className={styles.content}>
-            <img src={logo} className={styles.logo} />
-            <h1 className={styles.title}>{title}</h1>
+      <div className="EventHeader">
+        <style jsx>{`
+        .cover {
+          display: flex;
+          align-items: center;
+          position: relative;
+          text-align: center;
+          height: 400px;
+          width: 100%;
+        }
+        .backgroundCover {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          filter: brightness(50%);
+        }
+        .content {
+          position: relative;
+        }
+        .logo {
+          width: 7.5rem;
+          margin: 20px auto;
+          display: block;
+        }
+        h1 {
+          font-size: 4rem;
+          color: white;
+          line-height: 1.5;
+        }
+        `}</style>
+        <div className="cover">
+          <div className="backgroundCover" style={style} />
+          <div className="content">
+            <img src={logo} className="logo" />
+            <h1>{title}</h1>
           </div>
         </div>
       </div>

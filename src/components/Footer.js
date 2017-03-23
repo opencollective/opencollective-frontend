@@ -3,22 +3,19 @@ import React from 'react';
 
 class Footer extends React.Component {
 
-  componentDidMount() {
-    const svg = this.refs.svg.getSVGDocument();
-    if (svg) {
-      svg.querySelector('#logotype').style.fill = '#7a7b82';
-    }
-  }
-
   render() {
+
     return (
       <div className="Footer">
         <style jsx>{`
         .Footer {
           background-color: #303233;
           margin-top: 2rem;
-          padding: 0rem 1rem;
           overflow: hidden;
+          position: absolute;
+          bottom: 0;
+          min-height: 7.5rem;
+          width: 100%;
         }
         .container {
           padding: 2rem;
@@ -30,13 +27,13 @@ class Footer extends React.Component {
           margin: 0 auto;
         }
         .logo {
-          padding-top: 0.8rem;
+          padding-top: 0.5rem;
         }
         ul {
           list-style: none;
           margin: 0;
-          white-space: pre;
           padding-left: 0;
+          text-align: center;
         }
         li {
           display: inline-block;
@@ -45,10 +42,19 @@ class Footer extends React.Component {
           opacity: 0.5;
           color: white;
           font-size: 1.2rem;
+          font-weight: 300;
           font-family: Montserrat,sans-serif;
           text-decoration: none;
           padding: 1rem;
           display: block;
+        }
+        @media(max-width: 600px) {
+          .container {
+            flex-direction: column;
+          }
+          .logo {
+            padding: 1rem;
+          }
         }
         :global(svg #logotype) {
           fill: red;
@@ -56,7 +62,7 @@ class Footer extends React.Component {
         `}</style>
         <div className="container">
           <div className="left">
-            <object ref="svg" type="image/svg+xml" data="/static/images/opencollectivelogo.svg" height='20' className="logo"></object>
+            <object ref="svg" type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height='20' className="logo"></object>
           </div>
           <div className="right">
             <nav>

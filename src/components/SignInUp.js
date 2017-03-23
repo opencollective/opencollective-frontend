@@ -107,11 +107,12 @@ class SignInUp extends React.Component {
 
     return (
       <div className={styles.SignInUp}>
-        <style>{`
+        <style jsx global>{`
           .field {
             display: flex;
+            width: 100%;
             flex-direction: column;
-            margin: 10px 0;
+            margin: 1rem;
           }
           .field label {
             color: ${colors.black}

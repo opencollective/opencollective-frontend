@@ -71,6 +71,7 @@ class CreditCardForm extends React.Component {
             expYear: card.exp_year,
             token
           };
+          this.setState({ error: null });
           this.props.onCardAdded(sanitizedCard);
         }).catch((error) => {
           this.setState(Object.assign(this.state, { error }));
@@ -118,49 +119,47 @@ class CreditCardForm extends React.Component {
         padding-top: 1rem;
         clear: both;
       }
-      .form-control {
-          display: block;
-          width: 100%;
-          /*height: 34px;
-          padding: 6px 12px;*/
-          font-size: 14px;
-          line-height: 1.42857143;
-          color: #555;
-          background-color: #fff;
-          background-image: none;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-          transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+      :global(.form-control) {
+        display: block;
+        width: 100%;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
       }
-      .col-xs-12 {
-          width: 100%;
-          position: relative;
-          min-height: 1px;
-          padding-right: 15px;
-          padding-left: 15px;
+      :global(.col-xs-12) {
+        width: 100%;
+        position: relative;
+        min-height: 1px;
+        padding-right: 15px;
       }
-
-      .col-sm-4, .col-sm-5 {
+      :global(.col-sm-4, .col-sm-5) {
         float:left;
       }
-
-      .form-group {
-          margin-bottom: 15px;
+      :global(.form-group) {
+       margin-bottom: 15px;
       }
-
-      .col-xs-6 {
-          width: 50%;
-          position: relative;
-          min-height: 1px;
-          padding-right: 15px;
-          padding-left: 15px;
+      :global(.col-xs-6) {
+        width: 50%;
+        position: relative;
+        min-height: 1px;
+        padding-right: 15px;
+      }
+      .warning {
+        padding: 1rem;
+        width: 100%;
+        text-align: center;
+        color: red;        
       }
       `}</style>
-      <Row>
-        <Col xs={ 12 }>
-          <FormGroup>
-            <ControlLabel>Card Number</ControlLabel>
+      <div className="row">
+        <div className="field">
+            <label>Card Number:</label>
             <input
               onKeyUp={ this.setCardType }
               className="form-control"
@@ -170,13 +169,11 @@ class CreditCardForm extends React.Component {
               onChange={() => debouncedHandleEvent('number')}
               placeholder="Card Number"
             />
-          </FormGroup>
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={ 6 } sm={ 5 }>
-          <FormGroup>
-            <ControlLabel>Expiration</ControlLabel>
+        </div>
+      </div>
+      <div className="row">
+        <div className="field">
+            <label>Expiration</label>
             <input
               className="form-control text-center"
               type="text"
@@ -185,11 +182,9 @@ class CreditCardForm extends React.Component {
               onChange={() => debouncedHandleEvent('expiration')}
               placeholder="MM/YY"
             />
-          </FormGroup>
-        </Col>
-        <Col xs={ 6 } sm={ 4 } smOffset={ 3 }>
-          <FormGroup>
-            <ControlLabel>CVC</ControlLabel>
+        </div>
+        <div className="field">
+            <label>CVC</label>
             <input
               className="form-control text-center"
               type="text"
@@ -197,24 +192,11 @@ class CreditCardForm extends React.Component {
               onChange={() => debouncedHandleEvent('cvc')}
               placeholder="CVC"
             />
-          </FormGroup>
-        </Col>
-      </Row>
-      {error && <Alert bsStyle="warning">{error}</Alert>}
+        </div>
+      </div>
+      {error && <div className="warning">{error}</div>}
       <Button type="submit" className='green' disabled={this.props.disabled} >{addCardLabel || 'Add Card'}</Button>
     </div>);
-  }
-
-  renderCard() {
-    const { number, exp_month, exp_year, cvc, token } = this.state;
-    return number ? (<Alert bsStyle="info">
-      <h5>{ number }</h5>
-      <p className="exp-cvc">
-        <span>{ exp_month }/{ exp_year }</span>
-        <span>{ cvc }</span>
-      </p>
-      <em>{ token }</em>
-    </Alert>) : '';
   }
 
   render() {
@@ -228,7 +210,7 @@ class CreditCardForm extends React.Component {
         .CreditCardForm .credit-card-list {
           list-style: none;
           padding: 0;
-          margin: 15px 0;
+          margin: 15px;
         }
 
         .CreditCardForm li {

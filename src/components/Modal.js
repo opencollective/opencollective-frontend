@@ -63,11 +63,7 @@ class Modal extends React.Component {
         }
 
         .Modal-box > .content {
-          position: absolute;
-          top: 0;
-          left: 0;
-          padding: 4rem;
-          width: 100%;
+          position: relative;
           height: 100%;
           display: flex;
           justify-content: center;
@@ -88,7 +84,7 @@ class Modal extends React.Component {
         }
         `}</style>
         <style>
-          { this.props.show && `body { overflow: hidden; } .EventPage { filter: blur(3px); }` }
+          { this.props.show && `body { overflow: hidden; } .EventPage { filter: blur(3px); background: rgba(0,0,0,0.6);}` }
           { !this.props.show && `.TicketsConfirmed { display: none; }` }
         </style>
         <div className={`Modal-box ${this.props.className}`}>

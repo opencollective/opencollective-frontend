@@ -2,9 +2,9 @@ import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 
-export default () => {
+export default ({message}) => {
   return (
-    <div className="loading">
+    <div className="Error">
       <Header />
       <style jsx>{`
       h1 {
@@ -14,7 +14,7 @@ export default () => {
       `}
       </style>
       <Body>
-        <h1>Loading</h1>
+        <h1>{message || "unknown error"}</h1>
       </Body>
       <Footer />
     </div>
