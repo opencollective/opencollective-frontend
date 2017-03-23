@@ -62,6 +62,14 @@ class Event extends React.Component {
       actions: this.defaultActions
     };
 
+    // To test confirmation screen, uncomment the following:
+    // this.state.modal = "TicketsConfirmed";
+    // this.state.response = {
+    //   user: { email: "etienne@gmail.com"},
+    //   tier: this.event && this.event.tiers[0],
+    //   quantity: 2
+    // };
+
   }
 
   /**
@@ -198,17 +206,19 @@ class Event extends React.Component {
 
     return (
       <div>
+
+        <TicketsConfirmed
+          show={this.state.modal === 'TicketsConfirmed'}
+          onClose={this.closeModal}
+          event={this.event}
+          response={this.state.response} />
+
         <Header
           title={this.event.name}
           className={this.state.status} 
           />
 
         <Body>
-          <TicketsConfirmed
-            show={this.state.modal === 'TicketsConfirmed'}
-            onClose={this.closeModal}
-            event={this.event}
-            response={this.state.response} />
 
           <div className={`EventPage ${this.state.modal && 'showModal'}`}>
 

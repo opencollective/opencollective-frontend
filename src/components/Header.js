@@ -121,13 +121,13 @@ class Header extends React.Component {
 
       .content {
         max-width: 768px;
-        padding: 5px;
+        padding: 1rem;
         margin: 0 auto;
         line-height: 2rem;
       }
 
-      .eventDescription {
-          margin: 1rem;
+      .content > ul {
+        padding-left: 3rem;
       }
 
       .getTicketForm {

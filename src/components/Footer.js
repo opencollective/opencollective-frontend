@@ -5,11 +5,6 @@ class Footer extends React.Component {
 
   render() {
 
-    const svg = this.refs.svg && this.refs.svg.getSVGDocument();
-    if (svg) {
-      svg.querySelector('#logotype').style.fill = '#7a7b82';
-    }
-
     return (
       <div className="Footer">
         <style jsx>{`
@@ -67,7 +62,7 @@ class Footer extends React.Component {
         `}</style>
         <div className="container">
           <div className="left">
-            <object ref="svg" type="image/svg+xml" data="/static/images/opencollectivelogo.svg" height='20' className="logo"></object>
+            <object ref="svg" type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height='20' className="logo"></object>
           </div>
           <div className="right">
             <nav>
