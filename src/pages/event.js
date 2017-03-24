@@ -31,4 +31,14 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(EventPage);
+let EventPageWithData;
+require.ensure([
+  'intl',
+  'intl/locale-data/jsonp/en.js'
+], (require) => {
+  require('intl');
+  require('intl/locale-data/jsonp/en.js');
+  EventPageWithData = withData(EventPage);
+});
+
+export default EventPageWithData;
