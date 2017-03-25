@@ -22,7 +22,6 @@ class Header extends React.Component {
         content: meta[name]
       })
     }
-    console.log(">>> description", meta.description);
   }
 
   render() {
