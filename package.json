@@ -30,7 +30,7 @@
     "lodash": "^4.17.2",
     "markdown-in-js": "^1.1.3",
     "markdown-loader": "^2.0.0",
-    "next": "^2.0.0",
+    "next": "^2.0.0-beta.39",
     "node-sass": "^4.5.0",
     "now": "^4.9.0",
     "path-match": "^1.2.4",
