@@ -2,24 +2,26 @@ import React from 'react'
 import Head from 'next/head';
 import TopBar from './TopBar';
 
+import { truncate } from '../lib/utils';
+
 class Header extends React.Component {
 
   constructor(props) {
     super(props);
-    this.meta = [
-      { 'twitter:site': 'opencollect' }
-    ];
-    if (this.props.meta) {
-      for (let i=0; i<Object.keys(this.props.meta).length; i++) {
-        this.meta.push(this.props.meta[i]);
-      }
+    const { description, image } = props;
+    const meta = {
+      'twitter:site': 'opencollect',
+      'og:image': image,
+      'description': truncate(description, 256)
+    };
+
+    this.meta = [];
+    for (const name in meta) {
+      this.meta.push({
+        name,
+        content: meta[name]
+      })
     }
-    this.meta = this.meta.map(meta => {
-      return {
-        name: Object.keys(meta)[0],
-        content: meta[Object.keys(meta)[0]]
-      }
-    });
   }
 
   render() {

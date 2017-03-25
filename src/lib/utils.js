@@ -6,6 +6,14 @@ const messages = defineMessages({
   free: { id: 'utils.free', defaultMessage: 'free' }
 });
 
+export function truncate(str, length) {
+  if (!str || str.length <= length) {
+    return str;
+  }
+  const subString = str.substr(0, length-1);
+  return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
+}
+
 export function isValidEmail(email) {
   if (!email) return false;
   return Boolean(email.match(/.+@.+\..+/));

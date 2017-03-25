@@ -200,6 +200,8 @@ class Event extends React.Component {
       </HashLink>
     );
 
+    const backgroundImage = Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage;
+
     return (
       <div>
 {/*
@@ -211,6 +213,8 @@ class Event extends React.Component {
 
         <Header
           title={this.event.name}
+          description={this.event.description}
+          image={this.event.collective.logo || backgroundImage}
           className={this.state.status} 
           />
 
@@ -226,7 +230,7 @@ class Event extends React.Component {
               <EventHeader
                 logo={Event.collective.logo}
                 title={Event.name}
-                backgroundImage={Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage}
+                backgroundImage={backgroundImage}
                 />
             }
 
