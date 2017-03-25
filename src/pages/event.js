@@ -3,13 +3,15 @@ import React from 'react'
 import Event from '../components/Event';
 import { IntlProvider, addLocaleData } from 'react-intl';
 
+import 'intl';
+import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 import en from 'react-intl/locale-data/en';
-import fr from 'react-intl/locale-data/fr';
-import es from 'react-intl/locale-data/es';
 import enUS from '../lang/en-US.json';
+// import fr from 'react-intl/locale-data/fr';
+// import es from 'react-intl/locale-data/es';
 // import frFR from '../lang/fr-FR.json';
 
-addLocaleData([...en, ...fr, ...es]);
+addLocaleData([...en]);
 addLocaleData({
     locale: 'en-US',
     parentLocale: 'en',
