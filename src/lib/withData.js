@@ -31,7 +31,7 @@ export default (Component) => (
         uri: graphqlUri,
         headers
       }
-      const client = initClient(options)
+      const client = initClient(null, options)
 
       const props = {
         url: { query: ctx.query, pathname: ctx.pathname },
@@ -49,8 +49,7 @@ export default (Component) => (
 
       return {
         initialState: {
-          initialState: client.initialState,
-          data: client.getInitialState().data
+          [client.reduxRootKey]: { data: client.getInitialState().data }
         },
         options,
         ...props
@@ -59,7 +58,7 @@ export default (Component) => (
 
     constructor (props) {
       super(props);
-      this.client = initClient(this.props.options);
+      this.client = initClient(this.props.initialState, this.props.options);
     }
 
     render () {

@@ -22,7 +22,6 @@ class Header extends React.Component {
         content: meta[name]
       })
     }
-    console.log(">>> description", meta.description);
   }
 
   render() {
@@ -74,6 +73,13 @@ class Header extends React.Component {
         font-size: 14px;
         font-size: 1.4rem;
         overflow-x: hidden;
+      }
+
+      body.showModal {
+        overflow: hidden;
+      }
+      body.showModal .EventPage {
+        filter: blur(3px); background: rgba(0,0,0,0.6);
       }
 
       body > div:first-child {
