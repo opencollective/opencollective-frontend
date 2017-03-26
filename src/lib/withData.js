@@ -58,7 +58,6 @@ export default (Component) => (
 
     constructor (props) {
       super(props);
-      console.log("initialState props", this.props);
       this.client = initClient(this.props.initialState, this.props.options);
     }
 
