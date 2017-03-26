@@ -23,7 +23,7 @@ app.prepare()
       handle(req, res)
       return
     }
-
+    console.log(req.url);
     app.render(req, res, '/event', params)
   })
   .listen(3000, (err) => {
