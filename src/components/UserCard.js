@@ -44,10 +44,11 @@ export default ({ user, type }) => (
           text-overflow: ellipsis;
           font-size: 0.6875rem;
           letter-spacing: 1.47px;
+          margin-bottom: 0.3rem;
         }        
         .tier .since {
           font-size: .6875rem;
-          letter-spacing: 1.47px;
+          letter-spacing: 0.05rem;
           opacity: 0.5;
           margin: 0;
         }

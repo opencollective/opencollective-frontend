@@ -72,8 +72,8 @@ class Header extends React.Component {
         margin: 0;
         font-family: Lato,Helvetica,sans-serif;
         font-weight: 400;
-        font-size: 14px;
-        font-size: 1.4rem;
+        font-size: 1.6rem;
+        line-height: 1.5;
         overflow-x: hidden;
       }
 
@@ -134,7 +134,7 @@ class Header extends React.Component {
         max-width: 768px;
         padding: 1rem;
         margin: 0 auto;
-        line-height: 2rem;
+        line-height: 1.5;
       }
 
       .content > ul {
