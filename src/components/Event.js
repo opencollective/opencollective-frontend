@@ -298,31 +298,31 @@ class Event extends React.Component {
                     />
 
                   { Event.responses.length > 0 &&
-                    <div>
-                      <section id="responses">
-                        <h1>
-                          <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
-                          { responses.interested.length > 0 &&
-                            <span>
-                              <span> - </span>
-                              <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
-                            </span>
-                          }
-                        </h1>
-                        <Responses responses={responses.guests} />
-                      </section>
-                      <section id="sponsors">
-                        <h1>
-                          <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
-                        </h1>
-                        <Sponsors sponsors={responses.sponsors.map(r => {
-                          const user = Object.assign({}, r.user);
-                          user.tier = r.tier;
-                          user.createdAt = new Date(r.createdAt);
-                          return user;
-                        })} />
-                      </section>
-                    </div>
+                    <section id="responses">
+                      <h1>
+                        <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                        { responses.interested.length > 0 &&
+                          <span>
+                            <span> - </span>
+                            <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
+                          </span>
+                        }
+                      </h1>
+                      <Responses responses={responses.guests} />
+                    </section>
+                  }
+                  { responses.sponsors.length > 0 &&
+                    <section id="sponsors">
+                      <h1>
+                        <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
+                      </h1>
+                      <Sponsors sponsors={responses.sponsors.map(r => {
+                        const user = Object.assign({}, r.user);
+                        user.tier = r.tier;
+                        user.createdAt = new Date(r.createdAt);
+                        return user;
+                      })} />
+                    </section>
                   }
 
                 </div>

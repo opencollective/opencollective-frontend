@@ -54,7 +54,7 @@ class Response extends React.Component {
           <style jsx>{`
           .Response {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             width: 100%;
             margin: 10px;
             max-width: 300px;
@@ -66,10 +66,11 @@ class Response extends React.Component {
             float: left;
             width: 45px;
             border-radius: 50%;
+            margin-top: 1rem;
           }
 
           .bubble {
-              padding: 10px;
+              padding: 1rem;
           }
 
           .name {
