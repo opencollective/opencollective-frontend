@@ -8,9 +8,11 @@ class Header extends React.Component {
 
   constructor(props) {
     super(props);
-    const { description, image } = props;
+    const { description, image, twitterHandle } = props;
     const meta = {
       'twitter:site': 'opencollect',
+      'twitter:creator': twitterHandle, 
+      'fb:app_id': '266835577107099',
       'og:image': image,
       'description': truncate(description, 256)
     };
@@ -34,7 +36,7 @@ class Header extends React.Component {
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" />
         <title>{title}</title>
-        {this.meta.map(({name, content}) => <meta name={name} content={content} />)}
+        {this.meta.map(({name, content}) => <meta property={name} content={content} />)}
         <script type="text/javascript" src="https://js.stripe.com/v2/" />
       </Head>
 

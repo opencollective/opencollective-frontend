@@ -72,6 +72,10 @@ class Event extends React.Component {
 
   }
 
+  componentDidMount() {
+    window.oc = { event: this.event }; // for easy debugging
+  }
+
   /**
    * If user is logged in, we directly create a response 
    * Otherwise, we show the form to enter an email address
@@ -219,6 +223,7 @@ class Event extends React.Component {
           <Header
             title={this.event.name}
             description={this.event.description}
+            twitterHandle={this.event.collective.twitterHandle}
             image={this.event.collective.logo || backgroundImage}
             className={this.state.status} 
             />
