@@ -225,6 +225,23 @@ describe('Query Tests', () => {
             confirmedAt: new Date()
           })));
         
+        it('sends response data', async () => {
+          const query = `
+            query getMultipleEvents {
+              Event(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}") {
+                responses {
+                  createdAt,
+                  status
+                }
+              }
+            }
+          `;
+          const result = await graphql(schema, query);
+          const response = result.data.Event.responses[0];
+          expect(response).to.have.property("createdAt");
+          expect(response).to.have.property("status");
+        });
+
         it('when given only a collective slug', async () => {
           const query = `
             query getOneEvent {

@@ -453,6 +453,12 @@ export const ResponseType = new GraphQLObjectType({
           return response.getEvent();
         }
       },
+      createdAt: {
+        type: GraphQLString,
+        resolve(response) {
+          return response.createdAt;
+        }
+      },
       confirmedAt: {
         type: GraphQLString,
         resolve(response) {
