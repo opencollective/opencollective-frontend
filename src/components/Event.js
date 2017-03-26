@@ -61,6 +61,15 @@ class Event extends React.Component {
       api: { status: 'idle' },
       actions: this.defaultActions
     };
+
+    // To test confirmation screen, uncomment the following:
+    // this.state.modal = "TicketsConfirmed";
+    // this.state.response = {
+    //   user: { email: "etienne@gmail.com"},
+    //   tier: this.event && this.event.tiers[0],
+    //   quantity: 2
+    // };
+
   }
 
   /**
