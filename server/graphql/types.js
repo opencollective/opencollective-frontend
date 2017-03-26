@@ -166,6 +166,12 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.slug;
         }
       },
+      twitterHandle: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.twitterHandle;
+        }
+      },
       events: {
         type: new GraphQLList(EventType),
         resolve(collective) {
@@ -295,7 +301,7 @@ export const EventType = new GraphQLObjectType({
       tiers: {
         type: new GraphQLList(TierType),
         resolve(event) {
-          return event.getTiers();
+          return event.getTiers({ order: [['amount', 'ASC']] });
         }
       },
       responses: {
@@ -304,7 +310,10 @@ export const EventType = new GraphQLObjectType({
           return event.getResponses({
             where: { 
               confirmedAt: { $ne: null } 
-            }
+            },
+            order: [
+              ['createdAt', 'DESC']
+            ]
           });
         }
       }
@@ -445,6 +454,12 @@ export const ResponseType = new GraphQLObjectType({
         type: EventType,
         resolve(response) {
           return response.getEvent();
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(response) {
+          return response.createdAt;
         }
       },
       confirmedAt: {
