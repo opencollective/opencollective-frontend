@@ -56,13 +56,8 @@ class Event extends React.Component {
 
     this.state = {
       view: 'default',
-      modal: 'TicketsConfirmed',
       showInterestedForm: false,
-        response: {
-          user: { email: "etienne@gmail.com"},
-          tier: this.event && this.event.tiers[0],
-          quantity: 2
-        },
+      response: {},
       api: { status: 'idle' },
       actions: this.defaultActions
     };
@@ -204,104 +199,107 @@ class Event extends React.Component {
 
     return (
       <div>
-{/*
+
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
           event={this.event}
-          response={this.state.response} />*/}
+          response={this.state.response} />
 
-        <Header
-          title={this.event.name}
-          description={this.event.description}
-          image={this.event.collective.logo || backgroundImage}
-          className={this.state.status} 
-          />
+        <div className="EventPage">
 
-        <Body>
+          <Header
+            title={this.event.name}
+            description={this.event.description}
+            image={this.event.collective.logo || backgroundImage}
+            className={this.state.status} 
+            />
 
-          <div className={`EventPage ${this.state.modal && 'showModal'}`}>
+          <Body>
 
-            <NotificationBar status={this.state.status} error={this.state.error} />
+            <div className={`EventPage ${this.state.modal && 'showModal'}`}>
 
-            {this.state.view === 'loading' && <Loading /> }
+              <NotificationBar status={this.state.status} error={this.state.error} />
 
-            {this.state.view === 'default' &&
-              <EventHeader
-                logo={Event.collective.logo}
-                title={Event.name}
-                backgroundImage={backgroundImage}
-                />
-            }
+              {this.state.view === 'loading' && <Loading /> }
 
-            {this.state.view !== 'loading' &&
-              <ActionBar
-                actions={this.state.actions}
-                info={info}
-                />
-            }
-
-            {this.state.showInterestedForm &&
-              <InterestedForm onSubmit={this.setInterested} />
-            }
-
-            {this.state.view == 'GetTicket' &&
-              <GetTicketForm
-                onCancel={this.resetResponse}
-                onSubmit={this.rsvp}
-                quantity={this.state.response.quantity}
-                stripePublishableKey={this.event.collective.stripePublishableKey}
-                tier={this.state.response.tier || Event.tiers[0]}
-                />
-            }
-
-            {this.state.view == 'default' &&
-              <div>
-                <div className="content" >
-                  <div className="eventDescription" >
-                    <Markdown source={Event.description} />
-                  </div>
-
-                  <div id="tickets">
-                    {Event.tiers.map((tier) =>
-                      <Tier
-                        key={tier.id}
-                        className="tier"
-                        tier={tier}
-                        onChange={(response) => this.updateResponse(response)}
-                        onClick={(response) => this.handleGetTicketClick(response)}
-                        />
-                    )}
-                  </div>
-                </div>
-
-                <Location
-                  location={Event.location}
-                  address={Event.address}
-                  lat={Event.lat}
-                  long={Event.long}
+              {this.state.view === 'default' &&
+                <EventHeader
+                  logo={Event.collective.logo}
+                  title={Event.name}
+                  backgroundImage={backgroundImage}
                   />
+              }
 
-                { Event.responses.length > 0 &&
-                  <section id="responses">
-                    <h1>
-                      <FormattedMessage id='event.responses.title.going' values={{n: going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
-                      { interested.length > 0 &&
-                        <span>
-                          <span> - </span>
-                          <FormattedMessage id='event.responses.title.interested' values={{n: interested.length}} defaultMessage={`{n} interested`} />
-                        </span>
-                      }
-                    </h1>
-                    <Responses responses={Event.responses} />
-                  </section>
-                }
+              {this.state.view !== 'loading' &&
+                <ActionBar
+                  actions={this.state.actions}
+                  info={info}
+                  />
+              }
 
-              </div>
-            }
+              {this.state.showInterestedForm &&
+                <InterestedForm onSubmit={this.setInterested} />
+              }
+
+              {this.state.view == 'GetTicket' &&
+                <GetTicketForm
+                  onCancel={this.resetResponse}
+                  onSubmit={this.rsvp}
+                  quantity={this.state.response.quantity}
+                  stripePublishableKey={this.event.collective.stripePublishableKey}
+                  tier={this.state.response.tier || Event.tiers[0]}
+                  />
+              }
+
+              {this.state.view == 'default' &&
+                <div>
+                  <div className="content" >
+                    <div className="eventDescription" >
+                      <Markdown source={Event.description} />
+                    </div>
+
+                    <div id="tickets">
+                      {Event.tiers.map((tier) =>
+                        <Tier
+                          key={tier.id}
+                          className="tier"
+                          tier={tier}
+                          onChange={(response) => this.updateResponse(response)}
+                          onClick={(response) => this.handleGetTicketClick(response)}
+                          />
+                      )}
+                    </div>
+                  </div>
+
+                  <Location
+                    location={Event.location}
+                    address={Event.address}
+                    lat={Event.lat}
+                    long={Event.long}
+                    />
+
+                  { Event.responses.length > 0 &&
+                    <section id="responses">
+                      <h1>
+                        <FormattedMessage id='event.responses.title.going' values={{n: going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                        { interested.length > 0 &&
+                          <span>
+                            <span> - </span>
+                            <FormattedMessage id='event.responses.title.interested' values={{n: interested.length}} defaultMessage={`{n} interested`} />
+                          </span>
+                        }
+                      </h1>
+                      <Responses responses={Event.responses} />
+                    </section>
+                  }
+
+                </div>
+              }
+            </div>
+          </Body>
+          <Footer />
           </div>
-        </Body>
-        <Footer />
       </div>
     )
   }

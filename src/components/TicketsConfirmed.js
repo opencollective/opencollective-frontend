@@ -94,6 +94,11 @@ class TicketsConfirmed extends React.Component {
             font-size: 1.2rem;
             color: #797D7F;
           }
+
+          .AddToCalendarBtn {
+            text-align: center;
+            margin: 3rem 0 0;            
+          }
           `}</style>
           <style jsx global>{`
           .react-add-to-calendar {
@@ -171,9 +176,9 @@ class TicketsConfirmed extends React.Component {
           <div className='text'>
             <p>{ response.user && <FormattedMessage id="TicketsConfirmed.ConfirmationSent" values={{email:response.user.email}} defaultMessage={`A confirmation email has been sent to your address {email}`} />}</p>
             <p><FormattedMessage id="TicketsConfirmed.SeeYouSoon" defaultMessage='See you soon!' /></p>
-            <p>
+            <div className="AddToCalendarBtn">
               <AddToCalendar event={this.addToCalendarEvent} />
-            </p>
+            </div>
           </div>
         </div>
       </Modal>

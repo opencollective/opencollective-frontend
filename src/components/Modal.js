@@ -34,10 +34,6 @@ class Modal extends React.Component {
           display: none;
         }
 
-        .showModal .Modal-overlay {
-          display: block;
-        }
-
         .Modal-box {
           position: fixed;
           top: 50%;
@@ -93,7 +89,7 @@ class Modal extends React.Component {
             {this.props.children}
           </div>
         </div>
-        <div className="Modal-overlay" onClick={this.props.onClose}></div>
+        <div className="Modal-overlay" onClick={this.props.onClose} style={style}></div>
       </div>
     );
   }
