@@ -4,6 +4,7 @@
   "actions.GoBack": "go back",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
   "event.responses.title.interested": "{n} interested",
+  "event.sponsors.title": "Sponsors",
   "GetTicketForm.submit": "{quantity, plural, one {Get this ticket} other {Get those tickets}}",
   "InterestedForm.RemindMe": "remind me",
   "response.status.interested": "{name} is interested",
@@ -14,11 +15,12 @@
   "signinup.description.label": "one liner",
   "signinup.description.description": "Present yourself in 60 characters or less, if you can!",
   "signinup.twitterHandle.label": "twitter",
-  "signinup.twitterHandle.description": "@xdamman",
   "TicketsConfirmed.ticketsAcquired": "{quantity, plural, one {ticket réservé} other {tickets réservés}}!",
   "TicketsConfirmed.tickets": "{quantity} {quantity, plural, one {ticket} other {tickets}}",
   "TicketsConfirmed.ConfirmationSent": "A confirmation email has been sent to your address {email}",
   "TicketsConfirmed.SeeYouSoon": "See you soon!",
   "tier.GetTicket": "{quantity, plural, one {get ticket} other {get tickets}}",
+  "tier.GetTier": "deviens un {name}",
+  "UserCard.since": "depuis",
   "utils.free": "gratuit"
 }

@@ -33,6 +33,7 @@ const getEventQuery = gql`
         stripePublishableKey
       },
       responses {
+        createdAt,
         quantity,
         status,
         description,

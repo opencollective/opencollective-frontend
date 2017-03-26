@@ -11,6 +11,7 @@ import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
 import GetTicketForm from '../components/GetTicketForm';
 import InterestedForm from '../components/InterestedForm';
+import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
 import { filterCollection } from '../lib/utils';
 import { addEventData } from '../graphql/queries';
@@ -70,6 +71,10 @@ class Event extends React.Component {
     //   quantity: 2
     // };
 
+  }
+
+  componentDidMount() {
+    window.oc = { event: this.event }; // for easy debugging
   }
 
   /**
@@ -176,12 +181,18 @@ class Event extends React.Component {
     this.changeView('GetTicket');
   }
 
-  render () {
+  render() {
     const { Event, error, loading } = this.props.data;
 
     if (loading) return (<Loading />);
 
     this.event = Event;
+
+    const responses = {};
+    responses.sponsors = filterCollection(Event.responses, { tier: { name: /sponsor/i }});
+    responses.guests = filterCollection(Event.responses, { tier: { name: /sponsor/i }}, true);
+    responses.going = filterCollection(responses.guests, {'status':'YES'});
+    responses.interested = filterCollection(responses.guests, {'status':'INTERESTED'});
 
     if ( error ) {
       console.error(error.message);
@@ -192,8 +203,6 @@ class Event extends React.Component {
       return (<NotFound />)
     }
 
-    const going = loading && filterCollection(Event.responses, {'status':'YES'});
-    const interested = loading && filterCollection(Event.responses, {'status':'INTERESTED'});
 
     const info = (
       <HashLink to="#location">
@@ -219,6 +228,7 @@ class Event extends React.Component {
           <Header
             title={this.event.name}
             description={this.event.description}
+            twitterHandle={this.event.collective.twitterHandle}
             image={this.event.collective.logo || backgroundImage}
             className={this.state.status} 
             />
@@ -288,18 +298,31 @@ class Event extends React.Component {
                     />
 
                   { Event.responses.length > 0 &&
-                    <section id="responses">
-                      <h1>
-                        <FormattedMessage id='event.responses.title.going' values={{n: going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
-                        { interested.length > 0 &&
-                          <span>
-                            <span> - </span>
-                            <FormattedMessage id='event.responses.title.interested' values={{n: interested.length}} defaultMessage={`{n} interested`} />
-                          </span>
-                        }
-                      </h1>
-                      <Responses responses={Event.responses} />
-                    </section>
+                    <div>
+                      <section id="responses">
+                        <h1>
+                          <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />
+                          { responses.interested.length > 0 &&
+                            <span>
+                              <span> - </span>
+                              <FormattedMessage id='event.responses.title.interested' values={{n: responses.interested.length}} defaultMessage={`{n} interested`} />
+                            </span>
+                          }
+                        </h1>
+                        <Responses responses={responses.guests} />
+                      </section>
+                      <section id="sponsors">
+                        <h1>
+                          <FormattedMessage id='event.sponsors.title' defaultMessage={`Sponsors`} />
+                        </h1>
+                        <Sponsors sponsors={responses.sponsors.map(r => {
+                          const user = Object.assign({}, r.user);
+                          user.tier = r.tier;
+                          user.createdAt = new Date(r.createdAt);
+                          return user;
+                        })} />
+                      </section>
+                    </div>
                   }
 
                 </div>

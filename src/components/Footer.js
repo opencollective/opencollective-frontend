@@ -1,4 +1,4 @@
-import Link from 'next/prefetch'
+import Link from 'next/link'
 import React from 'react';
 
 class Footer extends React.Component {
