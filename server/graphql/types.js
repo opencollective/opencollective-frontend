@@ -301,7 +301,7 @@ export const EventType = new GraphQLObjectType({
       tiers: {
         type: new GraphQLList(TierType),
         resolve(event) {
-          return event.getTiers();
+          return event.getTiers({ order: [['amount', 'ASC']] });
         }
       },
       responses: {
@@ -310,7 +310,10 @@ export const EventType = new GraphQLObjectType({
           return event.getResponses({
             where: { 
               confirmedAt: { $ne: null } 
-            }
+            },
+            order: [
+              ['createdAt', 'DESC']
+            ]
           });
         }
       }
