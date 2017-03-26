@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
@@ -39,65 +40,66 @@ class Response extends React.Component {
     const { intl, response } = this.props;
     const { user, description, status } = response;
 
-    const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.email && user.email.substr(0, user.email.indexOf('@'));
+    const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.username || user.email && user.email.substr(0, user.email.indexOf('@'));
 
     if (!name) return (<div/>);
 
     const avatar = user.avatar || this.pickAvatar(name);
-
-    const linkTo = `https://opencollective.com/${user.username}`;
+    const linkTo = `/${user.username}`;
     const title = intl.formatMessage(this.messages[status], { name });
 
     return (
-      <a href={linkTo} title={title} >
-        <style jsx>{`
-        .Response {
-          display: flex;
-          align-items: center;
-          width: 100%;
-          margin: 10px;
-          max-width: 300px;
-          float: left;
-          position: relative;
-        }
-        
-        img {
-          float: left;
-          width: 45px;
-          border-radius: 50%;
-        }
+      <Link href={linkTo} title={title}>
+        <div>
+          <style jsx>{`
+          .Response {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 10px;
+            max-width: 300px;
+            float: left;
+            position: relative;
+          }
+          
+          img {
+            float: left;
+            width: 45px;
+            border-radius: 50%;
+          }
 
-        .bubble {
-            padding: 10px;
-        }
+          .bubble {
+              padding: 10px;
+          }
 
-        .name {
-            font-family: 'montserratlight';
-            font-size: 1.7rem;
-        }
+          .name {
+              font-family: 'montserratlight';
+              font-size: 1.7rem;
+          }
 
-        .description {
-          font-family: 'lato';
-          font-size: 1.4rem;
-        }
+          .description {
+            font-family: 'lato';
+            font-size: 1.4rem;
+          }
 
-        .star {
-          width: 14px;
-          height: 14px;
-          position: absolute;
-          top: 45px;
-          left: 0;
-        }
-        `}</style>
-        <div className="Response">
-          { status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" /> }
-          <img src={avatar} />
-          <div className="bubble">
-            <div className="name">{name}</div>
-            <div className="description" style={{color: colors.darkgray}}>{description || user.description}</div>
+          .star {
+            width: 14px;
+            height: 14px;
+            position: absolute;
+            top: 45px;
+            left: 0;
+          }
+          `}</style>
+          <div className="Response">
+            { status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" /> }
+            <img src={avatar} />
+            <div className="bubble">
+              <div className="name">{name}</div>
+              <div className="description" style={{color: colors.darkgray}}>{description || user.description}</div>
+            </div>
           </div>
         </div>
-      </a>
+      </Link>
     )
   }
 

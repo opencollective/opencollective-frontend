@@ -8,6 +8,8 @@ class Responses extends React.Component {
   }
 
   render() {
+    const { responses } = this.props;
+    if (!responses || responses.length === 0) return (<div />);
     return (
       <div className="Responses" >
         <style jsx>{`
@@ -16,7 +18,7 @@ class Responses extends React.Component {
           margin: 3rem auto 3rem;
         }
         `}</style>
-        {this.props.responses.map((response, index) =>
+        {responses.map((response, index) =>
           <Response key={`response${index}`} response={response} />
         )}
       </div>

@@ -82,6 +82,8 @@ class Tier extends React.Component {
   render() {
     const { name, description, currency } = this.props.tier;
 
+    const type = (name.match(/ticket/i)) ? 'ticket' : 'tier';
+
     return (
       <div className={this.props.className}>
         <div className={styles.tier}>
@@ -90,10 +92,17 @@ class Tier extends React.Component {
             <div className={styles.title} >{formatCurrency(this.state.amount, currency, this.props.intl)}</div>
           </div>
           <p className={styles.description}>{description}</p>
-          <div id="actions" className={styles.actions}>
-            <Button id="btnTicketsCtrl"><TicketsCtlr value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} /></Button>
-            {this.props.onClick && <Button className="blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
-          </div>
+          { type === 'ticket' &&
+            <div id="actions" className={styles.actions}>
+              <Button id="btnTicketsCtrl"><TicketsCtlr value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} /></Button>
+              {this.props.onClick && <Button className="blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
+            </div>
+          }
+          { type === 'tier' &&
+            <div id="actions" className={styles.actions}>
+              {this.props.onClick && <Button className="blue" label={(<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick(this.state)} />}
+            </div>
+          }
         </div>
       </div>
     );
