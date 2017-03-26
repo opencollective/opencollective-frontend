@@ -177,7 +177,6 @@ class Event extends React.Component {
   }
 
   render () {
-    console.log("new state:", this.state, "data", this.props.data);
     const { Event, error, loading } = this.props.data;
 
     if (loading) return (<Loading />);
