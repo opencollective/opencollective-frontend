@@ -153,10 +153,8 @@ export default function(Sequelize, DataTypes) {
 
     twitterHandle: {
       type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
-      set(username) {
-        if (username.substr(0,1) === '@') {
-          this.setDataValue('twitterHandle', username.substr(1));
-        }
+      set(twitterHandle) {
+        this.setDataValue('twitterHandle', twitterHandle.replace(/^@/,''));
       }
     },
 

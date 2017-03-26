@@ -166,6 +166,12 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.slug;
         }
       },
+      twitterHandle: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.twitterHandle;
+        }
+      },
       events: {
         type: new GraphQLList(EventType),
         resolve(collective) {

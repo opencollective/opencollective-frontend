@@ -116,6 +116,10 @@ describe('Query Tests', () => {
               id,
               name,
               description,
+              collective {
+                slug,
+                twitterHandle
+              }
               timezone
             }
           }
@@ -127,7 +131,11 @@ describe('Query Tests', () => {
               description: "January monthly meetup",
               id: 1,
               name: "January meetup",
-              timezone: "America/New_York"
+              timezone: "America/New_York",
+              collective: {
+                slug: 'scouts',
+                twitterHandle: 'scouts'
+              }
             }            
           }
         });
