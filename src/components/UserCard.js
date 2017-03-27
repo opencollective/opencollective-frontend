@@ -23,8 +23,8 @@ export default ({ user, type }) => (
           width: 17.5rem;
         }
         img {
-          max-width: 14rem;
-          max-height: 7rem;
+          max-width: 15rem;
+          max-height: 5rem;
         }
         .tier {
           padding: 1rem 0.5rem;

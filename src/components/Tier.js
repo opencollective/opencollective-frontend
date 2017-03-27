@@ -74,6 +74,7 @@ class Tier extends React.Component {
     this.quantity = props.quantity || 1;
     this.state = { quantity: this.quantity, amount: this.quantity * this.tier.amount, tier: this.tier };
     this.onChange = this.props.onChange || function() {}; 
+    this.anchor = this.tier.name.toLowerCase().replace(/ /g,'-');
   }
 
   handleTicketsChange(quantity) {
@@ -88,7 +89,7 @@ class Tier extends React.Component {
     const type = (name.match(/ticket/i)) ? 'ticket' : 'tier';
 
     return (
-      <div className={this.props.className}>
+      <div className={this.props.className} id={this.anchor}>
         <div className={styles.tier}>
           <div className={styles.header}>
             <div className={styles.title} >{name}</div>

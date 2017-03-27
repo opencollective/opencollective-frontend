@@ -23,6 +23,11 @@ class GetTicketForm extends React.Component {
     this.state = { response };
     this.handleTicketChange = this.handleTicketChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    if (this.props.tier.name.match(/ticket/i)) {
+      this.buttonLabel = (<FormattedMessage id='GetTicketForm.getTicketBtn' values={{quantity: this.state.response.quantity}} defaultMessage={`{quantity, plural, one {Get this ticket} other {Get those tickets}}`} />);
+    } else {
+      this.buttonLabel = (<FormattedMessage id='GetTicketForm.getTierBtn' values={{name: this.props.tier.name}} defaultMessage={`become a {name}`} />);
+    }
   }
 
   handleTicketChange(response) {
@@ -51,7 +56,7 @@ class GetTicketForm extends React.Component {
         `}</style>
         <Tier tier={tier} quantity={this.props.quantity} onChange={this.handleTicketChange} />
         <SignInUp
-          label={label}
+          label={this.buttonLabel}
           onSubmit={this.handleSubmit}
           requireCreditCard={(this.state.response.amount > 0)}
           stripePublishableKey={this.props.stripePublishableKey}

@@ -71,7 +71,7 @@ class Header extends React.Component {
         padding: 0;
         margin: 0;
         font-family: Lato,Helvetica,sans-serif;
-        font-weight: 400;
+        font-weight: 100;
         font-size: 1.6rem;
         line-height: 1.5;
         overflow-x: hidden;
