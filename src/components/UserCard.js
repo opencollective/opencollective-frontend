@@ -1,8 +1,7 @@
-import Link from 'next/link';
-import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 export default ({ user, type }) => (
-  <Link href={`/${user.username}`}>
+  <a href={`/${user.username}`}>
     <div className={`UserCard ${type}`}>
       <style jsx>{`
         .UserCard {
@@ -63,5 +62,5 @@ export default ({ user, type }) => (
         </p>
       </div>
     </div>
-  </Link>
+  </a>
 );
