@@ -35,7 +35,7 @@ function imageUrlToAmazonUrl(knox_client, src, callback) {
         }
       }, (err, body) => err ? callback(err) : callback(null, body.Location));
     } else {
-      callback(new Error('Image not found'));
+      callback(new Error(`Image not found: ${src}`));
     }
   });
 }
