@@ -52,7 +52,8 @@
     "react-scrollchor": "^2.2.0",
     "sass-loader": "^6.0.3",
     "serve": "^3.3.1",
-    "styled-jsx": "^0.5.7"
+    "styled-jsx": "^0.5.7",
+    "underscore": "^1.8.3"
   },
   "scripts": {
     "dev": "node src/server.js",

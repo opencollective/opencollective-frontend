@@ -21,6 +21,7 @@ import TicketsConfirmed from '../components/TicketsConfirmed';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
+import { uniq } from 'underscore';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -190,7 +191,7 @@ class Event extends React.Component {
 
     const responses = {};
     responses.sponsors = filterCollection(Event.responses, { tier: { name: /sponsor/i }});
-    responses.guests = filterCollection(Event.responses, { tier: { name: /sponsor/i }}, true);
+    responses.guests = filterCollection(uniq(Event.responses, (r) => `${r.status}:${r.user.username}` ), { tier: { name: /sponsor/i }}, true);
     responses.going = filterCollection(responses.guests, {'status':'YES'});
     responses.interested = filterCollection(responses.guests, {'status':'INTERESTED'});
 
