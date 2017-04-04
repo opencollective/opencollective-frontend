@@ -18,7 +18,16 @@ const {
 const createdLastWeek = getTimeFrame('createdAt');
 const updatedLastWeek = getTimeFrame('updatedAt');
 
-const donation = { where: { DonationId: { $not: null } } };
+const donation = {
+  where: {
+    DonationId: {
+      $not: null
+    },
+    platformFeeInTxnCurrency: {
+      $gt: 0
+    }
+  }
+};
 
 const pendingExpense = { where: { status: expenseStatus.PENDING } };
 const approvedExpense = { where: { status: expenseStatus.APPROVED } };
