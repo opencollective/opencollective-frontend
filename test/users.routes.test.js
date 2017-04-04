@@ -320,7 +320,7 @@ describe('users.routes.test.js', () => {
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-    it('should update first name, last name and description if logged in', (done) => {
+    it('should update username, first name, last name and description if logged in', (done) => {
       request(app)
         .put(`/users/${user.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
@@ -328,12 +328,14 @@ describe('users.routes.test.js', () => {
           user: {
             firstName: "Xavier",
             lastName: "Damman",
+            username: "xdamman2",
             description: "new description"
           }
         })
         .end((err, res) => {
           const { body } = res;
           expect(body.firstName).to.equal("Xavier");
+          expect(body.username).to.equal("xdamman2");
           expect(body.description).to.equal("new description");
           done();
         });
@@ -354,6 +356,25 @@ describe('users.routes.test.js', () => {
           expect(body.lastName).to.equal("Damman");
           done();
         });
+    });
+
+    it('should fail to update username if already taken by a group', (done) => {
+      models.Group.create(utils.data('group1')).then(() => {
+        request(app)
+          .put(`/users/${user.id}?api_key=${application.api_key}`)
+          .set('Authorization', `Bearer ${user.jwt(application)}`)
+          .send({
+            user: {
+              username: "scouts"
+            }
+          })
+          .end((err, res) => {
+            const { body } = res;
+            expect(body.error.code).to.equal(400);
+            expect(body.error.message).to.equal("username scouts is already taken");
+            done();
+          });
+      });
     });
   });
 

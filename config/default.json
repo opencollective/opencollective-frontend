@@ -29,9 +29,9 @@
   },
   "aws": {
     "s3": {
-      "key": "xxxxxxxxx",
-      "secret": "xxxxxxxxxxxxx",
-      "bucket": "xxxxxxxxxxxx"
+      "key": "",
+      "secret": "",
+      "bucket": ""
     }
   },
   "paypal": {
