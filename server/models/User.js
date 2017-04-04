@@ -351,7 +351,8 @@ export default (Sequelize, DataTypes) => {
 
         let update = false;
         const allowedFields = 
-          [ 'firstName',
+          [ 'username',
+            'firstName',
             'lastName',
             'description',
             'longDescription',
@@ -372,10 +373,23 @@ export default (Sequelize, DataTypes) => {
             this[prop] = attributes[prop];
             update = true;
           }
+
+          if (prop === 'username') {
+            return Sequelize.query(`
+              with usernames as (SELECT username FROM "Users" UNION SELECT slug as username FROM "Groups")
+              SELECT COUNT(*) FROM usernames WHERE username='${attributes[prop]}'
+              `, {
+                type: Sequelize.QueryTypes.SELECT
+              })
+            .then(res => {
+              const count = res[0].count;
+              if (count > 0) throw new errors.BadRequest(`username ${attributes[prop]} is already taken`);
+            })
+          }
         })
         .then(() => this.avatar || userLib.fetchAvatar(this.email))
         .then(avatar => {
-          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(knox.bucket) === -1) {
+          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(config.aws.s3.bucket) === -1) {
             return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, avatar)
               .then((aws_src, error) => {
                 this.avatar = error ? this.avatar : aws_src;

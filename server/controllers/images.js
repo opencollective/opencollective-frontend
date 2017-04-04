@@ -13,6 +13,10 @@ export default function uploadImage(req, res, next) {
     }));
   }
 
+  if (!knox) {
+    return next(new errors.ServerError('AWS Knox client not initialized'));
+  }
+
   /**
    * We will replace the name to avoid collisions
    */
