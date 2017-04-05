@@ -29,8 +29,9 @@ th {
 
 <div>
 <p>Hi {{recipient.firstName}}!</p>
-<p>February was short and sweet (and so is this email)! Collectives as a whole had their best month yet and we can’t be happier.️ 🤘</p>
-<p>As usual, let’s start with your monthly stats:</p>
+<p>This is the last time that we are sending this monthly report manually. Moving forward, we will fully automate this report so that you can have it on the first of the month.</p>
+<p>All the news about the Open Collective Community are now in our monthly newsletter.</p>
+<p>Here are your monthly stats:</p>
 
 <center>
 <table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
@@ -88,7 +89,7 @@ th {
 
 </center>
 
-<h2>Expenses</h2>
+<h2>🗒 Expenses</h2>
 <table width="100%" border=0>
 
 {{#each group.expenses}}
@@ -105,7 +106,7 @@ th {
 <p><a href="{{@root.group.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a></p>
 
 {{#if topBackers}}
-<h2>Recent sponsor activity on Open Collective</h2>
+<h2>💰 Recent sponsor activity on Open Collective</h2>
 <ul>
 {{#each topBackers}}
   <li><a href="{{website}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{name}}</a> gave {{{donationsString.html}}}</li>
@@ -114,39 +115,11 @@ th {
 {{/if}}
 
 
-<h2>Changelog</h2>
+<h2>💡 Tips for raising more money</h2>
+<p>We wrote this guide "<a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a>" with a bunch of tips to help you raise more money for your collective.</p>
 
-<ul>
-<li><b>Sell Tickets:</b> 
-We are rolling out the first release of a feature to sell event tickets on your Open Collective page! It's a great way to raise funds for your collective. Ping us if you want to test it! (just reply to this email) <a href="http://opencollective.com/brusselstogether/events/meetup-2?{{utm}}">http://opencollective.com/brusselstogether/events/meetup-2</a>
-<center><a href="http://opencollective.com/brusselstogether/events/meetup-2?{{utm}}"><img style="width:100%;" src="https://cl.ly/081v0t2p2e3Q/Screen%20Shot%202017-03-03%20at%2010.38.18%20AM.png" /></a></center>
-</li> 
-<li><b>npm-postinstall:</b> 
-A module to prompt your users to donate to your collective after `npm install` <a href="https://github.com/opencollective/opencollective-postinstall">https://github.com/opencollective/opencollective-postinstall</a>. 
-There has been a <a href="https://twitter.com/_developit/status/836377502939557888">lively conversation on twitter</a> about it. We are looking for someone to try it. Are you interested?
-<p><center><a href="https://github.com/opencollective/opencollective-postinstall"><img style="width:100%;" src="https://cl.ly/323M3x2Y1J3E/Screen%20Shot%202017-02-22%20at%202.03.58%20AM.png" /></a></center></p>
-</li>
-<li>
-  <b>Backer/Sponsor Widget:</b> If you are supporting a collective (or many collectives!), you can <a href="https://github.com/OpenCollective/OpenCollective/wiki/Website-widget">add a banner to your website</a> to showcase them.
-  <center><a href="https://github.com/OpenCollective/OpenCollective/wiki/Website-widget"><img style="width:100%;" src="https://cl.ly/421D2S413j1B/Screen%20Shot%202017-03-03%20at%2010.48.56%20AM.png" /></a></center>
-</li>
-</ul>
-
-<h2>Welcome Alanna to Open Collective</h2>
-We are super excited to have Alanna (Enspiral, loomio, Co-budget among other amazing projects) as a core contributor on Open Collective. She will be reaching out to many of you to chat and write about your work and your collectives. She wrote a great blog post about why she came on board: <a href="https://medium.com/open-collective/being-a-circle-in-a-world-made-for-triangles-bc434d823a79#.93kn2xcxn">Being a circle in a world made for triangles.</a>
-<p><center><img style="width:80%" src="https://blogs-images.forbes.com/laurabegleybloom/files/2017/02/1271266_10100637148575965_1564564159_o-1200x797.jpg?width=640" /></center></p>
-
-<h2>Ideas on how to spend your collective’s money</h2>
-
-<p><b>Technical writer for a monthly newsletter:</b> Healthiest communities are built around frequent communication. We know it's a lot of work to keep it up but it helps to keep your contributors updated and engaged. If you want help drafting a monthly newsletter, we have a technical writer (who currently writes Node JS newsletter) available to help for a small fee. She'll look through your GitHub repos, summarize changes and any new issues to draft an update to your contributors. Ping us to get started.</p>
-
-<p><b>Get together IRL!</b> If your team members don’t need the extra cash, or they have a company paying them to work on OSS what better way of spending the money than organizing a weekend together somewhere around the globe! 🌎 🌍 🌏</p>
-
-<h2>OpenCollective meetup</h2>
-If you are in NYC, come join us for a drink 🍻 next Wednesday (March 8th) at 7pm at the Swift Hiberian Lounge. RSVP on our new events page 😊 <a href="https://opencollective.com/opencollective/events/meetup-1?{{utm}}">https://opencollective.com/opencollective/events/meetup-1</a>
-
-<h2>Don’t forget!</h2>
-<p>Let us know if you want to receive an email when your collective receives a new donation or someone files an expense! We are very mindful of everyone’s inbox so we don’t do this by default.</p>
+<h2>🗣 Feedback</h2>
+As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
 
 </div>
 
