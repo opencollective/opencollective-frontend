@@ -113,15 +113,8 @@ export const fetchAllRepositories = (req, res, next) => {
       headers: { 'User-Agent': 'OpenCollective' },
       json: true
     }))
-    .then(data => {
-      const repositories = [];
-      data.map(repos => repos.map(repo => {
-        if (repo.permissions && repo.permissions.push) {
-          repositories.push(repo);
-        }
-      }));
-      return repositories;
-    })
+    .then(data => [].concat(...data))
+    .filter(repo => repo.permissions && repo.permissions.push && !repo.private)
   })
   .then(body => res.json(body))
   .catch(next);
