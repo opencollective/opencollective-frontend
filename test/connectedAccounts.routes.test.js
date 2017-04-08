@@ -41,7 +41,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a group', () => {
             expect(err).not.to.exist;
             const baseUrl = 'https://github.com/login/oauth/authorize';
             const redirectUri = encodeURIComponent(`${config.host.website}/api/connected-accounts/github/callback?utm_source=mm&slug=`);
-            const scope = encodeURIComponent('user:email,public_repo');
+            const scope = encodeURIComponent('user:email,repo');
             const location = `^${baseUrl}\\?response_type=code&redirect_uri=${redirectUri}&scope=${scope}&client_id=${clientId}$`;
             expect(res.headers.location).to.match(new RegExp(location));
             done();

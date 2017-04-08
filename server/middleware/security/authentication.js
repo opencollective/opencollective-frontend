@@ -199,7 +199,9 @@ export const authenticateService = (req, res, next) => {
   const { service } = req.params;
   switch (service) {
     case 'github':
-      opts.scope = [ 'user:email', 'public_repo' ];
+      // 'repo' gives us access to organizational repositories as well
+      // vs. 'public_repo' which requires the org to give separate access to app
+      opts.scope = [ 'user:email', 'repo' ]; 
       break;
     case 'meetup':
       opts.scope = 'ageless';
