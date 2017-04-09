@@ -16,7 +16,7 @@ E.g. http://polycode.co.uk
 
 Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
 Example:
-<center><iframe frameborder=0 src="http://localhost:3000/webpack/donate/button" width=300 height=50></iframe><iframe frameborder=0 src="http://localhost:3000/webpack/donate/button?color=blue" width=300 height=50></iframe></center>
+<center><iframe frameborder=0 src="/webpack/donate/button" width=300 height=50></iframe><iframe frameborder=0 src="/webpack/donate/button?color=blue" width=300 height=50></iframe></center>
 
 
 ## Show backers and sponsors
