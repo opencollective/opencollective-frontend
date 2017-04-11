@@ -1,17 +1,10 @@
 import './lib/load-dot-env'; // important to load first for environment config
-import config from 'config';
 import express from 'express';
-import perf from 'express-perf';
 import routes from './routes';
 import os from 'os';
 import expressLib from './lib/express';
 
 const app = express();
-
-// monitoring, should go first
-app.use(perf(express, {
-	apiKey: config.expressperf.api_key
-}))
 
 expressLib(app);
 
