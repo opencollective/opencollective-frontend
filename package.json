@@ -35,7 +35,6 @@
     "eslint-plugin-mocha": "4.5.0",
     "express": "4.14.0",
     "express-graphql": "0.6.1",
-    "express-perf": "1.11.2",
     "express-server-status": "1.0.3",
     "express-session": "1.14.0",
     "flat": "2.0.0",
