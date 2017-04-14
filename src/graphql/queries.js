@@ -53,3 +53,29 @@ const getEventQuery = gql`
 `;
 
 export const addEventData = graphql(getEventQuery);
+
+const getEventsQuery = gql`
+  query allEvents {
+    allEvents {
+      id,
+      slug,
+      name,
+      description,
+      startsAt,
+      endsAt,
+      timezone,
+      location,
+      address,
+      collective {
+        id,
+        slug,
+        name,
+        mission,
+        backgroundImage,
+        logo
+      }
+    }
+  }
+`;
+
+export const addEventsData = graphql(getEventsQuery);
