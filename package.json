@@ -31,6 +31,7 @@
     "markdown-in-js": "^1.1.3",
     "markdown-loader": "^2.0.0",
     "next": "^2.0.0-beta.39",
+    "next-routes": "^1.0.24",
     "node-sass": "^4.5.0",
     "now": "^4.9.0",
     "now-logs": "0.0.7",
@@ -59,12 +60,18 @@
     "dev": "node src/server.js",
     "build": "next build src",
     "start": "node src/server.js",
+    "test": "jest test/*",
     "build:server": "./node_modules/.bin/babel -D ./index.js -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
     "postinstall": "npm run build"
   },
   "devDependencies": {
+    "babel-jest": "^19.0.0",
+    "enzyme": "^2.8.0",
     "file-loader": "^0.10.1",
-    "image-webpack-loader": "^3.2.0"
+    "image-webpack-loader": "^3.2.0",
+    "jest-cli": "^19.0.2",
+    "react-addons-test-utils": "^15.5.1",
+    "react-test-renderer": "^15.5.4"
   }
 }

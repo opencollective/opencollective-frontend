@@ -137,8 +137,32 @@ class Header extends React.Component {
         line-height: 1.5;
       }
 
+      .content h2 {
+        font-size: 1.8rem;
+      }
+
+      .content h3 {
+        font-size: 1.7rem;
+      }
+
       .content > ul {
         padding-left: 3rem;
+      }
+
+      .content img {
+        max-width: 100%;
+      }
+
+      .content code {
+        background-color: #f6f8fa;
+        padding: 0.5rem;
+        overflow: scroll;
+        max-width: 100%;
+      }
+
+      .content code:first-child:last-child {
+        display: inline-block;
+        padding: 1rem;
       }
 
       .getTicketForm {
