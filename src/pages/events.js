@@ -25,7 +25,6 @@ class Events extends React.Component {
   render() {
     const { loading, allEvents } = this.props.data;
 
-    console.log("data", this.props.data);
     if (loading) return (<div />);
     return (
       <IntlProvider locale="en-US" messages={enUS}>

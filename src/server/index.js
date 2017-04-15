@@ -8,8 +8,8 @@ import { loggerMiddleware, logger } from './logger';
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
 const server = express();
-const app = next({ dev, dir: 'src' });
-const handler = routes.getRequestHandler(app)
+const app = next({ dev, dir: dev ? 'src' : 'build' });
+const handler = routes.getRequestHandler(app);
 
 app.prepare()
 .then(() => {
@@ -19,7 +19,7 @@ app.prepare()
   server.use(loggerMiddleware.errorLogger);
   server.listen(3000, (err) => {
     if (err) {
-      logger.error("error in creating server", err);
+      logger.error(">> Error when starting server", err);
       throw err
     }
     logger.info(`>> Ready on http://localhost:3000 in ${env} environment`);

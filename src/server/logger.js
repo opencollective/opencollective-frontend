@@ -39,7 +39,7 @@ const loggerMiddleware = {
         return false;
       }
     }),
-    errorLogger: expressWinston.errorLogger( { transports })
+    errorLogger: expressWinston.errorLogger( { transports } )
 }
 
 module.exports = { logger, loggerMiddleware };

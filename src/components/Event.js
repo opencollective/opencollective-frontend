@@ -196,7 +196,7 @@ class Event extends React.Component {
     responses.interested = filterCollection(responses.guests, {'status':'INTERESTED'});
 
     if ( error ) {
-      console.error(error.message);
+      console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
 
