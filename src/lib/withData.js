@@ -2,7 +2,7 @@ import { ApolloProvider, getDataFromTree } from 'react-apollo'
 import React from 'react'
 import 'isomorphic-fetch'
 import { initClient } from './initClient'
-
+import { logger } from '../server/logger';
 
 const env = process.env.NODE_ENV || "development";
 
@@ -44,7 +44,9 @@ export default (Component) => (
             <Component {...props} />
           </ApolloProvider>
         )
-        await getDataFromTree(app);
+        await getDataFromTree(app).catch(err => {
+          logger.error(">>> error in getDataFromTree", JSON.stringify(err));
+        });
       }
 
       return {
