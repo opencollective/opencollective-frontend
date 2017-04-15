@@ -1,19 +1,23 @@
 process.env.LOGS_SECRET_KEY && require('now-logs')(process.env.LOGS_SECRET_KEY)
 
-import logger from './logger';
-import { createServer } from 'http';
+import express from 'express';
 import next from 'next';
 import routes from './routes';
+import { loggerMiddleware, logger } from './logger';
 
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
+const server = express();
 const app = next({ dev, dir: 'src' });
 const handler = routes.getRequestHandler(app)
 
 app.prepare()
 .then(() => {
-  createServer(handler)
-  .listen(3000, (err) => {
+
+  server.use(loggerMiddleware.logger);
+  server.use(handler)
+  server.use(loggerMiddleware.errorLogger);
+  server.listen(3000, (err) => {
     if (err) {
       logger.error("error in creating server", err);
       throw err
