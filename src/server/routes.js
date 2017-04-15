@@ -1,4 +1,4 @@
-const nextRoutes = require('next-routes');
+import nextRoutes from 'next-routes';
 const routes = module.exports = nextRoutes();
 
 routes.add('event', '/:collectiveSlug/events/:eventSlug');
