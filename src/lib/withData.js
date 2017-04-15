@@ -2,7 +2,7 @@ import { ApolloProvider, getDataFromTree } from 'react-apollo'
 import React from 'react'
 import 'isomorphic-fetch'
 import { initClient } from './initClient'
-import { logger } from '../server/logger';
+import { logger } from '../lib/logger';
 
 const env = process.env.NODE_ENV || "development";
 
