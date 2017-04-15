@@ -36,6 +36,7 @@ const loggerMiddleware = {
       ignoreRoute: (req) => {
          // optional: allows to skip some log messages based on request and/or response 
         if (req.url.match(/^\/_/)) return true;
+        if (req.url.match(/^\/log\//)) return true;
         return false;
       }
     }),

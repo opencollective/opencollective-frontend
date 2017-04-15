@@ -15,6 +15,13 @@ app.prepare()
 .then(() => {
 
   server.use(loggerMiddleware.logger);
+
+  // allow the frontend to log errors to papertrail
+  server.get('/log/:type', (req, res) => {
+    logger[req.params.type](req.query.message);
+    res.send('ok');
+  });
+
   server.use(handler)
   server.use(loggerMiddleware.errorLogger);
   server.listen(3000, (err) => {
