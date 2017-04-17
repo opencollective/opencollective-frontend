@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
@@ -49,7 +48,7 @@ class Response extends React.Component {
     const title = intl.formatMessage(this.messages[status], { name });
 
     return (
-      <Link href={linkTo} title={title}>
+      <a href={linkTo} title={title}>
         <div>
           <style jsx>{`
           .Response {
@@ -100,7 +99,7 @@ class Response extends React.Component {
             </div>
           </div>
         </div>
-      </Link>
+      </a>
     )
   }
 
