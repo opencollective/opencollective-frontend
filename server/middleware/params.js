@@ -2,6 +2,7 @@ import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
 import { isUUID } from '../lib/utils';
+import { hasRole } from '../middleware/security/auth';
 
 const {
   User,
@@ -55,6 +56,16 @@ export function userid(req, res, next, userIdOrName) {
 export function groupid(req, res, next, groupIdOrSlug) {
   getByKeyValue(Group, isNaN(groupIdOrSlug) ? 'slug' : 'id', groupIdOrSlug)
     .then(group => req.group = group)
+    .then(() => {
+      if (req.remoteUser) {
+        return hasRole(req.remoteUser.id, req.group.id, ['MEMBER','HOST'])
+      }
+    })
+    .then(canEdit => {
+      if (canEdit) {
+        req.canEditGroup = canEdit;
+      }
+    })
     .asCallback(next);
 }
 

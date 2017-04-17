@@ -53,7 +53,8 @@ export const list = (req, res, next) => {
 
   const query = Object.assign({
     where: { GroupId: req.group.id },
-    order: [[req.sorting.key, req.sorting.dir]]
+    order: [[req.sorting.key, req.sorting.dir]],
+    include: [ { model: models.User }]
   }, req.pagination);
 
   if (req.body.unpaid_only || req.query.unpaid_only) {
@@ -72,6 +73,7 @@ export const list = (req, res, next) => {
         const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
         expenses.rows = expenses.rows.map(expense => {
           const r = expense.info;
+          r.user = req.canEditGroup ? expense.User.info : expense.User.public;
           commentsCount[r.id] = commentsCount[r.id] || [{ dataValues: { comments: 0 } }];
           r.commentsCount = parseInt(commentsCount[r.id][0].dataValues.comments,10);
           return r;
