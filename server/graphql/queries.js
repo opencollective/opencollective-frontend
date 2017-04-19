@@ -5,12 +5,42 @@ import {
 } from 'graphql';
 
 import {
+  CollectiveType,
+  UserType,
   EventType
 } from './types';
 
 import models from '../models';
 
 const queries = {
+  Collective: {
+    type: CollectiveType,
+    args: {
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString)
+      }
+    },
+    resolve(_, args) {
+      return models.Group.findOne({
+        where: { slug: args.collectiveSlug.toLowerCase() }
+      })
+    }
+  },
+  /*
+   * Given a collective slug, returns all users
+   */
+  allUsers: {
+    type: new GraphQLList(UserType),
+    args: {
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString)
+      }
+    },
+    resolve(_, args, req) {
+      return models.Group.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
+        .then(group => group.getUsersForViewer(req.remoteUser));
+    }
+  },
   /*
    * Given a collective slug and an event slug, returns the event
    */
@@ -50,6 +80,16 @@ const queries = {
         include: [{
           model: models.Group,
           where: { slug: args.collectiveSlug.toLowerCase() }
+        }]
+      })
+    }
+  },
+  allEvents: {
+    type: new GraphQLList(EventType),
+    resolve() {
+      return models.Event.findAll({
+        include: [{
+          model: models.Group
         }]
       })
     }

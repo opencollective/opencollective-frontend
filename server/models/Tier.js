@@ -15,12 +15,28 @@ export default function(Sequelize, DataTypes) {
       },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
-      allowNull: false
+      allowNull: true
+    },
+
+    // human readable way to uniquely access a tier for a given group or group/event combo
+    slug: {
+      type: DataTypes.STRING,
+      set(slug) {
+        if (slug && slug.toLowerCase) {
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-'));
+        }
+      }
     },
 
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      set(name) {
+        if (!this.getDataValue('slug')) {
+          this.slug = name;
+        }
+        this.setDataValue('name', name);
+      }
     },
 
     description: DataTypes.STRING,

@@ -8,8 +8,11 @@ import {
   GraphQLString,
 } from 'graphql';
 
-import models from '../models';
 import status from '../constants/response_status';
+import models from '../models';
+import dataloaderSequelize from 'dataloader-sequelize';
+dataloaderSequelize(models.Response);
+dataloaderSequelize(models.Event);
 
 export const ResponseStatusType = new GraphQLEnumType({
   name: 'Responses',
@@ -164,6 +167,12 @@ export const CollectiveType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(collective) {
           return collective.slug;
+        }
+      },
+      users: {
+        type: new GraphQLList(UserType),
+        resolve(collective, args, req) {
+          return collective.getUsersForViewer(req.remoteUser);
         }
       },
       twitterHandle: {
@@ -333,6 +342,12 @@ export const TierType = new GraphQLObjectType({
           return tier.id;
         }
       },
+      slug: {
+        type: GraphQLString,
+        resolve(tier) {
+          return tier.slug
+        }
+      },
       name: {
         type: GraphQLString,
         resolve(tier) {
@@ -428,8 +443,8 @@ export const ResponseType = new GraphQLObjectType({
       },
       user: {
         type: UserType,
-        resolve(response) {
-          return response.getUser();
+        resolve(response, args, req) {
+          return response.getUserForViewer(req.remoteUser);
         }
       },
       description: {

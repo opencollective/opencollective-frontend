@@ -16,6 +16,8 @@ import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
 import imageUrlLib from '../lib/imageUrlToAmazonUrl';
 
+import { hasRole } from '../lib/auth';
+
 /**
  * Constants.
  */
@@ -345,6 +347,10 @@ export default (Sequelize, DataTypes) => {
             UserId: this.id
           }
         });
+      },
+
+      canEditGroup(groupid) {
+        return hasRole(this.id, groupid, ['MEMBER', 'HOST']);
       },
 
       updateWhiteListedAttributes(attributes) {

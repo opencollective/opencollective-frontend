@@ -146,7 +146,7 @@ export default function(Sequelize, DataTypes) {
       unique: true,
       set(slug) {
         if (slug && slug.toLowerCase) {
-          this.setDataValue('slug', slug.toLowerCase());
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-'));
         }
       }
     },
@@ -250,6 +250,15 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
+      getUsersForViewer(viewer) {
+        const promises = [queries.getUsersFromGroupWithTotalDonations(this.id)];
+        if (viewer) {
+          promises.push(viewer.canEditGroup(this.id));
+        }
+        return Promise.all(promises)
+        .then(results => results[0].map(user => results[1] ? user.info : user.public))
+      },
+
       getSuperCollectiveGroupsIds() {
         if (!this.isSupercollective) return Promise.resolve([this.id]);
         if (this.superCollectiveGroupsIds) return Promise.resolve(this.superCollectiveGroupsIds);

@@ -1,10 +1,10 @@
 import config from 'config';
 
-import models from '../../models';
 import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
 import roles from '../../constants/roles';
 import {authenticateUser} from './authentication';
+import { hasRole } from '../../lib/auth';
 
 const {
   Forbidden, // I know who you are, but you permanently don't have access to this resource
@@ -69,22 +69,6 @@ export function mustBeLoggedInAsUser(req, res, next) {
     if (req.remoteUser.id !== parseInt(req.params.userid, 10)) return next(new Forbidden(`The authenticated user (${req.remoteUser.username}) cannot edit this user id (${req.params.userid})`));
     return next();
   });
-}
-
-export function hasRole(userId, groupId, possibleRoles) {
-  if (typeof possibleRoles === 'string') {
-    possibleRoles = [possibleRoles];
-  }
-
-  const query = {
-    where: {
-      UserId: userId,
-      GroupId: groupId,
-      role: { $in: possibleRoles }
-    }
-  };
-  return models.UserGroup.findOne(query)
-  .then(ug => Boolean(ug))
 }
 
 export function mustHaveRole(possibleRoles) {

@@ -43,10 +43,8 @@ const { secret } = config.keys.opencollective;
  * decodes the token (expected behaviour).
  */
 export const parseJwtNoExpiryCheck = (req, res, next) => {
-  let token;
-  if (req.params.access_token) {
-    token = req.params.access_token;
-  } else {
+  let token = req.params.access_token || req.query.access_token || req.body.access_token;
+  if (!token) {
     const header = req.headers && req.headers.authorization;
     if (!header) return next();
 

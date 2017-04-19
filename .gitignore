@@ -19,6 +19,7 @@ temp.js
 tempStripe.js
 
 .env
+.env.*
 
 .vscode
 jsconfig.json

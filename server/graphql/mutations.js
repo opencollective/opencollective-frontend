@@ -4,17 +4,92 @@ import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
 
 import {
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
+
+import {
+  EventType,
   ResponseType,
+  TierType
 } from './types';
 
 import {
-  ResponseInputType
+  EventInputType,
+  ResponseInputType,
+  TierInputType
 } from './inputTypes';
 
 // import { hasRole } from '../middleware/security/auth';
 // import {HOST, MEMBER} from '../constants/roles';
 
 const mutations = {
+  createEvent: {
+    type: EventType,
+    args: {
+      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
+      event: { type: EventInputType }
+    },
+    resolve(_, args) {
+      const event = args.event;
+      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      .then((group) => models.Event.create({
+        ...event,
+        GroupId: group.id
+      }))
+    }
+  },
+  updateEvent: {
+    type: EventType,
+    args: {
+      event: { type: EventInputType }
+    },
+    resolve(_, args) {
+      return models.Event.findById(args.event.id)
+      .then(event => {
+        if (!event) throw new Error(`Event with id ${args.event.id} not found`);
+        return Event;
+      })
+      .then(event => event.update(args.event))
+    }
+  },
+  createTier: {
+    type: TierType,
+    args: {
+      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
+      eventSlug: { type: GraphQLString },
+      tier: { type: TierInputType }
+    },
+    resolve(_, args) {
+      const tier = args.tier;
+
+      if (!args.eventSlug) {
+        return models.Tier.create(tier);
+      }
+
+      let event;
+      return models.Event.getBySlug(args.collectiveSlug, args.eventSlug)
+      .then(e => event = e)
+      .then(() => models.Tier.create({
+        ...tier,
+        EventId: event.id
+      }))
+    }
+  },
+  updateTier: {
+    type: TierType,
+    args: {
+      tier: { type: TierInputType }
+    },
+    resolve(_, args) {
+      return models.Tier.findById(args.tier.id)
+      .then(tier => {
+        if (!tier) throw new Error(`Tier with id ${args.tier.id} not found`);
+        return tier;
+      })
+      .then(tier => tier.update(args.tier))
+    }
+  },
   createResponse: {
     type: ResponseType,
     args: {
@@ -29,24 +104,8 @@ const mutations = {
       response.user.email = response.user.email.toLowerCase();
 
       const recordInterested = () => {
-        return models.Event.findOne({
-          where: {
-            slug: response.event.slug
-          },
-          include: [{
-            model: models.Group,
-            where: {
-              slug: response.group.slug
-            }
-          }]
-        })
-        .then(ev => {
-          if (!ev) {
-            throw new Error(`No event found with slug: ${response.event.slug} in collective: ${response.group.slug}`)
-          }
-          event = ev;
-        })
-
+        return models.Event.getBySlug(response.group.slug, response.event.slug)
+        .then(e => event = e)
         // find or create user
         .then(() => models.User.findOne({
           where: {
