@@ -34,7 +34,7 @@ describe('discover', () => {
    */
   describe('#get /discover', () => {
 
-    it('/discover - No params defaults to: /discover?show=all&sort=newest', (done) => {
+    it('/discover - No params defaults to: /discover?show=all&sort=most%20popular', (done) => {
       request(app)
         .get(`/discover?api_key=${application.api_key}`)
         .expect(200)
@@ -42,26 +42,26 @@ describe('discover', () => {
           const { body } = res;
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
-          expect(body.sort).equal('newest');
+          expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
           expect(ids.indexOf(group1.id)).not.equal(-1);
           expect(ids.indexOf(group2.id)).not.equal(-1);
-          expect(ids[0]).equal(group2.id); // Newest (created second)
-          expect(ids[1]).equal(group1.id);
+          expect(ids[0]).equal(group1.id); // Newest (created second)
+          expect(ids[1]).equal(group2.id);
           done();
         })
     });
 
     it('/discover?show=open source', (done) => {
       request(app)
-        .get(`/discover?api_key=${application.api_key}&show=open source`)
+        .get(`/discover?api_key=${application.api_key}&show=open%20source`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('open source');
-          expect(body.sort).equal('newest');
+          expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(1);
           expect(ids.indexOf(group1.id)).not.equal(-1);
@@ -79,7 +79,7 @@ describe('discover', () => {
           const { body } = res;
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('meetup');
-          expect(body.sort).equal('newest');
+          expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(1);
           expect(ids.indexOf(group1.id)).equal(-1);
@@ -96,28 +96,28 @@ describe('discover', () => {
         .end((err, res) => {
           const { body } = res;
           expect(body.show).equal('undefined');
-          expect(body.sort).equal('newest');
+          expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(0);
           done();
         })
     });
 
-    it('/discover?show=all&sort=oldest', (done) => {
+    it('/discover?show=all&sort=newest', (done) => {
       request(app)
-        .get(`/discover?api_key=${application.api_key}&show=all&sort=oldest`)
+        .get(`/discover?api_key=${application.api_key}&show=all&sort=newest`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
-          expect(body.sort).equal('oldest');
+          expect(body.sort).equal('newest');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
           expect(ids.indexOf(group1.id)).not.equal(-1);
           expect(ids.indexOf(group2.id)).not.equal(-1);
-          expect(ids[0]).equal(group1.id); // Oldest (created first)
-          expect(ids[1]).equal(group2.id);
+          expect(ids[0]).equal(group2.id); // Newest (created last)
+          expect(ids[1]).equal(group1.id);
           done();
         })
     });
@@ -130,13 +130,13 @@ describe('discover', () => {
           const { body } = res;
           const ids = body.collectives.map(c => c.id);
           expect(body.show).equal('all');
-          expect(body.sort).equal('newest');
+          expect(body.sort).equal('most popular');
           expect(body.collectives).to.be.Array;
           expect(body.collectives.length).equal(2);
           expect(ids.indexOf(group1.id)).not.equal(-1);
           expect(ids.indexOf(group2.id)).not.equal(-1);
-          expect(ids[0]).equal(group2.id); // Newest (created second)
-          expect(ids[1]).equal(group1.id);
+          expect(ids[0]).equal(group1.id); // Most popular
+          expect(ids[1]).equal(group2.id);
           done();
         })
     });

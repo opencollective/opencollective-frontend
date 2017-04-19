@@ -2,16 +2,28 @@ import models from '../models';
 
 export default (req, res, next) => {
   const show = req.query.show || 'all';
-  const sort = req.query.sort === 'oldest' ? 'oldest' : 'newest';
+  const sort = (req.query.sort === 'newest') ? 'newest' : 'most popular';
   const { offset } = req.query;
+
+  let orderBy;
+  switch (sort) {
+    case 'newest':
+      orderBy = 'g."createdAt"';
+      break;
+    case 'most popular':
+    default:
+      orderBy = 't."totalDonations"';
+      break;
+  }
+
   models.Group.getGroupsSummaryByTag(
     !show || show === 'all' ? '' : show,
     12,
     [],
-    10000,
+    1000,
     false,
-    'g."createdAt"',
-    sort === 'newest' ? 'desc' : 'asc',
+    orderBy,
+    'desc',
     offset
   )
   .then(collectives => {
