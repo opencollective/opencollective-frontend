@@ -2,7 +2,7 @@ import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
 import { isUUID } from '../lib/utils';
-import { hasRole } from '../middleware/security/auth';
+import { hasRole } from '../lib/auth';
 
 const {
   User,
