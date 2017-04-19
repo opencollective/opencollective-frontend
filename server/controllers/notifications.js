@@ -23,20 +23,8 @@ export function subscribe(req, res, next) {
 }
 
 export function unsubscribe(req, res, next) {
-  Notification.findOne({
-    where: {
-      UserId: req.remoteUser.id,
-      GroupId: req.group.id,
-      type: req.params.activityType
-    }
-  })
-  .then(notification => {
-    if (!notification)
-      return next(new errors.BadRequest('You were not subscribed to this type of activity'));
-
-    notification.active = false;
-    return notification.save();
-  })
+  req.remoteUser
+  .unsubscribe(req.group.id, req.params.activityType)
   .catch((err) => {
     console.error('Error when disabling a notification', err);
     next(err);

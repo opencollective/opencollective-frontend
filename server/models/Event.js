@@ -1,3 +1,7 @@
+import Promise from 'bluebird';
+import { uniq } from 'lodash';
+import _ from 'lodash';
+
 export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
@@ -128,7 +132,18 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    instanceMethods: {
+      getUsers() {
+        return this.getResponses({ include: [{model: models.User }]})
+          .then(rows => rows.map(r => r.User))
+          .then(users => uniq(users, (user) => user.id));
+      }
+    },
+
     classMethods: {
+      createMany: (events, defaultValues = {}) => {
+        return Promise.map(events, e => Event.create(_.defaults({}, e, defaultValues)), {concurrency: 1});
+      },
       getBySlug: (groupSlug, eventSlug) => {
         return Event.findOne({
           where: {

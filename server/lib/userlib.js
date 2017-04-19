@@ -3,6 +3,7 @@ import Promise from 'bluebird';
 import slug from 'slug';
 import clearbit from '../gateways/clearbit';
 import { sequelize } from '../models';
+import config from 'config';
 
 export default {
 
@@ -16,6 +17,8 @@ export default {
   },
 
   getUserData(email) {
+    if (!config.clearbit || config.clearbit.match(/x+/)) return Promise.resolve();
+
     if (!email || !email.match(/.+@.+\..+/)) {
       return Promise.resolve();
     }

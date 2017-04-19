@@ -11,6 +11,8 @@ import _ from 'lodash';
 
 export default function(Sequelize, DataTypes) {
 
+  const models = Sequelize.models;
+
   const Notification = Sequelize.define('Notification', {
 
     channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
@@ -40,6 +42,56 @@ export default function(Sequelize, DataTypes) {
     classMethods: {
       createMany: (notifications, defaultValues) => {
         return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
+      },
+
+      /**
+       * Get the list of subscribers to a mailing list (e.g. backers@:collectiveSlug.opencollective.com)
+       * For members, backers, and info: opt-in: we look for rows in the Notifications table
+       * For events, it's opt-out. We exclude people who have explicitly unsubscribed
+       */
+      getSubscribers: (collectiveSlug, mailinglist) => {
+
+        const getSubscribersForMailingList = (mailinglist) =>
+          models.Notification.findAll(
+              {
+                where: {
+                  channel: 'email',
+                  type: `mailinglist.${mailinglist}`
+                },
+                include: [{model: models.User }, {model: models.Group, where: { slug: collectiveSlug } }]
+              }
+            )
+            .then(subscriptions => subscriptions.map(s => s.User))        
+
+        const getSubscribersForEvent = (eventSlug) =>
+          models.Event.findOne({
+           where: { slug: eventSlug },
+           include: [
+             { model: models.Group, where: { slug: collectiveSlug } }
+           ]
+          })
+          .then(event => {
+              if (event) return event.getUsers().then(excludeUnsubscribed)
+          })
+
+        const excludeUnsubscribed = (users) =>
+          models.Notification.findAll({
+            where: {
+              channel: 'email',
+              active: false,
+              type: `mailinglist.${mailinglist}`
+            },
+            include: [ { model: models.Group, where: { slug: collectiveSlug } } ]
+          }).then(subscriptions => subscriptions.map(s => s.UserId ))
+          .then(excludeIds => {
+            return users.filter(u => excludeIds.indexOf(u.id) === -1)
+          })
+
+        return getSubscribersForEvent(mailinglist)
+        .then(subscribers => {
+          if (!subscribers) return getSubscribersForMailingList(mailinglist)
+          else return subscribers;
+        });
       }
     }
 

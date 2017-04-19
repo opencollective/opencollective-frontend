@@ -17,7 +17,6 @@ import nodemailer from 'nodemailer';
 import emailLib from '../server/lib/email';
 import models from '../server/models';
 import mock from './mocks/clearbit';
-import knox from '../server/gateways/knox';
 
 /**
  * Variables.
@@ -36,16 +35,15 @@ describe('users.routes.test.js', () => {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
     userlib.memory = {};
-    sandbox.stub(userlib.clearbit.Enrichment, 'find', (opts) => {
-      return new Bluebird((resolve, reject) => {
-        if (opts.email === "xdamman@gmail.com") {
-          return resolve(mock);
+    sandbox.stub(userlib, 'getUserData', (email) => {
+      return new Bluebird((resolve) => {
+        if (email === "xd@noreply.com") {
+          return resolve(mock.person);
         } else {
-          const NotFound = new userlib.clearbit.Enrichment.NotFoundError(' NotFound');
-          reject(NotFound);
+          return resolve(null);
         }
-      });
-    });
+      })
+    })
   });
 
   afterEach(() => sandbox.restore());
@@ -176,19 +174,22 @@ describe('users.routes.test.js', () => {
         .post('/users')
         .send({
           api_key: application.api_key,
-          user: { email: "xdamman@gmail.com" }
+          user: { email: "xd@noreply.com" }
         })
         .end((e, res) => {
           expect(e).to.not.exist;
-          models.User
-            .findById(parseInt(res.body.id))
-            .then((user) => {
-              expect(user.firstName).to.equal("Xavier");
-              expect(user.lastName).to.equal("Damman");
-              expect(user.twitterHandle).to.equal("xdamman");
-              done();
-            })
-            .catch(done);
+          // Creating the user returns before saving the response from clearbit
+          setTimeout(() => {
+            models.User
+              .findById(parseInt(res.body.id))
+              .then((user) => {
+                expect(user.firstName).to.equal("Xavier");
+                expect(user.lastName).to.equal("Damman");
+                expect(user.twitterHandle).to.equal("xdamman");
+                done();
+              })
+              .catch(done);
+          }, 50);
         });
     });
 
@@ -199,7 +200,7 @@ describe('users.routes.test.js', () => {
           .post('/users')
           .send({
             api_key: application.api_key,
-            user: { email: "xdamman@gmail.com", referrerId: referrer.id }
+            user: { email: "xd@noreply.com", referrerId: referrer.id }
           })
           .end((e, res) => {
             expect(e).to.not.exist;
@@ -528,22 +529,6 @@ describe('users.routes.test.js', () => {
       isOrganization: false,
       website: 'opencollective.com'
     };
-
-    before(() => {
-      sinon.stub(knox, 'put', () => {
-        const s = new require('stream').Readable();
-        s.write = function(){}
-        s.end = function(){
-          s.url = `https://${config.aws.s3.bucket}.s3-us-west-1.amazonaws.com/31654v3_2ba16cc0-124d-11e6-b36a-2d79eed36137.png`
-          s.emit('response', {statusCode: 200, statusMessage: 'OK'})
-        }
-        return s
-      });
-    });
-
-    after(() => {
-      knox.put.restore()
-    })
 
     beforeEach(() =>
       models.User.create({

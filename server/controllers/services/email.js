@@ -37,36 +37,18 @@ export const unsubscribe = (req, res, next) => {
 
 };
 
-const fetchSubscribers = (groupSlug, type) => {
-  return models.Notification.findAll(
-    {
-      where: {
-        channel: 'email',
-        type
-      },
-      order: [['createdAt','DESC']],
-      include: [{model: models.User }, {model: models.Group, where: { slug: groupSlug } }]
-    }
-  )
-  .then(subscriptions => subscriptions.map(s => s.User.info))
-  .then(subscribers => subscribers.map(s => {
-    s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.avatar)}`;
-    return s;
-  }));
-};
-
 // TODO: move to emailLib.js
 const sendEmailToList = (to, email) => {
   const tokens = to.match(/(.+)@(.+)\.opencollective\.com/i);
-  const list = tokens[1];
-  const slug = tokens[2];
-  const type = `mailinglist.${list}`;
-  email.from = email.from || `${slug} collective <info@${slug}.opencollective.com>`;
-  email.group = email.group || { slug }; // used for the unsubscribe url
+  const mailinglist = tokens[1];
+  const collectiveSlug = tokens[2];
+  const type = `mailinglist.${mailinglist}`;
+  email.from = email.from || `${collectiveSlug} collective <info@${collectiveSlug}.opencollective.com>`;
+  email.group = email.group || { slug: collectiveSlug }; // used for the unsubscribe url
 
-  return fetchSubscribers(slug, type)
+  return models.Notification.getSubscribers(collectiveSlug, mailinglist)
   .tap(subscribers => {
-    if (subscribers.length === 0) throw new errors.NotFound(`No subscribers found in ${slug} for email type ${type}`);
+    if (subscribers.length === 0) throw new errors.NotFound(`No subscribers found in ${collectiveSlug} for email type ${type}`);
   })
   .then(results => results.map(r => r.email))
   .then(recipients => {
@@ -150,7 +132,7 @@ export const webhook = (req, res, next) => {
   const { recipient } = email;
 
   const tokens = recipient.match(/(.+)@(.+)\.opencollective\.com/i);
-  const list = tokens[1];
+  const mailinglist = tokens[1];
   const slug = tokens[2];
 
   const body = email['body-html'] || email['body-plain'];
@@ -166,7 +148,7 @@ export const webhook = (req, res, next) => {
 
   // If an email is sent to expense@:slug.opencollective.com
   // we forward it to ops+expense@opencollective.com
-  if (list.match(/^expenses?$/i)) {
+  if (mailinglist.match(/^expenses?$/i)) {
    return emailLib.sendMessage('ops+expense@opencollective.com', email.subject, body, { from: email.from })
     .then(() => res.send('ok'))
     .catch(e => {
@@ -176,8 +158,8 @@ export const webhook = (req, res, next) => {
   }
 
   // If an email is sent to info@:slug.opencollective.com,
-  // we simply forward it to members who subscribed to that list
-  if (list === 'info') {
+  // we simply forward it to members who subscribed to that mailinglist
+  if (mailinglist === 'info') {
     return sendEmailToList(recipient, {
       subject: email.subject,
       body,
@@ -188,8 +170,9 @@ export const webhook = (req, res, next) => {
       console.error("Error: ", e);
       next(e);
     });
-  }
+  }  
 
+  // We send the email to the admins of the collective for approval
   let subscribers;
 
   models.Group.find({ where: { slug } })
@@ -197,10 +180,13 @@ export const webhook = (req, res, next) => {
       if (!g) throw new Error('group_not_found');
       group = g;
     })
-    .then(group => fetchSubscribers(group.slug, `mailinglist.${list}`))
-    .tap(s => {
-      if (s.length === 0) throw new Error('no_subscribers');
-      subscribers = s;
+    .then(group => models.Notification.getSubscribers(group.slug, mailinglist))
+    .tap(results => {
+      if (results.length === 0) throw new Error('no_subscribers');
+      subscribers = results.map(s => {
+        s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.avatar)}`;
+        return s;
+      });
     })
     .then(() => {
       return sequelize.query(`

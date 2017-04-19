@@ -1,4 +1,6 @@
+import Promise from 'bluebird';
 import status from '../constants/response_status';
+import _ from 'lodash';
 
 export default function(Sequelize, DataTypes) {
 
@@ -123,6 +125,11 @@ export default function(Sequelize, DataTypes) {
           const canEditGroup = results[1];
           return canEditGroup ? user.info : user.public;
         })
+      }
+    },
+    classMethods: {
+      createMany: (responses, defaultValues = {}) => {
+        return Promise.map(responses, r => Response.create(_.defaults({}, r, defaultValues)), {concurrency: 1});
       }
     }
   });

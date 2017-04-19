@@ -232,21 +232,5 @@ describe("email.routes.test", () => {
         .then(() => models.Notification.count({ where }))
         .then(count => expect(count).to.equal(0))
     });
-
-    it("fails to unsubscribe if already unsubscribed", () => {
-
-      const template = 'unknownType';
-      const token = generateToken(usersData[0].email, groupData.slug, template);
-      const unsubscribeUrl = `/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/${token}`;
-
-      return request(app)
-        .get(unsubscribeUrl)
-        .then(res => {
-          expect(res.statusCode).to.equal(400);
-          expect(res.body.error.message).to.equal("No notification found for this user, group and type");
-      });
-    });
-
   });
-
 });
