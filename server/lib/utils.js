@@ -322,8 +322,7 @@ export const demoHostId = () => {
  */
 export const isEmailInternal = (email) => {
   if (!email) return false;
-  if (email.toLowerCase().indexOf('@opencollective.com') !== -1 ||
-    email.toLowerCase().indexOf('@opencollective.org') !== -1) {
+  if (email.match(/(opencollective\.(com|org))$/i) !== -1 ) {
     return true;
   }
   return false;

@@ -7,7 +7,8 @@ import nock from 'nock';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
 import MailgunNock from './mocks/mailgun.nock.js';
-import webhookBody from './mocks/mailgun.webhook.payload';
+import webhookBodyPayload from './mocks/mailgun.webhook.payload';
+import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import crypto from 'crypto';
 import config from 'config';
@@ -110,27 +111,12 @@ describe("email.routes.test", () => {
 
     return request(app)
       .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBody, {recipient: 'info@testcollective.opencollective.com'}))
+      .send(Object.assign({}, webhookBodyPayload, {recipient: 'info@testcollective.opencollective.com'}))
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         expect(spy.args[0][0]).to.equal('info@testcollective.opencollective.com');
-        expect(spy.args[0][1]).to.equal(webhookBody.subject);
+        expect(spy.args[0][1]).to.equal(webhookBodyPayload.subject);
         expect(spy.args[0][3].bcc).to.equal(usersData[0].email);
-      });
-  });
-
-
-  it("forwards emails sent to expense@:slug.opencollective.com", () => {
-
-    const spy = sandbox.spy(emailLib, 'sendMessage');
-
-    return request(app)
-      .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBody, {recipient: 'expense@testcollective.opencollective.com'}))
-      .then((res) => {
-        expect(res.statusCode).to.equal(200);
-        expect(spy.args[0][0]).to.equal('ops+expense@opencollective.com');
-        expect(spy.args[0][1]).to.equal(webhookBody.subject);
       });
   });
 
@@ -139,7 +125,7 @@ describe("email.routes.test", () => {
 
     return request(app)
       .post('/webhooks/mailgun')
-      .send(webhookBody)
+      .send(webhookBodyPayload)
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         expect(spy.args[0][1]).to.equal('members@testcollective.opencollective.com');
@@ -149,9 +135,22 @@ describe("email.routes.test", () => {
       });
   });
 
+
+  it("skip the email if already processed", () => {
+    const spy = sandbox.spy(emailLib, 'send');
+
+    return request(app)
+      .post('/webhooks/mailgun')
+      .send(webhookBodyApprove)
+      .then((res) => {
+        expect(res.statusCode).to.equal(200);
+        expect(spy.called).to.be.false;
+      });
+  });
+
   it("rejects emails sent to unknown mailing list", () => {
 
-    const unknownMailingListWebhook = Object.assign({}, webhookBody, { recipient: 'unknown@testcollective.opencollective.com' });
+    const unknownMailingListWebhook = Object.assign({}, webhookBodyPayload, { recipient: 'unknown@testcollective.opencollective.com' });
 
     return request(app)
       .post('/webhooks/mailgun')

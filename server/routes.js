@@ -36,6 +36,8 @@ import cache from './middleware/cache';
 import * as params from './middleware/params';
 import errors from './lib/errors';
 
+import sanitizer from './middleware/sanitizer';
+
 /**
  * NotImplemented response.
  */
@@ -46,11 +48,6 @@ export default (app) => {
    * Status.
    */
   app.use('/status', serverStatus(app));
-
-  /**
-   * For testing the email templates
-   */
-  app.get('/templates/email/:template', test.generateTestEmail);
 
   app.use('*', auth.authorizeApiKey);
 
@@ -86,6 +83,14 @@ export default (app) => {
     pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
     graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging'
   }));
+
+  /**
+   * Webhook for stripe when it gets a new subscription invoice
+   */
+  app.post('/webhooks/stripe', stripeWebhook);
+  app.post('/webhooks/mailgun', email.webhook);
+
+  app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 
   /**
    * Homepage
@@ -230,12 +235,6 @@ export default (app) => {
    * TODO: User should be logged in
    */
   app.post('/images', uploadImage);
-
-  /**
-   * Webhook for stripe when it gets a new subscription invoice
-   */
-  app.post('/webhooks/stripe', stripeWebhook);
-  app.post('/webhooks/mailgun', email.webhook);
 
   /**
    * Stripe oAuth

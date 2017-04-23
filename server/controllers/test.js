@@ -4,7 +4,6 @@ import Sequelize from 'sequelize';
 import models, { setupModels } from '../models';
 import { type } from '../constants/transactions';
 import roles from '../constants/roles';
-import emailLib from '../lib/email';
 import errors from '../lib/errors';
 
 const envsAndDatabases = {
@@ -237,15 +236,4 @@ export const getTestUserLoginUrl = function(req, res, next) {
   return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for retreiving test API login token`));
 }
 
-export const generateTestEmail = function(req, res) {
-  const { template } = req.params;
-  try {
-    const data = JSON.parse(req.query.data);
-    console.log(`Generating ${template} with data`, data);
-    const html = emailLib.render(template, data);
-    res.send(html);
-  } catch (e) {
-    res.send("Invalid data", e);
-  }
-};
 
