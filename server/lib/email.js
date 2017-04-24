@@ -162,7 +162,7 @@ const getNotificationLabel = (template, recipient) => {
   const notificationTypeLabels = {
     'backer.monthlyreport': 'monthly reports for backers',
     'email.approve': 'notifications of new emails pending approval',
-    'email.message': recipient,
+    'email.message': `the ${recipient.substr(0, recipient.indexOf('@'))} mailing list`,
     'group.donation.created': 'notifications of new donations for this collective',
     'group.expense.created': 'notifications of new expenses submitted to this collective',
     'group.monthlyreport': 'monthly reports for collectives',
