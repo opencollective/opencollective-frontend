@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+// Only run on the first of the month
+const today = new Date();
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
+  console.log('NODE_ENV is production and today is not the first of month, script aborted!');
+  process.exit();
+}
+
 process.env.PORT = 3066;
 
 import _ from 'lodash';

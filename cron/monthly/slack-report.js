@@ -1,9 +1,15 @@
+
+// Only run on the first of the month
+const today = new Date();
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
+  console.log('NODE_ENV is production and today is not the first of month, script aborted!');
+  process.exit();
+}
+
 import _ from 'lodash';
 import models, {sequelize} from '../../server/models';
 import roles from '../../server/constants/roles';
 import {tweetStatus} from '../../server/lib/twitter';
-
-onlyExecuteInProdOn1stDayOfTheMonth();
 
 
 models.Group.findAll().map(group => getBackers(group)
@@ -16,14 +22,6 @@ models.Group.findAll().map(group => getBackers(group)
   console.log('err', err);
   process.exit();
 });
-
-function onlyExecuteInProdOn1stDayOfTheMonth() {
-  const dayOfMonth = new Date().getDate();
-  if (process.env.NODE_ENV === 'production' && dayOfMonth !== 1) {
-    console.log('NODE_ENV is production and it is not first day of the month, script aborted!');
-    process.exit();
-  }
-}
 
 function getBackers(group) {
   return sequelize.query(`
