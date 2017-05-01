@@ -379,8 +379,8 @@ export const refreshTokenByEmail = (req, res, next) => {
   const user = req.remoteUser;
 
   return emailLib.send('user.new.token', req.remoteUser.email, {
-    loginLink: user.generateLoginLink(redirect)
-  })
+    loginLink: user.generateLoginLink(redirect)},
+    { bcc: 'ops@opencollective.com' }) // allows us to log in as users to debug issue)
   .then(() => res.send({ success: true }))
   .catch(next);
 };

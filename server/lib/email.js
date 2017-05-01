@@ -83,7 +83,7 @@ const getTemplateAttributes = (str) => {
  * sends an email message to a recipient with given subject and body
  */
 const sendMessage = (recipients, subject, html, options = {}) => {
-  options.bcc = options.bcc || `ops@opencollective.com`;
+  options.bcc = options.bcc || `emailbcc@opencollective.com`;
 
   if (!_.isArray(recipients)) recipients = [ recipients ];
 
