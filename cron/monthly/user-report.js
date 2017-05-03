@@ -44,7 +44,7 @@ const init = () => {
   const where = {};
   const query = {
     where: {
-      type: 'backer.monthlyreport',
+      type: 'user.monthlyreport',
       active: true
     },
     include: [{ model: User, where }]
@@ -146,7 +146,7 @@ const sendEmail = (recipient, data) => {
   // We don't send the monthly email if there is no active subscription
   if (!data.subscriptions || data.subscriptions.length === 0) return;
 
-  return emailLib.send('backer.monthlyreport', recipient.email, data);
+  return emailLib.send('user.monthlyreport', recipient.email, data);
 }
 
 init();

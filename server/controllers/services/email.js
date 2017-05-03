@@ -12,7 +12,7 @@ export const unsubscribe = (req, res, next) => {
 
   const { type, email, slug, token } = req.params;
 
-  const identifier = `${email}.${slug}.${type}.${config.keys.opencollective.secret}`;
+  const identifier = `${email}.${slug || 'any'}.${type}.${config.keys.opencollective.secret}`;
   const computedToken = crypto.createHash('md5').update(identifier).digest("hex");
   if (token !== computedToken) {
     return next(new errors.BadRequest('Invalid token'));

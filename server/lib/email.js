@@ -55,7 +55,7 @@ const render = (template, data) => {
 };
 
 const generateUnsubscribeToken = (email, groupSlug, type) => {
-  const uid = `${email}.${groupSlug}.${type}.${config.keys.opencollective.secret}`;
+  const uid = `${email}.${groupSlug || 'any'}.${type}.${config.keys.opencollective.secret}`;
   const token = crypto.createHash('md5').update(uid).digest("hex");
   return token;
 }
@@ -160,13 +160,13 @@ const getNotificationLabel = (template, recipient) => {
   template = template.replace('.text', '');
 
   const notificationTypeLabels = {
-    'backer.monthlyreport': 'monthly reports for backers',
     'email.approve': 'notifications of new emails pending approval',
     'email.message': `the ${recipient.substr(0, recipient.indexOf('@'))} mailing list`,
     'group.donation.created': 'notifications of new donations for this collective',
     'group.expense.created': 'notifications of new expenses submitted to this collective',
     'group.monthlyreport': 'monthly reports for collectives',
     'group.transaction.created': 'notifications of new transactions for this collective',
+    'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports'
   }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * This script subscribes all backers to the backer.monthlyreport notification
+ * This script subscribes all users to the user.monthlyreport notification
  */
 import Promise from 'bluebird';
 import models from '../server/models';
@@ -23,7 +23,7 @@ const init = () => {
 }
 
 const processRow = (row) => {
-  const type = 'backer.monthlyreport';
+  const type = 'user.monthlyreport';
   debug(`Subscribing UserId ${row.id} to ${type}`);
 
   // return;

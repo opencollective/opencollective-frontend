@@ -24,7 +24,7 @@ data['ticket.confirmed'] = {
   }
 };
 data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
-data['backer.monthlyreport'] = {
+data['user.monthlyreport'] = {
   recipient: { firstName: 'Xavier' },
   month: 'march', year: '2017',
   manageSubscriptionsUrl: 'https://opencollective.com/subscriptions',
@@ -125,7 +125,7 @@ if (!templateName) {
   console.log('Usage: npm run compile:email <name>\n');
   console.log('Where <name> is the name of a template found in:');
   console.log('./server/lib/emailTemplates\n');
-  console.log('  Example 1: npm run -s compile:email backer.monthlyreport\n');
+  console.log('  Example 1: npm run -s compile:email user.monthlyreport\n');
   console.log('  Example 2: npm run -s compile:email email.approve > email-approve.html\n');
   console.log('Note: `-s` switch is requried to suppress warnings from npm.');
   console.log('Note: Edit the script to specify the data that is passed to the template.');

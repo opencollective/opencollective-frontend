@@ -13,8 +13,8 @@ const templates = {};
 const templateNames = [
   'announcement',
   'announcement.text',
-  'backer.monthlyreport',
-  'backer.monthlyreport.text',
+  'user.monthlyreport',
+  'user.monthlyreport.text',
   'comment.approve',
   'email.approve',
   'email.message',
