@@ -4,15 +4,7 @@ import Button from './Button';
 import _ from 'lodash';
 import { isValidEmail, capitalize } from '../lib/utils';
 import CreditCardForm from './CreditCardForm';
-import { css } from 'glamor';
 import { defineMessages, injectIntl } from 'react-intl';
-
-const styles = {
-  SignInUp: css({
-    margin: '0px auto',
-    maxWidth: '400px'
-  })
-}
 
 class SignInUp extends React.Component {
 
@@ -106,8 +98,12 @@ class SignInUp extends React.Component {
     const isFormValid = isValidEmail(this.state.user.email) && (!this.props.requireCreditCard || this.state.user.card);
 
     return (
-      <div className={styles.SignInUp}>
+      <div className="SignInUp">
         <style jsx global>{`
+          .SignInUp {
+            margin: 0px auto;
+            max-width: 400px;
+          }
           .field {
             display: flex;
             width: 100%;
