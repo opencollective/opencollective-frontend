@@ -2,6 +2,9 @@
   "name": "opencollective-frontend",
   "version": "0.0.2",
   "private": true,
+  "engine": {
+    "node": "7.6.0"
+  },
   "dependencies": {
     "apollo-client": "0.8.6",
     "autoprefixer": "6.7.6",

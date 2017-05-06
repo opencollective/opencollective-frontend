@@ -1,0 +1,4 @@
+{
+  "name": "opencollective-frontend",
+  "alias": ["oc-prod-frontend", "oc-staging-frontend"]
+}
