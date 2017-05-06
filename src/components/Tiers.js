@@ -1,5 +1,4 @@
 import React from 'react';
-import { css } from 'glamor';
 import Tier from './Tier';
 
 class Tiers extends React.Component {

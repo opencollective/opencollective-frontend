@@ -1,62 +1,9 @@
 import React from 'react';
-import { css } from 'glamor';
 import colors from '../constants/colors';
 import TicketController from './TicketController';
 import Button from './Button';
 import { formatCurrency } from '../lib/utils';
 import { injectIntl, FormattedMessage } from 'react-intl';
-
-const styles = {
-  tier: css({
-    width: '100%',
-    maxWidth: '400px',
-    minHeight: '12rem',
-    position: 'relative',
-    border: `1px solid ${colors.lightgray}`,
-    margin: '1rem auto',
-    paddingBottom: '6rem',
-    color: colors.black
-  }),
-  header: css({
-    margin: '1rem',
-    display: 'flex',
-    justifyContent: 'space-between'
-  }),
-  title: css({
-    fontSize: '1.8rem'
-  }),
-  description: css({
-    margin: '1rem',
-    color: colors.darkgray,
-    fontSize: '1.5rem'
-  }),
-  actions: css({
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    height: '6rem',
-    position: 'absolute',
-    bottom: '0',
-    width: '100%'
-  }),
-  btn: css({
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    width: '100%',
-    textTransform: 'uppercase',
-    '&.blue': {
-      color: 'white',
-      background: colors.blue
-    },
-    '&.gray': {
-      color: 'white',
-      background: colors.darkgray
-    }
-  })
-};
 
 class Tier extends React.Component {
 
@@ -89,21 +36,72 @@ class Tier extends React.Component {
     const type = (name.match(/ticket/i)) ? 'ticket' : 'tier';
 
     return (
-      <div className={this.props.className} id={this.anchor}>
-        <div className={styles.tier}>
-          <div className={styles.header}>
-            <div className={styles.title} >{name}</div>
-            <div className={styles.title} >{formatCurrency(this.state.amount, currency, this.props.intl)}</div>
+      <div className={`${this.props.className} tier`} id={this.anchor}>
+        <style jsx>{`
+          .tier {
+            width: 100%;
+            max-width: 400px;
+            min-height: 12rem;
+            position: relative;
+            border: 1px solid ${colors.lightgray};
+            margin: 3rem auto;
+            padding-bottom: 6rem;
+            color: ${colors.black};
+          }
+          .header {
+            margin: 1rem;
+            display: flex;
+            justify-content: space-between;
+          }
+          .title {
+            font-size: 1.8rem;
+          }
+          .description {
+            margin: 1rem;
+            color: ${colors.darkgray};
+            font-size: 1.5rem;
+          }
+          .actions {
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row;
+            height: 6rem;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+          }
+          .btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            text-transform: uppercase;
+          }
+          .btn.blue {
+            color: white;
+            background: ${colors.blue};
+          }
+          .btn.gray {
+            color: white;
+            background: ${colors.darkgray};
+          } 
+        `}</style>
+        <div>
+          <div className="header">
+            <div className="title" >{name}</div>
+            <div className="title" >{formatCurrency(this.state.amount, currency, this.props.intl)}</div>
           </div>
-          <p className={styles.description}>{description}</p>
+          <p className="description">{description}</p>
           { type === 'ticket' &&
-            <div id="actions" className={styles.actions}>
+            <div id="actions" className="actions">
               <Button className="gray"><TicketController value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} /></Button>
               {this.props.onClick && <Button className="blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
             </div>
           }
           { type === 'tier' &&
-            <div id="actions" className={styles.actions}>
+            <div id="actions" className="actions">
               {this.props.onClick && <Button className="gray" label={(<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick(this.state)} />}
             </div>
           }

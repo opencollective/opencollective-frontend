@@ -24,7 +24,6 @@
     "eslint-plugin-react": "6.2.0",
     "express": "4.15.2",
     "fs": "0.0.1-security",
-    "glamor": "2.20.12",
     "glob": "7.1.1",
     "global": "4.3.1",
     "graphql": "0.9.1",
