@@ -1,6 +1,5 @@
 import React from 'react';
 import Payment from 'payment';
-import { Row, Col, FormGroup, ControlLabel, Alert } from 'react-bootstrap';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import Button from './Button';
 import _ from 'lodash';
@@ -41,6 +40,12 @@ class CreditCardForm extends React.Component {
       this.state.card.exp_month = Number(tokens[0]);
       this.state.card.exp_year = 2000 + Number(tokens[1]);
     }
+
+    // If credit card is autofilled by the browser or a password manager, the onChange event is not triggered
+    // So we need to periodically check for change.
+    setInterval(() => {
+      this.handleChange('number');
+    }, 1000);
   }
 
   componentDidMount() {
