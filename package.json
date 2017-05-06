@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "private": true,
   "engine": {
-    "node": "7.6.0"
+    "node": "7.7.4"
   },
   "dependencies": {
     "apollo-client": "0.8.6",
@@ -35,7 +35,7 @@
     "markdown-in-js": "1.1.3",
     "markdown-loader": "2.0.0",
     "net": "1.0.2",
-    "next": "2.0.0-beta.39",
+    "next": "2.3.1",
     "next-routes": "1.0.24",
     "node-sass": "4.5.0",
     "now": "4.9.0",
