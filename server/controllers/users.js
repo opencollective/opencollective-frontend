@@ -400,8 +400,8 @@ export const sendNewTokenByEmail = (req, res, next) => {
     // Otherwise, we can leak email addresses
     if (user) {
       return emailLib.send('user.new.token', req.body.email, 
-        { loginLink: user.generateLoginLink(redirect)}, // allows us to log in as users to debug issue)
-        { bcc: 'ops@opencollective.com'});
+        { loginLink: user.generateLoginLink(redirect)}, 
+        { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue)
     }
     return null;
   })
