@@ -399,9 +399,9 @@ export const sendNewTokenByEmail = (req, res, next) => {
     // If you don't find a user, proceed without error
     // Otherwise, we can leak email addresses
     if (user) {
-      return emailLib.send('user.new.token', req.body.email, {
-        loginLink: user.generateLoginLink(redirect)
-      });
+      return emailLib.send('user.new.token', req.body.email, 
+        { loginLink: user.generateLoginLink(redirect)}, // allows us to log in as users to debug issue)
+        { bcc: 'ops@opencollective.com'});
     }
     return null;
   })
