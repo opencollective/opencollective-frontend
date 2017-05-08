@@ -146,7 +146,7 @@ export default function(Sequelize, DataTypes) {
       unique: true,
       set(slug) {
         if (slug && slug.toLowerCase) {
-          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-'));
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/./g, ''));
         }
       }
     },
