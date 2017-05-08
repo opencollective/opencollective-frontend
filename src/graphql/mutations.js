@@ -28,8 +28,27 @@ const createResponseQuery = gql`
   }
 `;
 
+const createEventQuery = gql`
+  mutation createEvent($collectiveSlug: String!, $event: EventInputType) {
+    createEvent(collectiveSlug: $collectiveSlug, event: $event) {
+      id,
+      slug,
+      name,
+      collective {
+        slug
+      }
+    }
+  }
+`;
+
 export const addCreateResponseMutation = graphql(createResponseQuery, {
   props: ( { mutate }) => ({
     createResponse: (response) => mutate({ variables: { response } })
+  })
+});
+
+export const addCreateEventMutation = graphql(createEventQuery, {
+  props: ( { mutate }) => ({
+    createEvent: (event) => mutate({ variables: { event } })
   })
 });
