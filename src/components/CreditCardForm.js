@@ -55,6 +55,8 @@ class CreditCardForm extends React.Component {
 
   handleChange(fieldname) {
 
+    if (!this.refs[fieldname]) return;
+
     const field = {};
     field[fieldname] = this.refs[fieldname].value;
     const card = Object.assign({}, this.state.card, field);
