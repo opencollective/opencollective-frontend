@@ -2,7 +2,7 @@
   "name": "opencollective-frontend",
   "version": "0.0.2",
   "private": true,
-  "engine": {
+  "engines": {
     "node": "7.7.4"
   },
   "dependencies": {
