@@ -1,10 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import UserCard from './UserCard';
 
 class Sponsors extends React.Component {
 
   static propTypes = {
-    sponsors: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+    sponsors: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
   constructor(props) {

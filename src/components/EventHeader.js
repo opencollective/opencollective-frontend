@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class EventHeader extends React.Component {
 
   static propTypes = {
-    title: React.PropTypes.string,
-    description: React.PropTypes.string,
-    logo: React.PropTypes.string,
-    backgroundImage: React.PropTypes.string
+    title: PropTypes.string,
+    description: PropTypes.string,
+    logo: PropTypes.string,
+    backgroundImage: PropTypes.string
   }
 
   render() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 const star = '/static/images/icons/star.svg';
@@ -10,13 +11,13 @@ const icons = {
 class Button extends React.Component {
 
   static propTypes = {
-    label: React.PropTypes.object,
-    disabled: React.PropTypes.bool,
-    type: React.PropTypes.string, // e.g. type="submit"
-    onClick: React.PropTypes.func,
-    className: React.PropTypes.string,
-    icon: React.PropTypes.string,
-    style: React.PropTypes.object
+    label: PropTypes.object,
+    disabled: PropTypes.bool,
+    type: PropTypes.string, // e.g. type="submit"
+    onClick: PropTypes.func,
+    className: PropTypes.string,
+    icon: PropTypes.string,
+    style: PropTypes.object
   }
 
   onClick() {

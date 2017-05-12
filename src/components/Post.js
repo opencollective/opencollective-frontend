@@ -1,13 +1,14 @@
 import React from 'react'
+import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
 class Post extends React.Component {
 
   static propTypes = {
-    post: React.PropTypes.object,
-    mutate: React.PropTypes.func,
-    refresh: React.PropTypes.func,
+    post: PropTypes.object,
+    mutate: PropTypes.func,
+    refresh: PropTypes.func,
   }
 
   render () {

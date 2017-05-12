@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 const logo = '/static/images/opencollective-icon.svg';
 
 class NotificationBar extends React.Component {
 
   static propTypes = {
-    status: React.PropTypes.string,
-    error: React.PropTypes.string
+    status: PropTypes.string,
+    error: PropTypes.string
   }
 
   render() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Payment from 'payment';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import Button from './Button';
@@ -7,10 +8,10 @@ import _ from 'lodash';
 class CreditCardForm extends React.Component {
 
   static propTypes = {
-    stripePublishableKey: React.PropTypes.string.isRequired,
-    onCardAdded: React.PropTypes.func,
-    addCardLabel: React.PropTypes.string,
-    disabled: React.PropTypes.bool
+    stripePublishableKey: PropTypes.string.isRequired,
+    onCardAdded: PropTypes.func,
+    addCardLabel: PropTypes.string,
+    disabled: PropTypes.bool
   }
 
   constructor(props) {
@@ -253,7 +254,5 @@ class CreditCardForm extends React.Component {
     );
   }
 }
-
-CreditCardForm.propTypes = {};
 
 export default CreditCardForm;

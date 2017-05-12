@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Gmaps, Marker } from 'react-gmaps';
 
 class Map extends React.Component {
 
   static propTypes = {
-    lat: React.PropTypes.number,
-    lng: React.PropTypes.number,
-    address: React.PropTypes.string
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+    address: PropTypes.string
   }
 
   onMapCreated(map) {
