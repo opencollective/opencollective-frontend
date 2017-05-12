@@ -102,7 +102,7 @@ class TicketsConfirmed extends React.Component {
           `}</style>
           <style jsx global>{`
           .react-add-to-calendar {
-            width: 175px;
+            width: 180px;
             -webkit-font-smoothing: antialiased;
             text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
             position: relative;

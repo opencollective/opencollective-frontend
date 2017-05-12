@@ -39,7 +39,7 @@ class GetTicketForm extends React.Component {
     response.status = 'YES';
     response.user = user;
     response.description = user.description;
-    this.props.onSubmit(response);
+    return this.props.onSubmit(response);
   }
 
   render() {
