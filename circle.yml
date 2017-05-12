@@ -1,0 +1,10 @@
+general:
+  branches:
+    ignore:
+      - staging
+      - production
+machine:
+  node:
+    version: 7.7.4
+  environment:
+    NODE_ENV: circleci
