@@ -11,6 +11,8 @@ const server = express();
 const app = next({ dev, dir: dev ? 'src' : 'build' });
 const handler = routes.getRequestHandler(app);
 
+const port = process.env.PORT || 3000;
+
 app.prepare()
 .then(() => {
 
@@ -24,11 +26,11 @@ app.prepare()
 
   server.use(handler)
   server.use(loggerMiddleware.errorLogger);
-  server.listen(3000, (err) => {
+  server.listen(port, (err) => {
     if (err) {
       logger.error(">> Error when starting server", err);
       throw err
     }
-    logger.info(`>> Ready on http://localhost:3000 in ${env} environment`);
+    logger.info(`>> Ready on http://localhost:port in ${env} environment`);
   })
 })
