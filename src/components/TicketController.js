@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 class TicketController extends React.Component {
 
   static propTypes = {
-    value: React.PropTypes.number,
-    className: React.PropTypes.object,
-    onChange: React.PropTypes.func
+    value: PropTypes.number,
+    className: PropTypes.object,
+    onChange: PropTypes.func
   }
 
   constructor(props) {

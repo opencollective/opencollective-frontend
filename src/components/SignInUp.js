@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import Button from './Button';
 import _ from 'lodash';
@@ -9,13 +10,13 @@ import { defineMessages, injectIntl } from 'react-intl';
 class SignInUp extends React.Component {
 
   static propTypes = {
-    label: React.PropTypes.object,
-    onSubmit: React.PropTypes.func, // onSubmit(user)
-    emailOnly: React.PropTypes.bool,
-    showLabels: React.PropTypes.bool,
-    requireCreditCard: React.PropTypes.bool,
-    stripePublishableKey: React.PropTypes.string,
-    className: React.PropTypes.string
+    label: PropTypes.object,
+    onSubmit: PropTypes.func, // onSubmit(user)
+    emailOnly: PropTypes.bool,
+    showLabels: PropTypes.bool,
+    requireCreditCard: PropTypes.bool,
+    stripePublishableKey: PropTypes.string,
+    className: PropTypes.string
   }
 
   constructor(props) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -28,9 +29,9 @@ const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 class Event extends React.Component {
 
   static propTypes = {
-    collectiveSlug: React.PropTypes.string.required,
-    eventSlug: React.PropTypes.string.required,
-    data: React.PropTypes.object,
+    collectiveSlug: PropTypes.string.required,
+    eventSlug: PropTypes.string.required,
+    data: PropTypes.object,
   }
 
   constructor(props) {

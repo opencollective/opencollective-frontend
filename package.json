@@ -43,6 +43,7 @@
     "payment": "2.1.4",
     "postcss-easy-import": "2.0.0",
     "postcss-loader": "1.3.3",
+    "prop-types": "^15.5.10",
     "raw-loader": "0.5.1",
     "react": "15.5.4",
     "react-add-to-calendar": "0.0.9",

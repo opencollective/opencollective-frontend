@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Button from './Button';
 import colors from '../constants/colors';
 
 class ActionBar extends React.Component {
 
   static propTypes = {
-    actions: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    info: React.PropTypes.string
+    actions: PropTypes.arrayOf(PropTypes.object).isRequired,
+    info: PropTypes.string
   }
 
   render() {

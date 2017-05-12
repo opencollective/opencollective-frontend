@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Tier from './Tier';
 import SignInUp from './SignInUp';
 import { FormattedMessage } from 'react-intl';
@@ -6,11 +7,11 @@ import { FormattedMessage } from 'react-intl';
 class GetTicketForm extends React.Component {
 
   static propTypes = {
-    onCancel: React.PropTypes.func.isRequired,
-    onSubmit: React.PropTypes.func.isRequired,
-    quantity: React.PropTypes.number.isRequired,
-    stripePublishableKey: React.PropTypes.string,
-    tier: React.PropTypes.object.isRequired
+    onCancel: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    quantity: PropTypes.number.isRequired,
+    stripePublishableKey: PropTypes.string,
+    tier: PropTypes.object.isRequired
   }
 
   constructor(props) {

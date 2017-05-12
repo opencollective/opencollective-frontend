@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import SignInUp from './SignInUp';
 import { FormattedMessage } from 'react-intl';
 
 class InterestedForm extends React.Component {
 
   static propTypes = {
-    onSubmit: React.PropTypes.func
+    onSubmit: PropTypes.func
   }
 
   constructor(props) {
