@@ -37,6 +37,11 @@ const mutations = {
         ...event,
         GroupId: group.id
       }))
+      .then(event => {
+        if (event.tiers) {
+          return models.Tier.createMany(event.tiers, { EventId: event.id })
+        }
+      })
     }
   },
   updateEvent: {
