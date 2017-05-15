@@ -1,6 +1,6 @@
 import path from 'path';
 import nextRoutes from 'next-routes';
-import { template } from 'lodash';
+import _ from 'lodash';
 import fs from 'fs';
 
 const pages = nextRoutes();
@@ -12,7 +12,8 @@ module.exports = (server) => {
 
   server.get('/:collectiveSlug/donate/button.js', (req, res) => {
     const content = fs.readFileSync(path.join(__dirname,'../templates/widget.js'), 'utf8');
-    const compiled = template(content);
+    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+    const compiled = _.template(content);
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,

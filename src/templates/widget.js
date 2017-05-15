@@ -28,7 +28,7 @@
   }
 
   const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
-  const regex = new RegExp("${host}".replace(/^https?:\/\//, ''),'i');
+  const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
   const anchor = scriptsNodesArray.find(s => s.getAttribute('src') && s.getAttribute('src').match(regex));
 
   const styles = window.getComputedStyle(anchor.parentNode, null);
@@ -52,7 +52,7 @@
   const attributes = OC.getAttributes();
   const color = attributes.color || 'white';
 
-  const html = `<center><iframe src="${host}/${collectiveSlug}/donate/button?color=` + color + `" width="300" height=50 frameborder=0></iframe></center>`;
+  const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/donate/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
 
   const e = document.createElement('div');
   e.id = 'opencollective-donate-button';
