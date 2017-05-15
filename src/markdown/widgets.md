@@ -12,11 +12,11 @@ E.g. http://polycode.co.uk
 
 ## Donate button
 
-    <iframe frameborder=0 src="https://opencollective.com/:collectiveSlug/donate/button?color=[white|blue]" width=300 height=50></iframe>
+    <script src="https://opencollective.com/:collectiveSlug/donate/button.js" color="[white|blue]"></script>
 
 Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
 Example:
-<center><iframe frameborder=0 src="/webpack/donate/button" width=300 height=50></iframe><iframe frameborder=0 src="/webpack/donate/button?color=blue" width=300 height=50></iframe></center>
+<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></iframe></center>
 
 
 ## Show backers and sponsors

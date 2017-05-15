@@ -16,7 +16,7 @@ module.exports = (server) => {
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,
-      host: 'http://localhost:3000'
+      host: process.env.WEBSITE_URL || "http://localhost:3000"
     }))
   });
 
