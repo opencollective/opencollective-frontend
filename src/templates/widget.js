@@ -1,63 +1,58 @@
 (function() {
-  let OC;
 
-  if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, "find", {
-      value: function(predicate) {
-      'use strict';
-      if (this == null) {
-        throw new TypeError('Array.prototype.find called on null or undefined');
-      }
-      if (typeof predicate !== 'function') {
-        throw new TypeError('predicate must be a function');
-      }
-      const list = Object(this);
-      const length = list.length >>> 0;
-      const thisArg = arguments[1];
-      let value;
-
-      for (let i = 0; i < length; i++) {
-        value = list[i];
-        if (predicate.call(thisArg, value, i, list)) {
-          return value;
-        }
-      }
-      return undefined;
-      }
-    });
+  // Make sure we only load the script once.
+  if (window.OC && window.OC.buttons) {
+    return;
   }
 
-  const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
-  const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
-  const anchor = scriptsNodesArray.find(s => s.getAttribute('src') && s.getAttribute('src').match(regex));
+  window.OC = {
+    buttons: []
+  };
 
-  const styles = window.getComputedStyle(anchor.parentNode, null);
+  class OpenCollectiveButton {
 
-  OC = {
-    getContainerWidth: () => {
-      return anchor.parentNode.getBoundingClientRect().width - parseInt(styles.paddingLeft, 10) - parseInt(styles.paddingRight, 10);
-    },
-    getAttributes: () => {
+    constructor(anchor) {
+      this.anchor = anchor;
+      this.styles = window.getComputedStyle(anchor.parentNode, null);
+
+      const attributes = this.getAttributes();
+      const color = attributes.color || 'white';
+      console.log("Attributes", attributes, color);
+      const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/donate/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
+
+      this.el = document.createElement('div');
+      this.el.className = 'opencollective-donate-button';
+      this.el.innerHTML = html;
+
+      this.inject(this.el);
+    }
+
+    getContainerWidth() {
+        return this.anchor.parentNode.getBoundingClientRect().width - parseInt(this.styles.paddingLeft, 10) - parseInt(this.styles.paddingRight, 10);
+    }
+
+    getAttributes() {
       const attributes = {};
-      [].slice.call(anchor.attributes).forEach((attr) => {
+      [].slice.call(this.anchor.attributes).forEach((attr) => {
         attributes[attr.name] = attr.value;
       });
       return attributes;
-    },
-    inject: (e) => {
-      anchor.parentNode.insertBefore(e, anchor);
     }
-  };
 
-  const attributes = OC.getAttributes();
-  const color = attributes.color || 'white';
+    inject(e) {
+      this.anchor.parentNode.insertBefore(e, this.anchor);
+    }
 
-  const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/donate/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
+  }
 
-  const e = document.createElement('div');
-  e.id = 'opencollective-donate-button';
-  e.innerHTML = html;
-
-  OC.inject(e);
+  document.addEventListener("DOMContentLoaded", () => {
+    const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
+    const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
+    scriptsNodesArray.map(s => {
+      if (s.getAttribute('src') && s.getAttribute('src').match(regex)) {
+        window.OC.buttons.push(new OpenCollectiveButton(s));
+      }
+    });
+  });
 
 })();
