@@ -16,7 +16,7 @@
       const thisArg = arguments[1];
       let value;
 
-      for (const i = 0; i < length; i++) {
+      for (let i = 0; i < length; i++) {
         value = list[i];
         if (predicate.call(thisArg, value, i, list)) {
           return value;
