@@ -69,6 +69,8 @@
     "test": "jest test/*",
     "build:server": "./node_modules/.bin/babel -D ./src -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",
+    "deploy:production": "git push production master",
+    "deploy:staging": "now -E .env.staging && now alias",
     "postinstall": "npm run build"
   },
   "devDependencies": {
