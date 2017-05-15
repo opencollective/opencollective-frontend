@@ -1,5 +1,3 @@
-process.env.LOGS_SECRET_KEY && require('now-logs')(process.env.LOGS_SECRET_KEY)
-
 import express from 'express';
 import next from 'next';
 import routes from './routes';
