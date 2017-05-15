@@ -1,13 +1,3 @@
-# For backers and sponsors
-
-To show the list of collectives that you are backing on your website, just add this script:
-
-    <script src="https://opencollective.com/:username/widget.js"></script>
-
-E.g. http://polycode.co.uk
-
-![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
-
 # For collectives
 
 ## Donate button
@@ -16,7 +6,17 @@ E.g. http://polycode.co.uk
 
 Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
 Example:
-<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></iframe></center>
+<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script></center>
+
+If you want to add a donate button to a blog post (on Medium for example), you can load an image version of the logo and then link to the donate page of your collective.
+
+    <a href="https://opencollective.com/webpack/donate">
+      <img src="https://opencollective.com/webpack/donate/button.png?color=blue" width=300 />
+    </a>
+
+Result:
+
+<a href="https://opencollective.com/webpack/donate"><img src="https://opencollective.com/webpack/donate/button.png?color=blue" width=300 /></a>
 
 
 ## Show backers and sponsors
@@ -39,6 +39,18 @@ You can target them with CSS to customize them:
     #opencollective-banner h1 {
       color: black;
     }
+
+
+# For backers and sponsors
+
+To show the list of collectives that you are backing on your website, just add this script:
+
+    <script src="https://opencollective.com/:username/widget.js"></script>
+
+E.g. http://polycode.co.uk
+
+![](https://cl.ly/01082x0W042G/Screen%20Shot%202017-02-27%20at%205.22.09%20PM.png)
+
 
 # Feedback
 
