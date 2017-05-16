@@ -10,9 +10,9 @@ pages.add('button', '/:collectiveSlug/donate/button');
 
 module.exports = (server) => {
 
-  server.get('/:collectiveSlug/donate/button.png', (req, res) => {
+  server.get('/:collectiveSlug/donate/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';
-    res.sendFile(path.join(__dirname, `../static/images/buttons/donate-button-${color}.png`));
+    res.sendFile(path.join(__dirname, `../static/images/buttons/donate-button-${color}${req.params.size}.png`));
   });
 
   server.get('/:collectiveSlug/donate/button.js', (req, res) => {

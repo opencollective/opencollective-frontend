@@ -8,15 +8,17 @@ Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack fo
 Example:
 <center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script></center>
 
-If you want to add a donate button to a blog post (on Medium for example), you can load an image version of the logo and then link to the donate page of your collective.
+If you want to add a donate button to a blog post, you can load an image version of the logo and then link to the donate page of your collective.
 
     <a href="https://opencollective.com/webpack/donate">
-      <img src="https://opencollective.com/webpack/donate/button.png?color=blue" width=300 />
+      <img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" width=300 />
     </a>
 
 Result:
 
-<a href="https://opencollective.com/webpack/donate"><img src="https://opencollective.com/webpack/donate/button.png?color=blue" width=300 /></a>
+<center><a href="https://opencollective.com/webpack/donate"><img src="https://opencollective.com/webpack/donate/button.png?color=blue" width=300 /></a></center>
+
+On Medium, just download the image then upload it to your post (make sure the image file ends with "@2x" to make it retina size). To link it, select the image then press CMD+K (or CTRL+K on Windows). A pop up menu will show up where you can enter the URL to link the image to (see [Medium support page](https://help.medium.com/hc/en-us/articles/115004808847-Image-links)). Here is an example: https://medium.com/open-collective/open-collective-donate-button-e7e6d5965b2c
 
 
 ## Show backers and sponsors
