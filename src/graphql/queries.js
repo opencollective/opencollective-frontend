@@ -66,6 +66,11 @@ const getEventsQuery = gql`
       timezone,
       location,
       address,
+      tiers {
+        name,
+        description,
+        amount
+      },
       collective {
         id,
         slug,

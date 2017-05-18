@@ -1,10 +1,14 @@
 import React from 'react';
-import _ from 'lodash';
+import Header from '../components/Header';
+import Body from '../components/Body';
+import Footer from '../components/Footer';
 import { addEventsData } from '../graphql/queries';
 import { addCreateEventMutation } from '../graphql/mutations';
-import { defineMessages, injectIntl, FormattedDate, FormattedMessage } from 'react-intl';
+import { injectIntl, FormattedDate, FormattedMessage } from 'react-intl';
 import colors from '../constants/colors';
 import Button from '../components/Button';
+import InputField from '../components/InputField';
+import EditTiers from '../components/EditTiers';
 import { isValidEmail, capitalize } from '../lib/utils';
 
 class CreateEvent extends React.Component {
@@ -15,22 +19,12 @@ class CreateEvent extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { event: {}, result: {} };
-    this.renderInputField = this.renderInputField.bind(this);
+    this.state = { event: {}, tiers: [{}, {}], result: {} };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleTiersChange = this.handleTiersChange.bind(this);
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
     
-    this.messages = defineMessages({
-      'slug.label': { id: 'createEvent.slug.label', defaultMessage: 'slug' },
-      'name.label': { id: 'createEvent.name.label', defaultMessage: 'name' },
-      'description.label': { id: 'createEvent.description.label', defaultMessage: 'description' },
-      'startsAt.label': { id: 'createEvent.startsAt.label', defaultMessage: 'Start date and time' },
-      'endsAt.label': { id: 'createEvent.endsAt.label', defaultMessage: 'End date and time' },
-      'location.label': { id: 'createEvent.location.label', defaultMessage: 'location name' },
-      'address.label': { id: 'createEvent.address.label', defaultMessage: 'address' }
-    });
-
     this.fields = [
       {
         name: 'slug',
@@ -42,6 +36,7 @@ class CreateEvent extends React.Component {
       },
       {
         name: 'description',
+        type: 'textarea',
         placeholder: ''
       },
       {
@@ -60,7 +55,7 @@ class CreateEvent extends React.Component {
         name: 'address',
         placeholder: ''
       }
-    ];  
+    ];
   }
 
   async createEvent(EventInputType) {
@@ -70,13 +65,11 @@ class CreateEvent extends React.Component {
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event created with success: ${eventUrl}` }});
     } catch (err) {
-      debugger;
       console.error(">>> createEvent error: ", err);
       const errorMsg = (err.graphQLErrors) ? err.graphQLErrors[0].message : err.message;
       this.setState( { result: { error: errorMsg }})
       throw new Error(errorMsg);
     }
-
   }
 
   renderEventEntry(event) {
@@ -89,14 +82,23 @@ class CreateEvent extends React.Component {
     this.setState( { event });
   }
 
+  handleTiersChange(tiers) {
+    console.log(">>> handleTiersChange", tiers);
+    this.setState({tiers});
+  }
+
   handleTemplateChange(e) {
     const eventId = Number(e.target.value);
     const template = eventId ? this.props.data.allEvents.find(event => event.id === eventId) : {};
     console.log(">>> handleTemplateChange", eventId, template);
-    this.fields.map(field => {
-      this.refs[field.name].value = template[field.name] || '';
-    })
-    this.setState({event: template});
+    const self = this;
+    debugger;
+    this.fields = this.fields.map(field => {
+      // this.refs[field.name].value = template[field.name];
+      field.value = template[field.name];
+      return field;
+    });
+    this.setState({event: template, tiers: template.tiers});
   }
 
   async handleSubmit(e) {
@@ -104,49 +106,77 @@ class CreateEvent extends React.Component {
     this.createEvent(this.state.event);
   }
 
-  renderInputField(field) {
-
-    const debouncedHandleEvent = _.debounce(this.handleChange, 500);
-    const { intl } = this.props;
-
-    return (
-      <div className="field" key={field.name} >
-        {this.messages[`${field.name}.label`] && <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>}
-        <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
-        {this.messages[`${field.name}.description`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.description`])}</span>}
-      </div>
-    );
-  }
-
   render() {
     const { loading, allEvents } = this.props.data;
 
     if (loading) return (<div />);
-
+    console.log(">>> this.state.tiers", this.state.tiers);
     return (
-      <div>
-        <h1>Create event</h1>
-        <h2><FormattedMessage id='createEvent.template' defaultMessage="Template" /></h2>
-        <form onSubmit={this.handleSubmit}>
-          <select name="template" onChange={this.handleTemplateChange}>
-            <option value="">No template</option>
-            {allEvents.map(this.renderEventEntry)}
-          </select>
-          <div>
-            {this.fields.map(this.renderInputField)}
-          </div>
-          <div>
-            <Button type="submit" className="green" label="Create Event" />
-          </div>
-          <div className="result">
-            <div className="success">{this.state.result.success}</div>
-            <div className="error">{this.state.result.error}</div>
-          </div>
-        </form>
+      <div className="CreateEvent">
+        <style jsx>{`
+        :global(.field) {
+          margin: 1rem;
+        }
+        :global(label) {
+          width: 150px;
+          display: inline-block;
+          vertical-align: top;
+        }
+        :global(input), select, :global(textarea) {
+          width: 300px;
+          font-size: 1.5rem;
+        }
+
+        form {
+          max-width: 700px;
+          margin: 0 auto;
+        }
+
+        .FormInputs {
+          column-count: 2;
+        }
+
+        .actions {
+          margin: 5rem auto;
+          text-align: center;
+        }
+        `}</style>
+
+        <Header title="Create Event" />
+
+        <Body>
+
+          <h1>Create event</h1>
+          <form onSubmit={this.handleSubmit}>
+            <div className="FormInputs">
+              <div className="field">
+                <label>Template</label>
+                <select name="template" onChange={this.handleTemplateChange}>
+                  <option value="">No template</option>
+                  {allEvents.map(this.renderEventEntry)}
+                </select>
+              </div>
+              {/*{this.fields.map((field) => <input type="text" ref={field.name} name={field.name} placeholder={field.placeholder} onChange={e => this.handleChange(e.target.value)} />)}*/}
+
+              {this.fields.map((field) => <InputField value={field.value} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} onChange={this.handleChange} />)}
+            </div>
+            <EditTiers tiers={this.state.tiers} onChange={this.handleTiersChange} />
+            <div className="actions">
+              <Button type="submit" className="green" label="Create Event" />
+              <div className="result">
+                <div className="success">{this.state.result.success}</div>
+                <div className="error">{this.state.result.error}</div>
+              </div>
+            </div>
+          </form>
+
+          </Body>
+
+          <Footer />
       </div>
     );
   }
 
 }
 
-export default addCreateEventMutation(addEventsData(injectIntl(CreateEvent)));
+export default addCreateEventMutation(addEventsData(CreateEvent));

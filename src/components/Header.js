@@ -189,13 +189,23 @@ class Header extends React.Component {
         margin: 40px auto;
       }
 
-      input[type=text] {
-        height: 42px;
+      label {
+        line-height: 4.2rem;
+        margin: 0.5rem 0;
+        vertical-align: top;
+      }
+
+      input[type=text], select, textarea {
+        height: 4.2rem;
         border: 1px solid rgba(48,50,51,0.2);
         border-radius: 5px;
         box-shadow: inset 0px 2px 0px rgba(0,0,0,0.05);
         padding: 5px;
         font-size: 1.8rem;
+      }
+
+      textarea {
+        height: 12.6rem;
       }
 
       button {
