@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import Button from './Button';
 import _ from 'lodash';
@@ -9,13 +10,13 @@ import { defineMessages, injectIntl } from 'react-intl';
 class SignInUp extends React.Component {
 
   static propTypes = {
-    label: React.PropTypes.object,
-    onSubmit: React.PropTypes.func, // onSubmit(user)
-    emailOnly: React.PropTypes.bool,
-    showLabels: React.PropTypes.bool,
-    requireCreditCard: React.PropTypes.bool,
-    stripePublishableKey: React.PropTypes.string,
-    className: React.PropTypes.string
+    label: PropTypes.object,
+    onSubmit: PropTypes.func, // onSubmit(user)
+    emailOnly: PropTypes.bool,
+    showLabels: PropTypes.bool,
+    requireCreditCard: PropTypes.bool,
+    stripePublishableKey: PropTypes.string,
+    className: PropTypes.string
   }
 
   constructor(props) {
@@ -80,10 +81,12 @@ class SignInUp extends React.Component {
     this.setState({ user: this.state.user });
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
     event.preventDefault();
+    this.setState({ loading: true });
     this.state.user.email = this.state.user.email.trim().toLowerCase();
-    this.props.onSubmit(this.state.user);
+    await this.props.onSubmit(this.state.user);
+    this.setState({ loading: false });
   }
 
   componentDidMount() {
@@ -96,6 +99,9 @@ class SignInUp extends React.Component {
     const showCreditCardForm = this.props.requireCreditCard && !this.state.user.creditCards;
 
     const isFormValid = isValidEmail(this.state.user.email) && (!this.props.requireCreditCard || this.state.user.card);
+    const isLoading = this.state.loading;
+
+    const submitBtnLabel = (isLoading) ? 'loading' : this.props.label;
 
     return (
       <div className="SignInUp">
@@ -137,17 +143,17 @@ class SignInUp extends React.Component {
         }
         {showCreditCardForm &&
           <CreditCardForm
-            addCardLabel={this.props.label}
+            addCardLabel={submitBtnLabel}
             onCardAdded={this.handleCardAdded}
             stripePublishableKey={this.props.stripePublishableKey}
             number={process.env.NODE_ENV === 'development' ? '4242424242424242' : undefined}
             expiration={process.env.NODE_ENV === 'development' ? '11/20' : undefined}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isLoading}
             />
         }
         {!showCreditCardForm &&
         <div id="actions" className="actions">
-          <Button type="submit" disabled={!isFormValid} className="green" label={this.props.label} />
+          <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} />
         </div>}
         </form>
       </div>

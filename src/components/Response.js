@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
@@ -15,7 +16,7 @@ const avatars = [avatar1, avatar2, avatar3, avatar4];
 class Response extends React.Component {
 
   static propTypes = {
-    response: React.PropTypes.object.isRequired
+    response: PropTypes.object.isRequired
   }
 
   constructor(props) {

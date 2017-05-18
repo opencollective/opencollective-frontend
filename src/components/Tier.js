@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import TicketController from './TicketController';
 import Button from './Button';
@@ -8,11 +9,11 @@ import { injectIntl, FormattedMessage } from 'react-intl';
 class Tier extends React.Component {
 
   static propTypes = {
-    tier: React.PropTypes.object.isRequired,
-    className: React.PropTypes.string,
-    quantity: React.PropTypes.number,
-    onChange: React.PropTypes.func, // onChange(response{quantity, amount, tier})
-    onClick: React.PropTypes.func // onClick(response{quantity, amount, tier})
+    tier: PropTypes.object.isRequired,
+    className: PropTypes.string,
+    quantity: PropTypes.number,
+    onChange: PropTypes.func, // onChange(response{quantity, amount, tier})
+    onClick: PropTypes.func // onClick(response{quantity, amount, tier})
   }
 
   constructor(props) {

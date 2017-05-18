@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Modal from './Modal';
 import AddToCalendar from 'react-add-to-calendar';
 
@@ -8,10 +9,10 @@ import { FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'reac
 class TicketsConfirmed extends React.Component {
 
   static propTypes = {
-    response: React.PropTypes.object.isRequired,
-    event: React.PropTypes.object.isRequired,
-    onClose: React.PropTypes.func,
-    show: React.PropTypes.bool
+    response: PropTypes.object.isRequired,
+    event: PropTypes.object.isRequired,
+    onClose: PropTypes.func,
+    show: PropTypes.bool
   }
 
   constructor(props) {
@@ -102,7 +103,7 @@ class TicketsConfirmed extends React.Component {
           `}</style>
           <style jsx global>{`
           .react-add-to-calendar {
-            width: 175px;
+            width: 180px;
             -webkit-font-smoothing: antialiased;
             text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
             position: relative;

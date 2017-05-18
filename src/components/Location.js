@@ -1,14 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Map from './Map';
 import colors from '../constants/colors';
 
 class Location extends React.Component {
 
   static propTypes = {
-    location: React.PropTypes.string,
-    address: React.PropTypes.string,
-    lat: React.PropTypes.number,
-    long: React.PropTypes.number
+    location: PropTypes.string,
+    address: PropTypes.string,
+    lat: PropTypes.number,
+    long: PropTypes.number
   }
 
   render() {

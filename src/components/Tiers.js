@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Tier from './Tier';
 
 class Tiers extends React.Component {
 
   static propTypes = {
-    tiers: React.PropTypes.array,
-    event: React.PropTypes.object
+    tiers: PropTypes.array,
+    event: PropTypes.object
   }
 
   getTicket(tier) {

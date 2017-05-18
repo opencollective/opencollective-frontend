@@ -1,10 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Response from './Response';
 
 class Responses extends React.Component {
 
   static propTypes = {
-    responses: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+    responses: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
   render() {
