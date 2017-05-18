@@ -3,7 +3,7 @@ Subject: New expense on {{group.name}}: {{{currency expense.amount currency=expe
 {{> header}}
 
 <center>
-  <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
+  <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
   <div>{{expense.title}}</div>
   <div>Submitted by: {{user.name}}</div>
   <div>Paypal Email: {{user.paypalEmail}}</div>
