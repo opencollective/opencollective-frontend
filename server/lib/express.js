@@ -13,11 +13,25 @@ import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
 import { sequelize as db } from '../models';
+import debug from 'debug';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
 export default function(app) {
   app.use(helmet());
+
+  if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
+    app.use((req, res, next) => {
+      const temp = res.send
+      res.send = function(json) {
+        if (typeof json === 'object') {
+          debug('response')(JSON.stringify(json, null, '  '));
+        }
+        temp.apply(this,arguments);
+      }
+      next();
+    });
+  }
 
   // Body parser.
   app.use(bodyParser.json({limit: '50mb'}));

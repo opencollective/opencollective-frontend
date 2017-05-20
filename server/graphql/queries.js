@@ -68,28 +68,22 @@ const queries = {
   /*
    * Given a collective slug, returns all events
    */
-  allEventsForCollective: {
+  allEvents: {
     type: new GraphQLList(EventType),
     args: {
       collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
+        type: GraphQLString
       }
     },
     resolve(_, args) {
+      const where = {};
+      if (args.collectiveSlug) {
+        where.slug = args.collectiveSlug.toLowerCase();
+      }
       return models.Event.findAll({
         include: [{
           model: models.Group,
-          where: { slug: args.collectiveSlug.toLowerCase() }
-        }]
-      })
-    }
-  },
-  allEvents: {
-    type: new GraphQLList(EventType),
-    resolve() {
-      return models.Event.findAll({
-        include: [{
-          model: models.Group
+          where
         }]
       })
     }
