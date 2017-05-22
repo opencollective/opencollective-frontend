@@ -74,7 +74,12 @@ export default function(Sequelize, DataTypes) {
 
     slug: {
       type: DataTypes.STRING,
-      allowNull: false
+      unique: true,
+      set(slug) {
+        if (slug && slug.toLowerCase) {
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
+        }
+      }
     },
 
     startsAt: {

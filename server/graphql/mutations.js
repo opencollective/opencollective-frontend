@@ -2,6 +2,7 @@ import models from '../models';
 import paymentsLib from '../lib/payments';
 import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
+import Promise from 'bluebird';
 
 import {
   GraphQLNonNull,
@@ -27,19 +28,20 @@ const mutations = {
   createEvent: {
     type: EventType,
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
       event: { type: EventInputType }
     },
     resolve(_, args) {
-      const event = args.event;
-      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      .tap(group => {
+        if (!group) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+      })
       .then((group) => models.Event.create({
-        ...event,
+        ...args.event,
         GroupId: group.id
       }))
-      .then(event => {
-        if (event.tiers) {
-          return models.Tier.createMany(event.tiers, { EventId: event.id })
+      .tap(event => {
+        if (args.event.tiers) {
+          return models.Tier.createMany(args.event.tiers, { EventId: event.id })
         }
       })
     }
@@ -53,9 +55,21 @@ const mutations = {
       return models.Event.findById(args.event.id)
       .then(event => {
         if (!event) throw new Error(`Event with id ${args.event.id} not found`);
-        return Event;
+        return event;
       })
       .then(event => event.update(args.event))
+      .then(event => {
+        if (args.event.tiers) {
+          return Promise.map(args.event.tiers, (tier) => {
+            if (tier.id) {
+              return models.Tier.update(tier, { where: { id: tier.id }});
+            } else {
+              tier.EventId = event.id;
+              return models.Tier.create(tier);  
+            }
+          });
+        }
+      })
     }
   },
   createTier: {

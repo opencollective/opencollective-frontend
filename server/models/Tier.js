@@ -114,7 +114,7 @@ export default function(Sequelize, DataTypes) {
 
     classMethods: {
       createMany: (tiers, defaultValues = {}) => {
-        return Promise.map(tiers, t => Event.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
+        return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
       }
     },
 
