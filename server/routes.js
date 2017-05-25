@@ -38,6 +38,8 @@ import errors from './lib/errors';
 
 import sanitizer from './middleware/sanitizer';
 
+import debug from 'debug';
+
 /**
  * NotImplemented response.
  */
@@ -50,6 +52,14 @@ export default (app) => {
   app.use('/status', serverStatus(app));
 
   app.use('*', auth.authorizeApiKey);
+
+  if (process.env.DEBUG) {
+    app.use('*', (req, res, next) => {
+      debug('params')("req.query", req.query, "req.body", req.body);
+      debug('headers')("req.headers", req.headers);
+      next();
+    });
+  }
 
   /**
    * User reset password or new token flow (no jwt verification)
