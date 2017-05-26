@@ -137,6 +137,57 @@ describe('Mutation Tests', () => {
       });
     });
 
+    describe('creates an event', () => {
+      it("creates an event with multiple tiers", async () => {
+        const event = {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","locationName":"Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28","startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":group1.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
+
+        const stringify = (json) => {
+          return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+        }
+
+        const query = `
+        mutation createEvent {
+          createEvent(event: ${stringify(event)}) {
+            id,
+            slug,
+            tiers {
+              id,
+              name,
+              amount
+            }
+          }
+        }
+        `;
+        const result = await graphql(schema, query);
+        const createdEvent = result.data.createEvent;
+        console.log(">>> event created", createdEvent);
+        expect(createdEvent.slug).to.equal(event.slug);
+        expect(createdEvent.tiers.length).to.equal(event.tiers.length);
+
+        event.id = createdEvent.id;
+        event.slug = 'newslug';
+        event.tiers[0].amount = 123;
+        const updateQuery = `
+        mutation updateEvent {
+          updateEvent(event: ${stringify(event)}) {
+            id,
+            slug,
+            tiers {
+              id,
+              name,
+              amount
+            }
+          }
+        }
+        `;
+        const r2 = await graphql(schema, updateQuery);
+        console.log("event updated", r2);
+        expect(r2.data.updateEvent.slug).to.equal(event.slug);
+        expect(r2.data.updateEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
+
+      })
+    })
+
     describe('creates a tier', () => {
 
       beforeEach(() => models.Event.create(

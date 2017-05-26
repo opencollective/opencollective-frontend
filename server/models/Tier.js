@@ -1,3 +1,6 @@
+import Promise from 'bluebird';
+import _ from 'lodash';
+
 export default function(Sequelize, DataTypes) {
 
   const Tier = Sequelize.define('Tier', {
@@ -106,6 +109,12 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      }
+    },
+
+    classMethods: {
+      createMany: (tiers, defaultValues = {}) => {
+        return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
       }
     },
 
