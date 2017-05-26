@@ -64,9 +64,11 @@ const mutations = {
       event: { type: EventInputType }
     },
     resolve(_, args) {
+      let event;
       return models.Event.findById(args.event.id)
-      .then(event => {
-        if (!event) throw new Error(`Event with id ${args.event.id} not found`);
+      .then(ev => {
+        if (!ev) throw new Error(`Event with id ${args.event.id} not found`);
+        event = ev;
         return event;
       })
       .then(event => event.update(args.event))
@@ -82,6 +84,7 @@ const mutations = {
           });
         }
       })
+      .then(() => event);
     }
   },
   createTier: {
@@ -135,7 +138,7 @@ const mutations = {
       response.user.email = response.user.email.toLowerCase();
 
       const recordInterested = () => {
-        return models.Event.getBySlug(response.group.slug, response.event.slug)
+        return models.Event.getBySlug(response.collective.slug, response.event.slug)
         .then(e => event = e)
         // find or create user
         .then(() => models.User.findOne({
@@ -173,14 +176,14 @@ const mutations = {
             include: [{
               model: models.Group,
               where: {
-                slug: response.group.slug
+                slug: response.collective.slug
               }
             }]
           }]
         })
         .then(t => {
           if (!t) {
-            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.group.slug}`);
+            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.collective.slug}`);
           }
           tier = t;
           event = t.Event;
