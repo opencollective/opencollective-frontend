@@ -23,9 +23,12 @@ export default function(app) {
   if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
     app.use((req, res, next) => {
       const temp = res.send
-      res.send = function(json) {
-        if (typeof json === 'object') {
-          debug('response')(JSON.stringify(json, null, '  '));
+      res.send = function(str) {
+        try {
+          const obj = JSON.parse(str);
+          debug('response')(JSON.stringify(obj, null, '  '));
+        } catch (e) {
+          debug('response', str);
         }
         temp.apply(this,arguments);
       }

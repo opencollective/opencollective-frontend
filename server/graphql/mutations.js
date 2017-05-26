@@ -27,16 +27,27 @@ const mutations = {
   createEvent: {
     type: EventType,
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      event: { type: EventInputType }
+      event: { type: new GraphQLNonNull(EventInputType) }
     },
     resolve(_, args) {
       const event = args.event;
-      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
       .then((group) => models.Event.create({
         ...event,
         GroupId: group.id
       }))
+      .catch(e => {
+        let msg;
+        switch (e.name) {
+          case "SequelizeUniqueConstraintError":
+            msg = `The slug ${e.fields.slug} is already taken. Please use another one.`
+            break;
+          default:
+            msg = e.message;
+            break;
+        }
+        throw new Error(msg);
+      })
     }
   },
   updateEvent: {

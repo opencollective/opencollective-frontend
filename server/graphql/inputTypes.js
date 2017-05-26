@@ -80,11 +80,13 @@ export const EventAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-    locationString: { type: GraphQLString },
+    locationName: { type: GraphQLString },
+    address: { type: GraphQLString },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
+    timezone: { type: GraphQLString },
     maxAmount: { type: GraphQLInt },
-    currency: { type: GraphQLString},
+    currency: { type: GraphQLString}
   })
 });
 
@@ -92,16 +94,18 @@ export const EventInputType = new GraphQLInputObjectType({
   name: 'EventInputType',
   description: 'Input type for EventType',
   fields: () => ({
+    slug: { type: GraphQLString },
     name: { type: new GraphQLNonNull(GraphQLString) },
     description: { type: new GraphQLNonNull(GraphQLString) },
-    locationString: { type: GraphQLString },
+    locationName: { type: GraphQLString },
+    address: { type: GraphQLString },
     startsAt: { type: new GraphQLNonNull(GraphQLString) },
     endsAt: { type: GraphQLString },
-    maxAmount: { type: new GraphQLNonNull(GraphQLString) },
+    timezone: { type: GraphQLString },
+    maxAmount: { type: GraphQLInt },
     currency: { type: GraphQLString },
-    quantity: { type: GraphQLInt },
     tiers: { type: new GraphQLList(TierInputType) },
-    group: { type: new GraphQLNonNull(GroupInputType) },
+    collective: { type: new GraphQLNonNull(GroupInputType) },
   })
 });
 

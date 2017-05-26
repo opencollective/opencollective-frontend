@@ -7,6 +7,7 @@ export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;
 
   const Event = Sequelize.define('Event', {
+
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -131,6 +132,13 @@ export default function(Sequelize, DataTypes) {
         }
       }
     },
+
+    indexes: [
+      {
+        unique: true,
+        fields: ['GroupId', 'slug']
+      }
+    ],
 
     instanceMethods: {
       getUsers() {
