@@ -1,0 +1,26 @@
+Hi {{recipient.firstName}}!
+
+Here are your monthly stats:
+
+Balance: {{{currency host.stats.balance currency=host.currency}}} (+{{{currency host.stats.totalDonations currency=host.currency}}}{{#if host.stats.totalExpenses}}, {{{currency host.stats.totalExpenses currency=host.currency}}}{{/if}}) 
+{{host.stats.backers.lastMonth}} backers (+{{host.stats.backers.new}}{{#if host.stats.backers.lost}}, -{{host.stats.backers.lost}}{{/if}}) 
+
+Payment processor fees: {{{currency host.accounting.paymentProcessorFees.total currency=host.currency}}}
+- PayPal: {{{currency host.accounting.paymentProcessorFees.paypal currency=host.currency}}}
+- Stripe: {{{currency host.accounting.paymentProcessorFees.stripe currency=host.currency}}}
+
+
+🗒 Transactions
+
+{{#each host.transactions}}
+- {{{moment createdAt format="MM/DD"}}} {{slug}} {{{currency netAmountInGroupCurrency currency=currency}}} {{description}}
+{{else}}
+No transaction. 
+{{/each}}
+
+
+🗣 Feedback
+As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
+
+
+{{>footer.text}}
