@@ -3,6 +3,7 @@ import paymentsLib from '../lib/payments';
 import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
 import Promise from 'bluebird';
+import { difference } from 'lodash';
 
 import {
   GraphQLNonNull,
@@ -58,7 +59,7 @@ const mutations = {
       })
     }
   },
-  updateEvent: {
+  editEvent: {
     type: EventType,
     args: {
       event: { type: EventInputType }
@@ -72,7 +73,15 @@ const mutations = {
         return event;
       })
       .then(event => event.update(args.event))
-      .then(event => {
+      .then(event => event.getTiers())
+      .then(tiers => {
+        if (args.event.tiers) {
+          // remove the tiers that are not present anymore in the updated event
+          const diff = difference(tiers.map(t => t.id), args.event.tiers.map(t => t.id));
+          return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        }
+      })
+      .then(() => {
         if (args.event.tiers) {
           return Promise.map(args.event.tiers, (tier) => {
             if (tier.id) {

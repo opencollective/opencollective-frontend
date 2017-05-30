@@ -168,10 +168,16 @@ describe('Mutation Tests', () => {
         event.id = createdEvent.id;
         event.slug = 'newslug';
         event.tiers = createdEvent.tiers;
+
+        // We remove the first tier
+        event.tiers.shift();
+
+        // We update the second (now only) tier
         event.tiers[0].amount = 123;
+
         const updateQuery = `
-        mutation updateEvent {
-          updateEvent(event: ${stringify(event)}) {
+        mutation editEvent {
+          editEvent(event: ${stringify(event)}) {
             id,
             slug,
             tiers {
@@ -183,8 +189,11 @@ describe('Mutation Tests', () => {
         }
         `;
         const r2 = await graphql(schema, updateQuery);
-        expect(r2.data.updateEvent.slug).to.equal(event.slug);
-        expect(r2.data.updateEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
+        const updatedEvent = r2.data.editEvent;
+        expect(updatedEvent.slug).to.equal(event.slug);
+        expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
+        expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
+
       })
     })
 
