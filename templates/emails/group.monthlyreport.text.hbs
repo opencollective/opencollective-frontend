@@ -6,7 +6,11 @@ Balance: {{{currency group.stats.balance currency=group.currency}}} (+{{{currenc
 {{group.stats.backers.lastMonth}} backers (+{{group.stats.backers.new}}{{#if group.stats.backers.lost}}, -{{group.stats.backers.lost}}{{/if}}) 
 
 
-# New Related Collectives
+🗞 Give your {{group.stats.backers.lastMonth}} backers an update!
+Don't forget to regularly send an email to backers@{{group.slug}}.opencollective.com to keep your backers posted on your latest activities!
+
+
+🔗 New Related Collectives
 
 {{#each relatedGroups}}
 {{publicUrl}}
@@ -26,16 +30,18 @@ Go to {{@root.group.publicUrl}}/expenses to submit a new expense.
 
 
 {{#if topBackers}}
-# Recent sponsor activity on Open Collective
+💰 Recent sponsor activity on Open Collective
 
 {{#each topBackers}}
 - {{name}} gave {{{donationsString.text}}}
 {{/each}}
 {{/if}}
 
+
 💡 Tips for raising more money
 We wrote this guide "Ten Steps to Successful Open Source Crowdfunding" with a bunch of tips to help you raise more money for your collective:
 https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687
+
 
 🗣 Feedback
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
