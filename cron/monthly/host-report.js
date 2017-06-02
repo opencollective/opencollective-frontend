@@ -15,8 +15,11 @@ import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
 import { getTiersStats } from '../../server/lib/utils';
-import models from '../../server/models';
+import models, {sequelize} from '../../server/models';
 import emailLib from '../../server/lib/email';
+import { convertToCurrency } from '../../server/lib/currency';
+
+import { getHostedGroups, getBackersStats, getTotalNetAmount, sumTransactions } from '../../server/lib/hostlib';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
@@ -31,10 +34,10 @@ const debug = debugLib('monthlyreport');
 
 const {
   Group,
+  User,
   UserGroup,
   Notification,
-  Transaction,
-  User
+  Transaction
 } = models;
 
 const init = () => {
@@ -46,7 +49,7 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { username: {$in: ['brusselstogether_host', 'adminwwc']} };
+    query.where = { username: {$in: ['adminwwc']} };
 
   User.findAll(query)
   .tap(hosts => {
@@ -60,45 +63,90 @@ const init = () => {
   });
 }
 
-const getHostedGroups = (host) => {
-  debug(`getHostedGroups(${host.username})`);
-  return host.getGroups({ where: { role: 'HOST '}})
-}
-
 const getTransactions = (groupids) => {
-  debug("groupids", groupids);
+  debug("getTransactions for ", groupids.length, "collectives");
   const query = {
     where: {
       GroupId: { $in: groupids },
       createdAt: { $gte: startDate, $lt: endDate }
     }
-  }
+  };
+  return Transaction.findAll(query);
+}
 
-  return Transaction.find(query);
+const getHostStats = (host, groupids) => {
+
+  const dateRange = {
+    createdAt: { $gte: startDate, $lt: endDate }
+  };
+
+  const where = {
+    GroupId: { $in: groupids }
+  };
+
+  return Promise.all([
+    sumTransactions('netAmountInGroupCurrency', where, host.currency),                      // total host balance
+    sumTransactions('netAmountInGroupCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
+    sumTransactions('amount', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total donations last month
+    sumTransactions('netAmountInGroupCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
+    sumTransactions('netAmountInGroupCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
+    sumTransactions("hostFeeInTxnCurrency", dateRange, host.currency),
+    sumTransactions("paymentProcessorFeeInTxnCurrency", dateRange, host.currency),
+    sumTransactions("platformFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
+    getBackersStats(groupids)
+  ]);
 }
 
 const processHost = (host) => {
 
-  let groups;
+  let data = {}, groupsById = {};
 
-  return getHostedGroups(host)
-    .then(results => groups = results)
-    .then(groups => getTransactions(groups.map(g => g.id)))
-    .then(transactions => {
-      const data = {
-        transactions,
-        groups
-      };
-      debug("data", data);
-      return data;
+  host.currency = host.currency || 'USD'; // TODO: Need to add a currency column to the Users table
+  host.name = "WWCode 501c3"; // TODO
+  data.host = host;
+
+  return getHostedGroups(host.id)
+    .tap(groups => groupsById = _.indexBy(groups, "id"))
+    .then(() => getTransactions(Object.keys(groupsById)))
+    .tap(transactions => Promise.map(transactions, (t) => {
+      const r = t.dataValues;
+      r.group = groupsById[r.GroupId];
+
+      // TODO: Need to add a netAmountInHostCurrency column to the Transactions table
+      if (r.group.currency !== host.currency) {
+        return convertToCurrency(t.netAmountInGroupCurrency, r.group.currency, host.currency, r.createdAt)
+          .then(amount => {
+            r.amountInHostCurrency = amount;
+            return r;
+          })
+      }
+      return r;
+    }))
+    .then(() => getHostStats(host, Object.keys(groupsById)))
+    .then(stats => {
+      data.stats = {
+        totalCollectives: Object.keys(groupsById).length,
+        balance: stats[0],
+        delta: stats[1],
+        totalNewDonations: stats[2],
+        totalNetAmountReceived: stats[3],
+        totalNewExpenses: stats[4],
+        totalNewHostFees: stats[5],
+        paymentProcessorFees: stats[6],
+        platformFees: stats[7],
+        backers: stats[8]
+      }
     })
-    .then((data) => sendEmail(host.email, data))
+    .then(() => sendEmail(host.email, data))
     .catch(e => {
       console.error("Error in processing host", host.username, e);
     });
 };
 
 const sendEmail = (recipient, data) => {
+    debug("Sending email to ", recipient);
+    debug("email data transactions", data.transactions);
+    debug("email data stats", data.stats);
     data.recipient = recipient;
     if (process.env.ONLY && recipient.email !== process.env.ONLY) {
       debug("Skipping ", recipient.email);

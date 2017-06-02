@@ -4,6 +4,8 @@ import jsonData from './mocks/data';
 import userlib from '../server/lib/userlib';
 import config from 'config';
 import { isArray, values } from 'lodash';
+import path from 'path';
+import { exec } from 'child_process';
 
 jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
@@ -25,3 +27,13 @@ export const resetTestDB = () => sequelize.sync({force: true})
     console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
     process.exit(1);
   });
+
+export function loadDB(dbname) {
+  return new Promise((resolve, reject) => {
+    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} opencollective_test ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, (err, stdout, stderr) => {
+      if (err) return reject(err);
+      console.log("stdout", stdout);
+      return resolve(stdout);
+    })
+  });
+}

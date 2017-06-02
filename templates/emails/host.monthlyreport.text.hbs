@@ -2,18 +2,27 @@ Hi {{recipient.firstName}}!
 
 Here are your monthly stats:
 
-Balance: {{{currency host.stats.balance currency=host.currency}}} (+{{{currency host.stats.totalDonations currency=host.currency}}}{{#if host.stats.totalExpenses}}, {{{currency host.stats.totalExpenses currency=host.currency}}}{{/if}}) 
-{{host.stats.backers.lastMonth}} backers (+{{host.stats.backers.new}}{{#if host.stats.backers.lost}}, -{{host.stats.backers.lost}}{{/if}}) 
+Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} (+{{stats.totalNetAmountReceived.totalInHostCurrency}}{{#if stats.totalNewExpenses.totalInHostCurrency}}, {{{currency stats.totalNewExpenses.totalInHostCurrency currency=host.currency}}}{{/if}}) 
 
-Payment processor fees: {{{currency host.accounting.paymentProcessorFees.total currency=host.currency}}}
-- PayPal: {{{currency host.accounting.paymentProcessorFees.paypal currency=host.currency}}}
-- Stripe: {{{currency host.accounting.paymentProcessorFees.stripe currency=host.currency}}}
+{{stats.backers.total}} backers (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}}) 
+
+Details for the month:
+
+Total donations: {{{currency stats.totalNewDonations.totalInHostCurrency currency=host.currency}}}
+Payment processor fees (Stripe): -{{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
+Platform fees (Open Collective): -{{{currency stats.platformFees.totalInHostCurrency currency=host.currency}}}
+
+Host fees ({{host.name}}): -{{{currency stats.totalNewHostFees.totalInHostCurrency currency=host.currency}}}
+
+Net amount for your {{stats.totalCollectives}} collectives: {{{currency stats.totalNetAmount.totalInHostCurrency currency=host.currency}}}
+
+Total expenses paid: {{{currency stats.totalNewExpenses.totalInHostCurrency currency=host.currency}}}
 
 
 🗒 Transactions
 
-{{#each host.transactions}}
-- {{{moment createdAt format="MM/DD"}}} {{slug}} {{{currency netAmountInGroupCurrency currency=currency}}} {{description}}
+{{#each transactions}}
+- {{{moment createdAt format="MM/DD"}}} {{group.slug}} {{{currency netAmountInGroupCurrency currency=host.currency}}} {{description}}
 {{else}}
 No transaction. 
 {{/each}}

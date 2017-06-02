@@ -1,0 +1,106 @@
+import models, {sequelize} from '../models';
+import _ from 'lodash';
+import { convertToCurrency } from '../lib/currency';
+import Promise from 'bluebird';
+
+
+export function getHostedGroups(hostid) {
+  return sequelize.query(`
+    SELECT g.* FROM "Groups" g LEFT JOIN "UserGroups" ug ON g.id = ug."GroupId" WHERE ug.role='HOST' AND ug."UserId"=:hostid
+  `, {
+    replacements: { hostid },
+    model: models.Group,
+    type: sequelize.QueryTypes.SELECT
+  }).catch(console.error);
+}
+
+
+export function getBackersStats(groupids, startDate = new Date('2015-01-01'), endDate = new Date) {
+
+  const getBackersIds = (startDate, endDate) => {
+    return models.Transaction.findAll({
+      attributes: [ [sequelize.fn('DISTINCT', sequelize.col('UserId')), 'userid'] ],
+      where: {
+        type: 'DONATION',
+        GroupId: { $in: groupids },
+        createdAt: { $gte: startDate, $lt: endDate }
+      }
+    })
+    .then(rows => rows.map(r => r.dataValues.userid))
+    .catch(console.error);
+  }
+
+  const stats = {};
+
+  return Promise.all([
+    getBackersIds(new Date('2015-01-01'), new Date),
+    getBackersIds(startDate, endDate)
+  ]).then(results => {
+    stats.total = results[0].length;
+    stats.repeat = _.intersection(results[0], results[1]).length;
+    stats.new = results[1].length - stats.repeat;
+    return stats;
+  }).catch(console.error);
+}
+
+export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency', where) {
+  const query = {
+    attributes: [ [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], 'currency' ],
+    group: ['currency'],
+    where
+  };
+  return models.Transaction.findAll(query)
+    .then(rows => rows.map(r => r.dataValues))
+    .catch(console.error);
+}
+
+/**
+ * Sum an attribute of the Transactions table and return the result by currency with the total in host currency
+ * 
+ * @param {*} attribute column to sum, e.g. 'netAmountInGroupCurrency' or 'hostFeeInTxnCurrency'
+ * @param {*} where where clause to reduce the scope
+ * @param {*} hostCurrency currency of the host
+ *
+ * @post { 
+ *   byCurrency: [ { amount: Float!, currency: 'USD' }]
+ *   totalInHostCurrency: Float!
+ * }
+ */
+export function sumTransactions(attribute, where, hostCurrency) {
+  const res = {};
+  console.log(">>> sum", attribute, hostCurrency);
+  return sumTransactionsByCurrency(attribute, where)
+    .tap(amounts => {
+      res.byCurrency = amounts;
+    })
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.amount, s.currency, hostCurrency || 'USD')))
+    .then(amounts => {
+      let total = 0;
+      amounts.map(a => total += a);
+      res.totalInHostCurrency = Math.round(total*100)/100; // double digit precision
+      return res;
+    })
+    .catch(console.error);
+}
+
+export function getTotalHostFees(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
+  const where = {
+    GroupId: { $in: groupids },
+    createdAt: { $gte: startDate, $lt: endDate }
+  }; 
+  if (type) {
+    where.type = type;
+  }
+  return sumTransactions('hostFeeInTxnCurrency', where, hostCurrency).catch(console.error);
+}
+
+export function getTotalNetAmount(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
+  const where = {
+    GroupId: { $in: groupids },
+    createdAt: { $gte: startDate, $lt: endDate }
+  };
+  if (type) {
+    where.type = type;
+  }
+  return sumTransactions('netAmountInGroupCurrency', where, hostCurrency).catch(console.error);
+}

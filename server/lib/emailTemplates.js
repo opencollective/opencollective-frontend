@@ -27,6 +27,8 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
+  'host.monthlyreport',
+  'host.monthlyreport.text',
   'subscription.canceled',
   'ticket.confirmed',
   'ticket.confirmed.sustainoss',
