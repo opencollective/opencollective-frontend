@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import * as utils from '../test/utils';
-import models from '../server/models';
 
 import * as hostlib from '../server/lib/hostlib';
 
@@ -26,7 +25,7 @@ describe('hostlib', () => {
   }).catch(console.error));
 
   it('get the backers stats', () => hostlib.getBackersStats(groupids, startDate, endDate).then(stats => {
-    expect(stats.new).to.equal(0);
+    expect(stats.new).to.equal(4);
     expect(stats.repeat).to.equal(8);
     expect(stats.total).to.equal(55);
     return true;

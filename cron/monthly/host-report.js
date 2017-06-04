@@ -31,10 +31,7 @@ console.log("startDate", startDate,"endDate", endDate);
 const debug = debugLib('monthlyreport');
 
 const {
-  Group,
   User,
-  UserGroup,
-  Notification,
   Transaction
 } = models;
 

@@ -1,7 +1,4 @@
 import { expect } from 'chai';
-import * as utils from '../test/utils';
-import models from '../server/models';
-
 import * as currencylib from '../server/lib/currency';
 
 describe('currencylib', () => {
