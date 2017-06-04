@@ -11,15 +11,13 @@ process.env.PORT = 3066;
 
 import _ from 'lodash';
 import moment from 'moment';
-import config from 'config';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import { getTiersStats } from '../../server/lib/utils';
-import models, {sequelize} from '../../server/models';
+import models from '../../server/models';
 import emailLib from '../../server/lib/email';
-import { convertToCurrency } from '../../server/lib/currency';
+import config from 'config';
 
-import { getHostedGroups, getBackersStats, getTotalNetAmount, sumTransactions } from '../../server/lib/hostlib';
+import { getHostedGroups, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
@@ -45,11 +43,11 @@ const init = () => {
   const startTime = new Date;
 
   const query = {
-    include: [ { model: models.UserGroup, where: { role: 'HOST' }}]
+    where: { isHost: true }
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { username: {$in: ['adminwwc']} };
+    query.where.username = {$in: ['adminwwc', 'host-org']};
 
   User.findAll(query)
   .tap(hosts => {
@@ -69,7 +67,8 @@ const getTransactions = (groupids) => {
     where: {
       GroupId: { $in: groupids },
       createdAt: { $gte: startDate, $lt: endDate }
-    }
+    },
+    order: [ ['createdAt', 'DESC' ]]
   };
   return Transaction.findAll(query);
 }
@@ -90,38 +89,32 @@ const getHostStats = (host, groupids) => {
     sumTransactions('amount', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total donations last month
     sumTransactions('netAmountInGroupCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
     sumTransactions('netAmountInGroupCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
-    sumTransactions("hostFeeInTxnCurrency", dateRange, host.currency),
-    sumTransactions("paymentProcessorFeeInTxnCurrency", dateRange, host.currency),
+    sumTransactions("hostFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
+    sumTransactions("paymentProcessorFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("platformFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
-    getBackersStats(groupids)
+    getBackersStats(groupids, startDate, endDate)
   ]);
 }
 
 const processHost = (host) => {
 
-  let data = {}, groupsById = {};
+  const data = {};
+  let groupsById = {};
 
-  host.currency = host.currency || 'USD'; // TODO: Need to add a currency column to the Users table
-  host.name = "WWCode 501c3"; // TODO
   data.host = host;
+  data.reportDate = endDate;
+  data.month = month;
+  data.config = _.pick(config, 'host');
 
   return getHostedGroups(host.id)
     .tap(groups => groupsById = _.indexBy(groups, "id"))
     .then(() => getTransactions(Object.keys(groupsById)))
-    .tap(transactions => Promise.map(transactions, (t) => {
-      const r = t.dataValues;
-      r.group = groupsById[r.GroupId];
-
-      // TODO: Need to add a netAmountInHostCurrency column to the Transactions table
-      if (r.group.currency !== host.currency) {
-        return convertToCurrency(t.netAmountInGroupCurrency, r.group.currency, host.currency, r.createdAt)
-          .then(amount => {
-            r.amountInHostCurrency = amount;
-            return r;
-          })
-      }
+    .then(transactions => transactions.map(t => {
+      const r = t.info;
+      r.group = groupsById[r.GroupId].dataValues;
       return r;
     }))
+    .then(transactions => data.transactions = transactions)
     .then(() => getHostStats(host, Object.keys(groupsById)))
     .then(stats => {
       data.stats = {
@@ -137,16 +130,17 @@ const processHost = (host) => {
         backers: stats[8]
       }
     })
-    .then(() => sendEmail(host.email, data))
+    .then(() => sendEmail(host, data))
     .catch(e => {
       console.error("Error in processing host", host.username, e);
     });
 };
 
 const sendEmail = (recipient, data) => {
-    debug("Sending email to ", recipient);
-    debug("email data transactions", data.transactions);
+    debug("Sending email to ", recipient.dataValues);
+    // debug("email data transactions", data.transactions);
     debug("email data stats", data.stats);
+    debug("email data stats.backers", data.stats.backers);
     data.recipient = recipient;
     if (process.env.ONLY && recipient.email !== process.env.ONLY) {
       debug("Skipping ", recipient.email);

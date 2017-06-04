@@ -29,11 +29,20 @@ export const resetTestDB = () => sequelize.sync({force: true})
   });
 
 export function loadDB(dbname) {
+
+  const importDB = (cb) => {
+    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} opencollective_test ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, cb);
+  };
+
   return new Promise((resolve, reject) => {
-    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} opencollective_test ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, (err, stdout, stderr) => {
-      if (err) return reject(err);
-      console.log("stdout", stdout);
-      return resolve(stdout);
+    importDB((err, stdout) => {
+      if (!err) return resolve(stdout);
+      if (err) { // First try may fail due to foreign keys restrictions
+        importDB((err, stdout) => {
+          if (err) return reject(err);
+          else return resolve(stdout);
+        });
+      }
     })
   });
 }

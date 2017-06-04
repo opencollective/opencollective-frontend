@@ -1,4 +1,19 @@
 export default {
+  "host1": {
+    "firstName": "Women Who Code",
+    "lastName": "501c3",
+    "name": "WWCode",
+    "username": "wwcode",
+    "email": "finance+wwcode@opencollective.com",
+    "paypalEmail": "paypal+wwcode@opencollective.com",
+    "description": "engineer",
+    "longDescription": "This is a long description with some *markdown* **style**",
+    "isOrganization": true,
+    "isHost": true,
+    "twitterHandle": "wwcode",
+    "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA",
+    "currency": "USD"
+  },
   "user1": {
     "firstName": "Phil",
     "lastName": "Mod",
@@ -57,6 +72,7 @@ export default {
     "name": "Scouts d'Arlon",
     "mission": "toujours prêt",
     "description": "Troupe Scoute Albert Schweitzer",
+    "currency": "EUR",
     "budget": 1000000,
     "burnrate": 10000,
     "twitterHandle": "scouts",
@@ -584,7 +600,7 @@ export default {
     "notes": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
-    "currency": "USD",
+    "currency": "EUR",
     "paypalEmail": "newPaypal2@gmail.com",
     "incurredAt": "2016-03-06 UTC+0300",
     "payoutMethod": "paypal",

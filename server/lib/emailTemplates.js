@@ -80,6 +80,20 @@ handlebars.registerHelper('toLowerCase', (str) => {
   return str.toLowerCase();
 });
 
+const col = (str, size) => {
+  if (str.length >= size) return `${str.substr(0, size-1)}…`;
+  while (str.length < size) {
+    str +=' ';
+  }
+  return str;
+}
+
+handlebars.registerHelper('col', (str, props) => {
+  if (!str || !props) return str;
+  const size = props.hash.size;
+  return col(str, size);
+});
+
 handlebars.registerHelper('json', (obj) => {
   if (!obj) return '';
   return JSON.stringify(obj);
@@ -94,16 +108,24 @@ handlebars.registerHelper('moment', (value, props) => {
 });
 
 handlebars.registerHelper('currency', (value, props) => {
-  const { currency, precision } = props.hash;
-  if (!currency) return value / 100;
-  value = value/100; // converting cents
+  const { currency, precision, size } = props.hash;
 
-  return value.toLocaleString(currency, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits : precision || 0,
-    maximumFractionDigits : precision || 0
-  });
+  if (isNaN(value)) return "";
+
+  const res = function() {
+    if (!currency) return value / 100;
+    value = value/100; // converting cents
+
+    return value.toLocaleString(currency, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits : precision || 0,
+      maximumFractionDigits : precision || 0
+    });
+  }();
+
+  if (size) return col(`${res}`, size);
+  else return res;
 });
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));

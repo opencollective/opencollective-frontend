@@ -41,13 +41,13 @@ describe('hostlib', () => {
 
   it('get the total amount of funds held by the host in host currency', () => hostlib.sumTransactions("netAmountInGroupCurrency", where).then(res => {
     expect(res.byCurrency).to.have.length(2);
-    expect(res.totalInHostCurrency).to.equal(459011.1);
+    expect(res.totalInHostCurrency).to.equal(458990);
     return true;
   }));
 
   it('get the total net amount of host fees', () => hostlib.sumTransactions("hostFeeInTxnCurrency", where).then(res => {
     expect(res.byCurrency).to.have.length(2);
-    expect(res.totalInHostCurrency).to.equal(12063.11);
+    expect(res.totalInHostCurrency).to.equal(12062);
     const cad = res.byCurrency.find(a => a.currency === 'CAD');
     expect(cad.amount).to.equal(1120);
     return true;

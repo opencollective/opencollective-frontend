@@ -12,20 +12,29 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('transaction model', () => {
 
-  let user, group;
+  let user, host, group, defaultTransactionData;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
+  beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
 
-  beforeEach('create group2 and add user as host', () =>
+  beforeEach('create group2 and add host', () =>
     models.Group.create(groupData)
       .tap(g => group = g)
-      .then(() => group.addUserWithRole(user, roles.HOST)));
+      .tap(() => {
+        defaultTransactionData = {
+          UserId: user.id,
+          HostId: host.id,
+          GroupId: group.id
+        };
+      })
+      .then(() => group.addUserWithRole(host, roles.HOST)));
 
   it('automatically generates uuid', done => {
     Transaction.create({
-      amount: -1000
+      amount: -1000,
+      ...defaultTransactionData
     })
     .then(transaction => {
       expect(transaction.info.uuid).to.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
@@ -36,12 +45,12 @@ describe('transaction model', () => {
 
   it('get the host', (done) => {
     Transaction.create({
-      GroupId: group.id,
+      ...defaultTransactionData,
       amount: 10000
     })
     .then(transaction => transaction.getHost())
-    .then(host => {
-      expect(host.id).to.equal(user.id);
+    .then(h => {
+      expect(h.id).to.equal(host.id);
       done();
     })
   });
@@ -62,17 +71,13 @@ describe('transaction model', () => {
     .catch(done);
   })
 
-  let createActivitySpy;
-
-  before(() => {
-    createActivitySpy = sinon.spy(Transaction, 'createActivity');
-  });
-
-  beforeEach(() => createActivitySpy.reset());
-
-  after(() => createActivitySpy.restore());
-
   it('createFromPayload() generates a new activity', (done) => {
+
+    const createActivityStub = sinon.stub(Transaction, 'createActivity', (t) => {
+      expect(t.amount).to.equal(transactionsData[7].amount);
+      createActivityStub.restore();
+      done();
+    });
 
     Transaction.createFromPayload({
       transaction: transactionsData[7],
@@ -81,8 +86,6 @@ describe('transaction model', () => {
     })
     .then(transaction => {
       expect(transaction.GroupId).to.equal(group.id);
-      expect(createActivitySpy.lastCall.args[0]).to.equal(transaction);
-      done();
     })
     .catch(done);
   });

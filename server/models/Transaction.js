@@ -7,10 +7,7 @@ import { type } from '../constants/transactions';
  * Transaction model
  * - this indicates that money was moved in the system
  */
-
 export default (Sequelize, DataTypes) => {
-
-  const { models } = Sequelize;
 
   const Transaction = Sequelize.define('Transaction', {
     uuid: DataTypes.STRING(36),
@@ -27,7 +24,42 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    // stores the currency that the transaction happened in (currency of the host)
+    UserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: false
+    },
+
+    // Keeps a reference to the host because this is where the bank account is
+    // Note that the host can also change over time (that's why just keeping GroupId is not enough)
+    HostId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: false
+    },
+
+    GroupId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Groups',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: false
+    },
+
+    // stores the currency that the transaction happened in (currency of the donor)
     txnCurrency: {
       type: DataTypes.STRING,
       set(val) {
@@ -63,6 +95,10 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
+      netAmountInTxnCurrency() {
+        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency
+      },
+
       // Info.
       info() {
         return {
@@ -78,20 +114,11 @@ export default (Sequelize, DataTypes) => {
           platformFee: this.platformFee,
           hostFee: this.hostFee,
           paymentProcessorFee: this.paymentProcessorFee,
-          netAmountInGroupCurrency: this.netAmountInGroupCurrency,
           amountInTxnCurrency: this.amountInTxnCurrency,
+          netAmountInGroupCurrency: this.netAmountInGroupCurrency,
+          netAmountInTxnCurrency: this.netAmountInTxnCurrency,
           txnCurrency: this.txnCurrency
         };
-      }
-    },
-
-    instanceMethods: {
-      getHost() {
-        return models.User.findOne({
-          include: [
-            { model: models.UserGroup, where: { role: 'HOST', GroupId: this.GroupId } }
-          ]
-        });
       }
     },
 
@@ -108,22 +135,26 @@ export default (Sequelize, DataTypes) => {
 
       createFromPayload({ transaction, user, group, paymentMethod }) {
 
-        // attach other objects manually. Needed for afterCreate hook to work properly
-        transaction.UserId = user && user.id;
-        transaction.GroupId = group && group.id;
-        transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
-        transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
+        return group.getHost().then(host => {
+          transaction.HostId = host.id;
+          // attach other objects manually. Needed for afterCreate hook to work properly
+          transaction.UserId = user && user.id;
+          transaction.GroupId = group && group.id;
+          transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
+          transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
 
-        if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
-          // populate netAmountInGroupCurrency for donations
-            transaction.netAmountInGroupCurrency =
-              Math.round((transaction.amountInTxnCurrency
-                - transaction.platformFeeInTxnCurrency
-                - transaction.hostFeeInTxnCurrency
-                - transaction.paymentProcessorFeeInTxnCurrency)
-              *transaction.txnCurrencyFxRate);
-        }
-        return Transaction.create(transaction);
+          if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
+            // populate netAmountInGroupCurrency for donations
+            // @aseem: why the condition on && transaction.txnCurrencyFxRate ?
+              transaction.netAmountInGroupCurrency =
+                Math.round((transaction.amountInTxnCurrency
+                  - transaction.platformFeeInTxnCurrency
+                  - transaction.hostFeeInTxnCurrency
+                  - transaction.paymentProcessorFeeInTxnCurrency)
+                *transaction.txnCurrencyFxRate);
+          }
+          return Transaction.create(transaction);
+        });
       },
 
       createActivity(transaction) {
@@ -166,10 +197,13 @@ export default (Sequelize, DataTypes) => {
     hooks: {
       beforeCreate: (transaction) => {
         transaction.uuid = uuid.v4();
+        return transaction;
       },
 
       afterCreate: (transaction) => {
-        Transaction.createActivity(transaction); // intentionally no return statement, needs to be async
+        Transaction.createActivity(transaction);
+        // intentionally returns null, needs to be async (https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it)
+        return null;
       }
     }
   });

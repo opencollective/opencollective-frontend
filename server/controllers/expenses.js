@@ -164,12 +164,15 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse;
+  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse, group;
 
   assertExpenseStatus(expense, status.APPROVED)
     // check that a group's balance is greater than the expense
     .then(() => models.Group.findById(expense.GroupId))
-    .then(group => group.getBalance())
+    .then(g => {
+      group = g;
+      return group.getBalance()
+    })
     .then(balance => checkIfEnoughFundsInGroup(expense, balance))
     .then(() => isManual ? null : getPaymentMethod())
     .tap(m => paymentMethod = m)
@@ -181,7 +184,8 @@ export const pay = (req, res, next) => {
     // TODO: Remove preapprovalDetails call once the new paypal preapproval flow is solid
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
-    .then(() => createTransaction(paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
+    .then(() => group.getHost())
+    .then((host) => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponses)));

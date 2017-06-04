@@ -2,8 +2,9 @@ import * as constants from '../constants';
 import {type} from '../constants/transactions';
 import models from '../models';
 import errors from '../lib/errors';
+import { getFxRate } from '../lib/currency';
 
-export function createFromPaidExpense(paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
+export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
   let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
 
   if (paymentResponses) {
@@ -12,7 +13,7 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
     executePaymentResponse = paymentResponses.executePaymentResponse;
 
     senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    txnCurrency = senderFees.code;
+    txnCurrency = senderFees.code; // currency of the host account
     fees = senderFees.amount*100 // paypal sends this in float
 
     switch (executePaymentResponse.paymentExecStatus) {
@@ -34,13 +35,10 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
 
   // We assume that all expenses are in Group currency
   // (otherwise, ledger breaks with a triple currency conversion)
-
-  return models.Transaction.create({
+  const transaction = {
     netAmountInGroupCurrency: -1*(expense.amount + fees),
-    amountInTxnCurrency: -expense.amount,
-    paymentProcessorFeeInTxnCurrency: fees,
     txnCurrency,
-    txnCurrencyFxRate: 1,
+    paymentProcessorFeeInTxnCurrency: fees,
     ExpenseId: expense.id,
     type: type.EXPENSE,
     amount: -expense.amount,
@@ -48,9 +46,18 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
     description: expense.title,
     UserId,
     GroupId: expense.GroupId,
-  })
-  .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
-  .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
+    HostId: host.id
+  };
+
+  return getFxRate(expense.currency, txnCurrency)
+    .then(fxrate => {
+      transaction.txnCurrencyFxRate = fxrate;
+      transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
+      return transaction;
+    })
+    .then((transaction) => models.Transaction.create(transaction))
+    .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
+    .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
 
 function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {

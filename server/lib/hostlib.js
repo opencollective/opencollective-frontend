@@ -34,11 +34,12 @@ export function getBackersStats(groupids, startDate = new Date('2015-01-01'), en
 
   return Promise.all([
     getBackersIds(new Date('2015-01-01'), new Date),
+    getBackersIds(new Date('2015-01-01'), startDate),
     getBackersIds(startDate, endDate)
   ]).then(results => {
     stats.total = results[0].length;
-    stats.repeat = _.intersection(results[0], results[1]).length;
-    stats.new = results[1].length - stats.repeat;
+    stats.repeat = _.intersection(results[1], results[2]).length;
+    stats.new = results[2].length - stats.repeat;
     return stats;
   }).catch(console.error);
 }
@@ -68,7 +69,6 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency'
  */
 export function sumTransactions(attribute, where, hostCurrency) {
   const res = {};
-  console.log(">>> sum", attribute, hostCurrency);
   return sumTransactionsByCurrency(attribute, where)
     .tap(amounts => {
       res.byCurrency = amounts;
@@ -77,7 +77,7 @@ export function sumTransactions(attribute, where, hostCurrency) {
     .then(amounts => {
       let total = 0;
       amounts.map(a => total += a);
-      res.totalInHostCurrency = Math.round(total*100)/100; // double digit precision
+      res.totalInHostCurrency = Math.round(total); // in cents
       return res;
     })
     .catch(console.error);

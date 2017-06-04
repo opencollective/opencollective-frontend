@@ -90,7 +90,18 @@ export default (Sequelize, DataTypes) => {
     description: DataTypes.STRING,
     longDescription: DataTypes.TEXT,
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
-
+    isHost: DataTypes.BOOLEAN, // e.g. WWCode
+    currency: {
+      type: DataTypes.STRING,
+      validate: {
+        len: 3
+      },
+      set(val) {
+        if (val && val.toUpperCase) {
+          this.setDataValue('currency', val.toUpperCase());
+        }
+      }
+    },
     twitterHandle: {
       type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
       set(val) {
@@ -515,6 +526,7 @@ export default (Sequelize, DataTypes) => {
       afterCreate: (instance) => {
         models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
           .then(() => userLib.updateUserInfoFromClearbit(instance));
+        return null;
       }
     }
   });
