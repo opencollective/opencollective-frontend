@@ -13,7 +13,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     executePaymentResponse = paymentResponses.executePaymentResponse;
 
     senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    txnCurrency = senderFees.code; // currency of the host account
+    txnCurrency = senderFees.code; // currency of the host account => is this reliable (see expense id 11375)? We could also use `host.currency` now instead.
     fees = senderFees.amount*100 // paypal sends this in float
 
     switch (executePaymentResponse.paymentExecStatus) {
