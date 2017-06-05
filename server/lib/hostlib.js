@@ -67,13 +67,16 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency'
  *   totalInHostCurrency: Float!
  * }
  */
-export function sumTransactions(attribute, where, hostCurrency) {
+export function sumTransactions(attribute, where = {}, hostCurrency, date) {
+  if (where.createdAt) {
+    date = date || where.createdAt.$lt || where.createdAt.$gte;
+  }
   const res = {};
   return sumTransactionsByCurrency(attribute, where)
     .tap(amounts => {
       res.byCurrency = amounts;
     })
-    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.amount, s.currency, hostCurrency || 'USD')))
+    .then(amounts => Promise.map(amounts, s => convertToCurrency(s.amount, s.currency, hostCurrency || 'USD', date)))
     .then(amounts => {
       let total = 0;
       amounts.map(a => total += a);
