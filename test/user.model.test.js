@@ -231,7 +231,7 @@ describe('user.models.test.js', () => {
     beforeEach(() => User.createMany(users));
     beforeEach(() => Group.create(utils.data('group1')));
     beforeEach(() => Group.create(utils.data('group2')));
-    beforeEach(() => Transaction.createMany(transactions));
+    beforeEach(() => Transaction.createMany(transactions, { HostId: 1 }));
 
     it('gets the top backers', () => {
       return User.getTopBackers()
