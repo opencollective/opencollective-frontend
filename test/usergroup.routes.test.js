@@ -37,7 +37,7 @@ const createTransactions = () => {
 
   return group
     .addUserWithRole(users[3], roles.BACKER)
-    .then(() => models.Transaction.createMany(transactions));
+    .then(() => models.Transaction.createMany(transactions, { HostId: 1 }));
 };
 
 describe('usergroup.routes.test.js', () => {

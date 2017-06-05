@@ -282,7 +282,7 @@ const processPayment = (donation) => {
       }
 
       return group.getHost()
-      .then(host => host.UserId == user.id)
+      .then(host => host.id == user.id)
       .tap(isHost => isUserHost = isHost)
       .then(isUserHost => {
         payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(group.hostFeePercent/100 * donation.amount);
