@@ -43,7 +43,7 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => host = u));
+  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
 
@@ -662,7 +662,7 @@ describe('expenses.routes.test.js', () => {
 
                     let expense, transaction, paymentMethod;
                     beforeEach(() => expectOne(Expense).tap(e => expense = e));
-                    beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[0]));
+                    beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[1]));
                     beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
 
                     it('THEN calls PayPal pay', () => expect(payStub.called).to.be.true);
@@ -686,11 +686,11 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('amountInTxnCurrency', -12000)
+                  expect(transaction).to.have.property('amountInTxnCurrency', -13164)
                   expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
-                  expect(transaction).to.have.property('txnCurrency', expense.currency);
-                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
+                  expect(transaction).to.have.property('txnCurrency', host.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 1.097);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);

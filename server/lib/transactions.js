@@ -49,7 +49,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     HostId: host.id
   };
 
-  return getFxRate(expense.currency, txnCurrency)
+  return getFxRate(expense.currency, txnCurrency, expense.incurredAt || expense.createdAt)
     .then(fxrate => {
       transaction.txnCurrencyFxRate = fxrate;
       transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
