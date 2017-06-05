@@ -534,7 +534,7 @@ export const getOne = (req, res, next) => {
   const group = req.group.info;
 
   const aggregate = (array, attribute) => {
-    return array.map(d => d[attribute]).reduce((a, b) => a + b);
+    return array.map(d => d[attribute]).reduce((a, b) => a + b, 0);
   };
 
   const getRelatedGroups = () => {
