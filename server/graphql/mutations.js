@@ -35,16 +35,16 @@ const mutations = {
     resolve(_, args, req) {
       let group;
       if (!req.remoteUser) {
-        throw new errors.Unauthorized("You need to be logged in to create an event");
+        return Promise.reject(new errors.Unauthorized("You need to be logged in to create an event"));
       }
       return models.Group.findOne({ where: { slug: args.event.collective.slug } })
       .then(g => {
-        if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+        if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
         group = g;
         return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
       })
       .then(canCreateEvent => {
-        if (!canCreateEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event");
+        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event"));
       })
       .then(() => models.Event.create({
         ...args.event,
