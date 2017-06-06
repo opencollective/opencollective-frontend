@@ -28,7 +28,8 @@ describe('homepage.routes.test.js', () => {
           amount:100000,
           PaymentMethodId: paymentMethod.id,
           GroupId: group.id,
-          UserId: user.id
+          UserId: user.id,
+          HostId: user.id
         })
       })
   );

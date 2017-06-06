@@ -6,6 +6,9 @@ import config from 'config';
 import { isArray, values } from 'lodash';
 import path from 'path';
 import { exec } from 'child_process';
+import debugLib from 'debug';
+
+const debug = debugLib('utils');
 
 jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
@@ -31,16 +34,24 @@ export const resetTestDB = () => sequelize.sync({force: true})
 export function loadDB(dbname) {
 
   const importDB = (cb) => {
-    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} opencollective_test ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, cb);
+    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} -d ${config.database.database} -U ${config.database.username} -f ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, cb);
   };
 
   return new Promise((resolve, reject) => {
     importDB((err, stdout) => {
-      if (!err) return resolve(stdout);
+      if (!err) {
+        debug(`${dbname} imported successfully`, stdout);
+        return resolve(stdout);
+      }
       if (err) { // First try may fail due to foreign keys restrictions
+        debug(`error importing ${dbname}`, err);
         importDB((err, stdout) => {
-          if (err) return reject(err);
-          else return resolve(stdout);
+          if (err) {
+            debug(`2nd attempt: error importing ${dbname}`, err);
+            return reject(err);
+          } else {
+            return resolve(stdout);
+          }
         });
       }
     })

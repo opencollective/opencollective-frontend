@@ -1,17 +1,44 @@
 #!/bin/bash
 
 usage() {
-  echo "Usage: db_restore.sh LOCALDBNAME DBDUMP_FILE";
+  echo "Usage: db_restore.sh -d DBNAME -U dbuser -f DBDUMP_FILE";
   echo "e.g.";
-  echo "> db_restore.sh wwcode_test opencollective-api/test/dbdumps/wwcode_test.pgsql"
+  echo "> db_restore.sh -d wwcode_test -U dbuser -f opencollective-api/test/dbdumps/wwcode_test.pgsql"
   exit 0;
 }
 
-if [ "$#" -ne 2 ]; then usage; fi;
+while [[ $# -gt 1 ]]
+do
+key="$1"
 
-LOCALDBNAME=$1
-DBDUMP_FILE=$2
-LOCALDBUSER="opencollective"
+case $key in
+    -d|--dbname)
+    LOCALDBNAME="$2"
+    shift # past argument
+    ;;
+    -U|--username)
+    LOCALDBUSER="$2"
+    shift # past argument
+    ;;
+    -f|--file)
+    DBDUMP_FILE="$2"
+    shift # past argument
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+LOCALDBUSER=${LOCALDBUSER:-"opencollective"}
+
+echo "LOCALDBUSER=$LOCALDBUSER"
+echo "LOCALDBNAME=$LOCALDBNAME"
+echo "DBDUMP_FILE=$DBDUMP_FILE"
+
+if [ -z "$LOCALDBNAME" ]; then usage; fi;
+
 
 # The first time we run it, we will trigger FK constraints errors
 set +e
