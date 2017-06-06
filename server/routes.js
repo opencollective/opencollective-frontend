@@ -55,7 +55,13 @@ export default (app) => {
 
   if (process.env.DEBUG) {
     app.use('*', (req, res, next) => {
-      debug('params')("req.query", req.query, "req.body", req.body);
+      const body = Object.assign({}, req.body);
+      if (body.query) {
+        const query = body.query;
+        debug('params')(query);
+        delete body.query;
+      }
+      debug('params')("req.query", req.query, "req.body", body);
       debug('headers')("req.headers", req.headers);
       next();
     });

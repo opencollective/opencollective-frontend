@@ -245,7 +245,7 @@ export const EventType = new GraphQLObjectType({
           return event.slug;
         }
       },
-      location: {
+      locationName: {
         type: GraphQLString,
         description: 'Name of the location. Ex: Puck Fair restaurant',
         resolve(event) {

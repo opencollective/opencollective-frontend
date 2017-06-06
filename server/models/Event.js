@@ -7,6 +7,7 @@ export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;
 
   const Event = Sequelize.define('Event', {
+
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -74,7 +75,12 @@ export default function(Sequelize, DataTypes) {
 
     slug: {
       type: DataTypes.STRING,
-      allowNull: false
+      unique: true,
+      set(slug) {
+        if (slug && slug.toLowerCase) {
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
+        }
+      }
     },
 
     startsAt: {
@@ -131,6 +137,13 @@ export default function(Sequelize, DataTypes) {
         }
       }
     },
+
+    indexes: [
+      {
+        unique: true,
+        fields: ['GroupId', 'slug']
+      }
+    ],
 
     instanceMethods: {
       getUsers() {

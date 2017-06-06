@@ -47,7 +47,7 @@ describe('Query Tests', () => {
       .tap(e => event2 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdByUserId: user2.id, GroupId: group2.id })));
+      Object.assign({}, utils.data('event2'), { slug: "another-event", createdByUserId: user2.id, GroupId: group2.id })));
       //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
 
     describe('throws an error', () => {
@@ -163,14 +163,14 @@ describe('Query Tests', () => {
             data: {
               allEvents: [
                 {
-                  description: "January monthly meetup",
-                  id: 1,
-                  name: "January meetup"
-                },
-                {
                   description: "February monthly meetup",
                   id: 2,
                   name: "Feb meetup"               
+                },
+                {
+                  description: "January monthly meetup",
+                  id: 1,
+                  name: "January meetup"
                 }
               ]
             }
@@ -255,7 +255,7 @@ describe('Query Tests', () => {
                 id,
                 name,
                 description,
-                location,
+                locationName,
                 address,
                 backgroundImage,
                 lat,
@@ -289,10 +289,34 @@ describe('Query Tests', () => {
             data: {
               allEvents: [
                 {
+                  "id": 2,
+                  "name": "Feb meetup",
+                  "description": "February monthly meetup",
+                  "address": "505 Broadway, NY 10012",
+                  "backgroundImage": null,
+                  "locationName": "Puck Fair",
+                  "lat": null,
+                  "long": null,
+                  "createdByUser": {
+                    "id": 1,
+                    "name": "Phil Mod"
+                  },
+                  "tiers":[
+                    {
+                      id: 3,
+                      name: tier3.name,
+                      description: tier3.description,
+                      "maxQuantity": 10,
+                      "availableQuantity": 10,
+                      responses: []
+                    }
+                  ]
+                },
+                {
                   id: 1,
                   name: "January meetup",
                   "description":"January monthly meetup",
-                  "location": "Balanced NYC",
+                  "locationName": "Balanced NYC",
                   "address": "547 Broadway, NY 10012",
                   "backgroundImage": "http://opencollective.com/backgroundimage.png",
                   "lat": 39.807222,
@@ -346,30 +370,6 @@ describe('Query Tests', () => {
                           }
                         }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "id": 2,
-                  "name": "Feb meetup",
-                  "description": "February monthly meetup",
-                  "address": "505 Broadway, NY 10012",
-                  "backgroundImage": null,
-                  "location": "Puck Fair",
-                  "lat": null,
-                  "long": null,
-                  "createdByUser": {
-                    "id": 1,
-                    "name": "Phil Mod"
-                  },
-                  "tiers":[
-                    {
-                      id: 3,
-                      name: tier3.name,
-                      description: tier3.description,
-                      "maxQuantity": 10,
-                      "availableQuantity": 10,
-                      responses: []
                     }
                   ]
                 }

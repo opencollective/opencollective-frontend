@@ -2,6 +2,8 @@ import models from '../models';
 import paymentsLib from '../lib/payments';
 import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
+import Promise from 'bluebird';
+import { difference } from 'lodash';
 
 import {
   GraphQLNonNull,
@@ -27,30 +29,71 @@ const mutations = {
   createEvent: {
     type: EventType,
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      event: { type: EventInputType }
+      event: { type: new GraphQLNonNull(EventInputType) }
     },
     resolve(_, args) {
-      const event = args.event;
-      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      .tap(group => {
+        if (!group) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+      })
       .then((group) => models.Event.create({
-        ...event,
+        ...args.event,
         GroupId: group.id
       }))
+      .tap(event => {
+        if (args.event.tiers) {
+          return models.Tier.createMany(args.event.tiers, { EventId: event.id })
+        }
+      })
+      .catch(e => {
+        let msg;
+        switch (e.name) {
+          case "SequelizeUniqueConstraintError":
+            msg = `The slug ${e.fields.slug} is already taken. Please use another one.`
+            break;
+          default:
+            msg = e.message;
+            break;
+        }
+        throw new Error(msg);
+      })
     }
   },
-  updateEvent: {
+  editEvent: {
     type: EventType,
     args: {
       event: { type: EventInputType }
     },
     resolve(_, args) {
+      let event;
       return models.Event.findById(args.event.id)
-      .then(event => {
-        if (!event) throw new Error(`Event with id ${args.event.id} not found`);
-        return Event;
+      .then(ev => {
+        if (!ev) throw new Error(`Event with id ${args.event.id} not found`);
+        event = ev;
+        return event;
       })
       .then(event => event.update(args.event))
+      .then(event => event.getTiers())
+      .then(tiers => {
+        if (args.event.tiers) {
+          // remove the tiers that are not present anymore in the updated event
+          const diff = difference(tiers.map(t => t.id), args.event.tiers.map(t => t.id));
+          return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        }
+      })
+      .then(() => {
+        if (args.event.tiers) {
+          return Promise.map(args.event.tiers, (tier) => {
+            if (tier.id) {
+              return models.Tier.update(tier, { where: { id: tier.id }});
+            } else {
+              tier.EventId = event.id;
+              return models.Tier.create(tier);  
+            }
+          });
+        }
+      })
+      .then(() => event);
     }
   },
   createTier: {
@@ -104,7 +147,7 @@ const mutations = {
       response.user.email = response.user.email.toLowerCase();
 
       const recordInterested = () => {
-        return models.Event.getBySlug(response.group.slug, response.event.slug)
+        return models.Event.getBySlug(response.collective.slug, response.event.slug)
         .then(e => event = e)
         // find or create user
         .then(() => models.User.findOne({
@@ -142,14 +185,14 @@ const mutations = {
             include: [{
               model: models.Group,
               where: {
-                slug: response.group.slug
+                slug: response.collective.slug
               }
             }]
           }]
         })
         .then(t => {
           if (!t) {
-            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.group.slug}`);
+            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.collective.slug}`);
           }
           tier = t;
           event = t.Event;

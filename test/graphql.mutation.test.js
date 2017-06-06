@@ -79,14 +79,16 @@ describe('Mutation Tests', () => {
     .catch(done);
   });
 
+  beforeEach('create an event', () => models.Event.create(
+    Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
+    .tap(e => event1 = e));
+
+
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
   });
 
   describe('createTier tests', () => {
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
-      .tap(e => event1 = e));
 
     describe('throws an error', () => {
 
@@ -137,11 +139,65 @@ describe('Mutation Tests', () => {
       });
     });
 
-    describe('creates a tier', () => {
+    describe('creates an event', () => {
+      it("creates an event with multiple tiers", async () => {
+        const event = {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","locationName":"Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28","startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":group1.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
 
-      beforeEach(() => models.Event.create(
-        Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
-        .tap(e => event1 = e));
+        const stringify = (json) => {
+          return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+        }
+
+        const query = `
+        mutation createEvent {
+          createEvent(event: ${stringify(event)}) {
+            id,
+            slug,
+            tiers {
+              id,
+              name,
+              amount
+            }
+          }
+        }
+        `;
+        const result = await graphql(schema, query);
+        const createdEvent = result.data.createEvent;
+        expect(createdEvent.slug).to.equal(event.slug);
+        expect(createdEvent.tiers.length).to.equal(event.tiers.length);
+
+        event.id = createdEvent.id;
+        event.slug = 'newslug';
+        event.tiers = createdEvent.tiers;
+
+        // We remove the first tier
+        event.tiers.shift();
+
+        // We update the second (now only) tier
+        event.tiers[0].amount = 123;
+
+        const updateQuery = `
+        mutation editEvent {
+          editEvent(event: ${stringify(event)}) {
+            id,
+            slug,
+            tiers {
+              id,
+              name,
+              amount
+            }
+          }
+        }
+        `;
+        const r2 = await graphql(schema, updateQuery);
+        const updatedEvent = r2.data.editEvent;
+        expect(updatedEvent.slug).to.equal(event.slug);
+        expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
+        expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
+
+      })
+    })
+
+    describe('creates a tier', () => {
 
       it('and updates it', async () => {
         const query = `
@@ -187,10 +243,6 @@ describe('Mutation Tests', () => {
 
   describe('createResponse tests', () => {
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
-      .tap(e => event1 = e));
-
     beforeEach(() => models.Tier.create(
       Object.assign(utils.data('tier1'), { EventId: event1.id }))
       .tap(t => tier1 = t));
@@ -220,7 +272,7 @@ describe('Mutation Tests', () => {
         const context = { remoteUser: null };
         const result = await graphql(schema, query, null, context)
         expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.contain('group');
+        expect(result.errors[0].message).to.contain('collective');
         expect(result.errors[0].message).to.contain('event');
         expect(result.errors[0].message).to.contain('user');
         expect(result.errors[0].message).to.contain('status');
@@ -231,7 +283,7 @@ describe('Mutation Tests', () => {
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "${user1.email}" }, group: { slug: "doesNotExist" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity:1 }) {
+              createResponse(response: { user: { email: "${user1.email}" }, collective: { slug: "doesNotExist" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -254,7 +306,7 @@ describe('Mutation Tests', () => {
         it('when event doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email:"user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
+              createResponse(response: { user: { email:"user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -277,7 +329,7 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -302,7 +354,7 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
                 id,
                 status
                 event {
@@ -326,7 +378,7 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid tier', async () => {
            const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
                 id,
                 status
                 event {
@@ -356,7 +408,7 @@ describe('Mutation Tests', () => {
             mutation createResponse {
               createResponse(response: {
                 user: { email: "${user2.email}" },
-                group: { slug: "${group1.slug}" },
+                collective: { slug: "${group1.slug}" },
                 event: { slug: "${event1.slug}" },
                 status:"INTERESTED"
               }) {
@@ -415,7 +467,7 @@ describe('Mutation Tests', () => {
           it('from an existing user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "${user2.email}" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
+                createResponse(response: { user: { email: "${user2.email}" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
                   id,
                   status,
                   user {
@@ -472,7 +524,7 @@ describe('Mutation Tests', () => {
           it('from a new user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "newuser@email.com" }, group: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
+                createResponse(response: { user: { email: "newuser@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
                   id,
                   status,
                   user {
@@ -542,7 +594,7 @@ describe('Mutation Tests', () => {
                       number: 4242
                     }
                   },
-                  group: { slug: "${group1.slug}" },
+                  collective: { slug: "${group1.slug}" },
                   event: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
@@ -622,7 +674,7 @@ describe('Mutation Tests', () => {
                       number: 4242
                     }
                   },
-                  group: { slug: "${group1.slug}" },
+                  collective: { slug: "${group1.slug}" },
                   event: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
