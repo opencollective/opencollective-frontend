@@ -1,6 +1,6 @@
 {
   "name": "opencollective-api",
-  "version": "0.0.279",
+  "version": "0.0.281",
   "description": "OpenCollective API",
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
@@ -147,10 +147,10 @@
     "report:monthly": "babel-node cron/monthly/slack-report.js",
     "check:transactions": "node scripts/check_transactions_on_stripe",
     "script": "node scripts/execute",
-    "cron:daily": "PG_MAX_CONNECTIONS=1 babel-node cron/daily/*.js",
-    "cron:weekly": "PG_MAX_CONNECTIONS=1 babel-node cron/weekly/*.js",
-    "cron:monthly": "PG_MAX_CONNECTIONS=1 babel-node cron/monthly/*.js",
-    "cron:yearly": "PG_MAX_CONNECTIONS=1 babel-node cron/yearly/*.js",
+    "cron:daily": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh daily",
+    "cron:weekly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh weekly",
+    "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
+    "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
     "compile:email": "babel-node scripts/compile-email.js"
   },
   "license": "MIT",
