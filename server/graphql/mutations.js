@@ -4,7 +4,8 @@ import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
 import Promise from 'bluebird';
 import { difference } from 'lodash';
-
+import { hasRole } from '../lib/auth';
+import errors from '../lib/errors';
 import {
   GraphQLNonNull,
   GraphQLString,
@@ -31,12 +32,21 @@ const mutations = {
     args: {
       event: { type: new GraphQLNonNull(EventInputType) }
     },
-    resolve(_, args) {
+    resolve(_, args, req) {
+      let group;
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You need to be logged in to create an event");
+      }
       return models.Group.findOne({ where: { slug: args.event.collective.slug } })
-      .tap(group => {
-        if (!group) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+      .then(g => {
+        if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+        group = g;
+        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
       })
-      .then((group) => models.Event.create({
+      .then(canCreateEvent => {
+        if (!canCreateEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event");
+      })
+      .then(() => models.Event.create({
         ...args.event,
         GroupId: group.id
       }))
@@ -64,9 +74,21 @@ const mutations = {
     args: {
       event: { type: EventInputType }
     },
-    resolve(_, args) {
-      let event;
-      return models.Event.findById(args.event.id)
+    resolve(_, args, req) {
+      let group, event;
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You need to be logged in to edit an event");
+      }
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      .then(g => {
+        if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+        group = g;
+        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
+      })
+      .then(canEditEvent => {
+        if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
+      })
+      .then(() => models.Event.findById(args.event.id))
       .then(ev => {
         if (!ev) throw new Error(`Event with id ${args.event.id} not found`);
         event = ev;
