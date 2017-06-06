@@ -6,6 +6,7 @@ import Promise from 'bluebird';
 import { difference } from 'lodash';
 import { hasRole } from '../lib/auth';
 import errors from '../lib/errors';
+
 import {
   GraphQLNonNull,
   GraphQLString,

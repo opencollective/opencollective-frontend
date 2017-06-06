@@ -242,6 +242,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
+
         const r2 = await graphql(schema, updateQuery, null, {});
         expect(r2.errors).to.have.length(1);
         expect(r2.errors[0].message).to.equal("You need to be logged in to edit an event");
