@@ -2,9 +2,7 @@ import withData from '../lib/withData'
 import React from 'react'
 import { addEventData } from '../graphql/queries';
 import NotFound from '../components/NotFound';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
-import Event from '../components/Event';
+import EditEvent from '../components/EditEvent';
 import { IntlProvider, addLocaleData } from 'react-intl';
 
 import 'intl';
@@ -21,7 +19,7 @@ addLocaleData({
     parentLocale: 'en',
 });
 
-class EventPage extends React.Component {
+class EditEventPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug, eventSlug } }) {
     return { collectiveSlug, eventSlug }
@@ -30,22 +28,18 @@ class EventPage extends React.Component {
   render() {
     const { data } = this.props;
 
-    if (data.loading) return (<Loading />);
-    if (!data.Event) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", error.message);
-      return (<Error message="GraphQL error" />)
+    if (!data.loading && !data.Event) {
+      return (<NotFound />)
     }
 
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <Event event={data.Event} />
+          <EditEvent event={data.Event} />
         </div>
       </IntlProvider>
     );
   }
 }
 
-export default withData(addEventData(EventPage));
+export default withData(addEventData(EditEventPage));

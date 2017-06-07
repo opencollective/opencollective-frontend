@@ -5,7 +5,17 @@
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
   "event.responses.title.interested": "{n} interested",
   "event.sponsors.title": "Sponsors",
+  "GetTicketForm.getTicketBtn": "{quantity, plural, one {Get this ticket} other {Get those tickets}}",
+  "GetTicketForm.getTierBtn": "become a {name}",
   "GetTicketForm.submit": "{quantity, plural, one {Get this ticket} other {Get those tickets}}",
+  "event.slug.label": "slug",
+  "event.name.label": "name",
+  "event.amount.label": "amount",
+  "event.description.label": "description",
+  "event.startsAt.label": "Start date and time",
+  "event.endsAt.label": "End date and time",
+  "event.location.label": "location name",
+  "event.address.label": "address",
   "InterestedForm.RemindMe": "remind me",
   "response.status.interested": "{name} is interested",
   "response.status.yes": "{name} is going",
@@ -22,5 +32,7 @@
   "tier.GetTicket": "{quantity, plural, one {get ticket} other {get tickets}}",
   "tier.GetTier": "become a {name}",
   "UserCard.since": "since",
-  "utils.free": "free"
+  "utils.free": "free",
+  "events.title.futureEvents": "Next {n, plural, one {event} other {events}}",
+  "events.title.pastEvents": "Past {n, plural, one {event} other {events}}"
 }

@@ -17,7 +17,7 @@ class EditTiers extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { tiers: props.tiers };
+    this.state = { tiers: props.tiers || [{}] };
     this.renderTier = this.renderTier.bind(this);
     this.addTier = this.addTier.bind(this);
     this.removeTier = this.removeTier.bind(this);
@@ -37,8 +37,15 @@ class EditTiers extends React.Component {
     ];
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log("EditTier nextProps", this.props.tiers, nextProps.tiers)
+    if (nextProps.tiers) {
+      const tiers = nextProps.tiers && nextProps.tiers.map(tier => Object.assign({}, tier));
+      this.setState({tiers});
+    }
+  }
+
   editTier(index, fieldname, value) {
-    console.log(">>> editTier", index, fieldname, value);
     const tiers = this.state.tiers;
     tiers[index][fieldname] = value;
     this.setState({tiers});
@@ -46,14 +53,12 @@ class EditTiers extends React.Component {
   }
 
   addTier(tier) {
-    console.log(">>> addTier", tier);
     const tiers = this.state.tiers;
     tiers.push(tier || {});
     this.setState({tiers});
   }
 
   removeTier(index) {
-    console.log(">>> removeTier", index);
     let tiers = this.state.tiers;
     if (index < 0 || index > tiers.length) return;
     tiers = [...tiers.slice(0, index), ...tiers.slice(index+1)];
@@ -63,11 +68,11 @@ class EditTiers extends React.Component {
 
   renderTier(tier, index) {
     return (
-      <div className="tier" key={index}>
+      <div className="tier" key={`tier-${index}`}>
         <div>
           <a onClick={() => this.removeTier(index)}>[remove tier]</a>
         </div>
-        {this.fields.map(field => <InputField name={field.name} placeholder={field.placeholder} onChange={(value) => this.editTier(index, field.name, value)} />)}
+        {this.fields.map(field => <InputField name={field.name} value={tier[field.name]} placeholder={field.placeholder} onChange={(value) => this.editTier(index, field.name, value)} />)}
       </div>
     );
   }

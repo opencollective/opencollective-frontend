@@ -5,7 +5,9 @@ import fs from 'fs';
 
 const pages = nextRoutes();
 
+pages.add('createEvent', '/:collectiveSlug/events/(new|create)');
 pages.add('event', '/:collectiveSlug/events/:eventSlug');
+pages.add('editEvent', '/:collectiveSlug/events/:eventSlug/edit');
 pages.add('events', '/:collectiveSlug/events');
 pages.add('events', '/');
 pages.add('button', '/:collectiveSlug/donate/button');

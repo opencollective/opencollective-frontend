@@ -169,7 +169,7 @@ class TicketsConfirmed extends React.Component {
                 </div>
               </div>
               <div className="location">
-                <div className="locationName">{event.location}</div>
+                <div className="locationName">{event.locationName}</div>
                 <div className="locationAddress">{event.address}</div>
               </div>
             </div>

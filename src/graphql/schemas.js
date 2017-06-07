@@ -47,7 +47,7 @@ type Event {
   backgroundImage: String
   createdByUser: User
   collective: Collective
-  location: String
+  locationName: String
   address: String
   lat: Float
   long: Float

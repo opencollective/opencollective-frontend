@@ -18,15 +18,17 @@ addLocaleData({
 });
 
 class CreateEventPage extends React.Component {
+
   static getInitialProps ({ query: { collectiveSlug } }) {
     return { collectiveSlug }
   }
+
   render() {
-    const { collectiveSlug } = this.props;
+
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <CreateEvent collectiveSlug={collectiveSlug} />
+          <CreateEvent collectiveSlug={this.props.collectiveSlug} />
         </div>
       </IntlProvider>
     );

@@ -15,7 +15,7 @@ class Location extends React.Component {
   render() {
 
     const {
-      location,
+      locationName,
       address,
       lat,
       long
@@ -41,7 +41,7 @@ class Location extends React.Component {
         `}</style>
         <div className="description">
           <h1>Location</h1>
-          <div className="name">{location}</div>
+          <div className="name">{locationName}</div>
           <div className="address" style={{color: colors.darkgray}}><a href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank">{address}</a></div>
         </div>
         { lat && long &&

@@ -1,5 +1,6 @@
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { pick } from 'lodash';
 
 const createResponseQuery = gql`
   mutation createResponse($response: ResponseInputType) {
@@ -29,12 +30,37 @@ const createResponseQuery = gql`
 `;
 
 const createEventQuery = gql`
-  mutation createEvent($collectiveSlug: String!, $event: EventInputType) {
-    createEvent(collectiveSlug: $collectiveSlug, event: $event) {
+  mutation createEvent($event: EventInputType!) {
+    createEvent(event: $event) {
       id,
       slug,
       name,
+      tiers {
+        id,
+        name,
+        amount
+      },
       collective {
+        id,
+        slug
+      }
+    }
+  }
+`;
+
+const editEventQuery = gql`
+  mutation editEvent($event: EventInputType!) {
+    editEvent(event: $event) {
+      id,
+      slug,
+      name,
+      tiers {
+        id,
+        name,
+        amount
+      },
+      collective {
+        id,
         slug
       }
     }
@@ -49,6 +75,47 @@ export const addCreateResponseMutation = graphql(createResponseQuery, {
 
 export const addCreateEventMutation = graphql(createEventQuery, {
   props: ( { mutate }) => ({
-    createEvent: (event) => mutate({ variables: { event } })
+    createEvent: async (event) => {
+      const EventInputType = pick(event, [
+        'slug',
+        'name',
+        'description',
+        'locationName',
+        'address',
+        'startsAt',
+        'endsAt',
+        'timezone',
+        'maxAmount',
+        'currency',
+        'quantity'
+      ]);
+      EventInputType.collective = { slug: event.collective.slug };
+      EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'name', 'description', 'amount']));
+      return await mutate({ variables: { event: EventInputType } })
+    }
+  })
+});
+
+export const addEditEventMutation = graphql(editEventQuery, {
+  props: ( { mutate }) => ({
+    editEvent: async (event) => {
+      const EventInputType = pick(event, [
+        'id',
+        'slug',
+        'name',
+        'description',
+        'locationName',
+        'address',
+        'startsAt',
+        'endsAt',
+        'timezone',
+        'maxAmount',
+        'currency',
+        'quantity'
+      ]);
+      EventInputType.collective = { slug: event.collective.slug };
+      EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'name', 'description', 'amount']));
+      return await mutate({ variables: { event: EventInputType } })
+    }
   })
 });
