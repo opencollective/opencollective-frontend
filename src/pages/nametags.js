@@ -49,7 +49,7 @@ class Nametags extends React.Component {
   renderNametag(user) {
     return (
       <div className="nametag" key={user.id}>
-        <h1>{capitalize(user.firstName)} {capitalize(user.lastName)}</h1>
+        <h1><span>{capitalize(user.firstName)}</span> <span>{capitalize(user.lastName)}</span></h1>
         {user.twitterHandle && <h2>@{user.twitterHandle}</h2> }
         <p>{firstSentence(user.description, 60)}</p>
       </div>
@@ -123,6 +123,10 @@ class Nametags extends React.Component {
             justify-content: space-around;
             align-items: center;
           
+          }
+
+          .nametag span {
+            display: inline-block;
           }
 
           .showMarks .page {
