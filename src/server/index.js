@@ -22,7 +22,7 @@ app.prepare()
     res.send('ok');
   });
 
-  server.use(routes(server));
+  server.use(routes(server, app));
   server.use(loggerMiddleware.errorLogger);
   server.listen(port, (err) => {
     if (err) {

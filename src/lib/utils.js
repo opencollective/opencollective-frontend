@@ -55,3 +55,34 @@ export const capitalize = (str) => {
   if (!str) return '';
   return `${str[0].toUpperCase()}${str.substr(1)}`;
 }
+
+export const trim = (str, length) => {
+  if (!str) return '';
+
+  if (str.length <= length) return str;
+
+  const res = [];
+  let res_length = 0;
+  const words = str.split(' ');
+  let i=0;
+  while (res_length < length && i < words.length) {
+    const w = words[i++];
+    res_length += w.length + 1;
+    res.push(w);
+  }
+  return `${res.join(' ')} …`;
+}
+
+export const firstSentence = (str, length) => {
+  if (!str) return '';
+
+  str = str.replace(/&amp;/g, '&');
+
+  if (str.length <= length) return str;
+  const tokens = str.match(/\.|\?|\!/);
+  if (tokens) {
+    str = str.substr(0, tokens.index + 1);
+  }
+  str = trim(str, length);
+  return str;
+}
