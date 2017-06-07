@@ -45,7 +45,7 @@ export default (Component) => (
           </ApolloProvider>
         )
         await getDataFromTree(app).catch(err => {
-          logger.error(">>> error in getDataFromTree", JSON.stringify(err));
+          logger.error(">>> error in getDataFromTree", err);
         });
       }
 

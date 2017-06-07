@@ -79,3 +79,32 @@ const getEventsQuery = gql`
 `;
 
 export const addEventsData = graphql(getEventsQuery);
+
+const getAttendeesQuery = gql`
+  query Event($collectiveSlug: String!, $eventSlug: String!) {
+    Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
+      slug,
+      name,
+      responses {
+        createdAt,
+        quantity,
+        status,
+        description,
+        user {
+          id,
+          firstName,
+          lastName,
+          avatar,
+          username,
+          twitterHandle,
+          description
+        },
+        tier {
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const addAttendeesData = graphql(getAttendeesQuery);
