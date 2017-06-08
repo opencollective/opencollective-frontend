@@ -46,12 +46,9 @@ class EditEventForm extends React.Component {
         placeholder: ''
       },
       {
-        name: 'locationName',
-        placeholder: ''
-      },
-      {
-        name: 'address',
-        placeholder: ''
+        name: 'location',
+        placeholder: '',
+        type: 'location'
       }
     ];
 
@@ -88,6 +85,7 @@ class EditEventForm extends React.Component {
     e.preventDefault();
     const event = Object.assign({}, this.state.event);
     event.tiers = this.state.tiers;
+    debugger;
     this.props.onSubmit(event);
   }
 
@@ -121,7 +119,8 @@ class EditEventForm extends React.Component {
 
         @media(min-width: 600px) {
           .FormInputs {
-            column-count: 2;
+            display: flex;
+            flex-direction: cols;
           }
         }
 
@@ -133,9 +132,12 @@ class EditEventForm extends React.Component {
 
         <form onSubmit={this.handleSubmit}>
           <div className="FormInputs">
-            {this.fields.map((field) => <InputField value={this.state.event[field.name]} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} context={this.state.event} onChange={(value) => this.handleChange(field.name, value)} />)}
+            <div className="inputs">
+              <h2>Event details</h2>
+              {this.fields.map((field) => <InputField value={this.state.event[field.name]} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} context={this.state.event} onChange={(value) => this.handleChange(field.name, value)} />)}
+            </div>
+            <EditTiers tiers={this.state.tiers} onChange={this.handleTiersChange} />
           </div>
-          <EditTiers tiers={this.state.tiers} onChange={this.handleTiersChange} />
           <div className="actions">
             <Button type="submit" className="green" label={submitBtnLabel} />
           </div>

@@ -6,6 +6,7 @@ import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
 import moment from 'moment-timezone';
+import InputTypeLocation from './InputTypeLocation';
 
 class InputField extends React.Component {
 
@@ -32,8 +33,7 @@ class InputField extends React.Component {
       'description.label': { id: 'event.description.label', defaultMessage: 'description' },
       'startsAt.label': { id: 'event.startsAt.label', defaultMessage: 'Start date and time' },
       'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'End date and time' },
-      'locationName.label': { id: 'event.locationName.label', defaultMessage: 'location name' },
-      'address.label': { id: 'event.address.label', defaultMessage: 'address' }
+      'location.label': { id: 'event.location.label', defaultMessage: 'Location' }
     });
 
   }
@@ -45,6 +45,7 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
+    console.log(">>> onChange", value);
     this.setState({value});
     this.debouncedHandleChange(value);
   }
@@ -62,7 +63,10 @@ class InputField extends React.Component {
         this.input = <textarea onChange={event => this.handleChange(event.target.value)} value={this.state.value || this.props.placeholder} />;
         break;
       case 'datetime':
-      this.input = <DateTime value={moment.tz(new Date(this.state.value), context.timezone)} onChange={date => this.handleChange(date.toISOString())}  />;
+        this.input = <DateTime value={moment.tz(new Date(this.state.value), context.timezone)} onChange={date => this.handleChange(date.toISOString())}  />;
+        break;
+      case 'location':
+        this.input = <InputTypeLocation value={this.state.value} onChange={event => this.handleChange(event)} />;
         break;
       default:
         this.input = <input type="text" value={this.state.value} placeholder={this.props.placeholder} onChange={event => this.handleChange(event.target.value)} />

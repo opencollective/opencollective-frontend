@@ -64,13 +64,14 @@ class CreateEvent extends React.Component {
           }
         `}</style>
 
-        <Header title={title} />
+        <Header
+          title={title}
+          scripts={['google']}
+          />
 
         <Body>
 
-          <h1>{title}</h1>
-
-          <EventTemplatePicker collectiveSlug={this.props.collectiveSlug} onChange={this.handleTemplateChange} />
+          <h1>{title} based on <EventTemplatePicker collectiveSlug={this.props.collectiveSlug} onChange={this.handleTemplateChange} /></h1>
 
           <EditEventForm event={this.state.event} onSubmit={this.createEvent} />
           <div className="result">

@@ -190,7 +190,7 @@ class Event extends React.Component {
       <HashLink to="#location">
         <FormattedDate value={this.event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
         <FormattedTime value={this.event.startsAt} timeZone={this.event.timezone} />&nbsp; - &nbsp;
-        {this.event.locationName}
+        {this.event.location.name}
       </HashLink>
     );
 
@@ -212,7 +212,8 @@ class Event extends React.Component {
             description={this.event.description}
             twitterHandle={this.event.collective.twitterHandle}
             image={this.event.collective.logo || backgroundImage}
-            className={this.state.status} 
+            className={this.state.status}
+            scripts={['stripe']}
             />
 
           <Body>
@@ -268,12 +269,7 @@ class Event extends React.Component {
                     </div>
                   </div>
 
-                  <Location
-                    location={this.event.locationName}
-                    address={this.event.address}
-                    lat={this.event.lat}
-                    long={this.event.long}
-                    />
+                  <Location location={this.event.location} />
 
                   { responses.guests.length >= 10 &&
                     <section id="responses">

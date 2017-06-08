@@ -49,6 +49,7 @@
     "react-apollo": "1.2.0",
     "react-datetime": "2.8.10",
     "react-dom": "15.4.2",
+    "react-geosuggest": "2.1.0",
     "react-gmaps": "1.5.0",
     "react-intl": "2.2.3",
     "react-markdown": "2.4.4",

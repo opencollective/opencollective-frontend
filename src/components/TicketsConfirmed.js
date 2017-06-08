@@ -21,7 +21,7 @@ class TicketsConfirmed extends React.Component {
     this.addToCalendarEvent = {
       title: event.name,
       description: event.description,
-      location: event.address,
+      location: event.location.address,
       startTime: (new Date(event.startsAt)).toISOString(),
       endTime: (new Date(event.endsAt)).toISOString()
     };
@@ -169,8 +169,8 @@ class TicketsConfirmed extends React.Component {
                 </div>
               </div>
               <div className="location">
-                <div className="locationName">{event.locationName}</div>
-                <div className="locationAddress">{event.address}</div>
+                <div className="locationName">{event.location.name}</div>
+                <div className="locationAddress">{event.location.address}</div>
               </div>
             </div>
           </div>

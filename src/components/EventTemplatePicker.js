@@ -43,7 +43,6 @@ class EventTemplatePicker extends React.Component {
         `}</style>
 
         <div className="field">
-          <label>Template</label>
           <select name="template" onChange={this.handleTemplateChange}>
             <option value="">No template</option>
             {allEvents.map(this.renderEventEntry)}

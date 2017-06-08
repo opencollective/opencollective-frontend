@@ -13,6 +13,13 @@ type Collective {
   name: String
 }
 
+type Location {
+  name: String
+  address: String
+  lat: Float
+  long: Float
+}
+
 type Tier {
   id: Int!
   name: String
@@ -47,10 +54,7 @@ type Event {
   backgroundImage: String
   createdByUser: User
   collective: Collective
-  locationName: String
-  address: String
-  lat: Float
-  long: Float
+  location: Location
   startsAt: String
   endsAt: String
   maxAmount: Int

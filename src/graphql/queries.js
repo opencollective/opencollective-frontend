@@ -11,10 +11,12 @@ const getEventQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      locationName,
-      address,
-      lat,
-      long,
+      location {
+        name,
+        address,
+        lat,
+        long
+      },
       tiers {
         id,
         name,
@@ -64,8 +66,12 @@ const getEventsQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      locationName,
-      address,
+      location {
+        name,
+        address,
+        lat,
+        long
+      },
       tiers {
         id,
         name,

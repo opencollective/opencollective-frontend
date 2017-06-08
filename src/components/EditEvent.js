@@ -51,7 +51,10 @@ class EditEvent extends React.Component {
             color: red;
           }
         `}</style>
-        <Header title={title} />
+        <Header
+          title={title}
+          scripts={['google']}
+        />
         <Body>
           <EditEventForm event={this.props.event} onSubmit={this.editEvent} />
           <div className="result">
