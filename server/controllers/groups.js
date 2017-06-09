@@ -552,7 +552,8 @@ export const getOne = (req, res, next) => {
     req.group.getBackersCount(),
     req.group.getTwitterSettings(),
     getRelatedGroups(),
-    req.group.getSuperCollectiveData()
+    req.group.getSuperCollectiveData(),
+    req.group.getHost()
     ])
   .then(values => {
     group.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
@@ -566,6 +567,7 @@ export const getOne = (req, res, next) => {
     group.settings.twitter = values[6];
     group.related = values[7];
     group.superCollectiveData = values[8];
+    group.host = values[9];
     if (group.superCollectiveData) {
       group.collectivesCount = group.superCollectiveData.length;
       group.contributorsCount += aggregate(group.superCollectiveData, 'contributorsCount');
