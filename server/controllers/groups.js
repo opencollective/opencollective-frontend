@@ -567,7 +567,7 @@ export const getOne = (req, res, next) => {
     group.settings.twitter = values[6];
     group.related = values[7];
     group.superCollectiveData = values[8];
-    group.host = values[9];
+    group.host = values[9].info;
     if (group.superCollectiveData) {
       group.collectivesCount = group.superCollectiveData.length;
       group.contributorsCount += aggregate(group.superCollectiveData, 'contributorsCount');
