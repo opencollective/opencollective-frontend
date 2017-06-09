@@ -3,42 +3,70 @@ import { addAttendeesData } from '../graphql/queries';
 import withData from '../lib/withData';
 import { capitalize, firstSentence } from '../lib/utils';
 import colors from '../constants/colors';
+import { FormattedDate } from 'react-intl';
+import { IntlProvider } from 'react-intl';
+
+import 'intl';
+import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
+import enUS from '../lang/en-US.json';
 
 class Nametags extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug } }) {
-    return { collectiveSlug, eventSlug }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight } }) {
+    return { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight }
   }
 
   constructor(props) {
     super(props);
+    const { format, nametagWidth, nametagHeight } = this.props;
+
+    this.renderPage = this.renderPage.bind(this);
+    this.renderNametag = this.renderNametag.bind(this);
+
     this.dimensions = {
-      unit: 'mm',
-      page: {
-        format: 'a4',
-        width: 210,
-        height: 297
+      'A4': {
+        unit: 'mm',
+        page: {
+          width: 210,
+          height: 297
+        },
+        nametag: {
+          width: nametagWidth || 100,
+          height: nametagHeight || 57,
+          padding: 5
+        }
       },
-      nametag: {
-        width: 100,
-        height: 57,
-        padding: 5
+     'US': {
+        unit: 'in',
+        page: {
+          width: 8.5,
+          height: 11
+        },
+        nametag: {
+          width: nametagWidth || 4,
+          height: nametagHeight || 3,
+          padding: 0.1
+        }
       }
-    }
+    };
 
-    this.cols = Math.floor(this.dimensions.page.width / this.dimensions.nametag.width);
-    this.rows = Math.floor(this.dimensions.page.height / this.dimensions.nametag.height);
+    this.dimensions = this.dimensions[format || 'US'];
+    this.page = this.dimensions.page;
+    this.cols = Math.floor(this.page.width / this.dimensions.nametag.width);
+    this.rows = Math.floor(this.page.height / this.dimensions.nametag.height);
 
-    this.dimensions.page.paddingTop = Math.floor((this.dimensions.page.height - this.rows * this.dimensions.nametag.height) / 2);
+    this.nametagsPerPage = this.cols * this.rows;
+
+    this.page.paddingTop = Math.floor((this.page.height - this.rows * this.dimensions.nametag.height) / 2);
   }
 
   renderPage(pageNumber, responses) {
     const users = responses.map(r => r.user);
-    while (users.length < 10) {
+    while (users.length < this.nametagsPerPage) {
       users.push({});
     }
     return (
-      <div className="page" key={pageNumber}>
+      <div className="page" key={this.pageNumber}>
         <div className="nametags">
           {users.map(this.renderNametag)}
         </div>
@@ -46,12 +74,16 @@ class Nametags extends React.Component {
     )
   }
 
-  renderNametag(user) {
+  renderNametag(user, index) {
     return (
-      <div className="nametag" key={user.id}>
-        <h1><span>{capitalize(user.firstName)}</span> <span>{capitalize(user.lastName)}</span></h1>
-        {user.twitterHandle && <h2>@{user.twitterHandle}</h2> }
-        <p>{firstSentence(user.description, 60)}</p>
+      <div className="nametag" key={index}>
+        <h1><span className="firstName">{capitalize(user.firstName)}</span> <span className="lastName">{capitalize(user.lastName)}</span></h1>
+        {user.twitterHandle && <h2 className="twitterHandle">@{user.twitterHandle}</h2> }
+        <p className="description">{firstSentence(user.description, 60)}</p>
+        <div className="eventInfo">
+          <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' />, &nbsp;
+          {this.event.locationName}
+        </div>
       </div>
     )
   }
@@ -59,9 +91,12 @@ class Nametags extends React.Component {
   render() {
     if (this.props.data.loading) return <div>Loading</div>
     const responses = [];
+    this.event = this.props.data.Event;
     this.props.data.Event.responses.map(r => responses.push(r));
+
     return (
-      <div className="NametagsPages">
+      <IntlProvider locale="en-US" messages={enUS}>
+      <div className={`NametagsPages ${this.props.template}`}>
         <style jsx global>{`
           @font-face {
             font-family: 'montserratlight';
@@ -83,12 +118,12 @@ class Nametags extends React.Component {
 
           html {
             font-size: 62.5%;
-            width:${this.dimensions.page.width}${this.dimensions.unit};
+            width:${this.page.width}${this.dimensions.unit};
             zoom: .75;
           }
 
           body {
-            width:${this.dimensions.page.width}${this.dimensions.unit};
+            width:${this.page.width}${this.dimensions.unit};
             padding: 0;
             margin: 0;
             font-family: Lato,Helvetica,sans-serif;
@@ -98,11 +133,11 @@ class Nametags extends React.Component {
           }
 
           .page {
-            width: ${this.dimensions.page.width}${this.dimensions.unit};
-            height: ${this.dimensions.page.height}${this.dimensions.unit};
+            width: ${this.page.width}${this.dimensions.unit};
+            height: ${this.page.height}${this.dimensions.unit};
             overflow: hidden;
             box-sizing: border-box;
-            padding-top: ${this.dimensions.page.paddingTop}${this.dimensions.unit};
+            padding-top: ${this.page.paddingTop}${this.dimensions.unit};
           }
 
           .nametags {
@@ -142,22 +177,44 @@ class Nametags extends React.Component {
           }
 
           .nametag h2 {
-            color: ${colors.blue}
+            color: ${colors.blue};
+            margin: 0.5rem 0;
           }
 
           .nametag p {
             font-weight: 600;
           }
+
+          .eventInfo {
+            display: none;
+          }
+
+          .sustainoss .firstName {
+            font-size: 5rem;
+          }
+          .sustainoss .lastName {
+            display: none;
+          }
+          .sustainoss .description {
+            display: none;
+          }
+          .sustainoss .twitterHandle {
+            display: none;
+          }
+          .sustainoss .eventInfo {
+            display: block;
+          }
         `}</style>
 
         <div className="pages">
           {responses.map((response, index) => {
-            if (index % 10 === 0) {
-              return this.renderPage(index/10 + 1, responses.slice(index, index + 10));
+            if (index % this.nametagsPerPage === 0) {
+              return this.renderPage(index/this.nametagsPerPage + 1, responses.slice(index, index + this.nametagsPerPage));
             }
           })}
         </div>
       </div>
+      </IntlProvider>
     );
   }
 }
