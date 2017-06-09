@@ -20,7 +20,8 @@ module.exports = (server, app) => {
 
   server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res) => {
     const { collectiveSlug, eventSlug, format } = req.params;
-    app.renderToHTML(req, res, 'nametags', req.params)
+    const params = {...req.params, ...req.query};
+    app.renderToHTML(req, res, 'nametags', params)
       .then((html) => {
         const options = {
           format: (format === 'A4') ? 'A4' : 'Letter',
