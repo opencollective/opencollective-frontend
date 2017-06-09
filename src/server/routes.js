@@ -19,11 +19,11 @@ module.exports = (server, app) => {
   });
 
   server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res) => {
-    const { collectiveSlug, eventSlug } = req.params;
+    const { collectiveSlug, eventSlug, format } = req.params;
     app.renderToHTML(req, res, 'nametags', req.params)
       .then((html) => {
         const options = {
-          format: 'A4', // or 'Letter'
+          format: (format === 'A4') ? 'A4' : 'Letter',
           renderDelay: 3000
         };
         // html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');

@@ -85,6 +85,8 @@ const getAttendeesQuery = gql`
     Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
       slug,
       name,
+      startsAt,
+      location,
       responses {
         createdAt,
         quantity,
