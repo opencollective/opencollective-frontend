@@ -96,7 +96,7 @@ class Nametags extends React.Component {
 
     return (
       <IntlProvider locale="en-US" messages={enUS}>
-      <div className={`NametagsPages ${this.props.template}`}>
+      <div className={`NametagsPages ${this.props.collectiveSlug} ${this.props.eventSlug} ${this.props.template}`}>
         <style jsx global>{`
           @font-face {
             font-family: 'montserratlight';
@@ -154,9 +154,13 @@ class Nametags extends React.Component {
             box-sizing: border-box;
             overflow: hidden;
             display: flex;
+            display:  -webkit-flex;
             flex-direction: column;
+            -webkit-flex-direction: column;
             justify-content: space-around;
+            -webkit-justify-content: space-around;
             align-items: center;
+            -webkit-align-items: center;
           
           }
 
