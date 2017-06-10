@@ -81,8 +81,8 @@ class Nametags extends React.Component {
         {user.twitterHandle && <h2 className="twitterHandle">@{user.twitterHandle}</h2> }
         <p className="description">{firstSentence(user.description, 60)}</p>
         <div className="eventInfo">
-          <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' />, &nbsp;
-          {this.event.location}
+          <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' /> - &nbsp;
+          {this.event.name} - {this.event.location}
         </div>
       </div>
     )

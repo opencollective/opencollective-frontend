@@ -9,8 +9,8 @@ const env = process.env.NODE_ENV || "development";
 let { API_URL, API_KEY } = process.env;
 switch (env) {
   case 'development':
+    API_KEY = (API_URL || (API_KEY && API_KEY.length > 24)) ? API_KEY : 'dvl-1510egmf4a23d80342403fb599qd';
     API_URL = API_URL || 'http://localhost:3060';
-    API_KEY = API_KEY || 'dvl-1510egmf4a23d80342403fb599qd';
     break;
   case 'production':
     API_URL = API_URL || 'https://opencollective.com/api';
