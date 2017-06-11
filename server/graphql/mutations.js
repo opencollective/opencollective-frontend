@@ -35,6 +35,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       let group;
+
+      const location = args.event.location;
+
+      const eventData = {
+        ...args.event,
+        locationName: location.name,
+        address: location.address,
+        geoLocationLatLong: {type: 'Point', coordinates: [location.lat, location.long]},
+        GroupId: group.id
+      };
+
       if (!req.remoteUser) {
         return Promise.reject(new errors.Unauthorized("You need to be logged in to create an event"));
       }
@@ -47,10 +58,7 @@ const mutations = {
       .then(canCreateEvent => {
         if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event"));
       })
-      .then(() => models.Event.create({
-        ...args.event,
-        GroupId: group.id
-      }))
+      .then(() => models.Event.create(eventData))
       .tap(event => {
         if (args.event.tiers) {
           return models.Tier.createMany(args.event.tiers, { EventId: event.id })
@@ -76,6 +84,18 @@ const mutations = {
       event: { type: EventInputType }
     },
     resolve(_, args, req) {
+
+      const location = args.event.location;
+
+      const updatedEventData = {
+        ...args.event,
+        locationName: location.name,
+        address: location.address
+      };
+      if (location.lat) {
+        updatedEventData.geoLocationLatLong = {type: 'Point', coordinates: [location.lat, location.long]};
+      }
+
       let group, event;
       if (!req.remoteUser) {
         throw new errors.Unauthorized("You need to be logged in to edit an event");
@@ -95,7 +115,7 @@ const mutations = {
         event = ev;
         return event;
       })
-      .then(event => event.update(args.event))
+      .then(event => event.update(updatedEventData))
       .then(event => event.getTiers())
       .then(tiers => {
         if (args.event.tiers) {

@@ -198,6 +198,17 @@ export const CollectiveType = new GraphQLObjectType({
   }
 });
 
+export const LocationType = new GraphQLObjectType({
+  name: 'LocationType',
+  description: 'Type for Location',
+  fields: () => ({
+    name: { type: GraphQLString },
+    address: { type: GraphQLString },
+    lat: { type: GraphQLFloat },
+    long: { type: GraphQLFloat }
+  })
+});
+
 export const EventType = new GraphQLObjectType({
   name: 'Event',
   description: 'This represents an Event',
@@ -245,30 +256,11 @@ export const EventType = new GraphQLObjectType({
           return event.slug;
         }
       },
-      locationName: {
-        type: GraphQLString,
-        description: 'Name of the location. Ex: Puck Fair restaurant',
+      location: {
+        type: LocationType,
+        description: 'Name, address, lat, long of the location.',
         resolve(event) {
-          return event.locationName;
-        }
-      },
-      address: {
-        type: GraphQLString,
-        description: 'Ex: 525 Broadway, NY 10012',
-        resolve(event) {
-          return event.address;
-        }
-      },
-      lat: {
-        type: GraphQLFloat,
-        resolve(event) {
-          return event.geoLocationLatLong ? event.geoLocationLatLong.coordinates[0] : null;
-        }
-      },
-      long: {
-        type: GraphQLFloat,
-        resolve(event) {
-          return event.geoLocationLatLong ? event.geoLocationLatLong.coordinates[1] : null;
+          return event.location;
         }
       },
       startsAt: {

@@ -8,8 +8,10 @@ data['ticket.confirmed'] = {
     name: "SustainOSS",
     startsAt: "2017-06-19 17:15:00+00",
     timezone: "America/Los_Angeles",
-    locationName: "Github HQ",
-    address: "88 Colin P Kelly Jr Street, San Francisco, CA"
+    location: {
+      name: "Github HQ",
+      address: "88 Colin P Kelly Jr Street, San Francisco, CA"
+    }
   },
   response: {
     quantity: 2,

@@ -112,6 +112,16 @@ export default function(Sequelize, DataTypes) {
     paranoid: true,
 
     getterMethods: {
+
+      location() {
+        return {
+          name: this.locationName,
+          address: this.address,
+          lat: this.geoLocationLatLong && this.geoLocationLatLong.coordinates[0],
+          long: this.geoLocationLatLong && this.geoLocationLatLong.coordinates[1]
+        }
+      },
+
       info() {
         return {
           id: this.id,
