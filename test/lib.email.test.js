@@ -56,10 +56,11 @@ describe('lib/email', () => {
     const group = { name: "La Primaire", slug: "laprimaire" };
     const data = {
       donation: { amount: 5000, currency: 'EUR'},
+      transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
+      config: { host: config.host },
       interval: 'month',
       user: emailData.user,
-      group,
-      config
+      group
     };
     const options = {
       from: `${group.name} <hello@${group.slug}.opencollective.com>`,
@@ -90,8 +91,7 @@ describe('lib/email', () => {
       group: {
         name: "WWCode Austin",
         slug: "wwcodeaustin"
-      },
-      config
+      }
     };
 
     return emailLib.send('thankyou', data.user.email, data)
