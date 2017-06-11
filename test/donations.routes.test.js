@@ -243,7 +243,7 @@ describe('donations.routes.test.js', () => {
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
             Object.assign({}, payment, {
-              description: undefined,
+              description: payment.description,
               interval: undefined,
               notes: undefined}));
         })
