@@ -83,6 +83,8 @@ describe('lib/email', () => {
 
     const data = {
       donation: paymentData,
+      transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
+      config: { host: config.host },
       interval: 'month',
       user: emailData.user,
       group: {
@@ -109,6 +111,8 @@ describe('lib/email', () => {
 
     const data = {
       donation: paymentData,
+      transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
+      config: { host: config.host },
       interval: 'month',
       user: emailData.user,
       group: {
@@ -116,8 +120,7 @@ describe('lib/email', () => {
         slug: 'brusselstogether',
         logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png'
       },
-      relatedGroups: utils.data('relatedGroups'),
-      config
+      relatedGroups: utils.data('relatedGroups')
     };
 
     return emailLib.send('thankyou', data.user.email, data)
@@ -125,6 +128,7 @@ describe('lib/email', () => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your €50/month donation to #BrusselsTogether');
         expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedGroups[0].name);
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.group.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
       });
   });
 
