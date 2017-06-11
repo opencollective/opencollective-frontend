@@ -250,13 +250,6 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
-      getHost() {
-        return models.User.findOne({
-          include: [
-            { model: models.UserGroup, where: { role: roles.HOST, GroupId: this.id } }
-          ]
-        });
-      },
 
       getUsersForViewer(viewer) {
         const promises = [queries.getUsersFromGroupWithTotalDonations(this.id)];
@@ -574,9 +567,17 @@ export default function(Sequelize, DataTypes) {
         return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
       },
 
+      getHost() {
+        return models.User.findOne({
+          include: [
+            { model: models.UserGroup, where: { role: roles.HOST, GroupId: this.id } }
+          ]
+        });
+      },
+
       hasHost() {
         return this.getHost()
-        .then(userGroup => Promise.resolve(!!userGroup));
+        .then(user => Promise.resolve(!!user));
       },
 
       getSuperCollectiveData() {

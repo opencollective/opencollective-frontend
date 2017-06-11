@@ -243,7 +243,6 @@ export default (Sequelize, DataTypes) => {
         };
       },
 
-      // Minimal (used to feed the jwt token)
       minimal() {
         return {
           id: this.id,
@@ -252,7 +251,8 @@ export default (Sequelize, DataTypes) => {
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
-          email: this.email
+          email: this.email,
+          paypalEmail: this.paypalEmail
         };
       },
 

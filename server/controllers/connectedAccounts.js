@@ -110,7 +110,10 @@ export const fetchAllRepositories = (req, res, next) => {
         type: 'all',
         page
       },
-      headers: { 'User-Agent': 'OpenCollective' },
+      headers: {
+        'User-Agent': 'OpenCollective',
+        'Accept': 'application/vnd.github.mercy-preview+json' // needed to fetch 'topics', which we can use as tags
+      },
       json: true
     }))
     .then(data => [].concat(...data))
