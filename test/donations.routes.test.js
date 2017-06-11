@@ -195,7 +195,7 @@ describe('donations.routes.test.js', () => {
         })
         .expect(200)
         .toPromise()
-        .then((res) => {
+        .then(() => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
