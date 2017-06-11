@@ -90,8 +90,7 @@ describe('lib/email', () => {
       group: {
         name: "WWCode Austin",
         slug: "wwcodeaustin"
-      },
-      config
+      }
     };
 
     return emailLib.send('thankyou', data.user.email, data)
