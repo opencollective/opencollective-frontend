@@ -39,8 +39,7 @@ export const stripe = (req, res, next) => {
   // if payment is on someone else's behalf, find or create that user
   if (payment.email && payment.email !== user.email) {
     promise = models.User.findOrCreateByEmail(payment.email)
-    .tap(u => user = u)
-    .tap(u => console.log(">>> User created", u.email));
+    .tap(u => user = u);
   }
 
   return promise.then(() => paymentsLib.createPayment({
