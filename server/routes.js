@@ -61,7 +61,9 @@ export default (app) => {
         debug('params')(query);
         delete body.query;
       }
-      debug('params')("req.query", req.query, "req.body", body);
+      debug('params')("req.query", req.query);
+      debug('params')("req.body", body);
+      debug('params')("req.params", req.params);
       debug('headers')("req.headers", req.headers);
       next();
     });

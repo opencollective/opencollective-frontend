@@ -22,7 +22,9 @@ export const unsubscribe = (req, res, next) => {
     models.Group.findOne({ where: { slug }}),
     models.User.findOne({ where: { email }})
   ]).then(results => {
-      return results[1].unsubscribe(results[0].id, type, 'email')
+    if (!results[1]) throw new errors.NotFound(`Cannot find a user with email "${email}"`);
+
+    return results[1].unsubscribe(results[0] && results[0].id, type, 'email')
     })
   .then(() => res.send({"response": "ok"}))
   .catch(next);
