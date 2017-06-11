@@ -28,13 +28,22 @@ export const list = (req, res, next) => {
 export const stripe = (req, res, next) => {
 
   const { payment } = req.required;
-  const { user } = req;
   const { group } = req;
   const { amount, interval, stripeToken, description, notes } = payment;
 
   const currency = payment.currency || group.currency;
 
-  return paymentsLib.createPayment({
+  let user = req.user;
+  let promise = Promise.resolve();
+
+  // if payment is on someone else's behalf, find or create that user
+  if (payment.email && payment.email !== user.email) {
+    promise = models.User.findOrCreateByEmail(payment.email)
+    .tap(u => user = u)
+    .tap(u => console.log(">>> User created", u.email));
+  }
+
+  return promise.then(() => paymentsLib.createPayment({
     user,
     group,
     payment: {
@@ -45,7 +54,7 @@ export const stripe = (req, res, next) => {
       interval,
       notes
     }
-  })
+  }))
   // returning transaction after processing payment because everything is synchronous for now.
   .then((transaction) => res.send({success: true, user: req.user.info, transaction: transaction && transaction.info }))
   .catch(err => next(new errors.BadRequest(err.message)))
