@@ -119,13 +119,16 @@ const processHost = (host) => {
         balance: stats[0],
         delta: stats[1],
         totalNewDonations: stats[2],
-        totalNetAmountReceived: stats[3],
+        totalNetAmountReceivedForCollectives: stats[3],
         totalNewExpenses: stats[4],
         totalNewHostFees: stats[5],
         paymentProcessorFees: stats[6],
         platformFees: stats[7],
         backers: stats[8]
-      }
+      };
+      data.stats.totalNetAmountReceived = {
+        totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalNewHostFees.totalInHostCurrency
+      };
     })
     .then(() => sendEmail(host, data))
     .catch(e => {

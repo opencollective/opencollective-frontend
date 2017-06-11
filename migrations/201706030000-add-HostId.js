@@ -14,7 +14,7 @@ const cache = { HostIdForGroupId: {}, updatedHosts: {} };
 const updateHosts = (sequelize) => {
 
   const getHostCurrency = (ug) => {
-    const query = `SELECT "txnCurrency" FROM "Transactions" WHERE "GroupId"=${ug.GroupId} AND "txnCurrency" is NOT NULL LIMIT 1`
+    const query = `SELECT "txnCurrency" FROM "Transactions" WHERE "GroupId"=${ug.GroupId} AND "txnCurrency" is NOT NULL AND "deletedAt" IS NULL AND "PaymentMethodId" IS NOT NULL LIMIT 1`
     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
       .then(rows => {
         if (!rows[0] || !rows[0].txnCurrency) {
@@ -66,6 +66,8 @@ const updateTransactions = (sequelize) => {
   const updateTransaction = (transaction) => {
     return getHostId(transaction.GroupId)
       .then(hostid => {
+        if (!hostid) return console.error(`Unable to update transaction ${transaction.id}: No hostid for group ${transaction.GroupId}`);
+
         // Update the transaction
         console.log(`Adding HostId ${hostid} to transaction ${transaction.id}`);
         return sequelize.query(`UPDATE "Transactions" SET "HostId"=:hostid WHERE id=:id`, { replacements: { id: transaction.id, hostid }})

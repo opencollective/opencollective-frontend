@@ -96,7 +96,11 @@ export default (Sequelize, DataTypes) => {
     getterMethods: {
 
       netAmountInTxnCurrency() {
-        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency
+        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency - this.hostFeeInTxnCurrency;
+      },
+
+      amountSentToHostInTxnCurrency() {
+        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency;
       },
 
       // Info.
@@ -117,6 +121,7 @@ export default (Sequelize, DataTypes) => {
           amountInTxnCurrency: this.amountInTxnCurrency,
           netAmountInGroupCurrency: this.netAmountInGroupCurrency,
           netAmountInTxnCurrency: this.netAmountInTxnCurrency,
+          amountSentToHostInTxnCurrency: this.amountSentToHostInTxnCurrency,
           txnCurrency: this.txnCurrency
         };
       }
