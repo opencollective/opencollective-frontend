@@ -181,6 +181,7 @@ describe('donations.routes.test.js', () => {
       stripeToken: STRIPE_TOKEN,
       amount: AMOUNT,
       currency: CURRENCY,
+      description: 'hello world'
     }
 
 
@@ -194,13 +195,13 @@ describe('donations.routes.test.js', () => {
         })
         .expect(200)
         .toPromise()
-        .then(() => {
+        .then((res) => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
             Object.assign({}, payment, {
-              description: undefined,
+              description: 'hello world',
               interval: undefined,
               notes: undefined}));
         })
