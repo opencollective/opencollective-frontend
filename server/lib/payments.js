@@ -192,6 +192,7 @@ const processPayment = (donation) => {
               hostFeeInTxnCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
               platformFeeInTxnCurrency: fees.applicationFee,
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+              description: donation.title,
               data: { charge, balanceTransaction },
             };
             return models.Transaction.createFromPayload(payload);
