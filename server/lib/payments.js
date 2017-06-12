@@ -199,7 +199,7 @@ const processPayment = (donation) => {
           });
       };
 
-      let groupStripeAccount;
+      let groupStripeAccount, transaction;
 
       return group.getStripeAccount()
         .then(stripeAccount => groupStripeAccount = stripeAccount)
@@ -216,6 +216,8 @@ const processPayment = (donation) => {
 
         // both one-time and subscriptions get charged immediately
         .then(() => createChargeAndTransaction(groupStripeAccount, donation, paymentMethod, group, user))
+
+        .tap(t => transaction = t)
 
         // if this is a subscription, we create it now on Stripe
         .tap(() => subscription ? createSubscription(groupStripeAccount, subscription, donation, paymentMethod, group) : null)
@@ -250,6 +252,7 @@ const processPayment = (donation) => {
               'thankyou',
               user.email,
               { donation: donation.info,
+                transaction,
                 user: user.info,
                 group: group.info,
                 relatedGroups,
