@@ -11,7 +11,7 @@ const getEventQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      location,
+      locationName,
       address,
       lat,
       long,
@@ -64,7 +64,7 @@ const getEventsQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      location,
+      locationName,
       address,
       collective {
         id,
@@ -86,7 +86,7 @@ const getAttendeesQuery = gql`
       slug,
       name,
       startsAt,
-      location,
+      locationName,
       responses {
         createdAt,
         quantity,
