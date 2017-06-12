@@ -92,6 +92,13 @@ export const createCharge = (stripeAccount, charge) => {
 };
 
 /**
+ * Fetch charge
+ */
+export const retrieveCharge = (stripeAccount, chargeId) => {
+  return client(stripeAccount).charges.retrieve(chargeId);
+};
+
+/**
  * Retrieve a balance transaction (for fees)
  */
 export const retrieveBalanceTransaction = (stripeAccount, txn) => {
