@@ -144,7 +144,7 @@ class Event extends React.Component {
   async createResponse(response) {
     response.tier = response.tier || {};
     const ResponseInputType = {
-      group: { slug: this.event.collective.slug },
+      collective: { slug: this.event.collective.slug },
       event: { slug: this.event.slug },
       tier: { id: response.tier.id },
       quantity: response.quantity,
@@ -210,7 +210,7 @@ class Event extends React.Component {
       <HashLink to="#location">
         <FormattedDate value={Event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
         <FormattedTime value={Event.startsAt} timeZone={Event.timezone} />&nbsp; - &nbsp;
-        {Event.location}
+        {Event.locationName}
       </HashLink>
     );
 
@@ -293,7 +293,7 @@ class Event extends React.Component {
                   </div>
 
                   <Location
-                    location={Event.location}
+                    location={Event.locationName}
                     address={Event.address}
                     lat={Event.lat}
                     long={Event.long}

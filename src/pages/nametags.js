@@ -82,7 +82,7 @@ class Nametags extends React.Component {
         <p className="description">{firstSentence(user.description, 60)}</p>
         <div className="eventInfo">
           <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' /> - &nbsp;
-          {this.event.name} - {this.event.location}
+          {this.event.name} - {this.event.locationLocation}
         </div>
       </div>
     )
