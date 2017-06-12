@@ -86,7 +86,7 @@ export function setupModels(client) {
   // Group.
   m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
   m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});
-  m.User.hasMany(m.UserGroup);
+  m.Group.hasMany(m.UserGroup);
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User

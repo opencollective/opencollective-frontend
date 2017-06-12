@@ -26,6 +26,14 @@ const queries = {
       })
     }
   },
+
+  LoggedInUser: {
+    type: UserType,
+    resolve(_, args, req) {
+      return req.remoteUser;
+    }
+  },
+
   /*
    * Given a collective slug, returns all users
    */

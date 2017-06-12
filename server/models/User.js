@@ -343,6 +343,16 @@ export default (Sequelize, DataTypes) => {
         });
       },
 
+      getCollectivesWithRoles() {
+        return this.getGroups({
+          include: [{ model: models.UserGroup, where: { UserId: this.id }}]
+        })
+        .then(groups => groups.map(g => {
+          g.role = g.UserGroup.role;
+          return g;
+        }))
+      },
+
       getRoles() {
         return models.UserGroup.findAll({
           where: {

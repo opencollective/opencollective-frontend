@@ -105,6 +105,12 @@ export const UserType = new GraphQLObjectType({
         resolve(user) {
           return user.paypalEmail;
         }
+      },
+      collectives: {
+        type: new GraphQLList(CollectiveType),
+        resolve(user) {
+          return user.getCollectivesWithRoles();
+        }
       }
     }
   }
@@ -173,6 +179,12 @@ export const CollectiveType = new GraphQLObjectType({
         type: new GraphQLList(UserType),
         resolve(collective, args, req) {
           return collective.getUsersForViewer(req.remoteUser);
+        }
+      },
+      role: {
+        type: GraphQLString,
+        resolve(collective, args, req) {
+          return collective.role || collective.getRoleForUser(req.remoteUser);
         }
       },
       twitterHandle: {
