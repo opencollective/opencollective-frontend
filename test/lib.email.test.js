@@ -59,8 +59,6 @@ describe('lib/email', () => {
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
-      transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
-      config: { host: config.host },
       user: emailData.user,
       group
     };
