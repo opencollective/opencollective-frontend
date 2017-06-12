@@ -567,17 +567,16 @@ export default function(Sequelize, DataTypes) {
       },
 
       getHost() {
-        return Sequelize.models.UserGroup.find({
-          where: {
-            GroupId: this.id,
-            role: roles.HOST
-          }
+        return Sequelize.models.User.findOne({
+          include: [
+            { model: models.UserGroup, where: { role: 'HOST', GroupId: this.id } }
+          ]
         });
       },
 
       hasHost() {
         return this.getHost()
-        .then(userGroup => Promise.resolve(!!userGroup));
+        .then(user => Promise.resolve(!!user));
       },
 
       getSuperCollectiveData() {

@@ -9,6 +9,7 @@ import errors from '../lib/errors';
 import {type} from '../constants/transactions';
 import emailLib from '../lib/email';
 import currencies from '../constants/currencies';
+import config from 'config';
 
 const {
   Activity,
@@ -250,6 +251,7 @@ export default function stripeWebhook(req, res, next) {
           firstPayment: false,
           group: group.info,
           relatedGroups,
+          config: { host: config.host },
           interval: subscription && subscription.interval,
           subscriptionsLink: user.generateLoginLink('/subscriptions')
         }, {

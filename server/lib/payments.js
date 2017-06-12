@@ -192,13 +192,14 @@ const processPayment = (donation) => {
               hostFeeInTxnCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
               platformFeeInTxnCurrency: fees.applicationFee,
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+              description: donation.title,
               data: { charge, balanceTransaction },
             };
             return models.Transaction.createFromPayload(payload);
           });
       };
 
-      let groupStripeAccount;
+      let groupStripeAccount, transaction;
 
       return group.getStripeAccount()
         .then(stripeAccount => groupStripeAccount = stripeAccount)
@@ -215,6 +216,8 @@ const processPayment = (donation) => {
 
         // both one-time and subscriptions get charged immediately
         .then(() => createChargeAndTransaction(groupStripeAccount, donation, paymentMethod, group, user))
+
+        .tap(t => transaction = t)
 
         // if this is a subscription, we create it now on Stripe
         .tap(() => subscription ? createSubscription(groupStripeAccount, subscription, donation, paymentMethod, group) : null)
@@ -249,6 +252,7 @@ const processPayment = (donation) => {
               'thankyou',
               user.email,
               { donation: donation.info,
+                transaction,
                 user: user.info,
                 group: group.info,
                 relatedGroups,
@@ -282,7 +286,7 @@ const processPayment = (donation) => {
       }
 
       return group.getHost()
-      .then(host => host.UserId == user.id)
+      .then(host => host.id === user.id)
       .tap(isHost => isUserHost = isHost)
       .then(isUserHost => {
         payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(group.hostFeePercent/100 * donation.amount);
