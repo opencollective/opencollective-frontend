@@ -236,7 +236,7 @@ class Header extends React.Component {
 
       `}
       </style>
-      <TopBar className={className} />
+      <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
     </header>
     );
   }

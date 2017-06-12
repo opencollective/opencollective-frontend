@@ -40,7 +40,7 @@ class CreateEvent extends React.Component {
     }
   }
 
-  handleTemplateChange(event) {
+  async handleTemplateChange(event) {
     delete event.id;
     this.setState({event, tiers: event.tiers});
   }
@@ -67,6 +67,7 @@ class CreateEvent extends React.Component {
         <Header
           title={title}
           scripts={['google']}
+          LoggedInUser={this.props.LoggedInUser}
           />
 
         <Body>

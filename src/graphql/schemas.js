@@ -1,5 +1,6 @@
-export default `
+import gql from 'graphql-tag'
 
+export default gql`
 type User {
   id: Int!
   email: String!
@@ -62,6 +63,4 @@ type Event {
   currency: String
   tiers: [Tier]
   responses: [Response]
-}
-
-`;
+}`;

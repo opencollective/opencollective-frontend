@@ -1,6 +1,23 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
+export const getLoggedInUserQuery = gql`
+  query LoggedInUser {
+    LoggedInUser {
+      id,
+      username,
+      firstName,
+      lastName,
+      avatar,
+      collectives {
+        slug,
+        name,
+        role
+      }
+    }
+  }
+`;
+
 const getEventQuery = gql`
   query Event($collectiveSlug: String!, $eventSlug: String!) {
     Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
@@ -54,8 +71,6 @@ const getEventQuery = gql`
   }
 `;
 
-export const addEventData = graphql(getEventQuery);
-
 const getEventsQuery = gql`
   query allEvents($collectiveSlug: String) {
     allEvents(collectiveSlug: $collectiveSlug) {
@@ -90,4 +105,44 @@ const getEventsQuery = gql`
   }
 `;
 
+const getAttendeesQuery = gql`
+  query Event($collectiveSlug: String!, $eventSlug: String!) {
+    Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
+      slug,
+      name,
+      startsAt,
+      location,
+      responses {
+        createdAt,
+        quantity,
+        status,
+        description,
+        user {
+          id,
+          firstName,
+          lastName,
+          avatar,
+          username,
+          twitterHandle,
+          description
+        },
+        tier {
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
+export const addAttendeesData = graphql(getAttendeesQuery);
+
+export const addGetLoggedInUserFunction = graphql(getLoggedInUserQuery, {
+  props: ({ data }) => ({
+    data,
+    getLoggedInUser: () => {
+      return data.refetch();
+    }
+  })
+});

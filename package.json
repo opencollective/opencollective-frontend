@@ -29,6 +29,7 @@
     "graphql": "0.9.1",
     "graphql-tag": "1.2.3",
     "graphql-tools": "0.10.0",
+    "html-pdf": "chriskinsman/node-html-pdf#6d8b3e4",
     "intl": "1.2.5",
     "lodash": "4.17.2",
     "markdown-in-js": "1.1.3",
