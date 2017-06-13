@@ -44,7 +44,7 @@
     "graphql": "0.9.1",
     "handlebars": "4.0.5",
     "helmet": "3.5.0",
-    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-fetch": "2.2.1",
     "joi": "7.3.0",
     "json2csv": "3.4.2",
     "jsonwebtoken": "5.7.0",
