@@ -32,11 +32,6 @@ console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
 
-const {
-  User,
-  Transaction
-} = models;
-
 const init = () => {
 
   const startTime = new Date;
