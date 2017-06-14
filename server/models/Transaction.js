@@ -117,7 +117,7 @@ export default (Sequelize, DataTypes) => {
           GroupId: this.GroupId,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
-          paymentProcessorFee: this.paymentProcessorFee,
+          paymentProcessorFeeInTxnCurrency: this.paymentProcessorFeeInTxnCurrency,
           amountInTxnCurrency: this.amountInTxnCurrency,
           netAmountInGroupCurrency: this.netAmountInGroupCurrency,
           netAmountInTxnCurrency: this.netAmountInTxnCurrency,

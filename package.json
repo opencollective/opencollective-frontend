@@ -52,7 +52,6 @@
     "knox": "github:automattic/knox#278337d7673341658efcc81e631c3f63fa53d374",
     "knox-mpu-alt": "0.2.2",
     "lodash": "3.10.1",
-    "mailgun-js": "0.7.11",
     "mime": "1.3.4",
     "moment": "2.12.0",
     "moment-timezone": "0.5.2",
