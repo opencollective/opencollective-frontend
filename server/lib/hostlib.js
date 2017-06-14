@@ -11,7 +11,7 @@ export function getHostedGroups(hostid) {
     replacements: { hostid },
     model: models.Group,
     type: sequelize.QueryTypes.SELECT
-  }).catch(console.error);
+  });
 }
 
 
@@ -27,7 +27,7 @@ export function getBackersStats(groupids, startDate = new Date('2015-01-01'), en
       }
     })
     .then(rows => rows.map(r => r.dataValues.userid))
-    .catch(console.error);
+    ;
   }
 
   const stats = {};
@@ -41,7 +41,7 @@ export function getBackersStats(groupids, startDate = new Date('2015-01-01'), en
     stats.repeat = _.intersection(results[1], results[2]).length;
     stats.new = results[2].length - stats.repeat;
     return stats;
-  }).catch(console.error);
+  });
 }
 
 export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency', where) {
@@ -52,7 +52,7 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency'
   };
   return models.Transaction.findAll(query)
     .then(rows => rows.map(r => r.dataValues))
-    .catch(console.error);
+    ;
 }
 
 /**
@@ -83,7 +83,7 @@ export function sumTransactions(attribute, where = {}, hostCurrency, date) {
       res.totalInHostCurrency = Math.round(total); // in cents
       return res;
     })
-    .catch(console.error);
+    ;
 }
 
 export function getTotalHostFees(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
@@ -94,7 +94,7 @@ export function getTotalHostFees(groupids, type, startDate = new Date('2015-01-0
   if (type) {
     where.type = type;
   }
-  return sumTransactions('hostFeeInTxnCurrency', where, hostCurrency).catch(console.error);
+  return sumTransactions('hostFeeInTxnCurrency', where, hostCurrency);
 }
 
 export function getTotalNetAmount(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
@@ -105,5 +105,5 @@ export function getTotalNetAmount(groupids, type, startDate = new Date('2015-01-
   if (type) {
     where.type = type;
   }
-  return sumTransactions('netAmountInGroupCurrency', where, hostCurrency).catch(console.error);
+  return sumTransactions('netAmountInGroupCurrency', where, hostCurrency);
 }
