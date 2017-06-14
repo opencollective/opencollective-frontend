@@ -4,10 +4,53 @@ import models from '../models';
 import errors from '../lib/errors';
 import { getFxRate } from '../lib/currency';
 
+/**
+ * Export transactions as CSV
+ * @param {*} transactions 
+ */
+export function exportTransactions(transactions) {
+  const attributes = ['id', 'createdAt', 'GroupId', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency' ];
+  const lines = [];
+  const groupids = transactions.map(t => t.GroupId);
+
+  const getColumnName = (attr) => {
+    if (attr === 'GroupId') return 'collective';
+    else return attr;
+  }
+
+  lines.push(`"${attributes.map(getColumnName).join('","')}"`); // Header
+  return models.Group.findAll({ attributes: ['id', 'slug'], where: { id: { $in: groupids }}})
+    .then(groups => {
+      const groupsById = {};
+      groups.map(g => {
+        groupsById[g.id] = g.dataValues;
+      });
+      const getLine = (transaction) => {
+        const cols = [];
+        attributes.map(attr => {
+          let value;
+          if (attr === 'GroupId') {
+            value = groupsById[transaction[attr]].slug;
+          } else {
+            value = transaction[attr];
+          }
+          cols.push(`${value}`.replace(/\"/g,"\""));
+        });
+        return `"${cols.join('","')}"`;
+      }
+
+      transactions.map(t => {
+        lines.push(getLine(t));
+      })
+
+      return lines.join('\n');
+    })
+}
+
 export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
+  const txnCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
-  let txnCurrency = host.currency;
-  let fxrate, amountInTxnCurrency;
+  let fxrate;
   let paymentProcessorFeeInGroupCurrency = 0;
   let paymentProcessorFeeInTxnCurrency = 0;
   let getFxRatePromise;

@@ -16,12 +16,14 @@ import debugLib from 'debug';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import config from 'config';
-
-import { getHostedGroups, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
+import { exportTransactions } from '../../server/lib/transactions';
+import { getHostedGroups, getBackersStats, sumTransactions, getTransactions } from '../../server/lib/hostlib';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
 const month = moment(d).format('MMMM');
+
+const csv_filename = `${moment(d).format('YYYYMM')}-transactions.csv`;
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
@@ -60,18 +62,6 @@ const init = () => {
   });
 }
 
-const getTransactions = (groupids) => {
-  debug("getTransactions for ", groupids.length, "collectives");
-  const query = {
-    where: {
-      GroupId: { $in: groupids },
-      createdAt: { $gte: startDate, $lt: endDate }
-    },
-    order: [ ['createdAt', 'DESC' ]]
-  };
-  return Transaction.findAll(query);
-}
-
 const getHostStats = (host, groupids) => {
 
   const dateRange = {
@@ -98,7 +88,7 @@ const getHostStats = (host, groupids) => {
 const processHost = (host) => {
 
   const data = {};
-  let groupsById = {};
+  let groupsById = {}, attachment;
 
   data.host = host;
   data.reportDate = endDate;
@@ -107,13 +97,22 @@ const processHost = (host) => {
 
   return getHostedGroups(host.id)
     .tap(groups => groupsById = _.indexBy(groups, "id"))
-    .then(() => getTransactions(Object.keys(groupsById)))
+    .then(() => getTransactions(Object.keys(groupsById), startDate, endDate))
+    .tap(transactions => {
+      data.transactions = transactions;
+      return exportTransactions(transactions)
+       .then(csv => {
+          attachment = {
+            filename: csv_filename,
+            content: csv
+          }
+        })
+    })
     .then(transactions => transactions.map(t => {
       const r = t.info;
       r.group = groupsById[r.GroupId].dataValues;
       return r;
     }))
-    .then(transactions => data.transactions = transactions)
     .then(() => getHostStats(host, Object.keys(groupsById)))
     .then(stats => {
       data.stats = {
@@ -132,13 +131,13 @@ const processHost = (host) => {
         totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalNewHostFees.totalInHostCurrency
       };
     })
-    .then(() => sendEmail(host, data))
+    .then(() => sendEmail(host, data, attachment))
     .catch(e => {
       console.error("Error in processing host", host.username, e);
     });
 };
 
-const sendEmail = (recipient, data) => {
+const sendEmail = (recipient, data, attachment) => {
     debug("Sending email to ", recipient.dataValues);
     // debug("email data transactions", data.transactions);
     debug("email data stats", data.stats);
@@ -148,7 +147,13 @@ const sendEmail = (recipient, data) => {
       debug("Skipping ", recipient.email);
       return Promise.resolve();
     }
-    return emailLib.send('host.monthlyreport', recipient.email, data);
+    if (process.env.SEND_EMAIL_TO) {
+      recipient.email = process.env.SEND_EMAIL_TO;
+    }
+    const options = {
+      attachments: [ attachment ]
+    }
+    return emailLib.send('host.monthlyreport', recipient.email, data, options);
 }
 
 init();

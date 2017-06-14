@@ -1,0 +1,32 @@
+import { expect } from 'chai';
+import models from '../server/models';
+import * as utils from '../test/utils';
+
+import * as tlib from '../server/lib/transactions';
+
+describe('lib.transactions.test.js', () => {
+  
+  const startDate = new Date("2017-02-01");
+  const endDate = new Date("2017-03-01");
+  let transactions;
+
+  const where = {
+    createdAt: { $gte: startDate, $lt: endDate}
+  };
+
+  before(() => utils.loadDB("wwcode_test"));
+
+  beforeEach('get transactions', () => models.Transaction.findAll({where}).then(ts => {
+    transactions = ts;
+    expect(transactions.length).to.equal(20);
+    return true;
+  }).catch(console.error));
+
+  it('exports transactions', () => tlib.exportTransactions(transactions).then(csv => {
+    const lines = csv.split('\n');
+    expect(lines.length).to.equal(21);
+    expect(lines[0].split('","').length).to.equal(13);
+    return true;
+  }));
+
+});

@@ -134,10 +134,11 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const from = options.from || config.email.from;
       const bcc = options.bcc;
       const text = options.text;
+      const attachments = options.attachments;
       const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
 
-      mailgun.sendMail({ from, to, bcc, subject, text, html, headers }, (err, info) => {
+      mailgun.sendMail({ from, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           return reject(err);
         } else {
