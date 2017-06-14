@@ -141,6 +141,10 @@ export default (Sequelize, DataTypes) => {
       createFromPayload({ transaction, user, group, paymentMethod }) {
 
         return group.getHost().then(host => {
+          if (!host) {
+            throw new Error(`Cannot create a transaction: collective id ${group.id} doesn't have a host`);
+          }
+
           transaction.HostId = host.id;
           // attach other objects manually. Needed for afterCreate hook to work properly
           transaction.UserId = user && user.id;

@@ -90,7 +90,6 @@ export default (Sequelize, DataTypes) => {
     description: DataTypes.STRING,
     longDescription: DataTypes.TEXT,
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
-    isHost: DataTypes.BOOLEAN, // e.g. WWCode
     currency: {
       type: DataTypes.STRING,
       validate: {

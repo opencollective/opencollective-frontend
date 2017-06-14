@@ -80,8 +80,13 @@ handlebars.registerHelper('toLowerCase', (str) => {
   return str.toLowerCase();
 });
 
-const col = (str, size) => {
-  if (str.length >= size) return `${str.substr(0, size-1)}…`;
+const col = (str, size, trim = true) => {
+  if (str.length >= size) {
+    if (str.match(/[0-9]\.00$/)) {
+      return col(str.replace(/\.00$/,''), size, trim);
+    }
+    return (trim) ? `${str.substr(0, size-1)}…` : str;
+  }
   while (str.length < size) {
     str +=' ';
   }
@@ -108,11 +113,11 @@ handlebars.registerHelper('moment', (value, props) => {
 });
 
 handlebars.registerHelper('currency', (value, props) => {
-  const { currency, precision, size } = props.hash;
+  const { currency, precision, size, sign } = props.hash;
 
   if (isNaN(value)) return "";
 
-  const res = function() {
+  let res = function() {
     if (!currency) return value / 100;
     value = value/100; // converting cents
 
@@ -124,8 +129,14 @@ handlebars.registerHelper('currency', (value, props) => {
     });
   }();
 
-  if (size) return col(`${res}`, size);
-  else return res;
+  if (sign && value > 0) {
+    res = `+${res}`;
+  }
+  if (size) {
+    res = col(`${res}`, size, false);
+  }
+
+  return res;
 });
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));

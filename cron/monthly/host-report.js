@@ -13,7 +13,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import Promise from 'bluebird';
 import debugLib from 'debug';
-import models from '../../server/models';
+import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import config from 'config';
 
@@ -39,14 +39,16 @@ const init = () => {
 
   const startTime = new Date;
 
-  const query = {
-    where: { isHost: true }
-  };
-
+  let previewCondition = '';
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where.username = {$in: ['adminwwc', 'host-org']};
+    previewCondition = "AND u.username IN ('adminwwc', 'host-org')";
 
-  User.findAll(query)
+  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName" FROM "Users" u LEFT JOIN "UserGroups" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
+
+  sequelize.query(query, {
+    model: models.User,
+    type: sequelize.QueryTypes.SELECT
+  })
   .tap(hosts => {
       console.log(`Preparing the ${month} report for ${hosts.length} hosts`);
   })
