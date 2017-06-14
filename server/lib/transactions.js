@@ -5,16 +5,24 @@ import errors from '../lib/errors';
 import { getFxRate } from '../lib/currency';
 
 export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
-  let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
+  let createPaymentResponse, executePaymentResponse;
+  let txnCurrency = host.currency;
+  let fxrate, amountInTxnCurrency;
+  let paymentProcessorFeeInGroupCurrency = 0;
+  let paymentProcessorFeeInTxnCurrency = 0;
+  let getFxRatePromise;
 
+  // If PayPal
   if (paymentResponses) {
 
     createPaymentResponse = paymentResponses.createPaymentResponse;
     executePaymentResponse = paymentResponses.executePaymentResponse;
 
-    senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    txnCurrency = senderFees.code; // currency of the host account => is this reliable (see expense id 11375)? We could also use `host.currency` now instead.
-    fees = senderFees.amount*100 // paypal sends this in float
+    const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion;
+    fxrate = 1 / currencyConversion.exchangeRate; // paypal returns a float from host.currency to expense.currency, need to reverse that
+    const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
+    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
+    paymentProcessorFeeInTxnCurrency = fxrate * paymentProcessorFeeInGroupCurrency;
 
     switch (executePaymentResponse.paymentExecStatus) {
       case 'COMPLETED':
@@ -31,14 +39,19 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       default:
         throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}`);
     }
+
+    getFxRatePromise = Promise.resolve(fxrate);
+  } else {
+    // If manual (add funds or manual reimbursement of an expense)
+    getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
   }
 
   // We assume that all expenses are in Group currency
   // (otherwise, ledger breaks with a triple currency conversion)
   const transaction = {
-    netAmountInGroupCurrency: -1*(expense.amount + fees),
+    netAmountInGroupCurrency: -1 * (expense.amount + paymentProcessorFeeInGroupCurrency),
     txnCurrency,
-    paymentProcessorFeeInTxnCurrency: fees,
+    paymentProcessorFeeInTxnCurrency,
     ExpenseId: expense.id,
     type: type.EXPENSE,
     amount: -expense.amount,
@@ -49,13 +62,13 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     HostId: host.id
   };
 
-  return getFxRate(expense.currency, txnCurrency, expense.incurredAt || expense.createdAt)
+  return getFxRatePromise(transaction)
     .then(fxrate => {
       transaction.txnCurrencyFxRate = fxrate;
       transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
       return transaction;
     })
-    .then((transaction) => models.Transaction.create(transaction))
+    .then(transaction => models.Transaction.create(transaction))
     .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
     .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
