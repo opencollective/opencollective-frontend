@@ -69,8 +69,8 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
 
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
-    fxrate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency, need to reverse that
-    paymentProcessorFeeInTxnCurrency = fxrate * paymentProcessorFeeInGroupCurrency;
+    fxrate = parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
+    paymentProcessorFeeInTxnCurrency = 1/fxrate * paymentProcessorFeeInGroupCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
