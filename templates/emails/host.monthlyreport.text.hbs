@@ -32,12 +32,13 @@ Total expenses paid:             {{{currency stats.totalNewExpenses.totalInHostC
 
 date  {{{col "collective" size=17}}} amount net amount*   description
 {{#each transactions}}
-{{{moment createdAt format="MM/DD"}}} {{{col group.shortSlug size=../maxSlugSize}}} {{{currency amount currency=group.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}} {{{col description size=80}}}
+{{{moment createdAt format="MM/DD"}}} {{{col group.shortSlug size=../maxSlugSize}}} {{{currency amount currency=group.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}}{{#if note}}**{{/if}} {{{col description size=80}}}
 {{else}}
 No transaction. 
 {{/each}}
 
 * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
+{{#if note}}** {{note}}{{/if}}
 
 🗣 Feedback
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!

@@ -22,11 +22,12 @@ describe('lib.transactions.test.js', () => {
     return true;
   }).catch(console.error));
 
-  it('exports transactions', () => tlib.exportTransactions(transactions).then(csv => {
+  it('exports transactions', (done) => {
+    const csv = tlib.exportTransactions(transactions);
     const lines = csv.split('\n');
     expect(lines.length).to.equal(21);
-    expect(lines[0].split('","').length).to.equal(13);
-    return true;
-  }));
+    expect(lines[0].split('","').length).to.equal(12);
+    done();
+  });
 
 });

@@ -14,17 +14,6 @@ export function getHostedGroups(hostid) {
   });
 }
 
-export function getTransactions(groupids, startDate, endDate) {
-  const query = {
-    where: {
-      GroupId: { $in: groupids },
-      createdAt: { $gte: startDate, $lt: endDate }
-    },
-    order: [ ['createdAt', 'DESC' ]]
-  };
-  return models.Transaction.findAll(query);
-}
-
 export function getBackersStats(groupids, startDate = new Date('2015-01-01'), endDate = new Date) {
 
   const getBackersIds = (startDate, endDate) => {

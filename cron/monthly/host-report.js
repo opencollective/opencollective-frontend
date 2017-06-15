@@ -16,8 +16,9 @@ import debugLib from 'debug';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import config from 'config';
-import { exportTransactions } from '../../server/lib/transactions';
-import { getHostedGroups, getBackersStats, sumTransactions, getTransactions } from '../../server/lib/hostlib';
+import { exportToCSV } from '../../server/lib/utils';
+import { getTransactions } from '../../server/lib/transactions';
+import { getHostedGroups, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
@@ -90,19 +91,25 @@ const processHost = (host) => {
   data.month = month;
   data.config = _.pick(config, 'host');
   data.maxSlugSize = 0;
+  data.note = null;
 
   const processTransaction = (transaction) => {
-    const r = transaction;
-    r.group = groupsById[r.GroupId].dataValues;
-    r.group.shortSlug = r.group.slug.replace(/^wwcode-?(.)/, '$1');
-    data.maxSlugSize = Math.max(data.maxSlugSize, r.group.shortSlug.length + 1);
-    if (!r.description) {
+    const t = transaction;
+    t.group = groupsById[t.GroupId].dataValues;
+    t.group.shortSlug = t.group.slug.replace(/^wwcode-?(.)/, '$1');
+    t.note = '';
+    if (t.data && t.data.fxrateSource) {
+      t.note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
+      data.note = t.note;
+    }
+    data.maxSlugSize = Math.max(data.maxSlugSize, t.group.shortSlug.length + 1);
+    if (!t.description) {
       return transaction.getSource().then(source => {
-          r.description = source.title
-          return r;
+          t.description = source.title
+          return t;
         });
     } else {
-      return Promise.resolve(r);      
+      return Promise.resolve(t);      
     }
   }
 
@@ -111,13 +118,24 @@ const processHost = (host) => {
     .then(() => getTransactions(Object.keys(groupsById), startDate, endDate))
     .then(transactions => Promise.map(transactions, processTransaction))
     .tap(transactions => {
-      return exportTransactions(transactions)
-       .then(csv => {
-          attachment = {
-            filename: csv_filename,
-            content: csv
-          }
-        })
+
+      const getColumnName = (attr) => {
+        if (attr === 'GroupId') return "collective";
+        else return attr;
+      }
+
+      const processValue = (attr, value) => {
+        if (attr === "GroupId") return groupsById[value].slug;
+        else return value;
+      }
+
+      const csv = exportToCSV(transactions, ['id', 'createdAt', 'GroupId', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency', 'note' ], getColumnName, processValue);
+  
+      attachment = {
+        filename: csv_filename,
+        content: csv
+      }
+
     })
     .then(transactions => data.transactions = transactions)
     .then(() => getHostStats(host, Object.keys(groupsById)))

@@ -105,7 +105,7 @@ th {
     <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{{moment createdAt format="MM/DD"}}}</a></td>
     <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
     <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
-    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}</td>    
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if note}}**{{/if}}</td>    
     <td valign="top" width="100%">{{description}}</td>
   </tr>
 {{else}}
@@ -113,7 +113,10 @@ th {
 {{/each}}
 </table>
 
-<p class="muted">* Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.</p>
+<p class="muted">
+  * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
+  {{#if note}}<br />** {{note}}{{/if}}
+</p>
 
 <h2>🗣 Feedback</h2>
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!

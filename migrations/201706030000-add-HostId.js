@@ -169,13 +169,18 @@ const updateTransactions = (sequelize) => {
               } else {
                 const amountInTxnCurrency = Math.round(parseInt(transaction.amount, 10) * parseFloat(fxrate)) // INTEGER in cents
                 console.log("> transaction", transaction.id, transaction.createdAt, transaction.currency, hostCurrency, "fxrate", fxrate,"amountInTxnCurrency", amountInTxnCurrency);
-                return updateQueriesToPerform.push(sequelize.query(`UPDATE "Transactions" SET "HostId"=:hostid, "txnCurrencyFxRate"=:fxrate, "txnCurrency"=:hostCurrency, "amountInTxnCurrency"=:amountInTxnCurrency WHERE id=:id`, { 
+                let data = transaction.data || {};
+                if (fxrate !== 1) {
+                  data.fxrateSource = "fixer.io";
+                }
+                return updateQueriesToPerform.push(sequelize.query(`UPDATE "Transactions" SET "HostId"=:hostid, "txnCurrencyFxRate"=:fxrate, "txnCurrency"=:hostCurrency, "amountInTxnCurrency"=:amountInTxnCurrency, data=:data WHERE id=:id`, { 
                   replacements: {
                     id: transaction.id,
                     hostid,
                     fxrate,
                     hostCurrency,
-                    amountInTxnCurrency
+                    amountInTxnCurrency,
+                    data: JSON.stringify(data)
                   }
                 }))
               }
@@ -188,7 +193,7 @@ const updateTransactions = (sequelize) => {
       })
   };
 
-  return sequelize.query(`SELECT id, "createdAt", "GroupId", currency, "txnCurrency", amount FROM "Transactions"`, { type: sequelize.QueryTypes.SELECT }).then(transactions => Promise.map(transactions, updateTransaction))
+  return sequelize.query(`SELECT id, "createdAt", "GroupId", currency, "txnCurrency", amount, data FROM "Transactions"`, { type: sequelize.QueryTypes.SELECT }).then(transactions => Promise.map(transactions, updateTransaction))
   .then(() => Promise.all(updateQueriesToPerform))
   .then(() => console.log(">>> missing currency for hosts (fallback to USD)", JSON.stringify(missingCurrency)));
 }
