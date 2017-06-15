@@ -89,12 +89,28 @@ const processHost = (host) => {
   data.reportDate = endDate;
   data.month = month;
   data.config = _.pick(config, 'host');
+  data.maxSlugSize = 0;
+
+  const processTransaction = (transaction) => {
+    const r = transaction;
+    r.group = groupsById[r.GroupId].dataValues;
+    r.group.shortSlug = r.group.slug.replace(/^wwcode-?(.)/, '$1');
+    data.maxSlugSize = Math.max(data.maxSlugSize, r.group.shortSlug.length + 1);
+    if (!r.description) {
+      return transaction.getSource().then(source => {
+          r.description = source.title
+          return r;
+        });
+    } else {
+      return Promise.resolve(r);      
+    }
+  }
 
   return getHostedGroups(host.id)
     .tap(groups => groupsById = _.indexBy(groups, "id"))
     .then(() => getTransactions(Object.keys(groupsById), startDate, endDate))
+    .then(transactions => Promise.map(transactions, processTransaction))
     .tap(transactions => {
-      data.transactions = transactions;
       return exportTransactions(transactions)
        .then(csv => {
           attachment = {
@@ -103,11 +119,7 @@ const processHost = (host) => {
           }
         })
     })
-    .then(transactions => transactions.map(t => {
-      const r = t.info;
-      r.group = groupsById[r.GroupId].dataValues;
-      return r;
-    }))
+    .then(transactions => data.transactions = transactions)
     .then(() => getHostStats(host, Object.keys(groupsById)))
     .then(stats => {
       data.stats = {

@@ -132,6 +132,10 @@ handlebars.registerHelper('currency', (value, props) => {
   if (sign && value > 0) {
     res = `+${res}`;
   }
+  // If we are limited in space, no need to show the trailing .00
+  if (size && precision == 2) {
+    res = res.replace(/\.00$/, '');
+  }
   if (size) {
     res = col(`${res}`, size, false);
   }

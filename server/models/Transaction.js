@@ -127,6 +127,17 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
+    instanceMethods: {
+      getSource() {
+        switch (this.type) {
+          case 'EXPENSE':
+            return this.getExpense();
+          case 'DONATION':
+            return this.getDonation();
+        }        
+      }
+    },
+
     classMethods: {
 
       createMany: (transactions, defaultValues) => {

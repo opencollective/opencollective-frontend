@@ -9,7 +9,6 @@ export default {
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
     "isOrganization": true,
-    "isHost": true,
     "twitterHandle": "wwcode",
     "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA",
     "currency": "USD"
