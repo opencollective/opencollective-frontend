@@ -35,6 +35,8 @@ cache.hostCurrency[5161] = 'USD'; // affcny.org
 cache.hostCurrency[3271] = 'EUR'; // https://twitter.com/felixsanzm
 cache.hostCurrency[2909] = 'USD'; // https://twitter.com/inhabit_
 
+// some cache value to avoid rate limiting
+cache.fxrate = {"2016-10-24-EUR-USD":1.0891,"2016-10-19-EUR-USD":1.0979,"2016-10-18-EUR-USD":1.0993,"2016-12-23-EUR-USD":1.0446,"2016-10-07-GBP-USD":1.2329,"2016-12-07-GBP-USD":1.2609,"2016-12-27-EUR-USD":1.0445,"2016-12-23-GBP-USD":1.2249,"2016-12-07-EUR-USD":1.073,"2016-12-28-CAD-USD":0.73667,"2016-12-27-GBP-USD":1.2245,"2016-12-23-AUD-USD":0.71715,"2016-03-22-AUD-USD":0.76008,"2016-03-31-AUD-USD":0.76889,"2016-04-02-MXN-USD":0.057447,"2016-06-02-CHF-USD":1.0114,"2017-03-07-MXN-USD":0.05131,"2016-12-27-AUD-USD":0.71876,"2016-12-27-INR-USD":0.014702,"2017-06-02-EUR-USD":1.1217,"2017-06-09-EUR-USD":1.1176,"2017-06-14-GBP-USD":1.2736,"2016-12-27-MXN-USD":0.048505,"2017-06-06-AUD-USD":0.74854,"2017-06-07-AUD-USD":0.75561,"2017-02-21-EUR-USD":1.0537,"2017-04-17-GBP-USD":1.2541,"2017-03-31-CAD-USD":0.74946,"2017-05-16-EUR-USD":1.1059,"2017-03-14-MXN-USD":0.050995,"2017-03-31-GBP-USD":1.2496,"2016-11-01-EUR-USD":1.1025,"2017-04-17-MXN-USD":0.053779,"2016-12-28-AUD-USD":0.71771,"2017-03-27-GBP-USD":1.2603,"2016-02-16-MXN-USD":0.053055,"2016-02-04-AUD-USD":0.72083,"2016-04-18-INR-USD":0.01502,"2016-08-15-MXN-USD":0.055136,"2016-07-10-JPY-USD":0.0099577,"2016-07-22-JPY-USD":0.009425,"2016-03-05-AUD-USD":0.73827,"2016-11-29-GBP-USD":1.2469,"2016-12-28-JPY-USD":0.0084982,"2016-07-19-JPY-USD":0.0094155,"2016-03-27-AUD-USD":0.75071,"2016-06-13-CAD-USD":0.78304,"2016-05-16-MXN-USD":0.054923,"2016-07-31-JPY-USD":0.0096778,"2016-07-28-JPY-USD":0.0095488,"2016-07-30-JPY-USD":0.0096778,"2016-09-29-EUR-USD":1.1221,"2016-02-15-MXN-USD":0.053008,"2016-03-15-MXN-USD":0.055973,"2016-09-30-EUR-USD":1.1161,"2016-11-14-EUR-USD":1.0777,"2017-06-05-GBP-USD":1.2911,"2017-06-06-EUR-USD":1.1258,"2017-05-08-EUR-USD":1.0938,"2017-04-18-GBP-USD":1.266,"2016-02-10-MXN-USD":0.053439,"2016-06-09-AUD-USD":0.7438};
 
 function getDate(date = 'latest') {
   if (date.getFullYear) {
@@ -52,6 +54,7 @@ const getFxRate = (fromCurrency, toCurrency, date = 'latest') => {
 
   if (fromCurrency === toCurrency) return Promise.resolve(1);
   if (!fromCurrency || !toCurrency) return Promise.resolve(1);
+  if (fromCurrency === 'UYU' || toCurrency === 'UYU') return Promise.resolve("n/a");
 
   date = getDate(date);
 
@@ -71,6 +74,7 @@ const getFxRate = (fromCurrency, toCurrency, date = 'latest') => {
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
           console.error(msg, "json:", json, "error:", e);
+          console.log(">>> cache for fxrate", JSON.stringify(cache.fxrate));
           return reject(new Error(msg));
         }
       })
@@ -128,7 +132,7 @@ const updateTransactions = (sequelize) => {
       SELECT "UserId" FROM "UserGroups" WHERE "GroupId"=:groupid AND role='HOST'
     `, { type: sequelize.QueryTypes.SELECT, replacements: { groupid }})
     .then(ug => {
-      const HostId = ug[0].UserId;
+      const HostId = ug[0] && ug[0].UserId;
       if (!HostId) {
         throw new Error(`Not host found for group id ${groupid}`);
       }
@@ -184,9 +188,9 @@ const updateTransactions = (sequelize) => {
       })
   };
 
-  return sequelize.query(`SELECT id, "createdAt", "GroupId", currency, "txnCurrency", amount FROM "Transactions" LIMIT 100`, { type: sequelize.QueryTypes.SELECT }).then(transactions => Promise.map(transactions, updateTransaction))
+  return sequelize.query(`SELECT id, "createdAt", "GroupId", currency, "txnCurrency", amount FROM "Transactions"`, { type: sequelize.QueryTypes.SELECT }).then(transactions => Promise.map(transactions, updateTransaction))
   .then(() => Promise.all(updateQueriesToPerform))
-  .then(() => console.log(">>> missing currency for hosts", missingCurrency.join(', ')));
+  .then(() => console.log(">>> missing currency for hosts (fallback to USD)", JSON.stringify(missingCurrency)));
 }
 
 module.exports = {
