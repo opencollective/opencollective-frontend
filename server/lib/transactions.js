@@ -4,6 +4,7 @@ import models from '../models';
 import errors from '../lib/errors';
 import { getFxRate } from '../lib/currency';
 import { exportToCSV } from '../lib/utils';
+import Promise from 'bluebird';
 
 /**
  * Export transactions as CSV
@@ -48,12 +49,6 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     createPaymentResponse = paymentResponses.createPaymentResponse;
     executePaymentResponse = paymentResponses.executePaymentResponse;
 
-    const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion;
-    fxrate = 1 / currencyConversion.exchangeRate; // paypal returns a float from host.currency to expense.currency, need to reverse that
-    const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
-    paymentProcessorFeeInTxnCurrency = fxrate * paymentProcessorFeeInGroupCurrency;
-
     switch (executePaymentResponse.paymentExecStatus) {
       case 'COMPLETED':
         break;
@@ -69,6 +64,13 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       default:
         throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}`);
     }
+
+    const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
+    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
+
+    const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
+    fxrate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency, need to reverse that
+    paymentProcessorFeeInTxnCurrency = fxrate * paymentProcessorFeeInGroupCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
@@ -92,10 +94,12 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     HostId: host.id
   };
 
-  return getFxRatePromise(transaction)
+  return getFxRatePromise
     .then(fxrate => {
-      transaction.txnCurrencyFxRate = fxrate;
-      transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
+      if (!isNaN(fxrate)) {
+        transaction.txnCurrencyFxRate = fxrate;
+        transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
+      }
       return transaction;
     })
     .then(transaction => models.Transaction.create(transaction))

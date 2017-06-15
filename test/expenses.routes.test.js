@@ -671,7 +671,7 @@ describe('expenses.routes.test.js', () => {
 
                     it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
-                    it('THEN creates transaction', () => {
+                    it('THEN creates transaction1', () => {
                       expectTransactionCreated(expense, transaction);
                       expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
                     });
@@ -687,7 +687,7 @@ describe('expenses.routes.test.js', () => {
 
                 function expectTransactionCreated(expense, transaction) {
                   expect(transaction).to.have.property('amountInTxnCurrency', -13164)
-                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 415)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
                   expect(transaction).to.have.property('txnCurrency', host.currency);
                   expect(transaction).to.have.property('txnCurrencyFxRate', 1.097);
@@ -817,7 +817,7 @@ describe('expenses.routes.test.js', () => {
 
                   it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
-                  it('THEN creates transaction', () => expectTransactionCreated(expense, transaction));
+                  it('THEN creates transaction2', () => expectTransactionCreated(expense, transaction));
 
                   it('THEN creates a transaction paid activity', () =>
                     expectTransactionPaidActivity(group, host, transaction)

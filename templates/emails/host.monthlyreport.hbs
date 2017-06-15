@@ -36,8 +36,10 @@ th {
 </style>
 
 <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-  Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency}}}) &nbsp; | &nbsp; 
-  {{stats.backers.total}} backers (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}}) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  Collectives: {{stats.totalCollectives}} //
+  Backers: {{stats.backers.total}} (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}}) //  
+  Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}}) //       
+  Host fees: {{{currency stats.totalNewHostFees.totalInHostCurrency currency=host.currency}}} //  
 </div>
 
 <div>
