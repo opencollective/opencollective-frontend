@@ -250,6 +250,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
+
       getUsersForViewer(viewer) {
         const promises = [queries.getUsersFromGroupWithTotalDonations(this.id)];
         if (viewer) {
@@ -567,9 +568,9 @@ export default function(Sequelize, DataTypes) {
       },
 
       getHost() {
-        return Sequelize.models.User.findOne({
+        return models.User.findOne({
           include: [
-            { model: models.UserGroup, where: { role: 'HOST', GroupId: this.id } }
+            { model: models.UserGroup, where: { role: roles.HOST, GroupId: this.id } }
           ]
         });
       },

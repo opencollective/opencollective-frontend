@@ -295,6 +295,31 @@ export const getTiersStats = (tiers, startDate, endDate) => {
   return { stats, tiers};
 }
 
+/**
+ * export data to CSV
+ * @param {*} data
+ * @param {*} attributes 
+ * @param {*} getColumnName 
+ * @param {*} processValue 
+ */
+export function exportToCSV(data, attributes, getColumnName = (attr) => attr, processValue = (attr, val) => val) {
+  const lines = [];
+
+  lines.push(`"${attributes.map(getColumnName).join('","')}"`); // Header
+
+  const getLine = (row) => {
+    const cols = [];
+    attributes.map(attr => {
+      cols.push(`${processValue(attr, row[attr])}`.replace(/\"/g,"\""));
+    });
+    return `"${cols.join('","')}"`;
+  }
+
+  data.map(row => {
+    lines.push(getLine(row));
+  });
+  return lines.join('\n');
+}
 
 /**
  * Default host id, set this for new groups created through Github

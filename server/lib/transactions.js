@@ -2,18 +2,52 @@ import * as constants from '../constants';
 import {type} from '../constants/transactions';
 import models from '../models';
 import errors from '../lib/errors';
+import { getFxRate } from '../lib/currency';
+import { exportToCSV } from '../lib/utils';
+import Promise from 'bluebird';
 
-export function createFromPaidExpense(paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
-  let createPaymentResponse, executePaymentResponse, senderFees, txnCurrency = expense.currency, fees = 0;
+/**
+ * Export transactions as CSV
+ * @param {*} transactions 
+ */
+export function exportTransactions(transactions, attributes) {
+  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency' ];
 
+  return exportToCSV(transactions, attributes);
+}
+
+/**
+ * Get transactions between startDate and endDate for groupids
+ * @param {*} groupids 
+ * @param {*} startDate 
+ * @param {*} endDate 
+ * @param {*} limit 
+ */
+export function getTransactions(groupids, startDate, endDate, limit) {
+  const query = {
+    where: {
+      GroupId: { $in: groupids },
+      createdAt: { $gte: startDate, $lt: endDate }
+    },
+    order: [ ['createdAt', 'DESC' ]],
+    limit
+  };
+  return models.Transaction.findAll(query);
+}
+
+export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
+  const txnCurrency = host.currency;
+  let createPaymentResponse, executePaymentResponse;
+  let fxrate;
+  let paymentProcessorFeeInGroupCurrency = 0;
+  let paymentProcessorFeeInTxnCurrency = 0;
+  let getFxRatePromise;
+
+  // If PayPal
   if (paymentResponses) {
 
     createPaymentResponse = paymentResponses.createPaymentResponse;
     executePaymentResponse = paymentResponses.executePaymentResponse;
-
-    senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    txnCurrency = senderFees.code;
-    fees = senderFees.amount*100 // paypal sends this in float
 
     switch (executePaymentResponse.paymentExecStatus) {
       case 'COMPLETED':
@@ -30,17 +64,26 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
       default:
         throw new errors.ServerError(`controllers.expenses.pay: Unknown error while trying to create transaction for expense ${expense.id}`);
     }
+
+    const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
+    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
+
+    const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
+    fxrate = parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
+    paymentProcessorFeeInTxnCurrency = 1/fxrate * paymentProcessorFeeInGroupCurrency;
+
+    getFxRatePromise = Promise.resolve(fxrate);
+  } else {
+    // If manual (add funds or manual reimbursement of an expense)
+    getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
   }
 
   // We assume that all expenses are in Group currency
   // (otherwise, ledger breaks with a triple currency conversion)
-
-  return models.Transaction.create({
-    netAmountInGroupCurrency: -1*(expense.amount + fees),
-    amountInTxnCurrency: -expense.amount,
-    paymentProcessorFeeInTxnCurrency: fees,
+  const transaction = {
+    netAmountInGroupCurrency: -1 * (expense.amount + paymentProcessorFeeInGroupCurrency),
     txnCurrency,
-    txnCurrencyFxRate: 1,
+    paymentProcessorFeeInTxnCurrency,
     ExpenseId: expense.id,
     type: type.EXPENSE,
     amount: -expense.amount,
@@ -48,9 +91,20 @@ export function createFromPaidExpense(paymentMethod, expense, paymentResponses, 
     description: expense.title,
     UserId,
     GroupId: expense.GroupId,
-  })
-  .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
-  .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
+    HostId: host.id
+  };
+
+  return getFxRatePromise
+    .then(fxrate => {
+      if (!isNaN(fxrate)) {
+        transaction.txnCurrencyFxRate = fxrate;
+        transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
+      }
+      return transaction;
+    })
+    .then(transaction => models.Transaction.create(transaction))
+    .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
+    .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
 
 function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {

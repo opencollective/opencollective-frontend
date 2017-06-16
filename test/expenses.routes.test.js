@@ -43,7 +43,7 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => host = u));
+  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
 
@@ -530,7 +530,7 @@ describe('expenses.routes.test.js', () => {
           describe('#pay unapproved expense', () => {
             let payReq;
 
-            beforeEach(() => {
+            beforeEach('send pay POST request', () => {
               payReq = request(app)
                 .post(`/groups/${group.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
@@ -564,7 +564,7 @@ describe('expenses.routes.test.js', () => {
 
             let payReq;
 
-            beforeEach(() => {
+            beforeEach('send pay POST request', () => {
               payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
             });
 
@@ -589,7 +589,7 @@ describe('expenses.routes.test.js', () => {
                   () => Promise.resolve(executePaymentMock));
               });
 
-              beforeEach(() => {
+              beforeEach('send pay request with api_key', () => {
                 payReq = payReq.send({api_key:application.api_key});
               });
 
@@ -614,7 +614,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 12000}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 12000}})
                     .expect(200);
                 })
 
@@ -634,7 +634,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 12500}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 12500}})
                     .expect(200);
                 })
 
@@ -649,7 +649,7 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 describe('WHEN user has paymentMethod', () => {
-                  beforeEach(() => {
+                  beforeEach('create paypal payment method', () => {
                     PaymentMethod.create({
                       service: 'paypal',
                       UserId: host.id,
@@ -658,11 +658,11 @@ describe('expenses.routes.test.js', () => {
                   });
 
                   describe('THEN returns 200', () => {
-                    beforeEach(() => payReq.expect(200));
+                    beforeEach('expect 200', () => payReq.expect(200));
 
                     let expense, transaction, paymentMethod;
                     beforeEach(() => expectOne(Expense).tap(e => expense = e));
-                    beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
+                    beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[1]));
                     beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
 
                     it('THEN calls PayPal pay', () => expect(payStub.called).to.be.true);
@@ -671,7 +671,7 @@ describe('expenses.routes.test.js', () => {
 
                     it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
-                    it('THEN creates transaction', () => {
+                    it('THEN creates transaction1', () => {
                       expectTransactionCreated(expense, transaction);
                       expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
                     });
@@ -686,11 +686,11 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('amountInTxnCurrency', -12000)
-                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 378)
+                  expect(transaction).to.have.property('amountInTxnCurrency', -10939)
+                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 415)
                   expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
-                  expect(transaction).to.have.property('txnCurrency', expense.currency);
-                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
+                  expect(transaction).to.have.property('txnCurrency', host.currency);
+                  expect(transaction).to.have.property('txnCurrencyFxRate', 0.911577028258888);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);
@@ -800,7 +800,7 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/groups/${group.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {netAmountInGroupCurrency: 10000}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 10000}})
                     .expect(200);
                 })
 
@@ -808,8 +808,8 @@ describe('expenses.routes.test.js', () => {
                   beforeEach(() => payReq.expect(200));
 
                   let expense, transaction;
-                  beforeEach(() => expectTwo(Expense).tap(e => expense = e));
-                  beforeEach(() => expectTwo(Transaction).tap(t => transaction = t));
+                  beforeEach(() => expectTwo(Expense).tap(e => expense = e[1]));
+                  beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[1]));
 
                   it('THEN does not call PayPal pay', () => expect(payStub.called).to.be.false);
 
@@ -817,7 +817,7 @@ describe('expenses.routes.test.js', () => {
 
                   it('THEN marks expense as paid', () => expect(expense.status).to.be.equal('PAID'));
 
-                  it('THEN creates transaction', () => expectTransactionCreated(expense, transaction));
+                  it('THEN creates transaction2', () => expectTransactionCreated(expense, transaction));
 
                   it('THEN creates a transaction paid activity', () =>
                     expectTransactionPaidActivity(group, host, transaction)
@@ -876,7 +876,7 @@ describe('expenses.routes.test.js', () => {
   function expectTwo(model) {
     return model.findAndCountAll()
       .tap(entities => expect(entities.count).to.be.equal(2))
-      .then(entities => entities.rows[1]);
+      .then(entities => entities.rows);
   }
 
   function expectExpenseActivity(type, expenseId) {

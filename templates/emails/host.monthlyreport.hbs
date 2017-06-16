@@ -1,0 +1,129 @@
+Subject: {{{capitalize host.name}}} host {{month}} Report
+
+{{> header}}
+
+<style>
+.counter {
+  font-size: 36px;
+  color: #7FADF2;
+}
+.delta {
+  color: #7A7B82;
+}
+.reimbursed {
+  color: #7A7B82;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #7A7B82;
+  vertical-align: top;
+}
+.muted {
+  color: #555;
+  font-size: 12px;
+}
+.DONATION {
+  color: #66C71A;
+}
+.EXPENSE {
+  color: red;
+}
+.small-table th, .small-table td {
+  font-size: 12px;
+}
+</style>
+
+<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  Collectives: {{stats.totalCollectives}} ({{stats.totalActiveCollectives}} active) //
+  Backers: {{stats.backers.total}} (+{{stats.backers.new}}{{#if stats.backers.lost}}, -{{stats.backers.lost}}{{/if}}) //  
+  Balance: {{{currency stats.balance.totalInHostCurrency currency=host.currency}}} ({{{currency stats.delta.totalInHostCurrency currency=host.currency sign=true}}}) //       
+  Host fees: {{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}} //  
+</div>
+
+<div>
+<p>Hi {{recipient.firstName}}!</p>
+<p>Here are your monthly stats:</p>
+
+<center>
+<table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
+  <tr>
+    <td align="center"><span class="counter">{{{currency stats.balance.totalInHostCurrency currency=host.currency}}}</span></td>
+    <td width=200>&nbsp;</td>
+    <td align="center"><span class="counter">{{stats.backers.total}}</span></td>
+  </tr>
+  <tr>
+    <td align="center" nowrap><span class="label">current balance</span></td>
+    <td></td>
+    <td align="center" nowrap><span class="label">total backers</span></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <span class="positive">(+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}})</span><br />
+      <span class="negative">&nbsp;{{#if stats.totalPaidExpenses.totalInHostCurrency}}({{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}){{/if}}&nbsp;</span>
+    </td>
+    <td></td>
+    <td align="center">
+      <span class="positive">(+{{stats.backers.new}})</span><br />
+      <span class="negative">&nbsp;{{#if stats.backers.lost}}(-{{host.stats.backers.lost}}){{/if}}&nbsp;</span>
+    </td>
+  </tr>
+</table>
+</center>
+
+<h2>Details for the month</h2>
+<table border=0 width="100%">
+  <tr><td>Number of collectives:</td><td></td><td>{{stats.totalCollectives}} ({{stats.totalActiveCollectives}} active)</td></tr>
+  <tr><td>Total donations:</td><td></td><td>{{{currency stats.totalDonations.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Payment processor fees:</td><td></td><td>-{{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Stripe, PayPal)</td></tr>
+  <tr><td>Platform fees:</td><td></td><td>-{{{currency stats.platformFees.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Open Collective)</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Total amount received:</td><td></td><td>{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Total amount transferred to your {{host.name}} bank account)</td></tr>
+  <tr><td>Host fees:</td><td></td><td>-{{{currency stats.totalHostFees.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Total commission for {{host.name}})</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Net amount:</td><td></td><td>{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td colspan=3 class="muted">(Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Total expenses paid:</td><td></td><td>{{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
+</table>
+
+
+<h2>🗒 {{transactions.length}} transactions</h2>
+<table width="100%" border=0 class="small-table">
+  <tr>
+    <th>date</th>
+    <th>collective</th>
+    <th>amount</th>
+    <th>net amount*</th>
+    <th>description</th>
+  </tr>
+{{#each transactions}}
+  <tr>
+    <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{{moment createdAt format="MM/DD"}}}</a></td>
+    <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if note}}**{{/if}}</td>    
+    <td valign="top" width="100%">{{description}}</td>
+  </tr>
+{{else}}
+  No expense submitted. 
+{{/each}}
+</table>
+
+<p class="muted">
+  * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
+  {{#if note}}<br />** {{note}}{{/if}}
+</p>
+
+<h2>🗣 Feedback</h2>
+As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
+
+</div>
+
+{{> footer}}

@@ -29,7 +29,7 @@ const render = (template, data) => {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
-  const slug = data.group && data.group.slug || data.recipient && data.recipient.username;
+  const slug = data.group && data.group.slug || data.recipient && data.recipient.username || data.recipient && data.recipient.substr(0, data.recipient.indexOf('@'));
 
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
@@ -134,10 +134,11 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       const from = options.from || config.email.from;
       const bcc = options.bcc;
       const text = options.text;
+      const attachments = options.attachments;
       const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
 
-      mailgun.sendMail({ from, to, bcc, subject, text, html, headers }, (err, info) => {
+      mailgun.sendMail({ from, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           return reject(err);
         } else {
@@ -155,7 +156,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Get the label to unsubscribe from the email notification
  * Shown in the footer of the email following "To unsubscribe from "
  */
-const getNotificationLabel = (template, recipient) => {
+const getNotificationLabel = (template, recipient = '') => {
 
   template = template.replace('.text', '');
 
@@ -165,6 +166,7 @@ const getNotificationLabel = (template, recipient) => {
     'group.donation.created': 'notifications of new donations for this collective',
     'group.expense.created': 'notifications of new expenses submitted to this collective',
     'group.monthlyreport': 'monthly reports for collectives',
+    'host.monthlyreport': 'monthly reports for host',
     'group.transaction.created': 'notifications of new transactions for this collective',
     'user.monthlyreport': 'monthly reports for backers',
     'user.yearlyreport': 'yearly reports'
@@ -230,7 +232,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   data.utm = `utm_source=opencollective&utm_campaign=${template}&utm_medium=email`;
 
   if (!templates[template]) {
-    return Promise.reject(new Error("Invalid email template"));
+    return Promise.reject(new Error(`Invalid email template: ${template}`));
   }
   return Promise.resolve(render(template, data));
 };

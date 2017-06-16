@@ -27,6 +27,9 @@ const templateNames = [
   'group.donation.created',
   'group.monthlyreport',
   'group.monthlyreport.text',
+  'host.monthlyreport',
+  'host.monthlyreport.text',
+  'host.monthlyreport.summary',
   'subscription.canceled',
   'ticket.confirmed',
   'ticket.confirmed.sustainoss',
@@ -78,6 +81,25 @@ handlebars.registerHelper('toLowerCase', (str) => {
   return str.toLowerCase();
 });
 
+const col = (str, size, trim = true) => {
+  if (str.length >= size) {
+    if (str.match(/[0-9]\.00$/)) {
+      return col(str.replace(/\.00$/,''), size, trim);
+    }
+    return (trim) ? `${str.substr(0, size-1)}…` : str;
+  }
+  while (str.length < size) {
+    str +=' ';
+  }
+  return str;
+}
+
+handlebars.registerHelper('col', (str, props) => {
+  if (!str || !props) return str;
+  const size = props.hash.size;
+  return col(str, size);
+});
+
 handlebars.registerHelper('json', (obj) => {
   if (!obj) return '';
   return JSON.stringify(obj);
@@ -92,16 +114,34 @@ handlebars.registerHelper('moment', (value, props) => {
 });
 
 handlebars.registerHelper('currency', (value, props) => {
-  const { currency, precision } = props.hash;
-  if (!currency) return value / 100;
-  value = value/100; // converting cents
+  const { currency, precision, size, sign } = props.hash;
 
-  return value.toLocaleString(currency, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits : precision || 0,
-    maximumFractionDigits : precision || 0
-  });
+  if (isNaN(value)) return "";
+
+  let res = function() {
+    if (!currency) return value / 100;
+    value = value/100; // converting cents
+
+    return value.toLocaleString(currency, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits : precision || 0,
+      maximumFractionDigits : precision || 0
+    });
+  }();
+
+  if (sign && value > 0) {
+    res = `+${res}`;
+  }
+  // If we are limited in space, no need to show the trailing .00
+  if (size && precision == 2) {
+    res = res.replace(/\.00$/, '');
+  }
+  if (size) {
+    res = col(`${res}`, size, false);
+  }
+
+  return res;
 });
 
 handlebars.registerHelper('resizeImage', (imageUrl, props) => resizeImage(imageUrl, props.hash));

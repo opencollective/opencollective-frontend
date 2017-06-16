@@ -117,6 +117,7 @@ export function setupModels(client) {
   m.Transaction.belongsTo(m.Group);
   m.Group.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User);
+  m.Transaction.belongsTo(m.User, { as: 'Host' });
   m.User.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.PaymentMethod);
   m.PaymentMethod.hasMany(m.Transaction);

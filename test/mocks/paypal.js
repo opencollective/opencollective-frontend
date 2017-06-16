@@ -23,6 +23,9 @@ export default {
           "code":"USD",
           "amount":"3.78"
         },
+        "currencyConversion": {
+          "exchangeRate": "0.9115770282588879"
+        },
         "charge": [{
           "charge":{"code":"USD","amount":"120.00"},
           "fundingSource":{"type":"BALANCE"}

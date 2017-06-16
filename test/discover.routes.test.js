@@ -12,13 +12,16 @@ const application = utils.data('application');
 
 describe('discover', () => {
 
-  let group1, group2, paymentMethod1;
+  let user, group1, group2, paymentMethod1;
 
   beforeEach(() => utils.resetTestDB());
   beforeEach(() => models.PaymentMethod.create(paymentMethodData1).tap(pm => paymentMethod1 = pm));
+  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
   beforeEach(() => models.Group.create(groupData1).tap(g => group1 = g));
   beforeEach(() => models.Group.create(groupData2).tap(g => group2 = g));
   beforeEach((done) => {
+    transactionsData[8].UserId = user.id;
+    transactionsData[8].HostId = user.id;
     transactionsData[8].GroupId = group1.id;
     transactionsData[8].PaymentMethodId = paymentMethod1.id;
     models.Transaction.create(transactionsData[8]).tap(() => done()).catch(done);

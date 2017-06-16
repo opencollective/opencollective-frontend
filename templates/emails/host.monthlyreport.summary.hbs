@@ -1,0 +1,97 @@
+Subject: Platform {{month}} Report
+
+{{> header}}
+
+<style>
+.counter {
+  font-size: 36px;
+  color: #7FADF2;
+}
+.delta {
+  color: #7A7B82;
+}
+.reimbursed {
+  color: #7A7B82;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #7A7B82;
+  vertical-align: top;
+}
+.muted {
+  color: #555;
+  font-size: 12px;
+}
+.DONATION {
+  color: #66C71A;
+}
+.EXPENSE {
+  color: red;
+}
+.small-table th, .small-table td {
+  font-size: 12px;
+}
+td p.muted {
+  margin: 0;
+}
+</style>
+
+<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  Hosts: {{totalHosts}} ({{totalActiveHosts}} active) //
+  Collectives: {{totalCollectives}} ({{totalActiveCollectives}} active) //
+  Transactions: {{totalTransactions}} //
+  Donations: {{{currency platformStats.totalDonations.totalInHostCurrency currency='USD'}}} //  
+  Paid expenses: {{{currency platformStats.totalPaidExpenses.totalInHostCurrency currency='USD'}}} //
+  Host fees: {{{currency stats.totalHostFees.totalInHostCurrency currency='USD'}}} //  
+</div>
+
+<table>
+  <tr><td>Hosts:</td><td width=20></td><td>{{totalHosts}} ({{totalActiveHosts}} active)</td></tr>
+  <tr><td>Collectives:</td><td></td><td>{{totalCollectives}} ({{totalActiveCollectives}} active)</td></tr>
+  <tr><td>Backers:</td><td></td><td>{{platformStats.backers.total}} ({{platformStats.backers.new}} new, {{platformStats.backers.repeat}} repeat)</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Transactions:</td><td></td><td>{{totalTransactions}}</td></tr>
+  <tr><td>Donations:</td><td></td><td>{{{currency platformStats.totalDonations.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Paid Expenses:</td><td></td><td>{{{currency platformStats.totalPaidExpenses.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Hosts fees:</td><td></td><td>{{{currency platformStats.totalHostFees.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Payment Processor Fees:</td><td></td><td>{{{currency platformStats.totalPaymentProcessorFees.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Platform fees:</td><td></td><td>{{{currency platformStats.totalPlatformFees.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Total Hosts Balance:</td><td></td><td>{{{currency platformStats.totalHostBalance.totalInHostCurrency currency='USD'}}}</td></tr>
+</table>
+
+<br /><br />
+<hr />
+<br /><br />
+
+<table class="small-table">
+  <tr>
+    <td></td>
+    <th>balance</th>
+    <th>collectives<br />(active)</th>
+    <th>backers<br />(new/repeat)</th>
+    <th>donations</th>
+    <th>paid<br />expenses</th>
+  </tr>
+{{#each hosts}}
+<tr>
+  <td>{{host.username}}</td>
+  <td align="center">{{{currency stats.balance.totalInHostCurrency currency=host.currency}}}</td>
+  <td align="center">{{stats.totalCollectives}}<br /><p class="muted">({{stats.totalActiveCollectives}})</p></td>
+  <td align="center">{{stats.backers.total}}<br /><p class="muted">({{stats.backers.new}}/{{stats.backers.repeat}})</p></td>
+  <td align="center">{{{currency stats.totalDonations.totalInHostCurrency currency=host.currency sign=true}}}</td>
+  <td align="center">{{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
+</tr>
+{{/each}}
+</table>
+
+<br /><br />
+<hr />
+<br /><br />
+
+<p class="muted">Time elapsed: {{timeLapsed}}s</p>
+
+{{> footer}}
