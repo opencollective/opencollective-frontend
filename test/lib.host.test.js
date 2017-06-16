@@ -1,7 +1,10 @@
+import sinon from 'sinon';
 import { expect } from 'chai';
 import * as utils from '../test/utils';
 
 import * as hostlib from '../server/lib/hostlib';
+import * as currencyLib from '../server/lib/currency';
+
 
 describe('hostlib', () => {
   
@@ -14,6 +17,18 @@ describe('hostlib', () => {
     GroupId: { $in: groupids },
     createdAt: { $gte: startDate, $lt: endDate}
   };
+
+  let sandbox;
+
+  before(() => {
+    sandbox = sinon.sandbox.create();
+    sandbox.stub(currencyLib, 'convertToCurrency', (amount, fromCurrency, toCurrency, date) => {
+      if (fromCurrency === toCurrency) return Promise.resolve(amount);
+      return Promise.resolve(0.75779 * amount)
+    });
+  });
+
+  after(() => sandbox.restore());
 
   before(() => utils.loadDB("wwcode_test"));
 
