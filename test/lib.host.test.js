@@ -22,7 +22,7 @@ describe('hostlib', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
-    sandbox.stub(currencyLib, 'convertToCurrency', (amount, fromCurrency, toCurrency, date) => {
+    sandbox.stub(currencyLib, 'convertToCurrency', (amount, fromCurrency, toCurrency) => {
       if (fromCurrency === toCurrency) return Promise.resolve(amount);
       return Promise.resolve(0.75779 * amount)
     });
