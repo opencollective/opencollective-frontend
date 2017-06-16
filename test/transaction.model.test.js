@@ -65,6 +65,7 @@ describe('transaction model', () => {
       Transaction.findAll()
       .then(transactions => {
         expect(transactions.length).to.equal(1);
+        expect(transactions[0].description).to.equal(transactionsData[7].description);
         done();
       })
     })
