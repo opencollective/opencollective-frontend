@@ -14,16 +14,21 @@ export function getHostedGroups(hostid) {
   });
 }
 
-export function getBackersStats(groupids, startDate = new Date('2015-01-01'), endDate = new Date) {
+export function getBackersStats(startDate = new Date('2015-01-01'), endDate = new Date, groupids) {
 
   const getBackersIds = (startDate, endDate) => {
+    const where = {
+        type: 'DONATION',
+        createdAt: { $gte: startDate, $lt: endDate }
+      };
+
+    if (groupids) {
+      where.GroupId = { $in: groupids };
+    }
+
     return models.Transaction.findAll({
       attributes: [ [sequelize.fn('DISTINCT', sequelize.col('UserId')), 'userid'] ],
-      where: {
-        type: 'DONATION',
-        GroupId: { $in: groupids },
-        createdAt: { $gte: startDate, $lt: endDate }
-      }
+      where
     })
     .then(rows => rows.map(r => r.dataValues.userid))
     ;

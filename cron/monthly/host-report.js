@@ -33,13 +33,22 @@ console.log("startDate", startDate,"endDate", endDate);
 
 const debug = debugLib('monthlyreport');
 
+const summary = {
+  totalHosts: 0,
+  totalActiveHosts: 0,
+  totalCollectives: 0,
+  totalActiveCollectives: 0,
+  totalTransactions: 0,
+  hosts: []
+};
+
 const init = () => {
 
   const startTime = new Date;
 
   let previewCondition = '';
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    previewCondition = "AND u.username IN ('adminwwc', 'host-org')";
+    previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
 
   const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName" FROM "Users" u LEFT JOIN "UserGroups" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
 
@@ -51,11 +60,51 @@ const init = () => {
       console.log(`Preparing the ${month} report for ${hosts.length} hosts`);
   })
   .then(hosts => Promise.map(hosts, processHost))
-  .then(() => {
-    const timeLapsed = Math.round((new Date - startTime)/1000);
+  .then(() => getPlatformStats())
+  .then(platformStats => {
+    const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
     console.log(`Total run time: ${timeLapsed}s`);
-    process.exit(0)
+    summary.timeLapsed = timeLapsed;
+    summary.month = month;
+    summary.platformStats = {
+      totalHostBalance: platformStats[0],
+      deltaHostBalance: platformStats[1],
+      totalDonations: platformStats[2],
+      totalNetAmountReceived: platformStats[3],
+      totalPaidExpenses: platformStats[4],
+      totalHostFees: platformStats[5],
+      totalPaymentProcessorFees: platformStats[6],
+      totalPlatformFees: platformStats[7],
+      backers: platformStats[8]
+    };
+    summary.hosts.sort((a, b) => {
+      return b.stats.backers.new - a.stats.backers.new;
+    });
+    return emailLib.send('host.monthlyreport.summary', 'info@opencollective.com', summary);
+  })
+  .then(() => {
+    process.exit(0);
   });
+}
+
+
+const getPlatformStats = () => {
+
+  const dateRange = {
+    createdAt: { $gte: startDate, $lt: endDate }
+  };
+
+  return Promise.all([
+    sumTransactions('netAmountInGroupCurrency', {}, 'USD'),                      // total host balance
+    sumTransactions('netAmountInGroupCurrency', { ...dateRange}, 'USD'),   // delta host balance last month
+    sumTransactions('amount', { type: 'DONATION', ...dateRange}, 'USD'), // total donations last month
+    sumTransactions('netAmountInGroupCurrency', { type: 'DONATION', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
+    sumTransactions('netAmountInGroupCurrency', { type: 'EXPENSE', ...dateRange}, 'USD'),  // total net amount paid out last month
+    sumTransactions("hostFeeInTxnCurrency", dateRange, 'USD'),
+    sumTransactions("paymentProcessorFeeInTxnCurrency", dateRange, 'USD'),
+    sumTransactions("platformFeeInTxnCurrency", dateRange, 'USD'),
+    getBackersStats(startDate, endDate)
+  ]);
 }
 
 const getHostStats = (host, groupids) => {
@@ -77,11 +126,13 @@ const getHostStats = (host, groupids) => {
     sumTransactions("hostFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("paymentProcessorFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("platformFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
-    getBackersStats(groupids, startDate, endDate)
+    getBackersStats(startDate, endDate, groupids)
   ]);
 }
 
 const processHost = (host) => {
+
+  summary.totalHosts++;
 
   const data = {};
   let groupsById = {}, attachment;
@@ -116,6 +167,11 @@ const processHost = (host) => {
   return getHostedGroups(host.id)
     .tap(groups => groupsById = _.indexBy(groups, "id"))
     .then(() => getTransactions(Object.keys(groupsById), startDate, endDate))
+    .tap(transactions => {
+      if (!transactions || transactions.length == 0) {
+        throw new Error(`No transaction found`);
+      }
+    })
     .then(transactions => Promise.map(transactions, processTransaction))
     .tap(transactions => {
 
@@ -142,23 +198,34 @@ const processHost = (host) => {
     .then(stats => {
       data.stats = {
         totalCollectives: Object.keys(groupsById).length,
+        totalActiveCollectives: Object.keys(_.indexBy(data.transactions, "GroupId")).length,
+        totalTransactions: data.transactions.length,
         balance: stats[0],
         delta: stats[1],
-        totalNewDonations: stats[2],
+        totalDonations: stats[2],
         totalNetAmountReceivedForCollectives: stats[3],
-        totalNewExpenses: stats[4],
-        totalNewHostFees: stats[5],
+        totalPaidExpenses: stats[4],
+        totalHostFees: stats[5],
         paymentProcessorFees: stats[6],
         platformFees: stats[7],
         backers: stats[8]
       };
       data.stats.totalNetAmountReceived = {
-        totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalNewHostFees.totalInHostCurrency
+        totalInHostCurrency: data.stats.totalNetAmountReceivedForCollectives.totalInHostCurrency + data.stats.totalHostFees.totalInHostCurrency
       };
+      summary.hosts.push({
+        host: { name: host.name, username: host.username, currency: host.currency },
+        stats: data.stats
+      });
+      summary.totalActiveHosts++;
+      summary.totalCollectives += data.stats.totalCollectives;
+      summary.totalActiveCollectives += data.stats.totalActiveCollectives;
+      summary.totalTransactions += data.stats.totalTransactions;
     })
     .then(() => sendEmail(host, data, attachment))
     .catch(e => {
-      console.error("Error in processing host", host.username, e);
+      console.error(`Error in processing host ${host.username}:`, e.message);
+      debug(e);
     });
 };
 
