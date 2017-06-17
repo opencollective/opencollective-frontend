@@ -2,7 +2,7 @@
 
 // Only run on the first of the month
 const today = new Date();
-if (process.env.NODE_ENV === 'production' && today.getDate() !== 3) {
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
   console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
@@ -47,7 +47,6 @@ const init = () => {
       type: 'user.monthlyreport',
       active: true
     },
-    offset: 326, // TO REMOVE (only 326 emails where sent at first try)
     include: [{ model: User, where }]
   };
 
