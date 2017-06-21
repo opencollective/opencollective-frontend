@@ -26,15 +26,9 @@ describe('Query Tests', () => {
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
-
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
 
   beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
-
-  beforeEach(() => models.Group.create(utils.data('group4')).tap(g => group3 = g));
 
   beforeEach(() => group1.addUserWithRole(user1, 'BACKER'));
   beforeEach(() => group2.addUserWithRole(user1, 'MEMBER'));
