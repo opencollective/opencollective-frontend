@@ -262,7 +262,7 @@ export default function(Sequelize, DataTypes) {
 
       getRoleForUser(user) {
         if (!user) return null;
-        return models.UserGroup.findOne({ UserId: user.id}).then(ug => ug.role);
+        return models.UserGroup.findOne({ UserId: user.id, GroupId: this.id }).then(ug => ug.role);
       },
 
       getSuperCollectiveGroupsIds() {
