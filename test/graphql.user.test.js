@@ -8,7 +8,7 @@ import models from '../server/models';
 
 
 describe('Query Tests', () => {
-  let user1, user2, user3, group1, group2, group3;
+  let user1, group1, group2;
 
   /* SETUP
     group1: 2 events
