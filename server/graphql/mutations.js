@@ -42,8 +42,7 @@ const mutations = {
         ...args.event,
         locationName: location.name,
         address: location.address,
-        geoLocationLatLong: {type: 'Point', coordinates: [location.lat, location.long]},
-        GroupId: group.id
+        geoLocationLatLong: {type: 'Point', coordinates: [location.lat, location.long]}
       };
 
       if (!req.remoteUser) {
@@ -53,6 +52,7 @@ const mutations = {
       .then(g => {
         if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
         group = g;
+        eventData.GroupId = group.id;
         return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
       })
       .then(canCreateEvent => {
