@@ -105,7 +105,7 @@ describe('lib.payments.processPayment.test.js', () => {
         .catch(err => expect(err).to.not.exist);
       });
 
-      it('creates a transaction', () => {
+      it('creates a transaction1', () => {
         return models.Transaction.findAll()
         .then(transactions => {
           expect(transactions.length).to.equal(1);

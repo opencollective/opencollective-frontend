@@ -46,7 +46,8 @@ describe('Group model', () => {
     currency: 'USD',
     type: 'expense',
     description: 'pizza',
-    tags: ['food']
+    tags: ['food'],
+    UserId: 1
   },{
     createdAt: new Date('2016-07-14'),
     amount: -150,
@@ -54,7 +55,8 @@ describe('Group model', () => {
     currency: 'USD',
     type: 'expense',
     description: 'stickers',
-    tags: ['marketing']
+    tags: ['marketing'],
+    UserId: 1
   },{
     createdAt: new Date('2016-06-15'),
     amount: 250,
@@ -89,7 +91,7 @@ describe('Group model', () => {
     .then(g => group = g)
     .then(() => User.createMany(users))
     .then(() => group.addUserWithRole({ id: 1 }, 'BACKER'))
-    .then(() => Transaction.createMany(transactions, { GroupId: group.id })));
+    .then(() => Transaction.createMany(transactions, { GroupId: group.id, HostId: 1 })));
 
   it('returns a default logo if no logo', () => {
     expect(group.logo).to.contain('/public/images/1px.png');
