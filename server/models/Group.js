@@ -260,6 +260,11 @@ export default function(Sequelize, DataTypes) {
         .then(results => results[0].map(user => results[1] ? user.info : user.public))
       },
 
+      getRoleForUser(user) {
+        if (!user) return null;
+        return models.UserGroup.findOne({ UserId: user.id, GroupId: this.id }).then(ug => ug.role);
+      },
+
       getSuperCollectiveGroupsIds() {
         if (!this.isSupercollective) return Promise.resolve([this.id]);
         if (this.superCollectiveGroupsIds) return Promise.resolve(this.superCollectiveGroupsIds);

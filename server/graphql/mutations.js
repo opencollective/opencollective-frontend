@@ -4,6 +4,8 @@ import emailLib from '../lib/email';
 import responseStatus from '../constants/response_status';
 import Promise from 'bluebird';
 import { difference } from 'lodash';
+import { hasRole } from '../lib/auth';
+import errors from '../lib/errors';
 
 import {
   GraphQLNonNull,
@@ -31,15 +33,32 @@ const mutations = {
     args: {
       event: { type: new GraphQLNonNull(EventInputType) }
     },
-    resolve(_, args) {
-      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
-      .tap(group => {
-        if (!group) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
-      })
-      .then((group) => models.Event.create({
+    resolve(_, args, req) {
+      let group;
+
+      const location = args.event.location;
+
+      const eventData = {
         ...args.event,
-        GroupId: group.id
-      }))
+        locationName: location.name,
+        address: location.address,
+        geoLocationLatLong: {type: 'Point', coordinates: [location.lat, location.long]}
+      };
+
+      if (!req.remoteUser) {
+        return Promise.reject(new errors.Unauthorized("You need to be logged in to create an event"));
+      }
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      .then(g => {
+        if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
+        group = g;
+        eventData.GroupId = group.id;
+        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
+      })
+      .then(canCreateEvent => {
+        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event"));
+      })
+      .then(() => models.Event.create(eventData))
       .tap(event => {
         if (args.event.tiers) {
           return models.Tier.createMany(args.event.tiers, { EventId: event.id })
@@ -64,15 +83,39 @@ const mutations = {
     args: {
       event: { type: EventInputType }
     },
-    resolve(_, args) {
-      let event;
-      return models.Event.findById(args.event.id)
+    resolve(_, args, req) {
+
+      const location = args.event.location;
+
+      const updatedEventData = {
+        ...args.event,
+        locationName: location.name,
+        address: location.address
+      };
+      if (location.lat) {
+        updatedEventData.geoLocationLatLong = {type: 'Point', coordinates: [location.lat, location.long]};
+      }
+
+      let group, event;
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You need to be logged in to edit an event");
+      }
+      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      .then(g => {
+        if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
+        group = g;
+        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
+      })
+      .then(canEditEvent => {
+        if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
+      })
+      .then(() => models.Event.findById(args.event.id))
       .then(ev => {
         if (!ev) throw new Error(`Event with id ${args.event.id} not found`);
         event = ev;
         return event;
       })
-      .then(event => event.update(args.event))
+      .then(event => event.update(updatedEventData))
       .then(event => event.getTiers())
       .then(tiers => {
         if (args.event.tiers) {

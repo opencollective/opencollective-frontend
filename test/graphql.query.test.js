@@ -255,11 +255,13 @@ describe('Query Tests', () => {
                 id,
                 name,
                 description,
-                locationName,
-                address,
+                location {
+                  name,
+                  address,
+                  lat,
+                  long
+                },
                 backgroundImage,
-                lat,
-                long,
                 createdByUser {
                   id,
                   name
@@ -292,11 +294,13 @@ describe('Query Tests', () => {
                   "id": 2,
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
-                  "address": "505 Broadway, NY 10012",
                   "backgroundImage": null,
-                  "locationName": "Puck Fair",
-                  "lat": null,
-                  "long": null,
+                  "location": {
+                    "name": "Puck Fair",
+                    "address": "505 Broadway, NY 10012",
+                    "lat": null,
+                    "long": null
+                  },
                   "createdByUser": {
                     "id": 1,
                     "name": "Phil Mod"
@@ -316,11 +320,13 @@ describe('Query Tests', () => {
                   id: 1,
                   name: "January meetup",
                   "description":"January monthly meetup",
-                  "locationName": "Balanced NYC",
-                  "address": "547 Broadway, NY 10012",
+                  "location" : {
+                    "name": "Balanced NYC",
+                    "address": "547 Broadway, NY 10012",
+                    "lat": 39.807222,
+                    "long": -76.984722
+                  },
                   "backgroundImage": "http://opencollective.com/backgroundimage.png",
-                  "lat": 39.807222,
-                  "long": -76.984722,
                   "createdByUser": {
                     "id":1,
                     "name":"Phil Mod"

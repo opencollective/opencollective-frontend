@@ -1,5 +1,6 @@
 import {
   GraphQLInt,
+  GraphQLFloat,
   GraphQLList,
   GraphQLInputObjectType,
   GraphQLNonNull,
@@ -80,13 +81,23 @@ export const EventAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-    locationName: { type: GraphQLString },
-    address: { type: GraphQLString },
+    location: { type: LocationInputType },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
     maxAmount: { type: GraphQLInt },
     currency: { type: GraphQLString}
+  })
+});
+
+export const LocationInputType = new GraphQLInputObjectType({
+  name: 'LocationInputType',
+  description: 'Input type for Location',
+  fields: () => ({
+    name: { type: GraphQLString },
+    address: { type: GraphQLString },
+    lat: { type: GraphQLFloat },
+    long: { type: GraphQLFloat }
   })
 });
 
@@ -98,9 +109,7 @@ export const EventInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     name: { type: new GraphQLNonNull(GraphQLString) },
     description: { type: new GraphQLNonNull(GraphQLString) },
-    locationName: { type: GraphQLString },
-    address: { type: GraphQLString },
-    geoLocationLatLong: { type: GraphQLString },
+    location: { type: LocationInputType},
     startsAt: { type: new GraphQLNonNull(GraphQLString) },
     endsAt: { type: GraphQLString },
     timezone: { type: GraphQLString },
