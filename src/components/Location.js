@@ -6,20 +6,22 @@ import colors from '../constants/colors';
 class Location extends React.Component {
 
   static propTypes = {
-    location: PropTypes.string,
-    address: PropTypes.string,
-    lat: PropTypes.number,
-    long: PropTypes.number
+    location: PropTypes.object,
+    showTitle: PropTypes.bool
+  }
+
+  static defaultProps = {
+    showTitle: true
   }
 
   render() {
 
     const {
-      location,
+      name,
       address,
       lat,
       long
-    } = this.props;
+    } = this.props.location;
 
     return (
       <section id="location" className="location">
@@ -40,13 +42,13 @@ class Location extends React.Component {
         }
         `}</style>
         <div className="description">
-          <h1>Location</h1>
-          <div className="name">{location}</div>
+          {this.props.showTitle && <h1>Location</h1>}
+          <div className="name">{name}</div>
           <div className="address" style={{color: colors.darkgray}}><a href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank">{address}</a></div>
         </div>
         { lat && long &&
           <div className="map">
-            <Map lat={lat} lng={long} />
+            <Map lat={lat} long={long} />
           </div>
         }
       </section>

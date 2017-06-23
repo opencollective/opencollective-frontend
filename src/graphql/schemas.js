@@ -1,5 +1,6 @@
-export default `
+import gql from 'graphql-tag'
 
+export default gql`
 type User {
   id: Int!
   email: String!
@@ -11,6 +12,13 @@ type Collective {
   id: Int!
   slug: String!
   name: String
+}
+
+type Location {
+  name: String
+  address: String
+  lat: Float
+  long: Float
 }
 
 type Tier {
@@ -47,10 +55,7 @@ type Event {
   backgroundImage: String
   createdByUser: User
   collective: Collective
-  location: String
-  address: String
-  lat: Float
-  long: Float
+  location: Location
   startsAt: String
   endsAt: String
   maxAmount: Int
@@ -58,6 +63,4 @@ type Event {
   currency: String
   tiers: [Tier]
   responses: [Response]
-}
-
-`;
+}`;

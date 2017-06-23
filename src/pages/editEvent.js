@@ -1,12 +1,10 @@
 import withData from '../lib/withData'
 import React from 'react'
 import { addEventData, addGetLoggedInUserFunction } from '../graphql/queries';
-
 import NotFound from '../components/NotFound';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
-import Event from '../components/Event';
+import EditEvent from '../components/EditEvent';
 import { IntlProvider, addLocaleData } from 'react-intl';
+
 import 'intl';
 import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 import en from 'react-intl/locale-data/en';
@@ -21,7 +19,7 @@ addLocaleData({
     parentLocale: 'en',
 });
 
-class EventPage extends React.Component {
+class EditEventPage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -47,22 +45,18 @@ class EventPage extends React.Component {
   render() {
     const { data } = this.props;
 
-    if (data.loading) return (<Loading />);
-    if (!data.Event) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+    if (!data.loading && !data.Event) {
+      return (<NotFound />)
     }
 
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <Event event={data.Event} LoggedInUser={this.state.LoggedInUser} />
+          <EditEvent event={data.Event} LoggedInUser={this.state.LoggedInUser} />
         </div>
       </IntlProvider>
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addEventData(EventPage)));
+export default withData(addGetLoggedInUserFunction(addEventData(EditEventPage)));

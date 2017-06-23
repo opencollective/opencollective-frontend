@@ -6,7 +6,7 @@
     "node": "7.7.4"
   },
   "dependencies": {
-    "apollo-client": "0.8.6",
+    "apollo-client": "1.3.0",
     "autoprefixer": "6.7.6",
     "babel-cli": "6.23.0",
     "babel-eslint": "7.1.1",
@@ -34,6 +34,7 @@
     "lodash": "4.17.2",
     "markdown-in-js": "1.1.3",
     "markdown-loader": "2.0.0",
+    "moment-timezone": "^0.5.13",
     "net": "1.0.2",
     "next": "2.1.1",
     "next-routes": "1.0.24",
@@ -46,8 +47,10 @@
     "raw-loader": "0.5.1",
     "react": "15.5.4",
     "react-add-to-calendar": "0.0.9",
-    "react-apollo": "0.11.1",
+    "react-apollo": "1.2.0",
+    "react-datetime": "2.8.10",
     "react-dom": "15.4.2",
+    "react-geosuggest": "2.1.0",
     "react-gmaps": "1.5.0",
     "react-intl": "2.2.3",
     "react-markdown": "2.4.4",

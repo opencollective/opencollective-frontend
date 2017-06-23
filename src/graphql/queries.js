@@ -1,6 +1,24 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
+export const getLoggedInUserQuery = gql`
+  query LoggedInUser {
+    LoggedInUser {
+      id,
+      username,
+      firstName,
+      lastName,
+      avatar,
+      collectives {
+        id,
+        slug,
+        name,
+        role
+      }
+    }
+  }
+`;
+
 const getEventQuery = gql`
   query Event($collectiveSlug: String!, $eventSlug: String!) {
     Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
@@ -11,10 +29,12 @@ const getEventQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      locationName,
-      address,
-      lat,
-      long,
+      location {
+        name,
+        address,
+        lat,
+        long
+      },
       tiers {
         id,
         name,
@@ -52,11 +72,9 @@ const getEventQuery = gql`
   }
 `;
 
-export const addEventData = graphql(getEventQuery);
-
 const getEventsQuery = gql`
-  query allEvents {
-    allEvents {
+  query allEvents($collectiveSlug: String) {
+    allEvents(collectiveSlug: $collectiveSlug) {
       id,
       slug,
       name,
@@ -64,8 +82,18 @@ const getEventsQuery = gql`
       startsAt,
       endsAt,
       timezone,
-      locationName,
-      address,
+      location {
+        name,
+        address,
+        lat,
+        long
+      },
+      tiers {
+        id,
+        name,
+        description,
+        amount
+      },
       collective {
         id,
         slug,
@@ -77,8 +105,6 @@ const getEventsQuery = gql`
     }
   }
 `;
-
-export const addEventsData = graphql(getEventsQuery);
 
 const getAttendeesQuery = gql`
   query Event($collectiveSlug: String!, $eventSlug: String!) {
@@ -109,4 +135,15 @@ const getAttendeesQuery = gql`
   }
 `;
 
+export const addEventData = graphql(getEventQuery);
+export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
+
+export const addGetLoggedInUserFunction = graphql(getLoggedInUserQuery, {
+  props: ({ data }) => ({
+    data,
+    getLoggedInUser: () => {
+      return data.refetch();
+    }
+  })
+});

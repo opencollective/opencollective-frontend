@@ -1,11 +1,83 @@
 import React from 'react';
+import TopBarProfileMenu from './TopBarProfileMenu';
 
 const logo = '/static/images/opencollective-icon.svg';
 
 class TopBar extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      showProfileMenu: false
+    };
+  }
+
+  componentDidMount() {
+    this.onClickOutsideRef = this.onClickOutside.bind(this);
+    document.addEventListener('click', this.onClickOutsideRef);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onClickOutsideRef);
+  }
+
+  onClickOutside() {
+    this.setState({showProfileMenu: false});
+  }
+
+  toggleProfileMenu(e) {
+    if (e.target.className.indexOf('LoginTopBarProfileButton') !== -1) {
+      this.setState({showProfileMenu: !this.state.showProfileMenu});
+      e.nativeEvent.stopImmediatePropagation();
+    }
+  }
+
+  onClickLogout(e) {
+    this.props.logout();
+    this.toggleProfileMenu(e);
+  }
+
+  onClickSubscriptions(e) {
+    this.props.pushState(null, '/subscriptions')
+    this.toggleProfileMenu(e);
+  }
+  
+  renderProfileMenu() {
+    const { LoggedInUser } = this.props;
+
+    return (
+      <div className='LoginTopBarProfileMenu' onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
+        <div>
+          <div className='LoginTopBarProfileMenuHeading'>
+            <span>collectives</span>
+            <div className='-dash'></div>
+          </div>
+          <ul>
+          {this.showCreateBtn && <li><a href='/create'>create a collective</a></li>}
+          <li><a href='/discover'>Discover</a></li>
+            <li><a href='#' onClick={this.onClickSubscriptions.bind(this)}>Subscriptions</a></li>
+          </ul>
+        </div>
+        <div>
+          <div className='LoginTopBarProfileMenuHeading'>
+            <span>my account</span>
+            <div className='-dash'></div>
+          </div>
+          <ul>
+            <li><a href={`/${LoggedInUser.username}`}>Profile</a></li>
+          </ul>
+          <ul>
+            <li><a className='-blue' href='#' onClick={this.onClickLogout.bind(this)}>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+
   render() {
-    const {className} = this.props;
+    const { className, LoggedInUser } = this.props;
+    const { showProfileMenu } = this.state;
+
     return (
       <div className={`${className} TopBar`}>
         <style jsx>{`
@@ -82,7 +154,8 @@ class TopBar extends React.Component {
             <li><a href="https://medium.com/open-collective">Blog</a></li>
           </ul>
           <div className="separator"></div>
-          <a href="/login?next=/">Login</a>
+          { !LoggedInUser && <a href="/login?next=/">Login</a> }
+          { LoggedInUser && <TopBarProfileMenu LoggedInUser={LoggedInUser} /> }
         </div>
       </div>
     )

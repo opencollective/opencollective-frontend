@@ -5,7 +5,6 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import EventHeader from '../components/EventHeader';
 import ActionBar from '../components/ActionBar';
-import NotFound from '../components/NotFound';
 import Location from '../components/Location';
 import HashLink from 'react-scrollchor';
 import Tier from '../components/Tier';
@@ -15,12 +14,9 @@ import InterestedForm from '../components/InterestedForm';
 import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
 import { filterCollection } from '../lib/utils';
-import { addEventData } from '../graphql/queries';
 import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniq } from 'underscore';
 
@@ -36,7 +32,7 @@ class Event extends React.Component {
 
   constructor(props) {
     super(props);
-    this.event = this.props.data.Event; // pre-loaded by SSR
+    this.event = this.props.event; // pre-loaded by SSR
     this.setInterested = this.setInterested.bind(this);
     this.updateResponse = this.updateResponse.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
@@ -124,6 +120,23 @@ class Event extends React.Component {
     this.setState({ modal: null });
   }
 
+  getDefaultActions(props) {
+    const { LoggedInUser } = props;
+    const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
+    if (LoggedInUser && LoggedInUser.canEditCollective) {
+      return [...this.defaultActions, {
+        className: 'whiteblue small',
+        component: <a href={editUrl}>EDIT</a>
+      }]
+    } else {
+      return this.defaultActions;
+    }
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({actions: this.getDefaultActions(props) });
+  }
+
   changeView(view) {
     let actions;
     switch (view) {
@@ -134,7 +147,7 @@ class Event extends React.Component {
         }];
         break;
       default:
-        actions = this.defaultActions;
+        actions = this.getDefaultActions();
         break;
     }
     this.setState({view, actions});
@@ -184,37 +197,21 @@ class Event extends React.Component {
   }
 
   render() {
-    const { Event, error, loading } = this.props.data;
-
-    if (loading) return (<Loading />);
-
-    this.event = Event;
-
     const responses = {};
-    responses.sponsors = filterCollection(Event.responses, { tier: { name: /sponsor/i }});
-    responses.guests = filterCollection(uniq(Event.responses, (r) => `${r.status}:${r.user.username}` ), { tier: { name: /sponsor/i }}, true);
+    responses.sponsors = filterCollection(this.event.responses, { tier: { name: /sponsor/i }});
+    responses.guests = filterCollection(uniq(this.event.responses, (r) => `${r.status}:${r.user.username}` ), { tier: { name: /sponsor/i }}, true);
     responses.going = filterCollection(responses.guests, {'status':'YES'});
     responses.interested = filterCollection(responses.guests, {'status':'INTERESTED'});
 
-    if ( error ) {
-      console.error("graphql error>>>", error.message);
-      return (<Error message="GraphQL error" />)
-    }
-
-    if (!loading && !this.props.data.Event) {
-      return (<NotFound />)
-    }
-
-
     const info = (
       <HashLink to="#location">
-        <FormattedDate value={Event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
-        <FormattedTime value={Event.startsAt} timeZone={Event.timezone} />&nbsp; - &nbsp;
-        {Event.locationName}
+        <FormattedDate value={this.event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+        <FormattedTime value={this.event.startsAt} timeZone={this.event.timezone} />&nbsp; - &nbsp;
+        {this.event.location.name}
       </HashLink>
     );
 
-    const backgroundImage = Event.backgroundImage || Event.collective.backgroundImage || defaultBackgroundImage;
+    const backgroundImage = this.event.backgroundImage || this.event.collective.backgroundImage || defaultBackgroundImage;
 
     return (
       <div>
@@ -232,7 +229,9 @@ class Event extends React.Component {
             description={this.event.description}
             twitterHandle={this.event.collective.twitterHandle}
             image={this.event.collective.logo || backgroundImage}
-            className={this.state.status} 
+            className={this.state.status}
+            LoggedInUser={this.props.LoggedInUser}
+            scripts={['stripe']}
             />
 
           <Body>
@@ -241,22 +240,18 @@ class Event extends React.Component {
 
               <NotificationBar status={this.state.status} error={this.state.error} />
 
-              {this.state.view === 'loading' && <Loading /> }
-
               {this.state.view === 'default' &&
                 <EventHeader
-                  logo={Event.collective.logo}
-                  title={Event.name}
+                  logo={this.event.collective.logo}
+                  title={this.event.name}
                   backgroundImage={backgroundImage}
                   />
               }
 
-              {this.state.view !== 'loading' &&
-                <ActionBar
-                  actions={this.state.actions}
-                  info={info}
-                  />
-              }
+              <ActionBar
+                actions={this.state.actions}
+                info={info}
+                />
 
               {this.state.showInterestedForm &&
                 <InterestedForm onSubmit={this.setInterested} />
@@ -268,7 +263,7 @@ class Event extends React.Component {
                   onSubmit={this.rsvp}
                   quantity={this.state.response.quantity}
                   stripePublishableKey={this.event.collective.stripePublishableKey}
-                  tier={this.state.response.tier || Event.tiers[0]}
+                  tier={this.state.response.tier || this.event.tiers[0]}
                   />
               }
 
@@ -276,11 +271,11 @@ class Event extends React.Component {
                 <div>
                   <div className="content" >
                     <div className="eventDescription" >
-                      <Markdown source={Event.description} />
+                      <Markdown source={this.event.description} />
                     </div>
 
                     <div id="tickets">
-                      {Event.tiers.map((tier) =>
+                      {this.event.tiers.map((tier) =>
                         <Tier
                           key={tier.id}
                           className="tier"
@@ -292,12 +287,7 @@ class Event extends React.Component {
                     </div>
                   </div>
 
-                  <Location
-                    location={Event.locationName}
-                    address={Event.address}
-                    lat={Event.lat}
-                    long={Event.long}
-                    />
+                  <Location location={this.event.location} />
 
                   { responses.guests.length >= 10 &&
                     <section id="responses">
@@ -338,6 +328,4 @@ class Event extends React.Component {
   }
 }
 
-const EventWithDataWithMutation = addCreateResponseMutation(addEventData(Event));
-
-export default EventWithDataWithMutation;
+export default addCreateResponseMutation(Event);

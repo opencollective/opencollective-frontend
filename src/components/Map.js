@@ -6,7 +6,7 @@ class Map extends React.Component {
 
   static propTypes = {
     lat: PropTypes.number,
-    lng: PropTypes.number,
+    long: PropTypes.number,
     address: PropTypes.string
   }
 
@@ -17,7 +17,7 @@ class Map extends React.Component {
   }
 
   render() {
-    const { lat, lng } = this.props;
+    const { lat, long } = this.props;
 
     return (
       <div style={{width: '100%', height: '100%' }}>
@@ -25,17 +25,17 @@ class Map extends React.Component {
           width={'100%'}
           height={'100%'}
           lat={lat}
-          lng={lng}
+          lng={long}
           zoom={16}
           loadingMessage={'Loading map'}
           params={{v: '3.exp', key: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI'}}
           onMapCreated={this.onMapCreated}>
           <Marker
             lat={lat}
-            lng={lng}
+            lng={long}
             draggable={false} />
         </Gmaps>
-        <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${lng}`} target="_blank"></a>
+        <a className="map-overlay" href={`http://maps.apple.com/?q=${lat},${long}`} target="_blank"></a>
       </div>
     );
   }

@@ -8,7 +8,7 @@ class Header extends React.Component {
 
   constructor(props) {
     super(props);
-    const { description, image, twitterHandle } = props;
+    const { description, image, twitterHandle, scripts } = props;
     const meta = {
       'twitter:site': 'opencollect',
       'twitter:creator': twitterHandle, 
@@ -16,6 +16,16 @@ class Header extends React.Component {
       'og:image': image,
       'description': truncate(description, 256)
     };
+
+    const scriptsUrls = {
+      stripe: "https://js.stripe.com/v2/",
+      google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
+    };
+
+    this.scripts = [];
+    if (scripts) {
+      scripts.map(script => this.scripts.push(scriptsUrls[script]));
+    }
 
     this.meta = [];
     for (const name in meta) {
@@ -37,7 +47,7 @@ class Header extends React.Component {
         <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" />
         <title>{title}</title>
         {this.meta.map(({name, content}) => <meta property={name} content={content} />)}
-        <script type="text/javascript" src="https://js.stripe.com/v2/" />
+        {this.scripts.map((script) => <script type="text/javascript" src={script} />)}
       </Head>
 
       <style jsx global>{`
@@ -189,13 +199,23 @@ class Header extends React.Component {
         margin: 40px auto;
       }
 
-      input[type=text] {
-        height: 42px;
+      label {
+        line-height: 4.2rem;
+        margin: 0.5rem 0;
+        vertical-align: top;
+      }
+
+      input[type=text], select, textarea {
+        height: 4.2rem;
         border: 1px solid rgba(48,50,51,0.2);
         border-radius: 5px;
         box-shadow: inset 0px 2px 0px rgba(0,0,0,0.05);
         padding: 5px;
         font-size: 1.8rem;
+      }
+
+      textarea {
+        height: 12.6rem;
       }
 
       button {
@@ -216,7 +236,7 @@ class Header extends React.Component {
 
       `}
       </style>
-      <TopBar className={className} />
+      <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
     </header>
     );
   }
