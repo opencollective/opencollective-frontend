@@ -1,6 +1,6 @@
 import withData from '../lib/withData'
 import React from 'react'
-import { addEventData } from '../graphql/queries';
+import { addEventData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import EditEvent from '../components/EditEvent';
 import { IntlProvider, addLocaleData } from 'react-intl';
@@ -21,8 +21,25 @@ addLocaleData({
 
 class EditEventPage extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   static getInitialProps ({ query: { collectiveSlug, eventSlug } }) {
     return { collectiveSlug, eventSlug }
+  }
+
+  async componentDidMount() {
+    setTimeout(async () => {
+    const res = await this.props.getLoggedInUser();
+    const LoggedInUser = res.data.LoggedInUser;
+    const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
+    LoggedInUser.membership = membership;
+    LoggedInUser.canEditCollective = membership && membership.role === 'MEMBER';
+    console.log("Logged in user: ", LoggedInUser);
+    this.setState({LoggedInUser});
+    }, 0);
   }
 
   render() {
@@ -35,11 +52,11 @@ class EditEventPage extends React.Component {
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <EditEvent event={data.Event} />
+          <EditEvent event={data.Event} LoggedInUser={this.state.LoggedInUser} />
         </div>
       </IntlProvider>
     );
   }
 }
 
-export default withData(addEventData(EditEventPage));
+export default withData(addGetLoggedInUserFunction(addEventData(EditEventPage)));

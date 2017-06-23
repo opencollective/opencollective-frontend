@@ -10,6 +10,7 @@ export const getLoggedInUserQuery = gql`
       lastName,
       avatar,
       collectives {
+        id,
         slug,
         name,
         role

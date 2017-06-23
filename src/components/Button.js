@@ -79,6 +79,9 @@ class Button extends React.Component {
           color: ${colors.blue};
           background: white;
         }
+        .whiteblue.small {
+          width: 20rem;
+        }
         .blue {
           color: white;
           border-color: ${colors.blue};

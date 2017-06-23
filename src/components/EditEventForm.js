@@ -85,7 +85,6 @@ class EditEventForm extends React.Component {
     e.preventDefault();
     const event = Object.assign({}, this.state.event);
     event.tiers = this.state.tiers;
-    debugger;
     this.props.onSubmit(event);
   }
 
@@ -94,7 +93,7 @@ class EditEventForm extends React.Component {
     const { event } = this.props;
 
     const isNew = !(event && event.id);
-    const submitBtnLabel = isNew ? "Create Event" : "Edit Event";
+    const submitBtnLabel = isNew ? "Create Event" : "Save";
 
     return (
       <div className="EditEventForm">
@@ -125,7 +124,7 @@ class EditEventForm extends React.Component {
         }
 
         .actions {
-          margin: 5rem auto;
+          margin: 5rem auto 1rem;
           text-align: center;
         }
         `}</style>

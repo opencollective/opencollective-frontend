@@ -33,8 +33,8 @@ class CreateEvent extends React.Component {
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event created with success: ${eventUrl}` }});
     } catch (err) {
-      console.error(">>> createEvent error: ", err);
-      const errorMsg = (err.graphQLErrors) ? err.graphQLErrors[0].message : err.message;
+      console.error(">>> createEvent error: ", JSON.stringify(err));
+      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
       this.setState( { result: { error: errorMsg }})
       throw new Error(errorMsg);
     }
@@ -49,12 +49,12 @@ class CreateEvent extends React.Component {
 
     const title = "Create Event";
 
-    console.log(">>> this.state.tiers", this.state.tiers);
     return (
       <div className="CreateEvent">
         <style jsx>{`
           .result {
             text-align: center;
+            margin-bottom: 5rem;
           }
           .success {
             color: green;

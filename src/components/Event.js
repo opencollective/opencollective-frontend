@@ -120,6 +120,23 @@ class Event extends React.Component {
     this.setState({ modal: null });
   }
 
+  getDefaultActions(props) {
+    const { LoggedInUser } = props;
+    const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
+    if (LoggedInUser && LoggedInUser.canEditCollective) {
+      return [...this.defaultActions, {
+        className: 'whiteblue small',
+        component: <a href={editUrl}>EDIT</a>
+      }]
+    } else {
+      return this.defaultActions;
+    }
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({actions: this.getDefaultActions(props) });
+  }
+
   changeView(view) {
     let actions;
     switch (view) {
@@ -130,7 +147,7 @@ class Event extends React.Component {
         }];
         break;
       default:
-        actions = this.defaultActions;
+        actions = this.getDefaultActions();
         break;
     }
     this.setState({view, actions});
@@ -213,6 +230,7 @@ class Event extends React.Component {
             twitterHandle={this.event.collective.twitterHandle}
             image={this.event.collective.logo || backgroundImage}
             className={this.state.status}
+            LoggedInUser={this.props.LoggedInUser}
             scripts={['stripe']}
             />
 

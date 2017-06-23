@@ -26,9 +26,9 @@ class EditEvent extends React.Component {
       const event = res.data.editEvent;
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event edited with success: ${eventUrl}` }});
-    } catch (e) {
-      console.error(">>> editEvent error: ", e);
-      const errorMsg = (e.graphQLErrors) ? e.graphQLErrors[0].message : e.message;
+    } catch (err) {
+      console.error(">>> editEvent error: ", JSON.stringify(err));
+      const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
       this.setState( { result: { error: errorMsg }})
       throw new Error(errorMsg);
     }
@@ -43,6 +43,7 @@ class EditEvent extends React.Component {
         <style jsx>{`
           .result {
             text-align: center;
+            margin-bottom: 5rem;
           }
           .success {
             color: green;
@@ -53,6 +54,7 @@ class EditEvent extends React.Component {
         `}</style>
         <Header
           title={title}
+          LoggedInUser={this.props.LoggedInUser}
           scripts={['google']}
         />
         <Body>

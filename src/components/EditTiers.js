@@ -32,7 +32,8 @@ class EditTiers extends React.Component {
         name: 'description'
       },
       {
-        name: 'amount'
+        name: 'amount',
+        type: 'currency'
       }
     ];
   }
@@ -70,9 +71,9 @@ class EditTiers extends React.Component {
     return (
       <div className="tier" key={`tier-${index}`}>
         <div>
-          <a onClick={() => this.removeTier(index)}>[remove tier]</a>
+          <a href="#" onClick={() => this.removeTier(index)}>[remove tier]</a>
         </div>
-        {this.fields.map(field => <InputField name={field.name} value={tier[field.name]} placeholder={field.placeholder} onChange={(value) => this.editTier(index, field.name, value)} />)}
+        {this.fields.map(field => <InputField name={field.name} type={field.type} value={tier[field.name]} placeholder={field.placeholder} onChange={(value) => this.editTier(index, field.name, value)} />)}
       </div>
     );
   }
@@ -89,7 +90,7 @@ class EditTiers extends React.Component {
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div>
-          <a onClick={() => this.addTier({})}>[add tier]</a>
+          <a href="#"  onClick={() => this.addTier({})}>[add tier]</a>
         </div>
 
       </div>

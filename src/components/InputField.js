@@ -35,7 +35,6 @@ class InputField extends React.Component {
       'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'End date and time' },
       'location.label': { id: 'event.location.label', defaultMessage: 'Location' }
     });
-
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,7 +44,6 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
-    console.log(">>> onChange", value);
     this.setState({value});
     this.debouncedHandleChange(value);
   }
@@ -67,6 +65,9 @@ class InputField extends React.Component {
         break;
       case 'location':
         this.input = <InputTypeLocation value={this.state.value} onChange={event => this.handleChange(event)} />;
+        break;
+      case 'currency':
+        this.input = <input type="text" value={(this.state.value||0)/100} placeholder={this.props.placeholder} onChange={event => this.handleChange(event.target.value*100)} />
         break;
       default:
         this.input = <input type="text" value={this.state.value} placeholder={this.props.placeholder} onChange={event => this.handleChange(event.target.value)} />

@@ -89,7 +89,8 @@ export const addCreateEventMutation = graphql(createEventQuery, {
         'quantity'
       ]);
       EventInputType.collective = { slug: event.collective.slug };
-      EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'name', 'description', 'amount']));
+      EventInputType.tiers = event.tiers.map(tier => pick(tier, ['name', 'description', 'amount']));
+      EventInputType.location = pick(event.location, ['name','address','lat','long']);
       return await mutate({ variables: { event: EventInputType } })
     }
   })
@@ -113,6 +114,7 @@ export const addEditEventMutation = graphql(editEventQuery, {
       ]);
       EventInputType.collective = { slug: event.collective.slug };
       EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'name', 'description', 'amount']));
+      EventInputType.location = pick(event.location, ['name','address','lat','long']);
       return await mutate({ variables: { event: EventInputType } })
     }
   })
