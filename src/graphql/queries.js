@@ -112,7 +112,7 @@ const getAttendeesQuery = gql`
       slug,
       name,
       startsAt,
-      location,
+      locationName,
       responses {
         createdAt,
         quantity,
