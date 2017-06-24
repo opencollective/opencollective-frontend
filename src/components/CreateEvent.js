@@ -11,14 +11,14 @@ import EditEventForm from '../components/EditEventForm';
 class CreateEvent extends React.Component {
 
   static propTypes = {
-    collectiveSlug: PropTypes.string
+    collective: PropTypes.object
   }
 
   constructor(props) {
     super(props);
     const timezone = moment.tz.guess();
     this.state = { event: { 
-      collective: { slug: props.collectiveSlug, currency: timezone.match(/^Europe/) ? 'EUR' : 'USD' },
+      collective: props.collective,
       timezone, // "Europe/Brussels", // "America/New_York"
     }, result: {} };
     this.createEvent = this.createEvent.bind(this);
@@ -85,7 +85,7 @@ class CreateEvent extends React.Component {
 
           <div className="EventTemplatePicker">
             <div className="field">
-              <EventTemplatePicker label="Template" collectiveSlug={this.props.collectiveSlug} onChange={this.handleTemplateChange} />
+              <EventTemplatePicker label="Template" collectiveSlug={this.props.collective.slug} onChange={this.handleTemplateChange} />
             </div>
           </div>
 

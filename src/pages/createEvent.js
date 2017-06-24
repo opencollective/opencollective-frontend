@@ -2,7 +2,8 @@ import withData from '../lib/withData'
 import React from 'react'
 import CreateEvent from '../components/CreateEvent';
 import { IntlProvider, addLocaleData } from 'react-intl';
-import { addGetLoggedInUserFunction } from '../graphql/queries';
+import { addGetLoggedInUserFunction, addCollectiveData } from '../graphql/queries';
+import NotFound from '../components/NotFound';
 
 import 'intl';
 import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
@@ -39,14 +40,21 @@ class CreateEventPage extends React.Component {
   }
 
   render() {
+
+    const { data } = this.props;
+
+    if (!data.loading && !data.Collective) {
+      return (<NotFound />)
+    }
+
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <CreateEvent collectiveSlug={this.props.collectiveSlug} LoggedInUser={this.state.LoggedInUser} />
+          <CreateEvent collective={data.Collective} LoggedInUser={this.state.LoggedInUser} />
         </div>
       </IntlProvider>
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(CreateEventPage));
+export default withData(addGetLoggedInUserFunction(addCollectiveData(CreateEventPage)));

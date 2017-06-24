@@ -19,6 +19,20 @@ export const getLoggedInUserQuery = gql`
   }
 `;
 
+export const getCollectiveQuery = gql`
+  query Collective($collectiveSlug: String!) {
+    Collective(collectiveSlug: $collectiveSlug) {
+      id,
+      slug,
+      name,
+      description,
+      backgroundImage,
+      logo,
+      currency
+    }
+  }
+`;
+
 const getEventQuery = gql`
   query Event($collectiveSlug: String!, $eventSlug: String!) {
     Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
@@ -136,6 +150,7 @@ const getAttendeesQuery = gql`
   }
 `;
 
+export const addCollectiveData = graphql(getCollectiveQuery);
 export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
