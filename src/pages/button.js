@@ -29,7 +29,7 @@ class ButtonPage extends React.Component {
             }
 
             .btn.contribute {
-              width: 334px;
+              width: 338px;
             }
 
             .donate.btn.blue {
