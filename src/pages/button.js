@@ -1,12 +1,13 @@
 import React from 'react';
 
 class ButtonPage extends React.Component {
-  static getInitialProps ({ query: { color, collectiveSlug } }) {
-    return { color, collectiveSlug }
+  static getInitialProps ({ query: { color, collectiveSlug, verb } }) {
+    return { color, collectiveSlug, verb }
   }
 
   render() {
-    const { color = 'white', collectiveSlug } = this.props;
+    const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;
+
     return (
         <div>
           <style jsx>{`
@@ -27,12 +28,24 @@ class ButtonPage extends React.Component {
               cursor: pointer;
             }
 
-            .btn.blue {
+            .btn.contribute {
+              width: 334px;
+            }
+
+            .donate.btn.blue {
               background-image: url(/static/images/buttons/donate-button-blue.svg);              
             }
 
-            .btn.white {
+            .donate.btn.white {
               background-image: url(/static/images/buttons/donate-button-white.svg);
+            }
+
+            .contribute.btn.blue {
+              background-image: url(/static/images/buttons/contribute-button-blue.svg);              
+            }
+
+            .contribute.btn.white {
+              background-image: url(/static/images/buttons/contribute-button-white.svg);
             }
 
             .btn:hover {
@@ -49,7 +62,7 @@ class ButtonPage extends React.Component {
               background-position: 0 -100px;
             }
           `}</style>
-          <a type="button" className={`btn ${color}`} target="_blank" href={`https://opencollective.com/${collectiveSlug}/donate`} />
+          <a type="button" className={`btn ${color} ${verb}`} target="_blank" href={`https://opencollective.com/${collectiveSlug}/${verb}`} />
         </div>
     );
   }
