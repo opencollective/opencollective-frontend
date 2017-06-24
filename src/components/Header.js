@@ -43,8 +43,9 @@ class Header extends React.Component {
 
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
         <title>{title}</title>
         {this.meta.map(({name, content}) => <meta property={name} content={content} />)}
         {this.scripts.map((script) => <script type="text/javascript" src={script} />)}
@@ -199,34 +200,8 @@ class Header extends React.Component {
         margin: 40px auto;
       }
 
-      label {
-        line-height: 4.2rem;
-        margin: 0.5rem 0;
-        vertical-align: top;
-      }
-
-      input[type=text], select, textarea {
-        height: 4.2rem;
-        border: 1px solid rgba(48,50,51,0.2);
-        border-radius: 5px;
-        box-shadow: inset 0px 2px 0px rgba(0,0,0,0.05);
-        padding: 5px;
-        font-size: 1.8rem;
-      }
-
-      textarea {
-        height: 12.6rem;
-      }
-
       button {
         cursor: pointer;
-      }
-
-      label {
-        display: inline-block;
-        max-width: 100%;
-        margin-bottom: 5px;
-        font-weight: 700;
       }
 
       .row {

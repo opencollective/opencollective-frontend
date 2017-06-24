@@ -48,6 +48,7 @@ const getEventQuery = gql`
         slug,
         name,
         mission,
+        currency,
         backgroundImage,
         logo,
         stripePublishableKey

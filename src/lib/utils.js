@@ -36,6 +36,11 @@ export function isValidEmail(email) {
   return Boolean(email.match(/.+@.+\..+/));
 }
 
+export function getCurrencySymbol(currency) {
+ const r = Number(0).toLocaleString(currency, { style: 'currency', currency, maximumFractionDigits: 0});
+ return r.replace(/0$/,'');
+}
+
 export function formatCurrency(amount, currency = 'USD', intl) {
   if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
   amount = amount / 100;

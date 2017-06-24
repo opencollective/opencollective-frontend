@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { addEventsData } from '../graphql/queries';
+import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
 class EventTemplatePicker extends React.Component {
 
@@ -37,19 +38,13 @@ class EventTemplatePicker extends React.Component {
     if (loading) return (<div />);
 
     return (
-      <div className="EventTemplatePicker">
-        <style jsx>{`
-
-        `}</style>
-
-        <div className="field">
-          <select name="template" onChange={this.handleTemplateChange}>
-            <option value="">No template</option>
-            {allEvents.map(this.renderEventEntry)}
-          </select>
-        </div>
-    </div>
-
+      <FormGroup className="EventTemplatePicker">
+        <ControlLabel>{this.props.label}</ControlLabel>
+        <FormControl name="template" componentClass="select" placeholder="select" onChange={this.handleTemplateChange}>
+          <option value="">No template</option>
+          {allEvents.map(this.renderEventEntry)}
+        </FormControl>
+      </FormGroup>
     );
   }
 

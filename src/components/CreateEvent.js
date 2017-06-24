@@ -16,9 +16,10 @@ class CreateEvent extends React.Component {
 
   constructor(props) {
     super(props);
+    const timezone = moment.tz.guess();
     this.state = { event: { 
-      collective: { slug: props.collectiveSlug },
-      timezone: moment.tz.guess(), // "Europe/Brussels", // "America/New_York"
+      collective: { slug: props.collectiveSlug, currency: timezone.match(/^Europe/) ? 'EUR' : 'USD' },
+      timezone, // "Europe/Brussels", // "America/New_York"
     }, result: {} };
     this.createEvent = this.createEvent.bind(this);
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
@@ -32,6 +33,7 @@ class CreateEvent extends React.Component {
       const event = res.data.createEvent;
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event created with success: ${eventUrl}` }});
+      window.location.replace(eventUrl);
     } catch (err) {
       console.error(">>> createEvent error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
@@ -47,7 +49,7 @@ class CreateEvent extends React.Component {
 
   render() {
 
-    const title = "Create Event";
+    const title = "Create a New Event";
 
     return (
       <div className="CreateEvent">
@@ -62,6 +64,13 @@ class CreateEvent extends React.Component {
           .error {
             color: red;
           }
+          .EventTemplatePicker {
+            max-width: 700px;
+            margin: 0 auto;
+          }
+          .EventTemplatePicker .field {
+            margin: 1rem;
+          }
         `}</style>
 
         <Header
@@ -72,7 +81,13 @@ class CreateEvent extends React.Component {
 
         <Body>
 
-          <h1>{title} based on <EventTemplatePicker collectiveSlug={this.props.collectiveSlug} onChange={this.handleTemplateChange} /></h1>
+          <h1>{title}</h1>
+
+          <div className="EventTemplatePicker">
+            <div className="field">
+              <EventTemplatePicker label="Template" collectiveSlug={this.props.collectiveSlug} onChange={this.handleTemplateChange} />
+            </div>
+          </div>
 
           <EditEventForm event={this.state.event} onSubmit={this.createEvent} />
           <div className="result">
