@@ -23,6 +23,8 @@ class EditEventForm extends React.Component {
     this.fields = [
       {
         name: 'slug',
+        label: 'URL',
+        pre: `https://opencollective.com/${event.collective.slug}/events/`,
         placeholder: ''
       },
       {
@@ -81,8 +83,7 @@ class EditEventForm extends React.Component {
     this.setState({tiers});
   }
 
-  async handleSubmit(e) {
-    e.preventDefault();
+  async handleSubmit() {
     const event = Object.assign({}, this.state.event);
     event.tiers = this.state.tiers;
     this.props.onSubmit(event);
@@ -111,36 +112,34 @@ class EditEventForm extends React.Component {
           font-size: 1.5rem;
         }
 
-        form {
+        .FormInputs {
           max-width: 700px;
           margin: 0 auto;
         }
 
-        @media(min-width: 600px) {
-          .FormInputs {
-            display: flex;
-            flex-direction: cols;
-          }
+        :global(textarea#description) {
+          height: 30rem;
         }
 
         .actions {
           margin: 5rem auto 1rem;
           text-align: center;
         }
+
+        :global(section#location) {
+          margin-top: 0;
+        }
         `}</style>
 
-        <form onSubmit={this.handleSubmit}>
-          <div className="FormInputs">
-            <div className="inputs">
-              <h2>Event details</h2>
-              {this.fields.map((field) => <InputField value={this.state.event[field.name]} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} context={this.state.event} onChange={(value) => this.handleChange(field.name, value)} />)}
-            </div>
-            <EditTiers tiers={this.state.tiers} onChange={this.handleTiersChange} />
+        <div className="FormInputs">
+          <div className="inputs">
+            {this.fields.map((field) => <InputField value={this.state.event[field.name]} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} pre={field.pre} context={this.state.event} onChange={(value) => this.handleChange(field.name, value)} />)}
           </div>
-          <div className="actions">
-            <Button type="submit" className="green" label={submitBtnLabel} />
-          </div>
-        </form>
+          <EditTiers tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
+        </div>
+        <div className="actions">
+          <Button type="submit" className="green" label={submitBtnLabel} onClick={this.handleSubmit} />
+        </div>
       </div>
     );
   }

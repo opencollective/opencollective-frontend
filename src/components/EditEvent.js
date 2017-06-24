@@ -26,6 +26,7 @@ class EditEvent extends React.Component {
       const event = res.data.editEvent;
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event edited with success: ${eventUrl}` }});
+      window.location.replace(eventUrl);
     } catch (err) {
       console.error(">>> editEvent error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;

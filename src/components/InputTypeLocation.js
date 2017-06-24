@@ -7,6 +7,7 @@ class InputTypeLocation extends React.Component {
 
   static propTypes = {
     value: PropTypes.object,
+    className: PropTypes.string,
     onChange: PropTypes.func.required
   };
 
@@ -35,9 +36,8 @@ class InputTypeLocation extends React.Component {
   }
 
   render() {
-    console.log(">>> settings location to ", this.state.value);
     return (
-      <div className="InputTypeLocation">
+      <div className="InputTypeLocation" className={this.props.className}>
         <style jsx global>{`
         .geosuggest {
           font-size: 18px;
@@ -46,12 +46,17 @@ class InputTypeLocation extends React.Component {
           text-align: left;
         }
         .geosuggest__input {
+          display: block;
           width: 100%;
-          border: 2px solid transparent;
-          box-shadow: 0 0 1px #3d464d;
-          padding: .5em 1em;
-          -webkit-transition: border 0.2s, box-shadow 0.2s;
-                  transition: border 0.2s, box-shadow 0.2s;
+          height: 34px;
+          padding: 6px 12px;
+          font-size: 14px;
+          line-height: 1.42857143;
+          color: #555;
+          background-color: #fff;
+          background-image: none;
+          border: 1px solid #ccc;
+          border-radius: 4px;
         }
         .geosuggest__input:focus {
           border-color: #267dc0;
