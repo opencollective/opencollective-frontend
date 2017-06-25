@@ -5,9 +5,8 @@
     return;
   }
 
-  window.OC = {
-    buttons: []
-  };
+  window.OC = window.OC || {};
+  window.OC.buttons = [];
 
   function OpenCollectiveButton(anchor) {
 

@@ -8,6 +8,7 @@ import moment from 'moment';
 const pages = nextRoutes();
 
 pages.add('createEvent', '/:collectiveSlug/events/(new|create)');
+pages.add('events-iframe', '/:collectiveSlug/events/iframe');
 pages.add('event', '/:collectiveSlug/events/:eventSlug');
 pages.add('editEvent', '/:collectiveSlug/events/:eventSlug/edit');
 pages.add('events', '/:collectiveSlug/events');
@@ -43,13 +44,25 @@ module.exports = (server, app) => {
   })
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname,'../templates/widget.js'), 'utf8');
+    const content = fs.readFileSync(path.join(__dirname,'../templates/button.js'), 'utf8');
     _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
     const compiled = _.template(content);
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,
       verb: req.params.verb,
+      host: process.env.WEBSITE_URL || "http://localhost:3000"
+    }))
+  });
+
+  server.get('/:collectiveSlug/events.js', (req, res) => {
+    const content = fs.readFileSync(path.join(__dirname,'../templates/events.js'), 'utf8');
+    _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+    const compiled = _.template(content);
+    res.setHeader('content-type', 'application/javascript');
+    res.send(compiled({
+      collectiveSlug: req.params.collectiveSlug,
+      id: req.query.id,
       host: process.env.WEBSITE_URL || "http://localhost:3000"
     }))
   });

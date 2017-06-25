@@ -11,7 +11,7 @@ function createClient (initialState, options) {
 
   return new ApolloClient({
     ssrMode: !process.browser,
-    dataIdFromObject: result => `${result.__typename}#${result.id}` || null,
+    dataIdFromObject: result => `${result.__typename}#${result.id || result.name}` || null,
     initialState,
     networkInterface: createNetworkInterface({
       uri: options.uri,
@@ -32,7 +32,6 @@ export const initClient = (initialState, options) => {
     if (window.localStorage) {
       options.accessToken = window.localStorage.getItem('accessToken');
     }
-    console.log("creating client with options", options);
     apolloClient = createClient(initialState, options)
   }
   return apolloClient

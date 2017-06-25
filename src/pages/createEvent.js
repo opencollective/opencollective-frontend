@@ -4,6 +4,7 @@ import CreateEvent from '../components/CreateEvent';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import { addGetLoggedInUserFunction, addCollectiveData } from '../graphql/queries';
 import NotFound from '../components/NotFound';
+import Loading from '../components/Loading';
 
 import 'intl';
 import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
@@ -23,7 +24,7 @@ class CreateEventPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { loading: true };
   }
 
   static getInitialProps ({ query: { collectiveSlug } }) {
@@ -34,14 +35,23 @@ class CreateEventPage extends React.Component {
     setTimeout(async () => {
     const res = await this.props.getLoggedInUser();
     const LoggedInUser = res.data.LoggedInUser;
+    if (LoggedInUser) {
+      const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
+      LoggedInUser.membership = membership;
+      LoggedInUser.canCreateEvent = Boolean(membership);
+    }
     console.log("Logged in user: ", LoggedInUser);
-    this.setState({LoggedInUser});
+    this.setState({LoggedInUser, loading: false});
     }, 0);
   }
 
   render() {
 
     const { data } = this.props;
+
+    if (this.state.loading) {
+      return (<Loading />)
+    }
 
     if (!data.loading && !data.Collective) {
       return (<NotFound />)

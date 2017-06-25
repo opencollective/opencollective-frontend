@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import EditEventForm from '../components/EditEventForm';
+import { Button } from 'react-bootstrap';
 
 import { addEditEventMutation } from '../graphql/mutations';
 
@@ -37,7 +38,8 @@ class EditEvent extends React.Component {
 
   render() {
 
-    const title = "Edit Event";
+    const title = `Edit ${this.props.event.name}`;
+    const canEditEvent = this.props.LoggedInUser.canEditEvent;
 
     return (
       <div className="EditEvent">
@@ -52,6 +54,9 @@ class EditEvent extends React.Component {
           .error {
             color: red;
           }
+          .login {
+            text-align: center;
+          }
         `}</style>
         <Header
           title={title}
@@ -59,11 +64,24 @@ class EditEvent extends React.Component {
           scripts={['google']}
         />
         <Body>
-          <EditEventForm event={this.props.event} onSubmit={this.editEvent} />
-          <div className="result">
-            <div className="success">{this.state.result.success}</div>
-            <div className="error">{this.state.result.error}</div>
-          </div>
+
+          <h1>{title}</h1>
+
+          {!canEditEvent &&
+            <div className="login">
+              <p>You need to be logged in as the creator of this event or as a core contributor of this collective to be able to edit this event.</p>
+              <p><Button bsStyle="primary" href={`/login?next=${this.props.event.collective.slug}/events/${this.props.event.slug}/edit`}>Login</Button></p>
+            </div>
+          }   
+          { canEditEvent &&
+            <div>
+              <EditEventForm event={this.props.event} onSubmit={this.editEvent} />
+              <div className="result">
+                <div className="success">{this.state.result.success}</div>
+                <div className="error">{this.state.result.error}</div>
+              </div>
+            </div>
+          }
         </Body>
         <Footer />
       </div>
