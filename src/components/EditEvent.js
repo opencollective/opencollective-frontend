@@ -38,7 +38,8 @@ class EditEvent extends React.Component {
 
   render() {
 
-    const title = `Edit ${this.props.event.name}`;
+    const collectiveName = this.props.event && this.props.event.name;
+    const title = `Edit ${collectiveName}`;
     const canEditEvent = this.props.LoggedInUser.canEditEvent;
 
     return (
