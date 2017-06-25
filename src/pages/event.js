@@ -36,7 +36,7 @@ class EventPage extends React.Component {
     setTimeout(async () => {
       const res = await this.props.getLoggedInUser();
       const LoggedInUser = {...res.data.LoggedInUser};
-      if (LoggedInUser) {
+      if (LoggedInUser && LoggedInUser.collectives) {
         const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
         LoggedInUser.membership = membership;
       }

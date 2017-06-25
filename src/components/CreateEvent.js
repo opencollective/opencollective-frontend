@@ -50,9 +50,10 @@ class CreateEvent extends React.Component {
 
   render() {
 
-    const collectiveName = this.props.collective && this.props.collective.name;
     const canCreateEvent = this.props.LoggedInUser && this.props.LoggedInUser.canCreateEvent;
-    const title = `Create a New ${collectiveName} Event`;
+
+    const collective = this.props.collective || {};
+    const title = `Create a New ${collective.name} Event`;
 
     return (
       <div className="CreateEvent">
@@ -94,14 +95,14 @@ class CreateEvent extends React.Component {
           {!canCreateEvent &&
             <div className="login">
               <p>You need to be logged in as a member of this collective to be able to create an event.</p>
-              <p><Button bsStyle="primary" href={`/${this.props.collective.slug}#support`}>Become a member</Button> <Button bsStyle="default" href={`/login?next=${this.props.collective.slug}/events/new`}>Login</Button></p>
+              <p><Button bsStyle="primary" href={`/${collective.slug}#support`}>Become a member</Button> <Button bsStyle="default" href={`/login?next=${collective.slug}/events/new`}>Login</Button></p>
             </div>
           }
           {canCreateEvent &&
             <div>
               <div className="EventTemplatePicker">
                 <div className="field">
-                  <EventTemplatePicker label="Template" collectiveSlug={this.props.collective.slug} onChange={this.handleTemplateChange} />
+                  <EventTemplatePicker label="Template" collectiveSlug={collective.slug} onChange={this.handleTemplateChange} />
                 </div>
               </div>
 

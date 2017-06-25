@@ -38,8 +38,8 @@ class EditEvent extends React.Component {
 
   render() {
 
-    const collectiveName = this.props.event && this.props.event.name;
-    const title = `Edit ${collectiveName}`;
+    const event = this.props.event || {};
+    const title = `Edit ${event.name}`;
     const canEditEvent = this.props.LoggedInUser.canEditEvent;
 
     return (
@@ -70,13 +70,13 @@ class EditEvent extends React.Component {
 
           {!canEditEvent &&
             <div className="login">
-              <p>You need to be logged in as the creator of this event or as a core contributor of this collective to be able to edit this event.</p>
-              <p><Button bsStyle="primary" href={`/login?next=${this.props.event.collective.slug}/events/${this.props.event.slug}/edit`}>Login</Button></p>
+              <p>You need to be logged in as the creator of this event or as a core contributor of this collective.</p>
+              <p><Button bsStyle="primary" href={`/login?next=${event.collective.slug}/events/${event.slug}/edit`}>Login</Button></p>
             </div>
           }   
           { canEditEvent &&
             <div>
-              <EditEventForm event={this.props.event} onSubmit={this.editEvent} />
+              <EditEventForm event={event} onSubmit={this.editEvent} />
               <div className="result">
                 <div className="success">{this.state.result.success}</div>
                 <div className="error">{this.state.result.error}</div>
