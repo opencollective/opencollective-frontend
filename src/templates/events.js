@@ -43,7 +43,7 @@
 
     const attributes = this.getAttributes();
     const limit = attributes.limit || 10;
-    const width = attributes.width || 300;
+    const width = attributes.width || this.getContainerWidth();
     const height = attributes.height || 50;
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;
@@ -64,7 +64,8 @@
     const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
     const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
     scriptsNodesArray.map(s => {
-      if (s.getAttribute('src') && s.getAttribute('src').match(regex)) {
+      const src = s.getAttribute('src');
+      if (src && src.match(regex) && src.match(/events\.js/)) {
         window.OC.widgets.push(new OpenCollectiveWidget(s));
       }
     });

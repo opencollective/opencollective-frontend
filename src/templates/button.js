@@ -31,7 +31,10 @@
 
     const attributes = this.getAttributes();
     const color = attributes.color || 'white';
-    const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/{{verb}}/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
+    const tokens = attributes.src.match(/([a-z]+)\/button\.js/);
+    const verb = tokens[1];
+    const width = (verb === 'donate') ? 300 : 338;
+    const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/${verb}/button?color=${color}" width="${width}" height=50 frameborder=0></iframe></center>`;
 
     this.el = document.createElement('div');
     this.el.className = 'opencollective-{{verb}}-button';
@@ -45,7 +48,8 @@
     const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
     const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
     scriptsNodesArray.map(s => {
-      if (s.getAttribute('src') && s.getAttribute('src').match(regex)) {
+      const src = s.getAttribute('src');
+      if (src && src.match(regex) && src.match(/button\.js/)) {
         window.OC.buttons.push(new OpenCollectiveButton(s));
       }
     });
