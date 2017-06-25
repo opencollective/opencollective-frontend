@@ -42,7 +42,7 @@ class Event extends React.Component {
 
     this.defaultActions = [
       {
-        label: (<FormattedMessage id='actions.interested' defaultMessage='interested' />),
+        component: (<FormattedMessage id='actions.interested' defaultMessage='interested' />),
         // className: 'selected', 
         // icon: 'star',
         onClick: this.setInterested

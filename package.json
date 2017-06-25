@@ -36,7 +36,7 @@
     "markdown-loader": "2.0.0",
     "moment-timezone": "^0.5.13",
     "net": "1.0.2",
-    "next": "2.1.1",
+    "next": "^3.0.1-beta.1",
     "next-routes": "1.0.24",
     "node-sass": "4.5.0",
     "path-match": "1.2.4",

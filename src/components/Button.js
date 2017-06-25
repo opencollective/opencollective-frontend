@@ -71,10 +71,6 @@ class Button extends React.Component {
           height: 1.6rem;
           margin: 0 0.5rem;
         }
-        .label {
-          padding: 0px;
-          margin: 0px;
-        }
         .whiteblue, .whiteblue :global(a) {
           color: ${colors.blue};
           background: white;
@@ -109,7 +105,7 @@ class Button extends React.Component {
         }
         `}</style>
         {this.props.icon && <img src={icons[this.props.icon]} />}
-        {this.props.label && <span className="label">{this.props.label}</span>}
+        {this.props.label && <span>{this.props.label}</span>}
         {this.props.children}
       </button>
     );
