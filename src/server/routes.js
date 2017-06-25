@@ -14,13 +14,13 @@ pages.add('editEvent', '/:collectiveSlug/events/:eventSlug/edit');
 pages.add('events', '/:collectiveSlug/events');
 pages.add('events', '/');
 pages.add('nametags', '/:collectiveSlug/events/:eventSlug/nametags');
-pages.add('button', '/:collectiveSlug/donate/button');
+pages.add('button', '/:collectiveSlug/:verb(contribute|donate)/button');
 
 module.exports = (server, app) => {
 
-  server.get('/:collectiveSlug/donate/button:size(|@2x).png', (req, res) => {
+  server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';
-    res.sendFile(path.join(__dirname, `../static/images/buttons/donate-button-${color}${req.params.size}.png`));
+    res.sendFile(path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`));
   });
 
   server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res) => {
@@ -50,6 +50,7 @@ module.exports = (server, app) => {
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,
+      verb: req.params.verb,
       host: process.env.WEBSITE_URL || "http://localhost:3000"
     }))
   });

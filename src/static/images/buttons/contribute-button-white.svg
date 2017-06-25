@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="338px" height="150px" viewBox="0 0 338 150" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>contribute-button-white</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="0%" id="linearGradient-1">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#F3F6F8" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-2" x="0" y="0" width="334" height="48" rx="24"></rect>
+        <filter x="-0.6%" y="-4.2%" width="101.2%" height="108.3%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-4">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#F3F6F8" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-5" x="0" y="0" width="334" height="48" rx="24"></rect>
+        <filter x="-2.1%" y="-14.6%" width="104.2%" height="129.2%" filterUnits="objectBoundingBox" id="filter-6">
+            <feMorphology radius="1" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="0" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.247058824   0 0 0 0 0.68627451   0 0 0 0 0.941176471  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-7" x="0" y="0" width="334" height="48" rx="24"></rect>
+    </defs>
+    <g id="Widgets-&amp;-Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="contribute" transform="translate(-95.000000, 0.000000)">
+            <g id="::-white">
+                <g id="contribute-button-white" transform="translate(96.000000, 1.000000)">
+                    <g id="contribute-button-white-pressed" transform="translate(1.000000, 100.000000)">
+                        <g id="::-bg">
+                            <g id="div">
+                                <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                                <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                                <rect stroke-opacity="0.15" stroke="#000000" stroke-width="1" x="-0.5" y="-0.5" width="335" height="49" rx="24.5"></rect>
+                            </g>
+                        </g>
+                        <g id="::-symbol" transform="translate(287.000000, 2.000000)">
+                            <circle id="circle" fill="#FFFFFF" cx="22" cy="22" r="22"></circle>
+                            <g id="::-oc-symbol" transform="translate(8.000000, 8.000000)">
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z M21.9735157,2.49095039 L18.3469656,6.11750053 C17.0583408,5.40534531 15.5765071,5 14,5 C9.02943725,5 5,9.02943725 5,14 C5,18.9705627 9.02943725,23 14,23 C15.5765071,23 17.0583408,22.5946547 18.3469656,21.8824995 L21.9735157,25.5090496 C19.7108751,27.0795729 16.9629262,28 14,28 C6.2680135,28 0,21.7319865 0,14 C0,6.2680135 6.2680135,0 14,0 C16.9629262,0 19.7108751,0.920427138 21.9735157,2.49095039 Z" id="3/4-circle" fill="#3FAFF0"></path>
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
+                            </g>
+                        </g>
+                        <g id="::-label-copy" transform="translate(18.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#22A5E6" font-weight="normal">
+                            <text id="CONTRIBUTE-TO-OUR-COLLECTIVE">
+                                <tspan x="0.188" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <g id="contribute-button-white-hover" transform="translate(2.000000, 50.000000)">
+                        <g id="::-bg">
+                            <g id="div">
+                                <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                                <use fill="url(#linearGradient-4)" fill-rule="evenodd" xlink:href="#path-5"></use>
+                                <rect stroke="#3FAFF0" stroke-width="1" x="-0.5" y="-0.5" width="335" height="49" rx="24.5"></rect>
+                            </g>
+                        </g>
+                        <g id="::-symbol" transform="translate(286.000000, 2.000000)">
+                            <circle id="circle" fill="#FFFFFF" cx="22" cy="22" r="22"></circle>
+                            <g id="::-oc-symbol" transform="translate(8.000000, 8.000000)">
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z M21.9735157,2.49095039 L18.3469656,6.11750053 C17.0583408,5.40534531 15.5765071,5 14,5 C9.02943725,5 5,9.02943725 5,14 C5,18.9705627 9.02943725,23 14,23 C15.5765071,23 17.0583408,22.5946547 18.3469656,21.8824995 L21.9735157,25.5090496 C19.7108751,27.0795729 16.9629262,28 14,28 C6.2680135,28 0,21.7319865 0,14 C0,6.2680135 6.2680135,0 14,0 C16.9629262,0 19.7108751,0.920427138 21.9735157,2.49095039 Z" id="3/4-circle" fill="#3FAFF0"></path>
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
+                            </g>
+                        </g>
+                        <g id="::-label" transform="translate(17.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#22A5E6" font-weight="normal">
+                            <text id="CONTRIBUTE-TO-OUR-COLLECTIVE">
+                                <tspan x="0.188" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <g>
+                        <g id="::-bg">
+                            <g id="div">
+                                <use fill="url(#linearGradient-4)" fill-rule="evenodd" xlink:href="#path-7"></use>
+                                <rect stroke-opacity="0.15" stroke="#000000" stroke-width="1" x="-0.5" y="-0.5" width="335" height="49" rx="24.5"></rect>
+                            </g>
+                        </g>
+                        <g id="::-symbol" transform="translate(288.000000, 2.000000)">
+                            <circle id="circle" fill="#FFFFFF" cx="22" cy="22" r="22"></circle>
+                            <g id="::-oc-symbol" transform="translate(8.000000, 8.000000)">
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z M21.9735157,2.49095039 L18.3469656,6.11750053 C17.0583408,5.40534531 15.5765071,5 14,5 C9.02943725,5 5,9.02943725 5,14 C5,18.9705627 9.02943725,23 14,23 C15.5765071,23 17.0583408,22.5946547 18.3469656,21.8824995 L21.9735157,25.5090496 C19.7108751,27.0795729 16.9629262,28 14,28 C6.2680135,28 0,21.7319865 0,14 C0,6.2680135 6.2680135,0 14,0 C16.9629262,0 19.7108751,0.920427138 21.9735157,2.49095039 Z" id="3/4-circle" fill="#3FAFF0"></path>
+                                <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
+                            </g>
+                        </g>
+                        <g id="::-label" transform="translate(19.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#22A5E6" font-weight="normal">
+                            <text id="CONTRIBUTE-TO-OUR-COLLECTIVE">
+                                <tspan x="0.188" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

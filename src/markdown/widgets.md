@@ -2,11 +2,12 @@
 
 ## Donate button
 
-    <script src="https://opencollective.com/:collectiveSlug/donate/button.js" color="[white|blue]"></script>
+    <script src="https://opencollective.com/:collectiveSlug/:verb/button.js" color="[white|blue]"></script>
 
 Just replace `:collectiveSlug` with the slug of your collective (e.g. webpack for https://opencollective.com/webpack).
+The verb can either be "donate" or "contribute".
 Example:
-<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script></center>
+<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script><script src="https://opencollective.com/webpack/contribute/button.js" color="blue"></script></center>
 
 If you want to add a donate button to a blog post, you can load an image version of the logo and then link to the donate page of your collective.
 
