@@ -38,6 +38,9 @@ const getEventQuery = gql`
     Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
       id,
       slug,
+      createdByUser {
+        id
+      },
       name,
       description,
       startsAt,

@@ -137,7 +137,7 @@ class Header extends React.Component {
       h1 {
         text-align: center;
         margin: 40px 0px 20px;
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: bold;
       }
 

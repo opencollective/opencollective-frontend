@@ -7,6 +7,7 @@ import { addCreateEventMutation } from '../graphql/mutations';
 import moment from 'moment-timezone';
 import EventTemplatePicker from '../components/EventTemplatePicker';
 import EditEventForm from '../components/EditEventForm';
+import { Button } from 'react-bootstrap';
 
 class CreateEvent extends React.Component {
 
@@ -49,7 +50,9 @@ class CreateEvent extends React.Component {
 
   render() {
 
-    const title = "Create a New Event";
+    const collectiveName = this.props.collective && this.props.collective.name;
+    const canCreateEvent = this.props.LoggedInUser && this.props.LoggedInUser.canCreateEvent;
+    const title = `Create a New ${collectiveName} Event`;
 
     return (
       <div className="CreateEvent">
@@ -71,6 +74,11 @@ class CreateEvent extends React.Component {
           .EventTemplatePicker .field {
             margin: 1rem;
           }
+
+          .login {
+            margin: 0 auto;
+            text-align: center;
+          }
         `}</style>
 
         <Header
@@ -83,18 +91,27 @@ class CreateEvent extends React.Component {
 
           <h1>{title}</h1>
 
-          <div className="EventTemplatePicker">
-            <div className="field">
-              <EventTemplatePicker label="Template" collectiveSlug={this.props.collective.slug} onChange={this.handleTemplateChange} />
+          {!canCreateEvent &&
+            <div className="login">
+              <p>You need to be logged in as a member of this collective to be able to create an event.</p>
+              <p><Button bsStyle="primary" href={`/${this.props.collective.slug}#support`}>Become a member</Button> <Button bsStyle="default" href={`/login?next=${this.props.collective.slug}/events/new`}>Login</Button></p>
             </div>
-          </div>
+          }
+          {canCreateEvent &&
+            <div>
+              <div className="EventTemplatePicker">
+                <div className="field">
+                  <EventTemplatePicker label="Template" collectiveSlug={this.props.collective.slug} onChange={this.handleTemplateChange} />
+                </div>
+              </div>
 
-          <EditEventForm event={this.state.event} onSubmit={this.createEvent} />
-          <div className="result">
-            <div className="success">{this.state.result.success}</div>
-            <div className="error">{this.state.result.error}</div>
-          </div>
-
+              <EditEventForm event={this.state.event} onSubmit={this.createEvent} />
+              <div className="result">
+                <div className="success">{this.state.result.success}</div>
+                <div className="error">{this.state.result.error}</div>
+              </div>
+            </div>
+          }
           </Body>
 
           <Footer />

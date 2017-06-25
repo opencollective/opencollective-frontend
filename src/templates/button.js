@@ -5,9 +5,8 @@
     return;
   }
 
-  window.OC = {
-    buttons: []
-  };
+  window.OC = window.OC || {};
+  window.OC.buttons = [];
 
   function OpenCollectiveButton(anchor) {
 
@@ -32,10 +31,10 @@
 
     const attributes = this.getAttributes();
     const color = attributes.color || 'white';
-    const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/donate/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
+    const html = `<center><iframe src="{{host}}/{{collectiveSlug}}/{{verb}}/button?color=${color}" width="300" height=50 frameborder=0></iframe></center>`;
 
     this.el = document.createElement('div');
-    this.el.className = 'opencollective-donate-button';
+    this.el.className = 'opencollective-{{verb}}-button';
     this.el.innerHTML = html;
 
     this.inject(this.el);

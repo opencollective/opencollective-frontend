@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import _ from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 
 import InputField from '../components/InputField';
@@ -104,7 +103,7 @@ class EditTiers extends React.Component {
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div className="editTiersActions">
-          <Button bsStyle="primary" onClick={() => this.addTier({})}>Add Ticket</Button>
+          <Button bsStyle="primary" onClick={() => this.addTier({})}>Add Another Ticket</Button>
         </div>
 
       </div>

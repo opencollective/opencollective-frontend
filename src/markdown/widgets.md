@@ -43,6 +43,15 @@ You can target them with CSS to customize them:
     }
 
 
+## Show next events
+
+    <script src="https://opencollective.com/:collectiveSlug/events.js" width="500"></script>
+
+Example:
+
+<script src="https://opencollective.com/brusselstogether/events.js" width="500"></script>
+
+
 # For backers and sponsors
 
 To show the list of collectives that you are backing on your website, just add this script:
