@@ -34,18 +34,19 @@ class EventPage extends React.Component {
 
   async componentDidMount() {
     setTimeout(async () => {
-    const res = await this.props.getLoggedInUser();
-    const LoggedInUser = res.data.LoggedInUser;
-    const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
-    LoggedInUser.membership = membership;
-    LoggedInUser.canEditCollective = membership && membership.role === 'MEMBER';
-    console.log("Logged in user: ", LoggedInUser);
-    this.setState({LoggedInUser});
+      const res = await this.props.getLoggedInUser();
+      const LoggedInUser = {...res.data.LoggedInUser};
+      if (LoggedInUser) {
+        const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
+        LoggedInUser.membership = membership;
+      }
+      this.setState({LoggedInUser});
     }, 0);
   }
 
   render() {
     const { data } = this.props;
+    const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
     if (!data.Event) return (<NotFound />);
@@ -55,10 +56,17 @@ class EventPage extends React.Component {
       return (<Error message="GraphQL error" />)
     }
 
+    const event = data.Event;
+
+    if (LoggedInUser) {
+      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
+      console.log("Logged in user: ", LoggedInUser);
+    }
+
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <Event event={data.Event} LoggedInUser={this.state.LoggedInUser} />
+          <Event event={event} LoggedInUser={this.state.LoggedInUser} />
         </div>
       </IntlProvider>
     );

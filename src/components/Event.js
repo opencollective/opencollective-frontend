@@ -123,7 +123,7 @@ class Event extends React.Component {
   getDefaultActions(props) {
     const { LoggedInUser } = props;
     const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
-    if (LoggedInUser && LoggedInUser.canEditCollective) {
+    if (LoggedInUser && LoggedInUser.canEditEvent) {
       return [...this.defaultActions, {
         className: 'whiteblue small',
         component: <a href={editUrl}>EDIT</a>
