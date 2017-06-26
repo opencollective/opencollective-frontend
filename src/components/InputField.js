@@ -43,7 +43,7 @@ function FieldGroup({ id, label, help, pre, className, ...props }) {
 class InputField extends React.Component {
 
   static propTypes = {
-    name: PropTypes.string.required,
+    name: PropTypes.string.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     context: PropTypes.object,
     placeholder: PropTypes.string,
@@ -92,14 +92,24 @@ class InputField extends React.Component {
       case 'textarea':
         this.input =  (<FormGroup controlId={field.name}>
                         <ControlLabel>{capitalize(field.name)}</ControlLabel>
-                        <FormControl componentClass="textarea" placeholder={this.props.placeholder} value={this.state.value || this.props.placeholder}  onChange={event => this.handleChange(event.target.value)} />
+                        <FormControl
+                          componentClass="textarea"
+                          placeholder={this.props.placeholder}
+                          name={field.name}
+                          value={this.state.value || this.props.placeholder}
+                          onChange={event => this.handleChange(event.target.value)}
+                        />
                       </FormGroup>)
         break;
       case 'datetime':
         this.input = (
         <FormGroup>
           {this.messages[`${field.name}.label`] && <ControlLabel>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</ControlLabel>}
-          <DateTime value={moment.tz(new Date(this.state.value), context.timezone)} onChange={date => this.handleChange(date.toISOString())}  />
+          <DateTime
+            name={field.name}
+            value={moment.tz(new Date(this.state.value), context.timezone)}
+            onChange={date => this.handleChange(date.toISOString())} 
+            />
           {this.messages[`${field.name}.description`] && <HelpBlock>{intl.formatMessage(this.messages[`${field.name}.description`])}</HelpBlock>}
         </FormGroup>
         )
@@ -120,6 +130,7 @@ class InputField extends React.Component {
           onChange={event => this.handleChange(event.target.value*100)}
           type={field.type}
           pre={field.pre}
+          name={field.name}
           label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
           help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
           placeholder={field.placeholder}
@@ -134,6 +145,7 @@ class InputField extends React.Component {
           onChange={event => this.handleChange(event.target.value)}
           type={field.type}
           pre={field.pre}
+          name={field.name}
           label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
           help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
           placeholder={field.placeholder}

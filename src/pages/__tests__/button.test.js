@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { shallow } from 'enzyme'
-import App from '../src/pages/button.js'
+import App from '../button.js'
 
 describe('Donate Button', () => {
   it('Button links to /:collectiveSlug/donate"', () => {

@@ -10,8 +10,8 @@ class EditTiers extends React.Component {
 
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object),
-    currency: PropTypes.string.required,
-    onChange: PropTypes.func.required
+    currency: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -39,7 +39,6 @@ class EditTiers extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("EditTier nextProps", this.props.tiers, nextProps.tiers)
     if (nextProps.tiers) {
       const tiers = nextProps.tiers && nextProps.tiers.map(tier => Object.assign({}, tier));
       this.setState({tiers});
@@ -71,10 +70,19 @@ class EditTiers extends React.Component {
     return (
       <div className="tier" key={`tier-${index}`}>
         <div className="tierActions">
-          <a href="#" onClick={() => this.removeTier(index)}>Remove Ticket</a>
+          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>Remove Ticket</a>
         </div>
         <Form horizontal>
-          {this.fields.map(field => <InputField className="horizontal" name={field.name} type={field.type} value={tier[field.name]} pre={field.pre} placeholder={field.placeholder} onChange={(value) => this.editTier(index, field.name, value)} />)}
+          {this.fields.map(field => <InputField
+            className="horizontal"
+            key={field.name}
+            name={field.name}
+            type={field.type}
+            value={tier[field.name]}
+            pre={field.pre}
+            placeholder={field.placeholder}
+            onChange={(value) => this.editTier(index, field.name, value)}
+            />)}
         </Form>
       </div>
     );

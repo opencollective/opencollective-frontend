@@ -1,0 +1,152 @@
+{
+  "data": {
+    "Event": {
+      "id": 11,
+      "slug": "meetup-5",
+      "createdByUser": {
+        "id": 2957,
+        "__typename": "User"
+      },
+      "name": "BrusselsTogether Meetup 5",
+      "description": "Hello Brussels 👋\n\nWe meet every first Wednesday of the month to talk about the Brussels development community.\n\n![](https://cl.ly/3p013o452u3Y/Screen%20Shot%202017-05-17%20at%202.42.35%20PM.png)\n\nJoin us to discuss with MakeSense, Our House Project and many more change makers.\n\nSchedule\n\n7 pm - Doors open \n\n7:30 pm - #BrusselsTogether - On a mission to make Brussels a great city to live and work\n\n7:40 pm - MakeSense - Turning your talents into unique superpowers to solve challenges of social entrepreneurs\n\n7:55 pm - Our House Project - Enabling effective refugee integration\n\n8:10 pm - Zero Waste X\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n\nThank you for your support :pray:\nGet your early bird ticket now for €5 while they last (€10 at the door). We also have a limited number of free tickets for students and people with low income as we want to make sure we don't exclude anyone. Event is also free for the members of BrusselsTogether ([become a member](https://opencollective.com/brusselstogether/donate/10/monthly)).\n\n**Why making this a paid event?**\nIf we really want this movement to succeed and to have an impact, we need to finance it, together.\nWe are a non profit and all our expenses are posted publicly on our [open collective](https://opencollective.com/brusselstogether).\n\nThank you for your support 🙏",
+      "startsAt": "Wed Jun 07 2017 13:00:00 GMT-0400 (EDT)",
+      "endsAt": "Wed Jun 07 2017 15:00:00 GMT-0400 (EDT)",
+      "timezone": "Europe/Brussels",
+      "location": {
+        "name": "Elzenhof Elsene",
+        "address": "Kroonlaan 12, 1050 Elsene",
+        "lat": 50.8325036,
+        "long": 4.3758299,
+        "__typename": "LocationType"
+      },
+      "tiers": [
+        {
+          "id": 29,
+          "name": "early bird ticket",
+          "description": "Get those while you can. RSVP before June 1st and get the ticket at €5",
+          "amount": 500,
+          "currency": "EUR",
+          "maxQuantity": null,
+          "__typename": "Tier"
+        },
+        {
+          "id": 30,
+          "name": "regular ticket",
+          "description": "Get your ticket for a great evening of inspiration and meeting great people. Includes a free drink and a free high five!",
+          "amount": 1000,
+          "currency": "EUR",
+          "maxQuantity": null,
+          "__typename": "Tier"
+        },
+        {
+          "id": 31,
+          "name": "sponsor",
+          "description": "Sponsor the drinks. Pretty sure everyone will love you.",
+          "amount": 15000,
+          "currency": "EUR",
+          "maxQuantity": null,
+          "__typename": "Tier"
+        },
+        {
+          "id": 32,
+          "name": "free ticket",
+          "description": "For students and low income people only.",
+          "amount": null,
+          "currency": "EUR",
+          "maxQuantity": null,
+          "__typename": "Tier"
+        }
+      ],
+      "collective": {
+        "id": 207,
+        "slug": "brusselstogether",
+        "name": "BrusselsTogether",
+        "mission": "We are on a mission to make Brussels a great city to live and work",
+        "currency": "EUR",
+        "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+        "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+        "stripePublishableKey": "pk_test_5aBB887rPuzvWzbdRiSzV3QB",
+        "__typename": "Collective"
+      },
+      "responses": [
+        {
+          "createdAt": "Wed Jun 07 2017 12:43:47 GMT-0400 (EDT)",
+          "quantity": 1,
+          "status": "YES",
+          "description": null,
+          "user": {
+            "name": "Rick",
+            "avatar": "https://opencollective-production.s3-us-west-1.amazonaws.com/610ddba481394d48bfedcb734ed8bd67_1d38d340-e177-11e6-a815-370fd440a75b.jpeg",
+            "username": "rikmende",
+            "twitterHandle": "RikMende",
+            "description": "Co-Captain @Armada Digital (goal: coop) | Love to promote #Indieweb #CivicTech #Dataviz #RSS Curious about #Blockchain and the future of work by enabling #platformcoop",
+            "__typename": "User"
+          },
+          "tier": {
+            "name": "free ticket",
+            "__typename": "Tier"
+          },
+          "__typename": "Response"
+        },
+        {
+          "createdAt": "Wed Jun 07 2017 12:43:31 GMT-0400 (EDT)",
+          "quantity": 1,
+          "status": "YES",
+          "description": null,
+          "user": {
+            "name": "Larry Moffett",
+            "avatar": null,
+            "username": "larrybru",
+            "twitterHandle": "larrybru",
+            "description": "Organizer of the Brussels Maker Faire",
+            "__typename": "User"
+          },
+          "tier": {
+            "name": "early bird ticket",
+            "__typename": "Tier"
+          },
+          "__typename": "Response"
+        },
+        {
+          "createdAt": "Wed Jun 07 2017 11:09:38 GMT-0400 (EDT)",
+          "quantity": 1,
+          "status": "YES",
+          "description": null,
+          "user": {
+            "name": "Jean-François De Hertogh",
+            "avatar": null,
+            "username": "jfdehertogh1",
+            "twitterHandle": "jfdehertogh",
+            "description": "Contributor #BrusselsTogether",
+            "__typename": "User"
+          },
+          "tier": {
+            "name": "free ticket",
+            "__typename": "Tier"
+          },
+          "__typename": "Response"
+        },
+        {
+          "createdAt": "Wed Jun 07 2017 11:05:51 GMT-0400 (EDT)",
+          "quantity": 1,
+          "status": "YES",
+          "description": null,
+          "user": {
+            "name": "Xavier Damman",
+            "avatar": "https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg",
+            "username": "xdamman",
+            "twitterHandle": "xdamman",
+            "description": "Entrepreneur sharing ideas in copyleft",
+            "__typename": "User"
+          },
+          "tier": {
+            "name": "free ticket",
+            "__typename": "Tier"
+          },
+          "__typename": "Response"
+        }
+      ],
+      "__typename": "Event"
+    }
+  }
+}

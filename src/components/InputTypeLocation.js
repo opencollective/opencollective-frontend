@@ -8,7 +8,7 @@ class InputTypeLocation extends React.Component {
   static propTypes = {
     value: PropTypes.object,
     className: PropTypes.string,
-    onChange: PropTypes.func.required
+    onChange: PropTypes.func.isRequired
   };
 
   constructor(props) {
