@@ -194,7 +194,7 @@ describe('Mutation Tests', () => {
         };
         const result = await graphql(schema, query, null, req);
         expect(result.errors).to.have.length(1);
-        expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to create an event");
+        expect(result.errors[0].message).to.equal("You must be logged in as a member of the collective to create an event");
       });
 
       it("creates an event with multiple tiers", async () => {

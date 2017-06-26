@@ -53,10 +53,10 @@ const mutations = {
         if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
         group = g;
         eventData.GroupId = group.id;
-        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
+        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST', 'BACKER'])
       })
       .then(canCreateEvent => {
-        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You need to be logged in as a core contributor or as a host to create an event"));
+        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You must be logged in as a member of the collective to create an event"));
       })
       .then(() => models.Event.create(eventData))
       .tap(event => {
