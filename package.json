@@ -48,6 +48,7 @@
     "raw-loader": "0.5.1",
     "react": "15.6.1",
     "react-add-to-calendar": "0.0.9",
+    "react-addons-test-utils": "15.5.1",
     "react-apollo": "1.2.0",
     "react-bootstrap": "0.31.0",
     "react-datetime": "2.8.10",
@@ -84,7 +85,6 @@
     "file-loader": "0.10.1",
     "image-webpack-loader": "3.2.0",
     "jest-cli": "20.0.4",
-    "react-addons-test-utils": "15.5.1",
     "react-test-renderer": "15.5.4"
   },
   "jest": {
