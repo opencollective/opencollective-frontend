@@ -10,7 +10,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 class SignInUp extends React.Component {
 
   static propTypes = {
-    label: PropTypes.object,
+    label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
     onSubmit: PropTypes.func, // onSubmit(user)
     emailOnly: PropTypes.bool,
     showLabels: PropTypes.bool,

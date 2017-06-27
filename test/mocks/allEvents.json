@@ -1,0 +1,244 @@
+{
+  "data": {
+    "allEvents": [
+      {
+        "id": 1,
+        "slug": "meetup-2",
+        "name": "BrusselsTogether Meetup 2",
+        "description": "Hey Brussels people,\n\nAfter a very fruitful first event in the heart of Brussels, we are back with some crunchy new projects!\n\n\\#BrusselsTogether events allow people to discover citizen initiatives, while offering the opportunity to the audience to share their ideas and get support from the community. See more on our website http://brusselstogether.org/\n\nEvents always take place in very cool and innovative places.\n\n\\#BrusselsTogether is also a growing community of transparent and inclusive projects, for which everyone can contribute! https://opencollective.com/brusselstogether\n\nSchedule \n\n7 pm - Doors open, onigiris, gyozas & local beers 🍙🍜🍻\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Civic innovation network - Designing a new civic model to foster collaborations between citizens\n\n7:55 pm - Déclic en Perspectives - En route to social entrepreneurship \n\n8:10 pm - Brass'Art Digitaal Café - The first artistic and digital brewery in Molenbeek\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n\n*Registration*\n\nWe suggest a donation of €10 for the organization of the event. Profit will go to the 3 projects.",
+        "startsAt": "Wed Mar 01 2017 13:00:00 GMT-0500 (EST)",
+        "endsAt": "Wed Mar 01 2017 15:00:00 GMT-0500 (EST)",
+        "timezone": "Europe/Brussels",
+        "location": {
+          "name": "W-est end izakaya - Ex Bravo",
+          "address": "Aalststraat 7, 1000 Brussels",
+          "lat": 50.852439,
+          "long": 4.342169,
+          "__typename": "LocationType"
+        },
+        "tiers": [
+          {
+            "id": 4,
+            "name": "free",
+            "description": "Free ticket",
+            "amount": 0,
+            "__typename": "Tier"
+          },
+          {
+            "id": 2,
+            "name": "donate",
+            "description": "Contribute €10 and get a high five at the event! ✋",
+            "amount": 1000,
+            "__typename": "Tier"
+          }
+        ],
+        "collective": {
+          "id": 207,
+          "slug": "brusselstogether",
+          "name": "BrusselsTogether",
+          "mission": "We are on a mission to make Brussels a great city to live and work",
+          "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+          "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+          "__typename": "Collective"
+        },
+        "__typename": "Event"
+      },
+      {
+        "id": 4,
+        "slug": "meetup-3",
+        "name": "BrusselsTogether Meetup 3",
+        "description": "Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n",
+        "startsAt": "Wed Apr 05 2017 13:00:00 GMT-0400 (EDT)",
+        "endsAt": "Wed Apr 05 2017 15:00:00 GMT-0400 (EDT)",
+        "timezone": "Europe/Brussels",
+        "location": {
+          "name": "Brass'Art Digitaal Cafe",
+          "address": "Place communale de Molenbeek 28",
+          "lat": 50.8540523,
+          "long": 4.338612199999943,
+          "__typename": "LocationType"
+        },
+        "tiers": [
+          {
+            "id": 12,
+            "name": "free ticket",
+            "description": "Free ticket",
+            "amount": 0,
+            "__typename": "Tier"
+          },
+          {
+            "id": 11,
+            "name": "sponsor",
+            "description": "Sponsor the drinks. Pretty sure everyone will love you.",
+            "amount": 15000,
+            "__typename": "Tier"
+          }
+        ],
+        "collective": {
+          "id": 207,
+          "slug": "brusselstogether",
+          "name": "BrusselsTogether",
+          "mission": "We are on a mission to make Brussels a great city to live and work",
+          "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+          "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+          "__typename": "Collective"
+        },
+        "__typename": "Event"
+      },
+      {
+        "id": 12,
+        "slug": "meetup-6",
+        "name": "BrusselsTogether Meetup 6",
+        "description": "BrusselsTogether is delighted to invite you to its 6th Meetup of the year.\n\nFor this edition, get ready to learn on the topic of sustainable food. Exchange with great associations working in this field and taste delicious local food!\n\n#BrusselsTogether organizes monthly meetups on the first Wednesday of the month to celebrate bottom-up initiatives that make Brussels a better city to live and work. Join the community https://opencollective.com/brusselstogether\n\n**Agenda & Speakers:**\n\n7.00 pm - Doors open\n\n7.30 pm - Presentation of #BrusselsTogether\n\n7.40 pm - Géry Brusselmans, contributor of Tartine et Boterham\n\n7.50 pm - Seb Dp, contributor of FruitCollect\n\n8.00 pm - Tom Gendry, contributor of Co-oking\n\n8.10 pm - TBA",
+        "startsAt": "Wed Jul 05 2017 13:00:00 GMT-0400 (EDT)",
+        "endsAt": "Wed Jul 05 2017 15:00:00 GMT-0400 (EDT)",
+        "timezone": "Europe/Brussels",
+        "location": {
+          "name": "DigitYser",
+          "address": " Boulevard d'Anvers 40, 1000 Brussels",
+          "lat": 50.857351,
+          "long": 4.350038,
+          "__typename": "LocationType"
+        },
+        "tiers": [
+          {
+            "id": 35,
+            "name": "free ticket",
+            "description": "Please register so that we can print a nametag for you.",
+            "amount": 0,
+            "__typename": "Tier"
+          },
+          {
+            "id": 36,
+            "name": "supporter ticket",
+            "description": "Support the BrusselsTogether collective. Your donations matter. We'll print a nametag for you for the event :)",
+            "amount": 500,
+            "__typename": "Tier"
+          },
+          {
+            "id": 34,
+            "name": "sponsor",
+            "description": "Sponsor the drinks. Pretty sure everyone will love you.",
+            "amount": 15000,
+            "__typename": "Tier"
+          }
+        ],
+        "collective": {
+          "id": 207,
+          "slug": "brusselstogether",
+          "name": "BrusselsTogether",
+          "mission": "We are on a mission to make Brussels a great city to live and work",
+          "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+          "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+          "__typename": "Collective"
+        },
+        "__typename": "Event"
+      },
+      {
+        "id": 8,
+        "slug": "meetup-4",
+        "name": "BrusselsTogether Meetup 4",
+        "description": "Hello Brussels 👋\n\n#BrusselsTogether is growing everyday with tons of new people and ideas to renovate our dear city!\n\nThere are now 9 projects on [#BrusselsTogether](https://opencollective.com/brusselstogether). Although they operate in different areas (civic innovation, urbanism, social inclusiveness), they all share the same purpose: rebuild the city from the bottom-up. \n\nThe next meetup will take place at the all-new BeCentral, a grass-roots initiative aiming to boost Belgium as a digital front-runner. \n\nJoin us to discover 3 ambitious projects happening in Brussels.\n\nSchedule: \n\n7 pm - Doors open \n\n7:30 pm - Introduction to #brusselstogether\n\n7:40 pm - [Share Food](https://www.facebook.com/sharefoodbrussels/) - Sharing instead of wasting\n\n7:55 pm - [Communa ASBL](https://www.facebook.com/asblCommuna/) - Turning empty buildings into socio-cultural centers \n\n8:10 pm - [Veganizer](https://opencollective.com/veganizerbxl) - Let's make Brussels more Vegan Friendly! \n\n8:30 pm - How do *YOU* make Brussels better. Pitch your idea in 60 seconds or less!\n\nGet your early bird ticket now for €5 while they last (€10 at the door). We also have a limited number of free tickets for students and people with low income as we want to make sure we don't exclude anyone. Event is also free for the members of BrusselsTogether ([become a member](https://opencollective.com/brusselstogether/donate/10/monthly)).\n\n**Why making this a paid event?**\nIf we really want this movement to succeed and to have an impact, we need to finance it, together.\nWe are a non profit and all our expenses are posted publicly on our [open collective](https://opencollective.com/brusselstogether).\n\nThank you for your support 🙏",
+        "startsAt": "Wed May 03 2017 13:00:00 GMT-0400 (EDT)",
+        "endsAt": "Wed May 03 2017 15:00:00 GMT-0400 (EDT)",
+        "timezone": "Europe/Brussels",
+        "location": {
+          "name": "BeCentral",
+          "address": "Cantersteen 12, 1000 Brussels",
+          "lat": 50.845568,
+          "long": 4.357482,
+          "__typename": "LocationType"
+        },
+        "tiers": [
+          {
+            "id": 22,
+            "name": "regular ticket",
+            "description": "Get your ticket for a great evening of inspiration and meeting great people. Includes a free drink and a free high five!",
+            "amount": 1000,
+            "__typename": "Tier"
+          },
+          {
+            "id": 20,
+            "name": "sponsor",
+            "description": "Sponsor the drinks. Pretty sure everyone will love you.",
+            "amount": 15000,
+            "__typename": "Tier"
+          },
+          {
+            "id": 24,
+            "name": "free ticket",
+            "description": "For students and low income people only.",
+            "amount": null,
+            "__typename": "Tier"
+          }
+        ],
+        "collective": {
+          "id": 207,
+          "slug": "brusselstogether",
+          "name": "BrusselsTogether",
+          "mission": "We are on a mission to make Brussels a great city to live and work",
+          "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+          "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+          "__typename": "Collective"
+        },
+        "__typename": "Event"
+      },
+      {
+        "id": 11,
+        "slug": "meetup-5",
+        "name": "BrusselsTogether Meetup 5",
+        "description": "Hello Brussels 👋\n\nWe meet every first Wednesday of the month to talk about the Brussels development community.\n\n![](https://cl.ly/3p013o452u3Y/Screen%20Shot%202017-05-17%20at%202.42.35%20PM.png)\n\nJoin us to discuss with MakeSense, Our House Project and many more change makers.\n\nSchedule\n\n7 pm - Doors open \n\n7:30 pm - #BrusselsTogether - On a mission to make Brussels a great city to live and work\n\n7:40 pm - MakeSense - Turning your talents into unique superpowers to solve challenges of social entrepreneurs\n\n7:55 pm - Our House Project - Enabling effective refugee integration\n\n8:10 pm - Zero Waste X\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n\nThank you for your support :pray:\nGet your early bird ticket now for €5 while they last (€10 at the door). We also have a limited number of free tickets for students and people with low income as we want to make sure we don't exclude anyone. Event is also free for the members of BrusselsTogether ([become a member](https://opencollective.com/brusselstogether/donate/10/monthly)).\n\n**Why making this a paid event?**\nIf we really want this movement to succeed and to have an impact, we need to finance it, together.\nWe are a non profit and all our expenses are posted publicly on our [open collective](https://opencollective.com/brusselstogether).\n\nThank you for your support 🙏",
+        "startsAt": "Wed Jun 07 2017 13:00:00 GMT-0400 (EDT)",
+        "endsAt": "Wed Jun 07 2017 15:00:00 GMT-0400 (EDT)",
+        "timezone": "Europe/Brussels",
+        "location": {
+          "name": "Elzenhof Elsene",
+          "address": "Kroonlaan 12, 1050 Elsene",
+          "lat": 50.8325036,
+          "long": 4.3758299,
+          "__typename": "LocationType"
+        },
+        "tiers": [
+          {
+            "id": 29,
+            "name": "early bird ticket",
+            "description": "Get those while you can. RSVP before June 1st and get the ticket at €5",
+            "amount": 500,
+            "__typename": "Tier"
+          },
+          {
+            "id": 30,
+            "name": "regular ticket",
+            "description": "Get your ticket for a great evening of inspiration and meeting great people. Includes a free drink and a free high five!",
+            "amount": 1000,
+            "__typename": "Tier"
+          },
+          {
+            "id": 31,
+            "name": "sponsor",
+            "description": "Sponsor the drinks. Pretty sure everyone will love you.",
+            "amount": 15000,
+            "__typename": "Tier"
+          },
+          {
+            "id": 32,
+            "name": "free ticket",
+            "description": "For students and low income people only.",
+            "amount": null,
+            "__typename": "Tier"
+          }
+        ],
+        "collective": {
+          "id": 207,
+          "slug": "brusselstogether",
+          "name": "BrusselsTogether",
+          "mission": "We are on a mission to make Brussels a great city to live and work",
+          "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+          "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+          "__typename": "Collective"
+        },
+        "__typename": "Event"
+      }
+    ]
+  }
+}

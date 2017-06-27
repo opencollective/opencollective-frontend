@@ -25,8 +25,8 @@ const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 class Event extends React.Component {
 
   static propTypes = {
-    collectiveSlug: PropTypes.string.required,
-    eventSlug: PropTypes.string.required,
+    collectiveSlug: PropTypes.string.isRequired,
+    eventSlug: PropTypes.string.isRequired,
     data: PropTypes.object,
   }
 

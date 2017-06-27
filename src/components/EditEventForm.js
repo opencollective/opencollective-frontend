@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, FormattedDate, FormattedMessage } from 'react-intl';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
 import EditTiers from '../components/EditTiers';
@@ -19,6 +18,49 @@ class EditEventForm extends React.Component {
     this.handleTiersChange = this.handleTiersChange.bind(this);
     
     const event = props.event || {};
+
+    this.state = { event, tiers: event.tiers || [{}] };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.event && (!this.props.event || nextProps.event.name != this.props.event.name)) {
+      this.setState({ event: nextProps.event, tiers: nextProps.event.tiers });
+    }
+  }
+
+  handleChange(fieldname, value) {
+    const event = {};
+    event[fieldname] = value;
+
+    // Make sure that endsAt is always >= startsAt
+    if (fieldname === 'startsAt') {
+      const endsAt = this.state.event.endsAt;
+      if (!endsAt || new Date(endsAt) < new Date(value)) {
+        event['endsAt'] = value;
+      }
+    }
+
+    this.setState( { event: Object.assign({}, this.state.event, event) });
+  }
+
+  handleTiersChange(tiers) {
+    this.setState({tiers});
+  }
+
+  async handleSubmit() {
+    const event = Object.assign({}, this.state.event);
+    event.tiers = this.state.tiers;
+    this.props.onSubmit(event);
+  }
+
+  render() {
+
+    const { event } = this.props;
+
+    if (!event.collective) return (<div />);
+
+    const isNew = !(event && event.id);
+    const submitBtnLabel = isNew ? "Create Event" : "Save";
 
     this.fields = [
       {
@@ -53,48 +95,6 @@ class EditEventForm extends React.Component {
         type: 'location'
       }
     ];
-
-    this.state = { event, tiers: event.tiers || [{}] };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.event && (!this.props.event || nextProps.event.name != this.props.event.name)) {
-      this.setState({ event: nextProps.event, tiers: nextProps.event.tiers });
-    }
-  }
-
-  handleChange(fieldname, value) {
-    const event = {};
-    event[fieldname] = value;
-
-    // Make sure that endsAt is always >= startsAt
-    if (fieldname === 'startsAt') {
-      const endsAt = this.state.event.endsAt;
-      if (!endsAt || new Date(endsAt) < new Date(value)) {
-        event['endsAt'] = value;
-      }
-    }
-
-    this.setState( { event: Object.assign({}, this.state.event, event) });
-  }
-
-  handleTiersChange(tiers) {
-    console.log(">>> handleTiersChange", tiers);
-    this.setState({tiers});
-  }
-
-  async handleSubmit() {
-    const event = Object.assign({}, this.state.event);
-    event.tiers = this.state.tiers;
-    this.props.onSubmit(event);
-  }
-
-  render() {
-
-    const { event } = this.props;
-
-    const isNew = !(event && event.id);
-    const submitBtnLabel = isNew ? "Create Event" : "Save";
 
     return (
       <div className="EditEventForm">
@@ -133,7 +133,17 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
-            {this.fields.map((field) => <InputField value={this.state.event[field.name]} ref={field.name} name={field.name} placeholder={field.placeholder} type={field.type} pre={field.pre} context={this.state.event} onChange={(value) => this.handleChange(field.name, value)} />)}
+            {this.fields.map((field) => <InputField
+              key={field.name}
+              value={this.state.event[field.name]}
+              ref={field.name}
+              name={field.name}
+              placeholder={field.placeholder}
+              type={field.type}
+              pre={field.pre}
+              context={this.state.event}
+              onChange={(value) => this.handleChange(field.name, value)}
+              />)}
           </div>
           <EditTiers tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
         </div>

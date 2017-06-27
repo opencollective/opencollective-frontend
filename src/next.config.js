@@ -1,9 +1,15 @@
 
-const path = require('path')
-const glob = require('glob')
+import path from 'path';
+import glob from 'glob';
+import webpack from 'webpack';
 
 module.exports = {
   webpack: (config, { dev }) => {
+    config.plugins.push(
+      new webpack.IgnorePlugin(/react\/addons/),
+      new webpack.IgnorePlugin(/react\/lib\/ExecutionEnvironment/),
+      new webpack.IgnorePlugin(/react\/lib\/ReactContext/)
+    );
     config.module.rules.push(
       {
         test: /\.(css|scss|md)/,

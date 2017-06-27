@@ -37,7 +37,7 @@ export function isValidEmail(email) {
 }
 
 export function getCurrencySymbol(currency) {
- const r = Number(0).toLocaleString(currency, { style: 'currency', currency, maximumFractionDigits: 0});
+ const r = Number(0).toLocaleString(currency, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0});
  return r.replace(/0$/,'');
 }
 

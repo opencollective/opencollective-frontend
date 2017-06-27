@@ -1,0 +1,14 @@
+{
+  "data": {
+    "Collective": {
+      "id": 207,
+      "slug": "brusselstogether",
+      "name": "BrusselsTogether",
+      "description": "We are coming together to make Brussels a great city to live and work.",
+      "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
+      "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+      "currency": "EUR",
+      "__typename": "Collective"
+    }
+  }
+}
