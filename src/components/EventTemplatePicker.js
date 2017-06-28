@@ -24,7 +24,6 @@ class EventTemplatePicker extends React.Component {
   handleTemplateChange(e) {
     const eventId = Number(e.target.value);
     const template = eventId ? this.props.data.allEvents.find(event => event.id === eventId) : {};
-    console.log(">>> handleTemplateChange", eventId, template, this.props.data.allEvents);
     this.props.onChange(Object.assign({}, template));
   }
 

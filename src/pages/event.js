@@ -33,15 +33,8 @@ class EventPage extends React.Component {
   }
 
   async componentDidMount() {
-    setTimeout(async () => {
-      const res = await this.props.getLoggedInUser();
-      const LoggedInUser = {...res.data.LoggedInUser};
-      if (LoggedInUser && LoggedInUser.collectives) {
-        const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
-        LoggedInUser.membership = membership;
-      }
-      this.setState({LoggedInUser});
-    }, 0);
+    const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
+    this.setState({LoggedInUser});
   }
 
   render() {
@@ -66,7 +59,7 @@ class EventPage extends React.Component {
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
-          <Event event={event} LoggedInUser={this.state.LoggedInUser} />
+          <Event event={event} LoggedInUser={LoggedInUser} />
         </div>
       </IntlProvider>
     );

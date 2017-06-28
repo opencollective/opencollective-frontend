@@ -32,17 +32,9 @@ class CreateEventPage extends React.Component {
   }
 
   async componentDidMount() {
-    setTimeout(async () => {
-      const res = await this.props.getLoggedInUser();
-      const LoggedInUser = {...res.data.LoggedInUser};
-      if (LoggedInUser && LoggedInUser.collectives) {
-        const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
-        LoggedInUser.membership = membership;
-        LoggedInUser.canCreateEvent = Boolean(membership);
-      }
-      console.log("Logged in user: ", LoggedInUser);
-      this.setState({LoggedInUser, loading: false});
-    }, 0);
+    const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
+    LoggedInUser.canCreateEvent = Boolean(LoggedInUser.membership);
+    this.setState({LoggedInUser, loading: false});
   }
 
   render() {

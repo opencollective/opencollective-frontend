@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import EventHeader from '../components/EventHeader';
+import CollectiveCover from '../components/CollectiveCover';
 import ActionBar from '../components/ActionBar';
 import Location from '../components/Location';
 import HashLink from 'react-scrollchor';
@@ -25,9 +25,8 @@ const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 class Event extends React.Component {
 
   static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired,
-    eventSlug: PropTypes.string.isRequired,
-    data: PropTypes.object,
+    event: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -121,7 +120,7 @@ class Event extends React.Component {
   }
 
   getDefaultActions(props) {
-    const { LoggedInUser } = props;
+    const { LoggedInUser } = props || this.props;
     const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
     if (LoggedInUser && LoggedInUser.canEditEvent) {
       return [...this.defaultActions, {
@@ -134,7 +133,10 @@ class Event extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    this.setState({actions: this.getDefaultActions(props) });
+    console.log(">>> componentWillReceiveProps", props);
+    if (props) {
+      this.setState({actions: this.getDefaultActions(props) });
+    }
   }
 
   changeView(view) {
@@ -241,7 +243,7 @@ class Event extends React.Component {
               <NotificationBar status={this.state.status} error={this.state.error} />
 
               {this.state.view === 'default' &&
-                <EventHeader
+                <CollectiveCover
                   logo={this.event.collective.logo}
                   title={this.event.name}
                   backgroundImage={backgroundImage}

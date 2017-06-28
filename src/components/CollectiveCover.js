@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class EventHeader extends React.Component {
+class CollectiveCover extends React.Component {
 
   static propTypes = {
     title: PropTypes.string,
     description: PropTypes.string,
     logo: PropTypes.string,
-    backgroundImage: PropTypes.string
+    backgroundImage: PropTypes.string,
+    style: PropTypes.object
   }
 
   render() {
-    const { title, logo, backgroundImage } = this.props;
+    const { title, logo, backgroundImage, className } = this.props;
 
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundSize: 'cover'
+      backgroundSize: 'cover',
+      ...this.props.style
     };
 
     return (
-      <div className="EventHeader">
+      <div className={`CollectiveCover ${className}`}>
         <style jsx>{`
         .cover {
           display: flex;
@@ -28,6 +30,9 @@ class EventHeader extends React.Component {
           text-align: center;
           height: 400px;
           width: 100%;
+        }
+        .small .cover {
+          height: 200px;
         }
         .backgroundCover {
           position: absolute;
@@ -63,4 +68,4 @@ class EventHeader extends React.Component {
   }
 }
 
-export default EventHeader;
+export default CollectiveCover;

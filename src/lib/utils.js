@@ -41,6 +41,11 @@ export function getCurrencySymbol(currency) {
  return r.replace(/0$/,'');
 }
 
+export function imagePreview(src, defaultImage, options = { width: 640 }) {
+  if (src) return `https://res.cloudinary.com/opencollective/image/fetch/w_${options.width},f_jpg/${src}`;
+  return defaultImage;
+}
+
 export function formatCurrency(amount, currency = 'USD', intl) {
   if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
   amount = amount / 100;

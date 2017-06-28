@@ -153,6 +153,81 @@ const getAttendeesQuery = gql`
   }
 `;
 
+const getCollectiveTransactionsQuery = gql`
+  query CollectiveTransactions($collectiveSlug: String!, $limit: Int, $offset: Int) {
+    Collective(collectiveSlug: $collectiveSlug) {
+      id,
+      slug,
+      name,
+      currency,
+      backgroundImage,
+      settings,
+      logo
+    }
+    allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset) {
+      id,
+      uuid,
+      title,
+      createdAt,
+      type,
+      amount,
+      currency,
+      netAmountInGroupCurrency,
+      hostFeeInTxnCurrency,
+      platformFeeInTxnCurrency,
+      paymentProcessorFeeInTxnCurrency,
+      paymentMethod {
+        name
+      },
+      user {
+        id,
+        name,
+        avatar
+      },
+      host {
+        id,
+        name
+      }
+      ... on Expense {
+        category
+        attachment
+      }
+    }
+  }
+`;
+
+const TRANSACTIONS_PER_PAGE = 10;
+export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQuery, {
+  options(props) {
+    return {
+      variables: {
+        ...props,
+        offset: 0,
+        limit: TRANSACTIONS_PER_PAGE * 2
+      }
+    }
+  },
+  props: ({ data }) => ({
+    data,
+    fetchMore: () => {
+      return data.fetchMore({
+        variables: {
+          offset: data.allTransactions.length,
+          limit: TRANSACTIONS_PER_PAGE
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return previousResult
+          }
+          return Object.assign({}, previousResult, {
+            // Append the new posts results to the old one
+            allTransactions: [...previousResult.allTransactions, ...fetchMoreResult.allTransactions]
+          })
+        }
+      })
+    }
+  })  
+});
 export const addCollectiveData = graphql(getCollectiveQuery);
 export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
@@ -161,8 +236,23 @@ export const addAttendeesData = graphql(getAttendeesQuery);
 export const addGetLoggedInUserFunction = graphql(getLoggedInUserQuery, {
   props: ({ data }) => ({
     data,
-    getLoggedInUser: () => {
-      return data.refetch();
+    getLoggedInUser: (collectiveSlug) => {
+      if (window.localStorage.getItem('accessToken')) {
+        return new Promise((resolve) => {
+          setTimeout(async () => {
+            return data.refetch().then(res => {
+              if (res.data && res.data.LoggedInUser) {
+                const LoggedInUser = {...res.data.LoggedInUser};
+                if (LoggedInUser && LoggedInUser.collectives && collectiveSlug) {
+                  const membership = LoggedInUser.collectives.find(c => c.slug === collectiveSlug);
+                  LoggedInUser.membership = membership;
+                }
+                return resolve(LoggedInUser);
+              }
+            });      
+          }, 0);
+        });
+      }
     }
   })
 });

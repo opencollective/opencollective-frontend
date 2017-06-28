@@ -1,5 +1,21 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client'
-
+import { IntrospectionFragmentMatcher } from 'react-apollo';
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData: {
+    __schema: {
+      types: [
+        {
+          kind: "INTERFACE",
+          name: "Transaction",
+          possibleTypes: [
+            { name: "Expense" },
+            { name: "Donation" },
+          ],
+        }
+      ],
+    },
+  }
+})
 let apolloClient = null
 
 function createClient (initialState, options) {
@@ -12,6 +28,7 @@ function createClient (initialState, options) {
   return new ApolloClient({
     ssrMode: !process.browser,
     dataIdFromObject: result => `${result.__typename}#${result.id || result.name}` || null,
+    fragmentMatcher,
     initialState,
     networkInterface: createNetworkInterface({
       uri: options.uri,

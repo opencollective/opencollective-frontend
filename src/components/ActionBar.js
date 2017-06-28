@@ -7,7 +7,7 @@ class ActionBar extends React.Component {
 
   static propTypes = {
     actions: PropTypes.arrayOf(PropTypes.object).isRequired,
-    info: PropTypes.string
+    info: PropTypes.node
   }
 
   render() {
@@ -82,7 +82,7 @@ class ActionBar extends React.Component {
               style={action.className === 'selected' ? { color: colors.green } : {}}
               label={action.label}
               icon={action.icon}
-              onClick={() => action.onClick()}
+              onClick={() => action.onClick && action.onClick()}
               >{action.component}</Button> 
           )}
           </div>
