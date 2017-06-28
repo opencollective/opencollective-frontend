@@ -233,26 +233,30 @@ export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
 
-export const addGetLoggedInUserFunction = graphql(getLoggedInUserQuery, {
-  props: ({ data }) => ({
-    data,
-    getLoggedInUser: (collectiveSlug) => {
-      if (window.localStorage.getItem('accessToken')) {
-        return new Promise((resolve) => {
-          setTimeout(async () => {
-            return data.refetch().then(res => {
-              if (res.data && res.data.LoggedInUser) {
-                const LoggedInUser = {...res.data.LoggedInUser};
-                if (LoggedInUser && LoggedInUser.collectives && collectiveSlug) {
-                  const membership = LoggedInUser.collectives.find(c => c.slug === collectiveSlug);
-                  LoggedInUser.membership = membership;
+export const addGetLoggedInUserFunction = (component) => {
+  const accessToken = global.window && window.localStorage.getItem('accessToken');
+  if (!accessToken) return component;
+  return graphql(getLoggedInUserQuery, {
+    props: ({ data }) => ({
+      data,
+      getLoggedInUser: (collectiveSlug) => {
+        if (window.localStorage.getItem('accessToken')) {
+          return new Promise((resolve) => {
+            setTimeout(async () => {
+              return data.refetch().then(res => {
+                if (res.data && res.data.LoggedInUser) {
+                  const LoggedInUser = {...res.data.LoggedInUser};
+                  if (LoggedInUser && LoggedInUser.collectives && collectiveSlug) {
+                    const membership = LoggedInUser.collectives.find(c => c.slug === collectiveSlug);
+                    LoggedInUser.membership = membership;
+                  }
+                  return resolve(LoggedInUser);
                 }
-                return resolve(LoggedInUser);
-              }
-            });      
-          }, 0);
-        });
+              });      
+            }, 0);
+          });
+        }
       }
-    }
-  })
-});
+    })
+  })(component);
+}

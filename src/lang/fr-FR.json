@@ -15,7 +15,6 @@
   "event.startsAt.label": "Start date and time",
   "event.endsAt.label": "End date and time",
   "event.location.label": "location name",
-  "event.address.label": "address",
   "InterestedForm.RemindMe": "remind me",
   "response.status.interested": "{name} is interested",
   "response.status.yes": "{name} is going",
@@ -31,8 +30,16 @@
   "TicketsConfirmed.SeeYouSoon": "See you soon!",
   "tier.GetTicket": "{quantity, plural, one {get ticket} other {get tickets}}",
   "tier.GetTier": "deviens un {name}",
+  "transaction.expense.type": "dépense",
+  "transaction.expense.madeBy": "soumise par",
+  "transaction.donation.type": "donation",
+  "transaction.donation.madeBy": "de",
+  "transaction.hostFeeInTxnCurrency": "commission pour le sponsor fiscal",
+  "transaction.platformFeeInTxnCurrency": "commission Open Collective",
+  "transaction.paymentProcessorFeeInTxnCurrency": "commission pour le processeur de paiement",
   "UserCard.since": "depuis",
   "utils.free": "gratuit",
-  "events.title.futureEvents": "Next {n, plural, one {event} other {events}}",
-  "events.title.pastEvents": "Past {n, plural, one {event} other {events}}"
+  "events.title.futureEvents": "{n, plural, one {Prochain événement} other {Prochains événements}}",
+  "events.title.pastEvents": "{n, plural, one {événement précédent} other {événement précédents}}",
+  "transactions.title": "{n, plural, one {Dernière transaction} other {Dernières transactions}}"
 }

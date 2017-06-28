@@ -25,8 +25,8 @@ addLocaleData({
 
 class TransactionsPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug } }) {
-    return { collectiveSlug }
+  static getInitialProps ({ query: { collectiveSlug }, data }) {
+    return { collectiveSlug, data }
   }
 
   constructor(props) {
@@ -43,8 +43,6 @@ class TransactionsPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
-
-    if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
