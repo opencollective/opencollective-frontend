@@ -22,7 +22,6 @@ class CreditCardForm extends React.Component {
     if (typeof Stripe !== 'undefined') {
       // eslint-disable-next-line
       Stripe.setPublishableKey(this.props.stripePublishableKey);
-      console.log("setting stripePublishableKey",this.props.stripePublishableKey);
     }
 
     this.state = {

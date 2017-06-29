@@ -1,8 +1,9 @@
 import { ApolloProvider, getDataFromTree } from 'react-apollo'
 import React from 'react'
+import PropTypes from 'prop-types';
 import 'isomorphic-fetch'
 import { initClient } from './initClient'
-import { logger } from '../lib/logger';
+import Head from 'next/head'
 
 const env = process.env.NODE_ENV || "development";
 
@@ -23,52 +24,74 @@ switch (env) {
 const api_key_param = (API_KEY) ? `?api_key=${API_KEY}` : '';
 const graphqlUri = `${API_URL}/graphql${api_key_param}`;
 
-export default (Component) => (
-  class extends React.Component {
+export default ComposedComponent => {
+  return class WithData extends React.Component {
+    static displayName = `WithData(${ComposedComponent.displayName})`
+    static propTypes = {
+      serverState: PropTypes.object.isRequired
+    }
+
     static async getInitialProps (ctx) {
+      let serverState = {}
+
       const headers = ctx.req ? ctx.req.headers : {}
       const options = {
         uri: graphqlUri,
         headers
       }
-      const client = initClient(null, options)
 
-      const props = {
-        url: { query: ctx.query, pathname: ctx.pathname },
-        ...await (Component.getInitialProps ? Component.getInitialProps(ctx) : {})
+      // Evaluate the composed component's getInitialProps()
+      let composedInitialProps = {}
+      if (ComposedComponent.getInitialProps) {
+        composedInitialProps = await ComposedComponent.getInitialProps(ctx)
       }
 
+      // Run all graphql queries in the component tree
+      // and extract the resulting data
       if (!process.browser) {
+        const apollo = initClient(undefined, options)
+        // Provide the `url` prop data in case a graphql query uses it
+        const url = {query: ctx.query, pathname: ctx.pathname}
+
+        // Run all graphql queries
         const app = (
-          <ApolloProvider client={client}>
-            <Component {...props} />
+          <ApolloProvider client={apollo}>
+            <ComposedComponent url={url} {...composedInitialProps} />
           </ApolloProvider>
         )
-        await getDataFromTree(app).catch(err => {
-          logger.error(">>> error in getDataFromTree", err);
-        });
+        await getDataFromTree(app)
+        // getDataFromTree does not call componentWillUnmount
+        // head side effect therefore need to be cleared manually
+        Head.rewind()
+
+        // Extract query data from the Apollo's store
+        const state = apollo.getInitialState()
+
+        serverState = {
+          apollo: { // Make sure to only include Apollo's data state
+            data: state.data
+          }
+        }
       }
 
       return {
-        initialState: {
-          [client.reduxRootKey]: { data: client.getInitialState().data }
-        },
         options,
-        ...props
+        serverState,
+        ...composedInitialProps
       }
     }
 
     constructor (props) {
-      super(props);
-      this.client = initClient(this.props.initialState, this.props.options);
+      super(props)
+      this.apollo = initClient(this.props.serverState, this.props.options)
     }
 
     render () {
       return (
-        <ApolloProvider client={this.client}>
-          <Component {...this.props} />
+        <ApolloProvider client={this.apollo}>
+          <ComposedComponent {...this.props} />
         </ApolloProvider>
       )
     }
   }
-)
+}

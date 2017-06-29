@@ -1,24 +1,11 @@
 import withData from '../lib/withData'
+import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addEventData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
 import EditEvent from '../components/EditEvent';
-import { IntlProvider, addLocaleData } from 'react-intl';
 
-import 'intl';
-import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
-import en from 'react-intl/locale-data/en';
-import enUS from '../lang/en-US.json';
-// import fr from 'react-intl/locale-data/fr';
-// import es from 'react-intl/locale-data/es';
-// import frFR from '../lang/fr-FR.json';
-
-addLocaleData([...en]);
-addLocaleData({
-    locale: 'en-US',
-    parentLocale: 'en',
-});
 
 class EditEventPage extends React.Component {
 
@@ -32,15 +19,8 @@ class EditEventPage extends React.Component {
   }
 
   async componentDidMount() {
-    setTimeout(async () => {
-      const res = await this.props.getLoggedInUser();
-      const LoggedInUser = {...res.data.LoggedInUser};
-      if (LoggedInUser && LoggedInUser.collectives) {
-        const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
-        LoggedInUser.membership = membership;
-      }
-      this.setState({LoggedInUser, loading: false});
-    }, 0);
+    const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
+    this.setState({LoggedInUser, loading: false});
   }
 
   render() {
@@ -62,13 +42,11 @@ class EditEventPage extends React.Component {
     }
 
     return (
-      <IntlProvider locale="en-US" messages={enUS}>
-        <div>
-          <EditEvent event={event} LoggedInUser={LoggedInUser} />
-        </div>
-      </IntlProvider>
+      <div>
+        <EditEvent event={event} LoggedInUser={LoggedInUser} />
+      </div>
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addEventData(EditEventPage)));
+export default withData(addGetLoggedInUserFunction(addEventData(withIntl(EditEventPage))));

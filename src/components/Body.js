@@ -8,7 +8,7 @@ export default class Body extends React.Component {
         <style jsx>{`
         main {
           height: 100%;
-          padding-bottom: 8rem;
+          padding-bottom: 10rem;
         }
         @media(max-width: 600px) {
           main {

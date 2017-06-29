@@ -1,8 +1,32 @@
-import ApolloClient, { createNetworkInterface } from 'apollo-client'
+import { ApolloClient, createNetworkInterface } from 'react-apollo'
+import fetch from 'isomorphic-fetch'
 
 let apolloClient = null
 
-function createClient (initialState, options) {
+// Polyfill fetch() on the server (used by apollo-client)
+if (!process.browser) {
+  global.fetch = fetch
+}
+
+import { IntrospectionFragmentMatcher } from 'react-apollo';
+const fragmentMatcher = new IntrospectionFragmentMatcher({
+  introspectionQueryResultData: {
+    __schema: {
+      types: [
+        {
+          kind: "INTERFACE",
+          name: "Transaction",
+          possibleTypes: [
+            { name: "Expense" },
+            { name: "Donation" },
+          ],
+        }
+      ],
+    },
+  }
+})
+
+function createClient (initialState, options = {}) {
 
   const headers = {};
   if (options.accessToken) {
@@ -12,27 +36,32 @@ function createClient (initialState, options) {
   return new ApolloClient({
     ssrMode: !process.browser,
     dataIdFromObject: result => `${result.__typename}#${result.id || result.name}` || null,
+    fragmentMatcher,
     initialState,
     networkInterface: createNetworkInterface({
       uri: options.uri,
       opts: {
         credentials: 'same-origin',
         headers
-        // Pass options.headers here if your graphql server requires them
       }
     })
   })
 }
 
-export const initClient = (initialState, options) => {
+export function initClient (initialState, options) {
+  // Make sure to create a new client for every server-side request so that data
+  // isn't shared between connections (which would be bad)
   if (!process.browser) {
     return createClient(initialState, options)
   }
+
+  // Reuse client on the client-side
   if (!apolloClient) {
     if (window.localStorage) {
       options.accessToken = window.localStorage.getItem('accessToken');
     }
     apolloClient = createClient(initialState, options)
   }
+
   return apolloClient
 }

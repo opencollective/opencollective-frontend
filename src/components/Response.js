@@ -3,15 +3,10 @@ import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
+import { pickAvatar } from '../lib/user.lib';
 
 const star = '/static/images/icons/star.svg';
 
-const avatar1 = '/static/images/avatar-01.svg';
-const avatar2 = '/static/images/avatar-02.svg';
-const avatar3 = '/static/images/avatar-03.svg';
-const avatar4 = '/static/images/avatar-04.svg';
-
-const avatars = [avatar1, avatar2, avatar3, avatar4];
 
 class Response extends React.Component {
 
@@ -28,14 +23,6 @@ class Response extends React.Component {
 
   }
 
-  pickAvatar(name) {
-    let sum = 0;
-    for (let i = 0; i < name.length; i++) {
-      sum += name.charCodeAt(i);
-    }
-    return avatars[sum % 4];
-  }
-
   render() {
     const { intl, response } = this.props;
     const { user, description, status } = response;
@@ -44,7 +31,7 @@ class Response extends React.Component {
 
     if (!name) return (<div/>);
 
-    const avatar = user.avatar || this.pickAvatar(name);
+    const avatar = user.avatar || pickAvatar(name);
     const linkTo = `/${user.username}`;
     const title = intl.formatMessage(this.messages[status], { name });
 

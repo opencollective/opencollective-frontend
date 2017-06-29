@@ -19,7 +19,7 @@ export default () => {
       </style>
       <Header />
       <Body>
-        <h1>Event Not Found</h1>
+        <h1>Not Found</h1>
         <div className="shrug">¯\_(ツ)_/¯ </div>
       </Body>
       <Footer />

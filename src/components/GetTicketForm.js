@@ -9,7 +9,7 @@ class GetTicketForm extends React.Component {
   static propTypes = {
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
-    quantity: PropTypes.number.isRequired,
+    quantity: PropTypes.number,
     stripePublishableKey: PropTypes.string,
     tier: PropTypes.object.isRequired
   }

@@ -1,24 +1,10 @@
-import withData from '../lib/withData'
-import React from 'react'
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
+import React from 'react';
 import CreateEvent from '../components/CreateEvent';
-import { IntlProvider, addLocaleData } from 'react-intl';
 import { addGetLoggedInUserFunction, addCollectiveData } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
-
-import 'intl';
-import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
-import en from 'react-intl/locale-data/en';
-import enUS from '../lang/en-US.json';
-// import fr from 'react-intl/locale-data/fr';
-// import es from 'react-intl/locale-data/es';
-// import frFR from '../lang/fr-FR.json';
-
-addLocaleData([...en]);
-addLocaleData({
-    locale: 'en-US',
-    parentLocale: 'en',
-});
 
 class CreateEventPage extends React.Component {
 
@@ -32,17 +18,9 @@ class CreateEventPage extends React.Component {
   }
 
   async componentDidMount() {
-    setTimeout(async () => {
-      const res = await this.props.getLoggedInUser();
-      const LoggedInUser = {...res.data.LoggedInUser};
-      if (LoggedInUser && LoggedInUser.collectives) {
-        const membership = LoggedInUser.collectives.find(c => c.slug === this.props.collectiveSlug);
-        LoggedInUser.membership = membership;
-        LoggedInUser.canCreateEvent = Boolean(membership);
-      }
-      console.log("Logged in user: ", LoggedInUser);
-      this.setState({LoggedInUser, loading: false});
-    }, 0);
+    const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
+    LoggedInUser.canCreateEvent = Boolean(LoggedInUser.membership);
+    this.setState({LoggedInUser, loading: false});
   }
 
   render() {
@@ -58,13 +36,11 @@ class CreateEventPage extends React.Component {
     }
 
     return (
-      <IntlProvider locale="en-US" messages={enUS}>
-        <div>
-          <CreateEvent collective={data.Collective} LoggedInUser={this.state.LoggedInUser} />
-        </div>
-      </IntlProvider>
+      <div>
+        <CreateEvent collective={data.Collective} LoggedInUser={this.state.LoggedInUser} />
+      </div>
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveData(CreateEventPage)));
+export default withData(withIntl(addGetLoggedInUserFunction(addCollectiveData(CreateEventPage))));
