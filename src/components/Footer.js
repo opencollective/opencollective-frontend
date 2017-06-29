@@ -43,7 +43,7 @@ class Footer extends React.Component {
           color: white;
           font-size: 1.2rem;
           font-weight: 300;
-          font-family: Montserrat,sans-serif;
+          font-family: montserratlight,arial,sans-serif;
           text-decoration: none;
           padding: 1rem;
           display: block;

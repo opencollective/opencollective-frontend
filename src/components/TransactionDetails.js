@@ -74,7 +74,7 @@ class TransactionDetails extends React.Component {
             text-transform: uppercase;
             color: #aaaeb3;
             font-weight: 300;
-            font-family: Lato, Montserrat, Arial;
+            font-family: lato, montserratlight, arial;
             white-space: nowrap;
           }
           .netAmountInGroupCurrency {

@@ -27,7 +27,8 @@ class TransactionsPage extends React.Component {
   }
 
   async componentDidMount() {
-    const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
+    const { getLoggedInUser } = this.props;
+    const LoggedInUser = await getLoggedInUser && getLoggedInUser(this.props.collectiveSlug);
     this.setState({LoggedInUser});
   }
 
@@ -72,6 +73,7 @@ class TransactionsPage extends React.Component {
             <Transactions
               collective={collective}
               transactions={transactions}
+              refetch={data.refetch}
               fetchMore={this.props.fetchMore}
               />
 

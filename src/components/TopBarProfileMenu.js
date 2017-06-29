@@ -55,7 +55,7 @@ class TopBarProfileMenu extends React.Component {
         }
         .LoginTopBarProfileMenuHeading {
           position: relative;
-          font-family: Montserrat;
+          font-family: montserratlight, arial;
           font-size: 10px;
           font-weight: 500;
           text-align: left;
@@ -85,7 +85,7 @@ class TopBarProfileMenu extends React.Component {
           display: inline-block;
           width: 100%;
           text-decoration: none;
-          font-family: Montserrat;
+          font-family: montserratlight, arial;
           font-size: 14px;
           font-weight: 300;
           text-align: left;
