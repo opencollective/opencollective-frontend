@@ -79,6 +79,20 @@ const queries = {
     }
   },
   /*
+   * Given an id, returns a transaction
+   */
+  Transaction: {
+    type: TransactionInterfaceType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args) {
+      return models.Transaction.findOne({ where: { id: args.id }});
+    }
+  },
+  /*
    * Given a collective slug and an event slug, returns the event
    */
   Event: {

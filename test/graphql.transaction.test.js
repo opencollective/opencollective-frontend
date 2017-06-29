@@ -81,6 +81,46 @@ describe('graphql.transaction.test.js', () => {
 
   describe('return transactions', () => {
 
+    it('returns one transaction ', async () => {
+      const query = `
+        query Transaction {
+          Transaction(id: 7071) {
+            id,
+            type,
+            user {
+              id,
+              firstName,
+              email
+            },
+            host {
+              id,
+              firstName
+              email
+            },
+            ... on Expense {
+              attachment
+            }
+            ... on Donation {
+              paymentMethod {
+                id,
+                name
+              },
+              subscription {
+                id,
+                interval
+              }
+            }
+          }
+        }
+      `;
+      const context = { remoteUser: null };
+      const result = await graphql(schema, query, null, context);
+      expect(result.errors).to.not.exist;
+      const transaction = result.data.Transaction;
+      expect(transaction.id).to.equal(7071);
+      expect(transaction.attachment).to.equal(null);
+    });
+
     it('with pagination', async () => {
       const limit = 10;
       const offset = 5;

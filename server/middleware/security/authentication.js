@@ -9,6 +9,7 @@ import {createOrUpdate as createOrUpdateConnectedAccount} from '../../controller
 import models from '../../models';
 import errors from '../../lib/errors';
 import required from '../required_param';
+import debug from 'debug';
 
 const {
   User
@@ -134,6 +135,7 @@ export const _authenticateUserByJwt = (req, res, next) => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({seenAt: new Date()});
       req.remoteUser = user;
+      debug('auth')('logged in user', req.remoteUser.username);
       next();
     })
     .catch(next);
