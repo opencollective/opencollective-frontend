@@ -76,7 +76,7 @@ class Transaction extends React.Component {
             cursor: pointer;
           }
           .details {
-            font-size: 11px;
+            font-size: 1.2rem;
             overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             max-height: 15rem;
@@ -167,7 +167,7 @@ class Transaction extends React.Component {
           <img src={imagePreview(transaction.user.avatar,pickAvatar(transaction.user.id), { width: 80 })} />
         </div>
         <div className="body">
-        <a href={`/${collective.slug}/transactions/${transaction.uuid}`}>
+        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
           {type === 'expense' && transaction.title}
           {type === 'donation' && capitalize(intl.formatMessage(this.messages['donation.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')}))}
         </a>
