@@ -192,6 +192,11 @@ const getCollectiveTransactionsQuery = gql`
         category
         attachment
       }
+      ... on Donation {
+        subscription {
+          interval
+        }
+      }
     }
   }
 `;

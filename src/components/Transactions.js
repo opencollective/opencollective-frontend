@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Transaction from './Transaction';
 import { Button } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 
 class Transactions extends React.Component {
 
@@ -44,7 +45,10 @@ class Transactions extends React.Component {
             />
         )}
         <div className="loadMoreBtn">
-          <Button bsStyle='default' onClick={this.fetchMore}>{this.state.loading ? 'loading' : 'load more'}</Button>
+          <Button bsStyle='default' onClick={this.fetchMore}>
+            {this.state.loading && <FormattedMessage id='transactions.loading' defaultMessage='loading' />}
+            {!this.state.loading && <FormattedMessage id='transactions.loadMore' defaultMessage='load more' />}
+          </Button>
         </div>
       </div>
     );

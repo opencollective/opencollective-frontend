@@ -63,6 +63,7 @@ export const pluralize = (str, n) => {
 
 export const capitalize = (str) => {
   if (!str) return '';
+  str = str.trim();
   return `${str[0].toUpperCase()}${str.substr(1)}`;
 }
 

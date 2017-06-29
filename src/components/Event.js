@@ -244,6 +244,7 @@ class Event extends React.Component {
 
               {this.state.view === 'default' &&
                 <CollectiveCover
+                  collective={this.event.collective}
                   logo={this.event.collective.logo}
                   title={this.event.name}
                   backgroundImage={backgroundImage}

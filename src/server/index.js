@@ -2,6 +2,8 @@ import express from 'express';
 import next from 'next';
 import routes from './routes';
 import { loggerMiddleware, logger } from './logger';
+import accepts from 'accepts';
+import { getLocaleDataScript, getMessages, languages } from './intl';
 
 const env = process.env.NODE_ENV || "development";
 const dev = (env === 'development');
@@ -20,6 +22,15 @@ app.prepare()
   server.get('/log/:type', (req, res) => {
     logger[req.params.type](req.query.message);
     res.send('ok');
+  });
+
+  server.use((req, res, next) => {
+    const accept = accepts(req)
+    const locale = accept.language(dev ? ['en'] : languages)
+    req.locale = locale
+    req.localeDataScript = getLocaleDataScript(locale)
+    req.messages = dev ? {} : getMessages(locale)
+    next();
   });
 
   server.use(routes(server, app));

@@ -27,7 +27,7 @@ class Footer extends React.Component {
           margin: 0 auto;
         }
         .logo {
-          padding-top: 0.5rem;
+          margin-top: 8px;
         }
         ul {
           list-style: none;
@@ -51,9 +51,6 @@ class Footer extends React.Component {
         @media(max-width: 600px) {
           .container {
             flex-direction: column;
-          }
-          .logo {
-            padding: 1rem;
           }
         }
         :global(svg #logotype) {

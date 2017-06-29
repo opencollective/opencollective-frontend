@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 class CollectiveCover extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object,
     title: PropTypes.string,
     description: PropTypes.string,
     logo: PropTypes.string,
@@ -12,7 +13,7 @@ class CollectiveCover extends React.Component {
   }
 
   render() {
-    const { title, logo, backgroundImage, className } = this.props;
+    const { collective, title, logo, backgroundImage, className } = this.props;
 
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
@@ -44,22 +45,34 @@ class CollectiveCover extends React.Component {
         }
         .content {
           position: relative;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          max-height: 300px;
+          justify-content: space-around;
         }
         .logo {
-          width: 7.5rem;
-          margin: 20px auto;
+          max-width: 20rem;
+          max-height: 10rem;
+          margin: 0 auto;
           display: block;
         }
         h1 {
-          font-size: 4rem;
+          font-size: 3rem;
           color: white;
-          line-height: 1.5;
+          margin: 0;
+        }
+
+        @media(max-width: 600px) {
+          h1 {
+            font-size: 2.5rem;
+          }
         }
         `}</style>
         <div className="cover">
           <div className="backgroundCover" style={style} />
           <div className="content">
-            <img src={logo} className="logo" />
+            <a href={`/${collective.slug}`}><img src={logo} className="logo" /></a>
             <h1>{title}</h1>
           </div>
         </div>

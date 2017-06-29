@@ -5,23 +5,12 @@ import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveTransactionsData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
-import Loading from '../components/Loading';
 import Error from '../components/Error';
 import withData from '../lib/withData';
-import { IntlProvider, addLocaleData } from 'react-intl';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
 import Transactions from '../components/Transactions';
-import 'intl';
-import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
-import en from 'react-intl/locale-data/en';
-import enUS from '../lang/en-US.json';
 import { get } from 'lodash';
-
-addLocaleData([...en]);
-addLocaleData({
-    locale: 'en-US',
-    parentLocale: 'en',
-});
+import {defineMessages} from 'react-intl'
 
 class TransactionsPage extends React.Component {
 
@@ -32,6 +21,9 @@ class TransactionsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.messages = defineMessages({
+      title: { id: 'transactions.title', defaultMessage: `{n, plural, one {Latest transaction} other {Latest transactions}}` }
+    });
   }
 
   async componentDidMount() {
@@ -41,7 +33,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { intl, data } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -54,51 +46,46 @@ class TransactionsPage extends React.Component {
     const transactions = data.allTransactions;
 
     return (
-      <IntlProvider locale="en-US" messages={enUS}>
-        <div className="TransactionsPage">
+      <div className="TransactionsPage">
 
-          <Header
-            title={collective.name}
-            description={collective.description}
-            twitterHandle={collective.twitterHandle}
-            image={collective.logo || collective.backgroundImage}
-            className={this.state.status}
-            LoggedInUser={LoggedInUser}
+        <Header
+          title={collective.name}
+          description={collective.description}
+          twitterHandle={collective.twitterHandle}
+          image={collective.logo || collective.backgroundImage}
+          className={this.state.status}
+          LoggedInUser={LoggedInUser}
+          />
+
+        <Body>
+
+          <CollectiveCover
+            collective={collective}
+            logo={collective.logo}
+            title={intl.formatMessage(this.messages['title'], { n: transactions.length })}
+            className="small"
+            backgroundImage={collective.backgroundImage}
+            style={get(collective, 'settings.style.hero.cover')}
             />
 
-          <Body>
+          <div className="content" >
 
-            <CollectiveCover
-              logo={collective.logo}
-              title={collective.name}
-              className="small"
-              backgroundImage={collective.backgroundImage}
-              style={get(collective, 'settings.style.hero.cover')}
+            <Transactions
+              collective={collective}
+              transactions={transactions}
+              fetchMore={this.props.fetchMore}
               />
 
-            <div className="content" >
+          </div>
 
-              <h2>
-                <FormattedMessage id='transactions.title' values={{n: transactions.length}} defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`} />
-              </h2>
+        </Body>
 
-              <Transactions
-                collective={collective}
-                transactions={transactions}
-                fetchMore={this.props.fetchMore}
-                />
+        <Footer />
 
-            </div>
-
-          </Body>
-
-          <Footer />
-
-        </div>
-      </IntlProvider>
+      </div>
     );
   }
 
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveTransactionsData(TransactionsPage)));
+export default withData(addGetLoggedInUserFunction(addCollectiveTransactionsData(withIntl(TransactionsPage))));
