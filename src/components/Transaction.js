@@ -164,7 +164,9 @@ class Transaction extends React.Component {
             />
         </div>
         <div className="user">
-          <img src={imagePreview(transaction.user.avatar,pickAvatar(transaction.user.id), { width: 80 })} />
+          <a href={`/${transaction.user.username}`} title={transaction.user.name}>
+            <img src={imagePreview(transaction.user.avatar,pickAvatar(transaction.user.id), { width: 80 })} />
+          </a>
         </div>
         <div className="body">
         <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}

@@ -182,6 +182,7 @@ const getCollectiveTransactionsQuery = gql`
       user {
         id,
         name,
+        username,
         avatar
       },
       host {
