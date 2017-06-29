@@ -202,6 +202,46 @@ const getCollectiveTransactionsQuery = gql`
   }
 `;
 
+const getTransactionQuery = gql`
+  query Transaction($id: Int!) {
+    Transaction(id: $id) {
+      id,
+      uuid,
+      title,
+      createdAt,
+      type,
+      amount,
+      currency,
+      netAmountInGroupCurrency,
+      hostFeeInTxnCurrency,
+      platformFeeInTxnCurrency,
+      paymentProcessorFeeInTxnCurrency,
+      paymentMethod {
+        name
+      },
+      user {
+        id,
+        name,
+        username,
+        avatar
+      },
+      host {
+        id,
+        name
+      }
+      ... on Expense {
+        category
+        attachment
+      }
+      ... on Donation {
+        subscription {
+          interval
+        }
+      }
+    }
+  }
+`;
+
 const TRANSACTIONS_PER_PAGE = 10;
 export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQuery, {
   options(props) {
@@ -239,8 +279,26 @@ export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
 
+export const addGetTransaction = (component) => {
+  const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
+
+  // if we don't have an accessToken, there is no need to get the details of a transaction
+  // as we won't have access to any more information than the allTransactions query
+  if (!accessToken) return component;
+
+  return graphql(getTransactionQuery, {
+    options(props) {
+      return {
+        variables: {
+          id: props.transaction.id
+        }
+      }
+    }
+  })(component);
+}
+
 export const addGetLoggedInUserFunction = (component) => {
-  const accessToken = global.window && window.localStorage.getItem('accessToken');
+  const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
   if (!accessToken) return component;
   return graphql(getLoggedInUserQuery, {
     props: ({ data }) => ({

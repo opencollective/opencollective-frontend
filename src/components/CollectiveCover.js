@@ -31,6 +31,7 @@ class CollectiveCover extends React.Component {
           text-align: center;
           height: 400px;
           width: 100%;
+          overflow: hidden;
         }
         .small .cover {
           height: 200px;

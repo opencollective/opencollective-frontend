@@ -28,7 +28,6 @@ class TransactionsPage extends React.Component {
 
   async componentDidMount() {
     const LoggedInUser = await this.props.getLoggedInUser(this.props.collectiveSlug);
-    LoggedInUser.canCreateEvent = Boolean(LoggedInUser.membership);
     this.setState({LoggedInUser});
   }
 

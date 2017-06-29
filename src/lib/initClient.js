@@ -55,11 +55,9 @@ export function initClient (initialState, options) {
     return createClient(initialState, options)
   }
 
-  // Reuse client on the client-side
+  // Reuse client on the client-side unless we have an access token
   if (!apolloClient) {
-    if (window.localStorage) {
-      options.accessToken = window.localStorage.getItem('accessToken');
-    }
+    options.accessToken = process.browser && window.localStorage.getItem('accessToken');
     apolloClient = createClient(initialState, options)
   }
 

@@ -231,7 +231,7 @@ class TopBarProfileMenu extends React.Component {
       }
       `}</style>
       {LoggedInUser.avatar && <div className='LoginTopBarProfileButton-avatar' style={{backgroundImage: `url(${LoggedInUser.avatar})`}}></div>}
-      <div className='LoginTopBarProfileButton-name'>{LoggedInUser.username}</div>
+      <div className='LoginTopBarProfileButton-name desktopOnly'>{LoggedInUser.username}</div>
       <div className='LoginTopBarProfileButton-caret'></div>
       {showProfileMenu && this.renderProfileMenu()}
     </div>

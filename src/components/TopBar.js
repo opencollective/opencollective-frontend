@@ -148,7 +148,7 @@ class TopBar extends React.Component {
         `}</style>
         <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
         <div className="nav">
-          <ul>
+          <ul className="mediumScreenOnly">
             <li><a href="/learn-more">How it works</a></li>
             <li><a href="/discover">Discover</a></li>
             <li><a href="https://medium.com/open-collective">Blog</a></li>

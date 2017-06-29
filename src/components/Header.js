@@ -209,6 +209,17 @@ class Header extends React.Component {
         flex-direction: row;
       }
 
+      @media(max-width: 600px) {
+        .desktopOnly {
+          display: none !important;
+        }
+      }
+      #media(max-width: 400px) {
+        .mediumScreenOnly {
+          display: none !important;
+        }
+      }
+
       `}
       </style>
       <TopBar className={className} LoggedInUser={this.props.LoggedInUser} />
