@@ -143,6 +143,25 @@ export default function (Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      },
+      public() {
+        return {
+          type: expenseType,
+          id: this.id,
+          UserId: this.UserId,
+          GroupId: this.GroupId,
+          currency: this.currency,
+          amount: this.amount,
+          title: this.title,
+          category: this.category,
+          payoutMethod: this.payoutMethod,
+          vat: this.vat,
+          lastEditedById: this.lastEditedById,
+          status: this.status,
+          incurredAt: this.incurredAt,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
+        }
       }
     },
 

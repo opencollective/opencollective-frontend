@@ -6,13 +6,22 @@ import {
   GraphQLList,
   GraphQLObjectType,
   GraphQLString,
+  GraphQLInterfaceType
 } from 'graphql';
+
+import GraphQLJSON from 'graphql-type-json';
 
 import status from '../constants/response_status';
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 dataloaderSequelize(models.Response);
 dataloaderSequelize(models.Event);
+dataloaderSequelize(models.Transaction);
+dataloaderSequelize(models.Expense);
+dataloaderSequelize(models.Donation);
+
+// This breaks the tests for some reason (mocha test/usergroup.routes.test.js -g "successfully add a user to a group with a role")
+// dataloaderSequelize(models.User);
 
 export const ResponseStatusType = new GraphQLEnumType({
   name: 'Responses',
@@ -169,6 +178,12 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.backgroundImage;
         }
       },
+      settings: {
+        type: GraphQLJSON,
+        resolve(collective) {
+          return collective.settings || {};
+        }
+      },
       slug: {
         type: GraphQLString,
         resolve(collective) {
@@ -179,6 +194,20 @@ export const CollectiveType = new GraphQLObjectType({
         type: new GraphQLList(UserType),
         resolve(collective, args, req) {
           return collective.getUsersForViewer(req.remoteUser);
+        }
+      },
+      transactions: {
+        type: new GraphQLList(TransactionInterfaceType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(collective, args) {
+          const query = {};
+          if (args.limit) query.limit = args.limit;
+          if (args.offset) query.offset = args.offset;
+          query.order = [ ['id', 'DESC'] ];
+          return collective.getTransactions(query);
         }
       },
       role: {
@@ -195,8 +224,15 @@ export const CollectiveType = new GraphQLObjectType({
       },
       events: {
         type: new GraphQLList(EventType),
-        resolve(collective) {
-          return collective.getEvents();
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(collective, args) {
+          const query = {};
+          if (args.limit) query.limit = args.limit;
+          if (args.offset) query.offset = args.offset;
+          return collective.getEvents(query);
         }
       },
       stripePublishableKey: {
@@ -497,3 +533,365 @@ export const ResponseType = new GraphQLObjectType({
   }
 });
 
+export const PaymentMethodType = new GraphQLObjectType({
+  name: "PaymentMethod",
+  description: "PaymentMethod model",
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(pm) {
+          return pm.id;
+        }
+      },
+      name: {
+        type: GraphQLString,
+        resolve(pm) {
+          return pm.service;
+        }
+      },
+    }
+  }
+});
+
+export const SubscriptionType = new GraphQLObjectType({
+  name: "Subscription",
+  description: "Subscription model",
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(s) {
+          return s.id;
+        }
+      },
+      amount: {
+        type: GraphQLInt,
+        resolve(s) {
+          return s.amount;
+        }
+      },
+      currency: {
+        type: GraphQLString,
+        resolve(s) {
+          return s.currency;
+        }
+      },
+      interval: {
+        type: GraphQLString,
+        resolve(s) {
+          return s.interval;
+        }
+      },
+      isActive: {
+        type: GraphQLBoolean,
+        resolve(s) {
+          return s.isActive;
+        }
+      }
+    }
+  }
+});
+
+export const TransactionInterfaceType = new GraphQLInterfaceType({
+  name: "Transaction",
+  description: "Transaction interface",
+  resolveType: (transaction) => {
+    switch (transaction.type) {
+      case 'DONATION':
+        return TransactionDonationType;
+      case 'EXPENSE':
+        return TransactionExpenseType;
+      default:
+        return null;
+    }
+  },
+  fields: {
+    id: { type: GraphQLInt },
+    uuid: { type: GraphQLString },
+    amount: { type: GraphQLInt },
+    currency: { type: GraphQLString },
+    netAmountInGroupCurrency: { type: GraphQLInt },
+    hostFeeInTxnCurrency: { type: GraphQLInt },
+    platformFeeInTxnCurrency: { type: GraphQLInt },
+    paymentProcessorFeeInTxnCurrency: { type: GraphQLInt },
+    user: { type: UserType },
+    host: { type: UserType },
+    paymentMethod: { type: PaymentMethodType },
+    collective: { type: CollectiveType },
+    type: { type: GraphQLString },
+    title: { type: GraphQLString },
+    notes: { type: GraphQLString },
+    createdAt: { type: GraphQLString }
+  }
+});
+
+export const TransactionExpenseType = new GraphQLObjectType({
+  name: 'Expense',
+  description: 'Expense model',
+  interfaces: [TransactionInterfaceType],
+  fields: {
+      id: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.id;
+      }
+    },
+    uuid: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.uuid;
+      }
+    },
+    type: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.type;
+      }
+    },
+    amount: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.amount;
+      }
+    },
+    currency: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.currency;
+      }
+    },
+    txnCurrency: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.txnCurrency;
+      }
+    },
+    txnCurrencyFxRate: {
+      type: GraphQLFloat,
+      resolve(transaction) {
+        return transaction.txnCurrencyFxRate;
+      }
+    },
+    hostFeeInTxnCurrency: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.hostFeeInTxnCurrency;
+      }
+    },
+    platformFeeInTxnCurrency: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.platformFeeInTxnCurrency;
+      }
+    },
+    paymentProcessorFeeInTxnCurrency: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.paymentProcessorFeeInTxnCurrency;
+      }
+    },
+    netAmountInGroupCurrency: {
+      type: GraphQLInt,
+      resolve(transaction) {
+        return transaction.netAmountInGroupCurrency;
+      }
+    },
+    host: {
+      type: UserType,
+      resolve(transaction, args, req) {
+        return transaction.getHostForViewer(req.remoteUser);
+      }
+    },
+    user: {
+      type: UserType,
+      resolve(transaction, args, req) {
+        return transaction.getUserForViewer(req.remoteUser);
+      }
+    },
+    description: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.description;
+      }
+    },
+    collective: {
+      type: CollectiveType,
+      resolve(transaction) {
+        return transaction.getGroup();
+      }
+    },
+    createdAt: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.createdAt;
+      }
+    },
+    title: {
+      type: GraphQLString,
+      resolve(transaction) {
+        return transaction.getExpense().then(expense => expense && expense.title);
+      }
+    },
+    notes: {
+      type: GraphQLString,
+      resolve(transaction, args, req) {
+        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.notes);
+      }
+    },
+    paymentMethod: {
+      type: PaymentMethodType,
+      resolve(transaction) {
+        return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
+      }
+    },
+    category: {
+      type: GraphQLString,
+      resolve(transaction, args, req) {
+        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category);
+      }
+    },
+    attachment: {
+      type: GraphQLString,
+      resolve(transaction, args, req) {
+        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment);
+      }
+    }
+  }
+});
+
+export const TransactionDonationType = new GraphQLObjectType({
+  name: 'Donation',
+  description: 'Donation model',
+  interfaces: [TransactionInterfaceType],
+  fields: () => {
+    return {
+       id: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.id;
+        }
+      },
+      uuid: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.uuid;
+        }
+      },
+      type: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.type;
+        }
+      },
+      amount: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.amount;
+        }
+      },
+      currency: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.currency;
+        }
+      },
+      txnCurrency: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.txnCurrency;
+        }
+      },
+      txnCurrencyFxRate: {
+        type: GraphQLFloat,
+        resolve(transaction) {
+          return transaction.txnCurrencyFxRate;
+        }
+      },
+      hostFeeInTxnCurrency: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.hostFeeInTxnCurrency;
+        }
+      },
+      platformFeeInTxnCurrency: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.platformFeeInTxnCurrency;
+        }
+      },
+      paymentProcessorFeeInTxnCurrency: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.paymentProcessorFeeInTxnCurrency;
+        }
+      },
+      netAmountInGroupCurrency: {
+        type: GraphQLInt,
+        resolve(transaction) {
+          return transaction.netAmountInGroupCurrency;
+        }
+      },
+      host: {
+        type: UserType,
+        resolve(transaction, args, req) {
+          return transaction.getHostForViewer(req.remoteUser);
+        }
+      },
+      user: {
+        type: UserType,
+        resolve(transaction, args, req) {
+          return transaction.getUserForViewer(req.remoteUser);
+        }
+      },
+      description: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.description;
+        }
+      },
+      collective: {
+        type: CollectiveType,
+        resolve(transaction) {
+          return transaction.getGroup();
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.createdAt;
+        }
+      },
+      title: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.getDonation().then(donation => donation && donation.title);
+        }
+      },
+      notes: {
+        type: GraphQLString,
+        resolve(transaction) {
+          return transaction.getDonation().then(donation => donation && donation.notes);
+        }
+      },
+      paymentMethod: {
+        type: PaymentMethodType,
+        resolve(transaction) {
+          return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
+        }
+      },
+      response: {
+        type: ResponseType,
+        resolve(transaction) {
+          return transaction.getDonation().then(donation => donation && donation.getResponse());
+        }
+      },
+      subscription: {
+        type: SubscriptionType,
+        resolve(transaction) {
+          return transaction.getDonation().then(donation => donation && donation.getSubscription());
+        }
+      }
+    }
+  }
+});

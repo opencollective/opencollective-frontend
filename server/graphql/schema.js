@@ -3,6 +3,12 @@ import {
   GraphQLSchema,
 } from 'graphql';
 
+import {
+  TransactionInterfaceType,
+  TransactionDonationType,
+  TransactionExpenseType
+} from './types';
+
 import query from './queries';
 import mutation from './mutations';
 
@@ -23,6 +29,7 @@ const Mutation = new GraphQLObjectType({
 })
 
 const Schema = new GraphQLSchema({
+  types: [TransactionInterfaceType, TransactionDonationType, TransactionExpenseType],
   query: Query,
   mutation: Mutation
 });

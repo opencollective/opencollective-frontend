@@ -388,7 +388,7 @@ describe('expenses.routes.test.js', () => {
               it('THEN returns success:true', () => expect(response).to.have.property('success', true));
 
               it('THEN has deleted expense', () =>
-                Expense.findById(actualExpense.id).tap(e => expect(e).to.not.exist));
+                Expense.findById(actualExpense.id).then(e => expect(e).to.not.exist));
 
               it('THEN a group.expense.deleted activity is created', () =>
                 expectExpenseActivity('group.expense.deleted', actualExpense.id));

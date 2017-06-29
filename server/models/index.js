@@ -153,6 +153,7 @@ export function setupModels(client) {
   // PaymentMethod
   m.Donation.belongsTo(m.PaymentMethod);
   m.PaymentMethod.hasMany(m.Donation);
+  m.Transaction.belongsTo(m.PaymentMethod);
 
   // Event
   m.Event.belongsTo(m.Group);

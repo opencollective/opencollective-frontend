@@ -1,11 +1,13 @@
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+  GraphQLInt
 } from 'graphql';
 
 import {
   CollectiveType,
+  TransactionInterfaceType,
   UserType,
   EventType
 } from './types';
@@ -47,6 +49,33 @@ const queries = {
     resolve(_, args, req) {
       return models.Group.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
         .then(group => group.getUsersForViewer(req.remoteUser));
+    }
+  },
+  /*
+   * Given a collective slug, returns all transactions
+   */
+  allTransactions: {
+    type: new GraphQLList(TransactionInterfaceType),
+    args: {
+      collectiveSlug: {
+        type: new GraphQLNonNull(GraphQLString)
+      },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = {
+        include: [
+          {
+            model: models.Group,
+            where: { slug: args.collectiveSlug.toLowerCase() }
+          }
+        ],
+        order: [ ['id', 'DESC'] ]
+      };
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      return models.Transaction.findAll(query);
     }
   },
   /*

@@ -130,7 +130,7 @@ export const _authenticateUserByJwt = (req, res, next) => {
   const userid = req.jwtPayload.sub;
   User
     .findById(userid)
-    .tap(user => {
+    .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({seenAt: new Date()});
       req.remoteUser = user;
