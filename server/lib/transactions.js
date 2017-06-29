@@ -23,15 +23,18 @@ export function exportTransactions(transactions, attributes) {
  * @param {*} endDate 
  * @param {*} limit 
  */
-export function getTransactions(groupids, startDate, endDate, limit) {
+export function getTransactions(groupids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
+  const where = options.where || {};
   const query = {
     where: {
+      ...where,
       GroupId: { $in: groupids },
       createdAt: { $gte: startDate, $lt: endDate }
     },
-    order: [ ['createdAt', 'DESC' ]],
-    limit
+    order: [ ['createdAt', 'DESC' ]]
   };
+  if (options.limit) query.limit = options.limit;
+  if (options.include) query.include = options.include.map(model => models[model]);
   return models.Transaction.findAll(query);
 }
 

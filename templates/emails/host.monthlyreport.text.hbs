@@ -27,20 +27,20 @@ Host fees:                       -{{{currency stats.totalHostFees.totalInHostCur
 Net amount:                      {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}
 (Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}})
 
-Total expenses paid:             {{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}
+Total expenses paid:             {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
 
 
 🗒 {{transactions.length}} transactions
 
 date  {{{col "collective" size=17}}} amount net amount*   description
 {{#each transactions}}
-{{{moment createdAt format="MM/DD"}}} {{{col group.shortSlug size=../maxSlugSize}}} {{{currency amount currency=group.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}}{{#if note}}**{{/if}} {{{col description size=80}}}
+{{{moment createdAt format="MM/DD"}}} {{{col group.shortSlug size=../maxSlugSize}}} {{{currency amount currency=group.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}}{{#if notes}}**{{/if}} {{{col description size=80}}}
 {{else}}
 No transaction. 
 {{/each}}
 
 * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
-{{#if note}}** {{note}}{{/if}}
+{{#if notes}}** {{notes}}{{/if}}
 
 🗣 Feedback
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!

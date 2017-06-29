@@ -1,0 +1,174 @@
+<style>
+html {
+  font-size: 62.5%;
+  width:{{paperSize.width}};
+  zoom: .75;
+}
+
+body {
+  width:{{paperSize.width}};
+  padding: 0;
+  margin: 0;
+  font-family: Lato,Helvetica,sans-serif;
+  font-weight: 300;
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+.page {
+  width: {{paperSize.width}};
+  height: {{paperSize.height}};
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: {{paperSize.margin.top}} {{paperSize.margin.left}};
+  overflow: hidden;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+}
+
+.footer {
+  text-align: center;
+  font-size: 9pt;
+}
+
+table {
+  margin: 10px;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.category th, .expenseTitleDescription th {
+  width: 60px;
+}
+
+th, td {
+  text-align: left;
+  font-size: 9pt;
+}
+
+td.tdpadding {
+  width: 10px;
+}
+
+.amountDetails {
+  float: left;
+}
+
+.category {
+  float: left;
+  margin-right: 20px;
+}
+
+.expenseTitleDescription {
+  clear: both;
+}
+
+.notes { 
+  font-size: 8pt;
+}
+
+.muted {
+  color: #333;
+  font-size: 9pt;
+}
+</style>
+
+<div id="document">
+
+ {{#each expensesPerPage}}
+
+  <div class="page">
+    <h1>{{@root.month}} {{@root.year}} - {{@root.host.name}} expense receipts ({{{increment @index}}}/{{../expensesPerPage.length}})</h1>
+
+    <table width="100%" border=0 class="small-table">
+      <tr>
+        <th>date</th>
+        <th>collective</th>
+        <th>amount</th>
+        <th nowrap>net amount*</th>
+        <th>description</th>
+        <th align="center">page</th>
+      </tr>
+    {{#each this}}
+      <tr>
+        <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
+        <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
+        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
+        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
+        <td valign="top" width="100%">{{description}}</td>
+        <td valign="top" align="center">{{page}}</td>
+      </tr>
+    {{else}}
+      No expense submitted. 
+    {{/each}}
+    </table>
+
+    <p class="muted">
+      * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
+      {{#if @root.notes}}<br />** {{@root.notes}}{{/if}}
+    </p>
+
+  </div>
+  {{/each}}
+
+{{#each expensesPerPage}}
+  {{#each this}}
+    <div class="page">
+
+      <div class="header">
+        <table class="category">
+          <tr>
+            <th>Date</th>
+            <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
+            <td nowrap>{{{moment createdAt format="YYYY-MM-DD"}}}</td>
+          </tr>
+          <tr><th>Collective</th><td></td><td><a href="https://opencollective.com/{{group.slug}}">{{group.slug}}</a></td></tr>
+          <tr><th>Category</th><td></td><td nowrap>{{Expense.category}}</td></tr>
+        </table>
+        <table class="amountDetails">
+          <tr>
+            <th>Amount</th>
+            <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
+            <td>{{{currency amount currency=currency precision=2}}}</td>
+          </tr>
+          <tr>
+            <th>Fees</th>
+            <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
+            <td>-{{{currency paymentProcessorFeeInTxnCurrency currency=@root.host.currency precision=2}}}</td>
+          </tr>
+          <tr><th nowrap>Net amount in {{@root.host.currency}}</th><td></td><td>{{{currency netAmountInTxnCurrency currency=@root.host.currency precision=2}}}{{#if note}}*{{/if}}</td></tr>
+          <tr><th nowrap>Payout method</th><td></td><td nowrap>{{Expense.payoutMethod}}</td></tr>
+          <tr><th>Recipient</th><td></td><td nowrap>{{User.name}} &lt;{{User.email}}&gt;</td></tr>
+        </table>
+        <table class="expenseTitleDescription">
+          <tr>
+            <th valign="top">Title</th>
+            <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
+            <td>{{Expense.title}}</td>
+          </tr>
+          {{#if notes}}
+          <tr>
+            <th valign="top">Notes</th>
+            <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
+            <td class="notes">{{notes}})</td>
+          </tr>
+          {{/if}}
+        </table>
+      </div>
+
+      <div class="preview" style="background-image: url('https://res.cloudinary.com/opencollective/image/fetch/w_640,f_jpg/{{Expense.attachment}}')"></div>
+
+      <div class="footer">{{@root.host.name}} {{@root.month}} {{@root.year}} expense receipts - page {{page}}/{{@root.totalPaidExpenses}} - opencollective.com</div>
+
+    </div>
+  {{/each}}
+{{/each}}
+</div>

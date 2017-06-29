@@ -285,6 +285,7 @@ export default (app) => {
    */
   app.get('/database/reset', test.resetTestDatabase);
   app.get('/test/loginlink', test.getTestUserLoginUrl);
+  app.get('/test/pdf', test.exportPDF);
 
   /**
    * Stripe subscriptions (recurring payments)

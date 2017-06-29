@@ -61,7 +61,7 @@ th {
   <tr>
     <td align="center">
       <span class="positive">(+{{{currency stats.totalNetAmountReceived.totalInHostCurrency currency=host.currency}}})</span><br />
-      <span class="negative">&nbsp;{{#if stats.totalPaidExpenses.totalInHostCurrency}}({{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}){{/if}}&nbsp;</span>
+      <span class="negative">&nbsp;{{#if stats.totalAmountPaidExpenses.totalInHostCurrency}}({{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}){{/if}}&nbsp;</span>
     </td>
     <td></td>
     <td align="center">
@@ -90,7 +90,7 @@ th {
   <tr><td>Net amount:</td><td></td><td>{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}</td></tr>
   <tr><td colspan=3 class="muted">(Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}</td></tr>
   <tr><td colspan=3 height=10></td></tr>
-  <tr><td>Total expenses paid:</td><td></td><td>{{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td>Total expenses paid:</td><td></td><td>{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
 </table>
 
 
@@ -108,7 +108,7 @@ th {
     <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{{moment createdAt format="MM/DD"}}}</a></td>
     <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
     <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
-    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if note}}**{{/if}}</td>    
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
     <td valign="top" width="100%">{{description}}</td>
   </tr>
 {{else}}
@@ -118,7 +118,7 @@ th {
 
 <p class="muted">
   * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
-  {{#if note}}<br />** {{note}}{{/if}}
+  {{#if notes}}<br />** {{notes}}{{/if}}
 </p>
 
 <h2>🗣 Feedback</h2>

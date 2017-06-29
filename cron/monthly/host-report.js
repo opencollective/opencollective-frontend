@@ -16,15 +16,19 @@ import debugLib from 'debug';
 import models, { sequelize } from '../../server/models';
 import emailLib from '../../server/lib/email';
 import config from 'config';
-import { exportToCSV } from '../../server/lib/utils';
+import { exportToCSV, exportToPDF } from '../../server/lib/utils';
 import { getTransactions } from '../../server/lib/transactions';
 import { getHostedGroups, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
+import path from 'path';
+import fs from 'fs';
 
 const d = new Date;
 d.setMonth(d.getMonth() - 1);
 const month = moment(d).format('MMMM');
+const year = d.getFullYear();
 
 const csv_filename = `${moment(d).format('YYYYMM')}-transactions.csv`;
+const pdf_filename = `${moment(d).format('YYYYMM')}-expenses.pdf`;
 
 const startDate = new Date(d.getFullYear(), d.getMonth(), 1);
 const endDate = new Date(d.getFullYear(), d.getMonth()+1, 1);
@@ -71,7 +75,7 @@ const init = () => {
       deltaHostBalance: platformStats[1],
       totalDonations: platformStats[2],
       totalNetAmountReceived: platformStats[3],
-      totalPaidExpenses: platformStats[4],
+      totalAmountPaidExpenses: platformStats[4],
       totalHostFees: platformStats[5],
       totalPaymentProcessorFees: platformStats[6],
       totalPlatformFees: platformStats[7],
@@ -134,25 +138,43 @@ const processHost = (host) => {
 
   summary.totalHosts++;
 
-  const data = {};
-  let groupsById = {}, attachment;
+  const data = {}, attachments = [];
+  let groupsById = {};
 
   data.host = host;
   data.reportDate = endDate;
   data.month = month;
+  data.year = year;
   data.config = _.pick(config, 'host');
   data.maxSlugSize = 0;
-  data.note = null;
-
+  data.notes = null;
+  const note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
+  let page = 1;
+  let currentPage = 0;
+  const expensesPerPage = 30; // number of expenses per page of the Table Of Content (for PDF export)
+  data.expensesPerPage = [ [] ];
+  data.totalPaidExpenses = 0;
   const processTransaction = (transaction) => {
     const t = transaction;
     t.group = groupsById[t.GroupId].dataValues;
     t.group.shortSlug = t.group.slug.replace(/^wwcode-?(.)/, '$1');
-    t.note = '';
+    t.notes = t.Expense && t.Expense.notes;
     if (t.data && t.data.fxrateSource) {
-      t.note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
-      data.note = t.note;
+      t.notes = (t.notes) ? `${t.notes} (${note})` : note;
+      data.notes = t.note;
     }
+
+    // We prepare expenses for the PDF export
+    if (t.type === 'EXPENSE') {
+      t.page = page++;
+      data.totalPaidExpenses++;
+      if (page - 1 % expensesPerPage === 0) {
+        currentPage++;
+        data.expensesPerPage[currentPage] = [];
+      }
+      data.expensesPerPage[currentPage].push(t);
+    }
+
     data.maxSlugSize = Math.max(data.maxSlugSize, t.group.shortSlug.length + 1);
     if (!t.description) {
       return transaction.getSource().then(source => {
@@ -166,7 +188,7 @@ const processHost = (host) => {
 
   return getHostedGroups(host.id)
     .tap(groups => groupsById = _.indexBy(groups, "id"))
-    .then(() => getTransactions(Object.keys(groupsById), startDate, endDate))
+    .then(() => getTransactions(Object.keys(groupsById), startDate, endDate, { include: ['Expense', 'User'] }))
     .tap(transactions => {
       if (!transactions || transactions.length == 0) {
         throw new Error(`No transaction found`);
@@ -187,13 +209,22 @@ const processHost = (host) => {
 
       const csv = exportToCSV(transactions, ['id', 'createdAt', 'GroupId', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency', 'note' ], getColumnName, processValue);
   
-      attachment = {
+      attachments.push({
         filename: csv_filename,
         content: csv
-      }
+      });
 
     })
     .then(transactions => data.transactions = transactions)
+    .then(() => exportToPDF("expenses", data, {
+      paper: host.currency === 'USD' ? 'Letter' : 'A4'
+    }))
+    .then(pdf => {
+      attachments.push({
+        filename: pdf_filename,
+        content: pdf
+      })
+    })
     .then(() => getHostStats(host, Object.keys(groupsById)))
     .then(stats => {
       data.stats = {
@@ -204,7 +235,7 @@ const processHost = (host) => {
         delta: stats[1],
         totalDonations: stats[2],
         totalNetAmountReceivedForCollectives: stats[3],
-        totalPaidExpenses: stats[4],
+        totalAmountPaidExpenses: stats[4],
         totalHostFees: stats[5],
         paymentProcessorFees: stats[6],
         platformFees: stats[7],
@@ -222,14 +253,14 @@ const processHost = (host) => {
       summary.totalActiveCollectives += data.stats.totalActiveCollectives;
       summary.totalTransactions += data.stats.totalTransactions;
     })
-    .then(() => sendEmail(host, data, attachment))
+    .then(() => sendEmail(host, data, attachments))
     .catch(e => {
       console.error(`Error in processing host ${host.username}:`, e.message);
       debug(e);
     });
 };
 
-const sendEmail = (recipient, data, attachment) => {
+const sendEmail = (recipient, data, attachments) => {
     debug("Sending email to ", recipient.dataValues);
     // debug("email data transactions", data.transactions);
     debug("email data stats", data.stats);
@@ -243,8 +274,16 @@ const sendEmail = (recipient, data, attachment) => {
       recipient.email = process.env.SEND_EMAIL_TO;
     }
     const options = {
-      attachments: [ attachment ]
+      attachments
     }
+    if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
+      attachments.map(attachment => {
+        const filepath = path.resolve(`/tmp/${recipient.username}-${attachment.filename}`);
+        fs.writeFileSync(filepath, attachment.content);
+        console.log(">>> preview attachment", filepath);
+      })
+    }
+
     return emailLib.send('host.monthlyreport', recipient.email, data, options);
 }
 

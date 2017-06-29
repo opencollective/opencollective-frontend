@@ -43,7 +43,7 @@ td p.muted {
   Collectives: {{totalCollectives}} ({{totalActiveCollectives}} active) //
   Transactions: {{totalTransactions}} //
   Donations: {{{currency platformStats.totalDonations.totalInHostCurrency currency='USD'}}} //  
-  Paid expenses: {{{currency platformStats.totalPaidExpenses.totalInHostCurrency currency='USD'}}} //
+  Paid expenses: {{{currency platformStats.totalAmountPaidExpenses.totalInHostCurrency currency='USD'}}} //
   Host fees: {{{currency stats.totalHostFees.totalInHostCurrency currency='USD'}}} //  
 </div>
 
@@ -54,7 +54,7 @@ td p.muted {
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Transactions:</td><td></td><td>{{totalTransactions}}</td></tr>
   <tr><td>Donations:</td><td></td><td>{{{currency platformStats.totalDonations.totalInHostCurrency currency='USD'}}}</td></tr>
-  <tr><td>Paid Expenses:</td><td></td><td>{{{currency platformStats.totalPaidExpenses.totalInHostCurrency currency='USD'}}}</td></tr>
+  <tr><td>Paid Expenses:</td><td></td><td>{{{currency platformStats.totalAmountPaidExpenses.totalInHostCurrency currency='USD'}}}</td></tr>
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Hosts fees:</td><td></td><td>{{{currency platformStats.totalHostFees.totalInHostCurrency currency='USD'}}}</td></tr>
   <tr><td>Payment Processor Fees:</td><td></td><td>{{{currency platformStats.totalPaymentProcessorFees.totalInHostCurrency currency='USD'}}}</td></tr>
@@ -83,7 +83,7 @@ td p.muted {
   <td align="center">{{stats.totalCollectives}}<br /><p class="muted">({{stats.totalActiveCollectives}})</p></td>
   <td align="center">{{stats.backers.total}}<br /><p class="muted">({{stats.backers.new}}/{{stats.backers.repeat}})</p></td>
   <td align="center">{{{currency stats.totalDonations.totalInHostCurrency currency=host.currency sign=true}}}</td>
-  <td align="center">{{{currency stats.totalPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
+  <td align="center">{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td>
 </tr>
 {{/each}}
 </table>

@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {getTier} from '../server/lib/utils';
+import {getTier, exportToPDF } from '../server/lib/utils';
 import data from './mocks/data';
 import roles from '../server/constants/roles';
 
@@ -21,5 +21,38 @@ describe("utils", () => {
   it("returns contributor if the member didn't make any donation", () => {
     expect(getTier({ role: roles.MEMBER, totalDonations: null }, group.tiers)).to.equal('core contributor');
   });
+
+  it("exports PDF", function(done) {
+    this.timeout(10000);
+
+    const data = {
+      host: {
+        name: "WWCode",
+        currency: "USD"
+      },
+      expensesPerPage: [
+        [
+          {
+            amount: 1000,
+            currency: 'USD',
+            title: 'Pizza',
+            paymentProcessorFeeInTxnCurrency: 5,
+            group: {
+              slug: 'testcollective'
+            },
+            User: {
+              name: "Xavier",
+              email: "xavier@gmail.com"
+            }
+          }
+        ]
+      ]
+    }
+    exportToPDF("expenses", data).then(buffer => {
+      const expectedSize = (process.env.NODE_ENV === 'circleci') ? 27750 : 26123;
+      expect(buffer.length).to.equal(expectedSize);
+      done();
+    });
+  })
 
 });

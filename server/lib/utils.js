@@ -5,6 +5,10 @@ import base64url from 'base64url';
 import moment from 'moment';
 import _ from 'lodash';
 import debugLib from 'debug';
+import pdf from 'html-pdf';
+import fs from 'fs';
+import path from 'path';
+import handlebars from './handlebars';
 
 const debug = debugLib('utils');
 
@@ -319,6 +323,60 @@ export function exportToCSV(data, attributes, getColumnName = (attr) => attr, pr
     lines.push(getLine(row));
   });
   return lines.join('\n');
+}
+
+/**
+ * export transactions to PDF
+ */
+export function exportToPDF(template, data, options) {
+
+  options = options || {};
+  options.paper = options.paper || 'Letter' // Letter for US or A4 for Europe
+
+  let paperSize;
+
+  switch (options.paper) {
+    case 'A4':
+      paperSize = {
+        width: '210mm',
+        height: '297mm',
+        margin: {
+          top: '10mm',
+          left: '10mm'
+        }
+      }
+      break;
+    case 'Letter':
+    default:
+      paperSize = {
+        width: '8.5in',
+        height: '11in',
+        margin: {
+          top: '0.4in',
+          left: '0.4in'
+        }
+      }
+      break;
+  }
+
+  data.paperSize = paperSize;
+  options.paperSize = paperSize;
+
+  const templateFilepath = path.resolve(__dirname, `../../templates/pdf/${template}.hbs`);
+  const source = fs.readFileSync(templateFilepath, 'utf8');
+  const render = handlebars.compile(source);
+
+  const html = render(data);
+
+  if (options.format === 'html') return Promise.resolve(html);
+  options.format = options.paper;
+
+  return new Promise((resolve, reject) => {
+    pdf.create(html, options).toBuffer((err, buffer) => {
+      if (err) return reject(err);
+      return resolve(buffer);
+    });
+  });
 }
 
 /**
