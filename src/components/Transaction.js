@@ -38,6 +38,11 @@ class Transaction extends React.Component {
 
     const type = transaction.type.toLowerCase();
 
+    let title = transaction.title;
+    if (type === 'donation' && (!title || title.match(/donation to /i))) {
+      title = intl.formatMessage(this.messages['donation.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
+    }
+
     const meta = [];
     meta.push(transaction.category);
     meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.user.name, createdAt: new Date(transaction.createdAt) }));
@@ -119,8 +124,7 @@ class Transaction extends React.Component {
         </div>
         <div className="body">
         <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
-          {type === 'expense' && transaction.title}
-          {type === 'donation' && capitalize(intl.formatMessage(this.messages['donation.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')}))}
+          {capitalize(title)}
         </a>
           <div className="meta">
             {capitalize(meta.join(' '))}
