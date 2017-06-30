@@ -154,7 +154,7 @@ const getAttendeesQuery = gql`
 `;
 
 const getCollectiveTransactionsQuery = gql`
-  query CollectiveTransactions($collectiveSlug: String!, $limit: Int, $offset: Int) {
+  query CollectiveTransactions($collectiveSlug: String!, $type: String, $limit: Int, $offset: Int) {
     Collective(collectiveSlug: $collectiveSlug) {
       id,
       slug,
@@ -164,7 +164,7 @@ const getCollectiveTransactionsQuery = gql`
       settings,
       logo
     }
-    allTransactions(collectiveSlug: $collectiveSlug, limit: $limit, offset: $offset) {
+    allTransactions(collectiveSlug: $collectiveSlug, type: $type, limit: $limit, offset: $offset) {
       id,
       uuid,
       title,
@@ -247,7 +247,7 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   options(props) {
     return {
       variables: {
-        ...props,
+        collectiveSlug: props.collectiveSlug,
         offset: 0,
         limit: TRANSACTIONS_PER_PAGE * 2
       }
