@@ -57,9 +57,8 @@ const queries = {
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
     args: {
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      },
+      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
+      type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
@@ -73,6 +72,7 @@ const queries = {
         ],
         order: [ ['id', 'DESC'] ]
       };
+      if (args.type) query.where = { type: args.type };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       return models.Transaction.findAll(query);

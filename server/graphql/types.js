@@ -199,11 +199,13 @@ export const CollectiveType = new GraphQLObjectType({
       transactions: {
         type: new GraphQLList(TransactionInterfaceType),
         args: {
+          type: { type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(collective, args) {
           const query = {};
+          if (args.type) query.where = { type: args.type };
           if (args.limit) query.limit = args.limit;
           if (args.offset) query.offset = args.offset;
           query.order = [ ['id', 'DESC'] ];

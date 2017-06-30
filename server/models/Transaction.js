@@ -138,6 +138,7 @@ export default (Sequelize, DataTypes) => {
         return Promise.all(promises)
         .then(results => {
           const user = results[0];
+          if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
           const canEditGroup = results[1];
           return canEditGroup ? user.info : user.public;
         })

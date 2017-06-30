@@ -121,6 +121,27 @@ describe('graphql.transaction.test.js', () => {
       expect(transaction.attachment).to.equal(null);
     });
 
+    it('with filter on type', async () => {
+      const limit = 10;
+      const offset = 5;
+      const query = `
+        query allTransactions {
+          allTransactions(collectiveSlug: "wwcodeaustin", type: "DONATION", limit: ${limit}, offset: ${offset}) {
+            id,
+            type
+          }
+        }
+      `;
+      const context = { remoteUser: null };
+      const result = await graphql(schema, query, null, context);
+      expect(result.errors).to.not.exist;
+      const transactions = result.data.allTransactions;
+      expect(transactions.length).to.equal(limit);
+      transactions.map(t => {
+        expect(t.type).to.equal('DONATION');
+      });
+    });
+
     it('with pagination', async () => {
       const limit = 10;
       const offset = 5;
