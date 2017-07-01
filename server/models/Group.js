@@ -626,7 +626,8 @@ export default function(Sequelize, DataTypes) {
                   groupInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;
                   groupInfo.sponsorsCount = backers.filter((b) => b.tier.match(/^sponsor/i)).length;
                   groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
-                  groupInfo.contributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : 0;
+                  groupInfo.githubContributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : 0;
+                  groupInfo.contributorsCount = groupInfo.membersCount + groupInfo.githubContributorsCount + groupInfo.backersAndSponsorsCount;
                   return groupInfo;
                 });
             }));

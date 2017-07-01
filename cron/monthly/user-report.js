@@ -31,6 +31,7 @@ const debug = debugLib('monthlyreport');
 
 const {
   Group,
+  Expense,
   Notification,
   Subscription,
   User
@@ -66,6 +67,33 @@ const init = () => {
   });
 }
 
+const now = new Date;
+const processEvents = (events) => {
+  const res = {
+    upcoming: [],
+    past: []
+  };
+
+  events.forEach(event => {
+    event.stats = { confirmed: 0, interested: 0 };
+    event.Responses.forEach(response => {
+      if (response.status === 'INTERESTED') {
+        event.stats.interested++;
+      }
+      if (response.status === 'YES') {
+        event.stats.confirmed++;
+      }
+    })
+
+    if (new Date(event.startsAt) > now) {
+      res.upcoming.push(event);
+    } else {
+      res.past.push(event);
+    }
+  })
+  return res;
+};
+
 const groupsData = {};
 const processGroup = (group) => {
   if ( groupsData[group.slug]) return groupsData[group.slug];
@@ -76,24 +104,27 @@ const processGroup = (group) => {
     group.getTotalTransactions(startDate, endDate, 'donation'),
     group.getTotalTransactions(startDate, endDate, 'expense'),
     group.getExpenses(null, startDate, endDate),
-    group.getYearlyIncome()
+    group.getYearlyIncome(),
+    Expense.findAll({ where: { GroupId: group.id, createdAt: { $gte: startDate, $lt: endDate } }, limit: 3, order: [['id', 'DESC']], include: [ {model: User} ]}),
+    group.getEvents({ where: { GroupId: group.id, startsAt: { $gte: startDate } }, order: [['startsAt', 'DESC']], include: [ {model: models.Response} ]})
   ];
 
   return Promise.all(promises)
           .then(results => {
             console.log('***', group.name, '***');
             const data = {};
-            data.group = _.pick(group, ['id', 'name', 'slug', 'logo', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+            data.group = _.pick(group, ['id', 'name', 'slug', 'website', 'logo', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
             const res = getTiersStats(results[0], startDate, endDate);
             data.group.stats = res.stats;
             data.group.stats.balance = results[1];
             data.group.stats.totalDonations = results[2];
-            data.group.stats.totalExpenses = results[3];
+            data.group.stats.totalPaidExpenses = -results[3];
             data.group.contributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : data.group.stats.backers.lastMonth;
             data.group.yearlyIncome = results[5];
+            data.group.expenses = results[6];
+            data.group.events = processEvents(results[7]);
             console.log(data.group.stats);
             groupsData[group.slug] = data.group;
-            console.log("group", data.group);
             return group;
           })
           .catch(e => {
@@ -145,6 +176,10 @@ const sendEmail = (recipient, data) => {
 
   // We don't send the monthly email if there is no active subscription
   if (!data.subscriptions || data.subscriptions.length === 0) return;
+
+  if (process.env.SEND_EMAIL_TO) {
+    recipient.email = process.env.SEND_EMAIL_TO;
+  }
 
   return emailLib.send('user.monthlyreport', recipient.email, data);
 }

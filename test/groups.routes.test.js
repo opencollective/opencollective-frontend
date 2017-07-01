@@ -535,8 +535,8 @@ describe('groups.routes.test.js', () => {
             expect(res.body).to.have.property('isSupercollective', supercollective.isSupercollective);
             expect(res.body).to.have.property('superCollectiveData')
             expect(res.body.superCollectiveData.length).to.eql(1);
-            expect(res.body.superCollectiveData[0].contributorsCount).to.eql(Object.keys(data.githubContributors).length);
-            expect(res.body.contributorsCount).to.equal(Object.keys(data.githubContributors).length);
+            expect(res.body.superCollectiveData[0].contributorsCount).to.eql(1+Object.keys(data.githubContributors).length);
+            expect(res.body.contributorsCount).to.equal(1+Object.keys(data.githubContributors).length);
             expect(res.body.superCollectiveData[0].publicUrl).to.contain('wwcode-austin');
             expect(res.body.superCollectiveData[0]).to.have.property('settings');
             done();

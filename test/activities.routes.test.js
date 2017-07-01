@@ -79,7 +79,8 @@ describe('activities.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(3);
-            expect(res.body[0].id).to.equal(4);
+            const ids = res.body.map(r => r.id).sort();
+            expect(ids[0]).to.equal(4);
 
             // Check pagination header.
             const { headers } = res;
