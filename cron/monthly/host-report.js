@@ -54,7 +54,7 @@ const init = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
 
-  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName" FROM "Users" u LEFT JOIN "UserGroups" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
+  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "UserGroups" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
 
   sequelize.query(query, {
     model: models.User,
@@ -161,7 +161,7 @@ const processHost = (host) => {
     t.notes = t.Expense && t.Expense.notes;
     if (t.data && t.data.fxrateSource) {
       t.notes = (t.notes) ? `${t.notes} (${note})` : note;
-      data.notes = t.note;
+      data.notes = note;
     }
 
     // We prepare expenses for the PDF export

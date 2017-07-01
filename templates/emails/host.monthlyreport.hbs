@@ -1,4 +1,4 @@
-Subject: {{{capitalize host.name}}} host {{month}} Report
+Subject: {{{capitalize host.name}}} Host {{month}} Report
 
 {{> header}}
 
@@ -32,6 +32,7 @@ th {
 }
 .small-table th, .small-table td {
   font-size: 12px;
+  margin: 2px;
 }
 </style>
 
@@ -120,6 +121,12 @@ th {
   * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
   {{#if notes}}<br />** {{notes}}{{/if}}
 </p>
+
+<h2>📎 Attachments</h2>
+<ul>
+  <li>A CSV export of all the transactions of the month</li>
+  <li>A PDF with all the receipts</li>
+</ul>
 
 <h2>🗣 Feedback</h2>
 As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
