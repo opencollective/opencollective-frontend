@@ -9,6 +9,7 @@
   window.OC.widgets = [];
 
   window.addEventListener('message', (e) => {
+    if (e.origin !== "https://opencollective.com") return;
     if (typeof e.data === 'string' && e.data.substr(0,3) !=='oc-') return;
     const data = JSON.parse(e.data.substr(3));
     for (let i=0; i<window.OC.widgets.length; i++) {

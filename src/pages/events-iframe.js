@@ -34,8 +34,8 @@ class Events extends React.Component {
   componentDidUpdate() {
     if (!window.parent) return;
     if (!this.refs.events) return;
-    const parentHost = `${window.parent.location.protocol}//${window.parent.location.host}`;
-    window.parent.postMessage(`oc-${JSON.stringify({id: this.props.id, height: this.refs.events.offsetHeight})}`, parentHost);
+    const message = `oc-${JSON.stringify({id: this.props.id, height: this.refs.events.offsetHeight})}`;
+    window.parent.postMessage(message, "*");
   }
 
   render() {
