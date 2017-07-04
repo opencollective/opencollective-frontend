@@ -28,7 +28,7 @@ class TransactionsPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser && getLoggedInUser(this.props.collectiveSlug);
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
     this.setState({LoggedInUser});
   }
 

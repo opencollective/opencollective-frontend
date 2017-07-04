@@ -21,7 +21,7 @@ class EventPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = await getLoggedInUser && getLoggedInUser(this.props.collectiveSlug);
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
     this.setState({LoggedInUser});
   }
 
@@ -41,7 +41,6 @@ class EventPage extends React.Component {
 
     if (LoggedInUser) {
       LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
-      console.log("Logged in user: ", LoggedInUser);
     }
 
     return (

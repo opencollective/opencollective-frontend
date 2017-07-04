@@ -2,19 +2,8 @@ import React from 'react';
 import { addEventsData } from '../graphql/queries';
 import Link from 'next/link';
 import withData from '../lib/withData';
-import { IntlProvider, addLocaleData } from 'react-intl';
+import withIntl from '../lib/withIntl';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-
-import 'intl';
-import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
-import en from 'react-intl/locale-data/en';
-import enUS from '../lang/en-US.json';
-
-addLocaleData([...en]);
-addLocaleData({
-    locale: 'en-US',
-    parentLocale: 'en',
-});
 
 class Events extends React.Component {
 
@@ -44,21 +33,19 @@ class Events extends React.Component {
     pastEvents.reverse();
 
     return (
-      <IntlProvider locale="en-US" messages={enUS}>
-        <div>
-          <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
-          <ul>
-          {futureEvents.map(this.renderEventEntry)}
-          </ul>
-          <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
-          <ul>
-          {pastEvents.map(this.renderEventEntry)}
-          </ul>
-        </div>
-      </IntlProvider>
+      <div>
+        <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
+        <ul>
+        {futureEvents.map(this.renderEventEntry)}
+        </ul>
+        <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
+        <ul>
+        {pastEvents.map(this.renderEventEntry)}
+        </ul>
+      </div>
     );
   }
 
 }
 
-export default withData(addEventsData(Events));
+export default withData(withIntl(addEventsData(Events)));

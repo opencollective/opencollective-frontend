@@ -133,7 +133,6 @@ class Event extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log(">>> componentWillReceiveProps", props);
     if (props) {
       this.setState({actions: this.getDefaultActions(props) });
     }

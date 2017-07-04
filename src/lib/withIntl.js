@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import {IntlProvider, addLocaleData, injectIntl} from 'react-intl'
+import 'intl';
+import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 
 // Register React Intl's locale data for the user's locale in the browser. This
 // locale data was added to the page by `pages/_document.js`. This only happens
