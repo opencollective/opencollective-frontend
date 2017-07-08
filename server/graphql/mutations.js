@@ -6,6 +6,7 @@ import Promise from 'bluebird';
 import { difference } from 'lodash';
 import { hasRole } from '../lib/auth';
 import errors from '../lib/errors';
+import { pluralize } from '../lib/utils';
 
 import {
   GraphQLNonNull,
@@ -262,7 +263,11 @@ const mutations = {
         }))
         .then(u => u || models.User.create(response.user))
         .tap(u => user = u)
-        
+        .then(() => {
+          if (tier.maxQuantityPerUser > 0 && response.quantity > tier.maxQuantityPerUser) {
+            Promise.reject(new Error(`You can only buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
+          }
+        })
         // create response
         .then(() => models.Response.create({
           UserId: user.id,

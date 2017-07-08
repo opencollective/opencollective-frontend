@@ -390,6 +390,12 @@ export const TierType = new GraphQLObjectType({
           return tier.slug
         }
       },
+      type: {
+        type: GraphQLString,
+        resolve(tier) {
+          return tier.type
+        }
+      },
       name: {
         type: GraphQLString,
         resolve(tier) {
@@ -420,12 +426,30 @@ export const TierType = new GraphQLObjectType({
           return tier.maxQuantity;
         }
       },
+      maxQuantityPerUser: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.maxQuantityPerUser;
+        }
+      },
       availableQuantity: {
         type: GraphQLInt,
         resolve(tier) {
           return tier.availableQuantity()
           // graphql doesn't like infinity value
           .then(availableQuantity => availableQuantity === Infinity ? 10000000 : availableQuantity);
+        }
+      },
+      goal: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.goal;
+        }
+      },
+      totalAmount: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.totalAmount();
         }
       },
       password: {

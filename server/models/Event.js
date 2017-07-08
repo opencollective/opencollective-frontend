@@ -44,11 +44,13 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    // Max amount to raise across all tiers
     maxAmount: {
       type: DataTypes.INTEGER, // In cents
       min: 0
     },
 
+    // Max quantity of tickets across all tiers
     maxQuantity: {
       type: DataTypes.INTEGER
     },

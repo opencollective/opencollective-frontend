@@ -42,6 +42,8 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, GOAL, ...
+
     description: DataTypes.STRING,
 
     amount: {
@@ -59,7 +61,20 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    // Max quantity of tickets to sell (0 for unlimited)
     maxQuantity: {
+      type: DataTypes.INTEGER,
+      min: 0
+    },
+
+    // Max quantity of tickets per user (0 for unlimited)
+    maxQuantityPerUser: {
+      type: DataTypes.INTEGER,
+      min: 0
+    },
+
+    // Goal to reach
+    goal: {
       type: DataTypes.INTEGER,
       min: 0
     },
@@ -119,6 +134,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
+      // TODO: Check for maxQuantityPerUser
       availableQuantity() {
         return Sequelize.models.Response.sum('quantity', { 
             where: {
@@ -139,6 +155,11 @@ export default function(Sequelize, DataTypes) {
       checkAvailableQuantity(quantityNeeded) {
         return this.availableQuantity()
         .then(available => (available - quantityNeeded >= 0))
+      },
+      // Get the total amount of money raised with this tier
+      // TODO: Implement
+      totalAmount() {
+        return 0; // xdamman: NOT IMPLEMENTED (need to add ResponseId to Transaction model)
       }
     }
   });
