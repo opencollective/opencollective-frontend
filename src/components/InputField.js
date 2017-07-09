@@ -45,6 +45,9 @@ class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    validate: PropTypes.func,
+    options: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.object,
     placeholder: PropTypes.string,
     type: PropTypes.string,
@@ -60,6 +63,7 @@ class InputField extends React.Component {
 
     this.messages = defineMessages({
       'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
+      'type.label': { id: 'event.type.label', defaultMessage: 'type' },
       'name.label': { id: 'event.name.label', defaultMessage: 'name' },
       'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
       'description.label': { id: 'event.description.label', defaultMessage: 'description' },
@@ -107,7 +111,8 @@ class InputField extends React.Component {
           {this.messages[`${field.name}.label`] && <ControlLabel>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</ControlLabel>}
           <DateTime
             name={field.name}
-            value={moment.tz(new Date(this.state.value), context.timezone)}
+            value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
+            isValidDate={field.validate}
             onChange={date => this.handleChange(date.toISOString())} 
             />
           {this.messages[`${field.name}.description`] && <HelpBlock>{intl.formatMessage(this.messages[`${field.name}.description`])}</HelpBlock>}
@@ -139,8 +144,30 @@ class InputField extends React.Component {
         />
         )
         break;
-      default:
 
+      case 'select':
+        this.input = (
+          <FieldGroup
+            componentClass="select"
+            type={field.type}
+            name={field.name}
+            label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
+            help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
+            placeholder={field.placeholder}
+            className={field.className}
+            defaultValue={field.defaultValue}
+            onChange={event => this.handleChange(event.target.value)}
+            >
+            {field.options.map(option => {
+              const value = Object.keys(option)[0];
+              const label = option[value];
+              return (<option value={value}>{label}</option>)
+              })
+            }
+          </FieldGroup>)
+        break;
+
+      default:
       this.input = (<FieldGroup
           onChange={event => this.handleChange(event.target.value)}
           type={field.type}

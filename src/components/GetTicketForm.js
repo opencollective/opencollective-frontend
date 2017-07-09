@@ -24,7 +24,7 @@ class GetTicketForm extends React.Component {
     this.state = { response };
     this.handleTicketChange = this.handleTicketChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    if (this.props.tier.name.match(/ticket/i)) {
+    if (this.props.tier.type === 'TICKET') {
       this.buttonLabel = (<FormattedMessage id='GetTicketForm.getTicketBtn' values={{quantity: this.state.response.quantity}} defaultMessage={`{quantity, plural, one {Get this ticket} other {Get those tickets}}`} />);
     } else {
       this.buttonLabel = (<FormattedMessage id='GetTicketForm.getTierBtn' values={{name: this.props.tier.name}} defaultMessage={`become a {name}`} />);

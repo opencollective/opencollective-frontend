@@ -5,8 +5,8 @@ import Document, {Head, Main, NextScript} from 'next/document'
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps (context) {
-    const props = await super.getInitialProps(context)
-    const {req: {locale, localeDataScript}} = context
+    const props = await super.getInitialProps(context);
+    const {req: {locale, localeDataScript}} = context;
 
     return {
       ...props,
@@ -17,14 +17,22 @@ export default class IntlDocument extends Document {
 
   render () {
     // Polyfill Intl API for older browsers
-    const polyfill = `https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.${this.props.locale}`
+    const scriptsUrls = {
+      intl: `https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.${this.props.locale}`,
+      stripe: "https://js.stripe.com/v2/",
+      google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
+    };
 
+    const scripts = [];
+    Object.keys(scriptsUrls).forEach(script => scripts.push(scriptsUrls[script]));
+
+    console.log("scripts", scripts);
     return (
       <html>
         <Head />
         <body>
           <Main />
-          <script src={polyfill} />
+          {scripts.map((script) => <script type="text/javascript" src={script} />)}
           <script
             dangerouslySetInnerHTML={{
               __html: this.props.localeDataScript
