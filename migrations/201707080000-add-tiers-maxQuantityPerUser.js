@@ -4,7 +4,7 @@ module.exports = {
   up: function (queryInterface, DataTypes) {
     return queryInterface.addColumn('Tiers', 'maxQuantityPerUser', { type: DataTypes.INTEGER })
       .then(() => queryInterface.addColumn('Tiers', 'goal', { type: DataTypes.INTEGER }))
-      .then(() => queryInterface.addColumn('Tiers', 'type', { type: DataTypes.STRING }))
+      .then(() => queryInterface.addColumn('Tiers', 'type', { type: DataTypes.STRING, defaultValue: 'TICKET' }))
   },
 
   down: function (queryInterface) {

@@ -352,7 +352,7 @@ export const EventType = new GraphQLObjectType({
       tiers: {
         type: new GraphQLList(TierType),
         resolve(event) {
-          return event.getTiers({ order: [['amount', 'ASC']] });
+          return event.getTiers({ order: [['name', 'ASC']] });
         }
       },
       responses: {

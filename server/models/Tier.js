@@ -42,7 +42,10 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, GOAL, ...
+    type: {
+      type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, GOAL, ...
+      defaultValue: 'TICKET'
+    },
 
     description: DataTypes.STRING,
 
