@@ -9,7 +9,7 @@
   window.OC.widgets = [];
 
   window.addEventListener('message', (e) => {
-    if (e.origin !== "https://opencollective.com") return;
+    if (e.origin !== "{{host}}") return;
     if (typeof e.data === 'string' && e.data.substr(0,3) !=='oc-') return;
     const data = JSON.parse(e.data.substr(3));
     for (let i=0; i<window.OC.widgets.length; i++) {
@@ -61,7 +61,7 @@
 
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const init = () => {
     const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
     const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
     scriptsNodesArray.map(s => {
@@ -70,6 +70,12 @@
         window.OC.widgets.push(new OpenCollectiveWidget(s));
       }
     });
-  });
+  };
+
+  if (document.readyState !== "loading") {
+    init();
+  } else {
+    document.addEventListener("DOMContentLoaded", init);
+  }
 
 })();
