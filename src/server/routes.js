@@ -52,7 +52,7 @@ module.exports = (server, app) => {
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,
       verb: req.params.verb,
-      host: process.env.WEBSITE_URL || "http://localhost:3000"
+      host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`
     }))
   });
 
@@ -64,7 +64,7 @@ module.exports = (server, app) => {
     res.send(compiled({
       collectiveSlug: req.params.collectiveSlug,
       id: req.query.id,
-      host: process.env.WEBSITE_URL || "http://localhost:3000"
+      host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`
     }))
   });
 

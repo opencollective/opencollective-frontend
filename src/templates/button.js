@@ -44,7 +44,7 @@
 
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const init = () => {
     const scriptsNodesArray = [].slice.call(document.querySelectorAll("script"));
     const regex = new RegExp("{{host}}".replace(/^https?:\/\//, ''),'i');
     scriptsNodesArray.map(s => {
@@ -53,6 +53,12 @@
         window.OC.buttons.push(new OpenCollectiveButton(s));
       }
     });
-  });
+  };
+
+  if (document.readyState !== "loading") {
+    init();
+  } else {
+    document.addEventListener("DOMContentLoaded", init);
+  }
 
 })();
