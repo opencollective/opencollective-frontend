@@ -56,6 +56,8 @@
   "transactions.loadMore": "afficher plus de transactions",
   "UserCard.since": "depuis",
   "utils.free": "gratuit",
+  "events.widget.noEventScheduled": "Aucun événement n'a encore été programmé.",
+  "events.widget.createEvent": "Créer un événement",
   "events.title.futureEvents": "{n, plural, one {Prochain événement} other {Prochains événements}}",
   "events.title.pastEvents": "{n, plural, one {événement précédent} other {événement précédents}}",
   "transactions.title": "{n, plural, one {Dernière transaction} other {Dernières transactions}}"

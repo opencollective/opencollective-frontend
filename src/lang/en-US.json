@@ -56,6 +56,8 @@
   "transactions.loadMore": "load more",
   "UserCard.since": "since",
   "utils.free": "free",
+  "events.widget.noEventScheduled": "No event has been scheduled yet.",
+  "events.widget.createEvent": "Create an Event",
   "events.title.futureEvents": "Next {n, plural, one {event} other {events}}",
   "events.title.pastEvents": "Past {n, plural, one {event} other {events}}",
   "transactions.title": "{n, plural, one {Latest transaction} other {Latest transactions}}"

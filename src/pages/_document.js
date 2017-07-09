@@ -23,10 +23,15 @@ export default class IntlDocument extends Document {
       google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
     };
 
-    const scripts = [];
-    Object.keys(scriptsUrls).forEach(script => scripts.push(scriptsUrls[script]));
+    const page = this.props.__NEXT_DATA__.pathname.substr(1);
+    let requiredScripts = ['intl'];
+    if (['createEvent', 'event', 'editEvent'].indexOf(page) !== -1) {
+      requiredScripts = Object.keys(scriptsUrls);
+    }
 
-    console.log("scripts", scripts);
+    const scripts = [];
+    requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
+
     return (
       <html>
         <Head />

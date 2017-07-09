@@ -1,6 +1,5 @@
 import React from 'react';
 import { addEventsData } from '../graphql/queries';
-import Link from 'next/link';
 import withData from '../lib/withData';
 import { IntlProvider, addLocaleData } from 'react-intl';
 import { FormattedDate, FormattedMessage } from 'react-intl';
@@ -118,27 +117,74 @@ class Events extends React.Component {
 
           .events {
             padding: 10px;
+            max-width: 450px;
+            margin: 0 auto;
           }
-
+          .createEvent {
+            text-align: center;
+          }
+          .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+          }
+          .btn-default {
+            color: #333;
+            background-color: #fff;
+            border-color: #ccc;
+          }
+          .btn-default:hover {
+            color: #333;
+            background-color: #e6e6e6;
+            border-color: #adadad;
+            text-decoration: none;
+            outline: 0;
+          }
           `}
           </style>
           <div className="events" ref="events">
-            <div className="title">
-              <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
-              <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} target="_blank">Create an Event</a></div>
-            </div>
-            <ul>
-            {futureEvents.length === 0 &&
-            <div>No event planned.</div>
+            {futureEvents.length === 0 && pastEvents.length === 0 &&
+              <div className="createEvent">
+                <p><FormattedMessage id='events.widget.noEventScheduled' defaultMessage={`No event has been scheduled yet.`} /></p>
+                <a href={`/${this.props.collectiveSlug}/events/new`} className="btn btn-default" target="_top"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a>
+              </div>
             }
-            {futureEvents.map(this.renderEventEntry)}
-            </ul>
-            <div className="title">
-              <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
+            { (futureEvents.length > 0 || pastEvents.length > 0) &&
+              <div>
+              <div className="title">
+                <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
+                <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} target="_blank"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a></div>
+              </div>
+              <ul>
+              {futureEvents.length === 0 &&
+              <div>No event planned.</div>
+              }
+              {futureEvents.map(this.renderEventEntry)}
+              </ul>
+              {pastEvents.length > 0 &&
+                <div className="pastEvents">
+                  <div className="title">
+                    <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
+                  </div>
+                  <ul>
+                  {pastEvents.map(this.renderEventEntry)}
+                  </ul>
+                </div>
+              }
             </div>
-            <ul>
-            {pastEvents.map(this.renderEventEntry)}
-            </ul>
+            }
           </div>
         </div>
       </IntlProvider>
