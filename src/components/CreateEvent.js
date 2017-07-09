@@ -84,7 +84,6 @@ class CreateEvent extends React.Component {
 
         <Header
           title={title}
-          scripts={['google']}
           LoggedInUser={this.props.LoggedInUser}
           />
 

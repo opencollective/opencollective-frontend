@@ -54,6 +54,7 @@ const getEventQuery = gql`
       },
       tiers {
         id,
+        type,
         name,
         description,
         amount,
@@ -108,6 +109,7 @@ const getEventsQuery = gql`
       },
       tiers {
         id,
+        type,
         name,
         description,
         amount

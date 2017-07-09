@@ -42,8 +42,10 @@ class EditEvent extends React.Component {
 
     if (!event.name) return (<div />);
 
+    const { LoggedInUser } = this.props;
+
     const title = `Edit ${event.name}`;
-    const canEditEvent = this.props.LoggedInUser.canEditEvent;
+    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent;
 
     return (
       <div className="EditEvent">
@@ -65,7 +67,6 @@ class EditEvent extends React.Component {
         <Header
           title={title}
           LoggedInUser={this.props.LoggedInUser}
-          scripts={['google']}
         />
         <Body>
 

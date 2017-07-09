@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import InputField from '../components/InputField';
 import { getCurrencySymbol } from '../lib/utils';
@@ -16,14 +17,37 @@ class EditTiers extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { tiers: props.tiers || [{}] };
+    this.state = { tiers: [...props.tiers] || [{}] };
     this.renderTier = this.renderTier.bind(this);
     this.addTier = this.addTier.bind(this);
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-    
+
+    this.messages = defineMessages({
+      'TIER': { id: 'tier.type.tier', defaultMessage: 'default tier' },
+      'TICKET': { id: 'tier.type.ticket', defaultMessage: 'ticket' },
+      'BACKER': { id: 'tier.type.backer', defaultMessage: 'backer tier' },
+      'SPONSOR': { id: 'tier.type.sponsor', defaultMessage: 'sponsor tier' },
+      'CUSTOM': { id: 'tier.type.custom', defaultMessage: 'custom tier' }
+    });
+
+    const getOptions = (arr) => {
+      const { intl } = this.props;
+      return arr.map(key => { 
+        const obj = {};
+        obj[key] = intl.formatMessage(this.messages[key]);
+        return obj;
+      })
+    }
+
     this.fields = [
+      {
+        name: 'type',
+        type: 'select',
+        options: getOptions(['BACKER', 'SPONSOR', 'TICKET']),
+        defaultValue: 'TICKET'
+      },
       {
         name: 'name'
       },
@@ -47,7 +71,7 @@ class EditTiers extends React.Component {
 
   editTier(index, fieldname, value) {
     const tiers = this.state.tiers;
-    tiers[index][fieldname] = value;
+    tiers[index] = {...tiers[index], ... {[fieldname]:value}};
     this.setState({tiers});
     this.onChange(tiers);
   }
@@ -78,7 +102,9 @@ class EditTiers extends React.Component {
             key={field.name}
             name={field.name}
             type={field.type}
+            defaultValue={field.defaultValue}
             value={tier[field.name]}
+            options={field.options}
             pre={field.pre}
             placeholder={field.placeholder}
             onChange={(value) => this.editTier(index, field.name, value)}
@@ -120,4 +146,4 @@ class EditTiers extends React.Component {
 
 }
 
-export default EditTiers;
+export default injectIntl(EditTiers);
