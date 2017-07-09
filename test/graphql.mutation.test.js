@@ -265,25 +265,35 @@ describe('Mutation Tests', () => {
       it('and updates it', async () => {
         const query = `
         mutation createTier {
-          createTier(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}", tier: { name: "free ticket" }) {
+          createTier(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}", tier: { name: "free ticket", type: "TICKET", maxQuantityPerUser: 2 }) {
             id,
-            name
+            name,
+            type,
+            maxQuantityPerUser
           }
         }
         `;
         const result = await graphql(schema, query, null, { remoteUser: user1 });
         expect(result.data.createTier.name).to.equal("free ticket");
+        expect(result.data.createTier.type).to.equal("TICKET");
+        expect(result.data.createTier.maxQuantityPerUser).to.equal(2);
 
         const updateQuery = `
         mutation updateTier {
-          updateTier(tier: { id: 1, name: "sponsor" }) {
+          updateTier(tier: { id: 1, name: "sponsor", type: "SPONSOR", maxQuantityPerUser: 1, goal: 100000 }) {
             id,
-            name
+            name,
+            type,
+            maxQuantityPerUser,
+            goal
           }
         }
         `;
         const result2 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
         expect(result2.data.updateTier.name).to.equal("sponsor");
+        expect(result2.data.updateTier.type).to.equal("SPONSOR");
+        expect(result2.data.updateTier.maxQuantityPerUser).to.equal(1);
+        expect(result2.data.updateTier.goal).to.equal(100000);
       })
 
       it('creates a tier not linked to any event', async () => {
