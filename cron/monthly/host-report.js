@@ -42,7 +42,9 @@ const summary = {
   totalActiveHosts: 0,
   totalCollectives: 0,
   totalActiveCollectives: 0,
-  totalTransactions: 0,
+  numberTransactions: 0,
+  numberDonations: 0,
+  numberPaidExpenses: 0,
   hosts: []
 };
 
@@ -61,7 +63,7 @@ const init = () => {
     type: sequelize.QueryTypes.SELECT
   })
   .tap(hosts => {
-      console.log(`Preparing the ${month} report for ${hosts.length} hosts`);
+      console.log(`Preparing the ${month} ${year} report for ${hosts.length} hosts`);
   })
   .then(hosts => Promise.map(hosts, processHost))
   .then(() => getPlatformStats())
@@ -70,10 +72,11 @@ const init = () => {
     console.log(`Total run time: ${timeLapsed}s`);
     summary.timeLapsed = timeLapsed;
     summary.month = month;
+    summary.year = year;
     summary.platformStats = {
       totalHostBalance: platformStats[0],
       deltaHostBalance: platformStats[1],
-      totalDonations: platformStats[2],
+      totalAmountDonations: platformStats[2],
       totalNetAmountReceived: platformStats[3],
       totalAmountPaidExpenses: platformStats[4],
       totalHostFees: platformStats[5],
@@ -84,6 +87,7 @@ const init = () => {
     summary.hosts.sort((a, b) => {
       return b.stats.backers.new - a.stats.backers.new;
     });
+    summary.numberDonations = summary.numberTransactions - summary.numberPaidExpenses;
     return emailLib.send('host.monthlyreport.summary', 'info@opencollective.com', summary);
   })
   .then(() => {
@@ -139,7 +143,12 @@ const processHost = (host) => {
   summary.totalHosts++;
 
   const data = {}, attachments = [];
+  const note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
+  const expensesPerPage = 30; // number of expenses per page of the Table Of Content (for PDF export)
+
   let groupsById = {};
+  let page = 1;
+  let currentPage = 0;
 
   data.host = host;
   data.reportDate = endDate;
@@ -148,12 +157,11 @@ const processHost = (host) => {
   data.config = _.pick(config, 'host');
   data.maxSlugSize = 0;
   data.notes = null;
-  const note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
-  let page = 1;
-  let currentPage = 0;
-  const expensesPerPage = 30; // number of expenses per page of the Table Of Content (for PDF export)
   data.expensesPerPage = [ [] ];
-  data.totalPaidExpenses = 0;
+  data.stats = {
+    numberPaidExpenses: 0
+  };
+
   const processTransaction = (transaction) => {
     const t = transaction;
     t.group = groupsById[t.GroupId].dataValues;
@@ -167,7 +175,7 @@ const processHost = (host) => {
     // We prepare expenses for the PDF export
     if (t.type === 'EXPENSE') {
       t.page = page++;
-      data.totalPaidExpenses++;
+      data.stats.numberPaidExpenses++;
       if (page - 1 % expensesPerPage === 0) {
         currentPage++;
         data.expensesPerPage[currentPage] = [];
@@ -186,8 +194,12 @@ const processHost = (host) => {
     }
   }
 
-  return getHostedGroups(host.id)
-    .tap(groups => groupsById = _.indexBy(groups, "id"))
+  return getHostedGroups(host.id, endDate)
+    .tap(groups => {
+      groupsById = _.indexBy(groups, "id")
+      data.stats.totalCollectives = Object.keys(groupsById).length;
+      summary.totalCollectives += data.stats.totalCollectives;
+    })
     .then(() => getTransactions(Object.keys(groupsById), startDate, endDate, { include: ['Expense', 'User'] }))
     .tap(transactions => {
       if (!transactions || transactions.length == 0) {
@@ -228,12 +240,13 @@ const processHost = (host) => {
     .then(() => getHostStats(host, Object.keys(groupsById)))
     .then(stats => {
       data.stats = {
-        totalCollectives: Object.keys(groupsById).length,
+        ... data.stats,
         totalActiveCollectives: Object.keys(_.indexBy(data.transactions, "GroupId")).length,
-        totalTransactions: data.transactions.length,
+        numberTransactions: data.transactions.length,
         balance: stats[0],
         delta: stats[1],
-        totalDonations: stats[2],
+        numberDonations: data.transactions.length - data.stats.numberPaidExpenses,
+        totalAmountDonations: stats[2],        
         totalNetAmountReceivedForCollectives: stats[3],
         totalAmountPaidExpenses: stats[4],
         totalHostFees: stats[5],
@@ -249,9 +262,11 @@ const processHost = (host) => {
         stats: data.stats
       });
       summary.totalActiveHosts++;
-      summary.totalCollectives += data.stats.totalCollectives;
       summary.totalActiveCollectives += data.stats.totalActiveCollectives;
-      summary.totalTransactions += data.stats.totalTransactions;
+      summary.numberTransactions += data.stats.numberTransactions;
+      summary.numberDonations += data.stats.numberDonations;
+      summary.numberPaidExpenses += data.stats.numberPaidExpenses;
+      summary.totalAmountPaidExpenses += data.stats.totalAmountPaidExpenses;
     })
     .then(() => sendEmail(host, data, attachments))
     .catch(e => {
