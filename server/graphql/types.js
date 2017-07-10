@@ -196,6 +196,12 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.getUsersForViewer(req.remoteUser);
         }
       },
+      tiers: {
+        type: new GraphQLList(TierType),
+        resolve(collective, args) {
+          return collective.getTiers();
+        }
+      },
       transactions: {
         type: new GraphQLList(TransactionInterfaceType),
         args: {
@@ -420,6 +426,12 @@ export const TierType = new GraphQLObjectType({
           return tier.currency;
         }
       },
+      interval: {
+        type: GraphQLString,
+        resolve(tier) {
+          return tier.interval;
+        }
+      },
       maxQuantity: {
         type: GraphQLInt,
         resolve(tier) {
@@ -468,6 +480,12 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(tier) {
           return tier.startsAt
+        }
+      },
+      collective: {
+        type: CollectiveType,
+        resolve(tier) {
+          return tier.getGroup();
         }
       },
       event: {

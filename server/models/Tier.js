@@ -10,6 +10,16 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
+    GroupId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Groups',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
     EventId: {
       type: DataTypes.INTEGER,
       references: {
@@ -63,6 +73,8 @@ export default function(Sequelize, DataTypes) {
         }
       }
     },
+
+    interval: DataTypes.STRING, // one-time, month, year
 
     // Max quantity of tickets to sell (0 for unlimited)
     maxQuantity: {

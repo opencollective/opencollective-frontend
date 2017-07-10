@@ -158,6 +158,7 @@ export function setupModels(client) {
   // Event
   m.Event.belongsTo(m.Group);
   m.Group.hasMany(m.Event);
+  m.Group.hasMany(m.Tier);
 
   // Tier
   m.Tier.belongsTo(m.Event);

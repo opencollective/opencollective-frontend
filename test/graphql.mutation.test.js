@@ -17,6 +17,10 @@ const application = utils.data('application');
 let user1, user2, group1, event1, tier1;
 let sandbox, createPaymentStub;
 
+const stringify = (json) => {
+  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+}
+
 describe('Mutation Tests', () => {
 
   /* SETUP
@@ -90,61 +94,11 @@ describe('Mutation Tests', () => {
 
   describe('createEvent tests', () => {
 
-    describe('throws an error', () => {
-
-      it('when missing all required fields', async () => {
-        const query = `
-          mutation createTier {
-            createTier(tier: {}) {
-              id,
-              name
-            }
-          }
-        `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.contain('collectiveSlug');
-      });
-
-      it('when collective doesn\'t exist', async () => {
-        const query = `
-          mutation createTier {
-            createTier(collectiveSlug: "doesNotExist" , eventSlug: "${event1.slug}") {
-              id,
-              name
-            }
-          }
-        `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal(`No event found with slug: ${event1.slug} in collective: doesNotExist`);
-      });
-
-      it('when event doesn\'t exist', async () => {
-        const query = `
-          mutation createTier {
-            createTier(collectiveSlug: "${group1.slug}", eventSlug: "doesNotExist", tier: { id:1, name: "free tier" } ) {
-              id,
-              name,
-            }
-          }
-        `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal('No event found with slug: doesNotExist in collective: scouts');
-      });
-
-    });
-
     describe('creates an event', () => {
 
       const getEventData = (group) => {
         return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":group.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
       };
-
-      const stringify = (json) => {
-        return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
-      }
 
       it("fails if not authenticated", async () => {
 
@@ -260,56 +214,81 @@ describe('Mutation Tests', () => {
       })
     })
 
-    describe('creates a tier', () => {
+    describe('edit tiers', () => {
 
-      it('and updates it', async () => {
+      it('fails if not authenticated', async () => {
         const query = `
-        mutation createTier {
-          createTier(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}", tier: { name: "free ticket", type: "TICKET", maxQuantityPerUser: 2 }) {
+        mutation editTiers {
+          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
-            maxQuantityPerUser
+            amount,
+            interval
+          }
+        }
+        `;
+        const result = await graphql(schema, query, null, { });
+        console.log("result", result.errors);
+        expect(result.errors).to.exist;
+        expect(result.errors[0].message).to.equal("You need to be logged in to edit tiers");
+      });
+
+      it('fails if not authenticated as host or member of collective', async () => {
+        const query = `
+        mutation editTiers {
+          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+            id,
+            name,
+            type,
+            amount,
+            interval
+          }
+        }
+        `;
+        const result = await graphql(schema, query, null, { remoteUser: user2 });
+        expect(result.errors).to.exist;
+        expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host of the scouts collective");
+      });
+
+      it('add new tiers and update existing', async () => {
+        const query = `
+        mutation editTiers {
+          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+            id,
+            name,
+            type,
+            amount,
+            interval
           }
         }
         `;
         const result = await graphql(schema, query, null, { remoteUser: user1 });
-        expect(result.data.createTier.name).to.equal("free ticket");
-        expect(result.data.createTier.type).to.equal("TICKET");
-        expect(result.data.createTier.maxQuantityPerUser).to.equal(2);
+        const tiers = result.data.editTiers;
+        expect(tiers).to.have.length(2);
+        expect(tiers[0].interval).to.equal('month');
+        expect(tiers[1].interval).to.equal('year');
 
+        tiers[0].goal = 20000;
+        tiers[1].amount = 100000;
+        tiers.push({name: "free ticket", type: "TICKET", amount: 0});
         const updateQuery = `
-        mutation updateTier {
-          updateTier(tier: { id: 1, name: "sponsor", type: "SPONSOR", maxQuantityPerUser: 1, goal: 100000 }) {
+        mutation editTiers {
+          editTiers(collectiveSlug: "${group1.slug}", tiers: ${stringify(tiers)}) {
             id,
             name,
+            amount,
             type,
-            maxQuantityPerUser,
             goal
           }
         }
         `;
         const result2 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
-        expect(result2.data.updateTier.name).to.equal("sponsor");
-        expect(result2.data.updateTier.type).to.equal("SPONSOR");
-        expect(result2.data.updateTier.maxQuantityPerUser).to.equal(1);
-        expect(result2.data.updateTier.goal).to.equal(100000);
+        const updatedTiers = result2.data.editTiers;
+        expect(updatedTiers).to.have.length(3);
+        expect(updatedTiers[0].goal).to.equal(tiers[0].goal);
+        expect(updatedTiers[1].amount).to.equal(tiers[1].amount);
       })
-
-      it('creates a tier not linked to any event', async () => {
-        const query = `
-        mutation createTier {
-          createTier(collectiveSlug: "${group1.slug}", tier: { name: "Silver Sponsor" }) {
-            id,
-            name,
-            slug
-          }
-        }
-        `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
-        expect(result.data.createTier.name).to.equal("Silver Sponsor");
-        expect(result.data.createTier.slug).to.equal("silver-sponsor");
-      });
     })
   })
 

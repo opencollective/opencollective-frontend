@@ -10,6 +10,7 @@ import { pluralize } from '../lib/utils';
 
 import {
   GraphQLNonNull,
+  GraphQLList,
   GraphQLString,
   GraphQLInt
 } from 'graphql';
@@ -165,41 +166,44 @@ const mutations = {
         });
     }
   },
-  createTier: {
-    type: TierType,
+  editTiers: {
+    type: new GraphQLList(TierType),
     args: {
       collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
-      eventSlug: { type: GraphQLString },
-      tier: { type: TierInputType }
+      tiers: { type: new GraphQLList(TierInputType) }
     },
-    resolve(_, args) {
-      const tier = args.tier;
+    resolve(_, args, req) {
 
-      if (!args.eventSlug) {
-        return models.Tier.create(tier);
+      let collective;
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You need to be logged in to edit tiers");
       }
-
-      let event;
-      return models.Event.getBySlug(args.collectiveSlug, args.eventSlug)
-      .then(e => event = e)
-      .then(() => models.Tier.create({
-        ...tier,
-        EventId: event.id
-      }))
-    }
-  },
-  updateTier: {
-    type: TierType,
-    args: {
-      tier: { type: TierInputType }
-    },
-    resolve(_, args) {
-      return models.Tier.findById(args.tier.id)
-      .then(tier => {
-        if (!tier) throw new Error(`Tier with id ${args.tier.id} not found`);
-        return tier;
+      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      .then(c => {
+        if (!c) throw new Error(`Collective with slug ${args.collectiveSlug} not found`);
+        collective = c;
+        return hasRole(req.remoteUser.id, collective.id, ['MEMBER','HOST'])
       })
-      .then(tier => tier.update(args.tier))
+      .then(canEdit => {
+        if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as a core contributor or as a host of the ${args.collectiveSlug} collective`);
+      })
+      .then(() => collective.getTiers({ where: { EventId: { $eq: null }}}))
+      .then(tiers => {
+        // remove the tiers that are not present anymore in the updated collective
+        const diff = difference(tiers.map(t => t.id), args.tiers.map(t => t.id));
+        return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+      })
+      .then(() => {
+        return Promise.map(args.tiers, (tier) => {
+          if (tier.id) {
+            return models.Tier.update(tier, { where: { id: tier.id }});
+          } else {
+            tier.GroupId = collective.id;
+            return models.Tier.create(tier);
+          }
+        });
+      })
+      .then(() => collective.getTiers());
     }
   },
   createResponse: {
