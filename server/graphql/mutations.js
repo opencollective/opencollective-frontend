@@ -11,6 +11,7 @@ import { pluralize } from '../lib/utils';
 import {
   GraphQLNonNull,
   GraphQLString,
+  GraphQLInt
 } from 'graphql';
 
 import {
@@ -138,6 +139,30 @@ const mutations = {
         }
       })
       .then(() => event);
+    }
+  },
+  deleteEvent: {
+    type: EventType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt)}
+    },
+    resolve(_, args, req) {
+
+      if (!req.remoteUser) {
+        throw new errors.Unauthorized("You need to be logged in to delete an event");
+      }
+
+      return models.Event
+        .findById(args.id)
+        .then(event => {
+          if (!event) throw new errors.NotFound(`Event with id ${args.id} not found`);
+          return event
+            .canEdit(req.remoteUser)
+            .then(canEditEvent => {
+              if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
+              return event.destroy();
+            });
+        });
     }
   },
   createTier: {

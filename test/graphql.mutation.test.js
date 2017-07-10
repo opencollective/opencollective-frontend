@@ -88,7 +88,7 @@ describe('Mutation Tests', () => {
     utils.clearbitStubAfterEach(sandbox);
   });
 
-  describe('createTier tests', () => {
+  describe('createEvent tests', () => {
 
     describe('throws an error', () => {
 
@@ -312,6 +312,52 @@ describe('Mutation Tests', () => {
       });
     })
   })
+
+  describe('delete Event', () => {
+    it('fails to delete an event if not logged in', async () => {
+      const query = `
+      mutation deleteEvent {
+        deleteEvent(id: ${event1.id}) {
+          id,
+          name
+        }
+      }`;
+      const result = await graphql(schema, query, null, { });
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal("You need to be logged in to delete an event");
+      return models.Event.findById(event1.id).then(event => {
+        expect(event).to.not.be.null;
+      })
+    });
+    it('fails to delete an event if logged in as another user', async () => {
+      const query = `
+      mutation deleteEvent {
+        deleteEvent(id: ${event1.id}) {
+          id,
+          name
+        }
+      }`;
+      const result = await graphql(schema, query, null, { remoteUser: user2 });
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this event");
+      return models.Event.findById(event1.id).then(event => {
+        expect(event).to.not.be.null;
+      })
+    });
+    it('deletes an event', async () => {
+      const query = `
+      mutation deleteEvent {
+        deleteEvent(id: ${event1.id}) {
+          id,
+          name
+        }
+      }`;
+      await graphql(schema, query, null, { remoteUser: user1 });
+      return models.Event.findById(event1.id).then(event => {
+        expect(event).to.be.null;
+      })
+    });
+  });
 
   describe('createResponse tests', () => {
 
