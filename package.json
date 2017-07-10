@@ -80,6 +80,7 @@
     "deploy:production": "git push production master",
     "deploy:staging": "git push staging master && heroku ps:scale web=1 -a opencollective-staging-api && heroku ps:scale web=1 -a oc-staging-frontend && heroku ps:scale web=1 -a opencollective-staging-website",
     "stop:staging": "heroku ps:scale web=0 -a oc-staging-frontend && heroku ps:scale web=0 -a opencollective-staging-website && heroku ps:scale web=0 -a opencollective-staging-api",
+    "git:clean": "./scripts/git_clean.sh",
     "postinstall": "npm run build"
   },
   "devDependencies": {
