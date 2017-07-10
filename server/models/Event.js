@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import { uniq } from 'lodash';
 import _ from 'lodash';
+import { hasRole } from '../lib/auth';
 
 export default function(Sequelize, DataTypes) {
 
@@ -162,6 +163,10 @@ export default function(Sequelize, DataTypes) {
         return this.getResponses({ include: [{model: models.User }]})
           .then(rows => rows.map(r => r.User))
           .then(users => uniq(users, (user) => user.id));
+      },
+      canEdit(remoteUser) {
+        if (remoteUser.id === this.UserId) return Promise.resolve(true);
+        else return hasRole(remoteUser.id, this.GroupId, ['HOST', 'MEMBER']);
       }
     },
 
