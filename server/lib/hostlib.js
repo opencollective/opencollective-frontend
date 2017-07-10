@@ -4,11 +4,11 @@ import { convertToCurrency } from '../lib/currency';
 import Promise from 'bluebird';
 
 
-export function getHostedGroups(hostid) {
+export function getHostedGroups(hostid, endDate = new Date) {
   return sequelize.query(`
-    SELECT g.* FROM "Groups" g LEFT JOIN "UserGroups" ug ON g.id = ug."GroupId" WHERE ug.role='HOST' AND ug."UserId"=:hostid
+    SELECT g.* FROM "Groups" g LEFT JOIN "UserGroups" ug ON g.id = ug."GroupId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
   `, {
-    replacements: { hostid },
+    replacements: { hostid, endDate },
     model: models.Group,
     type: sequelize.QueryTypes.SELECT
   });
@@ -37,13 +37,14 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
   const stats = {};
 
   return Promise.all([
-    getBackersIds(new Date('2015-01-01'), new Date),
+    getBackersIds(new Date('2015-01-01'), endDate),
     getBackersIds(new Date('2015-01-01'), startDate),
     getBackersIds(startDate, endDate)
   ]).then(results => {
     stats.total = results[0].length;
     stats.repeat = _.intersection(results[1], results[2]).length;
     stats.new = results[2].length - stats.repeat;
+    stats.inactive = stats.total - (stats.repeat + stats.new);
     return stats;
   });
 }

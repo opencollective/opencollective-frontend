@@ -76,7 +76,10 @@ th {
 <h2>Details for the month</h2>
 <table border=0 width="100%">
   <tr><td>Number of collectives:</td><td></td><td>{{stats.totalCollectives}} ({{stats.totalActiveCollectives}} active)</td></tr>
-  <tr><td>Total donations:</td><td></td><td>{{{currency stats.totalDonations.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td>Number of transactions:</td><td></td><td>{{stats.numberTransactions}} ({{stats.numberDonations}} {{{pluralize "donation" n=stats.numberDonations}}}, {{stats.numberPaidExpenses}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)</td></tr>
+  <tr><td colspan=3 height=10></td></tr>
+  <tr><td>Donations received:</td><td></td><td>{{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}</td></tr>
+  <tr><td>Expenses paid:</td><td></td><td>{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Payment processor fees:</td><td></td><td>-{{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}</td></tr>
   <tr><td colspan=3 class="muted">(Stripe, PayPal)</td></tr>
@@ -90,8 +93,6 @@ th {
   <tr><td colspan=3 height=10></td></tr>
   <tr><td>Net amount:</td><td></td><td>{{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}</td></tr>
   <tr><td colspan=3 class="muted">(Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}}</td></tr>
-  <tr><td colspan=3 height=10></td></tr>
-  <tr><td>Total expenses paid:</td><td></td><td>{{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}</td></tr>
 </table>
 
 

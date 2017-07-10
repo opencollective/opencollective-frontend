@@ -10,7 +10,11 @@ Balance as of {{{moment reportDate}}}: {{{currency stats.balance.totalInHostCurr
 
 Details for the month:
 
-Total donations:                 {{{currency stats.totalDonations.totalInHostCurrency currency=host.currency}}}
+Transactions:                    {{stats.numberTransactions}} ({{stats.numberDonations}} {{{pluralize "donation" n=stats.numberDonations}}}, {{stats.numberPaidExpenses}} {{{pluralize "expense" n=stats.numberPaidExpenses}}} paid)
+
+Donations received:              {{{currency stats.totalAmountDonations.totalInHostCurrency currency=host.currency}}}
+Expenses paid:                   {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
+
 Payment processor fees:          -{{{currency stats.paymentProcessorFees.totalInHostCurrency currency=host.currency}}}
 (Stripe, PayPal)
 
@@ -26,8 +30,6 @@ Host fees:                       -{{{currency stats.totalHostFees.totalInHostCur
 
 Net amount:                      {{{currency stats.totalNetAmountReceivedForCollectives.totalInHostCurrency currency=host.currency}}}
 (Net amount received for your {{stats.totalCollectives}} {{{pluralize "collective" n=stats.totalCollectives}}})
-
-Total expenses paid:             {{{currency stats.totalAmountPaidExpenses.totalInHostCurrency currency=host.currency}}}
 
 
 🗒 {{transactions.length}} transactions

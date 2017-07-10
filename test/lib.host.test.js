@@ -42,7 +42,7 @@ describe('hostlib', () => {
   it('get the backers stats', () => hostlib.getBackersStats(startDate, endDate, groupids).then(stats => {
     expect(stats.new).to.equal(4);
     expect(stats.repeat).to.equal(5);
-    expect(stats.total).to.equal(55);
+    expect(stats.total).to.equal(44);
     return true;
   }));
 
