@@ -27,12 +27,12 @@ class EditEvent extends React.Component {
       const res = await this.props.editEvent(EventInputType);
       const event = res.data.editEvent;
       const eventUrl = `${window.location.protocol}//${window.location.host}/${event.collective.slug}/events/${event.slug}`;
-      this.setState({ status: 'idle', result: { success: `Event edited with success: ${eventUrl}` }});
       window.location.replace(eventUrl);
+      this.setState({ result: { success: `Event edited with success: ${eventUrl} (redirecting...)` }});
     } catch (err) {
       console.error(">>> editEvent error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
-      this.setState( { result: { error: errorMsg }})
+      this.setState( { status: 'idle', result: { error: errorMsg }})
       throw new Error(errorMsg);
     }
   }
@@ -98,7 +98,7 @@ class EditEvent extends React.Component {
           }   
           { canEditEvent &&
             <div>
-              <EditEventForm event={event} onSubmit={this.editEvent} />
+              <EditEventForm event={event} onSubmit={this.editEvent} loading={this.state.status === 'loading'} />
               <div className="actions">
                 (<a onClick={this.deleteEvent}>delete event</a>)
                 <div className="result">
