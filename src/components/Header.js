@@ -111,7 +111,8 @@ class Header extends React.Component {
       }
 
       a {
-        text-decoration: none;
+        text-decoration: none !important;
+        cursor: pointer;
       }
 
       section {

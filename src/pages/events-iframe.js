@@ -117,8 +117,6 @@ class Events extends React.Component {
 
           .events {
             padding: 10px;
-            max-width: 450px;
-            margin: 0 auto;
           }
           .createEvent {
             text-align: center;

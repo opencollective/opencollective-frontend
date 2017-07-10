@@ -67,6 +67,14 @@ const editEventQuery = gql`
   }
 `;
 
+const deleteEventQuery = gql`
+  mutation deleteEvent($id: Int!) {
+    deleteEvent(id: $id) {
+      id
+    }
+  }
+`;
+
 export const addCreateResponseMutation = graphql(createResponseQuery, {
   props: ( { mutate }) => ({
     createResponse: (response) => mutate({ variables: { response } })
@@ -116,6 +124,14 @@ export const addEditEventMutation = graphql(editEventQuery, {
       EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
       EventInputType.location = pick(event.location, ['name','address','lat','long']);
       return await mutate({ variables: { event: EventInputType } })
+    }
+  })
+});
+
+export const addDeleteEventMutation = graphql(deleteEventQuery, {
+  props: ( { mutate }) => ({
+    deleteEvent: async (id) => {
+      return await mutate({ variables: { id } })
     }
   })
 });

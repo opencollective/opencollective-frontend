@@ -8,6 +8,7 @@ class EditEventForm extends React.Component {
 
   static propTypes = {
     event: PropTypes.object,
+    loading: PropTypes.bool,
     onSubmit: PropTypes.func
   };
 
@@ -55,12 +56,12 @@ class EditEventForm extends React.Component {
 
   render() {
 
-    const { event } = this.props;
+    const { event, loading } = this.props;
 
     if (!event.collective) return (<div />);
 
     const isNew = !(event && event.id);
-    const submitBtnLabel = isNew ? "Create Event" : "Save";
+    const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
     const defaultStartsAt = new Date;
     defaultStartsAt.setHours(19);
     defaultStartsAt.setMinutes(0);
@@ -164,7 +165,7 @@ class EditEventForm extends React.Component {
           <EditTiers tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
         </div>
         <div className="actions">
-          <Button type="submit" className="green" label={submitBtnLabel} onClick={this.handleSubmit} />
+          <Button type="submit" className="green" ref="submit" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
         </div>
       </div>
     );
