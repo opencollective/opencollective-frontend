@@ -205,7 +205,7 @@ export const CollectiveType = new GraphQLObjectType({
       },
       tiers: {
         type: new GraphQLList(TierType),
-        resolve(collective, args) {
+        resolve(collective) {
           return collective.getTiers();
         }
       },

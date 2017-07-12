@@ -68,7 +68,7 @@ describe('Query Tests', () => {
         return {
           description: "test response",
           user: {
-            email: user1.email,
+            email: user.email,
             card: {
               service: 'stripe',
               identifier: '4242',
@@ -140,6 +140,10 @@ describe('Query Tests', () => {
         const responses = result.data.Tier.responses;
         expect(responses).to.have.length(1);
         expect(responses[0].user.cards).to.have.length(0);
+        const result2 = await graphql(schema, query, null, { remoteUser: user2 });
+        const responses2 = result2.data.Tier.responses;
+        expect(responses2).to.have.length(1);
+        expect(responses2[0].user.cards).to.have.length(0);
       });
 
       it("gets the credit cards of the user if logged in as that user", async () => {
