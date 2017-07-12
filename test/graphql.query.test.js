@@ -8,13 +8,13 @@ import models from '../server/models';
 
 
 describe('Query Tests', () => {
-  let user1, user2, user3, group1, group2, group3, event1, event2, tier1, tier2, tier3;
+  let user1, user2, user3, group1, group2, group3, event1, event2, ticket1, ticket2, tier3;
 
   /* SETUP
     group1: 2 events
       event1: 2 tiers
-        tier1: 2 responses
-        tier2: 1 response
+        ticket1: 2 responses
+        ticket2: 1 response
       event2: 1 tier
         tier3: no response
     group2: 1 event
@@ -181,21 +181,21 @@ describe('Query Tests', () => {
       describe('returns multiple events with tiers and responses', () => {
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier1'), { EventId: event1.id }))
-          .tap(t => tier1 = t));
+          Object.assign(utils.data('ticket1'), { EventId: event1.id }))
+          .tap(t => ticket1 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier2'), { EventId: event1.id }))
-          .tap(t => tier2 = t));
+          Object.assign(utils.data('ticket2'), { EventId: event1.id }))
+          .tap(t => ticket2 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier1'), { EventId: event2.id }))
+          Object.assign(utils.data('ticket1'), { EventId: event2.id }))
           .tap(t => tier3 = t));
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response1'), { 
             EventId: event1.id, 
-            TierId: tier1.id, 
+            TierId: ticket1.id, 
             GroupId: group1.id, 
             UserId: user2.id,
             confirmedAt: new Date()
@@ -204,7 +204,7 @@ describe('Query Tests', () => {
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
             EventId: event1.id, 
-            TierId: tier1.id, 
+            TierId: ticket1.id, 
             GroupId: group1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
@@ -215,7 +215,7 @@ describe('Query Tests', () => {
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
             EventId: event1.id, 
-            TierId: tier1.id, 
+            TierId: ticket1.id, 
             GroupId: group1.id, 
             UserId: user1.id,
             confirmedAt: null
@@ -224,7 +224,7 @@ describe('Query Tests', () => {
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response3'), { 
             EventId: event1.id, 
-            TierId: tier2.id, 
+            TierId: ticket2.id, 
             GroupId: group1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
@@ -334,7 +334,7 @@ describe('Query Tests', () => {
                   "tiers": [
                     {
                       "id": 1,
-                      "name": tier1.name,
+                      "name": ticket1.name,
                       "description":"free tickets for all",
                       "maxQuantity": 10,
                       "availableQuantity": 7,
@@ -361,7 +361,7 @@ describe('Query Tests', () => {
                     },
                     {
                       "id": 2,
-                      "name": tier2.name,
+                      "name": ticket2.name,
                       "description": "$20 ticket",
                       "maxQuantity": 100,
                       "availableQuantity": 98,
