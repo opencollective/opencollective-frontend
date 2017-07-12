@@ -14,7 +14,7 @@ import paymentsLib from '../server/lib/payments';
 
 const application = utils.data('application');
 
-let user1, user2, group1, event1, tier1;
+let user1, user2, group1, event1, ticket1;
 let sandbox, createPaymentStub;
 
 const stringify = (json) => {
@@ -25,7 +25,7 @@ describe('Mutation Tests', () => {
 
   /* SETUP
     group1: 2 events
-      event1: 1 free tier, 1 paid tier
+      event1: 1 free ticket, 1 paid ticket
   */
 
   before(() => {
@@ -229,7 +229,6 @@ describe('Mutation Tests', () => {
         }
         `;
         const result = await graphql(schema, query, null, { });
-        console.log("result", result.errors);
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to edit tiers");
       });
@@ -341,11 +340,11 @@ describe('Mutation Tests', () => {
   describe('createResponse tests', () => {
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('tier1'), { EventId: event1.id }))
-      .tap(t => tier1 = t));
+      Object.assign(utils.data('ticket1'), { EventId: event1.id, GroupId: group1.id }))
+      .tap(t => ticket1 = t));
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('tier2'), { EventId: event1.id })));
+      Object.assign(utils.data('ticket2'), { EventId: event1.id, GroupId: group1.id })));
 
     describe('throws an error', () => {
 
@@ -370,9 +369,7 @@ describe('Mutation Tests', () => {
         const result = await graphql(schema, query, null, context)
         expect(result.errors.length).to.equal(1);
         expect(result.errors[0].message).to.contain('collective');
-        expect(result.errors[0].message).to.contain('event');
         expect(result.errors[0].message).to.contain('user');
-        expect(result.errors[0].message).to.contain('status');
       });
 
       describe('when collective/event/tier doesn\'t exist', () => {
@@ -467,12 +464,12 @@ describe('Mutation Tests', () => {
           `;
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
-          expect(result.errors[0].message).to.equal(`No more tickets left for ${tier1.name}`);
+          expect(result.errors[0].message).to.equal(`No more tickets left for ${ticket1.name}`);
         });
       });
 
       describe('when no payment method', () => {
-        it('and it\'s a paid tier', async () => {
+        it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createResponse {
               createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
@@ -559,7 +556,7 @@ describe('Mutation Tests', () => {
 
       describe('for YES status', () => {
 
-        describe('in a free tier', () => {
+        describe('in a free ticket', () => {
 
           it('from an existing user', async () => {
             const query = `
@@ -603,7 +600,7 @@ describe('Mutation Tests', () => {
                     "description": "free tickets for all",
                     "id": 1,
                     "maxQuantity": 10,
-                    "name": "Free tier"
+                    "name": "Free ticket"
                   },
                   "user": {
                     "email": null,
@@ -660,7 +657,7 @@ describe('Mutation Tests', () => {
                     "description": "free tickets for all",
                     "id": 1,
                     "maxQuantity": 10,
-                    "name": "Free tier"
+                    "name": "Free ticket"
                   },
                   "user": {
                     "email": null,
@@ -676,7 +673,7 @@ describe('Mutation Tests', () => {
           });
         });
 
-        describe('in a paid tier', () => {
+        describe('in a paid ticket', () => {
 
           it('from an existing user', async () => {
             const query = `
@@ -686,9 +683,10 @@ describe('Mutation Tests', () => {
                     email: "${user2.email}",
                     card: {
                       token: "tok_stripe",
+                      service: "stripe",
                       expMonth: 11,
                       expYear: 2020,
-                      number: 4242
+                      identifier: "4242"
                     }
                   },
                   collective: { slug: "${group1.slug}" },
@@ -733,7 +731,7 @@ describe('Mutation Tests', () => {
                     "description": "$20 ticket",
                     "id": 2,
                     "maxQuantity": 100,
-                    "name": "paid tier"
+                    "name": "paid ticket"
                   },
                   "user": {
                     "email": null,
@@ -754,7 +752,7 @@ describe('Mutation Tests', () => {
               stripeToken: 'tok_stripe',
               amount: 4000,
               currency: 'USD',
-              description: 'January meetup - paid tier'
+              description: 'January meetup - paid ticket'
             });
           });
 
@@ -768,7 +766,7 @@ describe('Mutation Tests', () => {
                       token: "tok_stripe",
                       expMonth: 11,
                       expYear: 2020,
-                      number: 4242
+                      identifier: "4242"
                     }
                   },
                   collective: { slug: "${group1.slug}" },
@@ -813,7 +811,7 @@ describe('Mutation Tests', () => {
                     "description": "$20 ticket",
                     "id": 2,
                     "maxQuantity": 100,
-                    "name": "paid tier"
+                    "name": "paid ticket"
                   },
                   "user": {
                     "email": null,
@@ -834,7 +832,7 @@ describe('Mutation Tests', () => {
               stripeToken: 'tok_stripe',
               amount: 4000,
               currency: 'USD',
-              description: 'January meetup - paid tier'
+              description: 'January meetup - paid ticket'
             });
           });
         });

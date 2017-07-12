@@ -39,9 +39,14 @@ export const CardInputType = new GraphQLInputObjectType({
   description: 'Input type for Card',
   fields: () => ({
     token: { type: new GraphQLNonNull(GraphQLString)},
+    service: { type: GraphQLString},
+    brand: { type: GraphQLString},
+    funding: { type: GraphQLString},
+    country: { type: GraphQLString},
+    fullName: { type: GraphQLString},
     expMonth: { type: new GraphQLNonNull(GraphQLInt)},
     expYear: { type: new GraphQLNonNull(GraphQLInt)},
-    number: { type: new GraphQLNonNull(GraphQLInt)}
+    identifier: { type: new GraphQLNonNull(GraphQLString)}
   })
 });
 
@@ -145,10 +150,11 @@ export const ResponseInputType = new GraphQLInputObjectType({
   description: 'Input type for ResponseType',
   fields: () => ({
     quantity: { type: GraphQLInt },
+    description: { type: GraphQLString },
     user: { type: new GraphQLNonNull(UserInputType) },
     collective: { type: new GraphQLNonNull(CollectiveInputType) },
     tier: { type: TierInputType },
-    event: { type: new GraphQLNonNull(EventAttributesInputType) },
-    status: { type: new GraphQLNonNull(GraphQLString) }
+    event: { type: EventAttributesInputType },
+    status: { type: GraphQLString }
   })
 });

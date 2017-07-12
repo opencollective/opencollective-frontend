@@ -51,7 +51,7 @@ export default function(Sequelize, DataTypes) {
       },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
-      allowNull: false
+      allowNull: true
     },
 
     confirmedAt: {

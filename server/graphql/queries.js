@@ -9,6 +9,7 @@ import {
   CollectiveType,
   TransactionInterfaceType,
   UserType,
+  TierType,
   EventType
 } from './types';
 
@@ -26,6 +27,18 @@ const queries = {
       return models.Group.findOne({
         where: { slug: args.collectiveSlug.toLowerCase() }
       })
+    }
+  },
+
+  Tier: {
+    type: TierType,
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt)
+      }
+    },
+    resolve(_, args) {
+      return models.Tier.findById(args.id);
     }
   },
 

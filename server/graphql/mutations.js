@@ -246,29 +246,35 @@ const mutations = {
       }
 
       const recordYes = () => {
+        let group;
+        const include = [{
+          model: models.Group,
+          where: {
+            slug: response.collective.slug
+          }
+        }];
+        if (response.event) {
+          include.push({
+            model: models.Event,
+            where: {
+              slug: response.event.slug
+            }
+          });
+        }
         return models.Tier.findOne({
           where: {
             id: response.tier.id,
           },
-          include: [{
-            model: models.Event,
-            where: {
-              slug: response.event.slug
-            },
-            include: [{
-              model: models.Group,
-              where: {
-                slug: response.collective.slug
-              }
-            }]
-          }]
+          include
         })
         .then(t => {
           if (!t) {
-            throw new Error(`No tier found with tier id: ${response.tier.id} for event slug:${response.event.slug} in collective slug:${response.collective.slug}`);
+            const forEvent = (response.event) ? ` for event slug:${response.event.slug}` : '';
+            throw new Error(`No tier found with tier id: ${response.tier.id}${forEvent} in collective slug:${response.collective.slug}`);
           }
           tier = t;
           event = t.Event;
+          group = t.Group;
           isPaidTier = tier.amount > 0;
         })
 
@@ -297,11 +303,17 @@ const mutations = {
             Promise.reject(new Error(`You can only buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
           }
         })
+        // records the credit card if provided
+        .then(() => {
+          if (response.user.card) {
+            return models.Card.create({...response.user.card, UserId: user.id});
+          }
+        })
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
-          GroupId: event.Group.id,
-          EventId: event.id,
+          GroupId: group.id,
+          EventId: event && event.id,
           TierId: tier.id,
           confirmedAt: isPaidTier ? null : new Date(),
           quantity: response.quantity || 0,
@@ -309,20 +321,19 @@ const mutations = {
           description: response.description
         }))
         .tap(rm => responseModel = rm)
-
         // record payment, if needed
         .then(responseModel => {
           if (tier.amount > 0) {
             // also sends out email 
             return paymentsLib.createPayment({
               user,
-              group: event.Group,
+              group,
               response: responseModel,
               payment: {
                 stripeToken: response.user.card.token,
-                amount: tier.amount * responseModel.quantity,
+                amount: tier.amount * (responseModel.quantity || 1),
                 currency: tier.currency,
-                description: `${event.name} - ${tier.name}`,
+                description: event ? `${event.name} - ${tier.name}` : tier.name
               }
             })
           } else {
@@ -331,9 +342,9 @@ const mutations = {
               'ticket.confirmed',
               user.email,
               { user: user.info,
-                group: event.Group.info,
+                group: group.info,
                 response: responseModel.info,
-                event: event.info,
+                event: event && event.info,
                 tier: tier && tier.info
               });
           }
@@ -345,11 +356,8 @@ const mutations = {
         case responseStatus.INTERESTED:
           return recordInterested();
 
-        case responseStatus.YES:
-          return recordYes();
-        
         default:
-          throw new Error(`Unknown status ${response.status}`)
+          return recordYes();
       }
 
     }

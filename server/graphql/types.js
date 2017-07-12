@@ -120,6 +120,13 @@ export const UserType = new GraphQLObjectType({
         resolve(user) {
           return user.getCollectivesWithRoles();
         }
+      },
+      cards: {
+        type: new GraphQLList(CardType),
+        resolve(user, args, req) {
+          if (!req.remoteUser || req.remoteUser.id !== user.id) return [];
+          return models.Card.findAll({where: { UserId: user.id }});
+        }
       }
     }
   }
@@ -594,6 +601,69 @@ export const PaymentMethodType = new GraphQLObjectType({
           return pm.service;
         }
       },
+    }
+  }
+});
+
+export const CardType = new GraphQLObjectType({
+  name: "CardType",
+  description: "Sanitized Credit Card Info",
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(card) {
+          return card.id;
+        }
+      },
+      service: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.service;
+        }
+      },
+      brand: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.brand;
+        }
+      },
+      funding: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.funding;
+        }
+      },
+      country: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.country;
+        }
+      },
+      identifier: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.identifier;
+        }
+      },
+      fullName: {
+        type: GraphQLString,
+        resolve(card) {
+          return card.fullName;
+        }
+      },
+      expMonth: {
+        type: GraphQLInt,
+        resolve(card) {
+          return card.expMonth;
+        }
+      },
+      expYear: {
+        type: GraphQLInt,
+        resolve(card) {
+          return card.expYear;
+        }
+      }
     }
   }
 });

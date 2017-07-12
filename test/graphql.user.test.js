@@ -6,29 +6,23 @@ import { graphql } from 'graphql';
 import * as utils from './utils';
 import models from '../server/models';
 
+const stringify = (json) => {
+  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+}
 
 describe('Query Tests', () => {
-  let user1, group1, group2;
-
-  /* SETUP
-    group1: 2 events
-      event1: 2 tiers
-        tier1: 2 responses
-        tier2: 1 response
-      event2: 1 tier
-        tier3: no response
-    group2: 1 event
-      event3: no tiers // event3 not declared above due to linting
-    group3: no events
-  */
+  let user1, user2, group1, group2, tier1;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
 
   beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+
+  beforeEach(() => group1.createTier(utils.data('ticket1')).tap(t => tier1 = t));
 
   beforeEach(() => group1.addUserWithRole(user1, 'BACKER'));
   beforeEach(() => group2.addUserWithRole(user1, 'MEMBER'));
@@ -66,6 +60,123 @@ describe('Query Tests', () => {
         const data = result.data.LoggedInUser;
         expect(data).to.be.null;
       })
-    })
+    });
+
+    describe('cards', () => {
+
+      const generateResponse = (user) => {
+        return {
+          description: "test response",
+          user: {
+            email: user1.email,
+            card: {
+              service: 'stripe',
+              identifier: '4242',
+              expMonth: 1,
+              expYear: 2021,
+              funding: 'credit',
+              brand: 'Visa',
+              country: 'US',
+              token: 'card_1AejcADjPFcHOcTmBJRASiOV'
+            }
+          },
+          collective: { slug: group1.slug },
+          tier: { id: tier1.id }
+        }
+      }
+
+      it("adds a credit card to the user", async () => {
+        const query = `
+        mutation createResponse {
+          createResponse(response: ${stringify(generateResponse(user1))}) {
+            user {
+              id,
+              email,
+              cards {
+                brand,
+                identifier
+              }
+            }
+          }
+        }`;
+
+        const result = await graphql(schema, query, null, {});
+        expect(result.errors).to.not.exist;
+        const cards = await models.Card.findAll({where: { UserId: user1.id }});
+        expect(cards).to.have.length(1);
+        expect(cards[0].identifier).to.equal('4242');
+      });
+
+      it("doesn't get the credit cards of the user if not logged in as that user", async () => {
+        const createResponseQuery = `
+        mutation createResponse {
+          createResponse(response: ${stringify(generateResponse(user1))}) {
+            description
+          }
+        }`;
+
+        await graphql(schema, createResponseQuery, null, {});
+
+        const query = `
+          query Tier {
+            Tier(id: ${tier1.id}) {
+              name,
+              responses {
+                id,
+                description,
+                user {
+                  id,
+                  name,
+                  cards {
+                    identifier,
+                    brand
+                  }
+                }
+              }
+            }
+          }
+        `;
+        const result = await graphql(schema, query, null, {});
+        const responses = result.data.Tier.responses;
+        expect(responses).to.have.length(1);
+        expect(responses[0].user.cards).to.have.length(0);
+      });
+
+      it("gets the credit cards of the user if logged in as that user", async () => {
+          const createResponseQuery = `
+          mutation createResponse {
+            createResponse(response: ${stringify(generateResponse(user1))}) {
+              description
+            }
+          }`;
+
+          await graphql(schema, createResponseQuery, null, {});
+
+          const query = `
+            query Tier {
+              Tier(id: ${tier1.id}) {
+                name,
+                responses {
+                  id,
+                  description,
+                  user {
+                    id,
+                    name,
+                    cards {
+                      identifier,
+                      brand
+                    }
+                  }
+                }
+              }
+            }
+          `;
+          const result = await graphql(schema, query, null, { remoteUser: user1 });
+          const responses = result.data.Tier.responses;
+          expect(responses).to.have.length(1);
+          expect(responses[0].user.cards).to.have.length(1);
+          expect(responses[0].user.cards[0].identifier).to.equal('4242');
+        });
+      });
+    });
   });
-});

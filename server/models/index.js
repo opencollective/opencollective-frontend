@@ -53,6 +53,7 @@ export function setupModels(client) {
 
   [
     'Activity',
+    'Card',
     'Comment',
     'ConnectedAccount',
     'Donation',
@@ -162,6 +163,7 @@ export function setupModels(client) {
 
   // Tier
   m.Tier.belongsTo(m.Event);
+  m.Tier.belongsTo(m.Group);
   m.Event.hasMany(m.Tier);
 
   // Response
@@ -173,6 +175,7 @@ export function setupModels(client) {
   m.Tier.hasMany(m.Response);
   m.Group.hasMany(m.Response);
   m.User.hasMany(m.Response);
+  m.User.hasMany(m.Card);
 
   return m;
 }

@@ -651,15 +651,37 @@ export default {
   },
 
   "tier1": {
-    name: "Free tier",
+    name: "backer",
+    type: "BACKER",
+    description: "$10/month",
+    amount: 1000,
+    interval: 'month',
+    currency: "USD",
+    maxQuantity: 10,
+  },
+
+  "tier2": {
+    name: "sponsor",
+    type: "SPONSOR",
+    description: "$1,000/year sponsorship",
+    amount: 10000,
+    interval: 'year',
+    currency: "USD",
+    maxQuantity: 100
+  },
+
+  "ticket1": {
+    name: "Free ticket",
+    type: "TICKET",
     description: "free tickets for all",
     amount: 0,
     currency: "USD",
     maxQuantity: 10,
   },
 
-  "tier2": {
-    name: "paid tier",
+  "ticket2": {
+    name: "paid ticket",
+    type: "TICKET",
     description: "$20 ticket",
     amount: 2000,
     currency: "USD",

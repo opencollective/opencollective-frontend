@@ -167,7 +167,7 @@ export default function(Sequelize, DataTypes) {
             }
           })
       },
-      checkAvailableQuantity(quantityNeeded) {
+      checkAvailableQuantity(quantityNeeded = 1) {
         return this.availableQuantity()
         .then(available => (available - quantityNeeded >= 0))
       },
