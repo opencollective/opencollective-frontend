@@ -266,7 +266,8 @@ const processPayment = (donation) => {
                 subscriptionsLink: user.generateLoginLink('/subscriptions')
               }));
           }
-      })
+        })
+        .then(() => transaction); // make sure we return the transaction created
     },
     manual: (donation) => {
       const group = donation.Group;
