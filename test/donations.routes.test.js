@@ -11,12 +11,9 @@ const AMOUNT = 1099;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
 const application = utils.data('application');
-const userData = utils.data('user3');
-const userData2 = utils.data('user2');
-const groupData = utils.data('group2');
 
 describe('donations.routes.test.js', () => {
-  let user, user2, group, sandbox, createPaymentStub, processPaymentStub;
+  let user, user2, host, group, sandbox, createPaymentStub, processPaymentStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -34,29 +31,12 @@ describe('donations.routes.test.js', () => {
   // Create a stub for clearbit
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
-  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
-
-  beforeEach('create a second user', () => models.User.create(userData2).tap(u => user2 = u));
-
-  beforeEach('create group with user as first member', (done) => {
-    request(app)
-      .post('/groups')
-      .send({
-        api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        models.Group
-          .findById(parseInt(res.body.id))
-          .then((g) => {
-            group = g;
-            done();
-          })
-          .catch(done);
-      });
-  });
+  beforeEach('create a user', () => models.User.create(utils.data('user3')).tap(u => user = u));
+  beforeEach('create a host', () => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach('create a group', () => models.Group.create(utils.data('group2')).tap(g => group = g));
+  beforeEach('add host to group', () => group.addUserWithRole(host, roles.HOST));
+  beforeEach('add user to group', () => group.addUserWithRole(user, roles.MEMBER));
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
@@ -364,11 +344,11 @@ describe('donations.routes.test.js', () => {
           it('calls processPayment successfully when donation from host', () => {
             request(app)
               .post(`/groups/${group.id}/donations/manual`)
-              .set('Authorization', `Bearer ${user.jwt()}`)
+              .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
                 donation: Object.assign({}, payment, {
-                  email: user.email,
+                  email: host.email,
                   title: 'desc',
                   notes: 'long notes'
                 })
@@ -377,7 +357,7 @@ describe('donations.routes.test.js', () => {
               .then(() => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
-                  UserId: user.id,
+                  UserId: host.id,
                   GroupId: group.id,
                   currency: group.currency,
                   amount: AMOUNT,
@@ -391,7 +371,7 @@ describe('donations.routes.test.js', () => {
           it('calls processPayment successfully when no email is sent with the donation', () => {
             request(app)
               .post(`/groups/${group.id}/donations/manual`)
-              .set('Authorization', `Bearer ${user.jwt()}`)
+              .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
                 donation: Object.assign({}, payment, {
@@ -403,7 +383,7 @@ describe('donations.routes.test.js', () => {
               .then(() => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
-                  UserId: user.id,
+                  UserId: host.id,
                   GroupId: group.id,
                   currency: group.currency,
                   amount: AMOUNT,
@@ -417,7 +397,7 @@ describe('donations.routes.test.js', () => {
           it('calls processPayment successfully when manual donation is from a new user but submitted by host', () => {
             return request(app)
               .post(`/groups/${group.id}/donations/manual`)
-              .set('Authorization', `Bearer ${user.jwt()}`)
+              .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
                 donation: Object.assign({}, payment, {
@@ -445,7 +425,7 @@ describe('donations.routes.test.js', () => {
           it('calls processPayment successfully when manual donation is from an existing user who is not the host but submitted by host', () => {
             return request(app)
               .post(`/groups/${group.id}/donations/manual`)
-              .set('Authorization', `Bearer ${user.jwt()}`)
+              .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
                 donation: Object.assign({}, payment, {
