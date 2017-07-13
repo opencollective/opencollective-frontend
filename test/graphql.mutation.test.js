@@ -681,7 +681,7 @@ describe('Mutation Tests', () => {
                 createResponse(response: {
                   user: {
                     email: "${user2.email}",
-                    card: {
+                    paymentMethod: {
                       token: "tok_stripe",
                       service: "stripe",
                       expMonth: 11,
@@ -762,7 +762,7 @@ describe('Mutation Tests', () => {
                 createResponse(response: {
                   user: {
                     email: "newuser@email.com",
-                    card: {
+                    paymentMethod: {
                       token: "tok_stripe",
                       expMonth: 11,
                       expYear: 2020,
