@@ -199,11 +199,14 @@ describe('donations.routes.test.js', () => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
-            Object.assign({}, payment, {
-              description: 'hello world',
-              interval: undefined,
-              notes: undefined}));
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+            paymentMethod: { token: payment.stripeToken },
+            amount: AMOUNT,
+            currency: CURRENCY,
+            description: 'hello world',
+            interval: undefined,
+            notes: undefined
+          });
         })
         .catch();
       });
@@ -220,11 +223,14 @@ describe('donations.routes.test.js', () => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal('anonymous@anon.com');
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
-            Object.assign({}, payment, {
-              description: payment.description,
-              interval: undefined,
-              notes: undefined}));
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+            paymentMethod: { token: payment.stripeToken },
+            amount: AMOUNT,
+            currency: CURRENCY,
+            description: payment.description,
+            interval: undefined,
+            notes: undefined
+          });
         })
         .catch();
       });
@@ -241,11 +247,14 @@ describe('donations.routes.test.js', () => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user2.email);
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
-            Object.assign({}, payment, {
-              description: payment.description,
-              interval: undefined,
-              notes: undefined}));
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+            paymentMethod: { token: payment.stripeToken },
+            amount: AMOUNT,
+            currency: CURRENCY,
+            description: payment.description,
+            interval: undefined,
+            notes: undefined
+          });
         })
         .catch();
       });
@@ -267,11 +276,14 @@ describe('donations.routes.test.js', () => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
           expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
-          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal(
-            Object.assign({}, payment, {
-              description: 'desc',
-              interval: 'month',
-              notes: 'long notes'}));
+          expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
+            paymentMethod: { token: payment.stripeToken },
+            amount: AMOUNT,
+            currency: CURRENCY,
+            description: 'desc',
+            interval: 'month',
+            notes: 'long notes'
+          });
         })
         .catch();
       });
