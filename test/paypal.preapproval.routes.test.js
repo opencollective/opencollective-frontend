@@ -107,7 +107,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     const preapprovalkey = paypalMock.adaptive.preapproval.preapprovalKey;
 
-    beforeEach((done) => {
+    beforeEach('get preapproval key', (done) => {
       request(app)
         .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
@@ -117,12 +117,12 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     describe('Details from Paypal COMPLETED', () => {
 
-      beforeEach(() => {
+      beforeEach('stub paypalAdaptive', () => {
         sinon.stub(paypalAdaptive, 'preapprovalDetails',
           () => Promise.resolve(paypalMock.adaptive.preapprovalDetails.completed));
       });
 
-      afterEach(() => {
+      afterEach('restore paypalAdaptive', () => {
         paypalAdaptive.preapprovalDetails.restore();
       });
 
@@ -157,7 +157,7 @@ describe('paypal.preapproval.routes.test.js', () => {
               expect(res.count).to.equal(1);
               expect(res.rows[0].confirmedAt).not.to.be.null;
               expect(res.rows[0].service).to.equal('paypal');
-              expect(res.rows[0].number).to.equal(mock.completed.senderEmail);
+              expect(res.rows[0].identifier).to.equal(mock.completed.senderEmail);
               expect(res.rows[0].UserId).to.equal(user.id);
             })
             .then(() => models.Activity.findAndCountAll({where: {type: 'user.paymentMethod.created'} }))

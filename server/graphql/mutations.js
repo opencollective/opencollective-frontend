@@ -283,7 +283,7 @@ const mutations = {
         .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
-        // make sure if it's paid tier, we have a payment method attached
+        // make sure if it's a paid tier, we have a payment method attached
         .then(() => isPaidTier && !(response.user.paymentMethod && (response.user.paymentMethod.id || response.user.paymentMethod.token)) ? 
           Promise.reject(new Error(`This tier requires a payment method`)) : Promise.resolve())
         
@@ -316,7 +316,7 @@ const mutations = {
         }))
         .tap(rm => responseModel = rm)
 
-        // record payment, if needed
+        // process payment, if needed
         .then(responseModel => {
           if (tier.amount > 0) {
             // if the user is trying to reuse an existing credit card,

@@ -192,7 +192,7 @@ describe('lib.payments.processPayment.test.js', () => {
   describe('Paypal payment method', () => {
     beforeEach('create a payment method', () => {
       return models.PaymentMethod.create({
-        number: 'blah',
+        identifier: 'blah',
         token: 'token-xxx',
         service: 'paypal'
         })
@@ -283,7 +283,7 @@ describe('lib.payments.processPayment.test.js', () => {
 
       beforeEach('create a payment method and a donation', () => {
         return models.PaymentMethod.create({
-          number: 'blah',
+          identifier: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
         })
@@ -363,7 +363,7 @@ describe('lib.payments.processPayment.test.js', () => {
       const createDonation = (interval) => {
         let pm;
         return models.PaymentMethod.create({
-          number: 'blah',
+          identifier: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
           })
