@@ -601,6 +601,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.id;
         }
       },
+      uuid: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.uuid;
+        }
+      },
       service: {
         type: GraphQLString,
         resolve(paymentMethod) {

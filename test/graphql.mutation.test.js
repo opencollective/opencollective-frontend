@@ -2,19 +2,14 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import schema from '../server/graphql/schema';
 import { graphql } from 'graphql';
-import request from 'supertest';
 import sinon from 'sinon';
 
-import app from '../server/index';
 import * as utils from './utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 import paymentsLib from '../server/lib/payments';
 
-
-const application = utils.data('application');
-
-let user1, user2, group1, event1, ticket1;
+let host, user1, user2, group1, event1, ticket1;
 let sandbox, createPaymentStub;
 
 const stringify = (json) => {
@@ -30,11 +25,6 @@ describe('Mutation Tests', () => {
 
   before(() => {
     sandbox = sinon.sandbox.create();
-  });
-
-  after(() => sandbox.restore());
-
-  beforeEach(() => {
     createPaymentStub = sandbox.stub(paymentsLib, 'createPayment',
       () => {
         // assumes payment goes through and marks Response as confirmedAt
@@ -43,42 +33,23 @@ describe('Mutation Tests', () => {
       });
   });
 
-  // Create a stub for clearbit
-  beforeEach((done) => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  after(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-
-  beforeEach('create group with user as first member', (done) => {
-    request(app)
-    .post('/groups')
-    .send({
-      api_key: application.api_key,
-      group: Object.assign({}, utils.data('group1'), { users: [{ email: user1.email, role: roles.HOST}]})
-    })
-    .expect(200)
-    .end((e, res) => {
-      expect(e).to.not.exist;
-      models.Group
-        .findById(parseInt(res.body.id))
-        .then((g) => {
-          group1 = g;
-          done();
-        })
-    })
-  });
+  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
+  beforeEach(() => group1.addUserWithRole(host, roles.HOST));
+  beforeEach(() => group1.addUserWithRole(user1, roles.MEMBER));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => user1.setStripeAccount(account))
+    .then((account) => host.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -86,11 +57,6 @@ describe('Mutation Tests', () => {
   beforeEach('create an event', () => models.Event.create(
     Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
     .tap(e => event1 = e));
-
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
 
   describe('createEvent tests', () => {
 
@@ -542,7 +508,7 @@ describe('Mutation Tests', () => {
                 "tier": null,
                 "user": {
                   "email": null, // note: since the logged in user cannot edit the group, it cannot get back the email address of a response
-                  "id": 2
+                  "id": 3
                 },
                 "collective": {
                   "id": 1,
@@ -587,29 +553,27 @@ describe('Mutation Tests', () => {
             `;
             const context = { remoteUser: null };
             const result = await graphql(schema, query, null, context)
-            expect(result).to.deep.equal({
-              data: {
-                "createResponse": {
-                  "event": {
-                    "id": 1
-                  },
+            expect(result.data).to.deep.equal({
+              "createResponse": {
+                "event": {
+                  "id": 1
+                },
+                "id": 1,
+                "status": "YES",
+                "tier": {
+                  "availableQuantity": 8,
+                  "description": "free tickets for all",
                   "id": 1,
-                  "status": "YES",
-                  "tier": {
-                    "availableQuantity": 8,
-                    "description": "free tickets for all",
-                    "id": 1,
-                    "maxQuantity": 10,
-                    "name": "Free ticket"
-                  },
-                  "user": {
-                    "email": null,
-                    "id": 2
-                  },
-                  "collective": {
-                    "id": 1,
-                    "slug": "scouts"
-                  }
+                  "maxQuantity": 10,
+                  "name": "Free ticket"
+                },
+                "user": {
+                  "email": null,
+                  "id": 3
+                },
+                "collective": {
+                  "id": 1,
+                  "slug": "scouts"
                 }
               }
             });
@@ -661,7 +625,7 @@ describe('Mutation Tests', () => {
                   },
                   "user": {
                     "email": null,
-                    "id": 3
+                    "id": 4
                   },
                   "collective": {
                     "id": 1,
@@ -718,42 +682,40 @@ describe('Mutation Tests', () => {
             `;
             const context = { remoteUser: null };
             const result = await graphql(schema, query, null, context);
-            expect(result).to.deep.equal({
-              data: {
-                "createResponse": {
-                  "event": {
-                    "id": 1
-                  },
+            expect(result.data).to.deep.equal({
+              "createResponse": {
+                "event": {
+                  "id": 1
+                },
+                "id": 1,
+                "status": "YES",
+                "tier": {
+                  "availableQuantity": 98,
+                  "description": "$20 ticket",
+                  "id": 2,
+                  "maxQuantity": 100,
+                  "name": "paid ticket"
+                },
+                "user": {
+                  "email": null,
+                  "id": 3
+                },
+                "collective": {
                   "id": 1,
-                  "status": "YES",
-                  "tier": {
-                    "availableQuantity": 98,
-                    "description": "$20 ticket",
-                    "id": 2,
-                    "maxQuantity": 100,
-                    "name": "paid ticket"
-                  },
-                  "user": {
-                    "email": null,
-                    "id": 2
-                  },
-                  "collective": {
-                    "id": 1,
-                    "slug": "scouts"
-                  }
+                  "slug": "scouts"
                 }
               }
             });
+            const createPaymentArgument = createPaymentStub.firstCall.args[0];
             expect(createPaymentStub.callCount).to.equal(1);
-            expect(createPaymentStub.firstCall.args[0].user.id).to.equal(2);
-            expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
-            expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
-            expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-              stripeToken: 'tok_stripe',
-              amount: 4000,
-              currency: 'USD',
-              description: 'January meetup - paid ticket'
-            });
+            createPaymentStub.reset();
+            expect(createPaymentArgument.user.id).to.equal(3);
+            expect(createPaymentArgument.group.slug).to.equal('scouts');
+            expect(createPaymentArgument.response.id).to.equal(1);
+            expect(createPaymentArgument.payment.amount).to.equal(4000);
+            expect(createPaymentArgument.payment.currency).to.equal('USD');
+            expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
+            expect(createPaymentArgument.payment.paymentMethod.token).to.equal('tok_stripe');
           });
 
           it('from an existing user', async () => {
@@ -796,8 +758,9 @@ describe('Mutation Tests', () => {
                 }
               }
             `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+            const context = { remoteUser: null };
+            const result = await graphql(schema, query, null, context);
+            const createPaymentArgument = createPaymentStub.firstCall.args[0];
             expect(result).to.deep.equal({
               data: {
                 "createResponse": {
@@ -815,7 +778,7 @@ describe('Mutation Tests', () => {
                   },
                   "user": {
                     "email": null,
-                    "id": 3
+                    "id": 4
                   },
                   "collective": {
                     "id": 1,
@@ -824,20 +787,18 @@ describe('Mutation Tests', () => {
                 }
               }
             });
+
             expect(createPaymentStub.callCount).to.equal(1);
-            expect(createPaymentStub.firstCall.args[0].user.id).to.equal(3);
-            expect(createPaymentStub.firstCall.args[0].group.slug).to.equal('scouts');
-            expect(createPaymentStub.firstCall.args[0].response.id).to.equal(1);
-            expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
-              stripeToken: 'tok_stripe',
-              amount: 4000,
-              currency: 'USD',
-              description: 'January meetup - paid ticket'
-            });
+            expect(createPaymentArgument.user.id).to.equal(4);
+            expect(createPaymentArgument.group.slug).to.equal('scouts');
+            expect(createPaymentArgument.response.id).to.equal(1);
+            expect(createPaymentArgument.payment.amount).to.equal(4000);
+            expect(createPaymentArgument.payment.currency).to.equal('USD');
+            expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
+            expect(createPaymentArgument.payment.paymentMethod.token).to.equal('tok_stripe');
           });
         });
       });
-
     });
   });
 });

@@ -284,8 +284,8 @@ const mutations = {
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
         // make sure if it's a paid tier, we have a payment method attached
-        .then(() => isPaidTier && !(response.user.paymentMethod && (response.user.paymentMethod.id || response.user.paymentMethod.token)) ? 
-          Promise.reject(new Error(`This tier requires a payment method`)) : Promise.resolve())
+        .then(() => isPaidTier && !(response.user.paymentMethod && (response.user.paymentMethod.uuid || response.user.paymentMethod.token)) &&
+          Promise.reject(new Error(`This tier requires a payment method`)))
         
         // find or create user
         .then(() => models.User.findOne({
@@ -322,14 +322,15 @@ const mutations = {
             // if the user is trying to reuse an existing credit card,
             // we make sure it belongs to the logged in user.
             let getPaymentMethod;
-            if (response.user.paymentMethod.id) {
+            if (response.user.paymentMethod.uuid) {
               if (!req.remoteUser) throw new errors.Forbidden("You need to be logged in to be able to use a payment method on file");
-              getPaymentMethod = models.PaymentMethod.findOne({ where: { id: response.user.paymentMethod.id, UserId: req.remoteUser.id }}).then(PaymentMethod => {
-                if (!PaymentMethod) throw new errors.NotFound(`You don't have a payment method with that id`);
+              getPaymentMethod = models.PaymentMethod.findOne({ where: { uuid: response.user.paymentMethod.uuid, UserId: req.remoteUser.id }}).then(PaymentMethod => {
+                if (!PaymentMethod) throw new errors.NotFound(`You don't have a payment method with that uuid`);
                 else return PaymentMethod;
               })
             } else {
-              getPaymentMethod = models.PaymentMethod.create({...response.user.paymentMethod, service: "stripe", UserId: user.id});
+              const paymentMethodData = {...response.user.paymentMethod, service: "stripe", UserId: user.id};
+              getPaymentMethod = models.PaymentMethod.create(paymentMethodData);
             }
             return getPaymentMethod
               .then(paymentMethod => {

@@ -8,6 +8,11 @@ export default function(Sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      unique: true
+    },
     identifier: DataTypes.STRING,
 
     brand: {
@@ -89,6 +94,7 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           id: this.id,
+          uuid: this.uuid,
           token: this.token,
           service: this.service,
           createdAt: this.createdAt,
@@ -114,17 +120,6 @@ export default function(Sequelize, DataTypes) {
           expiryDate: this.expiryDate,
           number: this.number
         };
-      }
-    },
-
-    classMethods: {
-      // Note we can't use findOrCreate() method in Sequelize because of
-      // https://github.com/sequelize/sequelize/issues/4631
-      getOrCreate: params => {
-        if (! (params.id && params.UserId)) return PaymentMethod.create(params);
-        // We make sure that we can only fetch a card id that belongs to the user
-        return PaymentMethod.findOne({ where: { id: params.id, UserId: params.UserId } })
-          .then(paymentMethod => paymentMethod || PaymentMethod.create(params));
       }
     }
   });

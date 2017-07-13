@@ -1,6 +1,5 @@
 import Promise from 'bluebird';
 import activities from '../constants/activities';
-import uuid from 'uuid';
 import { type } from '../constants/transactions';
 
 /*
@@ -12,7 +11,11 @@ export default (Sequelize, DataTypes) => {
   const { models } = Sequelize;
 
   const Transaction = Sequelize.define('Transaction', {
-    uuid: DataTypes.STRING(36),
+    uuid: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      unique: true
+    },
     type: DataTypes.STRING, // Expense or Donation
     description: DataTypes.STRING,
     amount: DataTypes.INTEGER,
@@ -248,11 +251,6 @@ export default (Sequelize, DataTypes) => {
     },
 
     hooks: {
-      beforeCreate: (transaction) => {
-        transaction.uuid = uuid.v4();
-        return transaction;
-      },
-
       afterCreate: (transaction) => {
         Transaction.createActivity(transaction);
         // intentionally returns null, needs to be async (https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it)

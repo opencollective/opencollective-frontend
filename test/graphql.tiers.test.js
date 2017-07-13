@@ -127,7 +127,7 @@ describe('graphql.tiers.test', () => {
 
       it("fails to use a payment method on file if not logged in", async () => {
         const response = generateResponse(user1);
-        response.user.paymentMethod = { id: paymentMethod1.id };
+        response.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(response)}) {
@@ -149,7 +149,7 @@ describe('graphql.tiers.test', () => {
     
       it("fails to use a payment method on file if not logged in as the owner", async () => {
         const response = generateResponse(user1);
-        response.user.paymentMethod = { id: paymentMethod1.id };
+        response.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(response)}) {
@@ -166,12 +166,12 @@ describe('graphql.tiers.test', () => {
 
         const result = await graphql(schema, query, null, { remoteUser: user2 });
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal("You don't have a payment method with that id");
+        expect(result.errors[0].message).to.equal("You don't have a payment method with that uuid");
       });
           
       it("user1 becomes a backer of group1 using a payment method on file", async () => {
         const responseInput = generateResponse(user1);
-        responseInput.user.paymentMethod = { id: paymentMethod1.id };
+        responseInput.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(responseInput)}) {

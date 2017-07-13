@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import schema from '../server/graphql/schema';
 import { graphql } from 'graphql';
+import sinon from 'sinon';
+import paymentsLib from '../server/lib/payments';
 
 import * as utils from './utils';
 import models from '../server/models';
@@ -11,21 +13,44 @@ const stringify = (json) => {
 }
 
 describe('Query Tests', () => {
-  let user1, user2, group1, group2, tier1;
+  let user1, user2, host, group1, group2, tier1, ticket1, sandbox;
+
+
+  before(() => sandbox = sinon.sandbox.create());
+
+  before(() => {
+    sandbox.stub(paymentsLib, 'createPayment', ({response}) => {
+      return models.Response.update({ confirmedAt: new Date}, { where: { id: response.id }});
+    });
+  });
+
+  after(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
 
   beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
 
-  beforeEach(() => group1.createTier(utils.data('ticket1')).tap(t => tier1 = t));
+  beforeEach(() => group1.createTier(utils.data('tier1')).tap(t => tier1 = t));
+  beforeEach(() => group1.createTier(utils.data('ticket1')).tap(t => ticket1 = t));
 
   beforeEach(() => group1.addUserWithRole(user1, 'BACKER'));
   beforeEach(() => group2.addUserWithRole(user1, 'MEMBER'));
+  beforeEach(() => group1.addUserWithRole(host, 'HOST'));
+
+  beforeEach('create stripe account', (done) => {
+    models.StripeAccount.create({
+      accessToken: 'abc'
+    })
+    .then((account) => host.setStripeAccount(account))
+    .tap(() => done())
+    .catch(done);
+  });
 
   describe('graphql.user.test.js', () => {
 
@@ -64,7 +89,7 @@ describe('Query Tests', () => {
 
     describe('payment methods', () => {
 
-      const generateResponse = (user) => {
+      const generateResponse = (user, tier = tier1) => {
         return {
           description: "test response",
           user: {
@@ -81,7 +106,7 @@ describe('Query Tests', () => {
             }
           },
           collective: { slug: group1.slug },
-          tier: { id: tier1.id }
+          tier: { id: tier.id }
         }
       }
 
@@ -110,7 +135,7 @@ describe('Query Tests', () => {
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createResponseQuery = `
         mutation createResponse {
-          createResponse(response: ${stringify(generateResponse(user1))}) {
+          createResponse(response: ${stringify(generateResponse(user1, ticket1))}) {
             description
           }
         }`;
@@ -119,7 +144,8 @@ describe('Query Tests', () => {
 
         const query = `
           query Tier {
-            Tier(id: ${tier1.id}) {
+            Tier(id: ${ticket1.id}) {
+              id,
               name,
               responses {
                 id,

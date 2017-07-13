@@ -38,17 +38,18 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
   name: 'PaymentMethodInputType',
   description: 'Input type for PaymentMethod (paypal/stripe)',
   fields: () => ({
-    id: { type: GraphQLInt},
-    token: { type: GraphQLString},
-    service: { type: GraphQLString},
-    customerId: { type: GraphQLString},
-    brand: { type: GraphQLString},
-    funding: { type: GraphQLString},
-    country: { type: GraphQLString},
-    fullName: { type: GraphQLString},
-    expMonth: { type: GraphQLInt},
-    expYear: { type: GraphQLInt},
-    identifier: { type: GraphQLString}
+    id: { type: GraphQLInt },
+    uuid: { type: GraphQLString }, // used to fetch an existing payment method
+    token: { type: GraphQLString },
+    service: { type: GraphQLString },
+    customerId: { type: GraphQLString },
+    brand: { type: GraphQLString },
+    funding: { type: GraphQLString },
+    country: { type: GraphQLString },
+    fullName: { type: GraphQLString },
+    expMonth: { type: GraphQLInt },
+    expYear: { type: GraphQLInt },
+    identifier: { type: GraphQLString }
   })
 });
 

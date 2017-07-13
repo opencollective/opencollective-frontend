@@ -10,6 +10,8 @@ module.exports = {
       .then(() => queryInterface.addColumn('PaymentMethods', 'expMonth', DataTypes.INTEGER))
       .then(() => queryInterface.addColumn('PaymentMethods', 'expYear', DataTypes.INTEGER))
       .then(() => queryInterface.addColumn('Users', 'organization', DataTypes.STRING))
+      .then(() => queryInterface.addColumn('PaymentMethods', 'uuid', DataTypes.UUID))
+      .then(() => queryInterface.changeColumn('Transactions', 'uuid', { type: 'UUID USING CAST("uuid" as UUID)' }))
   },
 
   down: function (queryInterface, DataTypes) {
@@ -21,5 +23,7 @@ module.exports = {
       .then(() => queryInterface.removeColumn('PaymentMethods', 'expMonth'))
       .then(() => queryInterface.removeColumn('PaymentMethods', 'expYear'))
       .then(() => queryInterface.removeColumn('Users', 'organization'))
+      .then(() => queryInterface.removeColumn('PaymentMethods', 'uuid'))
+      .then(() => queryInterface.changeColumn('Transactions', 'uuid', DataTypes.STRING(36)))
   }
 };

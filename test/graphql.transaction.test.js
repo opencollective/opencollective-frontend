@@ -51,7 +51,7 @@ describe('graphql.transaction.test.js', () => {
               ... on Donation {
                 paymentMethod {
                   id,
-                  name
+                  identifier
                 },
                 subscription {
                   id,
@@ -64,6 +64,7 @@ describe('graphql.transaction.test.js', () => {
       `;
       const context = { remoteUser: null };
       const result = await graphql(schema, query, null, context);
+      console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
@@ -103,7 +104,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Donation {
               paymentMethod {
                 id,
-                name
+                identifier
               },
               subscription {
                 id,
@@ -166,7 +167,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Donation {
               paymentMethod {
                 id,
-                name
+                identifier
               },
               subscription {
                 id,
