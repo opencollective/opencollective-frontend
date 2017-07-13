@@ -62,14 +62,14 @@ describe('Query Tests', () => {
       })
     });
 
-    describe('cards', () => {
+    describe('payment methods', () => {
 
       const generateResponse = (user) => {
         return {
           description: "test response",
           user: {
             email: user.email,
-            card: {
+            paymentMethod: {
               service: 'stripe',
               identifier: '4242',
               expMonth: 1,
@@ -85,14 +85,14 @@ describe('Query Tests', () => {
         }
       }
 
-      it("adds a credit card to the user", async () => {
+      it("adds a payment method to the user", async () => {
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(generateResponse(user1))}) {
             user {
               id,
               email,
-              cards {
+              paymentMethods {
                 brand,
                 identifier
               }
@@ -102,12 +102,12 @@ describe('Query Tests', () => {
 
         const result = await graphql(schema, query, null, {});
         expect(result.errors).to.not.exist;
-        const cards = await models.Card.findAll({where: { UserId: user1.id }});
-        expect(cards).to.have.length(1);
-        expect(cards[0].identifier).to.equal('4242');
+        const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
+        expect(paymentMethods).to.have.length(1);
+        expect(paymentMethods[0].identifier).to.equal('4242');
       });
 
-      it("doesn't get the credit cards of the user if not logged in as that user", async () => {
+      it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createResponseQuery = `
         mutation createResponse {
           createResponse(response: ${stringify(generateResponse(user1))}) {
@@ -127,7 +127,7 @@ describe('Query Tests', () => {
                 user {
                   id,
                   name,
-                  cards {
+                  paymentMethods {
                     identifier,
                     brand
                   }
@@ -139,14 +139,14 @@ describe('Query Tests', () => {
         const result = await graphql(schema, query, null, {});
         const responses = result.data.Tier.responses;
         expect(responses).to.have.length(1);
-        expect(responses[0].user.cards).to.have.length(0);
+        expect(responses[0].user.paymentMethods).to.have.length(0);
         const result2 = await graphql(schema, query, null, { remoteUser: user2 });
         const responses2 = result2.data.Tier.responses;
         expect(responses2).to.have.length(1);
-        expect(responses2[0].user.cards).to.have.length(0);
+        expect(responses2[0].user.paymentMethods).to.have.length(0);
       });
 
-      it("gets the credit cards of the user if logged in as that user", async () => {
+      it("gets the payment method of the user if logged in as that user", async () => {
           const createResponseQuery = `
           mutation createResponse {
             createResponse(response: ${stringify(generateResponse(user1))}) {
@@ -166,7 +166,7 @@ describe('Query Tests', () => {
                   user {
                     id,
                     name,
-                    cards {
+                    paymentMethods {
                       identifier,
                       brand
                     }
@@ -178,8 +178,8 @@ describe('Query Tests', () => {
           const result = await graphql(schema, query, null, { remoteUser: user1 });
           const responses = result.data.Tier.responses;
           expect(responses).to.have.length(1);
-          expect(responses[0].user.cards).to.have.length(1);
-          expect(responses[0].user.cards[0].identifier).to.equal('4242');
+          expect(responses[0].user.paymentMethods).to.have.length(1);
+          expect(responses[0].user.paymentMethods[0].identifier).to.equal('4242');
         });
       });
     });

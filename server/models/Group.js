@@ -378,7 +378,6 @@ export default function(Sequelize, DataTypes) {
           if (!userGroup) {
             return { stripeAccount: null };
           }
-
           return Sequelize.models.User.find({
             where: {
               id: userGroup.UserId
@@ -388,7 +387,7 @@ export default function(Sequelize, DataTypes) {
             }]
           });
         })
-        .then((user) => user.StripeAccount);
+        .then((host) => host.StripeAccount);
       },
 
       getConnectedAccount() {

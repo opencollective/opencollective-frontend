@@ -121,7 +121,7 @@ describe('lib.payments.createPayment.test.js', () => {
           payment: {
             amount: AMOUNT, 
             currency: CURRENCY,
-            stripeToken: STRIPE_TOKEN,
+            paymentMethod: { token: STRIPE_TOKEN },
             interval: 'something'
           }})
         .catch(err => expect(err.message).to.equal('Interval should be month or year.'));
@@ -133,7 +133,7 @@ describe('lib.payments.createPayment.test.js', () => {
           group, 
           payment: {
             currency: CURRENCY,
-            stripeToken: STRIPE_TOKEN,
+            paymentMethod: { token: STRIPE_TOKEN },
           }})
         .catch(err => expect(err.message).to.equal('Payment amount missing'));
       });
@@ -144,7 +144,7 @@ describe('lib.payments.createPayment.test.js', () => {
           group, 
           payment: {
             currency: CURRENCY,
-            stripeToken: STRIPE_TOKEN,
+            paymentMethod: { token: STRIPE_TOKEN },
             amount: 35
           }})
         .catch(err => expect(err.message).to.equal('Payment amount must be at least $0.50'));
@@ -161,7 +161,7 @@ describe('lib.payments.createPayment.test.js', () => {
             user,
             group,
             payment: {
-              stripeToken: STRIPE_TOKEN,
+              paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
               currency: CURRENCY
             }
@@ -177,7 +177,7 @@ describe('lib.payments.createPayment.test.js', () => {
             user,
             group,
             payment: {
-              stripeToken: STRIPE_TOKEN,
+              paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
               currency: CURRENCY
             }
@@ -196,7 +196,7 @@ describe('lib.payments.createPayment.test.js', () => {
               user,
               group,
               payment: {
-                stripeToken: STRIPE_TOKEN,
+                paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
                 currency: CURRENCY,
               }
@@ -238,7 +238,7 @@ describe('lib.payments.createPayment.test.js', () => {
               user,
               group,
               payment: {
-                stripeToken: STRIPE_TOKEN,
+                paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
                 currency: CURRENCY,
               }
@@ -249,7 +249,7 @@ describe('lib.payments.createPayment.test.js', () => {
                 user,
                 group,
                 payment: {
-                  stripeToken: STRIPE_TOKEN,
+                  paymentMethod: { token: STRIPE_TOKEN },
                   amount: AMOUNT2,
                   currency: CURRENCY,
                 }
@@ -287,7 +287,7 @@ describe('lib.payments.createPayment.test.js', () => {
               user: user2,
               group: group2,
               payment: {
-                stripeToken: STRIPE_TOKEN,
+                paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT2,
                 currency: CURRENCY,
                 interval: 'month'

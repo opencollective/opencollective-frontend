@@ -21,7 +21,7 @@ const createPayment = (payload) => {
   } = payload;
 
   const {
-    stripeToken,
+    paymentMethod,
     amount,
     currency,
     description,
@@ -29,13 +29,13 @@ const createPayment = (payload) => {
   } = payment;
 
   const isSubscription = _.includes(['month', 'year'], interval);
-  let paymentMethod, title;
+  let paymentMethodInstance, title;
 
   if (interval && !isSubscription) {
     return Promise.reject(new Error('Interval should be month or year.'));
   }
 
-  if (!stripeToken) {
+  if (!paymentMethod.token) {
     return Promise.reject(new Error('Stripe Token missing.'));
   }
 
@@ -47,14 +47,15 @@ const createPayment = (payload) => {
     return Promise.reject(new Error('Payment amount must be at least $0.50'));
   }
 
+  const getOrCreatePaymentMethod = (paymentMethod) => {
+    if (paymentMethod instanceof models.PaymentMethod.Instance) return Promise.resolve(paymentMethod);
+    else return models.PaymentMethod.create({...paymentMethod, service: 'stripe', UserId: user.id});
+  }
+
   // fetch Stripe Account and get or create Payment Method
   return Promise.props({
       stripeAccount: group.getStripeAccount(),
-      paymentMethod: models.PaymentMethod.getOrCreate({
-        token: stripeToken,
-        service: 'stripe',
-        UserId: user.id
-      })
+      paymentMethod: getOrCreatePaymentMethod(paymentMethod)
     })
     .then(results => {
       const stripeAccount = results.stripeAccount;
@@ -63,7 +64,7 @@ const createPayment = (payload) => {
       } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.accessToken, 'live')) {
         return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
       } else {
-        paymentMethod = results.paymentMethod;
+        paymentMethodInstance = results.paymentMethod;
         return Promise.resolve();
       }
     })
@@ -90,11 +91,11 @@ const createPayment = (payload) => {
       currency: currency,
       amount,
       title,
-      PaymentMethodId: paymentMethod.id,
+      PaymentMethodId: paymentMethodInstance.id,
       SubscriptionId: subscription && subscription.id,
       ResponseId: response && response.id
     }))
-    .then(paymentsLib.processPayment);
+    .then(donation => paymentsLib.processPayment(donation));
 }
 
 /*
@@ -111,18 +112,18 @@ const processPayment = (donation) => {
       const user = donation.User;
       const paymentMethod = donation.PaymentMethod;
       const subscription = donation.Subscription;
-      const eventResponse = donation.Response;
+      const response = donation.Response;
 
-      const createSubscription = (groupStripeAccount) => {
+      const createSubscription = (hostStripeAccount) => {
         return stripe.getOrCreatePlan(
-          groupStripeAccount,
+          hostStripeAccount,
           {
             interval: subscription.interval,
             amount: donation.amount,
             currency: donation.currency
           })
           .then(plan => stripe.createSubscription(
-            groupStripeAccount,
+            hostStripeAccount,
             paymentMethod.customerId,
             {
               plan: plan.id,
@@ -151,10 +152,10 @@ const processPayment = (donation) => {
       /**
        * Returns a Promise with the transaction created
        */
-      const createChargeAndTransaction = (groupStripeAccount) => {
+      const createChargeAndTransaction = (hostStripeAccount) => {
         let charge;
         return stripe.createCharge(
-          groupStripeAccount,
+          hostStripeAccount,
           {
             amount: donation.amount,
             currency: donation.currency,
@@ -170,7 +171,7 @@ const processPayment = (donation) => {
           })
           .tap(c => charge = c)
           .then(charge => stripe.retrieveBalanceTransaction(
-            groupStripeAccount,
+            hostStripeAccount,
             charge.balance_transaction))
           .then(balanceTransaction => {
             // create a transaction
@@ -199,28 +200,26 @@ const processPayment = (donation) => {
           });
       };
 
-      let groupStripeAccount, transaction;
-
+      let hostStripeAccount, transaction;
       return group.getStripeAccount()
-        .then(stripeAccount => groupStripeAccount = stripeAccount)
-
+        .then(stripeAccount => hostStripeAccount = stripeAccount)
         // get or create a customer
         .then(() => paymentMethod.customerId || stripe.createCustomer(
-          groupStripeAccount,
+          hostStripeAccount,
           paymentMethod.token, {
             email: user.email,
-            group
-          }))
-
-        .tap(customer => paymentMethod.customerId ? null : paymentMethod.update({ customerId: customer.id }))
-
+            group: group.info
+          }).then(customer => customer.id))
+        .tap(customerId => {
+          paymentMethod.customerId ? paymentMethod : paymentMethod.update({ customerId: customerId })
+        })
+        
         // both one-time and subscriptions get charged immediately
-        .then(() => createChargeAndTransaction(groupStripeAccount, donation, paymentMethod, group, user))
-
+        .then((paymentMethod) => createChargeAndTransaction(hostStripeAccount, donation, paymentMethod, group, user))
         .tap(t => transaction = t)
 
         // if this is a subscription, we create it now on Stripe
-        .tap(() => subscription ? createSubscription(groupStripeAccount, subscription, donation, paymentMethod, group) : null)
+        .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, donation, paymentMethod, group) : null)
 
         // add user to the group
         .tap(() => group.findOrAddUserWithRole(user, roles.BACKER))
@@ -228,11 +227,15 @@ const processPayment = (donation) => {
         // Mark donation row as processed
         .tap(() => donation.update({ isProcessed: true, processedAt: new Date() }))
 
-        .tap(() => eventResponse ? eventResponse.update({ confirmedAt: new Date() }) : Promise.resolve())
+        // Mark response row as processed
+        .tap(() => response && response.update({ status: 'PROCESSED', confirmedAt: new Date() }))
+
+        // Fetch event associated with the donation
+        .then(() => response && response.EventId && models.Event.findById(response.EventId))
 
         // send out confirmation email
-        .tap(() => {
-          if (eventResponse) {
+        .then((event) => {
+          if (response) {
             return emailLib.send(
               'ticket.confirmed',
               user.email,
@@ -240,9 +243,9 @@ const processPayment = (donation) => {
                 transaction: transaction.info,
                 user: user.info,
                 group: group.info,
-                response: eventResponse.info,
-                event: eventResponse.Event.info,
-                tier: eventResponse.Tier.info
+                response: response.info,
+                event: event && event.info,
+                tier: response.Tier.info
               }, {
                 from: `${group.name} <hello@${group.slug}.opencollective.com>`
               })
@@ -298,15 +301,19 @@ const processPayment = (donation) => {
     }
   };
 
-  return models.Donation.findById(donation.id, {
-      include: [{ model: models.User },
-      { model: models.Group },
-      { model: models.PaymentMethod },
-      { model: models.Subscription },
-      { model: models.Response,
-        include: [{ model: models.Event },
-                  { model: models.Tier }]
-      }]
+  return models.Donation.findOne({
+      where: { id: donation.id },
+      include: [
+        { model: models.User },
+        { model: models.Group },
+        { model: models.PaymentMethod },
+        { model: models.Subscription },
+        { model: models.Response,
+          include: [
+            { model: models.Tier }
+          ]
+        }
+      ]
     })
     .then(donation => {
       if (!donation.PaymentMethod) {

@@ -8,7 +8,43 @@ export default function(Sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
-    number: DataTypes.STRING, // Delete #postmigration
+    identifier: DataTypes.STRING,
+
+    brand: {
+      type: DataTypes.STRING,
+      set(val) {
+        if (val && val.toLowerCase) {
+          this.setDataValue('brand', val.toLowerCase());
+        }
+      }
+    },
+
+    expMonth: {
+      type: DataTypes.INTEGER,
+      set(val) {
+        this.expiryDate = this.expiryDate || new Date;
+        this.expiryDate.setMonth(val - 1);
+        this.setDataValue('expMonth', Number(val));
+      },
+      validate: {
+        'len': [1,2]
+      }
+    },
+
+    expYear: {
+      type: DataTypes.INTEGER,
+      set(val) {
+        this.expiryDate = this.expiryDate || new Date;
+        this.expiryDate.setYear(val);
+        this.setDataValue('expYear', Number(val));
+      },
+      validate: {
+        'len': [4, 4]
+      }
+    },
+    funding: DataTypes.STRING,
+    country: DataTypes.STRING,
+    fullName: DataTypes.STRING,
     token: DataTypes.STRING,
     customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
     service: {
@@ -30,10 +66,10 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    confirmedAt: {
+    expiryDate: {
       type: DataTypes.DATE
     },
-    expiryDate: {
+    confirmedAt: {
       type: DataTypes.DATE
     },
     UserId: {
@@ -58,8 +94,13 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           confirmedAt: this.confirmedAt,
-          expiryDate: this.expiryDate,
-          number: this.number
+          expMonth: this.expMonth,
+          expYear: this.expYear,
+          identifier: this.identifier,
+          funding: this.funding,
+          brand: this.brand,
+          fullName: this.fullName,
+          country: this.country
         };
       },
 
@@ -80,14 +121,13 @@ export default function(Sequelize, DataTypes) {
       // Note we can't use findOrCreate() method in Sequelize because of
       // https://github.com/sequelize/sequelize/issues/4631
       getOrCreate: params => {
-        const attrs = {
-          token: params.token,
-          service: params.service,
-          UserId: params.UserId
-        };
-      
-        return PaymentMethod.findOne({ where: attrs })
-          .then(paymentMethod => paymentMethod || PaymentMethod.create(attrs));
+
+        console.log("getOrCreate id:", params.id, "UserId:", params.UserId, typeof params)
+
+        if (! (params.id && params.UserId)) return PaymentMethod.create(params);
+        // We make sure that we can only fetch a card id that belongs to the user
+        return PaymentMethod.findOne({ where: { id: params.id, UserId: params.UserId } })
+          .then(paymentMethod => paymentMethod || PaymentMethod.create(params));
       }
     }
   });

@@ -34,19 +34,21 @@ const EmailType = new GraphQLScalarType({
     }
 });
 
-export const CardInputType = new GraphQLInputObjectType({
-  name: 'CardInputType',
-  description: 'Input type for Card',
+export const PaymentMethodInputType = new GraphQLInputObjectType({
+  name: 'PaymentMethodInputType',
+  description: 'Input type for PaymentMethod (paypal/stripe)',
   fields: () => ({
-    token: { type: new GraphQLNonNull(GraphQLString)},
+    id: { type: GraphQLInt},
+    token: { type: GraphQLString},
     service: { type: GraphQLString},
+    customerId: { type: GraphQLString},
     brand: { type: GraphQLString},
     funding: { type: GraphQLString},
     country: { type: GraphQLString},
     fullName: { type: GraphQLString},
-    expMonth: { type: new GraphQLNonNull(GraphQLInt)},
-    expYear: { type: new GraphQLNonNull(GraphQLInt)},
-    identifier: { type: new GraphQLNonNull(GraphQLString)}
+    expMonth: { type: GraphQLInt},
+    expYear: { type: GraphQLInt},
+    identifier: { type: GraphQLString}
   })
 });
 
@@ -65,7 +67,7 @@ export const UserInputType = new GraphQLInputObjectType({
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
       paypalEmail: { type: GraphQLString },
-      card: { type: CardInputType }
+      paymentMethod: { type: PaymentMethodInputType }
   })
 });
 

@@ -213,7 +213,7 @@ const mutations = {
         type: ResponseInputType
       }
     },
-    resolve(_, args) {
+    resolve(_, args, req) {
 
       let tier, user, event, responseModel, isPaidTier;
       const response = args.response;
@@ -283,8 +283,8 @@ const mutations = {
         .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
               Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
-        // make sure if it's paid tier, we have a card attached
-        .then(() => isPaidTier && !(response.user.card && response.user.card.token) ? 
+        // make sure if it's paid tier, we have a payment method attached
+        .then(() => isPaidTier && !(response.user.paymentMethod && (response.user.paymentMethod.id || response.user.paymentMethod.token)) ? 
           Promise.reject(new Error(`This tier requires a payment method`)) : Promise.resolve())
         
         // find or create user
@@ -303,12 +303,6 @@ const mutations = {
             Promise.reject(new Error(`You can only buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
           }
         })
-        // records the credit card if provided
-        .then(() => {
-          if (response.user.card) {
-            return models.Card.create({...response.user.card, UserId: user.id});
-          }
-        })
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
@@ -321,21 +315,39 @@ const mutations = {
           description: response.description
         }))
         .tap(rm => responseModel = rm)
+
         // record payment, if needed
         .then(responseModel => {
           if (tier.amount > 0) {
-            // also sends out email 
-            return paymentsLib.createPayment({
-              user,
-              group,
-              response: responseModel,
-              payment: {
-                stripeToken: response.user.card.token,
-                amount: tier.amount * (responseModel.quantity || 1),
-                currency: tier.currency,
-                description: event ? `${event.name} - ${tier.name}` : tier.name
-              }
-            })
+            // if the user is trying to reuse an existing credit card,
+            // we make sure it belongs to the logged in user.
+            let getPaymentMethod;
+            if (response.user.paymentMethod.id) {
+              if (!req.remoteUser) throw new errors.Forbidden("You need to be logged in to be able to use a payment method on file");
+              getPaymentMethod = models.PaymentMethod.findOne({ where: { id: response.user.paymentMethod.id, UserId: req.remoteUser.id }}).then(PaymentMethod => {
+                if (!PaymentMethod) throw new errors.NotFound(`You don't have a payment method with that id`);
+                else return PaymentMethod;
+              })
+            } else {
+              getPaymentMethod = models.PaymentMethod.create({...response.user.paymentMethod, service: "stripe", UserId: user.id});
+            }
+            return getPaymentMethod
+              .then(paymentMethod => {
+                // also sends out email 
+                return paymentsLib.createPayment({
+                  user,
+                  group,
+                  response: responseModel,
+                  payment: {
+                    paymentMethod,
+                    user,
+                    amount: tier.amount * (responseModel.quantity || 1),
+                    interval: tier.interval,
+                    currency: tier.currency,
+                    description: event ? `${event.name} - ${tier.name}` : tier.name
+                  }
+                })
+              })
           } else {
             // only send out email if no payment
             return emailLib.send(

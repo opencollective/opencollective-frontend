@@ -53,7 +53,6 @@ export function setupModels(client) {
 
   [
     'Activity',
-    'Card',
     'Comment',
     'ConnectedAccount',
     'Donation',
@@ -175,7 +174,7 @@ export function setupModels(client) {
   m.Tier.hasMany(m.Response);
   m.Group.hasMany(m.Response);
   m.User.hasMany(m.Response);
-  m.User.hasMany(m.Card);
+  m.User.hasMany(m.PaymentMethod);
 
   return m;
 }

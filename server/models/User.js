@@ -89,6 +89,7 @@ export default (Sequelize, DataTypes) => {
     mission: DataTypes.STRING,
     description: DataTypes.STRING,
     longDescription: DataTypes.TEXT,
+    organization: DataTypes.STRING,
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
     currency: {
       type: DataTypes.STRING,
@@ -212,6 +213,7 @@ export default (Sequelize, DataTypes) => {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
+          organization: this.organization,
           isOrganization: this.isOrganization,
           avatar: this.avatar,
           twitterHandle: this.twitterHandle,
@@ -236,6 +238,7 @@ export default (Sequelize, DataTypes) => {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
+          organization: this.organization,
           isOrganization: this.isOrganization,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
@@ -268,6 +271,7 @@ export default (Sequelize, DataTypes) => {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
+          organization: this.organization,
           isOrganization: this.isOrganization,
           twitterHandle: this.twitterHandle
         };

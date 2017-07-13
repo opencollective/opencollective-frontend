@@ -85,6 +85,12 @@ export const UserType = new GraphQLObjectType({
           return user.description
         }
       },
+      organization: {
+        type: GraphQLString,
+        resolve(user) {
+          return user.organization
+        }
+      },
       isOrganization: {
         type: GraphQLBoolean,
         resolve(user) {
@@ -121,11 +127,11 @@ export const UserType = new GraphQLObjectType({
           return user.getCollectivesWithRoles();
         }
       },
-      cards: {
-        type: new GraphQLList(CardType),
+      paymentMethods: {
+        type: new GraphQLList(PaymentMethodType),
         resolve(user, args, req) {
           if (!req.remoteUser || req.remoteUser.id !== user.id) return [];
-          return models.Card.findAll({where: { UserId: user.id }});
+          return models.PaymentMethod.findAll({where: { UserId: user.id }});
         }
       }
     }
@@ -585,83 +591,62 @@ export const ResponseType = new GraphQLObjectType({
 });
 
 export const PaymentMethodType = new GraphQLObjectType({
-  name: "PaymentMethod",
-  description: "PaymentMethod model",
+  name: "PaymentMethodType",
+  description: "Sanitized PaymentMethod Info (PaymentMethod model)",
   fields: () => {
     return {
       id: {
         type: GraphQLInt,
-        resolve(pm) {
-          return pm.id;
-        }
-      },
-      name: {
-        type: GraphQLString,
-        resolve(pm) {
-          return pm.service;
-        }
-      },
-    }
-  }
-});
-
-export const CardType = new GraphQLObjectType({
-  name: "CardType",
-  description: "Sanitized Credit Card Info",
-  fields: () => {
-    return {
-      id: {
-        type: GraphQLInt,
-        resolve(card) {
-          return card.id;
+        resolve(paymentMethod) {
+          return paymentMethod.id;
         }
       },
       service: {
         type: GraphQLString,
-        resolve(card) {
-          return card.service;
+        resolve(paymentMethod) {
+          return paymentMethod.service;
         }
       },
       brand: {
         type: GraphQLString,
-        resolve(card) {
-          return card.brand;
+        resolve(paymentMethod) {
+          return paymentMethod.brand;
         }
       },
       funding: {
         type: GraphQLString,
-        resolve(card) {
-          return card.funding;
+        resolve(paymentMethod) {
+          return paymentMethod.funding;
         }
       },
       country: {
         type: GraphQLString,
-        resolve(card) {
-          return card.country;
+        resolve(paymentMethod) {
+          return paymentMethod.country;
         }
       },
-      identifier: {
+      identifier: { // last 4 digit of card number for Stripe
         type: GraphQLString,
-        resolve(card) {
-          return card.identifier;
+        resolve(paymentMethod) {
+          return paymentMethod.identifier;
         }
       },
       fullName: {
         type: GraphQLString,
-        resolve(card) {
-          return card.fullName;
+        resolve(paymentMethod) {
+          return paymentMethod.fullName;
         }
       },
       expMonth: {
         type: GraphQLInt,
-        resolve(card) {
-          return card.expMonth;
+        resolve(paymentMethod) {
+          return paymentMethod.expMonth;
         }
       },
       expYear: {
         type: GraphQLInt,
-        resolve(card) {
-          return card.expYear;
+        resolve(paymentMethod) {
+          return paymentMethod.expYear;
         }
       }
     }
