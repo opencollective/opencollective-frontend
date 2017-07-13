@@ -1,6 +1,4 @@
-import app from '../server/index';
 import { expect } from 'chai';
-import request from 'supertest';
 import sinon from 'sinon';
 
 import models from '../server/models';
@@ -13,9 +11,7 @@ const AMOUNT2 = 199;
 const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'superStripeToken';
 const EMAIL = 'anotheruser@email.com';
-const application = utils.data('application');
 const userData = utils.data('user3');
-const groupData = utils.data('group2');
 
 describe('lib.payments.createPayment.test.js', () => {
   let host, user, user2, group, group2, sandbox;
@@ -39,8 +35,8 @@ describe('lib.payments.createPayment.test.js', () => {
   beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
   beforeEach('create a group', () => models.Group.create(utils.data('group1')).tap(g => group = g));
   beforeEach('create a group', () => models.Group.create(utils.data('group2')).tap(g => group2 = g));
-  beforeEach('add user to group as member', () => group.addUserWithRole(host, 'HOST'));
-  beforeEach('add user to group2 as member', () => group2.addUserWithRole(host, 'HOST'));
+  beforeEach('add user to group as member', () => group.addUserWithRole(host, roles.HOST));
+  beforeEach('add user to group2 as member', () => group2.addUserWithRole(host, roles.HOST));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
