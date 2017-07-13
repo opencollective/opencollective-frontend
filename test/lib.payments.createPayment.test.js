@@ -18,17 +18,13 @@ const userData = utils.data('user3');
 const groupData = utils.data('group2');
 
 describe('lib.payments.createPayment.test.js', () => {
-  let user, user2, group, group2, sandbox;
+  let host, user, user2, group, group2, sandbox;
 
-  before(() => {
-    sandbox = sinon.sandbox.create();
-  });
+  before(() => sandbox = sinon.sandbox.create());
 
   after(() => sandbox.restore());
 
-  beforeEach(() => {
-    sandbox.stub(paymentsLib, 'processPayment');
-  });
+  beforeEach(() => sandbox.stub(paymentsLib, 'processPayment'));
 
   beforeEach(() => utils.resetTestDB());
 
@@ -40,53 +36,17 @@ describe('lib.payments.createPayment.test.js', () => {
 
   beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
   beforeEach('create a user', () => models.User.create({email: EMAIL}).tap(u => user2 = u));
-
-  beforeEach('create group with user as first member', (done) => {
-    request(app)
-      .post('/groups')
-      .send({
-        api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        models.Group
-          .findById(parseInt(res.body.id))
-          .then((g) => {
-            group = g;
-            done();
-          })
-          .catch(done);
-      });
-  });
-
-  beforeEach('create second group with user as first member', (done) => {
-    request(app)
-      .post('/groups')
-      .send({
-        api_key: application.api_key,
-        group: Object.assign(utils.data('group1'), { users: [{ email: user.email, role: roles.HOST}]}),
-        role: roles.HOST
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        models.Group
-          .findById(parseInt(res.body.id))
-          .tap((g) => {
-            group2 = g;
-            done();
-          })
-          .catch(done);
-      });
-  });
+  beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach('create a group', () => models.Group.create(utils.data('group1')).tap(g => group = g));
+  beforeEach('create a group', () => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+  beforeEach('add user to group as member', () => group.addUserWithRole(host, 'HOST'));
+  beforeEach('add user to group2 as member', () => group2.addUserWithRole(host, 'HOST'));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => user.setStripeAccount(account))
+    .then((account) => host.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -245,15 +205,17 @@ describe('lib.payments.createPayment.test.js', () => {
             }));
 
             beforeEach(() => {
-              return paymentsLib.createPayment({
-                user,
-                group,
-                payment: {
-                  paymentMethod: { token: STRIPE_TOKEN },
-                  amount: AMOUNT2,
-                  currency: CURRENCY,
-                }
-              });
+              return models.PaymentMethod.findOne().then(paymentMethod => {
+                return paymentsLib.createPayment({
+                  user,
+                  group,
+                  payment: {
+                    paymentMethod,
+                    amount: AMOUNT2,
+                    currency: CURRENCY,
+                  }
+                });
+              })
             });
 
             it('does not re-create a paymentMethod', (done) => {

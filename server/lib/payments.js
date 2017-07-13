@@ -35,7 +35,7 @@ const createPayment = (payload) => {
     return Promise.reject(new Error('Interval should be month or year.'));
   }
 
-  if (!paymentMethod.token) {
+  if (!paymentMethod || !paymentMethod.token) {
     return Promise.reject(new Error('Stripe Token missing.'));
   }
 
