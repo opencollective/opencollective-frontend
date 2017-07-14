@@ -131,7 +131,7 @@ export const UserType = new GraphQLObjectType({
         type: new GraphQLList(PaymentMethodType),
         resolve(user, args, req) {
           if (!req.remoteUser || req.remoteUser.id !== user.id) return [];
-          return models.PaymentMethod.findAll({where: { UserId: user.id }});
+          return models.PaymentMethod.findAll({where: { UserId: user.id, identifier: { $ne: null }, confirmedAt: { $ne: null } }});
         }
       }
     }

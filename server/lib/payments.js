@@ -227,6 +227,9 @@ const processPayment = (donation) => {
         // Mark donation row as processed
         .tap(() => donation.update({ isProcessed: true, processedAt: new Date() }))
 
+        // Mark paymentMethod as confirmed
+        .tap(() => paymentMethod.update({confirmedAt: new Date}))
+
         // Mark response row as processed
         .tap(() => response && response.update({ status: 'PROCESSED', confirmedAt: new Date() }))
 

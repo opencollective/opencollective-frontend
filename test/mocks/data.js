@@ -83,7 +83,7 @@ export default {
       "description": "One time tier",
       "range": [0, 100],
       "button": "Become a backer",
-      "interval": "one-time"
+      "interval": "month"
     }, {
       "name": "sponsor",
       "title":" Sponsors",
@@ -111,14 +111,14 @@ export default {
       "title": "Donors",
       "description": "One time tier",
       "range": [0, 100],
-      "interval": "one-time",
+      "interval": "year",
       "button": "Become a sponsor"
     }, {
       "name": "sponsor",
       "title": "Sponsors",
       "description": "Monthly tier",
       "range": [0, 100],
-      "interval": "monthly",
+      "interval": "month",
       "button": "Become a member"
     }],
     "hostFeePercent": 0,

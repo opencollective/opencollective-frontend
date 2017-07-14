@@ -1,6 +1,7 @@
 import {
   GraphQLInt,
   GraphQLFloat,
+  GraphQLBoolean,
   GraphQLList,
   GraphQLInputObjectType,
   GraphQLNonNull,
@@ -49,7 +50,8 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     fullName: { type: GraphQLString },
     expMonth: { type: GraphQLInt },
     expYear: { type: GraphQLInt },
-    identifier: { type: GraphQLString }
+    identifier: { type: GraphQLString },
+    save: { type: GraphQLBoolean }
   })
 });
 
@@ -62,6 +64,7 @@ export const UserInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
+      organization: { type: GraphQLString },
       avatar: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },

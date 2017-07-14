@@ -74,7 +74,16 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    interval: DataTypes.STRING, // one-time, month, year
+    interval: {
+      type: DataTypes.STRING, // null, month or year
+      set(val) {
+        val = val && val.toLowerCase().trim();
+        if (this.type === 'TICKET' || ['month','year'].indexOf(val) === -1) {
+          val = null;
+        }
+        this.setDataValue('interval', val);
+      }
+    },
 
     // Max quantity of tickets to sell (0 for unlimited)
     maxQuantity: {

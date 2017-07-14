@@ -64,7 +64,12 @@ const mutations = {
       .then(() => models.Event.create(eventData))
       .tap(event => {
         if (args.event.tiers) {
-          return models.Tier.createMany(args.event.tiers, { EventId: event.id })
+          args.event.tiers.map
+          return Promise.map(args.event.tiers, (tier) => {
+            tier.EventId = event.id;
+            tier.currency = tier.currency || group.currency;
+            return models.Tier.create(tier);
+          })
         }
       })
       .catch(e => {
@@ -134,6 +139,7 @@ const mutations = {
               return models.Tier.update(tier, { where: { id: tier.id }});
             } else {
               tier.EventId = event.id;
+              tier.currency = tier.currency || group.currency;
               return models.Tier.create(tier);  
             }
           });
@@ -199,6 +205,7 @@ const mutations = {
             return models.Tier.update(tier, { where: { id: tier.id }});
           } else {
             tier.GroupId = collective.id;
+            tier.currency = tier.currency || collective.currency;
             return models.Tier.create(tier);
           }
         });
@@ -330,6 +337,9 @@ const mutations = {
               })
             } else {
               const paymentMethodData = {...response.user.paymentMethod, service: "stripe", UserId: user.id};
+              if (!paymentMethodData.save) {
+                paymentMethodData.identifier = null;
+              }
               getPaymentMethod = models.PaymentMethod.create(paymentMethodData);
             }
             return getPaymentMethod

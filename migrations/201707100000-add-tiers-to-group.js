@@ -9,8 +9,7 @@ module.exports = {
         onUpdate: 'CASCADE'
       })
       .then(() => queryInterface.addColumn('Tiers', 'interval', {
-        type: DataTypes.STRING,
-        defaultValue: 'one-time' // or month/year
+        type: DataTypes.STRING
       }))
   },
 
