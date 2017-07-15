@@ -6,7 +6,7 @@ import { hasRole } from '../lib/auth';
 
 const {
   User,
-  Group,
+  Collective,
   Transaction,
   Expense,
   Comment
@@ -51,19 +51,19 @@ export function userid(req, res, next, userIdOrName) {
 }
 
 /**
- * groupid
+ * collectiveid
  */
-export function groupid(req, res, next, groupIdOrSlug) {
-  getByKeyValue(Group, isNaN(groupIdOrSlug) ? 'slug' : 'id', groupIdOrSlug)
-    .then(group => req.group = group)
+export function collectiveid(req, res, next, collectiveIdOrSlug) {
+  getByKeyValue(Collective, isNaN(collectiveIdOrSlug) ? 'slug' : 'id', collectiveIdOrSlug)
+    .then(collective => req.collective = collective)
     .then(() => {
       if (req.remoteUser) {
-        return hasRole(req.remoteUser.id, req.group.id, ['MEMBER','HOST'])
+        return hasRole(req.remoteUser.id, req.collective.id, ['MEMBER','HOST'])
       }
     })
     .then(canEdit => {
       if (canEdit) {
-        req.canEditGroup = canEdit;
+        req.canEditCollective = canEdit;
       }
     })
     .asCallback(next);
@@ -131,22 +131,22 @@ export function paranoidtransactionid(req, res, next, id) {
  * ExpenseId.
  */
 export function expenseid(req, res, next, expenseid) {
-  let queryInGroup, NotFoundInGroup = '';
-  if (req.params.groupid) {
-    queryInGroup = { GroupId: req.params.groupid };
-    NotFoundInGroup = `in group ${req.params.groupid}`;
+  let queryInCollective, NotFoundInCollective = '';
+  if (req.params.collectiveid) {
+    queryInCollective = { CollectiveId: req.params.collectiveid };
+    NotFoundInCollective = `in collective ${req.params.collectiveid}`;
   }
   parseId(expenseid)
     .then(where => Expense.findOne({
-      where: Object.assign({}, where, queryInGroup),
+      where: Object.assign({}, where, queryInCollective),
       include: [
-        { model: models.Group },
+        { model: models.Collective },
         { model: models.User }
       ]
     }))
     .then((expense) => {
       if (!expense) {
-        return next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInGroup}`));
+        return next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInCollective}`));
       } else {
         req.expense = expense;
         next();

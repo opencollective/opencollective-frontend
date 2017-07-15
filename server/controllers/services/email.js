@@ -19,7 +19,7 @@ export const unsubscribe = (req, res, next) => {
   }
 
   Promise.all([
-    models.Group.findOne({ where: { slug }}),
+    models.Collective.findOne({ where: { slug }}),
     models.User.findOne({ where: { email }})
   ]).then(results => {
     if (!results[1]) throw new errors.NotFound(`Cannot find a user with email "${email}"`);
@@ -35,7 +35,7 @@ export const unsubscribe = (req, res, next) => {
 const sendEmailToList = (to, email) => {
   const { mailinglist, collectiveSlug, type } = getNotificationType(to);  
   email.from = email.from || `${collectiveSlug} collective <hello@${collectiveSlug}.opencollective.com>`;
-  email.group = email.group || { slug: collectiveSlug }; // used for the unsubscribe url
+  email.collective = email.collective || { slug: collectiveSlug }; // used for the unsubscribe url
 
   return models.Notification.getSubscribers(collectiveSlug, mailinglist)
   .tap(subscribers => {
@@ -137,7 +137,7 @@ export const webhook = (req, res, next) => {
 
   const body = email['body-html'] || email['body-plain'];
 
-  let group;
+  let collective;
 
   // If receive an email that has already been processed, we skip it
   // (it happens since we send the approved email to the mailing list and add the recipients in /bcc)
@@ -167,13 +167,13 @@ export const webhook = (req, res, next) => {
   // once approved, we will fetch the original email from the server and send it to all recipients
   let subscribers;
 
-  models.Group.find({ where: { slug: collectiveSlug } })
+  models.Collective.find({ where: { slug: collectiveSlug } })
     .tap(g => {
-      if (!g) throw new Error('group_not_found');
-      group = g;
+      if (!g) throw new Error('collective_not_found');
+      collective = g;
     })
     // We fetch all the recipients of that mailing list to give a preview in the approval email
-    .then(group => models.Notification.getSubscribers(group.slug, mailinglist))
+    .then(collective => models.Notification.getSubscribers(collective.slug, mailinglist))
     .tap(results => {
       if (results.length === 0) throw new Error('no_subscribers');
       subscribers = results.map(s => {
@@ -184,9 +184,9 @@ export const webhook = (req, res, next) => {
     // We fetch all the organizers of the collective (admins) to whom we will send the email to approve
     .then(() => {
       return sequelize.query(`
-        SELECT * FROM "UserGroups" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."GroupId"=:groupid AND ug.role=:role AND ug."deletedAt" IS NULL
+        SELECT * FROM "UserCollectives" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."CollectiveId"=:collectiveid AND ug.role=:role AND ug."deletedAt" IS NULL
       `, {
-        replacements: { groupid: group.id, role: 'MEMBER' },
+        replacements: { collectiveid: collective.id, role: 'MEMBER' },
         model: models.User
       });
     })
@@ -224,7 +224,7 @@ export const webhook = (req, res, next) => {
            * - if the sender is unknown, we return an email suggesting to contact info@:collectiveSlug.opencollective.com
            */
           return res.send({error: { message: `There is no user subscribed to ${recipient}` }});
-        case 'group_not_found':
+        case 'collective_not_found':
           /**
            * TODO
            * If there is no such collective, we send an email to confirm to create the collective

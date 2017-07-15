@@ -16,7 +16,7 @@ export default (req, res, next) => {
       break;
   }
 
-  models.Group.getGroupsSummaryByTag(
+  models.Collective.getCollectivesSummaryByTag(
     !show || show === 'all' ? '' : show,
     12,
     [],

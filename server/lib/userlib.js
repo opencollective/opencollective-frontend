@@ -136,7 +136,7 @@ export default {
     return sequelize.query(`
         SELECT username as username FROM "Users" where username like '${potentialUserNames[0]}%'
         UNION ALL
-        SELECT slug as username FROM "Groups" where slug like '${potentialUserNames[0]}%'
+        SELECT slug as username FROM "Collectives" where slug like '${potentialUserNames[0]}%'
       `, {
         type: sequelize.QueryTypes.SELECT
       })

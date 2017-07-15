@@ -17,15 +17,15 @@ import * as auth from '../middleware/security/auth';
  */
 export const create = (req, res, next) => {
   const user = req.remoteUser || req.user;
-  const { group } = req;
+  const { collective } = req;
   const attributes = Object.assign({}, req.required.expense, {
     UserId: user.id,
-    GroupId: group.id,
+    CollectiveId: collective.id,
     lastEditedById: user.id
   });
   // TODO make sure that the payoutMethod is also properly stored in DB, then propagated to Transaction when paying
   models.Expense.create(attributes)
-    .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
+    .then(expense => models.Expense.findById(expense.id, { include: [ models.Collective, models.User ]}))
     .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
     .tap(expense => res.send(expense))
     .catch(next);
@@ -52,7 +52,7 @@ export const getOne = (req, res) => {
 export const list = (req, res, next) => {
 
   const query = Object.assign({
-    where: { GroupId: req.group.id },
+    where: { CollectiveId: req.collective.id },
     order: [[req.sorting.key, req.sorting.dir]],
     include: [ { model: models.User }]
   }, req.pagination);
@@ -67,13 +67,13 @@ export const list = (req, res, next) => {
       return models.Comment.findAll({
         attributes: ['ExpenseId', [sequelize.fn('COUNT', sequelize.col('ExpenseId')), 'comments']],
         where: { ExpenseId: { $in: ids }},
-        group: ['ExpenseId']
+        collective: ['ExpenseId']
       })
       .then(commentIds => {
-        const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
+        const commentsCount =  _.collectiveBy(commentIds, 'ExpenseId');
         expenses.rows = expenses.rows.map(expense => {
           const r = expense.info;
-          r.user = req.canEditGroup ? expense.User.info : expense.User.public;
+          r.user = req.canEditCollective ? expense.User.info : expense.User.public;
           commentsCount[r.id] = commentsCount[r.id] || [{ dataValues: { comments: 0 } }];
           r.commentsCount = parseInt(commentsCount[r.id][0].dataValues.comments,10);
           return r;
@@ -160,16 +160,16 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse, group;
+  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse, collective;
 
   assertExpenseStatus(expense, status.APPROVED)
-    // check that a group's balance is greater than the expense
-    .then(() => models.Group.findById(expense.GroupId))
+    // check that a collective's balance is greater than the expense
+    .then(() => models.Collective.findById(expense.CollectiveId))
     .then(g => {
-      group = g;
-      return group.getBalance()
+      collective = g;
+      return collective.getBalance()
     })
-    .then(balance => checkIfEnoughFundsInGroup(expense, balance))
+    .then(balance => checkIfEnoughFundsInCollective(expense, balance))
     .then(() => isManual ? null : getPaymentMethod())
     .tap(m => paymentMethod = m)
     .then(getBeneficiaryEmail)
@@ -180,13 +180,13 @@ export const pay = (req, res, next) => {
     // TODO: Remove preapprovalDetails call once the new paypal preapproval flow is solid
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
-    .then(() => group.getHost())
+    .then(() => collective.getHost())
     .then((host) => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponses)));
 
-  function checkIfEnoughFundsInGroup(expense, balance) {
+  function checkIfEnoughFundsInCollective(expense, balance) {
     const estimatedFees = isManual ? 0 : Math.ceil(expense.amount*.029 + 30); // 2.9% + 30 is a typical fee.
 
     if (balance >= (expense.amount + estimatedFees)) { 
@@ -227,7 +227,7 @@ export const pay = (req, res, next) => {
    */
   function pay() {
     const preapprovalKey = paymentMethod.token;
-    return payExpense(payoutMethod)(req.group, expense, email, preapprovalKey);
+    return payExpense(payoutMethod)(req.collective, expense, email, preapprovalKey);
   }
 };
 
@@ -248,9 +248,9 @@ function createActivity(expense, type) {
   return models.Activity.create({
     type,
     UserId: expense.User.id,
-    GroupId: expense.Group.id,
+    CollectiveId: expense.Collective.id,
     data: {
-      group: expense.Group.minimal,
+      collective: expense.Collective.minimal,
       user: expense.User.minimal,
       expense: expense.info
     }

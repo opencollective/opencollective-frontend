@@ -196,7 +196,7 @@ export const appendTier = (backers, tiers) => {
  * Returns whether the backer is still an active member of its tier
  */
 export const isBackerActive = (backer, tiers, until) => {
-  tiers = _.groupBy(tiers, 'name'); // this makes a copy
+  tiers = _.collectiveBy(tiers, 'name'); // this makes a copy
   const now = moment(until);
   if (tiers[backer.tier] && tiers[backer.tier][0].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
     return false
@@ -380,7 +380,7 @@ export function exportToPDF(template, data, options) {
 }
 
 /**
- * Default host id, set this for new groups created through Github
+ * Default host id, set this for new collectives created through Github
  */
 export const defaultHostId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
@@ -390,7 +390,7 @@ export const defaultHostId = () => {
 };
 
 /**
- * Demo host id, set this for new groups created through the flow
+ * Demo host id, set this for new collectives created through the flow
  */
 export const demoHostId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import groupBy from 'lodash/collection/groupBy';
+import collectiveBy from 'lodash/collection/collectiveBy';
 import async from 'async';
 import userLib from '../lib/userlib';
 import { generateURLSafeToken, getTier } from '../lib/utils';
@@ -17,7 +17,7 @@ import moment from 'moment-timezone';
 const {
   User,
   Activity,
-  UserGroup
+  UserCollective
 } = models;
 
 const { Unauthorized } = errors;
@@ -28,23 +28,23 @@ const { Unauthorized } = errors;
  *
  */
 
-const getUserGroups = (UserId) => {
-  return UserGroup.findAll({
+const getUserCollectives = (UserId) => {
+  return UserCollective.findAll({
     where: {
       UserId
     }
   })
-  .then((userGroups) => _.pluck(userGroups, 'info'));
+  .then((userCollectives) => _.pluck(userCollectives, 'info'));
 };
 
-const getGroupsFromUser = (req, options) => {
-  // UserGroup has multiple entries for a user and group because
-  // of the multiple roles. We will get the unique groups in-memory for now
-  // because of the small number of groups.
+const getCollectivesFromUser = (req, options) => {
+  // UserCollective has multiple entries for a user and collective because
+  // of the multiple roles. We will get the unique collectives in-memory for now
+  // because of the small number of collectives.
   // Distinct queries are not supported by sequelize yet.
   return req.user
-    .getGroups(options)
-    .then(groups => _.uniq(groups, 'id'));
+    .getCollectives(options)
+    .then(collectives => _.uniq(collectives, 'id'));
 };
 
 export const updatePaypalEmail = (req, res, next) => {
@@ -280,42 +280,42 @@ export const show = (req, res, next) => {
       })
       .catch(next);
   } else if (req.query.profile) {
-    const groupInfoArray = [];
-    req.user.getGroups().map(group => {
+    const collectiveInfoArray = [];
+    req.user.getCollectives().map(collective => {
       return Promise.all([
-        group.getYearlyIncome(),
-        queries.getUsersFromGroupWithTotalDonations(group.id).tap(backers => {
-          backers.map(b => b.tier = getTier(b, group.tiers));
+        collective.getYearlyIncome(),
+        queries.getUsersFromCollectiveWithTotalDonations(collective.id).tap(backers => {
+          backers.map(b => b.tier = getTier(b, collective.tiers));
         })
       ])
       .then(results => {
-        let groupInfo = group.info;
-        groupInfo.yearlyIncome = results[0];
+        let collectiveInfo = collective.info;
+        collectiveInfo.yearlyIncome = results[0];
         const users = results[1];
         const user = users.filter(u => u.id === req.user.id)[0];
-        const usersByRole = groupBy(users, 'role');
+        const usersByRole = collectiveBy(users, 'role');
         const backers = usersByRole[roles.BACKER] || [];
-        groupInfo.backersAndSponsorsCount = backers.length;
-        groupInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
-        groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
-        groupInfo.myTotalDonations = user.totalDonations;
-        groupInfo.myTier = user.tier;
-        groupInfo = Object.assign(groupInfo, { role: group.UserGroup.role, createdAt: group.UserGroup.createdAt });
-        groupInfoArray.push(groupInfo);
-        return group;
+        collectiveInfo.backersAndSponsorsCount = backers.length;
+        collectiveInfo.sponsorsCount = filter(values(backers), {tier: 'sponsor'}).length;
+        collectiveInfo.backersCount = collectiveInfo.backersAndSponsorsCount - collectiveInfo.sponsorsCount;
+        collectiveInfo.myTotalDonations = user.totalDonations;
+        collectiveInfo.myTier = user.tier;
+        collectiveInfo = Object.assign(collectiveInfo, { role: collective.UserCollective.role, createdAt: collective.UserCollective.createdAt });
+        collectiveInfoArray.push(collectiveInfo);
+        return collective;
       })
     })
-    .then(groups => UserGroup.findAll({
-      where: { GroupId: { $in: groups.map(g => g.id) } },
-      attributes: ['GroupId', [ sequelize.fn('count', sequelize.col('GroupId')), 'members' ]],
-      group: ['GroupId']
+    .then(collectives => UserCollective.findAll({
+      where: { CollectiveId: { $in: collectives.map(g => g.id) } },
+      attributes: ['CollectiveId', [ sequelize.fn('count', sequelize.col('CollectiveId')), 'members' ]],
+      collective: ['CollectiveId']
     }))
     .tap(counts => {
-      const membersByGroupId = {};
+      const membersByCollectiveId = {};
       counts.map(g => {
-        membersByGroupId[parseInt(g.GroupId,10)] = parseInt(g.dataValues.members, 10);
+        membersByCollectiveId[parseInt(g.CollectiveId,10)] = parseInt(g.dataValues.members, 10);
       });
-      userData.groups = groupInfoArray.map(g => Object.assign(g, { members: membersByGroupId[parseInt(g.id, 10)] }));
+      userData.collectives = collectiveInfoArray.map(g => Object.assign(g, { members: membersByCollectiveId[parseInt(g.id, 10)] }));
       res.send(userData);
     })
     .catch(next);
@@ -325,39 +325,39 @@ export const show = (req, res, next) => {
 };
 
 /**
- * Get a user's groups.
+ * Get a user's collectives.
  */
-export const getGroups = (req, res, next) => {
+export const getCollectives = (req, res, next) => {
   // Follows json api spec http://jsonapi.org/format/#fetching-includes
   const { include } = req.query;
-  const withRoles = _.contains(include, 'usergroup.role');
+  const withRoles = _.contains(include, 'usercollective.role');
   const options = {
     include: []
   };
 
-  let groupObjects; // stores sequelize objects
-  const groupData = []; // stores data to return
+  let collectiveObjects; // stores sequelize objects
+  const collectiveData = []; // stores data to return
 
-  return getGroupsFromUser(req, options)
-  .tap(groups => groupObjects = groups)
-  .then(groups => groups.map(group => groupData.push(group.info)))
-  .then(() => groupObjects.map(groupObject => {
-    const group = _.find(groupData, {id: groupObject.id})
-    return groupObject.getBalance()
-      .then(balance => _.extend(group, { balance }))
+  return getCollectivesFromUser(req, options)
+  .tap(collectives => collectiveObjects = collectives)
+  .then(collectives => collectives.map(collective => collectiveData.push(collective.info)))
+  .then(() => collectiveObjects.map(collectiveObject => {
+    const collective = _.find(collectiveData, {id: collectiveObject.id})
+    return collectiveObject.getBalance()
+      .then(balance => _.extend(collective, { balance }))
   }))
   .then(() => {
     if (withRoles) {
-      return getUserGroups(req.user.id)
-        .then(userGroups => groupData.map(group => {
-          const userGroup = _.find(userGroups, { GroupId: group.id }) || {};
-          return _.extend(group, { role: userGroup.role });
+      return getUserCollectives(req.user.id)
+        .then(userCollectives => collectiveData.map(collective => {
+          const userCollective = _.find(userCollectives, { CollectiveId: collective.id }) || {};
+          return _.extend(collective, { role: userCollective.role });
         }))
     } else {
       return null;
     }
   })
-  .then(() => res.send(groupData))
+  .then(() => res.send(collectiveData))
   .catch(next)
 };
 

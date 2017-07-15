@@ -2,7 +2,7 @@ import roles from '../constants/roles';
 
 export default function(Sequelize, DataTypes) {
 
-  const UserGroup = Sequelize.define('UserGroup', {
+  const Roles = Sequelize.define('Roles', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -36,8 +36,8 @@ export default function(Sequelize, DataTypes) {
     indexes: [
        {
           unique: true,
-          fields: ['UserId', 'GroupId', 'role'],
-          name: 'UserGroups_3way',
+          fields: ['UserId', 'CollectiveId', 'role'],
+          name: 'Roless_3way',
           constraints: true
       }
     ],
@@ -47,7 +47,7 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           role: this.role,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           UserId: this.UserId,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
@@ -57,5 +57,5 @@ export default function(Sequelize, DataTypes) {
     }
   });
 
-  return UserGroup;
+  return Roles;
 }

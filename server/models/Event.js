@@ -25,10 +25,10 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    GroupId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -129,7 +129,7 @@ export default function(Sequelize, DataTypes) {
         return {
           id: this.id,
           createdByUserId: this.createdByUserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           maxAmount: this.maxAmount,
           maxQuantity: this.maxQuantity,
@@ -154,7 +154,7 @@ export default function(Sequelize, DataTypes) {
     indexes: [
       {
         unique: true,
-        fields: ['GroupId', 'slug']
+        fields: ['CollectiveId', 'slug']
       }
     ],
 
@@ -166,7 +166,7 @@ export default function(Sequelize, DataTypes) {
       },
       canEdit(remoteUser) {
         if (remoteUser.id === this.UserId) return Promise.resolve(true);
-        else return hasRole(remoteUser.id, this.GroupId, ['HOST', 'MEMBER']);
+        else return hasRole(remoteUser.id, this.CollectiveId, ['HOST', 'MEMBER']);
       }
     },
 
@@ -174,21 +174,21 @@ export default function(Sequelize, DataTypes) {
       createMany: (events, defaultValues = {}) => {
         return Promise.map(events, e => Event.create(_.defaults({}, e, defaultValues)), {concurrency: 1});
       },
-      getBySlug: (groupSlug, eventSlug) => {
+      getBySlug: (collectiveSlug, eventSlug) => {
         return Event.findOne({
           where: {
             slug: eventSlug
           },
           include: [{
-            model: models.Group,
+            model: models.Collective,
             where: {
-              slug: groupSlug
+              slug: collectiveSlug
             }
           }]
         })
         .then(ev => {
           if (!ev) {
-            throw new Error(`No event found with slug: ${eventSlug} in collective: ${groupSlug}`)
+            throw new Error(`No event found with slug: ${eventSlug} in collective: ${collectiveSlug}`)
           }
           return ev;
         })        

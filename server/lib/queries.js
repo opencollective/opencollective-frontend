@@ -7,11 +7,11 @@ import config from 'config';
 */
 const generateFXConversionSQL = (aggregate) => {
   let currencyColumn = "t.currency";
-  let amountColumn = "t.\"netAmountInGroupCurrency\"";
+  let amountColumn = "t.\"netAmountInCollectiveCurrency\"";
 
   if (aggregate) {
     currencyColumn = 'MAX(t.currency)';
-    amountColumn = 'SUM("t.\"netAmountInGroupCurrency\"")';
+    amountColumn = 'SUM("t.\"netAmountInCollectiveCurrency\"")';
   }
 
   const fxConversion = [];
@@ -36,7 +36,7 @@ const getTotalAnnualBudget = () => {
       LEFT JOIN "Transactions" t
       ON (s.id = d."SubscriptionId"
         AND t.id = (SELECT MAX(id) from "Transactions" t where t."DonationId" = d.id))
-      WHERE t.amount > 0 AND t."GroupId" != 1
+      WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
         AND s.interval = 'month'
         AND s."isActive" IS TRUE
@@ -46,7 +46,7 @@ const getTotalAnnualBudget = () => {
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
       LEFT JOIN "Donations" d ON t."DonationId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-      WHERE t.amount > 0 AND t."GroupId" != 1
+      WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
         AND t."createdAt" > (current_date - INTERVAL '12 months') 
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
@@ -55,7 +55,7 @@ const getTotalAnnualBudget = () => {
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
       LEFT JOIN "Donations" d on t."DonationId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-      WHERE t.amount > 0 AND t."GroupId" != 1
+      WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
         AND t."createdAt" > (current_date - INTERVAL '12 months')
         AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
@@ -92,7 +92,7 @@ const getTopBackers = (since, until, tags, limit) => {
     SELECT MAX(u.id) as id, MAX(u."firstName") as "firstName", MAX(u."lastName") as "lastName", MAX(u.username) as username, MAX(u.website) as "website", MAX(u."twitterHandle") as "twitterHandle", MAX(u.avatar) as "avatar", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
     FROM "Transactions" t
     LEFT JOIN "Users" u ON u.id = t."UserId"
-    LEFT JOIN "Groups" g ON g.id = t."GroupId"
+    LEFT JOIN "Collectives" g ON g.id = t."CollectiveId"
     WHERE 
       t.amount > 0
       ${sinceClause}
@@ -111,7 +111,7 @@ const getTopBackers = (since, until, tags, limit) => {
 /**
  * Get top collectives based on total donations
  */
-const getGroupsByTag = (tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
+const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
   let tagClause = '';
   let excludeClause = '';
   let minTotalDonationInCentsClause = '';
@@ -137,24 +137,24 @@ const getGroupsByTag = (tag, limit, excludeList, minTotalDonationInCents, random
 
   return sequelize.query(`
     WITH "totalDonations" AS (
-      SELECT "GroupId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL GROUP BY "GroupId"
+      SELECT "CollectiveId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "CollectiveId") as collectives FROM "Transactions" WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL GROUP BY "CollectiveId"
     )
     SELECT g.id, g.name, g.slug, g.mission, g.logo, g."backgroundImage", g.currency, g.settings, g.data, t."totalDonations", t.collectives
-    FROM "Groups" g LEFT JOIN "totalDonations" t ON t."GroupId" = g.id
+    FROM "Collectives" g LEFT JOIN "totalDonations" t ON t."CollectiveId" = g.id
     WHERE ${minTotalDonationInCentsClause} ${tagClause} g."deletedAt" IS NULL ${excludeClause} AND g."isActive" IS TRUE
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
     bind: { tag: [tag] },
-    model: models.Group
+    model: models.Collective
   });
 };
 
 /**
-* Get list of all unique tags for groups.
+* Get list of all unique tags for collectives.
 */
-const getUniqueGroupTags = () => {
-  return sequelize.query('SELECT DISTINCT UNNEST(tags) FROM "Groups" WHERE ARRAY_LENGTH(tags, 1) > 0')
+const getUniqueCollectiveTags = () => {
+  return sequelize.query('SELECT DISTINCT UNNEST(tags) FROM "Collectives" WHERE ARRAY_LENGTH(tags, 1) > 0')
   .then(results => results[0].map(x => x.unnest).sort())
 }
 
@@ -164,7 +164,7 @@ const getUniqueGroupTags = () => {
 const getTopSponsors = () => {
   return sequelize.query(`
     WITH "totalDonations" AS (
-      SELECT "UserId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "GroupId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "UserId"
+      SELECT "UserId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "CollectiveId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "UserId"
     )
     SELECT u.id, u."firstName", u."lastName", u.username, u.mission, u.description, u.avatar as logo, t."totalDonations", t.currency, t.collectives
     FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
@@ -182,12 +182,12 @@ const getTopSponsors = () => {
 };
 
 /**
- * Returns all the users of a group with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
+ * Returns all the users of a collective with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
  */
-const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
+const getUsersFromCollectiveWithTotalDonations = (CollectiveIds, until) => {
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
 
-  const groupids = (typeof GroupIds === 'number') ? [GroupIds] : GroupIds;
+  const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
   return sequelize.query(`
     WITH stats AS (
       SELECT
@@ -196,7 +196,7 @@ const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
         max("createdAt") as "lastDonation",
         min("createdAt") as "firstDonation"
       FROM "Transactions" t
-      WHERE t."GroupId" IN (:groupids) AND t.amount >= 0 ${untilCondition('t')}
+      WHERE t."CollectiveId" IN (:collectiveids) AND t.amount >= 0 ${untilCondition('t')}
       GROUP BY t."UserId"
     )
     SELECT
@@ -216,14 +216,14 @@ const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
       max(s."lastDonation") as "lastDonation"
     FROM "Users" u
     LEFT JOIN stats s ON u.id = s."UserId"
-    LEFT JOIN "UserGroups" ug ON u.id = ug."UserId"
-    WHERE ug."GroupId" IN (:groupids)
+    LEFT JOIN "UserCollectives" ug ON u.id = ug."UserId"
+    WHERE ug."CollectiveId" IN (:collectiveids)
     AND ug."deletedAt" IS NULL ${untilCondition('ug')}
     GROUP BY ug.role, u.id
     ORDER BY "totalDonations" DESC, "createdAt" ASC
   `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
-    replacements: { groupids },
+    replacements: { collectiveids },
     type: sequelize.QueryTypes.SELECT
   });
 };
@@ -231,10 +231,10 @@ const getUsersFromGroupWithTotalDonations = (GroupIds, until) => {
 export default {
   getTotalDonations,
   getTotalAnnualBudget,
-  getUsersFromGroupWithTotalDonations,
+  getUsersFromCollectiveWithTotalDonations,
   getTopSponsors,
   getTopBackers,
-  getGroupsByTag,
-  getUniqueGroupTags
+  getCollectivesByTag,
+  getUniqueCollectiveTags
 };
 

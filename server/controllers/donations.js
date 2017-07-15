@@ -11,7 +11,7 @@ import paymentsLib from '../lib/payments';
 export const list = (req, res, next) => {
 
   const query = Object.assign({
-    where: { GroupId: req.group.id },
+    where: { CollectiveId: req.collective.id },
     order: [[req.sorting.key, req.sorting.dir]]
   }, req.pagination);
 
@@ -28,10 +28,10 @@ export const list = (req, res, next) => {
 export const stripe = (req, res, next) => {
 
   const { payment } = req.required;
-  const { group } = req;
+  const { collective } = req;
   const { amount, interval, stripeToken, description, notes } = payment;
 
-  const currency = payment.currency || group.currency;
+  const currency = payment.currency || collective.currency;
 
   let user = req.user;
   let promise = Promise.resolve();
@@ -44,7 +44,7 @@ export const stripe = (req, res, next) => {
 
   return promise.then(() => paymentsLib.createPayment({
     user,
-    group,
+    collective,
     payment: {
       paymentMethod: { token: stripeToken },
       amount,
@@ -65,7 +65,7 @@ export const stripe = (req, res, next) => {
 export const manual = (req, res, next) => {  
   const { donation } = req.required;
   const { remoteUser } = req;
-  const { group } = req;
+  const { collective } = req;
   const { amount, title, notes } = donation;
 
   if (!amount || amount < 0) {
@@ -83,8 +83,8 @@ export const manual = (req, res, next) => {
 
   return promise.then(() => models.Donation.create({
       UserId: user.id,
-      GroupId: group.id,
-      currency: group.currency,
+      CollectiveId: collective.id,
+      currency: collective.currency,
       amount,
       title,
       notes
@@ -97,9 +97,9 @@ export const manual = (req, res, next) => {
 
 /*
 const paypalDonation = (req, res, next) => {
-  const { group } = req;
+  const { collective } = req;
   const { payment } = req.required;
-  const currency = payment.currency || group.currency;
+  const currency = payment.currency || collective.currency;
   const amount = parseInt(payment.amount * 100, 10);
   const { interval } = payment;
   const isSubscription = _.contains(['month', 'year'], interval);
@@ -116,7 +116,7 @@ const paypalDonation = (req, res, next) => {
   async.auto({
 
     getConnectedAccount: (cb) => {
-      group.getConnectedAccount()
+      collective.getConnectedAccount()
         .tap(connectedAccount => cb(null, connectedAccount))
         .catch(cb);
     },
@@ -139,12 +139,12 @@ const paypalDonation = (req, res, next) => {
     // the user logs on the PayPal website
     createTransaction: ['createSubscription', (cb, results) => {
       const payload = {
-        group,
+        collective,
         transaction: {
           type: 'payment',
           amount,
           currency,
-          description: payment.description || `Donation to ${group.name}`,
+          description: payment.description || `Donation to ${collective.name}`,
           tags: ['Donation'],
           comment: distribution,
           // In paranoid mode, the deleted transactions are not visible
@@ -170,14 +170,14 @@ const paypalDonation = (req, res, next) => {
       if (isSubscription) {
         paypal.createSubscription(
           connectedAccount,
-          group,
+          collective,
           transaction,
           results.createSubscription
         , cb);
       } else {
         paypal.createPayment(
           connectedAccount,
-          group,
+          collective,
           transaction
         , cb);
       }
@@ -220,7 +220,7 @@ export {paypalDonation as paypal};
 
 export const paypalCallback = (req, res, next) => {
   const transaction = req.paranoidtransaction;
-  const { group } = req;
+  const { collective } = req;
   const { token } = req.query;
 
   // For single payments
@@ -235,7 +235,7 @@ export const paypalCallback = (req, res, next) => {
 
   async.auto({
     getConnectedAccount: (cb) => {
-      req.group.getConnectedAccount()
+      req.collective.getConnectedAccount()
         .then(connectedAccount => cb(null, connectedAccount))
         .catch(cb);
     },
@@ -291,10 +291,10 @@ export const paypalCallback = (req, res, next) => {
 
       const donation = {
         UserId: user.id,
-        GroupId: group.id,
+        CollectiveId: collective.id,
         currency,
         amount: amountInt,
-        title: `Donation to ${group.name}`,
+        title: `Donation to ${collective.name}`,
         SubscriptionId: subscriptionId
       };
 
@@ -304,22 +304,22 @@ export const paypalCallback = (req, res, next) => {
         .catch(cb);
     }],
 
-    addUserToGroup: ['getOrCreateUser', (cb, results) => {
+    addUserToCollective: ['getOrCreateUser', (cb, results) => {
       const user = results.getOrCreateUser;
 
-      models.UserGroup.findOne({
+      models.UserCollective.findOne({
         where: {
-          GroupId: group.id,
+          CollectiveId: collective.id,
           UserId: user.id,
           role: roles.BACKER
         }
       })
-      .then(userGroup => userGroup || group.addUserWithRole(user, roles.BACKER))
+      .then(userCollective => userCollective || collective.addUserWithRole(user, roles.BACKER))
       .then(() => cb())
       .catch(cb);
     }],
 
-    updateTransaction: ['addUserToGroup', (cb, results) => {
+    updateTransaction: ['addUserToCollective', (cb, results) => {
       transaction.restore() // removes the deletedAt field http://docs.sequelizejs.com/en/latest/api/instance/#restoreoptions-promiseundefined
         .then(() => transaction.setUser(results.getOrCreateUser))
         .then(() => models.Transaction.createActivity(transaction))
@@ -330,7 +330,7 @@ export const paypalCallback = (req, res, next) => {
     if (err) return next(err);
     const user = results.getOrCreateUser;
 
-    res.redirect(`${config.host.website}/${req.group.slug}?status=payment_success&userid=${user.id}&has_full_account=${!user.hasMissingInfo()}`);
+    res.redirect(`${config.host.website}/${req.collective.slug}?status=payment_success&userid=${user.id}&has_full_account=${!user.hasMissingInfo()}`);
   });
 
 };

@@ -26,10 +26,10 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    GroupId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -128,7 +128,7 @@ export default function (Sequelize, DataTypes) {
           type: expenseType,
           id: this.id,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
           title: this.title,
@@ -149,7 +149,7 @@ export default function (Sequelize, DataTypes) {
           type: expenseType,
           id: this.id,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
           title: this.title,

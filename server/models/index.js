@@ -58,7 +58,7 @@ export function setupModels(client) {
     'Donation',
     'Event',
     'Expense',
-    'Group',
+    'Collective',
     'Notification',
     'PaymentMethod',
     'Response',
@@ -68,7 +68,7 @@ export function setupModels(client) {
     'Tier',
     'Transaction',
     'User',
-    'UserGroup'
+    'Roles'
   ].forEach((model) => {
     m[model] = client.import(`${__dirname}/${model}`);
   });
@@ -83,11 +83,11 @@ export function setupModels(client) {
   // Referrer
   m.User.belongsTo(m.User, { as: 'referrer' });
 
-  // Group.
-  m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
-  m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});
-  m.User.hasMany(m.UserGroup);
-  m.Group.hasMany(m.UserGroup);
+  // Collective.
+  m.Collective.belongsToMany(m.User, {through: {model: m.Roles, unique:false}, as: 'users'});
+  m.User.belongsToMany(m.Collective, {through: {model: m.Roles, unique: false}, as: 'collectives'});
+  m.User.hasMany(m.Roles);
+  m.Collective.hasMany(m.Roles);
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
@@ -95,12 +95,12 @@ export function setupModels(client) {
   // ConnectedAccount
   m.User.hasMany(m.ConnectedAccount);
   m.ConnectedAccount.belongsTo(m.User);
-  m.Group.hasMany(m.ConnectedAccount);
-  m.ConnectedAccount.belongsTo(m.Group);
+  m.Collective.hasMany(m.ConnectedAccount);
+  m.ConnectedAccount.belongsTo(m.Collective);
 
   // Activity.
-  m.Activity.belongsTo(m.Group);
-  m.Group.hasMany(m.Activity);
+  m.Activity.belongsTo(m.Collective);
+  m.Collective.hasMany(m.Activity);
 
   m.Activity.belongsTo(m.User);
   m.User.hasMany(m.Activity);
@@ -111,12 +111,12 @@ export function setupModels(client) {
   m.User.hasMany(m.Notification);
   m.Notification.belongsTo(m.User);
 
-  m.Notification.belongsTo(m.Group);
-  m.Group.hasMany(m.Notification);
+  m.Notification.belongsTo(m.Collective);
+  m.Collective.hasMany(m.Notification);
 
   // Transaction.
-  m.Transaction.belongsTo(m.Group);
-  m.Group.hasMany(m.Transaction);
+  m.Transaction.belongsTo(m.Collective);
+  m.Collective.hasMany(m.Transaction);
   m.Transaction.belongsTo(m.User);
   m.Transaction.belongsTo(m.User, { as: 'Host' });
   m.User.hasMany(m.Transaction);
@@ -125,22 +125,22 @@ export function setupModels(client) {
 
   // Expense
   m.Expense.belongsTo(m.User);
-  m.Expense.belongsTo(m.Group);
+  m.Expense.belongsTo(m.Collective);
   m.Transaction.belongsTo(m.Expense);
 
   // Comment
   m.Comment.belongsTo(m.User);
-  m.Comment.belongsTo(m.Group);
+  m.Comment.belongsTo(m.Collective);
   m.Comment.belongsTo(m.Expense);
   m.Expense.hasMany(m.Comment);
   m.User.hasMany(m.Comment);
-  m.Group.hasMany(m.Comment);
+  m.Collective.hasMany(m.Comment);
 
   // Donation.
   m.Donation.belongsTo(m.User);
   m.User.hasMany(m.Donation);
-  m.Donation.belongsTo(m.Group);
-  m.Group.hasMany(m.Donation);
+  m.Donation.belongsTo(m.Collective);
+  m.Collective.hasMany(m.Donation);
   m.Transaction.belongsTo(m.Donation);
   m.Donation.hasMany(m.Transaction);
   m.Donation.belongsTo(m.Response);
@@ -156,23 +156,23 @@ export function setupModels(client) {
   m.Transaction.belongsTo(m.PaymentMethod);
 
   // Event
-  m.Event.belongsTo(m.Group);
-  m.Group.hasMany(m.Event);
-  m.Group.hasMany(m.Tier);
+  m.Event.belongsTo(m.Collective);
+  m.Collective.hasMany(m.Event);
+  m.Collective.hasMany(m.Tier);
 
   // Tier
   m.Tier.belongsTo(m.Event);
-  m.Tier.belongsTo(m.Group);
+  m.Tier.belongsTo(m.Collective);
   m.Event.hasMany(m.Tier);
 
   // Response
   m.Response.belongsTo(m.Event);
   m.Response.belongsTo(m.Tier);
-  m.Response.belongsTo(m.Group);
+  m.Response.belongsTo(m.Collective);
   m.Response.belongsTo(m.User);
   m.Event.hasMany(m.Response);
   m.Tier.hasMany(m.Response);
-  m.Group.hasMany(m.Response);
+  m.Collective.hasMany(m.Response);
   m.User.hasMany(m.Response);
   m.User.hasMany(m.PaymentMethod);
 

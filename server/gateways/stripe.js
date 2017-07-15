@@ -67,12 +67,12 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
  * Create stripe customer
  */
 export const createCustomer = (stripeAccount, token, options) => {
-  const group = options.group || {};
+  const collective = options.collective || {};
   const email = options.email || '';
 
   return client(stripeAccount).customers.create({
     source: token,
-    description:  `Paying ${email} to ${group.name}`,
+    description:  `Paying ${email} to ${collective.name}`,
     email
   });
 };

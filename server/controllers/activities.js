@@ -13,10 +13,10 @@ const { Activity } = models;
 /**
  * Public methods.
 */
-export function group(req, res, next) {
+export function collective(req, res, next) {
   const query = _.merge({
     where: {
-      GroupId: req.group.id
+      CollectiveId: req.collective.id
     },
     order: [[req.sorting.key, req.sorting.dir]]
   }, req.pagination);

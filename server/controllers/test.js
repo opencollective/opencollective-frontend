@@ -70,10 +70,10 @@ export const resetTestDatabase = function(req, res, next) {
         .catch(cb);
     },
 
-    createGroup: ['resetDb', (cb) => {
-      models.Group.create({
-        name: 'OpenCollective Test Group',
-        description: 'OpenCollective test group on the test server',
+    createCollective: ['resetDb', (cb) => {
+      models.Collective.create({
+        name: 'OpenCollective Test Collective',
+        description: 'OpenCollective test collective on the test server',
         slug: 'testcollective',
         mission: 'our awesome mission',
         tags: ['open source'],
@@ -84,34 +84,34 @@ export const resetTestDatabase = function(req, res, next) {
         currency: 'EUR',
         isActive: true
       })
-      .then(group => cb(null, group))
+      .then(collective => cb(null, collective))
       .catch(cb);
     }],
 
-    createTestUser: ['createGroup', (cb, results) => {
+    createTestUser: ['createCollective', (cb, results) => {
       models.User.create(testUser)
-        .tap(u => results.createGroup.addUserWithRole(u, roles.HOST))
+        .tap(u => results.createCollective.addUserWithRole(u, roles.HOST))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
-    createMember: ['createGroup', (cb, results) => {
+    createMember: ['createCollective', (cb, results) => {
       models.User.create(member)
-        .tap(u => results.createGroup.addUserWithRole(u, roles.MEMBER))
+        .tap(u => results.createCollective.addUserWithRole(u, roles.MEMBER))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
-    createBacker: ['createGroup', (cb, results) => {
+    createBacker: ['createCollective', (cb, results) => {
       models.User.create(backer)
-        .tap(u => results.createGroup.addUserWithRole(u, roles.BACKER))
+        .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
-    createBacker2: ['createGroup', (cb, results) => {
+    createBacker2: ['createCollective', (cb, results) => {
       models.User.create(backer2)
-        .tap(u => results.createGroup.addUserWithRole(u, roles.BACKER))
+        .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
         .then(u => cb(null, u))
         .catch(cb);
     }],
@@ -152,7 +152,7 @@ export const resetTestDatabase = function(req, res, next) {
         title: "Donation 1",
         amount: 100,
         currency: 'EUR',
-        GroupId: results.createGroup.id,
+        CollectiveId: results.createCollective.id,
         UserId: results.createBacker.id
       })
       .then(donation => models.Transaction.create({
@@ -162,7 +162,7 @@ export const resetTestDatabase = function(req, res, next) {
         UserId: results.createBacker.id,
         DonationId: donation.id
       }))
-      .then(t => t.setGroup(results.createGroup))
+      .then(t => t.setCollective(results.createCollective))
       .then(() => cb())
       .catch(cb);
     }],
@@ -172,7 +172,7 @@ export const resetTestDatabase = function(req, res, next) {
         title: "Donation 2",
         amount: 200,
         currency: 'EUR',
-        GroupId: results.createGroup.id,
+        CollectiveId: results.createCollective.id,
         UserId: results.createBacker2.id
       })
       .then(donation => models.Transaction.create({
@@ -182,7 +182,7 @@ export const resetTestDatabase = function(req, res, next) {
         UserId: results.createBacker2.id,
         DonationId: donation.id
       }))
-      .then(t => t.setGroup(results.createGroup))
+      .then(t => t.setCollective(results.createCollective))
       .then(() => cb())
       .catch(cb);
     }],
@@ -194,7 +194,7 @@ export const resetTestDatabase = function(req, res, next) {
         "currency": "EUR",
         "incurredAt": "2016-03-01T08:00:00.000Z",
         "createdAt": "2016-03-01T08:00:00.000Z",
-        "GroupId": results.createGroup.id,
+        "CollectiveId": results.createCollective.id,
         "UserId": results.createTestUser.id,
         "lastEditedById": results.createTestUser.id,
         "payoutMethod": 'paypal'
@@ -211,7 +211,7 @@ export const resetTestDatabase = function(req, res, next) {
         "currency": "EUR",
         "incurredAt": "2016-02-29T08:00:00.000Z",
         "createdAt": "2016-03-01T08:00:00.000Z",
-        "GroupId": results.createGroup.id,
+        "CollectiveId": results.createCollective.id,
         "UserId": results.createMember.id,
         "lastEditedById": results.createMember.id,
         "payoutMethod": 'manual'
@@ -258,7 +258,7 @@ export const exportPDF = function(req, res, next) {
   const paper = req.query.papaer || 'Letter';
   const format = req.query.format || 'html';
   const wwcodeids = ['524','47','292','275','521','525','522','262','51','295','280','283','286','510','14','515','516','518','519','520','523','512','511','513','517','59','584','299','430','48','260','261','298','272','293','273','294','263','274','276','277','301','195','241','265','297','259','266','279','267','278','12','269','270','281','10','282','3','284','264','287','268','4','300','289','13','291','285','288','271','290','15','2'];
-  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'EXPENSE' }, include: ["User", "Expense", "Group"] }).then(transactions => {
+  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'EXPENSE' }, include: ["User", "Expense", "Collective"] }).then(transactions => {
     console.log("transactions", JSON.stringify(transactions));
     const data = { host: { name: "WWCode", currency: 'USD' }, year: (new Date).getFullYear(), month };
     let page = 1;
@@ -269,8 +269,8 @@ export const exportPDF = function(req, res, next) {
     data.totalPaidExpenses = transactions.length;
     data.transactions = transactions.map(t => {
       t.page = page++;
-      t.group = t.Group;
-      t.group.shortSlug = t.group.slug.replace(/^wwcode-?(.)/, '$1');
+      t.collective = t.Collective;
+      t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
       t.notes = t.Expense && t.Expense.notes;
       if (t.data && t.data.fxrateSource) {
         t.notes = (t.notes) ? `${t.notes} (${note})` : note;

@@ -3,17 +3,17 @@ import roles from '../constants/roles';
 import models from '../models';
 import errors from '../lib/errors';
 
-export function getUserOrGroupFromSlug(slug, userId) {
-  return models.Group
+export function getUserOrCollectiveFromSlug(slug, userId) {
+  return models.Collective
     .findOne({where: {slug}})
-    .then(group => {
-      if (group) {
-        return Promise.promisify(group.hasUserWithRole)(userId, roles.HOST)
+    .then(collective => {
+      if (collective) {
+        return Promise.promisify(collective.hasUserWithRole)(userId, roles.HOST)
           .then(isHost => {
             if (!isHost) {
               return Promise.reject(new errors.Forbidden(`You do not have access to this resource`));
             }
-            return group;
+            return collective;
           });
       } else {
         return models.User.findOne({
@@ -26,7 +26,7 @@ export function getUserOrGroupFromSlug(slug, userId) {
             if (user) {
               return user;
             } else {
-              return Promise.reject(new errors.NotFound(`User or group ${slug} not found or is not a host of this group`));
+              return Promise.reject(new errors.NotFound(`User or collective ${slug} not found or is not a host of this collective`));
             }
           });
       }

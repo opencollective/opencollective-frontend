@@ -4,17 +4,17 @@ import { convertToCurrency } from '../lib/currency';
 import Promise from 'bluebird';
 
 
-export function getHostedGroups(hostid, endDate = new Date) {
+export function getHostedCollectives(hostid, endDate = new Date) {
   return sequelize.query(`
-    SELECT g.* FROM "Groups" g LEFT JOIN "UserGroups" ug ON g.id = ug."GroupId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
+    SELECT g.* FROM "Collectives" g LEFT JOIN "UserCollectives" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
   `, {
     replacements: { hostid, endDate },
-    model: models.Group,
+    model: models.Collective,
     type: sequelize.QueryTypes.SELECT
   });
 }
 
-export function getBackersStats(startDate = new Date('2015-01-01'), endDate = new Date, groupids) {
+export function getBackersStats(startDate = new Date('2015-01-01'), endDate = new Date, collectiveids) {
 
   const getBackersIds = (startDate, endDate) => {
     const where = {
@@ -22,8 +22,8 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
         createdAt: { $gte: startDate, $lt: endDate }
       };
 
-    if (groupids) {
-      where.GroupId = { $in: groupids };
+    if (collectiveids) {
+      where.CollectiveId = { $in: collectiveids };
     }
 
     return models.Transaction.findAll({
@@ -49,10 +49,10 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
   });
 }
 
-export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency', where) {
+export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurrency', where) {
   const query = {
     attributes: [ [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], 'currency' ],
-    group: ['currency'],
+    collective: ['currency'],
     where
   };
   return models.Transaction.findAll(query)
@@ -63,7 +63,7 @@ export function sumTransactionsByCurrency(attribute = 'netAmountInGroupCurrency'
 /**
  * Sum an attribute of the Transactions table and return the result by currency with the total in host currency
  * 
- * @param {*} attribute column to sum, e.g. 'netAmountInGroupCurrency' or 'hostFeeInTxnCurrency'
+ * @param {*} attribute column to sum, e.g. 'netAmountInCollectiveCurrency' or 'hostFeeInTxnCurrency'
  * @param {*} where where clause to reduce the scope
  * @param {*} hostCurrency currency of the host
  *
@@ -91,9 +91,9 @@ export function sumTransactions(attribute, where = {}, hostCurrency, date) {
     ;
 }
 
-export function getTotalHostFees(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
+export function getTotalHostFees(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    GroupId: { $in: groupids },
+    CollectiveId: { $in: collectiveids },
     createdAt: { $gte: startDate, $lt: endDate }
   }; 
   if (type) {
@@ -102,13 +102,13 @@ export function getTotalHostFees(groupids, type, startDate = new Date('2015-01-0
   return sumTransactions('hostFeeInTxnCurrency', where, hostCurrency);
 }
 
-export function getTotalNetAmount(groupids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
+export function getTotalNetAmount(collectiveids, type, startDate = new Date('2015-01-01'), endDate = new Date, hostCurrency = 'USD') {
   const where = {
-    GroupId: { $in: groupids },
+    CollectiveId: { $in: collectiveids },
     createdAt: { $gte: startDate, $lt: endDate }
   };
   if (type) {
     where.type = type;
   }
-  return sumTransactions('netAmountInGroupCurrency', where, hostCurrency);
+  return sumTransactions('netAmountInCollectiveCurrency', where, hostCurrency);
 }

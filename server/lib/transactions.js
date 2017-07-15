@@ -11,24 +11,24 @@ import Promise from 'bluebird';
  * @param {*} transactions 
  */
 export function exportTransactions(transactions, attributes) {
-  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency' ];
+  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency' ];
 
   return exportToCSV(transactions, attributes);
 }
 
 /**
- * Get transactions between startDate and endDate for groupids
- * @param {*} groupids 
+ * Get transactions between startDate and endDate for collectiveids
+ * @param {*} collectiveids 
  * @param {*} startDate 
  * @param {*} endDate 
  * @param {*} limit 
  */
-export function getTransactions(groupids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
+export function getTransactions(collectiveids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
   const where = options.where || {};
   const query = {
     where: {
       ...where,
-      GroupId: { $in: groupids },
+      CollectiveId: { $in: collectiveids },
       createdAt: { $gte: startDate, $lt: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]
@@ -42,7 +42,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
   const txnCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
   let fxrate;
-  let paymentProcessorFeeInGroupCurrency = 0;
+  let paymentProcessorFeeInCollectiveCurrency = 0;
   let paymentProcessorFeeInTxnCurrency = 0;
   let getFxRatePromise;
 
@@ -69,11 +69,11 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     }
 
     const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
+    paymentProcessorFeeInCollectiveCurrency = senderFees.amount * 100; // paypal sends this in float
 
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
     fxrate = parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
-    paymentProcessorFeeInTxnCurrency = 1/fxrate * paymentProcessorFeeInGroupCurrency;
+    paymentProcessorFeeInTxnCurrency = 1/fxrate * paymentProcessorFeeInCollectiveCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
@@ -81,10 +81,10 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
   }
 
-  // We assume that all expenses are in Group currency
+  // We assume that all expenses are in Collective currency
   // (otherwise, ledger breaks with a triple currency conversion)
   const transaction = {
-    netAmountInGroupCurrency: -1 * (expense.amount + paymentProcessorFeeInGroupCurrency),
+    netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
     txnCurrency,
     paymentProcessorFeeInTxnCurrency,
     ExpenseId: expense.id,
@@ -93,7 +93,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     currency: expense.currency,
     description: expense.title,
     UserId,
-    GroupId: expense.GroupId,
+    CollectiveId: expense.CollectiveId,
     HostId: host.id
   };
 
@@ -114,7 +114,7 @@ function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDet
   const payload = {
     type: constants.activities.GROUP_EXPENSE_PAID,
     UserId: transaction.UserId,
-    GroupId: transaction.GroupId,
+    CollectiveId: transaction.CollectiveId,
     TransactionId: transaction.id,
     data: {
       transaction: transaction.info
@@ -128,7 +128,7 @@ function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDet
   }
   return transaction.getUser()
     .tap(user => payload.data.user = user.minimal)
-    .then(() => transaction.getGroup())
-    .tap(group => payload.data.group = group.minimal)
+    .then(() => transaction.getCollective())
+    .tap(collective => payload.data.collective = collective.minimal)
     .then(() => models.Activity.create(payload));
 }

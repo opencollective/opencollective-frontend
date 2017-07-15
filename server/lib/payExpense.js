@@ -4,8 +4,8 @@ import errors from './errors';
 import paypalAdaptive from '../gateways/paypalAdaptive';
 
 const services = {
-  paypal: (group, expense, email, preapprovalKey) => {
-    const uri = `/groups/${group.id}/expenses/${expense.id}/paykey/`;
+  paypal: (collective, expense, email, preapprovalKey) => {
+    const uri = `/collectives/${collective.id}/expenses/${expense.id}/paykey/`;
     const baseUrl = config.host.webapp + uri;
     const amount = expense.amount/100;
     let createPaymentResponse;
@@ -17,7 +17,7 @@ const services = {
       // TODO does PayPal accept all the currencies that we support in our expenses?
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
-      memo: `Reimbursement from ${group.name}: ${expense.title}`,
+      memo: `Reimbursement from ${collective.name}: ${expense.title}`,
       trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${baseUrl}/success`,

@@ -14,7 +14,7 @@ import config from 'config';
 const {
   Activity,
   Donation,
-  Group,
+  Collective,
   Subscription,
   Transaction,
   User,
@@ -95,7 +95,7 @@ export default function stripeWebhook(req, res, next) {
 
       Donation.findOne({
         include: [
-          { model: Group },
+          { model: Collective },
           { model: User },
           { model: Subscription, where: { stripeSubscriptionId } }
         ]
@@ -200,12 +200,12 @@ export default function stripeWebhook(req, res, next) {
       const donation = results.fetchDonation;
       const { stripeSubscription } = results.fetchEvent;
       const user = donation.User || {};
-      const group = donation.Group || {};
+      const collective = donation.Collective || {};
       const paymentMethod = results.fetchPaymentMethod;
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
       const fees = extractFees(balanceTransaction);
-      const { hostFeePercent } = group;
+      const { hostFeePercent } = collective;
 
       // Now we record a new transaction
       const newTransaction = {
@@ -226,7 +226,7 @@ export default function stripeWebhook(req, res, next) {
       models.Transaction.createFromPayload({
         transaction: newTransaction,
         user,
-        group,
+        collective,
         paymentMethod
       })
       .then(t => cb(null, t))
@@ -239,23 +239,23 @@ export default function stripeWebhook(req, res, next) {
       // We only send an invoice for donations > $10 equivalent
       if (donation.amount < 10 * currencies[donation.currency].fxrate * 100) return cb(null);
       const user = donation.User || {};
-      const group = donation.Group || {};
+      const collective = donation.Collective || {};
       const subscription = donation.Subscription;
-      group.getRelatedGroups(2, 0)
-      .then((relatedGroups) => emailLib.send(
+      collective.getRelatedCollectives(2, 0)
+      .then((relatedCollectives) => emailLib.send(
         'thankyou',
         user.email,
         { donation: donation.info,
           transaction: transaction.info,
           user: user.info,
           firstPayment: false,
-          group: group.info,
-          relatedGroups,
+          collective: collective.info,
+          relatedCollectives,
           config: { host: config.host },
           interval: subscription && subscription.interval,
           subscriptionsLink: user.generateLoginLink('/subscriptions')
         }, {
-          from: `${group.name} <hello@${group.slug}.opencollective.com>`
+          from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
         }))
       .then(() => cb())
       .catch(cb);

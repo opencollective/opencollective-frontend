@@ -9,7 +9,7 @@ import * as donations from './controllers/donations';
 import * as transactions from './controllers/transactions';
 import * as expenses from './controllers/expenses';
 import * as comments from './controllers/comments';
-import * as groups from './controllers/groups';
+import * as collectives from './controllers/collectives';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
@@ -87,7 +87,7 @@ export default (app) => {
    * Parameters.
    */
   app.param('userid', params.userid);
-  app.param('groupid', params.groupid);
+  app.param('collectiveid', params.collectiveid);
   app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
@@ -167,38 +167,38 @@ export default (app) => {
   app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
 
   /**
-   * Groups.
+   * Collectives.
    */
-  app.post('/groups', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), groups.createFromGithub); // Create a group from a github repo
-  app.post('/groups', required('group'), groups.create); // Create a group, optionally include `users` with `role` to add them. No need to be authenticated.
-  app.get('/groups/tags', groups.getGroupTags); // List all unique tags on all groups
-  app.get('/groups/:groupid', groups.getOne);
-  app.get('/groups/:groupid/users', cache(60), groups.getUsers); // Get group users
-  app.get('/groups/:groupid/users.csv', cache(60), mw.format('csv'), groups.getUsers);
-  app.put('/groups/:groupid', auth.canEditGroup, required('group'), groups.update); // Update a group.
-  app.put('/groups/:groupid/settings', auth.canEditGroup, required('group'), groups.updateSettings); // Update group settings
-  app.delete('/groups/:groupid', NotImplemented); // Delete a group.
+  app.post('/collectives', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), collectives.createFromGithub); // Create a collective from a github repo
+  app.post('/collectives', required('collective'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
+  app.get('/collectives/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
+  app.get('/collectives/:collectiveid', collectives.getOne);
+  app.get('/collectives/:collectiveid/users', cache(60), collectives.getUsers); // Get collective users
+  app.get('/collectives/:collectiveid/users.csv', cache(60), mw.format('csv'), collectives.getUsers);
+  app.put('/collectives/:collectiveid', auth.canEditCollective, required('collective'), collectives.update); // Update a collective.
+  app.put('/collectives/:collectiveid/settings', auth.canEditCollective, required('collective'), collectives.updateSettings); // Update collective settings
+  app.delete('/collectives/:collectiveid', NotImplemented); // Delete a collective.
 
-  app.get('/groups/:groupid/services/meetup/sync', mw.fetchUsers, syncMeetup);
+  app.get('/collectives/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
-   * UserGroup.
+   * UserCollective.
    *
-   *  Relations between a group and a user.
+   *  Relations between a collective and a user.
    */
-  app.get('/users/:userid/groups', users.getGroups); // Get user's groups.
-  app.post('/groups/:groupid/users/:userid', auth.canEditGroup, groups.addUser); // Add a user to a group.
-  app.put('/groups/:groupid/users/:userid', auth.canEditGroup, groups.updateUser); // Update a user's role in a group.
-  app.delete('/groups/:groupid/users/:userid', auth.canEditGroup, groups.deleteUser); // Remove a user from a group.
+  app.get('/users/:userid/collectives', users.getCollectives); // Get user's collectives.
+  app.post('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
+  app.put('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.updateUser); // Update a user's role in a collective.
+  app.delete('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.deleteUser); // Remove a user from a collective.
 
   /**
    * Transactions (financial).
    */
-  app.get('/groups/:groupid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), groups.getTransactions); // Get a group's transactions.
+  app.get('/collectives/:collectiveid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), collectives.getTransactions); // Get a collective's transactions.
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
 
-  // TODO remove once app is deprecated, replaced by POST /groups/:groupid/expenses and POST /groups/:groupid/donations/manual
-  app.post('/groups/:groupid/transactions', required('transaction'), auth.canEditGroup, groups.createTransaction); // Create a transaction for a group.
+  // TODO remove once app is deprecated, replaced by POST /collectives/:collectiveid/expenses and POST /collectives/:collectiveid/donations/manual
+  app.post('/collectives/:collectiveid/transactions', required('transaction'), auth.canEditCollective, collectives.createTransaction); // Create a transaction for a collective.
 
 
   /**
@@ -206,47 +206,47 @@ export default (app) => {
    */
    // TODO: Built a better frontend and remove hack 
    // mw.paginate({default: 50}) is a hack to unblock hosts from finding expenses that have more than 20 expenses
-  app.get('/groups/:groupid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/groups/:groupid/expenses/:expenseid', expenses.getOne); // Get an expense.
-  app.post('/groups/:groupid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
-  app.put('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
-  app.delete('/groups/:groupid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/approve', auth.canEditGroup, required('approved'), expenses.setApprovalStatus); // Approve an expense.
-  app.post('/groups/:groupid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
+  app.get('/collectives/:collectiveid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+  app.get('/collectives/:collectiveid/expenses/:expenseid', expenses.getOne); // Get an expense.
+  app.post('/collectives/:collectiveid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
+  app.put('/collectives/:collectiveid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
+  app.delete('/collectives/:collectiveid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
+  app.post('/collectives/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
+  app.post('/collectives/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
 
   /**
    * Comments
    */
-  app.get('/groups/:groupid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), comments.list); // Get latest comments for a collective
-  app.get('/groups/:groupid/expenses/:expenseid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'ASC'}), comments.list); // Get latest comments for an expense
-  app.put('/groups/:groupid/expenses/:expenseid/comments/:commentid/approve', auth.canEditComment, comments.approve); // Approve comment
-  app.post('/groups/:groupid/expenses/:expenseid/comments', required('comment'), mw.getOrCreateUser, comments.create); // Create a comment as a new user
-  app.delete('/groups/:groupid/expenses/:expenseid/comments/:commentid', auth.canEditComment, comments.deleteComment); // Delete a comment
+  app.get('/collectives/:collectiveid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), comments.list); // Get latest comments for a collective
+  app.get('/collectives/:collectiveid/expenses/:expenseid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'ASC'}), comments.list); // Get latest comments for an expense
+  app.put('/collectives/:collectiveid/expenses/:expenseid/comments/:commentid/approve', auth.canEditComment, comments.approve); // Approve comment
+  app.post('/collectives/:collectiveid/expenses/:expenseid/comments', required('comment'), mw.getOrCreateUser, comments.create); // Create a comment as a new user
+  app.delete('/collectives/:collectiveid/expenses/:expenseid/comments/:commentid', auth.canEditComment, comments.deleteComment); // Delete a comment
 
   /**
    * Donations
    */
-  app.get('/groups/:groupid/donations', mw.paginate(), mw.sorting({key: 'processedAt', dir: 'DESC'}), donations.list); // Callback after a payment
-  app.post('/groups/:groupid/donations/stripe', required('payment'), mw.getOrCreateUser, donations.stripe); // Make a stripe donation.
-  app.post('/groups/:groupid/donations/manual', required('donation'), auth.mustHaveRole(roles.HOST), donations.manual); // Create a manual donation.
-  // app.post('/groups/:groupid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
-  // app.get('/groups/:groupid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
+  app.get('/collectives/:collectiveid/donations', mw.paginate(), mw.sorting({key: 'processedAt', dir: 'DESC'}), donations.list); // Callback after a payment
+  app.post('/collectives/:collectiveid/donations/stripe', required('payment'), mw.getOrCreateUser, donations.stripe); // Make a stripe donation.
+  app.post('/collectives/:collectiveid/donations/manual', required('donation'), auth.mustHaveRole(roles.HOST), donations.manual); // Create a manual donation.
+  // app.post('/collectives/:collectiveid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
+  // app.get('/collectives/:collectiveid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
 
   /**
    * Activities.
    *
-   *  An activity is any action linked to a User or a Group.
+   *  An activity is any action linked to a User or a Collective.
    */
-  app.get('/groups/:groupid/activities', auth.mustBePartOfTheGroup, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.group); // Get a group's activities.
+  app.get('/collectives/:collectiveid/activities', auth.mustBePartOfTheCollective, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.collective); // Get a collective's activities.
   app.get('/users/:userid/activities', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
 
   /**
    * Notifications.
    *
-   *  A user can subscribe by email to any type of activity of a Group.
+   *  A user can subscribe by email to any type of activity of a Collective.
    */
-  app.post('/groups/:groupid/activities/:activityType/subscribe', auth.mustBePartOfTheGroup, notifications.subscribe); // Subscribe to a group's activities
-  app.post('/groups/:groupid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a group's activities
+  app.post('/collectives/:collectiveid/activities/:activityType/subscribe', auth.mustBePartOfTheCollective, notifications.subscribe); // Subscribe to a collective's activities
+  app.post('/collectives/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
 
   /**
    * Separate route for uploading images to S3

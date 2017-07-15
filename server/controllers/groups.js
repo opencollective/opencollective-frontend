@@ -16,62 +16,62 @@ import errors from '../lib/errors';
 const {
   Activity,
   Notification,
-  Group,
+  Collective,
   Transaction,
   ConnectedAccount,
   User,
   Donation
 } = models;
 
-const _addUserToGroup = (group, user, options) => {
-  const checkIfGroupHasHost = () => {
+const _addUserToCollective = (collective, user, options) => {
+  const checkIfCollectiveHasHost = () => {
     if (options.role !== roles.HOST) {
       return Promise.resolve();
     }
 
-    return group.hasHost().then(hasHost => {
+    return collective.hasHost().then(hasHost => {
       if (hasHost) {
-        return Promise.reject(new errors.BadRequest('Group already has a host'));
+        return Promise.reject(new errors.BadRequest('Collective already has a host'));
       }
       return Promise.resolve();
     })
   };
 
-  const addUserToGroup = () => group.addUserWithRole(user, options.role);
+  const addUserToCollective = () => collective.addUserWithRole(user, options.role);
 
   const createActivity = () => Activity.create({
-    type: 'group.user.added',
-    GroupId: group.id,
+    type: 'collective.user.added',
+    CollectiveId: collective.id,
     data: {
-      group: group.info,
+      collective: collective.info,
       creator: options.remoteUser.info,
       user: user.info,
       role: options.role
     }
   });
 
-  return checkIfGroupHasHost()
-    .then(addUserToGroup)
+  return checkIfCollectiveHasHost()
+    .then(addUserToCollective)
     .then(createActivity);
 };
 
-const _getUsersData = (group) => {
-  return group.getSuperCollectiveGroupsIds()
-    .then(ids => queries.getUsersFromGroupWithTotalDonations(ids))
-    .then(backers => appendTier(backers, group.tiers))
+const _getUsersData = (collective) => {
+  return collective.getSuperCollectiveCollectivesIds()
+    .then(ids => queries.getUsersFromCollectiveWithTotalDonations(ids))
+    .then(backers => appendTier(backers, collective.tiers))
 };
 
 export const getUsers = (req, res, next) => {
 
-  let promise = _getUsersData(req.group);
+  let promise = _getUsersData(req.collective);
 
   if (req.query.filter && req.query.filter === 'active') {
-    promise = promise.filter(backer => isBackerActive(backer, req.group.tiers));
+    promise = promise.filter(backer => isBackerActive(backer, req.collective.tiers));
   }
 
   return promise
   .then(backers => {
-    if (req.canEditGroup) return backers;
+    if (req.canEditCollective) return backers;
     else return backers.map(b => {
       delete b.email;
       return b;
@@ -82,9 +82,9 @@ export const getUsers = (req, res, next) => {
 };
 
 export const getUsersWithEmail = (req, res, next) => {
-  let promise = _getUsersData(req.group);
+  let promise = _getUsersData(req.collective);
   if (req.query.filter && req.query.filter === 'active') {
-    promise = promise.filter(backer => isBackerActive(backer, req.group.tiers));
+    promise = promise.filter(backer => isBackerActive(backer, req.collective.tiers));
   }
   return promise
   .then(backers => res.send(backers))
@@ -117,11 +117,11 @@ export const updateTransaction = (req, res, next) => {
 };
 
 /**
- * Get group's transactions.
+ * Get collective's transactions.
  */
 export const getTransactions = (req, res, next) => {
   const where = {
-    GroupId: req.group.id
+    CollectiveId: req.collective.id
   };
 
   if (req.query.donation || req.query.type === 'donations') {
@@ -164,7 +164,7 @@ export const getTransactions = (req, res, next) => {
  */
 export const deleteTransaction = (req, res, next) => {
    const { transaction } = req;
-   const { group } = req;
+   const { collective } = req;
    const user = req.remoteUser || {};
 
    async.auto({
@@ -178,11 +178,11 @@ export const deleteTransaction = (req, res, next) => {
 
      createActivity: ['deleteTransaction', (cb) => {
        Activity.create({
-         type: 'group.transaction.deleted',
+         type: 'collective.transaction.deleted',
          UserId: user.id,
-         GroupId: group.id,
+         CollectiveId: collective.id,
          data: {
-           group: group.info,
+           collective: collective.info,
            transaction,
            user: user.info
          }
@@ -198,17 +198,17 @@ export const deleteTransaction = (req, res, next) => {
 };
 
 /**
- * Create a transaction and add it to a group.
+ * Create a transaction and add it to a collective.
  */
 export const createTransaction = (req, res, next) => {
   const { transaction } = req.required;
-  const { group } = req;
+  const { collective } = req;
 
   // Caller.
   const user = req.remoteUser || req.user || transaction.user || {};
   return models.Transaction.createFromPayload({
       transaction,
-      group,
+      collective,
       user
     })
     .then(t => res.send(t))
@@ -221,30 +221,30 @@ export const createTransaction = (req, res, next) => {
 export const deleteUser = (req, res, next) => {
   const query = {
     where: {
-      GroupId: req.group.id,
+      CollectiveId: req.collective.id,
       UserId: req.user.id
     }
   };
 
   models
-    .UserGroup
+    .UserCollective
     .findOne(query)
-    .then((usergroup) => {
-      if (!usergroup) {
-        throw (new errors.NotFound('The user is not part of the group yet.'));
+    .then((usercollective) => {
+      if (!usercollective) {
+        throw (new errors.NotFound('The user is not part of the collective yet.'));
       }
 
-      return usergroup;
+      return usercollective;
     })
-    .then((usergroup) => usergroup.destroy())
+    .then((usercollective) => usercollective.destroy())
     .tap(() => {
       // Create activities.
       const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
-        type: 'group.user.deleted',
-        GroupId: req.group.id,
+        type: 'collective.user.deleted',
+        CollectiveId: req.collective.id,
         data: {
-          group: req.group.info,
+          collective: req.collective.info,
           user: remoteUser,
           target: req.user.info
         }
@@ -262,32 +262,32 @@ export const deleteUser = (req, res, next) => {
 };
 
 /**
- * Create a group.
+ * Create a collective.
  */
 export const create = (req, res, next) => {
-  const { group } = req.required;
-  const { users = [] } = group;
-  let createdGroup, creator, host;
+  const { collective } = req.required;
+  const { users = [] } = collective;
+  let createdCollective, creator, host;
 
-  if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a group');
+  if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a collective');
 
-  const sendConfirmationEmail = (user, group) => {
+  const sendConfirmationEmail = (user, collective) => {
     const data = {
-      group,
-      confirmation_url: user.generateLoginLink(`/${group.slug}`)
+      collective,
+      confirmation_url: user.generateLoginLink(`/${collective.slug}`)
     }
-    emailLib.send('group.confirm', user.email, data);
+    emailLib.send('collective.confirm', user.email, data);
   };
 
   // Default tiers
-  group.tiers = group.tiers || [
+  collective.tiers = collective.tiers || [
     {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
     {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
   ];
 
-  return Group
-    .create(group)
-    .tap(g => createdGroup = g)
+  return Collective
+    .create(collective)
+    .tap(g => createdCollective = g)
     .tap(g => {
       return Promise.each(users, user => {
         if (user.email) {
@@ -297,37 +297,37 @@ export const create = (req, res, next) => {
             if (!creator) {
               creator = u;
             }
-            return _addUserToGroup(g, u, {role: user.role, remoteUser: creator})
+            return _addUserToCollective(g, u, {role: user.role, remoteUser: creator})
           })
-          .then(() => createdGroup.update({ lastEditedByUserId: creator.id }))
+          .then(() => createdCollective.update({ lastEditedByUserId: creator.id }))
         } else {
           return null;
         }
       })
     })
     .tap(g => {
-      return User.findOne({ where: { id: group.HostId || defaultHostId() }}).tap(h => {
+      return User.findOne({ where: { id: collective.HostId || defaultHostId() }}).tap(h => {
         host = h;
-        _addUserToGroup(g, host, {role: roles.HOST, remoteUser: creator})
+        _addUserToCollective(g, host, {role: roles.HOST, remoteUser: creator})
       })
     })
     .then(() => Activity.create({
       type: activities.GROUP_CREATED,
       UserId: creator.id,
-      GroupId: createdGroup.id,
+      CollectiveId: createdCollective.id,
       data: {
-        group: createdGroup.info,
+        collective: createdCollective.info,
         host: host && host.info,
         user: creator.info
       }
     }))
-    .then(() => sendConfirmationEmail(creator, createdGroup))
-    .then(() => res.send(createdGroup.info))
+    .then(() => sendConfirmationEmail(creator, createdCollective))
+    .then(() => res.send(createdCollective.info))
     .catch(next);
 };
 
 /*
- * Creates a group from Github
+ * Creates a collective from Github
  */
 export const createFromGithub = (req, res, next) => {
 
@@ -335,14 +335,14 @@ export const createFromGithub = (req, res, next) => {
   const { connectedAccountId } = req.jwtPayload;
 
   let creator, options, creatorConnectedAccount;
-  const { group } = payload;
+  const { collective } = payload;
   const githubUser = payload.user;
   const contributors = payload.users;
   const creatorGithubUsername = payload.github_username;
-  let dbGroup;
+  let dbCollective;
 
   // Default tiers
-  group.tiers = group.tiers || [
+  collective.tiers = collective.tiers || [
     {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
     {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
   ];
@@ -371,19 +371,19 @@ export const createFromGithub = (req, res, next) => {
         return creator.save();
       }
     })
-    .then(() => Group.findOne({where: {slug: group.slug.toLowerCase()}}))
-    .then(existingGroup => {
-      if (existingGroup) {
-        group.slug = `${group.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
+    .then(() => Collective.findOne({where: {slug: collective.slug.toLowerCase()}}))
+    .then(existingCollective => {
+      if (existingCollective) {
+        collective.slug = `${collective.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Group.create(Object.assign({}, group, {lastEditedByUserId: creator.id}));
+      return Collective.create(Object.assign({}, collective, {lastEditedByUserId: creator.id}));
     })
-    .tap(g => dbGroup = g)
-    .then(() => _addUserToGroup(dbGroup, creator, options))
+    .tap(g => dbCollective = g)
+    .then(() => _addUserToCollective(dbCollective, creator, options))
     .then(() => User.findById(defaultHostId())) // make sure the host exists
     .tap(host => {
       if (host) {
-        return _addUserToGroup(dbGroup, host, {role: roles.HOST, remoteUser: creator})
+        return _addUserToCollective(dbCollective, host, {role: roles.HOST, remoteUser: creator})
       } else {
         return null;
       }
@@ -391,9 +391,9 @@ export const createFromGithub = (req, res, next) => {
     .tap((host) => Activity.create({
       type: activities.GROUP_CREATED,
         UserId: creator.id,
-        GroupId: dbGroup.id,
+        CollectiveId: dbCollective.id,
         data: {
-          group: dbGroup.info,
+          collective: dbCollective.info,
           host: host.info,
           user: creator.info
         }
@@ -433,7 +433,7 @@ export const createFromGithub = (req, res, next) => {
             return contributorUser.save();
           })
           .then(() => contributorUser.addConnectedAccount(connectedAccount))
-          .then(() => _addUserToGroup(dbGroup, contributorUser, options));
+          .then(() => _addUserToCollective(dbCollective, contributorUser, options));
       } else {
         return Promise.resolve();
       }
@@ -442,11 +442,11 @@ export const createFromGithub = (req, res, next) => {
       const data = {
         firstName: creator.firstName,
         lastName: creator.lastName,
-        group: dbGroup.info
+        collective: dbCollective.info
       };
       return emailLib.send('github.signup', creator.email, data);
     })
-    .tap(() => res.send(dbGroup.info))
+    .tap(() => res.send(dbCollective.info))
     .catch(next);
 };
 
@@ -469,32 +469,32 @@ export const update = (req, res, next) => {
     'isActive'
   ];
 
-  const updatedGroupAttrs = _.pick(req.required.group, whitelist);
+  const updatedCollectiveAttrs = _.pick(req.required.collective, whitelist);
 
-  updatedGroupAttrs.lastEditedByUserId = req.remoteUser.id;
+  updatedCollectiveAttrs.lastEditedByUserId = req.remoteUser.id;
 
   // Need to handle settings separately, since it's an object
-  if (req.required.group.settings) {
-    updatedGroupAttrs.settings = Object.assign(req.group.settings || {}, req.required.group.settings);
+  if (req.required.collective.settings) {
+    updatedCollectiveAttrs.settings = Object.assign(req.collective.settings || {}, req.required.collective.settings);
   }
 
-  return req.group.update(updatedGroupAttrs)
-    .then(group => res.send(group.info))
+  return req.collective.update(updatedCollectiveAttrs)
+    .then(collective => res.send(collective.info))
     .catch(next)
 };
 
 export const updateSettings = (req, res, next) => {
-  putThankDonationOptInIntoNotifTable(req.group.id, req.required.group.settings)
+  putThankDonationOptInIntoNotifTable(req.collective.id, req.required.collective.settings)
     .then(() => doUpdate(['settings'], req, res, next))
     .catch(next);
 };
 
-function putThankDonationOptInIntoNotifTable(GroupId, groupSettings) {
-  const twitterSettings = groupSettings && groupSettings.twitter;
+function putThankDonationOptInIntoNotifTable(CollectiveId, collectiveSettings) {
+  const twitterSettings = collectiveSettings && collectiveSettings.twitter;
   const attrs = {
     channel: 'twitter',
     type: activities.GROUP_TRANSACTION_CREATED,
-    GroupId
+    CollectiveId
   };
 
   const thankDonationEnabled = twitterSettings.thankDonationEnabled;
@@ -510,79 +510,79 @@ function putThankDonationOptInIntoNotifTable(GroupId, groupSettings) {
 
 function doUpdate(whitelist, req, res, next) {
   whitelist.forEach((prop) => {
-    if (req.required.group[prop]) {
-      if (req.group[prop] && typeof req.group[prop] === 'object') {
-        req.group[prop] = Object.assign(req.group[prop], req.required.group[prop]);
+    if (req.required.collective[prop]) {
+      if (req.collective[prop] && typeof req.collective[prop] === 'object') {
+        req.collective[prop] = Object.assign(req.collective[prop], req.required.collective[prop]);
       } else {
-        req.group[prop] = req.required.group[prop];
+        req.collective[prop] = req.required.collective[prop];
       }
     }
   });
 
-  req.group.updatedAt = new Date();
+  req.collective.updatedAt = new Date();
 
-  req.group
+  req.collective
     .save()
-    .then((group) => res.send(group.info))
+    .then((collective) => res.send(collective.info))
     .catch(next);
 }
 
 /**
- * Get group content.
+ * Get collective content.
  */
 export const getOne = (req, res, next) => {
-  const group = req.group.info;
+  const collective = req.collective.info;
 
   const aggregate = (array, attribute) => {
     return array.map(d => d[attribute]).reduce((a, b) => a + b, 0);
   };
 
-  const getRelatedGroups = () => {
-    // don't fetch related groups for supercollectives for now
-    if (req.group.isSupercollective) return Promise.resolve();
-    else return req.group.getRelatedGroups();
+  const getRelatedCollectives = () => {
+    // don't fetch related collectives for supercollectives for now
+    if (req.collective.isSupercollective) return Promise.resolve();
+    else return req.collective.getRelatedCollectives();
   }
 
   Promise.all([
-    req.group.getStripeAccount(),
-    req.group.getConnectedAccount(),
-    req.group.getBalance(),
-    req.group.getYearlyIncome(),
-    req.group.getTotalDonations(),
-    req.group.getBackersCount(),
-    req.group.getTwitterSettings(),
-    getRelatedGroups(),
-    req.group.getSuperCollectiveData(),
-    req.group.getHost()
+    req.collective.getStripeAccount(),
+    req.collective.getConnectedAccount(),
+    req.collective.getBalance(),
+    req.collective.getYearlyIncome(),
+    req.collective.getTotalDonations(),
+    req.collective.getBackersCount(),
+    req.collective.getTwitterSettings(),
+    getRelatedCollectives(),
+    req.collective.getSuperCollectiveData(),
+    req.collective.getHost()
     ])
   .then(values => {
-    group.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
-    group.hasPaypal = values[1] && values[1].provider === 'paypal';
-    group.balance = values[2];
-    group.yearlyIncome = values[3];
-    group.donationTotal = values[4];
-    group.backersCount = values[5];
-    group.contributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : 0;
-    group.settings = group.settings || {};
-    group.settings.twitter = values[6];
-    group.related = values[7];
-    group.superCollectiveData = values[8];
-    group.host = values[9] && values[9].info;
-    if (group.superCollectiveData) {
-      group.collectivesCount = group.superCollectiveData.length;
-      group.contributorsCount += aggregate(group.superCollectiveData, 'contributorsCount');
-      group.yearlyIncome += aggregate(group.superCollectiveData, 'yearlyIncome');
-      group.backersCount += aggregate(group.superCollectiveData, 'backersCount');
-      group.donationTotal += aggregate(group.superCollectiveData, 'donationTotal');
+    collective.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
+    collective.hasPaypal = values[1] && values[1].provider === 'paypal';
+    collective.balance = values[2];
+    collective.yearlyIncome = values[3];
+    collective.donationTotal = values[4];
+    collective.backersCount = values[5];
+    collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
+    collective.settings = collective.settings || {};
+    collective.settings.twitter = values[6];
+    collective.related = values[7];
+    collective.superCollectiveData = values[8];
+    collective.host = values[9] && values[9].info;
+    if (collective.superCollectiveData) {
+      collective.collectivesCount = collective.superCollectiveData.length;
+      collective.contributorsCount += aggregate(collective.superCollectiveData, 'contributorsCount');
+      collective.yearlyIncome += aggregate(collective.superCollectiveData, 'yearlyIncome');
+      collective.backersCount += aggregate(collective.superCollectiveData, 'backersCount');
+      collective.donationTotal += aggregate(collective.superCollectiveData, 'donationTotal');
     }
-    return group;
+    return collective;
   })
-  .then(group => res.send(group))
+  .then(collective => res.send(collective))
   .catch(next)
 };
 
 /**
- * Add a user to a group.
+ * Add a user to a collective.
  */
 export const addUser = (req, res, next) => {
   const options = {
@@ -590,7 +590,7 @@ export const addUser = (req, res, next) => {
     remoteUser: req.remoteUser
   };
 
-  _addUserToGroup(req.group, req.user, options)
+  _addUserToCollective(req.collective, req.user, options)
     .tap(() => res.send({success: true}))
     .catch(next);
 };
@@ -601,57 +601,57 @@ export const addUser = (req, res, next) => {
 export const updateUser = (req, res, next) => {
 
   models
-    .UserGroup
+    .UserCollective
     .findOne({
       where: {
-        GroupId: req.group.id,
+        CollectiveId: req.collective.id,
         UserId: req.user.id
       }
     })
-    .then((usergroup) => {
-      if (!usergroup) {
-        throw (new errors.NotFound('The user is not part of the group yet.'));
+    .then((usercollective) => {
+      if (!usercollective) {
+        throw (new errors.NotFound('The user is not part of the collective yet.'));
       }
 
-      return usergroup;
+      return usercollective;
     })
-    .then((usergroup) => {
+    .then((usercollective) => {
       if (req.body.role) {
-        usergroup.role = req.body.role;
+        usercollective.role = req.body.role;
       }
 
-      usergroup.updatedAt = new Date();
+      usercollective.updatedAt = new Date();
 
-      return usergroup.save();
+      return usercollective.save();
     })
-    .then((usergroup) => {
+    .then((usercollective) => {
       // Create activities.
       const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
-        type: 'group.user.updated',
-        GroupId: req.group.id,
+        type: 'collective.user.updated',
+        CollectiveId: req.collective.id,
         data: {
-          group: req.group.info,
+          collective: req.collective.info,
           user: remoteUser,
           target: req.user.info,
-          usergroup: usergroup.info
+          usercollective: usercollective.info
         }
       };
       Activity.create(_.extend({UserId: req.user.id}, activity));
       if (req.remoteUser && req.user.id !== req.remoteUser.id)
         Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
 
-      return usergroup;
+      return usercollective;
     })
-    .then((usergroup) => res.send(usergroup))
+    .then((usercollective) => res.send(usercollective))
     .catch(next);
 };
 
 /**
- * Get array of unique group tags
+ * Get array of unique collective tags
  */
-export const getGroupTags = (req, res, next) => {
-  return queries.getUniqueGroupTags()
+export const getCollectiveTags = (req, res, next) => {
+  return queries.getUniqueCollectiveTags()
   .then(tags => res.send(tags))
   .catch(next);
 };

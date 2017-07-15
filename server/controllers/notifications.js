@@ -6,7 +6,7 @@ const { Notification } = models;
 export function subscribe(req, res, next) {
   Notification.create({
     UserId: req.remoteUser.id,
-    GroupId: req.group.id,
+    CollectiveId: req.collective.id,
     type: req.params.activityType
   })
   .then((notification) => {
@@ -24,7 +24,7 @@ export function subscribe(req, res, next) {
 
 export function unsubscribe(req, res, next) {
   req.remoteUser
-  .unsubscribe(req.group.id, req.params.activityType)
+  .unsubscribe(req.collective.id, req.params.activityType)
   .catch((err) => {
     console.error('Error when disabling a notification', err);
     next(err);

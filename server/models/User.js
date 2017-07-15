@@ -258,7 +258,7 @@ export default (Sequelize, DataTypes) => {
         };
       },
 
-      // Used for the public group
+      // Used for the public collective
       public() {
         return {
           id: this.id,
@@ -353,32 +353,32 @@ export default (Sequelize, DataTypes) => {
             createdAt: { $gte: since || 0, $lt: until || new Date}
           },
           order: [ ['amount','DESC'] ],
-          include: [ { model: models.Group, where: { tags: { $contains: tags } } } ]
+          include: [ { model: models.Collective, where: { tags: { $contains: tags } } } ]
         });
       },
 
       getCollectivesWithRoles() {
-        return this.getGroups({
-          include: [{ model: models.UserGroup, where: { UserId: this.id }}]
+        return this.getCollectives({
+          include: [{ model: models.UserCollective, where: { UserId: this.id }}]
         })
-        .then(groups => groups.map(g => {
-          g.role = g.UserGroup.role;
+        .then(collectives => collectives.map(g => {
+          g.role = g.UserCollective.role;
           return g;
         }))
       },
 
       getRoles() {
-        return models.UserGroup.findAll({
+        return models.UserCollective.findAll({
           where: {
             UserId: this.id
           }
         });
       },
 
-      unsubscribe(GroupId, type, channel = 'email') {
+      unsubscribe(CollectiveId, type, channel = 'email') {
         const notification = {
           UserId: this.id,
-          GroupId,
+          CollectiveId,
           type,
           channel
         };
@@ -392,8 +392,8 @@ export default (Sequelize, DataTypes) => {
         })
       },
 
-      canEditGroup(groupid) {
-        return hasRole(this.id, groupid, ['MEMBER', 'HOST']);
+      canEditCollective(collectiveid) {
+        return hasRole(this.id, collectiveid, ['MEMBER', 'HOST']);
       },
 
       updateWhiteListedAttributes(attributes) {
@@ -425,7 +425,7 @@ export default (Sequelize, DataTypes) => {
 
           if (prop === 'username') {
             return Sequelize.query(`
-              with usernames as (SELECT username FROM "Users" UNION SELECT slug as username FROM "Groups")
+              with usernames as (SELECT username FROM "Users" UNION SELECT slug as username FROM "Collectives")
               SELECT COUNT(*) FROM usernames WHERE username='${attributes[prop]}'
               `, {
                 type: Sequelize.QueryTypes.SELECT

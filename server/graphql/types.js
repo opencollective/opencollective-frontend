@@ -20,7 +20,7 @@ dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
 dataloaderSequelize(models.Donation);
 
-// This breaks the tests for some reason (mocha test/usergroup.routes.test.js -g "successfully add a user to a group with a role")
+// This breaks the tests for some reason (mocha test/usercollective.routes.test.js -g "successfully add a user to a collective with a role")
 // dataloaderSequelize(models.User);
 
 export const ResponseStatusType = new GraphQLEnumType({
@@ -316,7 +316,7 @@ export const EventType = new GraphQLObjectType({
       collective: {
         type: CollectiveType,
         resolve(event) {
-          return event.getGroup();
+          return event.getCollective();
         }
       },
       slug: {
@@ -498,7 +498,7 @@ export const TierType = new GraphQLObjectType({
       collective: {
         type: CollectiveType,
         resolve(tier) {
-          return tier.getGroup();
+          return tier.getCollective();
         }
       },
       event: {
@@ -553,7 +553,7 @@ export const ResponseType = new GraphQLObjectType({
       collective: {
         type: CollectiveType,
         resolve(response) {
-          return response.getGroup();
+          return response.getCollective();
         }
       },
       tier: {
@@ -716,7 +716,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
     uuid: { type: GraphQLString },
     amount: { type: GraphQLInt },
     currency: { type: GraphQLString },
-    netAmountInGroupCurrency: { type: GraphQLInt },
+    netAmountInCollectiveCurrency: { type: GraphQLInt },
     hostFeeInTxnCurrency: { type: GraphQLInt },
     platformFeeInTxnCurrency: { type: GraphQLInt },
     paymentProcessorFeeInTxnCurrency: { type: GraphQLInt },
@@ -796,10 +796,10 @@ export const TransactionExpenseType = new GraphQLObjectType({
         return transaction.paymentProcessorFeeInTxnCurrency;
       }
     },
-    netAmountInGroupCurrency: {
+    netAmountInCollectiveCurrency: {
       type: GraphQLInt,
       resolve(transaction) {
-        return transaction.netAmountInGroupCurrency;
+        return transaction.netAmountInCollectiveCurrency;
       }
     },
     host: {
@@ -823,7 +823,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
     collective: {
       type: CollectiveType,
       resolve(transaction) {
-        return transaction.getGroup();
+        return transaction.getCollective();
       }
     },
     createdAt: {
@@ -931,10 +931,10 @@ export const TransactionDonationType = new GraphQLObjectType({
           return transaction.paymentProcessorFeeInTxnCurrency;
         }
       },
-      netAmountInGroupCurrency: {
+      netAmountInCollectiveCurrency: {
         type: GraphQLInt,
         resolve(transaction) {
-          return transaction.netAmountInGroupCurrency;
+          return transaction.netAmountInCollectiveCurrency;
         }
       },
       host: {
@@ -958,7 +958,7 @@ export const TransactionDonationType = new GraphQLObjectType({
       collective: {
         type: CollectiveType,
         resolve(transaction) {
-          return transaction.getGroup();
+          return transaction.getCollective();
         }
       },
       createdAt: {

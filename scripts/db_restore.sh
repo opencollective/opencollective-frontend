@@ -39,6 +39,7 @@ echo "DBDUMP_FILE=$DBDUMP_FILE"
 
 if [ -z "$LOCALDBNAME" ]; then usage; fi;
 
+dropdb $LOCALDBNAME;
 createdb -O $LOCALDBUSER $LOCALDBNAME 2> /dev/null
 
 # Add POSTGIS extension

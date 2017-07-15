@@ -37,7 +37,7 @@ const mutations = {
       event: { type: new GraphQLNonNull(EventInputType) }
     },
     resolve(_, args, req) {
-      let group;
+      let collective;
 
       const location = args.event.location;
 
@@ -51,12 +51,12 @@ const mutations = {
       if (!req.remoteUser) {
         return Promise.reject(new errors.Unauthorized("You need to be logged in to create an event"));
       }
-      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      return models.Collective.findOne({ where: { slug: args.event.collective.slug } })
       .then(g => {
         if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
-        group = g;
-        eventData.GroupId = group.id;
-        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST', 'BACKER'])
+        collective = g;
+        eventData.CollectiveId = collective.id;
+        return hasRole(req.remoteUser.id, collective.id, ['MEMBER','HOST', 'BACKER'])
       })
       .then(canCreateEvent => {
         if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You must be logged in as a member of the collective to create an event"));
@@ -67,7 +67,7 @@ const mutations = {
           args.event.tiers.map
           return Promise.map(args.event.tiers, (tier) => {
             tier.EventId = event.id;
-            tier.currency = tier.currency || group.currency;
+            tier.currency = tier.currency || collective.currency;
             return models.Tier.create(tier);
           })
         }
@@ -104,15 +104,15 @@ const mutations = {
         updatedEventData.geoLocationLatLong = {type: 'Point', coordinates: [location.lat, location.long]};
       }
 
-      let group, event;
+      let collective, event;
       if (!req.remoteUser) {
         throw new errors.Unauthorized("You need to be logged in to edit an event");
       }
-      return models.Group.findOne({ where: { slug: args.event.collective.slug } })
+      return models.Collective.findOne({ where: { slug: args.event.collective.slug } })
       .then(g => {
         if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
-        group = g;
-        return hasRole(req.remoteUser.id, group.id, ['MEMBER','HOST'])
+        collective = g;
+        return hasRole(req.remoteUser.id, collective.id, ['MEMBER','HOST'])
       })
       .then(canEditEvent => {
         if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
@@ -139,7 +139,7 @@ const mutations = {
               return models.Tier.update(tier, { where: { id: tier.id }});
             } else {
               tier.EventId = event.id;
-              tier.currency = tier.currency || group.currency;
+              tier.currency = tier.currency || collective.currency;
               return models.Tier.create(tier);  
             }
           });
@@ -184,7 +184,7 @@ const mutations = {
       if (!req.remoteUser) {
         throw new errors.Unauthorized("You need to be logged in to edit tiers");
       }
-      return models.Group.findOne({ where: { slug: args.collectiveSlug } })
+      return models.Collective.findOne({ where: { slug: args.collectiveSlug } })
       .then(c => {
         if (!c) throw new Error(`Collective with slug ${args.collectiveSlug} not found`);
         collective = c;
@@ -204,7 +204,7 @@ const mutations = {
           if (tier.id) {
             return models.Tier.update(tier, { where: { id: tier.id }});
           } else {
-            tier.GroupId = collective.id;
+            tier.CollectiveId = collective.id;
             tier.currency = tier.currency || collective.currency;
             return models.Tier.create(tier);
           }
@@ -244,7 +244,7 @@ const mutations = {
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
-          GroupId: event.Group.id,
+          CollectiveId: event.Collective.id,
           EventId: event.id,
           confirmedAt: new Date(),
           status: response.status,
@@ -253,9 +253,9 @@ const mutations = {
       }
 
       const recordYes = () => {
-        let group;
+        let collective;
         const include = [{
-          model: models.Group,
+          model: models.Collective,
           where: {
             slug: response.collective.slug
           }
@@ -281,7 +281,7 @@ const mutations = {
           }
           tier = t;
           event = t.Event;
-          group = t.Group;
+          collective = t.Collective;
           isPaidTier = tier.amount > 0;
         })
 
@@ -313,7 +313,7 @@ const mutations = {
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
-          GroupId: group.id,
+          CollectiveId: collective.id,
           EventId: event && event.id,
           TierId: tier.id,
           confirmedAt: isPaidTier ? null : new Date(),
@@ -347,7 +347,7 @@ const mutations = {
                 // also sends out email 
                 return paymentsLib.createPayment({
                   user,
-                  group,
+                  collective,
                   response: responseModel,
                   payment: {
                     paymentMethod,
@@ -365,7 +365,7 @@ const mutations = {
               'ticket.confirmed',
               user.email,
               { user: user.info,
-                group: group.info,
+                collective: collective.info,
                 response: responseModel.info,
                 event: event && event.info,
                 tier: tier && tier.info

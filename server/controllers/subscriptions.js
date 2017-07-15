@@ -15,7 +15,7 @@ export const getAll = (req, res, next) => {
       },
       include: [
         { model: models.Transaction },
-        { model: models.Group },
+        { model: models.Collective },
         { model: models.User }
       ]
     }]
@@ -35,7 +35,7 @@ export const cancel = (req, res, next) => {
   // fetch subscription (through Donation)
   return models.Donation.find({
     include: [
-      { model: models.Group },
+      { model: models.Collective },
       { model: models.PaymentMethod },
       { model: models.User },
       { model: models.Subscription,
@@ -49,7 +49,7 @@ export const cancel = (req, res, next) => {
       Promise.reject(new errors.BadRequest(`No subscription found with id ${subscriptionid}. Please contact support@opencollective.com for help.`)))
 
   // get stripe account for accessToken
-  .then(() => donation.Group.getStripeAccount())
+  .then(() => donation.Collective.getStripeAccount())
 
   // cancel subscription on Stripe
   .then(stripeAccount => {
@@ -66,11 +66,11 @@ export const cancel = (req, res, next) => {
   // createActivity
   .then(() => models.Activity.create({
         type: activities.SUBSCRIPTION_CANCELED,
-        GroupId: donation.Group.id,
+        CollectiveId: donation.Collective.id,
         UserId: donation.User.id,
         data: {
           subscription: donation.Subscription,
-          group: donation.Group.minimal,
+          collective: donation.Collective.minimal,
           user: donation.User.minimal
         }
       }))

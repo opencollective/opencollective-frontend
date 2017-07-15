@@ -41,7 +41,7 @@ export default (Sequelize, DataTypes) => {
     },
 
     // Keeps a reference to the host because this is where the bank account is
-    // Note that the host can also change over time (that's why just keeping GroupId is not enough)
+    // Note that the host can also change over time (that's why just keeping CollectiveId is not enough)
     HostId: {
       type: DataTypes.INTEGER,
       references: {
@@ -53,10 +53,10 @@ export default (Sequelize, DataTypes) => {
       allowNull: false
     },
 
-    GroupId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -83,7 +83,7 @@ export default (Sequelize, DataTypes) => {
     platformFeeInTxnCurrency: DataTypes.INTEGER,
     hostFeeInTxnCurrency: DataTypes.INTEGER,
     paymentProcessorFeeInTxnCurrency: DataTypes.INTEGER,
-    netAmountInGroupCurrency: DataTypes.INTEGER, // stores the net amount received by the group
+    netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective
 
     data: DataTypes.JSON,
 
@@ -119,12 +119,12 @@ export default (Sequelize, DataTypes) => {
           currency: this.currency,
           createdAt: this.createdAt,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
           paymentProcessorFeeInTxnCurrency: this.paymentProcessorFeeInTxnCurrency,
           amountInTxnCurrency: this.amountInTxnCurrency,
-          netAmountInGroupCurrency: this.netAmountInGroupCurrency,
+          netAmountInCollectiveCurrency: this.netAmountInCollectiveCurrency,
           netAmountInTxnCurrency: this.netAmountInTxnCurrency,
           amountSentToHostInTxnCurrency: this.amountSentToHostInTxnCurrency,
           txnCurrency: this.txnCurrency
@@ -136,14 +136,14 @@ export default (Sequelize, DataTypes) => {
       getUserForViewer(viewer, userid = this.UserId) {
         const promises = [models.User.findOne({where: { id: userid }})];
         if (viewer) {
-          promises.push(viewer.canEditGroup(this.GroupId));
+          promises.push(viewer.canEditCollective(this.CollectiveId));
         }
         return Promise.all(promises)
         .then(results => {
           const user = results[0];
           if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
-          const canEditGroup = results[1];
-          return canEditGroup ? user.info : user.public;
+          const canEditCollective = results[1];
+          return canEditCollective ? user.info : user.public;
         })
       },
       getHostForViewer(viewer) {
@@ -152,14 +152,14 @@ export default (Sequelize, DataTypes) => {
       getExpenseForViewer(viewer) {
         const promises = [ models.Expense.findOne({where: { id: this.ExpenseId }}) ];
         if (viewer) {
-          promises.push(viewer.canEditGroup(this.GroupId));
+          promises.push(viewer.canEditCollective(this.CollectiveId));
         }
         return Promise.all(promises)
         .then(results => {
           const expense = results[0];
-          const canEditGroup = results[1];
+          const canEditCollective = results[1];
           if (!expense) return null;
-          if (viewer && canEditGroup) return expense.info;
+          if (viewer && canEditCollective) return expense.info;
           if (viewer && viewer.id === expense.UserId) return expense.info;
           return expense.public;
         })
@@ -185,24 +185,24 @@ export default (Sequelize, DataTypes) => {
         }).catch(console.error);
       },
 
-      createFromPayload({ transaction, user, group, paymentMethod }) {
+      createFromPayload({ transaction, user, collective, paymentMethod }) {
 
-        return group.getHost().then(host => {
+        return collective.getHost().then(host => {
           if (!host) {
-            throw new Error(`Cannot create a transaction: collective id ${group.id} doesn't have a host`);
+            throw new Error(`Cannot create a transaction: collective id ${collective.id} doesn't have a host`);
           }
 
           transaction.HostId = host.id;
           // attach other objects manually. Needed for afterCreate hook to work properly
           transaction.UserId = user && user.id;
-          transaction.GroupId = group && group.id;
+          transaction.CollectiveId = collective && collective.id;
           transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
           transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
 
           if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
-            // populate netAmountInGroupCurrency for donations
+            // populate netAmountInCollectiveCurrency for donations
             // @aseem: why the condition on && transaction.txnCurrencyFxRate ?
-              transaction.netAmountInGroupCurrency =
+              transaction.netAmountInCollectiveCurrency =
                 Math.round((transaction.amountInTxnCurrency
                   - transaction.platformFeeInTxnCurrency
                   - transaction.hostFeeInTxnCurrency
@@ -219,7 +219,7 @@ export default (Sequelize, DataTypes) => {
         }
         return Transaction.findById(transaction.id, {
           include: [
-            { model: models.Group },
+            { model: models.Collective },
             { model: models.User },
             { model: models.PaymentMethod }
           ]
@@ -230,12 +230,12 @@ export default (Sequelize, DataTypes) => {
           const activityPayload = {
             type: activities.GROUP_TRANSACTION_CREATED,
             TransactionId: transaction.id,
-            GroupId: transaction.GroupId,
+            CollectiveId: transaction.CollectiveId,
             UserId: transaction.UserId,
             data: {
               transaction: transaction.info,
               user: transaction.User && transaction.User.minimal,
-              group: transaction.Group && transaction.Group.minimal
+              collective: transaction.Collective && transaction.Collective.minimal
             }
           };
           if (transaction.User) {

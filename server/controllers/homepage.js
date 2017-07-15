@@ -7,7 +7,7 @@ export default (req, res, next) => {
    * (a collective is considered as active if it has ever received any funding from its host or through a donation)
    */
   const getTotalCollectives = () => {
-    return models.Transaction.aggregate('GroupId', 'count', {
+    return models.Transaction.aggregate('CollectiveId', 'count', {
       distinct: true,
       where: {
         amount: { $gt: 0 }
@@ -29,8 +29,8 @@ export default (req, res, next) => {
     getTotalCollectives(),
     getTotalDonors(),
     queries.getTotalAnnualBudget(),
-    models.Group.getGroupsSummaryByTag('open source', 3, [], 100000, true),
-    models.Group.getGroupsSummaryByTag('meetup', 3, [], 100000, true),
+    models.Collective.getCollectivesSummaryByTag('open source', 3, [], 100000, true),
+    models.Collective.getCollectivesSummaryByTag('meetup', 3, [], 100000, true),
     queries.getTopSponsors()
   ])
   .then(results => {

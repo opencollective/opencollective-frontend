@@ -24,7 +24,7 @@ const queries = {
       }
     },
     resolve(_, args) {
-      return models.Group.findOne({
+      return models.Collective.findOne({
         where: { slug: args.collectiveSlug.toLowerCase() }
       })
     }
@@ -60,8 +60,8 @@ const queries = {
       }
     },
     resolve(_, args, req) {
-      return models.Group.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
-        .then(group => group.getUsersForViewer(req.remoteUser));
+      return models.Collective.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
+        .then(collective => collective.getUsersForViewer(req.remoteUser));
     }
   },
   /*
@@ -79,7 +79,7 @@ const queries = {
       const query = {
         include: [
           {
-            model: models.Group,
+            model: models.Collective,
             where: { slug: args.collectiveSlug.toLowerCase() }
           }
         ],
@@ -123,7 +123,7 @@ const queries = {
       return models.Event.findOne({
         where: { slug: args.eventSlug.toLowerCase() },
         include: [{
-          model: models.Group,
+          model: models.Collective,
           where: { slug: args.collectiveSlug.toLowerCase() }
         }]
       })
@@ -146,7 +146,7 @@ const queries = {
       }
       return models.Event.findAll({
         include: [{
-          model: models.Group,
+          model: models.Collective,
           where
         }]
       })

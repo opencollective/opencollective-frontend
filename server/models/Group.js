@@ -7,7 +7,7 @@ import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
-import groupBy from 'lodash/collection/groupBy';
+import collectiveBy from 'lodash/collection/collectiveBy';
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
 import {getTier, isBackerActive, capitalize, pluralize } from '../lib/utils';
@@ -17,13 +17,13 @@ import Promise from 'bluebird';
 const DEFAULT_LOGO = '/public/images/1px.png';
 const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 
-const getDefaultSettings = (group) => {
+const getDefaultSettings = (collective) => {
   return {
     style: {
       hero: { 
         cover: { 
           transform: "scale(1.06)",
-          backgroundImage: `url(${group.backgroundImage || DEFAULT_BACKGROUND_IMG})`
+          backgroundImage: `url(${collective.backgroundImage || DEFAULT_BACKGROUND_IMG})`
         }, 
         a: {}
       }
@@ -31,63 +31,107 @@ const getDefaultSettings = (group) => {
   }
 };
 
-const tier = Joi.object().keys({
-  name: Joi.string().required(), // lowercase, act as a slug. E.g. "donors", "sponsors", "backers", "members", ...
-  title: Joi.string(), // e.g. "Sponsors"
-  description: Joi.string(), // what do people get as a member of this tier?
-  button: Joi.string(), // Call To Action, e.g. "Become a sponsor"
-  range: Joi.array().items(Joi.number().integer()).length(2).required(), // e.g. [100, 10000000]: Need to donate at least $100/interval to be a sponsor
-  presets: Joi.array().items(Joi.number().integer()), // e.g. [1, 5, 20] for presets of $1, $5 and $20
-  interval: Joi.string().valid(['monthly', 'yearly', 'one-time']).required(),
-  amount: Joi.number()
-}).unknown(); // this keeps unknown fields in the returned objects
-
-const tiers = Joi.array().items(tier);
-
 /**
- * Model.
+ * Collective Model.
+ * 
+ * There 3 types of collective at the moment
+ * - Collective
+ * - User: Collective with only one ADMIN
+ * - Event: Time based collective with a parent collective
  */
 export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
 
-  const Group = Sequelize.define('Group', {
+  const Collective = Sequelize.define('Collective', {
+
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+
+    type: {
+      type: DataTypes.STRING // COLLECTIVE, USER, EVENT
+    },
+
+    slug: {
+      type: DataTypes.STRING,
+      unique: true,
+      set(slug) {
+        if (slug && slug.toLowerCase) {
+          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
+        }
+      }
+    },
+
     name: {
       type: DataTypes.STRING,
       allowNull: false
     },
 
-    mission: {
-      type: DataTypes.STRING(100),
-      get() {
-        return (this.getDataValue('mission') || '').trim();
-      }
+    createdByUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    lastEditedByUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true // needs to be true because of old rows
+    },
+
+    ParentCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    HostId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    hostFeePercent: {
+      type: DataTypes.FLOAT,
+      defaultValue: HOST_FEE_PERCENT
     },
 
     description: DataTypes.STRING, // max 95 characters
 
     longDescription: DataTypes.TEXT,
-    whyJoin: DataTypes.TEXT,
-
-    // We should update those two fields periodically (but no need to be real time)
-    budget: DataTypes.INTEGER, // yearly budget in cents
-    burnrate: DataTypes.INTEGER, // monthly burnrate (last 3 months average, in cents)
 
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD'
     },
 
-    logo: {
+    image: {
       type: DataTypes.STRING,
       get() {
         return this.getDataValue('logo') || `${config.host.website}${DEFAULT_LOGO}`;
       }
     },
 
-    video: DataTypes.STRING,
-
-    image: DataTypes.STRING,
     backgroundImage: {
       type: DataTypes.STRING,
       get() {
@@ -95,19 +139,22 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    expensePolicy: DataTypes.TEXT,
-
-    tiers: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      validate: {
-        schema: (value) => {
-          Joi.validate(value, tiers, (err) => {
-            if (err) throw new Error(err.details[0].message);
-          })
-        }
-      }
+    // Max amount to raise across all tiers
+    maxAmount: {
+      type: DataTypes.INTEGER, // In cents
+      min: 0
     },
+
+    // Max quantity of tickets across all tiers
+    maxQuantity: {
+      type: DataTypes.INTEGER
+    },
+
+    locationName: DataTypes.STRING,
+
+    address: DataTypes.STRING,
+
+    geoLocationLatLong: DataTypes.GEOMETRY('POINT'),
 
     settings: {
       type: DataTypes.JSON,
@@ -122,15 +169,18 @@ export default function(Sequelize, DataTypes) {
       allowNull: true
     },
 
-    hostFeePercent: {
-      type: DataTypes.FLOAT,
-      defaultValue: HOST_FEE_PERCENT
+    endsAt: {
+      type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW
     },
+
+    timezone: DataTypes.TEXT,
 
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -139,16 +189,6 @@ export default function(Sequelize, DataTypes) {
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
-
-    slug: {
-      type: DataTypes.STRING,
-      unique: true,
-      set(slug) {
-        if (slug && slug.toLowerCase) {
-          this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
-        }
-      }
     },
 
     twitterHandle: {
@@ -174,18 +214,8 @@ export default function(Sequelize, DataTypes) {
     isSupercollective: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
-
-    lastEditedByUserId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: true // needs to be true because of old rows
     }
+
   }, {
     paranoid: true,
 
@@ -252,9 +282,9 @@ export default function(Sequelize, DataTypes) {
     instanceMethods: {
 
       getUsersForViewer(viewer) {
-        const promises = [queries.getUsersFromGroupWithTotalDonations(this.id)];
+        const promises = [queries.getUsersFromCollectiveWithTotalDonations(this.id)];
         if (viewer) {
-          promises.push(viewer.canEditGroup(this.id));
+          promises.push(viewer.canEditCollective(this.id));
         }
         return Promise.all(promises)
         .then(results => results[0].map(user => results[1] ? user.info : user.public))
@@ -262,13 +292,13 @@ export default function(Sequelize, DataTypes) {
 
       getRoleForUser(user) {
         if (!user) return null;
-        return models.UserGroup.findOne({ UserId: user.id, GroupId: this.id }).then(ug => ug.role);
+        return models.UserCollective.findOne({ UserId: user.id, CollectiveId: this.id }).then(ug => ug.role);
       },
 
-      getSuperCollectiveGroupsIds() {
+      getSuperCollectiveCollectivesIds() {
         if (!this.isSupercollective) return Promise.resolve([this.id]);
-        if (this.superCollectiveGroupsIds) return Promise.resolve(this.superCollectiveGroupsIds);
-        return models.Group.findAll({
+        if (this.superCollectiveCollectivesIds) return Promise.resolve(this.superCollectiveCollectivesIds);
+        return models.Collective.findAll({
           attributes: ['id'],
           where: {
             tags: { $contains: [this.settings.superCollectiveTag] }
@@ -277,21 +307,21 @@ export default function(Sequelize, DataTypes) {
         .then(rows => rows.map(r => r.id))
         .then(ids => {
           ids.push(this.id);
-          this.superCollectiveGroupsIds = ids;
+          this.superCollectiveCollectivesIds = ids;
           return ids;
         });
       },
 
       /**
        * returns the tiers with their users
-       * e.g. group.tiers = [
+       * e.g. collective.tiers = [
        *  { name: 'core contributor', users: [ {UserObject} ], range: [], ... },
        *  { name: 'backer', users: [ {UserObject}, {UserObject} ], range: [], ... }
        * ]
        */
       getTiersWithUsers(options = { active: false, attributes: ['id','username', 'avatar','firstDonation', 'lastDonation','totalDonations','website'] }) {
         const tiers = _.clone(this.tiers);
-        return queries.getUsersFromGroupWithTotalDonations(this.id, options.until)
+        return queries.getUsersFromCollectiveWithTotalDonations(this.id, options.until)
           .then(users => {
             if (!tiers) return [ { name: 'backer', title: 'Backers', range: [0, Infinity], users: users.map(u => _.pick(u,options.attributes)) } ];
             const tierIndex = {};
@@ -321,7 +351,7 @@ export default function(Sequelize, DataTypes) {
               id: userId
             }
           })
-          .then(users => users.map(user => user.UserGroup.role))
+          .then(users => users.map(user => user.UserCollective.role))
           .tap(actualRoles => cb(null, _.intersection(expectedRoles, actualRoles).length > 0))
           .catch(cb);
       },
@@ -341,46 +371,46 @@ export default function(Sequelize, DataTypes) {
             break;
           case roles.MEMBER:
             notifications.push({type:activities.GROUP_EXPENSE_CREATED});
-            notifications.push({type:'group.monthlyreport'});
+            notifications.push({type:'collective.monthlyreport'});
             break;
         }
 
         return Promise.all([
-          Sequelize.models.UserGroup.create({ role, UserId: user.id, GroupId: this.id }),
-          Sequelize.models.Notification.createMany(notifications, { UserId: user.id, GroupId: this.id, channel: 'email' })
+          Sequelize.models.UserCollective.create({ role, UserId: user.id, CollectiveId: this.id }),
+          Sequelize.models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
         ]);
       },
 
       findOrAddUserWithRole(user, role) {
-        return Sequelize.models.UserGroup.find({
+        return Sequelize.models.UserCollective.find({
           where: {
             role,
             UserId: user.id,
-            GroupId: this.id
+            CollectiveId: this.id
           }})
-        .then(userGroup => {
-          if (!userGroup) {
+        .then(userCollective => {
+          if (!userCollective) {
             return this.addUserWithRole(user, role)
           } else {
-            return userGroup;
+            return userCollective;
           }
         });
       },
 
       getStripeAccount() {
-        return Sequelize.models.UserGroup.find({
+        return Sequelize.models.UserCollective.find({
           where: {
-            GroupId: this.id,
+            CollectiveId: this.id,
             role: roles.HOST
           }
         })
-        .then((userGroup) => {
-          if (!userGroup) {
+        .then((userCollective) => {
+          if (!userCollective) {
             return { stripeAccount: null };
           }
           return Sequelize.models.User.find({
             where: {
-              id: userGroup.UserId
+              id: userCollective.UserId
             },
             include: [{
               model: Sequelize.models.StripeAccount
@@ -392,20 +422,20 @@ export default function(Sequelize, DataTypes) {
 
       getConnectedAccount() {
 
-        return models.UserGroup.find({
+        return models.UserCollective.find({
           where: {
-            GroupId: this.id,
+            CollectiveId: this.id,
             role: roles.HOST
           }
         })
-        .then((userGroup) => {
-          if (!userGroup) {
+        .then((userCollective) => {
+          if (!userCollective) {
             return null;
           }
 
           return models.ConnectedAccount.find({
             where: {
-              UserId: userGroup.UserId,
+              UserId: userCollective.UserId,
               provider: 'paypal',
             }
           });
@@ -417,7 +447,7 @@ export default function(Sequelize, DataTypes) {
         const where = {
           amount: { $lt: 0 },
           createdAt: { $lt: endDate },
-          GroupId: this.id
+          CollectiveId: this.id
         };
         if (status) where.status = status;
         if (startDate) where.createdAt.$gte = startDate;
@@ -429,10 +459,10 @@ export default function(Sequelize, DataTypes) {
         until = until || new Date();
         return models.Transaction.find({
           attributes: [
-            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 0), 'total']
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
           ],
           where: {
-            GroupId: this.id,
+            CollectiveId: this.id,
             createdAt: { $lt: until }
           }
         })
@@ -448,34 +478,34 @@ export default function(Sequelize, DataTypes) {
         */
         return Sequelize.query(`
           WITH "activeMonthlySubscriptions" as (
-            SELECT DISTINCT d."SubscriptionId", t."netAmountInGroupCurrency"
+            SELECT DISTINCT d."SubscriptionId", t."netAmountInCollectiveCurrency"
             FROM "Transactions" t
             LEFT JOIN "Donations" d ON d.id = t."DonationId"
             LEFT JOIN "Subscriptions" s ON s.id = d."SubscriptionId"
-            WHERE t."GroupId"=:GroupId
+            WHERE t."CollectiveId"=:CollectiveId
               AND s."isActive" IS TRUE
               AND s.interval = 'month'
               AND s."deletedAt" IS NULL
           )
           SELECT
             (SELECT
-              COALESCE(SUM("netAmountInGroupCurrency"*12),0) FROM "activeMonthlySubscriptions")
+              COALESCE(SUM("netAmountInCollectiveCurrency"*12),0) FROM "activeMonthlySubscriptions")
             +
             (SELECT
-              COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
+              COALESCE(SUM(t."netAmountInCollectiveCurrency"),0) FROM "Transactions" t
               LEFT JOIN "Donations" d ON t."DonationId" = d.id
               LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-              WHERE t."GroupId" = :GroupId
+              WHERE t."CollectiveId" = :CollectiveId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND t."createdAt" > (current_date - INTERVAL '12 months')
                 AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
             +
             (SELECT
-              COALESCE(SUM(t."netAmountInGroupCurrency"),0) FROM "Transactions" t
+              COALESCE(SUM(t."netAmountInCollectiveCurrency"),0) FROM "Transactions" t
               LEFT JOIN "Donations" d ON t."DonationId" = d.id
               LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-              WHERE t."GroupId" = :GroupId
+              WHERE t."CollectiveId" = :CollectiveId
                 AND t.amount > 0
                 AND t."deletedAt" IS NULL
                 AND t."createdAt" > (current_date - INTERVAL '12 months')
@@ -483,7 +513,7 @@ export default function(Sequelize, DataTypes) {
             "yearlyIncome"
           `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
           {
-            replacements: { GroupId: this.id },
+            replacements: { CollectiveId: this.id },
             type: Sequelize.QueryTypes.SELECT
           })
           .then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
@@ -495,7 +525,7 @@ export default function(Sequelize, DataTypes) {
         const where = {
           amount: { $gt: 0 },
           createdAt: { $lt: endDate },
-          GroupId: this.id
+          CollectiveId: this.id
         };
         if (startDate) where.createdAt.$gte = startDate;
         return models.Transaction.find({
@@ -511,14 +541,14 @@ export default function(Sequelize, DataTypes) {
         endDate = endDate || new Date;
         const where = {
           createdAt: { $lt: endDate },
-          GroupId: this.id
+          CollectiveId: this.id
         };
         if (startDate) where.createdAt.$gte = startDate;
         if (type === 'donation') where.amount = { $gt: 0 };
         if (type === 'expense') where.amount = { $lt: 0 };
         return models.Transaction.find({
           attributes: [
-            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInGroupCurrency')), 0), 'total']
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
           ],
           where
         })
@@ -533,7 +563,7 @@ export default function(Sequelize, DataTypes) {
               [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('UserId'))), 'backersCount']
             ],
             where: {
-              GroupId: this.id,
+              CollectiveId: this.id,
               amount: {
                 $gt: 0
               },
@@ -567,14 +597,14 @@ export default function(Sequelize, DataTypes) {
           });
       },
 
-      getRelatedGroups(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
-        return Group.getGroupsSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
+      getRelatedCollectives(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
+        return Collective.getCollectivesSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
       },
 
       getHost() {
         return models.User.findOne({
           include: [
-            { model: models.UserGroup, where: { role: roles.HOST, GroupId: this.id } }
+            { model: models.UserCollective, where: { role: roles.HOST, CollectiveId: this.id } }
           ]
         });
       },
@@ -588,60 +618,60 @@ export default function(Sequelize, DataTypes) {
         if (this.isSupercollective &&
           this.settings.superCollectiveTag &&
           this.settings.superCollectiveTag.length > 0) {
-          return Group.getGroupsSummaryByTag(this.settings.superCollectiveTag, 10000, [this.id], 0, false);
+          return Collective.getCollectivesSummaryByTag(this.settings.superCollectiveTag, 10000, [this.id], 0, false);
         }
         return Promise.resolve();
       }
     },
 
     classMethods: {
-      createMany: (groups, defaultValues) => {
-        return Promise.map(groups, u => Group.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
+      createMany: (collectives, defaultValues) => {
+        return Promise.map(collectives, u => Collective.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
       },
 
-      getGroupsSummaryByTag: (tags, limit=3, excludeList=[], minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
-        return queries.getGroupsByTag(tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset)
-          .then(groups => {
-            return Promise.all(groups.map(group => {
+      getCollectivesSummaryByTag: (tags, limit=3, excludeList=[], minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
+        return queries.getCollectivesByTag(tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset)
+          .then(collectives => {
+            return Promise.all(collectives.map(collective => {
               const appendTier = backers => {
                 backers = backers.map(backer => {
-                  backer.tier = getTier(backer, group.tiers);
+                  backer.tier = getTier(backer, collective.tiers);
                   return backer;
                 });
                 return backers;
               };
 
               return Promise.all([
-                  group.getYearlyIncome(),
-                  queries.getUsersFromGroupWithTotalDonations(group.id)
+                  collective.getYearlyIncome(),
+                  queries.getUsersFromCollectiveWithTotalDonations(collective.id)
                     .then(appendTier)
                 ])
                 .then(results => {
-                  const groupInfo = group.card;
-                  groupInfo.yearlyIncome = results[0];
-                  const usersByRole = groupBy(results[1], 'role');
+                  const collectiveInfo = collective.card;
+                  collectiveInfo.yearlyIncome = results[0];
+                  const usersByRole = collectiveBy(results[1], 'role');
                   const backers = usersByRole[roles.BACKER] || [];
-                  groupInfo.backersAndSponsorsCount = backers.length;
-                  groupInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;
-                  groupInfo.sponsorsCount = backers.filter((b) => b.tier.match(/^sponsor/i)).length;
-                  groupInfo.backersCount = groupInfo.backersAndSponsorsCount - groupInfo.sponsorsCount;
-                  groupInfo.githubContributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : 0;
-                  groupInfo.contributorsCount = groupInfo.membersCount + groupInfo.githubContributorsCount + groupInfo.backersAndSponsorsCount;
-                  return groupInfo;
+                  collectiveInfo.backersAndSponsorsCount = backers.length;
+                  collectiveInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;
+                  collectiveInfo.sponsorsCount = backers.filter((b) => b.tier.match(/^sponsor/i)).length;
+                  collectiveInfo.backersCount = collectiveInfo.backersAndSponsorsCount - collectiveInfo.sponsorsCount;
+                  collectiveInfo.githubContributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
+                  collectiveInfo.contributorsCount = collectiveInfo.membersCount + collectiveInfo.githubContributorsCount + collectiveInfo.backersAndSponsorsCount;
+                  return collectiveInfo;
                 });
             }));
           })
       }
     }
   });
-  Temporal(Group, Sequelize);
-  return Group;
+  Temporal(Collective, Sequelize);
+  return Collective;
 
-  function isThankDonationEnabled(GroupId) {
+  function isThankDonationEnabled(CollectiveId) {
     return models.Notification.findOne({where: {
       channel: 'twitter',
       type: activities.GROUP_TRANSACTION_CREATED,
-      GroupId,
+      CollectiveId,
       active: true
     }}).then(n => !!n);
   }

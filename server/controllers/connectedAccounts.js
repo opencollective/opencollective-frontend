@@ -2,7 +2,7 @@ import config from 'config';
 import request from 'request-promise';
 import Promise from 'bluebird';
 import models from '../models';
-import {getUserOrGroupFromSlug} from '../lib/slug';
+import {getUserOrCollectiveFromSlug} from '../lib/slug';
 import errors from '../lib/errors';
 
 const {
@@ -14,11 +14,11 @@ export const list = (req, res, next) => {
   const user = req.remoteUser;
   const slug = req.params.slug.toLowerCase();
 
-  getUserOrGroupFromSlug(slug, user.id)
-    .then(userOrGroup => {
-      const selector = userOrGroup.username ? 'UserId' : 'GroupId';
+  getUserOrCollectiveFromSlug(slug, user.id)
+    .then(userOrCollective => {
+      const selector = userOrCollective.username ? 'UserId' : 'CollectiveId';
       return models.ConnectedAccount.findAll({where: {
-        [selector]: userOrGroup.id,
+        [selector]: userOrCollective.id,
         deletedAt: null
       }});
     })
@@ -59,7 +59,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         .catch(next);
     }
     case 'meetup':
-      createConnectedAccountForGroup(req.query.slug, provider)
+      createConnectedAccountForCollective(req.query.slug, provider)
         .then(ca => ca.update({
           clientId: accessToken,
           secret: data.tokenSecret
@@ -69,7 +69,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       break;
 
     case 'twitter':
-      createConnectedAccountForGroup(req.query.slug, provider)
+      createConnectedAccountForCollective(req.query.slug, provider)
         .then(ca => ca.update({
           username: data.profile.username,
           clientId: accessToken,
@@ -123,10 +123,10 @@ export const fetchAllRepositories = (req, res, next) => {
   .catch(next);
 };
 
-function createConnectedAccountForGroup(slug, provider) {
+function createConnectedAccountForCollective(slug, provider) {
   const attrs = { provider };
-  return models.Group.findOne({where: { slug }})
-    .tap(group => attrs.GroupId = group.id)
+  return models.Collective.findOne({where: { slug }})
+    .tap(collective => attrs.CollectiveId = collective.id)
     .then(() => ConnectedAccount.findOne({ where: attrs }))
     .then(ca => ca || ConnectedAccount.create(attrs));
 }

@@ -10,28 +10,17 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    GroupId: {
+    ParentId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     },
 
-    EventId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Events',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: true
-    },
-
-    // human readable way to uniquely access a tier for a given group or group/event combo
+    // human readable way to uniquely access a tier for a given collective or collective/event combo
     slug: {
       type: DataTypes.STRING,
       set(slug) {
@@ -53,17 +42,22 @@ export default function(Sequelize, DataTypes) {
     },
 
     type: {
-      type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, GOAL, ...
+      type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, DONOR, GOAL, ...
       defaultValue: 'TICKET'
     },
 
     description: DataTypes.STRING,
+    button: DataTypes.STRING,
 
     amount: {
       type: DataTypes.INTEGER, // In cents
       min: 0
     },
 
+    presets: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER)
+    },
+  
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',

@@ -22,10 +22,10 @@ export default function(Sequelize, DataTypes) {
       allowNull: false
     },
 
-    GroupId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -100,7 +100,7 @@ export default function(Sequelize, DataTypes) {
         return {
           id: this.id,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           EventId: this.EventId,
           TierId: this.TierId,
           quantity: this.quantity,
@@ -117,13 +117,13 @@ export default function(Sequelize, DataTypes) {
       getUserForViewer(viewer) {
         const promises = [this.getUser()];
         if (viewer) {
-          promises.push(viewer.canEditGroup(this.GroupId));
+          promises.push(viewer.canEditCollective(this.CollectiveId));
         }
         return Promise.all(promises)
         .then(results => {
           const user = results[0];
-          const canEditGroup = results[1];
-          return canEditGroup ? user.info : user.public;
+          const canEditCollective = results[1];
+          return canEditCollective ? user.info : user.public;
         })
       }
     },

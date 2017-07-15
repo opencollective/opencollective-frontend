@@ -13,11 +13,11 @@ const {
 } = models;
 
 /**
- * Fetch backers of a group by tier
+ * Fetch backers of a collective by tier
  */
 export const fetchUsers = (req, res, next) => {
-  queries.getUsersFromGroupWithTotalDonations(req.group.id)
-    .then(users => appendTier(users, req.group.tiers))
+  queries.getUsersFromCollectiveWithTotalDonations(req.collective.id)
+    .then(users => appendTier(users, req.collective.tiers))
     .then(users => {
       req.users = users;
     })

@@ -9,10 +9,10 @@ function createActivity(comment, type) {
   return models.Activity.create({
     type,
     UserId: comment.User.id,
-    GroupId: comment.Group.id,
+    CollectiveId: comment.Collective.id,
     ExpenseId: comment.Expense.id,
     data: {
-      group: comment.Group.info,
+      collective: comment.Collective.info,
       user: comment.User.info,
       expense: comment.Expense.info,
       comment: comment.info
@@ -25,11 +25,11 @@ function createActivity(comment, type) {
  */
 export const create = (req, res, next) => {
   const user = req.remoteUser || req.user;
-  const { group, expense } = req;
+  const { collective, expense } = req;
   const approvedAt = (req.remoteUser) ? new Date() : null;
   const attributes = Object.assign({}, req.required.comment, {
     UserId: user.id,
-    GroupId: group.id,
+    CollectiveId: collective.id,
     ExpenseId: expense.id,
     approvedAt
   });
@@ -38,14 +38,14 @@ export const create = (req, res, next) => {
   const sendEmailForApproval = (activity) => {
     if (!approvedAt) {
       const data = Object.assign({}, activity.data);
-      data.login_url = user.generateLoginLink(`${config.host.website}/${group.slug}/expenses/${expense.id}`);
-      data.approve_url = user.generateLoginLink(`${config.host.website}/${group.slug}/expenses/${expense.id}/approve`);
+      data.login_url = user.generateLoginLink(`${config.host.website}/${collective.slug}/expenses/${expense.id}`);
+      data.approve_url = user.generateLoginLink(`${config.host.website}/${collective.slug}/expenses/${expense.id}/approve`);
       emailLib.send('comment.approve', user.email, data);
     }
   }
 
   models.Comment.create(attributes)
-    .then(comment => models.Comment.findById(comment.id, { include: [ models.Group, models.User, models.Expense ]}))
+    .then(comment => models.Comment.findById(comment.id, { include: [ models.Collective, models.User, models.Expense ]}))
     .then(comment => createActivity(comment, activities.GROUP_COMMENT_CREATED))
     .tap(sendEmailForApproval)
     .then(activity => res.send(activity))
@@ -58,7 +58,7 @@ export const create = (req, res, next) => {
 export const approve = (req, res, next) => {
   req.comment.update({approvedAt: new Date()})
     .then(() => {
-      res.send(`Comment on expense "${req.expense.title}" approved. [<a href="${config.host.website}/${req.group.slug}/expenses/${req.expense.id}">view the expense</a>]`);
+      res.send(`Comment on expense "${req.expense.title}" approved. [<a href="${config.host.website}/${req.collective.slug}/expenses/${req.expense.id}">view the expense</a>]`);
     })
     .catch(next);
 };
@@ -75,7 +75,7 @@ export const getOne = (req, res) => {
  */
 export const list = (req, res, next) => {
 
-  const where = { GroupId: req.group.id, approvedAt: { $ne: null } };
+  const where = { CollectiveId: req.collective.id, approvedAt: { $ne: null } };
 
   if (req.expense)
     where.ExpenseId = req.expense.id;
@@ -100,7 +100,7 @@ export const list = (req, res, next) => {
  */
 export const deleteComment = (req, res, next) => {
   const { comment } = req;
-  models.Comment.findById(comment.id, { include: [ models.Group, models.User, models.Expense ]})
+  models.Comment.findById(comment.id, { include: [ models.Collective, models.User, models.Expense ]})
     .tap(comment => comment.destroy())
     .then(comment => createActivity(comment, activities.GROUP_COMMENT_DELETED))
     .then(activity => res.send(activity))

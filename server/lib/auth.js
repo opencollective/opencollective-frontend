@@ -1,6 +1,6 @@
 import models from '../models';
 
-export function hasRole(userId, groupId, possibleRoles) {
+export function hasRole(userId, collectiveId, possibleRoles) {
   if (typeof possibleRoles === 'string') {
     possibleRoles = [possibleRoles];
   }
@@ -8,10 +8,10 @@ export function hasRole(userId, groupId, possibleRoles) {
   const query = {
     where: {
       UserId: userId,
-      GroupId: groupId,
+      CollectiveId: collectiveId,
       role: { $in: possibleRoles }
     }
   };
-  return models.UserGroup.findOne(query)
+  return models.UserCollective.findOne(query)
   .then(ug => Boolean(ug))
 }

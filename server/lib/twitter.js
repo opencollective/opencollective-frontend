@@ -8,24 +8,24 @@ export function tweetActivity(Sequelize, activity) {
     && activity.data.transaction.amount > 0
     // users without twitterHandle are ignored
     && activity.data.user.twitterHandle) {
-      return Sequelize.models.Group.findById(activity.GroupId)
-        .then(group => group.getTwitterSettings())
+      return Sequelize.models.Collective.findById(activity.CollectiveId)
+        .then(collective => collective.getTwitterSettings())
         .then(template => template.thankDonation.replace('$backer', `@${activity.data.user.twitterHandle}`))
-        .then(status => tweetStatus(Sequelize, activity.GroupId, status));
+        .then(status => tweetStatus(Sequelize, activity.CollectiveId, status));
   } else {
     return null;
   }
 }
 
-export function tweetStatus(Sequelize, GroupId, status) {
+export function tweetStatus(Sequelize, CollectiveId, status) {
   return Sequelize.models.ConnectedAccount.findOne({
     where: {
-      GroupId,
+      CollectiveId,
       provider: 'twitter'
     }
   })
   .tap(connectedAccount => {
-    // groups without twitter credentials are ignored
+    // collectives without twitter credentials are ignored
     if (connectedAccount) {
       const client = new Twitter({
         consumer_key: config.twitter.consumerKey,
@@ -34,7 +34,7 @@ export function tweetStatus(Sequelize, GroupId, status) {
         access_token_secret: connectedAccount.secret
       });
 
-      console.log(`Tweeting for group ID ${GroupId}: ${status}`);
+      console.log(`Tweeting for collective ID ${CollectiveId}: ${status}`);
       if (process.env.NODE_ENV === 'production') {
         const tweet = Promise.promisify(client.post, { context: client });
         return tweet("statuses/update", { status });
