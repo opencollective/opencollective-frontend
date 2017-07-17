@@ -36,7 +36,7 @@ Net amount:                      {{{currency stats.totalNetAmountReceivedForColl
 
 date  {{{col "collective" size=17}}} amount net amount*   description
 {{#each transactions}}
-{{{moment createdAt format="MM/DD"}}} {{{col group.shortSlug size=../maxSlugSize}}} {{{currency amount currency=group.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}}{{#if notes}}**{{/if}} {{{col description size=80}}}
+{{{moment createdAt format="MM/DD"}}} {{{col collective.shortSlug size=../maxSlugSize}}} {{{currency amount currency=collective.currency size=9 precision=2 sign=true}}} {{{currency netAmountInTxnCurrency currency=../host.currency size=9 precision=2 sign=true}}}{{#if notes}}**{{/if}} {{{col description size=80}}}
 {{else}}
 No transaction. 
 {{/each}}

@@ -30,7 +30,7 @@ console.log("startDate", startDate,"endDate", endDate);
 const debug = debugLib('monthlyreport');
 
 const {
-  Group,
+  Collective,
   Expense,
   Notification,
   Subscription,
@@ -94,41 +94,41 @@ const processEvents = (events) => {
   return res;
 };
 
-const groupsData = {};
-const processGroup = (group) => {
-  if ( groupsData[group.slug]) return groupsData[group.slug];
+const collectivesData = {};
+const processCollective = (collective) => {
+  if ( collectivesData[collective.slug]) return collectivesData[collective.slug];
 
   const promises = [
-    group.getTiersWithUsers({ attributes: ['id','username','name', 'avatar','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
-    group.getBalance(endDate),
-    group.getTotalTransactions(startDate, endDate, 'donation'),
-    group.getTotalTransactions(startDate, endDate, 'expense'),
-    group.getExpenses(null, startDate, endDate),
-    group.getYearlyIncome(),
-    Expense.findAll({ where: { GroupId: group.id, createdAt: { $gte: startDate, $lt: endDate } }, limit: 3, order: [['id', 'DESC']], include: [ {model: User} ]}),
-    group.getEvents({ where: { GroupId: group.id, startsAt: { $gte: startDate } }, order: [['startsAt', 'DESC']], include: [ {model: models.Response} ]})
+    collective.getTiersWithUsers({ attributes: ['id','username','name', 'image','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    collective.getBalance(endDate),
+    collective.getTotalTransactions(startDate, endDate, 'donation'),
+    collective.getTotalTransactions(startDate, endDate, 'expense'),
+    collective.getExpenses(null, startDate, endDate),
+    collective.getYearlyIncome(),
+    Expense.findAll({ where: { CollectiveId: collective.id, createdAt: { $gte: startDate, $lt: endDate } }, limit: 3, order: [['id', 'DESC']], include: [ {model: User} ]}),
+    collective.getEvents({ where: { CollectiveId: collective.id, startsAt: { $gte: startDate } }, order: [['startsAt', 'DESC']], include: [ {model: models.Response} ]})
   ];
 
   return Promise.all(promises)
           .then(results => {
-            console.log('***', group.name, '***');
+            console.log('***', collective.name, '***');
             const data = {};
-            data.group = _.pick(group, ['id', 'name', 'slug', 'website', 'logo', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
+            data.collective = _.pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
             const res = getTiersStats(results[0], startDate, endDate);
-            data.group.stats = res.stats;
-            data.group.stats.balance = results[1];
-            data.group.stats.totalDonations = results[2];
-            data.group.stats.totalPaidExpenses = -results[3];
-            data.group.contributorsCount = (group.data && group.data.githubContributors) ? Object.keys(group.data.githubContributors).length : data.group.stats.backers.lastMonth;
-            data.group.yearlyIncome = results[5];
-            data.group.expenses = results[6];
-            data.group.events = processEvents(results[7]);
-            console.log(data.group.stats);
-            groupsData[group.slug] = data.group;
-            return group;
+            data.collective.stats = res.stats;
+            data.collective.stats.balance = results[1];
+            data.collective.stats.totalDonations = results[2];
+            data.collective.stats.totalPaidExpenses = -results[3];
+            data.collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : data.collective.stats.backers.lastMonth;
+            data.collective.yearlyIncome = results[5];
+            data.collective.expenses = results[6];
+            data.collective.events = processEvents(results[7]);
+            console.log(data.collective.stats);
+            collectivesData[collective.slug] = data.collective;
+            return collective;
           })
           .catch(e => {
-            console.error("Error in processing group", group.slug, e);
+            console.error("Error in processing collective", collective.slug, e);
           });
 };
 
@@ -139,27 +139,27 @@ let subscriptions, tags;
 
  return user.getDonations({
    include: [
-     { model: Group },
+     { model: Collective },
      { model: Subscription, where: { isActive: true } }
    ]
   })
-  .tap(donations => Promise.map(donations, s => processGroup(s.Group)))
+  .tap(donations => Promise.map(donations, s => processCollective(s.Collective)))
   .then(donations => donations.map(s => {
     const subscription = _.pick(s.Subscription, ['amount', 'interval', 'currency', 'createdAt']);
-    subscription.group = groupsData[s.Group.slug];
-    tags = _.union(tags, subscription.group.tags);
+    subscription.collective = collectivesData[s.Collective.slug];
+    tags = _.union(tags, subscription.collective.tags);
     return subscription;
     })
   )
   .tap(s => subscriptions = s)
-  .then(() => Group.getGroupsSummaryByTag(tags, 3, null, 0, false, 'g."createdAt"', 'DESC'))
-  .then(relatedGroups => {
+  .then(() => Collective.getCollectivesSummaryByTag(tags, 3, null, 0, false, 'g."createdAt"', 'DESC'))
+  .then(relatedCollectives => {
     return {
       config: { host: config.host },
       month,
       subscriptions,
       manageSubscriptionsUrl: user.generateLoginLink('/subscriptions'),
-      relatedGroups
+      relatedCollectives
     }
   })
   .then(data => sendEmail(user, data))

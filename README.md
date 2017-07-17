@@ -68,7 +68,7 @@ Run the script afterwards:
 You can now login on development (website repo) with `user@opencollective.com` and the token will show up in your console.
 You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
 
-Feel free to modify `scripts/create_user_and_group.js` to create your own user/group.
+Feel free to modify `scripts/create_user_and_collective.js` to create your own user/collective.
 
 ## Documentation
 WIP

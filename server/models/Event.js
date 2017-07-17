@@ -15,7 +15,7 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    createdByUserId: {
+    CreatedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
@@ -128,7 +128,7 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           id: this.id,
-          createdByUserId: this.createdByUserId,
+          CreatedByUserId: this.CreatedByUserId,
           CollectiveId: this.CollectiveId,
           currency: this.currency,
           maxAmount: this.maxAmount,

@@ -9,7 +9,7 @@ import models from '../server/models';
 import roles from '../server/constants/roles';
 import paymentsLib from '../server/lib/payments';
 
-let host, user1, user2, group1, event1, ticket1;
+let host, user1, user2, collective1, event1, ticket1;
 let sandbox, createPaymentStub;
 
 const stringify = (json) => {
@@ -19,7 +19,7 @@ const stringify = (json) => {
 describe('Mutation Tests', () => {
 
   /* SETUP
-    group1: 2 events
+    collective1: 2 events
       event1: 1 free ticket, 1 paid ticket
   */
 
@@ -41,9 +41,9 @@ describe('Mutation Tests', () => {
   beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
-  beforeEach(() => group1.addUserWithRole(host, roles.HOST));
-  beforeEach(() => group1.addUserWithRole(user1, roles.MEMBER));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
+  beforeEach(() => collective1.addUserWithRole(host, roles.HOST));
+  beforeEach(() => collective1.addUserWithRole(user1, roles.MEMBER));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
@@ -55,20 +55,20 @@ describe('Mutation Tests', () => {
   });
 
   beforeEach('create an event', () => models.Event.create(
-    Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
+    Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
     .tap(e => event1 = e));
 
   describe('createEvent tests', () => {
 
     describe('creates an event', () => {
 
-      const getEventData = (group) => {
-        return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":group.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
+      const getEventData = (collective) => {
+        return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":collective.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
       };
 
       it("fails if not authenticated", async () => {
 
-        const event = stringify(getEventData(group1));
+        const event = stringify(getEventData(collective1));
 
         const query = `
         mutation createEvent {
@@ -94,7 +94,7 @@ describe('Mutation Tests', () => {
 
       it("fails if authenticated but cannot edit collective", async () => {
 
-        const event = getEventData(group1);
+        const event = getEventData(collective1);
 
         const query = `
         mutation createEvent {
@@ -119,7 +119,7 @@ describe('Mutation Tests', () => {
 
       it("creates an event with multiple tiers", async () => {
         
-        const event = getEventData(group1);
+        const event = getEventData(collective1);
 
         const query = `
         mutation createEvent {
@@ -185,7 +185,7 @@ describe('Mutation Tests', () => {
       it('fails if not authenticated', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
@@ -202,7 +202,7 @@ describe('Mutation Tests', () => {
       it('fails if not authenticated as host or member of collective', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
@@ -219,7 +219,7 @@ describe('Mutation Tests', () => {
       it('add new tiers and update existing', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${group1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
@@ -239,7 +239,7 @@ describe('Mutation Tests', () => {
         tiers.push({name: "free ticket", type: "TICKET", amount: 0});
         const updateQuery = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${group1.slug}", tiers: ${stringify(tiers)}) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: ${stringify(tiers)}) {
             id,
             name,
             amount,
@@ -306,11 +306,11 @@ describe('Mutation Tests', () => {
   describe('createResponse tests', () => {
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('ticket1'), { EventId: event1.id, GroupId: group1.id }))
+      Object.assign(utils.data('ticket1'), { EventId: event1.id, CollectiveId: collective1.id }))
       .tap(t => ticket1 = t));
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('ticket2'), { EventId: event1.id, GroupId: group1.id })));
+      Object.assign(utils.data('ticket2'), { EventId: event1.id, CollectiveId: collective1.id })));
 
     describe('throws an error', () => {
 
@@ -366,7 +366,7 @@ describe('Mutation Tests', () => {
         it('when event doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email:"user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
+              createResponse(response: { user: { email:"user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -389,7 +389,7 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
                 id,
                 status
                 event {
@@ -406,7 +406,7 @@ describe('Mutation Tests', () => {
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for event slug:${event1.slug} in collective slug:${group1.slug}`);
+          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for event slug:${event1.slug} in collective slug:${collective1.slug}`);
         });
       });
 
@@ -414,7 +414,7 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
                 id,
                 status
                 event {
@@ -438,7 +438,7 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
                 id,
                 status
                 event {
@@ -468,7 +468,7 @@ describe('Mutation Tests', () => {
             mutation createResponse {
               createResponse(response: {
                 user: { email: "${user2.email}" },
-                collective: { slug: "${group1.slug}" },
+                collective: { slug: "${collective1.slug}" },
                 event: { slug: "${event1.slug}" },
                 status:"INTERESTED"
               }) {
@@ -507,7 +507,7 @@ describe('Mutation Tests', () => {
                 "status": "INTERESTED",
                 "tier": null,
                 "user": {
-                  "email": null, // note: since the logged in user cannot edit the group, it cannot get back the email address of a response
+                  "email": null, // note: since the logged in user cannot edit the collective, it cannot get back the email address of a response
                   "id": 3
                 },
                 "collective": {
@@ -527,7 +527,7 @@ describe('Mutation Tests', () => {
           it('from an existing user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "${user2.email}" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
+                createResponse(response: { user: { email: "${user2.email}" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
                   id,
                   status,
                   user {
@@ -582,7 +582,7 @@ describe('Mutation Tests', () => {
           it('from a new user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "newuser@email.com" }, collective: { slug: "${group1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
+                createResponse(response: { user: { email: "newuser@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
                   id,
                   status,
                   user {
@@ -653,7 +653,7 @@ describe('Mutation Tests', () => {
                       identifier: "4242"
                     }
                   },
-                  collective: { slug: "${group1.slug}" },
+                  collective: { slug: "${collective1.slug}" },
                   event: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
@@ -710,7 +710,7 @@ describe('Mutation Tests', () => {
             expect(createPaymentStub.callCount).to.equal(1);
             createPaymentStub.reset();
             expect(createPaymentArgument.user.id).to.equal(3);
-            expect(createPaymentArgument.group.slug).to.equal('scouts');
+            expect(createPaymentArgument.collective.slug).to.equal('scouts');
             expect(createPaymentArgument.response.id).to.equal(1);
             expect(createPaymentArgument.payment.amount).to.equal(4000);
             expect(createPaymentArgument.payment.currency).to.equal('USD');
@@ -731,7 +731,7 @@ describe('Mutation Tests', () => {
                       identifier: "4242"
                     }
                   },
-                  collective: { slug: "${group1.slug}" },
+                  collective: { slug: "${collective1.slug}" },
                   event: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
@@ -790,7 +790,7 @@ describe('Mutation Tests', () => {
 
             expect(createPaymentStub.callCount).to.equal(1);
             expect(createPaymentArgument.user.id).to.equal(4);
-            expect(createPaymentArgument.group.slug).to.equal('scouts');
+            expect(createPaymentArgument.collective.slug).to.equal('scouts');
             expect(createPaymentArgument.response.id).to.equal(1);
             expect(createPaymentArgument.payment.amount).to.equal(4000);
             expect(createPaymentArgument.payment.currency).to.equal('USD');

@@ -169,7 +169,7 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('successfully create a user with just an email and auto prefills firstName, lastName, twitter, avatar', (done) => {
+    it('successfully create a user with just an email and auto prefills firstName, lastName, twitter, image', (done) => {
       request(app)
         .post('/users')
         .send({
@@ -267,7 +267,7 @@ describe('users.routes.test.js', () => {
     beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
     // Create a collective with two members
-    beforeEach(() => models.Group.create(utils.data('group1'))
+    beforeEach(() => models.Collective.create(utils.data('collective1'))
       .tap(g => g.addUserWithRole(user, 'MEMBER'))
       .tap(g => g.addUserWithRole(user2, 'MEMBER'))
     );
@@ -295,9 +295,9 @@ describe('users.routes.test.js', () => {
           expect(e).to.not.exist;
           const u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
-          expect(u.groups[0].name).to.equal(utils.data('group1').name);
-          expect(u.groups[0].role).to.equal('MEMBER');
-          expect(u.groups[0].members).to.equal(2);
+          expect(u.collectives[0].name).to.equal(utils.data('collective1').name);
+          expect(u.collectives[0].role).to.equal('MEMBER');
+          expect(u.collectives[0].members).to.equal(2);
           done();
         });
     });
@@ -359,8 +359,8 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('should fail to update username if already taken by a group', (done) => {
-      models.Group.create(utils.data('group1')).then(() => {
+    it('should fail to update username if already taken by a collective', (done) => {
+      models.Collective.create(utils.data('collective1')).then(() => {
         request(app)
           .put(`/users/${user.id}?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt(application)}`)
@@ -478,37 +478,37 @@ describe('users.routes.test.js', () => {
 
   });
 
-  describe('#update avatar', () => {
+  describe('#update image', () => {
     let user;
 
     beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
 
-    it('should update avatar', (done) => {
+    it('should update image', (done) => {
       const link = 'http://opencollective.com/assets/icon2.svg';
       request(app)
-        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
+        .put(`/users/${user.id}/image?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
-          avatar: link
+          image: link
         })
         .end((err, res) => {
           const { body } = res;
-          expect(body.avatar).to.equal(link);
+          expect(body.image).to.equal(link);
           done();
         });
     });
 
     it('fails if the user is not logged in', () =>
       request(app)
-        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
+        .put(`/users/${user.id}/image?api_key=${application.api_key}`)
         .send({
-          avatar: 'http://opencollective.com/assets/icon2.svg'
+          image: 'http://opencollective.com/assets/icon2.svg'
         })
         .expect(401));
 
-    it('fails if the avatar key is missing from the payload', () =>
+    it('fails if the image key is missing from the payload', () =>
       request(app)
-        .put(`/users/${user.id}/avatar?api_key=${application.api_key}`)
+        .put(`/users/${user.id}/image?api_key=${application.api_key}`)
         .send({})
         .expect(400));
 
@@ -534,7 +534,7 @@ describe('users.routes.test.js', () => {
       models.User.create({
         email: 'userwithinfo@example.com',
         firstName: 'Xavier',
-        avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg'
+        image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg'
       })
       .tap(u => userWithInfo = u));
 
@@ -544,7 +544,7 @@ describe('users.routes.test.js', () => {
       })
       .tap(u => userWithoutAvatar = u));
 
-    it('fails if the user already has a firstName and avatar set', done => {
+    it('fails if the user already has a firstName and image set', done => {
       // only users with a recent donation can be edited
       models.Donation.create({
           UserId: userWithInfo.id,
@@ -567,7 +567,7 @@ describe('users.routes.test.js', () => {
         });
     });
 
-    it('successfully updates a user without an avatar', done => {
+    it('successfully updates a user without an image', done => {
       // only users with a recent donation can be edited
       models.Donation.create({
           UserId: userWithoutAvatar.id,

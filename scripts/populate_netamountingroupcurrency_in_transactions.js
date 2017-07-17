@@ -13,16 +13,16 @@ models.Transaction.findAll({})
   console.log("Processing transaction id: ", transaction.id);
 
     if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
-      // populate netAmountInGroupCurrency for donations
-        transaction.netAmountInGroupCurrency =
+      // populate netAmountInCollectiveCurrency for donations
+        transaction.netAmountInCollectiveCurrency =
           Math.round((transaction.amountInTxnCurrency -
             transaction.platformFeeInTxnCurrency -
             transaction.hostFeeInTxnCurrency -
             transaction.paymentProcessorFeeInTxnCurrency) *
           transaction.txnCurrencyFxRate);
     } else {
-      // populate netAmountInGroupCurrency for "Add Funds" and Expenses
-      transaction.netAmountInGroupCurrency = transaction.amount*100;
+      // populate netAmountInCollectiveCurrency for "Add Funds" and Expenses
+      transaction.netAmountInCollectiveCurrency = transaction.amount*100;
     }
   return transaction.save();
 })

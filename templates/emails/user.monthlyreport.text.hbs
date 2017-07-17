@@ -6,37 +6,37 @@ This is your monthly report for all the collectives that you are supporting on o
 # Active subscriptions
 {{#each subscriptions}}
 
-{{group.name}}:
-{{group.publicUrl}}
-Backers: {{group.stats.backers.lastMonth}} (+{{group.stats.backers.new}}{{#if group.stats.backers.lost}}, -{{group.stats.backers.lost}}{{/if}})
-Current balance: {{{currency group.stats.balance currency=currency}}} (+{{{currency group.stats.totalDonations currency=currency}}}{{#if group.stats.totalPaidExpenses}}, {{{currency group.stats.totalPaidExpenses currency=currency}}}{{/if}}) 
+{{collective.name}}:
+{{collective.publicUrl}}
+Backers: {{collective.stats.backers.lastMonth}} (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}})
+Current balance: {{{currency collective.stats.balance currency=currency}}} (+{{{currency collective.stats.totalDonations currency=currency}}}{{#if collective.stats.totalPaidExpenses}}, {{{currency collective.stats.totalPaidExpenses currency=currency}}}{{/if}}) 
 Your contribution: {{currency amount currency=currency}} per {{interval}}
 Member since: {{{moment createdAt}}}
-{{#if group.events.upcoming}}
+{{#if collective.events.upcoming}}
 
-Upcoming {{{pluralize "event" n=group.events.upcoming.length}}}:
-{{#each group.events.upcoming}}
+Upcoming {{{pluralize "event" n=collective.events.upcoming.length}}}:
+{{#each collective.events.upcoming}}
   - {{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} {{name}} @ {{locationName}}
-    https://opencollective.com/{{../group.slug}}/events/{{slug}}
+    https://opencollective.com/{{../collective.slug}}/events/{{slug}}
     RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}
 {{/each}}
 {{/if}}
-{{#if group.events.past}}
+{{#if collective.events.past}}
 
-Past {{{pluralize "event" n=group.events.past.length}}}:
-{{#each group.events.past}}
+Past {{{pluralize "event" n=collective.events.past.length}}}:
+{{#each collective.events.past}}
   - {{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} {{name}} @ {{locationName}}
-    https://opencollective.com/{{../group.slug}}/events/{{slug}}
+    https://opencollective.com/{{../collective.slug}}/events/{{slug}}
     RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}
 {{/each}}
 {{/if}}
 
-Latest {{{pluralize "expense" n=group.expenses.length}}}:
-  {{#each group.expenses}}
+Latest {{{pluralize "expense" n=collective.expenses.length}}}:
+  {{#each collective.expenses}}
   - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{title}} {{status}}
   {{else}}
   (no expense filed)
-  Submit an expense on https://opencollective.com/{{group.slug}}/expenses/new
+  Submit an expense on https://opencollective.com/{{collective.slug}}/expenses/new
   {{/each}}
 
 {{/each}}
@@ -46,7 +46,7 @@ If you'd like to cancel any of your subscriptions, you can do so on https://open
 
 # New Related Collectives
 
-{{#each relatedGroups}}
+{{#each relatedCollectives}}
 {{publicUrl}}
 {{{capitalize mission}}}
 

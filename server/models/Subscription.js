@@ -18,7 +18,7 @@ export default (Sequelize, DataTypes) => {
     },
 
     interval: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(8),
       validate: {
         isIn: {
           args: [['month', 'year']],

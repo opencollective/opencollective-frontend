@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -29,20 +29,20 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 {{/if}}
 
 <p>You can follow our future activities and how we will be spending the money on our open collective page:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 {{> subscriptions}}
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
 
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} open collective
+  – The {{collective.name}} open collective
 </p>
 
-{{> relatedgroups}}
+{{> relatedcollectives}}
 
 {{> footer}}
 

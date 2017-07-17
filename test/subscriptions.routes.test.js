@@ -21,7 +21,7 @@ const STRIPE_URL = 'https://api.stripe.com:443';
 const donationsData = utils.data('donations');
 
 describe('subscriptions.routes.test.js', () => {
-  let group, user, paymentMethod, sandbox;
+  let collective, user, paymentMethod, sandbox;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -37,9 +37,9 @@ describe('subscriptions.routes.test.js', () => {
 
   beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap((g => group = g)));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap((g => collective = g)));
 
-  beforeEach(() => group.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
 
   // create stripe account
   beforeEach(() => {
@@ -60,14 +60,14 @@ describe('subscriptions.routes.test.js', () => {
    * Get the subscriptions of a user
    */
   describe('#getAll', () => {
-    // Create donation for group1.
+    // Create donation for collective1.
     beforeEach(() =>
       Promise.map(donationsData, donation =>
         models.Subscription.create(utils.data('subscription1'))
           .then(subscription => models.Donation.create({
             ...donation,
             UserId: user.id,
-            GroupId: group.id,
+            CollectiveId: collective.id,
             SubscriptionId: subscription.id
           })
         ))
@@ -96,7 +96,7 @@ describe('subscriptions.routes.test.js', () => {
           res.body.forEach(sub => {
             expect(sub).to.be.have.property('stripeSubscriptionId')
             expect(sub).to.be.have.property('Donation')
-            expect(sub.Donation).to.be.have.property('Group')
+            expect(sub.Donation).to.be.have.property('Collective')
           });
           done();
         });
@@ -145,7 +145,7 @@ describe('subscriptions.routes.test.js', () => {
         .then(sub => models.Donation.create({
           ...donationsData[0],
           UserId: user.id,
-          GroupId: group.id,
+          CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
           SubscriptionId: sub.id
         }))
@@ -230,10 +230,10 @@ describe('subscriptions.routes.test.js', () => {
             .then(() => models.Activity.findOne({where: {type: 'subscription.canceled'}}))
             .then(activity => {
               expect(activity).to.be.defined;
-              expect(activity.GroupId).to.be.equal(group.id);
+              expect(activity.CollectiveId).to.be.equal(collective.id);
               expect(activity.UserId).to.be.equal(user.id);
               expect(activity.data.subscription.id).to.be.equal(donation.SubscriptionId);
-              expect(activity.data.group.id).to.be.equal(group.id);
+              expect(activity.data.collective.id).to.be.equal(collective.id);
               expect(activity.data.user.id).to.be.equal(user.id);
             })
             .then(() => {

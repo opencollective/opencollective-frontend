@@ -18,7 +18,7 @@ import emailLib from '../../server/lib/email';
 import config from 'config';
 import { exportToCSV, exportToPDF } from '../../server/lib/utils';
 import { getTransactions } from '../../server/lib/transactions';
-import { getHostedGroups, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
+import { getHostedCollectives, getBackersStats, sumTransactions } from '../../server/lib/hostlib';
 import path from 'path';
 import fs from 'fs';
 
@@ -56,7 +56,7 @@ const init = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
 
-  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "UserGroups" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
+  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "Roles" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
 
   sequelize.query(query, {
     model: models.User,
@@ -103,11 +103,11 @@ const getPlatformStats = () => {
   };
 
   return Promise.all([
-    sumTransactions('netAmountInGroupCurrency', {}, 'USD'),                      // total host balance
-    sumTransactions('netAmountInGroupCurrency', { ...dateRange}, 'USD'),   // delta host balance last month
+    sumTransactions('netAmountInCollectiveCurrency', {}, 'USD'),                      // total host balance
+    sumTransactions('netAmountInCollectiveCurrency', { ...dateRange}, 'USD'),   // delta host balance last month
     sumTransactions('amount', { type: 'DONATION', ...dateRange}, 'USD'), // total donations last month
-    sumTransactions('netAmountInGroupCurrency', { type: 'DONATION', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
-    sumTransactions('netAmountInGroupCurrency', { type: 'EXPENSE', ...dateRange}, 'USD'),  // total net amount paid out last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...dateRange}, 'USD'),  // total net amount paid out last month
     sumTransactions("hostFeeInTxnCurrency", dateRange, 'USD'),
     sumTransactions("paymentProcessorFeeInTxnCurrency", dateRange, 'USD'),
     sumTransactions("platformFeeInTxnCurrency", dateRange, 'USD'),
@@ -115,26 +115,26 @@ const getPlatformStats = () => {
   ]);
 }
 
-const getHostStats = (host, groupids) => {
+const getHostStats = (host, collectiveids) => {
 
   const dateRange = {
     createdAt: { $gte: startDate, $lt: endDate }
   };
 
   const where = {
-    GroupId: { $in: groupids }
+    CollectiveId: { $in: collectiveids }
   };
 
   return Promise.all([
-    sumTransactions('netAmountInGroupCurrency', where, host.currency),                      // total host balance
-    sumTransactions('netAmountInGroupCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
+    sumTransactions('netAmountInCollectiveCurrency', where, host.currency),                      // total host balance
+    sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
     sumTransactions('amount', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total donations last month
-    sumTransactions('netAmountInGroupCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
-    sumTransactions('netAmountInGroupCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
     sumTransactions("hostFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("paymentProcessorFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("platformFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
-    getBackersStats(startDate, endDate, groupids)
+    getBackersStats(startDate, endDate, collectiveids)
   ]);
 }
 
@@ -146,7 +146,7 @@ const processHost = (host) => {
   const note = `using fxrate of the day of the transaction as provided by the ECB. Your effective fxrate may vary.`;
   const expensesPerPage = 30; // number of expenses per page of the Table Of Content (for PDF export)
 
-  let groupsById = {};
+  let collectivesById = {};
   let page = 1;
   let currentPage = 0;
 
@@ -164,8 +164,8 @@ const processHost = (host) => {
 
   const processTransaction = (transaction) => {
     const t = transaction;
-    t.group = groupsById[t.GroupId].dataValues;
-    t.group.shortSlug = t.group.slug.replace(/^wwcode-?(.)/, '$1');
+    t.collective = collectivesById[t.CollectiveId].dataValues;
+    t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
     t.notes = t.Expense && t.Expense.notes;
     if (t.data && t.data.fxrateSource) {
       t.notes = (t.notes) ? `${t.notes} (${note})` : note;
@@ -183,7 +183,7 @@ const processHost = (host) => {
       data.expensesPerPage[currentPage].push(t);
     }
 
-    data.maxSlugSize = Math.max(data.maxSlugSize, t.group.shortSlug.length + 1);
+    data.maxSlugSize = Math.max(data.maxSlugSize, t.collective.shortSlug.length + 1);
     if (!t.description) {
       return transaction.getSource().then(source => {
           t.description = source.title
@@ -194,13 +194,13 @@ const processHost = (host) => {
     }
   }
 
-  return getHostedGroups(host.id, endDate)
-    .tap(groups => {
-      groupsById = _.indexBy(groups, "id")
-      data.stats.totalCollectives = Object.keys(groupsById).length;
+  return getHostedCollectives(host.id, endDate)
+    .tap(collectives => {
+      collectivesById = _.indexBy(collectives, "id")
+      data.stats.totalCollectives = Object.keys(collectivesById).length;
       summary.totalCollectives += data.stats.totalCollectives;
     })
-    .then(() => getTransactions(Object.keys(groupsById), startDate, endDate, { include: ['Expense', 'User'] }))
+    .then(() => getTransactions(Object.keys(collectivesById), startDate, endDate, { include: ['Expense', 'User'] }))
     .tap(transactions => {
       if (!transactions || transactions.length == 0) {
         throw new Error(`No transaction found`);
@@ -210,16 +210,16 @@ const processHost = (host) => {
     .tap(transactions => {
 
       const getColumnName = (attr) => {
-        if (attr === 'GroupId') return "collective";
+        if (attr === 'CollectiveId') return "collective";
         else return attr;
       }
 
       const processValue = (attr, value) => {
-        if (attr === "GroupId") return groupsById[value].slug;
+        if (attr === "CollectiveId") return collectivesById[value].slug;
         else return value;
       }
 
-      const csv = exportToCSV(transactions, ['id', 'createdAt', 'GroupId', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency', 'note' ], getColumnName, processValue);
+      const csv = exportToCSV(transactions, ['id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency', 'note' ], getColumnName, processValue);
   
       attachments.push({
         filename: csv_filename,
@@ -237,11 +237,11 @@ const processHost = (host) => {
         content: pdf
       })
     })
-    .then(() => getHostStats(host, Object.keys(groupsById)))
+    .then(() => getHostStats(host, Object.keys(collectivesById)))
     .then(stats => {
       data.stats = {
         ... data.stats,
-        totalActiveCollectives: Object.keys(_.indexBy(data.transactions, "GroupId")).length,
+        totalActiveCollectives: Object.keys(_.indexBy(data.transactions, "CollectiveId")).length,
         numberTransactions: data.transactions.length,
         balance: stats[0],
         delta: stats[1],

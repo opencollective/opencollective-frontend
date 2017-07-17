@@ -9,15 +9,15 @@ import * as utils from './utils';
 
 describe('graphql.transaction.test.js', () => {
   /* SETUP
-    group1: 2 events
+    collective1: 2 events
       event1: 2 tiers
         tier1: 2 responses
         tier2: 1 response
       event2: 1 tier
         tier3: no response
-    group2: 1 event
+    collective2: 1 event
       event3: no tiers // event3 not declared above due to linting
-    group3: no events
+    collective3: no events
   */
 
   before(() => utils.loadDB("wwcode_test"));

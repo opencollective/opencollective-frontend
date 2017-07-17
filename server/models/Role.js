@@ -2,7 +2,7 @@ import roles from '../constants/roles';
 
 export default function(Sequelize, DataTypes) {
 
-  const Roles = Sequelize.define('Roles', {
+  const Role = Sequelize.define('Role', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -57,5 +57,5 @@ export default function(Sequelize, DataTypes) {
     }
   });
 
-  return Roles;
+  return Role;
 }

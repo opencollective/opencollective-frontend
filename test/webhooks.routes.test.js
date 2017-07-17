@@ -22,7 +22,7 @@ const chance = chanceLib.Chance();
  */
 const application = utils.data('application');
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 let stripeEmail;
 const webhookEvent = stripeMock.webhook;
 const webhookInvoice = webhookEvent.data.object;
@@ -47,7 +47,7 @@ const stubStripe = () => {
 
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
-  let sandbox, user, paymentMethod, group, donation, emailSendSpy;
+  let sandbox, user, paymentMethod, collective, donation, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -65,20 +65,20 @@ describe('webhooks.routes.test.js', () => {
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
 
-  // Create a group.
+  // Create a collective.
   beforeEach((done) => {
     stubStripe();
 
     request(app)
-      .post('/groups')
+      .post('/collectives')
       .send({
         api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: user.email, role: roles.HOST}]})
+        collective: Object.assign(collectiveData, { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e, res) => {
         expect(e).to.not.exist;
-        group = res.body;
+        collective = res.body;
         appStripe.accounts.create.restore();
         done();
       });
@@ -130,10 +130,10 @@ describe('webhooks.routes.test.js', () => {
         `amount=${STRIPE_SUBSCRIPTION_CHARGE}`,
         `currency=${CURRENCY}`,
         `customer=${stripeMock.customers.create.id}`,
-        `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
+        `description=${encodeURIComponent(`OpenCollective: ${collective.slug}`)}`,
         'application_fee=1750',
-        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
+        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
         `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(stripeEmail)}`,
         `${encodeURIComponent('metadata[paymentMethodId]')}=1`
       ].join('&');
@@ -149,10 +149,10 @@ describe('webhooks.routes.test.js', () => {
         `plan=${planId}`,
         'application_fee_percent=5',
         'trial_end=1485986482827',
-        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
+        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
         `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
+        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
       ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -184,7 +184,7 @@ describe('webhooks.routes.test.js', () => {
       };
 
       request(app)
-        .post(`/groups/${group.id}/donations/stripe`)
+        .post(`/collectives/${collective.id}/donations/stripe`)
         .send({
           api_key: application.api_key,
           payment
@@ -290,7 +290,7 @@ describe('webhooks.routes.test.js', () => {
         expect(res.count).to.equal(2);
         const transaction = res.rows[1];
         expect(transaction.DonationId).to.be.equal(donation.id);
-        expect(transaction.GroupId).to.be.equal(donation.GroupId);
+        expect(transaction.CollectiveId).to.be.equal(donation.CollectiveId);
         expect(transaction.UserId).to.be.equal(donation.UserId);
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
@@ -301,7 +301,7 @@ describe('webhooks.routes.test.js', () => {
         expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
         expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
         expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-        expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875)
+        expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Donation.Subscription.isActive).to.be.equal(true);
         expect(transaction.Donation.Subscription).to.have.property('activatedAt');
@@ -384,7 +384,7 @@ describe('webhooks.routes.test.js', () => {
           .tap(res => {
             expect(res.count).to.be.equal(3); // third transaction
             const transaction = res.rows[2];
-            expect(transaction.GroupId).to.be.equal(donation.GroupId);
+            expect(transaction.CollectiveId).to.be.equal(donation.CollectiveId);
             expect(transaction.UserId).to.be.equal(donation.UserId);
             expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
             expect(transaction.currency).to.be.equal(CURRENCY);
@@ -397,7 +397,7 @@ describe('webhooks.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
             expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-            expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 25875);
+            expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875);
             expect(transaction.Donation.Subscription.isActive).to.be.equal(true);
             expect(transaction.Donation.Subscription).to.have.property('activatedAt');
             expect(transaction.Donation.Subscription.interval).to.be.equal('month');

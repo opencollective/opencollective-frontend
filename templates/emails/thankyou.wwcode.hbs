@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -30,7 +30,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 <p>On behalf of the Women Who Code Board of Executives, our leadership team, and our members worldwide, thank you for furthering our mission. We appreciate and value your contribution and continued support of our community.</p>
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
 
 <p>Warmly,</p>
 

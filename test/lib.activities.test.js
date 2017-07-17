@@ -56,7 +56,7 @@ describe('lib.activities.test.js', () => {
 
     it (constants.GROUP_USER_ADDED, () => {
       const actual = activitiesLib.formatMessageForPrivateChannel(activitiesData[20], 'slack');
-      expect(actual).to.equal('New user: someone (UserId: 2) added to group: <https://opencollective.com/blah|Blah>');
+      expect(actual).to.equal('New user: someone (UserId: 2) added to collective: <https://opencollective.com/blah|Blah>');
     });
 
     it (`${constants.GROUP_EXPENSE_CREATED}`, () => {

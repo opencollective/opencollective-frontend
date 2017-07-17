@@ -12,6 +12,6 @@ export function hasRole(userId, collectiveId, possibleRoles) {
       role: { $in: possibleRoles }
     }
   };
-  return models.UserCollective.findOne(query)
+  return models.Role.findOne(query)
   .then(ug => Boolean(ug))
 }

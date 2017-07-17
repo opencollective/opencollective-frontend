@@ -12,9 +12,9 @@ import roles from '../../server/constants/roles';
 import {tweetStatus} from '../../server/lib/twitter';
 
 
-models.Group.findAll().map(group => getBackers(group)
-  .then(backers => getStatus(group, backers))
-  .then(status => status && tweetStatus(sequelize, group.id, status)))
+models.Collective.findAll().map(collective => getBackers(collective)
+  .then(backers => getStatus(collective, backers))
+  .then(status => status && tweetStatus(sequelize, collective.id, status)))
 .then(() => {
   console.log('Monthly reporting done!');
   process.exit();
@@ -23,38 +23,38 @@ models.Group.findAll().map(group => getBackers(group)
   process.exit();
 });
 
-function getBackers(group) {
+function getBackers(collective) {
   return sequelize.query(`
         SELECT
           ug."UserId" as id,
           u."twitterHandle" as "twitterHandle"
-        FROM "UserGroups" ug
+        FROM "Roles" ug
         LEFT JOIN "Users" u ON u.id = ug."UserId"
-        WHERE ug."GroupId" = :GroupId
+        WHERE ug."CollectiveId" = :CollectiveId
         AND ug.role = '${roles.BACKER}'
         AND ug."deletedAt" IS NULL
       `, {
-    replacements: { GroupId: group.id },
+    replacements: { CollectiveId: collective.id },
     type: sequelize.QueryTypes.SELECT
   });
 }
 
-function getStatus(group, backers) {
+function getStatus(collective, backers) {
   const backerCount = backers.length;
   // backers without twitterHandle are ignored
   const backerList = _.remove(backers, backer => backer.twitterHandle)
     .map(backer => `@${backer.twitterHandle}`)
     .join(' ');
 
-  const longStatus = getStatusFromDetails(group, backerCount, backerList);
+  const longStatus = getStatusFromDetails(collective, backerCount, backerList);
   if (!longStatus || longStatus.length <= 140) {
     return longStatus;
   }
-  return getStatusFromDetails(group, backerCount, "");
+  return getStatusFromDetails(collective, backerCount, "");
 }
 
-function getStatusFromDetails(group, backerCount, backerList) {
-  const twitterSettings = group.getTwitterSettings();
+function getStatusFromDetails(collective, backerCount, backerList) {
+  const twitterSettings = collective.getTwitterSettings();
   if (backerCount === 0 || !twitterSettings.monthlyThankDonationsEnabled) {
     return null;
   }

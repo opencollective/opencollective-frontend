@@ -62,13 +62,13 @@ export function setupModels(client) {
     'Notification',
     'PaymentMethod',
     'Response',
+    'Role',
     'Session',
     'StripeAccount',
     'Subscription',
     'Tier',
     'Transaction',
-    'User',
-    'Roles'
+    'User'
   ].forEach((model) => {
     m[model] = client.import(`${__dirname}/${model}`);
   });
@@ -84,10 +84,10 @@ export function setupModels(client) {
   m.User.belongsTo(m.User, { as: 'referrer' });
 
   // Collective.
-  m.Collective.belongsToMany(m.User, {through: {model: m.Roles, unique:false}, as: 'users'});
-  m.User.belongsToMany(m.Collective, {through: {model: m.Roles, unique: false}, as: 'collectives'});
-  m.User.hasMany(m.Roles);
-  m.Collective.hasMany(m.Roles);
+  m.Collective.belongsToMany(m.User, {through: {model: m.Role, unique:false}, as: 'users'});
+  m.User.belongsToMany(m.Collective, {through: {model: m.Role, unique: false}, as: 'collectives'});
+  m.User.hasMany(m.Role);
+  m.Collective.hasMany(m.Role);
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User

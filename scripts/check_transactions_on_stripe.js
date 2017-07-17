@@ -13,7 +13,7 @@ var message = [];
 
 models.Transaction.findAll({
    include: [
-    { model: models.Group },
+    { model: models.Collective },
     { model: models.User },
     { model: models.Card },
     { model: models.Subscription }
@@ -27,7 +27,7 @@ models.Transaction.findAll({
   var accountId;
 
   return new Promise((resolve, reject) => {
-    transaction.Group.getStripeAccount((err, account) => {
+    transaction.Collective.getStripeAccount((err, account) => {
       if (err) return reject(err);
       accountId = account.stripeUserId;
       return resolve(Stripe(account.accessToken)); // connected account client

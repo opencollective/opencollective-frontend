@@ -22,7 +22,7 @@ const updateTransaction = (donation, transaction) => {
 const createDonation = (transaction) => {
   const donation = {
     UserId: transaction.UserId,
-    GroupId: transaction.GroupId,
+    CollectiveId: transaction.CollectiveId,
     currency: transaction.currency,
     amount: transaction.amount*100,
     title: transaction.description,

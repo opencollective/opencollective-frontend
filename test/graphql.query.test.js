@@ -8,18 +8,18 @@ import models from '../server/models';
 
 
 describe('Query Tests', () => {
-  let user1, user2, user3, group1, group2, group3, event1, event2, ticket1, ticket2, tier3;
+  let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2, tier3;
 
   /* SETUP
-    group1: 2 events
+    collective1: 2 events
       event1: 2 tiers
         ticket1: 2 responses
         ticket2: 1 response
       event2: 1 tier
         tier3: no response
-    group2: 1 event
+    collective2: 1 event
       event3: no tiers // event3 not declared above due to linting
-    group3: no events
+    collective3: no events
   */
 
   beforeEach(() => utils.resetTestDB());
@@ -30,24 +30,24 @@ describe('Query Tests', () => {
 
   beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group4')).tap(g => group3 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective4')).tap(g => collective3 = g));
 
   describe('Root query tests', () => {
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
+      Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
       .tap(e => event1 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdByUserId: user1.id, GroupId: group1.id }))
+      Object.assign(utils.data('event2'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
       .tap(e => event2 = e));
 
     beforeEach(() => models.Event.create(
-      Object.assign({}, utils.data('event2'), { slug: "another-event", createdByUserId: user2.id, GroupId: group2.id })));
+      Object.assign({}, utils.data('event2'), { slug: "another-event", CreatedByUserId: user2.id, CollectiveId: collective2.id })));
       //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
 
     describe('throws an error', () => {
@@ -93,7 +93,7 @@ describe('Query Tests', () => {
       it('when given an existing collective slug when it has no events', async () => {
         const query = `
           query getMultipleEvents {
-            allEvents(collectiveSlug: "${group3.slug}") {
+            allEvents(collectiveSlug: "${collective3.slug}") {
               id,
               name,
               description
@@ -150,7 +150,7 @@ describe('Query Tests', () => {
         it('when given only a collective slug', async () => {
           const query = `
             query getMultipleEvents {
-              allEvents(collectiveSlug: "${group1.slug}") {
+              allEvents(collectiveSlug: "${collective1.slug}") {
                 id,
                 name,
                 description
@@ -196,7 +196,7 @@ describe('Query Tests', () => {
           Object.assign(utils.data('response1'), { 
             EventId: event1.id, 
             TierId: ticket1.id, 
-            GroupId: group1.id, 
+            CollectiveId: collective1.id, 
             UserId: user2.id,
             confirmedAt: new Date()
           })));
@@ -205,7 +205,7 @@ describe('Query Tests', () => {
           Object.assign(utils.data('response2'), { 
             EventId: event1.id, 
             TierId: ticket1.id, 
-            GroupId: group1.id, 
+            CollectiveId: collective1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
           })));
@@ -216,7 +216,7 @@ describe('Query Tests', () => {
           Object.assign(utils.data('response2'), { 
             EventId: event1.id, 
             TierId: ticket1.id, 
-            GroupId: group1.id, 
+            CollectiveId: collective1.id, 
             UserId: user1.id,
             confirmedAt: null
           })));
@@ -225,7 +225,7 @@ describe('Query Tests', () => {
           Object.assign(utils.data('response3'), { 
             EventId: event1.id, 
             TierId: ticket2.id, 
-            GroupId: group1.id, 
+            CollectiveId: collective1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
           })));
@@ -233,7 +233,7 @@ describe('Query Tests', () => {
         it('sends response data', async () => {
           const query = `
             query getMultipleEvents {
-              Event(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}") {
+              Event(collectiveSlug: "${collective1.slug}", eventSlug: "${event1.slug}") {
                 responses {
                   createdAt,
                   status
@@ -251,7 +251,7 @@ describe('Query Tests', () => {
         it('when given only a collective slug', async () => {
           const query = `
             query getOneEvent {
-              allEvents(collectiveSlug: "${group1.slug}") {
+              allEvents(collectiveSlug: "${collective1.slug}") {
                 id,
                 name,
                 description,

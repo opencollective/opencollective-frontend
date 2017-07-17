@@ -55,7 +55,7 @@ export default {
           "correlationId": "49f5b1753e0df",
           "build": "15743565"
         },
-        "cancelUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/cancel",
+        "cancelUrl": "http:\/\/localhost:8000\/collectives\/2\/transactions\/1\/cancel",
         "currencyCode": "USD",
         "memo": "Reimbursement transaction 1: Homepage design",
         "paymentInfoList": {
@@ -68,7 +68,7 @@ export default {
             ]
           ]
         },
-        "returnUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/success",
+        "returnUrl": "http:\/\/localhost:8000\/collectives\/2\/transactions\/1\/success",
         "status": "CREATED",
         "trackingId": "f56ca700:27",
         "payKey": "AP-791807008W699005A",
@@ -88,7 +88,7 @@ export default {
           "correlationId": "e0d6da2659ff9",
           "build": "15743565"
         },
-        "cancelUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/cancel",
+        "cancelUrl": "http:\/\/localhost:8000\/collectives\/2\/transactions\/1\/cancel",
         "currencyCode": "USD",
         "memo": "Reimbursement transaction 1: Homepage design",
         "paymentInfoList": {
@@ -101,7 +101,7 @@ export default {
             ]
           ]
         },
-        "returnUrl": "http:\/\/localhost:8000\/groups\/2\/transactions\/1\/success",
+        "returnUrl": "http:\/\/localhost:8000\/collectives\/2\/transactions\/1\/success",
         "senderEmail": "philippe.modard+paypalsandbox@gmail.com",
         "status": "COMPLETED",
         "trackingId": "f56ca700:27",

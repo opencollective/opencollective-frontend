@@ -6,20 +6,20 @@ import models from '../server/models';
 
 const application = utils.data('application');
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 
 describe('homepage.routes.test.js', () => {
 
-  let user, group, paymentMethod;
+  let user, collective, paymentMethod;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach(() =>
-    models.Group
-      .create(groupData).tap(g => {
-        group = g;
-        return group.addUserWithRole(user, 'HOST');
+    models.Collective
+      .create(collectiveData).tap(g => {
+        collective = g;
+        return collective.addUserWithRole(user, 'HOST');
       })
       .then(() => models.PaymentMethod.create({UserId: user.id}))
       .tap(p => paymentMethod = p)
@@ -27,7 +27,7 @@ describe('homepage.routes.test.js', () => {
         return models.Transaction.create({
           amount:100000,
           PaymentMethodId: paymentMethod.id,
-          GroupId: group.id,
+          CollectiveId: collective.id,
           UserId: user.id,
           HostId: user.id
         })
@@ -49,7 +49,7 @@ describe('homepage.routes.test.js', () => {
           expect(body.collectives).to.have.property('opensource');
           expect(body.collectives).to.have.property('meetup');
           expect(body.collectives.opensource.length).to.equal(1);
-          expect(body.collectives.opensource[0].name).to.equal(groupData.name);
+          expect(body.collectives.opensource[0].name).to.equal(collectiveData.name);
           done();
         })
     });

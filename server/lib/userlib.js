@@ -13,7 +13,7 @@ export default {
 
   fetchAvatar(email) {
     return this.getUserData(email)
-      .then(userData => userData && userData.avatar ? userData.avatar : null)
+      .then(userData => userData && userData.image ? userData.image : null)
   },
 
   getUserData(email) {
@@ -72,26 +72,26 @@ export default {
       const sources = [];
 
       if (person) {
-        const personAvatarSources = ['twitter', 'aboutme', 'gravatar', 'github'];
+        const personAvatarSources = ['twitter', 'aboutme', 'grimage', 'github'];
         personAvatarSources.forEach((source) => {
-          if (person[source] && person[source].avatar) {
-            sources.push({src: person[source].avatar, source});
+          if (person[source] && person[source].image) {
+            sources.push({src: person[source].image, source});
           }
         });
-        if (person.avatar) {
-          sources.push({src: person.avatar, source: 'clearbit'});
+        if (person.image) {
+          sources.push({src: person.image, source: 'clearbit'});
         }
       }
 
       if (company) {
         const companyAvatarSources = ['twitter', 'angellist'];
         companyAvatarSources.forEach((source) => {
-          if (company[source] && company[source].avatar) {
-            sources.push({src: company[source].avatar, source});
+          if (company[source] && company[source].image) {
+            sources.push({src: company[source].image, source});
           }
         });
-        if (company.logo) {
-          sources.push({src: company.logo, source: 'clearbit'});
+        if (company.image) {
+          sources.push({src: company.image, source: 'clearbit'});
         }
       }
 
@@ -116,7 +116,7 @@ export default {
     const potentialUserNames = [
       user.username,
       user.suggestedUsername,
-      user.avatar ? this.getUsernameFromGithubURL(user.avatar) : null,
+      user.image ? this.getUsernameFromGithubURL(user.image) : null,
       user.twitterHandle ? user.twitterHandle.replace(/@/g, '') : null,
       user.name ? user.name.replace(/ /g, '') : null,
       user.email ? user.email.split(/@|\+/)[0] : null]
@@ -157,11 +157,11 @@ export default {
   },
 
   /*
-   * Extract username from github avatar url
+   * Extract username from github image url
    * Needed to get usernames for github signups
    */ 
   getUsernameFromGithubURL(url) {
-    const githubUrl = 'avatars.githubusercontent.com/';
+    const githubUrl = 'images.githubusercontent.com/';
     if (url && url.indexOf(githubUrl) !== -1) {
       const tokens = url.split(githubUrl);
       if (tokens.length === 2 && tokens[1] !== '') {
@@ -180,7 +180,7 @@ export default {
         if (userData) {
           user.firstName = user.firstName || userData.name.givenName;
           user.lastName = user.lastName || userData.name.familyName;
-          user.avatar = user.avatar || userData.avatar;
+          user.image = user.image || userData.image;
           user.twitterHandle = user.twitterHandle || userData.twitter.handle;
           user.website = user.website || userData.site;
           return user.save();

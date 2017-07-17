@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * This script is useful for sending a one-time email to all group MEMBERS (aka core contributors).
+ * This script is useful for sending a one-time email to all collective MEMBERS (aka core contributors).
  */ 
 
 process.env.PORT = 3066;
@@ -18,8 +18,8 @@ import roles from '../server/constants/roles';
 const debug = debugLib('onetime.email');
 
 const {
-  Group,
-  UserGroup,
+  Collective,
+  Role,
   User
 } = models;
 
@@ -28,29 +28,29 @@ const init = () => {
 
   const startTime = new Date;
 
-  // find all active groups
-  const groupQuery = {
+  // find all active collectives
+  const collectiveQuery = {
     attributes: ['id', 'slug'],
     include: [ { model: models.Transaction, required: true }]
   }
 
-  // for debugging, handpick a few groups
+  // for debugging, handpick a few collectives
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    groupQuery.where = { slug: {$in: ['webpack']} };
+    collectiveQuery.where = { slug: {$in: ['webpack']} };
 
-  // get all active groups
-  return Group.findAll(groupQuery)
-  .tap(groups => console.log(`Active groups found: ${groups.length}`))
-  .map(group => group.id)
-  .then(groupIds => sequelize.query(`
-    SELECT distinct(u.email), u."firstName", u."lastName" from "UserGroups" ug
+  // get all active collectives
+  return Collective.findAll(collectiveQuery)
+  .tap(collectives => console.log(`Active collectives found: ${collectives.length}`))
+  .map(collective => collective.id)
+  .then(collectiveIds => sequelize.query(`
+    SELECT distinct(u.email), u."firstName", u."lastName" from "Roles" ug
     LEFT JOIN "Users" u on ug."UserId" = u.id
-    where ug.role = :role and ug."GroupId" IN (:groupIds)
+    where ug.role = :role and ug."CollectiveId" IN (:collectiveIds)
     `, {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { groupIds, role: roles.MEMBER }
+      replacements: { collectiveIds, role: roles.MEMBER }
     }))
-  .tap(coreContributorsOfActiveGroups => console.log(`Core contributors found: ${coreContributorsOfActiveGroups.length}`))
+  .tap(coreContributorsOfActiveCollectives => console.log(`Core contributors found: ${coreContributorsOfActiveCollectives.length}`))
   .then(sendEmail)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);

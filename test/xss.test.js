@@ -11,7 +11,7 @@ import middleware from '../server/middleware/sanitizer';
 const application = utils.data('application');
 const userData = utils.data('user3');
 const userData2 = utils.data('user2');
-const groupData = utils.data('group2');
+const collectiveData = utils.data('collective2');
 
 let user;
 
@@ -31,12 +31,12 @@ describe('XSS.test', () => {
 
   beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
 
-  beforeEach('create group with user as first member', (done) => {
+  beforeEach('create collective with user as first member', (done) => {
     request(app)
-      .post('/groups')
+      .post('/collectives')
       .send({
         api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: userData2.email, role: roles.MEMBER}]})
+        collective: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.MEMBER}]})
       })
       .expect(200)
       .end((e) => {
@@ -123,13 +123,13 @@ describe('XSS.test', () => {
     });
   });
 
-  describe('sanitizes group', () => {
+  describe('sanitizes collective', () => {
     it('name field', (done) => {
       request(app)
-        .put(`/groups/1?api_key=${application.api_key}`)
+        .put(`/collectives/1?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
-          group: {
+          collective: {
             name: "<script>alert(\"hi\")</script>hello"
           }
         })
@@ -141,10 +141,10 @@ describe('XSS.test', () => {
     });
   it('name field', (done) => {
       request(app)
-        .put(`/groups/1?api_key=${application.api_key}`)
+        .put(`/collectives/1?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
-          group: {
+          collective: {
             description: "<script>alert(\"hi\")</script> yo"
           }
         })

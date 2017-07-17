@@ -8,7 +8,7 @@ import Promise from 'bluebird';
 import models from '../server/models';
 
 const application = utils.data('application');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 const activitiesData = utils.data('activities1').activities;
 
 describe('activities.routes.test.js', () => {
@@ -16,7 +16,7 @@ describe('activities.routes.test.js', () => {
   let user;
   let user2;
   let user3;
-  let group;
+  let collective;
 
   before(() => utils.resetTestDB());
 
@@ -25,29 +25,29 @@ describe('activities.routes.test.js', () => {
   before('create user2', () => models.User.create(utils.data('user2')).tap(u => user2 = u));
   before('create user3', () => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
-  before('create group', () => models.Group.create(groupData).tap(g => group = g));
+  before('create collective', () => models.Collective.create(collectiveData).tap(g => collective = g));
 
-  before('add user as host', () => group.addUserWithRole(user, roles.HOST));
-  before('add user3 as backer', () => group.addUserWithRole(user3, roles.BACKER));
+  before('add user as host', () => collective.addUserWithRole(user, roles.HOST));
+  before('add user3 as backer', () => collective.addUserWithRole(user3, roles.BACKER));
 
   before('create activities', () => Promise.map(activitiesData, a => models.Activity.create(a)));
 
   /**
-   * Get group's activities.
+   * Get collective's activities.
    */
-  describe('#group', () => {
+  describe('#collective', () => {
 
-    const getActivitiesForGroup = (groupid) => request(app).get(`/groups/${groupid}/activities?api_key=${application.api_key}`);
+    const getActivitiesForCollective = (collectiveid) => request(app).get(`/collectives/${collectiveid}/activities?api_key=${application.api_key}`);
 
-    it('fails getting activities if not member of the group', (done) => {
-      getActivitiesForGroup(group.id)
+    it('fails getting activities if not member of the collective', (done) => {
+      getActivitiesForCollective(collective.id)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(403)
         .end(done);
     });
 
-    it('successfully get a group\'s activities', (done) => {
-      getActivitiesForGroup(group.id)
+    it('successfully get a collective\'s activities', (done) => {
+      getActivitiesForCollective(collective.id)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -56,7 +56,7 @@ describe('activities.routes.test.js', () => {
           const activities = res.body;
           expect(activities.length).to.equal(12);
           activities.forEach((a) => {
-            expect(a.GroupId).to.equal(group.id);
+            expect(a.CollectiveId).to.equal(collective.id);
           });
           done();
 
@@ -67,8 +67,8 @@ describe('activities.routes.test.js', () => {
 
       const perPage = 3;
 
-      it('successfully get a group\'s activities with per_page', (done) => {
-        getActivitiesForGroup(group.id)
+      it('successfully get a collective\'s activities with per_page', (done) => {
+        getActivitiesForCollective(collective.id)
           .send({
             per_page: perPage,
             sort: 'id',
@@ -90,19 +90,19 @@ describe('activities.routes.test.js', () => {
             expect(headers.link).to.contain('current');
             expect(headers.link).to.contain('page=1');
             expect(headers.link).to.contain(`per_page=${perPage}`);
-            expect(headers.link).to.contain(`/groups/${group.id}/activities`);
+            expect(headers.link).to.contain(`/collectives/${collective.id}/activities`);
             const tot = _.reduce(activitiesData, (memo, el) => {
-              return memo + ((el.GroupId === group.id) ? 1 : 0);
+              return memo + ((el.CollectiveId === collective.id) ? 1 : 0);
             }, 0);
-            expect(headers.link).to.contain(`/groups/1/activities?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
+            expect(headers.link).to.contain(`/collectives/1/activities?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
 
             done();
           });
       });
 
-      it('successfully get the second page of a group\'s activities', (done) => {
+      it('successfully get the second page of a collective\'s activities', (done) => {
         const page = 2;
-        getActivitiesForGroup(group.id)
+        getActivitiesForCollective(collective.id)
           .send({
             per_page: perPage,
             page,
@@ -124,10 +124,10 @@ describe('activities.routes.test.js', () => {
           });
       });
 
-      it('successfully get a group\'s activities using since_id', (done) => {
+      it('successfully get a collective\'s activities using since_id', (done) => {
         const sinceId = 8;
 
-        getActivitiesForGroup(group.id)
+        getActivitiesForCollective(collective.id)
           .send({
             since_id: sinceId,
             sort: 'id',
@@ -156,8 +156,8 @@ describe('activities.routes.test.js', () => {
 
     describe('Sorting', () => {
 
-      it('successfully get a group\'s activities with sorting', (done) => {
-        getActivitiesForGroup(group.id)
+      it('successfully get a collective\'s activities with sorting', (done) => {
+        getActivitiesForCollective(collective.id)
           .send({
             sort: 'createdAt',
             direction: 'desc'

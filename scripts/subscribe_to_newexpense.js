@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  * This script subscribes all hosts
- * to the group.expense.created event
+ * to the collective.expense.created event
  */
 import Promise from 'bluebird';
 import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const UserGroup = models.UserGroup;
+const Role = models.Role;
 const Notification = models.Notification;
 
 const processRows = (rows) => {
@@ -16,19 +16,19 @@ const processRows = (rows) => {
 };
 
 const init = () => {
-  UserGroup.findAll({ where: { role: 'HOST' }})
+  Role.findAll({ where: { role: 'HOST' }})
   .then(processRows)
   .then(() => process.exit(0));
 }
 
 const processRow = (row) => {
-  const type = `group.expense.created`;
-  debug(`Subscribing UserId ${row.UserId} to ${type} of GroupId ${row.GroupId}`);
+  const type = `collective.expense.created`;
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
-    GroupId: row.GroupId,
+    CollectiveId: row.CollectiveId,
     type
-  }).catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of GroupId ${row.GroupId}`));
+  }).catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`));
 };
 
 init();

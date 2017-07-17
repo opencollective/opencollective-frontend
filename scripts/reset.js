@@ -20,14 +20,14 @@ exec('make dropdb && make database')
   password: 'password'
 }))
 .tap(user => data.user = user)
-.then(() => models.Group.create({
+.then(() => models.Collective.create({
   name: 'OpenCollective Demo',
-  description: 'OpenCollective Demo group',
+  description: 'OpenCollective Demo collective',
   isActive: true,
   slug: 'opencollective',
   mission: 'demo open collective'
 }))
-.then(group => group.addUserWithRole(data.user, roles.HOST))
+.then(collective => collective.addUserWithRole(data.user, roles.HOST))
 .then(() => models.ConnectedAccount.create({
   provider: 'paypal',
   // Sandbox api keys
@@ -40,14 +40,14 @@ exec('make dropdb && make database')
   password: 'password'
 }))
 .then((user) => data.user = user)
-.then(() => models.Group.create({
+.then(() => models.Collective.create({
   name: 'OpenCollective Demo with stripe',
-  description: 'OpenCollective Demo group with stripe',
+  description: 'OpenCollective Demo collective with stripe',
   isActive: true,
   slug: 'oc-stripe',
   mission: 'oc with stripe'
 }))
-.then((group) => group.addUserWithRole(data.user, roles.HOST))
+.then((collective) => collective.addUserWithRole(data.user, roles.HOST))
 .then(() => {
   console.log('Please login on development with `user@opencollective.com` and `password` or ');
   console.log('Please login on development with `stripeuser@opencollective.com` and `password`');

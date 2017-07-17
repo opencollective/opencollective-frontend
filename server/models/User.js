@@ -65,7 +65,7 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    avatar: DataTypes.STRING,
+    image: DataTypes.STRING,
 
     email: {
       type: DataTypes.STRING,
@@ -215,7 +215,7 @@ export default (Sequelize, DataTypes) => {
           longDescription: this.longDescription,
           organization: this.organization,
           isOrganization: this.isOrganization,
-          avatar: this.avatar,
+          image: this.image,
           twitterHandle: this.twitterHandle,
           website: this.website,
           createdAt: this.createdAt,
@@ -232,7 +232,7 @@ export default (Sequelize, DataTypes) => {
           lastName: this.lastName,
           name: this.name,
           username: this.username,
-          avatar: this.avatar,
+          image: this.image,
           twitterHandle: this.twitterHandle,
           website: this.website,
           mission: this.mission,
@@ -249,7 +249,7 @@ export default (Sequelize, DataTypes) => {
         return {
           id: this.id,
           username: this.username,
-          avatar: this.avatar,
+          image: this.image,
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
@@ -262,7 +262,7 @@ export default (Sequelize, DataTypes) => {
       public() {
         return {
           id: this.id,
-          avatar: this.avatar,
+          image: this.image,
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
@@ -300,7 +300,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       hasMissingInfo() {
-        return !(this.firstName && this.avatar);
+        return !(this.firstName && this.image);
       },
 
       encryptId() {
@@ -359,16 +359,16 @@ export default (Sequelize, DataTypes) => {
 
       getCollectivesWithRoles() {
         return this.getCollectives({
-          include: [{ model: models.UserCollective, where: { UserId: this.id }}]
+          include: [{ model: models.Role, where: { UserId: this.id }}]
         })
         .then(collectives => collectives.map(g => {
-          g.role = g.UserCollective.role;
+          g.role = g.Role.role;
           return g;
         }))
       },
 
       getRoles() {
-        return models.UserCollective.findAll({
+        return models.Role.findAll({
           where: {
             UserId: this.id
           }
@@ -407,7 +407,7 @@ export default (Sequelize, DataTypes) => {
             'longDescription',
             'twitterHandle',
             'website',
-            'avatar',
+            'image',
             'paypalEmail'];
 
         if (attributes.name) {
@@ -436,12 +436,12 @@ export default (Sequelize, DataTypes) => {
             })
           }
         })
-        .then(() => this.avatar || userLib.fetchAvatar(this.email))
-        .then(avatar => {
-          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(config.aws.s3.bucket) === -1) {
-            return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, avatar)
+        .then(() => this.image || userLib.fetchAvatar(this.email))
+        .then(image => {
+          if (image && image.indexOf('/public') !== 0 && image.indexOf(config.aws.s3.bucket) === -1) {
+            return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, image)
               .then((aws_src, error) => {
-                this.avatar = error ? this.avatar : aws_src;
+                this.image = error ? this.image : aws_src;
                 update = true;
               });
           } else {

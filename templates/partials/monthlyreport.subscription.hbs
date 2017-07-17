@@ -115,35 +115,35 @@
     <td valign="top" width="100%">
       <table>
         <tr>
-          <td><h1>{{group.name}}</h1></td>
+          <td><h1>{{collective.name}}</h1></td>
         </tr>
         <tr>
           <td>
             <div class="Links">
-              {{#if group.website}}
-              <a href="{{group.website}}">Website</a>
+              {{#if collective.website}}
+              <a href="{{collective.website}}">Website</a>
               <span> | </span>
               {{/if}}
-              <a href="https://opencollective.com/{{group.slug}}?{{@root.utm}}">Open Collective Page</a>
+              <a href="https://opencollective.com/{{collective.slug}}?{{@root.utm}}">Open Collective Page</a>
             </div>
           </td>
         </tr>
         <tr><td height="10"></td></tr>
         <tr>
-          <td><p class="CollectiveMission">{{group.mission}}</p></td>
+          <td><p class="CollectiveMission">{{collective.mission}}</p></td>
         </tr>
         <tr>
           <td><p>You’re contributing <b>{{{currency amount currency=currency}}}</b> per {{interval}} since {{{moment createdAt}}}</p></td>
         </tr>
         <tr><td height="10"></td></tr>
-        {{#if group.events.upcoming}}
+        {{#if collective.events.upcoming}}
           <tr>
             <td>
-              <label>Upcoming {{{pluralize "event" n=group.events.upcoming.length}}}:</label>
+              <label>Upcoming {{{pluralize "event" n=collective.events.upcoming.length}}}:</label>
               <ul>
-              {{#each group.events.upcoming}}
+              {{#each collective.events.upcoming}}
                 <li>{{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} @ {{locationName}}<br />
-                <a href="https://opencollective.com/{{../group.slug}}/events/{{slug}}">{{name}}</a><br />
+                <a href="https://opencollective.com/{{../collective.slug}}/events/{{slug}}">{{name}}</a><br />
                 RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}</li>
               {{/each}}
               </ul>
@@ -152,14 +152,14 @@
           <tr><td height="5"></td></tr>
         {{/if}}
 
-        {{#if group.events.past}}
+        {{#if collective.events.past}}
           <tr>
             <td>
-              <label>Past {{{pluralize "event" n=group.events.past.length}}}:</label>
+              <label>Past {{{pluralize "event" n=collective.events.past.length}}}:</label>
               <ul>
-              {{#each group.events.past}}
+              {{#each collective.events.past}}
                 <li>{{{moment startsAt timezone=timezone format="MMMM Do HH:mm"}}} @ {{locationName}}<br />
-                <a href="https://opencollective.com/{{../group.slug}}/events/{{slug}}">{{name}}</a><br />
+                <a href="https://opencollective.com/{{../collective.slug}}/events/{{slug}}">{{name}}</a><br />
                 RSVPs: {{stats.confirmed}} {{#if stats.interested}}(+{{stats.interested}} interested){{/if}}</li>
               {{/each}}
               </ul>
@@ -172,13 +172,13 @@
             <div class="currentBalance">
               <label>Current balance:</label> 
               <div class="Statistic">
-                <div class="Amount">{{{currency group.stats.balance currency=currency}}}</div>
+                <div class="Amount">{{{currency collective.stats.balance currency=currency}}}</div>
                 <div class="Change">
-                  {{#if group.stats.totalDonations}}
-                  <div class="PositiveChange">+&nbsp;{{{currency group.stats.totalDonations currency=currency}}}</div>
+                  {{#if collective.stats.totalDonations}}
+                  <div class="PositiveChange">+&nbsp;{{{currency collective.stats.totalDonations currency=currency}}}</div>
                   {{/if}}
-                  {{#if group.stats.totalPaidExpenses}}
-                  <div class="NegativeChange">-&nbsp;{{{currency group.stats.totalPaidExpenses currency=currency}}}</div>
+                  {{#if collective.stats.totalPaidExpenses}}
+                  <div class="NegativeChange">-&nbsp;{{{currency collective.stats.totalPaidExpenses currency=currency}}}</div>
                   {{/if}}
                 </div>
               </div>
@@ -189,17 +189,17 @@
         <tr>
           <td>
             <div class="latestExpenses">
-              <label>Latest {{{pluralize "expense" n=group.expenses.length}}}:</label>
-              {{#if group.expenses.length}}
+              <label>Latest {{{pluralize "expense" n=collective.expenses.length}}}:</label>
+              {{#if collective.expenses.length}}
                 <ul>
-                {{#each group.expenses}}
+                {{#each collective.expenses}}
                 <li>{{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{title}} {{status}}</li>
                 {{/each}}
                 </ul>
               {{else}}
-              <p class="noExpense">No expense filed this month. <a href="https://opencollective.com/{{group.slug}}/expenses/new">Submit an expense</a>.</p>
+              <p class="noExpense">No expense filed this month. <a href="https://opencollective.com/{{collective.slug}}/expenses/new">Submit an expense</a>.</p>
               {{/if}}
-              <p><a href="https://opencollective.com/{{group.slug}}/transactions">View all past transactions</a></p>
+              <p><a href="https://opencollective.com/{{collective.slug}}/transactions">View all past transactions</a></p>
             </div>
           </td>
         </tr>
@@ -207,7 +207,7 @@
 
     </td>
     <td valign="top">
-      {{> collectivecard group}}
+      {{> collectivecard collective}}
     </td>
   </tr>
 </table>

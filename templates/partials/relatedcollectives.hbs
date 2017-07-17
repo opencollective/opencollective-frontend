@@ -13,7 +13,7 @@ th {
 }
 </style>
 
-{{#if relatedGroups.length}}
+{{#if relatedCollectives.length}}
 <table width="100%" height=30>
   <tr><td colspan="3" height="10">&nbsp;</td></tr>
   <tr>
@@ -23,7 +23,7 @@ th {
 </table>
 
 <div class="CollectiveCards">
-{{#each relatedGroups}}
+{{#each relatedCollectives}}
   {{> collectivecard}}
 {{/each}}
 </div>

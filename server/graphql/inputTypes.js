@@ -65,7 +65,7 @@ export const UserInputType = new GraphQLInputObjectType({
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
       organization: { type: GraphQLString },
-      avatar: { type: GraphQLString },
+      image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },

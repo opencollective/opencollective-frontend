@@ -20,7 +20,7 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
   <li>Open Source with us on <a href="https://github.com/sustainers">GitHub</a></li>
   <li><a href="https://slack.opencollective.com">Slack</a> with us</li>
   <li>You can follow our activities and how we will be spending the money on our open collective page:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a></li>
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a></li>
  </p>
  
  <p>If you have any questions feel free to contact us:<br />
@@ -32,13 +32,13 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 {{> subscriptions}}
 
 {{#if transaction}}
-<p>P.S: You can download a receipt for your ticket in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>P.S: You can download a receipt for your ticket in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
 {{/if}}
 
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} open collective
+  – The {{collective.name}} open collective
 </p>
 
 {{> footer}}

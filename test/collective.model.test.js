@@ -4,15 +4,15 @@ import * as utils from '../test/utils';
 
 const {
   Transaction,
-  Group,
+  Collective,
   User
 } = models;
 
-describe('Group model', () => {
+describe('Collective model', () => {
 
-  let group = {};
+  let collective = {};
 
-  const groupData = {
+  const collectiveData = {
     slug: 'tipbox',
     name: 'tipbox',
     currency: 'USD',
@@ -42,7 +42,7 @@ describe('Group model', () => {
   const transactions = [{
     createdAt: new Date('2016-06-14'),
     amount: -10,
-    netAmountInGroupCurrency: -1000,
+    netAmountInCollectiveCurrency: -1000,
     currency: 'USD',
     type: 'expense',
     description: 'pizza',
@@ -51,7 +51,7 @@ describe('Group model', () => {
   },{
     createdAt: new Date('2016-07-14'),
     amount: -150,
-    netAmountInGroupCurrency: -15000,
+    netAmountInCollectiveCurrency: -15000,
     currency: 'USD',
     type: 'expense',
     description: 'stickers',
@@ -61,7 +61,7 @@ describe('Group model', () => {
     createdAt: new Date('2016-06-15'),
     amount: 250,
     amountInTxnCurrency: 25000,
-    netAmountInGroupCurrency: 22500,
+    netAmountInCollectiveCurrency: 22500,
     currency: 'USD',
     type: 'donation',
     UserId: 1
@@ -69,7 +69,7 @@ describe('Group model', () => {
     createdAt: new Date('2016-07-16'),
     amount: 500,
     amountInTxnCurrency: 50000,
-    netAmountInGroupCurrency: 45000,
+    netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
     type: 'donation',
     UserId: 1
@@ -78,7 +78,7 @@ describe('Group model', () => {
     createdAt: new Date('2016-08-18'),
     amount: 500,
     amountInTxnCurrency: 50000,
-    netAmountInGroupCurrency: 45000,
+    netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
     type: 'donation',
     UserId: 2
@@ -87,30 +87,30 @@ describe('Group model', () => {
 
   before(() => utils.resetTestDB());
 
-  before(() => Group.create(groupData)
-    .then(g => group = g)
+  before(() => Collective.create(collectiveData)
+    .then(g => collective = g)
     .then(() => User.createMany(users))
-    .then(() => group.addUserWithRole({ id: 1 }, 'BACKER'))
-    .then(() => Transaction.createMany(transactions, { GroupId: group.id, HostId: 1 })));
+    .then(() => collective.addUserWithRole({ id: 1 }, 'BACKER'))
+    .then(() => Transaction.createMany(transactions, { CollectiveId: collective.id, HostId: 1 })));
 
-  it('returns a default logo if no logo', () => {
-    expect(group.logo).to.contain('/public/images/1px.png');
+  it('returns a default image if no image', () => {
+    expect(collective.image).to.contain('/public/images/1px.png');
   });
 
   it('computes the balance ', () =>
-    group.getBalance().then(balance => {
+    collective.getBalance().then(balance => {
       let sum = 0;
-      transactions.map(t => sum += t.netAmountInGroupCurrency);
+      transactions.map(t => sum += t.netAmountInCollectiveCurrency);
       expect(balance).to.equal(sum);
     }));
 
   it('computes the balance until a certain month', (done) => {
     const until = new Date('2016-07-01');
-    group.getBalance(until).then(balance => {
+    collective.getBalance(until).then(balance => {
       let sum = 0;
       transactions.map(t => {
         if (t.createdAt < until)
-          sum += t.netAmountInGroupCurrency
+          sum += t.netAmountInCollectiveCurrency
       });
       expect(balance).to.equal(sum);
       done();
@@ -118,7 +118,7 @@ describe('Group model', () => {
   });
 
   it('computes the number of backers', (done) => {
-    group.getBackersCount()
+    collective.getBackersCount()
       .then(count => {
         expect(count).to.equal(users.length);
         done();
@@ -127,7 +127,7 @@ describe('Group model', () => {
 
   it('computes the number of backers until a certain month', (done) => {
     const until = new Date('2016-07-01');
-    group.getBackersCount(until).then(count => {
+    collective.getBackersCount(until).then(count => {
       const backers = {};
       transactions.map(t => {
         if (t.amount > 0 && t.createdAt < until)
@@ -141,11 +141,11 @@ describe('Group model', () => {
   it('gets all the expenses', (done) => {
     let totalExpenses = 0;
     transactions.map(t => {
-      if (t.netAmountInGroupCurrency < 0)
+      if (t.netAmountInCollectiveCurrency < 0)
         totalExpenses++;
     });
 
-    group.getExpenses()
+    collective.getExpenses()
       .then(expenses => {
         expect(expenses.length).to.equal(totalExpenses);
         done();
@@ -162,11 +162,11 @@ describe('Group model', () => {
     let totalExpenses = 0;
 
     transactions.map(t => {
-      if (t.netAmountInGroupCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate)
+      if (t.netAmountInCollectiveCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate)
         totalExpenses++;
     });
 
-    group.getExpenses(null, startDate, endDate)
+    collective.getExpenses(null, startDate, endDate)
       .then(expenses => {
         expect(expenses.length).to.equal(totalExpenses);
         done();
@@ -176,26 +176,45 @@ describe('Group model', () => {
       });
   });
 
-  it('get the related groups', (done) => {
-    Group.createMany(utils.data('relatedGroups'))
-    .then(() => group.getRelatedGroups(3, 0))
-    .then(relatedGroups => {
-      expect(relatedGroups).to.have.length(3);
-      expect(relatedGroups[0].settings.style.hero).to.have.property('cover');
+  it('get the related collectives', (done) => {
+    Collective.createMany(utils.data('relatedCollectives'))
+    .then(() => collective.getRelatedCollectives(3, 0))
+    .then(relatedCollectives => {
+      expect(relatedCollectives).to.have.length(3);
+      expect(relatedCollectives[0].settings.style.hero).to.have.property('cover');
       done();
     })
   });
 
-  it('get the tiers with users', (done) => {
-    group.getTiersWithUsers()
-      .then(tiers => {
-        expect(tiers).to.have.length(groupData.tiers.length);
-        expect(tiers[1].users).to.have.length(1);
-        const sponsor = tiers[1].users[0];
-        expect(parseInt(sponsor.totalDonations, 10)).to.equal(transactions[2].amountInTxnCurrency + transactions[3].amountInTxnCurrency);
-        expect(new Date(sponsor.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
-        expect(new Date(sponsor.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
-        done();
-      });
+  describe("tiers", () => {
+
+    before(() => models.Tier.create({...utils.data('tier1'), CollectiveId: 1})); // adding backer tier
+    before(() => models.Tier.create({...utils.data('tier2'), CollectiveId: 1})); // adding sponsor tier
+
+    before(() => models.Response.create({
+      UserId: 1,
+      CollectiveId: 1,
+      TierId: 1
+    }));
+
+    before(() => models.Response.create({
+      UserId: 2,
+      CollectiveId: 1,
+      TierId: 2
+    }));
+
+    it('get the tiers with users', (done) => {
+
+      collective.getTiersWithUsers()
+        .then(tiers => {
+          expect(tiers).to.have.length(2);
+          expect(tiers[0].users).to.have.length(1);
+          const backer = tiers[0].users[0];
+          expect(parseInt(backer.totalDonations, 10)).to.equal(transactions[2].amountInTxnCurrency + transactions[3].amountInTxnCurrency);
+          expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
+          expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
+          done();
+        });
+    });
   });
 });

@@ -67,7 +67,7 @@ export default {
     "email": "internal_user@opencollective.com"
   },
 
-  "group1": {
+  "collective1": {
     "name": "Scouts d'Arlon",
     "mission": "toujours prêt",
     "description": "Troupe Scoute Albert Schweitzer",
@@ -77,28 +77,13 @@ export default {
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
     "slug": "scouts",
-    "tiers": [{
-      "name": "backer",
-      "title": "Backers",
-      "description": "One time tier",
-      "range": [0, 100],
-      "button": "Become a backer",
-      "interval": "month"
-    }, {
-      "name": "sponsor",
-      "title":" Sponsors",
-      "description": "Monthly tier",
-      "range": [50, 10000],
-      "interval": "monthly",
-      "button": "Become a sponsor"
-    }],
     "hostFeePercent": 10,
     "tags": ["open source", "test"],
     "isSupercollective": false,
     "isActive": true
   },
 
-  "group2": {
+  "collective2": {
     "name": "WWCode Austin",
     "slug": "wwcode-austin",
     "mission": "more women in tech",
@@ -127,11 +112,11 @@ export default {
     "isActive": true
   },
 
-  "group3": {
+  "collective3": {
     "name": "Yeoman"
   },
 
-  "group4": {
+  "collective4": {
     "name": "Open source collective",
     "slug": "meetups",
     "settings": {
@@ -140,7 +125,7 @@ export default {
     "isSupercollective": true
   },
 
-  "group5": {
+  "collective5": {
     "name": "Brussels Together",
     "slug": "brusselstogether",
     "settings": {
@@ -149,12 +134,12 @@ export default {
     "isSupercollective": true
   },
 
-  "relatedGroups": [
+  "relatedCollectives": [
     {
       name: 'Reinventing Brussels',
       slug: 'reinventingbrussels',
       mission: 'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
-      logo: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
+      image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
       currency: 'EUR',
       settings: { "style": { "hero": { "cover": { "background": "rgb(36,189,213)" } } } },
       tags: ['#brusselstogether'],
@@ -164,7 +149,7 @@ export default {
       name: 'Refugees Got Talent',
       slug: 'refugeesgottalent',
       mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
-      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
       isActive: true
@@ -173,7 +158,7 @@ export default {
       name: 'Brussels Smart City',
       slug: 'brusselssmartcity',
       mission: 'improve the life of Brussels Citizens by the use of technology',
-      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
       backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg',
@@ -207,19 +192,19 @@ export default {
       {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "John", "lastName": "Doe", "name": "John Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
       {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
-      {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.user.added", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.user.added", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}},
+      {"type": "collective.created", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.user.added", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.user.added", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.deleted", "UserId": 3, "CollectiveId": 1, "data": {}},
       {
-        "type": "group.transaction.created",
+        "type": "collective.transaction.created",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user": {
             "email":"john@doe.com"
@@ -229,7 +214,7 @@ export default {
             "amount":1042,
             "currency": "USD"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -237,9 +222,9 @@ export default {
         }
       },
       {
-        "type": "group.transaction.created",
+        "type": "collective.transaction.created",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user":{
             "email":"john@doe.com"
@@ -250,7 +235,7 @@ export default {
             "currency": "USD",
             "description": "pizza"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -258,9 +243,9 @@ export default {
         }
       },
       {
-        "type": "group.expense.paid",
+        "type": "collective.expense.paid",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user":{
             "email":"john@doe.com"
@@ -271,7 +256,7 @@ export default {
             "currency": "USD",
             "description": "pizza"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -301,7 +286,7 @@ export default {
             "amount": 1234,
             "currency": "EUR"
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -322,7 +307,7 @@ export default {
           "subscription": {
             "interval": "month"
           },
-          "group": {
+          "collective": {
             "name": "Yeoman",
             "slug": "yeoman",
             "twitterHandle": "yeoman",
@@ -345,7 +330,7 @@ export default {
             "interval": "month",
             "id": 4
           },
-          "group": {
+          "collective": {
             "name": "Yeoman",
             "slug": "yeoman",
             "twitterHandle": "yeoman",
@@ -354,12 +339,12 @@ export default {
         }
       },
       {
-        "type": "group.created",
+        "type": "collective.created",
         "data": {
           "user": {
             "email":"jussi@kuohujoki.fi"
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -367,13 +352,13 @@ export default {
         }
       },
       {
-        "type": "group.user.added",
+        "type": "collective.user.added",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -381,13 +366,13 @@ export default {
         }
       },
       {
-        "type": "group.expense.created",
+        "type": "collective.expense.created",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
@@ -399,13 +384,13 @@ export default {
         }
       },
       {
-        "type": "group.expense.rejected",
+        "type": "collective.expense.rejected",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
@@ -418,13 +403,13 @@ export default {
         }
       },
       {
-        "type": "group.expense.approved",
+        "type": "collective.expense.approved",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
@@ -553,7 +538,7 @@ export default {
       "link": null,
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
-      "GroupId": 1
+      "CollectiveId": 1
     },
 
     "user": {
@@ -562,7 +547,7 @@ export default {
       "lastName":"Mod",
       "username":"philmod",
       "email":"user1@opencollective.com",
-      "avatar":null,
+      "image":null,
       "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
       "description": "engineer",
@@ -572,7 +557,7 @@ export default {
       "paypalEmail":"philmod+paypal@email.com"
     },
 
-    "group": {
+    "collective": {
       "id": 1,
       "name": "Scouts d'Arlon",
       "mission": "toujours prêt",
@@ -581,9 +566,7 @@ export default {
       "budget": 100000,
       "burnrate": 1000,
       "currency": "USD",
-      "logo": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
-      "video": null,
-      "image": null,
+      "image": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
       "backgroundImage": null,
       "expensePolicy": null,
       "createdAt": "2016-01-30T07:31:37.802Z",

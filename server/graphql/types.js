@@ -20,7 +20,7 @@ dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
 dataloaderSequelize(models.Donation);
 
-// This breaks the tests for some reason (mocha test/usercollective.routes.test.js -g "successfully add a user to a collective with a role")
+// This breaks the tests for some reason (mocha test/Role.routes.test.js -g "successfully add a user to a collective with a role")
 // dataloaderSequelize(models.User);
 
 export const ResponseStatusType = new GraphQLEnumType({
@@ -61,10 +61,10 @@ export const UserType = new GraphQLObjectType({
           return user.name;
         }
       },
-      avatar: {
+      image: {
         type: GraphQLString,
         resolve(user) {
-          return user.avatar;
+          return user.image;
         }
       },
       username: {
@@ -179,10 +179,10 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.currency;
         }
       },
-      logo: {
+      image: {
         type: GraphQLString,
         resolve(collective) {
-          return collective.logo;
+          return collective.image;
         }
       },
       backgroundImage: {
@@ -310,7 +310,7 @@ export const EventType = new GraphQLObjectType({
       createdByUser: {
         type: UserType,
         resolve(event) {
-          return models.User.findById(event.createdByUserId)
+          return models.User.findById(event.CreatedByUserId)
         }
       },
       collective: {

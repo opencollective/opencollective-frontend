@@ -34,14 +34,14 @@ function run() {
           } 
         }
       },
-      { model: models.Group },
+      { model: models.Collective },
       { model: models.PaymentMethod }
     ]
   })
   .tap(donations => console.log("Total Subscriptions found: ", donations.length))
   .each(donation => {
     console.log(`Processing SubscriptionId: ${donation.SubscriptionId}`);
-    return donation.Group.getStripeAccount()
+    return donation.Collective.getStripeAccount()
       .then(stripeAccount => retrieveSubscription(stripeAccount, donation.PaymentMethod.customerId, donation.Subscription.stripeSubscriptionId))
       .then(stripeSubscription => {
         if (!stripeSubscription) {

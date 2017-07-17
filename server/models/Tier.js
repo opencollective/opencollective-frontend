@@ -1,7 +1,10 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
+import { capitalize, pluralize } from '../lib/utils';
 
 export default function(Sequelize, DataTypes) {
+
+  const { models } = Sequelize;
 
   const Tier = Sequelize.define('Tier', {
     id: {
@@ -10,7 +13,7 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    ParentId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Collectives',
@@ -69,13 +72,12 @@ export default function(Sequelize, DataTypes) {
     },
 
     interval: {
-      type: DataTypes.STRING, // null, month or year
-      set(val) {
-        val = val && val.toLowerCase().trim();
-        if (this.type === 'TICKET' || ['month','year'].indexOf(val) === -1) {
-          val = null;
+      type: DataTypes.STRING(8),
+      validate: {
+        isIn: {
+          args: [['month', 'year']],
+          msg: 'Must be month or year'
         }
-        this.setDataValue('interval', val);
       }
     },
 
@@ -142,6 +144,10 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
+      },
+
+      title() {
+        return capitalize(pluralize(this.name));
       }
     },
 
@@ -154,7 +160,7 @@ export default function(Sequelize, DataTypes) {
     instanceMethods: {
       // TODO: Check for maxQuantityPerUser
       availableQuantity() {
-        return Sequelize.models.Response.sum('quantity', { 
+        return models.Response.sum('quantity', { 
             where: {
               TierId: this.id,
               confirmedAt: { $ne: null }
@@ -174,6 +180,7 @@ export default function(Sequelize, DataTypes) {
         return this.availableQuantity()
         .then(available => (available - quantityNeeded >= 0))
       },
+
       // Get the total amount of money raised with this tier
       // TODO: Implement
       totalAmount() {

@@ -42,6 +42,8 @@ export const format = (format) => {
               row.createdAt = moment(row.createdAt).format("YYYY-MM-DD HH:mm");
             if (row.totalDonations)
               row.totalDonations = (row.totalDonations/100).toFixed(2); // convert from cents
+            if (row.tier)
+              row.tier = row.tier.name;
             return row;
           });
           const fields = (data.length > 0) ? Object.keys(data[0]) : [];

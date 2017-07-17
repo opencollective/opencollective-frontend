@@ -67,10 +67,10 @@ export const list = (req, res, next) => {
       return models.Comment.findAll({
         attributes: ['ExpenseId', [sequelize.fn('COUNT', sequelize.col('ExpenseId')), 'comments']],
         where: { ExpenseId: { $in: ids }},
-        collective: ['ExpenseId']
+        group: ['ExpenseId']
       })
       .then(commentIds => {
-        const commentsCount =  _.collectiveBy(commentIds, 'ExpenseId');
+        const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
         expenses.rows = expenses.rows.map(expense => {
           const r = expense.info;
           r.user = req.canEditCollective ? expense.User.info : expense.User.public;

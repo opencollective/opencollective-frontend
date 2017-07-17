@@ -5,7 +5,7 @@ import models from '../server/models';
 
 const userData = utils.data('user1');
 
-const { User, Group, Transaction } = models;
+const { User, Collective, Transaction } = models;
 
 describe('user.models.test.js', () => {
   let sandbox;
@@ -121,15 +121,19 @@ describe('user.models.test.js', () => {
         })
     })
 
-    it('creates a user and subscribes it to user.yearlyreport', () => {
+    it('creates a user and subscribes it to user.yearlyreport and user.monthlyreport', () => {
       return User
         .create({email: 'xdamman+opencollective@gmail.com'})
-        .tap(user => {
-          models.Notification.findOne({ UserId: user.id }).then(notification => {
-            expect(notification.channel).to.equal('email');
-            expect(notification.type).to.equal('user.yearlyreport');
+        .tap(() => {
+          return new Promise(resolve => {
+            setTimeout(resolve, 10);
           })
         })
+        .then(user => models.Notification.findAll({ UserId: user.id, channel: "email" }).then(notifications => {
+          expect(notifications.length).to.equal(2);
+          expect(notifications[0].type).to.equal('user.yearlyreport');
+          expect(notifications[1].type).to.equal('user.monthlyreport');
+        }))
     })
     
   });
@@ -196,41 +200,41 @@ describe('user.models.test.js', () => {
     const transactions = [{
       createdAt: new Date('2016-06-14'),
       amount: 10000,
-      netAmountInGroupCurrency: 10000,
+      netAmountInCollectiveCurrency: 10000,
       currency: 'USD',
       type: 'donation',
       UserId: 1,
-      GroupId: 1
+      CollectiveId: 1
     },{
       createdAt: new Date('2016-06-15'),
       amount: 15000,
-      netAmountInGroupCurrency: 15000,
+      netAmountInCollectiveCurrency: 15000,
       currency: 'USD',
       type: 'donation',
       UserId: 1,
-      GroupId: 2
+      CollectiveId: 2
     },{
       createdAt: new Date('2016-07-15'),
       amount: 25000,
-      netAmountInGroupCurrency: 25000,
+      netAmountInCollectiveCurrency: 25000,
       currency: 'USD',
       type: 'donation',
       UserId: 2,
-      GroupId: 1
+      CollectiveId: 1
     },{
       createdAt: new Date('2016-07-16'),
       amount: 50000,
-      netAmountInGroupCurrency: 50000,
+      netAmountInCollectiveCurrency: 50000,
       currency: 'USD',
       type: 'donation',
       UserId: 2,
-      GroupId: 2
+      CollectiveId: 2
     }];
 
     beforeEach(() => utils.resetTestDB());
     beforeEach(() => User.createMany(users));
-    beforeEach(() => Group.create(utils.data('group1')));
-    beforeEach(() => Group.create(utils.data('group2')));
+    beforeEach(() => Collective.create(utils.data('collective1')));
+    beforeEach(() => Collective.create(utils.data('collective2')));
     beforeEach(() => Transaction.createMany(transactions, { HostId: 1 }));
 
     it('gets the top backers', () => {
@@ -240,7 +244,7 @@ describe('user.models.test.js', () => {
           expect(backers.length).to.equal(2);
           expect(backers[0].totalDonations).to.equal(75000);
           expect(backers[0]).to.have.property('firstName');
-          expect(backers[0]).to.have.property('avatar');
+          expect(backers[0]).to.have.property('image');
           expect(backers[0]).to.have.property('website');
           expect(backers[0]).to.have.property('twitterHandle');
         });
@@ -280,8 +284,8 @@ describe('user.models.test.js', () => {
             expect(donations.length).to.equal(1);
             expect(donations[0]).to.have.property("amount");
             expect(donations[0]).to.have.property("currency");
-            expect(donations[0]).to.have.property("Group");
-            expect(donations[0].Group).to.have.property("name");
+            expect(donations[0]).to.have.property("Collective");
+            expect(donations[0].Collective).to.have.property("name");
           })
       });
     });

@@ -13,7 +13,7 @@ const stringify = (json) => {
 }
 
 describe('Query Tests', () => {
-  let user1, user2, host, group1, group2, tier1, ticket1, sandbox;
+  let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;
 
 
   before(() => sandbox = sinon.sandbox.create());
@@ -32,16 +32,16 @@ describe('Query Tests', () => {
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
   beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
 
-  beforeEach(() => group1.createTier(utils.data('tier1')).tap(t => tier1 = t));
-  beforeEach(() => group1.createTier(utils.data('ticket1')).tap(t => ticket1 = t));
+  beforeEach(() => collective1.createTier(utils.data('tier1')).tap(t => tier1 = t));
+  beforeEach(() => collective1.createTier(utils.data('ticket1')).tap(t => ticket1 = t));
 
-  beforeEach(() => group1.addUserWithRole(user1, 'BACKER'));
-  beforeEach(() => group2.addUserWithRole(user1, 'MEMBER'));
-  beforeEach(() => group1.addUserWithRole(host, 'HOST'));
+  beforeEach(() => collective1.addUserWithRole(user1, 'BACKER'));
+  beforeEach(() => collective2.addUserWithRole(user1, 'MEMBER'));
+  beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
@@ -102,15 +102,16 @@ describe('Query Tests', () => {
               funding: 'credit',
               brand: 'Visa',
               country: 'US',
-              token: 'card_1AejcADjPFcHOcTmBJRASiOV'
+              token: 'card_1AejcADjPFcHOcTmBJRASiOV',
+              save: true
             }
           },
-          collective: { slug: group1.slug },
+          collective: { slug: collective1.slug },
           tier: { id: tier.id }
         }
       }
 
-      it("adds a payment method to the user", async () => {
+      it("saves a payment method to the user", async () => {
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(generateResponse(user1))}) {
@@ -132,6 +133,31 @@ describe('Query Tests', () => {
         expect(paymentMethods[0].identifier).to.equal('4242');
       });
 
+
+      it("does not save a payment method to the user", async () => {
+        const response = generateResponse(user1);
+        response.user.paymentMethod.save = false;
+        const query = `
+        mutation createResponse {
+          createResponse(response: ${stringify(response)}) {
+            user {
+              id,
+              email,
+              paymentMethods {
+                brand,
+                identifier
+              }
+            }
+          }
+        }`;
+
+        const result = await graphql(schema, query, null, {});
+        expect(result.errors).to.not.exist;
+        const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
+        expect(paymentMethods).to.have.length(1);
+        expect(paymentMethods[0].identifier).to.be.null;
+      });
+      
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createResponseQuery = `
         mutation createResponse {
@@ -173,40 +199,43 @@ describe('Query Tests', () => {
       });
 
       it("gets the payment method of the user if logged in as that user", async () => {
-          const createResponseQuery = `
-          mutation createResponse {
-            createResponse(response: ${stringify(generateResponse(user1))}) {
-              description
-            }
-          }`;
+        const response = generateResponse(user1);
+        const createResponseQuery = `
+        mutation createResponse {
+          createResponse(response: ${stringify(response)}) {
+            description
+          }
+        }`;
 
-          await graphql(schema, createResponseQuery, null, {});
+        await graphql(schema, createResponseQuery, null, {});
 
-          const query = `
-            query Tier {
-              Tier(id: ${tier1.id}) {
-                name,
-                responses {
+        await models.PaymentMethod.update({confirmedAt: new Date}, { where: { UserId: user1.id }});
+
+        const query = `
+          query Tier {
+            Tier(id: ${tier1.id}) {
+              name,
+              responses {
+                id,
+                description,
+                user {
                   id,
-                  description,
-                  user {
-                    id,
-                    name,
-                    paymentMethods {
-                      identifier,
-                      brand
-                    }
+                  name,
+                  paymentMethods {
+                    identifier,
+                    brand
                   }
                 }
               }
             }
-          `;
-          const result = await graphql(schema, query, null, { remoteUser: user1 });
-          const responses = result.data.Tier.responses;
-          expect(responses).to.have.length(1);
-          expect(responses[0].user.paymentMethods).to.have.length(1);
-          expect(responses[0].user.paymentMethods[0].identifier).to.equal('4242');
-        });
+          }
+        `;
+        const result = await graphql(schema, query, null, { remoteUser: user1 });
+        const responses = result.data.Tier.responses;
+        expect(responses).to.have.length(1);
+        expect(responses[0].user.paymentMethods).to.have.length(1);
+        expect(responses[0].user.paymentMethods[0].identifier).to.equal('4242');
       });
     });
   });
+});

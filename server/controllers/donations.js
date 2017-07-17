@@ -307,14 +307,14 @@ export const paypalCallback = (req, res, next) => {
     addUserToCollective: ['getOrCreateUser', (cb, results) => {
       const user = results.getOrCreateUser;
 
-      models.UserCollective.findOne({
+      models.Role.findOne({
         where: {
           CollectiveId: collective.id,
           UserId: user.id,
           role: roles.BACKER
         }
       })
-      .then(userCollective => userCollective || collective.addUserWithRole(user, roles.BACKER))
+      .then(Role => Role || collective.addUserWithRole(user, roles.BACKER))
       .then(() => cb())
       .catch(cb);
     }],

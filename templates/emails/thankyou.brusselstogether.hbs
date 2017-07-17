@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -28,20 +28,20 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
   Your gift will help us continue our activities.</p>
 {{/if}}
 
-<p>Join our <a href="https://facebook.com/groups/BrusselsTogether">Facebook Group</a> or join the conversation on <a href="https://slack.brusselstogether.org">our slack</a>.
+<p>Join our <a href="https://facebook.com/collectives/BrusselsTogether">Facebook Collective</a> or join the conversation on <a href="https://slack.brusselstogether.org">our slack</a>.
 And don't forget to use the hashtag #BrusselsTogether whenever you share something on social networks about initiatives that are happening that we need to support together.</p>
 
 {{> subscriptions}}
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
 
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} collective
+  – The {{collective.name}} collective
 </p>
 
-{{> relatedgroups}}
+{{> relatedcollectives}}
 
 {{> footer}}
 

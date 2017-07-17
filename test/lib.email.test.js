@@ -53,17 +53,17 @@ describe('lib/email', () => {
   it('sends the thankyou.fr email template', () => {
 
     const template = 'thankyou';
-    const group = { name: "La Primaire", slug: "laprimaire" };
+    const collective = { name: "La Primaire", slug: "laprimaire" };
     const data = {
       donation: { amount: 5000, currency: 'EUR'},
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
       user: emailData.user,
-      group
+      collective
     };
     const options = {
-      from: `${group.name} <hello@${group.slug}.opencollective.com>`,
+      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
     };
 
     return emailLib.send(template, data.user.email, data, options)
@@ -88,7 +88,7 @@ describe('lib/email', () => {
       config: { host: config.host },
       interval: 'month',
       user: emailData.user,
-      group: {
+      collective: {
         name: "WWCode Austin",
         slug: "wwcodeaustin"
       }
@@ -115,20 +115,20 @@ describe('lib/email', () => {
       config: { host: config.host },
       interval: 'month',
       user: emailData.user,
-      group: {
+      collective: {
         name: '#BrusselsTogether',
         slug: 'brusselstogether',
-        logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png'
+        image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png'
       },
-      relatedGroups: utils.data('relatedGroups')
+      relatedCollectives: utils.data('relatedCollectives')
     };
 
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your €50/month donation to #BrusselsTogether');
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedGroups[0].name);
-        expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.group.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
+        expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.collective.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
       });
   });
 

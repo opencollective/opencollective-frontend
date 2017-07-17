@@ -15,7 +15,7 @@ const debug = debugLib('email');
 const render = (template, data) => {
 
   let text, filepath;
-  data.logoNotSvg = data.collective && data.collective.logo && !data.collective.logo.endsWith('.svg');
+  data.imageNotSvg = data.collective && data.collective.image && !data.collective.image.endsWith('.svg');
   data = _.merge({}, data);
   delete data.config;
   data.config = { host: config.host };

@@ -1,0 +1,130 @@
+Subject: {{{capitalize collective.name}}} Collective {{month}} Report
+
+{{> header}}
+
+<style>
+.counter {
+  font-size: 36px;
+  color: #7FADF2;
+}
+.delta {
+  color: #7A7B82;
+}
+.reimbursed {
+  color: #7A7B82;
+}
+th {
+  padding: 10px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #7A7B82;
+  vertical-align: top;
+}
+</style>
+
+<div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  Balance: {{{currency collective.stats.balance currency=collective.currency}}} (+{{{currency collective.stats.totalDonations currency=collective.currency}}}{{#if collective.stats.totalExpenses}}, {{{currency collective.stats.totalExpenses currency=collective.currency}}}{{/if}}) &nbsp; | &nbsp; 
+  {{collective.stats.backers.lastMonth}} backers (+{{collective.stats.backers.new}}{{#if collective.stats.backers.lost}}, -{{collective.stats.backers.lost}}{{/if}}) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+</div>
+
+<div>
+<p>Hi {{recipient.firstName}}!</p>
+<p>Here are your monthly stats:</p>
+
+<center>
+<table border=0 cellpadding=0 cellspacing=0 width=300 style="margin: 30px 0px">
+  <tr>
+    <td align="center"><span class="counter">{{{currency collective.stats.balance currency=collective.currency}}}</span></td>
+    <td width=200>&nbsp;</td>
+    <td align="center"><span class="counter">{{collective.stats.backers.lastMonth}}</span></td>
+  </tr>
+  <tr>
+    <td align="center" nowrap><span class="label">current balance</span></td>
+    <td></td>
+    <td align="center" nowrap><span class="label">total backers</span></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <span class="positive">(+{{{currency collective.stats.totalDonations currency=collective.currency}}})</span><br />
+      <span class="negative">&nbsp;{{#if collective.stats.totalExpenses}}({{{currency collective.stats.totalExpenses currency=collective.currency}}}){{/if}}&nbsp;</span>
+    </td>
+    <td></td>
+    <td align="center">
+      <span class="positive">(+{{collective.stats.backers.new}})</span><br />
+      <span class="negative">&nbsp;{{#if collective.stats.backers.lost}}(-{{collective.stats.backers.lost}}){{/if}}&nbsp;</span>
+    </td>
+  </tr>
+</table>
+</center>
+
+<h2>🗞 Give your {{collective.stats.backers.lastMonth}} backers an update!</h2>
+<p>Don't forget to regularly send an email to <a href="mailto:backers@{{collective.slug}}.opencollective.com">backers@{{collective.slug}}.opencollective.com</a> to keep them posted on your latest activities!</p>
+
+<center>
+{{#each collective.tiers}}
+<table width="100%" height=30>
+  <tr><td colspan="3" height="10">&nbsp;</td></tr>
+  <tr>
+    <td class="tdline"></td><th rowspan=2 nowrap>{{title}}</th><td class="tdline"></td>
+  </tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+</table>
+  {{#each users}}
+    <a href="{{@root.config.host.website}}/{{username}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email" class="{{../name}}">
+      {{#if isSponsor}}
+        <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
+      {{else}}
+        {{#if isNew}}
+          <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:66C71A/e_trim/f_auto/"}} height="48" alt="{{name}}" border="0" />
+        {{else}}
+          {{#if isLost}}
+            <img src={{resizeImage image height=96 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:FF0000/e_trim/f_auto/"}} height="48" alt="{{name}}" border="0" />
+          {{else}}
+            <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve,e_grayscale/e_trim/f_auto/"}} height="36" alt="{{name}}" border="0" />
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    </a>
+  {{/each}}
+{{/each}}
+
+{{> relatedcollectives}}
+
+</center>
+
+
+<h2>🗒 Expenses</h2>
+<table width="100%" border=0>
+
+{{#each collective.expenses}}
+  <tr>
+    <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
+    <td align="right" valign="top" nowrap class="negative">{{{currency netAmountInCollectiveCurrency currency=currency}}}</td>
+    <td valign="top" width="100%"><a href="{{@root.config.host.app}}/collectives/{{@root.collective.id}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{description}}</a></td>
+    <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
+  </tr>
+{{else}}
+  No expense submitted. 
+{{/each}}
+</table>
+<p><a href="{{@root.collective.publicUrl}}/expenses/new?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">Submit an expense</a></p>
+
+{{#if topBackers}}
+<h2>💰 Recent sponsor activity on Open Collective</h2>
+<ul>
+{{#each topBackers}}
+  <li><a href="{{website}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{name}}</a> gave {{{donationsString.html}}}</li>
+{{/each}}
+</ul>
+{{/if}}
+
+
+<h2>💡 Tips for raising more money</h2>
+<p>We wrote this guide "<a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a>" with a bunch of tips to help you raise more money for your collective.</p>
+
+<h2>🗣 Feedback</h2>
+As always, feel free to reply to this email to give us your feedback. A human will always be there on the other side!
+
+</div>
+
+{{> footer}}

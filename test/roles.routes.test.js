@@ -11,7 +11,7 @@ import models from '../server/models';
  * Variables.
  */
 const application = utils.data('application');
-let users, group;
+let users, collective;
 
 /**
  * Functions
@@ -20,7 +20,7 @@ const createTransactions = () => {
 
   const transactions = [{
     UserId: users[2].id,
-    GroupId: group.id,
+    CollectiveId: collective.id,
     amount: 2000,
     amountInTxnCurrency: 2000,
     createdAt: '2016-05-07 19:52:21.203+00',
@@ -28,19 +28,19 @@ const createTransactions = () => {
   },
   {
     UserId: users[3].id,
-    GroupId: group.id,
+    CollectiveId: collective.id,
     amount: 10000,
     amountInTxnCurrency: 10000,
     createdAt: '2016-05-07 19:52:21.203+00',
     updatedAt: '2016-05-07 19:52:21.203+00'
   }];
 
-  return group
+  return collective
     .addUserWithRole(users[3], roles.BACKER)
     .then(() => models.Transaction.createMany(transactions, { HostId: 1 }));
 };
 
-describe('usergroup.routes.test.js', () => {
+describe('role.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
@@ -49,35 +49,34 @@ describe('usergroup.routes.test.js', () => {
     Promise.map(['user1','user2','user3', 'user4'], u => models.User.create(utils.data(u)))
       .tap(results => users = results));
 
-  // Create group.
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
-    
+  // Create collective.
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
 
-  // Add the host and a backer to the group.
+  // Add the host and a backer to the collective.
   beforeEach((done) => {
-    const promises = [group.addUserWithRole(users[0], roles.HOST),
-                      group.addUserWithRole(users[1], roles.MEMBER),
-                      group.addUserWithRole(users[2], roles.BACKER)
+    const promises = [collective.addUserWithRole(users[0], roles.HOST),
+                      collective.addUserWithRole(users[1], roles.MEMBER),
+                      collective.addUserWithRole(users[2], roles.BACKER)
                       ];
     Promise.all(promises).then(() => done() );
   });
 
   /**
-   * Add user to a group.
+   * Add user to a collective.
    */
   describe('#addUser', () => {
 
-    it('fails adding a non-existing user to a group', (done) => {
+    it('fails adding a non-existing user to a collective', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/98765?api_key=${application.api_key}`)
+        .post(`/collectives/${collective.id}/users/98765?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
 
-    it('fails adding a user to a non-existing group', (done) => {
+    it('fails adding a user to a non-existing collective', (done) => {
       request(app)
-        .post(`/groups/98765/users/${users[1].id}?api_key=${application.api_key}`)
+        .post(`/collectives/98765/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -85,7 +84,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('fails adding a user with a non-existing role', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}`)
+        .post(`/collectives/${collective.id}/users/${users[1].id}`)
         .send({
           api_key: application.api_key,
           role: 'nonexistingrole'
@@ -95,9 +94,9 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
-    it('fails adding a user to a group if not a member of the group', (done) => {
+    it('fails adding a user to a collective if not a member of the collective', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[2].id}`)
+        .post(`/collectives/${collective.id}/users/${users[2].id}`)
         .send({
           api_key: application.api_key,
           role: 'MEMBER'
@@ -107,9 +106,9 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
-    it('fails adding a user to a group if no host', (done) => {
+    it('fails adding a user to a collective if no host', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}`)
+        .post(`/collectives/${collective.id}/users/${users[1].id}`)
         .send({
           api_key: application.api_key,
           role: 'nonexistingrole'
@@ -119,15 +118,15 @@ describe('usergroup.routes.test.js', () => {
         .end(done);
     });
 
-    it('fails adding a host if the group already has one', (done) => {
+    it('fails adding a host if the collective already has one', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}`)
+        .post(`/collectives/${collective.id}/users/${users[1].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(400, {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'Group already has a host'
+            message: 'Collective already has a host'
           }
         })
         .send({
@@ -137,29 +136,29 @@ describe('usergroup.routes.test.js', () => {
         .end(done)
     });
 
-    it('successfully add a user to a group', (done) => {
+    it('successfully add a user to a collective', (done) => {
       request(app)
-        .post(`/groups/${group.id}/users/${users[1].id}?api_key=${application.api_key}`)
+        .post(`/collectives/${collective.id}/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
 
-          users[1].getGroups().then((groups) => {
-            expect(groups[0].id).to.equal(group.id);
-            expect(groups[0].UserGroup.role).to.equal(roles.BACKER);
+          users[1].getCollectives().then((collectives) => {
+            expect(collectives[0].id).to.equal(collective.id);
+            expect(collectives[0].Role.role).to.equal(roles.BACKER);
             done();
           });
 
         });
     });
 
-    it('successfully add a user to a group with a role', (done) => {
+    it('successfully add a user to a collective with a role', (done) => {
       const role = roles.MEMBER;
 
       request(app)
-        .post(`/groups/${group.id}/users/${users[2].id}`)
+        .post(`/collectives/${collective.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           api_key: application.api_key,
@@ -170,9 +169,9 @@ describe('usergroup.routes.test.js', () => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
 
-          users[1].getGroups().then((groups) => {
-            expect(groups[0].id).to.equal(group.id);
-            expect(groups[0].UserGroup.role).to.equal(role);
+          users[1].getCollectives().then((collectives) => {
+            expect(collectives[0].id).to.equal(collective.id);
+            expect(collectives[0].Role.role).to.equal(role);
 
             setTimeout(() => {
               models.Activity.findAndCountAll({}).then((res) => {
@@ -187,7 +186,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('successfully adds the user to the mailing list', (done) => {
       models.Notification.findOne({where: {
-        GroupId: group.id,
+        CollectiveId: collective.id,
         UserId: users[2].id,
         type: 'mailinglist.members'
       }}).then(notification => {
@@ -195,7 +194,7 @@ describe('usergroup.routes.test.js', () => {
       })
       .then(() => {
         request(app)
-          .post(`/groups/${group.id}/users/${users[2].id}`)
+          .post(`/collectives/${collective.id}/users/${users[2].id}`)
           .set('Authorization', `Bearer ${users[0].jwt()}`)
           .send({
             api_key: application.api_key,
@@ -207,7 +206,7 @@ describe('usergroup.routes.test.js', () => {
             expect(res.body).to.have.property('success', true);
 
             models.Notification.findOne({where: {
-              GroupId: group.id,
+              CollectiveId: collective.id,
               UserId: users[2].id,
               type: 'mailinglist.members'
             }}).then(notification => {
@@ -222,25 +221,25 @@ describe('usergroup.routes.test.js', () => {
   });
 
   /**
-   * Get user's groups.
+   * Get user's collectives.
    */
-  describe('#getUserGroups', () => {
+  describe('#getRoles', () => {
 
-    beforeEach('add users[0] to group', () =>
+    beforeEach('add users[0] to collective', () =>
       request(app)
-        .post(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
+        .post(`/collectives/${collective.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200));
 
-    it('successfully get another user\'s groups', () =>
+    it('successfully get another user\'s collectives', () =>
       request(app)
-        .get(`/users/${users[0].id}/groups?api_key=${application.api_key}`)
+        .get(`/users/${users[0].id}/collectives?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(200));
 
-    it('successfully get a user\'s groups', (done) => {
+    it('successfully get a user\'s collectives', (done) => {
       request(app)
-        .get(`/users/${users[1].id}/groups?api_key=${application.api_key}`)
+        .get(`/users/${users[1].id}/collectives?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -250,9 +249,9 @@ describe('usergroup.routes.test.js', () => {
         });
     });
 
-    it('successfully get a user\'s groups bis', (done) => {
+    it('successfully get a user\'s collectives bis', (done) => {
       request(app)
-        .get(`/users/${users[0].id}/groups?api_key=${application.api_key}`)
+        .get(`/users/${users[0].id}/collectives?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -265,9 +264,9 @@ describe('usergroup.routes.test.js', () => {
         });
     });
 
-    it('successfully get a user\'s groups with the role', (done) => {
+    it('successfully get a user\'s collectives with the role', (done) => {
       request(app)
-        .get(`/users/${users[0].id}/groups?include=usergroup.role&api_key=${application.api_key}`)
+        .get(`/users/${users[0].id}/collectives?include=role&api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -284,30 +283,30 @@ describe('usergroup.routes.test.js', () => {
   });
 
   /**
-   * Update a user-group relation.
+   * Update a user-collective relation.
    */
-  describe('#updateUserGroup', () => {
+  describe('#updateRole', () => {
 
     it('fails if not the host', (done) => {
       request(app)
-        .put(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
+        .put(`/collectives/${collective.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
         .end(done);
     });
 
-    it('fails if the user is not part of the group yet', (done) => {
+    it('fails if the user is not part of the collective yet', (done) => {
       request(app)
-        .put(`/groups/${group.id}/users/${users[3].id}?api_key=${application.api_key}`)
+        .put(`/collectives/${collective.id}/users/${users[3].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
     });
 
-    it('successfully update a user-group relation', (done) => {
+    it('successfully update a user-collective relation', (done) => {
       const role = roles.MEMBER;
       request(app)
-        .put(`/groups/${group.id}/users/${users[2].id}?api_key=${application.api_key}`)
+        .put(`/collectives/${collective.id}/users/${users[2].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           api_key: application.api_key,
@@ -319,7 +318,7 @@ describe('usergroup.routes.test.js', () => {
           expect(res.body).to.have.property('role', role);
 
           // Check activities.
-          models.Activity.findAndCountAll({where: {type: 'group.user.updated'} }).then((res) => {
+          models.Activity.findAndCountAll({where: {type: 'collective.user.updated'} }).then((res) => {
             expect(res.count).to.equal(2);
             done();
           });
@@ -329,25 +328,25 @@ describe('usergroup.routes.test.js', () => {
   });
 
   /**
-   * Delete a user-group relation.
+   * Delete a user-collective relation.
    */
-  describe('#deleteUserGroup', () => {
+  describe('#deleteRole', () => {
 
     it('fails if not the host', () =>
       request(app)
-        .del(`/groups/${group.id}/users/${users[0].id}?api_key=${application.api_key}`)
+        .del(`/collectives/${collective.id}/users/${users[0].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403));
 
-    it('fails if the user is not part of the group yet', () =>
+    it('fails if the user is not part of the collective yet', () =>
       request(app)
-        .del(`/groups/${group.id}/users/${users[3].id}?api_key=${application.api_key}`)
+        .del(`/collectives/${collective.id}/users/${users[3].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404));
 
-    it('successfully update a user-group relation', (done) => {
+    it('successfully update a user-collective relation', (done) => {
       request(app)
-        .del(`/groups/${group.id}/users/${users[2].id}?api_key=${application.api_key}`)
+        .del(`/collectives/${collective.id}/users/${users[2].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -356,21 +355,21 @@ describe('usergroup.routes.test.js', () => {
 
           async.parallel([
             (cb) => {
-              // Check usergroup.
+              // Check role.
               const query = {
                 where: {
-                  GroupId: group.id,
+                  CollectiveId: collective.id,
                   UserId: users[2].id
                 }
               };
-              models.UserGroup.findAndCountAll(query).then((res) => {
+              models.Role.findAndCountAll(query).then((res) => {
                 expect(res.count).to.equal(0);
                 cb();
               });
             },
             (cb) => {
               // Check activities.
-              models.Activity.findAndCountAll({where: {type: 'group.user.deleted'} }).then((res) => {
+              models.Activity.findAndCountAll({where: {type: 'collective.user.deleted'} }).then((res) => {
                 expect(res.count).to.equal(2);
                 cb();
               });
@@ -383,44 +382,62 @@ describe('usergroup.routes.test.js', () => {
   });
 
   /**
-   * Get a group's users
+   * Get a collective's users
    */
-  describe('/groups/:slug/users', () => {
+  describe('/collectives/:slug/users', () => {
 
     beforeEach(createTransactions);
 
+    // Create the tiers
+    beforeEach('create backer tier', () => models.Tier.create({...utils.data('tier1'), CollectiveId: collective.id }))
+    beforeEach('create sponsor tier', () => models.Tier.create({...utils.data('tier2'), CollectiveId: collective.id }))
+
+    // Add users to tiers
+    beforeEach('add users to tiers', () => Promise.all([
+      models.Response.create({ UserId: users[2].id, CollectiveId: 1, TierId: 1, status: 'PROCESSED' }),
+      models.Response.create({ UserId: users[3].id, CollectiveId: 1, TierId: 2, status: 'PROCESSED' })
+    ]));
+
+    // Add active and non active subscription
+    beforeEach('add active subscription', () => Promise.all([
+      models.Donation.create({CollectiveId: collective.id, UserId: users[2].id, Subscription: { isActive: true }}, { include: [ { model: models.Subscription } ] }),
+      models.Donation.create({CollectiveId: collective.id, UserId: users[3].id, Subscription: { isActive: false }}, { include: [ { model: models.Subscription } ] })
+    ]));
+
     it('get the list of users with their corresponding tier', () =>
       request(app)
-        .get(`/groups/${group.slug}/users?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.slug}/users?api_key=${application.api_key}`)
         .expect(200)
         .toPromise()
         .tap(res => {
           const users = res.body;
           expect(users).to.have.length(4);
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].tier).to.equal('core contributor');
-          expect(users[1].tier).to.equal('sponsor');
-          expect(users[2].tier).to.equal('host');
-          expect(users[3].tier).to.equal('backer');
+          expect(users[0].role).to.equal('MEMBER');
+          expect(users[1].role).to.equal('BACKER');
+          expect(users[1].tier.name).to.equal('sponsor');
+          expect(users[2].role).to.equal('HOST');
+          expect(users[3].role).to.equal('BACKER');
+          expect(users[3].tier.name).to.equal('backer');
         })
     );
 
     it('get the list of *active* users with their corresponding tier', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users?filter=active&api_key=${application.api_key}`)
+        .get(`/collectives/${collective.slug}/users?filter=active&api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const users = res.body;
           expect(users).to.have.length(3);
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].tier).to.equal('core contributor');
+          expect(users[2].tier.name).to.equal('backer');
         })
         .end(done);
     });
 
     it('get the list of users in csv format without emails if not logged in as admin', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.slug}/users.csv?api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');
@@ -431,10 +448,10 @@ describe('usergroup.routes.test.js', () => {
           }
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
-          expect(getValue(0, "tier")).to.equal('"core contributor"');
-          expect(getValue(1, "tier")).to.equal('"sponsor"');
-          expect(getValue(2, "tier")).to.equal('"host"');
-          expect(getValue(3, "tier")).to.equal('"backer"');
+          expect(getValue(0, "role")).to.equal('"MEMBER"');
+          expect(getValue(1, "tier")).to.equal('"backer"');
+          expect(getValue(2, "tier")).to.equal('"sponsor"');
+          expect(getValue(3, "role")).to.equal('"HOST"');
           expect(headers).to.not.contain('"email"');
         })
         .end(done);
@@ -442,7 +459,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users in csv format without emails if logged in as backer', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.slug}/users.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`) // BACKER
         .expect(200)
         .expect((res) => {
@@ -454,7 +471,7 @@ describe('usergroup.routes.test.js', () => {
 
     it('get the list of users in csv format with emails if logged in as admin', (done) => {
       request(app)
-        .get(`/groups/${group.slug}/users.csv?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.slug}/users.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`) // MEMBER
         .expect(200)
         .expect((res) => {

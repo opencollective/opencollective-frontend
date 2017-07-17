@@ -20,7 +20,7 @@ const generateToken = (email, slug, template) => {
 
 const {
   User,
-  Group
+  Collective
 } = models;
 
 const usersData = [
@@ -29,7 +29,7 @@ const usersData = [
     lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
     role: 'MEMBER',
-    avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   },
   {
     firstName: 'Aseem',
@@ -51,13 +51,13 @@ const usersData = [
   }
 ];
 
-const groupData = {
+const collectiveData = {
   slug: 'testcollective',
   name: 'Test Collective',
   settings: {}
 };
 
-let group, users = [];
+let collective, users = [];
 
 describe("email.routes.test", () => {
 
@@ -77,14 +77,14 @@ describe("email.routes.test", () => {
     sandbox.restore();
   });
 
-  before('create group and members', (done) => {
+  before('create collective and members', (done) => {
 
-    Group.create(groupData)
-      .tap(g => group = g )
+    Collective.create(collectiveData)
+      .tap(g => collective = g )
       .then(() => User.createMany(usersData))
       .tap(users => {
         return Promise.map(users, (user, index) => {
-          return group.addUserWithRole(user, usersData[index].role);
+          return collective.addUserWithRole(user, usersData[index].role);
         });
       })
       .tap(usersRows => {
@@ -94,7 +94,7 @@ describe("email.routes.test", () => {
           return Promise.map(lists, (list) => models.Notification.create({
               channel: 'email',
               UserId: user.id,
-              GroupId: group.id,
+              CollectiveId: collective.id,
               type: list
             })
           );
@@ -190,13 +190,13 @@ describe("email.routes.test", () => {
     const template = 'mailinglist.members';
 
     const generateUnsubscribeUrl = (email) => {
-      const token = generateToken(email, groupData.slug, template);
-      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${groupData.slug}/${template}/${token}`;
+      const token = generateToken(email, collectiveData.slug, template);
+      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${collectiveData.slug}/${template}/${token}`;
     }
 
     it("returns an error if invalid token", () => {
       return request(app)
-        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/xxxxxxxxxx`)
+        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${collectiveData.slug}/${template}/xxxxxxxxxx`)
         .then((res) => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.error.message).to.equal('Invalid token');
@@ -221,7 +221,7 @@ describe("email.routes.test", () => {
     it("unsubscribes", () => {
       const where = {
         UserId: users[0].id,
-        GroupId: group.id,
+        CollectiveId: collective.id,
         type: 'mailinglist.members'
       };
 

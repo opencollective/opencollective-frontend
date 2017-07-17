@@ -133,11 +133,11 @@ export default (app) => {
   app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent donation)
   app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/avatar', required('avatar'), auth.mustBeLoggedInAsUser, users.updateAvatar); // Update a user's avatar
+  app.put('/users/:userid/image', required('image'), auth.mustBeLoggedInAsUser, users.updateAvatar); // Update a user's image
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   // TODO: Why is this a PUT and not a GET?
-  app.put('/users/:userid/avatars', required('userData'), users.getSocialMediaAvatars); // Return possible avatars for a user.
+  app.put('/users/:userid/images', required('userData'), users.getSocialMediaAvatars); // Return possible images for a user.
   
   /**
    * Authentication.
@@ -182,7 +182,7 @@ export default (app) => {
   app.get('/collectives/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
-   * UserCollective.
+   * Role.
    *
    *  Relations between a collective and a user.
    */

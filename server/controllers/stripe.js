@@ -9,14 +9,14 @@ const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
 
 const checkIfUserIsHost = UserId =>
-  models.UserCollective.find({
+  models.Role.find({
     where: {
       UserId,
       role: roles.HOST
     }
   })
-  .then(userCollective => {
-    if (!userCollective) throw new errors.BadRequest(`User ${UserId} is not a host`);
+  .then(Role => {
+    if (!Role) throw new errors.BadRequest(`User ${UserId} is not a host`);
   });
 
 const getToken = code => () => axios

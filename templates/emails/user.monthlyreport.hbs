@@ -78,7 +78,7 @@ Subject: {{{capitalize month}}} Report
     background-color: #fff;
     border-radius: 100%;
     box-shadow: 0 1px 4px 0 rgba(173, 176, 179, 0.6);
-    background-image: url(https://opencollective.com/public/images/oc-logo-icon.png);
+    background-image: url(https://opencollective.com/public/images/oc-image-icon.png);
     background-repeat: no-repeat;
     background-size: 48px;
     background-position: center;
@@ -88,7 +88,7 @@ Subject: {{{capitalize month}}} Report
     height: 32px;
     margin: 0 auto;
     margin-bottom: 40px;
-    background-image: url(https://opencollective.com/public/images/emails/oc-logo-name.png);
+    background-image: url(https://opencollective.com/public/images/emails/oc-image-name.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -224,11 +224,11 @@ Subject: {{{capitalize month}}} Report
           {{/each}}
         </div>
       </div>
-      {{#if relatedGroups.length}}
+      {{#if relatedCollectives.length}}
       <table class="Section Interest"><tr><td>
         <h3>Collectives that might interest you:</h3>
-        <div class="Cards CardsCount-{{relatedGroups.length}}">
-          {{#each relatedGroups}}
+        <div class="Cards CardsCount-{{relatedCollectives.length}}">
+          {{#each relatedCollectives}}
             {{> collectivecard}}
           {{/each}}
         </div>

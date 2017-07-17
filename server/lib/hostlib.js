@@ -6,7 +6,7 @@ import Promise from 'bluebird';
 
 export function getHostedCollectives(hostid, endDate = new Date) {
   return sequelize.query(`
-    SELECT g.* FROM "Collectives" g LEFT JOIN "UserCollectives" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
+    SELECT g.* FROM "Collectives" g LEFT JOIN "Roles" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
   `, {
     replacements: { hostid, endDate },
     model: models.Collective,
@@ -52,7 +52,7 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
 export function sumTransactionsByCurrency(attribute = 'netAmountInCollectiveCurrency', where) {
   const query = {
     attributes: [ [sequelize.fn('SUM', sequelize.col(attribute)), 'amount'], 'currency' ],
-    collective: ['currency'],
+    group: ['currency'],
     where
   };
   return models.Transaction.findAll(query)

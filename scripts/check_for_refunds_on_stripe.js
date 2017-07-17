@@ -40,7 +40,7 @@ function promiseSeq(arr, predicate, consecutive=100) {
 let refundCount = 0;
 
 function getCharge(transaction) {
-  return transaction.Group.getStripeAccount()
+  return transaction.Collective.getStripeAccount()
   .then(stripeAccount => {
     if (stripeAccount && transaction.data && transaction.data.charge) {
       return retrieveCharge(stripeAccount, transaction.data.charge.id)
@@ -72,7 +72,7 @@ function run() {
       }
     },
     include: [
-      { model: models.Group }
+      { model: models.Collective }
     ],
     order: [['id', 'DESC']]
   })

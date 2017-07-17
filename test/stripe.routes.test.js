@@ -14,7 +14,7 @@ describe('stripe.routes.test.js', () => {
 
   let user;
   let user2;
-  let group;
+  let collective;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -24,26 +24,26 @@ describe('stripe.routes.test.js', () => {
   // Create a user.
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
 
-  // Create a group.
+  // Create a collective.
   beforeEach((done) => {
     request(app)
-      .post('/groups')
+      .post('/collectives')
       .send({
         api_key: application.api_key,
-        group: Object.assign(utils.data('group1'), { users: [{ email: user.email, role: roles.HOST}]})
+        collective: Object.assign(utils.data('collective1'), { users: [{ email: user.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e, res) => {
         expect(e).to.not.exist;
-        group = res.body;
+        collective = res.body;
         done();
       });
   });
 
-  // Add user2 as backer to group.
+  // Add user2 as backer to collective.
   beforeEach((done) => {
     request(app)
-      .post(`/groups/${group.id}/users/${user2.id}?api_key=${application.api_key}`)
+      .post(`/collectives/${collective.id}/users/${user2.id}?api_key=${application.api_key}`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .expect(200)
       .end(e => {
@@ -64,7 +64,7 @@ describe('stripe.routes.test.js', () => {
         .end(done);
     });
 
-    it('should fail if the group does not have an host', (done) => {
+    it('should fail if the collective does not have an host', (done) => {
       request(app)
         .get(`/stripe/authorize?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
@@ -87,7 +87,7 @@ describe('stripe.routes.test.js', () => {
           expect(e).to.not.exist;
 
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(res.body.redirectUrl).to.contain(`state=${group.id}`)
+          expect(res.body.redirectUrl).to.contain(`state=${collective.id}`)
           done();
         });
     });

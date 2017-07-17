@@ -104,10 +104,10 @@ export const approve = (req, res, next) => {
         subject: email.Subject,
         body: email['body-html'] || email['body-plain'],
         to: email.To,
-        sender: _.pick(sender, ['email', 'name', 'avatar'])
+        sender: _.pick(sender, ['email', 'name', 'image'])
       }
       if ( approver && approver.email !== sender.email )
-        emailData.approver = _.pick(approver, ['email', 'name', 'avatar']);
+        emailData.approver = _.pick(approver, ['email', 'name', 'image']);
 
       return sendEmailToList(email.To, emailData);
     })
@@ -177,14 +177,14 @@ export const webhook = (req, res, next) => {
     .tap(results => {
       if (results.length === 0) throw new Error('no_subscribers');
       subscribers = results.map(s => {
-        s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.avatar)}`;
+        s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(s.image)}`;
         return s;
       });
     })
     // We fetch all the organizers of the collective (admins) to whom we will send the email to approve
     .then(() => {
       return sequelize.query(`
-        SELECT * FROM "UserCollectives" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."CollectiveId"=:collectiveid AND ug.role=:role AND ug."deletedAt" IS NULL
+        SELECT * FROM "Roles" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."CollectiveId"=:collectiveid AND ug.role=:role AND ug."deletedAt" IS NULL
       `, {
         replacements: { collectiveid: collective.id, role: 'MEMBER' },
         model: models.User

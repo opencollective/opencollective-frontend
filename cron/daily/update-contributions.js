@@ -7,9 +7,9 @@ const _ = require('lodash'); //eslint-disable-line import/no-commonjs
 Promise.longStackTraces();
 const client = GitHubClient({logLevel: 'verbose'});
 const { log } = client; // repurpose the logger
-const { Group } = models;
+const { Collective } = models;
 
-Group.findAll({
+Collective.findAll({
   attributes: [
     'id',
     'name',
@@ -17,14 +17,14 @@ Group.findAll({
     'data'
   ]
 })
-  .tap(groups => {
-    log.verbose('groups', `Found ${groups.length} group(s) to inspect`);
+  .tap(collectives => {
+    log.verbose('collectives', `Found ${collectives.length} collective(s) to inspect`);
   })
-  .each(group => {
-    const org = _.get(group, 'settings.githubOrg');
-    const repoLink = _.get(group, 'settings.githubRepo');
+  .each(collective => {
+    const org = _.get(collective, 'settings.githubOrg');
+    const repoLink = _.get(collective, 'settings.githubRepo');
     if (!org && !repoLink) {
-      log.warn(group.name, `No GitHub org or repo associated`);
+      log.warn(collective.name, `No GitHub org or repo associated`);
       return;
     }
     let fetchPromise;
@@ -53,7 +53,7 @@ Group.findAll({
     } else {
       const split = repoLink.split('/');
       if (split.length !== 2) {
-        log.warn(group.name, 'Incorrect format of githubRepo');
+        log.warn(collective.name, 'Incorrect format of githubRepo');
         return;
       }
       const options = {
@@ -70,21 +70,21 @@ Group.findAll({
 
     return fetchPromise
       .then(data => {
-        group.data = _.assign(group.data || {}, {
+        collective.data = _.assign(collective.data || {}, {
           githubContributors: data.contributorData,
           repos: data.repoData
         });
-        return group.save();
+        return collective.save();
       })
       .then(() => {
-        log.info(group.name,
+        log.info(collective.name,
           `Successfully updated contribution data`);
       })
       .catch(err => {
-        log.error(group.name, err.stack);
+        log.error(collective.name, err.stack);
       });
   })
   .finally(() => {
-    log.verbose('groups', 'Done.');
+    log.verbose('collectives', 'Done.');
     process.exit();
   });

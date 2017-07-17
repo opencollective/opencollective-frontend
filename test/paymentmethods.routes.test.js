@@ -34,9 +34,9 @@ describe('paymentMethods.routes.test.js', () => {
   });
 
   /**
-   * Get user's groups.
+   * Get user's collectives.
    */
-  describe('#getUserGroups', () => {
+  describe('#getRoles', () => {
 
     it('fails getting another user\'s paymentMethods', (done) => {
       request(app)

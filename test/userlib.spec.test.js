@@ -41,20 +41,21 @@ describe("userlib", () => {
     userlib.fetchAvatar('email.com')
       .then(() => expect(stub.called).to.be.false));
 
-  it("can't fetch the avatar of an unknown email", () =>
-    userlib.fetchAvatar(userData1.email).then(avatar => {
+  it("can't fetch the image of an unknown email", () =>
+    userlib.fetchAvatar(userData1.email).then(image => {
+      console.log("memory", userlib.memory);
       expect(userlib.memory).to.have.property(userData1.email);
       expect(stub.callCount).to.equal(1);
-      expect(avatar).to.equal(null);
+      expect(image).to.equal(null);
     }));
 
   it("only calls clearbit server once for an email not found", () =>
     userlib.fetchAvatar(userData1.email)
       .then(() => userlib.fetchAvatar(userData1.email))
-      .then(avatar => {
+      .then(image => {
         expect(stub.callCount).to.equal(1);
-        expect(avatar).to.be.falsy;
-        expect(avatar).to.equal(null);
+        expect(image).to.be.falsy;
+        expect(image).to.equal(null);
     }));
 
 });

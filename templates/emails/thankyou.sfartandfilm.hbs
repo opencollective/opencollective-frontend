@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -29,7 +29,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 <p>SF Art & Film remains steadfast in its goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible. We hope you’ll continue to introduce people like yourself—people who understand the importance of art education—to our program.</p>
 <p>We greatly appreciate your support.</p>
 <p>You can follow our future activities and how we will be spending the money on our open collective page:
-<a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+<a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 <p>Many Thanks,</p>
@@ -42,7 +42,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 <p>Your donation is tax-deductible to the extent allowed by law. You may save this receipt for your records. San Francisco Art & Film for Teenagers is a qualified non-profit organization with 501-C status, tax ID: 94-3310464.</p>
 
 {{> subscriptions}}
-{{> relatedgroups}}
+{{> relatedcollectives}}
 
 {{> footer}}
 

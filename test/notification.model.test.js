@@ -11,14 +11,14 @@ import Promise from 'bluebird';
 const application = utils.data('application');
 const userData = utils.data('user1');
 const user2Data = utils.data('user2');
-const groupData = utils.data('group1');
-const group2Data = utils.data('group2');
-const group3Data = utils.data('group3');
+const collectiveData = utils.data('collective1');
+const collective2Data = utils.data('collective2');
+const collective3Data = utils.data('collective3');
 const notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
 
 const {
   User,
-  Group,
+  Collective,
   Notification,
   Event,
   Tier,
@@ -29,26 +29,26 @@ describe("notification.model.test.js", () => {
 
   let user;
   let user2;
-  let group;
-  let group2;
+  let collective;
+  let collective2;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
-    const promises = [User.create(userData), User.create(user2Data), Group.create(groupData), Group.create(group2Data)];
+    const promises = [User.create(userData), User.create(user2Data), Collective.create(collectiveData), Collective.create(collective2Data)];
     return Promise.all(promises).then((results) => {
       user = results[0];
       user2 = results[1];
-      group = results[2];
-      group2 = results[3];
-      return group.addUserWithRole(user, 'HOST')
+      collective = results[2];
+      collective2 = results[3];
+      return collective.addUserWithRole(user, 'HOST')
     })
   });
 
 
-  it('subscribes to the notifications for the `group.transaction.approved` email', () =>
+  it('subscribes to the notifications for the `collective.transaction.approved` email', () =>
     request(app)
-      .post(`/groups/${group.id}/activities/group.transaction.approved/subscribe`)
+      .post(`/collectives/${collective.id}/activities/collective.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
@@ -58,8 +58,8 @@ describe("notification.model.test.js", () => {
         return Notification.findAndCountAll({
           where: {
             UserId: user.id,
-            GroupId: group.id,
-            type: 'group.transaction.approved'
+            CollectiveId: collective.id,
+            type: 'collective.transaction.approved'
           }
         });
       })
@@ -67,21 +67,21 @@ describe("notification.model.test.js", () => {
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
-      .post(`/groups/${group.id}/activities/${notificationData.type}/unsubscribe`)
+      .post(`/collectives/${collective.id}/activities/${notificationData.type}/unsubscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
       .then(() =>
         Notification.findAndCountAll({where: {
           UserId: user.id,
-          GroupId: group.id,
+          CollectiveId: collective.id,
           type: notificationData.type
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
   it('fails to add another notification if one exists', () =>
     request(app)
-      .post(`/groups/${group.id}/activities/${notificationData.type}/subscribe`)
+      .post(`/collectives/${collective.id}/activities/${notificationData.type}/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(400)
@@ -90,41 +90,41 @@ describe("notification.model.test.js", () => {
         return Notification.findAndCountAll({
           where: {
             UserId: user.id,
-            GroupId: group.id,
+            CollectiveId: collective.id,
             type: notificationData.type
           }
         });
       })
       .tap(res => expect(res.count).to.equal(1)));
 
-  it('fails to add a notification if not a member of the group', () =>
+  it('fails to add a notification if not a member of the collective', () =>
     request(app)
-      .post(`/groups/${group2.id}/activities/group.transaction.approved/subscribe`)
+      .post(`/collectives/${collective2.id}/activities/collective.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(403)
       .then(() => Notification.findAndCountAll({where: {
           UserId: user.id,
-          GroupId: group2.id,
+          CollectiveId: collective2.id,
           type: notificationData.type
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
-  it('automatically subscribe new members to `group.transaction.created`, `group.expense.created` and `group.monthlyreport` events', () =>
+  it('automatically subscribe new members to `collective.transaction.created`, `collective.expense.created` and `collective.monthlyreport` events', () =>
     request(app)
-      .post('/groups')
+      .post('/collectives')
       .send({
         api_key: application.api_key,
-        group: Object.assign(group3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.MEMBER}]})
+        collective: Object.assign(collective3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.MEMBER}]})
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
-          GroupId: res.body.id
+          CollectiveId: res.body.id
         }}))
       .tap(res => {
         const notifications = res.rows;
         const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([ 'group.expense.created', 'group.expense.created', 'group.monthlyreport', 'group.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
+        expect(types).to.deep.equal([ 'collective.expense.created', 'collective.expense.created', 'collective.monthlyreport', 'collective.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
       })
       .tap(res => expect(res.count).to.equal(6)));
 
@@ -134,15 +134,15 @@ describe("notification.model.test.js", () => {
     beforeEach(() => User.createMany([utils.data('user3'), utils.data('user4')]).then(result => users = result))
 
     it('getSubscribers to the backers mailinglist', () => {
-      return Promise.map(users, user => group.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
-      .then(() => Notification.getSubscribers(group.slug, 'backers').catch(e => console.error(e)))
+      return Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
+      .then(() => Notification.getSubscribers(collective.slug, 'backers').catch(e => console.error(e)))
       .tap(subscribers => {
         expect(subscribers.length).to.equal(2);
       })
       .tap(subscribers => {
-        return subscribers[0].unsubscribe(group.id, 'mailinglist.backers')
+        return subscribers[0].unsubscribe(collective.id, 'mailinglist.backers')
       })
-      .then(() => Notification.getSubscribers(group.slug, 'backers'))
+      .then(() => Notification.getSubscribers(collective.slug, 'backers'))
       .tap(subscribers => {
         expect(subscribers.length).to.equal(1);
       })
@@ -155,7 +155,7 @@ describe("notification.model.test.js", () => {
       let event;
       return Event.create({
         ...eventData,
-        GroupId: group.id
+        CollectiveId: collective.id
       })
       .then(res => {
         event = res;
@@ -168,20 +168,20 @@ describe("notification.model.test.js", () => {
         return Promise.map(users, (user) => {
           Response.create({
             UserId: user.id,
-            GroupId: group.id,
+            CollectiveId: collective.id,
             EventId: event.id,
             TierId: tier.id
           })
         });
       })
-      .then(() => Notification.getSubscribers(group.slug, eventData.slug))
+      .then(() => Notification.getSubscribers(collective.slug, eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(2);
       })
       .then(() => {
-        return users[0].unsubscribe(group.id, `mailinglist.${event.slug}`)
+        return users[0].unsubscribe(collective.id, `mailinglist.${event.slug}`)
       })
-      .then(() => Notification.getSubscribers(group.slug, eventData.slug))
+      .then(() => Notification.getSubscribers(collective.slug, eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(1);
       })

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * This script subscribes the first member of a collective (core contributor)
- * to the `group.expense.created` notification
+ * to the `collective.expense.created` notification
  */
 import Promise from 'bluebird';
 import models from '../server/models';
@@ -10,7 +10,7 @@ const debug = require('debug')('subscribe');
 
 const {
   Notification,
-  UserGroup
+  Role
 } = models;
 
 const processRows = (rows) => {
@@ -26,30 +26,30 @@ const init = () => {
       order: [['id', 'ASC']]
   };
 
-  UserGroup.findAll(query)
+  Role.findAll(query)
   .then(processRows)
   .then(() => process.exit(0));
 }
 
-const groups = {};
-const type = 'group.expense.created';
+const collectives = {};
+const type = 'collective.expense.created';
 
 const processRow = (row) => {
   // If we already have a core contributor (member) registered to the notification, we don't add another person
-  if (groups[row.GroupId]) {
-    console.error(`Group ${row.GroupId} has already userid ${groups[row.GroupId]} subscribed to ${type}`);
+  if (collectives[row.CollectiveId]) {
+    console.error(`Collective ${row.CollectiveId} has already userid ${collectives[row.CollectiveId]} subscribed to ${type}`);
     return;
   }
-  groups[row.GroupId] = row.UserId;
+  collectives[row.CollectiveId] = row.UserId;
 
-  debug(`Subscribing UserId ${row.UserId} to ${type} of GroupId ${row.GroupId}`);
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
-    GroupId: row.GroupId,
+    CollectiveId: row.CollectiveId,
     type
   })
-  .then(notification => console.log(`> UserId ${row.UserId} is now subscribed to ${type} of GroupId ${row.GroupId}`))
-  .catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of GroupId ${row.GroupId}`));
+  .then(notification => console.log(`> UserId ${row.UserId} is now subscribed to ${type} of CollectiveId ${row.CollectiveId}`))
+  .catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`));
 };
 
 init();

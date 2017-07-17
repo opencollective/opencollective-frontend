@@ -13,16 +13,16 @@ const stringify = (json) => {
 }
 
 describe('graphql.tiers.test', () => {
-  let user1, user2, host, group1, group2, tier1, paymentMethod1;
+  let user1, user2, host, collective1, collective2, tier1, paymentMethod1;
   let sandbox;
 
   beforeEach(() => utils.resetTestDB());
 
   /**
    * Setup:
-   * - User1 is a member of group2 has a payment method on file
-   * - User1 will become a backer of group1
-   * - Host is the host of both group1 and group2
+   * - User1 is a member of collective2 has a payment method on file
+   * - User1 will become a backer of collective1
+   * - Host is the host of both collective1 and collective2
    */
 
   beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
@@ -30,15 +30,15 @@ describe('graphql.tiers.test', () => {
   beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
   beforeEach(() => models.PaymentMethod.create({...utils.data('paymentMethod2'), UserId: user1.id}).tap(c => paymentMethod1 = c));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
 
-  beforeEach(() => group1.createTier(utils.data('tier1')).tap(t => tier1 = t));
+  beforeEach(() => collective1.createTier(utils.data('tier1')).tap(t => tier1 = t));
 
-  beforeEach(() => group1.addUserWithRole(host, 'HOST'));
-  beforeEach(() => group2.addUserWithRole(host, 'HOST'));
-  beforeEach(() => group2.addUserWithRole(user1, 'MEMBER'));
+  beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
+  beforeEach(() => collective2.addUserWithRole(host, 'HOST'));
+  beforeEach(() => collective2.addUserWithRole(user1, 'MEMBER'));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
@@ -120,7 +120,7 @@ describe('graphql.tiers.test', () => {
               token: 'card_1AejcADjPFcHOcTmBJRASiOV'
             }
           },
-          collective: { slug: group1.slug },
+          collective: { slug: collective1.slug },
           tier: { id: tier1.id }
         }
       }
@@ -169,7 +169,7 @@ describe('graphql.tiers.test', () => {
         expect(result.errors[0].message).to.equal("You don't have a payment method with that uuid");
       });
           
-      it("user1 becomes a backer of group1 using a payment method on file", async () => {
+      it("user1 becomes a backer of collective1 using a payment method on file", async () => {
         const responseInput = generateResponse(user1);
         responseInput.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
@@ -187,15 +187,13 @@ describe('graphql.tiers.test', () => {
         }`;
 
         const result = await graphql(schema, query, null, { remoteUser: user1 });
-        console.log("result", result);
-        console.log("result", result.data.createResponse);
         expect(result.errors).to.not.exist;
 
-        const memberships = await models.UserGroup.findAll({where: { UserId: user1.id, GroupId: group1.id }});
-        const donations = await models.Donation.findAll({where: { UserId: user1.id, GroupId: group1.id }});
+        const memberships = await models.Role.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const donations = await models.Donation.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
         const subscription = await models.Subscription.findById(donations[0].SubscriptionId);
         const response = await models.Response.findById(donations[0].ResponseId);
-        const transactions = await models.Transaction.findAll({where: { UserId: user1.id, GroupId: group1.id }});
+        const transactions = await models.Transaction.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
 
         expect(memberships).to.have.length(1);
         expect(donations).to.have.length(1);
@@ -206,7 +204,7 @@ describe('graphql.tiers.test', () => {
         expect(response.status).to.equal('PROCESSED');
       });
       
-      it("user1 becomes a backer of group1 using a new payment method", async () => {
+      it("user1 becomes a backer of collective1 using a new payment method", async () => {
         const query = `
         mutation createResponse {
           createResponse(response: ${stringify(generateResponse(user1))}) {
@@ -222,10 +220,8 @@ describe('graphql.tiers.test', () => {
         }`;
 
         const result = await graphql(schema, query, null, {});
-        console.log("result", result);
-        console.log("result", result.data.createResponse);
         expect(result.errors).to.not.exist;
-        const memberships = await models.UserGroup.findAll({where: { UserId: user1.id, GroupId: group1.id }});
+        const memberships = await models.Role.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
         expect(memberships).to.have.length(1);
         const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
         expect(paymentMethods).to.have.length(2);

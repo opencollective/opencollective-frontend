@@ -100,8 +100,8 @@ td.tdpadding {
     {{#each this}}
       <tr>
         <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
-        <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
-        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
+        <td valign="top"><a href="{{@root.config.host.website}}/{{collective.slug}}">{{collective.shortSlug}}</a></td>
+        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=collective.currency precision=2}}}</td>
         <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
         <td valign="top" width="100%">{{description}}</td>
         <td valign="top" align="center">{{page}}</td>
@@ -130,7 +130,7 @@ td.tdpadding {
             <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
             <td nowrap>{{{moment createdAt format="YYYY-MM-DD"}}}</td>
           </tr>
-          <tr><th>Collective</th><td></td><td><a href="https://opencollective.com/{{group.slug}}">{{group.slug}}</a></td></tr>
+          <tr><th>Collective</th><td></td><td><a href="https://opencollective.com/{{collective.slug}}">{{collective.slug}}</a></td></tr>
           <tr><th>Category</th><td></td><td nowrap>{{Expense.category}}</td></tr>
         </table>
         <table class="amountDetails">

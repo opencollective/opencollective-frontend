@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -24,14 +24,14 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 <p>Please register for the event with John Poulsen before March the 20th: <a href="https://www.eventbrite.com.au/e/ispc-wa-networking-event-with-john-poulsen-registration-21584720480">https://www.eventbrite.com.au/e/ispc-wa-networking-event-with-john-poulsen-registration-21584720480</a></p>
 
 <p>You can follow our future activities and how we will be spending the money on our open collective page:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 
 {{> subscriptions}}
 
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} open collective
+  – The {{collective.name}} open collective
 </p>
 
 {{> footer}}

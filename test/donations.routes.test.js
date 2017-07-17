@@ -13,7 +13,7 @@ const STRIPE_TOKEN = 'superStripeToken';
 const application = utils.data('application');
 
 describe('donations.routes.test.js', () => {
-  let user, user2, host, group, sandbox, createPaymentStub, processPaymentStub;
+  let user, user2, host, collective, sandbox, createPaymentStub, processPaymentStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -34,18 +34,18 @@ describe('donations.routes.test.js', () => {
   beforeEach('create a user', () => models.User.create(utils.data('user3')).tap(u => user = u));
   beforeEach('create a host', () => models.User.create(utils.data('user2')).tap(u => user2 = u));
   beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
-  beforeEach('create a group', () => models.Group.create(utils.data('group2')).tap(g => group = g));
-  beforeEach('add host to group', () => group.addUserWithRole(host, roles.HOST));
-  beforeEach('add user to group', () => group.addUserWithRole(user, roles.MEMBER));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).tap(g => collective = g));
+  beforeEach('add host to collective', () => collective.addUserWithRole(host, roles.HOST));
+  beforeEach('add user to collective', () => collective.addUserWithRole(user, roles.MEMBER));
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
 
   describe('#list', () => {
 
-    const createDonation = (index, UserId = user.id, GroupId = group.id) => {
+    const createDonation = (index, UserId = user.id, CollectiveId = collective.id) => {
       const donations = utils.data('donations');
-      const donation = Object.assign({}, donations[index], { GroupId, UserId });
+      const donation = Object.assign({}, donations[index], { CollectiveId, UserId });
       return models.Donation.create(donation)
     }
 
@@ -55,7 +55,7 @@ describe('donations.routes.test.js', () => {
 
     it('THEN returns 200', (done) => {
       request(app)
-      .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+      .get(`/collectives/${collective.id}/donations?api_key=${application.api_key}`)
       .expect(200)
       .then(res => {
         const donations = res.body;
@@ -70,7 +70,7 @@ describe('donations.routes.test.js', () => {
 
       beforeEach('get 2 per page', (done) => {
         request(app)
-        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.id}/donations?api_key=${application.api_key}`)
         .send({ per_page })
         .expect(200)
         .then(res => {
@@ -91,9 +91,9 @@ describe('donations.routes.test.js', () => {
         expect(headers.link).to.contain('current');
         expect(headers.link).to.contain('page=1');
         expect(headers.link).to.contain(`per_page=${per_page}`);
-        expect(headers.link).to.contain(`/groups/${group.id}/donations`);
+        expect(headers.link).to.contain(`/collectives/${collective.id}/donations`);
         const tot = 3;
-        expect(headers.link).to.contain(`/groups/${group.id}/donations?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
+        expect(headers.link).to.contain(`/collectives/${collective.id}/donations?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
       });
     });
 
@@ -103,7 +103,7 @@ describe('donations.routes.test.js', () => {
 
       beforeEach('get page 2 with one per page', (done) => {
         request(app)
-        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.id}/donations?api_key=${application.api_key}`)
         .send({ page, per_page: 1 })
         .expect(200)
         .then(res => {
@@ -132,7 +132,7 @@ describe('donations.routes.test.js', () => {
 
       beforeEach('get expenses since id 2', (done) => {
         request(app)
-        .get(`/groups/${group.id}/donations?api_key=${application.api_key}`)
+        .get(`/collectives/${collective.id}/donations?api_key=${application.api_key}`)
         .send({ since_id })
         .expect(200)
         .then(res => {
@@ -166,9 +166,9 @@ describe('donations.routes.test.js', () => {
 
 
     describe('stripe donation', () => {
-      it('calls createPayment successfully when payment by a group\'s user', () => {
+      it('calls createPayment successfully when payment by a collective\'s user', () => {
         return request(app)
-        .post(`/groups/${group.id}/donations/stripe`)
+        .post(`/collectives/${collective.id}/donations/stripe`)
         .send({
           api_key: application.api_key,
           payment: Object.assign({}, payment, {email: user.email})
@@ -178,7 +178,7 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].collective.slug).to.equal(collective.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
             paymentMethod: { token: payment.stripeToken },
             amount: AMOUNT,
@@ -193,7 +193,7 @@ describe('donations.routes.test.js', () => {
 
       it('calls createPayment successfully when payment by a new, anonymous user', () => {
         return request(app)
-        .post(`/groups/${group.id}/donations/stripe`)
+        .post(`/collectives/${collective.id}/donations/stripe`)
         .send({
           api_key: application.api_key,
           payment: Object.assign({}, payment, {email: 'anonymous@anon.com'})
@@ -202,7 +202,7 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal('anonymous@anon.com');
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].collective.slug).to.equal(collective.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
             paymentMethod: { token: payment.stripeToken },
             amount: AMOUNT,
@@ -217,7 +217,7 @@ describe('donations.routes.test.js', () => {
 
       it('Payment success by an existing user in the database', () => {
         return request(app)
-        .post(`/groups/${group.id}/donations/stripe`)
+        .post(`/collectives/${collective.id}/donations/stripe`)
         .send({
           api_key: application.api_key,
           payment: Object.assign({}, payment, {email: user2.email})
@@ -226,7 +226,7 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user2.email);
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].collective.slug).to.equal(collective.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
             paymentMethod: { token: payment.stripeToken },
             amount: AMOUNT,
@@ -241,7 +241,7 @@ describe('donations.routes.test.js', () => {
 
       it('Recurring payment success', () => {
         return request(app)
-        .post(`/groups/${group.id}/donations/stripe`)
+        .post(`/collectives/${collective.id}/donations/stripe`)
         .send({
           api_key: application.api_key,
           payment: Object.assign({}, payment, {
@@ -255,7 +255,7 @@ describe('donations.routes.test.js', () => {
         .then(() => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentStub.firstCall.args[0].user.email).to.equal(user.email);
-          expect(createPaymentStub.firstCall.args[0].group.slug).to.equal(group.slug);
+          expect(createPaymentStub.firstCall.args[0].collective.slug).to.equal(collective.slug);
           expect(createPaymentStub.firstCall.args[0].payment).to.deep.equal({
             paymentMethod: { token: payment.stripeToken },
             amount: AMOUNT,
@@ -275,13 +275,13 @@ describe('donations.routes.test.js', () => {
       describe('fails', () => {
 
         it('when user is a MEMBER', () => {
-          return models.UserGroup.create({
+          return models.Role.create({
             UserId: user2.id,
-            GroupId: group.id,
+            CollectiveId: collective.id,
             role: roles.MEMBER
           })
           .then(() => request(app)
-            .post(`/groups/${group.id}/donations/manual`)
+            .post(`/collectives/${collective.id}/donations/manual`)
             .set('Authorization', `Bearer ${user2.jwt()}`)
             .send({
               api_key: application.api_key,
@@ -293,9 +293,9 @@ describe('donations.routes.test.js', () => {
           });
 
         it('when user is a BACKER', () => {
-          return group.addUserWithRole(user2, roles.BACKER)
+          return collective.addUserWithRole(user2, roles.BACKER)
           .then(() => request(app)
-            .post(`/groups/${group.id}/donations/manual`)
+            .post(`/collectives/${collective.id}/donations/manual`)
             .set('Authorization', `Bearer ${user2.jwt()}`)
             .send({
               api_key: application.api_key,
@@ -312,7 +312,7 @@ describe('donations.routes.test.js', () => {
         describe('fails when amount', () => {
           it('is missing', () => {
             request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${user.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -326,7 +326,7 @@ describe('donations.routes.test.js', () => {
 
           it('is 0', () => {
             request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${user.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -343,7 +343,7 @@ describe('donations.routes.test.js', () => {
 
           it('calls processPayment successfully when donation from host', () => {
             request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -358,8 +358,8 @@ describe('donations.routes.test.js', () => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
                   UserId: host.id,
-                  GroupId: group.id,
-                  currency: group.currency,
+                  CollectiveId: collective.id,
+                  currency: collective.currency,
                   amount: AMOUNT,
                   title: 'desc',
                   notes: 'long notes',
@@ -370,7 +370,7 @@ describe('donations.routes.test.js', () => {
 
           it('calls processPayment successfully when no email is sent with the donation', () => {
             request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -384,8 +384,8 @@ describe('donations.routes.test.js', () => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
                   UserId: host.id,
-                  GroupId: group.id,
-                  currency: group.currency,
+                  CollectiveId: collective.id,
+                  currency: collective.currency,
                   amount: AMOUNT,
                   title: 'desc',
                   notes: 'long notes',
@@ -396,7 +396,7 @@ describe('donations.routes.test.js', () => {
 
           it('calls processPayment successfully when manual donation is from a new user but submitted by host', () => {
             return request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -412,8 +412,8 @@ describe('donations.routes.test.js', () => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
                   UserId: newUser.id,
-                  GroupId: group.id,
-                  currency: group.currency,
+                  CollectiveId: collective.id,
+                  currency: collective.currency,
                   amount: AMOUNT,
                   title: null,
                   notes: null
@@ -424,7 +424,7 @@ describe('donations.routes.test.js', () => {
 
           it('calls processPayment successfully when manual donation is from an existing user who is not the host but submitted by host', () => {
             return request(app)
-              .post(`/groups/${group.id}/donations/manual`)
+              .post(`/collectives/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -437,8 +437,8 @@ describe('donations.routes.test.js', () => {
                 expect(processPaymentStub.callCount).to.equal(1);
                 expect(processPaymentStub.firstCall.args[0]).to.contain({
                   UserId: user2.id,
-                  GroupId: group.id,
-                  currency: group.currency,
+                  CollectiveId: collective.id,
+                  currency: collective.currency,
                   amount: AMOUNT,
                   title: null,
                   notes: null
@@ -465,7 +465,7 @@ describe('donations.routes.test.js', () => {
 
         beforeEach((done) => {
           request(app)
-            .post(`/groups/${group.id}/payments/paypal`)
+            .post(`/collectives/${collective.id}/payments/paypal`)
             .send({
               api_key: application.api_key,
               payment: {
@@ -501,7 +501,7 @@ describe('donations.routes.test.js', () => {
             const transaction = res.rows[0];
             const subscription = transaction.Subscription;
 
-            expect(transaction).to.have.property('GroupId', group.id);
+            expect(transaction).to.have.property('CollectiveId', collective.id);
             expect(transaction).to.have.property('currency', 'USD');
             expect(transaction).to.have.property('tags');
             expect(transaction).to.have.property('amount', 10);
@@ -532,7 +532,7 @@ describe('donations.routes.test.js', () => {
             });
 
           request(app)
-            .get(`/groups/${group.id}/transactions/1/callback?token=${token}`) // hardcode transaction id
+            .get(`/collectives/${collective.id}/transactions/1/callback?token=${token}`) // hardcode transaction id
             .end((err, res) => {
               expect(err).to.not.exist;
               expect(executeRequest.isDone()).to.be.true;
@@ -564,17 +564,17 @@ describe('donations.routes.test.js', () => {
                 expect(text).to.contain('status=payment_success')
 
                 expect(donation).to.have.property('UserId', user.id);
-                expect(donation).to.have.property('GroupId', group.id);
+                expect(donation).to.have.property('CollectiveId', collective.id);
                 expect(donation).to.have.property('currency', 'USD');
                 expect(donation).to.have.property('amount', 1000);
-                expect(donation).to.have.property('title', `Donation to ${group.name}`);
+                expect(donation).to.have.property('title', `Donation to ${collective.name}`);
                 expect(donation).to.have.property('SubscriptionId', transaction.Subscription.id);
 
-                return group.getUsers();
+                return collective.getUsers();
               })
               .then((users) => {
                 const backer = _.find(users, {email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -596,7 +596,7 @@ describe('donations.routes.test.js', () => {
 
         beforeEach((done) => {
           request(app)
-            .post(`/groups/${group.id}/payments/paypal`)
+            .post(`/collectives/${collective.id}/payments/paypal`)
             .send({
               api_key: application.api_key,
               payment: {
@@ -622,7 +622,7 @@ describe('donations.routes.test.js', () => {
             expect(res.count).to.equal(1);
             const transaction = res.rows[0];
 
-            expect(transaction).to.have.property('GroupId', group.id);
+            expect(transaction).to.have.property('CollectiveId', collective.id);
             expect(transaction).to.have.property('currency', 'USD');
             expect(transaction).to.have.property('tags');
             expect(transaction).to.have.property('SubscriptionId', null);
@@ -656,7 +656,7 @@ describe('donations.routes.test.js', () => {
             });
 
           request(app)
-            .get(`/groups/${group.id}/transactions/1/callback?token=${token}&paymentId=${paymentId}&PayerID=${PayerID}`) // hardcode transaction id
+            .get(`/collectives/${collective.id}/transactions/1/callback?token=${token}&paymentId=${paymentId}&PayerID=${PayerID}`) // hardcode transaction id
             .end((err, res) => {
               expect(err).to.not.exist;
               expect(executeRequest.isDone()).to.be.true;
@@ -682,26 +682,26 @@ describe('donations.routes.test.js', () => {
                 expect(text).to.contain('status=payment_success')
 
                 expect(donation).to.have.property('UserId', user.id);
-                expect(donation).to.have.property('GroupId', group.id);
+                expect(donation).to.have.property('CollectiveId', collective.id);
                 expect(donation).to.have.property('currency', 'USD');
                 expect(donation).to.have.property('amount', 1000);
-                expect(donation).to.have.property('title', `Donation to ${group.name}`);
+                expect(donation).to.have.property('title', `Donation to ${collective.name}`);
 
-                return group.getUsers();
+                return collective.getUsers();
               })
               .then((users) => {
                 const backer = _.find(users, {email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
               })
-              .then(() => models.Activity.findAndCountAll({ where: { type: "group.transaction.created" } }))
+              .then(() => models.Activity.findAndCountAll({ where: { type: "collective.transaction.created" } }))
               .then(res => {
                 expect(res.count).to.equal(1);
                 const activity = res.rows[0].get();
-                expect(activity).to.have.property('GroupId', group.id);
+                expect(activity).to.have.property('CollectiveId', collective.id);
                 expect(activity).to.have.property('UserId', transaction.UserId);
                 expect(activity).to.have.property('TransactionId', transaction.id);
                 expect(activity.data.transaction).to.have.property('id', transaction.id);
-                expect(activity.data.group).to.have.property('id', group.id);
+                expect(activity.data.collective).to.have.property('id', collective.id);
                 expect(activity.data.user).to.have.property('id', transaction.UserId);
               })
               .then(() => done())
@@ -713,7 +713,7 @@ describe('donations.routes.test.js', () => {
       describe('errors', () => {
         it('fails if the interval is wrong', (done) => {
           request(app)
-            .post(`/groups/${group.id}/payments/paypal`)
+            .post(`/collectives/${collective.id}/payments/paypal`)
             .send({
               api_key: application.api_key,
               payment: {
@@ -734,7 +734,7 @@ describe('donations.routes.test.js', () => {
 
         it('fails if it has no amount', (done) => {
           request(app)
-            .post(`/groups/${group.id}/payments/paypal`)
+            .post(`/collectives/${collective.id}/payments/paypal`)
             .send({
               api_key: application.api_key,
               payment: {

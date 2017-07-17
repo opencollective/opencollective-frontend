@@ -2,15 +2,14 @@
  * Dependencies.
  */
 import _ from 'lodash';
-import Joi from 'joi';
 import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
-import collectiveBy from 'lodash/collection/collectiveBy';
+import groupBy from 'lodash/collection/groupBy';
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
-import {getTier, isBackerActive, capitalize, pluralize } from '../lib/utils';
+import {getTier } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 
@@ -70,7 +69,7 @@ export default function(Sequelize, DataTypes) {
       allowNull: false
     },
 
-    createdByUserId: {
+    CreatedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
@@ -80,7 +79,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    lastEditedByUserId: {
+    LastEditedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
@@ -116,6 +115,7 @@ export default function(Sequelize, DataTypes) {
       defaultValue: HOST_FEE_PERCENT
     },
 
+    mission: DataTypes.STRING, // max 95 characters
     description: DataTypes.STRING, // max 95 characters
 
     longDescription: DataTypes.TEXT,
@@ -128,7 +128,7 @@ export default function(Sequelize, DataTypes) {
     image: {
       type: DataTypes.STRING,
       get() {
-        return this.getDataValue('logo') || `${config.host.website}${DEFAULT_LOGO}`;
+        return this.getDataValue('image') || `${config.host.website}${DEFAULT_LOGO}`;
       }
     },
 
@@ -228,12 +228,9 @@ export default function(Sequelize, DataTypes) {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
-          whyJoin: this.whyJoin,
           budget: this.budget,
           burnrate: this.burnrate,
           currency: this.currency,
-          logo: this.logo,
-          video: this.video,
           image: this.image,
           data: this.data,
           backgroundImage: this.backgroundImage,
@@ -258,7 +255,7 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           name: this.name,
           slug: this.slug,
-          logo: this.logo,
+          image: this.image,
           backgroundImage: this.backgroundImage,
           publicUrl: this.publicUrl,
           mission: this.mission,
@@ -270,7 +267,7 @@ export default function(Sequelize, DataTypes) {
         return {
           id: this.id,
           name: this.name,
-          logo: this.logo,
+          image: this.image,
           slug: this.slug,
           publicUrl: this.publicUrl,
           mission: this.mission,
@@ -292,7 +289,7 @@ export default function(Sequelize, DataTypes) {
 
       getRoleForUser(user) {
         if (!user) return null;
-        return models.UserCollective.findOne({ UserId: user.id, CollectiveId: this.id }).then(ug => ug.role);
+        return models.Role.findOne({ UserId: user.id, CollectiveId: this.id }).then(ug => ug.role);
       },
 
       getSuperCollectiveCollectivesIds() {
@@ -319,29 +316,77 @@ export default function(Sequelize, DataTypes) {
        *  { name: 'backer', users: [ {UserObject}, {UserObject} ], range: [], ... }
        * ]
        */
-      getTiersWithUsers(options = { active: false, attributes: ['id','username', 'avatar','firstDonation', 'lastDonation','totalDonations','website'] }) {
-        const tiers = _.clone(this.tiers);
+      getTiersWithUsers(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
+        const tiersById = {};
+
+        const addIsActive = (user, response) => {
+          if (options.active) {
+            return models.Donation.findOne({
+              where: { CollectiveId: this.id, UserId: user.id, TierId: response.TierId },
+              include: [ { model: models.Subscription, attributes: ['isActive'] } ]
+            })
+            .then(donation => {
+              user.isActive = donation.Subscription.isActive;
+              return user;
+            })
+          } else {
+            return user;
+          }
+        }
+
         return queries.getUsersFromCollectiveWithTotalDonations(this.id, options.until)
-          .then(users => {
-            if (!tiers) return [ { name: 'backer', title: 'Backers', range: [0, Infinity], users: users.map(u => _.pick(u,options.attributes)) } ];
-            const tierIndex = {};
-            tiers.map((tier, index) => {
-              tierIndex[tier.name] = index;
-              tiers[index].title = tier.title || capitalize(pluralize(tier.name));
-              tiers[index].users = [];
-            });
-            users.map(user => {
-              user.tier = getTier(user, tiers);
-              user.avatar = user.avatar || `/public/images/users/avatar-02.svg`;
-              if (tierIndex[user.tier] === undefined) {
-                tierIndex[user.tier] = tiers.length;
-                tiers.push({ name: user.tier, title: capitalize(pluralize(user.tier)), users: [], range: [0, Infinity] });
+          .tap(() => {
+            models.Tier.findAll({where: { CollectiveId: this.id }})
+            .then(tiers => tiers.map(t => {
+              tiersById[t.id] = t;
+            }));
+          })
+          .then(users => Promise.map(users, user => {
+            return models.Response.findOne({
+              attributes: [ 'TierId' ],
+              where: { CollectiveId: this.id, UserId: user.id }
+            }).then(response => {
+              if (!response) {
+                console.log(">>> no response for ", { CollectiveId: this.id, UserId: user.id });
               }
-              if (!options.active || isBackerActive(user, tiers))
-                tiers[tierIndex[user.tier]].users.push(_.pick(user,options.attributes));
-            });
-            return tiers;
-          });
+              const TierId = response.TierId;
+              tiersById[TierId] = tiersById[TierId] || response.Tier;
+              tiersById[TierId].users = tiersById[TierId].users || [];
+              return addIsActive(user, response).then(user => {
+                tiersById[TierId].users.push(user);
+              })
+            })
+          }))
+          .then(() => Object.values(tiersById));
+      },
+
+      getUserTier(user) {
+        if (user.role && user.role !== 'BACKER') return user;
+        return models.Response.findOne({
+          where: { CollectiveId: this.id, UserId: user.id },
+          include: [ { model: models.Tier, where: { type: { $in: ['TIER', 'BACKER', 'SPONSOR'] } } } ]
+        }).then(response => response && response.Tier);
+      },
+
+      /**
+       * Returns whether the backer is still active
+       */
+      isBackerActive(backer, until) {
+        const where = { UserId: backer.id, CollectiveId: this.id };
+        if (until) {
+          where.createdAt = { $lt: until };
+        }
+
+        return models.Donation
+          .findOne({
+            where,
+            include: [ { model: models.Subscription, where: { isActive: true } } ]
+          })
+          .then(donation => {
+            if (!donation) return false;
+            if (!donation.Subscription) return false;
+            return donation.Subscription.isActive;
+          })
       },
 
       hasUserWithRole(userId, expectedRoles, cb) {
@@ -351,7 +396,7 @@ export default function(Sequelize, DataTypes) {
               id: userId
             }
           })
-          .then(users => users.map(user => user.UserCollective.role))
+          .then(users => users.map(user => user.Role.role))
           .tap(actualRoles => cb(null, _.intersection(expectedRoles, actualRoles).length > 0))
           .catch(cb);
       },
@@ -376,41 +421,41 @@ export default function(Sequelize, DataTypes) {
         }
 
         return Promise.all([
-          Sequelize.models.UserCollective.create({ role, UserId: user.id, CollectiveId: this.id }),
+          Sequelize.models.Role.create({ role, UserId: user.id, CollectiveId: this.id }),
           Sequelize.models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
         ]);
       },
 
       findOrAddUserWithRole(user, role) {
-        return Sequelize.models.UserCollective.find({
+        return Sequelize.models.Role.find({
           where: {
             role,
             UserId: user.id,
             CollectiveId: this.id
           }})
-        .then(userCollective => {
-          if (!userCollective) {
+        .then(Role => {
+          if (!Role) {
             return this.addUserWithRole(user, role)
           } else {
-            return userCollective;
+            return Role;
           }
         });
       },
 
       getStripeAccount() {
-        return Sequelize.models.UserCollective.find({
+        return Sequelize.models.Role.find({
           where: {
             CollectiveId: this.id,
             role: roles.HOST
           }
         })
-        .then((userCollective) => {
-          if (!userCollective) {
+        .then((Role) => {
+          if (!Role) {
             return { stripeAccount: null };
           }
           return Sequelize.models.User.find({
             where: {
-              id: userCollective.UserId
+              id: Role.UserId
             },
             include: [{
               model: Sequelize.models.StripeAccount
@@ -422,20 +467,20 @@ export default function(Sequelize, DataTypes) {
 
       getConnectedAccount() {
 
-        return models.UserCollective.find({
+        return models.Role.find({
           where: {
             CollectiveId: this.id,
             role: roles.HOST
           }
         })
-        .then((userCollective) => {
-          if (!userCollective) {
+        .then((Role) => {
+          if (!Role) {
             return null;
           }
 
           return models.ConnectedAccount.find({
             where: {
-              UserId: userCollective.UserId,
+              UserId: Role.UserId,
               provider: 'paypal',
             }
           });
@@ -604,14 +649,14 @@ export default function(Sequelize, DataTypes) {
       getHost() {
         return models.User.findOne({
           include: [
-            { model: models.UserCollective, where: { role: roles.HOST, CollectiveId: this.id } }
+            { model: models.Role, where: { role: roles.HOST, CollectiveId: this.id } }
           ]
         });
       },
 
       hasHost() {
         return this.getHost()
-        .then(user => Promise.resolve(!!user));
+        .then(user => Promise.resolve(Boolean(user)));
       },
 
       getSuperCollectiveData() {
@@ -649,7 +694,7 @@ export default function(Sequelize, DataTypes) {
                 .then(results => {
                   const collectiveInfo = collective.card;
                   collectiveInfo.yearlyIncome = results[0];
-                  const usersByRole = collectiveBy(results[1], 'role');
+                  const usersByRole = groupBy(results[1], 'role');
                   const backers = usersByRole[roles.BACKER] || [];
                   collectiveInfo.backersAndSponsorsCount = backers.length;
                   collectiveInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;

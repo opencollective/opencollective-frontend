@@ -8,12 +8,12 @@ import * as utils from '../test/utils';
 import models from '../server/models';
 import roles from '../server/constants/roles';
 const application = utils.data('application');
-const publicGroupData = utils.data('group1');
+const publicCollectiveData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
 describe('transactions.routes.test.js', () => {
 
-  let sandbox, publicGroup, group2, user, user2, user3;
+  let sandbox, publicCollective, collective2, user, user2, user3;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -31,14 +31,14 @@ describe('transactions.routes.test.js', () => {
   beforeEach('create user2', () => models.User.create(utils.data('user2')).tap(u => user2 = u));
   beforeEach('create user3', () => models.User.create(utils.data('user3')).tap(u => user3 = u));
 
-  // Create groups
-  beforeEach('create publicGroup', () => models.Group.create(publicGroupData).tap(g => publicGroup = g));
-  beforeEach('create group2', () => models.Group.create(_.omit(utils.data('group2'), ['slug'])).tap(g => group2 = g));
+  // Create collectives
+  beforeEach('create publicCollective', () => models.Collective.create(publicCollectiveData).tap(g => publicCollective = g));
+  beforeEach('create collective2', () => models.Collective.create(_.omit(utils.data('collective2'), ['slug'])).tap(g => collective2 = g));
 
-  // Add users to groups
-  beforeEach('add user to group2 as a host', () => group2.addUserWithRole(user, roles.HOST));
-  beforeEach('add user to publicGroup as a host', () => publicGroup.addUserWithRole(user, roles.HOST));
-  beforeEach('add user3 to publicGroup as a member', () => publicGroup.addUserWithRole(user3, roles.MEMBER));
+  // Add users to collectives
+  beforeEach('add user to collective2 as a host', () => collective2.addUserWithRole(user, roles.HOST));
+  beforeEach('add user to publicCollective as a host', () => publicCollective.addUserWithRole(user, roles.HOST));
+  beforeEach('add user3 to publicCollective as a member', () => publicCollective.addUserWithRole(user3, roles.MEMBER));
 
   beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
 
@@ -52,7 +52,7 @@ describe('transactions.routes.test.js', () => {
 
     it('fails creating a transaction if no authenticated', (done) => {
       request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
+        .post(`/collectives/${publicCollective.id}/transactions`)
         .send({
           api_key: application.api_key,
           transaction: transactionsData[0]
@@ -63,7 +63,7 @@ describe('transactions.routes.test.js', () => {
 
     it('fails creating a transaction if no transaction passed', (done) => {
       request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
+        .post(`/collectives/${publicCollective.id}/transactions`)
         .send({
           api_key: application.api_key
         })
@@ -75,9 +75,9 @@ describe('transactions.routes.test.js', () => {
         });
     });
 
-    it('fails creating a transaction if user has no access to the group', (done) => {
+    it('fails creating a transaction if user has no access to the collective', (done) => {
       request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
+        .post(`/collectives/${publicCollective.id}/transactions`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
           api_key: application.api_key,
@@ -89,7 +89,7 @@ describe('transactions.routes.test.js', () => {
 
     it('successfully create a transaction with a user', (done) => {
       request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
+        .post(`/collectives/${publicCollective.id}/transactions`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
@@ -98,7 +98,7 @@ describe('transactions.routes.test.js', () => {
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('GroupId', publicGroup.id);
+          expect(res.body).to.have.property('CollectiveId', publicCollective.id);
           expect(res.body).to.have.property('UserId', user.id); // ...
           done();
         });
@@ -109,7 +109,7 @@ describe('transactions.routes.test.js', () => {
     // xdamman: fixed -- but need to test on staging to be sure
     it('cannot create a transaction without a user', () => 
       request(app)
-        .post(`/groups/${publicGroup.id}/transactions`)
+        .post(`/collectives/${publicCollective.id}/transactions`)
         .send({
           api_key: application.api_key,
           transaction: transactionsData[7]
@@ -120,16 +120,16 @@ describe('transactions.routes.test.js', () => {
   });
 
   /**
-   * Get group's transactions.
+   * Get collective's transactions.
    */
   describe('#get', () => {
 
     let transaction;
 
-    beforeEach('create multiple transactions for publicGroup', (done) => {
+    beforeEach('create multiple transactions for publicCollective', (done) => {
       async.each(transactionsData, (t, cb) => {
         request(app)
-          .post(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+          .post(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user3.jwt()}`)
           .send({ transaction: t })
           .expect(200)
@@ -141,10 +141,10 @@ describe('transactions.routes.test.js', () => {
       }, done);
     });
 
-    beforeEach('create a transaction for group2', (done) => {
+    beforeEach('create a transaction for collective2', (done) => {
       async.each(transactionsData, (transaction, cb) => {
         request(app)
-          .post(`/groups/${group2.id}/transactions?api_key=${application.api_key}`)
+          .post(`/collectives/${collective2.id}/transactions?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .send({
             transaction
@@ -157,9 +157,9 @@ describe('transactions.routes.test.js', () => {
       }, done);
     });
 
-    it('successfully get a group\'s transactions', (done) => {
+    it('successfully get a collective\'s transactions', (done) => {
       request(app)
-        .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+        .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
@@ -167,7 +167,7 @@ describe('transactions.routes.test.js', () => {
           const transactions = res.body;
           expect(transactions).to.have.length(transactionsData.length);
           transactions.forEach((t) => {
-            expect(t.GroupId).to.equal(publicGroup.id);
+            expect(t.CollectiveId).to.equal(publicCollective.id);
           });
 
           done();
@@ -198,7 +198,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.host.username).to.equal(user.username);
           expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
-          expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           expect(transactionDetails.user).to.not.have.property('email');
           expect(transactionDetails.user).to.not.have.property('paypalEmail');
           expect(transactionDetails.host).to.not.have.property('email');
@@ -222,7 +222,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.host.username).to.equal(user.username);
           expect(transactionDetails.host.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.user.billingAddress).to.equal(user3.billingAddress);
-          expect(transactionDetails.group.slug).to.equal(publicGroup.slug);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           done();
         });
     });
@@ -231,9 +231,9 @@ describe('transactions.routes.test.js', () => {
 
       const perPage = 3;
 
-      it('successfully get a group\'s transactions with per_page', (done) => {
+      it('successfully get a collective\'s transactions with per_page', (done) => {
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
           .send({
             per_page: perPage,
             sort: 'id',
@@ -254,18 +254,18 @@ describe('transactions.routes.test.js', () => {
             expect(headers.link).to.contain('current');
             expect(headers.link).to.contain('page=1');
             expect(headers.link).to.contain(`per_page=${perPage}`);
-            expect(headers.link).to.contain(`/groups/${publicGroup.id}/transactions`);
+            expect(headers.link).to.contain(`/collectives/${publicCollective.id}/transactions`);
             const tot = transactionsData.length;
-            expect(headers.link).to.contain(`/groups/${publicGroup.id}/transactions?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
+            expect(headers.link).to.contain(`/collectives/${publicCollective.id}/transactions?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
 
             done();
           });
       });
 
-      it('successfully get the second page of a group\'s transactions', (done) => {
+      it('successfully get the second page of a collective\'s transactions', (done) => {
         const page = 2;
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
           .send({
             per_page: perPage,
             page,
@@ -287,11 +287,11 @@ describe('transactions.routes.test.js', () => {
           });
       });
 
-      it('successfully get a group\'s transactions using since_id', (done) => {
+      it('successfully get a collective\'s transactions using since_id', (done) => {
         const sinceId = 5;
 
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
           .send({
             since_id: sinceId,
             sort: 'id',
@@ -320,9 +320,9 @@ describe('transactions.routes.test.js', () => {
 
     describe('Sorting', () => {
 
-      it('successfully get a group\'s transactions with sorting', (done) => {
+      it('successfully get a collective\'s transactions with sorting', (done) => {
         request(app)
-          .get(`/groups/${publicGroup.id}/transactions?api_key=${application.api_key}`)
+          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
           .send({
             sort: 'createdAt',
             direction: 'asc'

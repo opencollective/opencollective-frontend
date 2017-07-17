@@ -18,8 +18,8 @@ import roles from '../server/constants/roles';
 const debug = debugLib('onetime.email');
 
 const {
-  Group,
-  UserGroup,
+  Collective,
+  Role,
   User
 } = models;
 

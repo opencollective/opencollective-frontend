@@ -14,7 +14,7 @@ const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
 
 describe('lib.payments.createPayment.test.js', () => {
-  let host, user, user2, group, group2, sandbox;
+  let host, user, user2, collective, collective2, sandbox;
 
   before(() => sandbox = sinon.sandbox.create());
 
@@ -33,10 +33,10 @@ describe('lib.payments.createPayment.test.js', () => {
   beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
   beforeEach('create a user', () => models.User.create({email: EMAIL}).tap(u => user2 = u));
   beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
-  beforeEach('create a group', () => models.Group.create(utils.data('group1')).tap(g => group = g));
-  beforeEach('create a group', () => models.Group.create(utils.data('group2')).tap(g => group2 = g));
-  beforeEach('add user to group as member', () => group.addUserWithRole(host, roles.HOST));
-  beforeEach('add user to group2 as member', () => group2.addUserWithRole(host, roles.HOST));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
+  beforeEach('add user to collective as member', () => collective.addUserWithRole(host, roles.HOST));
+  beforeEach('add user to collective2 as member', () => collective2.addUserWithRole(host, roles.HOST));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
@@ -62,7 +62,7 @@ describe('lib.payments.createPayment.test.js', () => {
       it('stripe token is missing', () => {
         return paymentsLib.createPayment({ 
           user, 
-          group, 
+          collective, 
           payment: {
             amount: AMOUNT, 
             currency: CURRENCY,
@@ -73,7 +73,7 @@ describe('lib.payments.createPayment.test.js', () => {
       it('interval is present and it is not month or year', () => {
         return paymentsLib.createPayment({ 
           user, 
-          group, 
+          collective, 
           payment: {
             amount: AMOUNT, 
             currency: CURRENCY,
@@ -86,7 +86,7 @@ describe('lib.payments.createPayment.test.js', () => {
       it('payment amount is missing', () => {
         return paymentsLib.createPayment({ 
           user, 
-          group, 
+          collective, 
           payment: {
             currency: CURRENCY,
             paymentMethod: { token: STRIPE_TOKEN },
@@ -97,7 +97,7 @@ describe('lib.payments.createPayment.test.js', () => {
       it('payment amount is less than 50', () => {
         return paymentsLib.createPayment({ 
           user, 
-          group, 
+          collective, 
           payment: {
             currency: CURRENCY,
             paymentMethod: { token: STRIPE_TOKEN },
@@ -115,7 +115,7 @@ describe('lib.payments.createPayment.test.js', () => {
           return user.setStripeAccount(null)
           .then(() => paymentsLib.createPayment({
             user,
-            group,
+            collective,
             payment: {
               paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
@@ -131,7 +131,7 @@ describe('lib.payments.createPayment.test.js', () => {
           .then((account) => user.setStripeAccount(account))
           .then(() => paymentsLib.createPayment({
             user,
-            group,
+            collective,
             payment: {
               paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
@@ -150,7 +150,7 @@ describe('lib.payments.createPayment.test.js', () => {
             
             beforeEach(() => paymentsLib.createPayment({
               user,
-              group,
+              collective,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
@@ -177,11 +177,11 @@ describe('lib.payments.createPayment.test.js', () => {
                 .then((res) => {
                   expect(res.count).to.equal(1);
                   expect(res.rows[0]).to.have.property('UserId', user.id);
-                  expect(res.rows[0]).to.have.property('GroupId', group.id);
+                  expect(res.rows[0]).to.have.property('CollectiveId', collective.id);
                   expect(res.rows[0]).to.have.property('currency', CURRENCY);
                   expect(res.rows[0]).to.have.property('amount', AMOUNT);
                   expect(res.rows[0]).to.have.property('title',
-                    `Donation to ${group.name}`);
+                    `Donation to ${collective.name}`);
                   done();
                 })
                 .catch(done);
@@ -192,7 +192,7 @@ describe('lib.payments.createPayment.test.js', () => {
             
             beforeEach(() => paymentsLib.createPayment({
               user,
-              group,
+              collective,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
@@ -204,7 +204,7 @@ describe('lib.payments.createPayment.test.js', () => {
               return models.PaymentMethod.findOne().then(paymentMethod => {
                 return paymentsLib.createPayment({
                   user,
-                  group,
+                  collective,
                   payment: {
                     paymentMethod,
                     amount: AMOUNT2,
@@ -243,7 +243,7 @@ describe('lib.payments.createPayment.test.js', () => {
           beforeEach(() => {
             return paymentsLib.createPayment({
               user: user2,
-              group: group2,
+              collective: collective2,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT2,
@@ -270,11 +270,11 @@ describe('lib.payments.createPayment.test.js', () => {
               .then((res) => {
                 expect(res.count).to.equal(1);
                 expect(res.rows[0]).to.have.property('UserId', user2.id);
-                expect(res.rows[0]).to.have.property('GroupId', group2.id);
+                expect(res.rows[0]).to.have.property('CollectiveId', collective2.id);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('amount', AMOUNT2);
                 expect(res.rows[0]).to.have.property('SubscriptionId');
-                expect(res.rows[0]).to.have.property('title', `Monthly donation to ${group2.name}`);
+                expect(res.rows[0]).to.have.property('title', `Monthly donation to ${collective2.name}`);
                 done();
               })
               .catch(done)

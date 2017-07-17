@@ -6,20 +6,20 @@ import models from '../server/models';
 
 const application = utils.data('application');
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 
 describe('profile.routes.test.js', () => {
 
-  let user, group;
+  let user, collective;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => models.User.create(userData).tap(u => user = u));
   beforeEach(() =>
-    models.Group
-      .create(groupData).tap(g => {
-        group = g;
-        return group.addUserWithRole(user, 'HOST');
+    models.Collective
+      .create(collectiveData).tap(g => {
+        collective = g;
+        return collective.addUserWithRole(user, 'HOST');
       })
   );
 
@@ -39,13 +39,13 @@ describe('profile.routes.test.js', () => {
         })
     );
 
-    it('gets the group', (done) => {
+    it('gets the collective', (done) => {
       request(app)
-        .get(`/profile/${group.slug}?api_key=${application.api_key}`)
+        .get(`/profile/${collective.slug}?api_key=${application.api_key}`)
         .expect(200)
         .end((err, res) => {
           const { body } = res;
-          expect(body.mission).to.equal(group.mission);
+          expect(body.mission).to.equal(collective.mission);
           done();
         })
     });

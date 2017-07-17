@@ -18,7 +18,7 @@ const chance = chanceLib.Chance();
 const application = utils.data('application');
 const userData = utils.data('user3');
 const userData2 = utils.data('user2');
-const groupData = utils.data('group5');
+const collectiveData = utils.data('collective5');
 import stripeMock from './mocks/stripe';
 const STRIPE_URL = 'https://api.stripe.com:443';
 const CHARGE = 10.99;
@@ -29,7 +29,7 @@ const STRIPE_TOKEN = 'superStripeToken';
  * Tests
  */
 describe('lib.payments.processPayment.test.js', () => {
-  let user, user2, group, sandbox, processPaymentSpy, emailSendSpy;
+  let user, user2, collective, sandbox, processPaymentSpy, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -61,21 +61,21 @@ describe('lib.payments.processPayment.test.js', () => {
   // Create a user.
   beforeEach('create a user', () => models.User.create(userData2).tap(u => user2 = u));
 
-  // Create a group.
-  beforeEach('create a group', (done) => {
+  // Create a collective.
+  beforeEach('create a collective', (done) => {
     request(app)
-      .post('/groups')
+      .post('/collectives')
       .send({
         api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: 'member@group.com', role: roles.MEMBER}] })
+        collective: Object.assign(collectiveData, { users: [{ email: 'member@collective.com', role: roles.MEMBER}] })
       })
       .expect(200)
       .end((e, res) => {
         expect(e).to.not.exist;
-        models.Group
+        models.Collective
           .findById(parseInt(res.body.id))
           .then((g) => {
-            group = g;
+            collective = g;
             done();
           })
           .catch(done);
@@ -98,7 +98,7 @@ describe('lib.payments.processPayment.test.js', () => {
           amount: 10000,
           currency: 'USD',
           UserId: user.id,
-          GroupId: group.id
+          CollectiveId: collective.id
         })
         .then(d => donation = d)
         .then(paymentsLib.processPayment)
@@ -139,7 +139,7 @@ describe('lib.payments.processPayment.test.js', () => {
           amount: 10000,
           currency: 'USD',
           UserId: user2.id,
-          GroupId: group.id
+          CollectiveId: collective.id
         })
         .then(d => donation = d)
         .then(paymentsLib.processPayment)
@@ -166,15 +166,15 @@ describe('lib.payments.processPayment.test.js', () => {
       });
 
       it('adds the user as a backer', () => {
-        return models.UserGroup.findOne({
+        return models.Role.findOne({
           where: {
             UserId: user2.id,
-            GroupId: group.id,
+            CollectiveId: collective.id,
             role: roles.BACKER
           }
         })
-        .then(userGroup => {
-          expect(userGroup).to.exist;
+        .then(Role => {
+          expect(Role).to.exist;
         });
       });
 
@@ -260,10 +260,10 @@ describe('lib.payments.processPayment.test.js', () => {
         `amount=${CHARGE * 100}`,
         `currency=${CURRENCY}`,
         `customer=${stripeMock.customers.create.id}`,
-        `description=${encodeURIComponent(`OpenCollective: ${group.slug}`)}`,
+        `description=${encodeURIComponent(`OpenCollective: ${collective.slug}`)}`,
         'application_fee=54',
-        `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-        `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(groupData.name)}`,
+        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
+        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
         `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
         `${encodeURIComponent('metadata[paymentMethodId]')}=1`
       ].join('&');
@@ -279,7 +279,7 @@ describe('lib.payments.processPayment.test.js', () => {
     });
 
     describe('One-time donation', () => {
-      beforeEach('create related groups', () => models.Group.createMany(utils.data('relatedGroups')));
+      beforeEach('create related collectives', () => models.Collective.createMany(utils.data('relatedCollectives')));
 
       beforeEach('create a payment method and a donation', () => {
         return models.PaymentMethod.create({
@@ -293,7 +293,7 @@ describe('lib.payments.processPayment.test.js', () => {
           SubscriptionId: null,
           PaymentMethodId: pm.id,
           UserId: user.id,
-          GroupId: group.id
+          CollectiveId: collective.id
         }))
         .then(paymentsLib.processPayment)
         .then(transaction => {
@@ -330,19 +330,19 @@ describe('lib.payments.processPayment.test.js', () => {
             expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
             expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
-            expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+            expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 867)
             done();
           })
           .catch(done);
       });
 
       it('successfully adds the user as a backer', (done) => {
-        group
+        collective
           .getUsers()
           .then((users) => {
             expect(users).to.have.length(3);
             const backer = _.find(users, {email: user.email});
-            expect(backer.UserGroup.role).to.equal(roles.BACKER);
+            expect(backer.Role.role).to.equal(roles.BACKER);
             done();
           })
           .catch(done);
@@ -351,8 +351,8 @@ describe('lib.payments.processPayment.test.js', () => {
       it('successfully sends out an email to donor', () => {
         expect(emailSendSpy.args[1][0]).to.equal('thankyou');
         expect(emailSendSpy.args[1][1]).to.equal(user.email);
-        expect(emailSendSpy.args[1][2].relatedGroups).to.have.length(2);
-        expect(emailSendSpy.args[1][2].relatedGroups[0]).to.have.property('settings');
+        expect(emailSendSpy.args[1][2].relatedCollectives).to.have.length(2);
+        expect(emailSendSpy.args[1][2].relatedCollectives[0]).to.have.property('settings');
       });
     });
 
@@ -379,7 +379,7 @@ describe('lib.payments.processPayment.test.js', () => {
           SubscriptionId: subscription.id,
           PaymentMethodId: pm.id,
           UserId: user.id,
-          GroupId: group.id,
+          CollectiveId: collective.id,
           createdAt: '2017-01-22T15:01:22.827-07:00'
         }))
         .then(paymentsLib.processPayment);
@@ -404,10 +404,10 @@ describe('lib.payments.processPayment.test.js', () => {
             `plan=${planId}`,
             'application_fee_percent=5',
             'trial_end=1485986482',
-            `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-            `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
+            `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
+            `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collective.name)}`,
             `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
+            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
           ].join('&');
 
           nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -461,7 +461,7 @@ describe('lib.payments.processPayment.test.js', () => {
                 expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
                 expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
                 expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
-                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 867)
                 done();
               })
               .catch(done);
@@ -477,12 +477,12 @@ describe('lib.payments.processPayment.test.js', () => {
           });
 
           it('successfully adds the user as a backer', (done) => {
-            group
+            collective
               .getUsers()
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -526,7 +526,7 @@ describe('lib.payments.processPayment.test.js', () => {
                 expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
                 expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
                 expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
-                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 867)
                 done();
               })
               .catch(done);
@@ -542,12 +542,12 @@ describe('lib.payments.processPayment.test.js', () => {
           });
 
           it('successfully adds the user as a backer', (done) => {
-            group
+            collective
               .getUsers()
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -579,10 +579,10 @@ describe('lib.payments.processPayment.test.js', () => {
             `plan=${planId}`,
             'application_fee_percent=5',
             'trial_end=1514844082',
-            `${encodeURIComponent('metadata[groupId]')}=${group.id}`,
-            `${encodeURIComponent('metadata[groupName]')}=${encodeURIComponent(group.name)}`,
+            `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
+            `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collective.name)}`,
             `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${group.slug}`)}`
+            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
           ].join('&');
 
           nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -636,7 +636,7 @@ describe('lib.payments.processPayment.test.js', () => {
                 expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
                 expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
                 expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
-                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 867)
                 done();
               })
               .catch(done);
@@ -652,12 +652,12 @@ describe('lib.payments.processPayment.test.js', () => {
           });
 
           it('successfully adds the user as a backer', (done) => {
-            group
+            collective
               .getUsers()
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -701,7 +701,7 @@ describe('lib.payments.processPayment.test.js', () => {
                 expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
                 expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
                 expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.00785);
-                expect(res.rows[0]).to.have.property('netAmountInGroupCurrency', 867)
+                expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 867)
                 done();
               })
               .catch(done);
@@ -717,12 +717,12 @@ describe('lib.payments.processPayment.test.js', () => {
           });
 
           it('successfully adds the user as a backer', (done) => {
-            group
+            collective
               .getUsers()
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.UserGroup.role).to.equal(roles.BACKER);
+                expect(backer.Role.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);

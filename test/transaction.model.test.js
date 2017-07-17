@@ -7,29 +7,29 @@ import models from '../server/models';
 const {Transaction} = models;
 
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
 describe('transaction model', () => {
 
-  let user, host, group, defaultTransactionData;
+  let user, host, collective, defaultTransactionData;
 
   beforeEach(() => utils.resetTestDB());
 
   beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
   beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
 
-  beforeEach('create group2 and add host', () =>
-    models.Group.create(groupData)
-      .tap(g => group = g)
+  beforeEach('create collective2 and add host', () =>
+    models.Collective.create(collectiveData)
+      .tap(g => collective = g)
       .tap(() => {
         defaultTransactionData = {
           UserId: user.id,
           HostId: host.id,
-          GroupId: group.id
+          CollectiveId: collective.id
         };
       })
-      .then(() => group.addUserWithRole(host, roles.HOST)));
+      .then(() => collective.addUserWithRole(host, roles.HOST)));
 
   it('automatically generates uuid', done => {
     Transaction.create({
@@ -59,7 +59,7 @@ describe('transaction model', () => {
     Transaction.createFromPayload({
       transaction: transactionsData[7],
       user,
-      group
+      collective
     })
     .then(() => {
       Transaction.findAll()
@@ -83,10 +83,10 @@ describe('transaction model', () => {
     Transaction.createFromPayload({
       transaction: transactionsData[7],
       user,
-      group
+      collective
     })
     .then(transaction => {
-      expect(transaction.GroupId).to.equal(group.id);
+      expect(transaction.CollectiveId).to.equal(collective.id);
     })
     .catch(done);
   });

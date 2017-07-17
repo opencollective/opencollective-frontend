@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}/{{interval}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}/{{interval}} à {{collective.name}}
 {{else}}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} à {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -25,7 +25,7 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 {{/if}}
 
 <p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur notre page OpenCollective:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 {{#if subscriptionsLink}}
@@ -37,7 +37,7 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 <p>Encore merci et gros bisous de nous tous! 😘,</p>
 
 <p>
-  – Le collectif {{group.name}}
+  – Le collectif {{collective.name}}
 </p>
 
 {{> footer}}

@@ -29,7 +29,7 @@ const {
 } = models;
 
 describe('expenses.routes.test.js', () => {
-  let sandbox, host, member, otherUser, expenseFiler, group, emailSendMessageSpy;
+  let sandbox, host, member, otherUser, expenseFiler, collective, emailSendMessageSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -47,15 +47,15 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group = g));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
 
   beforeEach(() => models.User.create(utils.data('user3')).tap(u => otherUser = u));
 
   beforeEach(() => models.User.create(utils.data('user4')).tap(u => expenseFiler = u));
 
-  beforeEach(() => group.addUserWithRole(host, roles.HOST));
+  beforeEach(() => collective.addUserWithRole(host, roles.HOST));
 
-  beforeEach(() => group.addUserWithRole(member, roles.MEMBER));
+  beforeEach(() => collective.addUserWithRole(member, roles.MEMBER));
 
   describe('WHEN expense does not exist', () => {
     let req;
@@ -63,7 +63,7 @@ describe('expenses.routes.test.js', () => {
     describe('#getOne', () => {
       beforeEach(() => {
         req = request(app)
-          .get(`/groups/${group.id}/expenses/123?api_key=${application.api_key}`)
+          .get(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -73,7 +73,7 @@ describe('expenses.routes.test.js', () => {
     describe('#approve', () => {
       beforeEach(() => {
         req = request(app)
-          .post(`/groups/${group.id}/expenses/123/approve?api_key=${application.api_key}`)
+          .post(`/collectives/${collective.id}/expenses/123/approve?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -83,7 +83,7 @@ describe('expenses.routes.test.js', () => {
     describe('#delete', () => {
       beforeEach(() => {
         req = request(app)
-          .delete(`/groups/${group.id}/expenses/123?api_key=${application.api_key}`)
+          .delete(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -93,7 +93,7 @@ describe('expenses.routes.test.js', () => {
     describe('#update', () => {
       beforeEach(() => {
         req = request(app)
-          .put(`/groups/${group.id}/expenses/123?api_key=${application.api_key}`)
+          .put(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -106,7 +106,7 @@ describe('expenses.routes.test.js', () => {
     let createReq;
 
     beforeEach(() => {
-      createReq = request(app).post(`/groups/${group.id}/expenses?api_key=${application.api_key}`);
+      createReq = request(app).post(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`);
     });
 
     describe('WHEN not authenticated but providing an expense', () => {
@@ -119,7 +119,7 @@ describe('expenses.routes.test.js', () => {
           .expect(200)
           .then(res => {
             expect(res.body.UserId).not.to.be.equal(host.id);
-            expect(res.body.GroupId).to.be.equal(group.id);
+            expect(res.body.CollectiveId).to.be.equal(collective.id);
             expect(res.body.title).to.be.equal(expense.title);
             expect(res.body.notes).to.be.equal(expense.notes);
             expect(res.body.category).to.be.equal(expense.category);
@@ -191,7 +191,7 @@ describe('expenses.routes.test.js', () => {
             expect(actualExpense.payoutMethod).to.be.equal(expense.payoutMethod);
           });
 
-          it('THEN expense belongs to the group', () => expect(actualExpense.GroupId).to.be.equal(group.id));
+          it('THEN expense belongs to the collective', () => expect(actualExpense.CollectiveId).to.be.equal(collective.id));
 
           it('THEN expense belongs to the user', () => expect(actualExpense.UserId).to.be.equal(member.id));
 
@@ -203,8 +203,8 @@ describe('expenses.routes.test.js', () => {
             });
           });
 
-          it('THEN a group.expense.created activity is created', () =>
-            expectExpenseActivity('group.expense.created', actualExpense.id));
+          it('THEN a collective.expense.created activity is created', () =>
+            expectExpenseActivity('collective.expense.created', actualExpense.id));
 
           it('THEN an email notification is sent', (done) => {
             expect(emailSendMessageSpy.firstCall.args[1]).to.contain(actualExpense.title);
@@ -214,7 +214,7 @@ describe('expenses.routes.test.js', () => {
 
           describe('#getOne', () => {
             it('THEN returns the expense without the attachment if not logged in', () => request(app)
-              .get(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+              .get(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenseData = res.body;
@@ -222,7 +222,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenseData).to.not.have.property('attachment');
               }));
             it('THEN returns the expense with the attachment if logged in', () => request(app)
-              .get(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+              .get(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
               .set('Authorization', `Bearer ${member.jwt()}`)
               .expect(200)
               .then(res => {
@@ -232,12 +232,12 @@ describe('expenses.routes.test.js', () => {
           });
 
           describe('#list', () => {
-            beforeEach('create expense', () => createExpense(group, expenseFiler));
-            beforeEach('create expense 2', () => createExpense(group, expenseFiler));
-            beforeEach('create 1 comment', () => models.Comment.createMany([utils.data('comments')[0]], { UserId: 1, GroupId: group.id, ExpenseId: 1 }));
-            beforeEach('create many comments', () => models.Comment.createMany(utils.data('comments'), { UserId: 1, GroupId: group.id, ExpenseId: 2 }));
+            beforeEach('create expense', () => createExpense(collective, expenseFiler));
+            beforeEach('create expense 2', () => createExpense(collective, expenseFiler));
+            beforeEach('create 1 comment', () => models.Comment.createMany([utils.data('comments')[0]], { UserId: 1, CollectiveId: collective.id, ExpenseId: 1 }));
+            beforeEach('create many comments', () => models.Comment.createMany(utils.data('comments'), { UserId: 1, CollectiveId: collective.id, ExpenseId: 2 }));
             it('THEN returns all expenses without user.email', () => request(app)
-              .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
+              .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenses = res.body;
@@ -248,11 +248,11 @@ describe('expenses.routes.test.js', () => {
                 expect(expenses[1].user.id).to.equal(expenseFiler.id);
                 expect(expenses[0].user.email).to.not.exist;
                 console.log("Expense user", expenses[0].user);
-                expenses.forEach(e => expect(e.GroupId).to.equal(group.id));
+                expenses.forEach(e => expect(e.CollectiveId).to.equal(collective.id));
               }));
 
             it('THEN returns 200 with all expenses with user.email and user.paypalEmail', () => request(app)
-              .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
+              .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .expect(200)
               .then(res => {
@@ -268,7 +268,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
+                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ per_page })
                 .expect(200)
                 .then(res => response = res));
@@ -285,9 +285,9 @@ describe('expenses.routes.test.js', () => {
                 expect(headers.link).to.contain('current');
                 expect(headers.link).to.contain('page=1');
                 expect(headers.link).to.contain(`per_page=${per_page}`);
-                expect(headers.link).to.contain(`/groups/${group.id}/expenses`);
+                expect(headers.link).to.contain(`/collectives/${collective.id}/expenses`);
                 const tot = 3;
-                expect(headers.link).to.contain(`/groups/${group.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
+                expect(headers.link).to.contain(`/collectives/${collective.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
               });
             });
 
@@ -296,7 +296,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
+                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ page, per_page: 1 })
                 .expect(200)
                 .then(res => response = res));
@@ -320,7 +320,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/groups/${group.id}/expenses?api_key=${application.api_key}`)
+                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ since_id })
                 .expect(200)
                 .then(res => response = res));
@@ -338,17 +338,17 @@ describe('expenses.routes.test.js', () => {
           describe('#delete', () => {
             describe('WHEN not authenticated', () =>
               it('THEN returns 401', () => request(app)
-                .delete(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .expect(401)));
 
-            describe('WHEN expense does not belong to group', () => {
+            describe('WHEN expense does not belong to collective', () => {
               let otherExpense;
 
               beforeEach('create another expense', () => createExpense().tap(e => otherExpense = e));
 
               it('THEN returns 404', () => {
                 return request(app)
-                .delete(`/groups/${group.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
+                .delete(`/collectives/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(404);
               });
@@ -357,14 +357,14 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN user is not the host, not a member and not the author of the expense', () => {
 
               beforeEach('set status to rejected', () =>
-                request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({ approved: false })
                 .expect(200)
               );
 
               it('THEN returns 403', () => request(app)
-                .delete(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${otherUser.jwt()}`)
                 .expect(403));
             });
@@ -373,13 +373,13 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach('reject expense', () => request(app)
-                .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: false})
                 .expect(200));
 
               beforeEach('delete expense', () => request(app)
-                .delete(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(200)
                 .toPromise()
@@ -390,24 +390,24 @@ describe('expenses.routes.test.js', () => {
               it('THEN has deleted expense', () =>
                 Expense.findById(actualExpense.id).then(e => expect(e).to.not.exist));
 
-              it('THEN a group.expense.deleted activity is created', () =>
-                expectExpenseActivity('group.expense.deleted', actualExpense.id));
+              it('THEN a collective.expense.deleted activity is created', () =>
+                expectExpenseActivity('collective.expense.deleted', actualExpense.id));
             });
           });
 
           describe('#update', () => {
             describe('WHEN not authenticated', () =>
               it('THEN returns 401', () => request(app)
-                .put(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .expect(401)));
 
-            describe('WHEN expense does not belong to group', () => {
+            describe('WHEN expense does not belong to collective', () => {
               let otherExpense;
 
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
               it('THEN returns 404', () => request(app)
-                .put(`/groups/${group.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
+                .put(`/collectives/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(404));
             });
@@ -417,7 +417,7 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => {
                 updateReq = request(app)
-                  .put(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                  .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                   .set('Authorization', `Bearer ${host.jwt()}`);
               });
 
@@ -428,7 +428,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .put(`/groups/${group.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({expense: {title: 'new title'}})
                 .expect(200)
@@ -439,8 +439,8 @@ describe('expenses.routes.test.js', () => {
                 expect(response.category).to.be.equal('Engineering');
               });
 
-              it('THEN a group.expense.updated activity is created', () =>
-                expectExpenseActivity('group.expense.updated', actualExpense.id));
+              it('THEN a collective.expense.updated activity is created', () =>
+                expectExpenseActivity('collective.expense.updated', actualExpense.id));
             });
           });
 
@@ -448,10 +448,10 @@ describe('expenses.routes.test.js', () => {
             let approveReq;
 
             beforeEach(() => {
-              approveReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
+              approveReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
             });
 
-            beforeEach(() => Notification.create({type: 'group.expense.approved', GroupId: 1, UserId: host.id}));
+            beforeEach(() => Notification.create({type: 'collective.expense.approved', CollectiveId: 1, UserId: host.id}));
 
             describe('WHEN not authenticated', () =>
               it('THEN returns 401 unauthorized', () => approveReq.expect(401)));
@@ -471,7 +471,7 @@ describe('expenses.routes.test.js', () => {
 
                 it('THEN returns status: APPROVED', done => {
                   expectApprovalStatus(approveReq.send({approved: true}), 'APPROVED')
-                  .tap(() => expectExpenseActivity('group.expense.approved', actualExpense.id))
+                  .tap(() => expectExpenseActivity('collective.expense.approved', actualExpense.id))
                   .tap(() => {
                     expect(emailSendMessageSpy.lastCall.args[1]).to.contain(`New expense approved on`);
                     done();
@@ -532,7 +532,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach('send pay POST request', () => {
               payReq = request(app)
-                .post(`/groups/${group.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`)
+                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send();
             });
@@ -554,7 +554,7 @@ describe('expenses.routes.test.js', () => {
                   () => Promise.resolve(preapprovalDetailsMock));
 
               return request(app)
-                .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve`)
+                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: true, api_key:application.api_key})
                 .expect(200);
@@ -565,7 +565,7 @@ describe('expenses.routes.test.js', () => {
             let payReq;
 
             beforeEach('send pay POST request', () => {
-              payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
+              payReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
             });
 
             describe('WHEN not authenticated', () =>
@@ -597,7 +597,7 @@ describe('expenses.routes.test.js', () => {
 
               afterEach(() => executePaymentStub.restore());
 
-              describe('WHEN group has insufficient funds', () => {
+              describe('WHEN collective has insufficient funds', () => {
                 it('THEN returns 400', () => payReq.expect(400, {
                   error: {
                     code: 400,
@@ -607,14 +607,14 @@ describe('expenses.routes.test.js', () => {
                 }));
               });
 
-              describe('WHEN group has sufficient funds for expense but not for fees', () => {
+              describe('WHEN collective has sufficient funds for expense but not for fees', () => {
 
                 // add just enough money that fees can't be paid
                 beforeEach('create a transaction', () => {
                   return request(app)
-                    .post(`/groups/${group.id}/transactions`)
+                    .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 12000}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 12000}})
                     .expect(200);
                 })
 
@@ -627,14 +627,14 @@ describe('expenses.routes.test.js', () => {
                 }));
               })
 
-              describe('WHEN group has sufficient funds', () => {
+              describe('WHEN collective has sufficient funds', () => {
                 
                 // add some money, so collective has some funds
                 beforeEach('create a transaction', () => {
                   return request(app)
-                    .post(`/groups/${group.id}/transactions`)
+                    .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 12500}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 12500}})
                     .expect(200);
                 })
 
@@ -677,7 +677,7 @@ describe('expenses.routes.test.js', () => {
                     });
 
                     it('THEN creates a transaction paid activity', () =>
-                      expectTransactionPaidActivity(group, member, transaction)
+                      expectTransactionPaidActivity(collective, member, transaction)
                         .tap(activity => expect(activity.data.paymentResponses).to.deep.equal({ 
                           createPaymentResponse: payMock, 
                           executePaymentResponse: executePaymentMock 
@@ -688,7 +688,7 @@ describe('expenses.routes.test.js', () => {
                 function expectTransactionCreated(expense, transaction) {
                   expect(transaction).to.have.property('amountInTxnCurrency', -10939)
                   expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 415)
-                  expect(transaction).to.have.property('netAmountInGroupCurrency', -12378);
+                  expect(transaction).to.have.property('netAmountInCollectiveCurrency', -12378);
                   expect(transaction).to.have.property('txnCurrency', host.currency);
                   expect(transaction).to.have.property('txnCurrencyFxRate', 0.911577028258888);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
@@ -696,18 +696,18 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
-                  expect(transaction).to.have.property('GroupId', expense.GroupId);
+                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
 
-                function expectTransactionPaidActivity(group, user, transaction) {
+                function expectTransactionPaidActivity(collective, user, transaction) {
                   return Activity
-                    .findOne({ where: { type: 'group.expense.paid' }})
+                    .findOne({ where: { type: 'collective.expense.paid' }})
                     .tap(activity => {
                       expect(activity.UserId).to.be.equal(user.id);
-                      expect(activity.GroupId).to.be.equal(group.id);
+                      expect(activity.CollectiveId).to.be.equal(collective.id);
                       expect(activity.TransactionId).to.be.equal(transaction.id);
                       expect(activity.data.user.id).to.be.equal(user.id);
-                      expect(activity.data.group.id).to.be.equal(group.id);
+                      expect(activity.data.collective.id).to.be.equal(collective.id);
                       expect(activity.data.transaction.id).to.be.equal(transaction.id);
                     });
                 }
@@ -728,7 +728,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach('create an expense', () => {
               return request(app)
-                .post(`/groups/${group.id}/expenses`)
+                .post(`/collectives/${collective.id}/expenses`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({ api_key: application.api_key, expense: expense2 })
                 .expect(200)
@@ -740,7 +740,7 @@ describe('expenses.routes.test.js', () => {
                 .stub(paypalAdaptive, 'preapprovalDetails')
                 .yields(null, preapprovalDetailsMock);
               return request(app)
-                .post(`/groups/${group.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: true})
                 .expect(200);
@@ -751,7 +751,7 @@ describe('expenses.routes.test.js', () => {
             let payReq;
 
             beforeEach(() => {
-              payReq = request(app).post(`/groups/${group.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
+              payReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
             });
 
             describe('WHEN not authenticated', () =>
@@ -783,7 +783,7 @@ describe('expenses.routes.test.js', () => {
                 payReq = payReq.send();
               });
 
-              describe('WHEN group has insufficient funds', () => {
+              describe('WHEN collective has insufficient funds', () => {
                 it('THEN returns 400', () => payReq.expect(400, {
                     error: {
                       code: 400,
@@ -793,14 +793,14 @@ describe('expenses.routes.test.js', () => {
                   }));
               });
 
-              describe('WHEN group has sufficient funds', () => {
+              describe('WHEN collective has sufficient funds', () => {
 
                 // add some money, so we can approve a manual expense against it
                 beforeEach('create a transaction', () => {
                   return request(app)
-                    .post(`/groups/${group.id}/transactions`)
+                    .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInGroupCurrency: 10000}})
+                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 10000}})
                     .expect(200);
                 })
 
@@ -820,14 +820,14 @@ describe('expenses.routes.test.js', () => {
                   it('THEN creates transaction2', () => expectTransactionCreated(expense, transaction));
 
                   it('THEN creates a transaction paid activity', () =>
-                    expectTransactionPaidActivity(group, host, transaction)
+                    expectTransactionPaidActivity(collective, host, transaction)
                       .tap(activity => expect(activity.data.paymentResponses).to.be.undefined));
                 });
 
                 function expectTransactionCreated(expense, transaction) {
                   expect(transaction).to.have.property('amountInTxnCurrency', -3737)
                   expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 0)
-                  expect(transaction).to.have.property('netAmountInGroupCurrency', -3737);
+                  expect(transaction).to.have.property('netAmountInCollectiveCurrency', -3737);
                   expect(transaction).to.have.property('txnCurrency', expense.currency);
                   expect(transaction).to.have.property('txnCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
@@ -835,18 +835,18 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.title);
                   expect(transaction).to.have.property('UserId', expense.UserId);
-                  expect(transaction).to.have.property('GroupId', expense.GroupId);
+                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
 
-                function expectTransactionPaidActivity(group, user, transaction) {
+                function expectTransactionPaidActivity(collective, user, transaction) {
                   return Activity
-                    .findOne({ where: { type: 'group.expense.paid' }})
+                    .findOne({ where: { type: 'collective.expense.paid' }})
                     .tap(activity => {
                       expect(activity.UserId).to.be.equal(user.id);
-                      expect(activity.GroupId).to.be.equal(group.id);
+                      expect(activity.CollectiveId).to.be.equal(collective.id);
                       expect(activity.TransactionId).to.be.equal(transaction.id);
                       expect(activity.data.user.id).to.be.equal(user.id);
-                      expect(activity.data.group.id).to.be.equal(group.id);
+                      expect(activity.data.collective.id).to.be.equal(collective.id);
                       expect(activity.data.transaction.id).to.be.equal(transaction.id);
                     });
                 }
@@ -884,21 +884,21 @@ describe('expenses.routes.test.js', () => {
       .then(activity => {
         expect(activity).to.be.ok;
         expect(activity.UserId).to.be.equal(member.id);
-        expect(activity.GroupId).to.be.equal(group.id);
+        expect(activity.CollectiveId).to.be.equal(collective.id);
         expect(activity.data.user.id).to.be.equal(member.id);
-        expect(activity.data.group.id).to.be.equal(group.id);
+        expect(activity.data.collective.id).to.be.equal(collective.id);
         expect(activity.data.expense.id).to.be.equal(expenseId);
       })
   }
 
   function createExpense(g, u) {
-    let group, user;
-    return (g ? Promise.resolve(g) : models.Group.create(utils.data('group2')))
-      .tap(g => group = g)
+    let collective, user;
+    return (g ? Promise.resolve(g) : models.Collective.create(utils.data('collective2')))
+      .tap(g => collective = g)
       .then(() => u ? u : expenseFiler)
       .tap(u => user = u)
       .then(() => request(app)
-        .post(`/groups/${group.id}/expenses`)
+        .post(`/collectives/${collective.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({expense: expense3, api_key: application.api_key})
         .expect(200))
