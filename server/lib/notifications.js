@@ -42,7 +42,7 @@ export default (Sequelize, activity) => {
         active: true
       };
 
-      if (activity.type === activityType.GROUP_CREATED) {
+      if (activity.type === activityType.COLLECTIVE_CREATED) {
         where.UserId = activity.data.host.id;
       } else {
         where.CollectiveId = activity.CollectiveId;

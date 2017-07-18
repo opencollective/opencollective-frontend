@@ -135,6 +135,8 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
     tagClause = 'g.tags && $tag AND'; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
   }
 
+  console.log(">>> getCollectivesByTag", tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset);
+
   return sequelize.query(`
     WITH "totalDonations" AS (
       SELECT "CollectiveId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "CollectiveId") as collectives FROM "Transactions" WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL GROUP BY "CollectiveId"

@@ -92,25 +92,25 @@ export default {
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSACTION_CREATED:
+      case activities.COLLECTIVE_TRANSACTION_CREATED:
         if (activity.data.transaction.type === type.DONATION) {
           return `New Donation: ${userString} gave ${currency} ${amount} to ${collective}!`;
         }
         break;
 
-      case activities.GROUP_EXPENSE_CREATED:
+      case activities.COLLECTIVE_EXPENSE_CREATED:
         return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${title}!`
 
-      case activities.GROUP_EXPENSE_REJECTED:
+      case activities.COLLECTIVE_EXPENSE_REJECTED:
         return `Expense rejected: ${currency} ${amount} for ${title} in ${collective} by userId: ${lastEditedById}!`
 
-      case activities.GROUP_EXPENSE_APPROVED:
+      case activities.COLLECTIVE_EXPENSE_APPROVED:
         return `Expense approved: ${currency} ${amount} for ${title} in ${collective} by userId: ${lastEditedById}!`
 
       case activities.CONNECTED_ACCOUNT_CREATED:
         return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
 
-      case activities.GROUP_EXPENSE_PAID: {
+      case activities.COLLECTIVE_EXPENSE_PAID: {
         const details = activity.data.preapprovalDetails;
         let remainingClause = '';
         if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
@@ -134,10 +134,10 @@ export default {
       case activities.SUBSCRIPTION_CANCELED:
         return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${collective}`;
 
-      case activities.GROUP_CREATED:
+      case activities.COLLECTIVE_CREATED:
         return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
 
-      case activities.GROUP_USER_ADDED:
+      case activities.COLLECTIVE_USER_ADDED:
         return `New user: ${userString} (UserId: ${userId}) added to collective: ${collective}`;
 
       default:
@@ -222,7 +222,7 @@ export default {
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSACTION_CREATED:
+      case activities.COLLECTIVE_TRANSACTION_CREATED:
 
         switch (activity.data.transaction.type) {
           case type.DONATION:
@@ -239,16 +239,16 @@ export default {
 
         break;
 
-      case activities.GROUP_EXPENSE_CREATED:
+      case activities.COLLECTIVE_EXPENSE_CREATED:
         return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${title}!`
 
-      case activities.GROUP_EXPENSE_REJECTED:
+      case activities.COLLECTIVE_EXPENSE_REJECTED:
         return `Expense rejected: ${currency} ${amount} for ${title} in ${collective}!`
 
-      case activities.GROUP_EXPENSE_APPROVED:
+      case activities.COLLECTIVE_EXPENSE_APPROVED:
         return `Expense approved: ${currency} ${amount} for ${title} in ${collective}!`
 
-      case activities.GROUP_EXPENSE_PAID:
+      case activities.COLLECTIVE_EXPENSE_PAID:
         return `Expense paid on ${collective}: ${currency} ${amount} for '${description}'`;
 
       case activities.SUBSCRIPTION_CONFIRMED:
@@ -259,7 +259,7 @@ export default {
         }
         return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${collective}!${tweetThis}`;
 
-      case activities.GROUP_CREATED:
+      case activities.COLLECTIVE_CREATED:
         return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
 
       default:

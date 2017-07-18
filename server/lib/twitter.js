@@ -4,7 +4,7 @@ import Twitter from 'twitter';
 import activityType from '../constants/activities';
 
 export function tweetActivity(Sequelize, activity) {
-  if (activity.type === activityType.GROUP_TRANSACTION_CREATED
+  if (activity.type === activityType.COLLECTIVE_TRANSACTION_CREATED
     && activity.data.transaction.amount > 0
     // users without twitterHandle are ignored
     && activity.data.user.twitterHandle) {

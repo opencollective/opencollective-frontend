@@ -306,11 +306,11 @@ describe('Mutation Tests', () => {
   describe('createResponse tests', () => {
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('ticket1'), { EventId: event1.id, CollectiveId: collective1.id }))
+      Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }))
       .tap(t => ticket1 = t));
 
     beforeEach(() => models.Tier.create(
-      Object.assign(utils.data('ticket2'), { EventId: event1.id, CollectiveId: collective1.id })));
+      Object.assign(utils.data('ticket2'), { CollectiveId: event1.id })));
 
     describe('throws an error', () => {
 

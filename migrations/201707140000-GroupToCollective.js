@@ -368,8 +368,10 @@ const up = (queryInterface, Sequelize) => {
     .then(() => updateCollectives(queryInterface.sequelize))
     .then(() => createCollectivesForUsers(queryInterface.sequelize))
     .then(() => queryInterface.removeColumn('Tiers', 'EventId'))
+    .then(() => queryInterface.removeColumn('Responses', 'EventId'))
     .then(() => queryInterface.removeColumn('Collectives', 'tiers'))
     .then(() => queryInterface.removeColumn('Collectives', 'logo'))
+    .then(() => queryInterface.dropTable('Events'))
     .catch(e => {
       console.error("Error in migration. Reverting back.", e);
       throw e;
@@ -398,6 +400,7 @@ const down = (queryInterface, Sequelize) => {
     .then(() => queryInterface.addColumn('Groups', 'tiers', { type: Sequelize.JSON }))
     .then(() => queryInterface.renameColumn('Users', 'image', 'avatar'))
     .then(() => queryInterface.renameColumn('Transactions', 'netAmountInCollectiveCurrency', 'netAmountInGroupCurrency'))
+    .then(() => queryInterface.addColumn('Responses', 'EventId'))
     .then(() => queryInterface.addColumn('Tiers', 'EventId', {
       type: Sequelize.INTEGER,
       references: { model: 'Events', key: 'id' },

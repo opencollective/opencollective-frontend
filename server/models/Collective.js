@@ -6,12 +6,13 @@ import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
-import groupBy from 'lodash/collection/groupBy';
+import { uniq } from 'lodash';
 import roles from '../constants/roles';
 import {HOST_FEE_PERCENT} from '../constants/transactions';
-import {getTier } from '../lib/utils';
+import { appendTier } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
+import { hasRole } from '../lib/auth';
 
 const DEFAULT_LOGO = '/public/images/1px.png';
 const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
@@ -51,7 +52,8 @@ export default function(Sequelize, DataTypes) {
     },
 
     type: {
-      type: DataTypes.STRING // COLLECTIVE, USER, EVENT
+      type: DataTypes.STRING, // COLLECTIVE, USER, EVENT
+      defaultValue: "COLLECTIVE"
     },
 
     slug: {
@@ -234,6 +236,15 @@ export default function(Sequelize, DataTypes) {
           image: this.image,
           data: this.data,
           backgroundImage: this.backgroundImage,
+          maxAmount: this.maxAmount,
+          maxQuantity: this.maxQuantity,
+          locationName: this.locationName,
+          address: this.address,
+          geoLocationLatLong: this.geoLocationLatLong,
+          startsAt: this.startsAt,
+          endsAt: this.endsAt,
+          timezone: this.timezone,
+          status: this.status,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isActive: this.isActive,
@@ -245,6 +256,7 @@ export default function(Sequelize, DataTypes) {
           publicUrl: this.publicUrl,
           hostFeePercent: this.hostFeePercent,
           tags: this.tags,
+          HostId: this.HostId,
           isSupercollective: this.isSupercollective
         };
       },
@@ -276,6 +288,16 @@ export default function(Sequelize, DataTypes) {
     },
 
     instanceMethods: {
+      getUsers() {
+        return this.getResponses({ include: [{model: models.User }]})
+          .then(rows => rows.map(r => r.User))
+          .then(users => uniq(users, (user) => user.id));
+      },
+
+      canEdit(remoteUser) {
+        if (remoteUser.id === this.CreatedByUserId) return Promise.resolve(true);
+        else return hasRole(remoteUser.id, this.id, ['HOST', 'MEMBER']);
+      },
 
       getUsersForViewer(viewer) {
         const promises = [queries.getUsersFromCollectiveWithTotalDonations(this.id)];
@@ -365,6 +387,10 @@ export default function(Sequelize, DataTypes) {
           .then(() => Object.values(tiersById));
       },
 
+      /**
+       * Get the Tier object of a user
+       * @param {*} user 
+       */
       getUserTier(user) {
         if (user.role && user.role !== 'BACKER') return user;
         return models.Response.findOne({
@@ -416,11 +442,11 @@ export default function(Sequelize, DataTypes) {
 
         switch (role) {
           case roles.HOST:
-            notifications.push({type:activities.GROUP_TRANSACTION_CREATED});
-            notifications.push({type:activities.GROUP_EXPENSE_CREATED});
+            notifications.push({type:activities.COLLECTIVE_TRANSACTION_CREATED});
+            notifications.push({type:activities.COLLECTIVE_EXPENSE_CREATED});
             break;
           case roles.MEMBER:
-            notifications.push({type:activities.GROUP_EXPENSE_CREATED});
+            notifications.push({type:activities.COLLECTIVE_EXPENSE_CREATED});
             notifications.push({type:'collective.monthlyreport'});
             break;
         }
@@ -679,31 +705,41 @@ export default function(Sequelize, DataTypes) {
         return Promise.map(collectives, u => Collective.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
       },
 
+      getBySlug: (collectiveSlug) => {
+        return Collective.findOne({ where: { slug: collectiveSlug } })
+          .then(ev => {
+            if (!ev) {
+              throw new Error(`No collective found with slug ${collectiveSlug}`)
+            }
+            return ev;
+          })
+      },
+
       getCollectivesSummaryByTag: (tags, limit=3, excludeList=[], minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
         return queries.getCollectivesByTag(tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset)
           .then(collectives => {
+            console.log(">>> getCollectivesSummaryByTag: processing", collectives.length,"collectives");
             return Promise.all(collectives.map(collective => {
-              const appendTier = backers => {
-                backers = backers.map(backer => {
-                  backer.tier = getTier(backer, collective.tiers);
-                  return backer;
-                });
-                return backers;
-              };
 
               return Promise.all([
                   collective.getYearlyIncome(),
-                  queries.getUsersFromCollectiveWithTotalDonations(collective.id)
-                    .then(appendTier)
+                  queries
+                    .getUsersFromCollectiveWithTotalDonations(collective.id)
+                    .then(users => appendTier(collective, users))
                 ])
                 .then(results => {
+                  const usersByRole = {};
+                  const users = results[1];
+                  users.map(user => {
+                    usersByRole[user.dataValues.role] = usersByRole[user.dataValues.role] || [];
+                    usersByRole[user.dataValues.role].push(user);
+                  })
                   const collectiveInfo = collective.card;
                   collectiveInfo.yearlyIncome = results[0];
-                  const usersByRole = groupBy(results[1], 'role');
                   const backers = usersByRole[roles.BACKER] || [];
                   collectiveInfo.backersAndSponsorsCount = backers.length;
                   collectiveInfo.membersCount = (usersByRole[roles.MEMBER] || []).length;
-                  collectiveInfo.sponsorsCount = backers.filter((b) => b.tier.match(/^sponsor/i)).length;
+                  collectiveInfo.sponsorsCount = backers.filter((b) => b.tier && b.tier.class === 'sponsor').length;
                   collectiveInfo.backersCount = collectiveInfo.backersAndSponsorsCount - collectiveInfo.sponsorsCount;
                   collectiveInfo.githubContributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
                   collectiveInfo.contributorsCount = collectiveInfo.membersCount + collectiveInfo.githubContributorsCount + collectiveInfo.backersAndSponsorsCount;
@@ -720,7 +756,7 @@ export default function(Sequelize, DataTypes) {
   function isThankDonationEnabled(CollectiveId) {
     return models.Notification.findOne({where: {
       channel: 'twitter',
-      type: activities.GROUP_TRANSACTION_CREATED,
+      type: activities.COLLECTIVE_TRANSACTION_CREATED,
       CollectiveId,
       active: true
     }}).then(n => !!n);

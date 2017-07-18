@@ -63,7 +63,7 @@ Types:
       data: collective, user (caller), target (the deleted user)
       2* Userid: the deleted user + the caller
 
-  - constants.GROUP_TRANSACTION_CREATED
+  - constants.COLLECTIVE_TRANSACTION_CREATED
       data: collective, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
       CollectiveId:
@@ -73,7 +73,7 @@ Types:
       UserId: the one who initiate the delete
       CollectiveId:
       TransactionId:
-  - constants.GROUP_EXPENSE_PAID
+  - constants.COLLECTIVE_EXPENSE_PAID
       data: collective, transaction, user (the caller), pay (paypal payload)
       UserId:
       CollectiveId:

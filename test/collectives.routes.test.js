@@ -23,7 +23,7 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('collectives.routes.test.js', () => {
 
-  let user, sandbox;
+  let host, user, sandbox;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -34,6 +34,7 @@ describe('collectives.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
+  beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
   beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
 
   // Stripe stub.
@@ -83,7 +84,7 @@ describe('collectives.routes.test.js', () => {
     describe('successfully create a collective', () => {
       let response, collective;
 
-      beforeEach('subscribe host to collective.created notification', () => models.Notification.create({UserId: user.id, type: 'collective.created', channel: 'email'}));
+      beforeEach('subscribe host to collective.created notification', () => models.Notification.create({UserId: host.id, type: 'collective.created', channel: 'email'}));
 
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
       beforeEach('create the collective', (done) => {
@@ -92,7 +93,7 @@ describe('collectives.routes.test.js', () => {
               _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
 
         collective = Object.assign({}, publicCollectiveData, {users})
-        collective.HostId = user.id;
+        collective.HostId = host.id;
 
         request(app)
           .post('/collectives')
@@ -117,7 +118,7 @@ describe('collectives.routes.test.js', () => {
           expect(activity.data).to.have.property('collective');
           expect(activity.data).to.have.property('host');
           expect(activity.data).to.have.property('user');
-          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(user.email);
+          expect(emailLib.sendMessageFromActivity.args[0][1].User.email).to.equal(host.email);
           done();
         }, 200);
 
@@ -140,14 +141,14 @@ describe('collectives.routes.test.js', () => {
 
       it('assigns the users as members', () => {
         return Promise.all([
-          models.Role.findOne({where: { UserId: user.id, role: roles.HOST }}),
-          models.Role.count({where: { role: roles.MEMBER }}),
+          models.Role.findOne({where: { UserId: host.id, role: roles.HOST }}),
+          models.Role.count({where: { CollectiveId: 1, role: roles.MEMBER }}),
           models.Collective.find({where: { slug: collective.slug }})
           ])
         .then(results => {
           expect(results[0].CollectiveId).to.equal(1);
           expect(results[1]).to.equal(2);
-          expect(results[2].LastEditedByUserId).to.equal(2);
+          expect(results[2].LastEditedByUserId).to.equal(3);
         });
       });
 
@@ -255,7 +256,7 @@ describe('collectives.routes.test.js', () => {
         .tap(user => expect(user).to.exist)
         .then(caUser => caUser.getCollectives({paranoid: false})) // because we are setting deletedAt
         .tap(collectives => expect(collectives).to.have.length(1))
-        .tap(collectives => expect(collectives[0].LastEditedByUserId).to.equal(2))
+        .tap(collectives => expect(collectives[0].LastEditedByUserId).to.equal(3))
         .then(() => models.Role.findAll())
         .then(Roles => {
           expect(Roles).to.have.length(3);
@@ -282,7 +283,7 @@ describe('collectives.routes.test.js', () => {
       stub.yields(null, mock);
     };
 
-    beforeEach(() => utils.resetTestDB());
+    // beforeEach(() => utils.resetTestDB());
 
     beforeEach(() => {
       appStripe.accounts.create.restore();
@@ -295,7 +296,7 @@ describe('collectives.routes.test.js', () => {
         .post('/collectives')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
+          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.MEMBER} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -312,7 +313,7 @@ describe('collectives.routes.test.js', () => {
 
     beforeEach(() => models.StripeAccount
       .create({ stripePublishableKey: stripeMock.accounts.create.keys.publishable })
-      .tap(account => user.setStripeAccount(account))
+      .tap(account => host.setStripeAccount(account))
       .tap(account => user.setStripeAccount(account)));
 
     // Create another user.
@@ -373,18 +374,15 @@ describe('collectives.routes.test.js', () => {
 
     describe('Transactions/Budget', () => {
 
-      let collective2;
       const transactions = [];
       let totTransactions = 0;
       let totDonations = 0;
 
-      // Create collective2.
+      // Create collective2
       beforeEach('create collective 2', () =>
-        models.Collective.create(_.omit(utils.data('collective2'),['slug']))
-          .tap(g => collective2 = g)
-          .then(() => collective2.addUserWithRole(user, roles.HOST)));
+        models.Collective.create({HostId: host.id, name: "collective 2", slug: "collective2"}));
 
-      // Create transactions for publicCollective.
+        // Create transactions for publicCollective.
       beforeEach('create transactions for public collective', (done) => {
         async.each(transactionsData, (transaction, cb) => {
           if (transaction.amount < 0)
@@ -447,84 +445,18 @@ describe('collectives.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             const userData = res.body[0];
+            console.log(res.body);
             expect(userData.firstName).to.equal(user.public.firstName);
             expect(userData.lastName).to.equal(user.public.lastName);
             expect(userData.name).to.equal(user.public.name);
             expect(userData.username).to.equal(user.public.username);
-            expect(userData.role).to.equal(roles.HOST);
-            expect(userData.tier).to.equal('host');
+            expect(userData.role).to.equal(roles.MEMBER);
             done();
           });
       });
 
     });
 
-    describe('Supercollective', () => {
-      const data = {"utmSource":"undefined","githubContributors":{"staltz":1710,"TylorS":165,"Frikki":24,"ntilwalli":11,"pH200":10,"laszlokorte":7,"shvaikalesh":7,"Cmdv":7,"whitecolor":6,"Widdershin":4,"greenkeeperio-bot":4,"ccapndave":3,"chromakode":3,"bumblehead":3,"carloslfu":2,"niieani":2,"aqum":2,"craigmichaelmartin":2,"dobrite":2,"erykpiast":2,"Hypnosphi":2,"bloodyKnuckles":2,"mxstbr":2,"michalvankodev":2,"raquelxmoss":2,"secobarbital":2,"schrepfler":2,"SteveALee":2,"wbreakell":2,"arnodenuijl":2,"naruaway":2,"chadrien":2,"nlarche":1,"bcbcarl":1,"wyqydsyq":1,"voronianski":1,"dmitriid":1,"hhariri":1,"arlair":1,"harrywincup":1,"ivan-kleshnin":1,"jmeas":1,"joakimbeng":1,"kay-is":1,"krawaller":1,"leesiongchan":1,"ludovicofischer":1,"Maximilianos":1,"MicheleBertoli":1,"AdrianoFerrari":1,"axefrog":1,"benjyhirsch":1,"phadej":1,"pasih":1,"paulkogel":1,"pe3":1,"piamancini":1,"stevenmathews":1,"travenasty":1,"Vinnl":1,"psychowico":1,"wcastand":1,"fiatjaf":1,"iambumblehead":1,"joneshf":1,"m90":1,"mikekidder":1,"mz3":1,"tautvilas":1}};
-      const supercollectiveData = utils.data('collective4');
-      supercollectiveData.users = [{email:'testuser@test.com', role: roles.MEMBER}];
-      let supercollective;
-
-      // Create supercollective
-      beforeEach('create supercollective', (done) => {
-        request(app)
-          .post('/collectives')
-          .send({
-            api_key: application.api_key,
-            collective: supercollectiveData
-          })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            models.Collective
-              .findById(parseInt(res.body.id))
-              .tap((g) => {
-                supercollective = g;
-                done();
-              })
-              .catch(done);
-          });
-      });
-
-      beforeEach('create a second collective', () => {
-        return request(app).post('/collectives')
-          .send({
-            api_key: application.api_key,
-            collective: Object.assign({}, utils.data('collective2'), { users: [{email:userData3.email, role: roles.MEMBER}], data })
-          })
-          .expect(200);
-      });
-
-      it('successfully get a supercollective with data', (done) => {
-        request(app)
-          .get(`/collectives/${supercollective.slug.toUpperCase()}?api_key=${application.api_key}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            expect(res.body).to.have.property('id', supercollective.id);
-            expect(res.body).to.have.property('name', supercollective.name);
-            expect(res.body).to.have.property('isSupercollective', supercollective.isSupercollective);
-            expect(res.body).to.have.property('superCollectiveData')
-            expect(res.body.superCollectiveData.length).to.eql(1);
-            expect(res.body.superCollectiveData[0].contributorsCount).to.eql(1+Object.keys(data.githubContributors).length);
-            expect(res.body.contributorsCount).to.equal(1+Object.keys(data.githubContributors).length);
-            expect(res.body.superCollectiveData[0].publicUrl).to.contain('wwcode-austin');
-            expect(res.body.superCollectiveData[0]).to.have.property('settings');
-            done();
-          })
-      });
-
-      it('successfully get contributors across all sub collectives', (done) => {
-        request(app)
-          .get(`/collectives/${supercollective.slug}/users?api_key=${application.api_key}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            expect(res.body.length).to.equal(3);
-            done();
-          });
-      });
-    });
   });
 
   /**
@@ -556,7 +488,12 @@ describe('collectives.routes.test.js', () => {
         .post('/collectives')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, { slug: 'another', users: [ Object.assign({}, userData, { role: roles.HOST} )]})
+          collective: Object.assign({}, publicCollectiveData, {
+            slug: 'public-collective',
+            name: 'public collective with host',
+            HostId: host.id,
+            users: [ Object.assign({}, userData, { role: roles.MEMBER} ) ]
+          })
         })
         .expect(200)
         .end((e, res) => {
@@ -675,8 +612,8 @@ describe('collectives.routes.test.js', () => {
         CollectiveId: collective.id,
         role: roles.MEMBER
       })
-      .then(() => models.Role.findAll())
-      .tap(rows => expect(rows.length).to.equal(4)));
+      .then(() => models.Role.findAll({ where: { UserId: user3.id, CollectiveId: collective.id }}))
+      .tap(rows => expect(rows.length).to.equal(2)));
   });
 
 });

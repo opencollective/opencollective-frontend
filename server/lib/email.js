@@ -259,23 +259,23 @@ const sendMessageFromActivity = (activity, notification) => {
   const userEmail = notification && notification.User ? notification.User.email : activity.data.user.email;
 
   switch (activity.type) {
-    case activities.GROUP_TRANSACTION_CREATED:
+    case activities.COLLECTIVE_TRANSACTION_CREATED:
       return generateEmailFromTemplateAndSend('collective.transaction.created', userEmail, data);
 
-    case activities.GROUP_EXPENSE_CREATED:
+    case activities.COLLECTIVE_EXPENSE_CREATED:
       data.actions = {
         approve: notification.User.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/approve`),
         reject: notification.User.generateLoginLink(`/${data.collective.slug}/expenses/${data.expense.id}/reject`)
       };
       return generateEmailFromTemplateAndSend('collective.expense.created', userEmail, data);
 
-    case activities.GROUP_EXPENSE_APPROVED:
+    case activities.COLLECTIVE_EXPENSE_APPROVED:
       data.actions = {
         viewExpenseUrl: notification.User.generateLoginLink(`/${data.collective.slug}/transactions/expenses#exp${data.expense.id}`)
       }
       return generateEmailFromTemplateAndSend('collective.expense.approved.for.host', userEmail, data);
 
-    case activities.GROUP_CREATED:
+    case activities.COLLECTIVE_CREATED:
       return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
 
     case activities.SUBSCRIPTION_CANCELED:

@@ -43,17 +43,6 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE',
     },
 
-    EventId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Events',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: true
-    },
-
     confirmedAt: {
       type: DataTypes.DATE
     },
@@ -101,7 +90,6 @@ export default function(Sequelize, DataTypes) {
           id: this.id,
           UserId: this.UserId,
           CollectiveId: this.CollectiveId,
-          EventId: this.EventId,
           TierId: this.TierId,
           quantity: this.quantity,
           description: this.description,

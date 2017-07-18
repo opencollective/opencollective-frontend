@@ -181,31 +181,29 @@ describe('Query Tests', () => {
       describe('returns multiple events with tiers and responses', () => {
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket1'), { EventId: event1.id }))
+          Object.assign(utils.data('ticket1'), { CollectveId: event1.id }))
           .tap(t => ticket1 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket2'), { EventId: event1.id }))
+          Object.assign(utils.data('ticket2'), { CollectveId: event1.id }))
           .tap(t => ticket2 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket1'), { EventId: event2.id }))
+          Object.assign(utils.data('ticket1'), { CollectveId: event2.id }))
           .tap(t => tier3 = t));
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response1'), { 
-            EventId: event1.id, 
+            CollectveId: event1.id, 
             TierId: ticket1.id, 
-            CollectiveId: collective1.id, 
             UserId: user2.id,
             confirmedAt: new Date()
           })));
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
-            EventId: event1.id, 
+            CollectveId: event1.id, 
             TierId: ticket1.id, 
-            CollectiveId: collective1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
           })));
@@ -214,18 +212,16 @@ describe('Query Tests', () => {
         // because it's not confirmed
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
-            EventId: event1.id, 
+            CollectveId: event1.id, 
             TierId: ticket1.id, 
-            CollectiveId: collective1.id, 
             UserId: user1.id,
             confirmedAt: null
           })));
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response3'), { 
-            EventId: event1.id, 
+            CollectveId: event1.id, 
             TierId: ticket2.id, 
-            CollectiveId: collective1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
           })));

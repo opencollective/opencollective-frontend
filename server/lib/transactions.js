@@ -112,7 +112,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
 
 function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {
   const payload = {
-    type: constants.activities.GROUP_EXPENSE_PAID,
+    type: constants.activities.COLLECTIVE_EXPENSE_PAID,
     UserId: transaction.UserId,
     CollectiveId: transaction.CollectiveId,
     TransactionId: transaction.id,

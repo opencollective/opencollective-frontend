@@ -15,7 +15,6 @@ import status from '../constants/response_status';
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 dataloaderSequelize(models.Response);
-dataloaderSequelize(models.Event);
 dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
 dataloaderSequelize(models.Donation);

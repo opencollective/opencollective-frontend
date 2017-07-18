@@ -137,7 +137,6 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           id: this.id,
-          EventId: this.EventId,
           name: this.name,
           description: this.description,
           amount: this.amount,

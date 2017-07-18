@@ -233,8 +233,8 @@ const processPayment = (donation) => {
         // Mark response row as processed
         .tap(() => response && response.update({ status: 'PROCESSED', confirmedAt: new Date() }))
 
-        // Fetch event associated with the donation
-        .then(() => response && response.EventId && models.Event.findById(response.EventId))
+        // Fetch collective/event associated with the donation
+        .then(() => response && response.CollectiveId && models.Collective.findById(response.CollectiveId))
 
         // send out confirmation email
         .then((event) => {

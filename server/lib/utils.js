@@ -188,7 +188,7 @@ export const appendTier = (collective, users) => {
   return Promise.each(users, user => collective.getUserTier(user).then(tier => {
       user.tier = tier;
       return user;
-    })).catch(e => console.error(">>>>>> error!: ", e));
+    }));
 };
 
 /**

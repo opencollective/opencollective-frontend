@@ -46,7 +46,7 @@ export const create = (req, res, next) => {
 
   models.Comment.create(attributes)
     .then(comment => models.Comment.findById(comment.id, { include: [ models.Collective, models.User, models.Expense ]}))
-    .then(comment => createActivity(comment, activities.GROUP_COMMENT_CREATED))
+    .then(comment => createActivity(comment, activities.COLLECTIVE_COMMENT_CREATED))
     .tap(sendEmailForApproval)
     .then(activity => res.send(activity))
     .catch(next);
@@ -102,7 +102,7 @@ export const deleteComment = (req, res, next) => {
   const { comment } = req;
   models.Comment.findById(comment.id, { include: [ models.Collective, models.User, models.Expense ]})
     .tap(comment => comment.destroy())
-    .then(comment => createActivity(comment, activities.GROUP_COMMENT_DELETED))
+    .then(comment => createActivity(comment, activities.COLLECTIVE_COMMENT_DELETED))
     .then(activity => res.send(activity))
     .catch(next);
 };
@@ -115,7 +115,7 @@ export const update = (req, res, next) => {
   modifiableProps.forEach(prop => origComment[prop] = newComment[prop] || origComment[prop]);
   origComment.updatedAt = new Date();
   origComment.save()
-    .tap(comment => createActivity(comment, activities.GROUP_COMMENT_UPDATED))
+    .tap(comment => createActivity(comment, activities.COLLECTIVE_COMMENT_UPDATED))
     .tap(comment => res.send(comment.info))
     .catch(next);
 };

@@ -26,7 +26,7 @@ export const create = (req, res, next) => {
   // TODO make sure that the payoutMethod is also properly stored in DB, then propagated to Transaction when paying
   models.Expense.create(attributes)
     .then(expense => models.Expense.findById(expense.id, { include: [ models.Collective, models.User ]}))
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED))
     .tap(expense => res.send(expense))
     .catch(next);
 };
@@ -101,7 +101,7 @@ export const deleteExpense = (req, res, next) => {
     .then(() => expense.lastEditedById = user.id)
     .then(() => expense.save())
     .then(() => expense.destroy())
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_DELETED))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_DELETED))
     .tap(() => res.send({success: true}))
     .catch(next);
 };
@@ -126,7 +126,7 @@ export const update = (req, res, next) => {
   origExpense.updatedAt = new Date();
   origExpense.lastEditedById = user.id;
   return origExpense.save()
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_UPDATED))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_UPDATED))
     .tap(expense => res.send(expense.info))
     .catch(next);
 };
@@ -142,10 +142,10 @@ export const setApprovalStatus = (req, res, next) => {
     .then(() => {
       if (req.required.approved === false) {
         return expense.setRejected(user.id)
-          .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
+          .tap(exp => createActivity(exp, activities.COLLECTIVE_EXPENSE_REJECTED))
       } else {
         return expense.setApproved(user.id)
-          .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_APPROVED))
+          .tap(exp => createActivity(exp, activities.COLLECTIVE_EXPENSE_APPROVED))
       }
     })
     .then(() => res.send({success: true}))

@@ -14,7 +14,7 @@ const user2Data = utils.data('user2');
 const collectiveData = utils.data('collective1');
 const collective2Data = utils.data('collective2');
 const collective3Data = utils.data('collective3');
-const notificationData = { type: constants.GROUP_TRANSACTION_CREATED };
+const notificationData = { type: constants.COLLECTIVE_TRANSACTION_CREATED };
 
 const {
   User,
@@ -155,13 +155,13 @@ describe("notification.model.test.js", () => {
       let event;
       return Event.create({
         ...eventData,
-        CollectiveId: collective.id
+        ParentCollectiveId: collective.id
       })
       .then(res => {
         event = res;
         return Tier.create({
           ...tierData,
-          EventId: event.id
+          CollectiveId: event.id
         })
       })
       .then((tier) => {
@@ -169,7 +169,6 @@ describe("notification.model.test.js", () => {
           Response.create({
             UserId: user.id,
             CollectiveId: collective.id,
-            EventId: event.id,
             TierId: tier.id
           })
         });

@@ -34,7 +34,8 @@ export const resetTestDB = () => sequelize.sync({force: true})
 export function loadDB(dbname) {
 
   const importDB = (cb) => {
-    exec(`${path.join(__dirname, '../scripts/db_restore.sh')} -d ${config.database.database} -U ${config.database.username} -f ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`, cb);
+    const cmd = `${path.join(__dirname, '../scripts/db_restore.sh')} -d ${config.database.database} -U ${config.database.username} -f ${path.join(__dirname,"dbdumps", `${dbname}.pgsql`)}`;
+    exec(cmd, cb);
   };
 
   return new Promise((resolve, reject) => {

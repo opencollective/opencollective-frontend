@@ -66,7 +66,7 @@ const mutations = {
         if (args.event.tiers) {
           args.event.tiers.map
           return Promise.map(args.event.tiers, (tier) => {
-            tier.EventId = event.id;
+            tier.CollectiveId = event.id;
             tier.currency = tier.currency || collective.currency;
             return models.Tier.create(tier);
           })
@@ -138,7 +138,7 @@ const mutations = {
             if (tier.id) {
               return models.Tier.update(tier, { where: { id: tier.id }});
             } else {
-              tier.EventId = event.id;
+              tier.CollectiveId = event.id;
               tier.currency = tier.currency || collective.currency;
               return models.Tier.create(tier);  
             }
@@ -193,7 +193,7 @@ const mutations = {
       .then(canEdit => {
         if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as a core contributor or as a host of the ${args.collectiveSlug} collective`);
       })
-      .then(() => collective.getTiers({ where: { EventId: { $eq: null }}}))
+      .then(() => collective.getTiers())
       .then(tiers => {
         // remove the tiers that are not present anymore in the updated collective
         const diff = difference(tiers.map(t => t.id), args.tiers.map(t => t.id));
@@ -244,8 +244,7 @@ const mutations = {
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
-          CollectiveId: event.Collective.id,
-          EventId: event.id,
+          CollectiveId: event.id,
           confirmedAt: new Date(),
           status: response.status,
           description: response.description
@@ -313,8 +312,7 @@ const mutations = {
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
-          CollectiveId: collective.id,
-          EventId: event && event.id,
+          CollectiveId: event.id,
           TierId: tier.id,
           confirmedAt: isPaidTier ? null : new Date(),
           quantity: response.quantity || 0,

@@ -317,15 +317,17 @@ export const create = (req, res, next) => {
       return User.findOne({ where: { id: collective.HostId || defaultHostId() }}).tap(h => {
         host = h;
         _addUserToCollective(g, host, {role: roles.HOST, remoteUser: creator})
+        return null;
       })
     })
     .then(() => {
       if (collective.tiers) {
         return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id })
       }
+      return null;
     })
     .then(() => Activity.create({
-      type: activities.GROUP_CREATED,
+      type: activities.COLLECTIVE_CREATED,
       UserId: creator.id,
       CollectiveId: createdCollective.id,
       data: {
@@ -402,7 +404,7 @@ export const createFromGithub = (req, res, next) => {
       }
     })
     .tap((host) => Activity.create({
-      type: activities.GROUP_CREATED,
+      type: activities.COLLECTIVE_CREATED,
         UserId: creator.id,
         CollectiveId: dbCollective.id,
         data: {
@@ -502,7 +504,7 @@ function putThankDonationOptInIntoNotifTable(CollectiveId, collectiveSettings) {
   const twitterSettings = collectiveSettings && collectiveSettings.twitter;
   const attrs = {
     channel: 'twitter',
-    type: activities.GROUP_TRANSACTION_CREATED,
+    type: activities.COLLECTIVE_TRANSACTION_CREATED,
     CollectiveId
   };
 

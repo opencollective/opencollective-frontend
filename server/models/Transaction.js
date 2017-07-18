@@ -228,7 +228,7 @@ export default (Sequelize, DataTypes) => {
         .then(transaction => {
 
           const activityPayload = {
-            type: activities.GROUP_TRANSACTION_CREATED,
+            type: activities.COLLECTIVE_TRANSACTION_CREATED,
             TransactionId: transaction.id,
             CollectiveId: transaction.CollectiveId,
             UserId: transaction.UserId,
@@ -246,7 +246,7 @@ export default (Sequelize, DataTypes) => {
           }
           return models.Activity.create(activityPayload);
         })
-        .catch(err => console.error(`Error creating activity of type ${activities.GROUP_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err));
+        .catch(err => console.error(`Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err));
       }
     },
 

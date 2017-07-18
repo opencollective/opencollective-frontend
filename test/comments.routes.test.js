@@ -84,7 +84,7 @@ describe('comments.routes.test.js', () => {
         .set('Authorization', `Bearer ${member.jwt()}`)
         .expect(200)
         .then(res => {
-          expect(res.body.type).to.equal(activities.GROUP_COMMENT_DELETED);
+          expect(res.body.type).to.equal(activities.COLLECTIVE_COMMENT_DELETED);
         });
     });
 
@@ -94,7 +94,7 @@ describe('comments.routes.test.js', () => {
         .set('Authorization', `Bearer ${host.jwt()}`)
         .expect(200)
         .then(res => {
-          expect(res.body.type).to.equal(activities.GROUP_COMMENT_DELETED);
+          expect(res.body.type).to.equal(activities.COLLECTIVE_COMMENT_DELETED);
         });
     });
 
