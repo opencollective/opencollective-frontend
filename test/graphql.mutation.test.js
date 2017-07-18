@@ -185,7 +185,7 @@ describe('Mutation Tests', () => {
       it('fails if not authenticated', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "TIER", amount: 10000, interval: "month" }, { name: "sponsor", type: "TIER", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
@@ -202,7 +202,7 @@ describe('Mutation Tests', () => {
       it('fails if not authenticated as host or member of collective', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "TIER", amount: 10000, interval: "month" }, { name: "sponsor", type: "TIER", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,
@@ -219,7 +219,7 @@ describe('Mutation Tests', () => {
       it('add new tiers and update existing', async () => {
         const query = `
         mutation editTiers {
-          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "BACKER", amount: 10000, interval: "month" }, { name: "sponsor", type: "SPONSOR", amount: 500000, interval: "year" }]) {
+          editTiers(collectiveSlug: "${collective1.slug}", tiers: [{ name: "backer", type: "TIER", amount: 10000, interval: "month" }, { name: "sponsor", type: "TIER", amount: 500000, interval: "year" }]) {
             id,
             name,
             type,

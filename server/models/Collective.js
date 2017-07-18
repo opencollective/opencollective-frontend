@@ -329,30 +329,36 @@ export default function(Sequelize, DataTypes) {
               return user;
             })
           } else {
-            return user;
+            return Promise.resolve(user);
           }
         }
 
-        return queries.getUsersFromCollectiveWithTotalDonations(this.id, options.until)
-          .tap(() => {
-            models.Tier.findAll({where: { CollectiveId: this.id }})
-            .then(tiers => tiers.map(t => {
-              tiersById[t.id] = t;
-            }));
-          })
+         // Get the list of tiers for the collective
+        return models.Tier
+          .findAll({ where: { CollectiveId: this.id, type: 'TIER' } })
+          .then(tiers => tiers.map(t => {
+            tiersById[t.id] = t;
+          }))
+          .then(() => queries.getUsersFromCollectiveWithTotalDonations(this.id, options.until))
+          // Map the users to their respective tier
           .then(users => Promise.map(users, user => {
             return models.Response.findOne({
               attributes: [ 'TierId' ],
               where: { CollectiveId: this.id, UserId: user.id }
             }).then(response => {
               if (!response) {
-                console.log(">>> no response for ", { CollectiveId: this.id, UserId: user.id });
+                console.error("Collective.getTiersWithUsers: no response for ", { CollectiveId: this.id, UserId: user.id });
+                return null;
+              }
+              if (!response.TierId) {
+                console.error("Collective.getTiersWithUsers: no response.TierId for ", { CollectiveId: this.id, UserId: user.id });
+                return null;
               }
               const TierId = response.TierId;
               tiersById[TierId] = tiersById[TierId] || response.Tier;
               tiersById[TierId].users = tiersById[TierId].users || [];
               return addIsActive(user, response).then(user => {
-                tiersById[TierId].users.push(user);
+                tiersById[TierId].users.push(user.dataValues);
               })
             })
           }))
@@ -363,7 +369,7 @@ export default function(Sequelize, DataTypes) {
         if (user.role && user.role !== 'BACKER') return user;
         return models.Response.findOne({
           where: { CollectiveId: this.id, UserId: user.id },
-          include: [ { model: models.Tier, where: { type: { $in: ['TIER', 'BACKER', 'SPONSOR'] } } } ]
+          include: [ { model: models.Tier, where: { type: 'TIER' } } ]
         }).then(response => response && response.Tier);
       },
 

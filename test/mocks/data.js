@@ -640,7 +640,8 @@ export default {
 
   "tier1": {
     name: "backer",
-    type: "BACKER",
+    type: "TIER",
+    class: "backer",
     description: "$10/month",
     amount: 1000,
     interval: 'month',
@@ -650,7 +651,8 @@ export default {
 
   "tier2": {
     name: "sponsor",
-    type: "SPONSOR",
+    type: "TIER",
+    class: "sponsor",
     description: "$1,000/year sponsorship",
     amount: 10000,
     interval: 'year',

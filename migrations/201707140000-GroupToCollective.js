@@ -156,17 +156,18 @@ const updateCollectives = (sequelize) => {
   const addTiers = (collective) => {
     let tiers = collective.tiers || [];
 
-    const getType = (tier) => {
+    const getClass = (tier) => {
       const name = tier.name && tier.name.toLowerCase();
-      if (name.match(/sponsor/)) return 'SPONSOR';
-      if (name.match(/donor/)) return 'DONOR';
-      if (name.match(/member/)) return 'MEMBER';
-      return 'BACKER';
+      if (name.match(/sponsor/)) return 'sponsor';
+      if (name.match(/donor/)) return 'donor';
+      if (name.match(/member/)) return 'member';
+      return 'backer';
     }
 
     tiers = tiers.map(tier => {
       const res = {
-        type: getType(tier),
+        type: 'TIER',
+        class: getClass(tier),
         name: tier.title || tier.name,
         slug: tier.name,
         currency: collective.currency,
@@ -201,7 +202,8 @@ const updateCollectives = (sequelize) => {
     if (tiers.length === 0) {
       tiers.push({
         name: 'backer',
-        type: 'BACKER',
+        type: 'TIER',
+        class: 'backer',
         amount: 500,
         interval: 'month',
         CollectiveId: collective.id,
@@ -209,7 +211,8 @@ const updateCollectives = (sequelize) => {
       });
       tiers.push({
         name: 'sponsor',
-        type: 'SPONSOR',
+        type: 'TIER',
+        class: 'sponsor',
         amount: 10000,
         interval: 'month',
         CollectiveId: collective.id,
@@ -220,7 +223,8 @@ const updateCollectives = (sequelize) => {
     const donorTier = tiers.find(t => t.type === 'DONOR');
     if (!donorTier) {
       tiers.push({
-        type: 'DONOR',
+        type: 'TIER',
+        class: 'donor',
         name: 'donor',
         CollectiveId: collective.id,
         currency: collective.currency
@@ -325,36 +329,16 @@ const up = (queryInterface, Sequelize) => {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     }))
-    .then(() => queryInterface.addColumn('Collectives', 'type', {
-      type: Sequelize.STRING,
-      defaultValue: "COLLECTIVE"
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'startsAt', {
-      type: Sequelize.DATE
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'endsAt', {
-      type: Sequelize.DATE
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'locationName', {
-      type: Sequelize.STRING
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'address', {
-      type: Sequelize.STRING
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'timezone', {
-      type: Sequelize.STRING
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'maxAmount', {
-      type: Sequelize.INTEGER,
-      min: 0
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'maxQuantity', {
-      type: Sequelize.INTEGER,
-      min: 0
-    }))
-    .then(() => queryInterface.addColumn('Collectives', 'geoLocationLatLong', {
-      type: Sequelize.GEOMETRY('POINT')
-    }))
+    .then(() => queryInterface.addColumn('Collectives', 'type', { type: Sequelize.STRING, defaultValue: "COLLECTIVE" }))
+    .then(() => queryInterface.addColumn('Collectives', 'startsAt', { type: Sequelize.DATE }))
+    .then(() => queryInterface.addColumn('Collectives', 'endsAt', { type: Sequelize.DATE }))
+    .then(() => queryInterface.addColumn('Collectives', 'locationName', { type: Sequelize.STRING }))
+    .then(() => queryInterface.addColumn('Collectives', 'address', { type: Sequelize.STRING }))
+    .then(() => queryInterface.addColumn('Collectives', 'timezone', { type: Sequelize.STRING }))
+    .then(() => queryInterface.addColumn('Collectives', 'maxAmount', { type: Sequelize.INTEGER, min: 0 }))
+    .then(() => queryInterface.addColumn('Collectives', 'maxQuantity', { type: Sequelize.INTEGER, min: 0 }))
+    .then(() => queryInterface.addColumn('Collectives', 'geoLocationLatLong', { type: Sequelize.GEOMETRY('POINT') }))
+    .then(() => queryInterface.addColumn('Tiers', 'class', { type: Sequelize.STRING }))
     .then(() => queryInterface.addColumn('Tiers', 'button', { type: Sequelize.STRING }))
     .then(() => queryInterface.addColumn('Tiers', 'presets', { type: Sequelize.JSON }))
     .then(() => queryInterface.renameColumn('Responses', 'GroupId', 'CollectiveId'))
@@ -420,7 +404,8 @@ const down = (queryInterface, Sequelize) => {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     }))
-  .then(() => queryInterface.removeColumn('Tiers', 'button'))
+    .then(() => queryInterface.removeColumn('Tiers', 'class'))
+    .then(() => queryInterface.removeColumn('Tiers', 'button'))
     .then(() => queryInterface.removeColumn('Tiers', 'presets'))
     .then(() => queryInterface.renameColumn('Tiers', 'CollectiveId', 'GroupId'))
     .then(() => revertGroups(queryInterface.sequelize))

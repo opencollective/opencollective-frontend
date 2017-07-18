@@ -45,8 +45,12 @@ export default function(Sequelize, DataTypes) {
     },
 
     type: {
-      type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, DONOR, GOAL, ...
-      defaultValue: 'TICKET'
+      type: DataTypes.STRING, // TIER, TICKET
+      defaultValue: 'TIER'
+    },
+
+    class: {
+      type: DataTypes.STRING // backer, sponsor, donor, ...
     },
 
     description: DataTypes.STRING,
