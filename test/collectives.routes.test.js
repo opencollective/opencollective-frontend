@@ -222,7 +222,6 @@ describe('collectives.routes.test.js', () => {
             collective: {
               name:'Loot',
               slug:'Loot',
-              expensePolicy: 'expense policy',
               mission: 'mission statement'
             },
             users: ['asood123', 'oc'],
@@ -239,7 +238,6 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('mission', 'mission statement');
           expect(res.body).to.have.property('description');
           expect(res.body).to.have.property('longDescription');
-          expect(res.body).to.have.property('expensePolicy', 'expense policy');
           expect(res.body).to.have.property('isActive', false);
           expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
         })
@@ -547,7 +545,6 @@ describe('collectives.routes.test.js', () => {
       burnrate: 10000,
       image: 'http://opencollective.com/assets/image.svg',
       backgroundImage: 'http://opencollective.com/assets/backgroundImage.png',
-      expensePolicy: 'expense policy',
       isActive: true,
       settings: { lang: 'fr' },
       otherprop: 'value'

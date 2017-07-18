@@ -475,7 +475,6 @@ export const update = (req, res, next) => {
     'currency',
     'image',
     'backgroundImage',
-    'expensePolicy',
     'isActive'
   ];
 

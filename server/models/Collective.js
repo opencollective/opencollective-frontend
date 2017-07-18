@@ -234,7 +234,6 @@ export default function(Sequelize, DataTypes) {
           image: this.image,
           data: this.data,
           backgroundImage: this.backgroundImage,
-          expensePolicy: this.expensePolicy,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           isActive: this.isActive,

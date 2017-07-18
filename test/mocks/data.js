@@ -568,7 +568,6 @@ export default {
       "currency": "USD",
       "image": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
       "backgroundImage": null,
-      "expensePolicy": null,
       "createdAt": "2016-01-30T07:31:37.802Z",
       "updatedAt": "2016-01-30T07:31:37.802Z",
       "slug": "WWCodeAtl",
