@@ -16,13 +16,13 @@ import {
 } from 'graphql';
 
 import {
-  EventType,
+  CollectiveType,
   ResponseType,
   TierType
 } from './types';
 
 import {
-  EventInputType,
+  CollectiveInputType,
   ResponseInputType,
   TierInputType
 } from './inputTypes';
@@ -31,42 +31,46 @@ import {
 // import {HOST, MEMBER} from '../constants/roles';
 
 const mutations = {
-  createEvent: {
-    type: EventType,
+  createCollective: {
+    type: CollectiveType,
     args: {
-      event: { type: new GraphQLNonNull(EventInputType) }
+      collective: { type: new GraphQLNonNull(CollectiveInputType) }
     },
     resolve(_, args, req) {
-      let collective;
+      let collective, parentCollective;
 
-      const location = args.event.location;
+      const location = args.collective.location;
 
-      const eventData = {
-        ...args.event,
+      const collectiveData = {
+        type: 'EVENT',
+        ...args.collective,
         locationName: location.name,
-        address: location.address,
-        geoLocationLatLong: {type: 'Point', coordinates: [location.lat, location.long]}
+        address: location.address
       };
 
-      if (!req.remoteUser) {
-        return Promise.reject(new errors.Unauthorized("You need to be logged in to create an event"));
+      if (location && location.lat) {
+        collectiveData.geoLocationLatLong = { type: 'Point', coordinates: [location.lat, location.long] };
       }
-      return models.Collective.findOne({ where: { slug: args.event.collective.slug } })
-      .then(g => {
-        if (!g) return Promise.reject(new Error(`Collective with slug ${args.event.collective.slug} not found`));
-        collective = g;
-        eventData.CollectiveId = collective.id;
-        return hasRole(req.remoteUser.id, collective.id, ['MEMBER','HOST', 'BACKER'])
+
+      if (!req.remoteUser) {
+        return Promise.reject(new errors.Unauthorized("You need to be logged in to create a collective"));
+      }
+      return models.Collective.findById(args.collective.ParentCollectiveId)
+      .then(pc => {
+        if (!pc) return Promise.reject(new Error(`Collective with id ${args.collective.ParentCollectiveId} not found`));
+        parentCollective = pc;
+        collectiveData.ParentCollectiveId = parentCollective.id;
+        return hasRole(req.remoteUser.id, parentCollective.id, ['MEMBER','HOST', 'BACKER'])
       })
       .then(canCreateEvent => {
-        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized("You must be logged in as a member of the collective to create an event"));
+        if (!canCreateEvent) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
       })
-      .then(() => models.Event.create(eventData))
-      .tap(event => {
-        if (args.event.tiers) {
-          args.event.tiers.map
-          return Promise.map(args.event.tiers, (tier) => {
-            tier.CollectiveId = event.id;
+      .then(() => models.Collective.create(collectiveData))
+      .tap(collective => {
+        if (args.collective.tiers) {
+          args.collective.tiers.map
+          return Promise.map(args.collective.tiers, (tier) => {
+            tier.CollectiveId = collective.id;
             tier.currency = tier.currency || collective.currency;
             return models.Tier.create(tier);
           })
@@ -86,88 +90,88 @@ const mutations = {
       })
     }
   },
-  editEvent: {
-    type: EventType,
+  editCollective: {
+    type: CollectiveType,
     args: {
-      event: { type: EventInputType }
+      collective: { type: CollectiveInputType }
     },
     resolve(_, args, req) {
 
-      const location = args.event.location;
+      const location = args.collective.location;
 
-      const updatedEventData = {
-        ...args.event,
+      const updatedCollectiveData = {
+        ...args.collective,
         locationName: location.name,
         address: location.address
       };
       if (location.lat) {
-        updatedEventData.geoLocationLatLong = {type: 'Point', coordinates: [location.lat, location.long]};
+        updatedCollectiveData.geoLocationLatLong = {type: 'Point', coordinates: [location.lat, location.long]};
       }
 
-      let collective, event;
+      let collective, parentCollective;
       if (!req.remoteUser) {
-        throw new errors.Unauthorized("You need to be logged in to edit an event");
+        throw new errors.Unauthorized("You need to be logged in to edit a collective");
       }
-      return models.Collective.findOne({ where: { slug: args.event.collective.slug } })
-      .then(g => {
-        if (!g) throw new Error(`Collective with slug ${args.event.collective.slug} not found`);
-        collective = g;
-        return hasRole(req.remoteUser.id, collective.id, ['MEMBER','HOST'])
+      return models.Collective.findById(args.collective.ParentCollectiveId)
+      .then(pc => {
+        if (!pc) throw new Error(`Collective with id ${args.collective.ParentCollectiveId} not found`);
+        parentCollective = pc;
+        return hasRole(req.remoteUser.id, parentCollective.id, ['MEMBER','HOST'])
       })
-      .then(canEditEvent => {
-        if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
+      .then(canEditCollective => {
+        if (!canEditCollective) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this collective");
       })
-      .then(() => models.Event.findById(args.event.id))
-      .then(ev => {
-        if (!ev) throw new Error(`Event with id ${args.event.id} not found`);
-        event = ev;
-        return event;
+      .then(() => models.Collective.findById(args.collective.id))
+      .then(c => {
+        if (!c) throw new Error(`Collective with id ${args.collective.id} not found`);
+        collective = c;
+        return collective;
       })
-      .then(event => event.update(updatedEventData))
-      .then(event => event.getTiers())
+      .then(collective => collective.update(updatedCollectiveData))
+      .then(collective => collective.getTiers())
       .then(tiers => {
-        if (args.event.tiers) {
-          // remove the tiers that are not present anymore in the updated event
-          const diff = difference(tiers.map(t => t.id), args.event.tiers.map(t => t.id));
+        if (args.collective.tiers) {
+          // remove the tiers that are not present anymore in the updated collective
+          const diff = difference(tiers.map(t => t.id), args.collective.tiers.map(t => t.id));
           return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
         }
       })
       .then(() => {
-        if (args.event.tiers) {
-          return Promise.map(args.event.tiers, (tier) => {
+        if (args.collective.tiers) {
+          return Promise.map(args.collective.tiers, (tier) => {
             if (tier.id) {
               return models.Tier.update(tier, { where: { id: tier.id }});
             } else {
-              tier.CollectiveId = event.id;
+              tier.CollectiveId = collective.id;
               tier.currency = tier.currency || collective.currency;
               return models.Tier.create(tier);  
             }
           });
         }
       })
-      .then(() => event);
+      .then(() => collective);
     }
   },
-  deleteEvent: {
-    type: EventType,
+  deleteCollective: {
+    type: CollectiveType,
     args: {
       id: { type: new GraphQLNonNull(GraphQLInt)}
     },
     resolve(_, args, req) {
 
       if (!req.remoteUser) {
-        throw new errors.Unauthorized("You need to be logged in to delete an event");
+        throw new errors.Unauthorized("You need to be logged in to delete a collective");
       }
 
-      return models.Event
+      return models.Collective
         .findById(args.id)
-        .then(event => {
-          if (!event) throw new errors.NotFound(`Event with id ${args.id} not found`);
-          return event
+        .then(collective => {
+          if (!collective) throw new errors.NotFound(`Collective with id ${args.id} not found`);
+          return collective
             .canEdit(req.remoteUser)
-            .then(canEditEvent => {
-              if (!canEditEvent) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this event");
-              return event.destroy();
+            .then(canEditCollective => {
+              if (!canEditCollective) throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this collective");
+              return collective.destroy();
             });
         });
     }
@@ -227,7 +231,7 @@ const mutations = {
       response.user.email = response.user.email.toLowerCase();
 
       const recordInterested = () => {
-        return models.Event.getBySlug(response.collective.slug, response.event.slug)
+        return models.Collective.findBySlug(response.collective.slug)
         .then(e => event = e)
         // find or create user
         .then(() => models.User.findOne({
@@ -240,7 +244,6 @@ const mutations = {
         }))
         .then(u => u || models.User.create(response.user))
         .tap(u => user = u)
-
         // create response
         .then(() => models.Response.create({
           UserId: user.id,
@@ -253,33 +256,21 @@ const mutations = {
 
       const recordYes = () => {
         let collective;
-        const include = [{
-          model: models.Collective,
-          where: {
-            slug: response.collective.slug
-          }
-        }];
-        if (response.event) {
-          include.push({
-            model: models.Event,
-            where: {
-              slug: response.event.slug
-            }
-          });
-        }
         return models.Tier.findOne({
           where: {
             id: response.tier.id,
           },
-          include
+          include: [
+            { model: models.Collective, where: { slug: response.collective.slug } }
+          ]
         })
         .then(t => {
-          if (!t) {
-            const forEvent = (response.event) ? ` for event slug:${response.event.slug}` : '';
-            throw new Error(`No tier found with tier id: ${response.tier.id}${forEvent} in collective slug:${response.collective.slug}`);
+          if (!t || !t.Collective) {
+            const forEvent = (response.collective) ? ` for collective slug:${response.collective.slug}` : '';
+            throw new Error(`No tier found with tier id: ${response.tier.id}${forEvent}`);
           }
           tier = t;
-          event = t.Event;
+          event = t.Collective;
           collective = t.Collective;
           isPaidTier = tier.amount > 0;
         })

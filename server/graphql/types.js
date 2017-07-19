@@ -148,6 +148,18 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.id;
         }
       },
+      createdByUser: {
+        type: UserType,
+        resolve(collective) {
+          return models.User.findById(collective.CreatedByUserId)
+        }
+      },
+      parentCollective: {
+        type: CollectiveType,
+        resolve(collective) {
+          return models.Collective.findById(collective.ParentCollectiveId);
+        }
+      },
       name: {
         type: GraphQLString,
         resolve(collective) {
@@ -170,6 +182,37 @@ export const CollectiveType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(collective) {
           return collective.mission;
+        }
+      },
+      location: {
+        type: LocationType,
+        description: 'Name, address, lat, long of the location.',
+        resolve(collective) {
+          return collective.location;
+        }
+      },
+      startsAt: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.startsAt
+        }
+      },
+      endsAt: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.endsAt
+        }
+      },
+      timezone: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.timezone
+        }
+      },
+      maxAmount: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.maxAmount;
         }
       },
       currency: {
@@ -208,10 +251,29 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.getUsersForViewer(req.remoteUser);
         }
       },
+      maxQuantity: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.maxQuantity;
+        }
+      },
       tiers: {
         type: new GraphQLList(TierType),
         resolve(collective) {
-          return collective.getTiers();
+          return collective.getTiers({ order: [['name', 'ASC']] });
+        }
+      },
+      responses: {
+        type: new GraphQLList(ResponseType),
+        resolve(collective) {
+          return collective.getResponses({
+            where: { 
+              confirmedAt: { $ne: null } 
+            },
+            order: [
+              ['createdAt', 'DESC']
+            ]
+          });
         }
       },
       transactions: {
@@ -243,16 +305,16 @@ export const CollectiveType = new GraphQLObjectType({
         }
       },
       events: {
-        type: new GraphQLList(EventType),
+        type: new GraphQLList(CollectiveType),
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
         },
         resolve(collective, args) {
-          const query = {};
+          const query = { type: 'EVENT', ParentCollectiveId: collective.id };
           if (args.limit) query.limit = args.limit;
           if (args.offset) query.offset = args.offset;
-          return collective.getEvents(query);
+          return models.Collective.findAll(query);
         }
       },
       stripePublishableKey: {
@@ -275,120 +337,6 @@ export const LocationType = new GraphQLObjectType({
     lat: { type: GraphQLFloat },
     long: { type: GraphQLFloat }
   })
-});
-
-export const EventType = new GraphQLObjectType({
-  name: 'Event',
-  description: 'This represents an Event',
-  fields: () => {
-    return {
-      id: {
-        type: GraphQLInt,
-        resolve(event) {
-          return event.id;
-        }
-      },
-      name: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.name
-        }
-      },
-      description: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.description
-        }
-      },
-      backgroundImage: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.backgroundImage;
-        }
-      },
-      createdByUser: {
-        type: UserType,
-        resolve(event) {
-          return models.User.findById(event.CreatedByUserId)
-        }
-      },
-      collective: {
-        type: CollectiveType,
-        resolve(event) {
-          return event.getCollective();
-        }
-      },
-      slug: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.slug;
-        }
-      },
-      location: {
-        type: LocationType,
-        description: 'Name, address, lat, long of the location.',
-        resolve(event) {
-          return event.location;
-        }
-      },
-      startsAt: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.startsAt
-        }
-      },
-      endsAt: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.endsAt
-        }
-      },
-      timezone: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.timezone
-        }
-      },
-      maxAmount: {
-        type: GraphQLInt,
-        resolve(event) {
-          return event.maxAmount;
-        }
-      },
-      currency: {
-        type: GraphQLString,
-        resolve(event) {
-          return event.currency;
-        }
-      },
-      maxQuantity: {
-        type: GraphQLInt,
-        resolve(event) {
-          return event.maxQuantity;
-        }
-      },
-      tiers: {
-        type: new GraphQLList(TierType),
-        resolve(event) {
-          return event.getTiers({ order: [['name', 'ASC']] });
-        }
-      },
-      responses: {
-        type: new GraphQLList(ResponseType),
-        resolve(event) {
-          return event.getResponses({
-            where: { 
-              confirmedAt: { $ne: null } 
-            },
-            order: [
-              ['createdAt', 'DESC']
-            ]
-          });
-        }
-      }
-
-    }
-  }
 });
 
 export const TierType = new GraphQLObjectType({
@@ -501,9 +449,9 @@ export const TierType = new GraphQLObjectType({
         }
       },
       event: {
-        type: EventType,
+        type: CollectiveType,
         resolve(tier) {
-          return tier.getEvent();
+          return tier.getCollective();
         }
       },
       responses: {
@@ -559,12 +507,6 @@ export const ResponseType = new GraphQLObjectType({
         type: TierType,
         resolve(response) {
           return response.getTier();
-        }
-      },
-      event: {
-        type: EventType,
-        resolve(response) {
-          return response.getEvent();
         }
       },
       createdAt: {

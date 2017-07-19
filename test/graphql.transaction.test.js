@@ -29,7 +29,7 @@ describe('graphql.transaction.test.js', () => {
       const limit = 40;
       const query = `
         query Collective {
-          Collective(collectiveSlug: "wwcodeaustin") {
+          Collective(slug: "wwcodeaustin") {
             id,
             slug,
             transactions(limit: ${limit}) {

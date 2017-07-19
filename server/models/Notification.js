@@ -58,21 +58,19 @@ export default function(Sequelize, DataTypes) {
                   channel: 'email',
                   type: `mailinglist.${mailinglist}`
                 },
-                include: [{model: models.User }, {model: models.Collective, where: { slug: collectiveSlug } }]
+                include: [
+                  { model: models.User },
+                  { model: models.Collective, where: { slug: collectiveSlug } }
+                ]
               }
             )
             .then(subscriptions => subscriptions.map(s => s.User))        
 
-        const getSubscribersForEvent = (eventSlug) =>
-          models.Event.findOne({
-           where: { slug: eventSlug },
-           include: [
-             { model: models.Collective, where: { slug: collectiveSlug } }
-           ]
-          })
+        const getSubscribersForEvent = (eventSlug) => models.Collective
+          .findOne({ where: { slug: eventSlug, type: 'EVENT' } })
           .then(event => {
               if (event) return event.getUsers().then(excludeUnsubscribed)
-          })
+          });
 
         const excludeUnsubscribed = (users) =>
           models.Notification.findAll({

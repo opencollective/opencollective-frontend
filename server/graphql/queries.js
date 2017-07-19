@@ -9,8 +9,7 @@ import {
   CollectiveType,
   TransactionInterfaceType,
   UserType,
-  TierType,
-  EventType
+  TierType
 } from './types';
 
 import models from '../models';
@@ -19,14 +18,12 @@ const queries = {
   Collective: {
     type: CollectiveType,
     args: {
-      collectiveSlug: {
+      slug: {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
     resolve(_, args) {
-      return models.Collective.findOne({
-        where: { slug: args.collectiveSlug.toLowerCase() }
-      })
+      return models.Collective.findBySlug(args.slug);
     }
   },
 
@@ -64,6 +61,7 @@ const queries = {
         .then(collective => collective.getUsersForViewer(req.remoteUser));
     }
   },
+
   /*
    * Given a collective slug, returns all transactions
    */
@@ -91,6 +89,7 @@ const queries = {
       return models.Transaction.findAll(query);
     }
   },
+
   /*
    * Given an id, returns a transaction
    */
@@ -105,51 +104,32 @@ const queries = {
       return models.Transaction.findOne({ where: { id: args.id }});
     }
   },
-  /*
-   * Given a collective slug and an event slug, returns the event
-   */
-  Event: {
-    type: EventType,
-    args: {
-      eventSlug: {
-        type: new GraphQLNonNull(GraphQLString),
-        description: 'Event slug'
-      },
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
-    },
-    resolve(_, args) {
-      return models.Event.findOne({
-        where: { slug: args.eventSlug.toLowerCase() },
-        include: [{
-          model: models.Collective,
-          where: { slug: args.collectiveSlug.toLowerCase() }
-        }]
-      })
-    }
-  },
+
   /*
    * Given a collective slug, returns all events
    */
   allEvents: {
-    type: new GraphQLList(EventType),
+    type: new GraphQLList(CollectiveType),
     args: {
-      collectiveSlug: {
+      slug: {
         type: GraphQLString
       }
     },
     resolve(_, args) {
-      const where = {};
-      if (args.collectiveSlug) {
-        where.slug = args.collectiveSlug.toLowerCase();
+      if (args.slug) {
+        return models.Collective
+          .findBySlug(args.slug, { attributes: ['id'] })
+          .then(collective => models.Collective.findAll({
+            where: { ParentCollectiveId: collective.id, type: 'EVENT' },
+            order: [['startsAt', 'DESC'], ['createdAt', 'DESC']]
+          }))
+          .catch(e => {
+            console.error(e.message);
+            return [];
+          })
+      } else {
+        return models.Collective.findAll({ where: { type: 'EVENT' }});
       }
-      return models.Event.findAll({
-        include: [{
-          model: models.Collective,
-          where
-        }]
-      })
     }
   }
 }

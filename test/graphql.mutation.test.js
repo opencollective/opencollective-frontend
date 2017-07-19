@@ -54,16 +54,16 @@ describe('Mutation Tests', () => {
     .catch(done);
   });
 
-  beforeEach('create an event', () => models.Event.create(
+  beforeEach('create an event collective', () => models.Collective.create(
     Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
     .tap(e => event1 = e));
 
-  describe('createEvent tests', () => {
+  describe('createCollective tests', () => {
 
-    describe('creates an event', () => {
+    describe('creates an event collective', () => {
 
       const getEventData = (collective) => {
-        return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","description":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","collective":{"slug":collective.slug},"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
+        return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","longDescription":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","ParentCollectiveId":collective.id,"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
       };
 
       it("fails if not authenticated", async () => {
@@ -71,8 +71,8 @@ describe('Mutation Tests', () => {
         const event = stringify(getEventData(collective1));
 
         const query = `
-        mutation createEvent {
-          createEvent(event: ${event}) {
+        mutation createCollective {
+          createCollective(collective: ${event}) {
             id,
             slug,
             tiers {
@@ -88,7 +88,7 @@ describe('Mutation Tests', () => {
         };
         const result = await graphql(schema, query, null, req);
         expect(result.errors).to.have.length(1);
-        expect(result.errors[0].message).to.equal("You need to be logged in to create an event");
+        expect(result.errors[0].message).to.equal("You need to be logged in to create a collective");
       });
 
 
@@ -97,8 +97,8 @@ describe('Mutation Tests', () => {
         const event = getEventData(collective1);
 
         const query = `
-        mutation createEvent {
-          createEvent(event: ${stringify(event)}) {
+        mutation createCollective {
+          createCollective(collective: ${stringify(event)}) {
             id,
             slug,
             tiers {
@@ -114,16 +114,16 @@ describe('Mutation Tests', () => {
         };
         const result = await graphql(schema, query, null, req);
         expect(result.errors).to.have.length(1);
-        expect(result.errors[0].message).to.equal("You must be logged in as a member of the collective to create an event");
+        expect(result.errors[0].message).to.equal("You must be logged in as a member of the scouts collective to create an event");
       });
 
       it("creates an event with multiple tiers", async () => {
-        
+
         const event = getEventData(collective1);
 
         const query = `
-        mutation createEvent {
-          createEvent(event: ${stringify(event)}) {
+        mutation createCollective {
+          createCollective(collective: ${stringify(event)}) {
             id,
             slug,
             tiers {
@@ -135,7 +135,7 @@ describe('Mutation Tests', () => {
         }
         `;
         const result = await graphql(schema, query, null, { remoteUser: user1 });
-        const createdEvent = result.data.createEvent;
+        const createdEvent = result.data.createCollective;
         expect(createdEvent.slug).to.equal(event.slug);
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
 
@@ -150,8 +150,8 @@ describe('Mutation Tests', () => {
         event.tiers[0].amount = 123;
 
         const updateQuery = `
-        mutation editEvent {
-          editEvent(event: ${stringify(event)}) {
+        mutation editCollective {
+          editCollective(collective: ${stringify(event)}) {
             id,
             slug,
             tiers {
@@ -165,14 +165,14 @@ describe('Mutation Tests', () => {
 
         const r2 = await graphql(schema, updateQuery, null, {});
         expect(r2.errors).to.have.length(1);
-        expect(r2.errors[0].message).to.equal("You need to be logged in to edit an event");
+        expect(r2.errors[0].message).to.equal("You need to be logged in to edit a collective");
 
         const r3 = await graphql(schema, updateQuery, null, { remoteUser: user2 });
         expect(r3.errors).to.have.length(1);
-        expect(r3.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this event");
+        expect(r3.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this collective");
 
         const r4 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
-        const updatedEvent = r4.data.editEvent;
+        const updatedEvent = r4.data.editCollective;
         expect(updatedEvent.slug).to.equal(event.slug);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
@@ -233,7 +233,6 @@ describe('Mutation Tests', () => {
         expect(tiers).to.have.length(2);
         expect(tiers[0].interval).to.equal('month');
         expect(tiers[1].interval).to.equal('year');
-
         tiers[0].goal = 20000;
         tiers[1].amount = 100000;
         tiers.push({name: "free ticket", type: "TICKET", amount: 0});
@@ -257,47 +256,47 @@ describe('Mutation Tests', () => {
     })
   })
 
-  describe('delete Event', () => {
-    it('fails to delete an event if not logged in', async () => {
+  describe('delete Collective', () => {
+    it('fails to delete a collective if not logged in', async () => {
       const query = `
-      mutation deleteEvent {
-        deleteEvent(id: ${event1.id}) {
+      mutation deleteCollective {
+        deleteCollective(id: ${event1.id}) {
           id,
           name
         }
       }`;
       const result = await graphql(schema, query, null, { });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal("You need to be logged in to delete an event");
-      return models.Event.findById(event1.id).then(event => {
+      expect(result.errors[0].message).to.equal("You need to be logged in to delete a collective");
+      return models.Collective.findById(event1.id).then(event => {
         expect(event).to.not.be.null;
       })
     });
-    it('fails to delete an event if logged in as another user', async () => {
+    it('fails to delete a collective if logged in as another user', async () => {
       const query = `
-      mutation deleteEvent {
-        deleteEvent(id: ${event1.id}) {
+      mutation deleteCollective {
+        deleteCollective(id: ${event1.id}) {
           id,
           name
         }
       }`;
       const result = await graphql(schema, query, null, { remoteUser: user2 });
       expect(result.errors).to.exist;
-      expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this event");
-      return models.Event.findById(event1.id).then(event => {
+      expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this collective");
+      return models.Collective.findById(event1.id).then(event => {
         expect(event).to.not.be.null;
       })
     });
-    it('deletes an event', async () => {
+    it('deletes a collective', async () => {
       const query = `
-      mutation deleteEvent {
-        deleteEvent(id: ${event1.id}) {
+      mutation deleteCollective {
+        deleteCollective(id: ${event1.id}) {
           id,
           name
         }
       }`;
       await graphql(schema, query, null, { remoteUser: user1 });
-      return models.Event.findById(event1.id).then(event => {
+      return models.Collective.findById(event1.id).then(event => {
         expect(event).to.be.null;
       })
     });
@@ -320,7 +319,7 @@ describe('Mutation Tests', () => {
             createResponse(response: {}) {
               id,
               status
-              event {
+              collective {
                 id
               }
               tier {
@@ -338,15 +337,15 @@ describe('Mutation Tests', () => {
         expect(result.errors[0].message).to.contain('user');
       });
 
-      describe('when collective/event/tier doesn\'t exist', () => {
+      describe('when collective/tier doesn\'t exist', () => {
 
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "${user1.email}" }, collective: { slug: "doesNotExist" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity:1 }) {
+              createResponse(response: { user: { email: "${user1.email}" }, collective: { slug: "notfound" }, tier: { id: 1 }, status: "YES", quantity:1 }) {
                 id,
                 status
-                event {
+                collective {
                   id
                 }
                 tier {
@@ -360,39 +359,16 @@ describe('Mutation Tests', () => {
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for event slug:jan-meetup in collective slug:doesNotExist');
-        });
-
-        it('when event doesn\'t exist', async () => {
-          const query = `
-            mutation createResponse {
-              createResponse(response: { user: { email:"user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "doesNotExist" }, tier: { id:1 }, status:"YES", quantity:1 }) {
-                id,
-                status
-                event {
-                  id
-                }
-                tier {
-                  id,
-                  name,
-                  description
-                }
-              }
-            }
-          `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
-          expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for event slug:doesNotExist in collective slug:scouts');
+          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for collective slug:notfound');
         });
 
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: {id: 1002}, status:"YES", quantity:1 }) {
                 id,
                 status
-                event {
+                collective {
                   id
                 }
                 tier {
@@ -406,7 +382,7 @@ describe('Mutation Tests', () => {
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for event slug:${event1.slug} in collective slug:${collective1.slug}`);
+          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for collective slug:${event1.slug}`);
         });
       });
 
@@ -414,10 +390,10 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:101 }) {
                 id,
                 status
-                event {
+                collective {
                   id
                 }
                 tier {
@@ -438,10 +414,10 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createResponse {
-              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
+              createResponse(response: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 2 }, status:"YES", quantity:2 }) {
                 id,
                 status
-                event {
+                collective {
                   id
                 }
                 tier {
@@ -468,8 +444,7 @@ describe('Mutation Tests', () => {
             mutation createResponse {
               createResponse(response: {
                 user: { email: "${user2.email}" },
-                collective: { slug: "${collective1.slug}" },
-                event: { slug: "${event1.slug}" },
+                collective: { slug: "${event1.slug}" },
                 status:"INTERESTED"
               }) {
                 id,
@@ -477,9 +452,6 @@ describe('Mutation Tests', () => {
                 user {
                   id,
                   email
-                },
-                event {
-                  id
                 },
                 tier {
                   id,
@@ -500,9 +472,6 @@ describe('Mutation Tests', () => {
           expect(result).to.deep.equal({
             data: {
               "createResponse": {
-                "event": {
-                  "id": 1
-                },
                 "id": 1,
                 "status": "INTERESTED",
                 "tier": null,
@@ -511,8 +480,8 @@ describe('Mutation Tests', () => {
                   "id": 3
                 },
                 "collective": {
-                  "id": 1,
-                  "slug": "scouts"
+                  "id": 2,
+                  "slug": "jan-meetup"
                 }
               }
             }
@@ -527,15 +496,12 @@ describe('Mutation Tests', () => {
           it('from an existing user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "${user2.email}" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
+                createResponse(response: { user: { email: "${user2.email}" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, status:"YES", quantity:2 }) {
                   id,
                   status,
                   user {
                     id,
                     email
-                  },
-                  event {
-                    id
                   },
                   tier {
                     id,
@@ -543,6 +509,10 @@ describe('Mutation Tests', () => {
                     description,
                     maxQuantity,
                     availableQuantity
+                  },
+                  collective {
+                    id,
+                    slug
                   },
                   collective {
                     id,
@@ -555,8 +525,9 @@ describe('Mutation Tests', () => {
             const result = await graphql(schema, query, null, context)
             expect(result.data).to.deep.equal({
               "createResponse": {
-                "event": {
-                  "id": 1
+                "collective": {
+                  "id": 2,
+                  "slug": "jan-meetup"
                 },
                 "id": 1,
                 "status": "YES",
@@ -570,10 +541,6 @@ describe('Mutation Tests', () => {
                 "user": {
                   "email": null,
                   "id": 3
-                },
-                "collective": {
-                  "id": 1,
-                  "slug": "scouts"
                 }
               }
             });
@@ -582,15 +549,12 @@ describe('Mutation Tests', () => {
           it('from a new user', async () => {
             const query = `
               mutation createResponse {
-                createResponse(response: { user: { email: "newuser@email.com" }, collective: { slug: "${collective1.slug}" }, event: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
+                createResponse(response: { user: { email: "newuser@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, status: "YES", quantity: 2 }) {
                   id,
                   status,
                   user {
                     id,
                     email
-                  },
-                  event {
-                    id
                   },
                   tier {
                     id,
@@ -598,10 +562,6 @@ describe('Mutation Tests', () => {
                     description,
                     maxQuantity,
                     availableQuantity
-                  },
-                  collective {
-                    id,
-                    slug
                   }
                 }
               }
@@ -611,9 +571,6 @@ describe('Mutation Tests', () => {
             expect(result).to.deep.equal({
               data: {
                  "createResponse": {
-                  "event": {
-                    "id": 1
-                  },
                   "id": 1,
                   "status": "YES",
                   "tier": {
@@ -626,10 +583,6 @@ describe('Mutation Tests', () => {
                   "user": {
                     "email": null,
                     "id": 4
-                  },
-                  "collective": {
-                    "id": 1,
-                    "slug": "scouts"
                   }
                 }
               }
@@ -653,8 +606,7 @@ describe('Mutation Tests', () => {
                       identifier: "4242"
                     }
                   },
-                  collective: { slug: "${collective1.slug}" },
-                  event: { slug: "${event1.slug}" },
+                  collective: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
                   id,
@@ -662,9 +614,6 @@ describe('Mutation Tests', () => {
                   user {
                     id,
                     email
-                  },
-                  event {
-                    id
                   },
                   tier {
                     id,
@@ -684,9 +633,6 @@ describe('Mutation Tests', () => {
             const result = await graphql(schema, query, null, context);
             expect(result.data).to.deep.equal({
               "createResponse": {
-                "event": {
-                  "id": 1
-                },
                 "id": 1,
                 "status": "YES",
                 "tier": {
@@ -701,8 +647,8 @@ describe('Mutation Tests', () => {
                   "id": 3
                 },
                 "collective": {
-                  "id": 1,
-                  "slug": "scouts"
+                  "id": 2,
+                  "slug": "jan-meetup"
                 }
               }
             });
@@ -710,7 +656,7 @@ describe('Mutation Tests', () => {
             expect(createPaymentStub.callCount).to.equal(1);
             createPaymentStub.reset();
             expect(createPaymentArgument.user.id).to.equal(3);
-            expect(createPaymentArgument.collective.slug).to.equal('scouts');
+            expect(createPaymentArgument.collective.slug).to.equal('jan-meetup');
             expect(createPaymentArgument.response.id).to.equal(1);
             expect(createPaymentArgument.payment.amount).to.equal(4000);
             expect(createPaymentArgument.payment.currency).to.equal('USD');
@@ -731,8 +677,7 @@ describe('Mutation Tests', () => {
                       identifier: "4242"
                     }
                   },
-                  collective: { slug: "${collective1.slug}" },
-                  event: { slug: "${event1.slug}" },
+                  collective: { slug: "${event1.slug}" },
                   tier: { id: 2 }, status:"YES", quantity:2
                 }) {
                   id,
@@ -740,9 +685,6 @@ describe('Mutation Tests', () => {
                   user {
                     id,
                     email
-                  },
-                  event {
-                    id
                   },
                   tier {
                     id,
@@ -764,9 +706,6 @@ describe('Mutation Tests', () => {
             expect(result).to.deep.equal({
               data: {
                 "createResponse": {
-                  "event": {
-                    "id": 1
-                  },
                   "id": 1,
                   "status": "YES",
                   "tier": {
@@ -781,8 +720,8 @@ describe('Mutation Tests', () => {
                     "id": 4
                   },
                   "collective": {
-                    "id": 1,
-                    "slug": "scouts"
+                    "id": 2,
+                    "slug": "jan-meetup"
                   }
                 }
               }
@@ -790,7 +729,7 @@ describe('Mutation Tests', () => {
 
             expect(createPaymentStub.callCount).to.equal(1);
             expect(createPaymentArgument.user.id).to.equal(4);
-            expect(createPaymentArgument.collective.slug).to.equal('scouts');
+            expect(createPaymentArgument.collective.slug).to.equal('jan-meetup');
             expect(createPaymentArgument.response.id).to.equal(1);
             expect(createPaymentArgument.payment.amount).to.equal(4000);
             expect(createPaymentArgument.payment.currency).to.equal('USD');

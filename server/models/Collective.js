@@ -171,6 +171,11 @@ export default function(Sequelize, DataTypes) {
       allowNull: true
     },
 
+    startsAt: {
+      type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW
+    },
+
     endsAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -222,6 +227,16 @@ export default function(Sequelize, DataTypes) {
     paranoid: true,
 
     getterMethods: {
+
+      location() {
+        return {
+          name: this.locationName,
+          address: this.address,
+          lat: this.geoLocationLatLong && this.geoLocationLatLong.coordinates[0],
+          long: this.geoLocationLatLong && this.geoLocationLatLong.coordinates[1]
+        }
+      },
+
       // Info.
       info() {
         return {
@@ -474,9 +489,10 @@ export default function(Sequelize, DataTypes) {
       },
 
       getStripeAccount() {
+        const CollectiveId = this.ParentCollectiveId || this.id;
         return Sequelize.models.Role.find({
           where: {
-            CollectiveId: this.id,
+            CollectiveId,
             role: roles.HOST
           }
         })
@@ -705,13 +721,13 @@ export default function(Sequelize, DataTypes) {
         return Promise.map(collectives, u => Collective.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
       },
 
-      getBySlug: (collectiveSlug) => {
-        return Collective.findOne({ where: { slug: collectiveSlug } })
-          .then(ev => {
-            if (!ev) {
-              throw new Error(`No collective found with slug ${collectiveSlug}`)
+      findBySlug: (slug, options = {}) => {
+        return Collective.findOne({ where: { slug: slug.toLowerCase() }, ...options })
+          .then(collective => {
+            if (!collective) {
+              throw new Error(`No collective found with slug ${slug}`)
             }
-            return ev;
+            return collective;
           })
       },
 

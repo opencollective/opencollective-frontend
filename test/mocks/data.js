@@ -615,6 +615,7 @@ export default {
   },
 
   "event1": {
+    type: "EVENT",
     name: "January meetup",
     slug: "jan-meetup",
     description: "January monthly meetup",
@@ -629,6 +630,7 @@ export default {
   },
 
   "event2": {
+    type: "EVENT",
     name: "Feb meetup",
     slug: "feb-meetup",
     description: "February monthly meetup",

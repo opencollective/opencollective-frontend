@@ -38,43 +38,24 @@ describe('Query Tests', () => {
 
   describe('Root query tests', () => {
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
+    beforeEach(() => models.Collective.create(
+      Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
       .tap(e => event1 = e));
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { CreatedByUserId: user1.id, CollectiveId: collective1.id }))
+    beforeEach(() => models.Collective.create(
+      Object.assign(utils.data('event2'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
       .tap(e => event2 = e));
 
-    beforeEach(() => models.Event.create(
-      Object.assign({}, utils.data('event2'), { slug: "another-event", CreatedByUserId: user2.id, CollectiveId: collective2.id })));
+    beforeEach(() => models.Collective.create(
+      Object.assign({}, utils.data('event2'), { slug: "another-event", CreatedByUserId: user2.id, ParentCollectiveId: collective2.id })));
       //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
-
-    describe('throws an error', () => {
-
-      it('when given only an existing event slug', async () => {
-        const query = `
-          query getOneEvent {
-            Event(eventSlug: "${event1.slug}") {
-              id,
-              name,
-              description
-            }
-          }
-        `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal('Field \"Event\" argument \"collectiveSlug\" of type \"String!\" is required but not provided.');
-      })
-    })
 
     describe('returns nothing', () => {
 
       it('when given a non-existent slug', async () => {
         const query = `
           query getMultipleEvents {
-            allEvents(collectiveSlug: "non-existent-slug") {
+            allEvents(slug: "non-existent-slug") {
               id,
               name,
               description
@@ -93,7 +74,7 @@ describe('Query Tests', () => {
       it('when given an existing collective slug when it has no events', async () => {
         const query = `
           query getMultipleEvents {
-            allEvents(collectiveSlug: "${collective3.slug}") {
+            allEvents(slug: "${collective3.slug}") {
               id,
               name,
               description
@@ -115,11 +96,11 @@ describe('Query Tests', () => {
       it('when given an event slug and collectiveSlug (case insensitive)', async () => {
         const query = `
           query getOneEvent {
-            Event(collectiveSlug: "Scouts", eventSlug:"Jan-Meetup") {
+            Collective(slug:"Jan-Meetup") {
               id,
               name,
               description,
-              collective {
+              parentCollective {
                 slug,
                 twitterHandle
               }
@@ -131,12 +112,12 @@ describe('Query Tests', () => {
         const result = await graphql(schema, query, null, context);
         expect(result).to.deep.equal({
           data: {
-            Event: {
+            Collective: {
               description: "January monthly meetup",
-              id: 1,
+              id: 4,
               name: "January meetup",
               timezone: "America/New_York",
-              collective: {
+              parentCollective: {
                 slug: 'scouts',
                 twitterHandle: 'scouts'
               }
@@ -150,7 +131,7 @@ describe('Query Tests', () => {
         it('when given only a collective slug', async () => {
           const query = `
             query getMultipleEvents {
-              allEvents(collectiveSlug: "${collective1.slug}") {
+              allEvents(slug: "${collective1.slug}") {
                 id,
                 name,
                 description
@@ -164,12 +145,12 @@ describe('Query Tests', () => {
               allEvents: [
                 {
                   description: "February monthly meetup",
-                  id: 2,
+                  id: 5,
                   name: "Feb meetup"               
                 },
                 {
                   description: "January monthly meetup",
-                  id: 1,
+                  id: 4,
                   name: "January meetup"
                 }
               ]
@@ -181,20 +162,20 @@ describe('Query Tests', () => {
       describe('returns multiple events with tiers and responses', () => {
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket1'), { CollectveId: event1.id }))
+          Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }))
           .tap(t => ticket1 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket2'), { CollectveId: event1.id }))
+          Object.assign(utils.data('ticket2'), { CollectiveId: event1.id }))
           .tap(t => ticket2 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket1'), { CollectveId: event2.id }))
+          Object.assign(utils.data('ticket1'), { CollectiveId: event2.id }))
           .tap(t => tier3 = t));
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response1'), { 
-            CollectveId: event1.id, 
+            CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user2.id,
             confirmedAt: new Date()
@@ -202,7 +183,7 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
-            CollectveId: event1.id, 
+            CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user3.id,
             confirmedAt: new Date()
@@ -212,7 +193,7 @@ describe('Query Tests', () => {
         // because it's not confirmed
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response2'), { 
-            CollectveId: event1.id, 
+            CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user1.id,
             confirmedAt: null
@@ -220,7 +201,7 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Response.create(
           Object.assign(utils.data('response3'), { 
-            CollectveId: event1.id, 
+            CollectiveId: event1.id,
             TierId: ticket2.id, 
             UserId: user3.id,
             confirmedAt: new Date()
@@ -228,8 +209,8 @@ describe('Query Tests', () => {
         
         it('sends response data', async () => {
           const query = `
-            query getMultipleEvents {
-              Event(collectiveSlug: "${collective1.slug}", eventSlug: "${event1.slug}") {
+            query getOneCollective {
+              Collective(slug: "${event1.slug}") {
                 responses {
                   createdAt,
                   status
@@ -239,15 +220,15 @@ describe('Query Tests', () => {
           `;
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context);
-          const response = result.data.Event.responses[0];
+          const response = result.data.Collective.responses[0];
           expect(response).to.have.property("createdAt");
           expect(response).to.have.property("status");
         });
 
         it('when given only a collective slug', async () => {
           const query = `
-            query getOneEvent {
-              allEvents(collectiveSlug: "${collective1.slug}") {
+            query allEvents {
+              allEvents(slug: "${collective1.slug}") {
                 id,
                 name,
                 description,
@@ -287,7 +268,7 @@ describe('Query Tests', () => {
             data: {
               allEvents: [
                 {
-                  "id": 2,
+                  "id": 5,
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
                   "backgroundImage": null,
@@ -313,7 +294,7 @@ describe('Query Tests', () => {
                   ]
                 },
                 {
-                  id: 1,
+                  id: 4,
                   name: "January meetup",
                   "description":"January monthly meetup",
                   "location" : {
