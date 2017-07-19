@@ -37,7 +37,7 @@ const mutations = {
       collective: { type: new GraphQLNonNull(CollectiveInputType) }
     },
     resolve(_, args, req) {
-      let collective, parentCollective;
+      let parentCollective;
 
       const location = args.collective.location;
 
