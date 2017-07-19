@@ -20,7 +20,6 @@ const {
   User,
   Collective,
   Notification,
-  Event,
   Tier,
   Response
 } = models;
@@ -153,7 +152,7 @@ describe("notification.model.test.js", () => {
       const eventData = utils.data('event1');
       const tierData = utils.data('tier1');
       let event;
-      return Event.create({
+      return Collective.create({
         ...eventData,
         ParentCollectiveId: collective.id
       })
@@ -173,14 +172,14 @@ describe("notification.model.test.js", () => {
           })
         });
       })
-      .then(() => Notification.getSubscribers(collective.slug, eventData.slug))
+      .then(() => Notification.getSubscribers(eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(2);
       })
       .then(() => {
         return users[0].unsubscribe(collective.id, `mailinglist.${event.slug}`)
       })
-      .then(() => Notification.getSubscribers(collective.slug, eventData.slug))
+      .then(() => Notification.getSubscribers(eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(1);
       })

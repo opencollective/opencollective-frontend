@@ -5,7 +5,7 @@ process.env.PORT = 3066;
 import models, {sequelize} from '../../server/models';
 import _ from 'lodash';
 import Promise from 'bluebird';
-import { formatCurrency, formatArrayToString, getTier, formatCurrencyObject } from '../../server/lib/utils';
+import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../../server/lib/utils';
 import emailLib from '../../server/lib/email';
 
 const d = new Date;
@@ -32,7 +32,7 @@ SELECT
   host.username as "hostSlug",
   CONCAT(host."firstName", ' ', host."lastName") as "hostName",
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
-  g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.tiers, g.settings, g.data 
+  g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
 FROM "UserTransactions" ut 
 LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
 LEFT JOIN "Roles" ug ON ut."CollectiveId" = ug."CollectiveId" AND ug.role='HOST'
@@ -102,8 +102,6 @@ const processUser = (user) => {
       };
 
       hosts[row.hostSlug].collectives[row.slug] = collectives[row.slug];
-
-      hosts[row.hostSlug].collectives[row.slug].tier = getTier({ totalDonations: Number(row.amountInTxnCurrency)}, row.tiers);
 
       if (typeof totalDonations[row.txnCurrency] === 'undefined')
         totalDonations[row.txnCurrency] = 0;

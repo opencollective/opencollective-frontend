@@ -734,7 +734,6 @@ export default function(Sequelize, DataTypes) {
       getCollectivesSummaryByTag: (tags, limit=3, excludeList=[], minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
         return queries.getCollectivesByTag(tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset)
           .then(collectives => {
-            console.log(">>> getCollectivesSummaryByTag: processing", collectives.length,"collectives");
             return Promise.all(collectives.map(collective => {
 
               return Promise.all([

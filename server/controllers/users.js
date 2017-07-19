@@ -2,7 +2,7 @@ import _ from 'lodash';
 import groupBy from 'lodash/collection/groupBy';
 import async from 'async';
 import userLib from '../lib/userlib';
-import { generateURLSafeToken, getTier } from '../lib/utils';
+import { generateURLSafeToken, appendTier } from '../lib/utils';
 import constants from '../constants/activities';
 import roles from '../constants/roles';
 import sequelize from 'sequelize';
@@ -284,9 +284,7 @@ export const show = (req, res, next) => {
     req.user.getCollectives().map(collective => {
       return Promise.all([
         collective.getYearlyIncome(),
-        queries.getUsersFromCollectiveWithTotalDonations(collective.id).tap(backers => {
-          backers.map(b => b.tier = getTier(b, collective.tiers));
-        })
+        queries.getUsersFromCollectiveWithTotalDonations(collective.id).tap(backers => appendTier(collective, backers))
       ])
       .then(results => {
         let collectiveInfo = collective.info;

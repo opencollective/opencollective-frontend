@@ -7,7 +7,7 @@ const application = utils.data('application');
 
 describe('supercollectives.routes.test.js', () => {
 
-  beforeEach(() => utils.loadDB('wwcode_test'));      
+  before(() => utils.loadDB('wwcode_test'));
 
   it('successfully get a supercollective with data', (done) => {
     request(app)

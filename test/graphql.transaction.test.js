@@ -22,8 +22,6 @@ describe('graphql.transaction.test.js', () => {
 
   before(() => utils.loadDB("wwcode_test"));
 
-
-
   describe('return collective.transactions', () => {
     it('when given an event slug and collectiveSlug (case insensitive)', async () => {
       const limit = 40;
