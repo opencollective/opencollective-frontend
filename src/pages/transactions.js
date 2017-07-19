@@ -29,6 +29,7 @@ class TransactionsPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
+    LoggedInUser.canEditCollective = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1);
     this.setState({LoggedInUser});
   }
 
@@ -75,6 +76,7 @@ class TransactionsPage extends React.Component {
               transactions={transactions}
               refetch={data.refetch}
               fetchMore={this.props.fetchMore}
+              LoggedInUser={LoggedInUser}
               />
 
           </div>

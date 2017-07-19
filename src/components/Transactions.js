@@ -10,7 +10,8 @@ class Transactions extends React.Component {
     collective: PropTypes.object,
     transactions: PropTypes.array,
     refetch: PropTypes.func,
-    fetchMore: PropTypes.func
+    fetchMore: PropTypes.func,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -34,7 +35,7 @@ class Transactions extends React.Component {
   }
 
   render() {
-    const { collective, transactions } = this.props;
+    const { collective, transactions, LoggedInUser } = this.props;
 
     return (
       <div className="Transactions">
@@ -75,6 +76,7 @@ class Transactions extends React.Component {
             key={transaction.id}
             collective={collective}
             transaction={transaction}
+            LoggedInUser={LoggedInUser}
             />
         )}
         { transactions.length % 10 === 0 &&

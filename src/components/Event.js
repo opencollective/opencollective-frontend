@@ -290,7 +290,7 @@ class Event extends React.Component {
 
                   <Location location={this.event.location} />
 
-                  { responses.guests.length >= 10 &&
+                  { responses.guests.length > 0 &&
                     <section id="responses">
                       <h1>
                         <FormattedMessage id='event.responses.title.going' values={{n: responses.going.length}} defaultMessage={`{n} {n, plural, one {person going} other {people going}}`} />

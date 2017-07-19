@@ -13,7 +13,6 @@ pages.add('event', '/:collectiveSlug/events/:eventSlug');
 pages.add('editEvent', '/:collectiveSlug/events/:eventSlug/edit');
 pages.add('events', '/:collectiveSlug/events');
 pages.add('transactions', '/:collectiveSlug/transactions');
-pages.add('events', '/');
 pages.add('nametags', '/:collectiveSlug/events/:eventSlug/nametags');
 pages.add('button', '/:collectiveSlug/:verb(contribute|donate)/button');
 
