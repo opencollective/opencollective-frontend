@@ -10,7 +10,8 @@ class Transaction extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    transaction: PropTypes.object
+    transaction: PropTypes.object,
+    LoggedInUser: PropTypes.object
   }
 
   constructor(props) {
@@ -34,7 +35,7 @@ class Transaction extends React.Component {
   }
 
   render() {
-    const { intl, collective, transaction } = this.props;
+    const { intl, collective, transaction, LoggedInUser } = this.props;
 
     const type = transaction.type.toLowerCase();
 
@@ -130,7 +131,7 @@ class Transaction extends React.Component {
             {capitalize(meta.join(' '))}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
-          {this.state.loadDetails && <TransactionDetails transaction={transaction} collective={collective} mode={this.state.view === 'details' ? 'open' : 'closed'} />}
+          {this.state.loadDetails && <TransactionDetails LoggedInUser={LoggedInUser} transaction={transaction} collective={collective} mode={this.state.view === 'details' ? 'open' : 'closed'} />}
         </div>
       </div>
     );
