@@ -61,28 +61,28 @@ class Nametags extends React.Component {
   }
 
   renderPage(pageNumber, responses) {
-    const users = responses.map(r => r.user);
-    while (users.length < this.nametagsPerPage) {
-      users.push({});
+    while (responses.length < this.nametagsPerPage) {
+      responses.push({});
     }
     return (
       <div className="page" key={this.pageNumber}>
         <div className="nametags">
-          {users.map(this.renderNametag)}
+          {responses.map(this.renderNametag)}
         </div>
       </div>
     )
   }
 
-  renderNametag(user, index) {
+  renderNametag(response, index) {
+    const user = response.user || {};
     return (
       <div className="nametag" key={index}>
         <h1><span className="firstName">{capitalize(user.firstName)}</span> <span className="lastName">{capitalize(user.lastName)}</span></h1>
         {user.twitterHandle && <h2 className="twitterHandle">@{user.twitterHandle}</h2> }
-        <p className="description">{firstSentence(user.description, 60)}</p>
+        <p className="description">{firstSentence(response.description || user.description, 60)}</p>
         <div className="eventInfo">
           <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' /> - &nbsp;
-          {this.event.name} - {this.event.locationLocation}
+          {this.event.name} - {this.event.location.name}
         </div>
       </div>
     )
