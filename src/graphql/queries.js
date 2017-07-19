@@ -133,8 +133,12 @@ const getAttendeesQuery = gql`
       slug,
       name,
       startsAt,
-      locationName,
+      location {
+        name,
+        address
+      },
       responses {
+        id,
         createdAt,
         quantity,
         status,

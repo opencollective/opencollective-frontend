@@ -44,7 +44,6 @@ class GetTicketForm extends React.Component {
   }
 
   render() {
-    const label = (<FormattedMessage id='GetTicketForm.submit' values={{quantity: this.state.response.quantity}} defaultMessage={`{quantity, plural, one {Get this ticket} other {Get those tickets}}`} />);
     const tier = this.props.tier;
     return (
       <div className="GetTicketForm">
