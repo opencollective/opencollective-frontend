@@ -10,7 +10,7 @@ class CreditCardForm extends React.Component {
   static propTypes = {
     stripePublishableKey: PropTypes.string.isRequired,
     onCardAdded: PropTypes.func,
-    addCardLabel: PropTypes.string,
+    addCardLabel: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
     disabled: PropTypes.bool
   }
 
@@ -71,12 +71,12 @@ class CreditCardForm extends React.Component {
 
     if (isValidCard(card)) {
       getStripeToken(card)
-        .then((token) => {
+        .then((res) => {
           const sanitizedCard = {
-            number: card.number.replace(/ /g, '').substr(-4),
+            last4: card.number.replace(/ /g, '').substr(-4),
             expMonth: card.exp_month,
             expYear: card.exp_year,
-            token
+            token: res.token
           };
           this.setState({ error: null });
           this.props.onCardAdded(sanitizedCard);

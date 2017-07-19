@@ -9,6 +9,7 @@ const createResponseQuery = gql`
       status,
       user {
         id,
+        username,
         email
       },
       event {
@@ -63,6 +64,17 @@ const editEventQuery = gql`
         id,
         slug
       }
+    }
+  }
+`;
+
+const editTiersQuery = gql`
+  mutation editTiers($collectiveSlug: String!, $tiers: [TierInputType]!) {
+    editTiers(collectiveSlug: $collectiveSlug, tiers: $tiers) {
+      id,
+      type,
+      name,
+      amount
     }
   }
 `;
@@ -124,6 +136,15 @@ export const addEditEventMutation = graphql(editEventQuery, {
       EventInputType.tiers = event.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
       EventInputType.location = pick(event.location, ['name','address','lat','long']);
       return await mutate({ variables: { event: EventInputType } })
+    }
+  })
+});
+
+export const addEditTiersMutation = graphql(editTiersQuery, {
+  props: ( { mutate }) => ({
+    editTiers: async (collectiveSlug, tiers) => {
+      tiers = tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser', 'interval', 'endsAt']));
+      return await mutate({ variables: { collectiveSlug, tiers } })
     }
   })
 });

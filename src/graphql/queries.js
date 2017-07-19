@@ -8,12 +8,58 @@ export const getLoggedInUserQuery = gql`
       username,
       firstName,
       lastName,
+      twitterHandle,
+      description,
+      organization,
+      website,
+      email,
       avatar,
       collectives {
         id,
         slug,
         name,
         role
+      }
+      paymentMethods {
+        id,
+        uuid,
+        identifier,
+        brand,
+        funding,
+        expMonth,
+        expYear
+      }
+    }
+  }
+`;
+
+export const getUserQuery = gql`
+  query User($username: String!) {
+    User(username: $username) {
+      id,
+      username,
+      firstName,
+      lastName,
+      twitterHandle,
+      description,
+      organization,
+      website,
+      email,
+      avatar,
+      collectives {
+        id,
+        slug,
+        name,
+        role,
+        memberSince,
+        totalDonations,
+        tier {
+          id,
+          name,
+          amount,
+          currency,
+          interval
+        }
       }
     }
   }
@@ -29,6 +75,31 @@ export const getCollectiveQuery = gql`
       backgroundImage,
       logo,
       currency
+    }
+  }
+`;
+
+const getTiersQuery = gql`
+  query Collective($collectiveSlug: String!) {
+    Collective(collectiveSlug: $collectiveSlug) {
+      id,
+      slug,
+      name,
+      logo,
+      backgroundImage,
+      twitterHandle,
+      description,
+      currency,
+      settings,
+      tiers {
+        id,
+        type,
+        name,
+        description,
+        amount,
+        currency,
+        interval
+      }
     }
   }
 `;
@@ -155,6 +226,33 @@ const getAttendeesQuery = gql`
   }
 `;
 
+const getCollectiveTierQuery = gql`
+  query CollectiveTier($collectiveSlug: String!, $tierId: Int!) {
+    Collective(collectiveSlug: $collectiveSlug) {
+      id,
+      slug,
+      name,
+      logo,
+      description,
+      twitterHandle,
+      currency,
+      backgroundImage,
+      settings,
+      logo,
+      stripePublishableKey
+    }
+    Tier(id: $tierId) {
+      id,
+      type,
+      name,
+      description,
+      amount,
+      currency,
+      interval
+    }
+  }
+`;
+
 const getCollectiveTransactionsQuery = gql`
   query CollectiveTransactions($collectiveSlug: String!, $type: String, $limit: Int, $offset: Int) {
     Collective(collectiveSlug: $collectiveSlug) {
@@ -277,9 +375,12 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   })  
 });
 export const addCollectiveData = graphql(getCollectiveQuery);
+export const addCollectiveTierData = graphql(getCollectiveTierQuery);
 export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
+export const addTiersData = graphql(getTiersQuery);
+export const addUserData = graphql(getUserQuery);
 
 export const addGetTransaction = (component) => {
   const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');

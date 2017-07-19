@@ -32,7 +32,7 @@ class Tier extends React.Component {
   }
 
   render() {
-    const { type, name, description, currency } = this.props.tier;
+    const { type, name, description, currency, interval } = this.props.tier;
 
     return (
       <div className={`${this.props.className} tier`} id={this.anchor}>
@@ -43,7 +43,6 @@ class Tier extends React.Component {
             min-height: 12rem;
             position: relative;
             border: 1px solid ${colors.lightgray};
-            margin: 3rem auto;
             padding-bottom: 6rem;
             color: ${colors.black};
           }
@@ -90,7 +89,12 @@ class Tier extends React.Component {
         <div>
           <div className="header">
             <div className="title" >{name}</div>
-            <div className="title" >{formatCurrency(this.state.amount, currency, this.props.intl)}</div>
+            <div className="title" >
+              {formatCurrency(this.state.amount, currency, this.props.intl)}
+              { interval && '/' }
+              {interval && interval === 'month' && <FormattedMessage id='tier.interval.month' values={{interval}} defaultMessage={'month'} />}
+              {interval && interval === 'year' && <FormattedMessage id='tier.interval.year' values={{interval}} defaultMessage={'year'} />}
+            </div>
           </div>
           <p className="description">{description}</p>
           { type === 'TICKET' &&

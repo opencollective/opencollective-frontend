@@ -276,6 +276,11 @@ class Event extends React.Component {
                     </div>
 
                     <div id="tickets">
+                      <style jsx>{`
+                        #tickets :global(.tier) {
+                          margin: 4rem auto;            
+                        }
+                      `}</style>
                       {this.event.tiers.map((tier) =>
                         <Tier
                           key={tier.id}

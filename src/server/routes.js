@@ -1,21 +1,9 @@
 import path from 'path';
-import nextRoutes from 'next-routes';
 import _ from 'lodash';
 import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
-
-const pages = nextRoutes();
-
-pages.add('createEvent', '/:collectiveSlug/events/(new|create)');
-pages.add('events-iframe', '/:collectiveSlug/events/iframe');
-pages.add('event', '/:collectiveSlug/events/:eventSlug');
-pages.add('editEvent', '/:collectiveSlug/events/:eventSlug/edit');
-pages.add('events', '/:collectiveSlug/events');
-pages.add('transactions', '/:collectiveSlug/transactions');
-pages.add('events', '/');
-pages.add('nametags', '/:collectiveSlug/events/:eventSlug/nametags');
-pages.add('button', '/:collectiveSlug/:verb(contribute|donate)/button');
+import pages from './pages';
 
 module.exports = (server, app) => {
 

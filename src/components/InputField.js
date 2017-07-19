@@ -1,26 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
 import _ from 'lodash';
 import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
 import moment from 'moment-timezone';
 import InputTypeLocation from './InputTypeLocation';
+import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
 function FieldGroup({ id, label, help, pre, className, ...props }) {
 
+  const validationState = props.validationState === 'error' ? 'error' : null;
+  delete props.validationState;
+
   if (className == 'horizontal') {
     return (
-      <FormGroup controlId={id}>
-        <Col componentClass={ControlLabel} sm={2}>
+      <FormGroup controlId={id} validationState={validationState}>
+        <Col componentClass={ControlLabel} sm={3}>
           {label}
         </Col>
-        <Col sm={10}>
+        <Col sm={9}>
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...props} />
+          <FormControl.Feedback />
           </InputGroup>
           {help && <HelpBlock>{help}</HelpBlock>}
         </Col>
@@ -28,11 +32,12 @@ function FieldGroup({ id, label, help, pre, className, ...props }) {
     );
   } else {
     return (
-      <FormGroup controlId={id}>
+      <FormGroup controlId={id} validationState={validationState}>
         <ControlLabel>{label}</ControlLabel>
         <InputGroup>
         { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-        <FormControl {...props} />
+        <FormControl {...props} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+        <FormControl.Feedback />
         </InputGroup>
         {help && <HelpBlock>{help}</HelpBlock>}
       </FormGroup>
@@ -52,25 +57,16 @@ class InputField extends React.Component {
     placeholder: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func,
+    required: PropTypes.bool
   }
 
   constructor(props) {
     super(props);
 
-    this.state = { value: props.value };
+    this.state = { value: props.value, validationState: null };
     this.handleChange = this.handleChange.bind(this);
     this.debouncedHandleChange = _.debounce(props.onChange, 500);
 
-    this.messages = defineMessages({
-      'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
-      'type.label': { id: 'event.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'event.name.label', defaultMessage: 'name' },
-      'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
-      'description.label': { id: 'event.description.label', defaultMessage: 'description' },
-      'startsAt.label': { id: 'event.startsAt.label', defaultMessage: 'start date and time' },
-      'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'end date and time' },
-      'location.label': { id: 'event.location.label', defaultMessage: 'location' }
-    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -79,7 +75,24 @@ class InputField extends React.Component {
     }
   }
 
+  validate(value) {
+    if (!value) return !this.props.required;
+    if (this.props.validate) {
+      return this.props.validate(value);
+    }
+    switch (this.props.type) {
+      case 'email':
+        return value.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    }
+    return true;
+  }
+
   handleChange(value) {
+    if (this.validate(value)) {
+      this.setState({ validationState: null });
+    } else {
+      this.setState({ validationState: 'error' });
+    }
     this.setState({value});
     this.debouncedHandleChange(value);
   }
@@ -90,54 +103,71 @@ class InputField extends React.Component {
 
     const context = field.context || {};
 
-    const { intl } = this.props;
-
     switch (this.props.type) {
-      case 'textarea':
+      case 'creditcard':
         this.input =  (<FormGroup controlId={field.name}>
-                        <ControlLabel>{capitalize(field.name)}</ControlLabel>
-                        <FormControl
+                        {field.className === 'horizontal' &&
+                          <div>
+                            <Col componentClass={ControlLabel} sm={3}>
+                              {capitalize(field.label)}
+                            </Col>
+                            <Col sm={9}>
+                              <InputTypeCreditCard options={field.options} onChange={this.handleChange} />                   
+                            </Col>
+                          </div>
+                        }
+                        {field.className !== 'horizontal' &&
+                          <div>
+                            <ControlLabel>{capitalize(field.label)}</ControlLabel>
+                            <InputTypeCreditCard onChange={this.handleChange} />                   
+                          </div>
+                        }
+                      </FormGroup>)
+        break;
+      case 'textarea':
+        this.input =  (<FieldGroup
+                          label={capitalize(field.label)}
                           componentClass="textarea"
+                          className={field.className}
                           placeholder={this.props.placeholder}
                           name={field.name}
-                          value={this.state.value || this.props.placeholder}
+                          value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
                         />
-                      </FormGroup>)
+                      )
         break;
       case 'datetime':
         this.input = (
         <FormGroup>
-          {this.messages[`${field.name}.label`] && <ControlLabel>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</ControlLabel>}
+          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
           <DateTime
             name={field.name}
             value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
             isValidDate={field.validate}
             onChange={date => this.handleChange(date.toISOString())} 
             />
-          {this.messages[`${field.name}.description`] && <HelpBlock>{intl.formatMessage(this.messages[`${field.name}.description`])}</HelpBlock>}
+          {field.description && <HelpBlock>{field.description}</HelpBlock>}
         </FormGroup>
         )
         break;
       case 'location':
         this.input = (
         <FormGroup>
-          {this.messages[`${field.name}.label`] && <ControlLabel>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</ControlLabel>}
+          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
           <InputTypeLocation value={this.state.value} onChange={event => this.handleChange(event)} />
-          {this.messages[`${field.name}.description`] && <HelpBlock>{intl.formatMessage(this.messages[`${field.name}.description`])}</HelpBlock>}
+          {field.description && <HelpBlock>{field.description}</HelpBlock>}
         </FormGroup>
         )
         break;
       case 'currency':
         this.input = (
         <FieldGroup
-          id="formControlsText"
           onChange={event => this.handleChange(event.target.value*100)}
           type={field.type}
           pre={field.pre}
           name={field.name}
-          label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
-          help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
+          label={field.label && `${capitalize(field.label)}`}
+          help={field.description}
           placeholder={field.placeholder}
           className={field.className}
           value={(this.state.value||0)/100}
@@ -151,11 +181,12 @@ class InputField extends React.Component {
             componentClass="select"
             type={field.type}
             name={field.name}
-            label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
-            help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
+            label={field.label && `${capitalize(field.label)}`}
+            help={field.description}
             placeholder={field.placeholder}
             className={field.className}
-            defaultValue={field.defaultValue}
+            autoFocus={field.focus}
+            defaultValue={this.state.value || field.defaultValue}
             onChange={event => this.handleChange(event.target.value)}
             >
             {field.options.map(option => {
@@ -173,11 +204,13 @@ class InputField extends React.Component {
           type={field.type}
           pre={field.pre}
           name={field.name}
-          label={this.messages[`${field.name}.label`] && `${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}
-          help={this.messages[`${field.name}.description`] && intl.formatMessage(this.messages[`${field.name}.description`])}
+          label={field.label && `${capitalize(field.label)}`}
+          help={field.description}
+          autoFocus={field.focus}
           placeholder={field.placeholder}
           className={field.className}
-          value={this.state.value}
+          value={this.state.value || field.defaultValue}
+          validationState={this.state.validationState}
         />)
 
         break;
@@ -197,4 +230,4 @@ class InputField extends React.Component {
   }
 }
 
-export default injectIntl(InputField);
+export default InputField;

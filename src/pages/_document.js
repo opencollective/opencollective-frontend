@@ -23,17 +23,43 @@ export default class IntlDocument extends Document {
       google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
     };
 
-    const page = this.props.__NEXT_DATA__.pathname.substr(1);
-    let requiredScripts = ['intl'];
-    if (['createEvent', 'event', 'editEvent'].indexOf(page) !== -1) {
-      requiredScripts = Object.keys(scriptsUrls);
-    }
+    // const page = this.props.__NEXT_DATA__.pathname.substr(1);
+    const requiredScripts = Object.keys(scriptsUrls);
 
     const scripts = [];
     requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
 
     return (
       <html>
+        <style jsx global>{`
+          @font-face {
+            font-family: 'montserratlight';
+            src: url('/static/fonts/montserrat/montserrat-light-webfont.eot');
+            src: url('/static/fonts/montserrat/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+              url('/static/fonts/montserrat/montserrat-light-webfont.woff2') format('woff2'),
+              url('/static/fonts/montserrat/montserrat-light-webfont.woff') format('woff'),
+              url('/static/fonts/montserrat/montserrat-light-webfont.ttf') format('truetype'),
+              url('/static/fonts/montserrat/montserrat-light-webfont.svg#montserratlight') format('svg');
+            font-weight: normal;
+            font-style: normal;
+          }
+          @font-face {
+            font-family: 'lato';
+            src: url('/static/fonts/montserrat/lato-regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+          }
+          html {
+            width: 100%;
+            height: 100%;
+            font-size: 62.5%;          
+          }
+          body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+          }
+        `}</style>
         <Head />
         <body>
           <Main />

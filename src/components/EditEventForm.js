@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
 import EditTiers from '../components/EditTiers';
+import { defineMessages, injectIntl } from 'react-intl';
 
 class EditEventForm extends React.Component {
 
@@ -21,6 +22,18 @@ class EditEventForm extends React.Component {
     const event = props.event || {};
 
     this.state = { event, tiers: event.tiers || [{}] };
+
+    this.messages = defineMessages({
+      'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
+      'type.label': { id: 'event.type.label', defaultMessage: 'type' },
+      'name.label': { id: 'event.name.label', defaultMessage: 'name' },
+      'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
+      'description.label': { id: 'event.description.label', defaultMessage: 'description' },
+      'startsAt.label': { id: 'event.startsAt.label', defaultMessage: 'start date and time' },
+      'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'end date and time' },
+      'location.label': { id: 'event.location.label', defaultMessage: 'location' }
+    });
+
   }
 
   componentWillReceiveProps(nextProps) {
@@ -56,7 +69,7 @@ class EditEventForm extends React.Component {
 
   render() {
 
-    const { event, loading } = this.props;
+    const { event, loading, intl } = this.props;
 
     if (!event.collective) return (<div />);
 
@@ -69,7 +82,6 @@ class EditEventForm extends React.Component {
     this.fields = [
       {
         name: 'slug',
-        label: 'URL',
         pre: `https://opencollective.com/${event.collective.slug}/events/`,
         placeholder: ''
       },
@@ -110,6 +122,16 @@ class EditEventForm extends React.Component {
         type: 'location'
       }
     ];
+
+    this.fields = this.fields.map(field => {
+      if (this.messages[`${field.name}.label`]) {
+        field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
+      }
+      if (this.messages[`${field.name}.description`]) {
+        field.description = intl.formatMessage(this.messages[`${field.name}.description`]);
+      }
+      return field;
+    });
 
     return (
       <div className="EditEventForm">
@@ -155,6 +177,8 @@ class EditEventForm extends React.Component {
               validate={field.validate}
               ref={field.name}
               name={field.name}
+              label={field.label}
+              description={field.description}
               placeholder={field.placeholder}
               type={field.type}
               pre={field.pre}
@@ -162,7 +186,7 @@ class EditEventForm extends React.Component {
               onChange={(value) => this.handleChange(field.name, value)}
               />)}
           </div>
-          <EditTiers tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
+          <EditTiers title="Tickets" tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
         </div>
         <div className="actions">
           <Button type="submit" className="green" ref="submit" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
@@ -173,4 +197,4 @@ class EditEventForm extends React.Component {
 
 }
 
-export default EditEventForm;
+export default injectIntl(EditEventForm);

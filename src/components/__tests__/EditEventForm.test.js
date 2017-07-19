@@ -30,7 +30,8 @@ describe("EditEventForm component", () => {
     component.find('a.removeTier').first().simulate('click');
     component.find('a.removeTier').first().simulate('click');
     component.find('.actions Button').simulate('click');
-    expect(component.find('label').first().text()).toEqual('Url:');
+    console.log("labels", component.find('label').map(node => node.text()));
+    expect(component.find('label').first().text()).toEqual('Url');
     expect(component.find('input[name="slug"]').exists()).toBeTrue;
     expect(component.find('input[name="slug"]').prop("value")).toEqual(event.slug);
   });

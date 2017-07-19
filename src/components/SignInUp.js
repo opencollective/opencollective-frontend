@@ -32,7 +32,7 @@ class SignInUp extends React.Component {
       'firstName.label': { id: 'signinup.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'signinup.lastName.label', defaultMessage: 'last name' },
       'description.label': { id: 'signinup.description.label', defaultMessage: 'one liner' },
-      'description.description': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
+      'description.help': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'twitterHandle.label': { id: 'signinup.twitterHandle.label', defaultMessage: 'twitter' }
     });
 
@@ -71,7 +71,7 @@ class SignInUp extends React.Component {
       <div className="field" key={field.name} >
         {this.props.showLabels && this.messages[`${field.name}.label`] && <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>}
         <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
-        {this.messages[`${field.name}.description`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.description`])}</span>}
+        {this.messages[`${field.name}.help`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.help`])}</span>}
       </div>
     );
   }
