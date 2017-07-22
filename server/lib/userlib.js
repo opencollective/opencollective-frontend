@@ -13,7 +13,7 @@ export default {
 
   fetchAvatar(email) {
     return this.getUserData(email)
-      .then(userData => userData && userData.image ? userData.image : null)
+      .then(userData => userData && userData.avatar ? userData.avatar : null)
   },
 
   getUserData(email) {

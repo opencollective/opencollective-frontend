@@ -72,7 +72,7 @@ describe('lib.payments.createPayment.test.js', () => {
             amount: AMOUNT, 
             currency: CURRENCY,
           }})
-        .catch(err => expect(err.message).to.equal('Stripe Token missing.'));
+        .catch(err => expect(err.message).to.equal('paymentMethod.token missing in payment object.'));
       });
 
       it('interval is present and it is not month or year', () => {
@@ -94,7 +94,7 @@ describe('lib.payments.createPayment.test.js', () => {
             currency: CURRENCY,
             paymentMethod: { token: STRIPE_TOKEN },
           }})
-        .catch(err => expect(err.message).to.equal('Payment amount missing'));
+        .catch(err => expect(err.message).to.equal('payment.amount missing'));
       });
 
       it('payment amount is less than 50', () => {
@@ -105,7 +105,7 @@ describe('lib.payments.createPayment.test.js', () => {
             paymentMethod: { token: STRIPE_TOKEN },
             amount: 35
           }})
-        .catch(err => expect(err.message).to.equal('Payment amount must be at least $0.50'));
+        .catch(err => expect(err.message).to.equal('payment.amount must be at least $0.50'));
       });
     });
 

@@ -636,9 +636,10 @@ describe('Mutation Tests', () => {
           const createPaymentArgument = createPaymentStub.firstCall.args[0];
           expect(createPaymentStub.callCount).to.equal(1);
           createPaymentStub.reset();
-          expect(createPaymentArgument.user.id).to.equal(3);
-          expect(createPaymentArgument.collective.slug).to.equal('jan-meetup');
           expect(createPaymentArgument.order.id).to.equal(1);
+          expect(createPaymentArgument.order.TierId).to.equal(2);
+          expect(createPaymentArgument.order.CollectiveId).to.equal(2);
+          expect(createPaymentArgument.order.UserId).to.equal(3);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
           expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
@@ -707,9 +708,10 @@ describe('Mutation Tests', () => {
           });
 
           expect(createPaymentStub.callCount).to.equal(1);
-          expect(createPaymentArgument.user.id).to.equal(4);
-          expect(createPaymentArgument.collective.slug).to.equal('jan-meetup');
           expect(createPaymentArgument.order.id).to.equal(1);
+          expect(createPaymentArgument.order.TierId).to.equal(2);
+          expect(createPaymentArgument.order.CollectiveId).to.equal(2);
+          expect(createPaymentArgument.order.UserId).to.equal(4);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
           expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');

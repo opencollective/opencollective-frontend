@@ -122,8 +122,8 @@ export const getNotificationType = (email) => {
   const tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
   const collectiveSlug = tokens[2];
   let mailinglist = tokens[1];
-  if (['info','hello','members','organizers'].indexOf(mailinglist) !== -1) {
-    mailinglist = 'members';
+  if (['info','hello','members','organizers', 'admins'].indexOf(mailinglist) !== -1) {
+    mailinglist = 'admins';
   }
   const type = `mailinglist.${mailinglist}`;
   return { collectiveSlug, mailinglist, type };
@@ -148,7 +148,7 @@ export const webhook = (req, res, next) => {
 
   // If an email is sent to [info|hello|members|organizers]@:collectiveSlug.opencollective.com,
   // we simply forward it to organizers who subscribed to that mailinglist (no approval process)
-  if (mailinglist === 'members') {
+  if (mailinglist === 'admins') {
     return sendEmailToList(recipient, {
       subject: email.subject,
       body,

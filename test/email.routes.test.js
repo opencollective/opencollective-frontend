@@ -110,7 +110,7 @@ describe("email.routes.test", () => {
 
     return request(app)
       .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBodyPayload, {recipient: 'info@testcollective.opencollective.com'}))
+      .send(Object.assign({}, webhookBodyPayload, { recipient: 'info@testcollective.opencollective.com' }))
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         expect(spy.args[0][0]).to.equal('info@testcollective.opencollective.com');

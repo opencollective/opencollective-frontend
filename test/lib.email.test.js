@@ -55,7 +55,7 @@ describe('lib/email', () => {
     const template = 'thankyou';
     const collective = { name: "La Primaire", slug: "laprimaire" };
     const data = {
-      donation: { amount: 5000, currency: 'EUR'},
+      order: { amount: 5000, currency: 'EUR'},
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
@@ -83,7 +83,7 @@ describe('lib/email', () => {
      };
 
     const data = {
-      donation: paymentData,
+      order: paymentData,
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
@@ -110,7 +110,7 @@ describe('lib/email', () => {
      };
 
     const data = {
-      donation: paymentData,
+      order: paymentData,
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',

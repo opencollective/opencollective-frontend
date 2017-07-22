@@ -121,7 +121,7 @@ describe('expenses.routes.test.js', () => {
             expect(res.body.UserId).not.to.be.equal(host.id);
             expect(res.body.CollectiveId).to.be.equal(collective.id);
             expect(res.body.description).to.be.equal(expense.description);
-            expect(res.body.notes).to.be.equal(expense.notes);
+            expect(res.body.privateNotes).to.be.equal(expense.privateNotes);
             expect(res.body.category).to.be.equal(expense.category);
             expect(res.body.amount).to.be.equal(expense.amount);
             expect(res.body.currency).to.be.equal(expense.currency);
@@ -183,7 +183,7 @@ describe('expenses.routes.test.js', () => {
 
           it('THEN returns expense data', () => {
             expect(actualExpense.description).to.be.equal(expense.description);
-            expect(actualExpense.notes).to.be.equal(expense.notes);
+            expect(actualExpense.privateNotes).to.be.equal(expense.privateNotes);
             expect(actualExpense.category).to.be.equal(expense.category);
             expect(actualExpense.amount).to.be.equal(expense.amount);
             expect(actualExpense.currency).to.be.equal(expense.currency);

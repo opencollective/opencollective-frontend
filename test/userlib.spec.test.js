@@ -1,6 +1,10 @@
 
 import {expect} from 'chai';
 import * as utils from '../test/utils';
+
+import config from 'config';
+config.clearbit = '***';
+
 import userlib from '../server/lib/userlib';
 import sinon from 'sinon';
 import Bluebird from 'bluebird';
@@ -43,7 +47,6 @@ describe("userlib", () => {
 
   it("can't fetch the image of an unknown email", () =>
     userlib.fetchAvatar(userData1.email).then(image => {
-      console.log("memory", userlib.memory);
       expect(userlib.memory).to.have.property(userData1.email);
       expect(stub.callCount).to.equal(1);
       expect(image).to.equal(null);

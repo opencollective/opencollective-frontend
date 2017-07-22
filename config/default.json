@@ -29,9 +29,9 @@
   },
   "aws": {
     "s3": {
-      "key": "",
-      "secret": "",
-      "bucket": ""
+      "bucket": "opencollective-test",
+      "secret": "unknown",
+      "key": "unknown"
     }
   },
   "paypal": {

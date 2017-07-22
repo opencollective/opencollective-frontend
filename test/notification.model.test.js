@@ -123,7 +123,14 @@ describe("notification.model.test.js", () => {
       .tap(res => {
         const notifications = res.rows;
         const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([ 'collective.expense.created', 'collective.expense.created', 'collective.monthlyreport', 'collective.transaction.created', 'mailinglist.host', 'mailinglist.admins' ]);
+        expect(types).to.deep.equal([
+          'collective.expense.created',
+          'collective.expense.created',
+          'collective.monthlyreport',
+          'collective.transaction.created',
+          'mailinglist.admins',
+          'mailinglist.host'
+        ]);
       })
       .tap(res => expect(res.count).to.equal(6)));
 
