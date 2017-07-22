@@ -3,7 +3,6 @@ import config from 'config';
 import crypto from 'crypto';
 import base64url from 'base64url';
 import Promise from 'bluebird';
-import _ from 'lodash';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
 import fs from 'fs';

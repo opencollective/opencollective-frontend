@@ -1,6 +1,5 @@
 import {
   GraphQLBoolean,
-  GraphQLEnumType,
   GraphQLFloat,
   GraphQLInt,
   GraphQLList,
@@ -13,6 +12,7 @@ import GraphQLJSON from 'graphql-type-json';
 
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
+
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
@@ -147,6 +147,12 @@ export const CollectiveType = new GraphQLObjectType({
         type: CollectiveType,
         resolve(collective) {
           return models.Collective.findById(collective.ParentCollectiveId);
+        }
+      },
+      type: {
+        type: GraphQLString,
+        resolve(collective) {
+          return collective.type;
         }
       },
       name: {
