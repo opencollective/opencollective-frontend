@@ -7,16 +7,16 @@ describe('currencylib', () => {
   const endDate = new Date("2017-03-01");
 
   it('converts EUR to USD', () => currencylib.convertToCurrency(1, 'EUR', 'USD', startDate).then(amount => {
-    expect(amount).to.equal(1.0755);
+    expect(amount).to.equal(1.079);
   }));
 
   it('converts EUR to USD for another date', () => currencylib.convertToCurrency(1, 'EUR', 'USD', endDate).then(amount => {
-    expect(amount).to.equal(1.0597);
+    expect(amount).to.equal(1.0533);
   }));
 
 
   it('converts INR to USD', () => currencylib.convertToCurrency(1, 'INR', 'USD', endDate).then(amount => {
-    expect(amount).to.equal(0.015004);
+    expect(amount).to.equal(0.014962);
   }));
 
 });
