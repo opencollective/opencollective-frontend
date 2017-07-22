@@ -11,25 +11,14 @@ import {
 
 import GraphQLJSON from 'graphql-type-json';
 
-import status from '../constants/response_status';
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
-dataloaderSequelize(models.Response);
+dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
-dataloaderSequelize(models.Donation);
 
-// This breaks the tests for some reason (mocha test/Role.routes.test.js -g "successfully add a user to a collective with a role")
+// This breaks the tests for some reason (mocha test/Member.routes.test.js -g "successfully add a user to a collective with a role")
 // dataloaderSequelize(models.User);
-
-export const ResponseStatusType = new GraphQLEnumType({
-  name: 'Responses',
-  values: {
-    PENDING: { value: status.PENDING },
-    INTERESTED: { value: status.INTERESTED },
-    YES: { value: status.YES },
-  }
-});
 
 export const UserType = new GraphQLObjectType({
   name: 'User',
@@ -263,16 +252,12 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.getTiers({ order: [['name', 'ASC']] });
         }
       },
-      responses: {
-        type: new GraphQLList(ResponseType),
+      orders: {
+        type: new GraphQLList(OrderType),
         resolve(collective) {
-          return collective.getResponses({
-            where: { 
-              confirmedAt: { $ne: null } 
-            },
-            order: [
-              ['createdAt', 'DESC']
-            ]
+          return collective.getOrders({
+            where: { processedAt: { $ne: null } },
+            order: [ ['createdAt', 'DESC'] ]
           });
         }
       },
@@ -454,77 +439,106 @@ export const TierType = new GraphQLObjectType({
           return tier.getCollective();
         }
       },
-      responses: {
-        type: new GraphQLList(ResponseType),
+      orders: {
+        type: new GraphQLList(OrderType),
         resolve(tier) {
-          return tier.getResponses({
-            where: { 
-              confirmedAt: { $ne: null } 
-            }
-          });
+          return tier.getOrders({ where: { processedAt: { $ne: null } } });
         }
       }
     }
   }
 });
 
-export const ResponseType = new GraphQLObjectType({
-  name: 'Response',
-  description: 'This is a Response',
+export const MemberType = new GraphQLObjectType({
+  name: 'Member',
+  description: 'This is a Member',
   fields: () => {
     return {
        id: {
         type: GraphQLInt,
-        resolve(response) {
-          return response.id;
-        }
-      },
-      quantity: {
-        type: GraphQLInt,
-        resolve(response) {
-          return response.quantity;
-        }
-      },
-      user: {
-        type: UserType,
-        resolve(response, args, req) {
-          return response.getUserForViewer(req.remoteUser);
-        }
-      },
-      description: {
-        type: GraphQLString,
-        resolve(response) {
-          return response.description;
+        resolve(order) {
+          return order.id;
         }
       },
       collective: {
         type: CollectiveType,
-        resolve(response) {
-          return response.getCollective();
+        resolve(member) {
+          return member.getCollective();
+        }
+      },
+      user: {
+        type: UserType,
+        resolve(member, args, req) {
+          return member.getUserForViewer(req.remoteUser);
+        }
+      },
+      role: {
+        type: GraphQLString,
+        resolve(member) {
+          return member.role;
         }
       },
       tier: {
         type: TierType,
-        resolve(response) {
-          return response.getTier();
+        resolve(member) {
+          return member.getTier();
+        }
+      }
+    }
+  }
+});
+
+export const OrderType = new GraphQLObjectType({
+  name: 'OrderType',
+  description: 'This is an order',
+  fields: () => {
+    return {
+       id: {
+        type: GraphQLInt,
+        resolve(order) {
+          return order.id;
+        }
+      },
+      quantity: {
+        type: GraphQLInt,
+        resolve(order) {
+          return order.quantity;
+        }
+      },
+      user: {
+        type: UserType,
+        resolve(order, args, req) {
+          return order.getUserForViewer(req.remoteUser);
+        }
+      },
+      description: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.description;
+        }
+      },
+      collective: {
+        type: CollectiveType,
+        resolve(order) {
+          return order.getCollective();
+        }
+      },
+      tier: {
+        type: TierType,
+        resolve(order) {
+          return order.getTier();
         }
       },
       createdAt: {
         type: GraphQLString,
-        resolve(response) {
-          return response.createdAt;
+        resolve(order) {
+          return order.createdAt;
         }
       },
-      confirmedAt: {
+      processedAt: {
         type: GraphQLString,
-        resolve(response) {
-          return response.confirmedAt;
-        }
-      },
-      status: {
-        type: ResponseStatusType,
-        resolve(response) {
-          return response.status;
+        resolve(order) {
+          return order.processedAt;
         }
       }
     }
@@ -645,7 +659,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
   resolveType: (transaction) => {
     switch (transaction.type) {
       case 'DONATION':
-        return TransactionDonationType;
+        return TransactionOrderType;
       case 'EXPENSE':
         return TransactionExpenseType;
       default:
@@ -666,8 +680,8 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
     paymentMethod: { type: PaymentMethodType },
     collective: { type: CollectiveType },
     type: { type: GraphQLString },
-    title: { type: GraphQLString },
-    notes: { type: GraphQLString },
+    description: { type: GraphQLString },
+    privateNotes: { type: GraphQLString },
     createdAt: { type: GraphQLString }
   }
 });
@@ -758,7 +772,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
     description: {
       type: GraphQLString,
       resolve(transaction) {
-        return transaction.description;
+        return transaction.description || transaction.getExpense().then(expense => expense && expense.description);
       }
     },
     collective: {
@@ -773,16 +787,10 @@ export const TransactionExpenseType = new GraphQLObjectType({
         return transaction.createdAt;
       }
     },
-    title: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.getExpense().then(expense => expense && expense.title);
-      }
-    },
-    notes: {
+    privateNotes: {
       type: GraphQLString,
       resolve(transaction, args, req) {
-        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.notes);
+        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateNotes);
       }
     },
     paymentMethod: {
@@ -806,9 +814,9 @@ export const TransactionExpenseType = new GraphQLObjectType({
   }
 });
 
-export const TransactionDonationType = new GraphQLObjectType({
-  name: 'Donation',
-  description: 'Donation model',
+export const TransactionOrderType = new GraphQLObjectType({
+  name: 'Order',
+  description: 'Order model',
   interfaces: [TransactionInterfaceType],
   fields: () => {
     return {
@@ -893,7 +901,7 @@ export const TransactionDonationType = new GraphQLObjectType({
       description: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.description;
+          return transaction.description || transaction.getOrder().then(order => order && order.description);
         }
       },
       collective: {
@@ -908,16 +916,10 @@ export const TransactionDonationType = new GraphQLObjectType({
           return transaction.createdAt;
         }
       },
-      title: {
+      privateNotes: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.getDonation().then(donation => donation && donation.title);
-        }
-      },
-      notes: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.getDonation().then(donation => donation && donation.notes);
+          return transaction.getOrder().then(order => order && order.privateNotes);
         }
       },
       paymentMethod: {
@@ -926,16 +928,16 @@ export const TransactionDonationType = new GraphQLObjectType({
           return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
         }
       },
-      response: {
-        type: ResponseType,
+      order: {
+        type: OrderType,
         resolve(transaction) {
-          return transaction.getDonation().then(donation => donation && donation.getResponse());
+          return transaction.getOrder();
         }
       },
       subscription: {
         type: SubscriptionType,
         resolve(transaction) {
-          return transaction.getDonation().then(donation => donation && donation.getSubscription());
+          return transaction.getOrder().then(order => order && order.getSubscription());
         }
       }
     }

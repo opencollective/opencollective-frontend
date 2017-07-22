@@ -9,7 +9,7 @@ export default {
   COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
   COLLECTIVE_COMMENT_DELETED: 'collective.comment.deleted',
   COLLECTIVE_COMMENT_UPDATED: 'collective.comment.updated',
-  COLLECTIVE_DONATION_CREATED: 'collective.donation.created',
+  COLLECTIVE_DONATION_CREATED: 'collective.order.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
   COLLECTIVE_EXPENSE_UPDATED: 'collective.expense.updated',

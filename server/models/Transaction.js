@@ -16,9 +16,11 @@ export default (Sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       unique: true
     },
-    type: DataTypes.STRING, // Expense or Donation
+
+    type: DataTypes.STRING, // EXPENSE or DONATION
     description: DataTypes.STRING,
     amount: DataTypes.INTEGER,
+
     currency: {
       type: DataTypes.STRING,
       defaultValue: 'USD',
@@ -62,6 +64,28 @@ export default (Sequelize, DataTypes) => {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
       allowNull: false
+    },
+
+    OrderId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Orders',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true
+    },
+
+    ExpenseId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Expenses',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: true
     },
 
     // stores the currency that the transaction happened in (currency of the host)
@@ -169,7 +193,7 @@ export default (Sequelize, DataTypes) => {
           case 'EXPENSE':
             return this.getExpense();
           case 'DONATION':
-            return this.getDonation();
+            return this.getOrder();
         }        
       }
     },

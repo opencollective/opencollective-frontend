@@ -4,7 +4,9 @@ const donationType = type.DONATION;
 
 export default function(Sequelize, DataTypes) {
 
-  const Donation = Sequelize.define('Donation', {
+  const { models } = Sequelize;
+
+  const Order = Sequelize.define('Order', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -31,6 +33,21 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    TierId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Tiers',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+
+    quantity: {
+      type: DataTypes.INTEGER,
+      min: 0
+    },
+
     // 3 letter international code (in uppercase) of the currency (e.g. USD, EUR, MXN, GBP, ...)
     currency: {
       type: DataTypes.STRING,
@@ -43,13 +60,12 @@ export default function(Sequelize, DataTypes) {
     },
 
     amount: {
-      type: DataTypes.INTEGER, // In cents
-      min: 0
+      type: DataTypes.INTEGER // In cents
     },
 
-    title: DataTypes.STRING,
+    description: DataTypes.STRING,
 
-    notes: DataTypes.TEXT,
+    privateNotes: DataTypes.STRING,
 
     SubscriptionId: {
       type: DataTypes.INTEGER,
@@ -71,21 +87,6 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    ResponseId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Responses',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    },
-
-    isProcessed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-
     processedAt: DataTypes.DATE,
 
     createdAt: {
@@ -103,17 +104,32 @@ export default function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
-
+    instanceMethods: {
+      getUserForViewer(viewer, userid = this.UserId) {
+        const promises = [models.User.findOne({where: { id: userid }})];
+        if (viewer) {
+          promises.push(viewer.canEditCollective(this.CollectiveId));
+        }
+        return Promise.all(promises)
+        .then(results => {
+          const user = results[0];
+          if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
+          const canEditCollective = results[1];
+          return canEditCollective ? user.info : user.public;
+        })
+      }
+    },
     getterMethods: {
       info() {
         return {
           type: donationType,
           id: this.id,
           UserId: this.UserId,
+          TierId: this.TierId,
           CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
-          title: this.title,
+          description: this.description,
           SubscriptionId: this.SubscriptionId,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
@@ -122,5 +138,5 @@ export default function(Sequelize, DataTypes) {
     }
   });
 
-  return Donation;
+  return Order;
 }

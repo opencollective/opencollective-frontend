@@ -93,10 +93,6 @@ describe('Collective model', () => {
     .then(() => collective.addUserWithRole({ id: 1 }, 'BACKER'))
     .then(() => Transaction.createMany(transactions, { CollectiveId: collective.id, HostId: 1 })));
 
-  it('returns a default image if no image', () => {
-    expect(collective.image).to.contain('/public/images/1px.png');
-  });
-
   it('computes the balance ', () =>
     collective.getBalance().then(balance => {
       let sum = 0;
@@ -191,13 +187,13 @@ describe('Collective model', () => {
     before(() => models.Tier.create({...utils.data('tier1'), CollectiveId: 1})); // adding backer tier
     before(() => models.Tier.create({...utils.data('tier2'), CollectiveId: 1})); // adding sponsor tier
 
-    before(() => models.Response.create({
+    before(() => models.Order.create({
       UserId: 1,
       CollectiveId: 1,
       TierId: 1
     }));
 
-    before(() => models.Response.create({
+    before(() => models.Order.create({
       UserId: 2,
       CollectiveId: 1,
       TierId: 2

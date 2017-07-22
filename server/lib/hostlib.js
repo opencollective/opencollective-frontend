@@ -6,7 +6,7 @@ import Promise from 'bluebird';
 
 export function getHostedCollectives(hostid, endDate = new Date) {
   return sequelize.query(`
-    SELECT g.* FROM "Collectives" g LEFT JOIN "Roles" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
+    SELECT g.* FROM "Collectives" g LEFT JOIN "Members" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
   `, {
     replacements: { hostid, endDate },
     model: models.Collective,

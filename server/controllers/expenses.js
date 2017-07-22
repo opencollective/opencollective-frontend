@@ -111,7 +111,7 @@ export const update = (req, res, next) => {
   const newExpense = req.required.expense;
   const user = req.remoteUser || req.user;
   const modifiableProps = {
-    approved: ['payoutMethod', 'category', 'title', 'incurredAt', 'notes'],
+    approved: ['payoutMethod', 'category', 'description', 'incurredAt', 'privateNotes'],
     pending: ['amount', 'currency', 'vat', 'attachment']
   }
 

@@ -1,0 +1,6 @@
+export default {
+  COLLECTIVE: 'COLLECTIVE',
+  EVENT: 'EVENT',
+  USER: 'USER',
+  ORGANIZATION: 'ORGANIZATION'
+};

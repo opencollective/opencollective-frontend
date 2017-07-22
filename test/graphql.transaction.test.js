@@ -11,10 +11,10 @@ describe('graphql.transaction.test.js', () => {
   /* SETUP
     collective1: 2 events
       event1: 2 tiers
-        tier1: 2 responses
-        tier2: 1 response
+        tier1: 2 orders
+        tier2: 1 order
       event2: 1 tier
-        tier3: no response
+        tier3: no order
     collective2: 1 event
       event3: no tiers // event3 not declared above due to linting
     collective3: no events
@@ -46,7 +46,7 @@ describe('graphql.transaction.test.js', () => {
               ... on Expense {
                 attachment
               }
-              ... on Donation {
+              ... on Order {
                 paymentMethod {
                   id,
                   identifier
@@ -67,14 +67,14 @@ describe('graphql.transaction.test.js', () => {
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
       const expense = transactions.find(t => t.type === 'EXPENSE');
-      const donation = transactions.find(t => t.type === 'DONATION');
+      const order = transactions.find(t => t.type === 'DONATION');
       expect(expense).to.have.property('attachment');
       expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
-      expect(donation).to.have.property('paymentMethod');
-      expect(donation.user.id).to.equal(4720); // Lindsey user
-      expect(donation.host.id).to.equal(3); // wwcode host
-      expect(donation.user.email).to.equal(null); // can't see email if not logged in
-      expect(donation.host.email).to.equal(null);
+      expect(order).to.have.property('paymentMethod');
+      expect(order.user.id).to.equal(4720); // Lindsey user
+      expect(order.host.id).to.equal(3); // wwcode host
+      expect(order.user.email).to.equal(null); // can't see email if not logged in
+      expect(order.host.email).to.equal(null);
     });
   });
 
@@ -99,7 +99,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Expense {
               attachment
             }
-            ... on Donation {
+            ... on Order {
               paymentMethod {
                 id,
                 identifier
@@ -162,7 +162,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Expense {
               attachment
             }
-            ... on Donation {
+            ... on Order {
               paymentMethod {
                 id,
                 identifier

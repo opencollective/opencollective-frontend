@@ -5,6 +5,7 @@ import models from '../models';
 import { capitalize } from '../lib/utils';
 import emailLib from './email';
 import roles from '../constants/roles';
+import types from '../constants/collectives';
 import activities from '../constants/activities';
 import * as transactions from '../constants/transactions';
 import * as stripe from '../gateways/stripe';
@@ -14,9 +15,7 @@ import * as stripe from '../gateways/stripe';
  */
 const createPayment = (payload) => {
   const {
-    user,
-    collective,
-    response,
+    order,
     payment
   } = payload;
 
@@ -24,37 +23,40 @@ const createPayment = (payload) => {
     paymentMethod,
     amount,
     currency,
-    description,
     interval
   } = payment;
 
   const isSubscription = _.includes(['month', 'year'], interval);
-  let paymentMethodInstance, title;
+  let paymentMethodInstance, description = payment.description;
 
   if (interval && !isSubscription) {
     return Promise.reject(new Error('Interval should be month or year.'));
   }
 
   if (!paymentMethod || !paymentMethod.token) {
-    return Promise.reject(new Error('Stripe Token missing.'));
+    return Promise.reject(new Error('paymentMethod.token missing in payment object.'));
   }
 
   if (!amount) {
-    return Promise.reject(new Error('Payment amount missing'));
+    return Promise.reject(new Error('payment.amount missing'));
   }
 
   if (amount < 50) {
-    return Promise.reject(new Error('Payment amount must be at least $0.50'));
+    return Promise.reject(new Error('payment.amount must be at least $0.50'));
   }
 
   const getOrCreatePaymentMethod = (paymentMethod) => {
     if (paymentMethod instanceof models.PaymentMethod.Instance) return Promise.resolve(paymentMethod);
-    else return models.PaymentMethod.create({...paymentMethod, service: 'stripe', UserId: user.id});
+    else return models.PaymentMethod.create({...paymentMethod, service: 'stripe', UserId: order.UserId});
   }
 
+  let collective;
   // fetch Stripe Account and get or create Payment Method
   return Promise.props({
-      stripeAccount: collective.getStripeAccount(),
+      stripeAccount: order.getCollective().then(c => {
+        collective = c;
+        return c.getStripeAccount()
+      }),
       paymentMethod: getOrCreatePaymentMethod(paymentMethod)
     })
     .then(results => {
@@ -70,32 +72,27 @@ const createPayment = (payload) => {
     })
 
     // create a new subscription
-    // (this needs to happen first, because of hook on Donation model)
+    // (this needs to happen first, because of hook on Order model)
     .then(() => {
       if (isSubscription) {
-        title = description || capitalize(`${interval}ly donation to ${collective.name}`);
+        description = description || capitalize(`${interval}ly donation to ${collective.name}`);
         return models.Subscription.create({
           amount,
           currency,
           interval
         })
       } else {
-        title = description || `Donation to ${collective.name}`
+        description = description || `Donation to ${collective.name}`
         return Promise.resolve();
       }
     })
-    // create a new donation
-    .then(subscription => models.Donation.create({
-      UserId: user.id,
-      CollectiveId: collective.id,
-      currency: currency,
-      amount,
-      title,
-      PaymentMethodId: paymentMethodInstance.id,
-      SubscriptionId: subscription && subscription.id,
-      ResponseId: response && response.id
-    }))
-    .then(donation => paymentsLib.processPayment(donation));
+    .then(subscription => {
+      order.PaymentMethodId = paymentMethodInstance.id;
+      order.SubscriptionId = subscription && subscription.id;
+      order.description = order.description || description;
+      return order.save();
+    })
+    .then(paymentsLib.processPayment);
 }
 
 /*
@@ -104,23 +101,27 @@ const createPayment = (payload) => {
  * runs immediatelys after createPayment()
  * Returns a Promise with the transaction created
  */
-const processPayment = (donation) => {
+const processPayment = (order) => {
   const services = {
-    stripe: (donation) => {
+    stripe: (order) => {
 
-      const collective = donation.Collective;
-      const user = donation.User;
-      const paymentMethod = donation.PaymentMethod;
-      const subscription = donation.Subscription;
-      const response = donation.Response;
+      if (order.processedAt) {
+        return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
+      }
+
+      const collective = order.Collective;
+      const user = order.User;
+      const paymentMethod = order.PaymentMethod;
+      const subscription = order.Subscription;
+      const tier = order.Tier;
 
       const createSubscription = (hostStripeAccount) => {
         return stripe.getOrCreatePlan(
           hostStripeAccount,
           {
             interval: subscription.interval,
-            amount: donation.amount,
-            currency: donation.currency
+            amount: order.amount,
+            currency: order.currency
           })
           .then(plan => stripe.createSubscription(
             hostStripeAccount,
@@ -128,7 +129,7 @@ const processPayment = (donation) => {
             {
               plan: plan.id,
               application_fee_percent: transactions.OC_FEE_PERCENT,
-              trial_end: getSubscriptionTrialEndDate(donation.createdAt, subscription.interval),
+              trial_end: getSubscriptionTrialEndDate(order.createdAt, subscription.interval),
               metadata: {
                 collectiveId: collective.id,
                 collectiveName: collective.name,
@@ -143,7 +144,7 @@ const processPayment = (donation) => {
             data: {
               collective: collective.minimal,
               user: user.minimal,
-              donation: donation,
+              tier,
               subscription
             }
           }));
@@ -157,11 +158,11 @@ const processPayment = (donation) => {
         return stripe.createCharge(
           hostStripeAccount,
           {
-            amount: donation.amount,
-            currency: donation.currency,
+            amount: order.amount,
+            currency: order.currency,
             customer: paymentMethod.customerId,
             description: `OpenCollective: ${collective.slug}`,
-            application_fee: parseInt(donation.amount * transactions.OC_FEE_PERCENT / 100, 10),
+            application_fee: parseInt(order.amount * transactions.OC_FEE_PERCENT / 100, 10),
             metadata: {
               collectiveId: collective.id,
               collectiveName: collective.name,
@@ -184,16 +185,16 @@ const processPayment = (donation) => {
             };
             payload.transaction = {
               type: transactions.type.DONATION,
-              DonationId: donation.id,
-              amount: donation.amount,
-              currency: donation.currency,
+              OrderId: order.id,
+              amount: order.amount,
+              currency: order.currency,
               txnCurrency: balanceTransaction.currency,
               amountInTxnCurrency: balanceTransaction.amount,
-              txnCurrencyFxRate: donation.amount / balanceTransaction.amount,
+              txnCurrencyFxRate: order.amount / balanceTransaction.amount,
               hostFeeInTxnCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
               platformFeeInTxnCurrency: fees.applicationFee,
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
-              description: donation.title,
+              description: order.description,
               data: { charge, balanceTransaction },
             };
             return models.Transaction.createFromPayload(payload);
@@ -215,50 +216,45 @@ const processPayment = (donation) => {
         })
         
         // both one-time and subscriptions get charged immediately
-        .then((paymentMethod) => createChargeAndTransaction(hostStripeAccount, donation, paymentMethod, collective, user))
+        .then((paymentMethod) => createChargeAndTransaction(hostStripeAccount, order, paymentMethod, collective, user))
         .tap(t => transaction = t)
 
         // if this is a subscription, we create it now on Stripe
-        .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, donation, paymentMethod, collective) : null)
+        .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, collective) : null)
 
         // add user to the collective
         .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER))
 
-        // Mark donation row as processed
-        .tap(() => donation.update({ isProcessed: true, processedAt: new Date() }))
+        // Mark order row as processed
+        .tap(() => order.update({ processedAt: new Date() }))
 
         // Mark paymentMethod as confirmed
         .tap(() => paymentMethod.update({confirmedAt: new Date}))
 
-        // Mark response row as processed
-        .tap(() => response && response.update({ status: 'PROCESSED', confirmedAt: new Date() }))
-
-        // Fetch collective/event associated with the donation
-        .then(() => response && response.CollectiveId && models.Collective.findById(response.CollectiveId))
+        // Fetch collective/event associated with the order
+        .then(() => order && order.CollectiveId && models.Collective.findById(order.CollectiveId))
 
         // send out confirmation email
-        .then((event) => {
-          if (response) {
+        .then((collective) => {
+          if (collective.type === types.EVENT) {
             return emailLib.send(
               'ticket.confirmed',
               user.email,
-              { donation: donation.info,
+              { order: order.info,
                 transaction: transaction.info,
                 user: user.info,
-                collective: collective.info,
-                response: response.info,
-                event: event && event.info,
-                tier: response.Tier.info
+                event: collective && collective.info,
+                tier: order.Tier.info
               }, {
                 from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
               })
           } else {
-            // normal donation
+            // normal order
             return collective.getRelatedCollectives(2, 0)
             .then((relatedCollectives) => emailLib.send(
               'thankyou',
               user.email,
-              { donation: donation.info,
+              { order: order.info,
                 transaction: transaction.info,
                 user: user.info,
                 collective: collective.info,
@@ -272,61 +268,57 @@ const processPayment = (donation) => {
         })
         .then(() => transaction); // make sure we return the transaction created
     },
-    manual: (donation) => {
-      const collective = donation.Collective;
-      const user = donation.User;
-      let isUserHost;
+    manual: (order) => {
+      const collective = order.Collective;
+      const user = order.User;
+      let isUserHost, transaction;
 
       const payload = {
         user,
         collective,
         transaction: {
           type: transactions.type.DONATION,
-          DonationId: donation.id,
-          amount: donation.amount,
-          currency: donation.currency,
-          txnCurrency: donation.currency,
-          amountInTxnCurrency: donation.amount,
+          OrderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          txnCurrency: order.currency,
+          amountInTxnCurrency: order.amount,
           txnCurrencyFxRate: 1,
           platformFeeInTxnCurrency: 0,
           paymentProcessorFeeInTxnCurrency: 0,
-        }        
+        }
       }
-
-      return collective.getHost()
-      .then(host => host.id === user.id)
-      .tap(isHost => isUserHost = isHost)
-      .then(isUserHost => {
-        payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(collective.hostFeePercent/100 * donation.amount);
-        return models.Transaction.createFromPayload(payload);
-      })
-      .then(() => !isUserHost ? collective.findOrAddUserWithRole(user, roles.BACKER) : Promise.resolve())
-      .then(() => donation.update({isProcessed: true, processedAt: new Date()}))
+      return collective
+        .getHost()
+        .then(host => host.id === user.id)
+        .tap(isHost => isUserHost = isHost)
+        .then(isUserHost => {
+          payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.amount);
+          return models.Transaction.createFromPayload(payload);
+        })
+        .then(t => transaction = t)
+        .then(() => !isUserHost ? collective.findOrAddUserWithRole(user, roles.BACKER) : Promise.resolve())
+        .then(() => order.update({ processedAt: new Date }))
+        .then(() => transaction); // make sure we return the transaction created
     }
   };
 
-  return models.Donation.findOne({
-      where: { id: donation.id },
+  return models.Order.findOne({
+      where: { id: order.id },
       include: [
         { model: models.User },
         { model: models.Collective },
         { model: models.PaymentMethod },
         { model: models.Subscription },
-        { model: models.Response,
-          include: [
-            { model: models.Tier }
-          ]
-        }
+        { model: models.Tier }
       ]
     })
-    .then(donation => {
-      if (!donation.PaymentMethod) {
-        return services.manual(donation);
-      } else if (donation.PaymentMethod.service === 'paypal') {
-        // for manual add funds and paypal, which isn't processed this way yet
-        return donation.update({ isProcessed: true, processedAt: new Date() });
+    .then(order => {
+      if (!order.PaymentMethod) {
+        return services.manual(order);
       } else {
-        return services[donation.PaymentMethod.service](donation)
+        console.log("order.PaymentMethod.service", order.PaymentMethod.service);
+        return services[order.PaymentMethod.service](order)
       }
     });
 }

@@ -16,7 +16,7 @@ const done = (err) => {
 function run() {
   let inactiveSubscriptionCount = 0;
   let sumAmount = 0;
-  return models.Donation.findAll({
+  return models.Order.findAll({
     where: { 
       SubscriptionId: {
         $ne: null
@@ -38,11 +38,11 @@ function run() {
       { model: models.PaymentMethod }
     ]
   })
-  .tap(donations => console.log("Total Subscriptions found: ", donations.length))
-  .each(donation => {
-    console.log(`Processing SubscriptionId: ${donation.SubscriptionId}`);
-    return donation.Collective.getStripeAccount()
-      .then(stripeAccount => retrieveSubscription(stripeAccount, donation.PaymentMethod.customerId, donation.Subscription.stripeSubscriptionId))
+  .tap(orders => console.log("Total Subscriptions found: ", orders.length))
+  .each(order => {
+    console.log(`Processing SubscriptionId: ${order.SubscriptionId}`);
+    return order.Collective.getStripeAccount()
+      .then(stripeAccount => retrieveSubscription(stripeAccount, order.PaymentMethod.customerId, order.Subscription.stripeSubscriptionId))
       .then(stripeSubscription => {
         if (!stripeSubscription) {
           console.log('Stripe Subscription not found');
@@ -54,10 +54,10 @@ function run() {
         if (err.type === 'StripeInvalidRequestError') {
           console.log('Stripe Subscription not found');
           inactiveSubscriptionCount +=1;
-          if (donation.currency === 'USD' || donation.currency === 'EUR') {
-            sumAmount += donation.amount;
+          if (order.currency === 'USD' || order.currency === 'EUR') {
+            sumAmount += order.amount;
           }
-          const subscription = donation.Subscription;
+          const subscription = order.Subscription;
           subscription.isActive = false;
           subscription.deactivatedAt = new Date();
           return subscription.save();

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * This script is useful for sending a one-time email to all collective MEMBERS (aka core contributors).
+ * This script is useful for sending a one-time email to all collective ADMINS (aka core contributors).
  */ 
 
 process.env.PORT = 3066;
@@ -19,7 +19,7 @@ const debug = debugLib('onetime.email');
 
 const {
   Collective,
-  Role,
+  Member,
   User
 } = models;
 
@@ -43,12 +43,12 @@ const init = () => {
   .tap(collectives => console.log(`Active collectives found: ${collectives.length}`))
   .map(collective => collective.id)
   .then(collectiveIds => sequelize.query(`
-    SELECT distinct(u.email), u."firstName", u."lastName" from "Roles" ug
+    SELECT distinct(u.email), u."firstName", u."lastName" from "Members" ug
     LEFT JOIN "Users" u on ug."UserId" = u.id
     where ug.role = :role and ug."CollectiveId" IN (:collectiveIds)
     `, {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { collectiveIds, role: roles.MEMBER }
+      replacements: { collectiveIds, role: roles.ADMIN }
     }))
   .tap(coreContributorsOfActiveCollectives => console.log(`Core contributors found: ${coreContributorsOfActiveCollectives.length}`))
   .then(sendEmail)

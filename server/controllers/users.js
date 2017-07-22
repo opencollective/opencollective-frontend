@@ -17,7 +17,7 @@ import moment from 'moment-timezone';
 const {
   User,
   Activity,
-  Role
+  Member
 } = models;
 
 const { Unauthorized } = errors;
@@ -28,17 +28,17 @@ const { Unauthorized } = errors;
  *
  */
 
-const getRoles = (UserId) => {
-  return Role.findAll({
+const getMembers = (UserId) => {
+  return Member.findAll({
     where: {
       UserId
     }
   })
-  .then((Roles) => _.pluck(Roles, 'info'));
+  .then((Members) => _.pluck(Members, 'info'));
 };
 
 const getCollectivesFromUser = (req, options) => {
-  // Role has multiple entries for a user and collective because
+  // Member has multiple entries for a user and collective because
   // of the multiple roles. We will get the unique collectives in-memory for now
   // because of the small number of collectives.
   // Distinct queries are not supported by sequelize yet.
@@ -85,7 +85,7 @@ export const updateUser = (req, res, next) => {
     return next(new errors.BadRequest('Can\'t update user that already has provided their information'));
   }
 
-  return models.Donation.findOne({
+  return models.Order.findOne({
     where: {
       UserId: req.user.id,
       updatedAt: {
@@ -94,11 +94,11 @@ export const updateUser = (req, res, next) => {
     },
     include: { model: User }
   })
-  .tap(donation => {
-    if (!donation) {
+  .tap(order => {
+    if (!order) {
       return next(new Unauthorized("Can only modify user who had donation in last 10 min"));
     }
-    return donation.User.updateWhiteListedAttributes(req.required.user)
+    return order.User.updateWhiteListedAttributes(req.required.user)
       .then(user => res.send(user.info))
   })
   .catch(next);
@@ -298,12 +298,12 @@ export const show = (req, res, next) => {
         collectiveInfo.backersCount = collectiveInfo.backersAndSponsorsCount - collectiveInfo.sponsorsCount;
         collectiveInfo.myTotalDonations = user.totalDonations;
         collectiveInfo.myTier = user.tier;
-        collectiveInfo = Object.assign(collectiveInfo, { role: collective.Role.role, createdAt: collective.Role.createdAt });
+        collectiveInfo = Object.assign(collectiveInfo, { role: collective.Member.role, createdAt: collective.Member.createdAt });
         collectiveInfoArray.push(collectiveInfo);
         return collective;
       })
     })
-    .then(collectives => Role.findAll({
+    .then(collectives => Member.findAll({
       where: { CollectiveId: { $in: collectives.map(g => g.id) } },
       attributes: ['CollectiveId', [ sequelize.fn('count', sequelize.col('CollectiveId')), 'members' ]],
       group: ['CollectiveId']
@@ -328,7 +328,7 @@ export const show = (req, res, next) => {
 export const getCollectives = (req, res, next) => {
   // Follows json api spec http://jsonapi.org/format/#fetching-includes
   const { include } = req.query;
-  const withRoles = _.contains(include, 'role');
+  const withRole = _.contains(include, 'role');
   const options = {
     include: []
   };
@@ -345,11 +345,11 @@ export const getCollectives = (req, res, next) => {
       .then(balance => _.extend(collective, { balance }))
   }))
   .then(() => {
-    if (withRoles) {
-      return getRoles(req.user.id)
-        .then(Roles => collectiveData.map(collective => {
-          const Role = _.find(Roles, { CollectiveId: collective.id }) || {};
-          return _.extend(collective, { role: Role.role });
+    if (withRole) {
+      return getMembers(req.user.id)
+        .then(Members => collectiveData.map(collective => {
+          const Member = _.find(Members, { CollectiveId: collective.id }) || {};
+          return _.extend(collective, { role: Member.role });
         }))
     } else {
       return null;

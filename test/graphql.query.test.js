@@ -13,10 +13,10 @@ describe('Query Tests', () => {
   /* SETUP
     collective1: 2 events
       event1: 2 tiers
-        ticket1: 2 responses
-        ticket2: 1 response
+        ticket1: 2 orders
+        ticket2: 1 order
       event2: 1 tier
-        tier3: no response
+        tier3: no order
     collective2: 1 event
       event3: no tiers // event3 not declared above due to linting
     collective3: no events
@@ -159,7 +159,7 @@ describe('Query Tests', () => {
         });
       });
 
-      describe('returns multiple events with tiers and responses', () => {
+      describe('returns multiple events with tiers and orders', () => {
 
         beforeEach(() => models.Tier.create(
           Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }))
@@ -173,56 +173,56 @@ describe('Query Tests', () => {
           Object.assign(utils.data('ticket1'), { CollectiveId: event2.id }))
           .tap(t => tier3 = t));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response1'), { 
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order1'), { 
             CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user2.id,
-            confirmedAt: new Date()
+            processedAt: new Date()
           })));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response2'), { 
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order2'), { 
             CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user3.id,
-            confirmedAt: new Date()
+            processedAt: new Date()
           })));
 
-        // this response shouldn't show up in the query
+        // this order shouldn't show up in the query
         // because it's not confirmed
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response2'), { 
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order2'), { 
             CollectiveId: event1.id,
             TierId: ticket1.id, 
             UserId: user1.id,
-            confirmedAt: null
+            processedAt: null
           })));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response3'), { 
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order3'), { 
             CollectiveId: event1.id,
             TierId: ticket2.id, 
             UserId: user3.id,
-            confirmedAt: new Date()
+            processedAt: new Date()
           })));
         
-        it('sends response data', async () => {
+        it('sends order data', async () => {
           const query = `
             query getOneCollective {
               Collective(slug: "${event1.slug}") {
-                responses {
+                orders {
                   createdAt,
-                  status
+                  processedAt
                 }
               }
             }
           `;
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context);
-          const response = result.data.Collective.responses[0];
-          expect(response).to.have.property("createdAt");
-          expect(response).to.have.property("status");
+          const order = result.data.Collective.orders[0];
+          expect(order).to.have.property("createdAt");
+          expect(order).to.have.property("processedAt");
         });
 
         it('when given only a collective slug', async () => {
@@ -249,9 +249,8 @@ describe('Query Tests', () => {
                   description,
                   maxQuantity,
                   availableQuantity,
-                  responses {
+                  orders {
                     id,
-                    status,
                     description,
                     user {
                       id,
@@ -289,7 +288,7 @@ describe('Query Tests', () => {
                       description: tier3.description,
                       "maxQuantity": 10,
                       "availableQuantity": 10,
-                      responses: []
+                      orders: []
                     }
                   ]
                 },
@@ -315,19 +314,17 @@ describe('Query Tests', () => {
                       "description":"free tickets for all",
                       "maxQuantity": 10,
                       "availableQuantity": 7,
-                      "responses": [
+                      "orders": [
                         {
                           "id": 1,
-                          "status": "INTERESTED",
                           "description": "I work on bitcoin",
                           "user": {
                             "id": 2,
                             "name": "Anish Bas"
-                          },
+                          }
                         },
                         {
                           "id": 2,
-                          "status": "YES",
                           "description": "I have been working on open source for over a decade",
                           "user": {
                             "id": 3,
@@ -342,10 +339,9 @@ describe('Query Tests', () => {
                       "description": "$20 ticket",
                       "maxQuantity": 100,
                       "availableQuantity": 98,
-                      "responses": [
+                      "orders": [
                         {
                           "id": 4,
-                          "status": "YES",
                           "description": null,
                           "user": {
                             "id": 3,

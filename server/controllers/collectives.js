@@ -13,14 +13,18 @@ import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
 
+const DEFAULT_TIERS = [
+  { "type": "TIER", "name": "backer", "amount": 1000, "interval": "month", currency: collective.currency || "USD" },
+  { "type": "TIER", "name": "sponsor", "amount": 10000, "interval": "month", currency: collective.currency || "USD" }
+];
+
 const {
   Activity,
   Notification,
   Collective,
   Transaction,
   ConnectedAccount,
-  User,
-  Donation
+  User
 } = models;
 
 const _addUserToCollective = (collective, user, options) => {
@@ -143,7 +147,7 @@ export const getTransactions = (req, res, next) => {
 
   const query = _.merge({
     where,
-    include: { model: Donation },
+    include: { model: models.Order },
     order: [[req.sorting.key, req.sorting.dir]]
   }, req.pagination);
 
@@ -157,7 +161,7 @@ export const getTransactions = (req, res, next) => {
         Link: getLinkHeader(getRequestedUrl(req), req.pagination)
       });
 
-      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': (transaction.Donation && transaction.Donation.title) || transaction.description })));
+      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': (transaction.Donation && transaction.Donation.description) || transaction.description })));
     })
     .catch(next);
 };
@@ -230,16 +234,16 @@ export const deleteUser = (req, res, next) => {
   };
 
   models
-    .Role
+    .Member
     .findOne(query)
-    .then((Role) => {
-      if (!Role) {
+    .then((Member) => {
+      if (!Member) {
         throw (new errors.NotFound('The user is not part of the collective yet.'));
       }
 
-      return Role;
+      return Member;
     })
-    .then((Role) => Role.destroy())
+    .then((Member) => Member.destroy())
     .tap(() => {
       // Create activities.
       const remoteUser = (req.remoteUser && req.remoteUser.info);
@@ -283,10 +287,7 @@ export const create = (req, res, next) => {
   };
 
   // Default tiers
-  collective.tiers = collective.tiers || [
-    {"type": "TIER", "name":"backer", "amount": 1000, "interval":"month", currency: collective.currency || "USD"},
-    {"type": "TIER", "name":"sponsor", "amount": 10000, "interval":"month", currency: collective.currency || "USD"}
-  ];
+  collective.tiers = collective.tiers || DEFAULT_TIERS;
 
   return Collective
     .create(collective)
@@ -354,13 +355,10 @@ export const createFromGithub = (req, res, next) => {
   const githubUser = payload.user;
   const contributors = payload.users;
   const creatorGithubUsername = payload.github_username;
-  let dbCollective;
+  let createdCollective;
 
   // Default tiers
-  collective.tiers = collective.tiers || [
-    {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
-    {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
-  ];
+  collective.tiers = collective.tiers || DEFAULT_TIERS;
 
   ConnectedAccount
     .findOne({
@@ -371,7 +369,7 @@ export const createFromGithub = (req, res, next) => {
       creator = ca.User;
       creatorConnectedAccount = ca;
       options = {
-        role: roles.MEMBER,
+        role: roles.ADMIN,
         remoteUser: creator
       };
     })
@@ -393,62 +391,68 @@ export const createFromGithub = (req, res, next) => {
       }
       return Collective.create(Object.assign({}, collective, {LastEditedByUserId: creator.id}));
     })
-    .tap(g => dbCollective = g)
-    .then(() => _addUserToCollective(dbCollective, creator, options))
+    .tap(g => createdCollective = g)
+    .then(() => _addUserToCollective(createdCollective, creator, options))
     .then(() => User.findById(defaultHostId())) // make sure the host exists
     .tap(host => {
       if (host) {
-        return _addUserToCollective(dbCollective, host, {role: roles.HOST, remoteUser: creator})
+        return _addUserToCollective(createdCollective, host, {role: roles.HOST, remoteUser: creator})
       } else {
         return null;
       }
     })
     .tap((host) => Activity.create({
       type: activities.COLLECTIVE_CREATED,
-        UserId: creator.id,
-        CollectiveId: dbCollective.id,
-        data: {
-          collective: dbCollective.info,
-          host: host.info,
-          user: creator.info
-        }
-      }))
+      UserId: creator.id,
+      CollectiveId: createdCollective.id,
+      data: {
+        collective: createdCollective.info,
+        host: host.info,
+        user: creator.info
+      }
+    }))
+    .then(() => {
+      if (collective.tiers) {
+        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id })
+      }
+      return null;
+    })
     .then(() => Promise.map(contributors, contributor => {
-      // since we added the creator above with an email, avoid double adding
-      if (contributor !== creatorGithubUsername && contributor !== creatorConnectedAccount.username) {
-        const caAttr = {
-          username: contributor,
-          provider: 'github'
-        };
-        const userAttr = {
-          image: `https://images.githubusercontent.com/${contributor}`
-        };
-        let connectedAccount, contributorUser;
-        return ConnectedAccount.findOne({where: caAttr})
-          .then(ca => ca || ConnectedAccount.create(caAttr))
-          .then(ca => {
-            connectedAccount = ca;
-            if (!ca.UserId) {
-              return User.findOne({where: userAttr});
-            } else {
-              return ca.getUser();
-            }
-          })
-          .then(user => user || User.create(Object.assign(userAttr)))
-          .then(user => contributorUser = user)
-          .then(() => fetchGithubUser(contributor))
-          .tap(json => {
-            if (json.name) {
-              const nameTokens = json.name.split(' ');
-              contributorUser.firstName = nameTokens.shift();
-              contributorUser.lastName = nameTokens.join(' ');
-            }
-            contributorUser.website = json.blog;
-            contributorUser.email = json.email;
-            return contributorUser.save();
-          })
-          .then(() => contributorUser.addConnectedAccount(connectedAccount))
-          .then(() => _addUserToCollective(dbCollective, contributorUser, options));
+    // since we added the creator above with an email, avoid double adding
+    if (contributor !== creatorGithubUsername && contributor !== creatorConnectedAccount.username) {
+      const caAttr = {
+        username: contributor,
+        provider: 'github'
+      };
+      const userAttr = {
+        image: `https://images.githubusercontent.com/${contributor}`
+      };
+      let connectedAccount, contributorUser;
+      return ConnectedAccount.findOne({where: caAttr})
+        .then(ca => ca || ConnectedAccount.create(caAttr))
+        .then(ca => {
+          connectedAccount = ca;
+          if (!ca.UserId) {
+            return User.findOne({where: userAttr});
+          } else {
+            return ca.getUser();
+          }
+        })
+        .then(user => user || User.create(Object.assign(userAttr)))
+        .then(user => contributorUser = user)
+        .then(() => fetchGithubUser(contributor))
+        .tap(json => {
+          if (json.name) {
+            const nameTokens = json.name.split(' ');
+            contributorUser.firstName = nameTokens.shift();
+            contributorUser.lastName = nameTokens.join(' ');
+          }
+          contributorUser.website = json.blog;
+          contributorUser.email = json.email;
+          return contributorUser.save();
+        })
+        .then(() => contributorUser.addConnectedAccount(connectedAccount))
+        .then(() => _addUserToCollective(createdCollective, contributorUser, options));
       } else {
         return Promise.resolve();
       }
@@ -457,11 +461,11 @@ export const createFromGithub = (req, res, next) => {
       const data = {
         firstName: creator.firstName,
         lastName: creator.lastName,
-        collective: dbCollective.info
+        collective: createdCollective.info
       };
       return emailLib.send('github.signup', creator.email, data);
     })
-    .tap(() => res.send(dbCollective.info))
+    .tap(() => res.send(createdCollective.info))
     .catch(next);
 };
 
@@ -612,30 +616,30 @@ export const addUser = (req, res, next) => {
 export const updateUser = (req, res, next) => {
 
   models
-    .Role
+    .Member
     .findOne({
       where: {
         CollectiveId: req.collective.id,
         UserId: req.user.id
       }
     })
-    .then((Role) => {
-      if (!Role) {
+    .then((Member) => {
+      if (!Member) {
         throw (new errors.NotFound('The user is not part of the collective yet.'));
       }
 
-      return Role;
+      return Member;
     })
-    .then((Role) => {
+    .then((Member) => {
       if (req.body.role) {
-        Role.role = req.body.role;
+        Member.role = req.body.role;
       }
 
-      Role.updatedAt = new Date();
+      Member.updatedAt = new Date();
 
-      return Role.save();
+      return Member.save();
     })
-    .then((Role) => {
+    .then((Member) => {
       // Create activities.
       const remoteUser = (req.remoteUser && req.remoteUser.info);
       const activity = {
@@ -645,16 +649,16 @@ export const updateUser = (req, res, next) => {
           collective: req.collective.info,
           user: remoteUser,
           target: req.user.info,
-          Role: Role.info
+          Member: Member.info
         }
       };
       Activity.create(_.extend({UserId: req.user.id}, activity));
       if (req.remoteUser && req.user.id !== req.remoteUser.id)
         Activity.create(_.extend({UserId: req.remoteUser.id}, activity));
 
-      return Role;
+      return Member;
     })
-    .then((Role) => res.send(Role))
+    .then((Member) => res.send(Member))
     .catch(next);
 };
 

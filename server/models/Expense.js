@@ -54,7 +54,7 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    title: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -71,7 +71,7 @@ export default function (Sequelize, DataTypes) {
       defaultValue: 'manual'
     },
 
-    notes: DataTypes.TEXT,
+    privateNotes: DataTypes.STRING,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
     vat: DataTypes.INTEGER,
@@ -131,12 +131,12 @@ export default function (Sequelize, DataTypes) {
           CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
-          title: this.title,
+          description: this.description,
           attachment: this.attachment,
           category: this.category,
           payoutMethod: this.payoutMethod,
           vat: this.vat,
-          notes: this.notes,
+          privateNotes: this.privateNotes,
           lastEditedById: this.lastEditedById,
           status: this.status,
           incurredAt: this.incurredAt,
@@ -152,7 +152,7 @@ export default function (Sequelize, DataTypes) {
           CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
-          title: this.title,
+          description: this.description,
           category: this.category,
           payoutMethod: this.payoutMethod,
           vat: this.vat,

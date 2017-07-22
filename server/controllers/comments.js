@@ -58,7 +58,7 @@ export const create = (req, res, next) => {
 export const approve = (req, res, next) => {
   req.comment.update({approvedAt: new Date()})
     .then(() => {
-      res.send(`Comment on expense "${req.expense.title}" approved. [<a href="${config.host.website}/${req.collective.slug}/expenses/${req.expense.id}">view the expense</a>]`);
+      res.send(`Comment on expense "${req.expense.description}" approved. [<a href="${config.host.website}/${req.collective.slug}/expenses/${req.expense.id}">view the expense</a>]`);
     })
     .catch(next);
 };

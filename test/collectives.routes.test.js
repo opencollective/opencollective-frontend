@@ -62,7 +62,7 @@ describe('collectives.routes.test.js', () => {
 
     it('fails creating a collective without name', (done) => {
       const collective = _.omit(publicCollectiveData, 'name');
-      collective.users = [{email: userData.email, role: roles.MEMBER}];
+      collective.users = [{email: userData.email, role: roles.ADMIN}];
       request(app)
         .post('/collectives')
         .send({
@@ -89,8 +89,8 @@ describe('collectives.routes.test.js', () => {
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
       beforeEach('create the collective', (done) => {
         const users = [
-              _.assign(_.omit(userData2, 'password'), {role: roles.MEMBER}),
-              _.assign(_.omit(userData3, 'password'), {role: roles.MEMBER})];
+              _.assign(_.omit(userData2, 'password'), {role: roles.ADMIN}),
+              _.assign(_.omit(userData3, 'password'), {role: roles.ADMIN})];
 
         collective = Object.assign({}, publicCollectiveData, {users})
         collective.HostId = host.id;
@@ -141,8 +141,8 @@ describe('collectives.routes.test.js', () => {
 
       it('assigns the users as members', () => {
         return Promise.all([
-          models.Role.findOne({where: { UserId: host.id, role: roles.HOST }}),
-          models.Role.count({where: { CollectiveId: 1, role: roles.MEMBER }}),
+          models.Member.findOne({where: { UserId: host.id, role: roles.HOST }}),
+          models.Member.count({where: { CollectiveId: 1, role: roles.ADMIN }}),
           models.Collective.find({where: { slug: collective.slug }})
           ])
         .then(results => {
@@ -257,12 +257,12 @@ describe('collectives.routes.test.js', () => {
         .then(caUser => caUser.getCollectives({paranoid: false})) // because we are setting deletedAt
         .tap(collectives => expect(collectives).to.have.length(1))
         .tap(collectives => expect(collectives[0].LastEditedByUserId).to.equal(3))
-        .then(() => models.Role.findAll())
-        .then(Roles => {
-          expect(Roles).to.have.length(3);
-          expect(Roles[0]).to.have.property('role', roles.MEMBER);
-          expect(Roles[1]).to.have.property('role', roles.HOST);
-          expect(Roles[2]).to.have.property('role', roles.MEMBER);
+        .then(() => models.Member.findAll())
+        .then(Members => {
+          expect(Members).to.have.length(3);
+          expect(Members[0]).to.have.property('role', roles.ADMIN);
+          expect(Members[1]).to.have.property('role', roles.HOST);
+          expect(Members[2]).to.have.property('role', roles.ADMIN);
           return null;
         }))
     });
@@ -296,7 +296,7 @@ describe('collectives.routes.test.js', () => {
         .post('/collectives')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.MEMBER} )]})
+          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -409,15 +409,15 @@ describe('collectives.routes.test.js', () => {
       // Create a subscription for PublicCollective.
       beforeEach(() => models.Subscription
         .create(utils.data('subscription1'))
-        .then(subscription => models.Donation.create({
+        .then(subscription => models.Order.create({
           amount: 999,
           currency: 'USD',
           UserId: user.id,
           CollectiveId: publicCollective.id,
           SubscriptionId: subscription.id
         }))
-        .then(donation => models.Transaction.createFromPayload({
-            transaction: Object.assign({}, transactionsData[7], { netAmountInCollectiveCurrency: transactionsData[7].amount, DonationId: donation.id}),
+        .then(order => models.Transaction.createFromPayload({
+            transaction: Object.assign({}, transactionsData[7], { netAmountInCollectiveCurrency: transactionsData[7].amount, OrderId: order.id}),
             user,
             collective: publicCollective,
           })));
@@ -450,7 +450,7 @@ describe('collectives.routes.test.js', () => {
             expect(userData.lastName).to.equal(user.public.lastName);
             expect(userData.name).to.equal(user.public.name);
             expect(userData.username).to.equal(user.public.username);
-            expect(userData.role).to.equal(roles.MEMBER);
+            expect(userData.role).to.equal(roles.ADMIN);
             done();
           });
       });
@@ -492,7 +492,7 @@ describe('collectives.routes.test.js', () => {
             slug: 'public-collective',
             name: 'public collective with host',
             HostId: host.id,
-            users: [ Object.assign({}, userData, { role: roles.MEMBER} ) ]
+            users: [ Object.assign({}, userData, { role: roles.ADMIN} ) ]
           })
         })
         .expect(200)
@@ -519,7 +519,7 @@ describe('collectives.routes.test.js', () => {
     // Create another user that is a member.
     beforeEach(() => models.User.create(utils.data('user4'))
       .tap(u => user4 = u)
-      .then(() => collective.addUserWithRole(user4, roles.MEMBER)));
+      .then(() => collective.addUserWithRole(user4, roles.ADMIN)));
 
     it('fails updating a collective if not authenticated', (done) => {
       request(app)
@@ -564,7 +564,7 @@ describe('collectives.routes.test.js', () => {
         .end(done);
     });
 
-    it('successfully updates a collective if authenticated as a MEMBER', (done) => {
+    it('successfully updates a collective if authenticated as a ADMIN', (done) => {
       request(app)
         .put(`/collectives/${collective.id}`)
         .set('Authorization', `Bearer ${user4.jwt()}`)
@@ -603,16 +603,16 @@ describe('collectives.routes.test.js', () => {
         });
     });
 
-    it('successfully create a collective with HOST and assign same person to be a MEMBER and a BACKER', () =>
+    it('successfully create a collective with HOST and assign same person to be a ADMIN and a BACKER', () =>
       /* TODO: this works but we'll need to do a lot refactoring.
        * Need to find a way to call this with one line: like collective.addUser()
        */
-      models.Role.create({
+      models.Member.create({
         UserId: user3.id,
         CollectiveId: collective.id,
-        role: roles.MEMBER
+        role: roles.ADMIN
       })
-      .then(() => models.Role.findAll({ where: { UserId: user3.id, CollectiveId: collective.id }}))
+      .then(() => models.Member.findAll({ where: { UserId: user3.id, CollectiveId: collective.id }}))
       .tap(rows => expect(rows.length).to.equal(2)));
   });
 

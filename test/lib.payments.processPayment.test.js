@@ -29,7 +29,7 @@ const STRIPE_TOKEN = 'superStripeToken';
  * Tests
  */
 describe('lib.payments.processPayment.test.js', () => {
-  let user, user2, collective, sandbox, processPaymentSpy, emailSendSpy;
+  let user, user2, collective, tier, sandbox, processPaymentSpy, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -45,7 +45,7 @@ describe('lib.payments.processPayment.test.js', () => {
     emailSendSpy = sandbox.spy(emailLib, 'send');
   });
 
-  beforeEach(() => utils.resetTestDB());
+  beforeEach('reset db', () => utils.resetTestDB());
 
   beforeEach(() => processPaymentSpy.reset());
 
@@ -67,7 +67,7 @@ describe('lib.payments.processPayment.test.js', () => {
       .post('/collectives')
       .send({
         api_key: application.api_key,
-        collective: Object.assign(collectiveData, { users: [{ email: 'member@collective.com', role: roles.MEMBER}] })
+        collective: Object.assign(collectiveData, { users: [{ email: 'member@collective.com', role: roles.ADMIN}] })
       })
       .expect(200)
       .end((e, res) => {
@@ -82,6 +82,8 @@ describe('lib.payments.processPayment.test.js', () => {
       });
   });
 
+  beforeEach('create a tier', () => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id }).tap(t => tier = t));
+
   afterEach(() => {
     utils.clearbitStubAfterEach(sandbox);
   });
@@ -89,18 +91,19 @@ describe('lib.payments.processPayment.test.js', () => {
   after(() => processPaymentSpy.restore());
 
   describe('No payment method', () => {
-    let donation;
+    let order;
 
-    describe('Donation given by the host', () => {
+    describe('Donation made by the host', () => {
 
-      beforeEach(() => {
-        return models.Donation.create({
+      beforeEach('create order', () => {
+        return models.Order.create({
           amount: 10000,
           currency: 'USD',
           UserId: user.id,
+          TierId: tier.id,
           CollectiveId: collective.id
         })
-        .then(d => donation = d)
+        .then(d => order = d)
         .then(paymentsLib.processPayment)
         .catch(err => expect(err).to.not.exist);
       });
@@ -111,11 +114,11 @@ describe('lib.payments.processPayment.test.js', () => {
           expect(transactions.length).to.equal(1);
           expect(transactions[0]).to.contain({
             type: constants.type.DONATION,
-            DonationId: donation.id,
-            amount: donation.amount,
-            currency: donation.currency,
-            txnCurrency: donation.currency,
-            amountInTxnCurrency: donation.amount,
+            OrderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            txnCurrency: order.currency,
+            amountInTxnCurrency: order.amount,
             txnCurrencyFxRate: 1,
             platformFeeInTxnCurrency: 0,
             paymentProcessorFeeInTxnCurrency: 0,
@@ -124,24 +127,24 @@ describe('lib.payments.processPayment.test.js', () => {
         })
       });
 
-      it('isProcessed and processedAt should not be false and null', () => {
-        return models.Donation.findById(donation.id)
-        .then(donation => {
-          expect(donation.isProcessed).to.equal(true);
-          expect(donation.processedAt).to.not.equal(null);
+      it('processedAt should not be null', () => {
+        return models.Order.findById(order.id)
+        .then(order => {
+          expect(order.processedAt).to.not.equal(null);
         })
       });
     });
 
     describe('Donation given by another user', () => {
       beforeEach(() => {
-        return models.Donation.create({
+        return models.Order.create({
           amount: 10000,
           currency: 'USD',
           UserId: user2.id,
+          TierId: tier.id,
           CollectiveId: collective.id
         })
-        .then(d => donation = d)
+        .then(d => order = d)
         .then(paymentsLib.processPayment)
         .catch(err => expect(err).to.not.exist);
       });
@@ -152,11 +155,11 @@ describe('lib.payments.processPayment.test.js', () => {
           expect(transactions.length).to.equal(1);
           expect(transactions[0]).to.contain({
             type: constants.type.DONATION,
-            DonationId: donation.id,
-            amount: donation.amount,
-            currency: donation.currency,
-            txnCurrency: donation.currency,
-            amountInTxnCurrency: donation.amount,
+            OrderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            txnCurrency: order.currency,
+            amountInTxnCurrency: order.amount,
             txnCurrencyFxRate: 1,
             platformFeeInTxnCurrency: 0,
             paymentProcessorFeeInTxnCurrency: 0,
@@ -166,52 +169,25 @@ describe('lib.payments.processPayment.test.js', () => {
       });
 
       it('adds the user as a backer', () => {
-        return models.Role.findOne({
+        return models.Member.findOne({
           where: {
             UserId: user2.id,
             CollectiveId: collective.id,
             role: roles.BACKER
           }
         })
-        .then(Role => {
-          expect(Role).to.exist;
+        .then(Member => {
+          expect(Member).to.exist;
         });
       });
 
-      it('isProcessed and processedAt should not be false and null', () => {
-        return models.Donation.findById(donation.id)
-        .then(donation => {
-          expect(donation.isProcessed).to.equal(true);
-          expect(donation.processedAt).to.not.equal(null);
+      it('processedAt should not be null', () => {
+        return models.Order.findById(order.id)
+        .then(order => {
+          expect(order.processedAt).to.not.equal(null);
         });
       });
 
-    });
-  });
-
-  describe('Paypal payment method', () => {
-    beforeEach('create a payment method', () => {
-      return models.PaymentMethod.create({
-        identifier: 'blah',
-        token: 'token-xxx',
-        service: 'paypal'
-        })
-      .then(pm => models.Donation.create({
-        amount: 100,
-        currency: 'USD',
-        SubscriptionId: null,
-        PaymentMethodId: pm.id
-      }))
-      .then(paymentsLib.processPayment);
-    });
-
-    it('isProcessed and processedAt should not be false and null', done => {
-      models.Donation.findById(1)
-        .then(donation => {
-          expect(donation.isProcessed).to.equal(true);
-          expect(donation.processedAt).to.not.equal(null);
-          done();
-        })
     });
   });
 
@@ -278,21 +254,22 @@ describe('lib.payments.processPayment.test.js', () => {
       nock.cleanAll();
     });
 
-    describe('One-time donation', () => {
+    describe('One-time order', () => {
       beforeEach('create related collectives', () => models.Collective.createMany(utils.data('relatedCollectives')));
 
-      beforeEach('create a payment method and a donation', () => {
+      beforeEach('create a payment method and an order', () => {
         return models.PaymentMethod.create({
           identifier: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
         })
-        .tap(pm => models.Donation.create({
+        .tap(pm => models.Order.create({
           amount: CHARGE * 100,
           currency: CURRENCY,
           SubscriptionId: null,
           PaymentMethodId: pm.id,
           UserId: user.id,
+          TierId: tier.id,
           CollectiveId: collective.id
         }))
         .then(paymentsLib.processPayment)
@@ -342,7 +319,7 @@ describe('lib.payments.processPayment.test.js', () => {
           .then((users) => {
             expect(users).to.have.length(3);
             const backer = _.find(users, {email: user.email});
-            expect(backer.Role.role).to.equal(roles.BACKER);
+            expect(backer.Member.role).to.equal(roles.BACKER);
             done();
           })
           .catch(done);
@@ -356,7 +333,7 @@ describe('lib.payments.processPayment.test.js', () => {
       });
     });
 
-    describe('Recurring donation', () => {
+    describe('Recurring order', () => {
 
       const customerId = stripeMock.customers.create.id;
 
@@ -373,13 +350,14 @@ describe('lib.payments.processPayment.test.js', () => {
           currency: CURRENCY,
           amount: 10.99
         }))
-        .then(subscription => models.Donation.create({
+        .then(subscription => models.Order.create({
           amount: 1099,
           currency: CURRENCY,
           SubscriptionId: subscription.id,
           PaymentMethodId: pm.id,
           UserId: user.id,
           CollectiveId: collective.id,
+          TierId: tier.id,
           createdAt: '2017-01-22T15:01:22.827-07:00'
         }))
         .then(paymentsLib.processPayment);
@@ -482,7 +460,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.Role.role).to.equal(roles.BACKER);
+                expect(backer.Member.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -547,7 +525,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.Role.role).to.equal(roles.BACKER);
+                expect(backer.Member.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -657,7 +635,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.Role.role).to.equal(roles.BACKER);
+                expect(backer.Member.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);
@@ -722,7 +700,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .then((users) => {
                 expect(users).to.have.length(3);
                 const backer = _.find(users, {email: user.email});
-                expect(backer.Role.role).to.equal(roles.BACKER);
+                expect(backer.Member.role).to.equal(roles.BACKER);
                 done();
               })
               .catch(done);

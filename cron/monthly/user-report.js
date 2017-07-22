@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import roles from '../../server/constants/roles';
+
 // Only run on the first of the month
 const today = new Date();
 if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
@@ -76,11 +78,13 @@ const processEvents = (events) => {
 
   events.forEach(event => {
     event.stats = { confirmed: 0, interested: 0 };
-    event.Responses.forEach(response => {
-      if (response.status === 'INTERESTED') {
+    event.Members.forEach(member => {
+      if (member.role === roles.FOLLOWER) {
         event.stats.interested++;
       }
-      if (response.status === 'YES') {
+    });
+    event.Orders.forEach(order => {
+      if (order.processedAt !== null) {
         event.stats.confirmed++;
       }
     })
@@ -105,8 +109,17 @@ const processCollective = (collective) => {
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
     collective.getYearlyIncome(),
-    Expense.findAll({ where: { CollectiveId: collective.id, createdAt: { $gte: startDate, $lt: endDate } }, limit: 3, order: [['id', 'DESC']], include: [ {model: User} ]}),
-    collective.getEvents({ where: { CollectiveId: collective.id, startsAt: { $gte: startDate } }, order: [['startsAt', 'DESC']], include: [ {model: models.Response} ]})
+    Expense.findAll({
+      where: { CollectiveId: collective.id, createdAt: { $gte: startDate, $lt: endDate } },
+      limit: 3,
+      order: [['id', 'DESC']],
+      include: [ User ]
+    }),
+    collective.getEvents({
+      where: { startsAt: { $gte: startDate } },
+      order: [['startsAt', 'DESC']],
+      include: [ models.Member, models.Order ]
+    })
   ];
 
   return Promise.all(promises)
@@ -137,14 +150,14 @@ const processUser = (user) => {
 
 let subscriptions, tags;
 
- return user.getDonations({
+ return user.getOrders({
    include: [
      { model: Collective },
      { model: Subscription, where: { isActive: true } }
    ]
   })
-  .tap(donations => Promise.map(donations, s => processCollective(s.Collective)))
-  .then(donations => donations.map(s => {
+  .tap(orders => Promise.map(orders, s => processCollective(s.Collective)))
+  .then(orders => orders.map(s => {
     const subscription = _.pick(s.Subscription, ['amount', 'interval', 'currency', 'createdAt']);
     subscription.collective = collectivesData[s.Collective.slug];
     tags = _.union(tags, subscription.collective.tags);

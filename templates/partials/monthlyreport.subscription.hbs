@@ -193,7 +193,7 @@
               {{#if collective.expenses.length}}
                 <ul>
                 {{#each collective.expenses}}
-                <li>{{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{title}} {{status}}</li>
+                <li>{{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{description}} {{status}}</li>
                 {{/each}}
                 </ul>
               {{else}}

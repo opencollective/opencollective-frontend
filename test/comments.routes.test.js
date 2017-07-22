@@ -30,7 +30,7 @@ describe('comments.routes.test.js', () => {
   beforeEach('create collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
 
   beforeEach('add host to collective', () => collective.addUserWithRole(host, roles.HOST));
-  beforeEach('add member to collective', () => collective.addUserWithRole(member, roles.MEMBER));
+  beforeEach('add member to collective', () => collective.addUserWithRole(member, roles.ADMIN));
   beforeEach('create expense', () => models.Expense.create(Object.assign({}, utils.data('expense1'), { UserId: member.id, CollectiveId: collective.id, lastEditedById: member.id })).tap(e => expense = e));
 
   describe('#create', () => {
@@ -46,7 +46,7 @@ describe('comments.routes.test.js', () => {
           expect(result.comment.text).to.equal(utils.data('comments')[0].text);
           expect(result.comment.approvedAt).to.exist;
           expect(result.collective.name).to.equal(utils.data('collective1').name);
-          expect(result.expense.title).to.equal(utils.data('expense1').title);
+          expect(result.expense.description).to.equal(utils.data('expense1').description);
         });
     });
 
@@ -60,7 +60,7 @@ describe('comments.routes.test.js', () => {
           const result = res.body.data;
           expect(result.comment.text).to.equal(utils.data('comments')[1].text);
           expect(result.user.email).to.equal(utils.data('user4').email);
-          expect(result.expense.title).to.equal(utils.data('expense1').title);
+          expect(result.expense.description).to.equal(utils.data('expense1').description);
           expect(spy.args[0][0]).to.equal('comment.approve');
           expect(spy.args[0][1]).to.equal(result.user.email);
         });

@@ -49,10 +49,6 @@ export default function(Sequelize, DataTypes) {
       defaultValue: 'TIER'
     },
 
-    class: {
-      type: DataTypes.STRING // backer, sponsor, donor, ...
-    },
-
     description: DataTypes.STRING,
     button: DataTypes.STRING,
 
@@ -163,10 +159,10 @@ export default function(Sequelize, DataTypes) {
     instanceMethods: {
       // TODO: Check for maxQuantityPerUser
       availableQuantity() {
-        return models.Response.sum('quantity', { 
+        return models.Order.sum('quantity', { 
             where: {
               TierId: this.id,
-              confirmedAt: { $ne: null }
+              processedAt: { $ne: null }
             }
           })
           .then(usedQuantity => {

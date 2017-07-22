@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.amount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.amount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -16,15 +16,15 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 {{#if interval}}
   {{#if firstPayment }}
-    <p>We would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us continue our activities.</p>
+    <p>We would like to thank you for your pledge to give {{{currency order.amount currency=order.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our activities.</p>
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.amount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your donation helps us continue our activities.</p>
   {{/if}}
   {{> charge_date_notice }}
 {{else}}
-<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+<p>We would like to thank you for your donation of {{{currency order.amount currency=order.currency}}} on {{{moment order.createdAt}}}.
   Your gift will help us continue our activities.</p>
 {{/if}}
 

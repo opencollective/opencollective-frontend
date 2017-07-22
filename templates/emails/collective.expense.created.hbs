@@ -1,10 +1,10 @@
-Subject: New expense on {{collective.name}}: {{{currency expense.amount currency=expense.currency}}} for {{expense.title}}
+Subject: New expense on {{collective.name}}: {{{currency expense.amount currency=expense.currency}}} for {{expense.description}}
 
 {{> header}}
 
 <center>
   <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
-  <div>{{expense.title}}</div>
+  <div>{{expense.description}}</div>
   <div>Submitted by: {{user.name}}</div>
   <div>Paypal Email: {{user.paypalEmail}}</div>
   <p><font color="#999">{{expense.notes}}</font></p>

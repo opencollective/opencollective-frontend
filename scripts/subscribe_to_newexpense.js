@@ -8,7 +8,7 @@ import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const Role = models.Role;
+const Member = models.Member;
 const Notification = models.Notification;
 
 const processRows = (rows) => {
@@ -16,7 +16,7 @@ const processRows = (rows) => {
 };
 
 const init = () => {
-  Role.findAll({ where: { role: 'HOST' }})
+  Member.findAll({ where: { role: 'HOST' }})
   .then(processRows)
   .then(() => process.exit(0));
 }

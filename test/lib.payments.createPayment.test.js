@@ -14,7 +14,7 @@ const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
 
 describe('lib.payments.createPayment.test.js', () => {
-  let host, user, user2, collective, collective2, sandbox;
+  let host, user, user2, collective, order, collective2, sandbox;
 
   before(() => sandbox = sinon.sandbox.create());
 
@@ -35,6 +35,12 @@ describe('lib.payments.createPayment.test.js', () => {
   beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
+  beforeEach('create an order', () => models.Order.create({
+    UserId: user.id,
+    CollectiveId: collective.id,
+    amount: AMOUNT,
+    currency: CURRENCY
+  }).tap(t => order = t))
   beforeEach('add user to collective as member', () => collective.addUserWithRole(host, roles.HOST));
   beforeEach('add user to collective2 as member', () => collective2.addUserWithRole(host, roles.HOST));
 
@@ -61,8 +67,7 @@ describe('lib.payments.createPayment.test.js', () => {
 
       it('stripe token is missing', () => {
         return paymentsLib.createPayment({ 
-          user, 
-          collective, 
+          order,
           payment: {
             amount: AMOUNT, 
             currency: CURRENCY,
@@ -72,8 +77,7 @@ describe('lib.payments.createPayment.test.js', () => {
 
       it('interval is present and it is not month or year', () => {
         return paymentsLib.createPayment({ 
-          user, 
-          collective, 
+          order,
           payment: {
             amount: AMOUNT, 
             currency: CURRENCY,
@@ -85,8 +89,7 @@ describe('lib.payments.createPayment.test.js', () => {
 
       it('payment amount is missing', () => {
         return paymentsLib.createPayment({ 
-          user, 
-          collective, 
+          order,
           payment: {
             currency: CURRENCY,
             paymentMethod: { token: STRIPE_TOKEN },
@@ -96,8 +99,7 @@ describe('lib.payments.createPayment.test.js', () => {
 
       it('payment amount is less than 50', () => {
         return paymentsLib.createPayment({ 
-          user, 
-          collective, 
+          order,
           payment: {
             currency: CURRENCY,
             paymentMethod: { token: STRIPE_TOKEN },
@@ -114,8 +116,7 @@ describe('lib.payments.createPayment.test.js', () => {
         it('if no stripe account', () => {
           return user.setStripeAccount(null)
           .then(() => paymentsLib.createPayment({
-            user,
-            collective,
+            order,
             payment: {
               paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
@@ -130,8 +131,7 @@ describe('lib.payments.createPayment.test.js', () => {
           return models.StripeAccount.create({ accessToken: 'sk_live_abc'})
           .then((account) => user.setStripeAccount(account))
           .then(() => paymentsLib.createPayment({
-            user,
-            collective,
+            order,
             payment: {
               paymentMethod: { token: STRIPE_TOKEN },
               amount: AMOUNT,
@@ -149,8 +149,7 @@ describe('lib.payments.createPayment.test.js', () => {
           describe('1st payment', () => {
             
             beforeEach(() => paymentsLib.createPayment({
-              user,
-              collective,
+              order,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
@@ -171,8 +170,8 @@ describe('lib.payments.createPayment.test.js', () => {
                 .catch(done);
             });
 
-            it('successfully creates a donation in the database', (done) => {
-              models.Donation
+            it('successfully creates an order in the database', (done) => {
+              models.Order
                 .findAndCountAll({})
                 .then((res) => {
                   expect(res.count).to.equal(1);
@@ -180,7 +179,7 @@ describe('lib.payments.createPayment.test.js', () => {
                   expect(res.rows[0]).to.have.property('CollectiveId', collective.id);
                   expect(res.rows[0]).to.have.property('currency', CURRENCY);
                   expect(res.rows[0]).to.have.property('amount', AMOUNT);
-                  expect(res.rows[0]).to.have.property('title',
+                  expect(res.rows[0]).to.have.property('description',
                     `Donation to ${collective.name}`);
                   done();
                 })
@@ -190,9 +189,8 @@ describe('lib.payments.createPayment.test.js', () => {
 
           describe('2nd payment with same stripeToken', () => {
             
-            beforeEach(() => paymentsLib.createPayment({
-              user,
-              collective,
+            beforeEach('create first payment', () => paymentsLib.createPayment({
+              order,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT,
@@ -200,19 +198,17 @@ describe('lib.payments.createPayment.test.js', () => {
               }
             }));
 
-            beforeEach(() => {
-              return models.PaymentMethod.findOne().then(paymentMethod => {
-                return paymentsLib.createPayment({
-                  user,
-                  collective,
-                  payment: {
-                    paymentMethod,
-                    amount: AMOUNT2,
-                    currency: CURRENCY,
-                  }
-                });
-              })
-            });
+            beforeEach('create 2nd payment', () => models.PaymentMethod
+              .findOne()
+              .then(paymentMethod => paymentsLib.createPayment({
+                order,
+                payment: {
+                  paymentMethod,
+                  amount: AMOUNT2,
+                  currency: CURRENCY,
+                }
+              }
+            )));
 
             it('does not re-create a paymentMethod', (done) => {
               models.PaymentMethod
@@ -223,27 +219,22 @@ describe('lib.payments.createPayment.test.js', () => {
                 })
                 .catch(done);
             });
-
-            it('successfully creates a donation in the database', (done) => {
-              models.Donation
-                .findAndCountAll({})
-                .then((res) => {
-                  expect(res.count).to.equal(2);
-                  expect(res.rows[1]).to.have.property('amount', AMOUNT2);
-                  done();
-                })
-                .catch(done);
-            });
           });
-
         });
 
         describe('recurringly', () => {
+          let order2;
+
+          beforeEach(() => models.Order.create({
+            UserId: user2.id,
+            CollectiveId: collective2.id,
+            amount: AMOUNT2,
+            currency: collective2.currency
+          }).then(o => order2 = o))
 
           beforeEach(() => {
             return paymentsLib.createPayment({
-              user: user2,
-              collective: collective2,
+              order: order2,
               payment: {
                 paymentMethod: { token: STRIPE_TOKEN },
                 amount: AMOUNT2,
@@ -264,17 +255,17 @@ describe('lib.payments.createPayment.test.js', () => {
               .catch(done);
           });
 
-          it('successfully creates a donation in the database', (done) => {
-            models.Donation
+          it('successfully creates an order in the database', (done) => {
+            models.Order
               .findAndCountAll({})
               .then((res) => {
-                expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user2.id);
-                expect(res.rows[0]).to.have.property('CollectiveId', collective2.id);
-                expect(res.rows[0]).to.have.property('currency', CURRENCY);
-                expect(res.rows[0]).to.have.property('amount', AMOUNT2);
-                expect(res.rows[0]).to.have.property('SubscriptionId');
-                expect(res.rows[0]).to.have.property('title', `Monthly donation to ${collective2.name}`);
+                expect(res.count).to.equal(2);
+                expect(res.rows[1]).to.have.property('UserId', user2.id);
+                expect(res.rows[1]).to.have.property('CollectiveId', collective2.id);
+                expect(res.rows[1]).to.have.property('currency', CURRENCY);
+                expect(res.rows[1]).to.have.property('amount', AMOUNT2);
+                expect(res.rows[1]).to.have.property('SubscriptionId');
+                expect(res.rows[1]).to.have.property('description', `Monthly donation to ${collective2.name}`);
                 done();
               })
               .catch(done)

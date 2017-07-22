@@ -4,7 +4,7 @@ import models from '../models';
 export default (req, res, next) => {
   /**
    * get total number of active collectives
-   * (a collective is considered as active if it has ever received any funding from its host or through a donation)
+   * (a collective is considered as active if it has ever received any funding from its host or through a order)
    */
   const getTotalCollectives = () => {
     return models.Transaction.aggregate('CollectiveId', 'count', {

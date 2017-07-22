@@ -113,7 +113,7 @@ describe('lib.notifications.test.js', () => {
           const options = nm.sendMail.lastCall.args[0];
           expect(options.to).to.equal(user.email);
           expect(options.subject).to.equal(`[TESTING] ${emailAttributes.subject}`);
-          expect(options.html).to.contain(expense.title);
+          expect(options.html).to.contain(expense.description);
           expect(options.html).to.contain("APPROVE");
           expect(options.html).to.contain("REJECT");
           done();

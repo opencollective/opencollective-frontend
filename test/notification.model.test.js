@@ -21,7 +21,7 @@ const {
   Collective,
   Notification,
   Tier,
-  Response
+  Order
 } = models;
 
 describe("notification.model.test.js", () => {
@@ -114,7 +114,7 @@ describe("notification.model.test.js", () => {
       .post('/collectives')
       .send({
         api_key: application.api_key,
-        collective: Object.assign(collective3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.MEMBER}]})
+        collective: Object.assign(collective3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.ADMIN}]})
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
@@ -123,7 +123,7 @@ describe("notification.model.test.js", () => {
       .tap(res => {
         const notifications = res.rows;
         const types = _.map(notifications, 'type').sort();
-        expect(types).to.deep.equal([ 'collective.expense.created', 'collective.expense.created', 'collective.monthlyreport', 'collective.transaction.created', 'mailinglist.host', 'mailinglist.members' ]);
+        expect(types).to.deep.equal([ 'collective.expense.created', 'collective.expense.created', 'collective.monthlyreport', 'collective.transaction.created', 'mailinglist.host', 'mailinglist.admins' ]);
       })
       .tap(res => expect(res.count).to.equal(6)));
 
@@ -165,7 +165,7 @@ describe("notification.model.test.js", () => {
       })
       .then((tier) => {
         return Promise.map(users, (user) => {
-          Response.create({
+          Order.create({
             UserId: user.id,
             CollectiveId: collective.id,
             TierId: tier.id

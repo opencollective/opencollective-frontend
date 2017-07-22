@@ -58,7 +58,7 @@ export function collectiveid(req, res, next, collectiveIdOrSlug) {
     .then(collective => req.collective = collective)
     .then(() => {
       if (req.remoteUser) {
-        return hasRole(req.remoteUser.id, req.collective.id, ['MEMBER','HOST'])
+        return hasRole(req.remoteUser.id, req.collective.id, ['ADMIN','HOST'])
       }
     })
     .then(canEdit => {

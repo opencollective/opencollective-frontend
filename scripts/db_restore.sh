@@ -39,6 +39,15 @@ echo "DBDUMP_FILE=$DBDUMP_FILE"
 
 if [ -z "$LOCALDBNAME" ]; then usage; fi;
 
+# kill all connections to the postgres server
+echo "Killing all connections to database '$LOCALDBNAME'"
+
+cat <<-EOF | psql -U $LOCALDBUSER -d $LOCALDBNAME 
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+where pg_stat_activity.datname = '$LOCALDBNAME'
+EOF
+
 dropdb $LOCALDBNAME;
 createdb -O $LOCALDBUSER $LOCALDBNAME 2> /dev/null
 

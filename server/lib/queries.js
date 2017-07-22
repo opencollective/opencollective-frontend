@@ -32,10 +32,10 @@ const getTotalAnnualBudget = () => {
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()} * 12),0)
       FROM "Subscriptions" s
-      LEFT JOIN "Donations" d ON s.id = d."SubscriptionId"
+      LEFT JOIN "Orders" d ON s.id = d."SubscriptionId"
       LEFT JOIN "Transactions" t
       ON (s.id = d."SubscriptionId"
-        AND t.id = (SELECT MAX(id) from "Transactions" t where t."DonationId" = d.id))
+        AND t.id = (SELECT MAX(id) from "Transactions" t where t."OrderId" = d.id))
       WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
         AND s.interval = 'month'
@@ -44,7 +44,7 @@ const getTotalAnnualBudget = () => {
     +
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
-      LEFT JOIN "Donations" d ON t."DonationId" = d.id
+      LEFT JOIN "Orders" d ON t."OrderId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
@@ -53,7 +53,7 @@ const getTotalAnnualBudget = () => {
     +
     (SELECT
       COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
-      LEFT JOIN "Donations" d on t."DonationId" = d.id
+      LEFT JOIN "Orders" d on t."OrderId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.amount > 0 AND t."CollectiveId" != 1
         AND t."deletedAt" IS NULL
@@ -135,8 +135,6 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
     tagClause = 'g.tags && $tag AND'; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
   }
 
-  console.log(">>> getCollectivesByTag", tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset);
-
   return sequelize.query(`
     WITH "totalDonations" AS (
       SELECT "CollectiveId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "CollectiveId") as collectives FROM "Transactions" WHERE amount > 0 AND "PaymentMethodId" IS NOT NULL GROUP BY "CollectiveId"
@@ -184,7 +182,7 @@ const getTopSponsors = () => {
 };
 
 /**
- * Returns all the users of a collective with their `totalDonations` and `role` (HOST/MEMBER/BACKER)
+ * Returns all the users of a collective with their `totalDonations` and `role` (HOST/ADMIN/BACKER)
  */
 const getUsersFromCollectiveWithTotalDonations = (CollectiveIds, until) => {
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
@@ -218,7 +216,7 @@ const getUsersFromCollectiveWithTotalDonations = (CollectiveIds, until) => {
       max(s."lastDonation") as "lastDonation"
     FROM "Users" u
     LEFT JOIN stats s ON u.id = s."UserId"
-    LEFT JOIN "Roles" ug ON u.id = ug."UserId"
+    LEFT JOIN "Members" ug ON u.id = ug."UserId"
     WHERE ug."CollectiveId" IN (:collectiveids)
     AND ug."deletedAt" IS NULL ${untilCondition('ug')}
     GROUP BY ug.role, u.id

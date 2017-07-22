@@ -97,7 +97,7 @@ export const resetTestDatabase = function(req, res, next) {
 
     createMember: ['createCollective', (cb, results) => {
       models.User.create(member)
-        .tap(u => results.createCollective.addUserWithRole(u, roles.MEMBER))
+        .tap(u => results.createCollective.addUserWithRole(u, roles.ADMIN))
         .then(u => cb(null, u))
         .catch(cb);
     }],
@@ -148,19 +148,19 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     addDonation1: ['createBacker', (cb, results) => {
-      models.Donation.create({
-        title: "Donation 1",
+      models.Order.create({
+        description: "Donation 1",
         amount: 100,
         currency: 'EUR',
         CollectiveId: results.createCollective.id,
         UserId: results.createBacker.id
       })
-      .then(donation => models.Transaction.create({
+      .then(order => models.Transaction.create({
         amount: 100,
         type: type.DONATION,
         currency: "EUR",
         UserId: results.createBacker.id,
-        DonationId: donation.id
+        OrderId: order.id
       }))
       .then(t => t.setCollective(results.createCollective))
       .then(() => cb())
@@ -168,19 +168,19 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     addDonation2: ['createBacker2', 'addDonation1', (cb, results) => {
-      models.Donation.create({
-        title: "Donation 2",
+      models.Order.create({
+        description: "Donation 2",
         amount: 200,
         currency: 'EUR',
         CollectiveId: results.createCollective.id,
         UserId: results.createBacker2.id
       })
-      .then(donation => models.Transaction.create({
+      .then(order => models.Transaction.create({
         amount: 200,
         type: type.DONATION,
         currency: "EUR",
         UserId: results.createBacker2.id,
-        DonationId: donation.id
+        OrderId: order.id
       }))
       .then(t => t.setCollective(results.createCollective))
       .then(() => cb())
@@ -189,7 +189,7 @@ export const resetTestDatabase = function(req, res, next) {
 
     addExpense1: ['createTestUser', (cb, results) => {
       models.Expense.create({
-        "title": "Expense 2",
+        "description": "Expense 2",
         "amount": 100,
         "currency": "EUR",
         "incurredAt": "2016-03-01T08:00:00.000Z",
@@ -206,7 +206,7 @@ export const resetTestDatabase = function(req, res, next) {
     // We add a second expense that incurred before the first expense we created
     addExpense2: ['createMember', 'addExpense1', (cb, results) => {
       models.Expense.create({
-        "title": "Expense 1",
+        "description": "Expense 1",
         "amount": 200,
         "currency": "EUR",
         "incurredAt": "2016-02-29T08:00:00.000Z",
@@ -271,10 +271,10 @@ export const exportPDF = function(req, res, next) {
       t.page = page++;
       t.collective = t.Collective;
       t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
-      t.notes = t.Expense && t.Expense.notes;
+      t.privateNotes = t.Expense && t.Expense.privateNotes;
       if (t.data && t.data.fxrateSource) {
-        t.notes = (t.notes) ? `${t.notes} (${note})` : note;
-        data.notes = note;
+        t.privateNotes = (t.privateNotes) ? `${t.privateNotes} (${note})` : note;
+        data.privateNotes = note;
       }
       if (page - 1 % transactionsPerTOCPage === 0) {
         currentPage++;

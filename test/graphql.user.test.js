@@ -19,8 +19,8 @@ describe('Query Tests', () => {
   before(() => sandbox = sinon.sandbox.create());
 
   before(() => {
-    sandbox.stub(paymentsLib, 'createPayment', ({response}) => {
-      return models.Response.update({ confirmedAt: new Date}, { where: { id: response.id }});
+    sandbox.stub(paymentsLib, 'createPayment', ({order}) => {
+      return models.Order.update({ processedAt: new Date }, { where: { id: order.id }});
     });
   });
 
@@ -40,7 +40,7 @@ describe('Query Tests', () => {
   beforeEach(() => collective1.createTier(utils.data('ticket1')).tap(t => ticket1 = t));
 
   beforeEach(() => collective1.addUserWithRole(user1, 'BACKER'));
-  beforeEach(() => collective2.addUserWithRole(user1, 'MEMBER'));
+  beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
   beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
 
   beforeEach('create stripe account', (done) => {
@@ -76,7 +76,7 @@ describe('Query Tests', () => {
         const data = result.data.LoggedInUser;
         expect(data.collectives.length).to.equal(2);
         expect(data.collectives[0].role).to.equal('BACKER');
-        expect(data.collectives[1].role).to.equal('MEMBER');
+        expect(data.collectives[1].role).to.equal('ADMIN');
       })
 
       it("doesn't return anything if not logged in", async () => {
@@ -89,9 +89,9 @@ describe('Query Tests', () => {
 
     describe('payment methods', () => {
 
-      const generateResponse = (user, tier = tier1) => {
+      const generateOrder = (user, tier = tier1) => {
         return {
-          description: "test response",
+          description: "test order",
           user: {
             email: user.email,
             paymentMethod: {
@@ -113,8 +113,8 @@ describe('Query Tests', () => {
 
       it("saves a payment method to the user", async () => {
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(generateResponse(user1))}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(generateOrder(user1))}) {
             user {
               id,
               email,
@@ -135,11 +135,11 @@ describe('Query Tests', () => {
 
 
       it("does not save a payment method to the user", async () => {
-        const response = generateResponse(user1);
-        response.user.paymentMethod.save = false;
+        const order = generateOrder(user1);
+        order.user.paymentMethod.save = false;
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(response)}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(order)}) {
             user {
               id,
               email,
@@ -159,21 +159,21 @@ describe('Query Tests', () => {
       });
       
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
-        const createResponseQuery = `
-        mutation createResponse {
-          createResponse(response: ${stringify(generateResponse(user1, ticket1))}) {
+        const createOrderQuery = `
+        mutation createOrder {
+          createOrder(order: ${stringify(generateOrder(user1, ticket1))}) {
             description
           }
         }`;
 
-        await graphql(schema, createResponseQuery, null, {});
+        await graphql(schema, createOrderQuery, null, {});
 
         const query = `
           query Tier {
             Tier(id: ${ticket1.id}) {
               id,
               name,
-              responses {
+              orders {
                 id,
                 description,
                 user {
@@ -189,25 +189,25 @@ describe('Query Tests', () => {
           }
         `;
         const result = await graphql(schema, query, null, {});
-        const responses = result.data.Tier.responses;
-        expect(responses).to.have.length(1);
-        expect(responses[0].user.paymentMethods).to.have.length(0);
+        const orders = result.data.Tier.orders;
+        expect(orders).to.have.length(1);
+        expect(orders[0].user.paymentMethods).to.have.length(0);
         const result2 = await graphql(schema, query, null, { remoteUser: user2 });
-        const responses2 = result2.data.Tier.responses;
-        expect(responses2).to.have.length(1);
-        expect(responses2[0].user.paymentMethods).to.have.length(0);
+        const orders2 = result2.data.Tier.orders;
+        expect(orders2).to.have.length(1);
+        expect(orders2[0].user.paymentMethods).to.have.length(0);
       });
 
       it("gets the payment method of the user if logged in as that user", async () => {
-        const response = generateResponse(user1);
-        const createResponseQuery = `
-        mutation createResponse {
-          createResponse(response: ${stringify(response)}) {
+        const order = generateOrder(user1);
+        const createOrderQuery = `
+        mutation createOrder {
+          createOrder(order: ${stringify(order)}) {
             description
           }
         }`;
 
-        await graphql(schema, createResponseQuery, null, {});
+        await graphql(schema, createOrderQuery, null, {});
 
         await models.PaymentMethod.update({confirmedAt: new Date}, { where: { UserId: user1.id }});
 
@@ -215,7 +215,7 @@ describe('Query Tests', () => {
           query Tier {
             Tier(id: ${tier1.id}) {
               name,
-              responses {
+              orders {
                 id,
                 description,
                 user {
@@ -231,10 +231,10 @@ describe('Query Tests', () => {
           }
         `;
         const result = await graphql(schema, query, null, { remoteUser: user1 });
-        const responses = result.data.Tier.responses;
-        expect(responses).to.have.length(1);
-        expect(responses[0].user.paymentMethods).to.have.length(1);
-        expect(responses[0].user.paymentMethods[0].identifier).to.equal('4242');
+        const orders = result.data.Tier.orders;
+        expect(orders).to.have.length(1);
+        expect(orders[0].user.paymentMethods).to.have.length(1);
+        expect(orders[0].user.paymentMethods[0].identifier).to.equal('4242');
       });
     });
   });

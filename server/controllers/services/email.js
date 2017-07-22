@@ -184,9 +184,9 @@ export const webhook = (req, res, next) => {
     // We fetch all the organizers of the collective (admins) to whom we will send the email to approve
     .then(() => {
       return sequelize.query(`
-        SELECT * FROM "Roles" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."CollectiveId"=:collectiveid AND ug.role=:role AND ug."deletedAt" IS NULL
+        SELECT * FROM "Members" ug LEFT JOIN "Users" u ON ug."UserId"=u.id WHERE ug."CollectiveId"=:collectiveid AND ug.role=:role AND ug."deletedAt" IS NULL
       `, {
-        replacements: { collectiveid: collective.id, role: 'MEMBER' },
+        replacements: { collectiveid: collective.id, role: 'ADMIN' },
         model: models.User
       });
     })
@@ -219,7 +219,7 @@ export const webhook = (req, res, next) => {
           /**
            * TODO
            * If there is no such mailing list,
-           * - if the sender is a MEMBER, we send an email to confirm to create the mailing list
+           * - if the sender is a ADMIN, we send an email to confirm to create the mailing list
            *   with the people in /cc as initial subscribers
            * - if the sender is unknown, we return an email suggesting to contact info@:collectiveSlug.opencollective.com
            */

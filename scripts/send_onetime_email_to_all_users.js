@@ -19,7 +19,7 @@ const debug = debugLib('onetime.email');
 
 const {
   Collective,
-  Role,
+  Member,
   User
 } = models;
 

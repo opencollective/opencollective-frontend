@@ -1,72 +1,16 @@
-import _ from 'lodash';
-
 import models from '../models';
 import errors from '../lib/errors';
-import {getLinkHeader, getRequestedUrl} from '../lib/utils';
 import paymentsLib from '../lib/payments';
-
-/**
- * Get donations
- */
-export const list = (req, res, next) => {
-
-  const query = Object.assign({
-    where: { CollectiveId: req.collective.id },
-    order: [[req.sorting.key, req.sorting.dir]]
-  }, req.pagination);
-
-  return models.Donation.findAndCountAll(query)
-    .then(donations => {
-      // Set headers for pagination.
-      req.pagination.total = donations.count;
-      res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
-      res.send(_.pluck(donations.rows, 'info'));
-    })
-    .catch(next);
-};
-
-export const stripe = (req, res, next) => {
-
-  const { payment } = req.required;
-  const { collective } = req;
-  const { amount, interval, stripeToken, description, notes } = payment;
-
-  const currency = payment.currency || collective.currency;
-
-  let user = req.user;
-  let promise = Promise.resolve();
-
-  // if payment is on someone else's behalf, find or create that user
-  if (payment.email && payment.email !== user.email) {
-    promise = models.User.findOrCreateByEmail(payment.email)
-    .tap(u => user = u);
-  }
-
-  return promise.then(() => paymentsLib.createPayment({
-    user,
-    collective,
-    payment: {
-      paymentMethod: { token: stripeToken },
-      amount,
-      currency,
-      description,
-      interval,
-      notes
-    }
-  }))
-  // returning transaction after processing payment because everything is synchronous for now.
-  .then((transaction) => res.send({success: true, user: req.user.info, transaction: transaction && transaction.info }))
-  .catch(err => next(new errors.BadRequest(err.message)))
-};
+import Promise from 'bluebird';
 
 /**
  * Create a manual donation
  */
 export const manual = (req, res, next) => {  
-  const { donation } = req.required;
+  const { order } = req.required;
   const { remoteUser } = req;
   const { collective } = req;
-  const { amount, title, notes } = donation;
+  const { amount, description, privateNotes } = order;
 
   if (!amount || amount < 0) {
     return Promise.reject(new Error('Amount must be greater than 0'));
@@ -76,22 +20,23 @@ export const manual = (req, res, next) => {
   let promise = Promise.resolve();
 
   // if donation is on someone else's behalf, find or create that user
-  if (donation.email && donation.email !== remoteUser.email) {
-    promise = models.User.findOrCreateByEmail(donation.email, models.User.splitName(donation.name))
+  if (order.email && order.email !== remoteUser.email) {
+    promise = models.User.findOrCreateByEmail(order.email, models.User.splitName(order.name))
     .tap(u => user = u)
   }
 
-  return promise.then(() => models.Donation.create({
+  return promise
+    .then(() => models.Order.create({
       UserId: user.id,
       CollectiveId: collective.id,
       currency: collective.currency,
       amount,
-      title,
-      notes
+      description,
+      privateNotes
     }))
-  .then(paymentsLib.processPayment)
-  .then(() => res.send({success: true}))
-  .catch(err => next(new errors.BadRequest(err.message)));
+    .then(order => paymentsLib.processPayment(order))
+    .then(() => res.send({success: true}))
+    .catch(err => next(new errors.BadRequest(err.message)));
 };
 
 
@@ -294,27 +239,27 @@ export const paypalCallback = (req, res, next) => {
         CollectiveId: collective.id,
         currency,
         amount: amountInt,
-        title: `Donation to ${collective.name}`,
+        description: `Donation to ${collective.name}`,
         SubscriptionId: subscriptionId
       };
 
-      models.Donation.create(donation)
-        .then(donation => transaction.setDonation(donation))
-        .then(donation => cb(null, donation))
+      models.Order.create(order)
+        .then(order => transaction.setDonation(order))
+        .then(order => cb(null, order))
         .catch(cb);
     }],
 
     addUserToCollective: ['getOrCreateUser', (cb, results) => {
       const user = results.getOrCreateUser;
 
-      models.Role.findOne({
+      models.Member.findOne({
         where: {
           CollectiveId: collective.id,
           UserId: user.id,
           role: roles.BACKER
         }
       })
-      .then(Role => Role || collective.addUserWithRole(user, roles.BACKER))
+      .then(Member => Member || collective.addUserWithRole(user, roles.BACKER))
       .then(() => cb())
       .catch(cb);
     }],

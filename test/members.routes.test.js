@@ -40,7 +40,7 @@ const createTransactions = () => {
     .then(() => models.Transaction.createMany(transactions, { HostId: 1 }));
 };
 
-describe('role.routes.test.js', () => {
+describe('members.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
@@ -50,12 +50,12 @@ describe('role.routes.test.js', () => {
       .tap(results => users = results));
 
   // Create collective.
-  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
 
   // Add the host and a backer to the collective.
-  beforeEach((done) => {
+  beforeEach('add host and backer', (done) => {
     const promises = [collective.addUserWithRole(users[0], roles.HOST),
-                      collective.addUserWithRole(users[1], roles.MEMBER),
+                      collective.addUserWithRole(users[1], roles.ADMIN),
                       collective.addUserWithRole(users[2], roles.BACKER)
                       ];
     Promise.all(promises).then(() => done() );
@@ -99,7 +99,7 @@ describe('role.routes.test.js', () => {
         .post(`/collectives/${collective.id}/users/${users[2].id}`)
         .send({
           api_key: application.api_key,
-          role: 'MEMBER'
+          role: 'ADMIN'
         })
         .set('Authorization', `Bearer ${users[2].jwt()}`)
         .expect(403)
@@ -144,19 +144,17 @@ describe('role.routes.test.js', () => {
         .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body).to.have.property('success', true);
-
           users[1].getCollectives().then((collectives) => {
             expect(collectives[0].id).to.equal(collective.id);
-            expect(collectives[0].Role.role).to.equal(roles.BACKER);
+            expect(collectives[0].Member.role).to.equal(roles.ADMIN);
+            expect(collectives[1].Member.role).to.equal(roles.BACKER);
             done();
           });
-
         });
     });
 
     it('successfully add a user to a collective with a role', (done) => {
-      const role = roles.MEMBER;
-
+      const role = roles.ADMIN;
       request(app)
         .post(`/collectives/${collective.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
@@ -171,7 +169,7 @@ describe('role.routes.test.js', () => {
 
           users[1].getCollectives().then((collectives) => {
             expect(collectives[0].id).to.equal(collective.id);
-            expect(collectives[0].Role.role).to.equal(role);
+            expect(collectives[0].Member.role).to.equal(role);
 
             setTimeout(() => {
               models.Activity.findAndCountAll({}).then((res) => {
@@ -188,7 +186,7 @@ describe('role.routes.test.js', () => {
       models.Notification.findOne({where: {
         CollectiveId: collective.id,
         UserId: users[2].id,
-        type: 'mailinglist.members'
+        type: 'mailinglist.admins'
       }}).then(notification => {
         expect(notification).to.not.exist;
       })
@@ -198,7 +196,7 @@ describe('role.routes.test.js', () => {
           .set('Authorization', `Bearer ${users[0].jwt()}`)
           .send({
             api_key: application.api_key,
-            role: roles.MEMBER
+            role: roles.ADMIN
           })
           .expect(200)
           .end((e, res) => {
@@ -208,9 +206,9 @@ describe('role.routes.test.js', () => {
             models.Notification.findOne({where: {
               CollectiveId: collective.id,
               UserId: users[2].id,
-              type: 'mailinglist.members'
+              type: 'mailinglist.admins'
             }}).then(notification => {
-              expect(notification.type).to.equal('mailinglist.members');
+              expect(notification.type).to.equal('mailinglist.admins');
               expect(notification.channel).to.equal('email');
               expect(notification.active).to.be.true;
               done();
@@ -223,7 +221,7 @@ describe('role.routes.test.js', () => {
   /**
    * Get user's collectives.
    */
-  describe('#getRoles', () => {
+  describe('#getMembers', () => {
 
     beforeEach('add users[0] to collective', () =>
       request(app)
@@ -285,7 +283,7 @@ describe('role.routes.test.js', () => {
   /**
    * Update a user-collective relation.
    */
-  describe('#updateRole', () => {
+  describe('#updateMember', () => {
 
     it('fails if not the host', (done) => {
       request(app)
@@ -304,7 +302,7 @@ describe('role.routes.test.js', () => {
     });
 
     it('successfully update a user-collective relation', (done) => {
-      const role = roles.MEMBER;
+      const role = roles.ADMIN;
       request(app)
         .put(`/collectives/${collective.id}/users/${users[2].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
@@ -330,7 +328,7 @@ describe('role.routes.test.js', () => {
   /**
    * Delete a user-collective relation.
    */
-  describe('#deleteRole', () => {
+  describe('#deleteMember', () => {
 
     it('fails if not the host', () =>
       request(app)
@@ -362,7 +360,7 @@ describe('role.routes.test.js', () => {
                   UserId: users[2].id
                 }
               };
-              models.Role.findAndCountAll(query).then((res) => {
+              models.Member.findAndCountAll(query).then((res) => {
                 expect(res.count).to.equal(0);
                 cb();
               });
@@ -394,14 +392,14 @@ describe('role.routes.test.js', () => {
 
     // Add users to tiers
     beforeEach('add users to tiers', () => Promise.all([
-      models.Response.create({ UserId: users[2].id, CollectiveId: 1, TierId: 1, status: 'PROCESSED' }),
-      models.Response.create({ UserId: users[3].id, CollectiveId: 1, TierId: 2, status: 'PROCESSED' })
+      models.Order.create({ UserId: users[2].id, CollectiveId: 1, TierId: 1, processedAt: new Date }),
+      models.Order.create({ UserId: users[3].id, CollectiveId: 1, TierId: 2, processedAt: new Date })
     ]));
 
     // Add active and non active subscription
     beforeEach('add active subscription', () => Promise.all([
-      models.Donation.create({CollectiveId: collective.id, UserId: users[2].id, Subscription: { isActive: true }}, { include: [ { model: models.Subscription } ] }),
-      models.Donation.create({CollectiveId: collective.id, UserId: users[3].id, Subscription: { isActive: false }}, { include: [ { model: models.Subscription } ] })
+      models.Order.create({CollectiveId: collective.id, UserId: users[2].id, Subscription: { isActive: true }}, { include: [ { model: models.Subscription } ] }),
+      models.Order.create({CollectiveId: collective.id, UserId: users[3].id, Subscription: { isActive: false }}, { include: [ { model: models.Subscription } ] })
     ]));
 
     it('get the list of users with their corresponding tier', () =>
@@ -413,7 +411,7 @@ describe('role.routes.test.js', () => {
           const users = res.body;
           expect(users).to.have.length(4);
           users.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(users[0].role).to.equal('MEMBER');
+          expect(users[0].role).to.equal('ADMIN');
           expect(users[1].role).to.equal('BACKER');
           expect(users[1].tier.name).to.equal('sponsor');
           expect(users[2].role).to.equal('HOST');
@@ -448,7 +446,7 @@ describe('role.routes.test.js', () => {
           }
           expect(users.length).to.equal(4);
           users.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
-          expect(getValue(0, "role")).to.equal('"MEMBER"');
+          expect(getValue(0, "role")).to.equal('"ADMIN"');
           expect(getValue(1, "tier")).to.equal('"backer"');
           expect(getValue(2, "tier")).to.equal('"sponsor"');
           expect(getValue(3, "role")).to.equal('"HOST"');
@@ -472,7 +470,7 @@ describe('role.routes.test.js', () => {
     it('get the list of users in csv format with emails if logged in as admin', (done) => {
       request(app)
         .get(`/collectives/${collective.slug}/users.csv?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${users[1].jwt()}`) // MEMBER
+        .set('Authorization', `Bearer ${users[1].jwt()}`) // ADMIN
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');

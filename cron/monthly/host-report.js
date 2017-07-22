@@ -56,7 +56,7 @@ const init = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
 
-  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "Roles" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
+  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "Members" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
 
   sequelize.query(query, {
     model: models.User,
@@ -186,7 +186,7 @@ const processHost = (host) => {
     data.maxSlugSize = Math.max(data.maxSlugSize, t.collective.shortSlug.length + 1);
     if (!t.description) {
       return transaction.getSource().then(source => {
-          t.description = source.title
+          t.description = source.description
           return t;
         });
     } else {

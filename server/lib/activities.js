@@ -22,7 +22,6 @@ export default {
     let eventType = '';
     let provider = '';
     let connectedAccountUsername = '';
-    let title = '';
     let connectedAccountLink = '';
     let lastEditedById = 0;
 
@@ -45,9 +44,9 @@ export default {
     }
 
     // get donation data
-    if (activity.data.donation) {
-      amount = activity.data.donation.amount/100;
-      ({ currency } = activity.data.donation);
+    if (activity.data.order) {
+      amount = activity.data.order.amount/100;
+      ({ currency } = activity.data.order);
     }
 
     // get subscription data
@@ -69,7 +68,7 @@ export default {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       ({ currency } = activity.data.expense);
-      ({ title } = activity.data.expense);
+      ({ description } = activity.data.expense);
       ({ lastEditedById } = activity.data.expense);
     }
 
@@ -99,13 +98,13 @@ export default {
         break;
 
       case activities.COLLECTIVE_EXPENSE_CREATED:
-        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${title}!`
+        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
 
       case activities.COLLECTIVE_EXPENSE_REJECTED:
-        return `Expense rejected: ${currency} ${amount} for ${title} in ${collective} by userId: ${lastEditedById}!`
+        return `Expense rejected: ${currency} ${amount} for ${description} in ${collective} by userId: ${lastEditedById}!`
 
       case activities.COLLECTIVE_EXPENSE_APPROVED:
-        return `Expense approved: ${currency} ${amount} for ${title} in ${collective} by userId: ${lastEditedById}!`
+        return `Expense approved: ${currency} ${amount} for ${description} in ${collective} by userId: ${lastEditedById}!`
 
       case activities.CONNECTED_ACCOUNT_CREATED:
         return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
@@ -163,7 +162,6 @@ export default {
     let userTwitter = '';
     let collectiveTwitter = '';
     let tweet = '';
-    let title = '';
 
     // get user data
     if (activity.data.user) {
@@ -184,9 +182,9 @@ export default {
     }
 
     // get donation data
-    if (activity.data.donation) {
-      amount = activity.data.donation.amount/100;
-      ({ currency } = activity.data.donation);
+    if (activity.data.order) {
+      amount = activity.data.order.amount/100;
+      ({ currency } = activity.data.order);
     }
 
     // get subscription data
@@ -210,7 +208,7 @@ export default {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       ({ currency } = activity.data.expense);
-      ({ title } = activity.data.expense);
+      ({ description } = activity.data.expense);
     }
 
     let collective;
@@ -240,13 +238,13 @@ export default {
         break;
 
       case activities.COLLECTIVE_EXPENSE_CREATED:
-        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${title}!`
+        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
 
       case activities.COLLECTIVE_EXPENSE_REJECTED:
-        return `Expense rejected: ${currency} ${amount} for ${title} in ${collective}!`
+        return `Expense rejected: ${currency} ${amount} for ${description} in ${collective}!`
 
       case activities.COLLECTIVE_EXPENSE_APPROVED:
-        return `Expense approved: ${currency} ${amount} for ${title} in ${collective}!`
+        return `Expense approved: ${currency} ${amount} for ${description} in ${collective}!`
 
       case activities.COLLECTIVE_EXPENSE_PAID:
         return `Expense paid on ${collective}: ${currency} ${amount} for '${description}'`;

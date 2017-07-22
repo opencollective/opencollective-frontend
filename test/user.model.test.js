@@ -2,6 +2,7 @@ import sinon from 'sinon';
 import {expect} from 'chai';
 import * as utils from '../test/utils';
 import models from '../server/models';
+import { type } from '../server/constants/transactions';
 
 const userData = utils.data('user1');
 
@@ -202,7 +203,7 @@ describe('user.models.test.js', () => {
       amount: 10000,
       netAmountInCollectiveCurrency: 10000,
       currency: 'USD',
-      type: 'donation',
+      type: type.DONATION,
       UserId: 1,
       CollectiveId: 1
     },{
@@ -210,7 +211,7 @@ describe('user.models.test.js', () => {
       amount: 15000,
       netAmountInCollectiveCurrency: 15000,
       currency: 'USD',
-      type: 'donation',
+      type: type.DONATION,
       UserId: 1,
       CollectiveId: 2
     },{
@@ -218,7 +219,7 @@ describe('user.models.test.js', () => {
       amount: 25000,
       netAmountInCollectiveCurrency: 25000,
       currency: 'USD',
-      type: 'donation',
+      type: type.DONATION,
       UserId: 2,
       CollectiveId: 1
     },{
@@ -226,7 +227,7 @@ describe('user.models.test.js', () => {
       amount: 50000,
       netAmountInCollectiveCurrency: 50000,
       currency: 'USD',
-      type: 'donation',
+      type: type.DONATION,
       UserId: 2,
       CollectiveId: 2
     }];
@@ -268,24 +269,24 @@ describe('user.models.test.js', () => {
         });
     });
 
-    it('gets the latest donations of a user', () => {
+    it('gets the latest orders of a user', () => {
       return User.findOne().then(user => {
         return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
-          .then(donations => {
-            expect(donations.length).to.equal(2);
+          .then(orders => {
+            expect(orders.length).to.equal(2);
           })
       });
     });
 
-    it('gets the latest donations of a user to open source', () => {
+    it('gets the latest orders of a user to open source', () => {
       return User.findOne().then(user => {
         return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
-          .then(donations => {
-            expect(donations.length).to.equal(1);
-            expect(donations[0]).to.have.property("amount");
-            expect(donations[0]).to.have.property("currency");
-            expect(donations[0]).to.have.property("Collective");
-            expect(donations[0].Collective).to.have.property("name");
+          .then(orders => {
+            expect(orders.length).to.equal(1);
+            expect(orders[0]).to.have.property("amount");
+            expect(orders[0]).to.have.property("currency");
+            expect(orders[0]).to.have.property("Collective");
+            expect(orders[0].Collective).to.have.property("name");
           })
       });
     });

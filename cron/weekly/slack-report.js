@@ -20,7 +20,7 @@ const updatedLastWeek = getTimeFrame('updatedAt');
 
 const donation = {
   where: {
-    DonationId: {
+    OrderId: {
       $not: null
     },
     platformFeeInTxnCurrency: {

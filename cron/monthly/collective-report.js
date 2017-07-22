@@ -99,21 +99,21 @@ const formatCurrency =  (amount, currency) => {
   })
 }
 
-const generateDonationsString = (backer, donations) => {
+const generateDonationsString = (backer, orders) => {
   if (!backer.name) {
     debug(`Skipping ${backer.username} because it doesn't have a name (${backer.name})`);
     return;
   }
   const donationsTextArray = [], donationsHTMLArray = [];
-  donations = donations.filter(donation => (donation.amount > 0));
-  if (donations.length === 0) {
+  orders = orders.filter(order => (order.amount > 0));
+  if (orders.length === 0) {
     debug(`Skipping ${backer.name} because there is no donation`);
     return;
   }
-  for (let i=0; i<Math.min(3, donations.length); i++) {
-    const donation = donations[i];
-    donationsHTMLArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Collective.slug}">${donation.Collective.name}</a>`);
-    donationsTextArray.push(`${formatCurrency(donation.amount,donation.currency)} to https://opencollective.com/${donation.Collective.slug}`);
+  for (let i=0; i<Math.min(3, orders.length); i++) {
+    const order = orders[i];
+    donationsHTMLArray.push(`${formatCurrency(order.amount,order.currency)} to <a href="https://opencollective.com/${order.Collective.slug}">${order.Collective.name}</a>`);
+    donationsTextArray.push(`${formatCurrency(order.amount,order.currency)} to https://opencollective.com/${order.Collective.slug}`);
   }
   const joinStringArray = (arr) => {
     return arr.join(', ').replace(/,([^, ]*)$/,' and $1');

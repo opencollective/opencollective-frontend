@@ -8,7 +8,7 @@ import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const Role = models.Role;
+const Member = models.Member;
 const Notification = models.Notification;
 
 const processRows = (rows) => {
@@ -16,7 +16,7 @@ const processRows = (rows) => {
 };
 
 const init = () => {
-  Role.findAll()
+  Member.findAll()
   .then(processRows)
   .then(() => process.exit(0));
 }
@@ -24,7 +24,7 @@ const init = () => {
 const processRow = (row) => {
   const lists = {};
   lists['BACKER'] = 'backers';
-  lists['MEMBER'] = 'members';
+  lists['ADMIN'] = 'members';
   const type = `mailinglist.${lists[row.role]}`;
   debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({

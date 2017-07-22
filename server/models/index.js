@@ -6,7 +6,7 @@ import Sequelize from 'sequelize';
 import { database as config } from 'config';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
-// like in case of the key totalDonations and raw query (like User.getTopBackers())
+// like in case of the key totalOrders and raw query (like User.getTopBackers())
 pg.defaults.parseInt8 = true;
 
 /**
@@ -55,13 +55,12 @@ export function setupModels(client) {
     'Activity',
     'Comment',
     'ConnectedAccount',
-    'Donation',
+    'Order',
     'Expense',
     'Collective',
     'Notification',
     'PaymentMethod',
-    'Response',
-    'Role',
+    'Member',
     'Session',
     'StripeAccount',
     'Subscription',
@@ -81,23 +80,24 @@ export function setupModels(client) {
 
   // User
   m.User.belongsTo(m.User, { as: 'referrer' });
-  m.User.belongsToMany(m.Collective, { through: { model: m.Role, unique: false }, as: 'collectives' });
+  m.User.belongsToMany(m.Collective, { through: { model: m.Member, unique: false }, as: 'collectives' });
   m.User.hasMany(m.ConnectedAccount);
   m.User.hasMany(m.Activity);
   m.User.hasMany(m.Notification);
   m.User.hasMany(m.Transaction);
   m.User.hasMany(m.Comment);
-  m.User.hasMany(m.Donation);
-  m.User.hasMany(m.Response, { as: 'response' });
+  m.User.hasMany(m.Order, { as: 'orders' });
   m.User.hasMany(m.PaymentMethod);
-  m.User.hasMany(m.Role);
+  m.User.hasMany(m.Member);
 
-  // Roles
-  m.Role.belongsTo(m.User);
+  // Members
+  m.Member.belongsTo(m.User);
+  m.Member.belongsTo(m.Collective);
+  m.Member.belongsTo(m.Tier);
 
   // Collective.
-  m.Collective.belongsToMany(m.User, { through: { model: m.Role, unique: false }, as: 'users'});
-  m.Collective.hasMany(m.Role);
+  m.Collective.belongsToMany(m.User, { through: { model: m.Member, unique: false }, as: 'users'});
+  m.Collective.hasMany(m.Member);
 
   // StripeAccount
   m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
@@ -139,35 +139,27 @@ export function setupModels(client) {
   m.Expense.hasMany(m.Comment);
   m.Collective.hasMany(m.Comment);
 
-  // Donation.
-  m.Donation.belongsTo(m.User);
-  m.Donation.belongsTo(m.Collective);
-  m.Collective.hasMany(m.Donation);
-  m.Transaction.belongsTo(m.Donation);
-  m.Donation.hasMany(m.Transaction);
-  m.Donation.belongsTo(m.Response);
+  // Order.
+  m.Order.belongsTo(m.User);
+  m.Order.belongsTo(m.Collective);
+  m.Order.belongsTo(m.Tier);
+  m.Collective.hasMany(m.Order);
+  m.Transaction.belongsTo(m.Order);
+  m.Order.hasMany(m.Transaction);
+  m.Tier.hasMany(m.Order);
 
   // Subscription
-  m.Donation.belongsTo(m.Subscription);
-  m.Subscription.hasOne(m.Donation);
+  m.Order.belongsTo(m.Subscription);
+  m.Subscription.hasOne(m.Order);
 
   // PaymentMethod
-  m.Donation.belongsTo(m.PaymentMethod);
-  m.PaymentMethod.hasMany(m.Donation);
+  m.Order.belongsTo(m.PaymentMethod);
+  m.PaymentMethod.hasMany(m.Order);
   m.Transaction.belongsTo(m.PaymentMethod);
 
   // Tier
   m.Collective.hasMany(m.Tier, { as: 'tiers' });
   m.Tier.belongsTo(m.Collective);
-
-  // Response
-  m.Response.hasOne(m.Donation);
-  m.Response.belongsTo(m.Tier);
-  m.Response.belongsTo(m.Collective);
-  m.Response.belongsTo(m.User);
-  m.Collective.hasMany(m.Response);
-  m.Tier.hasMany(m.Response);
-  m.Collective.hasMany(m.Response);
 
   return m;
 }

@@ -91,7 +91,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     type: type.EXPENSE,
     amount: -expense.amount,
     currency: expense.currency,
-    description: expense.title,
+    description: expense.description,
     UserId,
     CollectiveId: expense.CollectiveId,
     HostId: host.id

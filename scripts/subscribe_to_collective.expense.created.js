@@ -10,7 +10,7 @@ const debug = require('debug')('subscribe');
 
 const {
   Notification,
-  Role
+  Member
 } = models;
 
 const processRows = (rows) => {
@@ -21,12 +21,12 @@ const init = () => {
 
   const query = {
       where: {
-        role: 'MEMBER'
+        role: 'ADMIN'
       },
       order: [['id', 'ASC']]
   };
 
-  Role.findAll(query)
+  Member.findAll(query)
   .then(processRows)
   .then(() => process.exit(0));
 }

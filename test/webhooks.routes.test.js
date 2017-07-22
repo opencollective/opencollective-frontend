@@ -14,6 +14,7 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 import stripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
+import paymentsLib from '../server/lib/payments';
 
 const chance = chanceLib.Chance();
 
@@ -23,7 +24,6 @@ const chance = chanceLib.Chance();
 const application = utils.data('application');
 const userData = utils.data('user1');
 const collectiveData = utils.data('collective1');
-let stripeEmail;
 const webhookEvent = stripeMock.webhook;
 const webhookInvoice = webhookEvent.data.object;
 const webhookSubscription = webhookInvoice.lines.data[0];
@@ -38,7 +38,6 @@ const INTERVAL = 'month';
 const stubStripe = () => {
   const mock = stripeMock.accounts.create;
   mock.email = chance.email();
-  stripeEmail = mock.email;
 
   const stub = sinon.stub(appStripe.accounts, 'create');
   stub.yields(null, mock);
@@ -47,7 +46,7 @@ const stubStripe = () => {
 
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
-  let sandbox, user, paymentMethod, collective, donation, emailSendSpy;
+  let sandbox, user, paymentMethod, collective, order, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -98,7 +97,7 @@ describe('webhooks.routes.test.js', () => {
   describe('success', () => {
 
     /*
-     * This section of beforeEach calls is for original donation to succeed.
+     * This section of beforeEach calls is for original order to succeed.
      */
     const planId = generatePlanId({
       amount: STRIPE_SUBSCRIPTION_CHARGE,
@@ -109,7 +108,7 @@ describe('webhooks.routes.test.js', () => {
     beforeEach('Nock for customers.create', () => {
       nocks['customers.create'] = nock(STRIPE_URL)
         .post('/v1/customers')
-        .reply(200, stripeMock.customers.create);
+        .reply(200, () => stripeMock.customers.create);
     });
 
     beforeEach('Nock for plans.retrieve', () => {
@@ -134,10 +133,9 @@ describe('webhooks.routes.test.js', () => {
         'application_fee=1750',
         `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
         `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
-        `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(stripeEmail)}`,
+        `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
         `${encodeURIComponent('metadata[paymentMethodId]')}=1`
       ].join('&');
-
       nocks['charges.create'] = nock(STRIPE_URL)
         .post('/v1/charges', params)
         .reply(200, stripeMock.charges.create);
@@ -173,35 +171,34 @@ describe('webhooks.routes.test.js', () => {
         .reply(200, stripeMock.balance);
     });
 
-    // Now we make the donation using above beforeEach calls
-    beforeEach('Make the donation', (done) => {
+    // Now we make the order using above beforeEach calls
+    beforeEach('Make the order', () => {
       const payment = {
-        stripeToken: STRIPE_TOKEN,
+        paymentMethod: {
+          token: STRIPE_TOKEN
+        },
         amount: webhookSubscription.amount,
         currency: CURRENCY,
-        interval: INTERVAL,
-        email: stripeEmail
+        interval: INTERVAL
       };
 
-      request(app)
-        .post(`/collectives/${collective.id}/donations/stripe`)
-        .send({
-          api_key: application.api_key,
-          payment
+      return models.Order
+        .create({
+          UserId: user.id,
+          CollectiveId: collective.id,
+          amount: webhookSubscription.amount
         })
-        .expect(200)
-        .end((err, res) => {
-          expect(err).to.not.exist;
-          expect(res.body.success).to.be.true;
-          done();
-        });
+        .then((order) => paymentsLib.createPayment({
+          order,
+          payment
+        }));
     });
 
     /*
-     * Next beforeEach calls confirm that donation went through
+     * Next beforeEach calls confirm that order went through
      */
-    beforeEach('Find donation', (done) => {
-      models.Donation.findAndCountAll({
+    beforeEach('Find order', (done) => {
+      models.Order.findAndCountAll({
           include: [
             {
               model: models.Subscription
@@ -210,8 +207,8 @@ describe('webhooks.routes.test.js', () => {
         })
         .tap((res) => {
           expect(res.count).to.equal(1);
-          donation = res.rows[0];
-          expect(donation.isProcessed).to.equal(true);
+          order = res.rows[0];
+          expect(order.processedAt).to.not.be.null;
           done();
         })
         .catch(done);
@@ -220,7 +217,7 @@ describe('webhooks.routes.test.js', () => {
     beforeEach('Find paymentMethod', (done) => {
       models.PaymentMethod.findAndCountAll({
         where: {
-          UserId: donation.UserId
+          UserId: order.UserId
         }})
         .tap((res) => {
           expect(res.count).to.equal(1);
@@ -277,10 +274,10 @@ describe('webhooks.routes.test.js', () => {
     it('adds a transaction', (done) => {
       models.Transaction.findAndCountAll({
         where: {
-          DonationId: donation.id
+          OrderId: order.id
         },
         include: [{
-          model: models.Donation,
+          model: models.Order,
           include: [{
             model: models.Subscription
           }]
@@ -289,9 +286,9 @@ describe('webhooks.routes.test.js', () => {
       .tap((res) => {
         expect(res.count).to.equal(2);
         const transaction = res.rows[1];
-        expect(transaction.DonationId).to.be.equal(donation.id);
-        expect(transaction.CollectiveId).to.be.equal(donation.CollectiveId);
-        expect(transaction.UserId).to.be.equal(donation.UserId);
+        expect(transaction.OrderId).to.be.equal(order.id);
+        expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
+        expect(transaction.UserId).to.be.equal(order.UserId);
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
         expect(transaction.type).to.be.equal(type.DONATION);
@@ -303,8 +300,8 @@ describe('webhooks.routes.test.js', () => {
         expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
         expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
-        expect(transaction.Donation.Subscription.isActive).to.be.equal(true);
-        expect(transaction.Donation.Subscription).to.have.property('activatedAt');
+        expect(transaction.Order.Subscription.isActive).to.be.equal(true);
+        expect(transaction.Order.Subscription).to.have.property('activatedAt');
         done();
       })
       .catch(done);
@@ -375,7 +372,7 @@ describe('webhooks.routes.test.js', () => {
           expect(err).to.not.exist;
           models.Transaction.findAndCountAll({
             include: [{ 
-              model: models.Donation,
+              model: models.Order,
               include: [{
                 model: models.Subscription
               }]
@@ -384,8 +381,8 @@ describe('webhooks.routes.test.js', () => {
           .tap(res => {
             expect(res.count).to.be.equal(3); // third transaction
             const transaction = res.rows[2];
-            expect(transaction.CollectiveId).to.be.equal(donation.CollectiveId);
-            expect(transaction.UserId).to.be.equal(donation.UserId);
+            expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
+            expect(transaction.UserId).to.be.equal(order.UserId);
             expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
             expect(transaction.currency).to.be.equal(CURRENCY);
             expect(transaction.type).to.be.equal(type.DONATION);
@@ -398,15 +395,15 @@ describe('webhooks.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
             expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
             expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875);
-            expect(transaction.Donation.Subscription.isActive).to.be.equal(true);
-            expect(transaction.Donation.Subscription).to.have.property('activatedAt');
-            expect(transaction.Donation.Subscription.interval).to.be.equal('month');
+            expect(transaction.Order.Subscription.isActive).to.be.equal(true);
+            expect(transaction.Order.Subscription).to.have.property('activatedAt');
+            expect(transaction.Order.Subscription.interval).to.be.equal('month');
 
             expect(emailSendSpy.callCount).to.equal(4);
             expect(emailSendSpy.thirdCall.args[0])
             expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
             expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-            expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
+            expect(emailSendSpy.thirdCall.args[1]).to.equal(user.email);
 
             done();
           })
@@ -420,7 +417,7 @@ describe('webhooks.routes.test.js', () => {
       expect(emailSendSpy.thirdCall.args[0])
       expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
       expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-      expect(emailSendSpy.thirdCall.args[1]).to.equal(stripeEmail);
+      expect(emailSendSpy.thirdCall.args[1]).to.equal(user.email);
     });
   });
 

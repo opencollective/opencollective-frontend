@@ -28,14 +28,14 @@ const usersData = [
     firstName: 'Xavier',
     lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
-    role: 'MEMBER',
+    role: 'ADMIN',
     image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   },
   {
     firstName: 'Aseem',
     lastName: 'Sood',
     email: 'asood123+test@gmail.com',
-    role: 'MEMBER'
+    role: 'ADMIN'
   },
   {
     firstName: 'Pia',
@@ -187,7 +187,7 @@ describe("email.routes.test", () => {
 
   describe("unsubscribe", () => {
 
-    const template = 'mailinglist.members';
+    const template = 'mailinglist.admins';
 
     const generateUnsubscribeUrl = (email) => {
       const token = generateToken(email, collectiveData.slug, template);
@@ -222,7 +222,7 @@ describe("email.routes.test", () => {
       const where = {
         UserId: users[0].id,
         CollectiveId: collective.id,
-        type: 'mailinglist.members'
+        type: 'mailinglist.admins'
       };
 
       return request(app)

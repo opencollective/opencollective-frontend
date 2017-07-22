@@ -38,7 +38,7 @@ describe('graphql.tiers.test', () => {
 
   beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
   beforeEach(() => collective2.addUserWithRole(host, 'HOST'));
-  beforeEach(() => collective2.addUserWithRole(user1, 'MEMBER'));
+  beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
 
   beforeEach('create stripe account', (done) => {
     models.StripeAccount.create({
@@ -104,9 +104,9 @@ describe('graphql.tiers.test', () => {
 
     describe('payment methods', () => {
 
-      const generateResponse = (user) => {
+      const generateOrder = (user) => {
         return {
-          description: "test response",
+          description: "test order",
           user: {
             email: user.email,
             paymentMethod: {
@@ -126,11 +126,11 @@ describe('graphql.tiers.test', () => {
       }
 
       it("fails to use a payment method on file if not logged in", async () => {
-        const response = generateResponse(user1);
-        response.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        const order = generateOrder(user1);
+        order.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(response)}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(order)}) {
             user {
               id,
               email,
@@ -148,11 +148,11 @@ describe('graphql.tiers.test', () => {
       });
     
       it("fails to use a payment method on file if not logged in as the owner", async () => {
-        const response = generateResponse(user1);
-        response.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        const order = generateOrder(user1);
+        order.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(response)}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(order)}) {
             user {
               id,
               email,
@@ -170,11 +170,11 @@ describe('graphql.tiers.test', () => {
       });
           
       it("user1 becomes a backer of collective1 using a payment method on file", async () => {
-        const responseInput = generateResponse(user1);
-        responseInput.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        const orderInput = generateOrder(user1);
+        orderInput.user.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(responseInput)}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(orderInput)}) {
             user {
               id,
               email,
@@ -189,25 +189,25 @@ describe('graphql.tiers.test', () => {
         const result = await graphql(schema, query, null, { remoteUser: user1 });
         expect(result.errors).to.not.exist;
 
-        const memberships = await models.Role.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
-        const donations = await models.Donation.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
-        const subscription = await models.Subscription.findById(donations[0].SubscriptionId);
-        const response = await models.Response.findById(donations[0].ResponseId);
+        const members = await models.Member.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const orders = await models.Order.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const subscription = await models.Subscription.findById(orders[0].SubscriptionId);
+        const order = await models.Order.findById(orders[0].id);
         const transactions = await models.Transaction.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
 
-        expect(memberships).to.have.length(1);
-        expect(donations).to.have.length(1);
-        expect(donations[0].SubscriptionId).to.not.be.null;
+        expect(members).to.have.length(1);
+        expect(orders).to.have.length(1);
+        expect(orders[0].SubscriptionId).to.not.be.null;
         expect(subscription.interval).to.equal(tier1.interval);
         expect(transactions).to.have.length(1);
         expect(transactions[0].amount).to.equal(tier1.amount);
-        expect(response.status).to.equal('PROCESSED');
+        expect(order.processedAt).to.not.be.null;
       });
       
       it("user1 becomes a backer of collective1 using a new payment method", async () => {
         const query = `
-        mutation createResponse {
-          createResponse(response: ${stringify(generateResponse(user1))}) {
+        mutation createOrder {
+          createOrder(order: ${stringify(generateOrder(user1))}) {
             user {
               id,
               email,
@@ -221,8 +221,8 @@ describe('graphql.tiers.test', () => {
 
         const result = await graphql(schema, query, null, {});
         expect(result.errors).to.not.exist;
-        const memberships = await models.Role.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
-        expect(memberships).to.have.length(1);
+        const members = await models.Member.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        expect(members).to.have.length(1);
         const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
         expect(paymentMethods).to.have.length(2);
       });

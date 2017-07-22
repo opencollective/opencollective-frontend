@@ -268,8 +268,8 @@ describe('users.routes.test.js', () => {
 
     // Create a collective with two members
     beforeEach(() => models.Collective.create(utils.data('collective1'))
-      .tap(g => g.addUserWithRole(user, 'MEMBER'))
-      .tap(g => g.addUserWithRole(user2, 'MEMBER'))
+      .tap(g => g.addUserWithRole(user, 'ADMIN'))
+      .tap(g => g.addUserWithRole(user2, 'ADMIN'))
     );
 
     it('successfully get a user\'s information', (done) => {
@@ -296,7 +296,7 @@ describe('users.routes.test.js', () => {
           const u = res.body;
           expect(u.username).to.equal(utils.data('user1').username);
           expect(u.collectives[0].name).to.equal(utils.data('collective1').name);
-          expect(u.collectives[0].role).to.equal('MEMBER');
+          expect(u.collectives[0].role).to.equal('ADMIN');
           expect(u.collectives[0].members).to.equal(2);
           done();
         });
@@ -546,7 +546,7 @@ describe('users.routes.test.js', () => {
 
     it('fails if the user already has a firstName and image set', done => {
       // only users with a recent donation can be edited
-      models.Donation.create({
+      models.Order.create({
           UserId: userWithInfo.id,
           currency: 'USD',
           amount: 100
@@ -569,7 +569,7 @@ describe('users.routes.test.js', () => {
 
     it('successfully updates a user without an image', done => {
       // only users with a recent donation can be edited
-      models.Donation.create({
+      models.Order.create({
           UserId: userWithoutAvatar.id,
           currency: 'USD',
           amount: 100

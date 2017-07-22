@@ -359,16 +359,16 @@ export default (Sequelize, DataTypes) => {
 
       getCollectivesWithRoles() {
         return this.getCollectives({
-          include: [{ model: models.Role, where: { UserId: this.id }}]
+          include: [{ model: models.Member, where: { UserId: this.id }}]
         })
         .then(collectives => collectives.map(g => {
-          g.role = g.Role.role;
+          g.role = g.Member.role;
           return g;
         }))
       },
 
-      getRoles() {
-        return models.Role.findAll({
+      getMembers() {
+        return models.Member.findAll({
           where: {
             UserId: this.id
           }
@@ -393,7 +393,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       canEditCollective(collectiveid) {
-        return hasRole(this.id, collectiveid, ['MEMBER', 'HOST']);
+        return hasRole(this.id, collectiveid, ['ADMIN', 'HOST']);
       },
 
       updateWhiteListedAttributes(attributes) {

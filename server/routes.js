@@ -2,10 +2,9 @@ import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql'
 
 import schema from './graphql/schema';
-import * as activities from './controllers/activities';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
-import * as donations from './controllers/donations';
+import * as orders from './controllers/orders';
 import * as transactions from './controllers/transactions';
 import * as expenses from './controllers/expenses';
 import * as comments from './controllers/comments';
@@ -130,7 +129,7 @@ export default (app) => {
    */
   app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/:userid', users.show); // Get a user.
-  app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent donation)
+  app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent order)
   app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
   app.put('/users/:userid/image', required('image'), auth.mustBeLoggedInAsUser, users.updateAvatar); // Update a user's image
@@ -182,7 +181,7 @@ export default (app) => {
   app.get('/collectives/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
-   * Role.
+   * Member.
    *
    *  Relations between a collective and a user.
    */
@@ -224,21 +223,11 @@ export default (app) => {
   app.delete('/collectives/:collectiveid/expenses/:expenseid/comments/:commentid', auth.canEditComment, comments.deleteComment); // Delete a comment
 
   /**
-   * Donations
+   * Orders
    */
-  app.get('/collectives/:collectiveid/donations', mw.paginate(), mw.sorting({key: 'processedAt', dir: 'DESC'}), donations.list); // Callback after a payment
-  app.post('/collectives/:collectiveid/donations/stripe', required('payment'), mw.getOrCreateUser, donations.stripe); // Make a stripe donation.
-  app.post('/collectives/:collectiveid/donations/manual', required('donation'), auth.mustHaveRole(roles.HOST), donations.manual); // Create a manual donation.
-  // app.post('/collectives/:collectiveid/donations/paypal', required('payment'), donations.paypal); // Make a paypal donation.
-  // app.get('/collectives/:collectiveid/transactions/:paranoidtransactionid/callback', donations.paypalCallback); // Callback after a payment
-
-  /**
-   * Activities.
-   *
-   *  An activity is any action linked to a User or a Collective.
-   */
-  app.get('/collectives/:collectiveid/activities', auth.mustBePartOfTheCollective, mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.collective); // Get a collective's activities.
-  app.get('/users/:userid/activities', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), activities.user); // Get a user's activities.
+  app.post('/collectives/:collectiveid/orders/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
+  // app.post('/collectives/:collectiveid/donations/paypal', required('payment'), orders.paypal); // Make a paypal order.
+  // app.get('/collectives/:collectiveid/transactions/:paranoidtransactionid/callback', orders.paypalCallback); // Callback after a payment
 
   /**
    * Notifications.

@@ -38,7 +38,7 @@ describe('transactions.routes.test.js', () => {
   // Add users to collectives
   beforeEach('add user to collective2 as a host', () => collective2.addUserWithRole(user, roles.HOST));
   beforeEach('add user to publicCollective as a host', () => publicCollective.addUserWithRole(user, roles.HOST));
-  beforeEach('add user3 to publicCollective as a member', () => publicCollective.addUserWithRole(user3, roles.MEMBER));
+  beforeEach('add user3 to publicCollective as a member', () => publicCollective.addUserWithRole(user3, roles.ADMIN));
 
   beforeEach(() => models.PaymentMethod.create({UserId: user.id}))
 

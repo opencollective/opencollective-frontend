@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}/{{interval}} à {{collective.name}}
+Subject: Merci pour votre donation de {{{currency order.amount currency=order.currency}}}/{{interval}} à {{collective.name}}
 {{else}}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} à {{collective.name}}
+Subject: Merci pour votre donation de {{{currency order.amount currency=order.currency}}} à {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -15,12 +15,12 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+<p>Merci pour votre donation de {{{currency order.amount currency=order.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
 
 <p>Veuillez noter que vos futurs paiements seront effectués au premier du mois. <a href='https://opencollective.com/faq#charge-date-notice'>Pourquoi?</a></p>
 
 {{else}}
-<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}.
+<p>Merci pour votre donation de {{{currency order.amount currency=order.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
 

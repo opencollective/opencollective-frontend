@@ -5,7 +5,7 @@ import {
 
 import {
   TransactionInterfaceType,
-  TransactionDonationType,
+  TransactionOrderType,
   TransactionExpenseType
 } from './types';
 
@@ -29,7 +29,7 @@ const Mutation = new GraphQLObjectType({
 })
 
 const Schema = new GraphQLSchema({
-  types: [TransactionInterfaceType, TransactionDonationType, TransactionExpenseType],
+  types: [TransactionInterfaceType, TransactionOrderType, TransactionExpenseType],
   query: Query,
   mutation: Mutation
 });

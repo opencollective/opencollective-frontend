@@ -148,40 +148,6 @@ export const paginateOffset = (page, perPage) => {
 };
 
 /**
- * Try to find in which tier a backer falls into based on the tiers definition
- */
-export const getTier = (user, tiers) => {
-
-  let defaultTier;
-  switch (user.role) {
-    case 'MEMBER':
-      return 'core contributor';
-    case 'HOST':
-      defaultTier = 'host';
-      break;
-   default:
-      defaultTier = 'backer';
-      break;
-  }
-
-  if (!tiers || !user.totalDonations) return defaultTier;
-
-  // we make a copy of tiers before we sort it
-  tiers = _.clone(tiers);
-
-  // We order the tiers by start range DESC
-  tiers.sort((a,b) => {
-    return b.range[0] - a.range[0];
-  });
-
-  // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
-  const tier = tiers.find((tier) => (user.totalDonations / 100 >= tier.range[0]));
-
-  return (tier && tier.name) ? tier.name : defaultTier;
-
-};
-
-/**
  * Append tier to each backer in an array of backers
  */
 export const appendTier = (collective, users) => {

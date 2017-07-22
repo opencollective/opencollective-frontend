@@ -147,7 +147,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       })
     });
   } else {
-    console.warn("Warning: No mail sent - Mailgun is not configured");
+    if (process.env.DEBUG && process.env.DEBUG.match(/email/)) {
+      console.warn("Warning: No mail sent - Mailgun is not configured");
+    }
     return Promise.resolve();
   }
 };
@@ -163,7 +165,7 @@ const getNotificationLabel = (template, recipient = '') => {
   const notificationTypeLabels = {
     'email.approve': 'notifications of new emails pending approval',
     'email.message': `the ${recipient.substr(0, recipient.indexOf('@'))} mailing list`,
-    'collective.donation.created': 'notifications of new donations for this collective',
+    'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
     'collective.monthlyreport': 'monthly reports for collectives',
     'host.monthlyreport': 'monthly reports for host',
@@ -213,7 +215,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   }
 
   if (template === 'collective.transaction.created') {
-    template = (data.transaction.amount > 0) ? 'collective.donation.created' : 'collective.expense.paid';
+    template = (data.transaction.amount > 0) ? 'collective.order.created' : 'collective.expense.paid';
     if (data.user && data.user.twitterHandle) {
       const collectiveMention = (data.collective.twitterHandle) ? `@${data.collective.twitterHandle}` : data.collective.name;
       const text = `Hi @${data.user.twitterHandle} thanks for your donation to ${collectiveMention} https://opencollective.com/${data.collective.slug} 🎉😊`;

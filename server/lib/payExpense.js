@@ -17,7 +17,7 @@ const services = {
       // TODO does PayPal accept all the currencies that we support in our expenses?
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
-      memo: `Reimbursement from ${collective.name}: ${expense.title}`,
+      memo: `Reimbursement from ${collective.name}: ${expense.description}`,
       trackingId: [uuid.v1().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${baseUrl}/success`,

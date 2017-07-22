@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.amount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.amount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -16,15 +16,15 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 {{#if interval}}
   {{#if firstPayment }}
-    <p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us make this conversation happen!</p>
+    <p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency order.amount currency=order.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us make this conversation happen!</p>
     {{> charge_date_notice}}
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.amount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your donation helps us continue our activities.</p>
   {{/if}}
 {{else}}
-<p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+<p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency order.amount currency=order.currency}}} on {{{moment order.createdAt}}}.
   If you made a $50 donation for a ticket, we look forward to meeting you! We will be emailing details shortly. You do not have to worry about bringing a ticket but do save this email just in case.</p>
 {{/if}}
 

@@ -55,7 +55,7 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => collective.addUserWithRole(host, roles.HOST));
 
-  beforeEach(() => collective.addUserWithRole(member, roles.MEMBER));
+  beforeEach(() => collective.addUserWithRole(member, roles.ADMIN));
 
   describe('WHEN expense does not exist', () => {
     let req;
@@ -120,7 +120,7 @@ describe('expenses.routes.test.js', () => {
           .then(res => {
             expect(res.body.UserId).not.to.be.equal(host.id);
             expect(res.body.CollectiveId).to.be.equal(collective.id);
-            expect(res.body.title).to.be.equal(expense.title);
+            expect(res.body.description).to.be.equal(expense.description);
             expect(res.body.notes).to.be.equal(expense.notes);
             expect(res.body.category).to.be.equal(expense.category);
             expect(res.body.amount).to.be.equal(expense.amount);
@@ -182,7 +182,7 @@ describe('expenses.routes.test.js', () => {
             .then(res => actualExpense = res.body));
 
           it('THEN returns expense data', () => {
-            expect(actualExpense.title).to.be.equal(expense.title);
+            expect(actualExpense.description).to.be.equal(expense.description);
             expect(actualExpense.notes).to.be.equal(expense.notes);
             expect(actualExpense.category).to.be.equal(expense.category);
             expect(actualExpense.amount).to.be.equal(expense.amount);
@@ -207,7 +207,7 @@ describe('expenses.routes.test.js', () => {
             expectExpenseActivity('collective.expense.created', actualExpense.id));
 
           it('THEN an email notification is sent', (done) => {
-            expect(emailSendMessageSpy.firstCall.args[1]).to.contain(actualExpense.title);
+            expect(emailSendMessageSpy.firstCall.args[1]).to.contain(actualExpense.description);
             expect(emailSendMessageSpy.firstCall.args[2]).to.contain(actualExpense.attachment);
             done();
           });
@@ -430,12 +430,12 @@ describe('expenses.routes.test.js', () => {
               beforeEach(() => request(app)
                 .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
-                .send({expense: {title: 'new title'}})
+                .send({expense: { description: 'new description' }})
                 .expect(200)
                 .then(res => response = res.body));
 
               it('THEN returns modified expense', () => {
-                expect(response.title).to.be.equal('new title');
+                expect(response.description).to.be.equal('new description');
                 expect(response.category).to.be.equal('Engineering');
               });
 
@@ -491,7 +491,7 @@ describe('expenses.routes.test.js', () => {
                   });
             });
 
-            describe('WHEN authenticated as a MEMBER', () => {
+            describe('WHEN authenticated as a ADMIN', () => {
 
               beforeEach(() => {
                 approveReq = approveReq.set('Authorization', `Bearer ${member.jwt()}`);
@@ -694,7 +694,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);
-                  expect(transaction).to.have.property('description', expense.title);
+                  expect(transaction).to.have.property('description', expense.description);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
@@ -714,7 +714,7 @@ describe('expenses.routes.test.js', () => {
               });
             });
 
-            describe('WHEN authenticated as a MEMBER', () => {
+            describe('WHEN authenticated as a ADMIN', () => {
 
               beforeEach(() => {
                 payReq = payReq.set('Authorization', `Bearer ${member.jwt()}`);
@@ -833,7 +833,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
-                  expect(transaction).to.have.property('description', expense.title);
+                  expect(transaction).to.have.property('description', expense.description);
                   expect(transaction).to.have.property('UserId', expense.UserId);
                   expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
@@ -853,7 +853,7 @@ describe('expenses.routes.test.js', () => {
               });
             });
 
-            describe('WHEN authenticated as a MEMBER', () => {
+            describe('WHEN authenticated as a ADMIN', () => {
 
               beforeEach(() => {
                 payReq = payReq.set('Authorization', `Bearer ${member.jwt()}`);

@@ -13,7 +13,7 @@ import config from 'config';
 
 const {
   Activity,
-  Donation,
+  Order,
   Collective,
   Subscription,
   Transaction,
@@ -61,7 +61,7 @@ export default function stripeWebhook(req, res, next) {
         }
 
         /*
-         * In case we get $0 donation, return 200. Otherwise, Stripe will keep pinging us.
+         * In case we get $0 order, return 200. Otherwise, Stripe will keep pinging us.
          */
         if (event.data.object.amount_due === 0) {
           return res.sendStatus(200);
@@ -90,17 +90,17 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    fetchDonation: ['createActivity', (cb, results) => {
+    fetchOrder: ['createActivity', (cb, results) => {
       const stripeSubscriptionId = results.fetchEvent.stripeSubscription.id;
 
-      Donation.findOne({
+      Order.findOne({
         include: [
           { model: Collective },
           { model: User },
           { model: Subscription, where: { stripeSubscriptionId } }
         ]
       })
-      .then((donation) => {
+      .then((order) => {
         /**
          * Stripe doesn't make a difference between development, test, staging
          * environments. If we get a webhook from another env,
@@ -110,25 +110,25 @@ export default function stripeWebhook(req, res, next) {
          * For non-production environments, we will simply return 200 to avoid
          * the retry on Stripe side (and the email from Stripe support).
          */
-        if (!donation && !isProduction) {
+        if (!order && !isProduction) {
           return res.sendStatus(200);
         }
 
-        if (!donation) {
-          return cb(new errors.BadRequest('Donation not found: unknown subscription id'));
+        if (!order) {
+          return cb(new errors.BadRequest('Order not found: unknown subscription id'));
         }
-        return cb(null, donation);
+        return cb(null, order);
       })
       .catch(cb)
     }],
 
-    confirmUniqueChargeId: ['fetchDonation', (cb, results) => {
+    confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
-      const donationId = results.fetchDonation.id;
+      const orderId = results.fetchOrder.id;
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 
-          "DonationId" = ${donationId} AND
+          "OrderId" = ${orderId} AND
           CAST(data->'charge'->'id' AS TEXT) like '%${chargeId}%' AND
           "deletedAt" IS NULL
         `.replace(/\s\s+/g, ' '),
@@ -145,7 +145,7 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
-      const userId = results.fetchDonation.UserId;
+      const userId = results.fetchOrder.UserId;
       const { customer } = results.fetchEvent.event.data.object;
 
 
@@ -197,10 +197,10 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     createTransaction: ['retrieveBalance', (cb, results) => {
-      const donation = results.fetchDonation;
+      const order = results.fetchOrder;
       const { stripeSubscription } = results.fetchEvent;
-      const user = donation.User || {};
-      const collective = donation.Collective || {};
+      const user = order.User || {};
+      const collective = order.Collective || {};
       const paymentMethod = results.fetchPaymentMethod;
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
@@ -210,17 +210,17 @@ export default function stripeWebhook(req, res, next) {
       // Now we record a new transaction
       const newTransaction = {
         type: type.DONATION,
-        DonationId: donation.id,
+        OrderId: order.id,
         amount: stripeSubscription.amount,
         currency: stripeSubscription.currency,
         txnCurrency: balanceTransaction.currency,
         amountInTxnCurrency: balanceTransaction.amount,
-        txnCurrencyFxRate: donation.amount/balanceTransaction.amount,
+        txnCurrencyFxRate: order.amount/balanceTransaction.amount,
         hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
         platformFeeInTxnCurrency: fees.applicationFee,
         paymentProcessorFeeInTxnCurrency: fees.stripeFee,
         data: {charge, balanceTransaction},
-        description: `${donation.Subscription.interval}ly recurring subscription`,
+        description: `${order.Subscription.interval}ly recurring subscription`,
       };
 
       models.Transaction.createFromPayload({
@@ -234,18 +234,18 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     sendInvoice: ['createTransaction', (cb, results) => {
-      const donation = results.fetchDonation;
+      const order = results.fetchOrder;
       const transaction = results.createTransaction;
-      // We only send an invoice for donations > $10 equivalent
-      if (donation.amount < 10 * currencies[donation.currency].fxrate * 100) return cb(null);
-      const user = donation.User || {};
-      const collective = donation.Collective || {};
-      const subscription = donation.Subscription;
+      // We only send an invoice for orders > $10 equivalent
+      if (order.amount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
+      const user = order.User || {};
+      const collective = order.Collective || {};
+      const subscription = order.Subscription;
       collective.getRelatedCollectives(2, 0)
       .then((relatedCollectives) => emailLib.send(
         'thankyou',
         user.email,
-        { donation: donation.info,
+        { order: order.info,
           transaction: transaction.info,
           user: user.info,
           firstPayment: false,

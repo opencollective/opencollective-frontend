@@ -28,7 +28,7 @@ function getBackers(collective) {
         SELECT
           ug."UserId" as id,
           u."twitterHandle" as "twitterHandle"
-        FROM "Roles" ug
+        FROM "Members" ug
         LEFT JOIN "Users" u ON u.id = ug."UserId"
         WHERE ug."CollectiveId" = :CollectiveId
         AND ug.role = '${roles.BACKER}'

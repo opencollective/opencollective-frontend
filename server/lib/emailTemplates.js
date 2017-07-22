@@ -21,7 +21,7 @@ const templateNames = [
   'collective.expense.approved.for.host',
   'collective.expense.created',
   'collective.expense.paid',
-  'collective.donation.created',
+  'collective.order.created',
   'collective.monthlyreport',
   'collective.monthlyreport.text',
   'host.monthlyreport',

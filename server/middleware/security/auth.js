@@ -13,7 +13,7 @@ const {
 
 const {
   HOST,
-  MEMBER,
+  ADMIN,
   BACKER
 } = roles;
 
@@ -71,18 +71,18 @@ export function mustBeLoggedInAsUser(req, res, next) {
   });
 }
 
-export function mustHaveRole(possibleRoles) {
-  if (typeof possibleRoles === 'string')
-    possibleRoles = [possibleRoles];
+export function mustHaveRole(possibleMembers) {
+  if (typeof possibleMembers === 'string')
+    possibleMembers = [possibleMembers];
 
   return (req, res, next) => {
     required_valid('remoteUser', 'collective')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
 
-      return hasRole(req.remoteUser.id, req.collective.id, possibleRoles)
+      return hasRole(req.remoteUser.id, req.collective.id, possibleMembers)
       .then(hasRole => {
-        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
+        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleMembers.join(' or ')} of this collective`));
         else return next(null, true);
       })
       .catch(next);
@@ -91,11 +91,11 @@ export function mustHaveRole(possibleRoles) {
 }
 
 export function canEditCollective(req, res, next) {
-  return mustHaveRole([HOST, MEMBER])(req, res, next);
+  return mustHaveRole([HOST, ADMIN])(req, res, next);
 }
 
 export function mustBePartOfTheCollective(req, res, next) {
-  return mustHaveRole([HOST, MEMBER, BACKER])(req, res, next);
+  return mustHaveRole([HOST, ADMIN, BACKER])(req, res, next);
 }
 
 /**
@@ -106,7 +106,7 @@ export function canEditObject(object) {
     required_valid('remoteUser', object)(req, res, (e) => {
       if (e) return next(e, false);
       if (req[object].UserId === req.remoteUser.id) return next(null, true);
-      mustHaveRole([HOST, MEMBER])(req, res, (err) => {
+      mustHaveRole([HOST, ADMIN])(req, res, (err) => {
         if (err) return next(new Forbidden(`Logged in user must be the author of the ${object} or the host or an admin of this collective`), false);
         return next(null, true);
       });
@@ -129,8 +129,8 @@ export function canEditExpense(req, res, next) {
 }
 
 /**
- * Only the author of the donation or the host or an admin member of the collective can edit a donation
+ * Only the author of the order or the host or an admin member of the collective can edit a order
  */
-export function canEditDonation (req, res, next) {
-  return canEditObject('donation')(req, res, next);
+export function canEditOrder (req, res, next) {
+  return canEditObject('order')(req, res, next);
 }

@@ -81,6 +81,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
   fields: () => ({
     id:   { type: GraphQLInt },
     slug: { type: new GraphQLNonNull(GraphQLString) },
+    type: { type: new GraphQLNonNull(GraphQLString) },
     name: { type: new GraphQLNonNull(GraphQLString) },
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
@@ -101,6 +102,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
   fields: () => ({
     id: { type: GraphQLInt },
     slug: { type: GraphQLString },
+    type: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
@@ -144,15 +146,14 @@ export const TierInputType = new GraphQLInputObjectType({
   })
 });
 
-export const ResponseInputType = new GraphQLInputObjectType({
-  name: 'ResponseInputType',
-  description: 'Input type for ResponseType',
+export const OrderInputType = new GraphQLInputObjectType({
+  name: 'OrderInputType',
+  description: 'Input type for OrderType',
   fields: () => ({
     quantity: { type: GraphQLInt },
     description: { type: GraphQLString },
     user: { type: new GraphQLNonNull(UserInputType) },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-    tier: { type: TierInputType },
-    status: { type: GraphQLString }
+    tier: { type: TierInputType }
   })
 });

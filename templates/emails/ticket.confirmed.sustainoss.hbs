@@ -12,7 +12,7 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 
 <p>We are excited that you'll be joining us at <a href="https://sustainoss.org">{{ event.name }}</a> on {{ moment event.startsAt timezone=event.timezone format="MMMM Do YYYY" }} at {{ event.locationName }}. The event starts at {{ moment event.startsAt timezone=event.timezone format="h:mma" }}.</p>
 
-<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}{{#if donation}} for a total of {{{currency donation.amount currency=donation.currency}}}{{/if}}. This is a collaborative conversation and we'd like to share creating the content with you. You will soon receive an email from Gunner from AspirationTech who is facilitating the day. Thank you so much for being part of the first $ustainOSS Conversation!</p>
+<p>This confirms your {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}}{{#if donation}} for a total of {{{currency order.amount currency=order.currency}}}{{/if}}. This is a collaborative conversation and we'd like to share creating the content with you. You will soon receive an email from Gunner from AspirationTech who is facilitating the day. Thank you so much for being part of the first $ustainOSS Conversation!</p>
 
 <p>Next steps:
 <ul>

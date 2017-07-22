@@ -35,7 +35,7 @@ SELECT
   g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
 FROM "UserTransactions" ut 
 LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
-LEFT JOIN "Roles" ug ON ut."CollectiveId" = ug."CollectiveId" AND ug.role='HOST'
+LEFT JOIN "Members" ug ON ut."CollectiveId" = ug."CollectiveId" AND ug.role='HOST'
 LEFT JOIN "Users" host ON ug."UserId" = host.id`;
 
 const buildTweet = (collectives, totalDonations) => {

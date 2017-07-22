@@ -91,21 +91,6 @@ export default {
     "currency": "EUR",
     "budget": 1000000,
     "burnrate": 1000,
-    "tiers": [{
-      "name": "donor",
-      "title": "Donors",
-      "description": "One time tier",
-      "range": [0, 100],
-      "interval": "year",
-      "button": "Become a sponsor"
-    }, {
-      "name": "sponsor",
-      "title": "Sponsors",
-      "description": "Monthly tier",
-      "range": [0, 100],
-      "interval": "month",
-      "button": "Become a member"
-    }],
     "hostFeePercent": 0,
     "tags": ["meetup", "test"],
     "isSupercollective": false,
@@ -300,7 +285,7 @@ export default {
             "email":"jussi@kuohujoki.fi",
             "twitterHandle": "xdamman"
           },
-          "donation": {
+          "order": {
             "amount": 1234,
             "currency": "EUR"
           },
@@ -322,7 +307,7 @@ export default {
             "email":"jussi@kuohujoki.fi",
             "twitterHandle": "xdamman"
           },
-          "donation": {
+          "order": {
             "amount": 1234,
             "currency": "EUR"
           },
@@ -379,7 +364,7 @@ export default {
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza"
+            "description": "for pizza"
           }
         }
       },
@@ -397,7 +382,7 @@ export default {
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza",
+            "description": "for pizza",
             "lastEditedById": 2
           }
         }
@@ -416,7 +401,7 @@ export default {
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza",
+            "description": "for pizza",
             "lastEditedById": 2
           }
         }
@@ -424,23 +409,23 @@ export default {
     ]
   },
 
-  "donations": [
+  "orders": [
       {
-        "title": "Donation to that great project",
+        "description": "Donation to that great project",
         "amount": 100,
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
-        "title": "Donation to that other great project",
+        "description": "Donation to that other great project",
         "amount": 999,
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
-        "title": "Donation to that amazing project",
+        "description": "Donation to that amazing project",
         "amount": 12000,
         "currency": "USD",
         "paypalEmail": "user2paypal@gmail.com",
@@ -583,7 +568,7 @@ export default {
     "stripeSubscriptionId": "sub_tokentest"
   },
   "expense1": {
-    "title": "Lunch with Jenn",
+    "description": "Lunch with Jenn",
     "notes": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
@@ -594,7 +579,7 @@ export default {
     "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
   },
   "expense2": {
-    "title": "tshirts",
+    "description": "tshirts",
     "notes": "longgggg note",
     "category": "Engineering",
     "amount": 3737,
@@ -604,7 +589,7 @@ export default {
     "payoutMethod": "manual"
   },
   "expense3": {
-    "title": "Lunch with Jenn",
+    "description": "Lunch with Jenn",
     "notes": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
@@ -643,7 +628,7 @@ export default {
   "tier1": {
     name: "backer",
     type: "TIER",
-    class: "backer",
+    slug: "backers",
     description: "$10/month",
     amount: 1000,
     interval: 'month',
@@ -654,7 +639,7 @@ export default {
   "tier2": {
     name: "sponsor",
     type: "TIER",
-    class: "sponsor",
+    slug: "sponsors",
     description: "$1,000/year sponsorship",
     amount: 10000,
     interval: 'year',
@@ -680,20 +665,17 @@ export default {
     maxQuantity: 100
   },
 
-  "response1": {
-    status: "INTERESTED",
+  "order1": {
     quantity: 1,
     description: "I work on bitcoin"
   },
 
-  "response2": {
-    status: "YES",
+  "order2": {
     quantity: 2,
     description: "I have been working on open source for over a decade"
   },
 
-  "response3": {
-    status: "YES",
+  "order3": {
     quantity: 2
   }
 }
