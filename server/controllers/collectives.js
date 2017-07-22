@@ -14,8 +14,8 @@ import models from '../models';
 import errors from '../lib/errors';
 
 const DEFAULT_TIERS = [
-  { "type": "TIER", "name": "backer", "amount": 1000, "interval": "month", currency: collective.currency || "USD" },
-  { "type": "TIER", "name": "sponsor", "amount": 10000, "interval": "month", currency: collective.currency || "USD" }
+  { "type": "TIER", "name": "backer", "amount": 1000, "interval": "month", currency: "USD" },
+  { "type": "TIER", "name": "sponsor", "amount": 10000, "interval": "month", currency: "USD" }
 ];
 
 const {
@@ -323,7 +323,7 @@ export const create = (req, res, next) => {
     })
     .then(() => {
       if (collective.tiers) {
-        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id })
+        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id, currency: collective.currency })
       }
       return null;
     })
@@ -413,7 +413,7 @@ export const createFromGithub = (req, res, next) => {
     }))
     .then(() => {
       if (collective.tiers) {
-        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id })
+        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id, currency: collective.currency })
       }
       return null;
     })
