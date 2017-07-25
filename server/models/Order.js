@@ -1,7 +1,5 @@
 import { type } from '../constants/transactions';
 
-const donationType = type.DONATION;
-
 export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
@@ -60,12 +58,13 @@ export default function(Sequelize, DataTypes) {
     },
 
     amount: {
-      type: DataTypes.INTEGER // In cents
+      type: DataTypes.INTEGER // Total amount of the order in cents
     },
 
     description: DataTypes.STRING,
 
-    privateNotes: DataTypes.STRING,
+    publicMessage: DataTypes.STRING,
+    privateMessage: DataTypes.STRING,
 
     SubscriptionId: {
       type: DataTypes.INTEGER,
@@ -120,9 +119,20 @@ export default function(Sequelize, DataTypes) {
       }
     },
     getterMethods: {
+
+      // total amount over time of this order
+      totalAmount() {
+        if (!this.SubscriptionId) return this.amount;
+        return models.Transaction.sum('amount', {
+          where: {
+            OrderId: this.id,
+            type: type.DONATION
+          }
+        })
+      },
       info() {
         return {
-          type: donationType,
+          type: type.DONATION,
           id: this.id,
           UserId: this.UserId,
           TierId: this.TierId,
@@ -130,6 +140,8 @@ export default function(Sequelize, DataTypes) {
           currency: this.currency,
           amount: this.amount,
           description: this.description,
+          privateMessage: this.privateMessage,
+          publicMessage: this.publicMessage,
           SubscriptionId: this.SubscriptionId,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt

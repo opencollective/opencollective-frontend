@@ -75,6 +75,27 @@ export const UserInputType = new GraphQLInputObjectType({
   })
 });
 
+
+export const UserAttributesInputType = new GraphQLInputObjectType({
+  name: 'UserAttributesInputType',
+  description: 'Input type for UserType',
+  fields: () => ({
+      id: { type: GraphQLInt },
+      email: { type: EmailType },
+      firstName: { type: GraphQLString },
+      lastName: { type: GraphQLString },
+      name: { type: GraphQLString },
+      organization: { type: GraphQLString },
+      image: { type: GraphQLString },
+      username: { type: GraphQLString },
+      description: { type: GraphQLString },
+      twitterHandle: { type: GraphQLString },
+      website: { type: GraphQLString },
+      paypalEmail: { type: GraphQLString },
+      paymentMethod: { type: PaymentMethodInputType }
+  })
+});
+
 export const CollectiveInputType = new GraphQLInputObjectType({
   name: 'CollectiveInputType',
   description: 'Input type for CollectiveType',
@@ -97,7 +118,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
 });
 
 export const CollectiveAttributesInputType = new GraphQLInputObjectType({
-  name: 'CollectiveAttributes',
+  name: 'CollectiveAttributesInputType',
   description: 'Input type for attributes of CollectiveInputType',
   fields: () => ({
     id: { type: GraphQLInt },
@@ -152,7 +173,9 @@ export const OrderInputType = new GraphQLInputObjectType({
   fields: () => ({
     quantity: { type: GraphQLInt },
     description: { type: GraphQLString },
-    user: { type: new GraphQLNonNull(UserInputType) },
+    publicMessage: { type: GraphQLString },
+    privateMessage: { type: GraphQLString },
+    user: { type: new GraphQLNonNull(UserAttributesInputType) },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType }
   })

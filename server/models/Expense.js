@@ -71,7 +71,7 @@ export default function (Sequelize, DataTypes) {
       defaultValue: 'manual'
     },
 
-    privateNotes: DataTypes.STRING,
+    privateMessage: DataTypes.STRING,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
     vat: DataTypes.INTEGER,
@@ -136,7 +136,7 @@ export default function (Sequelize, DataTypes) {
           category: this.category,
           payoutMethod: this.payoutMethod,
           vat: this.vat,
-          privateNotes: this.privateNotes,
+          privateMessage: this.privateMessage,
           lastEditedById: this.lastEditedById,
           status: this.status,
           incurredAt: this.incurredAt,

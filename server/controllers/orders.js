@@ -10,7 +10,7 @@ export const manual = (req, res, next) => {
   const { order } = req.required;
   const { remoteUser } = req;
   const { collective } = req;
-  const { amount, description, privateNotes } = order;
+  const { amount, description, privateMessage } = order;
 
   if (!amount || amount < 0) {
     return Promise.reject(new Error('Amount must be greater than 0'));
@@ -32,7 +32,7 @@ export const manual = (req, res, next) => {
       currency: collective.currency,
       amount,
       description,
-      privateNotes
+      privateMessage
     }))
     .then(order => paymentsLib.processPayment(order))
     .then(() => res.send({success: true}))
