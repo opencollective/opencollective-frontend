@@ -117,8 +117,7 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           confirmedAt: this.confirmedAt,
-          expiryDate: this.expiryDate,
-          number: this.number
+          expiryDate: this.expiryDate
         };
       }
     }

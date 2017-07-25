@@ -43,7 +43,7 @@ Types:
   - user.paymentMethod.updated
       data: user, paymentMethod (updated values)
   - user.paymentMethod.deleted
-      data: user, paymentMethod.number (only 4 last number)
+      data: user, paymentMethod.identifier (only 4 last number)
 
   + collective.created
       data: collective, user.info
