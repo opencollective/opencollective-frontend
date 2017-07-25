@@ -131,7 +131,7 @@ describe('orders.routes.test.js', () => {
                 order: Object.assign({}, payment, {
                   email: host.email,
                   description: 'desc',
-                  privateNotes: 'long notes'
+                  privateMessage: 'long notes'
                 })
               })
               .expect(200)
@@ -143,7 +143,7 @@ describe('orders.routes.test.js', () => {
                   currency: collective.currency,
                   amount: AMOUNT,
                   description: 'desc',
-                  privateNotes: 'long notes',
+                  privateMessage: 'long notes',
                 });
               })
               .catch());
@@ -155,7 +155,7 @@ describe('orders.routes.test.js', () => {
                 api_key: application.api_key,
                 order: Object.assign({}, payment, {
                   description: 'desc',
-                  privateNotes: 'long notes'
+                  privateMessage: 'long notes'
                 })
               })
               .expect(200)
@@ -167,7 +167,7 @@ describe('orders.routes.test.js', () => {
                   currency: collective.currency,
                   amount: AMOUNT,
                   description: 'desc',
-                  privateNotes: 'long notes',
+                  privateMessage: 'long notes',
                 });
               })
               .catch());
@@ -194,7 +194,7 @@ describe('orders.routes.test.js', () => {
                   currency: collective.currency,
                   amount: AMOUNT,
                   description: payment.description,
-                  privateNotes: null
+                  privateMessage: null
                 });
               })
               .catch();
@@ -219,7 +219,7 @@ describe('orders.routes.test.js', () => {
                   currency: collective.currency,
                   amount: AMOUNT,
                   description: payment.description,
-                  privateNotes: null
+                  privateMessage: null
                 });
               })
               .catch();

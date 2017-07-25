@@ -62,7 +62,7 @@ describe('graphql.transaction.test.js', () => {
       `;
       const context = { remoteUser: null };
       const result = await graphql(schema, query, null, context);
-      console.log(result.errors);
+      result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
@@ -125,7 +125,7 @@ describe('graphql.transaction.test.js', () => {
       const offset = 5;
       const query = `
         query allTransactions {
-          allTransactions(collectiveSlug: "wwcodeaustin", type: "DONATION", limit: ${limit}, offset: ${offset}) {
+          allTransactions(slug: "wwcodeaustin", type: "DONATION", limit: ${limit}, offset: ${offset}) {
             id,
             type
           }
@@ -133,6 +133,7 @@ describe('graphql.transaction.test.js', () => {
       `;
       const context = { remoteUser: null };
       const result = await graphql(schema, query, null, context);
+      result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);
@@ -146,7 +147,7 @@ describe('graphql.transaction.test.js', () => {
       const offset = 5;
       const query = `
         query allTransactions {
-          allTransactions(collectiveSlug: "wwcodeaustin", limit: ${limit}, offset: ${offset}) {
+          allTransactions(slug: "wwcodeaustin", limit: ${limit}, offset: ${offset}) {
             id,
             type,
             user {

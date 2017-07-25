@@ -52,12 +52,12 @@ const queries = {
   allUsers: {
     type: new GraphQLList(UserType),
     args: {
-      collectiveSlug: {
+      slug: {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
     resolve(_, args, req) {
-      return models.Collective.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
+      return models.Collective.findOne({ where: { slug: args.slug.toLowerCase() } })
         .then(collective => collective.getUsersForViewer(req.remoteUser));
     }
   },
@@ -68,7 +68,7 @@ const queries = {
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
+      slug: { type: new GraphQLNonNull(GraphQLString) },
       type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
@@ -78,7 +78,7 @@ const queries = {
         include: [
           {
             model: models.Collective,
-            where: { slug: args.collectiveSlug.toLowerCase() }
+            where: { slug: args.slug.toLowerCase() }
           }
         ],
         order: [ ['id', 'DESC'] ]

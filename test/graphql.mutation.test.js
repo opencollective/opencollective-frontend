@@ -63,7 +63,20 @@ describe('Mutation Tests', () => {
     describe('creates an event collective', () => {
 
       const getEventData = (collective) => {
-        return {"slug":"meetup-3","name":"BrusselsTogether Meetup 3","type":"EVENT","longDescription":"Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},"startsAt":"Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)","endsAt":"Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)","timezone":"Europe/Brussels","ParentCollectiveId":collective.id,"tiers":[{"name":"free ticket","description":"Free ticket","amount":0},{"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}]};
+        return {
+          "slug": "meetup-3",
+          "name": "BrusselsTogether Meetup 3",
+          "type": "EVENT",
+          "longDescription": "Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},
+          "startsAt": "Wed Apr 05 2017 10:00:00 GMT-0700 (PDT)",
+          "endsAt": "Wed Apr 05 2017 12:00:00 GMT-0700 (PDT)",
+          "timezone": "Europe/Brussels",
+          "ParentCollectiveId":collective.id,
+          "tiers": [
+            {"name":"free ticket","description":"Free ticket","amount":0},
+            {"name":"sponsor","description":"Sponsor the drinks. Pretty sure everyone will love you.","amount":15000}
+          ]
+        };
       };
 
       it("fails if not authenticated", async () => {
@@ -169,11 +182,11 @@ describe('Mutation Tests', () => {
 
         const r3 = await graphql(schema, updateQuery, null, { remoteUser: user2 });
         expect(r3.errors).to.have.length(1);
-        expect(r3.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this collective");
+        expect(r3.errors[0].message).to.equal("You must be logged in as an admin of the scouts collective to edit this event collective");
 
         const r4 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
         const updatedEvent = r4.data.editCollective;
-        expect(updatedEvent.slug).to.equal(event.slug);
+        expect(updatedEvent.slug).to.equal(`${collective1.slug}/events/${event.slug}`);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
 
@@ -359,7 +372,7 @@ describe('Mutation Tests', () => {
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No tier found with tier id: 1 for collective slug:notfound');
+          expect(result.errors[0].message).to.equal('No collective found with slug notfound');
         });
 
         it('when tier doesn\'t exist', async () => {
@@ -381,7 +394,7 @@ describe('Mutation Tests', () => {
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for collective slug:${event1.slug}`);
+          expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for collective slug ${event1.slug}`);
         });
       });
 
@@ -432,9 +445,9 @@ describe('Mutation Tests', () => {
       });
     });
 
-    describe('creates a member', () => {
+    describe('members', () => {
 
-      it('from an existing user', async () => {
+      it('creates a new member with an existing user', async () => {
         const query = `
           mutation createMember {
             createMember(
@@ -457,6 +470,7 @@ describe('Mutation Tests', () => {
         `;
         const context = { remoteUser: null };
         const result = await graphql(schema, query, null, context)
+
         expect(result).to.deep.equal({
           data: {
             "createMember": {
@@ -474,6 +488,38 @@ describe('Mutation Tests', () => {
           }
         });
       });
+
+      it('removes a member', async () => {
+        const query = `
+          mutation removeMember {
+            removeMember(
+              user: { id: 1 },
+              collective: { slug: "${event1.slug}" },
+              role: "FOLLOWER"
+            ) { id }
+          }
+        `;
+
+        const error1 = await graphql(schema, query, null, {});
+        expect(error1.errors[0].message).to.equal('You need to be logged in to remove a member');
+
+        const error2 = await graphql(schema, query, null, { remoteUser: { id: 2 } });
+        expect(error2.errors[0].message).to.equal('You need to be logged in as this user or as a core contributor or as a host of the jan-meetup collective');
+        
+        const error3 = await graphql(schema, query, null, { remoteUser: { id: 1 } });
+        expect(error3.errors[0].message).to.equal('Member not found');
+        
+        await models.Member.create({
+          UserId: 1,
+          CollectiveId: event1.id,
+          role: 'FOLLOWER'
+        });
+
+        const membersBefore = await models.Member.count();
+        await graphql(schema, query, null, { remoteUser: { id: 1 } })
+        const membersAfter = await models.Member.count();
+        expect(membersBefore - membersAfter).to.equal(1);
+      })
     });
 
     describe('creates an order', () => {
@@ -534,7 +580,14 @@ describe('Mutation Tests', () => {
         it('from a new user', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "newuser@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity: 2 }) {
+              createOrder(
+                order: {
+                  user: { email: "newuser@email.com" },
+                  collective: { slug: "${event1.slug}" },
+                  tier: { id: 1 },
+                  quantity: 2
+                }
+              ) {
                 id,
                 user {
                   id,
@@ -549,27 +602,27 @@ describe('Mutation Tests', () => {
                 }
               }
             }
-          `;
+        `;
         const context = { remoteUser: null };
         const result = await graphql(schema, query, null, context)
-          expect(result).to.deep.equal({
-            data: {
-                "createOrder": {
+        expect(result).to.deep.equal({
+          data: {
+            "createOrder": {
+              "id": 1,
+              "tier": {
+                "availableQuantity": 8,
+                "description": "free tickets for all",
                 "id": 1,
-                "tier": {
-                  "availableQuantity": 8,
-                  "description": "free tickets for all",
-                  "id": 1,
-                  "maxQuantity": 10,
-                  "name": "Free ticket"
-                },
-                "user": {
-                  "email": null,
-                  "id": 4
-                }
+                "maxQuantity": 10,
+                "name": "Free ticket"
+              },
+              "user": {
+                "email": null,
+                "id": 4
               }
             }
-          });
+          }
+        });
         });
       });
 

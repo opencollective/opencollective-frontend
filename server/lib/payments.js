@@ -62,7 +62,7 @@ const createPayment = (payload) => {
     .then(results => {
       const stripeAccount = results.stripeAccount;
       if (!stripeAccount || !stripeAccount.accessToken) {
-        return Promise.reject(new Error(`The host for the collective slug ${collective.slug} has no Stripe account set up`));
+        return Promise.reject(new Error(`The host for the collective id ${order.CollectiveId} has no Stripe account set up`));
       } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.accessToken, 'live')) {
         return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
       } else {
@@ -212,11 +212,14 @@ const processPayment = (order) => {
             collective: collective.info
           }).then(customer => customer.id))
         .tap(customerId => {
-          paymentMethod.customerId ? paymentMethod : paymentMethod.update({ customerId: customerId })
+          if (!paymentMethod.customerId) {
+            paymentMethod.customerId = customerId;
+            paymentMethod.update({ customerId: customerId })
+          }
         })
         
         // both one-time and subscriptions get charged immediately
-        .then((paymentMethod) => createChargeAndTransaction(hostStripeAccount, order, paymentMethod, collective, user))
+        .then(() => createChargeAndTransaction(hostStripeAccount))
         .tap(t => transaction = t)
 
         // if this is a subscription, we create it now on Stripe
@@ -231,11 +234,8 @@ const processPayment = (order) => {
         // Mark paymentMethod as confirmed
         .tap(() => paymentMethod.update({confirmedAt: new Date}))
 
-        // Fetch collective/event associated with the order
-        .then(() => order && order.CollectiveId && models.Collective.findById(order.CollectiveId))
-
         // send out confirmation email
-        .then((collective) => {
+        .then(() => {
           if (collective.type === types.EVENT) {
             return emailLib.send(
               'ticket.confirmed',
@@ -243,7 +243,7 @@ const processPayment = (order) => {
               { order: order.info,
                 transaction: transaction.info,
                 user: user.info,
-                event: collective && collective.info,
+                collective: collective && collective.info,
                 tier: order.Tier.info
               }, {
                 from: `${collective.name} <hello@${collective.slug}.opencollective.com>`

@@ -62,8 +62,10 @@ describe('Query Tests', () => {
             id,
             firstName,
             lastName,
-            collectives {
-              slug,
+            members {
+              collective {
+                slug
+              },
               role
             }
           }
@@ -74,9 +76,9 @@ describe('Query Tests', () => {
         const context = { remoteUser: user1 };
         const result = await graphql(schema, LoggedInUserQuery, null, context);
         const data = result.data.LoggedInUser;
-        expect(data.collectives.length).to.equal(2);
-        expect(data.collectives[0].role).to.equal('BACKER');
-        expect(data.collectives[1].role).to.equal('ADMIN');
+        expect(data.members.length).to.equal(2);
+        expect(data.members[0].role).to.equal('BACKER');
+        expect(data.members[1].role).to.equal('ADMIN');
       })
 
       it("doesn't return anything if not logged in", async () => {

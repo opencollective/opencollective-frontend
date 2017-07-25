@@ -569,7 +569,7 @@ export default {
   },
   "expense1": {
     "description": "Lunch with Jenn",
-    "privateNotes": "Some very long and super interesting extra notes for the whole world to see",
+    "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
     "currency": "EUR",
@@ -580,7 +580,7 @@ export default {
   },
   "expense2": {
     "description": "tshirts",
-    "privateNotes": "longgggg note",
+    "privateMessage": "longgggg note",
     "category": "Engineering",
     "amount": 3737,
     "currency": "USD",
@@ -590,7 +590,7 @@ export default {
   },
   "expense3": {
     "description": "Lunch with Jenn",
-    "privateNotes": "Some very long and super interesting extra notes for the whole world to see",
+    "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
     "currency": "USD",
