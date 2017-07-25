@@ -67,10 +67,8 @@ export default function(Sequelize, DataTypes) {
     paranoid: true,
     indexes: [
        {
-          unique: true,
           fields: ['UserId', 'CollectiveId', 'role'],
           name: 'UserId-CollectiveId-role',
-          constraints: true
       }
     ],
     instanceMethods: {

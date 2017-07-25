@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import { capitalize, pluralize } from '../lib/utils';
+import types from '../constants/tiers';
 
 export default function(Sequelize, DataTypes) {
 
@@ -151,8 +152,29 @@ export default function(Sequelize, DataTypes) {
     },
 
     classMethods: {
-      createMany: (tiers, defaultValues = {}) => {
+
+      createMany(tiers, defaultValues = {}) {
         return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
+      },
+
+      getOrFind({ id, amount, interval, CollectiveId }) {
+        if (id) {
+          return Tier.findOne({ where: { id, CollectiveId } });
+        } else {
+          // We pick the first tier that has an amount less than or equal to `amount` (for the same collective and interval)
+          return Tier.findOne({
+            where: {
+              type: types.TIER,
+              CollectiveId,
+              interval: interval || { $is: null },
+              amount: {
+                $or: [
+                  { $lte: amount },
+                  { $is: null }
+                ]
+            }
+          }, order: [['amount','DESC']] });
+        }
       }
     },
 

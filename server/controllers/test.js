@@ -89,28 +89,28 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     createTestUser: ['createCollective', (cb, results) => {
-      models.User.create(testUser)
+      models.User.createUserWithCollective(testUser)
         .tap(u => results.createCollective.addUserWithRole(u, roles.HOST))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
     createMember: ['createCollective', (cb, results) => {
-      models.User.create(member)
+      models.User.createUserWithCollective(member)
         .tap(u => results.createCollective.addUserWithRole(u, roles.ADMIN))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
     createBacker: ['createCollective', (cb, results) => {
-      models.User.create(backer)
+      models.User.createUserWithCollective(backer)
         .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
         .then(u => cb(null, u))
         .catch(cb);
     }],
 
     createBacker2: ['createCollective', (cb, results) => {
-      models.User.create(backer2)
+      models.User.createUserWithCollective(backer2)
         .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
         .then(u => cb(null, u))
         .catch(cb);
@@ -271,10 +271,10 @@ export const exportPDF = function(req, res, next) {
       t.page = page++;
       t.collective = t.Collective;
       t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
-      t.privateNotes = t.Expense && t.Expense.privateNotes;
+      t.privateMessage = t.Expense && t.Expense.privateMessage;
       if (t.data && t.data.fxrateSource) {
-        t.privateNotes = (t.privateNotes) ? `${t.privateNotes} (${note})` : note;
-        data.privateNotes = note;
+        t.privateMessage = (t.privateMessage) ? `${t.privateMessage} (${note})` : note;
+        data.privateMessage = note;
       }
       if (page - 1 % transactionsPerTOCPage === 0) {
         currentPage++;
