@@ -133,10 +133,18 @@ export const _authenticateUserByJwt = (req, res, next) => {
     .findById(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
-      user.update({seenAt: new Date()});
+      user.update({ seenAt: new Date() });
       req.remoteUser = user;
       debug('auth')('logged in user', req.remoteUser.username);
-      next();
+      if (req.body && req.body.variables && req.body.variables.collective) {
+        return req.remoteUser.canEditCollective(req.body.variables.collective.id).then(canEditCollective => {
+          req.remoteUser.canEditCollective = canEditCollective;
+          debug('auth')('Can edit collective', req.body.variables.collective.id, '?', canEditCollective);
+          next();
+        })
+      } else {
+        next();
+      }
     })
     .catch(next);
 };

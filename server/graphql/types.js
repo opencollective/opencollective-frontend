@@ -13,6 +13,9 @@ import GraphQLJSON from 'graphql-type-json';
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 
+import roles from '../constants/roles';
+import { type } from '../constants/transactions';
+
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
 dataloaderSequelize(models.Expense);
@@ -63,8 +66,12 @@ export const UserType = new GraphQLObjectType({
       },
       email: {
         type: GraphQLString,
-        resolve(user) {
-          return user.email;
+        resolve(user, args, req) {
+          if (req.remoteUser && (req.remoteUser.id === user.id || req.remoteUser.canEditCollective)) {
+            return user.email;
+          } else {
+            return null;
+          }
         }
       },
       description: {
@@ -109,17 +116,24 @@ export const UserType = new GraphQLObjectType({
           return user.paypalEmail;
         }
       },
-      collectives: {
-        type: new GraphQLList(CollectiveType),
+      members: {
+        type: new GraphQLList(MemberType),
         resolve(user) {
-          return user.getCollectivesWithRoles();
+          return user.getMembers();
         }
       },
       paymentMethods: {
         type: new GraphQLList(PaymentMethodType),
         resolve(user, args, req) {
           if (!req.remoteUser || req.remoteUser.id !== user.id) return [];
-          return models.PaymentMethod.findAll({where: { UserId: user.id, identifier: { $ne: null }, confirmedAt: { $ne: null } }});
+          return models.PaymentMethod.findAll({
+            where: {
+              UserId: user.id,
+              service: 'stripe',
+              identifier: { $ne: null },
+              confirmedAt: { $ne: null }
+            }
+          });
         }
       }
     }
@@ -240,10 +254,16 @@ export const CollectiveType = new GraphQLObjectType({
           return collective.slug;
         }
       },
-      users: {
+      members: {
+        type: new GraphQLList(MemberType),
+        resolve(collective) {
+          return models.Member.findAll({ where: { CollectiveId: collective.id } });
+        }
+      },
+      followers: {
         type: new GraphQLList(UserType),
-        resolve(collective, args, req) {
-          return collective.getUsersForViewer(req.remoteUser);
+        resolve(collective) {
+          return collective.getUsers({ where: { role: roles.FOLLOWER } });
         }
       },
       maxQuantity: {
@@ -383,6 +403,12 @@ export const TierType = new GraphQLObjectType({
           return tier.interval;
         }
       },
+      presets: {
+        type: new GraphQLList(GraphQLString),
+        resolve(tier) {
+          return tier.presets;
+        }
+      },      
       maxQuantity: {
         type: GraphQLInt,
         resolve(tier) {
@@ -466,6 +492,24 @@ export const MemberType = new GraphQLObjectType({
           return order.id;
         }
       },
+      createdAt: {
+        type: GraphQLString,
+        resolve(member) {
+          return member.createdAt;
+        }
+      },
+      totalDonations: {
+        type: GraphQLInt,
+        resolve(member) {
+          return models.Transaction.sum('amount', {
+            where: {
+              UserId: member.UserId,
+              CollectiveId: member.CollectiveId,
+              type: type.DONATION
+            }
+          })
+        }
+      },
       collective: {
         type: CollectiveType,
         resolve(member) {
@@ -474,8 +518,8 @@ export const MemberType = new GraphQLObjectType({
       },
       user: {
         type: UserType,
-        resolve(member, args, req) {
-          return member.getUserForViewer(req.remoteUser);
+        resolve(member) {
+          return member.getUser();
         }
       },
       role: {
@@ -511,16 +555,40 @@ export const OrderType = new GraphQLObjectType({
           return order.quantity;
         }
       },
+      amount: {
+        type: GraphQLInt,
+        resolve(order) {
+          return order.amount;
+        }
+      },
+      totalAmount: {
+        type: GraphQLInt,
+        resolve(order) {
+          return order.totalAmount;
+        }
+      },
       user: {
         type: UserType,
-        resolve(order, args, req) {
-          return order.getUserForViewer(req.remoteUser);
+        resolve(order) {
+          return order.getUser();
         }
       },
       description: {
         type: GraphQLString,
         resolve(order) {
           return order.description;
+        }
+      },
+      publicMessage: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.publicMessage;
+        }
+      },
+      privateMessage: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.privateMessage;
         }
       },
       collective: {
@@ -687,7 +755,7 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
     collective: { type: CollectiveType },
     type: { type: GraphQLString },
     description: { type: GraphQLString },
-    privateNotes: { type: GraphQLString },
+    privateMessage: { type: GraphQLString },
     createdAt: { type: GraphQLString }
   }
 });
@@ -765,14 +833,14 @@ export const TransactionExpenseType = new GraphQLObjectType({
     },
     host: {
       type: UserType,
-      resolve(transaction, args, req) {
-        return transaction.getHostForViewer(req.remoteUser);
+      resolve(transaction) {
+        return transaction.getHost();
       }
     },
     user: {
       type: UserType,
-      resolve(transaction, args, req) {
-        return transaction.getUserForViewer(req.remoteUser);
+      resolve(transaction) {
+        return transaction.getUser();
       }
     },
     description: {
@@ -793,10 +861,10 @@ export const TransactionExpenseType = new GraphQLObjectType({
         return transaction.createdAt;
       }
     },
-    privateNotes: {
+    privateMessage: {
       type: GraphQLString,
       resolve(transaction, args, req) {
-        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateNotes);
+        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage);
       }
     },
     paymentMethod: {
@@ -894,14 +962,14 @@ export const TransactionOrderType = new GraphQLObjectType({
       },
       host: {
         type: UserType,
-        resolve(transaction, args, req) {
-          return transaction.getHostForViewer(req.remoteUser);
+        resolve(transaction) {
+          return transaction.getHost();
         }
       },
       user: {
         type: UserType,
-        resolve(transaction, args, req) {
-          return transaction.getUserForViewer(req.remoteUser);
+        resolve(transaction) {
+          return transaction.getUser();
         }
       },
       description: {
@@ -922,10 +990,10 @@ export const TransactionOrderType = new GraphQLObjectType({
           return transaction.createdAt;
         }
       },
-      privateNotes: {
+      privateMessage: {
         type: GraphQLString,
         resolve(transaction) {
-          return transaction.getOrder().then(order => order && order.privateNotes);
+          return transaction.getOrder().then(order => order && order.privateMessage);
         }
       },
       paymentMethod: {

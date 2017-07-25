@@ -157,21 +157,11 @@ export default (Sequelize, DataTypes) => {
     },
 
     instanceMethods: {
-      getUserForViewer(viewer, userid = this.UserId) {
-        const promises = [models.User.findOne({where: { id: userid }})];
-        if (viewer) {
-          promises.push(viewer.canEditCollective(this.CollectiveId));
-        }
-        return Promise.all(promises)
-        .then(results => {
-          const user = results[0];
-          if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
-          const canEditCollective = results[1];
-          return canEditCollective ? user.info : user.public;
-        })
+      getUser() {
+        return models.User.findById(this.UserId);
       },
-      getHostForViewer(viewer) {
-        return this.getUserForViewer(viewer, this.HostId);
+      getHost() {
+        return models.User.findById(this.HostId);
       },
       getExpenseForViewer(viewer) {
         const promises = [ models.Expense.findOne({where: { id: this.ExpenseId }}) ];
