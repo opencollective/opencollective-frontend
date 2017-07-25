@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
-import slug from 'slug';
 
 import {decrypt, encrypt} from '../lib/utils';
 import errors from '../lib/errors';
@@ -32,11 +31,6 @@ export default (Sequelize, DataTypes) => {
 
   const User = Sequelize.define('User', {
 
-    _access: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
 
@@ -54,18 +48,6 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      set(val) {
-        if (typeof val === 'string') {
-          this.setDataValue('username', slug(val).toLowerCase());
-        }
-      }
-    },
-
-    image: DataTypes.STRING,
 
     email: {
       type: DataTypes.STRING,
@@ -86,11 +68,10 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    mission: DataTypes.STRING,
-    description: DataTypes.STRING,
-    longDescription: DataTypes.TEXT,
     organization: DataTypes.STRING,
+
     isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
+
     currency: {
       type: DataTypes.STRING,
       validate: {
@@ -102,24 +83,8 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-    twitterHandle: {
-      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
-      set(val) {
-        if (typeof val === 'string') {
-          this.setDataValue('twitterHandle', val.replace(/^@/,''));
-        }
-      }
-    },
 
     billingAddress: DataTypes.STRING, // Used for the invoices, we should create a separate table for addresses (billing/shipping)
-
-    website: {
-      type: DataTypes.STRING,
-      get() {
-        if (this.getDataValue('website')) return this.getDataValue('website');
-        return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
-      }
-    },
 
     paypalEmail: {
       type: DataTypes.STRING,
@@ -201,6 +166,35 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
+      // Collective of type USER corresponding to this user
+      userCollective() {
+        return models.Collective.findById(this.CollectiveId);
+      },
+
+      username() {
+        return this.userCollective.then(collective => collective.slug);
+      },
+
+      twitterHandle() {
+        return this.userCollective.then(collective => collective.twitterHandle);
+      },
+
+      website() {
+        return this.userCollective.then(collective => collective.website);
+      },
+
+      description() {
+        return this.userCollective.then(collective => collective.description);
+      },
+
+      longDescription() {
+        return this.userCollective.then(collective => collective.longDescription);
+      },
+
+      image() {
+        return this.userCollective.then(collective => collective.image);
+      },
+
       // Info (private).
       info() {
         return {
@@ -208,16 +202,9 @@ export default (Sequelize, DataTypes) => {
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
-          username: this.username,
           email: this.email,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
           organization: this.organization,
           isOrganization: this.isOrganization,
-          image: this.image,
-          twitterHandle: this.twitterHandle,
-          website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           paypalEmail: this.paypalEmail
@@ -231,13 +218,6 @@ export default (Sequelize, DataTypes) => {
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
-          username: this.username,
-          image: this.image,
-          twitterHandle: this.twitterHandle,
-          website: this.website,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
           organization: this.organization,
           isOrganization: this.isOrganization,
           createdAt: this.createdAt,
@@ -248,8 +228,6 @@ export default (Sequelize, DataTypes) => {
       minimal() {
         return {
           id: this.id,
-          username: this.username,
-          image: this.image,
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
@@ -262,18 +240,11 @@ export default (Sequelize, DataTypes) => {
       public() {
         return {
           id: this.id,
-          image: this.image,
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
-          username: this.username,
-          website: this.website,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
           organization: this.organization,
-          isOrganization: this.isOrganization,
-          twitterHandle: this.twitterHandle
+          isOrganization: this.isOrganization
         };
       }
     },
@@ -357,16 +328,6 @@ export default (Sequelize, DataTypes) => {
         });
       },
 
-      getCollectivesWithRoles() {
-        return this.getCollectives({
-          include: [{ model: models.Member, where: { UserId: this.id }}]
-        })
-        .then(collectives => collectives.map(g => {
-          g.role = g.Member.role;
-          return g;
-        }))
-      },
-
       getMembers() {
         return models.Member.findAll({
           where: {
@@ -396,11 +357,12 @@ export default (Sequelize, DataTypes) => {
         return hasRole(this.id, collectiveid, ['ADMIN', 'HOST']);
       },
 
+      // should be deprecated
       updateWhiteListedAttributes(attributes) {
 
         let update = false;
         const allowedFields = 
-          [ 'username',
+          [ 'slug',
             'firstName',
             'lastName',
             'description',
@@ -423,16 +385,13 @@ export default (Sequelize, DataTypes) => {
             update = true;
           }
 
-          if (prop === 'username') {
-            return Sequelize.query(`
-              with usernames as (SELECT username FROM "Users" UNION SELECT slug as username FROM "Collectives")
-              SELECT COUNT(*) FROM usernames WHERE username='${attributes[prop]}'
-              `, {
+          if (prop === 'slug') {
+            return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[prop]}'`, {
                 type: Sequelize.QueryTypes.SELECT
               })
             .then(res => {
               const count = res[0].count;
-              if (count > 0) throw new errors.BadRequest(`username ${attributes[prop]} is already taken`);
+              if (count > 0) throw new errors.BadRequest(`slug ${attributes[prop]} is already taken`);
             })
           }
         })
@@ -507,7 +466,35 @@ export default (Sequelize, DataTypes) => {
             }
           }
         })
-        .then(user => user || models.User.create(Object.assign({}, { email }, otherAttributes)))
+        .then(user => user || models.User.createUserWithCollective(Object.assign({}, { email }, otherAttributes)))
+      },
+
+      createUserWithCollective(userData) {
+        let user;
+        return User.create(userData)
+          .then(u => {
+            user = u;
+            const userCollective = {
+              type: 'USER',
+              name: user.name || user.email.split(/@|\+/)[0],
+              image: userData.image,
+              mission: userData.mission,
+              description: userData.description,
+              longDescription: userData.longDescription,
+              website: userData.website,
+              twitterHandle: userData.twitterHandle,
+              isActive: true,
+              CreatedByUserId: user.id,
+              data: { UserId: user.id }
+            };
+            return models.Collective.create(userCollective);
+          })
+          .then(collective => {
+            user.CollectiveId = collective.id;
+            user.save();
+            user.collective = collective;
+            return user;
+          })
       },
 
       splitName(name) {
@@ -522,20 +509,6 @@ export default (Sequelize, DataTypes) => {
     },
 
     hooks: {
-      beforeCreate: (instance) => {
-        if (!instance.username) {
-          return userLib.suggestUsername(instance)
-            .then(username => {
-              if (!username) {
-                return Promise.reject(new Error('A user must have a username'));
-              }
-              instance.username = username;
-              return Promise.resolve();
-            });
-        }
-        return Promise.resolve();
-
-      },
       afterCreate: (instance) => {
         models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
           .then(() => userLib.updateUserInfoFromClearbit(instance));

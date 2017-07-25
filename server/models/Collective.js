@@ -14,6 +14,8 @@ import { appendTier } from '../lib/utils';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 import { hasRole } from '../lib/auth';
+import slugify from 'slug';
+import userlib from '../lib/userlib';
 
 const DEFAULT_BACKGROUND_IMG = `${config.host.website}/public/images/collectives/default-header-bg.jpg`;
 
@@ -66,10 +68,7 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
+    name: DataTypes.STRING,
 
     CreatedByUserId: {
       type: DataTypes.INTEGER,
@@ -127,12 +126,7 @@ export default function(Sequelize, DataTypes) {
       defaultValue: 'USD'
     },
 
-    image: {
-      type: DataTypes.STRING,
-      get() {
-        return this.getDataValue('image');
-      }
-    },
+    image: DataTypes.STRING,
 
     backgroundImage: {
       type: DataTypes.STRING,
@@ -181,7 +175,7 @@ export default function(Sequelize, DataTypes) {
       defaultValue: Sequelize.NOW
     },
 
-    timezone: DataTypes.TEXT,
+    timezone: DataTypes.STRING,
 
     createdAt: {
       type: DataTypes.DATE,
@@ -201,11 +195,18 @@ export default function(Sequelize, DataTypes) {
     twitterHandle: {
       type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
       set(twitterHandle) {
+        if (typeof twitterHandle !== 'string') return;
         this.setDataValue('twitterHandle', twitterHandle.replace(/^@/,''));
       }
     },
 
-    website: DataTypes.STRING,
+    website: {
+      type: DataTypes.STRING,
+      get() {
+        if (this.getDataValue('website')) return this.getDataValue('website');
+        return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
+      }
+    },
 
     publicUrl: {
       type: new DataTypes.VIRTUAL(DataTypes.STRING, ['slug']),
@@ -245,8 +246,6 @@ export default function(Sequelize, DataTypes) {
           mission: this.mission,
           description: this.description,
           longDescription: this.longDescription,
-          budget: this.budget,
-          burnrate: this.burnrate,
           currency: this.currency,
           image: this.image,
           data: this.data,
@@ -314,12 +313,27 @@ export default function(Sequelize, DataTypes) {
       },
 
       canEdit(remoteUser) {
-        if (remoteUser.id === this.CreatedByUserId) return Promise.resolve(true);
-        else return hasRole(remoteUser.id, this.id, ['HOST', 'ADMIN']);
+        if (remoteUser.id === this.CreatedByUserId) {
+          return Promise.resolve(true);
+        }
+        if (this.type === types.COLLECTIVE) {
+          return hasRole(remoteUser.id, this.id, ['HOST', 'ADMIN']);
+        } else {
+          return hasRole(remoteUser.id, this.ParentCollectiveId, ['HOST', 'ADMIN']);
+        }
       },
 
-      getUsersForViewer(viewer) {
-        const promises = [queries.getUsersFromCollectiveWithTotalDonations(this.id)];
+      getUsersForViewer(viewer, options) {
+        const promises = [];
+        if (options) {
+          options.include = options.include || [];
+          options.where = options.where || {};
+          options.where.CollectiveId = this.id;
+          options.include.push({model: models.User });
+          promises.push(models.Member.findAll(options).map(member => member.User));
+        } else {
+          promises.push(queries.getUsersFromCollectiveWithTotalDonations(this.id));
+        }
         if (viewer) {
           promises.push(viewer.canEditCollective(this.id));
         }
@@ -685,10 +699,11 @@ export default function(Sequelize, DataTypes) {
         return Collective.getCollectivesSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
       },
 
+      // get the host of the parent collective if any, or of this collective
       getHost() {
         return models.User.findOne({
           include: [
-            { model: models.Member, where: { role: roles.HOST, CollectiveId: this.id } }
+            { model: models.Member, where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id } }
           ]
         });
       },
@@ -709,8 +724,43 @@ export default function(Sequelize, DataTypes) {
     },
 
     classMethods: {
+
       createMany: (collectives, defaultValues) => {
         return Promise.map(collectives, u => Collective.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
+      },
+
+
+      /*
+      * If there is a username suggested, we'll check that it's valid or increase it's count
+      * Otherwise, we'll suggest something.
+      */
+      generateSlug(suggestions) {
+
+        /*
+        * Checks a given slug in a list and if found, increments count and recursively checks again
+        */
+        const slugSuggestionHelper = (slugToCheck, slugList, count) => {
+          const slug = count > 0 ? `${slugToCheck}${count}` : slugToCheck;
+          if (slugList.indexOf(slug) === -1) {
+            return slug;
+          } else {
+            return slugSuggestionHelper(`${slugToCheck}`, slugList, count+1);
+          }
+        }
+
+        suggestions = suggestions.filter(slug => slug ? true : false) // filter out any nulls
+          .map(slug => slugify(slug).toLowerCase(/\./g,'')) // lowercase them all
+          // remove any '+' signs
+          .map(slug => slug.indexOf('+') !== -1 ? slug.substr(0, slug.indexOf('+')) : slug);
+
+        // fetch any matching slugs or slugs for the top choice in the list above
+        return Sequelize.query(`
+            SELECT slug FROM "Collectives" where slug like '${suggestions[0]}%'
+          `, {
+            type: Sequelize.QueryTypes.SELECT
+          })
+        .then(userObjectList => userObjectList.map(user => user.slug))
+        .then(slugList => slugSuggestionHelper(suggestions[0], slugList, 0));
       },
 
       findBySlug: (slug, options = {}) => {
@@ -754,6 +804,28 @@ export default function(Sequelize, DataTypes) {
                 });
             }));
           })
+      }
+    },
+
+    hooks: {
+      beforeCreate: (instance) => {
+        if (instance.slug) return Promise.resolve();
+
+        const potentialSlugs = [
+          instance.slug,
+          instance.image ? userlib.getUsernameFromGithubURL(instance.image) : null,
+          instance.twitterHandle ? instance.twitterHandle.replace(/@/g, '') : null,
+          instance.name ? instance.name.replace(/ /g, '') : null
+        ];
+        return Collective.generateSlug(potentialSlugs)
+          .then(slug => {
+            if (!slug) {
+              return Promise.reject(new Error(`We couldn't generate a unique slug for this collective`, potentialSlugs));
+            }
+            instance.slug = slug;
+            return Promise.resolve();
+          });
+
       }
     }
   });

@@ -120,7 +120,7 @@ export const getSocialMediaAvatars = (req, res) => {
 
   // TODO: reenable asynchronously
   // userLib.fetchInfo(user)
-export const _create = (user) => User.create(user)
+export const _create = (user) => User.createUserWithCollective(user)
   .tap(dbUser => Activity.create({
     type: constants.USER_CREATED,
     UserId: dbUser.id,

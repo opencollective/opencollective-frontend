@@ -93,6 +93,33 @@ describe('Collective model', () => {
     .then(() => collective.addUserWithRole({ id: 1 }, 'BACKER'))
     .then(() => Transaction.createMany(transactions, { CollectiveId: collective.id, HostId: 1 })));
 
+
+  it('creates a unique slug', () => {
+    return Collective
+      .create({slug: 'xdamman'})
+      .tap(collective => {
+        expect(collective.slug).to.equal('xdamman')
+      })
+      .then(() => Collective.create({ name: 'Xavier Damman'}))
+      .then(collective => {
+        expect(collective.slug).to.equal('xavierdamman')
+      })
+      .then(() => Collective.create({ name: 'xdamman2' }))
+      .then(() => Collective.create({ twitterHandle: '@xdamman'}))
+      .then(collective => {
+        expect(collective.slug).to.equal('xdamman1')
+        expect(collective.twitterHandle).to.equal('xdamman')
+      })
+      .then(() => Collective.create({ name: ' Xavier Damman' }))
+      .then(collective => {
+        expect(collective.slug).to.equal('xavierdamman1')
+      })
+      .then(() => Collective.create({ 'slug': 'hélène & les g.arçons' }))
+      .then(collective => {
+        expect(collective.slug).to.equal('helene-and-les-garcons');
+      })
+  })
+
   it('computes the balance ', () =>
     collective.getBalance().then(balance => {
       let sum = 0;

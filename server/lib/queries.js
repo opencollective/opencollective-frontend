@@ -89,9 +89,10 @@ const getTopBackers = (since, until, tags, limit) => {
   const tagsClause = (tags) ? `AND g.tags && $tags` : ''; // && operator means "overlaps"
 
   return sequelize.query(`
-    SELECT MAX(u.id) as id, MAX(u."firstName") as "firstName", MAX(u."lastName") as "lastName", MAX(u.username) as username, MAX(u.website) as "website", MAX(u."twitterHandle") as "twitterHandle", MAX(u.image) as "image", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
+    SELECT MAX(u.id) as id, MAX(u."firstName") as "firstName", MAX(u."lastName") as "lastName", MAX(c.slug) as username, MAX(c.website) as "website", MAX(c."twitterHandle") as "twitterHandle", MAX(c.image) as "image", SUM("amount") as "totalDonations", MAX(t.currency) as "currency"
     FROM "Transactions" t
     LEFT JOIN "Users" u ON u.id = t."UserId"
+    LEFT JOIN "Collectives" c ON c.id = u."CollectiveId"
     LEFT JOIN "Collectives" g ON g.id = t."CollectiveId"
     WHERE 
       t.amount > 0
@@ -166,8 +167,10 @@ const getTopSponsors = () => {
     WITH "totalDonations" AS (
       SELECT "UserId", SUM(amount) as "totalDonations", MAX(currency) as currency, COUNT(DISTINCT "CollectiveId") as collectives FROM "Transactions" WHERE amount > 0 AND currency='USD' AND "PaymentMethodId" IS NOT NULL GROUP BY "UserId"
     )
-    SELECT u.id, u."firstName", u."lastName", u.username, u.mission, u.description, u.image as image, t."totalDonations", t.currency, t.collectives
-    FROM "totalDonations" t LEFT JOIN "Users" u ON t."UserId" = u.id
+    SELECT u.id, u."firstName", u."lastName", c.slug as username, c.mission, c.description, c.image, t."totalDonations", t.currency, t.collectives
+    FROM "totalDonations" t
+    LEFT JOIN "Users" u ON t."UserId" = u.id
+    LEFT JOIN "Collectives" c ON u."CollectiveId" = c.id
     WHERE t."totalDonations" > 100 AND u."isOrganization" IS TRUE
     ORDER BY t.collectives DESC, "totalDonations" DESC LIMIT :limit
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
@@ -205,16 +208,17 @@ const getUsersFromCollectiveWithTotalDonations = (CollectiveIds, until) => {
       max(concat_ws(' ', u."firstName", u."lastName")) as name,
       max(u."firstName") as "firstName",
       max(u."lastName") as "lastName",
-      max(u.username) as username,
+      max(c.slug) as username,
       ug.role as role,
-      max(u.image) as image,
-      max(u.website) as website,
+      max(c.image) as image,
+      max(c.website) as website,
       max(u.email) as email,
-      max(u."twitterHandle") as "twitterHandle",
+      max(c."twitterHandle") as "twitterHandle",
       max(s."totalDonations") as "totalDonations",
       max(s."firstDonation") as "firstDonation",
       max(s."lastDonation") as "lastDonation"
     FROM "Users" u
+    LEFT JOIN "Collectives" c ON c.id = u."CollectiveId"
     LEFT JOIN stats s ON u.id = s."UserId"
     LEFT JOIN "Members" ug ON u.id = ug."UserId"
     WHERE ug."CollectiveId" IN (:collectiveids)

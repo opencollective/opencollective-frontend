@@ -39,7 +39,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
       return User.findOne({where: {email: {$in: emails.map(email => email.toLowerCase())}}})
-        .then(u => u || User.create({
+        .then(u => u || User.createUserWithCollective({
           name: data.profile.displayName,
           image,
           email: emails[0],

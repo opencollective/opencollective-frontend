@@ -39,7 +39,7 @@ describe('user.models.test.js', () => {
         .create({ firstName: userData.firstName, email: 'johndoe'})
         .catch(err => expect(err).to.exist));
 
-    it('fails if neither email or username is given', () => {
+    it('fails if no email is given', () => {
       User
         .create({ firstName: 'blah' })
         .catch(err => expect(err).to.exist);
@@ -88,40 +88,6 @@ describe('user.models.test.js', () => {
         });
     });
 
-    it('creates a unique username', () => {
-      return User
-        .create({username: 'xdamman'})
-        .tap(user => {
-          expect(user.username).to.equal('xdamman')
-        })
-        .then(() => User.create({ email: 'xavier.damman@gmail.com'}))
-        .then(user => {
-          expect(user.username).to.equal('xavierdamman')
-        })
-        .then(() => User.create({email: 'xdamman2@gmail.com'}))
-        .then(() => User.create({ twitterHandle: '@xdamman'}))
-        .then(user => {
-          expect(user.username).to.equal('xdamman1')
-          expect(user.twitterHandle).to.equal('xdamman')
-        })
-        .then(() => User.create({ firstName: 'Xavier', lastName: 'Damman'}))
-        .then(user => {
-          expect(user.username).to.equal('xavierdamman1')
-        })
-        .then(() => User.create({'username': 'hélène & les g.arçons'}))
-        .then(user => {
-          expect(user.username).to.equal('helene-and-les-garcons');
-        })
-    })
-
-    it('creates a valid username from an email', () => {
-      return User
-        .create({email: 'xdamman+opencollective@gmail.com'})
-        .tap(user => {
-          expect(user.username).to.equal('xdamman')
-        })
-    })
-
     it('creates a user and subscribes it to user.yearlyreport and user.monthlyreport', () => {
       return User
         .create({email: 'xdamman+opencollective@gmail.com'})
@@ -152,11 +118,6 @@ describe('user.models.test.js', () => {
         expect(user.info).to.have.property('paypalEmail');
         expect(user.public).to.not.have.property('email');
         expect(user.public).to.not.have.property('paypalEmail');
-        expect(user.public).to.have.property('website');
-        expect(user.public).to.have.property('twitterHandle');
-        expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
-        expect(userData.website).to.be.undefined;
-        expect(user.website).to.equal(`https://twitter.com/${userData.twitterHandle}`);
         done();
       });
     });
@@ -238,6 +199,24 @@ describe('user.models.test.js', () => {
     beforeEach(() => Collective.create(utils.data('collective2')));
     beforeEach(() => Transaction.createMany(transactions, { HostId: 1 }));
 
+    it('creates a new user collective and generates a unique slug', () => {
+      const email = 'xavier.damman@email.com';
+      return User.createUserWithCollective({ email })
+        .then(user => {
+          expect(user.email).to.equal(email);
+          expect(user.collective.slug).to.equal('xavierdamman');
+          expect(user.collective.type).to.equal('USER');
+          return User.createUserWithCollective({ firstName: 'Xavier', lastName: 'Damman', email: 'xavierdamman+test@mail.com' });
+        })
+        .then(user2 => {
+          expect(user2.collective.slug).to.equal('xavierdamman1');        
+          expect(user2.collective.name).to.equal('Xavier Damman');        
+          expect(user2.firstName).to.equal('Xavier');
+          expect(user2.lastName).to.equal('Damman');
+          expect(user2.name).to.equal('Xavier Damman');
+        })
+    });
+
     it('gets the top backers', () => {
       return User.getTopBackers()
         .then(backers => {
@@ -245,9 +224,6 @@ describe('user.models.test.js', () => {
           expect(backers.length).to.equal(2);
           expect(backers[0].totalDonations).to.equal(75000);
           expect(backers[0]).to.have.property('firstName');
-          expect(backers[0]).to.have.property('image');
-          expect(backers[0]).to.have.property('website');
-          expect(backers[0]).to.have.property('twitterHandle');
         });
     });
 

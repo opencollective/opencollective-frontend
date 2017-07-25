@@ -89,7 +89,8 @@ export function setupModels(client) {
   m.User.hasMany(m.Order, { as: 'orders' });
   m.User.hasMany(m.PaymentMethod);
   m.User.hasMany(m.Member);
-
+  m.User.belongsTo(m.Collective, { foreignKey: 'CollectiveId', constraints: false });
+  
   // Members
   m.Member.belongsTo(m.User);
   m.Member.belongsTo(m.Collective);

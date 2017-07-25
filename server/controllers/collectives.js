@@ -296,7 +296,7 @@ export const create = (req, res, next) => {
       return Promise.each(users, user => {
         if (user.email) {
           return User.findOne({where: { email: user.email.toLowerCase() }})
-          .then(u => u || User.create(user))
+          .then(u => u || User.createUserWithCollective(user))
           .then(u => {
             if (!creator) {
               creator = u;
@@ -438,7 +438,7 @@ export const createFromGithub = (req, res, next) => {
             return ca.getUser();
           }
         })
-        .then(user => user || User.create(Object.assign(userAttr)))
+        .then(user => user || User.createUserWithCollective(Object.assign(userAttr)))
         .then(user => contributorUser = user)
         .then(() => fetchGithubUser(contributor))
         .tap(json => {
