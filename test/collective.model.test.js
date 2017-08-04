@@ -278,17 +278,17 @@ describe('Collective model', () => {
 
   describe("tiers", () => {
 
-    before(() => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id })); // adding backer tier
-    before(() => models.Tier.create({ ...utils.data('tier2'), CollectiveId: collective.id })); // adding sponsor tier
-    before(() => collective.addUserWithRole(user2, 'BACKER'))
-    before(() => models.Order.create({
+    before('adding backer tier', () => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id })); // adding backer tier
+    before('adding sponsor tier', () => models.Tier.create({ ...utils.data('tier2'), CollectiveId: collective.id })); // adding sponsor tier
+    before('adding user as backer', () => collective.addUserWithRole(user2, 'BACKER'))
+    before('creating order for backer tier', () => models.Order.create({
       CreatedByUserId: user1.id,
       FromCollectiveId: user1.CollectiveId,
       ToCollectiveId: collective.id,
       TierId: 1
     }));
 
-    before(() => models.Order.create({
+    before('creating order for sponsor tier', () => models.Order.create({
       CreatedByUserId: user2.id,
       FromCollectiveId: user2.CollectiveId,
       ToCollectiveId: collective.id,

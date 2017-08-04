@@ -94,8 +94,8 @@ export function setupModels(client) {
   m.Member.belongsTo(m.Tier);
 
   // Collective.
-  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, foreignKey: 'MemberCollectiveId' }, as: 'members'});
-  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, foreignKey: 'CollectiveId' }, as: 'memberships'});
+  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'MemberCollectiveId' }, as: 'members'});
+  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'CollectiveId' }, as: 'memberships'});
   m.Collective.hasMany(m.Member);
 
   // StripeAccount

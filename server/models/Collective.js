@@ -467,14 +467,19 @@ export default function(Sequelize, DataTypes) {
             break;
         }
 
+        const member = {
+          role,
+          CreatedByUserId: user.id,
+          MemberCollectiveId: user.CollectiveId,
+          CollectiveId: this.id
+        };
+
+        if (TierId) {
+          member.TierId = TierId;
+        }
+
         return Promise.all([
-          Sequelize.models.Member.create({
-            role,
-            CreatedByUserId: user.id,
-            MemberCollectiveId: user.CollectiveId,
-            CollectiveId: this.id,
-            TierId
-          }),
+          Sequelize.models.Member.create(member),
           Sequelize.models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
         ]);
       },
