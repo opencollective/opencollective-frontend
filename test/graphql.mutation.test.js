@@ -310,7 +310,9 @@ describe('Mutation Tests', () => {
           name
         }
       }`;
-      await graphql(schema, query, null, { remoteUser: user1 });
+      const res = await graphql(schema, query, null, { remoteUser: user1 });
+      res.errors && console.error(res.errors[0]);
+      expect(res.errors).to.not.exist;
       return models.Collective.findById(event1.id).then(event => {
         expect(event).to.be.null;
       })
