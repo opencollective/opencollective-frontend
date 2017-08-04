@@ -239,11 +239,9 @@ describe('expenses.routes.test.js', () => {
               .expect(200)
               .then(res => {
                 const expenses = res.body;
-                console.log("expenses", expenses);
                 expect(expenses).to.have.length(3);
                 expect(expenses[1].user.id).to.equal(expenseFiler.id);
                 expect(expenses[0].user.email).to.not.exist;
-                console.log("Expense user", expenses[0].user);
                 expenses.forEach(e => expect(e.CollectiveId).to.equal(collective.id));
               }));
 
@@ -686,7 +684,7 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('amountInTxnCurrency', -10939)
                   expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 415)
                   expect(transaction).to.have.property('netAmountInCollectiveCurrency', -12378);
-                  expect(transaction).to.have.property('txnCurrency', host.currency);
+                  expect(transaction).to.have.property('txnCurrency', host.collective.currency);
                   expect(transaction).to.have.property('txnCurrencyFxRate', 0.911577028258888);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -12000);

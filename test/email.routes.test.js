@@ -126,7 +126,7 @@ describe("email.routes.test", () => {
       .send(webhookBodyPayload)
       .then((res) => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.args[0][1]).to.equal('organizers@testcollective.opencollective.com');
+        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
         const emailSentTo = [spy.args[0][3].bcc,spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
         expect(emailSentTo.indexOf(usersData[1].email) !== -1).to.be.true;
@@ -167,8 +167,8 @@ describe("email.routes.test", () => {
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
       .then(() => {
         expect(spy.callCount).to.equal(2);
-        expect(spy.args[0][1]).to.equal('organizers@testcollective.opencollective.com');
-        expect(spy.args[0][2].subject).to.equal('test collective organizers');
+        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
+        expect(spy.args[0][2].subject).to.equal('test collective admins');
         expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(usersData[0].email);
         expect(spy.args[0][3].from).to.equal('testcollective collective <hello@testcollective.opencollective.com>');
       });
@@ -212,7 +212,7 @@ describe("email.routes.test", () => {
         for (const i in spy.args) {
           const emailBody = spy.args[i][2];
           expect(emailBody).to.contain(generateUnsubscribeUrl(spy.args[i][3].bcc));
-          expect(emailBody).to.contain("To unsubscribe from the organizers mailing list");
+          expect(emailBody).to.contain("To unsubscribe from the admins mailing list");
         }
       });
     });
