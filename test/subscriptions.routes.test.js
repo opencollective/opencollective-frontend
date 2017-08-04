@@ -35,7 +35,7 @@ describe('subscriptions.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap((u => user = u)));
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap((g => collective = g)));
 
@@ -44,9 +44,9 @@ describe('subscriptions.routes.test.js', () => {
   // create stripe account
   beforeEach(() => {
     models.StripeAccount.create({
-      accessToken: 'sktest_123'
+      accessToken: 'sktest_123',
+      CollectiveId: user.CollectiveId
     })
-    .then((account) => user.setStripeAccount(account));
   });
 
   // Create a paymentMethod.
@@ -66,8 +66,9 @@ describe('subscriptions.routes.test.js', () => {
         models.Subscription.create(utils.data('subscription1'))
           .then(subscription => models.Order.create({
             ...order,
-            UserId: user.id,
-            CollectiveId: collective.id,
+            CreatedByUserId: user.id,
+            FromCollectiveId: user.CollectiveId,
+            ToCollectiveId: collective.id,
             SubscriptionId: subscription.id
           })
         ))
@@ -96,7 +97,7 @@ describe('subscriptions.routes.test.js', () => {
           res.body.forEach(sub => {
             expect(sub).to.be.have.property('stripeSubscriptionId')
             expect(sub).to.be.have.property('Order')
-            expect(sub.Order).to.be.have.property('Collective')
+            expect(sub.Order).to.be.have.property('toCollective')
           });
           done();
         });
@@ -143,8 +144,9 @@ describe('subscriptions.routes.test.js', () => {
       return models.Subscription.create(subscription)
         .then(sub => models.Order.create({
           ...ordersData[0],
-          UserId: user.id,
-          CollectiveId: collective.id,
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
           SubscriptionId: sub.id
         }))
@@ -239,7 +241,7 @@ describe('subscriptions.routes.test.js', () => {
               const subject = nm.sendMail.lastCall.args[0].subject;
               const html = nm.sendMail.lastCall.args[0].html;
               expect(subject).to.contain('Subscription canceled to Scouts');
-              expect(html).to.contain('€20/month has been canceled');
+              expect(html).to.contain('20/month has been canceled');
               done();
             })
             .catch(done);

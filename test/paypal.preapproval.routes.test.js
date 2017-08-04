@@ -46,12 +46,12 @@ describe('paypal.preapproval.routes.test.js', () => {
         utils.resetTestDB().asCallback(cb);
       },
       createUserA: ['resetDB', (cb) => {
-        models.User.create(utils.data('user1'))
+        models.User.createUserWithCollective(utils.data('user1'))
           .then(user => cb(null, user))
           .catch(cb);
       }],
       createUserB: ['createUserA', (cb) => {
-        models.User.create(utils.data('user2'))
+        models.User.createUserWithCollective(utils.data('user2'))
           .then(user => cb(null, user))
           .catch(cb);
       }]
@@ -91,7 +91,7 @@ describe('paypal.preapproval.routes.test.js', () => {
               expect(res.count).to.equal(1);
               const paykey = res.rows[0];
               expect(paykey).to.have.property('service', 'paypal');
-              expect(paykey).to.have.property('UserId', user.id);
+              expect(paykey).to.have.property('CreatedByUserId', user.id);
               expect(paykey).to.have.property('token', paypalMock.adaptive.preapproval.preapprovalKey);
               done();
             })
@@ -152,15 +152,15 @@ describe('paypal.preapproval.routes.test.js', () => {
             expect(e).to.not.exist;
             expect(res.body.token).to.equal(preapprovalkey);
 
-            models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} })
+            models.PaymentMethod.findAndCountAll({ where: { token: preapprovalkey } })
             .then(res => {
               expect(res.count).to.equal(1);
               expect(res.rows[0].confirmedAt).not.to.be.null;
               expect(res.rows[0].service).to.equal('paypal');
               expect(res.rows[0].identifier).to.equal(mock.completed.senderEmail);
-              expect(res.rows[0].UserId).to.equal(user.id);
+              expect(res.rows[0].CreatedByUserId).to.equal(user.id);
             })
-            .then(() => models.Activity.findAndCountAll({where: {type: 'user.paymentMethod.created'} }))
+            .then(() => models.Activity.findAndCountAll({ where: { type: 'user.paymentMethod.created' } }))
             .then(res => {
               expect(res.count).to.equal(1);
               done();
@@ -244,7 +244,8 @@ describe('paypal.preapproval.routes.test.js', () => {
       beforeEach(() => {
         return models.PaymentMethod.create({
           service: 'paypal',
-          UserId: user.id,
+          CreatedByUserId: user.id,
+          CollectiveId: user.CollectiveId,
           token: 'blah'
         })
       });
@@ -265,12 +266,12 @@ describe('paypal.preapproval.routes.test.js', () => {
           .expect(200)
           .end(e => {
             expect(e).to.not.exist;
-            models.PaymentMethod.findAndCountAll({where: {token: preapprovalkey} })
+            models.PaymentMethod.findAndCountAll({where: { token: preapprovalkey } })
             .then((res) => {
               expect(res.count).to.equal(1);
               expect(res.rows[0].confirmedAt).not.to.be.null;
               expect(res.rows[0].service).to.equal('paypal');
-              expect(res.rows[0].UserId).to.equal(user.id);
+              expect(res.rows[0].CreatedByUserId).to.equal(user.id);
               done();
             });
           });

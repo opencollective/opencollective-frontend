@@ -3,7 +3,6 @@ import models from '../server/models';
 import * as utils from '../test/utils';
 
 const {
-  Transaction,
   Collective,
   User
 } = models;

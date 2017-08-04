@@ -64,17 +64,14 @@ export const UserInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
-      organization: { type: GraphQLString },
       image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString },
-      paymentMethod: { type: PaymentMethodInputType }
+      paypalEmail: { type: GraphQLString }
   })
 });
-
 
 export const UserAttributesInputType = new GraphQLInputObjectType({
   name: 'UserAttributesInputType',
@@ -85,14 +82,12 @@ export const UserAttributesInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
-      organization: { type: GraphQLString },
       image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString },
-      paymentMethod: { type: PaymentMethodInputType }
+      paypalEmail: { type: GraphQLString }
   })
 });
 
@@ -172,11 +167,15 @@ export const OrderInputType = new GraphQLInputObjectType({
   description: 'Input type for OrderType',
   fields: () => ({
     quantity: { type: GraphQLInt },
+    totalAmount: { type: GraphQLInt },
+    interval: { type: GraphQLString },
     description: { type: GraphQLString },
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     user: { type: new GraphQLNonNull(UserAttributesInputType) },
-    collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+    paymentMethod: { type: PaymentMethodInputType },
+    fromCollective: { type: CollectiveAttributesInputType },
+    toCollective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType }
   })
 });

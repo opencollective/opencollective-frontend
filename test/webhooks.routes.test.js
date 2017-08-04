@@ -62,7 +62,7 @@ describe('webhooks.routes.test.js', () => {
 
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
 
   // Create a collective.
   beforeEach((done) => {
@@ -86,11 +86,11 @@ describe('webhooks.routes.test.js', () => {
   // create a stripe account
   beforeEach(() =>
     models.StripeAccount.create({
-      accessToken: 'abc'
-    })
-    .then((account) => user.setStripeAccount(account)));
+      accessToken: 'abc',
+      CollectiveId: user.CollectiveId
+    }));
 
-  afterEach(() => nock.cleanAll());
+    afterEach(() => nock.cleanAll());
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
@@ -184,9 +184,10 @@ describe('webhooks.routes.test.js', () => {
 
       return models.Order
         .create({
-          UserId: user.id,
-          CollectiveId: collective.id,
-          amount: webhookSubscription.amount
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
+          totalAmount: webhookSubscription.amount
         })
         .then((order) => paymentsLib.createPayment({
           order,
@@ -217,7 +218,7 @@ describe('webhooks.routes.test.js', () => {
     beforeEach('Find paymentMethod', (done) => {
       models.PaymentMethod.findAndCountAll({
         where: {
-          UserId: order.UserId
+          CreatedByUserId: order.CreatedByUserId
         }})
         .tap((res) => {
           expect(res.count).to.equal(1);
@@ -287,8 +288,8 @@ describe('webhooks.routes.test.js', () => {
         expect(res.count).to.equal(2);
         const transaction = res.rows[1];
         expect(transaction.OrderId).to.be.equal(order.id);
-        expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
-        expect(transaction.UserId).to.be.equal(order.UserId);
+        expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
+        expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
         expect(transaction.type).to.be.equal(type.DONATION);
@@ -381,8 +382,8 @@ describe('webhooks.routes.test.js', () => {
           .tap(res => {
             expect(res.count).to.be.equal(3); // third transaction
             const transaction = res.rows[2];
-            expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
-            expect(transaction.UserId).to.be.equal(order.UserId);
+            expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
+            expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
             expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
             expect(transaction.currency).to.be.equal(CURRENCY);
             expect(transaction.type).to.be.equal(type.DONATION);

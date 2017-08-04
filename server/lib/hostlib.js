@@ -6,7 +6,7 @@ import Promise from 'bluebird';
 
 export function getHostedCollectives(hostid, endDate = new Date) {
   return sequelize.query(`
-    SELECT g.* FROM "Collectives" g LEFT JOIN "Members" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."UserId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
+    SELECT g.* FROM "Collectives" g LEFT JOIN "Members" ug ON g.id = ug."CollectiveId" WHERE ug.role='HOST' AND ug."MemberCollectiveId"=:hostid AND g."deletedAt" IS NULL AND ug."deletedAt" IS NULL AND ug."createdAt" < :endDate AND g."createdAt" < :endDate
   `, {
     replacements: { hostid, endDate },
     model: models.Collective,
@@ -23,14 +23,14 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
       };
 
     if (collectiveids) {
-      where.CollectiveId = { $in: collectiveids };
+      where.ToCollectiveId = { $in: collectiveids };
     }
 
     return models.Transaction.findAll({
-      attributes: [ [sequelize.fn('DISTINCT', sequelize.col('UserId')), 'userid'] ],
+      attributes: [ [sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId')), 'CollectiveId'] ],
       where
     })
-    .then(rows => rows.map(r => r.dataValues.userid))
+    .then(rows => rows.map(r => r.dataValues.CollectiveId))
     ;
   }
 

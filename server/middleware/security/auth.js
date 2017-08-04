@@ -71,18 +71,17 @@ export function mustBeLoggedInAsUser(req, res, next) {
   });
 }
 
-export function mustHaveRole(possibleMembers) {
-  if (typeof possibleMembers === 'string')
-    possibleMembers = [possibleMembers];
+export function mustHaveRole(possibleRoles) {
+  if (typeof possibleRoles === 'string')
+    possibleRoles = [possibleRoles];
 
   return (req, res, next) => {
     required_valid('remoteUser', 'collective')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
-
-      return hasRole(req.remoteUser.id, req.collective.id, possibleMembers)
+      return hasRole(req.remoteUser.CollectiveId, req.collective.id, possibleRoles)
       .then(hasRole => {
-        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleMembers.join(' or ')} of this collective`));
+        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
         else return next(null, true);
       })
       .catch(next);
@@ -114,12 +113,6 @@ export function canEditObject(object) {
   }
 }
 
-/**
- * Only the author of the comment or the host or an admin member of the collective can edit an expense
- */
-export function canEditComment(req, res, next) {
-  return canEditObject('comment')(req, res, next);
-}
 
 /**
  * Only the author of the expense or the host or an admin member of the collective can edit an expense

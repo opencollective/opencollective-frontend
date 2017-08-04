@@ -34,7 +34,7 @@ describe("notification.model.test.js", () => {
   beforeEach(() => utils.resetTestDB());
 
   beforeEach(() => {
-    const promises = [User.create(userData), User.create(user2Data), Collective.create(collectiveData), Collective.create(collective2Data)];
+    const promises = [User.createUserWithCollective(userData), User.createUserWithCollective(user2Data), Collective.create(collectiveData), Collective.create(collective2Data)];
     return Promise.all(promises).then((results) => {
       user = results[0];
       user2 = results[1];
@@ -137,10 +137,9 @@ describe("notification.model.test.js", () => {
   describe('getSubscribers', () => {
 
     let users;
-    beforeEach(() => User.createMany([utils.data('user3'), utils.data('user4')]).then(result => users = result))
+    beforeEach(() => Promise.map([utils.data('user3'), utils.data('user4')], user => models.User.createUserWithCollective(user)).then(result => users = result))
 
-    it('getSubscribers to the backers mailinglist', () => {
-      return Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
+    it('getSubscribers to the backers mailinglist', () => Promise.map(users, user => collective.addUserWithRole(user, 'BACKER').catch(e => console.error(e)))
       .then(() => Notification.getSubscribers(collective.slug, 'backers').catch(e => console.error(e)))
       .tap(subscribers => {
         expect(subscribers.length).to.equal(2);
@@ -152,8 +151,7 @@ describe("notification.model.test.js", () => {
       .tap(subscribers => {
         expect(subscribers.length).to.equal(1);
       })
-      .catch(e => console.error(e));
-    })
+      .catch(e => console.error(e)));
 
     it('getSubscribers to an event', () => {
       const eventData = utils.data('event1');
@@ -170,21 +168,29 @@ describe("notification.model.test.js", () => {
           CollectiveId: event.id
         })
       })
-      .then((tier) => {
+      .tap((tier) => {
         return Promise.map(users, (user) => {
-          Order.create({
-            UserId: user.id,
-            CollectiveId: collective.id,
+          return Order.create({
+            CreatedByUserId: user.id,
+            FromCollectiveId: user.CollectiveId,
+            ToCollectiveId: collective.id,
             TierId: tier.id
           })
         });
       })
+      .then((tier) => Promise.map(users, user => models.Member.create({
+        CreatedByUserId: user.id,
+        MemberCollectiveId: user.CollectiveId,
+        CollectiveId: event.id,
+        TierId: tier.id,
+        role: roles.FOLLOWER
+      })))
       .then(() => Notification.getSubscribers(eventData.slug))
       .then(subscribers => {
         expect(subscribers.length).to.equal(2);
       })
       .then(() => {
-        return users[0].unsubscribe(collective.id, `mailinglist.${event.slug}`)
+        return users[0].unsubscribe(event.id, `mailinglist`)
       })
       .then(() => Notification.getSubscribers(eventData.slug))
       .then(subscribers => {

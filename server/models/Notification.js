@@ -51,7 +51,7 @@ export default function(Sequelize, DataTypes) {
        */
       getSubscribers: (collectiveSlug, mailinglist) => {
 
-        const getSubscribersForMailingList = (mailinglist) =>
+        const getSubscribersForMailingList = () =>
           models.Notification.findAll(
               {
                 where: {
@@ -66,26 +66,28 @@ export default function(Sequelize, DataTypes) {
             )
             .then(subscriptions => subscriptions.map(s => s.User))        
 
-        const getSubscribersForEvent = (eventSlug) => models.Collective
-          .findOne({ where: { slug: eventSlug, type: 'EVENT' } })
+        const getSubscribersForEvent = () => models.Collective
+          .findOne({
+            where: { slug: collectiveSlug, type: 'EVENT' }
+          })
           .then(event => {
-              if (event) return event.getUsers().then(excludeUnsubscribed)
-          });
+              if (event) return event.getMembers().then(excludeUnsubscribed)
+          })
 
-        const excludeUnsubscribed = (users) =>
+        const excludeUnsubscribed = (members) => 
           models.Notification.findAll({
             where: {
               channel: 'email',
               active: false,
-              type: `mailinglist.${mailinglist}`
+              type: `mailinglist`
             },
             include: [ { model: models.Collective, where: { slug: collectiveSlug } } ]
-          }).then(subscriptions => subscriptions.map(s => s.UserId ))
+          }).then(notifications => notifications.map(s => s.UserId ))
           .then(excludeIds => {
-            return users.filter(u => excludeIds.indexOf(u.id) === -1)
+            return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
           })
 
-        return getSubscribersForEvent(mailinglist)
+        return getSubscribersForEvent(collectiveSlug)
         .then(subscribers => {
           if (!subscribers) return getSubscribersForMailingList(mailinglist)
           else return subscribers;

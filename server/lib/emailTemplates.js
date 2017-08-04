@@ -12,7 +12,6 @@ const templateNames = [
   'announcement.text',
   'user.monthlyreport',
   'user.monthlyreport.text',
-  'comment.approve',
   'email.approve',
   'email.message',
   'github.signup',

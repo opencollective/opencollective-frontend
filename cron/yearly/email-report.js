@@ -17,15 +17,15 @@ console.log("startDate", startDate, "endDate", endDate);
 const GetUserTransactionsQuery = `
 with "UserTransactions" as (
   SELECT
-    "CollectiveId",
+    "ToCollectiveId",
     SUM("amountInTxnCurrency") as "amountInTxnCurrency",
     MAX("txnCurrency") as "txnCurrency",
     SUM("platformFeeInTxnCurrency") as "platformFeeInTxnCurrency",
     MAX("hostFeeInTxnCurrency") as "hostFeeInTxnCurrency",
     MAX("paymentProcessorFeeInTxnCurrency") as "paymentProcessorFeeInTxnCurrency"
   FROM "Transactions"
-  WHERE "UserId"=:userid AND amount > 0 AND "deletedAt" IS NULL AND "PaymentMethodId" IS NOT NULL
-  GROUP BY "CollectiveId"
+  WHERE "CreatedByUserId"=:userid AND amount > 0 AND "deletedAt" IS NULL AND "PaymentMethodId" IS NOT NULL
+  GROUP BY "ToCollectiveId"
 )
 SELECT
   ut.*,
@@ -34,9 +34,9 @@ SELECT
   host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
   g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
 FROM "UserTransactions" ut 
-LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
-LEFT JOIN "Members" ug ON ut."CollectiveId" = ug."CollectiveId" AND ug.role='HOST'
-LEFT JOIN "Users" host ON ug."UserId" = host.id`;
+LEFT JOIN "Collectives" g ON ut."ToCollectiveId" = g.id
+LEFT JOIN "Members" ug ON ut."ToCollectiveId" = ug."CollectiveId" AND ug.role='HOST'
+LEFT JOIN "Users" host ON ug."CreatedByUserId" = host.id`;
 
 const buildTweet = (collectives, totalDonations) => {
   let tweet;

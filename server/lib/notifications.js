@@ -42,6 +42,7 @@ export default (Sequelize, activity) => {
         active: true
       };
 
+      // TODO host.id is not referencing a user anymore
       if (activity.type === activityType.COLLECTIVE_CREATED) {
         where.UserId = activity.data.host.id;
       } else {

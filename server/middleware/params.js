@@ -8,8 +8,7 @@ const {
   User,
   Collective,
   Transaction,
-  Expense,
-  Comment
+  Expense
 } = models;
 
 /**
@@ -58,7 +57,7 @@ export function collectiveid(req, res, next, collectiveIdOrSlug) {
     .then(collective => req.collective = collective)
     .then(() => {
       if (req.remoteUser) {
-        return hasRole(req.remoteUser.id, req.collective.id, ['ADMIN','HOST'])
+        return hasRole(req.remoteUser.CollectiveId, req.collective.id, ['ADMIN','HOST'])
       }
     })
     .then(canEdit => {
@@ -70,30 +69,13 @@ export function collectiveid(req, res, next, collectiveIdOrSlug) {
 }
 
 /**
- * commentid
- */
-export function commentid(req, res, next, commentid) {
-  parseId(commentid)
-    .then(where => Comment.findOne({where}))
-    .then((comment) => {
-      if (!comment) {
-        return next(new errors.NotFound(`Comment '${commentid}' not found`));
-      } else {
-        req.comment = comment;
-        next();
-      }
-    })
-    .catch(next);
-}
-
-/**
  * transactionuuid
  */
 export function transactionuuid(req, res, next, transactionuuid) {
   if (!isUUID(transactionuuid))
     return next(new errors.BadRequest("Must provide transaction uuid"));
 
-  Transaction.findOne({where: { uuid: transactionuuid }})
+  Transaction.findOne({ where: { uuid: transactionuuid } })
     .then((transaction) => {
       if (!transaction) {
         return next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));

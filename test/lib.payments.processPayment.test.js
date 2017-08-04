@@ -3,8 +3,6 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import nock from 'nock';
 import chanceLib from 'chance';
-import request from 'supertest';
-import app from '../server/index';
 import * as utils from '../test/utils';
 import paymentsLib from '../server/lib/payments';
 import { planId as generatePlanId } from '../server/lib/utils.js';
@@ -15,7 +13,6 @@ import models from '../server/models';
 import {appStripe} from '../server/gateways/stripe';
 
 const chance = chanceLib.Chance();
-const application = utils.data('application');
 const userData = utils.data('user3');
 const userData2 = utils.data('user2');
 const collectiveData = utils.data('collective5');
@@ -29,7 +26,7 @@ const STRIPE_TOKEN = 'superStripeToken';
  * Tests
  */
 describe('lib.payments.processPayment.test.js', () => {
-  let user, user2, collective, tier, sandbox, processPaymentSpy, emailSendSpy;
+  let user, user2, host, collective, tier, sandbox, processPaymentSpy, emailSendSpy;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -55,32 +52,13 @@ describe('lib.payments.processPayment.test.js', () => {
     done();
   });
 
-  // Create a user.
-  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
-
-  // Create a user.
-  beforeEach('create a user', () => models.User.create(userData2).tap(u => user2 = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective(userData2).tap(u => user2 = u));
+  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
   // Create a collective.
-  beforeEach('create a collective', (done) => {
-    request(app)
-      .post('/collectives')
-      .send({
-        api_key: application.api_key,
-        collective: Object.assign(collectiveData, { users: [{ email: 'member@collective.com', role: roles.ADMIN}] })
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        models.Collective
-          .findById(parseInt(res.body.id))
-          .then((g) => {
-            collective = g;
-            done();
-          })
-          .catch(done);
-      });
-  });
+  beforeEach('create a collective', () => models.Collective.create(Object.assign(collectiveData, { HostCollectiveId: host.CollectiveId, users: [ { email: 'member@collective.com', role: roles.ADMIN} ] })).then(c => collective = c));
+  beforeEach('add host', () => collective.addUserWithRole(host, roles.HOST))
 
   beforeEach('create a tier', () => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id }).tap(t => tier = t));
 
@@ -97,11 +75,12 @@ describe('lib.payments.processPayment.test.js', () => {
 
       beforeEach('create order', () => {
         return models.Order.create({
-          amount: 10000,
+          totalAmount: 10000,
           currency: 'USD',
-          UserId: user.id,
+          CreatedByUserId: host.id,
           TierId: tier.id,
-          CollectiveId: collective.id
+          FromCollectiveId: host.CollectiveId,
+          ToCollectiveId: collective.id
         })
         .then(d => order = d)
         .then(paymentsLib.processPayment)
@@ -115,10 +94,10 @@ describe('lib.payments.processPayment.test.js', () => {
           expect(transactions[0]).to.contain({
             type: constants.type.DONATION,
             OrderId: order.id,
-            amount: order.amount,
+            amount: order.totalAmount,
             currency: order.currency,
             txnCurrency: order.currency,
-            amountInTxnCurrency: order.amount,
+            amountInTxnCurrency: order.totalAmount,
             txnCurrencyFxRate: 1,
             platformFeeInTxnCurrency: 0,
             paymentProcessorFeeInTxnCurrency: 0,
@@ -138,11 +117,12 @@ describe('lib.payments.processPayment.test.js', () => {
     describe('Donation given by another user', () => {
       beforeEach(() => {
         return models.Order.create({
-          amount: 10000,
+          totalAmount: 10000,
           currency: 'USD',
-          UserId: user2.id,
+          CreatedByUserId: user2.id,
           TierId: tier.id,
-          CollectiveId: collective.id
+          FromCollectiveId: user2.CollectiveId,
+          ToCollectiveId: collective.id
         })
         .then(d => order = d)
         .then(paymentsLib.processPayment)
@@ -156,10 +136,10 @@ describe('lib.payments.processPayment.test.js', () => {
           expect(transactions[0]).to.contain({
             type: constants.type.DONATION,
             OrderId: order.id,
-            amount: order.amount,
+            amount: order.totalAmount,
             currency: order.currency,
             txnCurrency: order.currency,
-            amountInTxnCurrency: order.amount,
+            amountInTxnCurrency: order.totalAmount,
             txnCurrencyFxRate: 1,
             platformFeeInTxnCurrency: 0,
             paymentProcessorFeeInTxnCurrency: 0,
@@ -168,18 +148,17 @@ describe('lib.payments.processPayment.test.js', () => {
         })
       });
 
-      it('adds the user as a backer', () => {
-        return models.Member.findOne({
+      it('adds the user as a backer', () => models.Member.findOne({
           where: {
-            UserId: user2.id,
+            CreatedByUserId: user2.id,
             CollectiveId: collective.id,
             role: roles.BACKER
           }
         })
-        .then(Member => {
-          expect(Member).to.exist;
-        });
-      });
+        .then(member => {
+          expect(member).to.exist;
+        })
+      );
 
       it('processedAt should not be null', () => {
         return models.Order.findById(order.id)
@@ -221,14 +200,10 @@ describe('lib.payments.processPayment.test.js', () => {
       stubStripe();
     });
 
-    beforeEach((done) => {
-      models.StripeAccount.create({
-        accessToken: 'abc'
-      })
-      .then((account) => user.setStripeAccount(account))
-      .tap(() => done())
-      .catch(done);
-    });
+    beforeEach(() => models.StripeAccount.create({
+      accessToken: 'abc',
+      CollectiveId: host.CollectiveId
+    }));
 
     // Nock for charges.create.
     beforeEach(() => {
@@ -264,13 +239,14 @@ describe('lib.payments.processPayment.test.js', () => {
           service: 'stripe'
         })
         .tap(pm => models.Order.create({
-          amount: CHARGE * 100,
+          totalAmount: CHARGE * 100,
           currency: CURRENCY,
           SubscriptionId: null,
           PaymentMethodId: pm.id,
-          UserId: user.id,
-          TierId: tier.id,
-          CollectiveId: collective.id
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
+          TierId: tier.id
         }))
         .then(paymentsLib.processPayment)
         .then(transaction => {
@@ -296,7 +272,7 @@ describe('lib.payments.processPayment.test.js', () => {
           .findAndCountAll({})
           .then((res) => {
             expect(res.count).to.equal(1);
-            expect(res.rows[0]).to.have.property('UserId', user.id);
+            expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
             expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
             expect(res.rows[0]).to.have.property('currency', CURRENCY);
             expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
@@ -313,23 +289,19 @@ describe('lib.payments.processPayment.test.js', () => {
           .catch(done);
       });
 
-      it('successfully adds the user as a backer', (done) => {
-        collective
-          .getUsers()
-          .then((users) => {
-            expect(users).to.have.length(3);
-            const backer = _.find(users, {email: user.email});
-            expect(backer.Member.role).to.equal(roles.BACKER);
-            done();
-          })
-          .catch(done);
-      });
+      it('successfully adds the user as a backer', () => models.Member.findOne({
+          where: { CollectiveId: collective.id, MemberCollectiveId: user.CollectiveId, role: roles.BACKER }
+        })
+        .then((member) => {
+          expect(member).to.exist;
+        })
+      );
 
       it('successfully sends out an email to donor', () => {
-        expect(emailSendSpy.args[1][0]).to.equal('thankyou');
-        expect(emailSendSpy.args[1][1]).to.equal(user.email);
-        expect(emailSendSpy.args[1][2].relatedCollectives).to.have.length(2);
-        expect(emailSendSpy.args[1][2].relatedCollectives[0]).to.have.property('settings');
+        expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
+        expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);
+        expect(emailSendSpy.lastCall.args[2].relatedCollectives).to.have.length(2);
+        expect(emailSendSpy.lastCall.args[2].relatedCollectives[0]).to.have.property('settings');
       });
     });
 
@@ -351,12 +323,13 @@ describe('lib.payments.processPayment.test.js', () => {
           amount: 10.99
         }))
         .then(subscription => models.Order.create({
-          amount: 1099,
+          totalAmount: 1099,
           currency: CURRENCY,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
           SubscriptionId: subscription.id,
           PaymentMethodId: pm.id,
-          UserId: user.id,
-          CollectiveId: collective.id,
+          CreatedByUserId: user.id,
           TierId: tier.id,
           createdAt: '2017-01-22T15:01:22.827-07:00'
         }))
@@ -428,7 +401,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
@@ -454,17 +427,18 @@ describe('lib.payments.processPayment.test.js', () => {
             expect(nocks['subscriptions.create'].isDone()).to.be.true;
           });
 
-          it('successfully adds the user as a backer', (done) => {
-            collective
-              .getUsers()
-              .then((users) => {
-                expect(users).to.have.length(3);
-                const backer = _.find(users, {email: user.email});
-                expect(backer.Member.role).to.equal(roles.BACKER);
-                done();
-              })
-              .catch(done);
-          });
+          it('successfully adds the user as a backer', () => models.Member.findOne({
+              where: {
+                MemberCollectiveId: user.CollectiveId,
+                CollectiveId: collective.id,
+                role: roles.BACKER
+              }
+            })
+            .then((member) => {
+              expect(member).to.exist;
+            })
+          );
+
         });
 
         describe('plan exists', () => {
@@ -493,7 +467,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
@@ -519,17 +493,15 @@ describe('lib.payments.processPayment.test.js', () => {
             expect(nocks['subscriptions.create'].isDone()).to.be.true;
           });
 
-          it('successfully adds the user as a backer', (done) => {
-            collective
-              .getUsers()
-              .then((users) => {
-                expect(users).to.have.length(3);
-                const backer = _.find(users, {email: user.email});
-                expect(backer.Member.role).to.equal(roles.BACKER);
-                done();
-              })
-              .catch(done);
-          });
+          it('successfully adds the user as a backer', () => models.Member.findOne({
+            where: {
+              MemberCollectiveId: user.CollectiveId,
+              CollectiveId: collective.id,
+              role: roles.BACKER
+            }
+          }).then(member => {
+            expect(member).to.exist;
+          }));
 
           it('successfully sends out an email to donor', () => {
             expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
@@ -603,7 +575,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
@@ -629,17 +601,15 @@ describe('lib.payments.processPayment.test.js', () => {
             expect(nocks['subscriptions.create'].isDone()).to.be.true;
           });
 
-          it('successfully adds the user as a backer', (done) => {
-            collective
-              .getUsers()
-              .then((users) => {
-                expect(users).to.have.length(3);
-                const backer = _.find(users, {email: user.email});
-                expect(backer.Member.role).to.equal(roles.BACKER);
-                done();
-              })
-              .catch(done);
-          });
+          it('successfully adds the user as a backer', () => models.Member.findOne({
+            where: {
+              MemberCollectiveId: user.CollectiveId,
+              CollectiveId: collective.id,
+              role: roles.BACKER
+            }
+          }).then(member => {
+            expect(member).to.exist;
+          }));
         });
 
         describe('plan exists', () => {
@@ -668,7 +638,7 @@ describe('lib.payments.processPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user.id);
+                expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
                 expect(res.rows[0]).to.have.property('PaymentMethodId', 1);
                 expect(res.rows[0]).to.have.property('currency', CURRENCY);
                 expect(res.rows[0]).to.have.property('type', constants.type.DONATION);
@@ -694,17 +664,15 @@ describe('lib.payments.processPayment.test.js', () => {
             expect(nocks['subscriptions.create'].isDone()).to.be.true;
           });
 
-          it('successfully adds the user as a backer', (done) => {
-            collective
-              .getUsers()
-              .then((users) => {
-                expect(users).to.have.length(3);
-                const backer = _.find(users, {email: user.email});
-                expect(backer.Member.role).to.equal(roles.BACKER);
-                done();
-              })
-              .catch(done);
-          });
+          it('successfully adds the user as a backer', () => models.Member.findOne({
+            where: {
+              MemberCollectiveId: user.CollectiveId,
+              CollectiveId: collective.id,
+              role: roles.BACKER
+            }
+          }).then(member => {
+            expect(member).to.exist;
+          }));
 
           it('successfully sends out an email to donor', () => {
             expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');

@@ -28,7 +28,7 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
   const query = {
     where: {
       ...where,
-      CollectiveId: { $in: collectiveids },
+      ToCollectiveId: { $in: collectiveids },
       createdAt: { $gte: startDate, $lt: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]
@@ -92,9 +92,9 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     amount: -expense.amount,
     currency: expense.currency,
     description: expense.description,
-    UserId,
-    CollectiveId: expense.CollectiveId,
-    HostId: host.id
+    CreatedByUserId: UserId,
+    ToCollectiveId: expense.CollectiveId,
+    HostCollectiveId: host.id
   };
 
   return getFxRatePromise
@@ -105,6 +105,11 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       }
       return transaction;
     })
+    .then(() => models.User.findById(UserId))
+    .then(user => {
+      transaction.FromCollectiveId = user.CollectiveId;
+      return transaction;
+    })
     .then(transaction => models.Transaction.create(transaction))
     .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
     .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
@@ -113,8 +118,8 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
 function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {
   const payload = {
     type: constants.activities.COLLECTIVE_EXPENSE_PAID,
-    UserId: transaction.UserId,
-    CollectiveId: transaction.CollectiveId,
+    UserId: transaction.CreatedByUserId,
+    CollectiveId: transaction.ToCollectiveId,
     TransactionId: transaction.id,
     data: {
       transaction: transaction.info
@@ -128,7 +133,7 @@ function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDet
   }
   return transaction.getUser()
     .tap(user => payload.data.user = user.minimal)
-    .then(() => transaction.getCollective())
+    .then(() => transaction.getToCollective())
     .tap(collective => payload.data.collective = collective.minimal)
     .then(() => models.Activity.create(payload));
 }

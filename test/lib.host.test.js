@@ -8,13 +8,13 @@ import * as currencyLib from '../server/lib/currency';
 
 describe('hostlib', () => {
   
-  const hostid = 3; // WWCode host
+  const hostid = 848; // WWCode collective host
   const startDate = new Date("2017-02-01");
   const endDate = new Date("2017-03-01");
   let collectiveids;
 
   const where = {
-    CollectiveId: { $in: collectiveids },
+    ToCollectiveId: { $in: collectiveids },
     createdAt: { $gte: startDate, $lt: endDate}
   };
 
@@ -34,8 +34,8 @@ describe('hostlib', () => {
 
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
     collectiveids = collectives.map(g => g.id);
-    where.CollectiveId = { $in: collectiveids };
-    expect(collectives.length).to.equal(73);
+    where.ToCollectiveId = { $in: collectiveids };
+    expect(collectives.length).to.equal(74);
     return true;
   }).catch(console.error));
 

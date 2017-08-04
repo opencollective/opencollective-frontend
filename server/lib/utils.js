@@ -149,10 +149,10 @@ export const paginateOffset = (page, perPage) => {
 /**
  * Append tier to each backer in an array of backers
  */
-export const appendTier = (collective, users) => {
-  return Promise.each(users, user => collective.getUserTier(user).then(tier => {
-      user.tier = tier;
-      return user;
+export const appendTier = (collective, backerCollectives) => {
+  return Promise.each(backerCollectives, backerCollective => collective.getBackerTier(backerCollective).then(tier => {
+      backerCollective.tier = tier;
+      return backerCollective;
     }));
 };
 
@@ -337,9 +337,10 @@ export function exportToPDF(template, data, options) {
 /**
  * Default host id, set this for new collectives created through Github
  */
-export const defaultHostId = () => {
+export const defaultHostCollectiveId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
-    return 772;
+    return 83; // Collective of the Open Source Host
+    // return 772; // Open Source Host Collective User
   }
   return 1;
 };

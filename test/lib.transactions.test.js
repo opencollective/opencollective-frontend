@@ -16,7 +16,7 @@ describe('lib.transactions.test.js', () => {
 
   before(() => utils.loadDB("wwcode_test"));
 
-  beforeEach('get transactions', () => models.Transaction.findAll({where}).then(ts => {
+  beforeEach('get transactions', () => models.Transaction.findAll({ where }).then(ts => {
     transactions = ts;
     expect(transactions.length).to.equal(20);
     return true;

@@ -24,11 +24,11 @@ describe('Query Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user3')).tap(u => user3 = u));
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
@@ -114,7 +114,7 @@ describe('Query Tests', () => {
           data: {
             Collective: {
               description: "January monthly meetup",
-              id: 4,
+              id: 7,
               name: "January meetup",
               timezone: "America/New_York",
               parentCollective: {
@@ -145,12 +145,12 @@ describe('Query Tests', () => {
               allEvents: [
                 {
                   description: "February monthly meetup",
-                  id: 5,
+                  id: 8,
                   name: "Feb meetup"               
                 },
                 {
                   description: "January monthly meetup",
-                  id: 4,
+                  id: 7,
                   name: "January meetup"
                 }
               ]
@@ -175,17 +175,19 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order1'), { 
-            CollectiveId: event1.id,
+            ToCollectiveId: event1.id,
+            FromCollectiveId: user2.CollectiveId,
             TierId: ticket1.id, 
-            UserId: user2.id,
+            CreatedByUserId: user2.id,
             processedAt: new Date()
           })));
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order2'), { 
-            CollectiveId: event1.id,
+            ToCollectiveId: event1.id,
+            FromCollectiveId: user3.CollectiveId,
             TierId: ticket1.id, 
-            UserId: user3.id,
+            CreatedByUserId: user3.id,
             processedAt: new Date()
           })));
 
@@ -193,17 +195,19 @@ describe('Query Tests', () => {
         // because it's not confirmed
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order2'), { 
-            CollectiveId: event1.id,
+            ToCollectiveId: event1.id,
+            FromCollectiveId: user1.CollectiveId,
             TierId: ticket1.id, 
-            UserId: user1.id,
+            CreatedByUserId: user1.id,
             processedAt: null
           })));
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order3'), { 
-            CollectiveId: event1.id,
+            ToCollectiveId: event1.id,
+            FromCollectiveId: user3.CollectiveId,
             TierId: ticket2.id, 
-            UserId: user3.id,
+            CreatedByUserId: user3.id,
             processedAt: new Date()
           })));
         
@@ -220,6 +224,7 @@ describe('Query Tests', () => {
           `;
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context);
+          result.errors && console.error(result.errors);
           const order = result.data.Collective.orders[0];
           expect(order).to.have.property("createdAt");
           expect(order).to.have.property("processedAt");
@@ -241,7 +246,7 @@ describe('Query Tests', () => {
                 backgroundImage,
                 createdByUser {
                   id,
-                  name
+                  firstName
                 }
                 tiers {
                   id,
@@ -252,9 +257,9 @@ describe('Query Tests', () => {
                   orders {
                     id,
                     description,
-                    user {
+                    createdByUser {
                       id,
-                      name
+                      firstName
                     }
                   }
                 }
@@ -267,7 +272,7 @@ describe('Query Tests', () => {
             data: {
               allEvents: [
                 {
-                  "id": 5,
+                  "id": 8,
                   "name": "Feb meetup",
                   "description": "February monthly meetup",
                   "backgroundImage": null,
@@ -279,7 +284,7 @@ describe('Query Tests', () => {
                   },
                   "createdByUser": {
                     "id": 1,
-                    "name": "Phil Mod"
+                    "firstName": "Phil"
                   },
                   "tiers":[
                     {
@@ -293,7 +298,7 @@ describe('Query Tests', () => {
                   ]
                 },
                 {
-                  id: 4,
+                  id: 7,
                   name: "January meetup",
                   "description":"January monthly meetup",
                   "location" : {
@@ -305,7 +310,7 @@ describe('Query Tests', () => {
                   "backgroundImage": "http://opencollective.com/backgroundimage.png",
                   "createdByUser": {
                     "id":1,
-                    "name":"Phil Mod"
+                    "firstName":"Phil"
                   },
                   "tiers": [
                     {
@@ -318,17 +323,17 @@ describe('Query Tests', () => {
                         {
                           "id": 1,
                           "description": "I work on bitcoin",
-                          "user": {
+                          "createdByUser": {
                             "id": 2,
-                            "name": "Anish Bas"
+                            "firstName": "Anish"
                           }
                         },
                         {
                           "id": 2,
                           "description": "I have been working on open source for over a decade",
-                          "user": {
+                          "createdByUser": {
                             "id": 3,
-                            "name": "Xavier Damman"
+                            "firstName": "Xavier"
                           }
                         }
                       ]
@@ -343,9 +348,9 @@ describe('Query Tests', () => {
                         {
                           "id": 4,
                           "description": null,
-                          "user": {
+                          "createdByUser": {
                             "id": 3,
-                            "name": "Xavier Damman"
+                            "firstName": "Xavier"
                           }
                         }
                       ]

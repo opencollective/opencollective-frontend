@@ -13,8 +13,6 @@ const userData = utils.data('user3');
 const userData2 = utils.data('user2');
 const collectiveData = utils.data('collective2');
 
-let user;
-
 describe('XSS.test', () => {
   let sandbox;
 
@@ -29,7 +27,7 @@ describe('XSS.test', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
+  beforeEach('create a user', () => models.User.create(userData));
 
   beforeEach('create collective with user as first member', (done) => {
     request(app)
@@ -96,63 +94,17 @@ describe('XSS.test', () => {
         .post(`/users?api_key=${application.api_key}`)
         .send({
           user: {
+            firstName: "<script>alert(\"hi\")</script>Janel",
             email: "aseem@opencollective.com",
           }
         })
         .end((err, res) => {
           const { body } = res;
           expect(body.email).to.equal('aseem@opencollective.com');
-          done();
-        });
-    });
-    
-    it('name field', (done) => {
-      request(app)
-        .put(`/users/${user.id}?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          user: {
-            name: "<script>alert(\"hi\")</script>Janel"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.name).to.equal('Janel');
+          expect(body.firstName).to.equal('Janel');
           done();
         });
     });
   });
 
-  describe('sanitizes collective', () => {
-    it('name field', (done) => {
-      request(app)
-        .put(`/collectives/1?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          collective: {
-            name: "<script>alert(\"hi\")</script>hello"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.name).to.equal('hello');
-          done();
-        });
-    });
-  it('name field', (done) => {
-      request(app)
-        .put(`/collectives/1?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          collective: {
-            description: "<script>alert(\"hi\")</script> yo"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.description).to.equal(' yo');
-          done();
-        });
-    });
-  });
 });

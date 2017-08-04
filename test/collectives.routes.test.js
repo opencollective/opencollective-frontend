@@ -34,8 +34,8 @@ describe('collectives.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
-  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
+  beforeEach('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
 
   // Stripe stub.
   beforeEach(() => {
@@ -60,40 +60,19 @@ describe('collectives.routes.test.js', () => {
         .expect(400)
     );
 
-    it('fails creating a collective without name', (done) => {
-      const collective = _.omit(publicCollectiveData, 'name');
-      collective.users = [{email: userData.email, role: roles.ADMIN}];
-      request(app)
-        .post('/collectives')
-        .send({
-          api_key: application.api_key,
-          collective
-        })
-        .expect(400)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('error');
-          expect(res.body.error).to.have.property('message', 'notNull Violation: name cannot be null');
-          expect(res.body.error).to.have.property('type', 'validation_failed');
-          expect(res.body.error).to.have.property('fields');
-          expect(res.body.error.fields).to.contain('name');
-          done();
-        });
-    });
-
     describe('successfully create a collective', () => {
-      let response, collective;
+      let collective;
 
       beforeEach('subscribe host to collective.created notification', () => models.Notification.create({UserId: host.id, type: 'collective.created', channel: 'email'}));
 
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
       beforeEach('create the collective', (done) => {
         const users = [
-              _.assign(_.omit(userData2, 'password'), {role: roles.ADMIN}),
-              _.assign(_.omit(userData3, 'password'), {role: roles.ADMIN})];
+              _.assign(_.omit(userData2, 'password'), { role: roles.ADMIN }),
+              _.assign(_.omit(userData3, 'password'), { role: roles.ADMIN })];
 
         collective = Object.assign({}, publicCollectiveData, {users})
-        collective.HostId = host.id;
+        collective.HostCollectiveId = host.CollectiveId;
 
         request(app)
           .post('/collectives')
@@ -104,7 +83,7 @@ describe('collectives.routes.test.js', () => {
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
-            response = res.body;
+            collective = res.body;
             done();
           })
       });
@@ -125,28 +104,28 @@ describe('collectives.routes.test.js', () => {
       });
 
       it('returns the attributes of the collective', () => {
-        expect(response).to.have.property('id');
-        expect(response).to.have.property('name');
-        expect(response).to.have.property('mission');
-        expect(response).to.have.property('description');
-        expect(response).to.have.property('longDescription');
-        expect(response).to.have.property('image');
-        expect(response).to.have.property('backgroundImage');
-        expect(response).to.have.property('createdAt');
-        expect(response).to.have.property('updatedAt');
-        expect(response).to.have.property('twitterHandle');
-        expect(response).to.have.property('website');
-        expect(response).to.have.property('isActive', true);
+        expect(collective).to.have.property('id');
+        expect(collective).to.have.property('name');
+        expect(collective).to.have.property('mission');
+        expect(collective).to.have.property('description');
+        expect(collective).to.have.property('longDescription');
+        expect(collective).to.have.property('image');
+        expect(collective).to.have.property('backgroundImage');
+        expect(collective).to.have.property('createdAt');
+        expect(collective).to.have.property('updatedAt');
+        expect(collective).to.have.property('twitterHandle');
+        expect(collective).to.have.property('website');
+        expect(collective).to.have.property('isActive', true);
       });
 
       it('assigns the users as members', () => {
         return Promise.all([
-          models.Member.findOne({where: { UserId: host.id, role: roles.HOST }}),
-          models.Member.count({where: { CollectiveId: 1, role: roles.ADMIN }}),
-          models.Collective.find({where: { slug: collective.slug }})
+          models.Member.findOne({ where: { MemberCollectiveId: host.CollectiveId, role: roles.HOST } }),
+          models.Member.count({ where: { CollectiveId: collective.id, role: roles.ADMIN } }),
+          models.Collective.find({ where: { slug: collective.slug } })
           ])
         .then(results => {
-          expect(results[0].CollectiveId).to.equal(1);
+          expect(results[0].CollectiveId).to.equal(collective.id);
           expect(results[1]).to.equal(2);
           expect(results[2].LastEditedByUserId).to.equal(3);
         });
@@ -205,9 +184,9 @@ describe('collectives.routes.test.js', () => {
         })
         .then(ca => {
           preCA = ca;
-          return User.create({email: 'githubuser@gmail.com'});
+          return User.createUserWithCollective({email: 'githubuser@gmail.com'});
         })
-        .then(user => user.addConnectedAccount(preCA));
+        .then(user => user.collective.addConnectedAccount(preCA));
       });
 
       beforeEach(() => sinon.spy(emailLib, 'send'));
@@ -217,7 +196,7 @@ describe('collectives.routes.test.js', () => {
       it('assigns contributors as users with connectedAccounts', () =>
         request(app)
         .post('/collectives?flow=github')
-        .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1})}`)
+        .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1 })}`)
         .send({
           payload: {
             collective: {
@@ -242,19 +221,20 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('isActive', false);
           expect(emailLib.send.lastCall.args[1]).to.equal('githubuser@gmail.com');
         })
-        .then(() => ConnectedAccount.findOne({where: {username: 'asood123'}}))
+        .then(() => ConnectedAccount.findOne({where: { username: 'asood123' }}))
         .then(ca => {
           expect(ca).to.have.property('provider', 'github');
-          return ca.getUser();
+          return ca.getCollective();
         })
-        .then(user => expect(user).to.exist)
-        .then(() => ConnectedAccount.findOne({where: {username: 'oc'}}))
+        .then(userCollective => expect(userCollective).to.exist)
+        .then(() => ConnectedAccount.findOne({ where: { username: 'oc' } }))
         .then(ca => {
           expect(ca).to.have.property('provider', 'github');
-          return ca.getUser();
+          return ca.getCollective();
         })
-        .tap(user => expect(user).to.exist)
-        .then(caUser => caUser.getCollectives({paranoid: false})) // because we are setting deletedAt
+        .tap(userCollective => expect(userCollective).to.exist)
+        .then(userCollective => models.User.findById(userCollective.CreatedByUserId))
+        .then(user => user.getCollectives({ paranoid: false })) // because we are setting deletedAt
         .tap(collectives => expect(collectives).to.have.length(1))
         .tap(collectives => expect(collectives[0].LastEditedByUserId).to.equal(3))
         .then(() => models.Member.findAll())
@@ -296,7 +276,7 @@ describe('collectives.routes.test.js', () => {
         .post('/collectives')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
+          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostCollectiveId: host.CollectiveId, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -311,25 +291,29 @@ describe('collectives.routes.test.js', () => {
         });
     });
 
-    beforeEach(() => models.StripeAccount
-      .create({ stripePublishableKey: stripeMock.accounts.create.keys.publishable })
-      .tap(account => host.setStripeAccount(account))
-      .tap(account => user.setStripeAccount(account)));
+    const stripeAccount = { stripePublishableKey: stripeMock.accounts.create.keys.publishable };
+    beforeEach(() => host.collective
+      .setStripeAccount(stripeAccount)
+      .tap(() => user.collective.setStripeAccount(stripeAccount)));
 
-    // Create another user.
-    beforeEach('create a new payment method for user', () => models.PaymentMethod.create({UserId: user.id}))
+    beforeEach('create a new payment method for user', () => models.PaymentMethod.create({CollectiveId: user.CollectiveId}))
 
     // Create a transaction for collective1.
     beforeEach('create a transaction for collective 1', () =>
-      request(app)
-        .post(`/collectives/${publicCollective.id}/transactions`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          api_key: application.api_key,
-          transaction: Object.assign({}, transactionsData[8], { netAmountInCollectiveCurrency: transactionsData[8].amount})
-        })
-        .expect(200)
-    );
+      models.Transaction.create({
+        ...transactionsData[8],
+        netAmountInCollectiveCurrency: transactionsData[8].amount,
+        CreatedByUserId: user.id,
+        FromCollectiveId: user.CollectiveId,
+        ToCollectiveId: publicCollective.id,
+        HostCollectiveId: host.CollectiveId
+      }));
+
+    beforeEach('add user as backer', () => models.Member.create({
+      role: roles.BACKER,
+      MemberCollectiveId: user.CollectiveId,
+      CollectiveId: publicCollective.id
+    }));
 
     it('fails getting an undefined collective', () =>
       request(app)
@@ -380,7 +364,7 @@ describe('collectives.routes.test.js', () => {
 
       // Create collective2
       beforeEach('create collective 2', () =>
-        models.Collective.create({HostId: host.id, name: "collective 2", slug: "collective2"}));
+        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "collective 2", slug: "collective2"}));
 
         // Create transactions for publicCollective.
       beforeEach('create transactions for public collective', (done) => {
@@ -412,14 +396,16 @@ describe('collectives.routes.test.js', () => {
         .then(subscription => models.Order.create({
           amount: 999,
           currency: 'USD',
-          UserId: user.id,
-          CollectiveId: publicCollective.id,
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: publicCollective.id,
           SubscriptionId: subscription.id
         }))
         .then(order => models.Transaction.createFromPayload({
             transaction: Object.assign({}, transactionsData[7], { netAmountInCollectiveCurrency: transactionsData[7].amount, OrderId: order.id}),
-            user,
-            collective: publicCollective,
+            CreatedByUserId: user.id,
+            FromCollectiveId: user.CollectiveId,
+            ToCollectiveId: publicCollective.id,
           })));
 
       it('successfully get a collective with remaining budget and yearlyIncome', (done) => {
@@ -438,19 +424,17 @@ describe('collectives.routes.test.js', () => {
           });
       });
 
-      it('successfully get a collective\'s users if it is public', (done) => {
+      it('successfully get a collective\'s backers', (done) => {
         request(app)
-          .get(`/collectives/${publicCollective.id}/users?api_key=${application.api_key}`)
+          .get(`/collectives/${publicCollective.id}/backers?api_key=${application.api_key}`)
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
             const userData = res.body[0];
-            console.log(res.body);
             expect(userData.firstName).to.equal(user.public.firstName);
             expect(userData.lastName).to.equal(user.public.lastName);
-            expect(userData.name).to.equal(user.public.name);
-            expect(userData.username).to.equal(user.public.username);
-            expect(userData.role).to.equal(roles.ADMIN);
+            expect(userData.name).to.equal(`${user.public.firstName} ${user.public.lastName}`);
+            expect(userData.role).to.equal(roles.BACKER);
             done();
           });
       });
@@ -491,7 +475,7 @@ describe('collectives.routes.test.js', () => {
           collective: Object.assign({}, publicCollectiveData, {
             slug: 'public-collective',
             name: 'public collective with host',
-            HostId: host.id,
+            HostCollectiveId: host.CollectiveId,
             users: [ Object.assign({}, userData, { role: roles.ADMIN} ) ]
           })
         })
@@ -509,15 +493,15 @@ describe('collectives.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
 
     // Create another user that is a backer.
-    beforeEach(() => models.User.create(utils.data('user3'))
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user3'))
       .tap(u => user3 = u)
       .then(() => collective.addUserWithRole(user3, roles.BACKER)));
 
     // Create another user that is a member.
-    beforeEach(() => models.User.create(utils.data('user4'))
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user4'))
       .tap(u => user4 = u)
       .then(() => collective.addUserWithRole(user4, roles.ADMIN)));
 
@@ -608,11 +592,11 @@ describe('collectives.routes.test.js', () => {
        * Need to find a way to call this with one line: like collective.addUser()
        */
       models.Member.create({
-        UserId: user3.id,
+        MemberCollectiveId: user3.CollectiveId,
         CollectiveId: collective.id,
         role: roles.ADMIN
       })
-      .then(() => models.Member.findAll({ where: { UserId: user3.id, CollectiveId: collective.id }}))
+      .then(() => models.Member.findAll({ where: { MemberCollectiveId: user3.CollectiveId, CollectiveId: collective.id }}))
       .tap(rows => expect(rows.length).to.equal(2)));
   });
 

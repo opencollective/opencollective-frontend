@@ -2,11 +2,10 @@
 import async from 'async';
 import _ from 'lodash';
 import activities from '../constants/activities';
-import {planId} from '../lib/utils';
-import {appStripe, extractFees} from '../gateways/stripe';
-import models, {sequelize} from '../models';
+import { planId } from '../lib/utils';
+import { appStripe, extractFees } from '../gateways/stripe';
+import models, { sequelize } from '../models';
 import errors from '../lib/errors';
-import {type} from '../constants/transactions';
 import emailLib from '../lib/email';
 import currencies from '../constants/currencies';
 import config from 'config';
@@ -95,8 +94,8 @@ export default function stripeWebhook(req, res, next) {
 
       Order.findOne({
         include: [
-          { model: Collective },
-          { model: User },
+          { model: User, as: 'createdByUser' },
+          { model: Collective, as: 'toCollective' },
           { model: Subscription, where: { stripeSubscriptionId } }
         ]
       })
@@ -145,18 +144,16 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
-      const userId = results.fetchOrder.UserId;
+      const FromCollectiveId = results.fetchOrder.FromCollectiveId;
       const { customer } = results.fetchEvent.event.data.object;
-
 
       if (!customer) {
         return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
       }
-
       PaymentMethod.findOne({
         where: {
           customerId: customer,
-          UserId: userId
+          CollectiveId: FromCollectiveId
         }
       })
       .then((paymentMethod) => {
@@ -199,8 +196,7 @@ export default function stripeWebhook(req, res, next) {
     createTransaction: ['retrieveBalance', (cb, results) => {
       const order = results.fetchOrder;
       const { stripeSubscription } = results.fetchEvent;
-      const user = order.User || {};
-      const collective = order.Collective || {};
+      const collective = order.toCollective || {};
       const paymentMethod = results.fetchPaymentMethod;
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
@@ -209,7 +205,6 @@ export default function stripeWebhook(req, res, next) {
 
       // Now we record a new transaction
       const newTransaction = {
-        type: type.DONATION,
         OrderId: order.id,
         amount: stripeSubscription.amount,
         currency: stripeSubscription.currency,
@@ -224,9 +219,10 @@ export default function stripeWebhook(req, res, next) {
       };
 
       models.Transaction.createFromPayload({
+        CreatedByUserId: order.CreatedByUserId,
+        FromCollectiveId: order.FromCollectiveId,
+        ToCollectiveId: order.ToCollectiveId,
         transaction: newTransaction,
-        user,
-        collective,
         paymentMethod
       })
       .then(t => cb(null, t))
@@ -238,8 +234,8 @@ export default function stripeWebhook(req, res, next) {
       const transaction = results.createTransaction;
       // We only send an invoice for orders > $10 equivalent
       if (order.amount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
-      const user = order.User || {};
-      const collective = order.Collective || {};
+      const user = order.createdByUser || {};
+      const collective = order.toCollective || {};
       const subscription = order.Subscription;
       collective.getRelatedCollectives(2, 0)
       .then((relatedCollectives) => emailLib.send(

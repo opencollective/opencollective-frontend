@@ -4,11 +4,12 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLString,
-  GraphQLInterfaceType
+  GraphQLString
 } from 'graphql';
 
-import GraphQLJSON from 'graphql-type-json';
+import {
+  CollectiveInterfaceType
+} from './CollectiveInterface';
 
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
@@ -24,14 +25,20 @@ dataloaderSequelize(models.Expense);
 // dataloaderSequelize(models.User);
 
 export const UserType = new GraphQLObjectType({
-  name: 'User',
-  description: 'This represents a User',
+  name: 'UserDetails',
+  description: 'This represents the details of a User',
   fields: () => {
     return {
       id: {
         type: GraphQLInt,
         resolve(user) {
           return user.id;
+        }
+      },
+      username: {
+        type: GraphQLString,
+        resolve(user) {
+          return user.username;
         }
       },
       firstName: {
@@ -58,12 +65,6 @@ export const UserType = new GraphQLObjectType({
           return user.image;
         }
       },
-      username: {
-        type: GraphQLString,
-        resolve(user) {
-          return user.username;
-        }
-      },
       email: {
         type: GraphQLString,
         resolve(user, args, req) {
@@ -74,28 +75,10 @@ export const UserType = new GraphQLObjectType({
           }
         }
       },
-      description: {
-        type: GraphQLString,
+      memberships: {
+        type: new GraphQLList(MemberType),
         resolve(user) {
-          return user.description
-        }
-      },
-      organization: {
-        type: GraphQLString,
-        resolve(user) {
-          return user.organization
-        }
-      },
-      isOrganization: {
-        type: GraphQLBoolean,
-        resolve(user) {
-          return user.isOrganization;
-        }
-      },
-      twitterHandle: {
-        type: GraphQLString,
-        resolve(user) {
-          return user.twitterHandle;
+          return models.Member.findAll({ where: { MemberCollectiveId: user.CollectiveId }});
         }
       },
       billingAddress: {
@@ -104,10 +87,24 @@ export const UserType = new GraphQLObjectType({
           return user.billingAddress;
         }
       },
-      website: {
-        type: GraphQLString,
+      paymentMethods: {
+        description: 'List of payment methods that this user can use',
+        type: new GraphQLList(PaymentMethodType),
         resolve(user) {
-          return user.website;
+          return models.Member.findAll({
+            attributes: ['CollectiveId'],
+            where: {
+              MemberCollectiveId: user.CollectiveId,
+              role: roles.ADMIN
+            }
+          })
+          .then(rows => {
+            const collectiveIds = rows.map(r => r.CollectiveId);
+            collectiveIds.push(user.CollectiveId);
+            return models.PaymentMethod.findAll({
+              where: { CollectiveId: { $in: collectiveIds } }
+            });
+          });
         }
       },
       paypalEmail: {
@@ -115,224 +112,62 @@ export const UserType = new GraphQLObjectType({
         resolve(user) {
           return user.paypalEmail;
         }
-      },
-      members: {
-        type: new GraphQLList(MemberType),
-        resolve(user) {
-          return user.getMembers();
-        }
-      },
-      paymentMethods: {
-        type: new GraphQLList(PaymentMethodType),
-        resolve(user, args, req) {
-          if (!req.remoteUser || req.remoteUser.id !== user.id) return [];
-          return models.PaymentMethod.findAll({
-            where: {
-              UserId: user.id,
-              service: 'stripe',
-              identifier: { $ne: null },
-              confirmedAt: { $ne: null }
-            }
-          });
-        }
       }
     }
   }
 });
 
-export const CollectiveType = new GraphQLObjectType({
-  name: 'Collective',
-  description: 'This represents a Collective',
+export const MemberType = new GraphQLObjectType({
+  name: 'Member',
+  description: 'This is a Member',
   fields: () => {
     return {
-      id: {
+       id: {
         type: GraphQLInt,
-        resolve(collective) {
-          return collective.id;
+        resolve(order) {
+          return order.id;
         }
       },
-      createdByUser: {
-        type: UserType,
-        resolve(collective) {
-          return models.User.findById(collective.CreatedByUserId)
-        }
-      },
-      parentCollective: {
-        type: CollectiveType,
-        resolve(collective) {
-          return models.Collective.findById(collective.ParentCollectiveId);
-        }
-      },
-      type: {
+      createdAt: {
         type: GraphQLString,
-        resolve(collective) {
-          return collective.type;
+        resolve(member) {
+          return member.createdAt;
         }
       },
-      name: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.name;
-        }
-      },
-      description: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.description;
-        }
-      },
-      longDescription: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.longDescription;
-        }
-      },
-      mission: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.mission;
-        }
-      },
-      location: {
-        type: LocationType,
-        description: 'Name, address, lat, long of the location.',
-        resolve(collective) {
-          return collective.location;
-        }
-      },
-      startsAt: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.startsAt
-        }
-      },
-      endsAt: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.endsAt
-        }
-      },
-      timezone: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.timezone
-        }
-      },
-      maxAmount: {
+      totalDonations: {
         type: GraphQLInt,
-        resolve(collective) {
-          return collective.maxAmount;
+        resolve(member) {
+          return models.Transaction.sum('amount', {
+            where: {
+              FromCollectiveId: member.MemberCollectiveId,
+              ToCollectiveId: member.CollectiveId,
+              type: type.DONATION
+            }
+          })
         }
       },
-      currency: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.currency;
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(member) {
+          return member.getCollective();
         }
       },
-      image: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.image;
-        }
-      },
-      backgroundImage: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.backgroundImage;
-        }
-      },
-      settings: {
-        type: GraphQLJSON,
-        resolve(collective) {
-          return collective.settings || {};
-        }
-      },
-      slug: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.slug;
-        }
-      },
-      members: {
-        type: new GraphQLList(MemberType),
-        resolve(collective) {
-          return models.Member.findAll({ where: { CollectiveId: collective.id } });
-        }
-      },
-      followers: {
-        type: new GraphQLList(UserType),
-        resolve(collective) {
-          return collective.getUsers({ where: { role: roles.FOLLOWER } });
-        }
-      },
-      maxQuantity: {
-        type: GraphQLInt,
-        resolve(collective) {
-          return collective.maxQuantity;
-        }
-      },
-      tiers: {
-        type: new GraphQLList(TierType),
-        resolve(collective) {
-          return collective.getTiers({ order: [['name', 'ASC']] });
-        }
-      },
-      orders: {
-        type: new GraphQLList(OrderType),
-        resolve(collective) {
-          return collective.getOrders({
-            where: { processedAt: { $ne: null } },
-            order: [ ['createdAt', 'DESC'] ]
-          });
-        }
-      },
-      transactions: {
-        type: new GraphQLList(TransactionInterfaceType),
-        args: {
-          type: { type: GraphQLString },
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt }
-        },
-        resolve(collective, args) {
-          const query = {};
-          if (args.type) query.where = { type: args.type };
-          if (args.limit) query.limit = args.limit;
-          if (args.offset) query.offset = args.offset;
-          query.order = [ ['id', 'DESC'] ];
-          return collective.getTransactions(query);
+      member: {
+        type: CollectiveInterfaceType,
+        resolve(member) {
+          return member.getMemberCollective();
         }
       },
       role: {
         type: GraphQLString,
-        resolve(collective, args, req) {
-          return collective.role || collective.getRoleForUser(req.remoteUser);
+        resolve(member) {
+          return member.role;
         }
       },
-      twitterHandle: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.twitterHandle;
-        }
-      },
-      events: {
-        type: new GraphQLList(CollectiveType),
-        args: {
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt }
-        },
-        resolve(collective, args) {
-          const query = { type: 'EVENT', ParentCollectiveId: collective.id };
-          if (args.limit) query.limit = args.limit;
-          if (args.offset) query.offset = args.offset;
-          return models.Collective.findAll(query);
-        }
-      },
-      stripePublishableKey: {
-        type: GraphQLString,
-        resolve(collective) {
-          return collective.getStripeAccount()
-          .then(stripeAccount => stripeAccount && stripeAccount.stripePublishableKey)
+      tier: {
+        type: TierType,
+        resolve(member) {
+          return member.getTier();
         }
       }
     }
@@ -460,13 +295,13 @@ export const TierType = new GraphQLObjectType({
         }
       },
       collective: {
-        type: CollectiveType,
+        type: CollectiveInterfaceType,
         resolve(tier) {
           return tier.getCollective();
         }
       },
       event: {
-        type: CollectiveType,
+        type: CollectiveInterfaceType,
         resolve(tier) {
           return tier.getCollective();
         }
@@ -481,66 +316,9 @@ export const TierType = new GraphQLObjectType({
   }
 });
 
-export const MemberType = new GraphQLObjectType({
-  name: 'Member',
-  description: 'This is a Member',
-  fields: () => {
-    return {
-       id: {
-        type: GraphQLInt,
-        resolve(order) {
-          return order.id;
-        }
-      },
-      createdAt: {
-        type: GraphQLString,
-        resolve(member) {
-          return member.createdAt;
-        }
-      },
-      totalDonations: {
-        type: GraphQLInt,
-        resolve(member) {
-          return models.Transaction.sum('amount', {
-            where: {
-              UserId: member.UserId,
-              CollectiveId: member.CollectiveId,
-              type: type.DONATION
-            }
-          })
-        }
-      },
-      collective: {
-        type: CollectiveType,
-        resolve(member) {
-          return member.getCollective();
-        }
-      },
-      user: {
-        type: UserType,
-        resolve(member) {
-          return member.getUser();
-        }
-      },
-      role: {
-        type: GraphQLString,
-        resolve(member) {
-          return member.role;
-        }
-      },
-      tier: {
-        type: TierType,
-        resolve(member) {
-          return member.getTier();
-        }
-      }
-    }
-  }
-});
-
 export const OrderType = new GraphQLObjectType({
   name: 'OrderType',
-  description: 'This is an order',
+  description: 'This is an order (for donations, buying tickets, subscribing to a Tier)',
   fields: () => {
     return {
        id: {
@@ -550,57 +328,91 @@ export const OrderType = new GraphQLObjectType({
         }
       },
       quantity: {
+        description: 'quantity of items (defined by Tier)',
         type: GraphQLInt,
         resolve(order) {
           return order.quantity;
         }
       },
-      amount: {
-        type: GraphQLInt,
-        resolve(order) {
-          return order.amount;
-        }
-      },
       totalAmount: {
+        description: `total amount for this order (doesn't include recurring transactions)`,
         type: GraphQLInt,
         resolve(order) {
           return order.totalAmount;
         }
       },
-      user: {
+      interval: {
+        description: `frequency of the subscription if any (could be either null, 'month' or 'year')`,
+        type: GraphQLString,
+        resolve(order) {
+          return order.getSubscription(s => s.interval);
+        }
+      },
+      subscription: {
+        type: SubscriptionType,
+        resolve(order) {
+          return order.getSubscription();
+        }
+      },
+      totalTransactions: {
+        description: 'total of all the transactions for this order (includes past recurring transactions)',
+        type: GraphQLInt,
+        resolve(order) {
+          return order.totalTransactions;
+        }
+      },
+      createdByUser: {
         type: UserType,
         resolve(order) {
-          return order.getUser();
+          return order.getCreatedByUser();
         }
       },
       description: {
+        description: 'Description of the order that will show up in the invoice',
         type: GraphQLString,
         resolve(order) {
           return order.description;
         }
       },
       publicMessage: {
+        description: 'Custom user message to show with the order, e.g. a special dedication, "in memory of", or to add a custom one liner when RSVP for an event',
         type: GraphQLString,
         resolve(order) {
           return order.publicMessage;
         }
       },
       privateMessage: {
+        description: 'Private message for the admins and the host of the collective',
         type: GraphQLString,
         resolve(order) {
           return order.privateMessage;
         }
       },
-      collective: {
-        type: CollectiveType,
+      fromCollective: {
+        description: 'Collective ordering (most of the time it will be the collective of the createdByUser)',
+        type: CollectiveInterfaceType,
         resolve(order) {
-          return order.getCollective();
+          return order.getFromCollective();
+        }
+      },
+      toCollective: {
+        description: 'Collective that receives the order',
+        type: CollectiveInterfaceType,
+        resolve(order) {
+          return order.getToCollective();
         }
       },
       tier: {
         type: TierType,
         resolve(order) {
           return order.getTier();
+        }
+      },
+      paymentMethod: {
+        description: 'Payment method used to pay for the order. The paymentMethod is also attached to individual transactions since a credit card can change over the lifetime of a subscription.',
+        type: PaymentMethodType,
+        resolve(order) {
+          return order.getPaymentMethod();
         }
       },
       createdAt: {
@@ -610,6 +422,7 @@ export const OrderType = new GraphQLObjectType({
         }
       },
       processedAt: {
+        description: 'Date and time when the order has been processed by the payment processor if needed to be (if totalAmount > 0)',
         type: GraphQLString,
         resolve(order) {
           return order.processedAt;
@@ -721,297 +534,6 @@ export const SubscriptionType = new GraphQLObjectType({
         type: GraphQLBoolean,
         resolve(s) {
           return s.isActive;
-        }
-      }
-    }
-  }
-});
-
-export const TransactionInterfaceType = new GraphQLInterfaceType({
-  name: "Transaction",
-  description: "Transaction interface",
-  resolveType: (transaction) => {
-    switch (transaction.type) {
-      case 'DONATION':
-        return TransactionOrderType;
-      case 'EXPENSE':
-        return TransactionExpenseType;
-      default:
-        return null;
-    }
-  },
-  fields: {
-    id: { type: GraphQLInt },
-    uuid: { type: GraphQLString },
-    amount: { type: GraphQLInt },
-    currency: { type: GraphQLString },
-    netAmountInCollectiveCurrency: { type: GraphQLInt },
-    hostFeeInTxnCurrency: { type: GraphQLInt },
-    platformFeeInTxnCurrency: { type: GraphQLInt },
-    paymentProcessorFeeInTxnCurrency: { type: GraphQLInt },
-    user: { type: UserType },
-    host: { type: UserType },
-    paymentMethod: { type: PaymentMethodType },
-    collective: { type: CollectiveType },
-    type: { type: GraphQLString },
-    description: { type: GraphQLString },
-    privateMessage: { type: GraphQLString },
-    createdAt: { type: GraphQLString }
-  }
-});
-
-export const TransactionExpenseType = new GraphQLObjectType({
-  name: 'Expense',
-  description: 'Expense model',
-  interfaces: [TransactionInterfaceType],
-  fields: {
-      id: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.id;
-      }
-    },
-    uuid: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.uuid;
-      }
-    },
-    type: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.type;
-      }
-    },
-    amount: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.amount;
-      }
-    },
-    currency: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.currency;
-      }
-    },
-    txnCurrency: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.txnCurrency;
-      }
-    },
-    txnCurrencyFxRate: {
-      type: GraphQLFloat,
-      resolve(transaction) {
-        return transaction.txnCurrencyFxRate;
-      }
-    },
-    hostFeeInTxnCurrency: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.hostFeeInTxnCurrency;
-      }
-    },
-    platformFeeInTxnCurrency: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.platformFeeInTxnCurrency;
-      }
-    },
-    paymentProcessorFeeInTxnCurrency: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.paymentProcessorFeeInTxnCurrency;
-      }
-    },
-    netAmountInCollectiveCurrency: {
-      type: GraphQLInt,
-      resolve(transaction) {
-        return transaction.netAmountInCollectiveCurrency;
-      }
-    },
-    host: {
-      type: UserType,
-      resolve(transaction) {
-        return transaction.getHost();
-      }
-    },
-    user: {
-      type: UserType,
-      resolve(transaction) {
-        return transaction.getUser();
-      }
-    },
-    description: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.description || transaction.getExpense().then(expense => expense && expense.description);
-      }
-    },
-    collective: {
-      type: CollectiveType,
-      resolve(transaction) {
-        return transaction.getCollective();
-      }
-    },
-    createdAt: {
-      type: GraphQLString,
-      resolve(transaction) {
-        return transaction.createdAt;
-      }
-    },
-    privateMessage: {
-      type: GraphQLString,
-      resolve(transaction, args, req) {
-        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.privateMessage);
-      }
-    },
-    paymentMethod: {
-      type: PaymentMethodType,
-      resolve(transaction) {
-        return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
-      }
-    },
-    category: {
-      type: GraphQLString,
-      resolve(transaction, args, req) {
-        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.category);
-      }
-    },
-    attachment: {
-      type: GraphQLString,
-      resolve(transaction, args, req) {
-        return transaction.getExpenseForViewer(req.remoteUser).then(expense => expense && expense.attachment);
-      }
-    }
-  }
-});
-
-export const TransactionOrderType = new GraphQLObjectType({
-  name: 'Order',
-  description: 'Order model',
-  interfaces: [TransactionInterfaceType],
-  fields: () => {
-    return {
-       id: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.id;
-        }
-      },
-      uuid: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.uuid;
-        }
-      },
-      type: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.type;
-        }
-      },
-      amount: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.amount;
-        }
-      },
-      currency: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.currency;
-        }
-      },
-      txnCurrency: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.txnCurrency;
-        }
-      },
-      txnCurrencyFxRate: {
-        type: GraphQLFloat,
-        resolve(transaction) {
-          return transaction.txnCurrencyFxRate;
-        }
-      },
-      hostFeeInTxnCurrency: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.hostFeeInTxnCurrency;
-        }
-      },
-      platformFeeInTxnCurrency: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.platformFeeInTxnCurrency;
-        }
-      },
-      paymentProcessorFeeInTxnCurrency: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.paymentProcessorFeeInTxnCurrency;
-        }
-      },
-      netAmountInCollectiveCurrency: {
-        type: GraphQLInt,
-        resolve(transaction) {
-          return transaction.netAmountInCollectiveCurrency;
-        }
-      },
-      host: {
-        type: UserType,
-        resolve(transaction) {
-          return transaction.getHost();
-        }
-      },
-      user: {
-        type: UserType,
-        resolve(transaction) {
-          return transaction.getUser();
-        }
-      },
-      description: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.description || transaction.getOrder().then(order => order && order.description);
-        }
-      },
-      collective: {
-        type: CollectiveType,
-        resolve(transaction) {
-          return transaction.getCollective();
-        }
-      },
-      createdAt: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.createdAt;
-        }
-      },
-      privateMessage: {
-        type: GraphQLString,
-        resolve(transaction) {
-          return transaction.getOrder().then(order => order && order.privateMessage);
-        }
-      },
-      paymentMethod: {
-        type: PaymentMethodType,
-        resolve(transaction) {
-          return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
-        }
-      },
-      order: {
-        type: OrderType,
-        resolve(transaction) {
-          return transaction.getOrder();
-        }
-      },
-      subscription: {
-        type: SubscriptionType,
-        resolve(transaction) {
-          return transaction.getOrder().then(order => order && order.getSubscription());
         }
       }
     }

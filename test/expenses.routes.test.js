@@ -43,15 +43,15 @@ describe('expenses.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => member = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => member = u));
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => otherUser = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user3')).tap(u => otherUser = u));
 
-  beforeEach(() => models.User.create(utils.data('user4')).tap(u => expenseFiler = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user4')).tap(u => expenseFiler = u));
 
   beforeEach(() => collective.addUserWithRole(host, roles.HOST));
 
@@ -234,17 +234,13 @@ describe('expenses.routes.test.js', () => {
           describe('#list', () => {
             beforeEach('create expense', () => createExpense(collective, expenseFiler));
             beforeEach('create expense 2', () => createExpense(collective, expenseFiler));
-            beforeEach('create 1 comment', () => models.Comment.createMany([utils.data('comments')[0]], { UserId: 1, CollectiveId: collective.id, ExpenseId: 1 }));
-            beforeEach('create many comments', () => models.Comment.createMany(utils.data('comments'), { UserId: 1, CollectiveId: collective.id, ExpenseId: 2 }));
             it('THEN returns all expenses without user.email', () => request(app)
               .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenses = res.body;
+                console.log("expenses", expenses);
                 expect(expenses).to.have.length(3);
-                expect(expenses[0].commentsCount).to.equal(1);
-                expect(expenses[1].commentsCount).to.equal(3);
-                expect(expenses[2].commentsCount).to.equal(0);
                 expect(expenses[1].user.id).to.equal(expenseFiler.id);
                 expect(expenses[0].user.email).to.not.exist;
                 console.log("Expense user", expenses[0].user);
@@ -451,7 +447,7 @@ describe('expenses.routes.test.js', () => {
               approveReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
             });
 
-            beforeEach(() => Notification.create({type: 'collective.expense.approved', CollectiveId: 1, UserId: host.id}));
+            beforeEach(() => Notification.create({type: 'collective.expense.approved', CollectiveId: collective.id, UserId: host.id}));
 
             describe('WHEN not authenticated', () =>
               it('THEN returns 401 unauthorized', () => approveReq.expect(401)));
@@ -470,7 +466,7 @@ describe('expenses.routes.test.js', () => {
               describe('WHEN sending approved: true', () => {
 
                 it('THEN returns status: APPROVED', done => {
-                  expectApprovalStatus(approveReq.send({approved: true}), 'APPROVED')
+                  expectApprovalStatus(approveReq.send({ approved: true }), 'APPROVED')
                   .tap(() => expectExpenseActivity('collective.expense.approved', actualExpense.id))
                   .tap(() => {
                     expect(emailSendMessageSpy.lastCall.args[1]).to.contain(`New expense approved on`);
@@ -652,7 +648,8 @@ describe('expenses.routes.test.js', () => {
                   beforeEach('create paypal payment method', () => {
                     PaymentMethod.create({
                       service: 'paypal',
-                      UserId: host.id,
+                      CreatedByUserId: host.id,
+                      CollectiveId: host.CollectiveId,
                       confirmedAt: Date.now()
                     })
                   });
@@ -695,8 +692,8 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.description);
-                  expect(transaction).to.have.property('UserId', expense.UserId);
-                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
+                  expect(transaction).to.have.property('CreatedByUserId', expense.UserId);
+                  expect(transaction).to.have.property('ToCollectiveId', expense.CollectiveId);
                 }
 
                 function expectTransactionPaidActivity(collective, user, transaction) {
@@ -834,8 +831,8 @@ describe('expenses.routes.test.js', () => {
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.description);
-                  expect(transaction).to.have.property('UserId', expense.UserId);
-                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
+                  expect(transaction).to.have.property('CreatedByUserId', expense.UserId);
+                  expect(transaction).to.have.property('ToCollectiveId', expense.CollectiveId);
                 }
 
                 function expectTransactionPaidActivity(collective, user, transaction) {

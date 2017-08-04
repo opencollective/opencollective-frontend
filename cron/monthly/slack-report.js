@@ -26,10 +26,10 @@ models.Collective.findAll().map(collective => getBackers(collective)
 function getBackers(collective) {
   return sequelize.query(`
         SELECT
-          ug."UserId" as id,
-          u."twitterHandle" as "twitterHandle"
+          ug."CreatedByUserId" as id,
+          c."twitterHandle" as "twitterHandle"
         FROM "Members" ug
-        LEFT JOIN "Users" u ON u.id = ug."UserId"
+        LEFT JOIN "Collectives" c ON c.id = ug."MemberCollectiveId"
         WHERE ug."CollectiveId" = :CollectiveId
         AND ug.role = '${roles.BACKER}'
         AND ug."deletedAt" IS NULL

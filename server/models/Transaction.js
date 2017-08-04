@@ -11,13 +11,15 @@ export default (Sequelize, DataTypes) => {
   const { models } = Sequelize;
 
   const Transaction = Sequelize.define('Transaction', {
+
+    type: DataTypes.STRING, // EXPENSE or DONATION
+
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       unique: true
     },
 
-    type: DataTypes.STRING, // EXPENSE or DONATION
     description: DataTypes.STRING,
     amount: DataTypes.INTEGER,
 
@@ -31,10 +33,32 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    UserId: {
+    CreatedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: false
+    },
+
+    FromCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      allowNull: false
+    },
+
+    ToCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -44,18 +68,7 @@ export default (Sequelize, DataTypes) => {
 
     // Keeps a reference to the host because this is where the bank account is
     // Note that the host can also change over time (that's why just keeping CollectiveId is not enough)
-    HostId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: false
-    },
-
-    CollectiveId: {
+    HostCollectiveId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Collectives',
@@ -77,6 +90,7 @@ export default (Sequelize, DataTypes) => {
       allowNull: true
     },
 
+    // Refactor: an Expense should be an Order
     ExpenseId: {
       type: DataTypes.INTEGER,
       references: {
@@ -142,8 +156,9 @@ export default (Sequelize, DataTypes) => {
           amount: this.amount,
           currency: this.currency,
           createdAt: this.createdAt,
-          UserId: this.UserId,
-          CollectiveId: this.CollectiveId,
+          CreatedByUserId: this.CreatedByUserId,
+          FromCollectiveId: this.FromCollectiveId,
+          ToCollectiveId: this.ToCollectiveId,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
           paymentProcessorFeeInTxnCurrency: this.paymentProcessorFeeInTxnCurrency,
@@ -158,15 +173,15 @@ export default (Sequelize, DataTypes) => {
 
     instanceMethods: {
       getUser() {
-        return models.User.findById(this.UserId);
+        return models.User.findById(this.CreatedByUserId);
       },
-      getHost() {
-        return models.User.findById(this.HostId);
+      getHostCollective() {
+        return models.Collective.findById(this.HostCollectiveId);
       },
       getExpenseForViewer(viewer) {
-        const promises = [ models.Expense.findOne({where: { id: this.ExpenseId }}) ];
+        const promises = [ models.Expense.findOne({ where: { id: this.ExpenseId } }) ];
         if (viewer) {
-          promises.push(viewer.canEditCollective(this.CollectiveId));
+          promises.push(viewer.canEditCollective(this.ToCollectiveId));
         }
         return Promise.all(promises)
         .then(results => {
@@ -176,7 +191,7 @@ export default (Sequelize, DataTypes) => {
           if (viewer && canEditCollective) return expense.info;
           if (viewer && viewer.id === expense.UserId) return expense.info;
           return expense.public;
-        })
+        });
       },
       getSource() {
         switch (this.type) {
@@ -199,17 +214,18 @@ export default (Sequelize, DataTypes) => {
         }).catch(console.error);
       },
 
-      createFromPayload({ transaction, user, collective, paymentMethod }) {
+      createFromPayload({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) {
 
-        return collective.getHost().then(host => {
-          if (!host) {
-            throw new Error(`Cannot create a transaction: collective id ${collective.id} doesn't have a host`);
+        return models.Member.findOne({ where: { role: 'HOST', CollectiveId: ToCollectiveId } }).then(member => {
+          if (!member) {
+            throw new Error(`Cannot create a transaction: collective id ${ToCollectiveId} doesn't have a host`);
           }
 
-          transaction.HostId = host.id;
+          transaction.HostCollectiveId = member.MemberCollectiveId;
           // attach other objects manually. Needed for afterCreate hook to work properly
-          transaction.UserId = user && user.id;
-          transaction.CollectiveId = collective && collective.id;
+          transaction.CreatedByUserId = CreatedByUserId;
+          transaction.FromCollectiveId = FromCollectiveId;
+          transaction.ToCollectiveId = ToCollectiveId;
           transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
           transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
 
@@ -221,7 +237,7 @@ export default (Sequelize, DataTypes) => {
                   - transaction.platformFeeInTxnCurrency
                   - transaction.hostFeeInTxnCurrency
                   - transaction.paymentProcessorFeeInTxnCurrency)
-                *transaction.txnCurrencyFxRate);
+                * transaction.txnCurrencyFxRate);
           }
           return Transaction.create(transaction);
         });
@@ -233,8 +249,9 @@ export default (Sequelize, DataTypes) => {
         }
         return Transaction.findById(transaction.id, {
           include: [
-            { model: models.Collective },
-            { model: models.User },
+            { model: models.Collective, as: 'fromCollective' },
+            { model: models.Collective, as: 'toCollective' },
+            { model: models.User, as: 'createdByUser' },
             { model: models.PaymentMethod }
           ]
         })
@@ -245,15 +262,15 @@ export default (Sequelize, DataTypes) => {
             type: activities.COLLECTIVE_TRANSACTION_CREATED,
             TransactionId: transaction.id,
             CollectiveId: transaction.CollectiveId,
-            UserId: transaction.UserId,
+            CreatedByUserId: transaction.CreatedByUserId,
             data: {
               transaction: transaction.info,
               user: transaction.User && transaction.User.minimal,
-              collective: transaction.Collective && transaction.Collective.minimal
+              collective: transaction.toCollective && transaction.toCollective.minimal
             }
           };
-          if (transaction.User) {
-            activityPayload.data.user = transaction.User.info;
+          if (transaction.createdByUser) {
+            activityPayload.data.user = transaction.createdByUser.info;
           }
           if (transaction.PaymentMethod) {
             activityPayload.data.paymentMethod = transaction.PaymentMethod.info;

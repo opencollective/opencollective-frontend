@@ -8,7 +8,6 @@ import {createFromPaidExpense as createTransaction} from '../lib/transactions';
 import paypalAdaptive from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
-import sequelize from 'sequelize';
 import models from '../models';
 import * as auth from '../middleware/security/auth';
 
@@ -62,30 +61,19 @@ export const list = (req, res, next) => {
   }
 
   return models.Expense.findAndCountAll(query)
-    .then(expenses => {
-      const ids = _.pluck(expenses.rows, 'id');
-      return models.Comment.findAll({
-        attributes: ['ExpenseId', [sequelize.fn('COUNT', sequelize.col('ExpenseId')), 'comments']],
-        where: { ExpenseId: { $in: ids }},
-        group: ['ExpenseId']
+    .then(result => {
+      result.rows = result.rows.map(instance => {
+        const expense = instance.info;
+        expense.user =  req.canEditCollective ? instance.User.info : instance.User.public;
+        return expense;
       })
-      .then(commentIds => {
-        const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
-        expenses.rows = expenses.rows.map(expense => {
-          const r = expense.info;
-          r.user = req.canEditCollective ? expense.User.info : expense.User.public;
-          commentsCount[r.id] = commentsCount[r.id] || [{ dataValues: { comments: 0 } }];
-          r.commentsCount = parseInt(commentsCount[r.id][0].dataValues.comments,10);
-          return r;
-        });
-        return expenses;
-      })
+      return result;
     })
-    .then(expenses => {
+    .then(result => {
       // Set headers for pagination.
-      req.pagination.total = expenses.count;
+      req.pagination.total = result.count;
       res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
-      res.send(expenses.rows);
+      res.send(result.rows);
     })
     .catch(next);
 };
@@ -180,7 +168,7 @@ export const pay = (req, res, next) => {
     // TODO: Remove preapprovalDetails call once the new paypal preapproval flow is solid
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
-    .then(() => collective.getHost())
+    .then(() => collective.getHostCollective())
     .then((host) => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
@@ -201,7 +189,7 @@ export const pay = (req, res, next) => {
     return models.PaymentMethod.findOne({
       where: {
         service: payoutMethod,
-        UserId: req.remoteUser.id,
+        CollectiveId: req.remoteUser.CollectiveId,
         confirmedAt: {$ne: null}
       },
       order: [['confirmedAt', 'DESC']]

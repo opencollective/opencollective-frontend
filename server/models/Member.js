@@ -2,8 +2,6 @@ import roles from '../constants/roles';
 
 export default function(Sequelize, DataTypes) {
 
-  const { models } = Sequelize;
-
   const Member= Sequelize.define('Member', {
 
     id: {
@@ -12,10 +10,20 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    UserId: {
+    CreatedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    MemberCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -48,8 +56,8 @@ export default function(Sequelize, DataTypes) {
       defaultValue: 'member',
       validate: {
         isIn: {
-          args: [[roles.HOST, roles.ADMIN, roles.BACKER, roles.CONTRIBUTOR, roles.FOLLOWER]],
-          msg: 'Must be host, admin, backer, contributor or follower'
+          args: [[roles.HOST, roles.ADMIN, roles.MEMBER, roles.BACKER, roles.CONTRIBUTOR, roles.FOLLOWER]],
+          msg: 'Must be host, admin, member, backer, contributor or follower'
         }
       }
     },
@@ -67,32 +75,18 @@ export default function(Sequelize, DataTypes) {
     paranoid: true,
     indexes: [
        {
-          fields: ['UserId', 'CollectiveId', 'role'],
-          name: 'UserId-CollectiveId-role',
+          fields: ['MemberCollectiveId', 'CollectiveId', 'role'],
+          name: 'MemberCollectiveId-CollectiveId-role',
       }
     ],
-    instanceMethods: {
-      getUserForViewer(viewer, userid = this.UserId) {
-        const promises = [models.User.findOne({where: { id: userid }})];
-        if (viewer) {
-          promises.push(viewer.canEditCollective(this.CollectiveId));
-        }
-        return Promise.all(promises)
-        .then(results => {
-          const user = results[0];
-          if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
-          const canEditCollective = results[1];
-          return canEditCollective ? user.info : user.public;
-        })
-      }
-    },
     getterMethods: {
       // Info.
       info() {
         return {
           role: this.role,
+          CreatedByUserId: this.CreatedByUserId,
           CollectiveId: this.CollectiveId,
-          UserId: this.UserId,
+          MemberCollectiveId: this.MemberCollectiveId,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           deletedAt: this.deletedAt

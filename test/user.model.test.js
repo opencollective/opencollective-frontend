@@ -2,11 +2,10 @@ import sinon from 'sinon';
 import {expect} from 'chai';
 import * as utils from '../test/utils';
 import models from '../server/models';
-import { type } from '../server/constants/transactions';
 
 const userData = utils.data('user1');
 
-const { User, Collective, Transaction } = models;
+const { User } = models;
 
 describe('user.models.test.js', () => {
   let sandbox;
@@ -158,46 +157,8 @@ describe('user.models.test.js', () => {
 
   describe('class methods', () => {
 
-    const users = [ utils.data('user1'), utils.data('user2') ];
-    const transactions = [{
-      createdAt: new Date('2016-06-14'),
-      amount: 10000,
-      netAmountInCollectiveCurrency: 10000,
-      currency: 'USD',
-      type: type.DONATION,
-      UserId: 1,
-      CollectiveId: 1
-    },{
-      createdAt: new Date('2016-06-15'),
-      amount: 15000,
-      netAmountInCollectiveCurrency: 15000,
-      currency: 'USD',
-      type: type.DONATION,
-      UserId: 1,
-      CollectiveId: 2
-    },{
-      createdAt: new Date('2016-07-15'),
-      amount: 25000,
-      netAmountInCollectiveCurrency: 25000,
-      currency: 'USD',
-      type: type.DONATION,
-      UserId: 2,
-      CollectiveId: 1
-    },{
-      createdAt: new Date('2016-07-16'),
-      amount: 50000,
-      netAmountInCollectiveCurrency: 50000,
-      currency: 'USD',
-      type: type.DONATION,
-      UserId: 2,
-      CollectiveId: 2
-    }];
-
     beforeEach(() => utils.resetTestDB());
-    beforeEach(() => User.createMany(users));
-    beforeEach(() => Collective.create(utils.data('collective1')));
-    beforeEach(() => Collective.create(utils.data('collective2')));
-    beforeEach(() => Transaction.createMany(transactions, { HostId: 1 }));
+    beforeEach(() => User.createUserWithCollective(utils.data('user1')));
 
     it('creates a new user collective and generates a unique slug', () => {
       const email = 'xavier.damman@email.com';
@@ -209,62 +170,12 @@ describe('user.models.test.js', () => {
           return User.createUserWithCollective({ firstName: 'Xavier', lastName: 'Damman', email: 'xavierdamman+test@mail.com' });
         })
         .then(user2 => {
-          expect(user2.collective.slug).to.equal('xavierdamman1');        
+          expect(user2.collective.slug).to.equal('xavier-damman');
           expect(user2.collective.name).to.equal('Xavier Damman');        
           expect(user2.firstName).to.equal('Xavier');
           expect(user2.lastName).to.equal('Damman');
           expect(user2.name).to.equal('Xavier Damman');
         })
-    });
-
-    it('gets the top backers', () => {
-      return User.getTopBackers()
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(2);
-          expect(backers[0].totalDonations).to.equal(75000);
-          expect(backers[0]).to.have.property('firstName');
-        });
-    });
-
-    it('gets the top backers in a given month', () => {
-      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'))
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(25000);
-        });
-    });
-
-    it('gets the top backers in open source', () => {
-      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'), ['open source'])
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(10000);
-        });
-    });
-
-    it('gets the latest orders of a user', () => {
-      return User.findOne().then(user => {
-        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
-          .then(orders => {
-            expect(orders.length).to.equal(2);
-          })
-      });
-    });
-
-    it('gets the latest orders of a user to open source', () => {
-      return User.findOne().then(user => {
-        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
-          .then(orders => {
-            expect(orders.length).to.equal(1);
-            expect(orders[0]).to.have.property("amount");
-            expect(orders[0]).to.have.property("currency");
-            expect(orders[0]).to.have.property("Collective");
-            expect(orders[0].Collective).to.have.property("name");
-          })
-      });
     });
 
   });

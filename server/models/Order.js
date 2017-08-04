@@ -11,7 +11,7 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    UserId: {
+    CreatedByUserId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
@@ -21,7 +21,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    CollectiveId: {
+    FromCollectiveId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Collectives',
@@ -31,6 +31,16 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    ToCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+    
     TierId: {
       type: DataTypes.INTEGER,
       references: {
@@ -57,7 +67,7 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
-    amount: {
+    totalAmount: {
       type: DataTypes.INTEGER // Total amount of the order in cents
     },
 
@@ -103,26 +113,12 @@ export default function(Sequelize, DataTypes) {
     }
   }, {
     paranoid: true,
-    instanceMethods: {
-      getUserForViewer(viewer, userid = this.UserId) {
-        const promises = [models.User.findOne({where: { id: userid }})];
-        if (viewer) {
-          promises.push(viewer.canEditCollective(this.CollectiveId));
-        }
-        return Promise.all(promises)
-        .then(results => {
-          const user = results[0];
-          if (!user) return {}; // need to return an object other it breaks when graphql tries user.name
-          const canEditCollective = results[1];
-          return canEditCollective ? user.info : user.public;
-        })
-      }
-    },
+
     getterMethods: {
 
-      // total amount over time of this order
-      totalAmount() {
-        if (!this.SubscriptionId) return this.amount;
+      // total Transactions over time for this order
+      totalTransactions() {
+        if (!this.SubscriptionId) return this.totalAmount;
         return models.Transaction.sum('amount', {
           where: {
             OrderId: this.id,
@@ -134,11 +130,12 @@ export default function(Sequelize, DataTypes) {
         return {
           type: type.DONATION,
           id: this.id,
-          UserId: this.UserId,
+          CreatedByUserId: this.CreatedByUserId,
           TierId: this.TierId,
-          CollectiveId: this.CollectiveId,
+          FromCollectiveId: this.FromCollectiveId,
+          ToCollectiveId: this.ToCollectiveId,
           currency: this.currency,
-          amount: this.amount,
+          totalAmount: this.totalAmount,
           description: this.description,
           privateMessage: this.privateMessage,
           publicMessage: this.publicMessage,

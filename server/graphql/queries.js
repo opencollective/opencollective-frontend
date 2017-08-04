@@ -6,8 +6,14 @@ import {
 } from 'graphql';
 
 import {
-  CollectiveType,
-  TransactionInterfaceType,
+  CollectiveInterfaceType
+} from './CollectiveInterface';
+
+import {
+  TransactionInterfaceType  
+} from './TransactionInterface';
+
+import {
   UserType,
   TierType
 } from './types';
@@ -16,7 +22,7 @@ import models from '../models';
 
 const queries = {
   Collective: {
-    type: CollectiveType,
+    type: CollectiveInterfaceType,
     args: {
       slug: {
         type: new GraphQLNonNull(GraphQLString)
@@ -77,7 +83,7 @@ const queries = {
       const query = {
         include: [
           {
-            model: models.Collective,
+            model: models.Collective, as: 'toCollective',
             where: { slug: args.slug.toLowerCase() }
           }
         ],
@@ -109,7 +115,7 @@ const queries = {
    * Given a collective slug, returns all events
    */
   allEvents: {
-    type: new GraphQLList(CollectiveType),
+    type: new GraphQLList(CollectiveInterfaceType),
     args: {
       slug: {
         type: GraphQLString

@@ -6,6 +6,12 @@ import models from '../server/models';
 
 import * as utils from './utils';
 
+const showErrors = (graphqlResult) => {
+  if (!graphqlResult || !graphqlResult.errors) return;
+  const { message, path } = graphqlResult.errors[0];
+  console.log("GraphQL error in path", path);
+  console.error(message.split('\n').filter(line => !line.match(/node_modules/)).join('\n'));
+}
 
 describe('graphql.transaction.test.js', () => {
   /* SETUP
@@ -33,7 +39,7 @@ describe('graphql.transaction.test.js', () => {
             transactions(limit: ${limit}) {
               id,
               type,
-              user {
+              createdByUser {
                 id,
                 firstName,
                 email
@@ -62,7 +68,7 @@ describe('graphql.transaction.test.js', () => {
       `;
       const context = { remoteUser: null };
       const result = await graphql(schema, query, null, context);
-      result.errors && console.log(result.errors);
+      showErrors(result);
       expect(result.errors).to.not.exist;
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
@@ -71,9 +77,9 @@ describe('graphql.transaction.test.js', () => {
       expect(expense).to.have.property('attachment');
       expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
       expect(order).to.have.property('paymentMethod');
-      expect(order.user.id).to.equal(4720); // Lindsey user
-      expect(order.host.id).to.equal(3); // wwcode host
-      expect(order.user.email).to.equal(null); // can't see email if not logged in
+      expect(order.createdByUser.id).to.equal(4720); // Lindsey user
+      expect(order.host.id).to.equal(848); // wwcode host collective
+      expect(order.createdByUser.email).to.equal(null); // can't see email if not logged in
       expect(order.host.email).to.equal(null);
     });
   });
@@ -86,7 +92,7 @@ describe('graphql.transaction.test.js', () => {
           Transaction(id: 7071) {
             id,
             type,
-            user {
+            createdByUser {
               id,
               firstName,
               email
@@ -150,14 +156,23 @@ describe('graphql.transaction.test.js', () => {
           allTransactions(slug: "wwcodeaustin", limit: ${limit}, offset: ${offset}) {
             id,
             type,
-            user {
-              id,
-              firstName,
-              email
-            },
-            host {
+            createdByUser {
               id,
               firstName
+              lastName
+              email
+            },
+            fromCollective {
+              id
+              slug
+            }
+            toCollective {
+              id
+              slug
+            }
+            host {
+              id,
+              name
               email
             },
             ... on Expense {
@@ -184,7 +199,7 @@ describe('graphql.transaction.test.js', () => {
       expect(transactions[0].id).to.equal(7661);
       const expense = transactions.find(t => t.type === 'EXPENSE');
       expect(expense.attachment).to.equal(null);
-      return models.User.findOne({where: { id: expense.user.id } }).then(async (user) => {
+      return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
         context.remoteUser = user;
         const result2 = await graphql(schema, query, null, context);
         const transactions2 = result2.data.allTransactions;

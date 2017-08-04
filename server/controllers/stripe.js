@@ -8,15 +8,17 @@ import roles from '../constants/roles';
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
 
-const checkIfUserIsHost = UserId =>
+const getHostCollective = UserId =>
   models.Member.find({
     where: {
-      UserId,
+      CreatedByUserId: UserId,
       role: roles.HOST
-    }
+    },
+    include: [ { model: models.Collective, as: 'collective' }]
   })
-  .then(Member => {
-    if (!Member) throw new errors.BadRequest(`User (id: ${UserId}) is not a host`);
+  .then(member => {
+    if (!member) throw new errors.BadRequest(`User (id: ${UserId}) is not a host`);
+    return member.collective;
   });
 
 const getToken = code => () => axios
@@ -41,7 +43,7 @@ const createStripeAccount = data => models.StripeAccount.create({
  * Ask stripe for authorization OAuth
  */
 export const authorize = (req, res, next) => {
-  checkIfUserIsHost(req.remoteUser.id)
+  getHostCollective(req.remoteUser.id)
     .then(() => {
       const params = qs.stringify({
         response_type: 'code',
@@ -62,15 +64,14 @@ export const authorize = (req, res, next) => {
  * Callback for the stripe OAuth
  */
 export const callback = (req, res, next) => {
+  let host;
   const userId = req.query.state;
 
   if (!userId) {
     return next(new errors.BadRequest('No state in the callback'));
   }
-  let host;
 
-  checkIfUserIsHost(userId)
-    .then(() => models.User.findById(userId))
+  getHostCollective(userId)
     .tap(h => host = h)
     .then(getToken(req.query.code))
     .then(createStripeAccount)

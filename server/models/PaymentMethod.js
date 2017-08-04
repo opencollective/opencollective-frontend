@@ -8,11 +8,33 @@ export default function(Sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
+
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       unique: true
     },
+
+    CreatedByUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    CollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
     identifier: DataTypes.STRING,
 
     brand: {
@@ -47,11 +69,13 @@ export default function(Sequelize, DataTypes) {
         'len': [4, 4]
       }
     },
+
     funding: DataTypes.STRING,
     country: DataTypes.STRING,
     fullName: DataTypes.STRING,
     token: DataTypes.STRING,
     customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
+
     service: {
       type: DataTypes.STRING,
       defaultValue: 'stripe',
@@ -62,30 +86,26 @@ export default function(Sequelize, DataTypes) {
         }
       }
     },
+
     data: DataTypes.JSON,
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
-    expiryDate: {
-      type: DataTypes.DATE
-    },
+
     confirmedAt: {
       type: DataTypes.DATE
     },
-    UserId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    },
+
+    expiryDate: {
+      type: DataTypes.DATE
+    }
   }, {
     paranoid: true,
 
@@ -113,6 +133,8 @@ export default function(Sequelize, DataTypes) {
       minimal() {
         return {
           id: this.id,
+          CreatedByUserId: this.CreatedByUserId,
+          CollectiveId: this.CollectiveId,
           service: this.service,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,

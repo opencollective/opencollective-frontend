@@ -30,15 +30,16 @@ describe('lib.payments.createPayment.test.js', () => {
     done();
   });
 
-  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
-  beforeEach('create a user', () => models.User.create({email: EMAIL}).tap(u => user2 = u));
-  beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective({email: EMAIL}).tap(u => user2 = u));
+  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
   beforeEach('create an order', () => models.Order.create({
-    UserId: user.id,
-    CollectiveId: collective.id,
-    amount: AMOUNT,
+    CreatedByUserId: user.id,
+    FromCollectiveId: user.CollectiveId,
+    ToCollectiveId: collective.id,
+    totalAmount: AMOUNT,
     currency: CURRENCY
   }).tap(t => order = t))
   beforeEach('add user to collective as member', () => collective.addUserWithRole(host, roles.HOST));
@@ -48,7 +49,7 @@ describe('lib.payments.createPayment.test.js', () => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => host.setStripeAccount(account))
+    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -114,7 +115,7 @@ describe('lib.payments.createPayment.test.js', () => {
       describe('it fails', () => {
 
         it('if no stripe account', () => {
-          return user.setStripeAccount(null)
+          return user.collective.setStripeAccount(null)
           .then(() => paymentsLib.createPayment({
             order,
             payment: {
@@ -123,13 +124,12 @@ describe('lib.payments.createPayment.test.js', () => {
               currency: CURRENCY
             }
           }))
-          .catch(err => expect(err.message).to.equal('The host for the collective slug wwcode-austin has no Stripe account set up'))
+          .catch(err => expect(err.message).to.equal('The host for the scouts collective has no Stripe account set up'))
 
         });
 
         it('if stripe has live key and not in production', () => {
-          return models.StripeAccount.create({ accessToken: 'sk_live_abc'})
-          .then((account) => user.setStripeAccount(account))
+          return models.StripeAccount.create({ accessToken: 'sk_live_abc', CollectiveId: user.CollectiveId })
           .then(() => paymentsLib.createPayment({
             order,
             payment: {
@@ -157,12 +157,12 @@ describe('lib.payments.createPayment.test.js', () => {
               }
             }));
 
-            it('successfully creates a paymentMethod with the UserId', (done) => {
+            it('successfully creates a paymentMethod with the CreatedByUserId', (done) => {
               models.PaymentMethod
                 .findAndCountAll({})
                 .then((res) => {
                   expect(res.count).to.equal(1);
-                  expect(res.rows[0]).to.have.property('UserId', user.id);
+                  expect(res.rows[0]).to.have.property('CreatedByUserId', user.id);
                   expect(res.rows[0]).to.have.property('token', STRIPE_TOKEN);
                   expect(res.rows[0]).to.have.property('service', 'stripe');
                   done();
@@ -175,12 +175,12 @@ describe('lib.payments.createPayment.test.js', () => {
                 .findAndCountAll({})
                 .then((res) => {
                   expect(res.count).to.equal(1);
-                  expect(res.rows[0]).to.have.property('UserId', user.id);
-                  expect(res.rows[0]).to.have.property('CollectiveId', collective.id);
-                  expect(res.rows[0]).to.have.property('currency', CURRENCY);
-                  expect(res.rows[0]).to.have.property('amount', AMOUNT);
-                  expect(res.rows[0]).to.have.property('description',
-                    `Donation to ${collective.name}`);
+                  const order = res.rows[0];
+                  expect(order).to.have.property('CreatedByUserId', user.id);
+                  expect(order).to.have.property('ToCollectiveId', collective.id);
+                  expect(order).to.have.property('currency', CURRENCY);
+                  expect(order).to.have.property('totalAmount', AMOUNT);
+                  expect(order).to.have.property('description',`Donation to ${collective.name}`);
                   done();
                 })
                 .catch(done);
@@ -226,9 +226,10 @@ describe('lib.payments.createPayment.test.js', () => {
           let order2;
 
           beforeEach(() => models.Order.create({
-            UserId: user2.id,
-            CollectiveId: collective2.id,
-            amount: AMOUNT2,
+            CreatedByUserId: user2.id,
+            FromCollectiveId: user2.CollectiveId,
+            ToCollectiveId: collective2.id,
+            totalAmount: AMOUNT2,
             currency: collective2.currency
           }).then(o => order2 = o))
 
@@ -249,7 +250,7 @@ describe('lib.payments.createPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(1);
-                expect(res.rows[0]).to.have.property('UserId', user2.id);
+                expect(res.rows[0]).to.have.property('CreatedByUserId', user2.id);
                 done();
               })
               .catch(done);
@@ -260,10 +261,10 @@ describe('lib.payments.createPayment.test.js', () => {
               .findAndCountAll({})
               .then((res) => {
                 expect(res.count).to.equal(2);
-                expect(res.rows[1]).to.have.property('UserId', user2.id);
-                expect(res.rows[1]).to.have.property('CollectiveId', collective2.id);
+                expect(res.rows[1]).to.have.property('CreatedByUserId', user2.id);
+                expect(res.rows[1]).to.have.property('ToCollectiveId', collective2.id);
                 expect(res.rows[1]).to.have.property('currency', CURRENCY);
-                expect(res.rows[1]).to.have.property('amount', AMOUNT2);
+                expect(res.rows[1]).to.have.property('totalAmount', AMOUNT2);
                 expect(res.rows[1]).to.have.property('SubscriptionId');
                 expect(res.rows[1]).to.have.property('description', `Monthly donation to ${collective2.name}`);
                 done();

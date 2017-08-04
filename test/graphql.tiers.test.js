@@ -25,10 +25,14 @@ describe('graphql.tiers.test', () => {
    * - Host is the host of both collective1 and collective2
    */
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
-  beforeEach(() => models.PaymentMethod.create({...utils.data('paymentMethod2'), UserId: user1.id}).tap(c => paymentMethod1 = c));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach(() => models.PaymentMethod.create({
+    ...utils.data('paymentMethod2'), 
+    CreatedByUserId: user1.id,
+    CollectiveId: user1.CollectiveId
+  }).tap(c => paymentMethod1 = c));
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
@@ -44,7 +48,7 @@ describe('graphql.tiers.test', () => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => host.setStripeAccount(account))
+    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -109,35 +113,35 @@ describe('graphql.tiers.test', () => {
           description: "test order",
           user: {
             email: user.email,
-            paymentMethod: {
-              service: 'stripe',
-              identifier: '4242',
-              expMonth: 1,
-              expYear: 2021,
-              funding: 'credit',
-              brand: 'Visa',
-              country: 'US',
-              token: 'card_1AejcADjPFcHOcTmBJRASiOV'
-            }
           },
-          collective: { slug: collective1.slug },
-          tier: { id: tier1.id }
+          toCollective: { slug: collective1.slug },
+          tier: { id: tier1.id },
+          paymentMethod: {
+            service: 'stripe',
+            identifier: '4242',
+            expMonth: 1,
+            expYear: 2021,
+            funding: 'credit',
+            brand: 'Visa',
+            country: 'US',
+            token: 'card_1AejcADjPFcHOcTmBJRASiOV'
+          }
         }
       }
 
       it("fails to use a payment method on file if not logged in", async () => {
         const order = generateOrder(user1);
-        order.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        order.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(order)}) {
-            user {
+            createdByUser {
               id,
-              email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+              email
+            },
+            paymentMethod {
+              brand,
+              identifier
             }
           }
         }`;
@@ -149,17 +153,17 @@ describe('graphql.tiers.test', () => {
     
       it("fails to use a payment method on file if not logged in as the owner", async () => {
         const order = generateOrder(user1);
-        order.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        order.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(order)}) {
-            user {
+            createdByUser {
               id,
-              email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+              email
+            },
+            paymentMethod {
+              brand,
+              identifier
             }
           }
         }`;
@@ -171,17 +175,17 @@ describe('graphql.tiers.test', () => {
           
       it("user1 becomes a backer of collective1 using a payment method on file", async () => {
         const orderInput = generateOrder(user1);
-        orderInput.user.paymentMethod = { uuid: paymentMethod1.uuid };
+        orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(orderInput)}) {
-            user {
+            createdByUser {
               id,
-              email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+              email
+            },
+            paymentMethod {
+              brand,
+              identifier
             }
           }
         }`;
@@ -189,11 +193,11 @@ describe('graphql.tiers.test', () => {
         const result = await graphql(schema, query, null, { remoteUser: user1 });
         expect(result.errors).to.not.exist;
 
-        const members = await models.Member.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
-        const orders = await models.Order.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
+        const orders = await models.Order.findAll({where: { FromCollectiveId: user1.CollectiveId, ToCollectiveId: collective1.id }});
         const subscription = await models.Subscription.findById(orders[0].SubscriptionId);
         const order = await models.Order.findById(orders[0].id);
-        const transactions = await models.Transaction.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const transactions = await models.Transaction.findAll({where: { FromCollectiveId: user1.CollectiveId, ToCollectiveId: collective1.id }});
 
         expect(members).to.have.length(1);
         expect(orders).to.have.length(1);
@@ -208,22 +212,22 @@ describe('graphql.tiers.test', () => {
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(generateOrder(user1))}) {
-            user {
+            createdByUser {
               id,
-              email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+              email
+            },
+            paymentMethod {
+              brand,
+              identifier
             }
           }
         }`;
 
         const result = await graphql(schema, query, null, {});
         expect(result.errors).to.not.exist;
-        const members = await models.Member.findAll({where: { UserId: user1.id, CollectiveId: collective1.id }});
+        const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
         expect(members).to.have.length(1);
-        const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
+        const paymentMethods = await models.PaymentMethod.findAll({where: { CreatedByUserId: user1.id }});
         expect(paymentMethods).to.have.length(2);
       });
     });

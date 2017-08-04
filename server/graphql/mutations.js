@@ -17,11 +17,14 @@ import {
 } from 'graphql';
 
 import {
-  CollectiveType,
   OrderType,
   TierType,
   MemberType
 } from './types';
+
+import {
+  CollectiveInterfaceType
+} from './CollectiveInterface';
 
 import {
   CollectiveInputType,
@@ -36,7 +39,7 @@ import {
 
 const mutations = {
   createCollective: {
-    type: CollectiveType,
+    type: CollectiveInterfaceType,
     args: {
       collective: { type: new GraphQLNonNull(CollectiveInputType) }
     },
@@ -105,7 +108,7 @@ const mutations = {
     }
   },
   editCollective: {
-    type: CollectiveType,
+    type: CollectiveInterfaceType,
     args: {
       collective: { type: CollectiveInputType }
     },
@@ -179,7 +182,7 @@ const mutations = {
     }
   },
   deleteCollective: {
-    type: CollectiveType,
+    type: CollectiveInterfaceType,
     args: {
       id: { type: new GraphQLNonNull(GraphQLInt)}
     },
@@ -293,7 +296,8 @@ const mutations = {
       .then(u => u || models.User.createUserWithCollective(args.user))
       // add user as member of the collective
       .then((user) => models.Member.create({
-        UserId: user.id,
+        CreatedByUserId: user.id,
+        MemberCollectiveId: user.CollectiveId,
         CollectiveId: collective.id,
         role: args.role.toUpperCase() || roles.FOLLOWER
       }));
@@ -316,7 +320,7 @@ const mutations = {
         if (req.remoteUser.id === args.user.id) {
           return Promise.resolve(true);
         }
-        return hasRole(req.remoteUser.id, collective.id, ['ADMIN','HOST'])
+        return hasRole(req.remoteUser.id, collective.id, ['ADMIN', 'HOST'])
           .then(canEdit => {
             if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as this user or as a core contributor or as a host of the ${args.collective.slug} collective`);
           })
@@ -331,7 +335,7 @@ const mutations = {
       // find member
       .then(() => models.Member.findOne({
         where: {
-          UserId: args.user.id,
+          CreatedByUserId: args.user.id,
           CollectiveId: collective.id,
           role: args.role.toUpperCase()
         }
@@ -355,16 +359,16 @@ const mutations = {
       const order = args.order;
 
       let collective;
-      return models.Collective.findBySlug(order.collective.slug)
+      return models.Collective.findBySlug(order.toCollective.slug)
       .then(c => {
         if (!c) {
-          throw new Error(`No collective found with slug: ${order.collective.slug}`);
+          throw new Error(`No collective found with slug: ${order.toCollective.slug}`);
         }
         collective = c;
       })
       .then(() => models.Tier.getOrFind({
         id: order.tier.id,
-        amount: order.amount,
+        amount: order.totalAmount / (order.quantity || 1),
         interval: order.interval,
         CollectiveId: collective.id
       }))
@@ -382,7 +386,7 @@ const mutations = {
             Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
       // make sure if it's a paid tier, we have a payment method attached
-      .then(() => isPaidTier && !(order.user.paymentMethod && (order.user.paymentMethod.uuid || order.user.paymentMethod.token)) &&
+      .then(() => isPaidTier && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token)) &&
         Promise.reject(new Error(`This tier requires a payment method`)))
       
       // find or create user
@@ -407,51 +411,74 @@ const mutations = {
       .tap(u => user = u)
       .then(() => {
         if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
-          Promise.reject(new Error(`You can only buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
+          Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
         }
       })
       .then(() => {
-        return models.Order.create({
-          UserId: user.id,
-          CollectiveId: collective.id,
+        const currency = tier.currency || collective.currency;
+        const quantity = order.quantity || 1;
+        let totalAmount;
+        if (tier.amount) {
+          totalAmount = tier.amount * quantity;
+        } else {
+          totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
+        }
+        const orderData = {
+          CreatedByUserId: user.id,
+          FromCollectiveId: args.order.fromCollective ? args.order.fromCollective.id : user.CollectiveId,
+          ToCollectiveId: collective.id,
           TierId: tier.id,
-          quantity: order.quantity || 1,
-          amount: tier.amount * (order.quantity || 1),
-          currency: tier.currency || collective.currency,
-          description: order.description,
+          quantity,
+          totalAmount,
+          currency,
+          description: order.description || `${collective.name} - ${tier.name}`,
           publicMessage: order.publicMessage,
           privateMessage: order.privateMessage,
           processedAt: isPaidTier ? null : new Date
-        })
+        };
+        return models.Order.create(orderData)
       })
       // process payment, if needed
       .tap((orderInstance) => {
-        if (tier.amount > 0) {
+        if (orderInstance.totalAmount > 0) {
           // if the user is trying to reuse an existing credit card,
           // we make sure it belongs to the logged in user.
           let getPaymentMethod;
-          if (order.user.paymentMethod.uuid) {
+          if (order.paymentMethod.uuid) {
             if (!req.remoteUser) throw new errors.Forbidden("You need to be logged in to be able to use a payment method on file");
-            getPaymentMethod = models.PaymentMethod.findOne({ where: { uuid: order.user.paymentMethod.uuid, UserId: req.remoteUser.id }}).then(PaymentMethod => {
+            getPaymentMethod = models.PaymentMethod.findOne({
+              where: {
+                uuid: order.paymentMethod.uuid,
+                CollectiveId: req.remoteUser.CollectiveId
+              }
+            }).then(PaymentMethod => {
               if (!PaymentMethod) throw new errors.NotFound(`You don't have a payment method with that uuid`);
               else return PaymentMethod;
             })
           } else {
-            const paymentMethodData = {...order.user.paymentMethod, service: "stripe", UserId: user.id};
+            const paymentMethodData = {
+              ...order.paymentMethod,
+              service: "stripe",
+              CreatedByUserId: user.id,
+              CollectiveId: orderInstance.FromCollectiveId
+            };
             if (!paymentMethodData.save) {
               paymentMethodData.identifier = null;
             }
             getPaymentMethod = models.PaymentMethod.create(paymentMethodData);
           }
           return getPaymentMethod
+            .tap(paymentMethod => {
+              orderInstance.PaymentMethodId = paymentMethod.id;
+              return orderInstance.save();
+            })
             .then(paymentMethod => {
               // also sends out email
               const payload = {
                 order: orderInstance,
                 payment: {
                   paymentMethod,
-                  user,
-                  amount: orderInstance.amount,
+                  amount: orderInstance.totalAmount,
                   interval: tier.interval,
                   currency: orderInstance.currency,
                   description: `${collective.name} - ${tier.name}`

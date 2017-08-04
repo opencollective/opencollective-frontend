@@ -15,7 +15,7 @@ const {
 export const getDetails = function(req, res, next) {
   const preapprovalKey = req.params.preapprovalkey;
 
-  return getPreapprovalDetailsAndUpdatePaymentMethod(preapprovalKey, req.remoteUser.id)
+  return getPreapprovalDetailsAndUpdatePaymentMethod(preapprovalKey, req.remoteUser.CollectiveId)
     .then(response => res.json(response))
     .catch(next);
 };
@@ -50,8 +50,9 @@ export const getPreapprovalKey = function(req, res, next) {
   return paypalAdaptive.preapproval(payload)
   .tap(r => response = r)
   .then(response => PaymentMethod.create({
+    CreatedByUserId: req.remoteUser.id,
     service: 'paypal',
-    UserId: req.remoteUser.id,
+    CollectiveId: req.remoteUser.CollectiveId,
     token: response.preapprovalKey,
     expiryDate
   }))
@@ -69,7 +70,7 @@ export const confirmPreapproval = function(req, res, next) {
   return PaymentMethod.findOne({
     where: {
       service: 'paypal',
-      UserId: req.remoteUser.id,
+      CollectiveId: req.remoteUser.CollectiveId,
       token: req.params.preapprovalkey
     }
   })
@@ -78,7 +79,7 @@ export const confirmPreapproval = function(req, res, next) {
     Promise.resolve() : 
     Promise.reject(new errors.NotFound('This preapprovalKey does not exist.')))
 
-  .then(() => getPreapprovalDetailsAndUpdatePaymentMethod(req.params.preapprovalkey, req.remoteUser.id, paymentMethod))
+  .then(() => getPreapprovalDetailsAndUpdatePaymentMethod(req.params.preapprovalkey, req.remoteUser.CollectiveId, paymentMethod))
 
   .then(() => Activity.create({
     type: 'user.paymentMethod.created',
@@ -93,7 +94,7 @@ export const confirmPreapproval = function(req, res, next) {
   .then(() => PaymentMethod.findAll({
     where: {
       service: 'paypal',
-      UserId: req.remoteUser.id,
+      CollectiveId: req.remoteUser.CollectiveId,
       token: {$ne: req.params.preapprovalkey}
     }
   }))
@@ -107,7 +108,7 @@ export const confirmPreapproval = function(req, res, next) {
 /*
  * Takes a Payment Response
  */
-const getPreapprovalDetailsAndUpdatePaymentMethod = function(preapprovalKey, userId, paymentMethod = null) {
+const getPreapprovalDetailsAndUpdatePaymentMethod = function(preapprovalKey, CollectiveId, paymentMethod = null) {
 
   let preapprovalDetailsResponse;
   return paypalAdaptive.preapprovalDetails(preapprovalKey)
@@ -118,7 +119,7 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(preapprovalKey, use
     .then(() => paymentMethod ? paymentMethod :  PaymentMethod.findOne({
         where: {
           service: 'paypal',
-          UserId: userId,
+          CollectiveId,
           token: preapprovalKey
         }
       }))

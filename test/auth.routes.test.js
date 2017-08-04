@@ -1,6 +1,5 @@
 import app from '../server/index';
 import { expect } from 'chai';
-import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import * as utils from '../test/utils';
 import models from '../server/models';
@@ -56,28 +55,6 @@ describe('auth.routes.test.js', () => {
         .expect(400)
         .end(e => {
           expect(e).to.not.exist;
-          done();
-        });
-    });
-
-    it('successfully authenticate with username', (done) => {
-      request(app)
-        .post('/authenticate')
-        .send({
-          api_key: application.api_key,
-          username: userData.username,
-          password: userData.password
-        })
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-          expect(res.body).to.have.property('access_token');
-          expect(res.body).to.have.property('refresh_token');
-          const data = jwt.decode(res.body.access_token);
-          expect(data).to.have.property('iat');
-          expect(data).to.have.property('exp');
-          expect(data).to.have.property('iss');
-          expect(data).to.have.property('sub');
           done();
         });
     });

@@ -14,22 +14,23 @@ describe('homepage.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
   beforeEach(() =>
     models.Collective
       .create(collectiveData).tap(g => {
         collective = g;
         return collective.addUserWithRole(user, 'HOST');
       })
-      .then(() => models.PaymentMethod.create({UserId: user.id}))
+      .then(() => models.PaymentMethod.create({ CreatedByUserId: user.id, CollectiveId: user.CollectiveId }))
       .tap(p => paymentMethod = p)
       .then(() => {
         return models.Transaction.create({
           amount:100000,
           PaymentMethodId: paymentMethod.id,
-          CollectiveId: collective.id,
-          UserId: user.id,
-          HostId: user.id
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
+          CreatedByUserId: user.id,
+          HostCollectiveId: user.id
         })
       })
   );

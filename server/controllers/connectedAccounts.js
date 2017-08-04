@@ -2,7 +2,6 @@ import config from 'config';
 import request from 'request-promise';
 import Promise from 'bluebird';
 import models from '../models';
-import {getUserOrCollectiveFromSlug} from '../lib/slug';
 import errors from '../lib/errors';
 
 const {
@@ -11,16 +10,13 @@ const {
 } = models;
 
 export const list = (req, res, next) => {
-  const user = req.remoteUser;
   const slug = req.params.slug.toLowerCase();
 
-  getUserOrCollectiveFromSlug(slug, user.id)
-    .then(userOrCollective => {
-      const selector = userOrCollective.username ? 'UserId' : 'CollectiveId';
-      return models.ConnectedAccount.findAll({where: {
-        [selector]: userOrCollective.id,
-        deletedAt: null
-      }});
+  models.Collective.findBySlug(slug)
+    .then(collective => {
+      return models.ConnectedAccount.findAll({
+        where: { CollectiveId: collective.id }
+      });
     })
     .map(connectedAccount => connectedAccount.info)
     .tap(connectedAccounts => res.json({connectedAccounts}))
@@ -38,19 +34,19 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       const image = `https://images.githubusercontent.com/${data.profile.username}`;
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
-      return User.findOne({where: {email: {$in: emails.map(email => email.toLowerCase())}}})
+      return User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) } } })
         .then(u => u || User.createUserWithCollective({
           name: data.profile.displayName,
           image,
           email: emails[0],
         }))
         .tap(u => user = u)
-        .tap(user => attrs.UserId = user.id)
-        .then(() => ConnectedAccount.findOne({where: attrs}))
+        .tap(user => attrs.CollectiveId = user.CollectiveId)
+        .then(() => ConnectedAccount.findOne({ where: attrs }))
         .then(ca => ca || ConnectedAccount.create(attrs))
         .then(ca => {
           caId = ca.id;
-          return ca.update({username: data.profile.username, secret: accessToken});
+          return ca.update({ username: data.profile.username, secret: accessToken });
         })
         .then(() => {
           const token = user.generateConnectedAccountVerifiedToken(caId, data.profile.username);

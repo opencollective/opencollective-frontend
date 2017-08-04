@@ -17,7 +17,7 @@ describe('supercollectives.routes.test.js', () => {
         expect(e).to.not.exist;
         const supercollective = res.body;
         const collectives = supercollective.superCollectiveData;
-        expect(supercollective.yearlyIncome).to.equal(16119187);
+        expect(supercollective.yearlyIncome).to.equal(15978487);
         expect(collectives.length).to.eql(72);
         expect(collectives[0].backersCount).to.equal(21); // WWCode Austin
         expect(collectives[0].contributorsCount).to.equal(21);
@@ -39,7 +39,7 @@ describe('supercollectives.routes.test.js', () => {
       .expect(200)
       .end((e, res) => {
         expect(e).to.not.exist;
-        expect(res.body.length).to.equal(164);
+        expect(res.body.length).to.equal(163);
         done();
       });
   });

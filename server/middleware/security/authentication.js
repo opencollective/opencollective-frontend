@@ -90,7 +90,8 @@ export function authenticateUserByJwtNoExpiry() {
 }
 
 /**
- * Authenticate user by username/email/password.
+ * Authenticate user by email/password. #deprecated
+ * TODO: remove
  */
 export const authenticateUserByPassword = (req, res, next) => {
   required('password')(req, res, (e) => {
@@ -98,13 +99,12 @@ export const authenticateUserByPassword = (req, res, next) => {
       return next(e);
     }
 
-    const username = (req.body && req.body.username) || req.query.username;
     const email = (req.body && req.body.email) || req.query.email;
     const password = (req.body && req.body.password) || req.query.password;
 
     User
-      .auth((username || email), password, (e, user) => {
-        const errorMsg = 'Invalid username/email or password';
+      .auth(email, password, (e, user) => {
+        const errorMsg = 'Invalid email or password';
 
         if (e) {
           if (e.code === 400) {
@@ -135,7 +135,7 @@ export const _authenticateUserByJwt = (req, res, next) => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({ seenAt: new Date() });
       req.remoteUser = user;
-      debug('auth')('logged in user', req.remoteUser.username);
+      debug('auth')('logged in user', req.remoteUser.id);
       if (req.body && req.body.variables && req.body.variables.collective) {
         return req.remoteUser.canEditCollective(req.body.variables.collective.id).then(canEditCollective => {
           req.remoteUser.canEditCollective = canEditCollective;

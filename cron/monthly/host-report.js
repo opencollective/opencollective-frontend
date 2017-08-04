@@ -56,10 +56,16 @@ const init = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
 
-  const query = `SELECT u.id, u.currency, u.username, u."firstName", u."lastName", u.email FROM "Users" u LEFT JOIN "Members" ug ON ug."UserId" = u.id WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY u.id`;
+  const query = `
+    SELECT c.*, u.email
+    FROM "Users" u
+      LEFT JOIN "Collectives" c ON c.id = u."CollectiveId"
+      LEFT JOIN "Members" ug ON ug."MemberCollectiveId" = u."CollectiveId"
+    WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY c.id
+  `;
 
   sequelize.query(query, {
-    model: models.User,
+    model: models.Collective,
     type: sequelize.QueryTypes.SELECT
   })
   .tap(hosts => {

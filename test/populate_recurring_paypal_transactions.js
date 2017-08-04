@@ -74,8 +74,9 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
         }
       }))
     .then(subscription => models.Transaction.createFromPayload({
-      collective,
-      user,
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      ToCollectiveId: collective.id,
       subscription,
       transaction: fixture
     }))
@@ -154,8 +155,8 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       expect(res.count).to.be.equal(2); // only adds one
       expect(res.rows[0].data.transaction_id).to.be.equal(paypalTransaction.completed.transaction_id);
       expect(res.rows[1].data.transaction_id).to.be.equal(transaction_id); // new one
-      expect(res.rows[1]).to.have.property('UserId');
-      expect(res.rows[1]).to.have.property('CollectiveId');
+      expect(res.rows[1]).to.have.property('CreatedByUserId');
+      expect(res.rows[1]).to.have.property('ToCollectiveId');
       expect(res.rows[1]).to.have.property('SubscriptionId');
     });
   });

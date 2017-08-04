@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import app from '../server/index';
 import request from 'supertest-as-promised';
 import Promise from 'bluebird';
@@ -19,7 +19,6 @@ const generateToken = (email, slug, template) => {
 }
 
 const {
-  User,
   Collective
 } = models;
 
@@ -81,7 +80,7 @@ describe("email.routes.test", () => {
 
     Collective.create(collectiveData)
       .tap(g => collective = g )
-      .then(() => User.createMany(usersData))
+      .then(() => Promise.map(usersData, models.User.createUserWithCollective))
       .tap(users => {
         return Promise.map(users, (user, index) => {
           return collective.addUserWithRole(user, usersData[index].role);

@@ -37,10 +37,10 @@ describe('Mutation Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
-  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
   beforeEach(() => collective1.addUserWithRole(host, roles.HOST));
   beforeEach(() => collective1.addUserWithRole(user1, roles.ADMIN));
@@ -49,7 +49,7 @@ describe('Mutation Tests', () => {
     models.StripeAccount.create({
       accessToken: 'abc'
     })
-    .then((account) => host.setStripeAccount(account))
+    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -333,7 +333,7 @@ describe('Mutation Tests', () => {
           mutation createOrder {
             createOrder(order: {}) {
               id,
-              collective {
+              toCollective {
                 id
               }
               tier {
@@ -347,7 +347,7 @@ describe('Mutation Tests', () => {
         const context = { remoteUser: null };
         const result = await graphql(schema, query, null, context)
         expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.contain('collective');
+        expect(result.errors[0].message).to.contain('toCollective');
         expect(result.errors[0].message).to.contain('user');
       });
 
@@ -356,9 +356,9 @@ describe('Mutation Tests', () => {
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "${user1.email}" }, collective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
+              createOrder(order: { user: { email: "${user1.email}" }, toCollective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
                 id,
-                collective {
+                toCollective {
                   id
                 }
                 tier {
@@ -378,9 +378,9 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
                 id,
-                collective {
+                toCollective {
                   id
                 }
                 tier {
@@ -402,9 +402,9 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
                 id,
-                collective {
+                toCollective {
                   id
                 }
                 tier {
@@ -425,9 +425,9 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, collective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
                 id,
-                collective {
+                toCollective {
                   id
                 }
                 tier {
@@ -448,7 +448,7 @@ describe('Mutation Tests', () => {
     describe('members', () => {
 
       it('creates a new member with an existing user', async () => {
-        const query = `
+        const createMemberQuery = `
           mutation createMember {
             createMember(
               user: { email: "${user2.email}" },
@@ -457,9 +457,11 @@ describe('Mutation Tests', () => {
             ) {
               id,
               role,
-              user {
+              member {
                 id,
-                email
+                ... on User {
+                  email
+                }
               },
               collective {
                 id,
@@ -469,19 +471,18 @@ describe('Mutation Tests', () => {
           }
         `;
         const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context)
-
+        const result = await graphql(schema, createMemberQuery, null, context);
         expect(result).to.deep.equal({
           data: {
             "createMember": {
               "id": 3,
               "role": "FOLLOWER",
-              "user": {
+              "member": {
                 "email": null, // note: since the logged in user cannot edit the collective, it cannot get back the email address of an order
                 "id": 3
               },
               "collective": {
-                "id": 2,
+                "id": 5,
                 "slug": "jan-meetup"
               }
             }
@@ -510,7 +511,7 @@ describe('Mutation Tests', () => {
         expect(error3.errors[0].message).to.equal('Member not found');
         
         await models.Member.create({
-          UserId: 1,
+          CreatedByUserId: 1,
           CollectiveId: event1.id,
           role: 'FOLLOWER'
         });
@@ -529,9 +530,9 @@ describe('Mutation Tests', () => {
         it('from an existing user', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "${user2.email}" }, collective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
+              createOrder(order: { user: { email: "${user2.email}" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
                 id,
-                user {
+                createdByUser {
                   id,
                   email
                 },
@@ -542,11 +543,11 @@ describe('Mutation Tests', () => {
                   maxQuantity,
                   availableQuantity
                 },
-                collective {
+                fromCollective {
                   id,
                   slug
                 },
-                collective {
+                toCollective {
                   id,
                   slug
                 }
@@ -555,10 +556,15 @@ describe('Mutation Tests', () => {
           `;
           const context = { remoteUser: null };
           const result = await graphql(schema, query, null, context)
+          result.errors && console.log(result.errors);
           expect(result.data).to.deep.equal({
             "createOrder": {
-              "collective": {
-                "id": 2,
+              "fromCollective": {
+                "id": 3,
+                "slug": "anish-bas"
+              },
+              "toCollective": {
+                "id": 5,
                 "slug": "jan-meetup"
               },
               "id": 1,
@@ -569,7 +575,7 @@ describe('Mutation Tests', () => {
                 "maxQuantity": 10,
                 "name": "Free ticket"
               },
-              "user": {
+              "createdByUser": {
                 "email": null,
                 "id": 3
               }
@@ -583,13 +589,13 @@ describe('Mutation Tests', () => {
               createOrder(
                 order: {
                   user: { email: "newuser@email.com" },
-                  collective: { slug: "${event1.slug}" },
+                  toCollective: { slug: "${event1.slug}" },
                   tier: { id: 1 },
                   quantity: 2
                 }
               ) {
                 id,
-                user {
+                createdByUser {
                   id,
                   email
                 },
@@ -616,7 +622,7 @@ describe('Mutation Tests', () => {
                 "maxQuantity": 10,
                 "name": "Free ticket"
               },
-              "user": {
+              "createdByUser": {
                 "email": null,
                 "id": 4
               }
@@ -634,19 +640,19 @@ describe('Mutation Tests', () => {
               createOrder(order: {
                 user: {
                   email: "${user2.email}",
-                  paymentMethod: {
-                    token: "tok_stripe",
-                    service: "stripe",
-                    expMonth: 11,
-                    expYear: 2020,
-                    identifier: "4242"
-                  }
                 },
-                collective: { slug: "${event1.slug}" },
+                paymentMethod: {
+                  token: "tok_stripe",
+                  service: "stripe",
+                  expMonth: 11,
+                  expYear: 2020,
+                  identifier: "4242"
+                },
+                toCollective: { slug: "${event1.slug}" },
                 tier: { id: 2 }, quantity:2
               }) {
                 id,
-                user {
+                createdByUser {
                   id,
                   email
                 },
@@ -657,7 +663,7 @@ describe('Mutation Tests', () => {
                   maxQuantity,
                   availableQuantity
                 },
-                collective {
+                toCollective {
                   id,
                   slug
                 }
@@ -676,12 +682,12 @@ describe('Mutation Tests', () => {
                 "maxQuantity": 100,
                 "name": "paid ticket"
               },
-              "user": {
+              "createdByUser": {
                 "email": null,
                 "id": 3
               },
-              "collective": {
-                "id": 2,
+              "toCollective": {
+                "id": 5,
                 "slug": "jan-meetup"
               }
             }
@@ -691,8 +697,8 @@ describe('Mutation Tests', () => {
           createPaymentStub.reset();
           expect(createPaymentArgument.order.id).to.equal(1);
           expect(createPaymentArgument.order.TierId).to.equal(2);
-          expect(createPaymentArgument.order.CollectiveId).to.equal(2);
-          expect(createPaymentArgument.order.UserId).to.equal(3);
+          expect(createPaymentArgument.order.ToCollectiveId).to.equal(5);
+          expect(createPaymentArgument.order.CreatedByUserId).to.equal(3);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
           expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
@@ -705,18 +711,18 @@ describe('Mutation Tests', () => {
               createOrder(order: {
                 user: {
                   email: "newuser@email.com",
-                  paymentMethod: {
-                    token: "tok_stripe",
-                    expMonth: 11,
-                    expYear: 2020,
-                    identifier: "4242"
-                  }
                 },
-                collective: { slug: "${event1.slug}" },
+                paymentMethod: {
+                  token: "tok_stripe",
+                  expMonth: 11,
+                  expYear: 2020,
+                  identifier: "4242"
+                },
+                toCollective: { slug: "${event1.slug}" },
                 tier: { id: 2 }, quantity: 2
               }) {
                 id,
-                user {
+                createdByUser {
                   id,
                   email
                 },
@@ -727,7 +733,7 @@ describe('Mutation Tests', () => {
                   maxQuantity,
                   availableQuantity
                 },
-                collective {
+                toCollective {
                   id,
                   slug
                 }
@@ -748,12 +754,12 @@ describe('Mutation Tests', () => {
                   "maxQuantity": 100,
                   "name": "paid ticket"
                 },
-                "user": {
+                "createdByUser": {
                   "email": null,
                   "id": 4
                 },
-                "collective": {
-                  "id": 2,
+                "toCollective": {
+                  "id": 5,
                   "slug": "jan-meetup"
                 }
               }
@@ -763,8 +769,8 @@ describe('Mutation Tests', () => {
           expect(createPaymentStub.callCount).to.equal(1);
           expect(createPaymentArgument.order.id).to.equal(1);
           expect(createPaymentArgument.order.TierId).to.equal(2);
-          expect(createPaymentArgument.order.CollectiveId).to.equal(2);
-          expect(createPaymentArgument.order.UserId).to.equal(4);
+          expect(createPaymentArgument.order.ToCollectiveId).to.equal(5);
+          expect(createPaymentArgument.order.CreatedByUserId).to.equal(4);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
           expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');

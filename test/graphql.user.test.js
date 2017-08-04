@@ -28,9 +28,9 @@ describe('Query Tests', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
-  beforeEach(() => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
   beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
@@ -43,14 +43,10 @@ describe('Query Tests', () => {
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
   beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
 
-  beforeEach('create stripe account', (done) => {
-    models.StripeAccount.create({
-      accessToken: 'abc'
-    })
-    .then((account) => host.setStripeAccount(account))
-    .tap(() => done())
-    .catch(done);
-  });
+  beforeEach('create stripe account', () => models.StripeAccount.create({
+    accessToken: 'abc',
+    CollectiveId: host.id
+  }));
 
   describe('graphql.user.test.js', () => {
 
@@ -62,7 +58,7 @@ describe('Query Tests', () => {
             id,
             firstName,
             lastName,
-            members {
+            memberships {
               collective {
                 slug
               },
@@ -75,15 +71,17 @@ describe('Query Tests', () => {
       it('returns all collectives with role', async () => {
         const context = { remoteUser: user1 };
         const result = await graphql(schema, LoggedInUserQuery, null, context);
+        result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
-        expect(data.members.length).to.equal(2);
-        expect(data.members[0].role).to.equal('BACKER');
-        expect(data.members[1].role).to.equal('ADMIN');
+        expect(data.memberships.length).to.equal(2);
+        expect(data.memberships[0].role).to.equal('BACKER');
+        expect(data.memberships[1].role).to.equal('ADMIN');
       })
 
       it("doesn't return anything if not logged in", async () => {
         const context = {};
         const result = await graphql(schema, LoggedInUserQuery, null, context);
+        result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
         expect(data).to.be.null;
       })
@@ -95,20 +93,20 @@ describe('Query Tests', () => {
         return {
           description: "test order",
           user: {
-            email: user.email,
-            paymentMethod: {
-              service: 'stripe',
-              identifier: '4242',
-              expMonth: 1,
-              expYear: 2021,
-              funding: 'credit',
-              brand: 'Visa',
-              country: 'US',
-              token: 'card_1AejcADjPFcHOcTmBJRASiOV',
-              save: true
-            }
+            email: user.email
           },
-          collective: { slug: collective1.slug },
+          paymentMethod: {
+            service: 'stripe',
+            identifier: '4242',
+            expMonth: 1,
+            expYear: 2021,
+            funding: 'credit',
+            brand: 'Visa',
+            country: 'US',
+            token: 'card_1AejcADjPFcHOcTmBJRASiOV',
+            save: true
+          },
+          toCollective: { slug: collective1.slug },
           tier: { id: tier.id }
         }
       }
@@ -117,20 +115,22 @@ describe('Query Tests', () => {
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(generateOrder(user1))}) {
-            user {
+            paymentMethod {
+              brand,
+              identifier
+            },
+            createdByUser {
               id,
-              email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+              email
             }
           }
         }`;
 
         const result = await graphql(schema, query, null, {});
+        result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
-        const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
+        const paymentMethods = await models.PaymentMethod.findAll({ where: { CreatedByUserId: user1.id }});
+        paymentMethods.errors && console.log(paymentMethods.errors);
         expect(paymentMethods).to.have.length(1);
         expect(paymentMethods[0].identifier).to.equal('4242');
       });
@@ -138,24 +138,25 @@ describe('Query Tests', () => {
 
       it("does not save a payment method to the user", async () => {
         const order = generateOrder(user1);
-        order.user.paymentMethod.save = false;
+        order.paymentMethod.save = false;
         const query = `
         mutation createOrder {
           createOrder(order: ${stringify(order)}) {
-            user {
+            createdByUser {
               id,
               email,
-              paymentMethods {
-                brand,
-                identifier
-              }
+            },
+            paymentMethod {
+              brand,
+              identifier
             }
           }
         }`;
 
         const result = await graphql(schema, query, null, {});
+        result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
-        const paymentMethods = await models.PaymentMethod.findAll({where: { UserId: user1.id }});
+        const paymentMethods = await models.PaymentMethod.findAll({where: { CreatedByUserId: user1.id }});
         expect(paymentMethods).to.have.length(1);
         expect(paymentMethods[0].identifier).to.be.null;
       });
@@ -178,26 +179,27 @@ describe('Query Tests', () => {
               orders {
                 id,
                 description,
-                user {
+                createdByUser {
                   id,
-                  name,
-                  paymentMethods {
-                    identifier,
-                    brand
-                  }
+                  firstName
+                },
+                paymentMethod {
+                  identifier,
+                  brand
                 }
               }
             }
           }
         `;
         const result = await graphql(schema, query, null, {});
+        result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
-        expect(orders[0].user.paymentMethods).to.have.length(0);
+        expect(orders[0].paymentMethod).to.be.null;
         const result2 = await graphql(schema, query, null, { remoteUser: user2 });
         const orders2 = result2.data.Tier.orders;
         expect(orders2).to.have.length(1);
-        expect(orders2[0].user.paymentMethods).to.have.length(0);
+        expect(orders2[0].paymentMethod).to.be.null;
       });
 
       it("gets the payment method of the user if logged in as that user", async () => {
@@ -211,7 +213,7 @@ describe('Query Tests', () => {
 
         await graphql(schema, createOrderQuery, null, {});
 
-        await models.PaymentMethod.update({confirmedAt: new Date}, { where: { UserId: user1.id }});
+        await models.PaymentMethod.update({ confirmedAt: new Date }, { where: { CreatedByUserId: user1.id }});
 
         const query = `
           query Tier {
@@ -220,23 +222,24 @@ describe('Query Tests', () => {
               orders {
                 id,
                 description,
-                user {
+                createdByUser {
                   id,
-                  name,
-                  paymentMethods {
-                    identifier,
-                    brand
-                  }
+                  firstName
+                },
+                paymentMethod {
+                  identifier,
+                  brand
                 }
               }
             }
           }
         `;
         const result = await graphql(schema, query, null, { remoteUser: user1 });
+        result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
-        expect(orders[0].user.paymentMethods).to.have.length(1);
-        expect(orders[0].user.paymentMethods[0].identifier).to.equal('4242');
+        console.log("orders", orders);
+        expect(orders[0].paymentMethod.identifier).to.equal('4242');
       });
     });
   });

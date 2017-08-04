@@ -16,8 +16,8 @@ describe('stripe.routes.test.js', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create a host', () => models.User.create(utils.data('host1')).tap(u => host = u));
-  beforeEach('create a user', () => models.User.create(utils.data('user1')).tap(u => user = u));
+  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user = u));
   beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(c => collective = c));
   beforeEach('add host', () => collective.addUserWithRole(host, roles.HOST));
   beforeEach('add backer', () => collective.addUserWithRole(user, roles.BACKER));
@@ -57,7 +57,7 @@ describe('stripe.routes.test.js', () => {
           expect(e).to.not.exist;
 
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(res.body.redirectUrl).to.contain(`state=${collective.id}`)
+          expect(res.body.redirectUrl).to.contain(`state=${host.CollectiveId}`)
           done();
         });
     });
@@ -148,14 +148,9 @@ describe('stripe.routes.test.js', () => {
         }],
 
         checkUser: ['checkStripeAccount', (cb, results) => {
-          models.User.findAndCountAll({
-            where: {
-              StripeAccountId: results.checkStripeAccount.id
-            }
-          })
-          .then(res => {
-            expect(res.count).to.be.equal(1);
-            expect(res.rows[0].id).to.be.equal(host.id);
+          models.Collective.findById(results.checkStripeAccount.id)
+          .then(collective => {
+            expect(collective.id).to.be.equal(host.CollectiveId);
             cb();
           })
           .catch(cb);

@@ -8,7 +8,6 @@ export default {
     "paypalEmail": "paypal+wwcode@opencollective.com",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
-    "isOrganization": true,
     "twitterHandle": "wwcode",
     "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA",
     "currency": "USD"
@@ -23,7 +22,6 @@ export default {
     "password": "passpass",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
-    "isOrganization": false,
     "twitterHandle": "philmod",
     "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA"
   },
@@ -433,18 +431,6 @@ export default {
       }
   ],
 
-  "comments": [
-    {
-      "text": "Where did you buy this?"
-    },
-    {
-      "text": "I think we should go with a V-neck model"
-    },
-    {
-      "text": "No way!"
-    }
-  ],
-
   "transactions1": {
     "transactions": [
       {
@@ -519,7 +505,6 @@ export default {
       "currency": "USD",
       "tags": ["Donation"],
       "status": null,
-      "comment":null,
       "link": null,
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
@@ -536,7 +521,6 @@ export default {
       "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
       "description": "engineer",
-      "isOrganization": false,
       "createdAt":"2016-01-30T07:31:37.747Z",
       "updatedAt":"2016-01-30T07:31:37.889Z",
       "paypalEmail":"philmod+paypal@email.com"

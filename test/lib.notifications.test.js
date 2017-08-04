@@ -24,7 +24,7 @@ describe('lib.notifications.test.js', () => {
   beforeEach(() => utils.resetTestDB());
 
   beforeEach('create user and collective', () => {
-    const promises = [User.create(userData), Collective.create(collectiveData)];
+    const promises = [User.createUserWithCollective(userData), Collective.create(collectiveData)];
     return Promise.all(promises).then(results => {
       user = results[0];
       collective = results[1];

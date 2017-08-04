@@ -5,15 +5,17 @@ import models from '../models';
 import { capitalize } from '../lib/utils';
 import emailLib from './email';
 import roles from '../constants/roles';
-import types from '../constants/collectives';
+import { types } from '../constants/collectives';
 import activities from '../constants/activities';
 import * as transactions from '../constants/transactions';
 import * as stripe from '../gateways/stripe';
 
 /**
  * Creates payment - records the intent to pay in our system 
+ * TODO: refactor to only pass the order instance
  */
 const createPayment = (payload) => {
+
   const {
     order,
     payment
@@ -47,22 +49,28 @@ const createPayment = (payload) => {
 
   const getOrCreatePaymentMethod = (paymentMethod) => {
     if (paymentMethod instanceof models.PaymentMethod.Instance) return Promise.resolve(paymentMethod);
-    else return models.PaymentMethod.create({...paymentMethod, service: 'stripe', UserId: order.UserId});
+    else return models.PaymentMethod.create({
+      ...paymentMethod,
+      service: 'stripe',
+      CreatedByUserId: order.CreatedByUserId,
+      CollectiveId: order.FromCollectiveId
+    });
   }
 
   let collective;
   // fetch Stripe Account and get or create Payment Method
   return Promise.props({
-      stripeAccount: order.getCollective().then(c => {
-        collective = c;
-        return c.getStripeAccount()
-      }),
+      stripeAccount: order.getToCollective()
+        .then(c => {
+          collective = c;
+          return c.getStripeAccount()
+        }),
       paymentMethod: getOrCreatePaymentMethod(paymentMethod)
     })
     .then(results => {
       const stripeAccount = results.stripeAccount;
       if (!stripeAccount || !stripeAccount.accessToken) {
-        return Promise.reject(new Error(`The host for the collective id ${order.CollectiveId} has no Stripe account set up`));
+        return Promise.reject(new Error(`The host for the ${collective.slug} collective has no Stripe account set up`));
       } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.accessToken, 'live')) {
         return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
       } else {
@@ -102,6 +110,7 @@ const createPayment = (payload) => {
  * Returns a Promise with the transaction created
  */
 const processPayment = (order) => {
+
   const services = {
     stripe: (order) => {
 
@@ -109,8 +118,8 @@ const processPayment = (order) => {
         return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
       }
 
-      const collective = order.Collective;
-      const user = order.User;
+      const collective = order.toCollective;
+      const user = order.createdByUser;
       const paymentMethod = order.PaymentMethod;
       const subscription = order.Subscription;
       const tier = order.Tier;
@@ -120,7 +129,7 @@ const processPayment = (order) => {
           hostStripeAccount,
           {
             interval: subscription.interval,
-            amount: order.amount,
+            amount: order.totalAmount,
             currency: order.currency
           })
           .then(plan => stripe.createSubscription(
@@ -158,11 +167,11 @@ const processPayment = (order) => {
         return stripe.createCharge(
           hostStripeAccount,
           {
-            amount: order.amount,
+            amount: order.totalAmount,
             currency: order.currency,
             customer: paymentMethod.customerId,
             description: `OpenCollective: ${collective.slug}`,
-            application_fee: parseInt(order.amount * transactions.OC_FEE_PERCENT / 100, 10),
+            application_fee: parseInt(order.totalAmount * transactions.OC_FEE_PERCENT / 100, 10),
             metadata: {
               collectiveId: collective.id,
               collectiveName: collective.name,
@@ -179,18 +188,19 @@ const processPayment = (order) => {
             const fees = stripe.extractFees(balanceTransaction);
             const hostFeePercent = collective.hostFeePercent;
             const payload = {
-              user,
-              collective,
+              CreatedByUserId: user.id,
+              FromCollectiveId: user.CollectiveId,
+              ToCollectiveId: collective.id,
               paymentMethod
             };
             payload.transaction = {
               type: transactions.type.DONATION,
               OrderId: order.id,
-              amount: order.amount,
+              amount: order.totalAmount,
               currency: order.currency,
               txnCurrency: balanceTransaction.currency,
               amountInTxnCurrency: balanceTransaction.amount,
-              txnCurrencyFxRate: order.amount / balanceTransaction.amount,
+              txnCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
               hostFeeInTxnCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
               platformFeeInTxnCurrency: fees.applicationFee,
               paymentProcessorFeeInTxnCurrency: fees.stripeFee,
@@ -226,7 +236,7 @@ const processPayment = (order) => {
         .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, collective) : null)
 
         // add user to the collective
-        .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER))
+        .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER, order.TierId))
 
         // Mark order row as processed
         .tap(() => order.update({ processedAt: new Date() }))
@@ -269,35 +279,36 @@ const processPayment = (order) => {
         .then(() => transaction); // make sure we return the transaction created
     },
     manual: (order) => {
-      const collective = order.Collective;
-      const user = order.User;
-      let isUserHost, transaction;
+      const collective = order.toCollective;
+      const user = order.createdByUser;
+      let isFromCollectiveHost, transaction;
 
       const payload = {
-        user,
-        collective,
+        CreatedByUserId: user.id,
+        FromCollectiveId: order.FromCollectiveId,
+        ToCollectiveId: order.ToCollectiveId,
         transaction: {
           type: transactions.type.DONATION,
           OrderId: order.id,
-          amount: order.amount,
+          amount: order.totalAmount,
           currency: order.currency,
           txnCurrency: order.currency,
-          amountInTxnCurrency: order.amount,
+          amountInTxnCurrency: order.totalAmount,
           txnCurrencyFxRate: 1,
           platformFeeInTxnCurrency: 0,
           paymentProcessorFeeInTxnCurrency: 0,
         }
       }
       return collective
-        .getHost()
-        .then(host => host.id === user.id)
-        .tap(isHost => isUserHost = isHost)
-        .then(isUserHost => {
-          payload.transaction.hostFeeInTxnCurrency = isUserHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.amount);
+        .getHostId()
+        .then(HostId => HostId === order.FromCollectiveId)
+        .tap(isHost => isFromCollectiveHost = isHost)
+        .then(isFromCollectiveHost => {
+          payload.transaction.hostFeeInTxnCurrency = isFromCollectiveHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.totalAmount);
           return models.Transaction.createFromPayload(payload);
         })
         .then(t => transaction = t)
-        .then(() => !isUserHost ? collective.findOrAddUserWithRole(user, roles.BACKER) : Promise.resolve())
+        .then(() => !isFromCollectiveHost ? collective.findOrAddUserWithRole(user, roles.BACKER, order.TierId) : Promise.resolve())
         .then(() => order.update({ processedAt: new Date }))
         .then(() => transaction); // make sure we return the transaction created
     }
@@ -306,8 +317,9 @@ const processPayment = (order) => {
   return models.Order.findOne({
       where: { id: order.id },
       include: [
-        { model: models.User },
-        { model: models.Collective },
+        { model: models.User, as: 'createdByUser' },
+        { model: models.Collective, as: 'fromCollective' },
+        { model: models.Collective, as: 'toCollective' },
         { model: models.PaymentMethod },
         { model: models.Subscription },
         { model: models.Tier }
@@ -317,7 +329,6 @@ const processPayment = (order) => {
       if (!order.PaymentMethod) {
         return services.manual(order);
       } else {
-        console.log("order.PaymentMethod.service", order.PaymentMethod.service);
         return services[order.PaymentMethod.service](order)
       }
     });

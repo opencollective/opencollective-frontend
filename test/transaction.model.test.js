@@ -16,17 +16,18 @@ describe('transaction model', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
-  beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
   beforeEach('create collective2 and add host', () =>
     models.Collective.create(collectiveData)
       .tap(g => collective = g)
       .tap(() => {
         defaultTransactionData = {
-          UserId: user.id,
-          HostId: host.id,
-          CollectiveId: collective.id
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: collective.id,
+          HostCollectiveId: host.CollectiveId
         };
       })
       .then(() => collective.addUserWithRole(host, roles.HOST)));
@@ -48,28 +49,26 @@ describe('transaction model', () => {
       ...defaultTransactionData,
       amount: 10000
     })
-    .then(transaction => transaction.getHost())
-    .then(h => {
-      expect(h.id).to.equal(host.id);
+    .then(transaction => {
+      expect(transaction.HostCollectiveId).to.equal(host.CollectiveId);
       done();
     })
   });
 
-  it('createFromPayload creates a new Transaction', done => {
-    Transaction.createFromPayload({
+  it('createFromPayload creates a new Transaction', () => {
+    return Transaction.createFromPayload({
       transaction: transactionsData[7],
-      user,
-      collective
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      ToCollectiveId: collective.id
     })
     .then(() => {
-      Transaction.findAll()
+      return Transaction.findAll()
       .then(transactions => {
         expect(transactions.length).to.equal(1);
         expect(transactions[0].description).to.equal(transactionsData[7].description);
-        done();
       })
     })
-    .catch(done);
   })
 
   it('createFromPayload() generates a new activity', (done) => {
@@ -82,11 +81,12 @@ describe('transaction model', () => {
 
     Transaction.createFromPayload({
       transaction: transactionsData[7],
-      user,
-      collective
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      ToCollectiveId: collective.id
     })
     .then(transaction => {
-      expect(transaction.CollectiveId).to.equal(collective.id);
+      expect(transaction.ToCollectiveId).to.equal(collective.id);
     })
     .catch(done);
   });

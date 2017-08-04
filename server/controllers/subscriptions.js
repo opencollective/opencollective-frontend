@@ -11,12 +11,12 @@ export const getAll = (req, res, next) => {
     include: [{
       model: models.Order,
       where: {
-        UserId: req.remoteUser.id
+        CreatedByUserId: req.remoteUser.id
       },
       include: [
         { model: models.Transaction },
-        { model: models.Collective },
-        { model: models.User }
+        { model: models.Collective, as: 'toCollective' },
+        { model: models.User, as: 'createdByUser' }
       ]
     }]
   })
@@ -35,9 +35,9 @@ export const cancel = (req, res, next) => {
   // fetch subscription (through Order)
   return models.Order.find({
     include: [
-      { model: models.Collective },
+      { model: models.Collective, as: 'toCollective' },
       { model: models.PaymentMethod },
-      { model: models.User },
+      { model: models.User, as: 'createdByUser' },
       { model: models.Subscription,
         where: {
           id: subscriptionid
@@ -49,7 +49,7 @@ export const cancel = (req, res, next) => {
       Promise.reject(new errors.BadRequest(`No subscription found with id ${subscriptionid}. Please contact support@opencollective.com for help.`)))
 
   // get stripe account for accessToken
-  .then(() => order.Collective.getStripeAccount())
+  .then(() => order.toCollective.getStripeAccount())
 
   // cancel subscription on Stripe
   .then(stripeAccount => {
@@ -62,16 +62,15 @@ export const cancel = (req, res, next) => {
 
   // deactivate Subscription on our end
   .then(() => order.Subscription.deactivate())
-
   // createActivity
   .then(() => models.Activity.create({
         type: activities.SUBSCRIPTION_CANCELED,
-        CollectiveId: order.Collective.id,
-        UserId: order.User.id,
+        CollectiveId: order.toCollective.id,
+        UserId: order.createdByUser.id,
         data: {
           subscription: order.Subscription,
-          collective: order.Collective.minimal,
-          user: order.User.minimal
+          collective: order.toCollective.minimal,
+          user: order.createdByUser.minimal
         }
       }))
   .then(() => res.send({ success: true }))

@@ -7,7 +7,6 @@ import getDiscoverPage from './controllers/discover';
 import * as orders from './controllers/orders';
 import * as transactions from './controllers/transactions';
 import * as expenses from './controllers/expenses';
-import * as comments from './controllers/comments';
 import * as collectives from './controllers/collectives';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
@@ -15,7 +14,6 @@ import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
 import getPaymentMethods from './controllers/paymentMethods';
 import * as paypal from './controllers/paypal';
-import getProfilePage from './controllers/profile';
 import * as stripe from './controllers/stripe';
 import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
@@ -71,8 +69,6 @@ export default (app) => {
   /**
    * User reset password or new token flow (no jwt verification)
    */
-  app.post('/users/password/forgot', required('email'), users.forgotPassword); // Send forgot password email
-  app.post('/users/password/reset/:userid_enc/:reset_token', required('password', 'passwordConfirmation'), users.resetPassword); // Reset password`
   app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
   app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
@@ -90,7 +86,6 @@ export default (app) => {
   app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
-  app.param('commentid', params.commentid);
 
   /**
    * GraphQL
@@ -114,10 +109,6 @@ export default (app) => {
    */
   app.get('/homepage', getHomePage);
 
-  /**
-   * Profile page of a user, organization or collective
-   */
-  app.get('/profile/:slug', getProfilePage);
 
   /**
    * Discover
@@ -128,11 +119,7 @@ export default (app) => {
    * Users.
    */
   app.post('/users', required('user'), users.create); // Create a user.
-  app.get('/users/:userid', users.show); // Get a user.
-  app.put('/users/:userid', required('user'), users.updateUser); // Update a user (needs to be logged as user or user must not have a password and made recent order)
-  app.put('/users/:userid/password', auth.mustBeLoggedInAsUser, required('password', 'passwordConfirmation'), users.updatePassword); // Update a user password.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
-  app.put('/users/:userid/image', required('image'), auth.mustBeLoggedInAsUser, users.updateAvatar); // Update a user's image
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
   // TODO: Why is this a PUT and not a GET?
@@ -172,8 +159,8 @@ export default (app) => {
   app.post('/collectives', required('collective'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/collectives/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
   app.get('/collectives/:collectiveid', collectives.getOne);
-  app.get('/collectives/:collectiveid/users', cache(60), collectives.getUsers); // Get collective users
-  app.get('/collectives/:collectiveid/users.csv', cache(60), mw.format('csv'), collectives.getUsers);
+  app.get('/collectives/:collectiveid/:tierSlug(backers|users)', cache(60), collectives.getUsers); // Get collective backers
+  app.get('/collectives/:collectiveid/:tierSlug(backers|users).csv', cache(60), mw.format('csv'), collectives.getUsers);
   app.put('/collectives/:collectiveid', auth.canEditCollective, required('collective'), collectives.update); // Update a collective.
   app.put('/collectives/:collectiveid/settings', auth.canEditCollective, required('collective'), collectives.updateSettings); // Update collective settings
   app.delete('/collectives/:collectiveid', NotImplemented); // Delete a collective.
@@ -185,10 +172,7 @@ export default (app) => {
    *
    *  Relations between a collective and a user.
    */
-  app.get('/users/:userid/collectives', users.getCollectives); // Get user's collectives.
   app.post('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
-  app.put('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.updateUser); // Update a user's role in a collective.
-  app.delete('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.deleteUser); // Remove a user from a collective.
 
   /**
    * Transactions (financial).
@@ -213,15 +197,7 @@ export default (app) => {
   app.post('/collectives/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/collectives/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
 
-  /**
-   * Comments
-   */
-  app.get('/collectives/:collectiveid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), comments.list); // Get latest comments for a collective
-  app.get('/collectives/:collectiveid/expenses/:expenseid/comments', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'ASC'}), comments.list); // Get latest comments for an expense
-  app.put('/collectives/:collectiveid/expenses/:expenseid/comments/:commentid/approve', auth.canEditComment, comments.approve); // Approve comment
-  app.post('/collectives/:collectiveid/expenses/:expenseid/comments', required('comment'), mw.getOrCreateUser, comments.create); // Create a comment as a new user
-  app.delete('/collectives/:collectiveid/expenses/:expenseid/comments/:commentid', auth.canEditComment, comments.deleteComment); // Delete a comment
-
+  
   /**
    * Orders
    */

@@ -10,7 +10,6 @@ import Promise from 'bluebird';
 
 import {decrypt, encrypt} from '../lib/utils';
 import errors from '../lib/errors';
-import queries from '../lib/queries';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
 import imageUrlLib from '../lib/imageUrlToAmazonUrl';
@@ -64,22 +63,6 @@ export default (Sequelize, DataTypes) => {
         },
         isEmail: {
           msg: 'Email must be valid'
-        }
-      }
-    },
-
-    organization: DataTypes.STRING,
-
-    isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
-
-    currency: {
-      type: DataTypes.STRING,
-      validate: {
-        len: 3
-      },
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
         }
       }
     },
@@ -141,16 +124,6 @@ export default (Sequelize, DataTypes) => {
 
     resetPasswordSentAt: DataTypes.DATE,
 
-    referrerId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    },
-
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -173,6 +146,10 @@ export default (Sequelize, DataTypes) => {
 
       username() {
         return this.userCollective.then(collective => collective.slug);
+      },
+
+      name() {
+        return this.userCollective.then(collective => collective.name);
       },
 
       twitterHandle() {
@@ -201,10 +178,7 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
           email: this.email,
-          organization: this.organization,
-          isOrganization: this.isOrganization,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           paypalEmail: this.paypalEmail
@@ -217,9 +191,6 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
-          organization: this.organization,
-          isOrganization: this.isOrganization,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
@@ -241,10 +212,7 @@ export default (Sequelize, DataTypes) => {
         return {
           id: this.id,
           firstName: this.firstName,
-          lastName: this.lastName,
-          name: this.name,
-          organization: this.organization,
-          isOrganization: this.isOrganization
+          lastName: this.lastName
         };
       }
     },
@@ -316,24 +284,21 @@ export default (Sequelize, DataTypes) => {
         return this.jwt({ scope: 'connected-account', connectedAccountId, username }, expiresInHours);
       },
 
-      getLatestDonations(since, until, tags) {
-        tags = tags || [];
-        return models.Transaction.findAll({
+      getMemberships(options = {}) {
+        const query = {          
           where: {
-            UserId: this.id,
-            createdAt: { $gte: since || 0, $lt: until || new Date}
+            MemberCollectiveId: this.CollectiveId
           },
-          order: [ ['amount','DESC'] ],
-          include: [ { model: models.Collective, where: { tags: { $contains: tags } } } ]
-        });
+          ...options
+        };
+        return models.Member.findAll(query);
       },
 
-      getMembers() {
-        return models.Member.findAll({
-          where: {
-            UserId: this.id
-          }
-        });
+      getCollectives(options = {}) {
+        return this.getMemberships({
+          ... options,
+          include: [ { model: models.Collective, as: 'collective' } ]
+        }).map(membership => membership.collective);
       },
 
       unsubscribe(CollectiveId, type, channel = 'email') {
@@ -354,7 +319,7 @@ export default (Sequelize, DataTypes) => {
       },
 
       canEditCollective(collectiveid) {
-        return hasRole(this.id, collectiveid, ['ADMIN', 'HOST']);
+        return hasRole(this.CollectiveId, collectiveid, ['ADMIN', 'HOST']);
       },
 
       // should be deprecated
@@ -421,15 +386,17 @@ export default (Sequelize, DataTypes) => {
     classMethods: {
 
       createMany: (users, defaultValues = {}) => {
-        return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), {concurrency: 1});
+        return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), { concurrency: 1 });
       },
 
-      auth(usernameOrEmail, password, cb) {
-        const msg = 'Invalid username/email or password.';
-        usernameOrEmail = usernameOrEmail.toLowerCase();
+      auth(email, password, cb) {
+        if (!email) return cb(new errors.BadRequest(msg));
+
+        const msg = 'Invalid email or password.';
+        email = email.toLowerCase();
 
         User.find({
-          where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail]
+          where: ['email = ?', email]
         })
         .then((user) => {
           if (!user) return cb(new errors.BadRequest(msg));
@@ -453,10 +420,6 @@ export default (Sequelize, DataTypes) => {
         return decrypt(encrypted);
       },
 
-      getTopBackers(since, until, tags, limit) {
-        return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5);
-      },
-
       findOrCreateByEmail(email, otherAttributes) {
         return User.findOne({
           where: {
@@ -476,7 +439,7 @@ export default (Sequelize, DataTypes) => {
             user = u;
             const userCollective = {
               type: 'USER',
-              name: user.name || user.email.split(/@|\+/)[0],
+              name: user.name || user.email && user.email.split(/@|\+/)[0],
               image: userData.image,
               mission: userData.mission,
               description: userData.description,
@@ -489,9 +452,11 @@ export default (Sequelize, DataTypes) => {
             };
             return models.Collective.create(userCollective);
           })
-          .then(collective => {
+          .tap(collective => {
             user.CollectiveId = collective.id;
-            user.save();
+            return user.save();
+          })
+          .then(collective => {
             user.collective = collective;
             return user;
           })

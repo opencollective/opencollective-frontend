@@ -142,7 +142,11 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     createPaypalPaymentMethod: ['createTestUser', (cb, results) => {
-      models.PaymentMethod.create({ service: 'paypal', UserId: results.createTestUser.id})
+      models.PaymentMethod.create({
+        service: 'paypal',
+        CreatedByUserId: results.createTestUser.id,
+        CollectiveId: results.createTestUser.CollectiveId
+      })
       .then(() => cb())
       .catch(cb);
     }],
