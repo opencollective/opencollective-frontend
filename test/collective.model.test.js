@@ -217,7 +217,6 @@ describe('Collective model', () => {
     .then(() => collective.getRelatedCollectives(3, 0))
     .then(relatedCollectives => {
       expect(relatedCollectives).to.have.length(3);
-      expect(relatedCollectives[0].settings.style.hero).to.have.property('cover');
       done();
     })
   });
