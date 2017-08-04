@@ -213,8 +213,8 @@ export default function(Sequelize, DataTypes) {
         return {
           name: this.locationName,
           address: this.address,
-          lat: this.geoLocationLatLong && this.geoLocationLatLong.coordinates.coordinates && this.geoLocationLatLong.coordinates[0],
-          long: this.geoLocationLatLong && this.geoLocationLatLong.coordinates.coordinates && this.geoLocationLatLong.coordinates[1]
+          lat: this.geoLocationLatLong && this.geoLocationLatLong.coordinates && this.geoLocationLatLong.coordinates[0],
+          long: this.geoLocationLatLong && this.geoLocationLatLong.coordinates && this.geoLocationLatLong.coordinates[1]
         }
       },
 
