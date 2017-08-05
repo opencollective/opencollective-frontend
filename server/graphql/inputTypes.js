@@ -107,6 +107,8 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     timezone: { type: GraphQLString },
     maxAmount: { type: GraphQLInt },
     currency: { type: GraphQLString },
+    image: { type: GraphQLString },
+    backgroundImage: { type: GraphQLString },
     tiers: { type: new GraphQLList(TierInputType) },
     ParentCollectiveId: { type: GraphQLInt }
   })

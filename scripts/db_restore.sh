@@ -52,7 +52,7 @@ dropdb $LOCALDBNAME;
 createdb -O $LOCALDBUSER $LOCALDBNAME 2> /dev/null
 
 # Add POSTGIS extension
-psql "${LOCALDBNAME}" -c "CREATE EXTENSION POSTGIS;" 2> /dev/null
+psql "${LOCALDBNAME}" -c "CREATE EXTENSION POSTGIS;" 1> /dev/null
 
 # The first time we run it, we will trigger FK constraints errors
 set +e
