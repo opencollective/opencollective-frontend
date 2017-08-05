@@ -65,6 +65,9 @@ class InputTypeCreditCard extends React.Component {
         .CreditCardForm {
           max-width: 350px;          
         }
+        .CreditCardForm :global(.form-group) {
+          margin: 0;
+        }
         #card-wrapper {
           margin: 0 0 2rem 0;
         }
@@ -124,16 +127,23 @@ class InputTypeCreditCard extends React.Component {
               }                          
             >
               <div className="ccform">
-                <FormGroup validationState={(!this.state.number || Payment.fns.validateCardNumber(this.state.number)) ? '' : 'error'} id="CCnumber">
-                  <FormControl placeholder="Card number" type="text" name="CCnumber" defaultValue={this.props.number} onChange={(e) => this.handleChange("number", e.target.value)} />
+                <FormGroup validationState={(!this.state.number || Payment.fns.validateCardNumber(this.state.number)) ? null : 'error'} controlId="CCnumber">
+                  <FormControl
+                    placeholder="Card number"
+                    type="text"
+                    name="CCnumber"
+                    key="CCnumber"
+                    defaultValue={this.props.number}
+                    onChange={(e) => this.handleChange("number", e.target.value)}
+                    />
                   <FormControl.Feedback />
                 </FormGroup>
                 <div className="oneline">
-                  <FormControl placeholder="Full name" type="text" name="CCname" id="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
-                  <FormControl placeholder="MM/YY" type="text" name="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
-                  <FormControl placeholder="CVC" type="text" name="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
+                  <FormControl placeholder="Full name" type="text" name="CCname" key="CCname" controlId="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
+                  <FormControl placeholder="MM/YY" type="text" name="CCexpiry" key="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
+                  <FormControl placeholder="CVC" type="text" name="CCcvc" key="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
                 </div>
-                <Checkbox defaultChecked={true} onChange={(e) => this.handleChange("save", e.target.checked)}>Save Card</Checkbox>
+                <Checkbox key="saveCard" defaultChecked={true} onChange={(e) => this.handleChange("save", e.target.checked)}>Save Card</Checkbox>
               </div>
           </CardReactFormContainer>
         </div>

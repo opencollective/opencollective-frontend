@@ -80,8 +80,8 @@ class Transactions extends React.Component {
         { transactions.length % 10 === 0 &&
           <div className="loadMoreBtn">
             <Button bsStyle='default' onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id='transactions.loading' defaultMessage='loading' />}
-              {!this.state.loading && <FormattedMessage id='transactions.loadMore' defaultMessage='load more' />}
+              {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
+              {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
             </Button>
           </div>
         }

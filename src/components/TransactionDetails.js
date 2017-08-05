@@ -77,7 +77,7 @@ class TransactionDetails extends React.Component {
             font-family: lato, montserratlight, arial;
             white-space: nowrap;
           }
-          .netAmountInGroupCurrency {
+          .netAmountInCollectiveCurrency {
             font-weight: bold;
           }
 
@@ -112,9 +112,9 @@ class TransactionDetails extends React.Component {
           <label><FormattedMessage id='transaction.amount' defaultMessage='amount' /></label>
           <div className="amountDetails">
             <span>{amountDetailsStr}</span>
-            <span className="netAmountInGroupCurrency">&nbsp;=&nbsp;
+            <span className="netAmountInCollectiveCurrency">&nbsp;=&nbsp;
               <FormattedNumber
-                value={transaction.netAmountInGroupCurrency / 100}
+                value={transaction.netAmountInCollectiveCurrency / 100}
                 currency={transaction.currency}
                 {...this.currencyStyle}
                 />

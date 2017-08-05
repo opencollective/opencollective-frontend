@@ -19,8 +19,8 @@ class EditEventForm extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleTiersChange = this.handleTiersChange.bind(this);
     
-    const event = props.event || {};
-
+    const event = { ... props.event || {} };
+    event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
     this.state = { event, tiers: event.tiers || [{}] };
 
     this.messages = defineMessages({
@@ -28,7 +28,7 @@ class EditEventForm extends React.Component {
       'type.label': { id: 'event.type.label', defaultMessage: 'type' },
       'name.label': { id: 'event.name.label', defaultMessage: 'name' },
       'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
-      'description.label': { id: 'event.description.label', defaultMessage: 'description' },
+      'longDescription.label': { id: 'event.longDescription.label', defaultMessage: 'description' },
       'startsAt.label': { id: 'event.startsAt.label', defaultMessage: 'start date and time' },
       'endsAt.label': { id: 'event.endsAt.label', defaultMessage: 'end date and time' },
       'location.label': { id: 'event.location.label', defaultMessage: 'location' }
@@ -71,7 +71,7 @@ class EditEventForm extends React.Component {
 
     const { event, loading, intl } = this.props;
 
-    if (!event.collective) return (<div />);
+    if (!event.parentCollective) return (<div />);
 
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? "loading" : isNew ? "Create Event" : "Save";
@@ -82,7 +82,7 @@ class EditEventForm extends React.Component {
     this.fields = [
       {
         name: 'slug',
-        pre: `https://opencollective.com/${event.collective.slug}/events/`,
+        pre: `https://opencollective.com/${event.parentCollective.slug}/events/`,
         placeholder: ''
       },
       {
@@ -90,7 +90,7 @@ class EditEventForm extends React.Component {
         placeholder: ''
       },
       {
-        name: 'description',
+        name: 'longDescription',
         type: 'textarea',
         placeholder: ''
       },
@@ -154,7 +154,7 @@ class EditEventForm extends React.Component {
           margin: 0 auto;
         }
 
-        :global(textarea#description) {
+        :global(textarea[name=longDescription]) {
           height: 30rem;
         }
 
@@ -186,7 +186,7 @@ class EditEventForm extends React.Component {
               onChange={(value) => this.handleChange(field.name, value)}
               />)}
           </div>
-          <EditTiers title="Tickets" tiers={this.state.tiers} currency={event.collective.currency} onChange={this.handleTiersChange} />
+          <EditTiers title="Tickets" tiers={this.state.tiers} currency={event.parentCollective.currency} onChange={this.handleTiersChange} />
         </div>
         <div className="actions">
           <Button type="submit" className="green" ref="submit" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />

@@ -1,7 +1,8 @@
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
-import { addEventData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { intersection } from 'lodash';
 
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
@@ -15,8 +16,8 @@ class EventPage extends React.Component {
     this.state = {};
   }
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug } }) {
-    return { collectiveSlug, eventSlug }
+  static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
+    return { parentCollectiveSlug, eventSlug, slug: `${parentCollectiveSlug}/events/${eventSlug}` }
   }
 
   async componentDidMount() {
@@ -26,21 +27,23 @@ class EventPage extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, slug, parentCollectiveSlug } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
-    if (!data.Event) return (<NotFound />);
+    if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
 
-    const event = data.Event;
+    const event = data.Collective;
 
     if (LoggedInUser) {
-      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
+      LoggedInUser.canEditEvent = (event.createdByUser && event.createdByUser.id === LoggedInUser.id) 
+        || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length
+        || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length;
     }
 
     return (
@@ -51,4 +54,4 @@ class EventPage extends React.Component {
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addEventData(withIntl(EventPage))));
+export default withData(addGetLoggedInUserFunction(addEventCollectiveData(withIntl(EventPage))));

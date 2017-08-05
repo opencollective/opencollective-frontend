@@ -12,7 +12,7 @@ import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 
-const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
+const defaultBackgroundImage = '/static/images/defaultBackgroundImage-profile.svg';
 
 class Profile extends React.Component {
 
@@ -37,19 +37,6 @@ class Profile extends React.Component {
     window.oc = { user: this.user }; // for easy debugging
   }
 
-  getDefaultActions(props) {
-    const { LoggedInUser } = props || this.props;
-    const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
-    if (LoggedInUser && LoggedInUser.canEditUser) {
-      return [...this.defaultActions, {
-        className: 'whiteblue small',
-        component: <a href={editUrl}>EDIT</a>
-      }]
-    } else {
-      return this.defaultActions;
-    }
-  }
-
   render() {
     const info = (
       <HashLink to="#location">
@@ -57,16 +44,16 @@ class Profile extends React.Component {
       </HashLink>
     );
 
-    const backgroundImage = this.event.backgroundImage || this.event.collective.backgroundImage || defaultBackgroundImage;
+    const backgroundImage = this.profile.backgroundImage || this.profile.parentCollective.backgroundImage || defaultBackgroundImage;
 
     return (
       <div className="EventPage">
 
         <Header
           title={this.user.name}
-          description={this.event.description}
-          twitterHandle={this.event.collective.twitterHandle}
-          image={this.event.collective.logo || backgroundImage}
+          description={this.profile.description}
+          twitterHandle={this.profile.parentCollective.twitterHandle}
+          image={this.profile.image || backgroundImage}
           className={this.state.status}
           LoggedInUser={this.props.LoggedInUser}
           />
@@ -79,9 +66,9 @@ class Profile extends React.Component {
 
             {this.state.view === 'default' &&
               <CollectiveCover
-                collective={this.event.collective}
-                logo={this.event.collective.logo}
-                title={this.event.name}
+                href={`/${this.profile.parentCollective.slug}`}
+                logo={this.profile.image}
+                title={this.profile.name}
                 backgroundImage={backgroundImage}
                 />
             }
@@ -94,7 +81,7 @@ class Profile extends React.Component {
             <div>
               <div className="content" >
                 <div className="eventDescription" >
-                  <Markdown source={this.event.description} />
+                  <Markdown source={this.profile.description} />
                 </div>
 
                 <div id="collectives">

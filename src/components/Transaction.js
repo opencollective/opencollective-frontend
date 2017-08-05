@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
-import { pickAvatar } from '../lib/user.lib';
+import { pickAvatar } from '../lib/collective.lib';
 import { get } from 'lodash';
 import TransactionDetails from './TransactionDetails';
 
@@ -119,7 +119,7 @@ class Transaction extends React.Component {
         </div>
         <div className="user">
           <a href={`/${transaction.user.username}`} title={transaction.user.name}>
-            <img src={imagePreview(transaction.user.avatar,pickAvatar(transaction.user.id), { width: 80 })} />
+            <img src={imagePreview(transaction.user.image,pickAvatar(transaction.user.id), { width: 80 })} />
           </a>
         </div>
         <div className="body">

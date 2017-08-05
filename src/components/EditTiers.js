@@ -30,10 +30,8 @@ class EditTiers extends React.Component {
     this.defaultType = this.props.defaultType || 'TICKET';
 
     this.messages = defineMessages({
-      'TIER': { id: 'tier.type.tier', defaultMessage: 'default tier' },
+      'TIER': { id: 'tier.type.tier', defaultMessage: 'tier' },
       'TICKET': { id: 'tier.type.ticket', defaultMessage: 'ticket' },
-      'BACKER': { id: 'tier.type.backer', defaultMessage: 'backer tier' },
-      'SPONSOR': { id: 'tier.type.sponsor', defaultMessage: 'sponsor tier' },
       'TIER.remove': { id: 'tier.type.tier.remove', defaultMessage: 'remove tier' },
       'TICKET.remove': { id: 'tier.type.ticket.remove', defaultMessage: 'remove ticket' },
       'BACKER.remove': { id: 'tier.type.backer.remove', defaultMessage: 'remove tier' },
@@ -67,7 +65,7 @@ class EditTiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(['BACKER', 'SPONSOR', 'TICKET']),
+        options: getOptions(['TIER', 'TICKET']),
         defaultValue: this.defaultType,
         label: intl.formatMessage(this.messages['type.label'])
       },
@@ -91,7 +89,7 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['onetime','month','year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: (tier) => tier.type !== 'TICKET'
+        when: (tier) => tier.type && tier.type !== 'TICKET'
       }
     ];
   }

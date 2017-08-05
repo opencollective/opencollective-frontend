@@ -1,21 +1,21 @@
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
-import { addEventCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { addCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
-import EditEvent from '../components/EditEvent';
+import EditCollective from '../components/EditCollective';
 import { intersection } from 'lodash';
 
-class EditEventPage extends React.Component {
+class EditCollectivePage extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = { loading: true };
   }
 
-  static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
-    return { parentCollectiveSlug, eventSlug, slug: `${parentCollectiveSlug}/events/${eventSlug}` }
+  static getInitialProps ({ query: { slug } }) {
+    return { slug };
   }
 
   async componentDidMount() {
@@ -36,20 +36,22 @@ class EditEventPage extends React.Component {
     }
 
     const { LoggedInUser } = this.state;
-    const event = data.Collective;
+    const collective = data.Collective;
 
+    window.OC = { collective };
+    
     if (LoggedInUser) {
-      LoggedInUser.canEditEvent = (event.createdByUser && event.createdByUser.id === LoggedInUser.id) 
+      LoggedInUser.canEditCollective = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
         || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length
         || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length;
     }
 
     return (
       <div>
-        <EditEvent event={event} LoggedInUser={LoggedInUser} />
+        <EditCollective collective={collective} LoggedInUser={LoggedInUser} />
       </div>
     );
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addEventCollectiveData(withIntl(EditEventPage))));
+export default withData(addGetLoggedInUserFunction(addCollectiveData(withIntl(EditCollectivePage))));

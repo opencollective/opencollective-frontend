@@ -54,8 +54,8 @@ class Tiers extends React.Component {
         <Header />
         <Body>
           <CollectiveCover
-            collective={Collective}
-            logo={Collective.logo}
+            href={`/${Collective.slug}`}
+            logo={Collective.image}
             title={intl.formatMessage(this.messages[`tiers.title`])}
             className="small"
             backgroundImage={Collective.backgroundImage}

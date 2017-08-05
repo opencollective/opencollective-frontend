@@ -20,8 +20,14 @@ class Button extends React.Component {
     style: PropTypes.object
   }
 
-  onClick() {
-    !this.props.disabled && this.props.onClick && this.props.onClick();
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick(e) {
+    e.preventDefault();
+    return !this.props.disabled && this.props.onClick && this.props.onClick();
   }
 
   render() {
@@ -31,21 +37,22 @@ class Button extends React.Component {
         disabled={this.props.disabled}
         style={this.props.style}
         className={`Button ${this.props.className}`}
-        onClick={this.onClick.bind(this)} >
+        onClick={this.onClick} >
         <style jsx>{`
         .Button {
           width: 100%;
           max-width: 400px;
           --webkit-appearance: none;
           background: transparent;
-          font-family: montserratlight;
+          font-family: montserratlight, Montserrat, arial;
           font-weight: bold;
-          font-size: 1.7rem;
+          font-size: 1.3rem;
           padding: 0;
           height: 6rem;
           border: 1px solid transparent;
           text-transform: uppercase;
           color: ${colors.darkgray};
+          letter-spacing: 4px;
         }
         .Button:focus {
           outline: 0;
@@ -74,14 +81,35 @@ class Button extends React.Component {
         .whiteblue, .whiteblue :global(a) {
           color: ${colors.blue};
           background: white;
+          background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
+          border: solid 1px rgba(0, 0, 0, 0.15);          
         }
         .whiteblue.small {
           width: 20rem;
+        }
+        .whiteblue:hover {
+          background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
+          box-shadow: 0 0 4px 0 rgba(63, 175, 240, 0.4);
+          border: solid 1px #3faff0;          
+        }
+        .whiteblue:active {
+          background-image: linear-gradient(to top, #ffffff, #f3f6f8);
+          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.05);
+          border: solid 1px rgba(0, 0, 0, 0.15);          
         }
         .blue {
           color: white;
           border-color: ${colors.blue};
           background: ${colors.blue};
+          border-radius: 3px;
+          background-image: linear-gradient(to bottom, #52bbf8, #2fa8ee);
+        }
+        .blue:hover {
+          background-image: linear-gradient(to bottom, #7acfff, #4cbeff);          
+        }
+        .blue:active {
+          background-image: linear-gradient(to top, #52bbf8, #2fa8ee);
+          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.1);          
         }
         .gray {
           color: ${colors.darkgray};

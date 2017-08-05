@@ -43,7 +43,7 @@ We may also obtain information from other sources.  For example, if you connect 
     <td>We may share information about you as follows or as otherwise described in this Privacy Policy:
 <ul>
 <li>With hosts and organizers of a collective, if you are a contributor, or request reimbursement for expenses made in support, of that collective</li>
-<li>We will share your name and avatar with Github if you participate in a collective that is also working on a software project through Github.</li>
+<li>We will share your name and image with Github if you participate in a collective that is also working on a software project through Github.</li>
 <li>With vendors, consultants and other service providers who need access to such information to carry out work on our behalf. If you submit a request to us, we will provide you with a list of the third-party service providers with which we have shared information about you for the 12 months prior to your request;</li>
 <li>In response to a request for information if we believe disclosure is in accordance with, or required by, any applicable law, regulation or legal process;</li>
 <li>If we believe your actions are inconsistent with our user agreements or policies, or to protect the rights, property and safety of Open Collective or others;</li>

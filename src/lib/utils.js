@@ -46,6 +46,11 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
   return defaultImage;
 }
 
+export function prettyUrl(url) {
+  if (!url) return '';
+  return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '');
+}
+
 export function formatCurrency(amount, currency = 'USD', intl) {
   if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
   amount = amount / 100;
@@ -57,9 +62,25 @@ export function formatCurrency(amount, currency = 'USD', intl) {
   })
 };
 
+export const singular = (str) => {
+  if (!str) return '';
+  return str.replace(/ies$/,'y').replace(/s$/,'');
+}
+
 export const pluralize = (str, n) => {
   return (n > 1) ? `${str}s` : str;
 }
+
+export const translateApiUrl = (url) => {
+  const withoutParams = process.env.API_URL + (url.replace('/api/', '/'));
+  const hasParams = `${url}`.match(/\?/) 
+  if (process.env.API_KEY) {
+    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
+  } else {
+    return withoutParams;
+  }
+};
+
 
 export const capitalize = (str) => {
   if (!str) return '';

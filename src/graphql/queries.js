@@ -4,29 +4,28 @@ import gql from 'graphql-tag'
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
     LoggedInUser {
-      id,
-      username,
-      firstName,
-      lastName,
-      twitterHandle,
-      description,
-      organization,
-      website,
-      email,
-      avatar,
-      collectives {
-        id,
-        slug,
-        name,
+      id
+      username
+      firstName
+      lastName
+      email
+      image
+      memberships {
+        id
         role
+        collective {
+          id
+          slug
+          name
+        }
       }
       paymentMethods {
-        id,
-        uuid,
-        identifier,
-        brand,
-        funding,
-        expMonth,
+        id
+        uuid
+        identifier
+        brand
+        funding
+        expMonth
         expYear
       }
     }
@@ -36,28 +35,28 @@ export const getLoggedInUserQuery = gql`
 export const getUserQuery = gql`
   query User($username: String!) {
     User(username: $username) {
-      id,
-      username,
-      firstName,
-      lastName,
-      twitterHandle,
-      description,
-      organization,
-      website,
-      email,
-      avatar,
+      id
+      username
+      firstName
+      lastName
+      twitterHandle
+      description
+      organization
+      website
+      email
+      image
       collectives {
-        id,
-        slug,
-        name,
-        role,
-        memberSince,
-        totalDonations,
+        id
+        slug
+        name
+        role
+        memberSince
+        totalDonations
         tier {
-          id,
-          name,
-          amount,
-          currency,
+          id
+          name
+          amount
+          currency
           interval
         }
       }
@@ -65,96 +64,199 @@ export const getUserQuery = gql`
   }
 `;
 
-export const getCollectiveQuery = gql`
-  query Collective($collectiveSlug: String!) {
-    Collective(collectiveSlug: $collectiveSlug) {
-      id,
-      slug,
-      name,
-      description,
-      backgroundImage,
-      logo,
-      currency
-    }
-  }
-`;
-
 const getTiersQuery = gql`
-  query Collective($collectiveSlug: String!) {
-    Collective(collectiveSlug: $collectiveSlug) {
-      id,
-      slug,
-      name,
-      logo,
-      backgroundImage,
-      twitterHandle,
-      description,
-      currency,
-      settings,
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      slug
+      name
+      image
+      backgroundImage
+      twitterHandle
+      description
+      currency
+      settings
       tiers {
-        id,
-        type,
-        name,
-        description,
-        amount,
-        currency,
+        id
+        type
+        name
+        description
+        amount
+        currency
         interval
       }
     }
   }
 `;
 
-const getEventQuery = gql`
-  query Event($collectiveSlug: String!, $eventSlug: String!) {
-    Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
-      id,
-      slug,
+
+const getCollectiveQuery = gql`
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
       createdByUser {
         id
-      },
-      name,
-      description,
-      startsAt,
-      endsAt,
-      timezone,
-      location {
-        name,
-        address,
-        lat,
-        long
-      },
+      }
+      name
+      image
+      backgroundImage
+      description
+      longDescription
+      twitterHandle
+      website
+      currency
+      settings
+      stats {
+        yearlyBudget
+        backers
+      }
       tiers {
-        id,
-        type,
-        name,
-        description,
-        amount,
-        currency,
+        id
+        slug
+        type
+        name
+        description
+        amount
+        presets
+        interval
+        currency
         maxQuantity
-      },
-      collective {
-        id,
-        slug,
-        name,
-        mission,
-        currency,
-        backgroundImage,
-        logo,
-        stripePublishableKey
-      },
-      responses {
-        createdAt,
-        quantity,
-        status,
-        description,
-        user {
-          name,
-          avatar,
-          username,
-          twitterHandle,
-          description
-        },
+        orders {
+          id
+          publicMessage
+          createdAt
+          totalTransactions
+          fromCollective {
+            id
+            name
+            image
+            slug
+            twitterHandle
+            description
+          }
+        }
+      }
+      memberships {
+        id
+        createdAt
+        role
+        totalDonations
         tier {
+          id
+          name
+        }
+        collective {
+          id
+          type
+          slug
+          name
+          currency
+          description
+          settings
+          image
+          stats {
+            backers
+            yearlyBudget
+          }
+        }
+      }
+      members {
+        id
+        createdAt
+        role
+        totalDonations
+        tier {
+          id
+          name
+        }
+        member {
+          id
+          name
+          image
+          slug
+          twitterHandle
+          description
+        }
+      }
+    }
+  }
+`;
+
+const getEventCollectiveQuery = gql`
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      slug
+      createdByUser {
+        id
+      }
+      name
+      image
+      description
+      longDescription
+      startsAt
+      endsAt
+      timezone
+      currency
+      settings
+      location {
+        name
+        address
+        lat
+        long
+      }
+      tiers {
+        id
+        slug
+        type
+        name
+        description
+        amount
+        currency
+        maxQuantity
+      }
+      parentCollective {
+        id
+        slug
+        name
+        mission
+        currency
+        backgroundImage
+        image
+        stripePublishableKey
+        settings
+      }
+      members {
+        id
+        createdAt
+        role
+        user {
+          id
+          name
+          image
+          username
+          twitterHandle
+          description
+        }
+      }
+      orders {
+        id
+        createdAt
+        quantity
+        processedAt
+        publicMessage
+        user {
+          id
+          name
+          image
+          username
+          twitterHandle
+          description
+        }
+        tier {
+          id
           name
         }
       }
@@ -163,62 +265,67 @@ const getEventQuery = gql`
 `;
 
 const getEventsQuery = gql`
-  query allEvents($collectiveSlug: String) {
-    allEvents(collectiveSlug: $collectiveSlug) {
-      id,
-      slug,
-      name,
-      description,
-      startsAt,
-      endsAt,
-      timezone,
+  query allEvents($parentCollectiveSlug: String) {
+    allEvents(slug: $parentCollectiveSlug) {
+      id
+      slug
+      name
+      description
+      longDescription
+      startsAt
+      endsAt
+      timezone
       location {
-        name,
-        address,
-        lat,
+        name
+        address
+        lat
         long
-      },
+      }
       tiers {
-        id,
-        type,
-        name,
-        description,
+        id
+        type
+        name
+        description
         amount
-      },
-      collective {
-        id,
-        slug,
-        name,
-        mission,
-        backgroundImage,
-        logo
+      }
+      parentCollective {
+        id
+        slug
+        name
+        mission
+        backgroundImage
+        image
       }
     }
   }
 `;
 
 const getAttendeesQuery = gql`
-  query Event($collectiveSlug: String!, $eventSlug: String!) {
-    Event(collectiveSlug: $collectiveSlug, eventSlug: $eventSlug) {
-      slug,
-      name,
-      startsAt,
-      locationName,
-      responses {
-        createdAt,
-        quantity,
-        status,
-        description,
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      slug
+      name
+      startsAt
+      location {
+        name
+      }
+      orders {
+        id
+        createdAt
+        quantity
+        processedAt
+        description
         user {
-          id,
-          firstName,
-          lastName,
-          avatar,
-          username,
-          twitterHandle,
+          id
+          firstName
+          lastName
+          image
+          username
+          twitterHandle
           description
-        },
+        }
         tier {
+          id
           name
         }
       }
@@ -227,73 +334,74 @@ const getAttendeesQuery = gql`
 `;
 
 const getCollectiveTierQuery = gql`
-  query CollectiveTier($collectiveSlug: String!, $tierId: Int!) {
-    Collective(collectiveSlug: $collectiveSlug) {
-      id,
-      slug,
-      name,
-      logo,
-      description,
-      twitterHandle,
-      currency,
-      backgroundImage,
-      settings,
-      logo,
+  query CollectiveTier($slug: String! $TierId: Int!) {
+    Collective(slug: $slug) {
+      id
+      slug
+      name
+      image
+      description
+      twitterHandle
+      currency
+      backgroundImage
+      settings
+      image
       stripePublishableKey
     }
-    Tier(id: $tierId) {
-      id,
-      type,
-      name,
-      description,
-      amount,
-      currency,
+    Tier(id: $TierId) {
+      id
+      type
+      name
+      description
+      amount
+      currency
       interval
+      presets
     }
   }
 `;
 
 const getCollectiveTransactionsQuery = gql`
-  query CollectiveTransactions($collectiveSlug: String!, $type: String, $limit: Int, $offset: Int) {
-    Collective(collectiveSlug: $collectiveSlug) {
-      id,
-      slug,
-      name,
-      currency,
-      backgroundImage,
-      settings,
-      logo
+  query CollectiveTransactions($slug: String!, $type: String, $limit: Int, $offset: Int) {
+    Collective(slug: $slug) {
+      id
+      slug
+      name
+      currency
+      backgroundImage
+      settings
+      image
     }
-    allTransactions(collectiveSlug: $collectiveSlug, type: $type, limit: $limit, offset: $offset) {
-      id,
-      uuid,
-      title,
-      createdAt,
-      type,
-      amount,
-      currency,
-      netAmountInGroupCurrency,
-      hostFeeInTxnCurrency,
-      platformFeeInTxnCurrency,
-      paymentProcessorFeeInTxnCurrency,
+    allTransactions(slug: $slug, type: $type, limit: $limit, offset: $offset) {
+      id
+      uuid
+      description
+      createdAt
+      type
+      amount
+      currency
+      netAmountInCollectiveCurrency
+      hostFeeInTxnCurrency
+      platformFeeInTxnCurrency
+      paymentProcessorFeeInTxnCurrency
       paymentMethod {
-        name
-      },
+        service
+      }
       user {
-        id,
-        name,
-        username,
-        avatar
-      },
+        id
+        name
+        username
+        image
+      }
       host {
-        id,
+        id
         name
       }
       ... on Expense {
         category
         attachment
       }
-      ... on Donation {
+      ... on Order {
         subscription {
           interval
         }
@@ -305,28 +413,30 @@ const getCollectiveTransactionsQuery = gql`
 const getTransactionQuery = gql`
   query Transaction($id: Int!) {
     Transaction(id: $id) {
-      id,
-      uuid,
-      title,
-      createdAt,
-      type,
-      amount,
-      currency,
-      netAmountInGroupCurrency,
-      hostFeeInTxnCurrency,
-      platformFeeInTxnCurrency,
-      paymentProcessorFeeInTxnCurrency,
+      id
+      uuid
+      description
+      publicMessage
+      privateMessage
+      createdAt
+      type
+      amount
+      currency
+      netAmountInCollectiveCurrency
+      hostFeeInTxnCurrency
+      platformFeeInTxnCurrency
+      paymentProcessorFeeInTxnCurrency
       paymentMethod {
         name
-      },
+      }
       user {
-        id,
-        name,
-        username,
-        avatar
-      },
+        id
+        name
+        username
+        image
+      }
       host {
-        id,
+        id
         name
       }
       ... on Expense {
@@ -347,7 +457,7 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   options(props) {
     return {
       variables: {
-        collectiveSlug: props.collectiveSlug,
+        slug: props.slug,
         offset: 0,
         limit: TRANSACTIONS_PER_PAGE * 2
       }
@@ -375,8 +485,8 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   })  
 });
 export const addCollectiveData = graphql(getCollectiveQuery);
+export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addCollectiveTierData = graphql(getCollectiveTierQuery);
-export const addEventData = graphql(getEventQuery);
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
 export const addTiersData = graphql(getTiersQuery);
@@ -406,7 +516,7 @@ export const addGetLoggedInUserFunction = (component) => {
   return graphql(getLoggedInUserQuery, {
     props: ({ data }) => ({
       data,
-      getLoggedInUser: (collectiveSlug) => {
+      getLoggedInUser: () => {
         if (window.localStorage.getItem('accessToken')) {
           return new Promise((resolve) => {
             setTimeout(async () => {
@@ -414,9 +524,13 @@ export const addGetLoggedInUserFunction = (component) => {
                 .then(res => {
                   if (res.data && res.data.LoggedInUser) {
                     const LoggedInUser = {...res.data.LoggedInUser};
-                    if (LoggedInUser && LoggedInUser.collectives && collectiveSlug) {
-                      const membership = LoggedInUser.collectives.find(c => c.slug === collectiveSlug);
-                      LoggedInUser.membership = membership;
+                    if (LoggedInUser && LoggedInUser.memberships) {
+                      const roles = {};
+                      LoggedInUser.memberships.map(member => {
+                        roles[member.collective.slug] = roles[member.collective.slug] || [];
+                        roles[member.collective.slug].push(member.role);
+                      });
+                      LoggedInUser.roles = roles;
                     }
                     console.log(">>> LoggedInUser", LoggedInUser);
                     return resolve(LoggedInUser);

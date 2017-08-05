@@ -184,7 +184,7 @@ class TopBarProfileMenu extends React.Component {
       .LoginTopBarProfileButton-caret:after {
         border-top: 5px solid #f7f7f7;
       }
-      .LoginTopBarProfileButton-avatar {
+      .LoginTopBarProfileButton-image {
         display: inline-block;
         width: 26px;
         height: 26px;
@@ -230,7 +230,7 @@ class TopBarProfileMenu extends React.Component {
         border-right: 5px solid transparent;
       }
       `}</style>
-      {LoggedInUser.avatar && <div className='LoginTopBarProfileButton-avatar' style={{backgroundImage: `url(${LoggedInUser.avatar})`}}></div>}
+      {LoggedInUser.image && <div className='LoginTopBarProfileButton-image' style={{backgroundImage: `url(${LoggedInUser.image})`}}></div>}
       <div className='LoginTopBarProfileButton-name desktopOnly'>{LoggedInUser.username}</div>
       <div className='LoginTopBarProfileButton-caret'></div>
       {showProfileMenu && this.renderProfileMenu()}

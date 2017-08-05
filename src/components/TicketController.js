@@ -57,9 +57,9 @@ class TicketController extends React.Component {
         }
         `}</style>
         <div className={this.props.className}>
-          <div className="btn" onClick={() => this.changeValue(-1)}>-</div>
+          <div className="btn decrease" onClick={() => this.changeValue(-1)}>-</div>
           {this.state.value} ticket{this.state.value > 1 ? 's' : ''}
-          <div className="btn" onClick={() => this.changeValue(1)}>+</div>
+          <div className="btn increase" onClick={() => this.changeValue(1)}>+</div>
         </div>
       </div>
     );

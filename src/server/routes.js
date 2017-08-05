@@ -4,8 +4,22 @@ import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
 import pages from './pages';
+import { translateApiUrl } from '../lib/utils';
+import request from 'request';
 
 module.exports = (server, app) => {
+
+  server.get('/favicon.*', (req, res) => res.send(404));
+
+  server.all('/api/*', (req, res) => {
+    req
+      .pipe(request(translateApiUrl(req.url), { followRedirect: false }))
+      .on('error', (e) => {
+        console.error("error calling api", translateApiUrl(req.url), e);
+        res.status(500).send(e);
+      })
+      .pipe(res);
+  });
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';

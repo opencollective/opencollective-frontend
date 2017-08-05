@@ -5,18 +5,25 @@ import { capitalize } from '../lib/utils';
 import DateTime from 'react-datetime';
 import stylesheet from '../styles/react-datetime.css';
 import moment from 'moment-timezone';
+import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel } from 'react-bootstrap';
 
-function FieldGroup({ id, label, help, pre, className, ...props }) {
+function FieldGroup({ controlId, label, help, pre, className, ...props }) {
 
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
+  props.key = props.key || props.name;
+
+  if (!props.key) {
+    console.log(">>> no key for input", props);
+  }
+
   if (className == 'horizontal') {
     return (
-      <FormGroup controlId={id} validationState={validationState}>
+      <FormGroup controlId={controlId} validationState={validationState}>
         <Col componentClass={ControlLabel} sm={3}>
           {label}
         </Col>
@@ -24,7 +31,7 @@ function FieldGroup({ id, label, help, pre, className, ...props }) {
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...props} />
-          <FormControl.Feedback />
+          { validationState && <FormControl.Feedback /> }
           </InputGroup>
           {help && <HelpBlock>{help}</HelpBlock>}
         </Col>
@@ -32,12 +39,12 @@ function FieldGroup({ id, label, help, pre, className, ...props }) {
     );
   } else {
     return (
-      <FormGroup controlId={id} validationState={validationState}>
-        <ControlLabel>{label}</ControlLabel>
+      <FormGroup controlId={controlId} validationState={validationState}>
+        {label && <ControlLabel>{label}</ControlLabel>}
         <InputGroup>
         { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
         <FormControl {...props} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
-        <FormControl.Feedback />
+        { validationState && <FormControl.Feedback /> }
         </InputGroup>
         {help && <HelpBlock>{help}</HelpBlock>}
       </FormGroup>
@@ -55,6 +62,7 @@ class InputField extends React.Component {
     options: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.object,
     placeholder: PropTypes.string,
+    className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func,
     required: PropTypes.bool
@@ -77,7 +85,7 @@ class InputField extends React.Component {
 
   validate(value) {
     if (!value) return !this.props.required;
-    if (this.props.validate) {
+    if (this.props.validate && this.props.type !== 'datetime') {
       return this.props.validate(value);
     }
     switch (this.props.type) {
@@ -154,11 +162,31 @@ class InputField extends React.Component {
         this.input = (
         <FormGroup>
           {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-          <InputTypeLocation value={this.state.value} onChange={event => this.handleChange(event)} />
+          <InputTypeLocation
+            value={this.state.value}
+            onChange={event => this.handleChange(event)}
+            placeholder={field.placeholder}
+            options={field.options}
+            />
           {field.description && <HelpBlock>{field.description}</HelpBlock>}
         </FormGroup>
         )
         break;
+      case 'dropzone':
+        this.input = (
+        <FormGroup>
+          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+          <InputTypeDropzone
+            value={this.state.value}
+            name={field.name}
+            onChange={event => this.handleChange(event)}
+            placeholder={field.placeholder}
+            options={field.options}
+            />
+          {field.description && <HelpBlock>{field.description}</HelpBlock>}
+        </FormGroup>
+        )
+        break;        
       case 'currency':
         this.input = (
         <FieldGroup
@@ -192,7 +220,7 @@ class InputField extends React.Component {
             {field.options.map(option => {
               const value = Object.keys(option)[0];
               const label = option[value];
-              return (<option value={value}>{label}</option>)
+              return (<option key={value} value={value}>{label}</option>)
               })
             }
           </FieldGroup>)
@@ -217,7 +245,7 @@ class InputField extends React.Component {
     }
 
     return (
-      <div className="field" key={`input-${this.props.name}`} >
+      <div className={`inputField ${this.props.className} ${this.props.name}`} key={`input-${this.props.name}`} >
         <style jsx>{`
           :global(span.input-group) {
             width: 100%;

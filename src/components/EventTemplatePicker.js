@@ -40,7 +40,7 @@ class EventTemplatePicker extends React.Component {
       <FormGroup className="EventTemplatePicker">
         <ControlLabel>{this.props.label}</ControlLabel>
         <FormControl name="template" componentClass="select" placeholder="select" onChange={this.handleTemplateChange}>
-          <option value="">No template</option>
+          <option value="">Use a previous event as a template</option>
           {allEvents.map(this.renderEventEntry)}
         </FormControl>
       </FormGroup>

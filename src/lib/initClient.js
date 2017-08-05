@@ -35,7 +35,7 @@ function createClient (initialState, options = {}) {
 
   return new ApolloClient({
     ssrMode: !process.browser,
-    dataIdFromObject: result => `${result.__typename}#${result.id || result.name}` || null,
+    dataIdFromObject: result => `${result.__typename}:${result.id || result.name || Math.floor(Math.random()*1000000)}`,
     fragmentMatcher,
     initialState,
     networkInterface: createNetworkInterface({

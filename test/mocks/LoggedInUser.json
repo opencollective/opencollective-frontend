@@ -5,13 +5,13 @@
       "username": "xdamman",
       "firstName": "Xavier",
       "lastName": "Damman",
-      "avatar": "https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg",
+      "image": "https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg",
       "collectives": [
         {
           "id": 7,
           "slug": "tipbox",
           "name": "tipbox",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
@@ -53,14 +53,14 @@
           "id": 19,
           "slug": "test",
           "name": "TEST",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 1,
           "slug": "opencollective",
           "name": "OpenCollective",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
@@ -81,14 +81,14 @@
           "id": 66,
           "slug": "foundation",
           "name": "Open Collective Foundation",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 104,
           "slug": "replaylastgoal",
           "name": "ReplayLastGoal",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
@@ -102,35 +102,35 @@
           "id": 193,
           "slug": "freeridetovote",
           "name": "FreeRideToVote",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 207,
           "slug": "brusselstogether",
           "name": "BrusselsTogether",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 208,
           "slug": "testcollective1",
           "name": "test collective",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 310,
           "slug": "xdamman-test",
           "name": "xdamman-test",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 316,
           "slug": "xdamman-test2",
           "name": "xdamman test2",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
@@ -193,14 +193,14 @@
           "id": 652,
           "slug": "selection-sharer",
           "name": "selection-sharer",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         },
         {
           "id": 734,
           "slug": "webrussels",
           "name": "WeBrussels",
-          "role": "MEMBER",
+          "role": "ADMIN",
           "__typename": "Collective"
         }
       ],

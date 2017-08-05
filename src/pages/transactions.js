@@ -15,7 +15,7 @@ import {defineMessages} from 'react-intl'
 class TransactionsPage extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug }, data }) {
-    return { collectiveSlug, data }
+    return { slug: collectiveSlug, data }
   }
 
   constructor(props) {
@@ -52,7 +52,7 @@ class TransactionsPage extends React.Component {
           title={collective.name}
           description={collective.description}
           twitterHandle={collective.twitterHandle}
-          image={collective.logo || collective.backgroundImage}
+          image={collective.image || collective.backgroundImage}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
           />
@@ -60,8 +60,8 @@ class TransactionsPage extends React.Component {
         <Body>
 
           <CollectiveCover
-            collective={collective}
-            logo={collective.logo}
+            href={`/${collective.slug}`}
+            logo={collective.image}
             title={intl.formatMessage(this.messages['title'], { n: transactions.length })}
             className="small"
             backgroundImage={collective.backgroundImage}
