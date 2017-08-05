@@ -16,7 +16,7 @@ console.log("> loading languages", languages);
 // locale. This function will also cache the scripts by lang in memory.
 const localeDataCache = new Map()
 
-export function getLocaleDataScript(locale = 'en') {
+export function getLocaleDataScript(locale = 'en-US') {
   const lang = locale.split('-')[0];
   if (!localeDataCache.has(lang)) {
     const localeDataFile = require.resolve(`react-intl/locale-data/${lang}`)
