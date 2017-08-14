@@ -117,3 +117,7 @@ The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take 
 
 3) `npm run db:migrate`
 
+# TODO
+
+- The User model is confusing with the concept of User Collective, we should rename the "User" model to "Login" or "Email" so that we could have multiple emails per User.
+- CreatedByUserId is confusing

@@ -58,7 +58,7 @@ describe('Query Tests', () => {
             id,
             firstName,
             lastName,
-            memberships {
+            memberOf {
               collective {
                 slug
               },
@@ -73,9 +73,9 @@ describe('Query Tests', () => {
         const result = await graphql(schema, LoggedInUserQuery, null, context);
         result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
-        expect(data.memberships.length).to.equal(2);
-        expect(data.memberships[0].role).to.equal('BACKER');
-        expect(data.memberships[1].role).to.equal('ADMIN');
+        expect(data.memberOf.length).to.equal(2);
+        expect(data.memberOf[0].role).to.equal('BACKER');
+        expect(data.memberOf[1].role).to.equal('ADMIN');
       })
 
       it("doesn't return anything if not logged in", async () => {
@@ -238,7 +238,6 @@ describe('Query Tests', () => {
         result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
-        console.log("orders", orders);
         expect(orders[0].paymentMethod.identifier).to.equal('4242');
       });
     });

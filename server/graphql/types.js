@@ -75,7 +75,7 @@ export const UserType = new GraphQLObjectType({
           }
         }
       },
-      memberships: {
+      memberOf: {
         type: new GraphQLList(MemberType),
         resolve(user) {
           return models.Member.findAll({ where: { MemberCollectiveId: user.CollectiveId }});
@@ -85,26 +85,6 @@ export const UserType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(user) {
           return user.billingAddress;
-        }
-      },
-      paymentMethods: {
-        description: 'List of payment methods that this user can use',
-        type: new GraphQLList(PaymentMethodType),
-        resolve(user) {
-          return models.Member.findAll({
-            attributes: ['CollectiveId'],
-            where: {
-              MemberCollectiveId: user.CollectiveId,
-              role: roles.ADMIN
-            }
-          })
-          .then(rows => {
-            const collectiveIds = rows.map(r => r.CollectiveId);
-            collectiveIds.push(user.CollectiveId);
-            return models.PaymentMethod.findAll({
-              where: { CollectiveId: { $in: collectiveIds } }
-            });
-          });
         }
       },
       paypalEmail: {

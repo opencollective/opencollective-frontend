@@ -236,7 +236,7 @@ const processPayment = (order) => {
         .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, collective) : null)
 
         // add user to the collective
-        .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER, order.TierId))
+        .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
 
         // Mark order row as processed
         .tap(() => order.update({ processedAt: new Date() }))
@@ -308,7 +308,7 @@ const processPayment = (order) => {
           return models.Transaction.createFromPayload(payload);
         })
         .then(t => transaction = t)
-        .then(() => !isFromCollectiveHost ? collective.findOrAddUserWithRole(user, roles.BACKER, order.TierId) : Promise.resolve())
+        .then(() => !isFromCollectiveHost ? collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }) : Promise.resolve())
         .then(() => order.update({ processedAt: new Date }))
         .then(() => transaction); // make sure we return the transaction created
     }

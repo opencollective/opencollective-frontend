@@ -433,6 +433,8 @@ export default (Sequelize, DataTypes) => {
       },
 
       createUserWithCollective(userData) {
+        if (!userData) return Promise.reject(new Error("Cannot create a user: no user data provided"));
+
         let user;
         return User.create(userData)
           .then(u => {

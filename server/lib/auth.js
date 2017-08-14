@@ -1,9 +1,11 @@
 import models from '../models';
 import roles from '../constants/roles';
 import { intersection } from 'lodash';
+import Promise from 'bluebird';
 
 export function hasRole(MemberCollectiveId, CollectiveId, possibleRoles) {
   if (!MemberCollectiveId || !CollectiveId) return Promise.resolve(false);
+  if (MemberCollectiveId === CollectiveId) return Promise.resolve(true);
 
   if (typeof possibleRoles === 'string') {
     possibleRoles = [ possibleRoles ];
@@ -36,11 +38,11 @@ export function canAccessUserDetails(RemoteUserCollectiveId, UserCollectiveId) {
     canEditCollectives: models.Member.findAll({
                           attributes: [ 'CollectiveId' ],
                           where: { MemberCollectiveId: RemoteUserCollectiveId, role: { $in: [ roles.ADMIN, roles.HOST ] } }
-                        }),
+                        }).then(rows => rows.map(r => r.CollectiveId)),
     memberOfCollectives: models.Member.findAll({
                            attributes: [ 'CollectiveId' ],
                            where: { MemberCollectiveId: UserCollectiveId, role: { $ne: roles.FOLLOWER } }
-                         })
+                         }).then(rows => rows.map(r => r.CollectiveId))
   })
   .then(props => {
     return (intersection(props.canEditCollectives, props.memberOfCollectives).length > 0);

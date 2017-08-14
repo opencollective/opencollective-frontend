@@ -287,7 +287,7 @@ const updateResponses = (sequelize) => {
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
             CreatedByUserId: response.UserId,
-            CollectiveId: CollectiveId,
+            CollectiveId: ToCollectiveId,
             MemberCollectiveId: FromCollectiveId,
             role: 'FOLLOWER'
           };
@@ -343,11 +343,15 @@ const updateCollectives = (sequelize) => {
 
       const tierName = tier.title || tier.name || getTierName(tier);
       const tierSlug = slugify(pluralize(tierName));
+      let description = tier.description;
+      if (description && description.length > 255) {
+        description = description.substr(0,254)+'…';
+      }
 
       const res = {
         type: 'TIER',
         name: tierName,
-        description: tier.description,
+        description,
         slug: tierSlug,
         currency: collective.currency,
         CollectiveId: collective.id
@@ -418,11 +422,15 @@ const updateCollectives = (sequelize) => {
         currency: collective.currency
       })
     }
-    return Promise.map(tiers, tier => sequelize.query(`
-      INSERT INTO "Tiers" ("${Object.keys(tier).join('","')}", "createdAt") VALUES ('${Object.values(tier).join("','")}', :createdAt)
-      `, {
-        replacements: { createdAt: new Date }
-      }))
+    return Promise.map(tiers, tier => {
+      tier.createdAt = new Date;
+      Object.keys(tier).map(key => {
+        tier[key] = tier[key] || null;
+      });
+      return sequelize.query(`
+        INSERT INTO "Tiers" ("${Object.keys(tier).join('","')}") VALUES (:${Object.keys(tier).join(",:")})
+        `, { replacements: tier })
+      })
       .then(() => tiers = null) // save memory
       .then(() => sequelize.query(`SELECT id, "CollectiveId", amount, interval, slug FROM "Tiers" WHERE type='TIER'`, { type: sequelize.QueryTypes.SELECT }));
   }
@@ -500,13 +508,14 @@ const updateCollectives = (sequelize) => {
       .then(() => getHostCollectiveId(sequelize, collective.id))
       .tap(id => HostCollectiveId = id)
       .then(ParentCollectiveId => {
+        const createdAt = collective.createdAt || collective.updatedAt;
         // if (!HostCollectiveId) throw new Error(`Unable to update collective ${collective.id}: No HostCollectiveId for collective ${collective.slug}`);
-        return sequelize.query(`UPDATE "Collectives" SET "HostCollectiveId"=:HostCollectiveId, "ParentCollectiveId"=:ParentCollectiveId WHERE id=:id AND type='COLLECTIVE'`,
-          { replacements: { id: collective.id, HostCollectiveId, ParentCollectiveId } });
+        return sequelize.query(`UPDATE "Collectives" SET "HostCollectiveId"=:HostCollectiveId, "ParentCollectiveId"=:ParentCollectiveId, "createdAt"=:createdAt WHERE id=:id AND type='COLLECTIVE'`,
+          { replacements: { id: collective.id, HostCollectiveId, ParentCollectiveId, createdAt } });
       })
   }
 
-  return sequelize.query(`SELECT id, slug, type, mission, description, currency, tiers FROM "Collectives"`, { type: sequelize.QueryTypes.SELECT })
+  return sequelize.query(`SELECT id, slug, type, mission, description, currency, tiers, "createdAt", "updatedAt" FROM "Collectives"`, { type: sequelize.QueryTypes.SELECT })
   .then(collectives => collectives && Promise.map(collectives, updateCollective))
 }
 

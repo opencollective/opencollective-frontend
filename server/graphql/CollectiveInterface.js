@@ -1,3 +1,6 @@
+import { hasRole } from '../lib/auth';
+import errors from '../lib/errors';
+
 import {
   GraphQLInt,
   GraphQLList,
@@ -35,6 +38,20 @@ export const CollectiveStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(collective) {
           return collective.getBackersCount();
+        }
+      },
+      totalAmountReceived: {
+        description: 'Net amount received',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountReceived();
+        }
+      },
+      totalAmountSent: {
+        description: 'Net amount donated to other collectives',
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getTotalAmountSent();
         }
       },
       yearlyBudget: {
@@ -80,6 +97,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         type: LocationType,
         description: 'Name, address, lat, long of the location.'
       },
+      createdAt: { type: GraphQLString },
       startsAt: { type: GraphQLString },
       endsAt: { type: GraphQLString },
       timezone: { type: GraphQLString },
@@ -90,11 +108,11 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
       members: { type: new GraphQLList(MemberType) },
-      followers: { type: new GraphQLList(UserType) },
+      memberOf: { type: new GraphQLList(MemberType)},
+      followers: { type: new GraphQLList(MemberType) },
       maxQuantity: { type: GraphQLInt },
       tiers: { type: new GraphQLList(TierType) },
       orders: { type: new GraphQLList(OrderType) },
-      memberships: { type: new GraphQLList(MemberType)},
       stats: { type: CollectiveStatsType },
       transactions: {
         type: new GraphQLList(TransactionInterfaceType),
@@ -114,7 +132,8 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      stripePublishableKey: { type: GraphQLString }
+      stripePublishableKey: { type: GraphQLString },
+      paymentMethods: { type: new GraphQLList(PaymentMethodType) }
     }
   }
 });
@@ -175,6 +194,12 @@ const CollectiveFields = () => {
       description: 'Name, address, lat, long of the location.',
       resolve(collective) {
         return collective.location;
+      }
+    },
+    createdAt: {
+      type: GraphQLString,
+      resolve(collective) {
+        return collective.createdAt
       }
     },
     startsAt: {
@@ -238,7 +263,7 @@ const CollectiveFields = () => {
         return models.Member.findAll({ where: { CollectiveId: collective.id } });
       }
     },
-    memberships: {
+    memberOf: {
       description: 'Get all the collective this collective is a member of (as a member, backer, follower, etc.)',
       type: new GraphQLList(MemberType),
       resolve(collective) {
@@ -246,9 +271,9 @@ const CollectiveFields = () => {
       }
     },
     followers: {
-      type: new GraphQLList(UserType),
+      type: new GraphQLList(MemberType),
       resolve(collective) {
-        return collective.getUsers({ where: { role: roles.FOLLOWER } });
+        return models.Member.findAll({ where: { CollectiveId: collective.id, role: roles.FOLLOWER } });
       }
     },
     maxQuantity: {
@@ -326,6 +351,27 @@ const CollectiveFields = () => {
         .then(stripeAccount => stripeAccount && stripeAccount.stripePublishableKey)
       }
     },
+    paymentMethods: {
+      type: new GraphQLList(PaymentMethodType),
+      resolve(collective, args, req) {
+        if (!req.remoteUser) return [];
+        return hasRole(req.remoteUser.CollectiveId, collective.id, ['ADMIN'])
+          .then(canAccess => {
+            if (!canAccess) {
+              return [];
+            }
+
+            return models.PaymentMethod.findAll({
+              where: {
+                CollectiveId: collective.id,
+                service: 'stripe',
+                identifier: { $ne: null }
+              }
+            });
+            
+          });
+      }
+    },
     stats: {
       type: CollectiveStatsType,
       resolve(collective) {
@@ -370,20 +416,6 @@ export const UserCollectiveType = new GraphQLObjectType({
               if (!canAccess) return null;
               return userCollective.getUser().then(user => user.email);
             });
-        }
-      },
-      paymentMethods: {
-        type: new GraphQLList(PaymentMethodType),
-        resolve(userCollective, args, req) {
-          if (!req.remoteUser || req.remoteUser.id !== userCollective.id) return [];
-          return models.PaymentMethod.findAll({
-            where: {
-              CollectiveId: userCollective.id,
-              service: 'stripe',
-              identifier: { $ne: null },
-              confirmedAt: { $ne: null }
-            }
-          });
         }
       }
     }

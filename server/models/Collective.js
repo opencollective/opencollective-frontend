@@ -6,10 +6,10 @@ import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
-import { uniq } from 'lodash';
+import { difference, uniq } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
-import {HOST_FEE_PERCENT} from '../constants/transactions';
+import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { appendTier } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
@@ -376,7 +376,6 @@ export default function(Sequelize, DataTypes) {
        */
       getTiersWithUsers(options = { active: false, attributes: ['id', 'username', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'website'] }) {
         const tiersById = {};
-
          // Get the list of tiers for the collective
         return models.Tier
           .findAll({ where: { CollectiveId: this.id, type: 'TIER' } })
@@ -448,7 +447,7 @@ export default function(Sequelize, DataTypes) {
           })
       },
 
-      addUserWithRole(user, role, TierId) {
+      addUserWithRole(user, role, defaultAttributes = {}) {
         const lists = {};
         lists[roles.BACKER] = 'backers';
         lists[roles.ADMIN] = 'admins';
@@ -471,21 +470,19 @@ export default function(Sequelize, DataTypes) {
           role,
           CreatedByUserId: user.id,
           MemberCollectiveId: user.CollectiveId,
-          CollectiveId: this.id
+          CollectiveId: this.id,
+          ... defaultAttributes
         };
 
-        if (TierId) {
-          member.TierId = TierId;
-        }
-
         return Promise.all([
-          Sequelize.models.Member.create(member),
-          Sequelize.models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
-        ]);
+          models.Member.create(member),
+          models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
+        ]).then(results => results[0]);
       },
 
-      findOrAddUserWithRole(user, role, TierId) {
-        return Sequelize.models.Member.findOne({
+      // Used when creating a transactin to add a user to the collective as a backer if needed
+      findOrAddUserWithRole(user, role, defaultAttributes) {
+        return models.Member.findOne({
           where: {
             role,
             CreatedByUserId: user.id,
@@ -494,11 +491,90 @@ export default function(Sequelize, DataTypes) {
           }})
         .then(Member => {
           if (!Member) {
-            return this.addUserWithRole(user, role, TierId)
+            return this.addUserWithRole(user, role, defaultAttributes)
           } else {
             return Member;
           }
         });
+      },
+
+      // edit the list of members and admins of this collective (create/update/remove)
+      // creates a User and a UserCollective if needed
+      editMembers(members, defaultAttributes = {}) {
+        if (!members) return Promise.resolve();
+        return this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } )
+          .then(oldMembers => {
+            // remove the members that are not present anymore
+            const diff = difference(oldMembers.map(t => t.id), members.map(t => t.id));
+            return models.Member.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+          })
+          .then(() => {
+            return Promise.map(members, (member) => {
+              if (member.id) {
+                // Edit an existing membership (e.g. edit the role)
+                return models.Member.update(member, { where: { id: member.id }});
+              } else {
+                // Create new membership
+                member.CollectiveId = this.id;
+                if (member.CreatedByUserId) {
+                  const user = {
+                    id: member.CreatedByUserId,
+                    CollectiveId: member.MemberCollectiveId
+                  };
+                  return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...defaultAttributes });
+                } else {
+                  return models.User.findOrCreateByEmail(member.member.email, member.member)
+                    .then(user => {
+                      return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...defaultAttributes });
+                    })
+                }
+              }
+            });
+          })
+          .then(() => this.getMembers({ where: { role: { $in: [ roles.ADMIN, roles.MEMBER ] } } } ))
+      },
+
+      // edit the tiers of this collective (create/update/remove)
+      editTiers(tiers) {
+        if (!tiers) return Promise.resolve();
+
+        return this.getTiers()
+        .then(oldTiers => {
+          // remove the tiers that are not present anymore in the updated collective
+          const diff = difference(oldTiers.map(t => t.id), tiers.map(t => t.id));
+          return models.Tier.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        })
+        .then(() => {
+          return Promise.map(tiers, (tier) => {
+            if (tier.id) {
+              return models.Tier.update(tier, { where: { id: tier.id }});
+            } else {
+              tier.CollectiveId = this.id;
+              tier.currency = tier.currency || this.currency;
+              return models.Tier.create(tier);  
+            }
+          });
+        })
+      },
+
+      editPaymentMethods(paymentMethods, defaultAttributes = {}) {
+        if (!paymentMethods) return Promise.resolve();
+        return models.PaymentMethod.findAll({ where: { CollectiveId: this.id }})
+        .then(oldPaymentMethods => {
+          // remove the paymentMethods that are not present anymore in the updated collective
+          const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
+          return models.PaymentMethod.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        })
+        .then(() => {
+          return Promise.map(paymentMethods, (pm) => {
+            if (pm.id) {
+              return models.PaymentMethod.update(pm, { where: { id: pm.id }});
+            } else {
+              pm.CollectiveId = this.id;
+              return models.PaymentMethod.create({...pm, ... defaultAttributes});  
+            }
+          });
+        })
       },
 
       getStripeAccount() {
@@ -619,13 +695,30 @@ export default function(Sequelize, DataTypes) {
           .then(result => Promise.resolve(parseInt(result[0].yearlyIncome,10)));
       },
 
-
-      getTotalDonations(startDate, endDate) {
+      getTotalAmountReceived(startDate, endDate) {
         endDate = endDate || new Date;
         const where = {
           amount: { $gt: 0 },
           createdAt: { $lt: endDate },
           ToCollectiveId: this.id
+        };
+        if (startDate) where.createdAt.$gte = startDate;
+        return models.Transaction.find({
+          attributes: [
+            [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']
+          ],
+          where
+        })
+        .then(result => Promise.resolve(parseInt(result.toJSON().total, 10)));
+      },
+
+      // Get the total amount donated to other collectives
+      getTotalAmountSent(startDate, endDate) {
+        endDate = endDate || new Date;
+        const where = {
+          amount: { $gt: 0 },
+          createdAt: { $lt: endDate },
+          FromCollectiveId: this.id
         };
         if (startDate) where.createdAt.$gte = startDate;
         return models.Transaction.find({

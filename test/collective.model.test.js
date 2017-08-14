@@ -272,11 +272,9 @@ describe('Collective model', () => {
           })
       });
     });
-    
-  })
+  });
 
   describe("tiers", () => {
-
     before('adding backer tier', () => models.Tier.create({ ...utils.data('tier1'), CollectiveId: collective.id })); // adding backer tier
     before('adding sponsor tier', () => models.Tier.create({ ...utils.data('tier2'), CollectiveId: collective.id })); // adding sponsor tier
     before('adding user as backer', () => collective.addUserWithRole(user2, 'BACKER'))
@@ -305,7 +303,80 @@ describe('Collective model', () => {
           expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
           expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
           done();
+        })
+        .catch(e => {
+          console.error(">>> error", e); done() 
         });
     });
+
+    it('add/update/create new tiers', done => {
+      // This add a new tier and removes the "sponsors" tier
+      collective.editTiers([
+        {
+          id: 1,
+          name: 'super backer',
+          amount: 1500
+        },
+        {
+          name: 'new tier',
+          amount: 2000,
+          slug: 'newtier'
+        }
+      ])
+      .then(() => collective.getTiers())
+      .then(tiers => {
+        expect(tiers.length).to.equal(2);
+        expect(tiers[0].name).to.equal('super backer');
+        expect(tiers[1].name).to.equal('new tier');
+        done();
+      })
+    })
   });
+
+  describe("members", () => {
+    it("add/update/remove members", (done) => {
+      collective.editMembers([
+        {
+          id: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
+          role: 'ADMIN'
+        },
+        {
+          role: 'MEMBER',
+          member: {
+            name: 'Etienne Dupont',
+            email: 'etiennedupont@email.com'
+          }
+        }
+      ]).then(members => {
+        expect(members.length).to.equal(2);
+        expect(members[0].role).to.equal('ADMIN');
+        expect(members[1].role).to.equal('MEMBER');
+        done();
+      })
+    });
+
+    it("add an existing user to a collective by email address", (done) => {
+      collective.editMembers([])
+      .then(members => {
+        expect(members).to.have.length(0);
+      })
+      .then(() => collective.editMembers([
+        {
+          role: 'MEMBER',
+          member: {
+            name: user1.name,
+            email: user1.email
+          }
+        }
+      ]))
+      .then(members => {
+        expect(members).to.have.length(1);
+        expect(members[0].role).to.equal('MEMBER');
+        expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
+        done();
+      });
+    });
+  });
+
 });

@@ -73,6 +73,17 @@ export const UserInputType = new GraphQLInputObjectType({
   })
 });
 
+export const MemberInputType = new GraphQLInputObjectType({
+  name: 'MemberInputType',
+  description: 'Input type for MemberType',
+  fields: () => ({
+      id: { type: GraphQLInt },
+      member: { type: CollectiveAttributesInputType },
+      collective: { type: CollectiveAttributesInputType },
+      role: { type: GraphQLString }
+  })
+});
+
 export const UserAttributesInputType = new GraphQLInputObjectType({
   name: 'UserAttributesInputType',
   description: 'Input type for UserType',
@@ -96,9 +107,10 @@ export const CollectiveInputType = new GraphQLInputObjectType({
   description: 'Input type for CollectiveType',
   fields: () => ({
     id:   { type: GraphQLInt },
-    slug: { type: new GraphQLNonNull(GraphQLString) },
-    type: { type: new GraphQLNonNull(GraphQLString) },
-    name: { type: new GraphQLNonNull(GraphQLString) },
+    slug: { type: GraphQLString },
+    type: { type: GraphQLString },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString }, // not very logical to have this here. Might need some refactoring. Used to add/edit members
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
     location: { type: LocationInputType},
@@ -110,6 +122,8 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     image: { type: GraphQLString },
     backgroundImage: { type: GraphQLString },
     tiers: { type: new GraphQLList(TierInputType) },
+    members: { type: new GraphQLList(MemberInputType) },
+    paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
     ParentCollectiveId: { type: GraphQLInt }
   })
 });
@@ -122,6 +136,7 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    email: { type: GraphQLString }, // for Collective type USER
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
     location: { type: LocationInputType },

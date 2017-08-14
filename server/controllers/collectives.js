@@ -493,7 +493,7 @@ export const getOne = (req, res, next) => {
     req.collective.getConnectedAccount(),
     req.collective.getBalance(),
     req.collective.getYearlyIncome(),
-    req.collective.getTotalDonations(),
+    req.collective.getTotalAmountReceived(),
     req.collective.getBackersCount(),
     req.collective.getTwitterSettings(),
     getRelatedCollectives(),
