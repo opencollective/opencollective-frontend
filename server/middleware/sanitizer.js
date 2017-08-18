@@ -16,10 +16,8 @@ const sanitizeHelper = (value) => {
     value = value.replace(/&gt;/gi, '>');
     value = value.replace(/&lt;/gi, '<');
     value = value.replace(/(&copy;|&quot;|&amp;)/gi, '');
-    return sanitize(value, {
-                        allowedTags: []
-                    });
-
+    const res = sanitize(value, { allowedTags: [] });
+    return res.replace(/&amp;/g, '&');
   } else if (typeof value === 'object') {
     lodashEach(value, (val, key) => {
       value[key] = sanitizeHelper(val);

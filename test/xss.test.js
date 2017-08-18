@@ -59,7 +59,7 @@ describe('XSS.test', () => {
           test3: 'Im <b>technically</b> allowed.',
           test4: null,
           test5: 1,
-          test6: 'This &lt;shouldnt&gt; work'
+          test6: '& This &lt;shouldnt&gt; work'
         }
       };
       next = sinon.spy();
@@ -81,7 +81,7 @@ describe('XSS.test', () => {
         expect(req.body.test3).to.equal('Im technically allowed.');
         expect(req.body.test4).to.equal(null);
         expect(req.body.test5).to.equal(1);
-        expect(req.body.test6).to.equal('This  work');
+        expect(req.body.test6).to.equal('& This  work');
     });
 
     it('should call next callback', () => {
