@@ -20,7 +20,7 @@ export default {
     let currency = '';
     let description = '';
     let eventType = '';
-    let provider = '';
+    let service = '';
     let connectedAccountUsername = '';
     let connectedAccountLink = '';
     let lastEditedById = 0;
@@ -74,9 +74,9 @@ export default {
 
     // get connected account data
     if (activity.data.connectedAccount) {
-      ({ provider } = activity.data.connectedAccount);
+      ({ service } = activity.data.connectedAccount);
       connectedAccountUsername = activity.data.connectedAccount.username;
-      if (provider === 'github') {
+      if (service === 'github') {
         connectedAccountLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
       }
     }
@@ -107,7 +107,7 @@ export default {
         return `Expense approved: ${currency} ${amount} for ${description} in ${collective} by userId: ${lastEditedById}!`
 
       case activities.CONNECTED_ACCOUNT_CREATED:
-        return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
+        return `New Connected Account created by ${connectedAccountUsername} on ${service}. ${connectedAccountLink}`;
 
       case activities.COLLECTIVE_EXPENSE_PAID: {
         const details = activity.data.preapprovalDetails;

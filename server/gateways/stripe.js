@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Stripe from 'stripe';
 import config from 'config';
 
-import {planId} from '../lib/utils';
+import { planId } from '../lib/utils';
 
 export const appStripe = Stripe(config.stripe.secret);
 
@@ -65,14 +65,15 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
 
 /**
  * Create stripe customer
+ * Returns a customerId (string)
  */
-export const createCustomer = (stripeAccount, token, options) => {
+export const createCustomer = (stripeAccount, token, options = {}) => {
   const collective = options.collective || {};
   const email = options.email || '';
-
-  return client(stripeAccount).customers.create({
+  const cli = stripeAccount ? client(stripeAccount) : appStripe;
+  return cli.customers.create({
     source: token,
-    description:  `Paying ${email} to ${collective.name}`,
+    description:  `Customer email ${email}, url https://opencollective.com/${collective.slug}`,
     email
   });
 };
@@ -82,6 +83,14 @@ export const createCustomer = (stripeAccount, token, options) => {
  */
 export const retrieveCustomer = (stripeAccount, customerId) => {
   return client(stripeAccount).customers.retrieve(customerId);
+};
+
+/**
+ * Create token
+ * Doc: https://stripe.com/docs/connect/shared-customers
+ */
+export const createToken = (stripeAccount, customerId) => {
+  return client(stripeAccount).tokens.create({ customer: customerId });
 };
 
 /**

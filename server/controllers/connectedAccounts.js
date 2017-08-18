@@ -24,11 +24,11 @@ export const list = (req, res, next) => {
 };
 
 export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
-  const provider = req.params.service;
+  const service = req.params.service;
 
-  switch (provider) {
+  switch (service) {
     case 'github': {
-      const attrs = {provider};
+      const attrs = {service};
       let caId, user;
       const utmSource = req.query.utm_source;
       const image = `https://images.githubusercontent.com/${data.profile.username}`;
@@ -46,7 +46,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         .then(ca => ca || ConnectedAccount.create(attrs))
         .then(ca => {
           caId = ca.id;
-          return ca.update({ username: data.profile.username, secret: accessToken });
+          return ca.update({ username: data.profile.username, token: accessToken });
         })
         .then(() => {
           const token = user.generateConnectedAccountVerifiedToken(caId, data.profile.username);
@@ -55,37 +55,37 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         .catch(next);
     }
     case 'meetup':
-      createConnectedAccountForCollective(req.query.slug, provider)
+      createConnectedAccountForCollective(req.query.slug, service)
         .then(ca => ca.update({
           clientId: accessToken,
-          secret: data.tokenSecret
+          token: data.tokenSecret
         }))
         .then(() => res.redirect(`${config.host.website}/${req.query.slug}`))
         .catch(next);
       break;
 
     case 'twitter':
-      createConnectedAccountForCollective(req.query.slug, provider)
+      createConnectedAccountForCollective(req.query.slug, service)
         .then(ca => ca.update({
           username: data.profile.username,
           clientId: accessToken,
-          secret: data.tokenSecret
+          token: data.tokenSecret
         }))
         .then(() => res.redirect(`${config.host.website}/${req.query.slug}/edit-twitter`))
         .catch(next);
       break;
 
     default:
-      return next(new errors.BadRequest(`unsupported provider ${provider}`));
+      return next(new errors.BadRequest(`unsupported service ${service}`));
   }
 };
 
 export const get = (req, res, next) => {
   const payload = req.jwtPayload;
-  const provider = req.params.service;
+  const service = req.params.service;
   if (!payload) return next(new errors.Unauthorized());
   if (payload.scope === 'connected-account' && payload.username) {
-    res.send({provider, username: payload.username, connectedAccountId: payload.connectedAccountId})
+    res.send({service, username: payload.username, connectedAccountId: payload.connectedAccountId})
   } else {
     return next(new errors.BadRequest('Github authorization failed'));
   }
@@ -102,7 +102,7 @@ export const fetchAllRepositories = (req, res, next) => {
       qs: {
         per_page: 100,
         sort: 'pushed',
-        access_token: ca.secret,
+        access_token: ca.token,
         type: 'all',
         page
       },
@@ -119,8 +119,8 @@ export const fetchAllRepositories = (req, res, next) => {
   .catch(next);
 };
 
-function createConnectedAccountForCollective(slug, provider) {
-  const attrs = { provider };
+function createConnectedAccountForCollective(slug, service) {
+  const attrs = { service };
   return models.Collective.findOne({where: { slug }})
     .tap(collective => attrs.CollectiveId = collective.id)
     .then(() => ConnectedAccount.findOne({ where: attrs }))

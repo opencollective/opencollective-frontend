@@ -1,3 +1,5 @@
+import * as stripe from '../gateways/stripe';
+
 export default function(Sequelize, DataTypes) {
   
   const payoutMethods = ['paypal', 'stripe'];
@@ -44,6 +46,11 @@ export default function(Sequelize, DataTypes) {
           this.setDataValue('brand', val.toLowerCase());
         }
       }
+    },
+
+    // Monthly limit in cents for each member of this.CollectiveId (in the currency of that collective)
+    monthlyLimitPerMember: {
+      type: DataTypes.INTEGER
     },
 
     expMonth: {
@@ -103,6 +110,10 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.DATE
     },
 
+    archivedAt: {
+      type: DataTypes.DATE
+    },
+
     expiryDate: {
       type: DataTypes.DATE
     }
@@ -141,6 +152,16 @@ export default function(Sequelize, DataTypes) {
           confirmedAt: this.confirmedAt,
           expiryDate: this.expiryDate
         };
+      }
+    },
+
+    classMethods: {
+      createFromStripeSourceToken(PaymentMethodData) {
+        return stripe.createCustomer(null, PaymentMethodData.token)
+          .then(customer => {
+            PaymentMethodData.customerId = customer.id;
+            return this.create(PaymentMethodData);
+          });
       }
     }
   });

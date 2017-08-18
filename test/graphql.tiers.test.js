@@ -45,10 +45,11 @@ describe('graphql.tiers.test', () => {
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
 
   beforeEach('create stripe account', (done) => {
-    models.StripeAccount.create({
-      accessToken: 'abc'
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      CollectiveId: host.collective.id,
+      token: 'abc'
     })
-    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });

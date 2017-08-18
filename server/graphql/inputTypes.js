@@ -51,6 +51,7 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     expMonth: { type: GraphQLInt },
     expYear: { type: GraphQLInt },
     identifier: { type: GraphQLString },
+    monthlyLimitPerMember: { type: GraphQLInt },
     save: { type: GraphQLBoolean }
   })
 });

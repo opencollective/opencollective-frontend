@@ -85,8 +85,9 @@ describe('webhooks.routes.test.js', () => {
 
   // create a stripe account
   beforeEach(() =>
-    models.StripeAccount.create({
-      accessToken: 'abc',
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'abc',
       CollectiveId: user.CollectiveId
     }));
 

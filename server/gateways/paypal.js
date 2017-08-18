@@ -10,7 +10,7 @@ import config from 'config';
 const getConfig = (connectedAccount) => ({
   mode: config.paypal.rest.mode,
   client_id: connectedAccount.clientId,
-  client_secret: connectedAccount.secret
+  client_secret: connectedAccount.token
 });
 
 const getCallbackUrl = (collective, transaction) => `${config.host.api}/collectives/${collective.id}/transactions/${transaction.id}/callback`;

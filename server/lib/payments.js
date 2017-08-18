@@ -123,6 +123,28 @@ const processPayment = (order) => {
       const paymentMethod = order.PaymentMethod;
       const subscription = order.Subscription;
       const tier = order.Tier;
+      let hostStripePlan, hostStripeToken, hostStripeCustomerId;
+
+      /**
+       * Get the customerId for the Stripe Account of the Host
+       * Or create one using the Stripe token associated with the platform (paymentMethod.token)
+       * and saves it under PaymentMethod.data[hostStripeAccount.stripeUserId]
+       * @param {*} hostStripeAccount
+       */
+      const getOrCreateCustomerIdForHost = (hostStripeAccount) => {
+        const data = paymentMethod.data || {};
+        data.CustomerIdForHost = data.CustomerIdForHost || {};
+        return data.CustomerIdForHost[hostStripeAccount.stripeUserId] || stripe.createCustomer(hostStripeAccount, paymentMethod.token, {
+          email: user.email,
+          collective: order.fromCollective.info
+        })
+        .then(customer => customer.id)
+        .tap(customerId => {
+          data.CustomerIdForHost[hostStripeAccount.stripeUserId] = customerId;
+          paymentMethod.data = data;
+          paymentMethod.save();
+        })
+      }
 
       const createSubscription = (hostStripeAccount) => {
         return stripe.getOrCreatePlan(
@@ -132,11 +154,17 @@ const processPayment = (order) => {
             amount: order.totalAmount,
             currency: order.currency
           })
-          .then(plan => stripe.createSubscription(
+          .tap(plan => hostStripePlan = plan)
+          // create a customer on the host stripe account
+          .then(() => getOrCreateCustomerIdForHost(hostStripeAccount))
+          .tap(customerId => {
+            hostStripeCustomerId = customerId
+          })
+          .then(() => stripe.createSubscription(
             hostStripeAccount,
-            paymentMethod.customerId,
+            hostStripeCustomerId,
             {
-              plan: plan.id,
+              plan: hostStripePlan.id,
               application_fee_percent: transactions.OC_FEE_PERCENT,
               trial_end: getSubscriptionTrialEndDate(order.createdAt, subscription.interval),
               metadata: {
@@ -161,6 +189,8 @@ const processPayment = (order) => {
 
       /**
        * Returns a Promise with the transaction created
+       * Note: we need to create a token for hostStripeAccount because paymentMethod.customerId is a customer of the platform
+       * See: Shared Customers: https://stripe.com/docs/connect/shared-customers
        */
       const createChargeAndTransaction = (hostStripeAccount) => {
         let charge;
@@ -169,7 +199,7 @@ const processPayment = (order) => {
           {
             amount: order.totalAmount,
             currency: order.currency,
-            customer: paymentMethod.customerId,
+            source: hostStripeToken.id,
             description: `OpenCollective: ${collective.slug}`,
             application_fee: parseInt(order.totalAmount * transactions.OC_FEE_PERCENT / 100, 10),
             metadata: {
@@ -214,20 +244,25 @@ const processPayment = (order) => {
       let hostStripeAccount, transaction;
       return collective.getStripeAccount()
         .then(stripeAccount => hostStripeAccount = stripeAccount)
-        // get or create a customer
+
+        // get or create a customer under the platform stripe account
         .then(() => paymentMethod.customerId || stripe.createCustomer(
-          hostStripeAccount,
+          null,
           paymentMethod.token, {
             email: user.email,
-            collective: collective.info
+            collective: order.fromCollective.info
           }).then(customer => customer.id))
-        .tap(customerId => {
+        .tap(platformCustomerId => {
           if (!paymentMethod.customerId) {
-            paymentMethod.customerId = customerId;
-            paymentMethod.update({ customerId: customerId })
+            paymentMethod.customerId = platformCustomerId;
+            paymentMethod.update({ customerId: platformCustomerId })
           }
         })
-        
+
+        // create a token for the host stripe account
+        .then(() => stripe.createToken(hostStripeAccount, paymentMethod.customerId))
+        .tap(token => hostStripeToken = token)
+
         // both one-time and subscriptions get charged immediately
         .then(() => createChargeAndTransaction(hostStripeAccount))
         .tap(t => transaction = t)

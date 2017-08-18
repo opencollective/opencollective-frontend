@@ -19,11 +19,12 @@ if (!isTest(publicKey) || !isTest(secret)) {
   process.exit();
 }
 
-models.StripeAccount.findAll({})
+models.ConnectedAccount.findAll({ where: { service: 'stripe' } })
 .map((stripeAccount) => {
 
-  stripeAccount.accessToken = secret;
-  stripeAccount.stripePublishableKey = publicKey;
+  stripeAccount.token = secret;
+  stripeAccount.data = stripeAccount.data || {};
+  stripeAccount.data.publishableKey = publicKey;
 
   return stripeAccount.save();
 })

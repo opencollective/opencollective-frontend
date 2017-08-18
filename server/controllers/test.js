@@ -117,24 +117,27 @@ export const resetTestDatabase = function(req, res, next) {
     }],
 
     createStripeAccount: ['createTestUser', (cb, results) => {
-      models.StripeAccount.create({
-        accessToken: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
+      models.ConnectedAccount.create({
+        service: 'stripe',
+        CollectiveId: results.createTestUser.CollectiveId,
+        username: 'acct_17TL97HrqFRlDDP2',
+        token: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
         refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
-        stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
-        stripeUserId: 'acct_17TL97HrqFRlDDP2',
-        scope: 'read_write'
+        data: {
+          publishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
+          scope: 'read_write'
+        }
       })
-      .then(stripeAccount => results.createTestUser.setStripeAccount(stripeAccount))
       .then(stripeAccount => cb(null, stripeAccount))
       .catch(cb);
     }],
 
     createConnectedAccount: ['createTestUser', (cb, results) => {
       models.ConnectedAccount.create({
-        provider: 'paypal',
+        service: 'paypal',
         // Sandbox api keys
         clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-        secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+        token: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
       })
       .then((connectedAccount) => connectedAccount.setUser(results.createTestUser))
       .then(() => cb())

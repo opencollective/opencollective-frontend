@@ -3,6 +3,9 @@ import { describe, it } from 'mocha';
 import schema from '../server/graphql/schema';
 import models from '../server/models';
 import { graphql } from 'graphql';
+import sinon from 'sinon';
+import { appStripe } from '../server/gateways/stripe';
+import stripeMock from './mocks/stripe';
 
 import * as utils from './utils';
 
@@ -11,8 +14,11 @@ const stringify = (json) => {
 }
 
 describe('Query Tests', () => {
+  let pubnubCollective;
 
   beforeEach(() => utils.loadDB('opencollective_dvl'));
+
+  beforeEach(() => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
 
   it('gets the collective info for the collective page', async () => {
 
@@ -103,6 +109,10 @@ describe('Query Tests', () => {
           service
           brand
         }
+        connectedAccounts {
+          id
+          service
+        }
         __typename
       }
     }`;
@@ -113,54 +123,62 @@ describe('Query Tests', () => {
     const userCollective = result.data.Collective;
     expect(userCollective.twitterHandle).to.equal('xdamman');
     expect(userCollective.website).to.equal('http://xdamman.com');
-    expect(userCollective.memberOf).to.have.length(4);
+    expect(userCollective.memberOf).to.have.length(5);
     const memberships = userCollective.memberOf;
-    memberships.sort((a, b) => {
-      `${b.collective.slug}${b.role}` - `${a.collective.slug}${a.role}`;
-    })
-    expect(memberships[0].role).to.equal('BACKER');
-    expect(memberships[1].role).to.equal('ADMIN');
+    memberships.sort((a, b) => a.id - b.id)
+    expect(memberships[0].role).to.equal('ADMIN');
+    expect(memberships[1].role).to.equal('BACKER');
     expect(memberships[2].role).to.equal('ADMIN');
     expect(memberships[3].role).to.equal('BACKER');
-    expect(memberships[0].collective.slug).to.equal('apex');
+    expect(memberships[1].collective.slug).to.equal('apex');
     expect(userCollective.createdByUser.firstName).to.equal('Xavier');
     expect(userCollective.createdByUser.email).to.be.null;
-    expect(memberships[0].collective.stats).to.deep.equal({
-      backers: 23,
-      yearlyBudget: 329321
+    expect(memberships[1].collective.stats).to.deep.equal({
+      backers: 25,
+      yearlyBudget: 339311
     });
+    console.log(userCollective.connectedAccounts);
   });
 
-  const collective = {
-    "id": 837,
-    "type": "ORGANIZATION",
-    "slug": "pubnub",
-    "name": "PubNub ",
-    "description": null,
-    "longDescription": null,
-    "currency": "USD",
-    "image": "https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png",
-    "members": [
-      {
-        "id": 5680,
-        "role": "ADMIN",
-        "member": {
-          "name": "Xavier Damman",
-          "email": null
-        }
-      },
-      {
-        "role": "MEMBER",
-        "member": {
-          "name": "member1",
-          "email": "member1@hail.com"
-        }
-      }
-    ],
-    "location": {}
-  }
-
   it('edits members', async () => {
+
+    const pubnubAdmin = await models.User.createUserWithCollective({ email: 'admin@pubnub.com'});
+    const adminMembership = await models.Member.findOne({
+      where: {
+        CollectiveId: pubnubCollective.id,
+        role: 'ADMIN'
+      }
+    });
+
+    const collective = {
+      "id": pubnubCollective.id,
+      "type": "ORGANIZATION",
+      "slug": "pubnub",
+      "name": "PubNub ",
+      "description": null,
+      "longDescription": null,
+      "currency": "USD",
+      "image": "https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png",
+      "members": [
+        {
+          "id": adminMembership.id,
+          "role": "ADMIN",
+          "member": {
+            "name": "Xavier Damman",
+            "email": null
+          }
+        },
+        {
+          "role": "MEMBER",
+          "member": {
+            "name": "member1",
+            "email": "member1@hail.com"
+          }
+        }
+      ],
+      "location": {}
+    }
+
     const query = `
     mutation editCollective {
       editCollective(collective: ${stringify(collective)}) {
@@ -183,15 +201,8 @@ describe('Query Tests', () => {
     }
     `;
 
-    const pubnubAdmin = await models.User.createUserWithCollective({ email: 'admin@pubnub.com'});
-    await models.Member.create({
-      CreatedByUserId: pubnubAdmin.id,
-      MemberCollectiveId: pubnubAdmin.CollectiveId,
-      CollectiveId: 837,
-      role: 'ADMIN'
-    });
-
     const res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const members = res.data.editCollective.members;
     expect(members.length).to.equal(2);
@@ -207,8 +218,10 @@ describe('Query Tests', () => {
   it('edit payment methods', async () => {
     let query, res, paymentMethods;
 
+    const stub = sinon.stub(appStripe.customers, 'create', () => Promise.resolve(stripeMock.customers.create));
+
     const collective = {
-      id: 837,
+      id: pubnubCollective.id,
       paymentMethods: [{
         identifier: '4242',
         brand: 'VISA',
@@ -238,11 +251,12 @@ describe('Query Tests', () => {
     await models.Member.create({
       CreatedByUserId: pubnubAdmin.id,
       MemberCollectiveId: pubnubAdmin.CollectiveId,
-      CollectiveId: 837,
+      CollectiveId: pubnubCollective.id,
       role: 'ADMIN'
     });
 
     res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
     expect(paymentMethods).to.have.length(1);
@@ -271,6 +285,7 @@ describe('Query Tests', () => {
     `;
 
     res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
     expect(paymentMethods).to.have.length(2);
@@ -309,5 +324,7 @@ describe('Query Tests', () => {
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(0);
+
+    appStripe.customers.create.restore();
   })
 });

@@ -30,7 +30,7 @@ const collective = {
 };
 
 const meetupAccount = {
-  provider: 'meetup',
+  service: 'meetup',
   username: 'opencollective',
   secret: '620459537f4174273a5d4g535321445',
   CollectiveId: 1

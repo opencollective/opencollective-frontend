@@ -46,10 +46,11 @@ describe('lib.payments.createPayment.test.js', () => {
   beforeEach('add user to collective2 as member', () => collective2.addUserWithRole(host, roles.HOST));
 
   beforeEach('create stripe account', (done) => {
-    models.StripeAccount.create({
-      accessToken: 'abc'
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'abc',
+      CollectiveId: host.collective.id
     })
-    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -129,7 +130,7 @@ describe('lib.payments.createPayment.test.js', () => {
         });
 
         it('if stripe has live key and not in production', () => {
-          return models.StripeAccount.create({ accessToken: 'sk_live_abc', CollectiveId: user.CollectiveId })
+          return models.ConnectedAccount.create({ service: 'stripe', token: 'sk_live_abc', CollectiveId: user.CollectiveId })
           .then(() => paymentsLib.createPayment({
             order,
             payment: {

@@ -555,15 +555,16 @@ export default function(Sequelize, DataTypes) {
             }
           });
         })
+        .then(() => this.getTiers());
       },
 
       editPaymentMethods(paymentMethods, defaultAttributes = {}) {
         if (!paymentMethods) return Promise.resolve();
-        return models.PaymentMethod.findAll({ where: { CollectiveId: this.id }})
+        return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $ne: null } }})
         .then(oldPaymentMethods => {
           // remove the paymentMethods that are not present anymore in the updated collective
           const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
-          return models.PaymentMethod.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+          return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { $in: diff }}})
         })
         .then(() => {
           return Promise.map(paymentMethods, (pm) => {
@@ -571,7 +572,7 @@ export default function(Sequelize, DataTypes) {
               return models.PaymentMethod.update(pm, { where: { id: pm.id }});
             } else {
               pm.CollectiveId = this.id;
-              return models.PaymentMethod.create({...pm, ... defaultAttributes});  
+              return models.PaymentMethod.createFromStripeSourceToken({ ...pm, ...defaultAttributes });
             }
           });
         })
@@ -579,16 +580,17 @@ export default function(Sequelize, DataTypes) {
 
       getStripeAccount() {
         return this.getHostId()
-          .then(id => id && models.StripeAccount.findOne({ where: { CollectiveId: id } }));
+          .then(id => id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } }));
       },
 
       setStripeAccount(stripeAccount) {
         if (!stripeAccount) return Promise.resolve(null);
 
         if (stripeAccount.id) {
-          return models.StripeAccount.update({ CollectiveId: this.id }, { where: { id: stripeAccount.id }, limit: 1});
+          return models.ConnectedAccount.update({ CollectiveId: this.id }, { where: { id: stripeAccount.id }, limit: 1});
         } else {
-          return models.StripeAccount.create({
+          return models.ConnectedAccount.create({
+            service: 'stripe',
             ...stripeAccount,
             CollectiveId: this.id
           });
@@ -612,7 +614,7 @@ export default function(Sequelize, DataTypes) {
           return models.ConnectedAccount.findOne({
             where: {
               CollectiveId: Member.CollectiveId,
-              provider: 'paypal'
+              service: 'paypal'
             }
           });
         });

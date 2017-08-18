@@ -21,7 +21,8 @@
     "website": "https://www.opencollective.com"
   },
   "stripe": {
-    "redirectUri": "https://opencollective-prod-api.herokuapp.com/stripe/oauth/callback"
+    "redirectUri": "https://opencollective-prod-api.herokuapp.com/stripe/oauth/callback",
+    "platformPublishableKey": "pk_live_qZ0OnX69UlIL6pRODicRzsZy"
   },
   "slack": {
     "privateActivityChannel": "#activity-private",

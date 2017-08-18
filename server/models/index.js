@@ -61,7 +61,6 @@ export function setupModels(client) {
     'PaymentMethod',
     'Member',
     'Session',
-    'StripeAccount',
     'Subscription',
     'Tier',
     'Transaction',
@@ -85,6 +84,7 @@ export function setupModels(client) {
   m.User.hasMany(m.Order, { foreignKey: 'CreatedByUserId', as: 'orders' });
   m.User.hasMany(m.PaymentMethod, { foreignKey: 'CreatedByUserId' });
   m.User.hasMany(m.Member, { foreignKey: 'CreatedByUserId' });
+  m.User.hasMany(m.ConnectedAccount, { foreignKey: 'CreatedByUserId' });
   m.User.belongsTo(m.Collective, { as: 'collective', foreignKey: 'CollectiveId', constraints: false });
   
   // Members
@@ -97,9 +97,6 @@ export function setupModels(client) {
   m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'MemberCollectiveId' }, as: 'members'});
   m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'CollectiveId' }, as: 'memberships'});
   m.Collective.hasMany(m.Member);
-
-  // StripeAccount
-  m.StripeAccount.belongsTo(m.Collective); // Add a CollectiveId to StripeAccount
 
   // ConnectedAccount
   m.ConnectedAccount.belongsTo(m.Collective);

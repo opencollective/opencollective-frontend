@@ -55,9 +55,9 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() =>
     models.ConnectedAccount.create({
-      provider: 'paypal',
+      service: 'paypal',
       clientId: 'abc',
-      secret: 'def'
+      token: 'def'
     })
     .then(account => account.setUser(user)));
 

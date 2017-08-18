@@ -1,5 +1,5 @@
 import { hasRole } from '../lib/auth';
-import errors from '../lib/errors';
+import config from 'config';
 
 import {
   GraphQLInt,
@@ -17,7 +17,8 @@ import {
   OrderType,
   MemberType,
   TierType,
-  PaymentMethodType
+  PaymentMethodType,
+  ConnectedAccountType
 } from './types';
 
 import {
@@ -133,7 +134,8 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       stripePublishableKey: { type: GraphQLString },
-      paymentMethods: { type: new GraphQLList(PaymentMethodType) }
+      paymentMethods: { type: new GraphQLList(PaymentMethodType) },
+      connectedAccounts: { type: new GraphQLList(ConnectedAccountType) }
     }
   }
 });
@@ -348,7 +350,7 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.getStripeAccount()
-        .then(stripeAccount => stripeAccount && stripeAccount.stripePublishableKey)
+        .then(stripeAccount => (stripeAccount && stripeAccount.data.publishableKey) || config.stripe.platformPublishableKey)
       }
     },
     paymentMethods: {
@@ -365,11 +367,18 @@ const CollectiveFields = () => {
               where: {
                 CollectiveId: collective.id,
                 service: 'stripe',
-                identifier: { $ne: null }
+                identifier: { $ne: null },
+                archivedAt: null
               }
             });
             
           });
+      }
+    },
+    connectedAccounts: {
+      type: new GraphQLList(ConnectedAccountType),
+      resolve(collective) {
+        return collective.getConnectedAccounts().map(ca => ca.info);
       }
     },
     stats: {

@@ -6,12 +6,12 @@ import requestPromise from 'request-promise';
 class Meetup {
 
   constructor(meetupAccount, collective) {
-    if (!meetupAccount || !meetupAccount.secret)
+    if (!meetupAccount || !meetupAccount.token)
       return Promise.reject(new errors.ValidationFailed("This collective doesn't have a meetup.com account connected"));
 
     this.collective = collective;
     this.settings = {
-      api_key: meetupAccount.secret,
+      api_key: meetupAccount.token,
       slug: meetupAccount.username
     };
   }

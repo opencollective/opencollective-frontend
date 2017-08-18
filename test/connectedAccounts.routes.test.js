@@ -140,7 +140,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
         req.expect(200)
           .end((err, res) => {
             expect(err).to.not.exist;
-            expect(res.body.provider).to.be.equal('github');
+            expect(res.body.service).to.be.equal('github');
             expect(res.body.username).to.be.equal('asood123');
             expect(res.body.connectedAccountId).to.be.equal(1);
             done();

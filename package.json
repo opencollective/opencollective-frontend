@@ -22,7 +22,7 @@
     "base64url": "1.0.6",
     "bcrypt": "1.0.2",
     "bluebird": "3.4.0",
-    "body-parser": "1.15.0",
+    "body-parser": "1.17.2",
     "child-process-promise": "1.1.0",
     "clearbit": "1.2.1",
     "config": "1.19.0",
@@ -112,8 +112,8 @@
     "react": "0.14.8",
     "react-dom": "0.14.8",
     "sinon": "1.10.3",
-    "supertest": "1.2.0",
-    "supertest-as-promised": "3.1.0",
+    "supertest": "3.0.0",
+    "supertest-as-promised": "4.0.2",
     "webpack": "2.2.0"
   },
   "scripts": {

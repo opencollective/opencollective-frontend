@@ -43,8 +43,9 @@ describe('subscriptions.routes.test.js', () => {
 
   // create stripe account
   beforeEach(() => {
-    models.StripeAccount.create({
-      accessToken: 'sktest_123',
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'sktest_123',
       CollectiveId: user.CollectiveId
     })
   });

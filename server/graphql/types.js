@@ -412,6 +412,45 @@ export const OrderType = new GraphQLObjectType({
   }
 });
 
+export const ConnectedAccountType = new GraphQLObjectType({
+  name: "ConnectedAccountType",
+  description: "Sanitized ConnectedAccount Info (ConnectedAccount model)",
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(ca) {
+          return ca.id;
+        }
+      },
+      service: {
+        type: GraphQLString,
+        resolve(ca) {
+          return ca.service;
+        }
+      },
+      username: {
+        type: GraphQLString,
+        resolve(ca) {
+          return ca.username;
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(ca) {
+          return ca.createdAt;
+        }
+      },
+      updatedAt: {
+        type: GraphQLString,
+        resolve(ca) {
+          return ca.updatedAt;
+        }
+      }
+    }
+  }
+});
+
 export const PaymentMethodType = new GraphQLObjectType({
   name: "PaymentMethodType",
   description: "Sanitized PaymentMethod Info (PaymentMethod model)",

@@ -15,5 +15,8 @@
       "api_key": "dvl-1510egmf4a23d80342403fb599qd",
       "secret": "dvl-7749ba6ad8e62b53b18b4c30295f45d849c1"
     }
+  },
+  "stripe": {
+    "platformPublishableKey": "pk_test_VgSB4VSg2wb5LdAkz7p38Gw8"
   }
 }

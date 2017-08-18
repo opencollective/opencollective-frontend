@@ -7,6 +7,7 @@ import app from '../server/index';
 import models from '../server/models';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
+import jwt from 'jsonwebtoken';
 
 const application = utils.data('application');
 
@@ -34,30 +35,28 @@ describe('stripe.routes.test.js', () => {
         .end(done);
     });
 
-    it('should fail if the collective does not have an host', (done) => {
-      request(app)
-        .get(`/stripe/authorize?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .expect(400)
-        .end((err, res) => {
-          expect(err).not.to.exist;
-          expect(res.body.error.code).to.be.equal(400);
-          expect(res.body.error.type).to.be.equal('bad_request');
-          expect(res.body.error.message).to.be.equal('User (id: 2) is not a host');
-          done();
-        });
+    it('should fail if the collective already has a stripeAccount', (done) => {
+      models.ConnectedAccount.create({ service: 'stripe', CollectiveId: collective.id })
+        .then(() => request(app)
+          .get(`/stripe/authorize?api_key=${application.api_key}&CollectiveId=${collective.id}`)
+          .set('Authorization', `Bearer ${host.jwt()}`)
+          .then(response => {
+            expect(response.status).to.equal(400);
+            expect(response.body.error.type).to.equal('validation_failed');
+            done();
+          }));
     });
 
     it('should redirect to stripe', (done) => {
       request(app)
-        .get(`/stripe/authorize?api_key=${application.api_key}`)
+        .get(`/stripe/authorize?api_key=${application.api_key}&CollectiveId=${collective.id}`)
         .set('Authorization', `Bearer ${host.jwt()}`)
         .expect(200) // redirect
         .end((e, res) => {
           expect(e).to.not.exist;
 
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
-          expect(res.body.redirectUrl).to.contain(`state=${host.CollectiveId}`)
+          expect(res.body.redirectUrl).to.contain(`&state=`)
           done();
         });
     });
@@ -95,7 +94,7 @@ describe('stripe.routes.test.js', () => {
         .end(done);
     });
 
-    it('should fail if the user does not exist', (done) => {
+    it('should fail if the state is not a valid JWT', (done) => {
       request(app)
         .get(`/stripe/oauth/callback?api_key=${application.api_key}&state=123412312`)
         .expect(400)
@@ -103,45 +102,35 @@ describe('stripe.routes.test.js', () => {
           expect(err).not.to.exist;
           expect(res.body.error.code).to.be.equal(400);
           expect(res.body.error.type).to.be.equal('bad_request');
-          expect(res.body.error.message).to.be.equal('User (id: 123412312) is not a host');
-          done();
-        });
-    });
-
-    it('should fail if the user is not a host', (done) => {
-      request(app)
-        .get(`/stripe/oauth/callback?state=${user.id}&api_key=${application.api_key}`)
-        .expect(400)
-        .end((err, res) => {
-          expect(err).not.to.exist;
-          expect(res.body.error.code).to.be.equal(400);
-          expect(res.body.error.type).to.be.equal('bad_request');
-          expect(res.body.error.message).to.be.equal(`User (id: ${user.id}) is not a host`);
+          expect(res.body.error.message).to.contain('Invalid JWT');
           done();
         });
     });
 
     it('should set a stripeAccount', (done) => {
-      console.log("api_key", application.api_key);
+      const encodedJWT = jwt.sign({
+        CollectiveId: collective.id,
+        CreatedByUserId: collective.CreatedByUserId
+      }, config.keys.opencollective.secret, { expiresIn: '1h' });
       async.auto({
         request: (cb) => {
           request(app)
-            .get(`/stripe/oauth/callback?state=${host.id}&code=abc&api_key=${application.api_key}`)
+            .get(`/stripe/oauth/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`)
             .expect(302)
             .end(() => cb());
         },
 
         checkStripeAccount: ['request', (cb) => {
-          models.StripeAccount.findAndCountAll({})
+          models.ConnectedAccount.findAndCountAll({})
             .then(res => {
               expect(res.count).to.be.equal(1);
               const account = res.rows[0];
-              expect(account).to.have.property('accessToken', stripeResponse.access_token);
+              expect(account).to.have.property('token', stripeResponse.access_token);
               expect(account).to.have.property('refreshToken', stripeResponse.refresh_token);
-              expect(account).to.have.property('tokenType', stripeResponse.token_type);
-              expect(account).to.have.property('stripePublishableKey', stripeResponse.stripe_publishable_key);
-              expect(account).to.have.property('stripeUserId', stripeResponse.stripe_user_id);
-              expect(account).to.have.property('scope', stripeResponse.scope);
+              expect(account).to.have.property('username', stripeResponse.stripe_user_id);
+              expect(account.data).to.have.property('tokenType', stripeResponse.token_type);
+              expect(account.data).to.have.property('publishableKey', stripeResponse.stripe_publishable_key);
+              expect(account.data).to.have.property('scope', stripeResponse.scope);
               cb(null, account);
             })
             .catch(cb);
@@ -156,8 +145,6 @@ describe('stripe.routes.test.js', () => {
           .catch(cb);
         }]
       }, done);
-
     });
   });
-
 });

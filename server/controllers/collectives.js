@@ -350,7 +350,7 @@ export const createFromGithub = (req, res, next) => {
     if (contributor !== creatorGithubUsername && contributor !== creatorCollectiveConnectedAccount.username) {
       const caAttr = {
         username: contributor,
-        provider: 'github'
+        service: 'github'
       };
       const userAttr = {
         image: `https://images.githubusercontent.com/${contributor}`
@@ -501,8 +501,8 @@ export const getOne = (req, res, next) => {
     req.collective.getHostCollective()
     ])
   .then(values => {
-    collective.stripeAccount = values[0] && _.pick(values[0], 'stripePublishableKey');
-    collective.hasPaypal = values[1] && values[1].provider === 'paypal';
+    collective.stripeAccount = values[0] && _.pick(values[0].data, 'publishableKey');
+    collective.hasPaypal = values[1] && values[1].service === 'paypal';
     collective.balance = values[2];
     collective.yearlyIncome = values[3];
     collective.donationTotal = values[4];

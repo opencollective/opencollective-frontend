@@ -179,7 +179,7 @@ describe('collectives.routes.test.js', () => {
         let preCA;
         return ConnectedAccount.create({
           username: 'asood123',
-          provider: 'github',
+          service: 'github',
           secret: 'xxxxx'
         })
         .then(ca => {
@@ -223,13 +223,13 @@ describe('collectives.routes.test.js', () => {
         })
         .then(() => ConnectedAccount.findOne({where: { username: 'asood123' }}))
         .then(ca => {
-          expect(ca).to.have.property('provider', 'github');
+          expect(ca).to.have.property('service', 'github');
           return ca.getCollective();
         })
         .then(userCollective => expect(userCollective).to.exist)
         .then(() => ConnectedAccount.findOne({ where: { username: 'oc' } }))
         .then(ca => {
-          expect(ca).to.have.property('provider', 'github');
+          expect(ca).to.have.property('service', 'github');
           return ca.getCollective();
         })
         .tap(userCollective => expect(userCollective).to.exist)
@@ -291,7 +291,7 @@ describe('collectives.routes.test.js', () => {
         });
     });
 
-    const stripeAccount = { stripePublishableKey: stripeMock.accounts.create.keys.publishable };
+    const stripeAccount = { data: { publishableKey: stripeMock.accounts.create.keys.publishable } };
     beforeEach(() => host.collective
       .setStripeAccount(stripeAccount)
       .tap(() => user.collective.setStripeAccount(stripeAccount)));
@@ -336,7 +336,6 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('related');
           expect(res.body.tags).to.eql(publicCollective.tags);
           expect(res.body).to.have.property('isSupercollective', false);
-          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });
@@ -351,7 +350,6 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('name', publicCollective.name);
           expect(res.body).to.have.property('isActive', true);
           expect(res.body).to.have.property('stripeAccount');
-          expect(res.body.stripeAccount).to.have.property('stripePublishableKey', stripeMock.accounts.create.keys.publishable);
           done();
         });
     });

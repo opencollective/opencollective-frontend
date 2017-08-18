@@ -46,10 +46,11 @@ describe('Mutation Tests', () => {
   beforeEach(() => collective1.addUserWithRole(user1, roles.ADMIN));
 
   beforeEach('create stripe account', (done) => {
-    models.StripeAccount.create({
-      accessToken: 'abc'
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'abc',
+      CollectiveId: host.collective.id
     })
-    .then((account) => host.collective.setStripeAccount(account))
     .tap(() => done())
     .catch(done);
   });
@@ -182,7 +183,7 @@ describe('Mutation Tests', () => {
 
         const r3 = await graphql(schema, updateQuery, null, { remoteUser: user2 });
         expect(r3.errors).to.have.length(1);
-        expect(r3.errors[0].message).to.equal("You must be logged in as an admin of the scouts collective to edit this event collective");
+        expect(r3.errors[0].message).to.equal("You must be logged in as the creator of this Event or as an admin of the scouts collective to edit this Event Collective");
 
         const r4 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
         const updatedEvent = r4.data.editCollective;
@@ -265,6 +266,7 @@ describe('Mutation Tests', () => {
         const updatedTiers = result2.data.editTiers;
         updatedTiers.sort((a, b) => a.id - b.id);
         expect(updatedTiers).to.have.length(3);
+        console.log("updatedTiers", updatedTiers);
         expect(updatedTiers[0].goal).to.equal(tiers[0].goal);
         expect(updatedTiers[1].amount).to.equal(tiers[1].amount);
       })

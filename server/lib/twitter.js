@@ -21,7 +21,7 @@ export function tweetStatus(Sequelize, CollectiveId, status) {
   return Sequelize.models.ConnectedAccount.findOne({
     where: {
       CollectiveId,
-      provider: 'twitter'
+      service: 'twitter'
     }
   })
   .tap(connectedAccount => {
@@ -31,7 +31,7 @@ export function tweetStatus(Sequelize, CollectiveId, status) {
         consumer_key: config.twitter.consumerKey,
         consumer_secret: config.twitter.consumerSecret,
         access_token_key: connectedAccount.clientId,
-        access_token_secret: connectedAccount.secret
+        access_token_secret: connectedAccount.token
       });
 
       console.log(`Tweeting for collective ID ${CollectiveId}: ${status}`);

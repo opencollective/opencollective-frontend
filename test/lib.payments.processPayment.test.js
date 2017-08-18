@@ -200,8 +200,9 @@ describe('lib.payments.processPayment.test.js', () => {
       stubStripe();
     });
 
-    beforeEach(() => models.StripeAccount.create({
-      accessToken: 'abc',
+    beforeEach(() => models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'abc',
       CollectiveId: host.CollectiveId
     }));
 
