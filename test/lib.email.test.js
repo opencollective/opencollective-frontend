@@ -65,12 +65,17 @@ describe('lib/email', () => {
     const options = {
       from: `${group.name} <hello@${group.slug}.opencollective.com>`,
     };
-
+    const amount = Number(50).toLocaleString('fr-BE', {
+      style: 'currency',
+      currency: 'EUR',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0
+    })
     return emailLib.send(template, data.user.email, data, options)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Merci pour votre donation de €50/mois à La Primaire');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amount}/mois à La Primaire`);
         expect(nm.sendMail.lastCall.args[0].headers['o:tag']).to.equal(template);
       });
   });
@@ -93,11 +98,16 @@ describe('lib/email', () => {
         slug: "wwcodeaustin"
       }
     };
-
+    const amount = Number(50).toLocaleString('USD', {
+      style: 'currency',
+      currency: 'USD',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0
+    })
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your $50/month donation to WWCode Austin');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amount}/month donation to WWCode Austin`);
         expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
       });
   });
@@ -123,10 +133,18 @@ describe('lib/email', () => {
       relatedGroups: utils.data('relatedGroups')
     };
 
-    return emailLib.send('thankyou', data.user.email, data)
+    const from = 'info@brusselstogether.opencollective.com';
+    const amount = Number(50).toLocaleString('fr-BE', {
+      style: 'currency',
+      currency: 'EUR',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0
+    })
+    return emailLib.send('thankyou', data.user.email, data, { from })
       .tap(() => {
+        expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
-        expect(nm.sendMail.lastCall.args[0].subject).to.contain('Thank you for your €50/month donation to #BrusselsTogether');
+        expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amount}/month donation to #BrusselsTogether`);
         expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedGroups[0].name);
         expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.group.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
       });
