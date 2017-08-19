@@ -261,6 +261,8 @@ const processPayment = (donation) => {
                 monthlyInterval: subscription && subscription.interval && (subscription.interval.indexOf('month') !== -1),
                 firstPayment: true,
                 subscriptionsLink: user.generateLoginLink('/subscriptions')
+              }, {
+                from: `${group.name} <hello@${group.slug}.opencollective.com>`
               }));
           }
       })
