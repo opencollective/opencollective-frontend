@@ -54,9 +54,7 @@ export const authorize = (req, res, next) => {
         state
       });
 
-      return res.send({
-        redirectUrl: `${AUTHORIZE_URI}?${params}`
-      });
+      return res.send(200, { redirectUrl: `${AUTHORIZE_URI}?${params}` });
     })
     .catch(next)
 };

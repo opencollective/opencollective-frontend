@@ -14,7 +14,6 @@ import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
 import getPaymentMethods from './controllers/paymentMethods';
 import * as paypal from './controllers/paypal';
-import * as stripe from './controllers/stripe';
 import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
@@ -220,16 +219,10 @@ export default (app) => {
   app.post('/images', uploadImage);
 
   /**
-   * Stripe oAuth
-   */
-  app.get('/stripe/authorize', auth.mustBeLoggedIn, stripe.authorize);
-  app.get('/stripe/oauth/callback', stripe.callback);
-
-  /**
    * Generic OAuth (ConnectedAccounts)
    */
   app.get('/:slug/connected-accounts', connectedAccounts.list);
-  app.get('/connected-accounts/:service(github|twitter|meetup)', aN.authenticateService);
+  app.get('/connected-accounts/:service(github|twitter|meetup|stripe)', aN.authenticateService);
   app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.get);
 

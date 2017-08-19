@@ -10,6 +10,7 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import required from '../required_param';
 import debug from 'debug';
+import * as stripe from '../../controllers/stripe';
 
 const {
   User
@@ -205,6 +206,11 @@ export const authenticateService = (req, res, next) => {
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
   const { service } = req.params;
+
+  if ( service === 'stripe') {
+    return stripe.authorize(req, res, next);
+  }
+
   switch (service) {
     case 'github':
       // 'repo' gives us access to organizational repositories as well
@@ -222,6 +228,11 @@ export const authenticateService = (req, res, next) => {
 
 export const authenticateServiceCallback = (req, res, next) => {
   const { service } = req.params;
+
+  if (service === 'stripe') {
+    return stripe.callback(req, res, next);
+  }
+
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
   console.log("authenticateServiceCallback calling Passport with options", opts);
   passport.authenticate(service, opts, (err, accessToken, data) => {
@@ -249,8 +260,8 @@ export const authenticateServiceCallback = (req, res, next) => {
 
 function getOAuthCallbackUrl(req) {
   const { utm_source } = req.query;
-  const { slug } = req.query;
-  const params = qs.stringify({ utm_source, slug });
+  const { CollectiveId } = req.query;
+  const params = qs.stringify({ utm_source, CollectiveId });
   const { service } = req.params;
   return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
 }

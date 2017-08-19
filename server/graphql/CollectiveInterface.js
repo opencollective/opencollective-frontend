@@ -356,6 +356,7 @@ const CollectiveFields = () => {
     paymentMethods: {
       type: new GraphQLList(PaymentMethodType),
       resolve(collective, args, req) {
+        console.log(">>> paymentMethods for ",req.remoteUser)
         if (!req.remoteUser) return [];
         return hasRole(req.remoteUser.CollectiveId, collective.id, ['ADMIN'])
           .then(canAccess => {

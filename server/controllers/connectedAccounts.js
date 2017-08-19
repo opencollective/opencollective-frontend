@@ -25,10 +25,11 @@ export const list = (req, res, next) => {
 
 export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
   const service = req.params.service;
+  const redirect = `${config.host.website}/${req.query.slug}/edit#connectedAccounts`;
 
   switch (service) {
     case 'github': {
-      const attrs = {service};
+      const attrs = { service };
       let caId, user;
       const utmSource = req.query.utm_source;
       const image = `https://images.githubusercontent.com/${data.profile.username}`;
@@ -42,8 +43,8 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         }))
         .tap(u => user = u)
         .tap(user => attrs.CollectiveId = user.CollectiveId)
-        .then(() => ConnectedAccount.findOne({ where: attrs }))
-        .then(ca => ca || ConnectedAccount.create(attrs))
+        .then(() => ConnectedAccount.findOne({ where: { service, CollectiveId: user.CollectiveId} }))
+        .then(ca => ca || ConnectedAccount.create({ ...attrs, CreatedByUserId: user.id }))
         .then(ca => {
           caId = ca.id;
           return ca.update({ username: data.profile.username, token: accessToken });
@@ -55,23 +56,25 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
         .catch(next);
     }
     case 'meetup':
-      createConnectedAccountForCollective(req.query.slug, service)
+      createConnectedAccountForCollective(req.query.CollectiveId, service)
         .then(ca => ca.update({
           clientId: accessToken,
-          token: data.tokenSecret
+          token: data.tokenSecret,
+          CreatedByUserId: req.remoteUser.id
         }))
-        .then(() => res.redirect(`${config.host.website}/${req.query.slug}`))
+        .then(() => res.redirect(redirect))
         .catch(next);
       break;
 
     case 'twitter':
-      createConnectedAccountForCollective(req.query.slug, service)
+      createConnectedAccountForCollective(req.query.CollectiveId, service)
         .then(ca => ca.update({
           username: data.profile.username,
           clientId: accessToken,
-          token: data.tokenSecret
+          token: data.tokenSecret,
+          CreatedByUserId: req.remoteUser.id
         }))
-        .then(() => res.redirect(`${config.host.website}/${req.query.slug}/edit-twitter`))
+        .then(() => res.redirect(redirect))
         .catch(next);
       break;
 
@@ -119,9 +122,9 @@ export const fetchAllRepositories = (req, res, next) => {
   .catch(next);
 };
 
-function createConnectedAccountForCollective(slug, service) {
+function createConnectedAccountForCollective(CollectiveId, service) {
   const attrs = { service };
-  return models.Collective.findOne({where: { slug }})
+  return models.Collective.findById(CollectiveId)
     .tap(collective => attrs.CollectiveId = collective.id)
     .then(() => ConnectedAccount.findOne({ where: attrs }))
     .then(ca => ca || ConnectedAccount.create(attrs));

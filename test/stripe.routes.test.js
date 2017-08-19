@@ -30,7 +30,7 @@ describe('stripe.routes.test.js', () => {
   describe('authorize', () => {
     it('should return an error if the user is not logged in', (done) => {
       request(app)
-        .get('/stripe/authorize?api_key=${application.api_key}')
+        .get('/connected-accounts/stripe?api_key=${application.api_key}')
         .expect(401)
         .end(done);
     });
@@ -38,7 +38,7 @@ describe('stripe.routes.test.js', () => {
     it('should fail if the collective already has a stripeAccount', (done) => {
       models.ConnectedAccount.create({ service: 'stripe', CollectiveId: collective.id })
         .then(() => request(app)
-          .get(`/stripe/authorize?api_key=${application.api_key}&CollectiveId=${collective.id}`)
+          .get(`/connected-accounts/stripe?api_key=${application.api_key}&CollectiveId=${collective.id}`)
           .set('Authorization', `Bearer ${host.jwt()}`)
           .then(response => {
             expect(response.status).to.equal(400);
@@ -49,12 +49,11 @@ describe('stripe.routes.test.js', () => {
 
     it('should redirect to stripe', (done) => {
       request(app)
-        .get(`/stripe/authorize?api_key=${application.api_key}&CollectiveId=${collective.id}`)
+        .get(`/connected-accounts/stripe?api_key=${application.api_key}&CollectiveId=${collective.id}`)
         .set('Authorization', `Bearer ${host.jwt()}`)
         .expect(200) // redirect
         .end((e, res) => {
           expect(e).to.not.exist;
-
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')
           expect(res.body.redirectUrl).to.contain(`&state=`)
           done();
@@ -89,14 +88,14 @@ describe('stripe.routes.test.js', () => {
 
     it('should fail if the state is empty', (done) => {
       request(app)
-        .get(`/stripe/oauth/callback?api_key=${application.api_key}`)
+        .get(`/connected-accounts/stripe/callback?api_key=${application.api_key}`)
         .expect(400)
         .end(done);
     });
 
     it('should fail if the state is not a valid JWT', (done) => {
       request(app)
-        .get(`/stripe/oauth/callback?api_key=${application.api_key}&state=123412312`)
+        .get(`/connected-accounts/stripe/callback?api_key=${application.api_key}&state=123412312`)
         .expect(400)
         .end((err, res) => {
           expect(err).not.to.exist;
@@ -115,7 +114,7 @@ describe('stripe.routes.test.js', () => {
       async.auto({
         request: (cb) => {
           request(app)
-            .get(`/stripe/oauth/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`)
+            .get(`/connected-accounts/stripe/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`)
             .expect(302)
             .end(() => cb());
         },
