@@ -308,7 +308,11 @@ const processPayment = (order) => {
                 monthlyInterval: subscription && subscription.interval && (subscription.interval.indexOf('month') !== -1),
                 firstPayment: true,
                 subscriptionsLink: user.generateLoginLink('/subscriptions')
-              }));
+              },
+              {
+                from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
+              }
+            ));
           }
         })
         .then(() => transaction); // make sure we return the transaction created

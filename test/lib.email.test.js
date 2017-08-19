@@ -136,8 +136,8 @@ describe('lib/email', () => {
       },
       relatedCollectives: utils.data('relatedCollectives')
     };
-
-    return emailLib.send('thankyou', data.user.email, data)
+    const from = `BrusselsTogether <info@brusselstogether.opencollective.com>`;
+    return emailLib.send('thankyou', data.user.email, data, { from })
       .tap(() => {
         let amountStr = 50;
         amountStr = amountStr.toLocaleString('EUR', {
@@ -147,6 +147,7 @@ describe('lib/email', () => {
           maximumFractionDigits : 0
         });
         
+        expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
         expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to #BrusselsTogether`);
         expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
