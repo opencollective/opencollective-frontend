@@ -33,6 +33,7 @@ const templateNames = [
   'thankyou',
   'thankyou.sustain',
   'thankyou.wwcode',
+  'thankyou.kendraio',
   'thankyou.brusselstogether',
   'thankyou.ispcwa',
   'thankyou.fr',

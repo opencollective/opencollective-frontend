@@ -190,6 +190,8 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
       template += '.wwcode';
     if (data.group.name.match(/ispcwa/i))
       template += '.ispcwa';
+    if (data.group.slug === 'kendraio')
+      template = 'thankyou.kendraio';
     if (data.group.slug === 'brusselstogether')
       template = 'thankyou.brusselstogether';
     if (data.group.slug === 'sustainoss')
