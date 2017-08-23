@@ -2,25 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import stylesheet from '../styles/card.css';
 import CardReactFormContainer from 'card-react';
-import { Checkbox, FormGroup, FormControl } from 'react-bootstrap';
+import { FormGroup, FormControl } from 'react-bootstrap';
 import Payment from 'payment';
 
 class InputTypeCreditCard extends React.Component {
 
   static propTypes = {
     name: PropTypes.string,
-    options: PropTypes.arrayOf(PropTypes.object),
-    number: PropTypes.number,
-    cvc: PropTypes.number,
-    exp_month: PropTypes.number,
-    exp_year: PropTypes.number,
+    value: PropTypes.object,
+    options: PropTypes.arrayOf(PropTypes.object), // dropdown to select credit card on file
     onChange: PropTypes.func.isRequired
   };
 
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { save: true };
+    this.state = {};
   }
 
   handleChange(fieldname, value) {
@@ -33,9 +30,9 @@ class InputTypeCreditCard extends React.Component {
 
     if (fieldname === 'expiry') {
       const expiration = value.split('/');
-      newState['exp_month'] = Number(expiration[0].trim());
+      newState['exp_month'] = Number((expiration[0] || '').trim());
       if (expiration.length > 0) {
-        const year = Number(expiration[1].trim());
+        const year = Number((expiration[1] || '').trim());
         newState['exp_year'] = (year > 2000) ? year : 2000 + year;
       }
     } else {
@@ -139,11 +136,10 @@ class InputTypeCreditCard extends React.Component {
                   <FormControl.Feedback />
                 </FormGroup>
                 <div className="oneline">
-                  <FormControl placeholder="Full name" type="text" name="CCname" key="CCname" controlId="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
+                  <FormControl placeholder="Full name" type="text" name="CCname" key="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
                   <FormControl placeholder="MM/YY" type="text" name="CCexpiry" key="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
                   <FormControl placeholder="CVC" type="text" name="CCcvc" key="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
                 </div>
-                <Checkbox key="saveCard" defaultChecked={true} onChange={(e) => this.handleChange("save", e.target.checked)}>Save Card</Checkbox>
               </div>
           </CardReactFormContainer>
         </div>

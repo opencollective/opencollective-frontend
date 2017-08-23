@@ -59,6 +59,10 @@ export default class IntlDocument extends Document {
             margin: 0;
             padding: 0;
           }
+          a:hover {
+            color: #797d80;
+            text-decoration: none;
+          }
         `}</style>
         <Head />
         <body>

@@ -100,7 +100,6 @@ class DonatePage extends React.Component {
               order={this.order}
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
-              stripePublishableKey={collective.stripePublishableKey}
               />
           </div>
         </Body>

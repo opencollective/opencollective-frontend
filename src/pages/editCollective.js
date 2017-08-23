@@ -1,7 +1,7 @@
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
-import { addCollectiveData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { addCollectiveToEditData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
 import EditCollective from '../components/EditCollective';
@@ -15,7 +15,7 @@ class EditCollectivePage extends React.Component {
   }
 
   static getInitialProps ({ query: { slug } }) {
-    return { slug };
+    return { slug, ssr: false };
   }
 
   async componentDidMount() {
@@ -25,9 +25,9 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug, parentCollectiveSlug } = this.props;
-
-    if (this.state.loading) {
+    const { data, parentCollectiveSlug } = this.props;
+    const { loading, slug, LoggedInUser } = this.state;
+    if (loading) {
       return <Loading />;
     }
 
@@ -35,7 +35,6 @@ class EditCollectivePage extends React.Component {
       return (<NotFound />)
     }
 
-    const { LoggedInUser } = this.state;
     const collective = data.Collective;
 
     window.OC = { collective };
@@ -54,4 +53,4 @@ class EditCollectivePage extends React.Component {
   }
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveData(withIntl(EditCollectivePage))));
+export default withData(addGetLoggedInUserFunction(addCollectiveToEditData(withIntl(EditCollectivePage))));

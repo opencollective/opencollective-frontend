@@ -12,6 +12,9 @@ import withIntl from '../lib/withIntl';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { get, groupBy } from 'lodash';
 import { Router } from '../server/pages';
+import HashLink from 'react-scrollchor';
+import MenuBar from './MenuBar';
+import MessageModal from './MessageModal';
 
 class UserCollective extends React.Component {
 
@@ -30,24 +33,27 @@ class UserCollective extends React.Component {
       api: { status: 'idle' },
     };
 
-    this.messages = defineMessages({      
-      'user.memberships.host.title': { id: 'user.memberships.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
-      'user.memberships.admin.title': { id: 'user.memberships.admin.title', defaultMessage: `I'm contributing to {n, plural, one {this collective} other {these collectives}}`},
-      'user.memberships.member.title': { id: 'user.memberships.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
-      'user.memberships.backer.title': { id: 'user.memberships.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
-      'user.memberships.follower.title': { id: 'user.memberships.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
+    this.messages = defineMessages({
+      'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing since {year}`},
+      'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing since {year}`},
+      'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `EDIT ORGANIZATION`},
+      'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `EDIT PROFILE`},
+      'user.collective.memberOf.host.title': { id: 'user.collective.memberOf.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.admin.title': { id: 'user.collective.memberOf.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.memberOf.follower.title': { id: 'user.collective.memberOf.follower.title', defaultMessage: `I'm following {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.host.title': { id: 'organization.collective.memberOf.host.title', defaultMessage: `We are hosting {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.admin.title': { id: 'organization.collective.memberOf.admin.title', defaultMessage: `We are a core contributor of {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.member.title': { id: 'organization.collective.memberOf.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.backer.title': { id: 'organization.collective.memberOf.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
+      'organization.collective.memberOf.follower.title': { id: 'organization.collective.memberOf.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
+      'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.menu.follower': { id: 'user.collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
     })
-
-    // testing order form
-    // this.state = {"view":"OrderTier","order":{"quantity":1,"totalAmount":1000,"tier":{"id":51,"slug":"members","type":"TIER","name":"member","description":"Become a member and receive our newsletter to stay up to date with the latest initiatives happening in Brussels","amount":1000,"presets":null,"interval":"month","currency":"EUR","maxQuantity":null,"orders":[{"id":950,"publicMessage":null,"user":{"id":1648,"name":"Alaric Bouvy","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/159f8200-9d48-11e6-9116-db595ff259df.jpg","username":"alaricbouvy","twitterHandle":"Womer_Founder","description":"A young entrepreneur who wants to do his part","__typename":"User"},"__typename":"OrderType"},{"id":1023,"publicMessage":null,"user":{"id":1726,"name":"Marine Visart","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/755423e0-a121-11e6-ba30-f10557c4c678.jpg","username":"marinevisart1","twitterHandle":null,"description":"Graphic design based in brussels","__typename":"User"},"__typename":"OrderType"},{"id":1146,"publicMessage":null,"user":{"id":1861,"name":"George Kosmopoulos","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/11df58878edf48ce98883a23ef438ae5_319d1380-b195-11e6-afe2-6129fbf4c498.png","username":"georgekosmopoulos","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1147,"publicMessage":null,"user":{"id":1863,"name":"Raphaël Krings","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/8c07a30c-c680-457d-ab59-722be66e09d9","username":"raphaelkrings","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1159,"publicMessage":null,"user":{"id":1877,"name":"Philippe Drouillon","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/8733f790-b3f8-11e6-bbdc-571063972d3c.JPG","username":"philippedrouillon","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1163,"publicMessage":null,"user":{"id":1885,"name":"Caroline DC","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/ce8b4d40-b4a8-11e6-8e7e-5955bbcb143d.jpg","username":"cdecartier","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1242,"publicMessage":null,"user":{"id":1993,"name":"Laurent Hublet","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/70555f77-cb32-430b-97f6-8de45072867d","username":"laurenthublet","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1266,"publicMessage":null,"user":{"id":2035,"name":"Thomas Carton de Wiart","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/7e57d0b0-19ec-11e7-a996-d1ff903d60a2.jpeg","username":"thomasdewiart","twitterHandle":"barrycarton","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1412,"publicMessage":null,"user":{"id":2282,"name":"Sacha Waedemon","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/ad4f7590-c919-11e6-9af0-47fca5e686db.jpg","username":"sacha","twitterHandle":"sachawb","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1716,"publicMessage":null,"user":{"id":2911,"name":"Tarik Hennen","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/7ba10bba-b82a-425d-8c0f-4685cfc3c750","username":"tarikhennen","twitterHandle":"tarikhennen","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":2076,"publicMessage":null,"user":{"id":3595,"name":"John Jadot","image":null,"username":"johnjadot","twitterHandle":"pulppp","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1625,"publicMessage":null,"user":{"id":2721,"name":"Anis Bedda","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/5e84b150-e31d-11e6-96ad-4fa0cb304f32.jpg","username":"anisbedda","twitterHandle":"anisb","description":"@transformabxl and @intrapreneurcnf cofounder, social innovation enabler, music addict, a world citizen &amp; a daddy (Alumnus Impact HUB, AIESEC) . find me at @anisb","__typename":"User"},"__typename":"OrderType"},{"id":3068,"publicMessage":null,"user":{"id":3729,"name":"Maite Morren","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/8ac96da6-8c02-4916-99b2-342bc5372b51","username":"maitemorren","twitterHandle":"MaiteMorren","description":"Brussels / politics / photography / foodie ","__typename":"User"},"__typename":"OrderType"},{"id":964,"publicMessage":null,"user":{"id":2,"name":"Xavier Damman","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg","username":"xdamman","twitterHandle":"xdamman","description":"Entrepreneur sharing ideas in copyleft","__typename":"User"},"__typename":"OrderType"},{"id":1037,"publicMessage":null,"user":{"id":1744,"name":"Frederik Vincx","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/c6de8770-a273-11e6-9564-49520f227cc8.jpg","username":"prezly","twitterHandle":"fritsbits","description":null,"__typename":"User"},"__typename":"OrderType"}],"__typename":"Tier"}},"api":{"status":"idle"}};
-    
-    // To test confirmation screen, uncomment the following:
-    // this.state.modal = "TicketsConfirmed";
-    // this.state.order = {
-    //   user: { email: "etienne@gmail.com"},
-    //   tier: this.collective && this.collective.tiers[0],
-    //   quantity: 2
-    // };
 
   }
 
@@ -57,12 +63,31 @@ class UserCollective extends React.Component {
 
   render() {
 
-    const { intl } = this.props;
+    const { intl, LoggedInUser } = this.props;
 
     console.log("UserCollectivePage> this.collective", this.collective, "state", this.state);
 
-    const memberships = groupBy(this.collective.memberships, 'role');
-    console.log("memberships", memberships);
+    const type = this.collective.type.toLowerCase();
+
+    const memberOf = groupBy(this.collective.memberOf, 'role');
+    console.log("memberOf", memberOf);
+
+    const actions = [];
+    Object.keys(memberOf).map(role => {
+      actions.push(
+        {
+          className: 'whiteblue',
+          component: <HashLink to={`#${role}`}>{intl.formatMessage(this.messages[`user.collective.menu.${role.toLowerCase()}`], { n: memberOf[role].length })}</HashLink>
+        }
+      );
+    });
+
+    if (LoggedInUser && LoggedInUser.canEditCollective) {
+      actions.push({
+        className: 'whiteblue small',
+        component: <a href={`/${this.collective.slug}/edit`}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</a>
+      });
+    }
 
     return (
       <div className="UserCollectivePage">
@@ -89,8 +114,15 @@ class UserCollective extends React.Component {
 
             <NotificationBar status={this.state.status} error={this.state.error} />
 
+            { this.props.message && <MessageModal message={this.props.message} /> }
+
             <CollectiveCover
               collective={this.collective}
+              />
+
+            <MenuBar
+              info={intl.formatMessage(this.messages[`${type}.collective.since`], { year: (new Date(this.collective.createdAt)).getFullYear() })}
+              actions={actions}
               />
 
             <div>
@@ -126,10 +158,10 @@ class UserCollective extends React.Component {
                   )}
                 </div>
               </div>
-              { Object.keys(memberships).map(role => (
+              { Object.keys(memberOf).map(role => (
                 <section id={role}>
-                    <h1>{intl.formatMessage(this.messages[`user.memberships.${role.toLowerCase()}.title`], { n: memberships[role].length })}</h1> 
-                    <Memberships className={role} memberships={memberships[role]} /> 
+                    <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1> 
+                    <Memberships className={role} memberships={memberOf[role]} />
                 </section>
               ))}
 

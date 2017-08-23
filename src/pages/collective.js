@@ -17,8 +17,8 @@ class CollectivePage extends React.Component {
     this.state = {};
   }
 
-  static getInitialProps ({ query: { slug } }) {
-    return { slug }
+  static getInitialProps ({ query: { slug, message } }) {
+    return { slug, message }
   }
 
   async componentDidMount() {
@@ -28,7 +28,7 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug } = this.props;
+    const { data, slug, message } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
@@ -42,14 +42,14 @@ class CollectivePage extends React.Component {
     const collective = data.Collective;
 
     if (LoggedInUser) {
-      LoggedInUser.canEditEvent = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
+      LoggedInUser.canEditCollective = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
         || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length;
     }
 
     return (
       <div>
-        {collective.type === 'COLLECTIVE' && <Collective collective={collective} LoggedInUser={LoggedInUser} />}
-        {['USER', 'ORGANIZATION'].includes(collective.type) && <UserCollective collective={collective} LoggedInUser={LoggedInUser} />}
+        {collective.type === 'COLLECTIVE' && <Collective collective={collective} LoggedInUser={LoggedInUser} message={message} />}
+        {['USER', 'ORGANIZATION'].includes(collective.type) && <UserCollective collective={collective} LoggedInUser={LoggedInUser} message={message} />}
       </div>
     );
   }

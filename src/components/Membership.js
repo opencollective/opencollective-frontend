@@ -3,21 +3,16 @@ import PropTypes from 'prop-types';
 
 import CollectiveCard from './CollectiveCard';
 
-import { defineMessages, injectIntl } from 'react-intl';
 import { pickAvatar } from '../lib/collective.lib';
 
 class Membership extends React.Component {
 
   static propTypes = {
-    order: PropTypes.object.isRequired
+    membership: PropTypes.object.isRequired
   }
 
   constructor(props) {
     super(props);
-    this.messages = defineMessages({
-      INTERESTED: { id: 'order.status.interested', defaultMessage: '{name} is interested' },
-      YES: { id: 'order.status.yes', defaultMessage: '{name} is going' }
-    });
 
   }
 
@@ -47,4 +42,4 @@ class Membership extends React.Component {
 
 }
 
-export default injectIntl(Membership);
+export default Membership;

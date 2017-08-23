@@ -12,6 +12,10 @@ import { addCreateOrderMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
+import MenuBar from './MenuBar';
+import HashLink from 'react-scrollchor';
+import { FormattedMessage, defineMessages } from 'react-intl';
+import withIntl from '../lib/withIntl';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -35,6 +39,18 @@ class Collective extends React.Component {
       api: { status: 'idle' },
     };
 
+    this.messages = defineMessages({      
+      'collective.since': { id: 'usercollective.since', defaultMessage: `Established in {year}`},
+      'collective.members.admin.title': { id: 'collective.members.admin.title', defaultMessage: `{n} {n, plural, one {core contributor} other {core contributors}}`},
+      'collective.members.member.title': { id: 'collective.members.member.title', defaultMessage: `{n} {n, plural, one {member} other {members}}`},
+      'collective.members.backer.title': { id: 'collective.members.backer.title', defaultMessage: `{n} {n, plural, one {backer} other {backers}}`},
+      'collective.members.follower.title': { id: 'collective.members.follower.title', defaultMessage: `{n} {n, plural, one {follower} other {followers}}`},
+      'collective.menu.host': { id: 'collective.menu.host', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.menu.admin': { id: 'collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.menu.member': { id: 'collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.menu.backer': { id: 'collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
+      'collective.menu.follower': { id: 'collective.menu.follower', defaultMessage: `following {n} {n, plural, one {collective} other {collectives}}`},
+    })
     // testing order form
     // this.state = {"view":"OrderTier","order":{"quantity":1,"totalAmount":1000,"tier":{"id":51,"slug":"members","type":"TIER","name":"member","description":"Become a member and receive our newsletter to stay up to date with the latest initiatives happening in Brussels","amount":1000,"presets":null,"interval":"month","currency":"EUR","maxQuantity":null,"orders":[{"id":950,"publicMessage":null,"user":{"id":1648,"name":"Alaric Bouvy","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/159f8200-9d48-11e6-9116-db595ff259df.jpg","username":"alaricbouvy","twitterHandle":"Womer_Founder","description":"A young entrepreneur who wants to do his part","__typename":"User"},"__typename":"OrderType"},{"id":1023,"publicMessage":null,"user":{"id":1726,"name":"Marine Visart","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/755423e0-a121-11e6-ba30-f10557c4c678.jpg","username":"marinevisart1","twitterHandle":null,"description":"Graphic design based in brussels","__typename":"User"},"__typename":"OrderType"},{"id":1146,"publicMessage":null,"user":{"id":1861,"name":"George Kosmopoulos","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/11df58878edf48ce98883a23ef438ae5_319d1380-b195-11e6-afe2-6129fbf4c498.png","username":"georgekosmopoulos","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1147,"publicMessage":null,"user":{"id":1863,"name":"Raphaël Krings","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/8c07a30c-c680-457d-ab59-722be66e09d9","username":"raphaelkrings","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1159,"publicMessage":null,"user":{"id":1877,"name":"Philippe Drouillon","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/8733f790-b3f8-11e6-bbdc-571063972d3c.JPG","username":"philippedrouillon","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1163,"publicMessage":null,"user":{"id":1885,"name":"Caroline DC","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/ce8b4d40-b4a8-11e6-8e7e-5955bbcb143d.jpg","username":"cdecartier","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1242,"publicMessage":null,"user":{"id":1993,"name":"Laurent Hublet","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/70555f77-cb32-430b-97f6-8de45072867d","username":"laurenthublet","twitterHandle":null,"description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1266,"publicMessage":null,"user":{"id":2035,"name":"Thomas Carton de Wiart","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/7e57d0b0-19ec-11e7-a996-d1ff903d60a2.jpeg","username":"thomasdewiart","twitterHandle":"barrycarton","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1412,"publicMessage":null,"user":{"id":2282,"name":"Sacha Waedemon","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/ad4f7590-c919-11e6-9af0-47fca5e686db.jpg","username":"sacha","twitterHandle":"sachawb","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1716,"publicMessage":null,"user":{"id":2911,"name":"Tarik Hennen","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/7ba10bba-b82a-425d-8c0f-4685cfc3c750","username":"tarikhennen","twitterHandle":"tarikhennen","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":2076,"publicMessage":null,"user":{"id":3595,"name":"John Jadot","image":null,"username":"johnjadot","twitterHandle":"pulppp","description":null,"__typename":"User"},"__typename":"OrderType"},{"id":1625,"publicMessage":null,"user":{"id":2721,"name":"Anis Bedda","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/5e84b150-e31d-11e6-96ad-4fa0cb304f32.jpg","username":"anisbedda","twitterHandle":"anisb","description":"@transformabxl and @intrapreneurcnf cofounder, social innovation enabler, music addict, a world citizen &amp; a daddy (Alumnus Impact HUB, AIESEC) . find me at @anisb","__typename":"User"},"__typename":"OrderType"},{"id":3068,"publicMessage":null,"user":{"id":3729,"name":"Maite Morren","image":"https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/8ac96da6-8c02-4916-99b2-342bc5372b51","username":"maitemorren","twitterHandle":"MaiteMorren","description":"Brussels / politics / photography / foodie ","__typename":"User"},"__typename":"OrderType"},{"id":964,"publicMessage":null,"user":{"id":2,"name":"Xavier Damman","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg","username":"xdamman","twitterHandle":"xdamman","description":"Entrepreneur sharing ideas in copyleft","__typename":"User"},"__typename":"OrderType"},{"id":1037,"publicMessage":null,"user":{"id":1744,"name":"Frederik Vincx","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/c6de8770-a273-11e6-9564-49520f227cc8.jpg","username":"prezly","twitterHandle":"fritsbits","description":null,"__typename":"User"},"__typename":"OrderType"}],"__typename":"Tier"}},"api":{"status":"idle"}};
     
@@ -45,7 +61,6 @@ class Collective extends React.Component {
     //   tier: this.collective && this.collective.tiers[0],
     //   quantity: 2
     // };
-
   }
 
   componentDidMount() {
@@ -115,6 +130,7 @@ class Collective extends React.Component {
 
   render() {
     console.log("CollectivePage> this.collective", this.collective, "state", this.state);
+    const { intl, LoggedInUser } = this.props;
 
     const members = {};
     this.collective.tiers.map(tier => {
@@ -129,6 +145,23 @@ class Collective extends React.Component {
         }
       })
     });
+
+    const actions = [];
+    Object.keys(members).map(tierSlug => {
+      actions.push(
+        {
+          className: 'whiteblue',
+          component: <HashLink to={`#${tierSlug}`}>{`${members[tierSlug].length} ${tierSlug}`}</HashLink>
+        }
+      );
+    });
+
+    if (LoggedInUser && LoggedInUser.canEditCollective) {
+      actions.push({
+        className: 'whiteblue small',
+        component: <a href={`/${this.collective.slug}/edit`}>EDIT COLLECTIVE</a>
+      });
+    }
 
     const backgroundImage = this.collective.backgroundImage || get(this.collective,'parentCollective.backgroundImage') || defaultBackgroundImage;
 
@@ -158,6 +191,11 @@ class Collective extends React.Component {
                 style={get(this.collective, 'settings.style.hero.cover') || get(this.collective.parentCollective, 'settings.style.hero.cover')}                  
                 />
 
+              <MenuBar
+                info={intl.formatMessage(this.messages['collective.since'], { year: (new Date(this.collective.createdAt)).getFullYear() })}
+                actions={actions}
+                />
+
               <div>
 
                 { this.state.view === 'OrderTier' &&
@@ -166,7 +204,6 @@ class Collective extends React.Component {
                       onSubmit={this.createOrder}
                       order={this.state.order}
                       LoggedInUser={this.props.LoggedInUser}
-                      stripePublishableKey={this.collective.stripePublishableKey}
                       />
                   </div>
                 }
@@ -219,4 +256,4 @@ class Collective extends React.Component {
   }
 }
 
-export default addCreateOrderMutation(Collective);
+export default addCreateOrderMutation(withIntl(Collective));

@@ -73,7 +73,6 @@
         "currency": "EUR",
         "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
         "image": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
-        "stripePublishableKey": "pk_test_5aBB887rPuzvWzbdRiSzV3QB",
         "settings": {
           "style": {
             "hero": {

@@ -46,7 +46,7 @@ class OrderTierPage extends React.Component {
 
   async createOrder(order) {
     const { intl, slug } = this.props;
-    order.collective = { slug };
+    order.toCollective = { slug };
     try {
       this.setState({ loading: true});
       const res = await this.props.createOrder(order);
@@ -83,12 +83,9 @@ class OrderTierPage extends React.Component {
 
         <Body>
           <CollectiveCover
-            href={`/${collective.slug}`}
-            logo={collective.image}
+            collective={collective}
             title={intl.formatMessage(this.messages[`${Tier.type.toLowerCase()}.title`], { name: Tier.name })}
             className="small"
-            backgroundImage={collective.backgroundImage}
-            style={get(collective, 'settings.style.hero.cover')}
             />
 
           <div className="content">
@@ -96,7 +93,6 @@ class OrderTierPage extends React.Component {
               order={this.order}
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
-              stripePublishableKey={collective.stripePublishableKey}
               />
           </div>
         </Body>

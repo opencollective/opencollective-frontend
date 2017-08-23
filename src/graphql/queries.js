@@ -10,23 +10,17 @@ export const getLoggedInUserQuery = gql`
       lastName
       email
       image
-      memberships {
+      CollectiveId
+      memberOf {
         id
         role
         collective {
           id
           slug
           name
+          balance
+          currency
         }
-      }
-      paymentMethods {
-        id
-        uuid
-        identifier
-        brand
-        funding
-        expMonth
-        expYear
       }
     }
   }
@@ -89,8 +83,7 @@ const getTiersQuery = gql`
   }
 `;
 
-
-const getCollectiveQuery = gql`
+const getCollectiveToEditQuery = gql`
   query Collective($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -108,9 +101,11 @@ const getCollectiveQuery = gql`
       website
       currency
       settings
+      createdAt
       stats {
         yearlyBudget
         backers
+        totalAmountSent
       }
       tiers {
         id
@@ -138,7 +133,7 @@ const getCollectiveQuery = gql`
           }
         }
       }
-      memberships {
+      memberOf {
         id
         createdAt
         role
@@ -178,6 +173,123 @@ const getCollectiveQuery = gql`
           slug
           twitterHandle
           description
+          ... on User {
+            email
+          }
+        }
+      }
+      paymentMethods {
+        id
+        uuid
+        identifier
+        brand
+        funding
+        expMonth
+        expYear
+      }
+      connectedAccounts {
+        id
+        service
+        username
+        createdAt
+      }
+    }
+  }
+`;
+
+const getCollectiveQuery = gql`
+  query Collective($slug: String!) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
+      createdByUser {
+        id
+      }
+      name
+      image
+      backgroundImage
+      description
+      longDescription
+      twitterHandle
+      website
+      currency
+      settings
+      createdAt
+      stats {
+        yearlyBudget
+        backers
+        totalAmountSent
+      }
+      tiers {
+        id
+        slug
+        type
+        name
+        description
+        amount
+        presets
+        interval
+        currency
+        maxQuantity
+        orders {
+          id
+          publicMessage
+          createdAt
+          totalTransactions
+          fromCollective {
+            id
+            name
+            image
+            slug
+            twitterHandle
+            description
+          }
+        }
+      }
+      memberOf {
+        id
+        createdAt
+        role
+        totalDonations
+        tier {
+          id
+          name
+        }
+        collective {
+          id
+          type
+          slug
+          name
+          currency
+          description
+          settings
+          image
+          stats {
+            backers
+            yearlyBudget
+          }
+        }
+      }
+      members {
+        id
+        createdAt
+        role
+        totalDonations
+        tier {
+          id
+          name
+        }
+        member {
+          id
+          name
+          image
+          slug
+          twitterHandle
+          description
+          ... on User {
+            email
+          }
         }
       }
     }
@@ -225,7 +337,6 @@ const getEventCollectiveQuery = gql`
         currency
         backgroundImage
         image
-        stripePublishableKey
         settings
       }
       members {
@@ -346,7 +457,6 @@ const getCollectiveTierQuery = gql`
       backgroundImage
       settings
       image
-      stripePublishableKey
     }
     Tier(id: $TierId) {
       id
@@ -485,6 +595,7 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   })  
 });
 export const addCollectiveData = graphql(getCollectiveQuery);
+export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addCollectiveTierData = graphql(getCollectiveTierQuery);
 export const addEventsData = graphql(getEventsQuery);
@@ -524,9 +635,9 @@ export const addGetLoggedInUserFunction = (component) => {
                 .then(res => {
                   if (res.data && res.data.LoggedInUser) {
                     const LoggedInUser = {...res.data.LoggedInUser};
-                    if (LoggedInUser && LoggedInUser.memberships) {
+                    if (LoggedInUser && LoggedInUser.memberOf) {
                       const roles = {};
-                      LoggedInUser.memberships.map(member => {
+                      LoggedInUser.memberOf.map(member => {
                         roles[member.collective.slug] = roles[member.collective.slug] || [];
                         roles[member.collective.slug].push(member.role);
                       });

@@ -48,7 +48,7 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
 
 export function prettyUrl(url) {
   if (!url) return '';
-  return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '');
+  return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '').replace(/\/$/,'');
 }
 
 export function formatCurrency(amount, currency = 'USD', intl) {
@@ -80,7 +80,6 @@ export const translateApiUrl = (url) => {
     return withoutParams;
   }
 };
-
 
 export const capitalize = (str) => {
   if (!str) return '';

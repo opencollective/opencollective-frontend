@@ -29,7 +29,7 @@ class Member extends React.Component {
   }
 
   onClick() {
-    Router.pushRoute(`/${this.props.membership.member.slug}`);    
+    Router.pushRoute(`/${this.props.member.member.slug}`);    
   }
 
   render() {

@@ -7,7 +7,7 @@ const createOrderQuery = gql`
     createOrder(order: $order) {
       id,
       createdAt,
-      user {
+      createdByUser {
         id,
         username,
         email
@@ -18,47 +18,6 @@ const createOrderQuery = gql`
         description,
         maxQuantity,
         availableQuantity
-      },
-      collective {
-        id,
-        slug
-      }
-    }
-  }
-`;
-
-const createMemberQuery = gql`
-  mutation createMember($user: UserAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
-    createMember(user: $user, collective: $collective, role: $role) {
-      id,
-      role,
-      createdAt,
-      user {
-        id,
-        username,
-        image,
-        twitterHandle,
-        description
-      },
-      collective {
-        id,
-        slug
-      }
-    }
-  }
-`;
-
-const removeMemberQuery = gql`
-  mutation removeMember($user: UserAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
-    removeMember(user: $user, collective: $collective, role: $role) {
-      id,
-      role,
-      user {
-        id,
-        username,
-        image,
-        twitterHandle,
-        description
       },
       collective {
         id,
@@ -131,19 +90,7 @@ export const addCreateOrderMutation = graphql(createOrderQuery, {
   })
 });
 
-export const addCreateMemberMutation = graphql(createMemberQuery, {
-  props: ( { mutate }) => ({
-    createMember: (user, collective, role) => mutate({ variables: { user, collective, role } })
-  })
-});
-
-export const addRemoveMemberMutation = graphql(removeMemberQuery, {
-  props: ( { mutate }) => ({
-    removeMember: (user, collective, role) => mutate({ variables: { user, collective, role } })
-  })
-});
-
-export const addRegisterToEventMutations = compose(addCreateOrderMutation, addCreateMemberMutation, addRemoveMemberMutation);
+export const addRegisterToEventMutations = compose(addCreateOrderMutation);
 
 export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   props: ( { mutate }) => ({
@@ -190,8 +137,25 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'image',
         'backgroundImage'
       ]);
+      if (collective.paymentMethods && collective.paymentMethods.length > 0) {
+        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm => pick(pm, ['id', 'brand', 'country', 'identifier', 'expMonth', 'expYear', 'fullName', 'funding', 'monthlyLimitPerMember', 'token']));
+      } else {
+        CollectiveInputType.paymentMethods = []; // force removing existing payment methods
+      }
       if (collective.tiers && collective.tiers.length > 0) {
         CollectiveInputType.tiers = collective.tiers.map(tier => pick(tier, ['id', 'type', 'name', 'description', 'amount', 'maxQuantity', 'maxQuantityPerUser']));
+      }
+      if (collective.members && collective.members.length > 0) {
+        CollectiveInputType.members = collective.members.map(member => {
+          return {
+            id: member.id,
+            role: member.role,
+            member: {
+              name: member.member.name,
+              email: member.member.email
+            }
+          }
+        });
       }
       CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
       console.log(">>> this.props.editCollective", CollectiveInputType)

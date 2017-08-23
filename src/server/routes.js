@@ -12,6 +12,7 @@ module.exports = (server, app) => {
   server.get('/favicon.*', (req, res) => res.send(404));
 
   server.all('/api/*', (req, res) => {
+    console.log(">>> api request", translateApiUrl(req.url));
     req
       .pipe(request(translateApiUrl(req.url), { followRedirect: false }))
       .on('error', (e) => {

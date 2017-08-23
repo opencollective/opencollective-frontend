@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 import { union, get } from 'lodash';
-import { prettyUrl } from '../lib/utils';
+import { prettyUrl} from '../lib/utils';
 import { Router } from '../server/pages';
 import Currency from './Currency';
-import { defaultBackgroundImage } from '../constants/collective';
+import { defaultBackgroundImage } from '../constants/collectives';
+import { pickAvatar } from '../lib/collective.lib';
 
 class CollectiveCover extends React.Component {
 
@@ -19,13 +20,13 @@ class CollectiveCover extends React.Component {
   render() {
     const {
       collective,
+      className,
       title,
       href
     } = this.props;
 
     const {
       description,
-      className,
       type,
       website,
       twitterHandle,
@@ -37,17 +38,21 @@ class CollectiveCover extends React.Component {
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundPosition: 'center center',
+      backgroundPosition: collective.type === 'COLLECTIVE' ? 'center center' : 'center -40px',
       backgroundSize: 'cover',
       ...customStyles
     };
 
     const logo = collective.image || get(collective.parentCollective, 'image');
 
-    const admins = members.filter(m => m.role === 'ADMIN');
-    const backers = members.filter(m => m.role === 'BACKER');
-    const membersPreview = union(admins, backers).slice(0, 5);
-    backers.sort((a, b) => b.totalDonations - a.totalDonations);
+    let membersPreview = [];
+    if (members) {
+      const admins = members.filter(m => m.role === 'ADMIN');
+      const contributors = members.filter(m => m.role === 'CONTRIBUTOR');
+      const backers = members.filter(m => m.role === 'BACKER');
+      backers.sort((a, b) => b.totalDonations - a.totalDonations);
+      membersPreview = union(admins, contributors, backers).slice(0, 5);
+    }
 
     return (
       <div className={`CollectiveCover ${className} ${type}`}>
@@ -57,12 +62,16 @@ class CollectiveCover extends React.Component {
           align-items: center;
           position: relative;
           text-align: center;
-          height: 400px;
+          min-height: 400px;
           width: 100%;
           overflow: hidden;
         }
         .small .cover {
           height: 200px;
+          min-height: 200px;
+        }
+        .small .description, .small .contact, .small .stats, .small .members {
+          display: none;
         }
         .backgroundCover {
           position: absolute;
@@ -76,17 +85,23 @@ class CollectiveCover extends React.Component {
           display: flex;
           flex-direction: column;
           justify-content: space-around;
-          color: white;
+          color: black;
+          margin-top: 70px;
+        }
+        .small .content {
+          margin-top: 0px;
         }
         .content a {
+          color: black;
+        }
+        .USER .cover {
+          display: block;
+        }
+        .COLLECTIVE .content {
+          margin-top: 0px;
+        }
+        .COLLECTIVE .content, .COLLECTIVE .content a {
           color: white;
-        }
-        .USER .content {
-          color: black;
-          margin-top: 30px;
-        }
-        .USER .content a {
-          color: black;
         }
         .logo {
           max-width: 20rem;
@@ -99,6 +114,9 @@ class CollectiveCover extends React.Component {
           box-shadow: 0 0 0 2px #75cc1f;
           border-radius: 50%;
           margin: 3rem auto;
+        }
+        .USER.small .logo {
+          margin: 2rem auto;
         }
         h1 {
           font-size: 3rem;
@@ -115,6 +133,7 @@ class CollectiveCover extends React.Component {
         .members {
           display: flex;
           justify-content: center;
+          margin: 2rem 0;
         }
         .avatar {
           float: left;
@@ -136,7 +155,7 @@ class CollectiveCover extends React.Component {
         .stats {
           font-size: 1.3rem;
         }
-        .yearlyBudget {
+        .stats .value {
           font-size: 3rem;
         }
 
@@ -151,7 +170,7 @@ class CollectiveCover extends React.Component {
           <div className="content">
             <Link route={href}><a><img src={logo} className="logo" /></a></Link>
             <h1>{title}</h1>
-            { description && <p>{description}</p> }
+            { description && <p className="description">{description}</p> }
             { (twitterHandle || website) &&
               <div className="contact">
                 { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
@@ -161,8 +180,8 @@ class CollectiveCover extends React.Component {
             { membersPreview.length > 0 &&
               <div className="members">
                 { membersPreview.map(member => (
-                  <a onClick={() => Router.pushRoute(`/${member.member.slug}`)} title={`${member.member.name} ${member.description || member.member.description || ''}`}>
-                    <div className="avatar" style={{ backgroundImage: `url(${member.member.image})`}}></div>
+                  <a onClick={() => Router.pushRoute(`/${member.member.slug}`)} title={`${member.member.name} ${member.description || member.member.description || ''}`} key={member.member.slug}>
+                    <div className="avatar" style={{ backgroundImage: `url(${member.member.image || pickAvatar(member.member.id)})`}}></div>
                   </a>
                 ))}
                 { membersPreview.length < members.length &&
@@ -174,10 +193,18 @@ class CollectiveCover extends React.Component {
             }
             { stats && stats.yearlyBudget > 0 &&
               <div className="stats">
-                <div className="yearlyBudget">
+                <div className="yearlyBudget value">
                   <Currency value={stats.yearlyBudget} currency={collective.currency} />
                 </div>
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
+              </div>
+            }
+            { stats && stats.totalAmountSent > 0 &&
+              <div className="stats">
+                <div className="totalAmountSent value">
+                  <Currency value={stats.totalAmountSent} currency={collective.currency} />
+                </div>
+                <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
               </div>
             }
           </div>

@@ -45,7 +45,6 @@ export default ComposedComponent => {
       if (ComposedComponent.getInitialProps) {
         composedInitialProps = await ComposedComponent.getInitialProps(ctx)
       }
-
       // Run all graphql queries in the component tree
       // and extract the resulting data
       if (!process.browser) {
@@ -59,17 +58,19 @@ export default ComposedComponent => {
             <ComposedComponent url={url} {...composedInitialProps} />
           </ApolloProvider>
         )
-        await getDataFromTree(app)
-        // getDataFromTree does not call componentWillUnmount
-        // head side effect therefore need to be cleared manually
-        Head.rewind()
+        if (composedInitialProps.ssr === undefined || composedInitialProps.ssr === true) {
+          await getDataFromTree(app)
+          // getDataFromTree does not call componentWillUnmount
+          // head side effect therefore need to be cleared manually
+          Head.rewind()
 
-        // Extract query data from the Apollo's store
-        const state = apollo.getInitialState()
+          // Extract query data from the Apollo's store
+          const state = apollo.getInitialState()
 
-        serverState = {
-          apollo: { // Make sure to only include Apollo's data state
-            data: state.data
+          serverState = {
+            apollo: { // Make sure to only include Apollo's data state
+              data: state.data
+            }
           }
         }
       }

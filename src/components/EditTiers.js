@@ -104,7 +104,7 @@ class EditTiers extends React.Component {
   editTier(index, fieldname, value) {
     const tiers = this.state.tiers;
     console.log("editTier", index, fieldname, value);
-    tiers[index] = { ...tiers[index], type: this.defaultType, [fieldname]:value} ;
+    tiers[index] = { ...tiers[index], type: tiers[index]['type'] || this.defaultType, [fieldname]:value} ;
     this.setState({tiers});
     this.onChange(tiers);
   }
@@ -159,8 +159,6 @@ class EditTiers extends React.Component {
         <style jsx>{`
           :global(.tierActions) {
             text-align: right;
-            margin-right: 15px;
-            margin-bottom: -5px;
             font-size: 1.3rem;
           }
           :global(.field) {
@@ -168,8 +166,7 @@ class EditTiers extends React.Component {
           }
           .editTiersActions {
             text-align: right;
-            margin-right: 15px;
-            margin-top: -20px;
+            margin-top: -10px;
           }
           :global(.tier) {
             margin: 3rem 0;

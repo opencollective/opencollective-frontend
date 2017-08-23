@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
-import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
 function FieldGroup({ controlId, label, help, pre, className, ...props }) {
 
@@ -21,6 +21,9 @@ function FieldGroup({ controlId, label, help, pre, className, ...props }) {
     console.log(">>> no key for input", props);
   }
 
+  const inputProps = { ... props };
+  delete inputProps.controlId;
+
   if (className == 'horizontal') {
     return (
       <FormGroup controlId={controlId} validationState={validationState}>
@@ -30,7 +33,7 @@ function FieldGroup({ controlId, label, help, pre, className, ...props }) {
         <Col sm={9}>
           <InputGroup>
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-          <FormControl {...props} />
+          <FormControl {...inputProps} />
           { validationState && <FormControl.Feedback /> }
           </InputGroup>
           {help && <HelpBlock>{help}</HelpBlock>}
@@ -43,7 +46,7 @@ function FieldGroup({ controlId, label, help, pre, className, ...props }) {
         {label && <ControlLabel>{label}</ControlLabel>}
         <InputGroup>
         { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-        <FormControl {...props} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+        <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
         { validationState && <FormControl.Feedback /> }
         </InputGroup>
         {help && <HelpBlock>{help}</HelpBlock>}
@@ -56,15 +59,15 @@ class InputField extends React.Component {
 
   static propTypes = {
     name: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.bool]),
     validate: PropTypes.func,
     options: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.object,
     placeholder: PropTypes.string,
     className: PropTypes.string,
     type: PropTypes.string,
-    onChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     required: PropTypes.bool
   }
 
@@ -139,6 +142,7 @@ class InputField extends React.Component {
                           className={field.className}
                           placeholder={this.props.placeholder}
                           name={field.name}
+                          help={field.help}
                           value={this.state.value || this.props.defaultValue}
                           onChange={event => this.handleChange(event.target.value)}
                         />
@@ -187,6 +191,7 @@ class InputField extends React.Component {
         </FormGroup>
         )
         break;        
+
       case 'currency':
         this.input = (
         <FieldGroup
@@ -226,6 +231,27 @@ class InputField extends React.Component {
           </FieldGroup>)
         break;
 
+      case 'checkbox':
+        this.input =  (<FormGroup controlId={field.name}>
+                        {field.className === 'horizontal' &&
+                          <div>
+                            <Col componentClass={ControlLabel} sm={3}>
+                              {capitalize(field.label)}
+                            </Col>
+                            <Col sm={9}>
+                              <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
+                            </Col>
+                          </div>
+                        }
+                        {field.className !== 'horizontal' &&
+                          <div>
+                            <ControlLabel>{capitalize(field.label)}</ControlLabel>
+                            <Checkbox defaultChecked={field.defaultValue} onChange={event => this.handleChange(event.target.checked)}>{field.description}</Checkbox>
+                          </div>
+                        }
+                      </FormGroup>)
+        break;
+
       default:
       this.input = (<FieldGroup
           onChange={event => this.handleChange(event.target.value)}
@@ -246,9 +272,13 @@ class InputField extends React.Component {
 
     return (
       <div className={`inputField ${this.props.className} ${this.props.name}`} key={`input-${this.props.name}`} >
-        <style jsx>{`
-          :global(span.input-group) {
+        <style jsx global>{`
+          span.input-group {
             width: 100%;
+          }
+          .inputField {
+            overflow: hidden;
+            margin: 1rem 0;
           }
         `}</style>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />

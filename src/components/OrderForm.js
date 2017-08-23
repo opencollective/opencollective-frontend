@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
-import { Row, Col, Form } from 'react-bootstrap';
+import { Row, Col, Form, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { capitalize } from '../lib/utils';
+import { capitalize, formatCurrency } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
@@ -15,8 +15,7 @@ class OrderForm extends React.Component {
   static propTypes = {
     order: PropTypes.object.isRequired, // { tier: {}, quantity: Int, interval: String, totalAmount: Int }
     LoggedInUser: PropTypes.object,
-    onSubmit: PropTypes.func.isRequired,
-    stripePublishableKey: PropTypes.string.isRequired
+    onSubmit: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -26,7 +25,8 @@ class OrderForm extends React.Component {
     this.creditcardRequired = order.totalAmount > 0 || order.tier.amount > 0;
 
     this.state = {
-      user: {},
+      fromCollective: {},
+      creditcard: {},
       order: order || {},
       tier: order.tier || {},
       result: {}
@@ -41,6 +41,7 @@ class OrderForm extends React.Component {
     this.messages = defineMessages({
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
+      'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to my open collective account' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
@@ -105,7 +106,7 @@ class OrderForm extends React.Component {
 
   componentDidMount() {
     if (typeof Stripe !== 'undefined') {
-      const stripePublishableKey = (window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : this.props.stripePublishableKey;
+      const stripePublishableKey = (window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
       Stripe.setPublishableKey(stripePublishableKey);
     }
@@ -113,10 +114,10 @@ class OrderForm extends React.Component {
 
   // Prefill the form with logged in user if any
   componentWillReceiveProps(props) {
-    if (!this.state.user.email) {
-      const user = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
+    if (!this.state.fromCollective.email) {
+      const fromCollective = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
       this.setState({
-        user,
+        fromCollective,
         LoggedInUser: props.LoggedInUser
       });
     }
@@ -125,18 +126,11 @@ class OrderForm extends React.Component {
   handleChange(obj, attr, value) {
     this.resetError();
     const newState = { ... this.state };
-    if (value) {
+
+    if (value !== undefined) {
       newState[obj][attr] = value;
     } else {
       newState[obj] = Object.assign({}, this.state[obj], attr);
-    }
-
-    // Trying to be smart and autodetect the organization based on the domain of the email address
-    if (obj === 'user' && attr === 'email' && !this.state.user.organization) {
-      const domain = value.substr(value.indexOf('@')+1).toLowerCase();
-      if (domain && ['gmail.com','skynet.be','outlook.com','gmx.com','qq.com','live.com', 'msn.com', 'aol.com', 'lycos.com', 'me.com','icloud.com', 'mac.com','web.de','yandex.ru'].indexOf(domain) === -1 && !domain.match(/mail/) && !domain.match(/yahoo\./)) {
-        newState['user']['organization'] = capitalize(domain.substr(0, domain.indexOf('.')));
-      }
     }
 
     this.setState(newState);
@@ -147,22 +141,19 @@ class OrderForm extends React.Component {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
-    const { sanitizedCard, order, tier } = this.state;
-    let { user } = this.state;
+    const { sanitizedCard, order, tier, fromCollective } = this.state;
 
-    if (this.state.LoggedInUser) {
-      user = { id: this.state.LoggedInUser.id };
-    }
-    user.paymentMethod = sanitizedCard;
     const quantity = tier.quantity || 1;
     const OrderInputType = {
-      user,
+      fromCollective,
       description: tier.description,
       publicMessage: order.publicMessage,
       quantity,
       interval: tier.interval,
-      totalAmount: (quantity * tier.amount) || order.totalAmount
+      totalAmount: (quantity * tier.amount) || order.totalAmount,
+      paymentMethod: sanitizedCard
     };
+
     if (tier.id) {
       OrderInputType.tier = { id: tier.id, amount: tier.amount };
     }
@@ -222,7 +213,9 @@ class OrderForm extends React.Component {
 
   render() {
     const { intl } = this.props;
+    const { LoggedInUser } = this.state;
     const quantity = this.state.order.quantity || 1;
+    const paymentMethods = (LoggedInUser && LoggedInUser.paymentMethods) || [];
 
     return (
       <div className="OrderForm">
@@ -278,26 +271,37 @@ class OrderForm extends React.Component {
         <Form horizontal>
           <div className="userDetailsForm">
             <h2>Personal details</h2>
-            {this.state.LoggedInUser && this.fields.map(field => (
-              <Row className={field.name} key={`${field.name}.value`}>
+            {LoggedInUser &&
+              <Row className="fromCollective" key={`fromCollective.value`}>
                 <Col sm={12}>
-                  <div className="form-group">
-                    <label className="col-sm-3 control-label">{capitalize(field.label)}</label>
-                    <Col sm={9}>
-                    <span className="value">{this.state.LoggedInUser[field.name]}</span>
-                    </Col>
-                  </div>
+                  <FormControl
+                    componentClass="select"
+                    className="fromCollectiveSelector"
+                    type="select"
+                    name="fromCollectiveSelector"
+                    onChange={event => this.handleChange("fromCollective", "id", event.target.value)}
+                    >
+                    <option value={LoggedInUser.CollectiveId}>{`${LoggedInUser.firstName} ${LoggedInUser.lastName}`}</option>
+                    {LoggedInUser.memberOf.map(membership => {
+                      if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
+                      const value = membership.collective.id;
+                      const label = membership.collective.name;
+                      return (<option value={value}>{`${label}`}</option>)
+                      })
+                    }
+                    <option value="createOrganization">Create an organization</option>
+                  </FormControl>
                 </Col>
               </Row>
-            ))}
-            {!this.state.LoggedInUser && this.fields.map(field => (
+            }
+            {!LoggedInUser && this.fields.map(field => (
               <Row key={`${field.name}.input`}>
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
                     {...field}
                     defaultValue={this.state.order[field.name]}
-                    onChange={(value) => this.handleChange("user", field.name, value)}
+                    onChange={(value) => this.handleChange("fromCollective", field.name, value)}
                     />
                 </Col>
               </Row>
@@ -309,14 +313,42 @@ class OrderForm extends React.Component {
             <h2>Payment details</h2>
             <Row>
               <Col sm={12}>
-                <InputField
-                  label="Credit Card"
-                  type="creditcard"
-                  name="creditcard"
-                  options={this.state.LoggedInUser && this.state.LoggedInUser.paymentMethods}
-                  className="horizontal"
-                  onChange={(value) => this.handleChange("creditcard", value)}
-                  />
+                { paymentMethods.length === 0 &&
+                  <div>
+                    <InputField
+                      label="Credit Card"
+                      type="creditcard"
+                      name="creditcard"
+                      className="horizontal"
+                      onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
+                      />
+                    <InputField
+                      description={intl.formatMessage(this.messages['creditcard.save'])}
+                      className="horizontal"
+                      name="saveCreditCard"
+                      type="checkbox"
+                      defaultValue={true}
+                      onChange={value => this.handleChange("creditcard", "save", value)}
+                      />
+                  </div>
+                }
+                { paymentMethods.length > 0 &&
+                  <FormControl
+                    componentClass="select"
+                    className="creditcardSelector"
+                    type="select"
+                    name="creditcardSelector"
+                    onChange={event => this.handleChange("uuid", event.target.value)}
+                    >
+                    {paymentMethods.map(option => {
+                      const value = option.uuid
+                      const label = `${option.brand} ${option.funding} ${option.identifier} ${option.expMonth}/${option.expYear}`;
+                      return (<option value={value}>{`💳 ${label}`}</option>)
+                      })
+                    }
+                    <option value="">other</option>
+                  </FormControl>
+                }              
               </Col>
             </Row>
           </div>

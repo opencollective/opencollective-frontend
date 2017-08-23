@@ -52,7 +52,7 @@ describe("OrderForm component", () => {
 
   const mountComponent = (props) => mount(
     <IntlProvider locale="en">
-      <OrderForm {...props} stripePublishableKey="xxxx" />
+      <OrderForm {...props} />
       </IntlProvider>
   );
 
