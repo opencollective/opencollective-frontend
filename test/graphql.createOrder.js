@@ -59,7 +59,7 @@ describe('Query Tests', () => {
       }
     });
 
-    order.fromCollective = {
+    order.user = {
       firstName: "John",
       lastName: "Smith",
       email: "jsmith@email.com"

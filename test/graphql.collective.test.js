@@ -9,10 +9,6 @@ import stripeMock from './mocks/stripe';
 
 import * as utils from './utils';
 
-const stringify = (json) => {
-  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
-}
-
 describe('Query Tests', () => {
   let pubnubCollective;
 
@@ -123,7 +119,7 @@ describe('Query Tests', () => {
     const userCollective = result.data.Collective;
     expect(userCollective.twitterHandle).to.equal('xdamman');
     expect(userCollective.website).to.equal('http://xdamman.com');
-    expect(userCollective.memberOf).to.have.length(5);
+    expect(userCollective.memberOf).to.have.length(4);
     const memberships = userCollective.memberOf;
     memberships.sort((a, b) => a.id - b.id)
     expect(memberships[0].role).to.equal('ADMIN');
@@ -137,17 +133,16 @@ describe('Query Tests', () => {
       backers: 25,
       yearlyBudget: 339311
     });
-    console.log(userCollective.connectedAccounts);
   });
 
   it('edits members', async () => {
 
     const pubnubAdmin = await models.User.createUserWithCollective({ email: 'admin@pubnub.com'});
-    const adminMembership = await models.Member.findOne({
-      where: {
-        CollectiveId: pubnubCollective.id,
-        role: 'ADMIN'
-      }
+    const adminMembership = await models.Member.create({
+      CreatedByUserId: pubnubAdmin.id,
+      MemberCollectiveId: pubnubAdmin.CollectiveId,
+      CollectiveId: pubnubCollective.id,
+      role: 'ADMIN'
     });
 
     const collective = {
@@ -181,7 +176,7 @@ describe('Query Tests', () => {
 
     const query = `
     mutation editCollective {
-      editCollective(collective: ${stringify(collective)}) {
+      editCollective(collective: ${utils.stringify(collective)}) {
         id,
         slug,
         members {
@@ -218,7 +213,7 @@ describe('Query Tests', () => {
   it('edit payment methods', async () => {
     let query, res, paymentMethods;
 
-    const stub = sinon.stub(appStripe.customers, 'create', () => Promise.resolve(stripeMock.customers.create));
+    sinon.stub(appStripe.customers, 'create', () => Promise.resolve(stripeMock.customers.create));
 
     const collective = {
       id: pubnubCollective.id,
@@ -235,7 +230,7 @@ describe('Query Tests', () => {
 
     query = `
     mutation editCollective {
-      editCollective(collective: ${stringify(collective)}) {
+      editCollective(collective: ${utils.stringify(collective)}) {
         id,
         slug,
         paymentMethods {
@@ -272,7 +267,7 @@ describe('Query Tests', () => {
 
     query = `
     mutation editCollective {
-      editCollective(collective: ${stringify(collective)}) {
+      editCollective(collective: ${utils.stringify(collective)}) {
         id,
         slug,
         paymentMethods {

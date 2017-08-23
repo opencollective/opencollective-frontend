@@ -48,12 +48,12 @@ export const cancel = (req, res, next) => {
   .then(d => d ? Promise.resolve() : 
       Promise.reject(new errors.BadRequest(`No subscription found with id ${subscriptionid}. Please contact support@opencollective.com for help.`)))
 
-  // get stripe account for accessToken
-  .then(() => order.toCollective.getStripeAccount())
+  // get stripe account for access token
+  .then(() => order.toCollective.getHostStripeAccount())
 
   // cancel subscription on Stripe
   .then(stripeAccount => {
-    const stripe = Stripe(stripeAccount.accessToken)
+    const stripe = Stripe(stripeAccount.token)
 
     return stripe.customers.cancelSubscription(
       order.PaymentMethod.customerId,

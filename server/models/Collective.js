@@ -559,13 +559,11 @@ export default function(Sequelize, DataTypes) {
       },
 
       editPaymentMethods(paymentMethods, defaultAttributes = {}) {
-        console.log(">>> editPaymentMethods", typeof paymentMethods, paymentMethods);
         if (!paymentMethods) return Promise.resolve();
         return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null } }})
         .then(oldPaymentMethods => {
           // remove the paymentMethods that are not present anymore in the updated collective
           const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
-          console.log(">>> diff", diff);
           return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { $in: diff }}})
         })
         .then(() => {
@@ -579,48 +577,6 @@ export default function(Sequelize, DataTypes) {
             }
           });
         })
-      },
-
-      getStripeAccount() {
-        return this.getHostId()
-          .then(id => id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } }));
-      },
-
-      setStripeAccount(stripeAccount) {
-        if (!stripeAccount) return Promise.resolve(null);
-
-        if (stripeAccount.id) {
-          return models.ConnectedAccount.update({ CollectiveId: this.id }, { where: { id: stripeAccount.id }, limit: 1});
-        } else {
-          return models.ConnectedAccount.create({
-            service: 'stripe',
-            ...stripeAccount,
-            CollectiveId: this.id
-          });
-        }
-      },
-
-      getConnectedAccount() {
-
-        return models.Member.find({
-          attributes: ['CollectiveId'],
-          where: {
-            CollectiveId: this.id,
-            role: roles.HOST
-          }
-        })
-        .then((Member) => {
-          if (!Member) {
-            return null;
-          }
-
-          return models.ConnectedAccount.findOne({
-            where: {
-              CollectiveId: Member.CollectiveId,
-              service: 'paypal'
-            }
-          });
-        });
       },
 
       getExpenses(status, startDate, endDate) {
@@ -828,6 +784,48 @@ export default function(Sequelize, DataTypes) {
 
       hasHost() {
         return this.getHostId().then(id => Promise.resolve(Boolean(id)));
+      },
+
+      getHostStripeAccount() {
+        return this.getHostId()
+          .then(id => id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } }));
+      },
+
+      setStripeAccount(stripeAccount) {
+        if (!stripeAccount) return Promise.resolve(null);
+
+        if (stripeAccount.id) {
+          return models.ConnectedAccount.update({ CollectiveId: this.id }, { where: { id: stripeAccount.id }, limit: 1});
+        } else {
+          return models.ConnectedAccount.create({
+            service: 'stripe',
+            ...stripeAccount,
+            CollectiveId: this.id
+          });
+        }
+      },
+
+      getConnectedAccount() {
+
+        return models.Member.find({
+          attributes: ['CollectiveId'],
+          where: {
+            CollectiveId: this.id,
+            role: roles.HOST
+          }
+        })
+        .then((Member) => {
+          if (!Member) {
+            return null;
+          }
+
+          return models.ConnectedAccount.findOne({
+            where: {
+              CollectiveId: Member.CollectiveId,
+              service: 'paypal'
+            }
+          });
+        });
       },
 
       getSuperCollectiveData() {

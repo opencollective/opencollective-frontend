@@ -3,31 +3,32 @@ import Stripe from 'stripe';
 import config from 'config';
 
 import { planId } from '../lib/utils';
-
+import debugLib from 'debug';
+const debug = debugLib('stripe');
 export const appStripe = Stripe(config.stripe.secret);
 
 /**
  * Get the stripe client for the connected account
  */
-const client = stripeAccount => Stripe(stripeAccount.accessToken);
+const client = stripeAccount => Stripe(stripeAccount.token);
 
 /**
  * Create a plan if it doesn not find it
  */
 export const getOrCreatePlan = (stripeAccount, plan) => {
-  const stripeClient = client(stripeAccount);
+  debug(">>> stripe: createCharge using stripeAccount", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "plan:", plan);
   const id = planId(plan);
 
   plan.id = id;
   plan.name = id;
 
-  return stripeClient.plans.retrieve(plan.id)
+  return appStripe.plans.retrieve(plan.id, { stripe_account: stripeAccount.username })
     .catch((err) => {
       if (err.type === 'StripeInvalidRequestError' && _.contains(err.message, 'No such plan')) {
-        return stripeClient.plans.create(plan);
+        return appStripe.plans.create(plan, { stripe_account: stripeAccount.username });
       }
 
-      console.log(err);
+      console.error(err);
       return Promise.reject(err);
     });
 };
@@ -36,14 +37,14 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
  * Create stripe subscription with plan
  */
 export const createSubscription = (stripeAccount, customerId, subscription) => {
-  return client(stripeAccount).customers.createSubscription(customerId, subscription);
+  return appStripe.customers.createSubscription(customerId, subscription, { stripe_account: stripeAccount.username });
 };
 
 /**
  * Retrieve stripe subscription
  */
 export const retrieveSubscription = (stripeAccount, customerId, stripeSubsriptionId) => {
-  return client(stripeAccount).customers.retrieveSubscription(customerId, stripeSubsriptionId);
+  return appStripe.customers.retrieveSubscription(customerId, stripeSubsriptionId, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -53,14 +54,14 @@ export const getSubscriptionsList = (stripeAccount, limit) => {
   if (!limit) {
     limit = 10;
   }
-  return client(stripeAccount).subscriptions.list({ limit });
+  return appStripe.subscriptions.list({ limit }, { stripe_account: stripeAccount.username });
 };
 
 /**
  * Delete a subscription
  */
 export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
-  return client(stripeAccount).subscriptions.del(stripeSubscriptionId);
+  return appStripe.subscriptions.del(stripeSubscriptionId, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -70,10 +71,10 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
 export const createCustomer = (stripeAccount, token, options = {}) => {
   const collective = options.collective || {};
   const email = options.email || '';
-  const cli = stripeAccount ? client(stripeAccount) : appStripe;
-  return cli.customers.create({
+  const stripeClient = stripeAccount ? client(stripeAccount) : appStripe;
+  return stripeClient.customers.create({
     source: token,
-    description:  `Customer email ${email}, url https://opencollective.com/${collective.slug}`,
+    description:  `https://opencollective.com/${collective.slug}`,
     email
   });
 };
@@ -82,7 +83,7 @@ export const createCustomer = (stripeAccount, token, options = {}) => {
  * Fetch customer
  */
 export const retrieveCustomer = (stripeAccount, customerId) => {
-  return client(stripeAccount).customers.retrieve(customerId);
+  return appStripe.customers.retrieve(customerId, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -90,14 +91,16 @@ export const retrieveCustomer = (stripeAccount, customerId) => {
  * Doc: https://stripe.com/docs/connect/shared-customers
  */
 export const createToken = (stripeAccount, customerId) => {
-  return client(stripeAccount).tokens.create({ customer: customerId });
+  debug(">>> stripe: createToken using stripeAccount", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "customerId:", customerId);
+  return appStripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
 };
 
 /**
  * Create charge
  */
 export const createCharge = (stripeAccount, charge) => {
-  return client(stripeAccount).charges.create(charge);
+  debug(">>> stripe: createCharge using stripeAccount", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "charge:", charge);
+  return appStripe.charges.create(charge, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -111,7 +114,7 @@ export const retrieveCharge = (stripeAccount, chargeId) => {
  * Retrieve a balance transaction (for fees)
  */
 export const retrieveBalanceTransaction = (stripeAccount, txn) => {
-  return client(stripeAccount).balance.retrieveTransaction(txn);
+  return appStripe.balance.retrieveTransaction(txn, { stripe_account: stripeAccount.username });
 };
 
 export const extractFees = (balance) => {

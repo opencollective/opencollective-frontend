@@ -4,7 +4,7 @@ import emailLib from '../lib/email';
 import Promise from 'bluebird';
 import { hasRole } from '../lib/auth';
 import errors from '../lib/errors';
-import { pluralize } from '../lib/utils';
+import { capitalize, pluralize } from '../lib/utils';
 
 import roles from '../constants/roles';
 import { types } from '../constants/collectives';
@@ -342,9 +342,8 @@ const mutations = {
     },
     resolve(_, args, req) {
 
-      let tier, collective, fromCollective, isPaidTier;
+      let tier, collective, fromCollective, paymentRequired, interval;
       const order = args.order;
-
       return models.Collective.findBySlug(order.toCollective.slug)
       .then(c => {
         if (!c) {
@@ -363,7 +362,9 @@ const mutations = {
           throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
         }
         tier = t;
-        isPaidTier = tier.amount > 0;
+        paymentRequired = order.totalAmount > 0;
+        // interval of the tier can only be overridden if it is null (e.g. for custom donations)
+        interval = tier.interval || order.interval;
       })
 
       // check for available quantity
@@ -371,8 +372,8 @@ const mutations = {
       .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
             Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
-      // make sure if it's a paid tier, we have a payment method attached
-      .then(() => isPaidTier && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token)) &&
+      // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
+      .then(() => paymentRequired && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token)) &&
         Promise.reject(new Error(`This tier requires a payment method`)))
       
       // find or create fromCollective
@@ -386,7 +387,7 @@ const mutations = {
             });
           });
         } else {
-          return models.User.findOrCreateByEmail(order.fromCollective.email, order.fromCollective).then(u => {
+          return models.User.findOrCreateByEmail(order.user.email, order.user).then(u => {
             return {
               id: u.CollectiveId,
               CreatedByUserId: u.id
@@ -409,6 +410,15 @@ const mutations = {
         } else {
           totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
         }
+
+        const tierNameInfo = (tier && tier.name) ? ` (${tier.name})` : '';
+        let description;
+        if (interval) {
+          description = capitalize(`${interval}ly donation to ${collective.name}${tierNameInfo}`);
+        } else {
+          description = `Donation to ${collective.name}${tierNameInfo}`
+        }
+
         const orderData = {
           CreatedByUserId: fromCollective.CreatedByUserId,
           FromCollectiveId: fromCollective.id,
@@ -417,10 +427,10 @@ const mutations = {
           quantity,
           totalAmount,
           currency,
-          description: order.description || `${collective.name} - ${tier.name}`,
+          description: order.description || description,
           publicMessage: order.publicMessage,
           privateMessage: order.privateMessage,
-          processedAt: isPaidTier ? null : new Date
+          processedAt: paymentRequired ? null : new Date
         };
         return models.Order.create(orderData)
       })
@@ -464,17 +474,16 @@ const mutations = {
                 order: orderInstance,
                 payment: {
                   paymentMethod,
-                  amount: orderInstance.totalAmount,
-                  interval: tier.interval,
-                  currency: orderInstance.currency,
-                  description: `${collective.name} - ${tier.name}`
+                  amount: orderInstance.totalAmount,                  
+                  interval, 
+                  currency: orderInstance.currency
                 }
               };
               return paymentsLib.createPayment(payload);
             })
         } else {
           // Free ticket
-          const email = (req.remoteUser) ? req.remoteUser.email : args.order.fromCollective.email;
+          const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
           return emailLib.send('ticket.confirmed', email, {
             recipient: { name: fromCollective.name },
             collective: collective.info,
@@ -483,6 +492,8 @@ const mutations = {
           });
         }
       })
+      // make sure we return the latest version of the Order Instance
+      .then(orderInstance => models.Order.findById(orderInstance.id))
       .catch(e => {
         // helps debugging
         console.error(">>> createOrder mutation error: ", e)

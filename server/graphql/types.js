@@ -14,7 +14,6 @@ import {
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 
-import roles from '../constants/roles';
 import { type } from '../constants/transactions';
 
 dataloaderSequelize(models.Order);
@@ -559,6 +558,12 @@ export const SubscriptionType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(s) {
           return s.interval;
+        }
+      },
+      stripeSubscriptionId: {
+        type: GraphQLString,
+        resolve(s) {
+          return s.stripeSubscriptionId;
         }
       },
       isActive: {

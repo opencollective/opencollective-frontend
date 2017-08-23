@@ -2,7 +2,6 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 
 import models from '../models';
-import { capitalize } from '../lib/utils';
 import emailLib from './email';
 import roles from '../constants/roles';
 import { types } from '../constants/collectives';
@@ -29,7 +28,7 @@ const createPayment = (payload) => {
   } = payment;
 
   const isSubscription = _.includes(['month', 'year'], interval);
-  let paymentMethodInstance, description = payment.description;
+  let paymentMethodInstance;
 
   if (interval && !isSubscription) {
     return Promise.reject(new Error('Interval should be month or year.'));
@@ -63,15 +62,15 @@ const createPayment = (payload) => {
       stripeAccount: order.getToCollective()
         .then(c => {
           collective = c;
-          return c.getStripeAccount()
+          return c.getHostStripeAccount()
         }),
       paymentMethod: getOrCreatePaymentMethod(paymentMethod)
     })
     .then(results => {
       const stripeAccount = results.stripeAccount;
-      if (!stripeAccount || !stripeAccount.accessToken) {
+      if (!stripeAccount || !stripeAccount.token) {
         return Promise.reject(new Error(`The host for the ${collective.slug} collective has no Stripe account set up`));
-      } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.accessToken, 'live')) {
+      } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.token, 'live')) {
         return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
       } else {
         paymentMethodInstance = results.paymentMethod;
@@ -83,21 +82,18 @@ const createPayment = (payload) => {
     // (this needs to happen first, because of hook on Order model)
     .then(() => {
       if (isSubscription) {
-        description = description || capitalize(`${interval}ly donation to ${collective.name}`);
         return models.Subscription.create({
           amount,
           currency,
           interval
         })
       } else {
-        description = description || `Donation to ${collective.name}`
         return Promise.resolve();
       }
     })
     .then(subscription => {
       order.PaymentMethodId = paymentMethodInstance.id;
       order.SubscriptionId = subscription && subscription.id;
-      order.description = order.description || description;
       return order.save();
     })
     .then(paymentsLib.processPayment);
@@ -128,19 +124,20 @@ const processPayment = (order) => {
       /**
        * Get the customerId for the Stripe Account of the Host
        * Or create one using the Stripe token associated with the platform (paymentMethod.token)
-       * and saves it under PaymentMethod.data[hostStripeAccount.stripeUserId]
+       * and saves it under PaymentMethod.data[hostStripeAccount.username]
        * @param {*} hostStripeAccount
        */
       const getOrCreateCustomerIdForHost = (hostStripeAccount) => {
         const data = paymentMethod.data || {};
         data.CustomerIdForHost = data.CustomerIdForHost || {};
-        return data.CustomerIdForHost[hostStripeAccount.stripeUserId] || stripe.createCustomer(hostStripeAccount, paymentMethod.token, {
+        return data.CustomerIdForHost[hostStripeAccount.username] || stripe.createToken(hostStripeAccount, paymentMethod.customerId)
+        .then(token => stripe.createCustomer(hostStripeAccount, token.id, {
           email: user.email,
           collective: order.fromCollective.info
-        })
+        }))
         .then(customer => customer.id)
         .tap(customerId => {
-          data.CustomerIdForHost[hostStripeAccount.stripeUserId] = customerId;
+          data.CustomerIdForHost[hostStripeAccount.username] = customerId;
           paymentMethod.data = data;
           paymentMethod.save();
         })
@@ -168,10 +165,9 @@ const processPayment = (order) => {
               application_fee_percent: transactions.OC_FEE_PERCENT,
               trial_end: getSubscriptionTrialEndDate(order.createdAt, subscription.interval),
               metadata: {
-                collectiveId: collective.id,
-                collectiveName: collective.name,
-                paymentMethodId: paymentMethod.id,
-                description: `https://opencollective.com/${collective.slug}`
+                from: `https://opencollective.com/${order.fromCollective.slug}`,
+                to: `https://opencollective.com/${order.toCollective.slug}`,
+                PaymentMethodId: paymentMethod.id
               }
             }))
           .then(stripeSubscription => subscription.update({ stripeSubscriptionId: stripeSubscription.id }))
@@ -200,11 +196,11 @@ const processPayment = (order) => {
             amount: order.totalAmount,
             currency: order.currency,
             source: hostStripeToken.id,
-            description: `OpenCollective: ${collective.slug}`,
+            description: order.description,
             application_fee: parseInt(order.totalAmount * transactions.OC_FEE_PERCENT / 100, 10),
             metadata: {
-              collectiveId: collective.id,
-              collectiveName: collective.name,
+              from: `https://opencollective.com/${order.fromCollective.slug}`,
+              to: `https://opencollective.com/${order.toCollective.slug}`,
               customerEmail: user.email,
               paymentMethodId: paymentMethod.id
             }
@@ -242,7 +238,7 @@ const processPayment = (order) => {
       };
 
       let hostStripeAccount, transaction;
-      return collective.getStripeAccount()
+      return collective.getHostStripeAccount()
         .then(stripeAccount => hostStripeAccount = stripeAccount)
 
         // get or create a customer under the platform stripe account

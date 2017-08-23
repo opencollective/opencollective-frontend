@@ -489,7 +489,6 @@ export const getOne = (req, res, next) => {
     else return req.collective.getRelatedCollectives();
   }
   Promise.all([
-    req.collective.getStripeAccount(),
     req.collective.getConnectedAccount(),
     req.collective.getBalance(),
     req.collective.getYearlyIncome(),
@@ -501,18 +500,17 @@ export const getOne = (req, res, next) => {
     req.collective.getHostCollective()
     ])
   .then(values => {
-    collective.stripeAccount = values[0] && _.pick(values[0].data, 'publishableKey');
-    collective.hasPaypal = values[1] && values[1].service === 'paypal';
-    collective.balance = values[2];
-    collective.yearlyIncome = values[3];
-    collective.donationTotal = values[4];
-    collective.backersCount = values[5];
+    collective.hasPaypal = values[0] && values[0].service === 'paypal';
+    collective.balance = values[1];
+    collective.yearlyIncome = values[2];
+    collective.donationTotal = values[3];
+    collective.backersCount = values[4];
     collective.contributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
     collective.settings = collective.settings || {};
-    collective.settings.twitter = values[6];
-    collective.related = values[7];
-    collective.superCollectiveData = values[8];
-    collective.host = values[9] && values[9].info;
+    collective.settings.twitter = values[5];
+    collective.related = values[6];
+    collective.superCollectiveData = values[7];
+    collective.host = values[8] && values[8].info;
     if (collective.superCollectiveData) {
       collective.collectivesCount = collective.superCollectiveData.length;
       collective.contributorsCount += aggregate(collective.superCollectiveData, 'contributorsCount');

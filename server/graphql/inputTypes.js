@@ -123,6 +123,8 @@ export const CollectiveAttributesInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    firstName: { type: GraphQLString }, // for Collective type USER
+    lastName: { type: GraphQLString }, // for Collective type USER
     email: { type: GraphQLString }, // for Collective type USER
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
@@ -177,6 +179,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     paymentMethod: { type: PaymentMethodInputType },
+    user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     toCollective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType }

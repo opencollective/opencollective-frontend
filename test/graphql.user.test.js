@@ -8,10 +8,6 @@ import paymentsLib from '../server/lib/payments';
 import * as utils from './utils';
 import models from '../server/models';
 
-const stringify = (json) => {
-  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
-}
-
 describe('Query Tests', () => {
   let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;
 
@@ -43,8 +39,9 @@ describe('Query Tests', () => {
   beforeEach(() => collective2.addUserWithRole(user1, 'ADMIN'));
   beforeEach(() => collective1.addUserWithRole(host, 'HOST'));
 
-  beforeEach('create stripe account', () => models.StripeAccount.create({
-    accessToken: 'abc',
+  beforeEach('create stripe account', () => models.ConnectedAccount.create({
+    service: 'stripe',
+    token: 'abc',
     CollectiveId: host.id
   }));
 
@@ -114,7 +111,7 @@ describe('Query Tests', () => {
       it("saves a payment method to the user", async () => {
         const query = `
         mutation createOrder {
-          createOrder(order: ${stringify(generateOrder(user1))}) {
+          createOrder(order: ${utils.stringify(generateOrder(user1))}) {
             paymentMethod {
               brand,
               identifier
@@ -141,7 +138,7 @@ describe('Query Tests', () => {
         order.paymentMethod.save = false;
         const query = `
         mutation createOrder {
-          createOrder(order: ${stringify(order)}) {
+          createOrder(order: ${utils.stringify(order)}) {
             createdByUser {
               id,
               email,
@@ -164,7 +161,7 @@ describe('Query Tests', () => {
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createOrderQuery = `
         mutation createOrder {
-          createOrder(order: ${stringify(generateOrder(user1, ticket1))}) {
+          createOrder(order: ${utils.stringify(generateOrder(user1, ticket1))}) {
             description
           }
         }`;
@@ -206,7 +203,7 @@ describe('Query Tests', () => {
         const order = generateOrder(user1);
         const createOrderQuery = `
         mutation createOrder {
-          createOrder(order: ${stringify(order)}) {
+          createOrder(order: ${utils.stringify(order)}) {
             description
           }
         }`;

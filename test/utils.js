@@ -58,3 +58,7 @@ export function loadDB(dbname) {
     })
   });
 }
+
+export const stringify = (json) => {
+  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+}
