@@ -198,6 +198,8 @@ class Event extends React.Component {
   }
 
   render() {
+    const { LoggedInUser } = this.props;
+    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent;
     const responses = {};
     responses.sponsors = filterCollection(this.event.responses, { tier: { name: /sponsor/i }});
     responses.guests = filterCollection(uniq(this.event.responses, (r) => `${r.status}:${r.user.username}` ), { tier: { name: /sponsor/i }}, true);
@@ -216,7 +218,15 @@ class Event extends React.Component {
 
     return (
       <div>
-
+        <style jsx>{`
+          .adminActions {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+          }
+        `}</style>
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
@@ -301,6 +311,11 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
+                      { canEditEvent &&
+                      <div className="adminActions">
+                        <a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a>
+                      </div>
+                      }
                       <Responses responses={responses.guests} />
                     </section>
                   }
