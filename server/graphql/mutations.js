@@ -30,8 +30,7 @@ import {
   CollectiveInputType,
   CollectiveAttributesInputType,
   OrderInputType,
-  TierInputType,
-  UserAttributesInputType
+  TierInputType
 } from './inputTypes';
 
 // import { hasRole } from '../middleware/security/auth';
@@ -254,7 +253,7 @@ const mutations = {
   createMember: {
     type: MemberType,
     args: {
-      user: { type: UserAttributesInputType },
+      member: { type: CollectiveAttributesInputType },
       collective: { type: CollectiveAttributesInputType },
       role: { type: GraphQLString }
     },
@@ -285,20 +284,16 @@ const mutations = {
       })
       // find or create user
       .then(() => {
-        if (args.user.id) {
-          return args.user;
-        } else {
-          return models.User.findOne({
-            where: {
-              $or: {
-                email: args.user.email,
-                paypalEmail: args.user.email
-              }
+        if (args.member.id) {
+          return models.Collective.findById(args.member.id).then(memberCollective => {
+            return {
+              id: memberCollective.CreatedByUserId,
+              CollectiveId: memberCollective.id
             }
-          })
+          });
         }
       })
-      .then(u => u || models.User.createUserWithCollective(args.user))
+      .then(u => u || models.User.findOrCreateByEmail(args.member.email, args.member))
       // add user as member of the collective
       .then((user) => models.Member.create({
         CreatedByUserId: user.id,
@@ -311,43 +306,30 @@ const mutations = {
   removeMember: {
     type: MemberType,
     args: {
-      user: { type: new GraphQLNonNull(UserAttributesInputType) },
-      collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-      role: { type: new GraphQLNonNull(GraphQLString) }
+      id: { type: new GraphQLNonNull(GraphQLInt) }
     },
     resolve(_, args, req) {
-      let collective;
+      let membership;
 
       const checkPermission = () => {
         if (!req.remoteUser) {
           throw new errors.Unauthorized("You need to be logged in to remove a member");
         }
-        if (req.remoteUser.id === args.user.id) {
-          return Promise.resolve(true);
-        }
-        return hasRole(req.remoteUser.CollectiveId, collective.id, ['ADMIN', 'HOST'])
+        if (req.remoteUser.id === membership.CreatedByUserId) return Promise.resolve(true);
+        return hasRole(req.remoteUser.CollectiveId, membership.CollectiveId, ['ADMIN', 'HOST'])
           .then(canEdit => {
-            if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as this user or as a core contributor or as a host of the ${args.collective.slug} collective`);
+            if (!canEdit) throw new errors.Unauthorized(`You need to be logged in as this user or as a core contributor or as a host of the collective id ${membership.CollectiveId}`);
           })
       }
 
-      return models.Collective.findBySlug(args.collective.slug)
-      .then(c => {
-        if (!c) throw new Error(`Collective with slug ${args.collective.slug} not found`);
-        collective = c;
+      return models.Member.findById(args.id)
+      .tap(m => {
+        if (!m) throw new errors.NotFound("Member not found");
+        membership = m;
       })
       .then(checkPermission)
-      // find member
-      .then(() => models.Member.findOne({
-        where: {
-          CreatedByUserId: args.user.id,
-          CollectiveId: collective.id,
-          role: args.role.toUpperCase()
-        }
-      }))
-      .then(member => {
-        if (!member) throw new errors.NotFound("Member not found");
-        return member.destroy();
+      .then(() => {
+        return membership.destroy();
       })
     }
   },
@@ -360,10 +342,9 @@ const mutations = {
     },
     resolve(_, args, req) {
 
-      let tier, user, isPaidTier;
+      let tier, collective, fromCollective, isPaidTier;
       const order = args.order;
 
-      let collective;
       return models.Collective.findBySlug(order.toCollective.slug)
       .then(c => {
         if (!c) {
@@ -394,26 +375,26 @@ const mutations = {
       .then(() => isPaidTier && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token)) &&
         Promise.reject(new Error(`This tier requires a payment method`)))
       
-      // find or create user
+      // find or create fromCollective
       .then(() => {
-        if (order.user.id) {
-          if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing user`);
-          if (order.user.id !== req.remoteUser.id) throw new Error(`You need to be logged in as user id ${order.user.id}`);
-          return order.user;
+        if (order.fromCollective && order.fromCollective.id) {
+          if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective account`);
+          return hasRole(req.remoteUser.CollectiveId, order.fromCollective.id, ['ADMIN', 'HOST']).then(canEdit => {
+            if (!canEdit) throw new Error(`You need to be logged in as an admin of the collective id ${order.fromCollective.id}`);
+            return models.Collective.findById(order.fromCollective.id).tap(c => {
+              if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
+            });
+          });
+        } else {
+          return models.User.findOrCreateByEmail(order.fromCollective.email, order.fromCollective).then(u => {
+            return {
+              id: u.CollectiveId,
+              CreatedByUserId: u.id
+            };
+          });
         }
-
-        const email = order.user.email.toLowerCase();
-        return models.User.findOne({
-          where: {
-            $or: {
-              email,
-              paypalEmail: email
-            }
-          }
-        })
       })
-      .then(u => u || models.User.createUserWithCollective(order.user))
-      .tap(u => user = u)
+      .then(c => fromCollective = c)
       .then(() => {
         if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
           Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
@@ -429,8 +410,8 @@ const mutations = {
           totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
         }
         const orderData = {
-          CreatedByUserId: user.id,
-          FromCollectiveId: args.order.fromCollective ? args.order.fromCollective.id : user.CollectiveId,
+          CreatedByUserId: fromCollective.CreatedByUserId,
+          FromCollectiveId: fromCollective.id,
           ToCollectiveId: collective.id,
           TierId: tier.id,
           quantity,
@@ -464,7 +445,7 @@ const mutations = {
             const paymentMethodData = {
               ...order.paymentMethod,
               service: "stripe",
-              CreatedByUserId: user.id,
+              CreatedByUserId: fromCollective.CreatedByUserId,
               CollectiveId: orderInstance.FromCollectiveId
             };
             if (!paymentMethodData.save) {
@@ -492,8 +473,10 @@ const mutations = {
               return paymentsLib.createPayment(payload);
             })
         } else {
-          return emailLib.send('ticket.confirmed', user.email, {
-            user: user.info,
+          // Free ticket
+          const email = (req.remoteUser) ? req.remoteUser.email : args.order.fromCollective.email;
+          return emailLib.send('ticket.confirmed', email, {
+            recipient: { name: fromCollective.name },
             collective: collective.info,
             order: orderInstance.info,
             tier: tier && tier.info

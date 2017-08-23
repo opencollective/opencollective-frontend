@@ -123,6 +123,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
+      balance: { type: GraphQLInt },
       role: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
@@ -133,7 +134,6 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      stripePublishableKey: { type: GraphQLString },
       paymentMethods: { type: new GraphQLList(PaymentMethodType) },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) }
     }
@@ -315,6 +315,12 @@ const CollectiveFields = () => {
         return collective.getTransactions(query);
       }
     },
+    balance: {
+      type: GraphQLInt,
+      resolve(collective) {
+        return collective.getBalance();
+      }
+    },
     role: {
       type: GraphQLString,
       resolve(collective, args, req) {
@@ -344,13 +350,6 @@ const CollectiveFields = () => {
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;
         return models.Collective.findAll(query);
-      }
-    },
-    stripePublishableKey: {
-      type: GraphQLString,
-      resolve(collective) {
-        return collective.getStripeAccount()
-        .then(stripeAccount => (stripeAccount && stripeAccount.data.publishableKey) || config.stripe.platformPublishableKey)
       }
     },
     paymentMethods: {

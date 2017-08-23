@@ -35,6 +35,12 @@ export const UserType = new GraphQLObjectType({
           return user.id;
         }
       },
+      CollectiveId: {
+        type: GraphQLInt,
+        resolve(user) {
+          return user.CollectiveId;
+        }
+      },
       username: {
         type: GraphQLString,
         resolve(user) {
@@ -502,6 +508,12 @@ export const PaymentMethodType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(paymentMethod) {
           return paymentMethod.fullName;
+        }
+      },
+      primary: {
+        type: GraphQLBoolean,
+        resolve(paymentMethod) {
+          return paymentMethod.primary;
         }
       },
       expMonth: {

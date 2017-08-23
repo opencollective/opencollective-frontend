@@ -38,6 +38,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     identifier: DataTypes.STRING,
+    primary: DataTypes.BOOLEAN,
 
     brand: {
       type: DataTypes.STRING,
@@ -160,6 +161,7 @@ export default function(Sequelize, DataTypes) {
         return stripe.createCustomer(null, PaymentMethodData.token)
           .then(customer => {
             PaymentMethodData.customerId = customer.id;
+            PaymentMethodData.primary = true;
             return this.create(PaymentMethodData);
           });
       }

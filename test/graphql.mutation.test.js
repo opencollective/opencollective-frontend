@@ -352,7 +352,6 @@ describe('Mutation Tests', () => {
         const result = await graphql(schema, query, null, context)
         expect(result.errors.length).to.equal(1);
         expect(result.errors[0].message).to.contain('toCollective');
-        expect(result.errors[0].message).to.contain('user');
       });
 
       describe('when collective/tier doesn\'t exist', () => {
@@ -360,7 +359,7 @@ describe('Mutation Tests', () => {
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "${user1.email}" }, toCollective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
+              createOrder(order: { fromCollective: { email: "${user1.email}" }, toCollective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
                 id,
                 toCollective {
                   id
@@ -382,7 +381,7 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
+              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
                 id,
                 toCollective {
                   id
@@ -406,7 +405,7 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
+              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
                 id,
                 toCollective {
                   id
@@ -429,7 +428,7 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
+              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
                 id,
                 toCollective {
                   id
@@ -455,7 +454,7 @@ describe('Mutation Tests', () => {
         const createMemberQuery = `
           mutation createMember {
             createMember(
-              user: { email: "${user2.email}" },
+              member: { email: "${user2.email}" },
               collective: { slug: "${event1.slug}" },
               role: "FOLLOWER"
             ) {
@@ -495,24 +494,20 @@ describe('Mutation Tests', () => {
       });
 
       it('removes a member', async () => {
-        const query = `
+        const query = (id) => `
           mutation removeMember {
-            removeMember(
-              user: { id: 1 },
-              collective: { slug: "${event1.slug}" },
-              role: "FOLLOWER"
-            ) { id }
+            removeMember(id: ${id}) { id }
           }
         `;
 
-        const error1 = await graphql(schema, query, null, {});
-        expect(error1.errors[0].message).to.equal('You need to be logged in to remove a member');
+        const error1 = await graphql(schema, query(3), null, {});
+        expect(error1.errors[0].message).to.equal('Member not found');
 
-        const error2 = await graphql(schema, query, null, { remoteUser: { id: 2 } });
-        expect(error2.errors[0].message).to.equal('You need to be logged in as this user or as a core contributor or as a host of the jan-meetup collective');
-        
-        const error3 = await graphql(schema, query, null, { remoteUser: { id: 1 } });
-        expect(error3.errors[0].message).to.equal('Member not found');
+        const error2 = await graphql(schema, query(2), null, {});
+        expect(error2.errors[0].message).to.equal('You need to be logged in to remove a member');
+
+        const error3 = await graphql(schema, query(2), null, { remoteUser: { id: 2 } });
+        expect(error3.errors[0].message).to.equal('You need to be logged in as this user or as a core contributor or as a host of the collective id 4');
         
         await models.Member.create({
           CreatedByUserId: 1,
@@ -521,7 +516,8 @@ describe('Mutation Tests', () => {
         });
 
         const membersBefore = await models.Member.count();
-        await graphql(schema, query, null, { remoteUser: { id: 1 } })
+        const res = await graphql(schema, query(3), null, { remoteUser: { id: 1 } })
+        res.errors && console.error(res.errors);
         const membersAfter = await models.Member.count();
         expect(membersBefore - membersAfter).to.equal(1);
       })
@@ -534,7 +530,7 @@ describe('Mutation Tests', () => {
         it('from an existing user', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { user: { email: "${user2.email}" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
+              createOrder(order: { fromCollective: { email: "${user2.email}" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
                 id,
                 createdByUser {
                   id,
@@ -592,7 +588,7 @@ describe('Mutation Tests', () => {
             mutation createOrder {
               createOrder(
                 order: {
-                  user: { email: "newuser@email.com" },
+                  fromCollective: { email: "newuser@email.com" },
                   toCollective: { slug: "${event1.slug}" },
                   tier: { id: 1 },
                   quantity: 2
@@ -642,7 +638,7 @@ describe('Mutation Tests', () => {
           const query = `
             mutation createOrder {
               createOrder(order: {
-                user: {
+                fromCollective: {
                   email: "${user2.email}",
                 },
                 paymentMethod: {
@@ -713,7 +709,7 @@ describe('Mutation Tests', () => {
           const query = `
             mutation createOrder {
               createOrder(order: {
-                user: {
+                fromCollective: {
                   email: "newuser@email.com",
                 },
                 paymentMethod: {

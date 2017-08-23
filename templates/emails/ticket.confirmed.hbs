@@ -4,8 +4,8 @@ Subject: {{ response.quantity }} {{{pluralize "ticket" n=response.quantity}}} co
 
 {{> toplogo}}
 
-{{#if user.name}}
-<p>Dear {{user.name}},</p>
+{{#if recipient.name}}
+<p>Dear {{recipient.name}},</p>
 {{else}}
 <p>Hi!</p>
 {{/if}}

@@ -559,11 +559,13 @@ export default function(Sequelize, DataTypes) {
       },
 
       editPaymentMethods(paymentMethods, defaultAttributes = {}) {
+        console.log(">>> editPaymentMethods", typeof paymentMethods, paymentMethods);
         if (!paymentMethods) return Promise.resolve();
-        return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $ne: null } }})
+        return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null } }})
         .then(oldPaymentMethods => {
           // remove the paymentMethods that are not present anymore in the updated collective
           const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
+          console.log(">>> diff", diff);
           return models.PaymentMethod.update({ archivedAt: new Date }, { where: { id: { $in: diff }}})
         })
         .then(() => {
@@ -572,6 +574,7 @@ export default function(Sequelize, DataTypes) {
               return models.PaymentMethod.update(pm, { where: { id: pm.id }});
             } else {
               pm.CollectiveId = this.id;
+              models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
               return models.PaymentMethod.createFromStripeSourceToken({ ...pm, ...defaultAttributes });
             }
           });

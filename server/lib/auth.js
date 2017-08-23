@@ -5,7 +5,7 @@ import Promise from 'bluebird';
 
 export function hasRole(MemberCollectiveId, CollectiveId, possibleRoles) {
   if (!MemberCollectiveId || !CollectiveId) return Promise.resolve(false);
-  if (MemberCollectiveId === CollectiveId) return Promise.resolve(true);
+  if (Number(MemberCollectiveId) === Number(CollectiveId)) return Promise.resolve(true);
 
   if (typeof possibleRoles === 'string') {
     possibleRoles = [ possibleRoles ];

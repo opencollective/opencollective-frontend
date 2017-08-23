@@ -51,6 +51,7 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     expMonth: { type: GraphQLInt },
     expYear: { type: GraphQLInt },
     identifier: { type: GraphQLString },
+    primary: { type: GraphQLBoolean },
     monthlyLimitPerMember: { type: GraphQLInt },
     save: { type: GraphQLBoolean }
   })
@@ -85,24 +86,6 @@ export const MemberInputType = new GraphQLInputObjectType({
   })
 });
 
-export const UserAttributesInputType = new GraphQLInputObjectType({
-  name: 'UserAttributesInputType',
-  description: 'Input type for UserType',
-  fields: () => ({
-      id: { type: GraphQLInt },
-      email: { type: EmailType },
-      firstName: { type: GraphQLString },
-      lastName: { type: GraphQLString },
-      name: { type: GraphQLString },
-      image: { type: GraphQLString },
-      username: { type: GraphQLString },
-      description: { type: GraphQLString },
-      twitterHandle: { type: GraphQLString },
-      website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString }
-  })
-});
-
 export const CollectiveInputType = new GraphQLInputObjectType({
   name: 'CollectiveInputType',
   description: 'Input type for CollectiveType',
@@ -111,7 +94,6 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
-    email: { type: GraphQLString }, // not very logical to have this here. Might need some refactoring. Used to add/edit members
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
     location: { type: LocationInputType},
@@ -125,7 +107,11 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     tiers: { type: new GraphQLList(TierInputType) },
     members: { type: new GraphQLList(MemberInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
-    ParentCollectiveId: { type: GraphQLInt }
+    ParentCollectiveId: { type: GraphQLInt },
+    // not very logical to have this here. Might need some refactoring. Used to add/edit members and to create a new user on a new order
+    email: { type: GraphQLString },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString }
   })
 });
 
@@ -190,7 +176,6 @@ export const OrderInputType = new GraphQLInputObjectType({
     description: { type: GraphQLString },
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
-    user: { type: new GraphQLNonNull(UserAttributesInputType) },
     paymentMethod: { type: PaymentMethodInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     toCollective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },

@@ -682,6 +682,7 @@ const up = (queryInterface, Sequelize) => {
     }))
     .then(() => queryInterface.addColumn('PaymentMethods', 'archivedAt', { type: Sequelize.DATE }))
     .then(() => queryInterface.addColumn('PaymentMethods', 'monthlyLimitPerMember', { type: Sequelize.INTEGER }))
+    .then(() => queryInterface.addColumn('PaymentMethods', 'primary', { type: Sequelize.BOOLEAN, defaultValue: false }))
     .then(() => queryInterface.renameColumn('PaymentMethods', 'UserId', 'CreatedByUserId'))
     .then(() => queryInterface.renameColumn('Members', 'UserId', 'CreatedByUserId'))
     .then(() => queryInterface.renameColumn('Transactions', 'UserId', 'CreatedByUserId'))
