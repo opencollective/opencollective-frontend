@@ -22,15 +22,15 @@ class OrderForm extends React.Component {
     super(props);
     const { intl, order } = props;
 
-    this.creditcardRequired = order.totalAmount > 0 || order.tier.amount > 0;
-
+    const tier = order.tier || {};
     this.state = {
       fromCollective: {},
       creditcard: {},
-      order: order || {},
-      tier: order.tier || {},
+      order: order || { totalAmount: tier.amount * (tier.quantity || 1)},
+      tier,
       result: {}
     };
+    console.log(">>> initial state", this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.error = this.error.bind(this);
@@ -116,6 +116,7 @@ class OrderForm extends React.Component {
   componentWillReceiveProps(props) {
     if (!this.state.fromCollective.email) {
       const fromCollective = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
+      fromCollective.id = props.LoggedInUser.CollectiveId;
       this.setState({
         fromCollective,
         LoggedInUser: props.LoggedInUser
@@ -133,8 +134,14 @@ class OrderForm extends React.Component {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
+    if (obj === 'tier') {
+      newState['order']['totalAmount'] = newState['tier']['amount'] * newState['tier']['quantity'];
+    }
+
     this.setState(newState);
-    window.state = newState;
+    if (typeof window !== undefined) {
+      window.state = newState;
+    }
   }
 
   async handleSubmit() {
@@ -146,7 +153,6 @@ class OrderForm extends React.Component {
     const quantity = tier.quantity || 1;
     const OrderInputType = {
       fromCollective,
-      description: tier.description,
       publicMessage: order.publicMessage,
       quantity,
       interval: tier.interval,
@@ -173,7 +179,7 @@ class OrderForm extends React.Component {
   async validate() {
     const { intl } = this.props;
 
-    if (this.creditcardRequired) {
+    if (this.state.order.totalAmount > 0) {
       const card = this.state.creditcard;
       if (!card) {
         this.setState({ result: { error: intl.formatMessage(this.messages['creditcard.missing']) }})
@@ -308,7 +314,7 @@ class OrderForm extends React.Component {
             ))}
         </div>
 
-        { this.creditcardRequired &&
+        { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
             <h2>Payment details</h2>
             <Row>

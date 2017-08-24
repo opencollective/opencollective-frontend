@@ -23,6 +23,7 @@ class Tier extends React.Component {
 
   constructor(props) {
     super(props);
+    this.onChange = this.props.onChange || function() {}; 
     this.handleChange = this.handleChange.bind(this);
     this.tier = props.tier;
     const quantity = this.props.quantity || 1;
@@ -31,10 +32,11 @@ class Tier extends React.Component {
     this.state = { quantity, amount, id };
     if (this.tier.presets) {
       this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
-      this.state.interval = this.props.interval || null,
-      this.state.amount = this.props.amount || this.presets[Math.floor(this.presets.length / 2)];
+      this.state.interval = this.props.interval || null;
+      if (!this.state.amount) {
+        this.handleChange('amount', this.presets[Math.floor(this.presets.length / 2)]);
+      }
     }
-    this.onChange = this.props.onChange || function() {}; 
     this.anchor = this.tier.name.toLowerCase().replace(/ /g,'-');
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 

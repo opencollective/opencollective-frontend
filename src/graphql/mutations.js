@@ -19,7 +19,11 @@ const createOrderQuery = gql`
         maxQuantity,
         availableQuantity
       },
-      collective {
+      fromCollective {
+        id,
+        slug
+      }
+      toCollective {
         id,
         slug
       }

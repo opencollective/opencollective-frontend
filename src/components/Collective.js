@@ -100,7 +100,9 @@ class Collective extends React.Component {
       interval: tier.interval
     }
     this.setState({ order });
-    window.state = this.state;
+    // if (typeof window !== undefined) {
+    //   window.state = this.state;
+    // }
   }
 
   resetOrder() {

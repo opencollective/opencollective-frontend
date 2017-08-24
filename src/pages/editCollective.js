@@ -25,8 +25,8 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, parentCollectiveSlug } = this.props;
-    const { loading, slug, LoggedInUser } = this.state;
+    const { data, slug } = this.props;
+    const { loading, LoggedInUser } = this.state;
     if (loading) {
       return <Loading />;
     }
@@ -42,7 +42,6 @@ class EditCollectivePage extends React.Component {
     if (LoggedInUser) {
       LoggedInUser.canEditCollective = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
         || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length
-        || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length;
     }
 
     return (

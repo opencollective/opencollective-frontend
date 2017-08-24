@@ -47,13 +47,14 @@ class OrderTierPage extends React.Component {
   async createOrder(order) {
     const { intl, slug } = this.props;
     order.toCollective = { slug };
+    console.log(">>> createOrder", order);
     try {
       this.setState({ loading: true});
       const res = await this.props.createOrder(order);
-      console.log(">>> createOrde response", res);
+      console.log(">>> createOrder response", res);
       const response = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      // window.location.replace(`https://opencollective.com/${response.user.username}`);
+      // window.location.replace(`https://opencollective.com/${response.fromCollective.slug}`);
     } catch (e) {
       this.setState({ loading: false, result: { error: intl.formatMessage(this.messages['order.error']) } });
     }
