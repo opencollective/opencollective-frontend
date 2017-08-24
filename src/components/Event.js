@@ -19,6 +19,7 @@ import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniq } from 'underscore';
+import { exportMembers } from '../lib/export_file';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -226,6 +227,18 @@ class Event extends React.Component {
             font-weight: 600;
             letter-spacing: 0.05rem;
           }
+          .adminActions ul {
+            overflow: hidden;
+            text-align: center;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            margin: 0 2rem;
+          }
         `}</style>
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
@@ -313,7 +326,11 @@ class Event extends React.Component {
                       </h1>
                       { canEditEvent &&
                       <div className="adminActions">
-                        <a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a>
+                        <ul>
+                          <li><a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a></li>
+                          <li><a href={`mailto:${this.event.slug}@${this.event.collective.slug}.opencollective.com`}>Send email</a></li>
+                          <li><a onClick={ exportMembers.bind(this, this.event.collective.slug, this.event.slug) }>Export CSV</a></li>
+                        </ul>
                       </div>
                       }
                       <Responses responses={responses.guests} />
