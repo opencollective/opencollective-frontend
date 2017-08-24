@@ -56,7 +56,7 @@ export default ComposedComponent => {
         // Run all graphql queries
         const app = (
           <ApolloProvider client={apollo}>
-            <ComposedComponent url={url} {...composedInitialProps} />
+            <ComposedComponent client={apollo} url={url} {...composedInitialProps} />
           </ApolloProvider>
         )
         await getDataFromTree(app)
@@ -89,7 +89,7 @@ export default ComposedComponent => {
     render () {
       return (
         <ApolloProvider client={this.apollo}>
-          <ComposedComponent {...this.props} />
+          <ComposedComponent client={this.apollo} {...this.props} />
         </ApolloProvider>
       )
     }
