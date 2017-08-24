@@ -231,6 +231,7 @@ class Event extends React.Component {
             overflow: hidden;
             text-align: center;
             margin: 0 auto;
+            padding: 0;
             display: flex;
             justify-content: center;
             flex-direction: row;
@@ -329,7 +330,7 @@ class Event extends React.Component {
                         <ul>
                           <li><a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a></li>
                           <li><a href={`mailto:${this.event.slug}@${this.event.collective.slug}.opencollective.com`}>Send email</a></li>
-                          <li><a onClick={ exportMembers.bind(this, this.event.collective.slug, this.event.slug) }>Export CSV</a></li>
+                          <li className="desktopOnly"><a onClick={ exportMembers.bind(this, this.event.collective.slug, this.event.slug) }>Export CSV</a></li>
                         </ul>
                       </div>
                       }
