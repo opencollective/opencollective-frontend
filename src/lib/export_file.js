@@ -67,7 +67,7 @@ export async function exportMembers(collectiveSlug, eventSlug) {
   const rows = res.data.Event.responses.map(r => {
     return {
       createdAt: formatDate(new Date(r.createdAt)),
-      tier: r.tier.name,
+      tier: r.tier && r.tier.name,
       status: r.status,
       quantity: r.quantity,
       name: r.user.name,
