@@ -355,6 +355,11 @@ export const demoHostId = () => {
   return 1;
 };
 
+export const isValidEmail = (email) => {
+  if (typeof email !== 'string') return false;
+  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+};
+
 /**
  * Check if this is an internal email address.
  * Useful for testing emails in localhost or staging

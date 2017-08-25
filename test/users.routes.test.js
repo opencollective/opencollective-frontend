@@ -75,6 +75,30 @@ describe('users.routes.test.js', () => {
     nodemailer.createTransport.restore();
   });
 
+
+  describe("existence", () => {
+    it("returns true", (done) => { 
+      models.User.create({ email: 'john@smith.com' })
+        .then(() => {
+          request(app)
+            .get(`/users/exists?email=john@smith.com&api_key=${application.api_key}`)
+            .end((e, res) => {
+              expect(res.body.exists).to.be.true;
+              done();
+            })
+        });
+    })
+
+    it("returns false", (done) => {
+      request(app)
+        .get(`/users/exists?email=john2@smith.com&api_key=${application.api_key}`)
+        .end((e, res) => {
+          expect(res.body.exists).to.be.false;
+          done();
+        })
+    });
+  })
+
   /**
    * Create.
    */

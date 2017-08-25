@@ -118,6 +118,7 @@ export default (app) => {
    * Users.
    */
   app.post('/users', required('user'), users.create); // Create a user.
+  app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
