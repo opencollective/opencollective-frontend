@@ -31,6 +31,7 @@ class CollectivePage extends React.Component {
     const { data, slug, message } = this.props;
     const { LoggedInUser } = this.state;
 
+    console.log(">>> this.props", this.props);
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
 

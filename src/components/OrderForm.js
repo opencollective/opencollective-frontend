@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
-import Button from '../components/Button';
-import { Row, Col, Form, FormControl } from 'react-bootstrap';
+import ActionButton from '../components/Button';
+import { Button, HelpBlock, Row, Col, Form, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
+import { checkUserExistence, login } from '../lib/api';
 
 class OrderForm extends React.Component {
 
@@ -24,13 +25,15 @@ class OrderForm extends React.Component {
 
     const tier = order.tier || {};
     this.state = {
+      isNewUser: true,
+      user: {},
       fromCollective: {},
       creditcard: {},
       order: order || { totalAmount: tier.amount * (tier.quantity || 1)},
       tier,
       result: {}
     };
-    console.log(">>> initial state", this.state);
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.error = this.error.bind(this);
@@ -51,7 +54,6 @@ class OrderForm extends React.Component {
       'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
       'firstName.label': { id: 'user.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'user.lastName.label', defaultMessage: 'last name' },
-      'organization.label': { id: 'user.organization.label', defaultMessage: 'organization' },
       'website.label': { id: 'user.website.label', defaultMessage: 'website' },
       'twitterHandle.label': { id: 'user.twitterHandle.label', defaultMessage: 'twitter' },
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
@@ -66,19 +68,10 @@ class OrderForm extends React.Component {
 
     this.fields = [
       {
-        name: 'email',
-        type: 'email',
-        focus: true,
-        required: true
-      },
-      {
         name: 'firstName'
       },
       {
         name: 'lastName'
-      },
-      {
-        name: 'organization'
       },
       {
         name: 'website'
@@ -114,7 +107,7 @@ class OrderForm extends React.Component {
 
   // Prefill the form with logged in user if any
   componentWillReceiveProps(props) {
-    if (!this.state.fromCollective.email) {
+    if (!this.state.fromCollective.email && props.LoggedInUser) {
       const fromCollective = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
       fromCollective.id = props.LoggedInUser.CollectiveId;
       this.setState({
@@ -136,6 +129,12 @@ class OrderForm extends React.Component {
 
     if (obj === 'tier') {
       newState['order']['totalAmount'] = newState['tier']['amount'] * newState['tier']['quantity'];
+    }
+
+    if (attr === 'email') {
+      checkUserExistence(value).then(exists => {
+        this.setState({ isNewUser: !exists });
+      });
     }
 
     this.setState(newState);
@@ -300,14 +299,31 @@ class OrderForm extends React.Component {
                 </Col>
               </Row>
             }
-            {!LoggedInUser && this.fields.map(field => (
+            {!LoggedInUser &&
+              <Row key={`email.input`}>
+                <Col sm={12}>
+                  <InputField
+                    className="horizontal"
+                    type="email"
+                    label={intl.formatMessage(this.messages['email.label'])}
+                    required={true}
+                    focus={true}
+                    defaultValue={this.state.order['email']}
+                    button={!this.state.isNewUser && <Button onClick={() => login(this.state.user.email)}>Login</Button>}
+                    description={!this.state.isNewUser && `Oh oh, looks like you already have an account on Open Collective with this email address.`}
+                    onChange={(value) => this.handleChange("user", "email", value)}
+                    />
+                </Col>
+              </Row>
+            }
+            {!LoggedInUser && this.state.isNewUser && this.fields.map(field => (
               <Row key={`${field.name}.input`}>
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
                     {...field}
                     defaultValue={this.state.order[field.name]}
-                    onChange={(value) => this.handleChange("fromCollective", field.name, value)}
+                    onChange={(value) => this.handleChange("user", field.name, value)}
                     />
                 </Col>
               </Row>
@@ -395,9 +411,9 @@ class OrderForm extends React.Component {
 
         <div className="actions">
           <div className="submit">
-            <Button className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
+            <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
               {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : this.state.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-            </Button>
+            </ActionButton>
           </div>
           <div className="result">
               {this.state.loading && <div className="loading">Processing...</div>}

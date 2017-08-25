@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import fetch from 'isomorphic-fetch';
+import { fetchConnectedAccount } from '../lib/api';
 
 class EditConnectedAccount extends React.Component {
 
@@ -31,41 +31,8 @@ class EditConnectedAccount extends React.Component {
     this.services = ['stripe', 'paypal', 'twitter', 'github'];
   }
 
-  /**
-   * The Promise returned from fetch() won't reject on HTTP error status. We
-   * need to throw an error ourselves.
-   */
-  checkStatus(response) {
-    console.log(">>> checkStatus", response);
-    const { status } = response;
-    if (status >= 200 && status < 300) {
-      return response.json();
-    } else {
-      return response.json()
-      .then((json) => {
-        const error = new Error(json.error.message);
-        error.json = json;
-        error.response = response;
-        throw error;
-      });
-    }
-  }
-
-  addAuthTokenToHeader(obj = {}) {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) return obj;
-    return {
-      Authorization: `Bearer ${accessToken}`,
-      ...obj,
-    };
-  }
-
   connect(service) {
-    fetch(`/api/connected-accounts/${service}?CollectiveId=${this.props.collective.id}`, {
-      method: 'get',
-      headers: this.addAuthTokenToHeader()
-    })
-    .then(this.checkStatus)
+    fetchConnectedAccount(this.props.collective.id, service)
     .then(json => {
       console.log(`>>> /api/connected-accounts/${service} response`, json);
       return window.location.replace(json.redirectUrl);

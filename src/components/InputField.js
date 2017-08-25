@@ -10,16 +10,12 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
 
-function FieldGroup({ controlId, label, help, pre, className, ...props }) {
+function FieldGroup({ controlId, label, help, pre, button, className, ...props }) {
 
   const validationState = props.validationState === 'error' ? 'error' : null;
   delete props.validationState;
 
   props.key = props.key || props.name;
-
-  if (!props.key) {
-    console.log(">>> no key for input", props);
-  }
 
   const inputProps = { ... props };
   delete inputProps.controlId;
@@ -35,6 +31,7 @@ function FieldGroup({ controlId, label, help, pre, className, ...props }) {
           { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
           <FormControl {...inputProps} />
           { validationState && <FormControl.Feedback /> }
+          { button && <InputGroup.Button>{button}</InputGroup.Button>}
           </InputGroup>
           {help && <HelpBlock>{help}</HelpBlock>}
         </Col>
@@ -48,6 +45,7 @@ function FieldGroup({ controlId, label, help, pre, className, ...props }) {
         { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
         <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
         { validationState && <FormControl.Feedback /> }
+        { button && <InputGroup.Button>{button}</InputGroup.Button>}
         </InputGroup>
         {help && <HelpBlock>{help}</HelpBlock>}
       </FormGroup>
@@ -65,6 +63,8 @@ class InputField extends React.Component {
     options: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.object,
     placeholder: PropTypes.string,
+    pre: PropTypes.string,
+    button: PropTypes.node,
     className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
@@ -257,6 +257,7 @@ class InputField extends React.Component {
           onChange={event => this.handleChange(event.target.value)}
           type={field.type}
           pre={field.pre}
+          button={field.button}
           name={field.name}
           label={field.label && `${capitalize(field.label)}`}
           help={field.description}

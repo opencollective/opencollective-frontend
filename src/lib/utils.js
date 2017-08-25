@@ -30,11 +30,10 @@ export function filterCollection(array, cond, inverse) {
   return array.filter((r) => inverse ? !test(r, cond) : test(r, cond))
 }
 
-
-export function isValidEmail(email) {
-  if (!email) return false;
-  return Boolean(email.match(/.+@.+\..+/));
-}
+export const isValidEmail = (email) => {
+  if (typeof email !== 'string') return false;
+  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+};
 
 export function getCurrencySymbol(currency) {
  const r = Number(0).toLocaleString(currency, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0});
