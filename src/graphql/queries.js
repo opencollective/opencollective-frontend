@@ -82,7 +82,8 @@ const getEventQuery = gql`
           avatar,
           username,
           twitterHandle,
-          description
+          description,
+          email
         },
         tier {
           name
