@@ -58,7 +58,7 @@ class Event extends React.Component {
       showInterestedForm: false,
       response: {},
       api: { status: 'idle' },
-      actions: this.defaultActions
+      actions: this.getDefaultActions(this.props)
     };
 
     // To test confirmation screen, uncomment the following:
@@ -135,7 +135,7 @@ class Event extends React.Component {
 
   componentWillReceiveProps(props) {
     if (props) {
-      this.setState({actions: this.getDefaultActions(props) });
+      this.setState({ actions: this.getDefaultActions(props) });
     }
   }
 
