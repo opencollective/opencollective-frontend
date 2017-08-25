@@ -1,4 +1,3 @@
-import async from 'async';
 import config from 'config';
 import Sequelize from 'sequelize';
 import models, { setupModels } from '../models';
@@ -104,7 +103,7 @@ export const resetTestDatabase = function(req, res, next) {
       testBacker2 = b;
       return testGroup.addUserWithRole(testBacker2, roles.BACKER);
     })
-    .then(() =>models.StripeAccount.create({
+    .then(() => models.StripeAccount.create({
       accessToken: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
       refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
       stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
