@@ -22,7 +22,7 @@ class EventPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -39,8 +39,11 @@ class EventPage extends React.Component {
 
     const event = data.Event;
 
-    if (LoggedInUser) {
+    if (LoggedInUser && !LoggedInUser.canEditEvent) {
       LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
+      if (LoggedInUser.canEditEvent) {
+        data.refetch(); // we refetch the data to get the email addresses of the participants
+      }
     }
 
     return (

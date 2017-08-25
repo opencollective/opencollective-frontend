@@ -283,7 +283,10 @@ export const addCollectiveTransactionsData = graphql(getCollectiveTransactionsQu
   })  
 });
 export const addCollectiveData = graphql(getCollectiveQuery);
-export const addEventData = graphql(getEventQuery);
+
+// Need to bypass the cache otherwise it won't update the list of participants with the email addresses when we refetch the query as an admin
+export const addEventData = graphql(getEventQuery, { options: { fetchPolicy: 'network-only' }});
+
 export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
 
