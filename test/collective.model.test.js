@@ -323,11 +323,11 @@ describe('Collective model', () => {
           slug: 'newtier'
         }
       ])
-      .then(() => collective.getTiers())
       .then(tiers => {
         expect(tiers.length).to.equal(2);
-        expect(tiers[0].name).to.equal('super backer');
-        expect(tiers[1].name).to.equal('new tier');
+        tiers.sort((a,b) => b.slug < a.slug);
+        expect(tiers[0].name).to.equal('new tier');
+        expect(tiers[1].name).to.equal('super backer');
         done();
       })
     })

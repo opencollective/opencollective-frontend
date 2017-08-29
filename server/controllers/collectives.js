@@ -489,7 +489,7 @@ export const getOne = (req, res, next) => {
     else return req.collective.getRelatedCollectives();
   }
   Promise.all([
-    req.collective.getConnectedAccount(),
+    req.collective.getConnectedAccounts({ where: { service: 'paypal' }}),
     req.collective.getBalance(),
     req.collective.getYearlyIncome(),
     req.collective.getTotalAmountReceived(),

@@ -77,7 +77,6 @@ export function setupModels(client) {
   m.PaymentMethod.belongsTo(m.Collective);
 
   // User
-  m.Collective.hasMany(m.ConnectedAccount);
   m.User.hasMany(m.Activity);
   m.User.hasMany(m.Notification);
   m.User.hasMany(m.Transaction, { foreignKey: 'CreatedByUserId', as: 'transactions' });
@@ -93,17 +92,11 @@ export function setupModels(client) {
   m.Member.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Member.belongsTo(m.Tier);
 
-  // Collective.
-  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'MemberCollectiveId' }, as: 'members'});
-  m.Collective.belongsToMany(m.Collective, { through: { model: m.Member, unique: false, foreignKey: 'CollectiveId' }, as: 'memberships'});
-  m.Collective.hasMany(m.Member);
-
   // ConnectedAccount
   m.ConnectedAccount.belongsTo(m.Collective);
 
   // Activity.
   m.Activity.belongsTo(m.Collective);
-  m.Collective.hasMany(m.Activity);
   m.Activity.belongsTo(m.User);
   m.Activity.belongsTo(m.Transaction);
 
@@ -111,12 +104,10 @@ export function setupModels(client) {
   m.Notification.belongsTo(m.User);
 
   m.Notification.belongsTo(m.Collective);
-  m.Collective.hasMany(m.Notification);
 
   // Transaction.
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'ToCollectiveId', as: 'toCollective' });
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
-  m.Collective.hasMany(m.Transaction, { foreignKey: 'ToCollectiveId', as: 'transactions' }); // collective.getTransactions()
 
   m.Transaction.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'HostCollectiveId', as: 'host' });
@@ -148,8 +139,8 @@ export function setupModels(client) {
   m.Transaction.belongsTo(m.PaymentMethod);
 
   // Tier
-  m.Collective.hasMany(m.Tier, { as: 'tiers' });
   m.Tier.belongsTo(m.Collective);
 
+  Object.keys(m).forEach((modelName) => m[modelName].associate && m[modelName].associate(m));
   return m;
 }

@@ -138,7 +138,7 @@ describe('expenses.routes.test.js', () => {
         error: {
           code: 400,
           type: 'validation_failed',
-          message: 'Validation error: Validation min failed',
+          message: 'Validation error: Validation min on amount failed',
           fields: [ 'amount' ]
         }
       }));

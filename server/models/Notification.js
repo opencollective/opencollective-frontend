@@ -39,63 +39,61 @@ export default function(Sequelize, DataTypes) {
       type: 'unique'
     }],
 
-    classMethods: {
-      createMany: (notifications, defaultValues) => {
-        return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
-      },
+  });
 
-      /**
-       * Get the list of subscribers to a mailing list (e.g. backers@:collectiveSlug.opencollective.com)
-       * For members, backers, and info: opt-in: we look for rows in the Notifications table
-       * For events, it's opt-out. We exclude people who have explicitly unsubscribed
-       */
-      getSubscribers: (collectiveSlug, mailinglist) => {
+  Notification.createMany = (notifications, defaultValues) => {
+    return Promise.map(notifications, u => Notification.create(_.defaults({},u,defaultValues))).catch(console.error);
+  };
 
-        const getSubscribersForMailingList = () =>
-          models.Notification.findAll(
-              {
-                where: {
-                  channel: 'email',
-                  type: `mailinglist.${mailinglist}`
-                },
-                include: [
-                  { model: models.User },
-                  { model: models.Collective, where: { slug: collectiveSlug } }
-                ]
-              }
-            )
-            .then(subscriptions => subscriptions.map(s => s.User))        
+  /**
+   * Get the list of subscribers to a mailing list (e.g. backers@:collectiveSlug.opencollective.com)
+   * For members, backers, and info: opt-in: we look for rows in the Notifications table
+   * For events, it's opt-out. We exclude people who have explicitly unsubscribed
+   */
+  Notification.getSubscribers = (collectiveSlug, mailinglist) => {
 
-        const getSubscribersForEvent = () => models.Collective
-          .findOne({
-            where: { slug: collectiveSlug, type: 'EVENT' }
-          })
-          .then(event => {
-              if (event) return event.getMembers().then(excludeUnsubscribed)
-          })
-
-        const excludeUnsubscribed = (members) => 
-          models.Notification.findAll({
+    const getSubscribersForMailingList = () =>
+      models.Notification.findAll(
+          {
             where: {
               channel: 'email',
-              active: false,
-              type: `mailinglist`
+              type: `mailinglist.${mailinglist}`
             },
-            include: [ { model: models.Collective, where: { slug: collectiveSlug } } ]
-          }).then(notifications => notifications.map(s => s.UserId ))
-          .then(excludeIds => {
-            return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
-          })
+            include: [
+              { model: models.User },
+              { model: models.Collective, where: { slug: collectiveSlug } }
+            ]
+          }
+        )
+        .then(subscriptions => subscriptions.map(s => s.User))        
 
-        return getSubscribersForEvent(collectiveSlug)
-        .then(subscribers => {
-          if (!subscribers) return getSubscribersForMailingList(mailinglist)
-          else return subscribers;
-        });
-      }
-    }
+    const getSubscribersForEvent = () => models.Collective
+      .findOne({
+        where: { slug: collectiveSlug, type: 'EVENT' }
+      })
+      .then(event => {
+          if (event) return event.getMembers().then(excludeUnsubscribed)
+      })
 
-  });
+    const excludeUnsubscribed = (members) => 
+      models.Notification.findAll({
+        where: {
+          channel: 'email',
+          active: false,
+          type: `mailinglist`
+        },
+        include: [ { model: models.Collective, where: { slug: collectiveSlug } } ]
+      }).then(notifications => notifications.map(s => s.UserId ))
+      .then(excludeIds => {
+        return members.filter(m => excludeIds.indexOf(m.CreatedByUserId) === -1)
+      })
+
+    return getSubscribersForEvent(collectiveSlug)
+    .then(subscribers => {
+      if (!subscribers) return getSubscribersForMailingList(mailinglist)
+      else return subscribers;
+    });
+  }
 
   return Notification;
 }

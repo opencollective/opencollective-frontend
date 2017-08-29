@@ -3,7 +3,6 @@ import config from 'config';
 /**
  * Model.
  */
-
 export default (Sequelize, DataTypes) => {
 
   const supportedServices = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];

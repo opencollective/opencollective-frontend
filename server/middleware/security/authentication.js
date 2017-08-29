@@ -8,7 +8,6 @@ import qs from 'querystring';
 import {createOrUpdate as createOrUpdateConnectedAccount} from '../../controllers/connectedAccounts';
 import models from '../../models';
 import errors from '../../lib/errors';
-import required from '../required_param';
 import debug from 'debug';
 import * as stripe from '../../controllers/stripe';
 
@@ -19,7 +18,6 @@ const {
 const {
   BadRequest,
   CustomError,
-  ServerError,
   Unauthorized
 } = errors;
 
@@ -89,43 +87,6 @@ export function authenticateUserByJwtNoExpiry() {
     this._authenticateUserByJwt
   ]
 }
-
-/**
- * Authenticate user by email/password. #deprecated
- * TODO: remove
- */
-export const authenticateUserByPassword = (req, res, next) => {
-  required('password')(req, res, (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    const email = (req.body && req.body.email) || req.query.email;
-    const password = (req.body && req.body.password) || req.query.password;
-
-    User
-      .auth(email, password, (e, user) => {
-        const errorMsg = 'Invalid email or password';
-
-        if (e) {
-          if (e.code === 400) {
-            return next(new BadRequest(errorMsg));
-          } else {
-            return next(new ServerError(e.message));
-          }
-        }
-
-        if (!user) {
-          return next(new BadRequest(errorMsg));
-        }
-
-        req.remoteUser = user;
-        req.user = req.remoteUser;
-
-        next();
-      });
-  });
-};
 
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();

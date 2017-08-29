@@ -113,7 +113,7 @@ describe('Query Tests', () => {
       }
     }`;
 
-    const result = await graphql(schema, query, null, context);
+    const result = await graphql(schema, query, null, utils.makeRequest());
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
     const userCollective = result.data.Collective;
@@ -131,7 +131,7 @@ describe('Query Tests', () => {
     expect(userCollective.createdByUser.email).to.be.null;
     expect(memberships[1].collective.stats).to.deep.equal({
       backers: 25,
-      yearlyBudget: 339311
+      yearlyBudget: 338470
     });
   });
 
@@ -196,7 +196,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    const res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    const res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const members = res.data.editCollective.members;
@@ -205,7 +205,7 @@ describe('Query Tests', () => {
     expect(members[1].member.name).to.equal('member1');
     expect(members[1].member.email).to.equal('member1@hail.com');
     
-    const res2 = await graphql(schema, query, null, { remoteUser: { id: members[1].member.createdByUser.id }})
+    const res2 = await graphql(schema, query, null, utils.makeRequest({ id: members[1].member.createdByUser.id }));
     expect(res2.errors).to.exist;
     expect(res2.errors[0].message).to.equal(`You must be logged in as an admin or as the host of this organization collective to edit it`);
   })
@@ -250,7 +250,7 @@ describe('Query Tests', () => {
       role: 'ADMIN'
     });
 
-    res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
@@ -279,7 +279,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
@@ -300,7 +300,8 @@ describe('Query Tests', () => {
       }
     }`;
 
-    res = await graphql(schema, query, null, { remoteUser: pubnubAdmin });
+    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
+    res.errors && console.error(res.errors[0]);
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(2);
     expect(paymentMethods[0].uuid).to.have.length(36);
@@ -309,13 +310,15 @@ describe('Query Tests', () => {
     expect(paymentMethods[1].identifier).to.equal('1212');
 
     // Should not return the credit cards if not logged in;
-    res = await graphql(schema, query, null, { remoteUser: null });
+    res = await graphql(schema, query, null, utils.makeRequest(null));
+    res.errors && console.error(res.errors[0]);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(0);
 
     // Shouldn't return the credit cards if not logged in as an admin of the collective
-    res = await graphql(schema, query, null, { remoteUser: {id: 2, CollectiveId: 793 } });
+    res = await graphql(schema, query, null, utils.makeRequest({id: 2, CollectiveId: 793 }));
+    res.errors && console.error(res.errors[0]);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(0);

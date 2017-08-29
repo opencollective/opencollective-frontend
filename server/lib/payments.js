@@ -47,7 +47,7 @@ const createPayment = (payload) => {
   }
 
   const getOrCreatePaymentMethod = (paymentMethod) => {
-    if (paymentMethod instanceof models.PaymentMethod.Instance) return Promise.resolve(paymentMethod);
+    if (paymentMethod instanceof models.PaymentMethod) return Promise.resolve(paymentMethod);
     else return models.PaymentMethod.create({
       ...paymentMethod,
       service: 'stripe',
@@ -202,7 +202,7 @@ const processPayment = (order) => {
               from: `https://opencollective.com/${order.fromCollective.slug}`,
               to: `https://opencollective.com/${order.toCollective.slug}`,
               customerEmail: user.email,
-              paymentMethodId: paymentMethod.id
+              PaymentMethodId: paymentMethod.id
             }
           })
           .tap(c => charge = c)

@@ -674,6 +674,8 @@ const up = (queryInterface, Sequelize) => {
     }))
     .then(() => queryInterface.removeIndex('Members', 'UserGroups_3way'))
     .then(() => queryInterface.addIndex('Members', ['MemberCollectiveId', 'CollectiveId', 'role'], { indexName: 'MemberCollectiveId-CollectiveId-role' }))
+    .then(() => queryInterface.addIndex('Transactions', ['ToCollectiveId', 'FromCollectiveId', 'deletedAt'], { indexName: 'ToCollectiveId-FromCollectiveId-type' }))
+    .then(() => queryInterface.addIndex('Tiers', ['CollectiveId', 'deletedAt'], { indexName: 'CollectiveId-deletedAt' }))
     .then(() => queryInterface.addColumn('PaymentMethods', 'CollectiveId', {
       type: Sequelize.INTEGER,
       references: { model: 'Collectives', key: 'id' },

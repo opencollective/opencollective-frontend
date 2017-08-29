@@ -138,6 +138,8 @@ const mutations = {
         LastEditedByUserId: req.remoteUser.id
       };
 
+      updatedCollectiveData.type = updatedCollectiveData.type || 'COLLECTIVE';
+
       if (location.lat) {
         updatedCollectiveData.geoLocationLatLong = {
           type: 'Point',
@@ -323,14 +325,14 @@ const mutations = {
       }
 
       return models.Member.findById(args.id)
-      .tap(m => {
-        if (!m) throw new errors.NotFound("Member not found");
-        membership = m;
-      })
-      .then(checkPermission)
-      .then(() => {
-        return membership.destroy();
-      })
+        .tap(m => {
+          if (!m) throw new errors.NotFound("Member not found");
+          membership = m;
+        })
+        .then(checkPermission)
+        .then(() => {
+          return membership.destroy();
+        })
     }
   },
   createOrder: {
@@ -362,7 +364,7 @@ const mutations = {
           throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
         }
         tier = t;
-        paymentRequired = order.totalAmount > 0;
+        paymentRequired = order.totalAmount > 0 || t.amount > 0;
         // interval of the tier can only be overridden if it is null (e.g. for custom donations)
         interval = tier.interval || order.interval;
       })
@@ -373,18 +375,24 @@ const mutations = {
             Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
 
       // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
-      .then(() => paymentRequired && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token)) &&
-        Promise.reject(new Error(`This tier requires a payment method`)))
+      .then(() => {
+        if (paymentRequired && !(order.paymentMethod && (order.paymentMethod.uuid || order.paymentMethod.token))) {
+          throw new Error(`This tier requires a payment method`);
+        }
+      })
       
-      // find or create fromCollective
+      // find or create user, check permissions to set `fromCollective`
       .then(() => {
         if (order.fromCollective && order.fromCollective.id) {
           if (!req.remoteUser) throw new Error(`You need to be logged in to create an order for an existing open collective account`);
           return hasRole(req.remoteUser.CollectiveId, order.fromCollective.id, ['ADMIN', 'HOST']).then(canEdit => {
             if (!canEdit) throw new Error(`You need to be logged in as an admin of the collective id ${order.fromCollective.id}`);
-            return models.Collective.findById(order.fromCollective.id).tap(c => {
-              if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
-            });
+            return models.Collective
+              .findById(order.fromCollective.id)
+              .then(c => {
+                if (!c) throw new Error(`From collective id ${order.fromCollective.id} not found`);
+                return c;
+              });
           });
         } else {
           return models.User.findOrCreateByEmail(order.user.email, order.user).then(u => {
@@ -434,9 +442,10 @@ const mutations = {
         };
         return models.Order.create(orderData)
       })
+
       // process payment, if needed
       .tap((orderInstance) => {
-        if (orderInstance.totalAmount > 0) {
+        if (paymentRequired) {
           // if the user is trying to reuse an existing credit card,
           // we make sure it belongs to the logged in user.
           let getPaymentMethod;

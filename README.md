@@ -6,6 +6,17 @@
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-api.svg)](https://david-dm.org/opencollective/opencollective-api)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCollective/opencollective-api/badge.svg)](https://coveralls.io/github/OpenCollective/opencollective-api)
 
+# TODO
+
+- Update card on Stripe for active subscriptions
+
+## Payment flows:
+- Pay with new credit card
+- Pay with existing credit card attached to user
+- Pay with existing credit card attached to organization
+- Pay with balance of a collective
+
+
 ## How to get started
 
 Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users. 

@@ -40,7 +40,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
           .end((err, res) => {
             expect(err).not.to.exist;
             const baseUrl = 'https://github.com/login/oauth/authorize';
-            const redirectUri = encodeURIComponent(`${config.host.website}/api/connected-accounts/github/callback?utm_source=mm&slug=`);
+            const redirectUri = encodeURIComponent(`${config.host.website}/api/connected-accounts/github/callback?utm_source=mm&CollectiveId=`);
             const scope = encodeURIComponent('user:email,repo');
             const location = `^${baseUrl}\\?response_type=code&redirect_uri=${redirectUri}&scope=${scope}&client_id=${clientId}$`;
             expect(res.headers.location).to.match(new RegExp(location));
@@ -80,7 +80,7 @@ describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
         req.expect(302)
           .end((err, res) => {
             expect(err).not.to.exist;
-            expect(res.headers.location).to.be.equal(`https://github.com/login/oauth/authorize?response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fconnected-accounts%2Fgithub%2Fcallback%3Futm_source%3D%26slug%3D&client_id=${clientId}`);
+            expect(res.headers.location).to.be.equal(`https://github.com/login/oauth/authorize?response_type=code&redirect_uri=${encodeURIComponent(`${config.host.website}/api/connected-accounts/github/callback`)}%3Futm_source%3D%26CollectiveId%3D&client_id=${clientId}`);
             done();
           });
       });

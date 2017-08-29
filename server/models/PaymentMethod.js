@@ -155,20 +155,18 @@ export default function(Sequelize, DataTypes) {
         };
       }
     },
-
-    classMethods: {
-      createFromStripeSourceToken(PaymentMethodData) {
-        return stripe.createCustomer(null, PaymentMethodData.token)
-          .then(customer => {
-            PaymentMethodData.customerId = customer.id;
-            PaymentMethodData.primary = true;
-            return this.create(PaymentMethodData);
-          });
-      }
-    }
   });
   
   PaymentMethod.payoutMethods = payoutMethods;
+
+  PaymentMethod.createFromStripeSourceToken = (PaymentMethodData) => {
+    return stripe.createCustomer(null, PaymentMethodData.token)
+      .then(customer => {
+        PaymentMethodData.customerId = customer.id;
+        PaymentMethodData.primary = true;
+        return PaymentMethod.create(PaymentMethodData);
+      });
+  };
 
   return PaymentMethod;
 }

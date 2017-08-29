@@ -293,7 +293,7 @@ describe('users.routes.test.js', () => {
           const options = nm.sendMail.lastCall.args[0];
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
-          expect(href).to.contain(`${config.host.website}/login/`);
+          expect(href).to.contain(`${config.host.website}/signin/`);
           expect(options.to).to.equal(user.email);
         }));
   });
@@ -352,7 +352,7 @@ describe('users.routes.test.js', () => {
           const options = nm.sendMail.lastCall.args[0];
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
-          expect(href).to.contain(`${config.host.website}/login/`);
+          expect(href).to.contain(`${config.host.website}/signin/`);
           expect(options.to).to.equal(user.email);
         });
     });

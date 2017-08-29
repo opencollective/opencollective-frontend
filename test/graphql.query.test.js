@@ -6,7 +6,6 @@ import { graphql } from 'graphql';
 import * as utils from './utils';
 import models from '../server/models';
 
-
 describe('Query Tests', () => {
   let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2, tier3;
 
@@ -62,8 +61,8 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
             allEvents: []
@@ -81,8 +80,8 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
             allEvents: []
@@ -108,8 +107,8 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
             Collective: {
@@ -138,8 +137,8 @@ describe('Query Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
           expect(result).to.deep.equal({
             data: {
               allEvents: [
@@ -222,8 +221,8 @@ describe('Query Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
           result.errors && console.error(result.errors);
           const order = result.data.Collective.orders[0];
           expect(order).to.have.property("createdAt");
@@ -266,8 +265,8 @@ describe('Query Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
           expect(result).to.deep.equal({
             data: {
               allEvents: [

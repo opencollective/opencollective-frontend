@@ -13,6 +13,12 @@ export default {
 
   },
 
+  "tokens": {
+    "create": {
+      "id": "tok_6IJf9vLMFVsKzX"
+    }
+  },
+
   "customers": {
 
     "create": {

@@ -84,7 +84,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    const res = await graphql(schema, query, null, {});
+    const res = await graphql(schema, query, null, utils.makeRequest());
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const fromCollective = res.data.createOrder.fromCollective;
@@ -144,7 +144,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    const res = await graphql(schema, query, null, { remoteUser: xdamman });
+    const res = await graphql(schema, query, null, utils.makeRequest(xdamman));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const toCollective = res.data.createOrder.toCollective;
@@ -208,7 +208,7 @@ describe('Query Tests', () => {
       }
     }
     `;
-    res = await graphql(schema, query, null, { remoteUser: xdamman });
+    res = await graphql(schema, query, null, utils.makeRequest(xdamman));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
@@ -230,7 +230,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    res = await graphql(schema, query, null, { remoteUser: xdamman });
+    res = await graphql(schema, query, null, utils.makeRequest(xdamman));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const toCollective = res.data.createOrder.toCollective;
@@ -301,7 +301,7 @@ describe('Query Tests', () => {
     }
     `;
 
-    const res = await graphql(schema, query, null, { remoteUser: xdamman });
+    const res = await graphql(schema, query, null, utils.makeRequest(xdamman));
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 

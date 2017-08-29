@@ -66,9 +66,9 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const context = { remoteUser: null };
-      const result = await graphql(schema, query, null, context);
+      const result = await graphql(schema, query, null, utils.makeRequest());
       showErrors(result);
+      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
@@ -118,8 +118,8 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const context = { remoteUser: null };
-      const result = await graphql(schema, query, null, context);
+      const result = await graphql(schema, query, null, utils.makeRequest());
+      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transaction = result.data.Transaction;
       expect(transaction.id).to.equal(7071);
@@ -137,8 +137,7 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const context = { remoteUser: null };
-      const result = await graphql(schema, query, null, context);
+      const result = await graphql(schema, query, null, utils.makeRequest());
       result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
@@ -191,8 +190,8 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const context = { remoteUser: null };
-      const result = await graphql(schema, query, null, context);
+      const result = await graphql(schema, query, null, utils.makeRequest());
+      result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);
@@ -200,9 +199,9 @@ describe('graphql.transaction.test.js', () => {
       const expense = transactions.find(t => t.type === 'EXPENSE');
       expect(expense.attachment).to.equal(null);
       return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
-        context.remoteUser = user;
-        const result2 = await graphql(schema, query, null, context);
+        const result2 = await graphql(schema, query, null, utils.makeRequest(user));
         const transactions2 = result2.data.allTransactions;
+        result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const expense2 = transactions2.find(t => t.type === 'EXPENSE');
         expect(expense2.attachment).to.equal('******');

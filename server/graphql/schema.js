@@ -6,6 +6,7 @@ import {
 import {
   CollectiveInterfaceType,
   CollectiveType,
+  CollectiveStatsType,
   UserCollectiveType,
   EventCollectiveType,
 } from './CollectiveInterface';
@@ -39,6 +40,7 @@ const Schema = new GraphQLSchema({
   types: [
     CollectiveInterfaceType,
     CollectiveType,
+    CollectiveStatsType,
     UserCollectiveType,
     EventCollectiveType,
     TransactionInterfaceType,

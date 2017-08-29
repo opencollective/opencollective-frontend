@@ -80,7 +80,8 @@ describe('lib.payments.processPayment.test.js', () => {
           CreatedByUserId: host.id,
           TierId: tier.id,
           FromCollectiveId: host.CollectiveId,
-          ToCollectiveId: collective.id
+          ToCollectiveId: collective.id,
+          description: '$100 donation'
         })
         .then(d => order = d)
         .then(paymentsLib.processPayment)
@@ -189,6 +190,14 @@ describe('lib.payments.processPayment.test.js', () => {
         .reply(200, stripeMock.customers.create);
     });
 
+    // Nock for tokens.create.
+    beforeEach(() => {
+      const params = `customer=${stripeMock.customers.create.id}`;
+      nocks['tokens.create'] = nock(STRIPE_URL)
+        .post('/v1/tokens', params)
+        .reply(200, stripeMock.tokens.create);
+    });
+
     // Nock for retrieving balance transaction
     beforeEach(() => {
       nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
@@ -211,13 +220,13 @@ describe('lib.payments.processPayment.test.js', () => {
       const params = [
         `amount=${CHARGE * 100}`,
         `currency=${CURRENCY}`,
-        `customer=${stripeMock.customers.create.id}`,
-        `description=${encodeURIComponent(`OpenCollective: ${collective.slug}`)}`,
+        `source=${stripeMock.tokens.create.id}`,
+        `description=`,
         'application_fee=54',
-        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
-        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
+        `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
+        `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
         `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
-        `${encodeURIComponent('metadata[paymentMethodId]')}=1`
+        `${encodeURIComponent('metadata[PaymentMethodId]')}=1`
       ].join('&');
 
       nocks['charges.create'] = nock(STRIPE_URL)
@@ -310,6 +319,20 @@ describe('lib.payments.processPayment.test.js', () => {
 
       const customerId = stripeMock.customers.create.id;
 
+      // Nock for customers.create.
+      beforeEach(() => {
+        nocks['customers.create'] = nock(STRIPE_URL)
+          .post('/v1/customers')
+          .reply(200, stripeMock.customers.create);
+      });
+      // Nock for tokens.create.
+      beforeEach(() => {
+        const params = `customer=${customerId}`;
+        nocks['tokens.create'] = nock(STRIPE_URL)
+          .post('/v1/tokens', params)
+          .reply(200, stripeMock.tokens.create);
+      });
+
       const createDonation = (interval) => {
         let pm;
         return models.PaymentMethod.create({
@@ -338,6 +361,7 @@ describe('lib.payments.processPayment.test.js', () => {
       };
 
       describe('monthly', () => {
+
         const planId = generatePlanId({
           currency: CURRENCY,
           interval: 'month',
@@ -356,10 +380,9 @@ describe('lib.payments.processPayment.test.js', () => {
             `plan=${planId}`,
             'application_fee_percent=5',
             'trial_end=1485986482',
-            `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
-            `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collective.name)}`,
-            `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
+            `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
+            `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
+            `${encodeURIComponent('metadata[PaymentMethodId]')}=1`
           ].join('&');
 
           nocks['subscriptions.create'] = nock(STRIPE_URL)
@@ -530,10 +553,9 @@ describe('lib.payments.processPayment.test.js', () => {
             `plan=${planId}`,
             'application_fee_percent=5',
             'trial_end=1514844082',
-            `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
-            `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collective.name)}`,
-            `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-            `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
+            `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
+            `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
+            `${encodeURIComponent('metadata[PaymentMethodId]')}=1`
           ].join('&');
 
           nocks['subscriptions.create'] = nock(STRIPE_URL)

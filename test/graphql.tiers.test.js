@@ -61,6 +61,9 @@ describe('graphql.tiers.test', () => {
   after(() => sandbox.restore());
 
   before(() => {
+    sandbox.stub(stripe, 'createToken', () => {
+      return Promise.resolve({ id: 'tok_B5s4wkqxtUtNyM'});
+    });
     sandbox.stub(stripe, 'createCustomer', () => {
       return Promise.resolve({ id: 'cus_B5s4wkqxtUtNyM'});
     });
@@ -147,7 +150,7 @@ describe('graphql.tiers.test', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, {});
+        const result = await graphql(schema, query, null, utils.makeRequest());
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to be able to use a payment method on file");
       });
@@ -169,7 +172,7 @@ describe('graphql.tiers.test', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, { remoteUser: user2 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user2));
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You don't have a payment method with that uuid");
       });
@@ -191,7 +194,8 @@ describe('graphql.tiers.test', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user1));
+        result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
 
         const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
@@ -224,7 +228,8 @@ describe('graphql.tiers.test', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, {});
+        const result = await graphql(schema, query, null, utils.makeRequest());
+        result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
         expect(members).to.have.length(1);

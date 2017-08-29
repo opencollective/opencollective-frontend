@@ -66,8 +66,7 @@ describe('Query Tests', () => {
       `;
 
       it('returns all collectives with role', async () => {
-        const context = { remoteUser: user1 };
-        const result = await graphql(schema, LoggedInUserQuery, null, context);
+        const result = await graphql(schema, LoggedInUserQuery, null, utils.makeRequest(user1));
         result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
         expect(data.memberOf.length).to.equal(2);
@@ -76,8 +75,7 @@ describe('Query Tests', () => {
       })
 
       it("doesn't return anything if not logged in", async () => {
-        const context = {};
-        const result = await graphql(schema, LoggedInUserQuery, null, context);
+        const result = await graphql(schema, LoggedInUserQuery, null, utils.makeRequest());
         result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
         expect(data).to.be.null;
@@ -123,7 +121,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, {});
+        const result = await graphql(schema, query, null, utils.makeRequest());
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({ where: { CreatedByUserId: user1.id }});
@@ -150,7 +148,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, {});
+        const result = await graphql(schema, query, null, utils.makeRequest());
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({where: { CreatedByUserId: user1.id }});
@@ -166,7 +164,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        await graphql(schema, createOrderQuery, null, {});
+        await graphql(schema, createOrderQuery, null, utils.makeRequest());
 
         const query = `
           query Tier {
@@ -188,12 +186,12 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const result = await graphql(schema, query, null, {});
+        const result = await graphql(schema, query, null, utils.makeRequest());
         result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
         expect(orders[0].paymentMethod).to.be.null;
-        const result2 = await graphql(schema, query, null, { remoteUser: user2 });
+        const result2 = await graphql(schema, query, null, utils.makeRequest(user2));
         const orders2 = result2.data.Tier.orders;
         expect(orders2).to.have.length(1);
         expect(orders2[0].paymentMethod).to.be.null;
@@ -208,7 +206,7 @@ describe('Query Tests', () => {
           }
         }`;
 
-        await graphql(schema, createOrderQuery, null, {});
+        await graphql(schema, createOrderQuery, null, utils.makeRequest());
 
         await models.PaymentMethod.update({ confirmedAt: new Date }, { where: { CreatedByUserId: user1.id }});
 
@@ -231,7 +229,7 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user1));
         result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);

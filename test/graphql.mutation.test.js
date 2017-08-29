@@ -97,10 +97,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const req = {
-          remoteUser: null
-        };
-        const result = await graphql(schema, query, null, req);
+        const result = await graphql(schema, query, null, utils.makeRequest());
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You need to be logged in to create a collective");
       });
@@ -123,10 +120,8 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const req = {
-          remoteUser: user2
-        };
-        const result = await graphql(schema, query, null, req);
+
+        const result = await graphql(schema, query, null, utils.makeRequest(user2));
         expect(result.errors).to.have.length(1);
         expect(result.errors[0].message).to.equal("You must be logged in as a member of the scouts collective to create an event");
       });
@@ -148,7 +143,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user1));
         const createdEvent = result.data.createCollective;
         expect(createdEvent.slug).to.equal(`scouts/events/${event.slug}`);
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
@@ -177,15 +172,15 @@ describe('Mutation Tests', () => {
         }
         `;
 
-        const r2 = await graphql(schema, updateQuery, null, {});
+        const r2 = await graphql(schema, updateQuery, null, utils.makeRequest());
         expect(r2.errors).to.have.length(1);
         expect(r2.errors[0].message).to.equal("You need to be logged in to edit a collective");
 
-        const r3 = await graphql(schema, updateQuery, null, { remoteUser: user2 });
+        const r3 = await graphql(schema, updateQuery, null, utils.makeRequest(user2));
         expect(r3.errors).to.have.length(1);
         expect(r3.errors[0].message).to.equal("You must be logged in as the creator of this Event or as an admin of the scouts collective to edit this Event Collective");
 
-        const r4 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
+        const r4 = await graphql(schema, updateQuery, null, utils.makeRequest(user1));
         const updatedEvent = r4.data.editCollective;
         expect(updatedEvent.slug).to.equal(`${collective1.slug}/events/${event.slug}`);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
@@ -208,7 +203,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const result = await graphql(schema, query, null, { });
+        const result = await graphql(schema, query, null, utils.makeRequest());
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to edit tiers");
       });
@@ -225,7 +220,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const result = await graphql(schema, query, null, { remoteUser: user2 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user2));
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host of the scouts collective");
       });
@@ -242,7 +237,7 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const result = await graphql(schema, query, null, { remoteUser: user1 });
+        const result = await graphql(schema, query, null, utils.makeRequest(user1));
         const tiers = result.data.editTiers;
         expect(tiers).to.have.length(2);
         tiers.sort((a, b) => a.id - b.id)
@@ -262,11 +257,10 @@ describe('Mutation Tests', () => {
           }
         }
         `;
-        const result2 = await graphql(schema, updateQuery, null, { remoteUser: user1 });
+        const result2 = await graphql(schema, updateQuery, null, utils.makeRequest(user1));
         const updatedTiers = result2.data.editTiers;
         updatedTiers.sort((a, b) => a.id - b.id);
         expect(updatedTiers).to.have.length(3);
-        console.log("updatedTiers", updatedTiers);
         expect(updatedTiers[0].goal).to.equal(tiers[0].goal);
         expect(updatedTiers[1].amount).to.equal(tiers[1].amount);
       })
@@ -282,7 +276,7 @@ describe('Mutation Tests', () => {
           name
         }
       }`;
-      const result = await graphql(schema, query, null, { });
+      const result = await graphql(schema, query, null, utils.makeRequest());
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal("You need to be logged in to delete a collective");
       return models.Collective.findById(event1.id).then(event => {
@@ -297,7 +291,7 @@ describe('Mutation Tests', () => {
           name
         }
       }`;
-      const result = await graphql(schema, query, null, { remoteUser: user2 });
+      const result = await graphql(schema, query, null, utils.makeRequest(user2));
       expect(result.errors).to.exist;
       expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host to edit this collective");
       return models.Collective.findById(event1.id).then(event => {
@@ -312,7 +306,7 @@ describe('Mutation Tests', () => {
           name
         }
       }`;
-      const res = await graphql(schema, query, null, { remoteUser: user1 });
+      const res = await graphql(schema, query, null, utils.makeRequest(user1));
       res.errors && console.error(res.errors[0]);
       expect(res.errors).to.not.exist;
       return models.Collective.findById(event1.id).then(event => {
@@ -348,8 +342,8 @@ describe('Mutation Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context)
+
+        const result = await graphql(schema, query, null, utils.makeRequest())
         expect(result.errors.length).to.equal(1);
         expect(result.errors[0].message).to.contain('toCollective');
       });
@@ -359,7 +353,7 @@ describe('Mutation Tests', () => {
         it('when collective doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { fromCollective: { email: "${user1.email}" }, toCollective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
+              createOrder(order: { user: { email: "${user1.email}" }, toCollective: { slug: "notfound" }, tier: { id: 1 }, quantity:1 }) {
                 id,
                 toCollective {
                   id
@@ -372,8 +366,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+
+          const result = await graphql(schema, query, null, utils.makeRequest())
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal('No collective found with slug notfound');
         });
@@ -381,7 +375,7 @@ describe('Mutation Tests', () => {
         it('when tier doesn\'t exist', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: {id: 1002}, quantity:1 }) {
                 id,
                 toCollective {
                   id
@@ -394,8 +388,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+
+          const result = await graphql(schema, query, null, utils.makeRequest())
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal(`No tier found with tier id: 1002 for collective slug ${event1.slug}`);
         });
@@ -405,7 +399,7 @@ describe('Mutation Tests', () => {
         it('and if not enough are available', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:101 }) {
                 id,
                 toCollective {
                   id
@@ -418,8 +412,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+
+          const result = await graphql(schema, query, null, utils.makeRequest())
           expect(result.errors[0].message).to.equal(`No more tickets left for ${ticket1.name}`);
         });
       });
@@ -428,7 +422,7 @@ describe('Mutation Tests', () => {
         it('and it\'s a paid ticket', async () => {
            const query = `
             mutation createOrder {
-              createOrder(order: { fromCollective: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
+              createOrder(order: { user: { email: "user@email.com" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 2 }, quantity:2 }) {
                 id,
                 toCollective {
                   id
@@ -441,8 +435,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+
+          const result = await graphql(schema, query, null, utils.makeRequest())
           expect(result.errors[0].message).to.equal('This tier requires a payment method');
         });
       });
@@ -473,8 +467,7 @@ describe('Mutation Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, createMemberQuery, null, context);
+        const result = await graphql(schema, createMemberQuery, null, utils.makeRequest());
         expect(result).to.deep.equal({
           data: {
             "createMember": {
@@ -500,13 +493,13 @@ describe('Mutation Tests', () => {
           }
         `;
 
-        const error1 = await graphql(schema, query(3), null, {});
+        const error1 = await graphql(schema, query(3), null, utils.makeRequest());
         expect(error1.errors[0].message).to.equal('Member not found');
 
-        const error2 = await graphql(schema, query(2), null, {});
+        const error2 = await graphql(schema, query(2), null, utils.makeRequest());
         expect(error2.errors[0].message).to.equal('You need to be logged in to remove a member');
 
-        const error3 = await graphql(schema, query(2), null, { remoteUser: { id: 2 } });
+        const error3 = await graphql(schema, query(2), null, utils.makeRequest({ id: 2 }));
         expect(error3.errors[0].message).to.equal('You need to be logged in as this user or as a core contributor or as a host of the collective id 4');
         
         await models.Member.create({
@@ -516,7 +509,7 @@ describe('Mutation Tests', () => {
         });
 
         const membersBefore = await models.Member.count();
-        const res = await graphql(schema, query(3), null, { remoteUser: { id: 1 } })
+        const res = await graphql(schema, query(3), null, utils.makeRequest({ id: 1 }));
         res.errors && console.error(res.errors);
         const membersAfter = await models.Member.count();
         expect(membersBefore - membersAfter).to.equal(1);
@@ -530,7 +523,7 @@ describe('Mutation Tests', () => {
         it('from an existing user', async () => {
           const query = `
             mutation createOrder {
-              createOrder(order: { fromCollective: { email: "${user2.email}" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
+              createOrder(order: { user: { email: "${user2.email}" }, toCollective: { slug: "${event1.slug}" }, tier: { id: 1 }, quantity:2 }) {
                 id,
                 createdByUser {
                   id,
@@ -554,8 +547,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context)
+
+          const result = await graphql(schema, query, null, utils.makeRequest())
           result.errors && console.log(result.errors);
           expect(result.data).to.deep.equal({
             "createOrder": {
@@ -588,7 +581,7 @@ describe('Mutation Tests', () => {
             mutation createOrder {
               createOrder(
                 order: {
-                  fromCollective: { email: "newuser@email.com" },
+                  user: { email: "newuser@email.com" },
                   toCollective: { slug: "${event1.slug}" },
                   tier: { id: 1 },
                   quantity: 2
@@ -609,8 +602,8 @@ describe('Mutation Tests', () => {
               }
             }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context)
+
+        const result = await graphql(schema, query, null, utils.makeRequest())
         expect(result).to.deep.equal({
           data: {
             "createOrder": {
@@ -638,7 +631,7 @@ describe('Mutation Tests', () => {
           const query = `
             mutation createOrder {
               createOrder(order: {
-                fromCollective: {
+                user: {
                   email: "${user2.email}",
                 },
                 paymentMethod: {
@@ -670,8 +663,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+
+          const result = await graphql(schema, query, null, utils.makeRequest());
           expect(result.data).to.deep.equal({
             "createOrder": {
               "id": 1,
@@ -701,7 +694,6 @@ describe('Mutation Tests', () => {
           expect(createPaymentArgument.order.CreatedByUserId).to.equal(3);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
-          expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
           expect(createPaymentArgument.payment.paymentMethod.token).to.equal('tok_stripe');
         });
 
@@ -709,7 +701,7 @@ describe('Mutation Tests', () => {
           const query = `
             mutation createOrder {
               createOrder(order: {
-                fromCollective: {
+                user: {
                   email: "newuser@email.com",
                 },
                 paymentMethod: {
@@ -740,8 +732,8 @@ describe('Mutation Tests', () => {
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+
+          const result = await graphql(schema, query, null, utils.makeRequest());
           const createPaymentArgument = createPaymentStub.firstCall.args[0];
           expect(result).to.deep.equal({
             data: {
@@ -773,7 +765,6 @@ describe('Mutation Tests', () => {
           expect(createPaymentArgument.order.CreatedByUserId).to.equal(4);
           expect(createPaymentArgument.payment.amount).to.equal(4000);
           expect(createPaymentArgument.payment.currency).to.equal('USD');
-          expect(createPaymentArgument.payment.description).to.equal('January meetup - paid ticket');
           expect(createPaymentArgument.payment.paymentMethod.token).to.equal('tok_stripe');
         });
       });

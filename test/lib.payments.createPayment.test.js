@@ -181,7 +181,6 @@ describe('lib.payments.createPayment.test.js', () => {
                   expect(order).to.have.property('ToCollectiveId', collective.id);
                   expect(order).to.have.property('currency', CURRENCY);
                   expect(order).to.have.property('totalAmount', AMOUNT);
-                  expect(order).to.have.property('description',`Donation to ${collective.name}`);
                   done();
                 })
                 .catch(done);
@@ -267,7 +266,6 @@ describe('lib.payments.createPayment.test.js', () => {
                 expect(res.rows[1]).to.have.property('currency', CURRENCY);
                 expect(res.rows[1]).to.have.property('totalAmount', AMOUNT2);
                 expect(res.rows[1]).to.have.property('SubscriptionId');
-                expect(res.rows[1]).to.have.property('description', `Monthly donation to ${collective2.name}`);
                 done();
               })
               .catch(done)

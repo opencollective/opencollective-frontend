@@ -68,6 +68,7 @@ export default (app) => {
   /**
    * User reset password or new token flow (no jwt verification)
    */
+  app.post('/users/signin', required('user'), users.signin);
   app.post('/users/new_login_token', required('email'), mw.getOrCreateUser, users.sendNewTokenByEmail);
   app.post('/users/refresh_login_token', aN.authenticateUserByJwtNoExpiry(), users.refreshTokenByEmail);
 
@@ -125,13 +126,7 @@ export default (app) => {
   // TODO: Why is this a PUT and not a GET?
   app.put('/users/:userid/images', required('userData'), users.getSocialMediaAvatars); // Return possible images for a user.
   
-  /**
-   * Authentication.
-   */
-  app.post('/authenticate', aN.authenticateUserByPassword, users.getToken); // Authenticate user to get a token.
-  app.post('/authenticate/refresh', NotImplemented); // Refresh the token (using a valid token OR a expired token + refresh_token).
-  app.post('/authenticate/reset', NotImplemented); // Reset the refresh_token.
-
+  
   /**
    * Credit paymentMethod.
    *

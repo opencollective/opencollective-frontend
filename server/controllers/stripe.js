@@ -92,7 +92,7 @@ export const callback = (req, res, next) => {
   });
 
   models.Collective.findById(CollectiveId)
-    .tap(c => collective = c)
+    .then(c => collective = c)
     .then(getToken(req.query.code))
     .then(createStripeAccount)
     .then(() => res.redirect(`${config.host.website}/${collective.slug}?message=StripeAccountConnected`))

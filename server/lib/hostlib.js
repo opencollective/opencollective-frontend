@@ -1,4 +1,4 @@
-import models, {sequelize} from '../models';
+import models, { sequelize } from '../models';
 import _ from 'lodash';
 import { convertToCurrency } from '../lib/currency';
 import Promise from 'bluebird';

@@ -109,6 +109,7 @@ describe('webhooks.routes.test.js', () => {
     beforeEach('Nock for customers.create', () => {
       nocks['customers.create'] = nock(STRIPE_URL)
         .post('/v1/customers')
+        .twice()
         .reply(200, () => stripeMock.customers.create);
     });
 
@@ -129,13 +130,13 @@ describe('webhooks.routes.test.js', () => {
       const params = [
         `amount=${STRIPE_SUBSCRIPTION_CHARGE}`,
         `currency=${CURRENCY}`,
-        `customer=${stripeMock.customers.create.id}`,
-        `description=${encodeURIComponent(`OpenCollective: ${collective.slug}`)}`,
+        `source=${stripeMock.tokens.create.id}`,
+        `description=`,
         'application_fee=1750',
-        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
-        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
+        `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
+        `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
         `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
-        `${encodeURIComponent('metadata[paymentMethodId]')}=1`
+        `${encodeURIComponent('metadata[PaymentMethodId]')}=1`
       ].join('&');
       nocks['charges.create'] = nock(STRIPE_URL)
         .post('/v1/charges', params)
@@ -148,16 +149,24 @@ describe('webhooks.routes.test.js', () => {
         `plan=${planId}`,
         'application_fee_percent=5',
         'trial_end=1485986482827',
-        `${encodeURIComponent('metadata[collectiveId]')}=${collective.id}`,
-        `${encodeURIComponent('metadata[collectiveName]')}=${encodeURIComponent(collectiveData.name)}`,
-        `${encodeURIComponent('metadata[paymentMethodId]')}=1`,
-        `${encodeURIComponent('metadata[description]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`
+        `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
+        `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
+        `${encodeURIComponent('metadata[PaymentMethodId]')}=1`,
       ].join('&');
 
       nocks['subscriptions.create'] = nock(STRIPE_URL)
         .filteringRequestBody(/trial_end=[^&]*/g, 'trial_end=1485986482827')
         .post(`/v1/customers/${customerId}/subscriptions`, params)
         .reply(200, webhookSubscription);
+    });
+
+    // Nock for tokens.create.
+    beforeEach('tokens.create', () => {
+      const params = `customer=${stripeMock.customers.create.id}`;
+      nocks['tokens.create'] = nock(STRIPE_URL)
+        .post('/v1/tokens', params)
+        .twice()
+        .reply(200, stripeMock.tokens.create);
     });
 
     beforeEach('Nock for retrieving charge', () => {
@@ -232,7 +241,9 @@ describe('webhooks.routes.test.js', () => {
     /*
      * These beforeEach calls are setting up for webhook
      */
+
     beforeEach('Nock for retrieving charge', () => {
+      console.log(">>> charge.retrieve2");
       nocks['charge.retrieve2'] = nock(STRIPE_URL)
         .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4_2')
         .reply(200, Object.assign({}, stripeMock.charges.create, {balance_transaction: 'txn_165j8oIqnMN1wWwOKlPn1D4_2' }));
@@ -243,7 +254,7 @@ describe('webhooks.routes.test.js', () => {
         .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4_2')
         .reply(200, stripeMock.balance);
     });
-
+    
     // Now we send the webhook
     beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
@@ -264,6 +275,15 @@ describe('webhooks.routes.test.js', () => {
           done();
         });
     });
+
+    // Nock for tokens.create.
+    beforeEach('tokens.create', () => {
+      const params = `customer=${stripeMock.customers.create.id}`;
+      console.log(">>> tokens.create nock", params);
+      nocks['tokens.create'] = nock(STRIPE_URL)
+        .post('/v1/tokens', params)
+        .reply(200, stripeMock.tokens.create);
+    });    
 
     it('successfully gets a Stripe charge', () => {
       expect(nocks['charge.retrieve2'].isDone()).to.be.true;
@@ -395,8 +415,8 @@ describe('webhooks.routes.test.js', () => {
             expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
             expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
             expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
-            expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-            expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875);
+            expect(transaction).to.have.property('txnCurrencyFxRate', 0.25);
+            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 25875);
             expect(transaction.Order.Subscription.isActive).to.be.equal(true);
             expect(transaction.Order.Subscription).to.have.property('activatedAt');
             expect(transaction.Order.Subscription.interval).to.be.equal('month');

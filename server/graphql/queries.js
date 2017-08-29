@@ -28,8 +28,8 @@ const queries = {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
-    resolve(_, args) {
-      return models.Collective.findBySlug(args.slug);
+    resolve(_, args, req) {
+      return req.loaders.collective.bySlug.load(args.slug.toLowerCase());
     }
   },
 

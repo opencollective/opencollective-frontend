@@ -27,13 +27,19 @@ import {
 import { types } from '../constants/collectives';
 import models from '../models';
 import roles from '../constants/roles';
-import { canAccessUserDetails } from '../lib/auth';
 
 export const CollectiveStatsType = new GraphQLObjectType({
   name: "CollectiveStatsType",
   description: "Stats for the collective",
   fields: () => {
     return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.id;
+        }
+      },
       backers: {
         type: GraphQLInt,
         resolve(collective) {
@@ -107,7 +113,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
-      members: { type: new GraphQLList(MemberType) },
+      members: {
+        type: new GraphQLList(MemberType),
+        args: {
+          limit: { type: GraphQLInt }
+        }
+      },
       memberOf: { type: new GraphQLList(MemberType)},
       followers: { type: new GraphQLList(MemberType) },
       maxQuantity: { type: GraphQLInt },
@@ -260,8 +271,11 @@ const CollectiveFields = () => {
     members: {
       description: 'Get all the members of this collective (admins, members, backers, followers)',
       type: new GraphQLList(MemberType),
-      resolve(collective) {
-        return models.Member.findAll({ where: { CollectiveId: collective.id } });
+      args: {
+        limit: { type: GraphQLInt }
+      },
+      resolve(collective, args) {
+        return models.Member.findAll({ where: { CollectiveId: collective.id }, limit: args.limit });
       }
     },
     memberOf: {
@@ -316,8 +330,8 @@ const CollectiveFields = () => {
     },
     balance: {
       type: GraphQLInt,
-      resolve(collective) {
-        return collective.getBalance();
+      resolve(collective, args, req) {
+        return req.loaders.collective.getBalance.load(collective.id);
       }
     },
     role: {
@@ -376,7 +390,8 @@ const CollectiveFields = () => {
     connectedAccounts: {
       type: new GraphQLList(ConnectedAccountType),
       resolve(collective) {
-        return collective.getConnectedAccounts().map(ca => ca.info);
+        // For some weird reason, Sequelize function collective.getConnectedAccounts() doesn't return a Promise with .map() ¯\_(ツ)_/¯ 
+        return collective.getConnectedAccounts().then(cas => cas.map(ca => ca.info));
       }
     },
     stats: {
@@ -404,25 +419,22 @@ export const UserCollectiveType = new GraphQLObjectType({
       ...CollectiveFields(),
       firstName: {
         type: GraphQLString,
-        resolve(userCollective) {
-          return userCollective && userCollective.getUser().then(u => u.firstName);
+        resolve(userCollective, args, req) {
+          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(u => u.firstName);
         }
       },
       lastName: {
         type: GraphQLString,
-        resolve(userCollective) {
-          return userCollective && userCollective.getUser().then(u => u.lastName);
+        resolve(userCollective, args, req) {
+          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(u => u.lastName);
         }
       },
       email: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
-          return canAccessUserDetails(req.remoteUser.CollectiveId, userCollective.id)
-            .then(canAccess => {
-              if (!canAccess) return null;
-              return userCollective.getUser().then(user => user.email);
-            });
+          if (!userCollective.canAccessUserDetails) return null;
+          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(user => user.email);
         }
       }
     }

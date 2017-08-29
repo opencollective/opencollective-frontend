@@ -171,116 +171,6 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    instanceMethods: {
-      getUser() {
-        return models.User.findById(this.CreatedByUserId);
-      },
-      getHostCollective() {
-        return models.Collective.findById(this.HostCollectiveId);
-      },
-      getExpenseForViewer(viewer) {
-        const promises = [ models.Expense.findOne({ where: { id: this.ExpenseId } }) ];
-        if (viewer) {
-          promises.push(viewer.canEditCollective(this.ToCollectiveId));
-        }
-        return Promise.all(promises)
-        .then(results => {
-          const expense = results[0];
-          const canEditCollective = results[1];
-          if (!expense) return null;
-          if (viewer && canEditCollective) return expense.info;
-          if (viewer && viewer.id === expense.UserId) return expense.info;
-          return expense.public;
-        });
-      },
-      getSource() {
-        switch (this.type) {
-          case 'EXPENSE':
-            return this.getExpense();
-          case 'DONATION':
-            return this.getOrder();
-        }        
-      }
-    },
-
-    classMethods: {
-
-      createMany: (transactions, defaultValues) => {
-        return Promise.map(transactions, transaction => {
-          for (const attr in defaultValues) {
-            transaction[attr] = defaultValues[attr];
-          }
-          return Transaction.create(transaction);
-        }).catch(console.error);
-      },
-
-      createFromPayload({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) {
-
-        return models.Member.findOne({ where: { role: 'HOST', CollectiveId: ToCollectiveId } }).then(member => {
-          if (!member) {
-            throw new Error(`Cannot create a transaction: collective id ${ToCollectiveId} doesn't have a host`);
-          }
-
-          transaction.HostCollectiveId = member.MemberCollectiveId;
-          // attach other objects manually. Needed for afterCreate hook to work properly
-          transaction.CreatedByUserId = CreatedByUserId;
-          transaction.FromCollectiveId = FromCollectiveId;
-          transaction.ToCollectiveId = ToCollectiveId;
-          transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
-          transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
-
-          if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
-            // populate netAmountInCollectiveCurrency for donations
-            // @aseem: why the condition on && transaction.txnCurrencyFxRate ?
-              transaction.netAmountInCollectiveCurrency =
-                Math.round((transaction.amountInTxnCurrency
-                  - transaction.platformFeeInTxnCurrency
-                  - transaction.hostFeeInTxnCurrency
-                  - transaction.paymentProcessorFeeInTxnCurrency)
-                * transaction.txnCurrencyFxRate);
-          }
-          return Transaction.create(transaction);
-        });
-      },
-
-      createActivity(transaction) {
-        if (transaction.deletedAt) {
-          return Promise.resolve();
-        }
-        return Transaction.findById(transaction.id, {
-          include: [
-            { model: models.Collective, as: 'fromCollective' },
-            { model: models.Collective, as: 'toCollective' },
-            { model: models.User, as: 'createdByUser' },
-            { model: models.PaymentMethod }
-          ]
-        })
-        // Create activity.
-        .then(transaction => {
-
-          const activityPayload = {
-            type: activities.COLLECTIVE_TRANSACTION_CREATED,
-            TransactionId: transaction.id,
-            CollectiveId: transaction.CollectiveId,
-            CreatedByUserId: transaction.CreatedByUserId,
-            data: {
-              transaction: transaction.info,
-              user: transaction.User && transaction.User.minimal,
-              collective: transaction.toCollective && transaction.toCollective.minimal
-            }
-          };
-          if (transaction.createdByUser) {
-            activityPayload.data.user = transaction.createdByUser.info;
-          }
-          if (transaction.PaymentMethod) {
-            activityPayload.data.paymentMethod = transaction.PaymentMethod.info;
-          }
-          return models.Activity.create(activityPayload);
-        })
-        .catch(err => console.error(`Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err));
-      }
-    },
-
     hooks: {
       afterCreate: (transaction) => {
         Transaction.createActivity(transaction);
@@ -289,6 +179,120 @@ export default (Sequelize, DataTypes) => {
       }
     }
   });
+
+  /**
+   * Instance Methods
+   */
+  Transaction.prototype.getUser = function() {
+    return models.User.findById(this.CreatedByUserId);
+  };
+
+  Transaction.prototype.getHostCollective = function() {
+    return models.Collective.findById(this.HostCollectiveId);
+  };
+
+  Transaction.prototype.getExpenseForViewer = function(viewer) {
+    const promises = [ models.Expense.findOne({ where: { id: this.ExpenseId } }) ];
+    if (viewer) {
+      promises.push(viewer.canEditCollective(this.ToCollectiveId));
+    }
+    return Promise.all(promises)
+    .then(results => {
+      const expense = results[0];
+      const canEditCollective = results[1];
+      if (!expense) return null;
+      if (viewer && canEditCollective) return expense.info;
+      if (viewer && viewer.id === expense.UserId) return expense.info;
+      return expense.public;
+    });
+  };
+
+  Transaction.prototype.getSource = function() {
+    switch (this.type) {
+      case 'EXPENSE':
+        return this.getExpense();
+      case 'DONATION':
+        return this.getOrder();
+    }        
+  };
+
+  /**
+   * Class Methods
+   */
+  Transaction.createMany = (transactions, defaultValues) => {
+    return Promise.map(transactions, transaction => {
+      for (const attr in defaultValues) {
+        transaction[attr] = defaultValues[attr];
+      }
+      return Transaction.create(transaction);
+    }).catch(console.error);
+  };
+
+  Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) => {
+
+    return models.Member.findOne({ where: { role: 'HOST', CollectiveId: ToCollectiveId } }).then(member => {
+      if (!member) {
+        throw new Error(`Cannot create a transaction: collective id ${ToCollectiveId} doesn't have a host`);
+      }
+
+      transaction.HostCollectiveId = member.MemberCollectiveId;
+      // attach other objects manually. Needed for afterCreate hook to work properly
+      transaction.CreatedByUserId = CreatedByUserId;
+      transaction.FromCollectiveId = FromCollectiveId;
+      transaction.ToCollectiveId = ToCollectiveId;
+      transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
+      transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
+
+      if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
+        // populate netAmountInCollectiveCurrency for donations
+        // @aseem: why the condition on && transaction.txnCurrencyFxRate ?
+          transaction.netAmountInCollectiveCurrency =
+            Math.round((transaction.amountInTxnCurrency
+              - transaction.platformFeeInTxnCurrency
+              - transaction.hostFeeInTxnCurrency
+              - transaction.paymentProcessorFeeInTxnCurrency)
+            * transaction.txnCurrencyFxRate);
+      }
+      return Transaction.create(transaction);
+    });
+  };
+
+  Transaction.createActivity = (transaction) => {
+    if (transaction.deletedAt) {
+      return Promise.resolve();
+    }
+    return Transaction.findById(transaction.id, {
+      include: [
+        { model: models.Collective, as: 'fromCollective' },
+        { model: models.Collective, as: 'toCollective' },
+        { model: models.User, as: 'createdByUser' },
+        { model: models.PaymentMethod }
+      ]
+    })
+    // Create activity.
+    .then(transaction => {
+
+      const activityPayload = {
+        type: activities.COLLECTIVE_TRANSACTION_CREATED,
+        TransactionId: transaction.id,
+        CollectiveId: transaction.CollectiveId,
+        CreatedByUserId: transaction.CreatedByUserId,
+        data: {
+          transaction: transaction.info,
+          user: transaction.User && transaction.User.minimal,
+          collective: transaction.toCollective && transaction.toCollective.minimal
+        }
+      };
+      if (transaction.createdByUser) {
+        activityPayload.data.user = transaction.createdByUser.info;
+      }
+      if (transaction.PaymentMethod) {
+        activityPayload.data.paymentMethod = transaction.PaymentMethod.info;
+      }
+      return models.Activity.create(activityPayload);
+    })
+    .catch(err => console.error(`Error creating activity of type ${activities.COLLECTIVE_TRANSACTION_CREATED} for transaction ID ${transaction.id}`, err));
+  };
 
   return Transaction;
 };

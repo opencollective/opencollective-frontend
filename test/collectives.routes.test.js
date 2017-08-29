@@ -283,7 +283,7 @@ describe('collectives.routes.test.js', () => {
           expect(e).to.not.exist;
           models.Collective
             .findById(parseInt(res.body.id))
-            .tap((g) => {
+            .then((g) => {
               publicCollective = g;
               done();
             })
@@ -294,7 +294,7 @@ describe('collectives.routes.test.js', () => {
     const stripeAccount = { data: { publishableKey: stripeMock.accounts.create.keys.publishable } };
     beforeEach(() => host.collective
       .setStripeAccount(stripeAccount)
-      .tap(() => user.collective.setStripeAccount(stripeAccount)));
+      .then(() => user.collective.setStripeAccount(stripeAccount)));
 
     beforeEach('create a new payment method for user', () => models.PaymentMethod.create({CollectiveId: user.CollectiveId}))
 
@@ -330,7 +330,6 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('id', publicCollective.id);
           expect(res.body).to.have.property('name', publicCollective.name);
           expect(res.body).to.have.property('isActive', true);
-          expect(res.body).to.have.property('stripeAccount');
           expect(res.body).to.have.property('yearlyIncome');
           expect(res.body).to.have.property('backersCount');
           expect(res.body).to.have.property('related');
@@ -349,7 +348,6 @@ describe('collectives.routes.test.js', () => {
           expect(res.body).to.have.property('id', publicCollective.id);
           expect(res.body).to.have.property('name', publicCollective.name);
           expect(res.body).to.have.property('isActive', true);
-          expect(res.body).to.have.property('stripeAccount');
           done();
         });
     });
@@ -482,7 +480,7 @@ describe('collectives.routes.test.js', () => {
           expect(e).to.not.exist;
           models.Collective
             .findById(parseInt(res.body.id))
-            .tap((g) => {
+            .then((g) => {
               collective = g;
               done();
             })
@@ -491,7 +489,7 @@ describe('collectives.routes.test.js', () => {
     });
 
     // Create another user.
-    beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
+    beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).then(u => user2 = u));
 
     // Create another user that is a backer.
     beforeEach(() => models.User.createUserWithCollective(utils.data('user3'))

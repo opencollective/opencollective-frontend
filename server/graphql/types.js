@@ -14,10 +14,9 @@ import {
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 
-import { type } from '../constants/transactions';
-
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
+dataloaderSequelize(models.Collective);
 dataloaderSequelize(models.Expense);
 
 // This breaks the tests for some reason (mocha test/Member.routes.test.js -g "successfully add a user to a collective with a role")
@@ -121,26 +120,23 @@ export const MemberType = new GraphQLObjectType({
       },
       totalDonations: {
         type: GraphQLInt,
-        resolve(member) {
-          return models.Transaction.sum('amount', {
-            where: {
-              FromCollectiveId: member.MemberCollectiveId,
-              ToCollectiveId: member.CollectiveId,
-              type: type.DONATION
-            }
-          })
+        resolve(member, args, req) {
+          return req.loaders.transactions.totalAmountDonatedFromTo.load({
+            FromCollectiveId: member.MemberCollectiveId,
+            ToCollectiveId: member.CollectiveId,
+          });
         }
       },
       collective: {
         type: CollectiveInterfaceType,
-        resolve(member) {
-          return member.getCollective();
+        resolve(member, args, req) {
+          return req.loaders.collective.byId.load(member.CollectiveId);
         }
       },
       member: {
         type: CollectiveInterfaceType,
-        resolve(member) {
-          return member.getMemberCollective();
+        resolve(member, args, req) {
+          return req.loaders.collective.byId.load(member.MemberCollectiveId);
         }
       },
       role: {
@@ -151,8 +147,8 @@ export const MemberType = new GraphQLObjectType({
       },
       tier: {
         type: TierType,
-        resolve(member) {
-          return member.getTier();
+        resolve(member, args, req) {
+          return member.TierId && req.loaders.tiers.load(member.TierId);
         }
       }
     }
@@ -281,14 +277,14 @@ export const TierType = new GraphQLObjectType({
       },
       collective: {
         type: CollectiveInterfaceType,
-        resolve(tier) {
-          return tier.getCollective();
+        resolve(tier, args, req) {
+          return req.loaders.collective.byId.load(tier.CollectiveId);
         }
       },
       event: {
         type: CollectiveInterfaceType,
-        resolve(tier) {
-          return tier.getCollective();
+        resolve(tier, args, req) {
+          return req.loaders.collective.byId.load(tier.CollectiveId);
         }
       },
       orders: {
@@ -342,8 +338,8 @@ export const OrderType = new GraphQLObjectType({
       totalTransactions: {
         description: 'total of all the transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
-        resolve(order) {
-          return order.totalTransactions;
+        resolve(order, args, req) {
+          return req.loaders.transactions.totalAmountForOrderId.load(order.id);
         }
       },
       createdByUser: {

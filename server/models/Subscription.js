@@ -40,23 +40,22 @@ export default (Sequelize, DataTypes) => {
 
     deactivatedAt: DataTypes.DATE
   }, {
-    paranoid: true,
-
-    instanceMethods: {
-      activate() {
-        this.isActive = true;
-        this.activatedAt = new Date();
-
-        return this.save();
-      },
-      deactivate() {
-        this.isActive = false;
-        this.deactivatedAt = new Date();
-
-        return this.save();
-      }
-    }
+    paranoid: true
   });
+
+  Subscription.prototype.activate = function() {
+    this.isActive = true;
+    this.activatedAt = new Date();
+
+    return this.save();
+  };
+
+  Subscription.prototype.deactivate = function() {
+    this.isActive = false;
+    this.deactivatedAt = new Date();
+
+    return this.save();
+  };
 
   return Subscription;
 };

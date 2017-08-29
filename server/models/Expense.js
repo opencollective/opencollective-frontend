@@ -164,27 +164,29 @@ export default function (Sequelize, DataTypes) {
         }
       }
     },
-
-    instanceMethods: {
-      setApproved(lastEditedById) {
-        this.status = status.APPROVED;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      },
-
-      setRejected(lastEditedById) {
-        this.status = status.REJECTED;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      },
-
-      setPaid(lastEditedById) {
-        this.status = status.PAID;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      }
-    }
   });
+
+  /**
+   * Instance Methods
+   */
+  Expense.prototype.setApproved = function(lastEditedById) {
+    this.status = status.APPROVED;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
+  Expense.prototype.setRejected = function(lastEditedById) {
+    this.status = status.REJECTED;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
+  Expense.prototype.setPaid = function(lastEditedById) {
+    this.status = status.PAID;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
   Temporal(Expense, Sequelize);
   return Expense;
 }

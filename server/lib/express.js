@@ -13,17 +13,23 @@ import { Strategy as GitHubStrategy } from 'passport-github';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { Strategy as MeetupStrategy } from 'passport-meetup-oauth2';
 import { sequelize as db } from '../models';
+import { middleware } from '../graphql/loaders';
 import debug from 'debug';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
+
 export default function(app) {
   app.use(helmet());
 
+  // Loaders are attached to the request to batch DB queries per request
+  // It also creates in-memory caching (based on request auth);
+  app.use(middleware);
+
   if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
     app.use((req, res, next) => {
-      const temp = res.send
-      res.send = function(str) {
+      const temp = res.end
+      res.end = function(str) {
         try {
           const obj = JSON.parse(str);
           debug('response')(JSON.stringify(obj, null, '  '));

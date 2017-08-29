@@ -7,6 +7,7 @@ import { isArray, values } from 'lodash';
 import path from 'path';
 import { exec } from 'child_process';
 import debugLib from 'debug';
+import { loaders } from '../server/graphql/loaders';
 
 const debug = debugLib('utils');
 
@@ -61,4 +62,11 @@ export function loadDB(dbname) {
 
 export const stringify = (json) => {
   return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
+}
+
+export const makeRequest = (remoteUser) => {
+  return {
+    remoteUser,
+    loaders: loaders({ remoteUser })
+  }
 }

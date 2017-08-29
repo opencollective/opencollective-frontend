@@ -149,66 +149,69 @@ export default function(Sequelize, DataTypes) {
       title() {
         return capitalize(pluralize(this.name));
       }
-    },
-
-    classMethods: {
-
-      createMany(tiers, defaultValues = {}) {
-        return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
-      },
-
-      getOrFind({ id, amount, interval, CollectiveId }) {
-        if (id) {
-          return Tier.findOne({ where: { id, CollectiveId } });
-        } else {
-          // We pick the first tier that has an amount less than or equal to `amount` (for the same collective and interval)
-          return Tier.findOne({
-            where: {
-              type: types.TIER,
-              CollectiveId,
-              interval: interval || { $is: null },
-              amount: {
-                $or: [
-                  { $lte: amount },
-                  { $is: null }
-                ]
-            }
-          }, order: [['amount','DESC']] });
-        }
-      }
-    },
-
-    instanceMethods: {
-      // TODO: Check for maxQuantityPerUser
-      availableQuantity() {
-        return models.Order.sum('quantity', { 
-            where: {
-              TierId: this.id,
-              processedAt: { $ne: null }
-            }
-          })
-          .then(usedQuantity => {
-            if (this.maxQuantity && usedQuantity) {
-              return this.maxQuantity - usedQuantity;
-            } else if (this.maxQuantity) {
-              return this.maxQuantity;
-            } else {
-              return Infinity;
-            }
-          })
-      },
-      checkAvailableQuantity(quantityNeeded = 1) {
-        return this.availableQuantity()
-        .then(available => (available - quantityNeeded >= 0))
-      },
-
-      // Get the total amount of money raised with this tier
-      // TODO: Implement
-      totalAmount() {
-        return 0; // xdamman: NOT IMPLEMENTED (need to add ResponseId to Transaction model)
-      }
     }
   });
+
+  /**
+   * Instance Methods
+   */
+
+   // TODO: Check for maxQuantityPerUser
+  Tier.prototype.availableQuantity = function() {
+    return models.Order.sum('quantity', { 
+        where: {
+          TierId: this.id,
+          processedAt: { $ne: null }
+        }
+      })
+      .then(usedQuantity => {
+        if (this.maxQuantity && usedQuantity) {
+          return this.maxQuantity - usedQuantity;
+        } else if (this.maxQuantity) {
+          return this.maxQuantity;
+        } else {
+          return Infinity;
+        }
+      })
+  };
+
+  Tier.prototype.checkAvailableQuantity = function(quantityNeeded = 1) {
+    return this.availableQuantity()
+    .then(available => (available - quantityNeeded >= 0))
+  };
+
+  // Get the total amount of money raised with this tier
+  // TODO: Implement
+  Tier.prototype.totalAmount = function() {
+    return 0; // xdamman: NOT IMPLEMENTED (need to add ResponseId to Transaction model)
+  };
+
+  /**
+   * Class Methods
+   */
+  Tier.createMany = (tiers, defaultValues = {}) => {
+    return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
+  };
+
+  Tier.getOrFind = ({ id, amount, interval, CollectiveId }) => {
+    if (id) {
+      return Tier.findOne({ where: { id, CollectiveId } });
+    } else {
+      // We pick the first tier that has an amount less than or equal to `amount` (for the same collective and interval)
+      return Tier.findOne({
+        where: {
+          type: types.TIER,
+          CollectiveId,
+          interval: interval || { $is: null },
+          amount: {
+            $or: [
+              { $lte: amount },
+              { $is: null }
+            ]
+        }
+      }, order: [['amount','DESC']] });
+    }
+  };
 
   return Tier;
 }

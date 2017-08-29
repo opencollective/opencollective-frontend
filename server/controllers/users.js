@@ -124,7 +124,7 @@ export const refreshTokenByEmail = (req, res, next) => {
 };
 
 /**
- * Send an email with the new token
+ * Send an email with the new token #deprecated
  */
 export const sendNewTokenByEmail = (req, res, next) => {
   const redirect = req.body.redirect || '/';
@@ -139,10 +139,28 @@ export const sendNewTokenByEmail = (req, res, next) => {
     if (user) {
       return emailLib.send('user.new.token', req.body.email, 
         { loginLink: user.generateLoginLink(redirect)}, 
-        { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue)
+        { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
     }
     return null;
   })
   .then(() => res.send({ success: true }))
   .catch(next);
 };
+
+/**
+ * Login or create a new user
+ */
+export const signin = (req, res, next) => {
+  const { user, redirect } = req.body;
+
+  return models.User.findOne({ where: { email: user.email }})
+    .then(u => u || models.User.createUserWithCollective(user))
+    .then(u => {
+      cache.set(u.email, true);
+      return emailLib.send('user.new.token', u.email, 
+        { loginLink: u.generateLoginLink(redirect || '/')}, 
+        { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
+    })
+    .then(() => res.send({ success: true }))
+    .catch(next);
+}
