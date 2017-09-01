@@ -14,7 +14,6 @@ import { appendTier } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
-import { hasRole } from '../lib/auth';
 import userlib from '../lib/userlib';
 
 /**
@@ -300,6 +299,16 @@ export default function(Sequelize, DataTypes) {
             return Promise.resolve();
           });
 
+      },
+      afterCreate: (instance) => {
+        models.PaymentMethod.create({
+          CollectiveId: instance.id,
+          service: 'opencollective',
+          identifier: `${instance.name} Collective`,
+          primary: true,
+          currency: instance.currency
+        });
+        return null;
       }
     }
   });
@@ -316,14 +325,12 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getUsers = function() {
-    console.log(">>> Collective.getUsers", this.id);
     return models.Member.findAll({
       where: { CollectiveId: this.id },
       include: [
         { model: models.Collective, as: 'memberCollective' }
       ]
     })
-    .tap(m => console.log("getUsers", m))
     .then(memberships => memberships.memberCollective)
     .map(memberCollective => memberCollective.getUser())
     .then(users => uniq(users, (user) => user.id));
@@ -338,35 +345,6 @@ export default function(Sequelize, DataTypes) {
       where: { ToCollectiveId: this.id }
     }, options);
     return models.Order.findAll(query);
-  };
-
-  Collective.prototype.canEdit = function(remoteUser) {
-    if (remoteUser.id === this.CreatedByUserId) {
-      return Promise.resolve(true);
-    }
-    if (this.type === types.COLLECTIVE) {
-      return hasRole(remoteUser.id, this.id, ['HOST', 'ADMIN']);
-    } else {
-      return hasRole(remoteUser.id, this.ParentCollectiveId, ['HOST', 'ADMIN']);
-    }
-  };
-
-  Collective.prototype.getUsersForViewer = function(viewer, options) {
-    const promises = [];
-    if (options) {
-      options.include = options.include || [];
-      options.where = options.where || {};
-      options.where.CollectiveId = this.id;
-      options.include.push({model: models.User });
-      promises.push(models.Member.findAll(options).map(member => member.User));
-    } else {
-      promises.push(queries.getBackersOfCollectiveWithTotalDonations(this.id));
-    }
-    if (viewer) {
-      promises.push(viewer.canEditCollective(this.id));
-    }
-    return Promise.all(promises)
-    .then(results => results[0].map(user => results[1] ? user.info : user.public))
   };
 
   Collective.prototype.getRoleForMemberCollective = function(MemberCollectiveId) {
@@ -823,8 +801,21 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getHostStripeAccount = function() {
+    let HostId;
     return this.getHostId()
-      .then(id => id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } }));
+      .then(id => {
+        HostId = id
+        return id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } });
+      })
+      .then(stripeAccount => {
+        if (!stripeAccount || !stripeAccount.token) {
+          return Promise.reject(new Error(`The host for the ${this.name} collective has no Stripe account set up (HostId: ${HostId})`));
+        } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.token, 'live')) {
+          return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
+        } else {
+          return stripeAccount;
+        }
+      });
   };
 
   Collective.prototype.setStripeAccount = function(stripeAccount) {
@@ -853,6 +844,23 @@ export default function(Sequelize, DataTypes) {
   /**
    * Class Methods
    */
+  Collective.createOrganization = (collectiveData, adminUser) => {
+    return Collective
+      .create({
+        ...collectiveData,
+        type: types.ORGANIZATION,
+        CreatedByUserId: adminUser.id
+      })
+      .tap(collective => {
+        return models.Member.create({
+          CreatedByUserId: adminUser.id,
+          CollectiveId: collective.id,
+          MemberCollectiveId: adminUser.CollectiveId,
+          role: roles.ADMIN
+        });
+      });
+  };
+
   Collective.createMany = (collectives, defaultValues) => {
     return Promise.map(collectives, u => Collective.create(_.defaults({},u,defaultValues)), {concurrency: 1}).catch(console.error);
   };

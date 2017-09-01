@@ -8,6 +8,14 @@ import path from 'path';
 import { exec } from 'child_process';
 import debugLib from 'debug';
 import { loaders } from '../server/graphql/loaders';
+import { graphql } from 'graphql';
+import schema from '../server/graphql/schema';
+import Stripe from 'stripe';
+const appStripe = Stripe(config.stripe.secret);
+import nock from 'nock';
+if (process.env.RECORD) {
+  nock.recorder.rec();
+}
 
 const debug = debugLib('utils');
 
@@ -69,4 +77,30 @@ export const makeRequest = (remoteUser) => {
     remoteUser,
     loaders: loaders({ remoteUser })
   }
+}
+
+export const graphqlQuery = async (query, remoteUser) => {
+
+  const prepare = () => {
+    if (remoteUser) {
+      remoteUser.rolesByCollectiveId = null; // force refetching the roles
+      return remoteUser.populateRoles();
+    }
+    else return Promise.resolve();
+  }
+
+  return prepare()
+    .then(() => graphql(schema, query, null, makeRequest(remoteUser)));
+}
+
+export const createStripeToken = async () => {
+    return appStripe.tokens.create({
+      card: {
+        number: '4242424242424242',
+        exp_month: 12,
+        exp_year: 2028,
+        cvc: 222
+      }
+    })
+    .then(st => st.id);
 }

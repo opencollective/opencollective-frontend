@@ -64,7 +64,7 @@ export const list = (req, res, next) => {
     .then(result => {
       result.rows = result.rows.map(instance => {
         const expense = instance.info;
-        expense.user =  req.canEditCollective ? instance.User.info : instance.User.public;
+        expense.user =  req.remoteUser.isAdmin(instance.CollectiveId) ? instance.User.info : instance.User.public;
         return expense;
       })
       return result;

@@ -409,9 +409,20 @@ export function formatArrayToString(arr) {
 
 export function formatCurrency(amount, currency, precision = 0) {
   amount = amount/100; // converting cents
-
-  return amount.toLocaleString(currency, {
+  let locale;
+  switch (currency) {
+    case 'USD':
+      locale = 'en-US';
+      break;
+    case 'EUR':
+      locale = 'en-EU';
+      break;
+    default:
+      locale = currency;
+  }
+  return amount.toLocaleString(locale, {
     style: 'currency',
+    currencyDisplay: 'symbol',
     currency,
     minimumFractionDigits : precision,
     maximumFractionDigits : precision

@@ -1,4 +1,5 @@
 import { type } from '../constants/transactions';
+import Promise from 'bluebird';
 
 export default function(Sequelize, DataTypes) {
 
@@ -126,6 +127,12 @@ export default function(Sequelize, DataTypes) {
           }
         })
       },
+      
+      // does this payment method support recurring payments?
+      recurring() {
+        return (this.service === 'stripe');
+      },
+
       info() {
         return {
           type: type.DONATION,
@@ -147,5 +154,29 @@ export default function(Sequelize, DataTypes) {
     }
   });
 
+  /**
+   * Instance Methods
+   */
+
+  /**
+   * Populate all the foreign keys if necessary
+   * (order.fromCollective, order.toCollective, order.createdByUser, order.tier)
+   * @param {*} order 
+   */
+  Order.prototype.populate = function(foreignKeys = ['FromCollectiveId', 'ToCollectiveId', 'CreatedByUserId', 'TierId']) {
+    return Promise.map(foreignKeys, fk => {
+      const attribute = (fk.substr(0,1).toLowerCase() + fk.substr(1)).replace(/Id$/, '');
+      const model = fk.replace(/(from|to|createdby)/i, '').replace(/Id$/,'');
+      const promise = () => {
+        if (this[attribute]) return Promise.resolve(this[attribute]);
+        if (!this[fk]) return Promise.resolve(null);
+        return models[model].findById(this[fk]);
+      }
+      return promise().then(obj => {
+        this[attribute] = obj;
+      })
+    })
+    .then(() => this);
+  }   
   return Order;
 }

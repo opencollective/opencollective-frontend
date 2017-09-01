@@ -4,7 +4,6 @@ import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
 import roles from '../../constants/roles';
 import {authenticateUser} from './authentication';
-import { hasRole } from '../../lib/auth';
 
 const {
   Forbidden, // I know who you are, but you permanently don't have access to this resource
@@ -79,12 +78,8 @@ export function mustHaveRole(possibleRoles) {
     required_valid('remoteUser', 'collective')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
-      return hasRole(req.remoteUser.CollectiveId, req.collective.id, possibleRoles)
-      .then(hasRole => {
-        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
-        else return next(null, true);
-      })
-      .catch(next);
+      if (!req.remoteUser.hasRole(possibleRoles, req.collective.id)) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
+      else return next(null, true);
     })
   };
 }

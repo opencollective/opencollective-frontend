@@ -134,7 +134,7 @@ export function setupModels(client) {
   m.Subscription.hasOne(m.Order);
 
   // PaymentMethod
-  m.Order.belongsTo(m.PaymentMethod);
+  m.Order.belongsTo(m.PaymentMethod, { foreignKey: 'PaymentMethodId', as: 'paymentMethod' });
   m.PaymentMethod.hasMany(m.Order);
   m.Transaction.belongsTo(m.PaymentMethod);
 

@@ -1,11 +1,10 @@
-import _ from 'lodash';
+import { get, contains } from 'lodash';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import request from 'request-promise';
 import qs from 'querystring';
-
-import {createOrUpdate as createOrUpdateConnectedAccount} from '../../controllers/connectedAccounts';
+import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controllers/connectedAccounts';
 import models from '../../models';
 import errors from '../../lib/errors';
 import debug from 'debug';
@@ -88,6 +87,11 @@ export function authenticateUserByJwtNoExpiry() {
   ]
 }
 
+/**
+ * Authenticate the user using the JWT token and populates:
+ *  - req.remoteUser
+ *  - req.remoteUser.memberships[CollectiveId] = [roles]
+ */
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = req.jwtPayload.sub;
@@ -97,16 +101,16 @@ export const _authenticateUserByJwt = (req, res, next) => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
       user.update({ seenAt: new Date() });
       req.remoteUser = user;
-      debug('auth')('logged in user', req.remoteUser.id);
-      if (req.body && req.body.variables && req.body.variables.collective) {
-        return req.remoteUser.canEditCollective(req.body.variables.collective.id).then(canEditCollective => {
-          req.remoteUser.canEditCollective = canEditCollective;
-          debug('auth')('Can edit collective', req.body.variables.collective.id, '?', canEditCollective);
-          next();
-        })
-      } else {
-        next();
-      }
+      return user.populateRoles();
+    })
+    .then(() => {
+      debug('auth')('logged in user', req.remoteUser.id, "roles:", req.remoteUser.rolesByCollectiveId);
+
+      // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
+      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
+      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
+      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
+      next();
     })
     .catch(next);
 };
@@ -156,7 +160,7 @@ export function authenticateInternalUserByJwt() {
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (req.jwtPayload && _.contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
+  if (req.jwtPayload && contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
     next();
   } else {
     throw new Unauthorized();

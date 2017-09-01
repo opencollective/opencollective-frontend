@@ -3,11 +3,14 @@ import { canAccessUserDetails } from '../lib/auth';
 import { type } from '../constants/transactions';
 import DataLoader from 'dataloader';
 import Promise from 'bluebird';
+import { get } from 'lodash';
+import debugLib from 'debug';
+const debug = debugLib('loaders');
 
 const addAccessRights = (remoteUser, collectives) => {
   if (!remoteUser) return collectives;
   return Promise.map(collectives, collective => {
-    return canAccessUserDetails(remoteUser.CollectiveId, collective.id)
+    return canAccessUserDetails(remoteUser, collective.id)
       .then(canAccessUserDetails => {
         collective.canAccessUserDetails = canAccessUserDetails;
         return collective;
@@ -16,6 +19,7 @@ const addAccessRights = (remoteUser, collectives) => {
 }
 
 const sortResults = (keys, results, attribute = 'id') => {
+  debug("sortResults", attribute, results.length);
   const resultsById = {};
   results.forEach(r => {
     const key = r.dataValues ? r.dataValues[attribute] : r[attribute];
@@ -30,16 +34,16 @@ const sortResults = (keys, results, attribute = 'id') => {
 export const loaders = (req) => {
   return {
     collective: {
-      byId: new DataLoader(ids => models.Collective
+      findById: new DataLoader(ids => models.Collective
         .findAll({ where: { id: { $in: ids }}})
         .then(collectives => addAccessRights(req.remoteUser, collectives))
         .then(collectives => sortResults(ids, collectives))
       ),
-      bySlug: new DataLoader(slugs => models.Collective.findAll({ where: { slug: { $in: slugs }}})
+      findBySlug: new DataLoader(slugs => models.Collective.findAll({ where: { slug: { $in: slugs }}})
         .then(collectives => addAccessRights(req.remoteUser, collectives))
         .then(collectives => sortResults(slugs, collectives, 'slug'))
       ),
-      getBalance: new DataLoader(ids => models.Transaction.findAll({
+      balance: new DataLoader(ids => models.Transaction.findAll({
           attributes: [
             'ToCollectiveId',
             [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'total' ]
@@ -48,7 +52,7 @@ export const loaders = (req) => {
           group: ['ToCollectiveId']
         })
         .then(results => sortResults(ids, results, 'ToCollectiveId'))
-        .map(result => result.dataValues.totalAmount || 0)
+        .map(result => get(result, 'dataValues.totalAmount') || 0)
       )
     },
     usersByCollectiveId: new DataLoader(keys => models.User.findAll({ where: { CollectiveId: { $in: keys } }})),
@@ -60,7 +64,7 @@ export const loaders = (req) => {
           group: ['OrderId']
         })
         .then(results => sortResults(keys, results, 'OrderId'))
-        .map(result => result.dataValues.totalAmount || 0)
+        .map(result => get(result, 'dataValues.totalAmount') || 0)
       ),
       totalAmountDonatedFromTo: new DataLoader(keys => models.Transaction.findAll({
         attributes: ['FromCollectiveId', 'ToCollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],

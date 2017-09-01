@@ -192,19 +192,14 @@ export default (Sequelize, DataTypes) => {
   };
 
   Transaction.prototype.getExpenseForViewer = function(viewer) {
-    const promises = [ models.Expense.findOne({ where: { id: this.ExpenseId } }) ];
-    if (viewer) {
-      promises.push(viewer.canEditCollective(this.ToCollectiveId));
-    }
-    return Promise.all(promises)
-    .then(results => {
-      const expense = results[0];
-      const canEditCollective = results[1];
-      if (!expense) return null;
-      if (viewer && canEditCollective) return expense.info;
-      if (viewer && viewer.id === expense.UserId) return expense.info;
-      return expense.public;
-    });
+    return models.Expense.findOne({ where: { id: this.ExpenseId } })
+      .then(expense => {
+        if (!expense) return null;
+        const canEditCollective = viewer.isAdmin(this.ToCollectiveId);
+        if (viewer && canEditCollective) return expense.info;
+        if (viewer && viewer.id === expense.UserId) return expense.info;
+        return expense.public;
+      });
   };
 
   Transaction.prototype.getSource = function() {
@@ -253,7 +248,20 @@ export default (Sequelize, DataTypes) => {
               - transaction.paymentProcessorFeeInTxnCurrency)
             * transaction.txnCurrencyFxRate);
       }
-      return Transaction.create(transaction);
+
+      // Create the opposite transaction from the perspective of the FromCollective
+      const oppositeTransaction = {
+        ...transaction,
+        type: (-transaction.amount > 0) ? type.DONATION : type.EXPENSE,
+        FromCollectiveId: transaction.ToCollectiveId,
+        ToCollectiveId: transaction.FromCollectiveId,
+        amount: -transaction.amount,
+        netAmountInCollectiveCurrency: -transaction.amount
+      }
+
+      // We first record the transaction to remove the money from FromCollectiveId, 
+      // then the transaction to add the money to ToCollectiveId
+      return Transaction.createMany([ oppositeTransaction, transaction ])
     });
   };
 

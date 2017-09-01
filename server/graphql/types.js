@@ -72,7 +72,7 @@ export const UserType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(user, args, req) {
-          if (req.remoteUser && (req.remoteUser.id === user.id || req.remoteUser.canEditCollective)) {
+          if (req.remoteUser && (req.remoteUser.id === user.id || req.remoteUser.canEditCurrentCollective)) {
             return user.email;
           } else {
             return null;
@@ -130,13 +130,13 @@ export const MemberType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return req.loaders.collective.byId.load(member.CollectiveId);
+          return req.loaders.collective.findById.load(member.CollectiveId);
         }
       },
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return req.loaders.collective.byId.load(member.MemberCollectiveId);
+          return req.loaders.collective.findById.load(member.MemberCollectiveId);
         }
       },
       role: {
@@ -278,13 +278,13 @@ export const TierType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(tier, args, req) {
-          return req.loaders.collective.byId.load(tier.CollectiveId);
+          return req.loaders.collective.findById.load(tier.CollectiveId);
         }
       },
       event: {
         type: CollectiveInterfaceType,
         resolve(tier, args, req) {
-          return req.loaders.collective.byId.load(tier.CollectiveId);
+          return req.loaders.collective.findById.load(tier.CollectiveId);
         }
       },
       orders: {

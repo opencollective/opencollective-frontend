@@ -3,8 +3,6 @@ import qs from 'querystring';
 import config from 'config';
 import models from '../models';
 import errors from '../lib/errors';
-import roles from '../constants/roles';
-import { hasRole } from '../lib/auth';
 import jwt from 'jsonwebtoken';
 
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
@@ -24,12 +22,11 @@ const getToken = code => () => axios
  */
 export const authorize = (req, res, next) => {
 
-  return hasRole(req.remoteUser.CollectiveId, req.query.CollectiveId, [roles.ADMIN, roles.HOST])
-    .then(canEdit => {
-      if (!canEdit) throw new errors.Unauthorized('You must be logged in as an admin of this collective to be able to connect it to a Stripe Account');
-      return true;
-    })
-    .then(() => models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: req.query.CollectiveId }}))
+  if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
+    return next(new errors.Unauthorized('You must be logged in as an admin of this collective to be able to connect it to a Stripe Account'));
+  }
+
+  return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: req.query.CollectiveId }})
     .then(ExistingStripeAccount => {
       if (ExistingStripeAccount) throw new errors.ValidationFailed(null, ['CollectiveId'], 'Collective already has a stripe account connected');
       return true;

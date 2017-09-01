@@ -1,5 +1,3 @@
-import { hasRole } from '../lib/auth';
-
 import {
   GraphQLInt,
   GraphQLList,
@@ -331,7 +329,7 @@ const CollectiveFields = () => {
     balance: {
       type: GraphQLInt,
       resolve(collective, args, req) {
-        return req.loaders.collective.getBalance.load(collective.id);
+        return req.loaders.collective.balance.load(collective.id);
       }
     },
     role: {
@@ -368,23 +366,17 @@ const CollectiveFields = () => {
     paymentMethods: {
       type: new GraphQLList(PaymentMethodType),
       resolve(collective, args, req) {
-        if (!req.remoteUser) return [];
-        return hasRole(req.remoteUser.CollectiveId, collective.id, ['ADMIN'])
-          .then(canAccess => {
-            if (!canAccess) {
-              return [];
-            }
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
 
-            return models.PaymentMethod.findAll({
-              where: {
-                CollectiveId: collective.id,
-                service: 'stripe',
-                identifier: { $ne: null },
-                archivedAt: null
-              }
-            });
+        return models.PaymentMethod.findAll({
+          where: {
+            CollectiveId: collective.id,
+            service: 'stripe',
+            identifier: { $ne: null },
+            archivedAt: null
+          }
             
-          });
+        });
       }
     },
     connectedAccounts: {
@@ -433,8 +425,11 @@ export const UserCollectiveType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
-          if (!userCollective.canAccessUserDetails) return null;
-          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(user => user.email);
+          if ((req.remoteUser.id === userCollective.CreatedByUserId || req.remoteUser.isAdmin(userCollective.id))) {
+            return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(user => user.email);
+          } else {
+            return null;
+          }
         }
       }
     }

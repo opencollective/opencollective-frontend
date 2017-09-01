@@ -1,20 +1,23 @@
 /**
  * Dependencies.
  */
-import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
 
-import {decrypt, encrypt} from '../lib/utils';
+import { decrypt, encrypt } from '../lib/utils';
 import errors from '../lib/errors';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
 import imageUrlLib from '../lib/imageUrlToAmazonUrl';
 
-import { hasRole } from '../lib/auth';
+import roles from '../constants/roles';
+import { extend, defaults, intersection } from 'lodash';
+
+import debugLib from 'debug';
+const debug = debugLib('user');
 
 /**
  * Constants.
@@ -226,7 +229,9 @@ export default (Sequelize, DataTypes) => {
     }
   });
 
-  // JWT token.
+  /**
+   * Instance Methods
+   */
   User.prototype.jwt = function(payload, expiresInHours) {
     const { secret } = config.keys.opencollective;
     expiresInHours = expiresInHours || 24*30; // 1 month
@@ -234,7 +239,7 @@ export default (Sequelize, DataTypes) => {
     // We are sending too much data (large jwt) but the app and website
     // need the id and email. We will refactor that progressively to have
     // a smaller token.
-    const data = _.extend({}, payload, {
+    const data = extend({}, payload, {
       id: this.id,
       email: this.email
     });
@@ -326,10 +331,6 @@ export default (Sequelize, DataTypes) => {
     })
   };
 
-  User.prototype.canEditCollective = function(collectiveid) {
-    return hasRole(this.CollectiveId, collectiveid, ['ADMIN', 'HOST']);
-  };
-
   // should be deprecated
   User.prototype.updateWhiteListedAttributes = function(attributes) {
 
@@ -389,9 +390,59 @@ export default (Sequelize, DataTypes) => {
     })
   };
 
+  User.prototype.populateRoles = function() {
 
+    if (this.rolesByCollectiveId) {
+      debug("roles already populated", this.rolesByCollectiveId);
+      return Promise.resolve(this.rolesByCollectiveId);
+    }
+
+    return this.rolesByCollectiveId || models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
+      .then(memberships => {
+        const rolesByCollectiveId = {};
+        memberships.map(m => {
+          rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
+          rolesByCollectiveId[m.CollectiveId].push(m.role);
+        });
+        this.rolesByCollectiveId = rolesByCollectiveId;
+        debug("populateRoles", this.rolesByCollectiveId);
+      })
+  }
+
+  User.prototype.hasRole = function(roles, CollectiveId) {
+    if (!CollectiveId) return false;
+    if (this.CollectiveId === CollectiveId) return true;
+    if (!this.rolesByCollectiveId) {
+      console.error(">>> User model error: User.rolesByCollectiveId hasn't been populated.", new Error().stack);
+      return false;
+    }
+    if (typeof roles === 'string') {
+      roles = [roles];
+    }
+    const result = intersection(this.rolesByCollectiveId[CollectiveId], roles).length > 0;
+    debug("hasRole of ", roles," in CollectiveId", CollectiveId, "?", result);    
+    return result;
+  }
+
+  // Adding some sugars
+  User.prototype.isAdmin = function(CollectiveId) {
+    const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
+    debug("isAdmin of CollectiveId", CollectiveId,"?", result);
+    return result;
+  }
+
+  User.prototype.isMember = function(CollectiveId) {
+    const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
+    debug("isMember of CollectiveId", CollectiveId,"?", result);
+    return result;
+  }
+
+
+  /**
+   * Class Methods
+   */
   User.createMany = (users, defaultValues = {}) => {
-    return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), { concurrency: 1 });
+    return Promise.map(users, u => User.create(defaults({},u,defaultValues)), { concurrency: 1 });
   };
 
   User.auth = (email, password, cb) => {
@@ -446,7 +497,7 @@ export default (Sequelize, DataTypes) => {
         user = u;
         const userCollective = {
           type: 'USER',
-          name: user.name || user.email && user.email.split(/@|\+/)[0],
+          name: userData.name || user.email && user.email.split(/@|\+/)[0],
           image: userData.image,
           mission: userData.mission,
           description: userData.description,

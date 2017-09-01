@@ -9,26 +9,6 @@ const cache = LRU({
   maxAge: 1000 * 60 * 60 // we keep it max 1h
 });
 
-export function hasRole(MemberCollectiveId, CollectiveId, possibleRoles) {
-  if (!MemberCollectiveId || !CollectiveId) return Promise.resolve(false);
-  if (Number(MemberCollectiveId) === Number(CollectiveId)) return Promise.resolve(true);
-
-  if (typeof possibleRoles === 'string') {
-    possibleRoles = [ possibleRoles ];
-  }
-
-  const query = {
-    attributes: ['id'],
-    where: {
-      MemberCollectiveId,
-      CollectiveId,
-      role: { $in: possibleRoles }
-    }
-  };
-  return models.Member.findOne(query)
-  .then(ug => Boolean(ug))
-}
-
 const canEditCollectives = (RemoteUserCollectiveId) => {
   const cachedVersion = cache.get(`RemoteUserCollectiveId:${RemoteUserCollectiveId}`);
   if (cachedVersion) {
@@ -70,12 +50,13 @@ const memberOfCollectives = (UserCollectiveId) => {
  * @param {*} RemoteUserCollective 
  * @param {*} UserCollective 
  */
-export function canAccessUserDetails(RemoteUserCollectiveId, UserCollectiveId) {
-  if (!RemoteUserCollectiveId) return Promise.resolve(false);
-  if (RemoteUserCollectiveId === UserCollectiveId) return Promise.resolve(true);
-
-  return Promise.all([ canEditCollectives(RemoteUserCollectiveId), memberOfCollectives(UserCollectiveId) ])
-  .then(results => {
-    return (intersection(results[0], results[1]).length > 0);
+export function canAccessUserDetails(remoteUser, UserCollectiveId) {
+  if (!remoteUser) return Promise.resolve(false);
+  if (remoteUser.CollectiveId === UserCollectiveId) return Promise.resolve(true);
+  if (!remoteUser.memberships) return Promise.resolve(false);
+  const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
+  return memberOfCollectives(UserCollectiveId)
+  .then(collectives => {
+    return (intersection(adminOfCollectives, collectives).length > 0);
   })
 }

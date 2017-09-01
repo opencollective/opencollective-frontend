@@ -29,7 +29,7 @@ const queries = {
       }
     },
     resolve(_, args, req) {
-      return req.loaders.collective.bySlug.load(args.slug.toLowerCase());
+      return req.loaders.collective.findBySlug.load(args.slug.toLowerCase());
     }
   },
 
@@ -49,22 +49,6 @@ const queries = {
     type: UserType,
     resolve(_, args, req) {
       return req.remoteUser;
-    }
-  },
-
-  /*
-   * Given a collective slug, returns all users
-   */
-  allUsers: {
-    type: new GraphQLList(UserType),
-    args: {
-      slug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
-    },
-    resolve(_, args, req) {
-      return models.Collective.findOne({ where: { slug: args.slug.toLowerCase() } })
-        .then(collective => collective.getUsersForViewer(req.remoteUser));
     }
   },
 

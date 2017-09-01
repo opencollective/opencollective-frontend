@@ -2,7 +2,6 @@ import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
 import { isUUID } from '../lib/utils';
-import { hasRole } from '../lib/auth';
 
 const {
   User,
@@ -55,16 +54,6 @@ export function userid(req, res, next, userIdOrName) {
 export function collectiveid(req, res, next, collectiveIdOrSlug) {
   getByKeyValue(Collective, isNaN(collectiveIdOrSlug) ? 'slug' : 'id', collectiveIdOrSlug)
     .then(collective => req.collective = collective)
-    .then(() => {
-      if (req.remoteUser) {
-        return hasRole(req.remoteUser.CollectiveId, req.collective.id, ['ADMIN','HOST'])
-      }
-    })
-    .then(canEdit => {
-      if (canEdit) {
-        req.canEditCollective = canEdit;
-      }
-    })
     .asCallback(next);
 }
 
