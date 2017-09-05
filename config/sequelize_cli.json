@@ -4,12 +4,18 @@
     "username": "opencollective",
     "password": "",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "pool": {
+      "max": 10000,
+      "min": 1,
+      "idle": 200000,
+      "acquire": 200000
+    }
   },
   "staging": {
     "use_env_variable": "PG_URL"
   },
   "production": {
     "use_env_variable": "PG_URL"
-  }
+  },
 }
