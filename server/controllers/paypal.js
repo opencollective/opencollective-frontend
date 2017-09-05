@@ -125,7 +125,7 @@ const getPreapprovalDetailsAndUpdatePaymentMethod = function(preapprovalKey, Col
       }))
     .then(paymentMethod => paymentMethod.update({
         confirmedAt: new Date(),
-        identifier: preapprovalDetailsResponse.senderEmail,
+        name: preapprovalDetailsResponse.senderEmail,
         data: {
           response: preapprovalDetailsResponse,
         }

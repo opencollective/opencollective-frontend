@@ -58,7 +58,7 @@ export default (app) => {
         delete body.query;
       }
       debug('params')("req.query", req.query);
-      debug('params')("req.body", body);
+      debug('params')("req.body", JSON.stringify(body, null, '  '));
       debug('params')("req.params", req.params);
       debug('headers')("req.headers", req.headers);
       next();

@@ -7,6 +7,8 @@ import {
   GraphQLString
 } from 'graphql';
 
+import GraphQLJSON from 'graphql-type-json';
+
 import {
   CollectiveInterfaceType
 } from './CollectiveInterface';
@@ -37,6 +39,12 @@ export const UserType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(user) {
           return user.CollectiveId;
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(user, args, req) {
+          return req.loaders.collective.findById.load(user.CollectiveId);
         }
       },
       username: {
@@ -72,11 +80,7 @@ export const UserType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(user, args, req) {
-          if (req.remoteUser && (req.remoteUser.id === user.id || req.remoteUser.canEditCurrentCollective)) {
-            return user.email;
-          } else {
-            return null;
-          }
+          return user.getPersonalDetails(req.remoteUser).then(user => user.email);
         }
       },
       memberOf: {
@@ -475,34 +479,16 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.service;
         }
       },
-      brand: {
-        type: GraphQLString,
+      data: {
+        type: GraphQLJSON,
         resolve(paymentMethod) {
-          return paymentMethod.brand;
+          return paymentMethod.data;
         }
       },
-      funding: {
+      name: { // last 4 digit of card number for Stripe
         type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.funding;
-        }
-      },
-      country: {
-        type: GraphQLString,
-        resolve(paymentMethod) {
-          return paymentMethod.country;
-        }
-      },
-      identifier: { // last 4 digit of card number for Stripe
-        type: GraphQLString,
-        resolve(paymentMethod) {
-          return paymentMethod.identifier;
-        }
-      },
-      fullName: {
-        type: GraphQLString,
-        resolve(paymentMethod) {
-          return paymentMethod.fullName;
+          return paymentMethod.name;
         }
       },
       primary: {
@@ -511,16 +497,22 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.primary;
         }
       },
-      expMonth: {
+      monthlyLimitPerMember: {
         type: GraphQLInt,
         resolve(paymentMethod) {
-          return paymentMethod.expMonth;
+          return paymentMethod.monthlyLimitPerMember;
         }
       },
-      expYear: {
+      balance: {
         type: GraphQLInt,
+        resolve(paymentMethod, args, req) {
+          return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
+        }
+      },
+      currency: {
+        type: GraphQLString,
         resolve(paymentMethod) {
-          return paymentMethod.expYear;
+          return paymentMethod.currency;
         }
       }
     }

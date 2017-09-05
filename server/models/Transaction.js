@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';
+import CustomDataTypes from './DataTypes';
 
 /*
  * Transaction model
@@ -23,15 +24,7 @@ export default (Sequelize, DataTypes) => {
     description: DataTypes.STRING,
     amount: DataTypes.INTEGER,
 
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD',
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
-        }
-      }
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     CreatedByUserId: {
       type: DataTypes.INTEGER,
@@ -195,8 +188,7 @@ export default (Sequelize, DataTypes) => {
     return models.Expense.findOne({ where: { id: this.ExpenseId } })
       .then(expense => {
         if (!expense) return null;
-        const canEditCollective = viewer.isAdmin(this.ToCollectiveId);
-        if (viewer && canEditCollective) return expense.info;
+        if (viewer && viewer.isAdmin(this.ToCollectiveId)) return expense.info;
         if (viewer && viewer.id === expense.UserId) return expense.info;
         return expense.public;
       });

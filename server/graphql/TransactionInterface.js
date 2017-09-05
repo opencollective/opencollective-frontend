@@ -18,6 +18,8 @@ import {
   UserType
 } from './types';
 
+import models from '../models';
+
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: "Transaction",
@@ -155,8 +157,9 @@ const TransactionFields = () => {
     },
     paymentMethod: {
       type: PaymentMethodType,
-      resolve(transaction) {
-        return transaction.getPaymentMethod().then(pm => pm || { service: 'manual' });
+      resolve(transaction, args, req) {
+        if (!transaction.PaymentMethodId) return null;
+        return req.loaders.paymentMethods.load(transaction.PaymentMethodId);
       }
     }    
   }

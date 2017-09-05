@@ -244,7 +244,7 @@ describe('lib.payments.processPayment.test.js', () => {
 
       beforeEach('create a payment method and an order', () => {
         return models.PaymentMethod.create({
-          identifier: 'blah',
+          name: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
         })
@@ -336,7 +336,7 @@ describe('lib.payments.processPayment.test.js', () => {
       const createDonation = (interval) => {
         let pm;
         return models.PaymentMethod.create({
-          identifier: 'blah',
+          name: 'blah',
           token: STRIPE_TOKEN,
           service: 'stripe'
           })

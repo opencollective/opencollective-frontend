@@ -10,11 +10,15 @@ import { difference, uniq } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { appendTier } from '../lib/utils';
+import { appendTier, capitalize } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
+import CustomDataTypes from './DataTypes';
+import debugLib from 'debug';
+const debug = debugLib('collective');
+
 
 /**
  * Collective Model.
@@ -104,10 +108,7 @@ export default function(Sequelize, DataTypes) {
 
     longDescription: DataTypes.TEXT,
 
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD'
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     image: DataTypes.STRING,
 
@@ -304,7 +305,7 @@ export default function(Sequelize, DataTypes) {
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
-          identifier: `${instance.name} Collective`,
+          name: `${capitalize(instance.name)} Collective`,
           primary: true,
           currency: instance.currency
         });
@@ -478,6 +479,7 @@ export default function(Sequelize, DataTypes) {
       ... defaultAttributes
     };
 
+    debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
       models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
@@ -510,12 +512,18 @@ export default function(Sequelize, DataTypes) {
       .then(oldMembers => {
         // remove the members that are not present anymore
         const diff = difference(oldMembers.map(t => t.id), members.map(t => t.id));
-        return models.Member.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        if (diff.length === 0) {
+          return null;
+        } else {
+          debug("editMembers", "delete", diff);
+          return models.Member.update({ deletedAt: new Date }, { where: { id: { $in: diff }}})
+        }
       })
       .then(() => {
         return Promise.map(members, (member) => {
           if (member.id) {
             // Edit an existing membership (e.g. edit the role)
+            debug("editMembers", "update member", member.id, member);
             return models.Member.update(member, { where: { id: member.id }});
           } else {
             // Create new membership
@@ -540,7 +548,7 @@ export default function(Sequelize, DataTypes) {
 
   // edit the tiers of this collective (create/update/remove)
   Collective.prototype.editTiers = function(tiers) {
-    if (!tiers) return Promise.resolve();
+    if (!tiers) return this.getTiers();
 
     return this.getTiers()
     .then(oldTiers => {
@@ -576,8 +584,9 @@ export default function(Sequelize, DataTypes) {
           return models.PaymentMethod.update(pm, { where: { id: pm.id }});
         } else {
           pm.CollectiveId = this.id;
+          pm.currency = pm.currency || this.currency;
           models.PaymentMethod.update({ primary: false }, { where: { CollectiveId: this.id, archivedAt: { $eq: null } }});
-          return models.PaymentMethod.createFromStripeSourceToken({ ...pm, ...defaultAttributes });
+          return models.PaymentMethod.createFromStripeSourceToken({ ...defaultAttributes, ...pm });
         }
       });
     })
@@ -790,9 +799,10 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getHostId = function() {
+    const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id }
+      where
     }).then(member => member && member.MemberCollectiveId);
   };
 
@@ -805,6 +815,7 @@ export default function(Sequelize, DataTypes) {
     return this.getHostId()
       .then(id => {
         HostId = id
+        debug("getHostStripeAccount", "HostId", id);
         return id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } });
       })
       .then(stripeAccount => {

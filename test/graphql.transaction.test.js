@@ -1,7 +1,5 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import schema from '../server/graphql/schema';
-import { graphql } from 'graphql';
 import models from '../server/models';
 
 import * as utils from './utils';
@@ -29,14 +27,14 @@ describe('graphql.transaction.test.js', () => {
   before(() => utils.loadDB("wwcode_test"));
 
   describe('return collective.transactions', () => {
-    it('when given an event slug and collectiveSlug (case insensitive)', async () => {
+    it('when given a collective slug (case insensitive)', async () => {
       const limit = 40;
       const query = `
-        query Collective {
-          Collective(slug: "wwcodeaustin") {
+        query Collective($slug: String!, $limit: Int) {
+          Collective(slug: $slug) {
             id,
             slug,
-            transactions(limit: ${limit}) {
+            transactions(limit: $limit) {
               id,
               type,
               createdByUser {
@@ -55,7 +53,7 @@ describe('graphql.transaction.test.js', () => {
               ... on Order {
                 paymentMethod {
                   id,
-                  identifier
+                  name
                 },
                 subscription {
                   id,
@@ -66,7 +64,7 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await graphql(schema, query, null, utils.makeRequest());
+      const result = await utils.graphqlQuery(query, { slug: "WWCodeAustin", limit });
       showErrors(result);
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
@@ -88,8 +86,8 @@ describe('graphql.transaction.test.js', () => {
 
     it('returns one transaction ', async () => {
       const query = `
-        query Transaction {
-          Transaction(id: 7071) {
+        query Transaction($id: Int!) {
+          Transaction(id: $id) {
             id,
             type,
             createdByUser {
@@ -108,7 +106,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Order {
               paymentMethod {
                 id,
-                identifier
+                name
               },
               subscription {
                 id,
@@ -118,7 +116,7 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await graphql(schema, query, null, utils.makeRequest());
+      const result = await utils.graphqlQuery(query, { id: 7071 });
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transaction = result.data.Transaction;
@@ -130,14 +128,14 @@ describe('graphql.transaction.test.js', () => {
       const limit = 10;
       const offset = 5;
       const query = `
-        query allTransactions {
-          allTransactions(slug: "wwcodeaustin", type: "DONATION", limit: ${limit}, offset: ${offset}) {
+        query allTransactions($slug: String!, $limit: Int, $offset: Int, $type: String) {
+          allTransactions(slug: $slug, limit: $limit, offset: $offset, type: $type) {
             id,
             type
           }
         }
       `;
-      const result = await graphql(schema, query, null, utils.makeRequest());
+      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset, type: 'DONATION' });
       result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
@@ -151,8 +149,8 @@ describe('graphql.transaction.test.js', () => {
       const limit = 10;
       const offset = 5;
       const query = `
-        query allTransactions {
-          allTransactions(slug: "wwcodeaustin", limit: ${limit}, offset: ${offset}) {
+        query allTransactions($slug: String!, $limit: Int, $offset: Int) {
+          allTransactions(slug: $slug, limit: $limit, offset: $offset) {
             id,
             type,
             createdByUser {
@@ -180,7 +178,7 @@ describe('graphql.transaction.test.js', () => {
             ... on Order {
               paymentMethod {
                 id,
-                identifier
+                name
               },
               subscription {
                 id,
@@ -190,7 +188,7 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await graphql(schema, query, null, utils.makeRequest());
+      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset });
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
@@ -199,9 +197,9 @@ describe('graphql.transaction.test.js', () => {
       const expense = transactions.find(t => t.type === 'EXPENSE');
       expect(expense.attachment).to.equal(null);
       return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
-        const result2 = await graphql(schema, query, null, utils.makeRequest(user));
+        const result2 = await utils.graphqlQuery(query, { slug: "wwcodeaustin" }, user);
+        result2.errors && console.error(result2.errors[0]);
         const transactions2 = result2.data.allTransactions;
-        result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const expense2 = transactions2.find(t => t.type === 'EXPENSE');
         expect(expense2.attachment).to.equal('******');

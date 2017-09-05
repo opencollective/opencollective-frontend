@@ -1,22 +1,10 @@
 import models, { sequelize } from '../models';
-import { canAccessUserDetails } from '../lib/auth';
+import { getListOfAccessibleUsers } from '../lib/auth';
 import { type } from '../constants/transactions';
 import DataLoader from 'dataloader';
-import Promise from 'bluebird';
 import { get } from 'lodash';
 import debugLib from 'debug';
 const debug = debugLib('loaders');
-
-const addAccessRights = (remoteUser, collectives) => {
-  if (!remoteUser) return collectives;
-  return Promise.map(collectives, collective => {
-    return canAccessUserDetails(remoteUser, collective.id)
-      .then(canAccessUserDetails => {
-        collective.canAccessUserDetails = canAccessUserDetails;
-        return collective;
-      });
-  });
-}
 
 const sortResults = (keys, results, attribute = 'id') => {
   debug("sortResults", attribute, results.length);
@@ -36,11 +24,9 @@ export const loaders = (req) => {
     collective: {
       findById: new DataLoader(ids => models.Collective
         .findAll({ where: { id: { $in: ids }}})
-        .then(collectives => addAccessRights(req.remoteUser, collectives))
         .then(collectives => sortResults(ids, collectives))
       ),
       findBySlug: new DataLoader(slugs => models.Collective.findAll({ where: { slug: { $in: slugs }}})
-        .then(collectives => addAccessRights(req.remoteUser, collectives))
         .then(collectives => sortResults(slugs, collectives, 'slug'))
       ),
       balance: new DataLoader(ids => models.Transaction.findAll({
@@ -55,8 +41,20 @@ export const loaders = (req) => {
         .map(result => get(result, 'dataValues.totalAmount') || 0)
       )
     },
-    usersByCollectiveId: new DataLoader(keys => models.User.findAll({ where: { CollectiveId: { $in: keys } }})),
-    tiers: new DataLoader(ids => models.Tier.findAll({ where: { id: { $in: ids }}})),
+    // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
+    getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleUsers(req.remoteUser, UserCollectiveIds)
+      .then(accessibleUserCollectiveIds => models.User.findAll({ where: { CollectiveId: { $in: accessibleUserCollectiveIds } }}))
+      .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId'))
+      .map(result => result || {})
+    ),
+    tiers: new DataLoader(ids => models.Tier
+      .findAll({ where: { id: { $in: ids }}})
+      .then(results => sortResults(ids, results, 'id'))
+    ),
+    paymentMethods: new DataLoader(ids => models.PaymentMethod
+      .findAll({ where: { id: { $in: ids }}})
+      .then(results => sortResults(ids, results, 'id'))
+    ),
     transactions: {
       totalAmountForOrderId: new DataLoader(keys => models.Transaction.findAll({
           attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],

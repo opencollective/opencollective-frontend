@@ -406,6 +406,7 @@ export default (Sequelize, DataTypes) => {
         });
         this.rolesByCollectiveId = rolesByCollectiveId;
         debug("populateRoles", this.rolesByCollectiveId);
+        return this;
       })
   }
 
@@ -420,7 +421,7 @@ export default (Sequelize, DataTypes) => {
       roles = [roles];
     }
     const result = intersection(this.rolesByCollectiveId[CollectiveId], roles).length > 0;
-    debug("hasRole of ", roles," in CollectiveId", CollectiveId, "?", result);    
+    debug("hasRole", "userid:", this.id, "has role", roles," in CollectiveId", CollectiveId, "?", result);    
     return result;
   }
 
@@ -435,6 +436,19 @@ export default (Sequelize, DataTypes) => {
     const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
     debug("isMember of CollectiveId", CollectiveId,"?", result);
     return result;
+  }
+
+  User.prototype.getPersonalDetails = function(remoteUser) {
+    if (!remoteUser) return Promise.resolve({});
+    return this.populateRoles()
+      .then(() => {
+        // all the CollectiveIds that the remoteUser is admin of.
+        const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
+        const memberOfCollectives = Object.keys(this.rolesByCollectiveId);
+        const canAccess = intersection(adminOfCollectives, memberOfCollectives).length > 0
+        debug("getPersonalDetails", "remoteUser id:", remoteUser.id, "is admin of collective ids:", adminOfCollectives, "this user id:", this.id, "is member of", memberOfCollectives, "canAccess?", canAccess);
+        return canAccess;
+      })
   }
 
 

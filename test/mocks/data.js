@@ -158,16 +158,18 @@ export default {
   },
 
   "paymentMethod2": {
-    "token": "stripetoken123",
+    "token": "tok_123456781234567812345678",
     "service": "stripe",
     "customerId": "cus_123",
     "confirmedAt": "2017-01-30T07:31:37.747Z",
-    "brand": "visa",
-    "country": "US",
-    "funding": "credit",
-    "identifier": "4242",
-    "expMonth": 1,
-    "expYear": 2022
+    "name": "4242",
+    "data": {
+      "brand": "visa",
+      "country": "US",
+      "funding": "credit",
+      "expMonth": 1,
+      "expYear": 2022
+    }
   },
 
   "activities1": {

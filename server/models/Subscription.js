@@ -1,3 +1,5 @@
+import CustomDataTypes from './DataTypes';
+
 export default (Sequelize, DataTypes) => {
 
   const Subscription = Sequelize.define('Subscription', {
@@ -7,15 +9,7 @@ export default (Sequelize, DataTypes) => {
       validate: { min: 0 }
     },
 
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD',
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
-        }
-      }
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     interval: {
       type: DataTypes.STRING(8),

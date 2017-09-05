@@ -372,7 +372,7 @@ const CollectiveFields = () => {
           where: {
             CollectiveId: collective.id,
             service: 'stripe',
-            identifier: { $ne: null },
+            name: { $ne: null },
             archivedAt: null
           }
             
@@ -412,24 +412,20 @@ export const UserCollectiveType = new GraphQLObjectType({
       firstName: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
-          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(u => u.firstName);
+          return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.firstName);
         }
       },
       lastName: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
-          return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(u => u.lastName);
+          return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(u => u.lastName);
         }
       },
       email: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
           if (!req.remoteUser) return null;
-          if ((req.remoteUser.id === userCollective.CreatedByUserId || req.remoteUser.isAdmin(userCollective.id))) {
-            return userCollective && req.loaders.usersByCollectiveId.load(userCollective.id).then(user => user.email);
-          } else {
-            return null;
-          }
+          return userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email);
         }
       }
     }

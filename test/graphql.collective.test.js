@@ -19,8 +19,8 @@ describe('Query Tests', () => {
   it('gets the collective info for the collective page', async () => {
 
     const query = `
-    query Collective {
-      Collective(slug: "xdamman") {
+    query Collective($slug: String!) {
+      Collective(slug: $slug) {
         id
         slug
         type
@@ -101,9 +101,8 @@ describe('Query Tests', () => {
         }
         paymentMethods {
           id
-          identifier
+          name
           service
-          brand
         }
         connectedAccounts {
           id
@@ -113,7 +112,7 @@ describe('Query Tests', () => {
       }
     }`;
 
-    const result = await graphql(schema, query, null, utils.makeRequest());
+    const result = await utils.graphqlQuery(query, { slug: "xdamman" });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
     const userCollective = result.data.Collective;
@@ -175,8 +174,8 @@ describe('Query Tests', () => {
     }
 
     const query = `
-    mutation editCollective {
-      editCollective(collective: ${utils.stringify(collective)}) {
+    mutation editCollective($collective: CollectiveInputType!) {
+      editCollective(collective: $collective) {
         id,
         slug,
         members {
@@ -195,8 +194,7 @@ describe('Query Tests', () => {
       }
     }
     `;
-
-    const res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
+    const res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const members = res.data.editCollective.members;
@@ -205,7 +203,8 @@ describe('Query Tests', () => {
     expect(members[1].member.name).to.equal('member1');
     expect(members[1].member.email).to.equal('member1@hail.com');
     
-    const res2 = await graphql(schema, query, null, utils.makeRequest({ id: members[1].member.createdByUser.id }));
+    const member = await models.User.findById(members[1].member.createdByUser.id);
+    const res2 = await utils.graphqlQuery(query, { collective }, member);
     expect(res2.errors).to.exist;
     expect(res2.errors[0].message).to.equal(`You must be logged in as an admin or as the host of this organization collective to edit it`);
   })
@@ -218,25 +217,27 @@ describe('Query Tests', () => {
     const collective = {
       id: pubnubCollective.id,
       paymentMethods: [{
-        identifier: '4242',
-        brand: 'VISA',
-        funding: 'credit',
         service: 'stripe',
-        token: 'token-xxxx',
-        expMonth: 1,
-        expYear: 2022
+        name: '4242',
+        token: 'tok_123456781234567812345678',
+        data: {
+          brand: 'VISA',
+          funding: 'credit',
+          expMonth: 1,
+          expYear: 2022
+        }
       }]
     }
 
     query = `
-    mutation editCollective {
-      editCollective(collective: ${utils.stringify(collective)}) {
+    mutation editCollective($collective: CollectiveInputType!) {
+      editCollective(collective: $collective) {
         id,
         slug,
         paymentMethods {
           id
           uuid
-          identifier
+          name
         }
       }
     }
@@ -250,74 +251,76 @@ describe('Query Tests', () => {
       role: 'ADMIN'
     });
 
-    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
+    res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
     expect(paymentMethods).to.have.length(1);
     expect(paymentMethods[0].uuid).to.have.length(36);
-    expect(paymentMethods[0].identifier).to.equal('4242');
+    expect(paymentMethods[0].name).to.equal('4242');
 
     // Adds another credit card
     collective.paymentMethods[0].id = paymentMethods[0].id;
     collective.paymentMethods.push({
-      identifier: '1212',
-      service: 'stripe'
+      name: '1212',
+      service: 'stripe',
+      token: 'tok_123456781234567812345678'
     });
 
     query = `
-    mutation editCollective {
-      editCollective(collective: ${utils.stringify(collective)}) {
+    mutation editCollective($collective: CollectiveInputType!) {
+      editCollective(collective: $collective) {
         id,
         slug,
         paymentMethods {
           id
           uuid
-          identifier
+          name
         }
       }
     }
     `;
 
-    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
+    res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.editCollective.paymentMethods;
     expect(paymentMethods).to.have.length(2);
     expect(paymentMethods[0].uuid).to.have.length(36);
-    expect(paymentMethods[0].identifier).to.equal('4242');
+    expect(paymentMethods[0].name).to.equal('4242');
     expect(paymentMethods[1].uuid).to.have.length(36);
-    expect(paymentMethods[1].identifier).to.equal('1212');
+    expect(paymentMethods[1].name).to.equal('1212');
 
 
     query = `
-    query Collective {
-      Collective(slug: "pubnub") {
+    query Collective($slug: String!) {
+      Collective(slug: $slug) {
         paymentMethods {
           uuid,
-          identifier
+          name
         }
       }
     }`;
 
-    res = await graphql(schema, query, null, utils.makeRequest(pubnubAdmin));
+    res = await utils.graphqlQuery(query, { slug: 'pubnub' }, pubnubAdmin);
     res.errors && console.error(res.errors[0]);
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(2);
     expect(paymentMethods[0].uuid).to.have.length(36);
-    expect(paymentMethods[0].identifier).to.equal('4242');
+    expect(paymentMethods[0].name).to.equal('4242');
     expect(paymentMethods[1].uuid).to.have.length(36);
-    expect(paymentMethods[1].identifier).to.equal('1212');
+    expect(paymentMethods[1].name).to.equal('1212');
 
     // Should not return the credit cards if not logged in;
-    res = await graphql(schema, query, null, utils.makeRequest(null));
+    res = await utils.graphqlQuery(query, { slug: 'pubnub' });
     res.errors && console.error(res.errors[0]);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.Collective.paymentMethods;
     expect(paymentMethods).to.have.length(0);
 
     // Shouldn't return the credit cards if not logged in as an admin of the collective
-    res = await graphql(schema, query, null, utils.makeRequest({id: 2, CollectiveId: 793 }));
+    const member = await models.User.findById(2);
+    res = await utils.graphqlQuery(query, { slug: 'pubnub' }, member);
     res.errors && console.error(res.errors[0]);
     expect(res.errors).to.not.exist;
     paymentMethods = res.data.Collective.paymentMethods;

@@ -1,16 +1,11 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import schema from '../server/graphql/schema';
-import { graphql } from 'graphql';
 import sinon from 'sinon';
 import * as stripe from '../server/gateways/stripe';
 import Promise from 'bluebird';
 import * as utils from './utils';
 import models from '../server/models';
 
-const stringify = (json) => {
-  return JSON.stringify(json, null, '>>>>').replace(/\n>>>>+"([^"]+)"/g,'$1').replace(/\n|>>>>+/g,'')
-}
 
 describe('graphql.tiers.test', () => {
   let user1, user2, host, collective1, collective2, tier1, paymentMethod1;
@@ -24,7 +19,6 @@ describe('graphql.tiers.test', () => {
    * - User1 will become a backer of collective1
    * - Host is the host of both collective1 and collective2
    */
-
   beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
   beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   beforeEach(() => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
@@ -112,6 +106,21 @@ describe('graphql.tiers.test', () => {
 
     describe('payment methods', () => {
 
+      const createOrderQuery = `
+      mutation createOrder($order: OrderInputType!) {
+        createOrder(order: $order) {
+          createdByUser {
+            id,
+            email
+          },
+          paymentMethod {
+            data,
+            name
+          }
+        }
+      }`;
+      
+
       const generateOrder = (user) => {
         return {
           description: "test order",
@@ -122,13 +131,15 @@ describe('graphql.tiers.test', () => {
           tier: { id: tier1.id },
           paymentMethod: {
             service: 'stripe',
-            identifier: '4242',
-            expMonth: 1,
-            expYear: 2021,
-            funding: 'credit',
-            brand: 'Visa',
-            country: 'US',
-            token: 'card_1AejcADjPFcHOcTmBJRASiOV'
+            name: '4242',
+            token: 'tok_123456781234567812345678',
+            data: {
+              expMonth: 1,
+              expYear: 2021,
+              funding: 'credit',
+              brand: 'Visa',
+              country: 'US',
+            }
           }
         }
       }
@@ -136,21 +147,8 @@ describe('graphql.tiers.test', () => {
       it("fails to use a payment method on file if not logged in", async () => {
         const order = generateOrder(user1);
         order.paymentMethod = { uuid: paymentMethod1.uuid };
-        const query = `
-        mutation createOrder {
-          createOrder(order: ${stringify(order)}) {
-            createdByUser {
-              id,
-              email
-            },
-            paymentMethod {
-              brand,
-              identifier
-            }
-          }
-        }`;
 
-        const result = await graphql(schema, query, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(createOrderQuery, { order });
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to be able to use a payment method on file");
       });
@@ -158,43 +156,17 @@ describe('graphql.tiers.test', () => {
       it("fails to use a payment method on file if not logged in as the owner", async () => {
         const order = generateOrder(user1);
         order.paymentMethod = { uuid: paymentMethod1.uuid };
-        const query = `
-        mutation createOrder {
-          createOrder(order: ${stringify(order)}) {
-            createdByUser {
-              id,
-              email
-            },
-            paymentMethod {
-              brand,
-              identifier
-            }
-          }
-        }`;
 
-        const result = await graphql(schema, query, null, utils.makeRequest(user2));
+        const result = await utils.graphqlQuery(createOrderQuery, { order }, user2);
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal("You don't have a payment method with that uuid");
+        expect(result.errors[0].message).to.equal("You don't have sufficient permissions to access this payment method");
       });
           
       it("user1 becomes a backer of collective1 using a payment method on file", async () => {
         const orderInput = generateOrder(user1);
         orderInput.paymentMethod = { uuid: paymentMethod1.uuid };
-        const query = `
-        mutation createOrder {
-          createOrder(order: ${stringify(orderInput)}) {
-            createdByUser {
-              id,
-              email
-            },
-            paymentMethod {
-              brand,
-              identifier
-            }
-          }
-        }`;
 
-        const result = await graphql(schema, query, null, utils.makeRequest(user1));
+        const result = await utils.graphqlQuery(createOrderQuery, { order: orderInput }, user1);
         result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
 
@@ -214,21 +186,7 @@ describe('graphql.tiers.test', () => {
       });
       
       it("user1 becomes a backer of collective1 using a new payment method", async () => {
-        const query = `
-        mutation createOrder {
-          createOrder(order: ${stringify(generateOrder(user1))}) {
-            createdByUser {
-              id,
-              email
-            },
-            paymentMethod {
-              brand,
-              identifier
-            }
-          }
-        }`;
-
-        const result = await graphql(schema, query, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(createOrderQuery, { order: generateOrder(user1) });
         result.errors && console.error(result.errors[0]);
         expect(result.errors).to.not.exist;
         const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});

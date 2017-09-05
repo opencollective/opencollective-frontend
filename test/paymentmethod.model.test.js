@@ -28,7 +28,7 @@ describe("paymentmethod.model.test.js", () => {
     before('create a collective', () => models.Collective.create({ name: "BrusselsTogether", currency: "EUR" }).then(c => collective = c));
     before('create an organization', () => models.Collective.create({ name: "pubnub", currency: "USD" }).then(o => organization = o));
     before('create a payment method', () => models.PaymentMethod.create({
-      identifier: '4242',
+      name: '4242',
       service: 'stripe',
       token: 'tok_123456781234567812345678',
       CollectiveId: organization.id,

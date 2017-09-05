@@ -11,12 +11,14 @@ const order = {
     "interval": null,
     "totalAmount": 154300,
     "paymentMethod": {
-        "identifier": "4242",
-        "expMonth": 10,
-        "expYear": 2023,
-        "brand": "Visa",
-        "country": "US",
-        "funding": "credit"
+        "name": "4242",
+        "data": {
+          "expMonth": 10,
+          "expYear": 2023,
+          "brand": "Visa",
+          "country": "US",
+          "funding": "credit"
+        }
     },
     "tier": {
         "id": 71,
@@ -25,12 +27,44 @@ const order = {
     "toCollective": {
         "slug": "brusselstogether"
     }
-}
+  }
 
-const constants = {
+const createOrderQuery = `
+  mutation createOrder($order: OrderInputType!) {
+    createOrder(order: $order) {
+      id
+      createdByUser {
+        id
+      }
+      totalAmount
+      fromCollective {
+        id
+        name
+      }
+      toCollective {
+        id
+        slug
+        currency
+      }
+      subscription {
+        id
+        amount
+        interval
+        isActive
+        stripeSubscriptionId
+      }
+      processedAt
+    }
+  }
+  `;
+
+  const constants = {
   paymentMethod: {
-    expMonth: 11,
-    expYear: 2025
+    service: "stripe",
+    data: {
+      expMonth: 11,
+      expYear: 2025
+    }
   }
 };
 
@@ -48,26 +82,8 @@ describe('createOrder', () => {
       email: "jsmith@email.com"
     };
     order.paymentMethod.token = stripeCardToken;
-    
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        totalAmount
-        fromCollective {
-          id
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
 
-    const res = await utils.graphqlQuery(query);
+    const res = await utils.graphqlQuery(createOrderQuery, { order });
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const fromCollective = res.data.createOrder.fromCollective;
@@ -104,23 +120,8 @@ describe('createOrder', () => {
 
     order.fromCollective = { id: xdamman.CollectiveId };
     order.paymentMethod.token = stripeCardToken;
-    
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        totalAmount
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
 
-    const res = await utils.graphqlQuery(query, xdamman);
+    const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const toCollective = res.data.createOrder.toCollective;
@@ -158,47 +159,32 @@ describe('createOrder', () => {
     }
     
     collectiveToEdit.paymentMethods.push({
-      identifier: '4242',
+      name: '4242',
       service: 'stripe',
       token
     });
 
     let query, res;
     query = `
-    mutation editCollective {
-      editCollective(collective: ${utils.stringify(collectiveToEdit)}) {
+    mutation editCollective($collective: CollectiveInputType!) {
+      editCollective(collective: $collective) {
         id,
         paymentMethods {
           uuid
           service
-          identifier
+          name
         }
       }
     }
     `;
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(query, { collective: collectiveToEdit }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
     order.fromCollective = { id: xdamman.CollectiveId }
     order.paymentMethod = { uuid: res.data.editCollective.paymentMethods[0].uuid };
-    
-    query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        totalAmount
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
 
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const toCollective = res.data.createOrder.toCollective;
@@ -239,29 +225,7 @@ describe('createOrder', () => {
     order.interval = 'month';
     order.totalAmount = 1000;
 
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        totalAmount
-        toCollective {
-          id
-          slug
-          currency
-        }
-        subscription {
-          id
-          amount
-          interval
-          isActive
-          stripeSubscriptionId
-        }
-        processedAt
-      }
-    }
-    `;
-
-    const res = await utils.graphqlQuery(query, xdamman);
+    const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
@@ -316,31 +280,7 @@ describe('createOrder', () => {
       token,
     }
 
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        createdByUser {
-          id
-          email
-        }
-        totalAmount
-        fromCollective {
-          id
-          name
-          website
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
-
-    const res = await utils.graphqlQuery(query);
+    const res = await utils.graphqlQuery(createOrderQuery, { order });
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const orderCreated = res.data.createOrder;
@@ -373,30 +313,8 @@ describe('createOrder', () => {
       token,
     }
 
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        createdByUser {
-          id
-        }
-        totalAmount
-        fromCollective {
-          id
-          name
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
-
     // Should fail if not an admin or member of the organization
-    let res = await utils.graphqlQuery(query, xdamman);
+    let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal("You don't have sufficient permissions to create an order on behalf of the newco organization");
 
@@ -407,7 +325,7 @@ describe('createOrder', () => {
       CreatedByUserId: xdamman.id
     });
 
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const orderCreated = res.data.createOrder;
@@ -445,30 +363,8 @@ describe('createOrder', () => {
 
     order.paymentMethod = { uuid: paymentMethod.uuid };
 
-    const query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        createdByUser {
-          id
-        }
-        totalAmount
-        fromCollective {
-          id
-          name
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
-
     // Should fail if not an admin or member of the organization
-    let res = await utils.graphqlQuery(query, xdamman);
+    let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal("You don't have sufficient permissions to create an order on behalf of the newco organization");
 
@@ -480,12 +376,12 @@ describe('createOrder', () => {
     });
 
     // Should fail if order.totalAmount > PaymentMethod.monthlyLimitPerMember
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $238) is higher than your monthly spending limit on this payment method ($100)");
     
     await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 
@@ -506,7 +402,7 @@ describe('createOrder', () => {
     expect(transactions[1].ToCollectiveId).to.equal(toCollective.id);
 
     // Should fail if order.totalAmount > PaymentMethod.getBalanceForUser
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal("You don't have enough funds available ($12 left) to execute this order (€200 ~= $238)");
 
@@ -540,57 +436,15 @@ describe('createOrder', () => {
     order.totalAmount = 10000000;
     delete order.tier;
 
-    query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        createdByUser {
-          id
-        }
-        totalAmount
-        fromCollective {
-          id
-          name
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
 
     // Should fail if not enough funds in the fromCollective
-    let res = await utils.graphqlQuery(query, xdamman);
+    let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
     expect(res.errors[0].message).to.equal("You don't have enough funds available ($3,317 left) to execute this order ($100,000)");
 
     order.totalAmount = 20000;
-    query = `
-    mutation createOrder {
-      createOrder(order: ${utils.stringify(order)}) {
-        id
-        createdByUser {
-          id
-        }
-        totalAmount
-        fromCollective {
-          id
-          name
-        }
-        toCollective {
-          id
-          slug
-          currency
-        }
-        processedAt
-      }
-    }
-    `;
 
-    res = await utils.graphqlQuery(query, xdamman);
+    res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
 

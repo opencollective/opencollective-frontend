@@ -52,7 +52,7 @@ const mutations = {
         return Promise.reject(new errors.ValidationFailed("collective.name required"));
       }
 
-      let parentCollective;
+      let parentCollective, collective;
 
       const location = args.collective.location;
 
@@ -93,9 +93,11 @@ const mutations = {
         if (!canCreateCollective) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
       })
       .then(() => models.Collective.create(collectiveData))
-      .then(collective => collective.editTiers(args.collective.tiers))
-      .then(collective => collective.editMembers(args.collective.members))
-      .then(collective => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
+      .then(c => collective = c)
+      .then(() => collective.editTiers(args.collective.tiers))
+      .then(() => collective.editMembers(args.collective.members))
+      .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
+      .then(() => collective)
       .catch(e => {
         let msg;
         switch (e.name) {
@@ -113,7 +115,7 @@ const mutations = {
   editCollective: {
     type: CollectiveInterfaceType,
     args: {
-      collective: { type: CollectiveInputType }
+      collective: { type: new GraphQLNonNull(CollectiveInputType) }
     },
     resolve(_, args, req) {
 
@@ -210,13 +212,13 @@ const mutations = {
         throw new errors.Unauthorized("You need to be logged in to delete a collective");
       }
 
-      if (!req.remoteUser.isAdmin(args.id)) {
-        throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to edit this collective");
-      }
-
       return models.Collective.findById(args.id)
         .then(collective => {
           if (!collective) throw new errors.NotFound(`Collective with id ${args.id} not found`);
+          if (!req.remoteUser.isAdmin(collective.id) && !req.remoteUser.isAdmin(collective.ParentCollectiveId)) {
+            throw new errors.Unauthorized("You need to be logged in as a core contributor or as a host to delete this collective");
+          }
+
           return collective.destroy();
         });
     }
@@ -233,6 +235,7 @@ const mutations = {
       if (!req.remoteUser) {
         throw new errors.Unauthorized("You need to be logged in to edit tiers");
       }
+
       return req.loaders.collective.findBySlug.load(args.collectiveSlug)
       .then(c => {
         if (!c) throw new Error(`Collective with slug ${args.collectiveSlug} not found`);
@@ -248,9 +251,9 @@ const mutations = {
   createMember: {
     type: MemberType,
     args: {
-      member: { type: CollectiveAttributesInputType },
-      collective: { type: CollectiveAttributesInputType },
-      role: { type: GraphQLString }
+      member: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+      collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+      role: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args, req) {
       let collective;
@@ -325,13 +328,17 @@ const mutations = {
     type: OrderType,
     args: {
       order: {
-        type: OrderInputType
+        type: new GraphQLNonNull(OrderInputType)
       }
     },
     resolve(_, args, req) {
 
       let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
       const order = args.order;
+
+      if (order.paymentMethod && order.paymentMethod.uuid && !req.remoteUser) {
+        throw new Error("You need to be logged in to be able to use a payment method on file");
+      }
 
       let id, method;
       if (order.toCollective.id) {
@@ -349,6 +356,11 @@ const mutations = {
           throw new Error(`No collective found with slug: ${order.toCollective.slug}`);
         }
         collective = c;
+
+        if (order.fromCollective && order.fromCollective.id === collective.id) {
+          throw new Error(`Well tried. But no you can't order yourself something ;-)`);
+        }
+
       })
       // Check the existence of the tier
       // We may have to find it since it can be omitted (e.g. /donate page)
@@ -378,10 +390,8 @@ const mutations = {
       // or that there is enough funds in the fromCollective
       .then(() => {
         if (paymentRequired) {
-          if (order.paymentMethod) {
-            if (!(order.paymentMethod.uuid || order.paymentMethod.token)) {
-              throw new Error(`This tier requires a payment method`);
-            }
+          if (!order.paymentMethod || !(order.paymentMethod.uuid || order.paymentMethod.token)) {
+            throw new Error(`This tier requires a payment method`);
           }
         }
       })
@@ -471,8 +481,13 @@ const mutations = {
       .then(oi => {
         orderCreated = oi;
         orderCreated.interval = interval;
+        if (order.paymentMethod && order.paymentMethod.save) {
+          order.paymentMethod.CollectiveId = orderCreated.FromCollectiveId;
+        }
         if (paymentRequired) {
-          return executeOrder(user, orderCreated, order.paymentMethod);
+          return orderCreated
+            .setPaymentMethod(order.paymentMethod)
+            .then(() => executeOrder(user, orderCreated));
         } else {
           // Free ticket
           const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;

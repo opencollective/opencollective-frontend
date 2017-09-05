@@ -4,53 +4,20 @@ import { includes, pick } from 'lodash';
 import models from '../models';
 import emailLib from './email';
 import { types } from '../constants/collectives';
-import { formatCurrency } from '../lib/utils';
 import * as paymentProviders from '../paymentProviders';
-import { getFxRate } from '../lib/currency';
-
-const validatePaymentMethodForOrder = (order, paymentMethod) => {
-  // If the payment method doesn't belong to the user, it can only be used to execute orders on behalf of the collective it is associated with
-  if (paymentMethod.CreatedByUserId !== order.CreatedByUserId && paymentMethod.CollectiveId !== order.FromCollectiveId) {
-    throw new Error(`This payment method can only be used to create orders on behalf of the collective id ${paymentMethod.CollectiveId}`);
-  }
-
-  if (order.interval && !paymentMethod.features.recurring) {
-    throw new Error("This payment method doesn't support recurring payments");
-  }
-
-  // We get an estimate of the total amount of the order in the currency of the payment method
-  return getFxRate(order.currency, order.fromCollective.currency)
-    .then(fxrate => {
-      const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
-      let orderAmountInfo = formatCurrency(order.totalAmount, order.currency);
-      if (order.currency !== order.fromCollective.currency) {
-        orderAmountInfo += ` ~= ${formatCurrency(totalAmountInPaymentMethodCurrency, order.fromCollective.currency)}`;
-      }
-      if (paymentMethod.monthlyLimitPerMember && totalAmountInPaymentMethodCurrency > paymentMethod.monthlyLimitPerMember) {
-        throw new Error(`The total amount of this order (${orderAmountInfo}) is higher than your monthly spending limit on this payment method (${formatCurrency(paymentMethod.monthlyLimitPerMember, order.fromCollective.currency)})`);
-      }
-      return paymentMethod.getBalanceForUser(order.createdByUser, paymentMethod)
-        .then(balance => {
-          if (balance && totalAmountInPaymentMethodCurrency > balance.amount) {
-            throw new Error(`You don't have enough funds available (${formatCurrency(balance.amount, balance.currency)} left) to execute this order (${orderAmountInfo})`)
-          }
-          return paymentMethod;
-        })
-      });
-}
 
 /**
  * Execute an order as user using paymentMethod
  * It validates the paymentMethod and makes sure the user can use it
- * @param {*} order { tier, description, totalAmount, currency, interval (null|month|year) }
+ * @param {*} order { tier, description, totalAmount, currency, interval (null|month|year), paymentMethod }
  */
-export const executeOrder = (user, order, paymentMethod) => {
+export const executeOrder = (user, order) => {
 
   if (!order) {
     throw new Error("No order provided");
   }
-  if (!paymentMethod) {
-    return Promise.reject(new Error('paymentMethod missing in the order'));
+  if (!order.PaymentMethodId) {
+    return Promise.reject(new Error('PaymentMethodId missing in the order'));
   }
   if (order.processedAt) {
     return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
@@ -65,13 +32,6 @@ export const executeOrder = (user, order, paymentMethod) => {
   validatePayment(payment);
 
   return order.populate()
-    .then(() => models.PaymentMethod.getOrCreate(user, paymentMethod))
-    .then(pm => validatePaymentMethodForOrder(order, pm))
-    .then(paymentMethod => {
-      order.paymentMethod = paymentMethod;
-      order.update({ PaymentMethodId: paymentMethod.id });
-      return paymentMethod;
-    })
     .then(() => {
       if (payment.interval) {
         return models.Subscription.create(payment)

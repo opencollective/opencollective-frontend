@@ -5,6 +5,7 @@ import * as paymentProviders from '../paymentProviders';
 import debugLib from 'debug';
 const debug = debugLib('PaymentMethod');
 import { sumTransactions } from '../lib/hostlib';
+import CustomDataTypes from './DataTypes';
 
 export default function(Sequelize, DataTypes) {
 
@@ -45,52 +46,17 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    identifier: DataTypes.STRING,
+    name: DataTypes.STRING, // custom human readable identifier for the payment method 
+    customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
+    token: DataTypes.STRING,
     primary: DataTypes.BOOLEAN,
-
-    brand: {
-      type: DataTypes.STRING,
-      set(val) {
-        if (val && val.toLowerCase) {
-          this.setDataValue('brand', val.toLowerCase());
-        }
-      }
-    },
 
     // Monthly limit in cents for each member of this.CollectiveId (in the currency of that collective)
     monthlyLimitPerMember: {
       type: DataTypes.INTEGER
     },
 
-    expMonth: {
-      type: DataTypes.INTEGER,
-      set(val) {
-        this.expiryDate = this.expiryDate || new Date;
-        this.expiryDate.setMonth(val - 1);
-        this.setDataValue('expMonth', Number(val));
-      },
-      validate: {
-        'len': [1,2]
-      }
-    },
-
-    expYear: {
-      type: DataTypes.INTEGER,
-      set(val) {
-        this.expiryDate = this.expiryDate || new Date;
-        this.expiryDate.setYear(val);
-        this.setDataValue('expYear', Number(val));
-      },
-      validate: {
-        'len': [4, 4]
-      }
-    },
-
-    funding: DataTypes.STRING,
-    country: DataTypes.STRING,
-    fullName: DataTypes.STRING,
-    token: DataTypes.STRING,
-    customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
+    currency: CustomDataTypes(DataTypes).currency,
 
     service: {
       type: DataTypes.STRING,
@@ -155,13 +121,8 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           confirmedAt: this.confirmedAt,
-          expMonth: this.expMonth,
-          expYear: this.expYear,
-          identifier: this.identifier,
-          funding: this.funding,
-          brand: this.brand,
-          fullName: this.fullName,
-          country: this.country
+          name: this.name,
+          data: this.data
         };
       },
 
@@ -199,6 +160,7 @@ export default function(Sequelize, DataTypes) {
    * - the available balance on the paykey for PayPal (not implemented yet)
    */
   PaymentMethod.prototype.getBalanceForUser = function(user) {
+    if (!user) return {};
     const paymentProvider = paymentProviders[this.service];
     let getBalance;
     debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
@@ -224,22 +186,13 @@ export default function(Sequelize, DataTypes) {
           type: TransactionTypes.DONATION,
           createdAt: { $gte: firstOfTheMonth }
         };
-        // TODO: add currency in the PaymentMethod model (need to specify the monthly spending limit in a given currency)
-        let collective;
-        return models.Collective.findOne({
-          attribute: ['currency'],
-          where: { id: this.CollectiveId }
-        })
-        .then(c => {
-          collective = c;
-          return sumTransactions('amount', where, collective.currency)
-        })
-        .then(result => {
-          const availableBalance = this.monthlyLimitPerMember - result.totalInHostCurrency;
-          return { amount: availableBalance, currency: collective.currency };
-        });          
+        return sumTransactions('amount', where, this.currency)
+          .then(result => {
+            const availableBalance = this.monthlyLimitPerMember - result.totalInHostCurrency;
+            return { amount: availableBalance, currency: this.currency };
+          });
       });
-  }
+  };
 
   /**
    * Class Methods

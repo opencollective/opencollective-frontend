@@ -6,7 +6,7 @@ import config from 'config';
 import { isArray, values } from 'lodash';
 import path from 'path';
 import { exec } from 'child_process';
-import debugLib from 'debug';
+import debug from 'debug';
 import { loaders } from '../server/graphql/loaders';
 import { graphql } from 'graphql';
 import schema from '../server/graphql/schema';
@@ -16,8 +16,6 @@ import nock from 'nock';
 if (process.env.RECORD) {
   nock.recorder.rec();
 }
-
-const debug = debugLib('utils');
 
 jsonData.application = { name: 'client', api_key: config.keys.opencollective.api_key };
 
@@ -50,14 +48,14 @@ export function loadDB(dbname) {
   return new Promise((resolve, reject) => {
     importDB((err, stdout) => {
       if (!err) {
-        debug(`${dbname} imported successfully`, stdout);
+        debug("utils")(`${dbname} imported successfully`, stdout);
         return resolve(stdout);
       }
       if (err) { // First try may fail due to foreign keys restrictions
-        debug(`error importing ${dbname}`, err);
+        debug("utils")(`error importing ${dbname}`, err);
         importDB((err, stdout) => {
           if (err) {
-            debug(`2nd attempt: error importing ${dbname}`, err);
+            debug("utils")(`2nd attempt: error importing ${dbname}`, err);
             return reject(err);
           } else {
             return resolve(stdout);
@@ -79,18 +77,31 @@ export const makeRequest = (remoteUser) => {
   }
 }
 
-export const graphqlQuery = async (query, remoteUser) => {
+export const graphqlQuery = async (query, variables, remoteUser) => {
 
   const prepare = () => {
     if (remoteUser) {
       remoteUser.rolesByCollectiveId = null; // force refetching the roles
       return remoteUser.populateRoles();
+    } else {
+      return Promise.resolve();
     }
-    else return Promise.resolve();
+  }
+
+  if (process.env.DEBUG && process.env.DEBUG.match(/graphql/)) {
+    debug('graphql')("query", query);
+    debug('graphql')("variables", variables);
+    debug('graphql')("context", remoteUser);
   }
 
   return prepare()
-    .then(() => graphql(schema, query, null, makeRequest(remoteUser)));
+    .then(() => graphql(
+      schema,
+      query,
+      null, // rootValue
+      makeRequest(remoteUser), // context
+      variables
+    ));
 }
 
 export const createStripeToken = async () => {

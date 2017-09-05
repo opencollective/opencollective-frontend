@@ -1,9 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import schema from '../server/graphql/schema';
-import { graphql } from 'graphql';
 import sinon from 'sinon';
-import paymentsLib from '../server/lib/payments';
+import * as payments from '../server/lib/payments';
 
 import * as utils from './utils';
 import models from '../server/models';
@@ -15,7 +13,7 @@ describe('Query Tests', () => {
   before(() => sandbox = sinon.sandbox.create());
 
   before(() => {
-    sandbox.stub(paymentsLib, 'createPayment', ({order}) => {
+    sandbox.stub(payments, 'executeOrder', (user, order, paymentMethod) => {
       return models.Order.update({ processedAt: new Date }, { where: { id: order.id }});
     });
   });
@@ -66,7 +64,7 @@ describe('Query Tests', () => {
       `;
 
       it('returns all collectives with role', async () => {
-        const result = await graphql(schema, LoggedInUserQuery, null, utils.makeRequest(user1));
+        const result = await utils.graphqlQuery(LoggedInUserQuery, null, user1);
         result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
         expect(data.memberOf.length).to.equal(2);
@@ -75,7 +73,7 @@ describe('Query Tests', () => {
       })
 
       it("doesn't return anything if not logged in", async () => {
-        const result = await graphql(schema, LoggedInUserQuery, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(LoggedInUserQuery);
         result.errors && console.log(result.errors);
         const data = result.data.LoggedInUser;
         expect(data).to.be.null;
@@ -92,14 +90,16 @@ describe('Query Tests', () => {
           },
           paymentMethod: {
             service: 'stripe',
-            identifier: '4242',
-            expMonth: 1,
-            expYear: 2021,
-            funding: 'credit',
-            brand: 'Visa',
-            country: 'US',
-            token: 'card_1AejcADjPFcHOcTmBJRASiOV',
-            save: true
+            name: '4242',
+            token: 'tok_123456781234567812345678',
+            save: true,
+            data: {
+              expMonth: 1,
+              expYear: 2021,
+              funding: 'credit',
+              brand: 'Visa',
+              country: 'US',
+            }
           },
           toCollective: { slug: collective1.slug },
           tier: { id: tier.id }
@@ -108,12 +108,14 @@ describe('Query Tests', () => {
 
       it("saves a payment method to the user", async () => {
         const query = `
-        mutation createOrder {
-          createOrder(order: ${utils.stringify(generateOrder(user1))}) {
+        mutation createOrder($order: OrderInputType!) {
+          createOrder(order: $order) {
             paymentMethod {
-              brand,
-              identifier
+              name
             },
+            fromCollective {
+              id
+            }
             createdByUser {
               id,
               email
@@ -121,13 +123,14 @@ describe('Query Tests', () => {
           }
         }`;
 
-        const result = await graphql(schema, query, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(query, { order: generateOrder(user1) });
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({ where: { CreatedByUserId: user1.id }});
         paymentMethods.errors && console.log(paymentMethods.errors);
         expect(paymentMethods).to.have.length(1);
-        expect(paymentMethods[0].identifier).to.equal('4242');
+        expect(paymentMethods[0].name).to.equal('4242');
+        expect(paymentMethods[0].CollectiveId).to.equal(result.data.createOrder.fromCollective.id);
       });
 
 
@@ -135,40 +138,39 @@ describe('Query Tests', () => {
         const order = generateOrder(user1);
         order.paymentMethod.save = false;
         const query = `
-        mutation createOrder {
-          createOrder(order: ${utils.stringify(order)}) {
+        mutation createOrder($order: OrderInputType!) {
+          createOrder(order: $order) {
             createdByUser {
               id,
               email,
             },
             paymentMethod {
-              brand,
-              identifier
+              name
             }
           }
         }`;
 
-        const result = await graphql(schema, query, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(query, { order });
         result.errors && console.log(result.errors);
         expect(result.errors).to.not.exist;
         const paymentMethods = await models.PaymentMethod.findAll({where: { CreatedByUserId: user1.id }});
         expect(paymentMethods).to.have.length(1);
-        expect(paymentMethods[0].identifier).to.be.null;
+        expect(paymentMethods[0].CollectiveId).to.be.null;
       });
       
       it("doesn't get the payment method of the user if not logged in as that user", async () => {
         const createOrderQuery = `
-        mutation createOrder {
-          createOrder(order: ${utils.stringify(generateOrder(user1, ticket1))}) {
+        mutation createOrder($order: OrderInputType!) {
+          createOrder(order: $order) {
             description
           }
         }`;
 
-        await graphql(schema, createOrderQuery, null, utils.makeRequest());
+        await utils.graphqlQuery(createOrderQuery, { order: generateOrder(user1, ticket1) });
 
         const query = `
-          query Tier {
-            Tier(id: ${ticket1.id}) {
+          query Tier($id: Int!) {
+            Tier(id: $id) {
               id,
               name,
               orders {
@@ -179,19 +181,19 @@ describe('Query Tests', () => {
                   firstName
                 },
                 paymentMethod {
-                  identifier,
-                  brand
+                  name
                 }
               }
             }
           }
         `;
-        const result = await graphql(schema, query, null, utils.makeRequest());
+        const result = await utils.graphqlQuery(query, { id: ticket1.id });
         result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
         expect(orders[0].paymentMethod).to.be.null;
-        const result2 = await graphql(schema, query, null, utils.makeRequest(user2));
+        const result2 = await utils.graphqlQuery(query, { id: ticket1.id }, user2);
+        result2.errors && console.log(result2.errors);
         const orders2 = result2.data.Tier.orders;
         expect(orders2).to.have.length(1);
         expect(orders2[0].paymentMethod).to.be.null;
@@ -200,19 +202,18 @@ describe('Query Tests', () => {
       it("gets the payment method of the user if logged in as that user", async () => {
         const order = generateOrder(user1);
         const createOrderQuery = `
-        mutation createOrder {
-          createOrder(order: ${utils.stringify(order)}) {
+        mutation createOrder($order: OrderInputType!) {
+          createOrder(order: $order) {
             description
           }
         }`;
 
-        await graphql(schema, createOrderQuery, null, utils.makeRequest());
-
+        await utils.graphqlQuery(createOrderQuery, { order });
         await models.PaymentMethod.update({ confirmedAt: new Date }, { where: { CreatedByUserId: user1.id }});
 
         const query = `
-          query Tier {
-            Tier(id: ${tier1.id}) {
+          query Tier($id: Int!) {
+            Tier(id: $id) {
               name,
               orders {
                 id,
@@ -222,18 +223,17 @@ describe('Query Tests', () => {
                   firstName
                 },
                 paymentMethod {
-                  identifier,
-                  brand
+                  name
                 }
               }
             }
           }
         `;
-        const result = await graphql(schema, query, null, utils.makeRequest(user1));
+        const result = await utils.graphqlQuery(query, { id: tier1.id }, user1);
         result.errors && console.log(result.errors);
         const orders = result.data.Tier.orders;
         expect(orders).to.have.length(1);
-        expect(orders[0].paymentMethod.identifier).to.equal('4242');
+        expect(orders[0].paymentMethod.name).to.equal('4242');
       });
     });
   });

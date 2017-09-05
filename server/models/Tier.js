@@ -4,6 +4,7 @@ import { capitalize, pluralize } from '../lib/utils';
 import types from '../constants/tiers';
 import debugLib from 'debug';
 const debug = debugLib('tier');
+import CustomDataTypes from './DataTypes';
 
 export default function(Sequelize, DataTypes) {
 
@@ -64,15 +65,7 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.ARRAY(DataTypes.INTEGER)
     },
   
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD',
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
-        }
-      }
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     interval: {
       type: DataTypes.STRING(8),
@@ -201,7 +194,7 @@ export default function(Sequelize, DataTypes) {
     if (id) {
       return Tier.findOne({ where: { id, CollectiveId } })
         .then(tier => {
-          debug("Tier found:", tier.dataValues);
+          debug("Tier found:", tier && tier.dataValues);
           return tier;
         });
     } else {
@@ -219,7 +212,7 @@ export default function(Sequelize, DataTypes) {
           }
         }, order: [['amount','DESC']] })
         .then(tier => {
-          debug("Tier found:", tier.dataValues);
+          debug("Tier found:", tier && tier.dataValues);
           return tier;
         });
     }

@@ -10,6 +10,7 @@ import {
   GraphQLError
 } from 'graphql';
 
+import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
 
 const EmailType = new GraphQLScalarType({
@@ -44,15 +45,11 @@ export const PaymentMethodInputType = new GraphQLInputObjectType({
     token: { type: GraphQLString },
     service: { type: GraphQLString },
     customerId: { type: GraphQLString },
-    brand: { type: GraphQLString },
-    funding: { type: GraphQLString },
-    country: { type: GraphQLString },
-    fullName: { type: GraphQLString },
-    expMonth: { type: GraphQLInt },
-    expYear: { type: GraphQLInt },
-    identifier: { type: GraphQLString },
+    data: { type: GraphQLJSON },
+    name: { type: GraphQLString },
     primary: { type: GraphQLBoolean },
     monthlyLimitPerMember: { type: GraphQLInt },
+    currency: { type: GraphQLString },
     save: { type: GraphQLBoolean }
   })
 });

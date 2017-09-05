@@ -1,12 +1,12 @@
 import Temporal from 'sequelize-temporal';
-import currencies from '../constants/currencies';
 import {type} from '../constants/transactions';
 
 import status from '../constants/expense_status';
 const expenseType = type.EXPENSE;
-const allowedCurrencies = Object.keys(currencies);
+import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {
+
 
   const Expense = Sequelize.define('Expense', {
     id: {
@@ -37,16 +37,7 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    currency: {
-      type: DataTypes.STRING,
-      validate: {
-        isIn: {
-          args: [allowedCurrencies],
-          msg: `Must be in ${allowedCurrencies}`
-        }
-      },
-      allowNull: false
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     amount: {
       type: DataTypes.INTEGER,
