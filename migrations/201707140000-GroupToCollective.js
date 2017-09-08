@@ -58,7 +58,7 @@ const slugify = (str) => {
 const insert = (sequelize, table, entry) => {
   return sequelize.query(`
     INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.keys(entry).join(",:")})
-  `, { replacements: entry });      
+  `, { replacements: entry });
 }
 
 const getHostCollectiveId = (sequelize, CollectiveId) => {
@@ -151,7 +151,7 @@ const createCollectivesForEvents = (sequelize) => {
   
     return sequelize.query(`SELECT id, "EventId", type FROM "Tiers" WHERE "EventId" IS NOT NULL`, { type: sequelize.QueryTypes.SELECT })
     .tap(tiers => console.log("Processing", tiers.length, "tiers"))
-    .then(tiers => tiers && Promise.map(tiers, updateTierForEvent))    
+    .then(tiers => tiers && Promise.map(tiers, updateTierForEvent, { concurrency: 10 }))
   }
 
   const createCollectiveForEvent = (event) => {
@@ -191,7 +191,7 @@ const createCollectivesForEvents = (sequelize) => {
 
   return sequelize.query(`SELECT * FROM "Events"`, { type: sequelize.QueryTypes.SELECT })
   .tap(events => console.log("Processing", events.length, "events"))
-  .then(events => events && Promise.map(events, createCollectiveForEvent))
+  .then(events => events && Promise.map(events, createCollectiveForEvent, { concurrency: 10 }))
   .then(() => updateTiersForEvents());
 }
 
@@ -271,7 +271,7 @@ const createCollectivesForUsers = (sequelize) => {
     ON m."CreatedByUserId"=u.id
   `, { type: sequelize.QueryTypes.SELECT })
   .tap(users => console.log("Processing", users.length, "users"))
-  .then(users => users && Promise.map(users, createCollectiveForUser))
+  .then(users => users && Promise.map(users, createCollectiveForUser, { concurrency: 10 }))
 }
 
 const updateResponses = (sequelize) => {
@@ -320,7 +320,7 @@ const updateResponses = (sequelize) => {
   }
 
   return sequelize.query(`SELECT r.*, t.amount FROM "Responses" r LEFT JOIN "Tiers" t ON r."TierId"=t.id`, { type: sequelize.QueryTypes.SELECT })
-  .then(responses => Promise.map(responses, updateResponse))
+  .then(responses => Promise.map(responses, updateResponse, { concurrency: 10 }))
 
 }
 
@@ -345,7 +345,7 @@ const updateStripeAccounts = (sequelize) => {
   };
 
   return sequelize.query(`SELECT * FROM "StripeAccounts"`, { type: sequelize.QueryTypes.SELECT })
-  .then(stripeAccounts => Promise.map(stripeAccounts, updateStripeAccount))
+  .then(stripeAccounts => Promise.map(stripeAccounts, updateStripeAccount, { concurrency: 10 }))
   
 }
 
@@ -451,7 +451,7 @@ const updateCollectives = (sequelize) => {
           tier[key] = tier[key] || null;
         });
         return insert(sequelize, "Tiers", tier);
-      })
+      }, { concurrency: 10 })
       .then(() => tiers = null) // save memory
       .then(() => sequelize.query(`SELECT id, "CollectiveId", amount, interval, slug FROM "Tiers" WHERE type='TIER'`, { type: sequelize.QueryTypes.SELECT }));
   }
@@ -500,7 +500,7 @@ const updateCollectives = (sequelize) => {
         replacements: { CollectiveId, CreatedByUserId, TierId: tier.id }
       }));
 
-    }))
+    }, { concurrency: 10 }))
   }
 
   const addUsersToTiers = (collective, tiers) => {
@@ -508,7 +508,7 @@ const updateCollectives = (sequelize) => {
       type: sequelize.QueryTypes.SELECT,
       replacements: { CollectiveId: collective.id }
     })
-    .then(ugs => Promise.map(ugs, (ug) => addUserToTiers(ug, tiers)))
+    .then(ugs => Promise.map(ugs, (ug) => addUserToTiers(ug, tiers), { concurrency: 10 }))
   }
 
   /**
@@ -537,7 +537,7 @@ const updateCollectives = (sequelize) => {
   }
 
   return sequelize.query(`SELECT id, slug, type, mission, description, currency, tiers, "createdAt", "updatedAt" FROM "Collectives"`, { type: sequelize.QueryTypes.SELECT })
-  .then(collectives => collectives && Promise.map(collectives, updateCollective))
+  .then(collectives => collectives && Promise.map(collectives, updateCollective, { concurrency: 10 }))
 }
 
 
