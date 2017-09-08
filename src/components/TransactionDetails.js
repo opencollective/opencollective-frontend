@@ -28,11 +28,11 @@ class TransactionDetails extends React.Component {
 
     const type = transaction.type.toLowerCase();
 
-    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: collective.currency, ...this.currencyStyle})];
+    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle})];
     const addFees = (feesArray) => {
       feesArray.forEach(feeName => {
         if (transaction[feeName]) {
-          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: transaction.currency, ...this.currencyStyle})} (${intl.formatMessage(this.messages[feeName])})`);
+          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: collective.currency, ...this.currencyStyle})} (${intl.formatMessage(this.messages[feeName])})`);
         }
       })
     }
@@ -120,7 +120,7 @@ class TransactionDetails extends React.Component {
             <span className="netAmountInGroupCurrency">
               <FormattedNumber
                 value={transaction.netAmountInGroupCurrency / 100}
-                currency={transaction.currency}
+                currency={collective.currency}
                 {...this.currencyStyle}
                 />
             </span>
