@@ -3,6 +3,7 @@ import { describe, it } from 'mocha';
 import models from '../server/models';
 import * as utils from './utils';
 import Stripe from 'stripe';
+import config from 'config';
 
 import './graphql.createOrder.nock';
 
@@ -34,6 +35,9 @@ const createOrderQuery = `
     createOrder(order: $order) {
       id
       createdByUser {
+        id
+      }
+      paymentMethod {
         id
       }
       totalAmount
@@ -164,8 +168,8 @@ describe('createOrder', () => {
       token
     });
 
-    let query, res;
-    query = `
+    let res;
+    const query = `
     mutation editCollective($collective: CollectiveInputType!) {
       editCollective(collective: $collective) {
         id,
@@ -251,12 +255,14 @@ describe('createOrder', () => {
     const hostStripeAccount = await models.ConnectedAccount.findOne({
       where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
     });
-    const stripeSubscription = await Stripe(hostStripeAccount.token).subscriptions.retrieve(subscription.stripeSubscriptionId);
+
+    const paymentMethod = await models.PaymentMethod.findById(orderCreated.paymentMethod.id);
+    const stripeSubscription = await Stripe(config.stripe.secret).subscriptions.retrieve(subscription.stripeSubscriptionId, { stripe_account: hostStripeAccount.username });
+
     expect(stripeSubscription.application_fee_percent).to.equal(5);
     expect(stripeSubscription.plan.id).to.equal('EUR-MONTH-1000');
     expect(stripeSubscription.plan.interval).to.equal('month');
 
-    const paymentMethod = await models.PaymentMethod.findById(Number(stripeSubscription.metadata.PaymentMethodId));
     expect(paymentMethod.data.CustomerIdForHost[hostStripeAccount.username]).to.equal(stripeSubscription.customer);
   });
 
@@ -409,8 +415,6 @@ describe('createOrder', () => {
   });
 
   it(`creates an order as a logged in user for an existing collective using the collective's balance`, async () => {
-
-    let query;
 
     const xdamman = await models.User.findById(2);
     const fromCollective = await models.Collective.findOne({ where: { slug: 'opensource' }})

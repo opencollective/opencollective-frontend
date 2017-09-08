@@ -207,6 +207,7 @@ export default function(Sequelize, DataTypes) {
     if (this.createdByUser) return Promise.resolve(this.createdByUser);
     return models.User.findById(this.CreatedByUserId).then(user => {
       this.createdByUser = user
+      debug("getUser", user.dataValues);
       return user.populateRoles();
     });
   }

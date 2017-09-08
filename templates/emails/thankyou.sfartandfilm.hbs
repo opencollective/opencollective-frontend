@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency order.amount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency order.amount currency=order.currency}}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -16,14 +16,14 @@ Subject: Thank you for your {{{currency order.amount currency=order.currency}}} 
 
 {{#if interval}}
   {{#if firstPayment }}
-    <p>We want to thank you for your contribution of {{{currency order.amount currency=order.currency}}} per {{interval}} to San Francisco Art & Film for Teenagers.
+    <p>We want to thank you for your contribution of {{{currency order.totalAmount currency=order.currency}}} per {{interval}} to San Francisco Art & Film for Teenagers.
       Your first payment was received on {{{moment order.createdAt}}}.</p>
     {{> charge_date_notice }}
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.amount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.</p>
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.</p>
   {{/if}}
 {{else}}
-<p>We would like to thank you for your donation of {{{currency order.amount currency=order.currency}}} on {{{moment order.createdAt}}}.</p>
+<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.</p>
 {{/if}}
 
 <p>SF Art & Film remains steadfast in its goal of making the arts a vital presence in the lives of young people and your extraordinary generosity is what makes it possible. We hope you’ll continue to introduce people like yourself—people who understand the importance of art education—to our program.</p>

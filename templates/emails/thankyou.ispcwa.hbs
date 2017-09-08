@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency order.amount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency order.amount currency=order.currency}}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -15,9 +15,9 @@ Subject: Thank you for your {{{currency order.amount currency=order.currency}}} 
 {{/if}}
 
 {{#if interval}}
-	<p>We would like to thank you for your pledge to give {{{currency order.amount currency=order.currency}}} per {{interval}}. Your first payment was received on {{{moment order.createdAt}}}. Your gift will help us continue our activities.</p>
+	<p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}. Your first payment was received on {{{moment order.createdAt}}}. Your gift will help us continue our activities.</p>
 {{else}}
-	<p>We would like to thank you for your donation of {{{currency order.amount currency=order.currency}}} on {{{moment transaction.createdAt}}}.
+	<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment transaction.createdAt}}}.
   Your gift will help us continue our activities.</p>
 {{/if}}
 

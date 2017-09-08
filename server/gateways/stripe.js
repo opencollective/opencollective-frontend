@@ -43,8 +43,9 @@ export const createSubscription = (stripeAccount, customerId, subscription) => {
 /**
  * Retrieve stripe subscription
  */
-export const retrieveSubscription = (stripeAccount, customerId, stripeSubsriptionId) => {
-  return appStripe.customers.retrieveSubscription(customerId, stripeSubsriptionId, { stripe_account: stripeAccount.username });
+export const retrieveSubscription = (stripeAccount, stripeSubsriptionId) => {
+  debug("retrieveSubscription", "account", stripeAccount.username, "stripeSubsriptionId", stripeSubsriptionId)
+  return appStripe.subscriptions.retrieve(stripeSubsriptionId, { stripe_account: stripeAccount.username });
 };
 
 /**
@@ -71,12 +72,12 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
 export const createCustomer = (stripeAccount, token, options = {}) => {
   const collective = options.collective || {};
   const email = options.email || '';
-  const stripeClient = stripeAccount ? client(stripeAccount) : appStripe;
-  return stripeClient.customers.create({
+  debug(">>> stripe: createCustomer using stripeAccount", stripeAccount && { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "and token", token);
+  return appStripe.customers.create({
     source: token,
     description:  `https://opencollective.com/${collective.slug}`,
     email
-  });
+  }, { stripe_account: stripeAccount && stripeAccount.username });
 };
 
 /**
@@ -91,7 +92,7 @@ export const retrieveCustomer = (stripeAccount, customerId) => {
  * Doc: https://stripe.com/docs/connect/shared-customers
  */
 export const createToken = (stripeAccount, customerId) => {
-  debug(">>> stripe: createToken using stripeAccount", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "customerId:", customerId);
+  debug(">>> stripe: createToken using stripeAccount", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "for customerId:", customerId);
   return appStripe.tokens.create({ customer: customerId }, { stripe_account: stripeAccount.username });
 };
 

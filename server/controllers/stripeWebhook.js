@@ -30,6 +30,8 @@ export default function stripeWebhook(req, res, next) {
     return res.sendStatus(200);
   }
 
+  console.log(">>> stripeWebhook go");
+
   async.auto({
     fetchEvent: (cb) => {
 
@@ -37,10 +39,12 @@ export default function stripeWebhook(req, res, next) {
        * We check the event on stripe to be sure we don't get a fake event from
        * someone else
        */
+      console.log(">>> fetchEvent:", body.id, "stripe_account", body.user_id);
       appStripe.events.retrieve(body.id, {
         stripe_account: body.user_id
       })
       .then(event => {
+        console.log(">>> event received", event);
         if (event.type !== 'invoice.payment_succeeded') {
           return cb(new errors.BadRequest('Wrong event type received'));
         }
@@ -55,6 +59,7 @@ export default function stripeWebhook(req, res, next) {
          * Example: Ruby together has a subscription model outside of us.
          * https://dashboard.stripe.com/acct_15avvkAcWgwn5pBt/events/evt_17oYejAcWgwn5pBtRo5gRiyY
          */
+        console.log(">>> planId(stripeSubscription.plan)", planId(stripeSubscription.plan), "stripeSubscription.plan.id", stripeSubscription.plan.id);
         if (planId(stripeSubscription.plan) !== stripeSubscription.plan.id) {
           return res.sendStatus(200);
         }
@@ -62,6 +67,7 @@ export default function stripeWebhook(req, res, next) {
         /*
          * In case we get $0 order, return 200. Otherwise, Stripe will keep pinging us.
          */
+        console.log(">>> event.data.object.amount_due", event.data.object.amount_due);
         if (event.data.object.amount_due === 0) {
           return res.sendStatus(200);
         }
@@ -97,7 +103,8 @@ export default function stripeWebhook(req, res, next) {
           { model: User, as: 'createdByUser' },
           { model: Collective, as: 'toCollective' },
           { model: Subscription, where: { stripeSubscriptionId } }
-        ]
+        ],
+        logging: console.log
       })
       .then((order) => {
         /**
@@ -124,6 +131,7 @@ export default function stripeWebhook(req, res, next) {
     confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       const orderId = results.fetchOrder.id;
+      console.log(">>> confirmUniqueChargeId", chargeId)
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 
@@ -135,6 +143,7 @@ export default function stripeWebhook(req, res, next) {
           model: Transaction
         })
       .then(t => {
+        console.log(">>> result", t);
         if (t.length > 0) {
           cb(new errors.BadRequest(`This chargeId: ${chargeId} already exists.`))
         } else {
@@ -144,18 +153,12 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
-      const FromCollectiveId = results.fetchOrder.FromCollectiveId;
       const { customer } = results.fetchEvent.event.data.object;
 
       if (!customer) {
         return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
       }
-      PaymentMethod.findOne({
-        where: {
-          customerId: customer,
-          CollectiveId: FromCollectiveId
-        }
-      })
+      PaymentMethod.findOne({ where: { customerId: customer } })
       .then((paymentMethod) => {
         if (!paymentMethod) {
           return cb(new errors.BadRequest('PaymentMethod not found: unknown customer'));
@@ -210,7 +213,7 @@ export default function stripeWebhook(req, res, next) {
         currency: stripeSubscription.currency,
         txnCurrency: balanceTransaction.currency,
         amountInTxnCurrency: balanceTransaction.amount,
-        txnCurrencyFxRate: order.amount/balanceTransaction.amount,
+        txnCurrencyFxRate: order.totalAmount/balanceTransaction.amount,
         hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
         platformFeeInTxnCurrency: fees.applicationFee,
         paymentProcessorFeeInTxnCurrency: fees.stripeFee,
@@ -233,7 +236,7 @@ export default function stripeWebhook(req, res, next) {
       const order = results.fetchOrder;
       const transaction = results.createTransaction;
       // We only send an invoice for orders > $10 equivalent
-      if (order.amount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
+      if (order.totalAmount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
       const user = order.createdByUser || {};
       const collective = order.toCollective || {};
       const subscription = order.Subscription;

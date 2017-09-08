@@ -198,6 +198,7 @@ export default function(Sequelize, DataTypes) {
    * Class Methods
    */
   PaymentMethod.createFromStripeSourceToken = (PaymentMethodData) => {
+    debug("createFromStripeSourceToken", PaymentMethodData);
     return stripe.createCustomer(null, PaymentMethodData.token)
       .then(customer => {
         PaymentMethodData.customerId = customer.id;
@@ -228,13 +229,13 @@ export default function(Sequelize, DataTypes) {
       // if the user is trying to reuse an existing payment method,
       // we make sure it belongs to the logged in user or to a collective that the user is an admin of
       if (!user) throw new Error("You need to be logged in to be able to use a payment method on file");
-      return models.PaymentMethod
+      return PaymentMethod
         .findOne({ where: { uuid: paymentMethod.uuid } })
-        .then(PaymentMethod => {
-          if (!PaymentMethod) {
+        .then(pm => {
+          if (!pm) {
             throw new Error(`You don't have a payment method with that uuid`);
           }
-          return models.Collective.findById(PaymentMethod.CollectiveId)
+          return models.Collective.findById(pm.CollectiveId)
             .then(PaymentMethodCollective => {
               // If this PaymentMethod is associated to an organization, members can use it within limit
               if (PaymentMethodCollective.type === CollectiveTypes.ORGANIZATION) {
@@ -246,7 +247,7 @@ export default function(Sequelize, DataTypes) {
                   throw new Error("You don't have sufficient permissions to access this payment method");                      
                 }
               }
-              return PaymentMethod;
+              return pm;
             });
         })
     }

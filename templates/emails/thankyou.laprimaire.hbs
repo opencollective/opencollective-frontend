@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency order.amount currency=order.currency}}}/{{interval}} à {{collective.name}}
+Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}/{{interval}} à {{collective.name}}
 {{else}}
-Subject: Merci pour votre donation de {{{currency order.amount currency=order.currency}}} à {{collective.name}}
+Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} à {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -15,9 +15,9 @@ Subject: Merci pour votre donation de {{{currency order.amount currency=order.cu
 {{/if}}
 
 {{#if interval}}
-<p>Nous venons de recevoir votre donation 1ère donation récurrente de {{{currency order.amount currency=order.currency}}} par {{interval}}. Merci énormément pour votre engagement à nous aider dans la durée, votre don nous sera précieux pour faire de LaPrimaire.org un succès !</p>
+<p>Nous venons de recevoir votre donation 1ère donation récurrente de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Merci énormément pour votre engagement à nous aider dans la durée, votre don nous sera précieux pour faire de LaPrimaire.org un succès !</p>
 {{else}}
-<p>Merci pour votre donation de {{{currency order.amount currency=order.currency}}}.
+<p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
 <p>Pour suivre l'utilisation qui est faite de votre argent, nous tenons des comptes transparents que vous pouvez consulter ici : <a href="https://laprimaire.org/transparence/">https://laprimaire.org/transparence/</a> (et très bientôt ici : <a href="https://opencollective.com/laprimaire">https://opencollective.com/laprimaire</a>).</p>

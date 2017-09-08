@@ -2,54 +2,39 @@ import {expect} from 'chai';
 import request from 'supertest';
 import nock from 'nock';
 import _ from 'lodash';
-import chanceLib from 'chance';
 import sinon from 'sinon';
 import app from '../server/index';
-import roles from '../server/constants/roles';
 import activities from '../server/constants/activities';
 import {type} from '../server/constants/transactions';
 import * as utils from '../test/utils';
 import {planId as generatePlanId} from '../server/lib/utils';
 import models from '../server/models';
-import {appStripe} from '../server/gateways/stripe';
 import stripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
-import paymentsLib from '../server/lib/payments';
-
-const chance = chanceLib.Chance();
+import * as payments from '../server/lib/payments';
+import './webhooks.routes.test.nock.js';
 
 /**
  * Mock data
  */
-const application = utils.data('application');
 const userData = utils.data('user1');
 const collectiveData = utils.data('collective1');
 const webhookEvent = stripeMock.webhook;
 const webhookInvoice = webhookEvent.data.object;
 const webhookSubscription = webhookInvoice.lines.data[0];
-const customerId = stripeMock.customers.create.id;
 
-const STRIPE_TOKEN = 'superStripeToken';
 const STRIPE_URL = 'https://api.stripe.com:443';
-const STRIPE_SUBSCRIPTION_CHARGE = webhookSubscription.amount;
 const CURRENCY = 'USD';
 const INTERVAL = 'month';
-
-const stubStripe = () => {
-  const mock = stripeMock.accounts.create;
-  mock.email = chance.email();
-
-  const stub = sinon.stub(appStripe.accounts, 'create');
-  stub.yields(null, mock);
-};
 
 
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
-  let sandbox, user, paymentMethod, collective, order, emailSendSpy;
+  let sandbox, user, host, paymentMethod, collective, order, emailSendSpy, stripeToken;
 
-  before(() => {
+  before(async () => {
     sandbox = sinon.sandbox.create();
+    stripeToken = await utils.createStripeToken();
   });
 
   after(() => sandbox.restore());
@@ -63,146 +48,53 @@ describe('webhooks.routes.test.js', () => {
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach(() => models.User.createUserWithCollective({ email: 'host@opencollective.com'}).tap(u => host = u));
 
   // Create a collective.
-  beforeEach((done) => {
-    stubStripe();
-
-    request(app)
-      .post('/collectives')
-      .send({
-        api_key: application.api_key,
-        collective: Object.assign(collectiveData, { users: [{ email: user.email, role: roles.HOST}]})
-      })
-      .expect(200)
-      .end((e, res) => {
-        expect(e).to.not.exist;
-        collective = res.body;
-        appStripe.accounts.create.restore();
-        done();
-      });
-  });
+  beforeEach('create a collective', () => models.Collective.create(collectiveData).then(c => collective = c));
+  beforeEach('attach a host', () => models.Member.create({
+    CreatedByUserId: host.id,
+    MemberCollectiveId: host.CollectiveId,
+    CollectiveId: collective.id,
+    role: 'HOST'
+  }));
 
   // create a stripe account
   beforeEach(() =>
     models.ConnectedAccount.create({
       service: 'stripe',
-      token: 'abc',
-      CollectiveId: user.CollectiveId
+      token: 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j',
+      username: 'acct_198T7jD8MNtzsDcg',
+      CollectiveId: host.CollectiveId
     }));
-
-    afterEach(() => nock.cleanAll());
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
 
-    /*
-     * This section of beforeEach calls is for original order to succeed.
-     */
-    const planId = generatePlanId({
-      amount: STRIPE_SUBSCRIPTION_CHARGE,
-      interval: INTERVAL,
-      currency: CURRENCY
-    });
-
-    beforeEach('Nock for customers.create', () => {
-      nocks['customers.create'] = nock(STRIPE_URL)
-        .post('/v1/customers')
-        .twice()
-        .reply(200, () => stripeMock.customers.create);
-    });
-
-    beforeEach('Nock for plans.retrieve', () => {
-      const plan = _.extend({}, stripeMock.plans.create, {
-        amount: STRIPE_SUBSCRIPTION_CHARGE,
-        interval: INTERVAL,
-        name: planId,
-        id: planId
-      });
-
-      nocks['plans.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/plans/${planId}`)
-        .reply(200, plan);
-    });
-
-    beforeEach('Nock for charges.create', () => {
-      const params = [
-        `amount=${STRIPE_SUBSCRIPTION_CHARGE}`,
-        `currency=${CURRENCY}`,
-        `source=${stripeMock.tokens.create.id}`,
-        `description=`,
-        'application_fee=1750',
-        `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
-        `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
-        `${encodeURIComponent('metadata[customerEmail]')}=${encodeURIComponent(user.email)}`,
-        `${encodeURIComponent('metadata[PaymentMethodId]')}=1`
-      ].join('&');
-      nocks['charges.create'] = nock(STRIPE_URL)
-        .post('/v1/charges', params)
-        .reply(200, stripeMock.charges.create);
-    });
-
-    
-    beforeEach('Nock for subscriptions.create', () => {
-      const params = [
-        `plan=${planId}`,
-        'application_fee_percent=5',
-        'trial_end=1485986482827',
-        `${encodeURIComponent('metadata[from]')}=${encodeURIComponent(`https://opencollective.com/${user.collective.slug}`)}`,
-        `${encodeURIComponent('metadata[to]')}=${encodeURIComponent(`https://opencollective.com/${collective.slug}`)}`,
-        `${encodeURIComponent('metadata[PaymentMethodId]')}=1`,
-      ].join('&');
-
-      nocks['subscriptions.create'] = nock(STRIPE_URL)
-        .filteringRequestBody(/trial_end=[^&]*/g, 'trial_end=1485986482827')
-        .post(`/v1/customers/${customerId}/subscriptions`, params)
-        .reply(200, webhookSubscription);
-    });
-
-    // Nock for tokens.create.
-    beforeEach('tokens.create', () => {
-      const params = `customer=${stripeMock.customers.create.id}`;
-      nocks['tokens.create'] = nock(STRIPE_URL)
-        .post('/v1/tokens', params)
-        .twice()
-        .reply(200, stripeMock.tokens.create);
-    });
-
     beforeEach('Nock for retrieving charge', () => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
+        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4_2')
+        .twice()
         .reply(200, stripeMock.charges.create);
-    });
-
-    beforeEach('nock for retrieving balance transaction', () => {
-      nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
-        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
-        .reply(200, stripeMock.balance);
     });
 
     // Now we make the order using above beforeEach calls
     beforeEach('Make the order', () => {
-      const payment = {
-        paymentMethod: {
-          token: STRIPE_TOKEN
-        },
-        amount: webhookSubscription.amount,
-        currency: CURRENCY,
-        interval: INTERVAL
-      };
-
       return models.Order
         .create({
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
           ToCollectiveId: collective.id,
-          totalAmount: webhookSubscription.amount
+          totalAmount: webhookSubscription.amount,
+          currency: CURRENCY
         })
-        .then((order) => paymentsLib.createPayment({
-          order,
-          payment
-        }));
+        .then((order) => {
+          order.currency
+          order.interval = INTERVAL;
+          return order.setPaymentMethod({ token: stripeToken })
+        })
+        .then(order => payments.executeOrder(user, order));
     });
 
     /*
@@ -242,19 +134,6 @@ describe('webhooks.routes.test.js', () => {
      * These beforeEach calls are setting up for webhook
      */
 
-    beforeEach('Nock for retrieving charge', () => {
-      console.log(">>> charge.retrieve2");
-      nocks['charge.retrieve2'] = nock(STRIPE_URL)
-        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4_2')
-        .reply(200, Object.assign({}, stripeMock.charges.create, {balance_transaction: 'txn_165j8oIqnMN1wWwOKlPn1D4_2' }));
-    });
-
-    beforeEach('Nock for retrieving balance transaction', () => {
-      nocks['balance.retrieveTransaction2'] = nock(STRIPE_URL)
-        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4_2')
-        .reply(200, stripeMock.balance);
-    });
-    
     // Now we send the webhook
     beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
@@ -276,23 +155,6 @@ describe('webhooks.routes.test.js', () => {
         });
     });
 
-    // Nock for tokens.create.
-    beforeEach('tokens.create', () => {
-      const params = `customer=${stripeMock.customers.create.id}`;
-      console.log(">>> tokens.create nock", params);
-      nocks['tokens.create'] = nock(STRIPE_URL)
-        .post('/v1/tokens', params)
-        .reply(200, stripeMock.tokens.create);
-    });    
-
-    it('successfully gets a Stripe charge', () => {
-      expect(nocks['charge.retrieve2'].isDone()).to.be.true;
-    });
-
-    it('successfully gets a Stripe balance', () => {
-      expect(nocks['balance.retrieveTransaction2'].isDone()).to.be.true;
-    });
-
     it('adds a transaction', (done) => {
       models.Transaction.findAndCountAll({
         where: {
@@ -306,7 +168,7 @@ describe('webhooks.routes.test.js', () => {
         }]
       })
       .tap((res) => {
-        expect(res.count).to.equal(2);
+        expect(res.count).to.equal(4);
         const transaction = res.rows[1];
         expect(transaction.OrderId).to.be.equal(order.id);
         expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
@@ -314,13 +176,13 @@ describe('webhooks.routes.test.js', () => {
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
         expect(transaction.type).to.be.equal(type.DONATION);
-        expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
-        expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-        expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
-        expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
-        expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
-        expect(res.rows[0]).to.have.property('txnCurrencyFxRate', 0.25);
-        expect(res.rows[0]).to.have.property('netAmountInCollectiveCurrency', 25875)
+        expect(transaction).to.have.property('amountInTxnCurrency', 28652); // taken from stripe mocks
+        expect(transaction).to.have.property('txnCurrency', 'EUR');
+        expect(transaction).to.have.property('hostFeeInTxnCurrency', 2865);
+        expect(transaction).to.have.property('platformFeeInTxnCurrency', 1433);
+        expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 856);
+        expect(transaction).to.have.property('txnCurrencyFxRate', 1.22155521429569);
+        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Order.Subscription.isActive).to.be.equal(true);
         expect(transaction.Order.Subscription).to.have.property('activatedAt');
@@ -401,7 +263,7 @@ describe('webhooks.routes.test.js', () => {
             }]
           })
           .tap(res => {
-            expect(res.count).to.be.equal(3); // third transaction
+            expect(res.count).to.be.equal(6); // third transaction
             const transaction = res.rows[2];
             expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
             expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
@@ -410,18 +272,18 @@ describe('webhooks.routes.test.js', () => {
             expect(transaction.type).to.be.equal(type.DONATION);
             expect(transaction.amount).to.be.equal(webhookSubscription.amount);
 
-            expect(res.rows[0]).to.have.property('amountInTxnCurrency', 140000); // taken from stripe mocks
-            expect(res.rows[0]).to.have.property('txnCurrency', 'USD');
-            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 14000);
-            expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 7000);
-            expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 15500);
-            expect(transaction).to.have.property('txnCurrencyFxRate', 0.25);
-            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 25875);
+            expect(res.rows[0]).to.have.property('amountInTxnCurrency', 28652); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('txnCurrency', 'EUR');
+            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 2865);
+            expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 1433);
+            expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 856);
+            expect(transaction).to.have.property('txnCurrencyFxRate', 1.22155521429569);
+            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704);
             expect(transaction.Order.Subscription.isActive).to.be.equal(true);
             expect(transaction.Order.Subscription).to.have.property('activatedAt');
             expect(transaction.Order.Subscription.interval).to.be.equal('month');
 
-            expect(emailSendSpy.callCount).to.equal(4);
+            expect(emailSendSpy.callCount).to.equal(3);
             expect(emailSendSpy.thirdCall.args[0])
             expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
             expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;

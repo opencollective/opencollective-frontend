@@ -105,15 +105,15 @@ const generateDonationsString = (backer, orders) => {
     return;
   }
   const donationsTextArray = [], donationsHTMLArray = [];
-  orders = orders.filter(order => (order.amount > 0));
+  orders = orders.filter(order => (order.totalAmount > 0));
   if (orders.length === 0) {
     debug(`Skipping ${backer.name} because there is no donation`);
     return;
   }
   for (let i=0; i<Math.min(3, orders.length); i++) {
     const order = orders[i];
-    donationsHTMLArray.push(`${formatCurrency(order.amount,order.currency)} to <a href="https://opencollective.com/${order.Collective.slug}">${order.Collective.name}</a>`);
-    donationsTextArray.push(`${formatCurrency(order.amount,order.currency)} to https://opencollective.com/${order.Collective.slug}`);
+    donationsHTMLArray.push(`${formatCurrency(order.totalAmount, order.currency)} to <a href="https://opencollective.com/${order.Collective.slug}">${order.Collective.name}</a>`);
+    donationsTextArray.push(`${formatCurrency(order.totalAmount, order.currency)} to https://opencollective.com/${order.Collective.slug}`);
   }
   const joinStringArray = (arr) => {
     return arr.join(', ').replace(/,([^, ]*)$/,' and $1');

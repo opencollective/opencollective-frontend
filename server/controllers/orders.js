@@ -1,12 +1,12 @@
 import models from '../models';
 import errors from '../lib/errors';
-import paymentsLib from '../lib/payments';
+import { executeOrder } from '../lib/payments';
 import Promise from 'bluebird';
 
 /**
  * Create a manual donation
  */
-export const manual = (req, res, next) => {  
+export const manual = (req, res, next) => {
   const { order } = req.required;
   const { remoteUser } = req;
   const { collective } = req;
@@ -35,7 +35,7 @@ export const manual = (req, res, next) => {
       description,
       privateMessage
     }))
-    .then(order => paymentsLib.processPayment(order))
+    .then(order => executeOrder(order))
     .then(() => res.send({success: true}))
     .catch(err => next(new errors.BadRequest(err.message)));
 };

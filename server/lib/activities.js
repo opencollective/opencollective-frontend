@@ -45,7 +45,7 @@ export default {
 
     // get donation data
     if (activity.data.order) {
-      amount = activity.data.order.amount/100;
+      amount = activity.data.order.totalAmount/100;
       ({ currency } = activity.data.order);
     }
 
@@ -183,7 +183,7 @@ export default {
 
     // get donation data
     if (activity.data.order) {
-      amount = activity.data.order.amount/100;
+      amount = activity.data.order.totalAmount/100;
       ({ currency } = activity.data.order);
     }
 

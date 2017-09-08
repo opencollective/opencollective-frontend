@@ -18,9 +18,6 @@ import {
   UserType
 } from './types';
 
-import models from '../models';
-
-
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: "Transaction",
   description: "Transaction interface",
