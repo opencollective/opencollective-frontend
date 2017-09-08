@@ -59,19 +59,23 @@ class EditCollective extends React.Component {
       let res;
       try {
         res = await getStripeToken(card)
-        const sanitizedCard = {
-          identifier: card.number.replace(/ /g, '').substr(-4),
-          fullName: card.full_name,
-          expMonth: card.exp_month,
-          expYear: card.exp_year,
+        const last4 = card.number.replace(/ /g, '').substr(-4);
+        const paymentMethod = {
+          name: last4,
           token: res.token,
-          brand: res.card.brand,
-          country: res.card.country,
-          funding: res.card.funding,
-          save: true,
-          monthlyLimitPerMember: newPaymentMethod.monthlyLimitPerMember
+          monthlyLimitPerMember: newPaymentMethod.monthlyLimitPerMember,
+          currency: CollectiveInputType.currency,
+          data: {
+            last4,
+            fullName: card.full_name,
+            expMonth: card.exp_month,
+            expYear: card.exp_year,
+            brand: res.card.brand,
+            country: res.card.country,
+            funding: res.card.funding
+          }
         };
-        CollectiveInputType.paymentMethods[index] = sanitizedCard;
+        CollectiveInputType.paymentMethods[index] = paymentMethod;
         return CollectiveInputType;
       } catch (e) {
         this.setState({ result: { error: `${intl.formatMessage(this.messages['creditcard.error'])}: ${e}` }})

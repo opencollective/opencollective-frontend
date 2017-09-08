@@ -142,7 +142,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'backgroundImage'
       ]);
       if (collective.paymentMethods && collective.paymentMethods.length > 0) {
-        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm => pick(pm, ['id', 'brand', 'country', 'identifier', 'expMonth', 'expYear', 'fullName', 'funding', 'monthlyLimitPerMember', 'token']));
+        CollectiveInputType.paymentMethods = collective.paymentMethods.map(pm => pick(pm, ['id', 'name', 'token', 'data', 'monthlyLimitPerMember', 'currency']));
       } else {
         CollectiveInputType.paymentMethods = []; // force removing existing payment methods
       }

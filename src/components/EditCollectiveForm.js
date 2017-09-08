@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ActionButton from '../components/Button';
 import InputField from '../components/InputField';
 import EditTiers from '../components/EditTiers';
 import EditMembers from '../components/EditMembers';
@@ -30,6 +29,7 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
 
     this.state = {
+      modified: false,
       section: 'info',
       collective,
       members: collective.members || [{}],
@@ -83,7 +83,7 @@ class EditCollectiveForm extends React.Component {
   handleChange(fieldname, value) {
     const collective = {};
     collective[fieldname] = value;
-    this.setState( { collective: Object.assign({}, this.state.collective, collective) });
+    this.setState( { modified: true, collective: Object.assign({}, this.state.collective, collective) });
   }
 
   handleObjectChange(obj) {
@@ -99,6 +99,7 @@ class EditCollectiveForm extends React.Component {
       paymentMethods: this.state.paymentMethods
     };
     this.props.onSubmit(collective);
+    this.setState({ modified: false })
   }
 
   render() {
@@ -326,7 +327,7 @@ class EditCollectiveForm extends React.Component {
           }
         </div>
         <div className="actions">
-          <ActionButton type="submit" className="green" ref="submit" label={submitBtnLabel} onClick={this.handleSubmit} disabled={loading} />
+          <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
         </div>
       </div>
     );

@@ -3,6 +3,7 @@ import nextRoutes from 'next-routes';
 const pages = nextRoutes();
 
 pages
+  .add('signin', '/signin/:token?')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('events-iframe', '/:parentCollectiveSlug/events/iframe')
   .add('event', '/:parentCollectiveSlug/events/:eventSlug')
@@ -19,4 +20,4 @@ pages
   .add('collective', '/:slug')
   .add('editCollective', '/:slug/edit')
 
-module.exports = pages;
+  module.exports = pages;

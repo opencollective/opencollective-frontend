@@ -11,6 +11,8 @@ import OrderForm from '../components/OrderForm';
 import CollectiveCover from '../components/CollectiveCover';
 import { get } from 'lodash';
 import { defineMessages } from 'react-intl';
+import gql from 'graphql-tag'
+import { graphql } from 'react-apollo'
 
 class OrderTierPage extends React.Component {
 
@@ -21,7 +23,7 @@ class OrderTierPage extends React.Component {
   constructor(props) {
     super(props);
     this.createOrder = this.createOrder.bind(this);
-    this.state = {};
+    this.state = { result: {}, loading: false };
     const interval = (props.interval || "").toLowerCase().replace(/ly$/,'');
     this.order = {
       quantity: props.quantity || 1,
@@ -56,7 +58,8 @@ class OrderTierPage extends React.Component {
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
       // window.location.replace(`https://opencollective.com/${response.fromCollective.slug}`);
     } catch (e) {
-      this.setState({ loading: false, result: { error: intl.formatMessage(this.messages['order.error']) } });
+      console.error(">>> createOrder error: ", e);
+      this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
     }
   }
 
@@ -72,7 +75,14 @@ class OrderTierPage extends React.Component {
 
     return (
       <div>
-
+        <style jsx>{`
+          .success {
+            color: green;
+          }
+          .error {
+            color: red;
+          }
+        `}</style>
         <Header
           title={collective.name}
           description={collective.description}
@@ -95,6 +105,10 @@ class OrderTierPage extends React.Component {
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
               />
+            <div className="result">
+              <div className="success">{this.state.result.success}</div>
+              <div className="error">{this.state.result.error}</div>
+            </div>
           </div>
         </Body>
         <Footer />

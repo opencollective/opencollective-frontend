@@ -9,7 +9,7 @@ import { capitalize, formatCurrency } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
-import { checkUserExistence, login } from '../lib/api';
+import { checkUserExistence, signin } from '../lib/api';
 
 class OrderForm extends React.Component {
 
@@ -26,9 +26,10 @@ class OrderForm extends React.Component {
     const tier = order.tier || {};
     this.state = {
       isNewUser: true,
+      loginSent: false,
       user: {},
       fromCollective: {},
-      creditcard: {},
+      creditcard: { save: true },
       order: order || { totalAmount: tier.amount * (tier.quantity || 1)},
       tier,
       result: {}
@@ -42,9 +43,11 @@ class OrderForm extends React.Component {
     this.resetOrder = this.resetOrder.bind(this);
 
     this.messages = defineMessages({
+      'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
-      'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to my open collective account' },
+      'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
+      'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
@@ -108,9 +111,10 @@ class OrderForm extends React.Component {
   // Prefill the form with logged in user if any
   componentWillReceiveProps(props) {
     if (!this.state.fromCollective.email && props.LoggedInUser) {
-      const fromCollective = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
-      fromCollective.id = props.LoggedInUser.CollectiveId;
+      const user = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
+      const fromCollective = { id: props.LoggedInUser.CollectiveId, type: 'USER' };
       this.setState({
+        user,
         fromCollective,
         LoggedInUser: props.LoggedInUser
       });
@@ -120,6 +124,10 @@ class OrderForm extends React.Component {
   handleChange(obj, attr, value) {
     this.resetError();
     const newState = { ... this.state };
+
+    if (value === 'null') {
+      value = null;
+    }
 
     if (value !== undefined) {
       newState[obj][attr] = value;
@@ -191,15 +199,18 @@ class OrderForm extends React.Component {
         return true;
       } else if (isValidCard(card)) {
         const res = await getStripeToken(card)
+        const last4 = card.number.replace(/ /g, '').substr(-4);
         const sanitizedCard = {
-          identifier: card.number.replace(/ /g, '').substr(-4),
-          fullName: card.fullName,
-          expMonth: card.exp_month,
-          expYear: card.exp_year,
+          name: last4,
           token: res.token,
-          brand: res.card.brand,
-          country: res.card.country,
-          funding: res.card.funding,
+          data: {
+            fullName: card.full_name,
+            expMonth: card.exp_month,
+            expYear: card.exp_year,
+            brand: res.card.brand,
+            country: res.card.country,
+            funding: res.card.funding,
+          },
           save: card.save
         };
         newState.sanitizedCard = sanitizedCard;
@@ -216,11 +227,61 @@ class OrderForm extends React.Component {
     this.setState({ order: {} });
   }
 
+  signin() {
+    signin(this.state.user, window.location.href).then(() => {
+      this.setState({ loginSent: true })
+    })
+  }
+
   render() {
     const { intl } = this.props;
     const { LoggedInUser } = this.state;
     const quantity = this.state.order.quantity || 1;
-    const paymentMethods = (LoggedInUser && LoggedInUser.paymentMethods) || [];
+
+    const inputEmail = {
+      type: 'email',
+      name: 'email',
+      required: true,
+      focus: true,
+      label: intl.formatMessage(this.messages['email.label']),
+      defaultValue: this.state.order['email'],
+      onChange: (value) => this.handleChange("user", "email", value)
+    };
+    if (!this.state.isNewUser) {
+      inputEmail.button = <Button onClick={() => this.signin()} focus={true}>Login</Button>;
+      if (!this.state.loginSent) {
+        inputEmail.description = `Oh oh, looks like you already have an account on Open Collective with this email address. Please login.`
+      } else {
+        inputEmail.button = <Button disabled={true}>Login</Button>;
+        inputEmail.description = `Login email sent. Please follow the instructions in that email to proceed.`
+      }
+    }
+
+    const fromCollectiveOptions = [], collectivesById = {};
+    if (LoggedInUser) {
+      fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
+      collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
+      LoggedInUser.memberOf.map(membership => {
+        if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
+        const value = membership.collective.id;
+        const label = membership.collective.name;
+        collectivesById[value] = membership.collective;
+        fromCollectiveOptions.push({ [value]: label });
+      })
+    }
+    fromCollectiveOptions.push({ createOrganization: 'Create an organization' });
+
+    let paymentMethods = [];
+    if (LoggedInUser && this.state.fromCollective) {
+      paymentMethods = collectivesById[this.state.fromCollective.id].paymentMethods
+    }
+    const paymentMethodsOptions = [];
+    paymentMethods.map(option => {
+      const value = option.uuid
+      const label = `💳  \xA0\xA0${option.data.brand} ${option.data.funding} ${option.data.identifier} - exp ${option.data.expMonth}/${option.data.expYear}`;
+      paymentMethodsOptions.push({ [value]: label });
+    });
+    paymentMethodsOptions.push({[null]: 'other'});
 
     return (
       <div className="OrderForm">
@@ -275,43 +336,23 @@ class OrderForm extends React.Component {
         `}</style>
         <Form horizontal>
           <div className="userDetailsForm">
-            <h2>Personal details</h2>
+            <h2><FormattedMessage id="tier.order.userdetails" defaultMessage="User details" /></h2>
             {LoggedInUser &&
-              <Row className="fromCollective" key={`fromCollective.value`}>
-                <Col sm={12}>
-                  <FormControl
-                    componentClass="select"
-                    className="fromCollectiveSelector"
-                    type="select"
-                    name="fromCollectiveSelector"
-                    onChange={event => this.handleChange("fromCollective", "id", event.target.value)}
-                    >
-                    <option value={LoggedInUser.CollectiveId}>{`${LoggedInUser.firstName} ${LoggedInUser.lastName}`}</option>
-                    {LoggedInUser.memberOf.map(membership => {
-                      if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
-                      const value = membership.collective.id;
-                      const label = membership.collective.name;
-                      return (<option value={value}>{`${label}`}</option>)
-                      })
-                    }
-                    <option value="createOrganization">Create an organization</option>
-                  </FormControl>
-                </Col>
-              </Row>
+              <InputField
+                className="horizontal"
+                type="select"
+                label={intl.formatMessage(this.messages['order.profile'])}
+                name="fromCollectiveSelector"
+                onChange={value => this.handleChange("fromCollective", collectivesById[value])}
+                options={fromCollectiveOptions}
+                />
             }
             {!LoggedInUser &&
               <Row key={`email.input`}>
                 <Col sm={12}>
                   <InputField
                     className="horizontal"
-                    type="email"
-                    label={intl.formatMessage(this.messages['email.label'])}
-                    required={true}
-                    focus={true}
-                    defaultValue={this.state.order['email']}
-                    button={!this.state.isNewUser && <Button onClick={() => login(this.state.user.email)}>Login</Button>}
-                    description={!this.state.isNewUser && `Oh oh, looks like you already have an account on Open Collective with this email address.`}
-                    onChange={(value) => this.handleChange("user", "email", value)}
+                    {...inputEmail}
                     />
                 </Col>
               </Row>
@@ -338,14 +379,14 @@ class OrderForm extends React.Component {
                 { paymentMethods.length === 0 &&
                   <div>
                     <InputField
-                      label="Credit Card"
+                      label={intl.formatMessage(this.messages['creditcard.label'])}
                       type="creditcard"
                       name="creditcard"
                       className="horizontal"
                       onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
                       />
                     <InputField
-                      description={intl.formatMessage(this.messages['creditcard.save'])}
+                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() })}
                       className="horizontal"
                       name="saveCreditCard"
                       type="checkbox"
@@ -355,21 +396,15 @@ class OrderForm extends React.Component {
                   </div>
                 }
                 { paymentMethods.length > 0 &&
-                  <FormControl
-                    componentClass="select"
-                    className="creditcardSelector"
+                  <InputField
                     type="select"
+                    className="horizontal"
+                    type="select"
+                    label={intl.formatMessage(this.messages['creditcard.label'])}
                     name="creditcardSelector"
-                    onChange={event => this.handleChange("uuid", event.target.value)}
-                    >
-                    {paymentMethods.map(option => {
-                      const value = option.uuid
-                      const label = `${option.brand} ${option.funding} ${option.identifier} ${option.expMonth}/${option.expYear}`;
-                      return (<option value={value}>{`💳 ${label}`}</option>)
-                      })
-                    }
-                    <option value="">other</option>
-                  </FormControl>
+                    onChange={value => this.handleChange("creditcard", "uuid", value)}
+                    options={paymentMethodsOptions}
+                    />
                 }              
               </Col>
             </Row>

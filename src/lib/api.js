@@ -5,7 +5,7 @@ import { isValidEmail } from './utils';
  * The Promise returned from fetch() won't reject on HTTP error status. We
  * need to throw an error ourselves.
  */
-export function checkFetchResponseStatus(response) {
+export function checkResponseStatus(response) {
   console.log(">>> checkStatus", response);
   const { status } = response;
   if (status >= 200 && status < 300) {
@@ -35,13 +35,25 @@ export function fetchConnectedAccount(CollectiveId, service) {
       method: 'get',
       headers: addAuthTokenToHeader()
     })
-    .then(checkFetchResponseStatus);
+    .then(checkResponseStatus);
 }
 
 export function checkUserExistence(email) {
   if (!isValidEmail(email)) return Promise.resolve(false);
   return fetch(`/api/users/exists?email=${email}`)
-    .then(checkFetchResponseStatus)
+    .then(checkResponseStatus)
     .then(json => Boolean(json.exists));  
 }
 
+export function signin(user, redirect) {
+  return fetch('/api/users/signin', {
+    method: 'POST',
+    headers: {
+      ...addAuthTokenToHeader(),
+      Accept: 'application/json',
+      'Content-Type': 'application/json'      
+    },
+    body: JSON.stringify({ user, redirect })
+  })
+  .then(checkResponseStatus);
+}

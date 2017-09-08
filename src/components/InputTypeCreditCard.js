@@ -98,7 +98,7 @@ class InputTypeCreditCard extends React.Component {
             >
             {options.map(option => {
               const value = option.uuid
-              const label = `${option.brand} ${option.funding} ${option.identifier} ${option.expMonth}/${option.expYear}`;
+              const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${option.data.expMonth}/${option.data.expYear}`;
               return (<option value={value}>{`💳 ${label}`}</option>)
               })
             }

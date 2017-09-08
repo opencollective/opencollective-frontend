@@ -11,15 +11,31 @@ export const getLoggedInUserQuery = gql`
       email
       image
       CollectiveId
+      collective {
+        name
+        type
+        paymentMethods {
+          uuid
+          name
+          data
+        }
+      }
       memberOf {
         id
         role
         collective {
           id
           slug
+          type
           name
           balance
           currency
+          paymentMethods {
+            uuid
+            name
+            data
+            balance
+          }
         }
       }
     }
@@ -103,6 +119,7 @@ const getCollectiveToEditQuery = gql`
       settings
       createdAt
       stats {
+        id
         yearlyBudget
         backers
         totalAmountSent
@@ -152,6 +169,7 @@ const getCollectiveToEditQuery = gql`
           settings
           image
           stats {
+            id
             backers
             yearlyBudget
           }
@@ -181,11 +199,8 @@ const getCollectiveToEditQuery = gql`
       paymentMethods {
         id
         uuid
-        identifier
-        brand
-        funding
-        expMonth
-        expYear
+        name
+        data
       }
       connectedAccounts {
         id
@@ -217,6 +232,7 @@ const getCollectiveQuery = gql`
       settings
       createdAt
       stats {
+        id
         yearlyBudget
         backers
         totalAmountSent
@@ -266,6 +282,7 @@ const getCollectiveQuery = gql`
           settings
           image
           stats {
+            id
             backers
             yearlyBudget
           }
@@ -629,29 +646,27 @@ export const addGetLoggedInUserFunction = (component) => {
       data,
       getLoggedInUser: () => {
         if (window.localStorage.getItem('accessToken')) {
-          return new Promise((resolve) => {
-            setTimeout(async () => {
-              return data.refetch()
-                .then(res => {
-                  if (res.data && res.data.LoggedInUser) {
-                    const LoggedInUser = {...res.data.LoggedInUser};
-                    if (LoggedInUser && LoggedInUser.memberOf) {
-                      const roles = {};
-                      LoggedInUser.memberOf.map(member => {
-                        roles[member.collective.slug] = roles[member.collective.slug] || [];
-                        roles[member.collective.slug].push(member.role);
-                      });
-                      LoggedInUser.roles = roles;
-                    }
-                    console.log(">>> LoggedInUser", LoggedInUser);
-                    return resolve(LoggedInUser);
+          return new Promise(async (resolve) => {
+              let res;
+              try {
+                res = await data.refetch();
+                if (res.data && res.data.LoggedInUser) {
+                  const LoggedInUser = {...res.data.LoggedInUser};
+                  if (LoggedInUser && LoggedInUser.memberOf) {
+                    const roles = {};
+                    LoggedInUser.memberOf.map(member => {
+                      roles[member.collective.slug] = roles[member.collective.slug] || [];
+                      roles[member.collective.slug].push(member.role);
+                    });
+                    LoggedInUser.roles = roles;
                   }
-                })
-                .catch(e => {
-                  console.error(">>> getLoggedInUserQuery error", e);
-                  return resolve(null);
-                });
-            }, 0);
+                  console.log(">>> LoggedInUser", LoggedInUser);
+                  return resolve(LoggedInUser);
+                }
+              } catch (e) {
+                console.error(">>> getLoggedInUser error : ", e);
+                return resolve(null);
+              }
           });
         }
       }
