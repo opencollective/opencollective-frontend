@@ -65,7 +65,12 @@ describe('lib/email', () => {
     const options = {
       from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
     };
-
+    const amount = Number(50).toLocaleString('fr-BE', {
+      style: 'currency',
+      currency: 'EUR',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0
+    })
     return emailLib.send(template, data.user.email, data, options)
       .tap(() => {
         let amountStr = 50;
@@ -100,7 +105,12 @@ describe('lib/email', () => {
         slug: "wwcodeaustin"
       }
     };
-
+    const amount = Number(50).toLocaleString('USD', {
+      style: 'currency',
+      currency: 'USD',
+      currencyDisplay: 'symbol',
+      minimumFractionDigits: 0
+    })
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         let amountStr = 50;

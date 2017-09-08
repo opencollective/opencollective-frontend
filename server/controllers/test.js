@@ -1,4 +1,3 @@
-import async from 'async';
 import config from 'config';
 import Sequelize from 'sequelize';
 import models, { setupModels } from '../models';
@@ -40,201 +39,147 @@ export const resetTestDatabase = function(req, res, next) {
   );
 
   const models = setupModels(sequelize);
-  const testUser = {
+
+  const userData = {
     email: 'testuser@opencollective.com',
     password: 'password'
   };
-  const member = {
+
+  const memberData = {
     email: 'member@opencollective.com',
     firstName: 'Xavier',
     lastName: 'Damman',
     image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   }
-  const backer = {
+
+  const backerData = {
     email: 'backer@opencollective.com',
     firstName: 'Aseem',
     lastName: 'Sood',
     image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/908fbcbca45e4a52a4309d00e980018c_e554f450-2127-11e6-9a76-e98f5a4a50b6.jpeg'
   }
-  const backer2 = {
+
+  const backer2Data = {
     email: 'backer2@opencollective.com',
     firstName: 'Pia',
     lastName: 'Mancini',
     image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/9EflVQqM_400x400jpg_2aee92e0-858d-11e6-9fd7-73dd31eb7c0c.jpeg'
   }
 
-  async.auto({
-    resetDb: (cb) => {
-      sequelize.sync({force: true})
-        .then(() => cb())
-        .catch(cb);
-    },
+  const groupData = {
+    name: 'OpenCollective Test Group',
+    description: 'OpenCollective test group on the test server',
+    slug: 'testcollective',
+    mission: 'our awesome mission',
+    tags: ['open source'],
+    tiers: [
+      { "name": "backer", "range": [2,100000], "presets": [2,10,25], "interval": "monthly" },
+      { "name": "sponsor", "range": [100,500000], "presets": [100,250,500], "interval": "monthly" }
+    ],
+    currency: 'EUR',
+    isActive: true
+  };
 
-    createCollective: ['resetDb', (cb) => {
-      models.Collective.create({
-        name: 'OpenCollective Test Collective',
-        description: 'OpenCollective test collective on the test server',
-        slug: 'testcollective',
-        mission: 'our awesome mission',
-        tags: ['open source'],
-        tiers: [
-          {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
-          {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
-        ],
-        currency: 'EUR',
-        isActive: true
-      })
-      .then(collective => cb(null, collective))
-      .catch(cb);
-    }],
-
-    createTestUser: ['createCollective', (cb, results) => {
-      models.User.createUserWithCollective(testUser)
-        .tap(u => results.createCollective.addUserWithRole(u, roles.HOST))
-        .then(u => cb(null, u))
-        .catch(cb);
-    }],
-
-    createMember: ['createCollective', (cb, results) => {
-      models.User.createUserWithCollective(member)
-        .tap(u => results.createCollective.addUserWithRole(u, roles.ADMIN))
-        .then(u => cb(null, u))
-        .catch(cb);
-    }],
-
-    createBacker: ['createCollective', (cb, results) => {
-      models.User.createUserWithCollective(backer)
-        .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
-        .then(u => cb(null, u))
-        .catch(cb);
-    }],
-
-    createBacker2: ['createCollective', (cb, results) => {
-      models.User.createUserWithCollective(backer2)
-        .tap(u => results.createCollective.addUserWithRole(u, roles.BACKER))
-        .then(u => cb(null, u))
-        .catch(cb);
-    }],
-
-    createStripeAccount: ['createTestUser', (cb, results) => {
-      models.ConnectedAccount.create({
-        service: 'stripe',
-        CollectiveId: results.createTestUser.CollectiveId,
-        username: 'acct_17TL97HrqFRlDDP2',
-        token: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
-        refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
-        data: {
-          publishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
-          scope: 'read_write'
-        }
-      })
-      .then(stripeAccount => cb(null, stripeAccount))
-      .catch(cb);
-    }],
-
-    createConnectedAccount: ['createTestUser', (cb, results) => {
-      models.ConnectedAccount.create({
-        service: 'paypal',
-        // Sandbox api keys
-        clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-        token: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
-      })
-      .then((connectedAccount) => connectedAccount.setUser(results.createTestUser))
-      .then(() => cb())
-      .catch(cb);
-    }],
-
-    createPaypalPaymentMethod: ['createTestUser', (cb, results) => {
-      models.PaymentMethod.create({
-        service: 'paypal',
-        CreatedByUserId: results.createTestUser.id,
-        CollectiveId: results.createTestUser.CollectiveId
-      })
-      .then(() => cb())
-      .catch(cb);
-    }],
-
-    addDonation1: ['createBacker', (cb, results) => {
-      models.Order.create({
-        description: "Donation 1",
-        amount: 100,
-        currency: 'EUR',
-        CollectiveId: results.createCollective.id,
-        UserId: results.createBacker.id
-      })
-      .then(order => models.Transaction.create({
-        amount: 100,
-        type: type.DONATION,
-        currency: "EUR",
-        UserId: results.createBacker.id,
-        OrderId: order.id
-      }))
-      .then(t => t.setCollective(results.createCollective))
-      .then(() => cb())
-      .catch(cb);
-    }],
-
-    addDonation2: ['createBacker2', 'addDonation1', (cb, results) => {
-      models.Order.create({
-        description: "Donation 2",
-        amount: 200,
-        currency: 'EUR',
-        CollectiveId: results.createCollective.id,
-        UserId: results.createBacker2.id
-      })
-      .then(order => models.Transaction.create({
-        amount: 200,
-        type: type.DONATION,
-        currency: "EUR",
-        UserId: results.createBacker2.id,
-        OrderId: order.id
-      }))
-      .then(t => t.setCollective(results.createCollective))
-      .then(() => cb())
-      .catch(cb);
-    }],
-
-    addExpense1: ['createTestUser', (cb, results) => {
-      models.Expense.create({
-        "description": "Expense 2",
-        "amount": 100,
-        "currency": "EUR",
-        "incurredAt": "2016-03-01T08:00:00.000Z",
-        "createdAt": "2016-03-01T08:00:00.000Z",
-        "CollectiveId": results.createCollective.id,
-        "UserId": results.createTestUser.id,
-        "lastEditedById": results.createTestUser.id,
-        "payoutMethod": 'paypal'
-      })
-      .then(() => cb())
-      .catch(cb);
-    }],
-
+  let testHost, testGroup, testMember, testBacker, testBacker2;
+  return sequelize.sync({force: true})
+    .then(() => models.User.create(userData))
+    .tap(u => testHost = u)
+    .then(() => {
+      groupData.HostId = testHost.id;
+      return models.Group.create(groupData);
+    })
+    .then(g => testGroup = g)
+    .then(() => testGroup.addUserWithRole(testHost, roles.HOST))
+    .then(() => models.User.create(memberData))
+    .tap(m => testMember = m)
+    .then(() => testGroup.addUserWithRole(testMember, roles.MEMBER))
+    .then(() => models.User.create(backerData))
+    .then(b => {
+      testBacker = b;
+      return testGroup.addUserWithRole(testBacker, roles.BACKER);
+    })
+    .then(() => models.User.create(backer2Data))
+    .then(b => {
+      testBacker2 = b;
+      return testGroup.addUserWithRole(testBacker2, roles.BACKER);
+    })
+    .then(() => models.StripeAccount.create({
+      accessToken: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
+      refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
+      stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
+      stripeUserId: 'acct_17TL97HrqFRlDDP2',
+      scope: 'read_write'
+    }))
+    .then(stripeAccount => testHost.setStripeAccount(stripeAccount))
+    .then(() => models.ConnectedAccount.create({
+      provider: 'paypal',
+      // Sandbox api keys
+      clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
+      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+    }))
+    .then((connectedAccount) => connectedAccount.setUser(testHost))
+    .then(() => models.PaymentMethod.create({ service: 'paypal', UserId: testHost.id}))
+    .then(() => models.Donation.create({
+      title: "Donation 1",
+      amount: 100,
+      currency: 'EUR',
+      GroupId: testGroup.id,
+      UserId: testBacker.id
+    }))
+    .then(donation => models.Transaction.create({
+      amount: 100,
+      GroupId: testGroup.id,
+      type: type.DONATION,
+      currency: "EUR",
+      UserId: testBacker.id,
+      DonationId: donation.id,
+      HostId: testHost.id
+    }))
+    .then(() => models.Donation.create({
+      title: "Donation 2",
+      amount: 200,
+      currency: 'EUR',
+      GroupId: testGroup.id,
+      UserId: testBacker2.id
+    }))
+    .then(donation => models.Transaction.create({
+      amount: 200,
+      type: type.DONATION,
+      currency: "EUR",
+      UserId: testBacker2.id,
+      DonationId: donation.id,
+      GroupId: testGroup.id,
+      HostId: testHost.id
+    }))
+    .then(() => models.Expense.create({
+      title: "Expense 2",
+      amount: 100,
+      currency: "EUR",
+      incurredAt: "2016-03-01T08:00:00.000Z",
+      createdAt: "2016-03-01T08:00:00.000Z",
+      GroupId: testGroup.id,
+      UserId: testHost.id,
+      lastEditedById: testHost.id,
+      payoutMethod: 'paypal'
+    }))
     // We add a second expense that incurred before the first expense we created
-    addExpense2: ['createMember', 'addExpense1', (cb, results) => {
-      models.Expense.create({
-        "description": "Expense 1",
-        "amount": 200,
-        "currency": "EUR",
-        "incurredAt": "2016-02-29T08:00:00.000Z",
-        "createdAt": "2016-03-01T08:00:00.000Z",
-        "CollectiveId": results.createCollective.id,
-        "UserId": results.createMember.id,
-        "lastEditedById": results.createMember.id,
-        "payoutMethod": 'manual'
-      })
-      .then(() => cb())
-      .catch(cb);
-    }]
-  }, (err) => {
-    if (err) {
-      return next(err);
-    } else {
+    .then(() => models.Expense.create({
+      title: "Expense 1",
+      amount: 200,
+      currency: "EUR",
+      incurredAt: "2016-02-29T08:00:00.000Z",
+      createdAt: "2016-03-01T08:00:00.000Z",
+      GroupId: testGroup.id,
+      UserId: testMember.id,
+      lastEditedById: testMember.id,
+      payoutMethod: 'manual'
+    }))
+    .then(() => {
       res.send({
         success: true
       });
-    }
-  });
+    })
+    .catch(next);
 };
 
 export const getTestUserLoginUrl = function(req, res, next) {
