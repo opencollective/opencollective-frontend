@@ -3,8 +3,8 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
-import {getLinkHeader, getRequestedUrl} from '../lib/utils';
-import {createFromPaidExpense as createTransaction} from '../lib/transactions';
+import { getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { createFromPaidExpense as createTransaction } from '../lib/transactions';
 import paypalAdaptive from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
@@ -64,7 +64,7 @@ export const list = (req, res, next) => {
     .then(result => {
       result.rows = result.rows.map(instance => {
         const expense = instance.info;
-        expense.user =  req.remoteUser.isAdmin(instance.CollectiveId) ? instance.User.info : instance.User.public;
+        expense.user =  (req.remoteUser && req.remoteUser.isAdmin(instance.CollectiveId)) ? instance.User.info : instance.User.public;
         return expense;
       })
       return result;
@@ -169,7 +169,7 @@ export const pay = (req, res, next) => {
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
     .then(() => collective.getHostCollective())
-    .then((host) => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
+    .then(host => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponses)));

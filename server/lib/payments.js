@@ -52,8 +52,8 @@ export const executeOrder = (user, order) => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
       return paymentProviders[paymentProvider].processOrder(order); // eslint-disable-line import/namespace
     })
-    .then(transactions => {
-      order.transactions = transactions;
+    .then(transaction => {
+      order.transaction = transaction;
       sendConfirmationEmail(order); // async
       return null;
     });
@@ -96,7 +96,7 @@ const sendConfirmationEmail = (order) => {
       'thankyou',
       user.email,
       { order: order.info,
-        transaction: pick(order.transactions[0], ['createdAt', 'uuid']),
+        transaction: pick(order.transaction, ['createdAt', 'uuid']),
         user: user.info,
         collective: toCollective.info,
         relatedCollectives,

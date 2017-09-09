@@ -608,7 +608,14 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 12000}})
+                    .send({
+                      api_key: application.api_key,
+                      transaction: {
+                        description: "add funds",
+                        amount: 12000,
+                        netAmountInCollectiveCurrency: 12000
+                      }
+                    })
                     .expect(200);
                 })
 
@@ -628,7 +635,14 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 12500}})
+                    .send({
+                      api_key: application.api_key,
+                      transaction: {
+                        description: "add funds",
+                        amount: 12500,
+                        netAmountInCollectiveCurrency: 12500
+                      }
+                    })
                     .expect(200);
                 })
 
@@ -646,6 +660,7 @@ describe('expenses.routes.test.js', () => {
                   beforeEach('create paypal payment method', () => {
                     PaymentMethod.create({
                       service: 'paypal',
+                      token: 'abc',
                       CreatedByUserId: host.id,
                       CollectiveId: host.CollectiveId,
                       confirmedAt: Date.now()
@@ -657,8 +672,8 @@ describe('expenses.routes.test.js', () => {
 
                     let expense, transaction, paymentMethod;
                     beforeEach(() => expectOne(Expense).tap(e => expense = e));
-                    beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[1]));
-                    beforeEach(() => expectOne(PaymentMethod).tap(pm => paymentMethod = pm));
+                    beforeEach(() => expectTwo(Transaction, { ExpenseId: expense.id }).tap(t => transaction = t[0]));
+                    beforeEach(() => expectOne(PaymentMethod, { service: 'paypal' }).tap(pm => paymentMethod = pm));
 
                     it('THEN calls PayPal pay', () => expect(payStub.called).to.be.true);
 
@@ -795,7 +810,14 @@ describe('expenses.routes.test.js', () => {
                   return request(app)
                     .post(`/collectives/${collective.id}/transactions`)
                     .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({ api_key: application.api_key, transaction: {description: "add funds", netAmountInCollectiveCurrency: 10000}})
+                    .send({
+                      api_key: application.api_key,
+                      transaction: {
+                        description: "add funds",
+                        amount: 10000,
+                        netAmountInCollectiveCurrency: 10000
+                      }
+                    })
                     .expect(200);
                 })
 
@@ -804,7 +826,7 @@ describe('expenses.routes.test.js', () => {
 
                   let expense, transaction;
                   beforeEach(() => expectTwo(Expense).tap(e => expense = e[1]));
-                  beforeEach(() => expectTwo(Transaction).tap(t => transaction = t[1]));
+                  beforeEach(() => expectTwo(Transaction, { ExpenseId: expense.id }).tap(t => transaction = t[0]));
 
                   it('THEN does not call PayPal pay', () => expect(payStub.called).to.be.false);
 
@@ -862,14 +884,14 @@ describe('expenses.routes.test.js', () => {
     });
   });
 
-  function expectOne(model) {
-    return model.findAndCountAll()
+  function expectOne(model, where = {}) {
+    return model.findAndCountAll({ where })
       .tap(entities => expect(entities.count).to.be.equal(1))
       .then(entities => entities.rows[0]);
   }
 
-  function expectTwo(model) {
-    return model.findAndCountAll()
+  function expectTwo(model, where = {}) {
+    return model.findAndCountAll({ where })
       .tap(entities => expect(entities.count).to.be.equal(2))
       .then(entities => entities.rows);
   }

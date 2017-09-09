@@ -5,19 +5,15 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
   .reply(200, {"id":"tok_1AzPXBDjPFcHOcTmeXZjqoJP","object":"token","card":{"id":"card_1AzPXADjPFcHOcTm0SU3o9IW","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"217.136.35.207","created":1504788905,"livemode":false,"type":"card","used":false});
 
-nock('http://127.0.0.1:53906', {"encodedQueryParams":true})
-  .post('/webhooks/stripe', {"created":1326853478,"livemode":false,"id":"evt_00000000000000","type":"invoice.payment_succeeded","object":"event","request":null,"pending_webhooks":1,"api_version":"2015-04-07","data":{"object":{"id":"in_00000000000000","object":"invoice","amount_due":1000,"application_fee":null,"attempt_count":0,"attempted":true,"charge":"ch_17KUJnBgJgc4Ba6uvdu1hxm4_2","closed":true,"currency":"usd","customer":"cus_BM7mGwp1Ea8RtL","date":1450707776,"description":null,"discount":null,"ending_balance":null,"forgiven":false,"lines":{"data":[{"id":"sub_7ZdqElVkS7b8Ep","object":"line_item","amount":35000,"currency":"usd","description":null,"discountable":true,"livemode":true,"metadata":{},"period":{"start":1453386176,"end":1456064576},"plan":{"id":"USD-MONTH-1000","object":"plan","amount":1000,"created":1450088389,"currency":"usd","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"test","statement_descriptor":null,"trial_period_days":null},"proration":false,"quantity":1,"subscription":null,"type":"subscription"}],"total_count":1,"object":"list","url":"/v1/invoices/in_17KUYuDjPFcHOcTmtBymgNST/lines"},"livemode":false,"metadata":{},"next_payment_attempt":1450711376,"paid":true,"period_end":1450707776,"period_start":1450707776,"receipt_number":null,"starting_balance":0,"statement_descriptor":null,"subscription":null,"subtotal":0,"tax":null,"tax_percent":null,"total":0,"webhooks_delivered_at":null,"payment":null}}})
-  .reply(200, "OK");
-
 // create the customer at platform level
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/customers', "source=tok_1AzPXBDjPFcHOcTmeXZjqoJP&description=https%3A%2F%2Fopencollective.com%2Fphilmod&email=user1%40opencollective.com")
-  .times(3)
+  .times(5)
   .reply(200, {"id":"cus_BM7mGwp1Ea8RtL","object":"customer","account_balance":0,"created":1504788909,"currency":null,"default_source":"card_1AzPXADjPFcHOcTm0SU3o9IW","delinquent":false,"description":"https://opencollective.com/philmod","discount":null,"email":"user1@opencollective.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AzPXADjPFcHOcTm0SU3o9IW","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BM7mGwp1Ea8RtL","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BM7mGwp1Ea8RtL/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BM7mGwp1Ea8RtL/subscriptions"}});
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .post('/v1/tokens', "customer=cus_BM7mGwp1Ea8RtL")
-  .times(6)
+  .times(10)
   .reply(200, {"id":"tok_1AzPXGD8MNtzsDcgwaltZuvp","object":"token","card":{"id":"card_1AzPXGD8MNtzsDcgy7M2jlds","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"217.136.35.207","created":1504788910,"livemode":false,"type":"card","used":false});
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
@@ -27,7 +23,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})
   .get('/v1/balance/history/txn_1AzPXID8MNtzsDcgpAUVjNJm')
-  .times(7)
+  .times(12)
   .reply(200, {"id":"txn_1AzPXID8MNtzsDcgpAUVjNJm","object":"balance_transaction","amount":28652,"available_on":1505347200,"created":1504788911,"currency":"eur","description":"","fee":2289,"fee_details":[{"amount":1433,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":856,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":26363,"source":"ch_1AzPXHD8MNtzsDcgXpUhv4pm","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AzPXHD8MNtzsDcgXpUhv4pm"},"status":"pending","type":"charge"});
 
 nock('https://api.stripe.com:443', {"encodedQueryParams":true})

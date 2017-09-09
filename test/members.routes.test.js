@@ -284,11 +284,11 @@ describe('members.routes.test.js', () => {
             return row[headers.indexOf(colName)];
           }
           expect(backers.length).to.equal(2);
-          backers.sort((a,b) => (a.substr(22,1) < b.substr(22,1)) ? -1 : 1);
+          backers.sort((a,b) => (a.substr(0,1) < b.substr(0,1)) ? -1 : 1);
           expect(getValue(0, "role")).to.equal('"BACKER"');
-          expect(getValue(0, "tier")).to.equal('"sponsor"');
+          expect(getValue(0, "tier")).to.equal('"backer"');
           expect(getValue(1, "role")).to.equal('"BACKER"');
-          expect(getValue(1, "tier")).to.equal('"backer"');
+          expect(getValue(1, "tier")).to.equal('"sponsor"');
           expect(headers).to.not.contain('"email"');
         })
         .end(done);

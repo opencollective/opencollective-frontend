@@ -30,8 +30,6 @@ export default function stripeWebhook(req, res, next) {
     return res.sendStatus(200);
   }
 
-  console.log(">>> stripeWebhook go");
-
   async.auto({
     fetchEvent: (cb) => {
 
@@ -39,12 +37,10 @@ export default function stripeWebhook(req, res, next) {
        * We check the event on stripe to be sure we don't get a fake event from
        * someone else
        */
-      console.log(">>> fetchEvent:", body.id, "stripe_account", body.user_id);
       appStripe.events.retrieve(body.id, {
         stripe_account: body.user_id
       })
       .then(event => {
-        console.log(">>> event received", event);
         if (event.type !== 'invoice.payment_succeeded') {
           return cb(new errors.BadRequest('Wrong event type received'));
         }
@@ -59,7 +55,6 @@ export default function stripeWebhook(req, res, next) {
          * Example: Ruby together has a subscription model outside of us.
          * https://dashboard.stripe.com/acct_15avvkAcWgwn5pBt/events/evt_17oYejAcWgwn5pBtRo5gRiyY
          */
-        console.log(">>> planId(stripeSubscription.plan)", planId(stripeSubscription.plan), "stripeSubscription.plan.id", stripeSubscription.plan.id);
         if (planId(stripeSubscription.plan) !== stripeSubscription.plan.id) {
           return res.sendStatus(200);
         }
@@ -67,7 +62,6 @@ export default function stripeWebhook(req, res, next) {
         /*
          * In case we get $0 order, return 200. Otherwise, Stripe will keep pinging us.
          */
-        console.log(">>> event.data.object.amount_due", event.data.object.amount_due);
         if (event.data.object.amount_due === 0) {
           return res.sendStatus(200);
         }
@@ -103,8 +97,7 @@ export default function stripeWebhook(req, res, next) {
           { model: User, as: 'createdByUser' },
           { model: Collective, as: 'toCollective' },
           { model: Subscription, where: { stripeSubscriptionId } }
-        ],
-        logging: console.log
+        ]
       })
       .then((order) => {
         /**
@@ -131,7 +124,6 @@ export default function stripeWebhook(req, res, next) {
     confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       const orderId = results.fetchOrder.id;
-      console.log(">>> confirmUniqueChargeId", chargeId)
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 
@@ -143,7 +135,6 @@ export default function stripeWebhook(req, res, next) {
           model: Transaction
         })
       .then(t => {
-        console.log(">>> result", t);
         if (t.length > 0) {
           cb(new errors.BadRequest(`This chargeId: ${chargeId} already exists.`))
         } else {

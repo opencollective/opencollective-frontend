@@ -4,7 +4,7 @@ import models from '../server/models';
 import nock from 'nock';
 
 nock('http://api.fixer.io:80')
-  .get('/2017-09-01')
+  .get(/.*/)
   .query({"base":"EUR","symbols":"USD"})
   .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
 
@@ -49,15 +49,12 @@ describe("paymentmethod.model.test.js", () => {
       type: 'DONATION'
     }));
 
-    it(`computes the balance in the currency of the payment method's collective`, (done) => {
-      paymentMethod
-        .getBalanceForUser(user)
-        .then(balance => {
-          expect(balance.currency).to.equal(organization.currency);
-          expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
-          done();
-        })
-    });
+    it(`computes the balance in the currency of the payment method's collective`, () => paymentMethod
+      .getBalanceForUser(user)
+      .then(balance => {
+        expect(balance.currency).to.equal(organization.currency);
+        expect(balance.amount).to.equal(7974); // $100 - (€5 + €2 + €10)
+      }));
 
   });
 

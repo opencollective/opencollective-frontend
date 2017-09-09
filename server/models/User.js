@@ -509,9 +509,13 @@ export default (Sequelize, DataTypes) => {
     return User.create(userData)
       .then(u => {
         user = u;
+        let name = userData.firstName;
+        if (name && userData.lastName) {
+          name += ` ${userData.lastName}`;
+        }
         const userCollective = {
           type: 'USER',
-          name: userData.name || user.email && user.email.split(/@|\+/)[0],
+          name: userData.name || name || user.email && user.email.split(/@|\+/)[0],
           image: userData.image,
           mission: userData.mission,
           description: userData.description,

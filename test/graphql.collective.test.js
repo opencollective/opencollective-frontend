@@ -7,7 +7,7 @@ import stripeMock from './mocks/stripe';
 
 import * as utils from './utils';
 
-describe('Query Tests', () => {
+describe('graphql.collective.test.js', () => {
   let pubnubCollective;
 
   beforeEach(() => utils.loadDB('opencollective_dvl'));
@@ -128,7 +128,7 @@ describe('Query Tests', () => {
     expect(userCollective.createdByUser.email).to.be.null;
     expect(memberships[1].collective.stats).to.deep.equal({
       backers: 25,
-      yearlyBudget: 338470
+      yearlyBudget: 338413
     });
   });
 

@@ -82,7 +82,7 @@ export const getUsers = (req, res, next) => {
   return promise
     .map(user => {
       const u = {...user.dataValues, role: user.dataValues.role, tier: user.tier && user.tier.info};
-      if (!req.remoteUser || !req.remoteUser.canEditCurrentCollective) {
+      if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }
       return u;

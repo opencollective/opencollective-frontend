@@ -42,7 +42,9 @@ describe('transactions.routes.test.js', () => {
 
   beforeEach(() => models.PaymentMethod.create({
     CreatedByUserId: user.id,
-    CollectiveId: user.CollectiveId
+    CollectiveId: user.CollectiveId,
+    service: 'stripe',
+    token: 'tok_123456781234567812345678'
   }))
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
@@ -278,7 +280,7 @@ describe('transactions.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(perPage);
-            expect(res.body[0].id).to.equal(perPage + 1);
+            expect(res.body[0].id).to.equal(perPage * 2 + 1);
 
             // Check pagination header.
             const { headers } = res;

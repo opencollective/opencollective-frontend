@@ -2,6 +2,8 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
+import debugLib from 'debug';
+const debug = debugLib("transaction");
 
 /*
  * Transaction model
@@ -215,7 +217,47 @@ export default (Sequelize, DataTypes) => {
     }).catch(console.error);
   };
 
+  /**
+   * Create the opposite transaction from the perspective of the FromCollective
+   * There is no fees
+   * @POST Two transactions are created. Returns the initial transaction FromCollectiveId -> ToCollectiveId
+   */
+  Transaction.createDoubleEntry = (transaction) => {
+    const oppositeTransaction = {
+      ...transaction,
+      type: (-transaction.amount > 0) ? type.DONATION : type.EXPENSE,
+      FromCollectiveId: transaction.ToCollectiveId,
+      ToCollectiveId: transaction.FromCollectiveId,
+      amount: -transaction.amount,
+      netAmountInCollectiveCurrency: -transaction.amount,
+      paymentProcessorFeeInTxnCurrency: 0,
+      platformFeeInTxnCurrency: 0,
+      hostFeeInTxnCurrency: 0
+    }
+
+    debug("createDoubleEntry", transaction, "opposite", oppositeTransaction);
+    
+    // We first record the negative transaction 
+    // and only then we can create the transaction to add money somewhere else
+    const transactions = [];
+    let index = 0;
+    if (transaction.amount < 0) {
+      index = 0;
+      transactions.push(transaction);
+      transactions.push(oppositeTransaction);
+    } else {
+      index = 1;
+      transactions.push(oppositeTransaction);
+      transactions.push(transaction);
+    }
+    return Transaction.createMany(transactions).then(transactions => transactions[index]);
+  };
+
   Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) => {
+
+    if (!transaction.amount) {
+      return Promise.reject(new Error("transaction.amount cannot be null or zero"));
+    }
 
     return models.Member.findOne({ where: { role: 'HOST', CollectiveId: ToCollectiveId } }).then(member => {
       if (!member) {
@@ -240,20 +282,7 @@ export default (Sequelize, DataTypes) => {
               - transaction.paymentProcessorFeeInTxnCurrency)
             * transaction.txnCurrencyFxRate);
       }
-
-      // Create the opposite transaction from the perspective of the FromCollective
-      const oppositeTransaction = {
-        ...transaction,
-        type: (-transaction.amount > 0) ? type.DONATION : type.EXPENSE,
-        FromCollectiveId: transaction.ToCollectiveId,
-        ToCollectiveId: transaction.FromCollectiveId,
-        amount: -transaction.amount,
-        netAmountInCollectiveCurrency: -transaction.amount
-      }
-
-      // We first record the transaction to remove the money from FromCollectiveId, 
-      // then the transaction to add the money to ToCollectiveId
-      return Transaction.createMany([ oppositeTransaction, transaction ])
+      return Transaction.createDoubleEntry(transaction);
     });
   };
 

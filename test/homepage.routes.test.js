@@ -21,7 +21,12 @@ describe('homepage.routes.test.js', () => {
         collective = g;
         return collective.addUserWithRole(user, 'HOST');
       })
-      .then(() => models.PaymentMethod.create({ CreatedByUserId: user.id, CollectiveId: user.CollectiveId }))
+      .then(() => models.PaymentMethod.create({
+        CreatedByUserId: user.id,
+        CollectiveId: user.CollectiveId,
+        service: 'stripe',
+        token: 'tok_123456781234567812345678'
+      }))
       .tap(p => paymentMethod = p)
       .then(() => {
         return models.Transaction.create({

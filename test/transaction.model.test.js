@@ -55,7 +55,7 @@ describe('transaction model', () => {
     })
   });
 
-  it('createFromPayload creates a new Transaction', () => {
+  it('createFromPayload creates a double entry transaction', () => {
     return Transaction.createFromPayload({
       transaction: transactionsData[7],
       CreatedByUserId: user.id,
@@ -65,8 +65,10 @@ describe('transaction model', () => {
     .then(() => {
       return Transaction.findAll()
       .then(transactions => {
-        expect(transactions.length).to.equal(1);
+        expect(transactions.length).to.equal(2);
         expect(transactions[0].description).to.equal(transactionsData[7].description);
+        expect(transactions[0].amount).to.equal(-transactionsData[7].amount);
+        expect(transactions[1].amount).to.equal(transactionsData[7].amount);
       })
     })
   })
@@ -74,7 +76,7 @@ describe('transaction model', () => {
   it('createFromPayload() generates a new activity', (done) => {
 
     const createActivityStub = sinon.stub(Transaction, 'createActivity', (t) => {
-      expect(t.amount).to.equal(transactionsData[7].amount);
+      expect(Math.abs(t.amount)).to.equal(Math.abs(transactionsData[7].amount));
       createActivityStub.restore();
       done();
     });

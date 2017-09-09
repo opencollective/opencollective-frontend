@@ -13,7 +13,7 @@ nock('http://api.fixer.io:80')
   .reply(200, {"base":"EUR","date":"2017-03-01","rates":{"USD":1.0533}});
 
 nock('http://api.fixer.io:80')
-  .get('/2017-03-01')
+  .get(/.*/)
   .query({"base":"INR","symbols":"USD"})
   .reply(200, {"base":"INR","date":"2017-03-01","rates":{"USD":0.014962}});
 

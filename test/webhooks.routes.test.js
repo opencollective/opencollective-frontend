@@ -5,7 +5,7 @@ import _ from 'lodash';
 import sinon from 'sinon';
 import app from '../server/index';
 import activities from '../server/constants/activities';
-import {type} from '../server/constants/transactions';
+import { type } from '../server/constants/transactions';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import stripeMock from './mocks/stripe';
@@ -73,7 +73,7 @@ describe('webhooks.routes.test.js', () => {
 
     beforeEach('Nock for retrieving charge', () => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4_2')
+        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
         .twice()
         .reply(200, stripeMock.charges.create);
     });
@@ -296,11 +296,11 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('successfully sends out an invoice by email to donor', () => {
-      expect(emailSendSpy.callCount).to.equal(3);
-      expect(emailSendSpy.thirdCall.args[0])
-      expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
-      expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-      expect(emailSendSpy.thirdCall.args[1]).to.equal(user.email);
+      expect(emailSendSpy.callCount).to.equal(2);
+      expect(emailSendSpy.secondCall.args[0])
+      expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
+      expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.false;
+      expect(emailSendSpy.secondCall.args[1]).to.equal(user.email);
     });
   });
 
@@ -335,6 +335,8 @@ describe('webhooks.routes.test.js', () => {
         type: 'application_fee.created'
       });
 
+      event.id = event.id.replace(/0/g, 1);
+
       nocks['events.retrieve'] = nock(STRIPE_URL)
         .get(`/v1/events/${event.id}`)
         .reply(200, event);
@@ -353,10 +355,8 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns an error if the event does not exist', (done) => {
-      const { id } = webhookEvent;
-
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${id}`)
+        .get(`/v1/events/123`)
         .reply(200, {
           error: {
             type: 'invalid_request_error',
@@ -369,7 +369,7 @@ describe('webhooks.routes.test.js', () => {
       request(app)
         .post('/webhooks/stripe')
         .send({
-          id
+          id: 123
         })
         .expect(400)
         .end(done);
@@ -421,6 +421,7 @@ describe('webhooks.routes.test.js', () => {
 
     it('returns 200 if the plan id is not valid', (done) => {
       const e = _.extend({}, webhookEvent);
+      e.id = e.id.replace(/0/g, 2);
       e.data.object.lines.data[0].plan.id = 'abc';
 
       nocks['events.retrieve'] = nock(STRIPE_URL)
@@ -446,10 +447,6 @@ describe('webhooks.routes.test.js', () => {
             })
             .catch(done);
         });
-
     });
-
-
   });
-
 });

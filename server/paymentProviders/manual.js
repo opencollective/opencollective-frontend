@@ -10,7 +10,7 @@ export default {
     const collective = order.toCollective;
     const user = order.createdByUser;
 
-    let isFromCollectiveHost, transactions;
+    let isFromCollectiveHost, transaction;
 
     const payload = {
       CreatedByUserId: user.id,
@@ -34,11 +34,12 @@ export default {
       .tap(isHost => isFromCollectiveHost = isHost)
       .then(isFromCollectiveHost => {
         payload.transaction.hostFeeInTxnCurrency = isFromCollectiveHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.totalAmount);
+        console.log(">>> Transaction.createFromPayload ", payload);
         return models.Transaction.createFromPayload(payload);
       })
-      .then(t => transactions = t)
+      .then(t => transaction = t)
       .then(() => !isFromCollectiveHost ? collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }) : Promise.resolve())
       .then(() => order.update({ processedAt: new Date }))
-      .then(() => transactions); // make sure we return the transactions created
+      .then(() => transaction); // make sure we return the transaction created
   }
 }

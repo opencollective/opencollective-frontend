@@ -538,12 +538,12 @@ describe('Mutation Tests', () => {
           expect(result.data).to.deep.equal({
             "createOrder": {
               "fromCollective": {
-                "id": 3,
-                "slug": "xdam"
+                "id": user2.CollectiveId,
+                "slug": user2.collective.slug
               },
               "toCollective": {
-                "id": 5,
-                "slug": "jan-meetup"
+                "id": event1.id,
+                "slug": event1.slug
               },
               "id": 1,
               "tier": {

@@ -86,7 +86,7 @@ describe('paypal.preapproval.routes.test.js', () => {
           expect(res.body).to.have.property('preapprovalKey', paypalMock.adaptive.preapproval.preapprovalKey);
 
           models.PaymentMethod
-            .findAndCountAll({})
+            .findAndCountAll({ where: { service: 'paypal' }})
             .then((res) => {
               expect(res.count).to.equal(1);
               const paykey = res.rows[0];

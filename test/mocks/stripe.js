@@ -248,7 +248,7 @@ export default {
         "application_fee": null,
         "attempt_count": 0,
         "attempted": true,
-        "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4_2",
+        "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4",
         "closed": true,
         "currency": "usd",
         "customer": "cus_BM7mGwp1Ea8RtL",

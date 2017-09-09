@@ -94,7 +94,8 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     description: expense.description,
     CreatedByUserId: UserId,
     ToCollectiveId: expense.CollectiveId,
-    HostCollectiveId: host.id
+    HostCollectiveId: host.id,
+    PaymentMethodId: paymentMethod ? paymentMethod.id : null
   };
 
   return getFxRatePromise
@@ -110,8 +111,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
       transaction.FromCollectiveId = user.CollectiveId;
       return transaction;
     })
-    .then(transaction => models.Transaction.create(transaction))
-    .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
+    .then(transaction => models.Transaction.createDoubleEntry(transaction))
     .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
 

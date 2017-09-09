@@ -111,6 +111,7 @@ export const _authenticateUserByJwt = (req, res, next) => {
       req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
       debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
       next();
+      return null;
     })
     .catch(next);
 };

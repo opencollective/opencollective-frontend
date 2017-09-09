@@ -286,7 +286,7 @@ export default {
             "twitterHandle": "xdamman"
           },
           "order": {
-            "amount": 1234,
+            "totalAmount": 1234,
             "currency": "EUR"
           },
           "subscription": {
@@ -308,7 +308,7 @@ export default {
             "twitterHandle": "xdamman"
           },
           "order": {
-            "amount": 1234,
+            "totalAmount": 1234,
             "currency": "EUR"
           },
           "subscription": {
@@ -554,7 +554,7 @@ export default {
     "stripeSubscriptionId": "sub_tokentest"
   },
   "expense1": {
-    "description": "Lunch with Jenn",
+    "description": "Expense 1: Lunch with Jenn",
     "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
@@ -575,7 +575,7 @@ export default {
     "payoutMethod": "manual"
   },
   "expense3": {
-    "description": "Lunch with Jenn",
+    "description": "Expense 3: Lunch with Jenn",
     "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,

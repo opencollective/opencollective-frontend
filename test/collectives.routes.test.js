@@ -296,7 +296,11 @@ describe('collectives.routes.test.js', () => {
       .setStripeAccount(stripeAccount)
       .then(() => user.collective.setStripeAccount(stripeAccount)));
 
-    beforeEach('create a new payment method for user', () => models.PaymentMethod.create({CollectiveId: user.CollectiveId}))
+    beforeEach('create a new payment method for user', () => models.PaymentMethod.create({
+      CollectiveId: user.CollectiveId,
+      service: 'stripe',
+      token: 'tok_123456781234567812345678'
+    }))
 
     // Create a transaction for collective1.
     beforeEach('create a transaction for collective 1', () =>

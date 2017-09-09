@@ -118,7 +118,7 @@ export const resetTestDatabase = function(req, res, next) {
       secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
     }))
     .then((connectedAccount) => connectedAccount.setUser(testHost))
-    .then(() => models.PaymentMethod.create({ service: 'paypal', UserId: testHost.id}))
+    .then(() => models.PaymentMethod.create({ service: 'paypal', token: 'abc', UserId: testHost.id}))
     .then(() => models.Donation.create({
       title: "Donation 1",
       amount: 100,
