@@ -7,7 +7,6 @@ import app from '../server/index';
 import activities from '../server/constants/activities';
 import {type} from '../server/constants/transactions';
 import * as utils from '../test/utils';
-import {planId as generatePlanId} from '../server/lib/utils';
 import models from '../server/models';
 import stripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';

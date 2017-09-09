@@ -127,7 +127,7 @@ export default function(Sequelize, DataTypes) {
       },
 
       features() {
-        const paymentProvider = paymentProviders[this.service];
+        const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
         return paymentProvider.features || {};
       },
 
@@ -161,7 +161,7 @@ export default function(Sequelize, DataTypes) {
    */
   PaymentMethod.prototype.getBalanceForUser = function(user) {
     if (!user) return {};
-    const paymentProvider = paymentProviders[this.service];
+    const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
     let getBalance;
     debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
     if (paymentProvider.getBalance) {

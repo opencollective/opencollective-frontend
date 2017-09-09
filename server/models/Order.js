@@ -165,6 +165,7 @@ export default function(Sequelize, DataTypes) {
         this.PaymentMethodId = pm.id;
         return this.save();
       })
+      .then(() => this);
   }
 
   /**

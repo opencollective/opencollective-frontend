@@ -13,8 +13,11 @@ import * as paymentProviders from '../paymentProviders';
  */
 export const executeOrder = (user, order) => {
 
+  if (! (order instanceof models.Order)) {
+    return Promise.reject(new Error("order should be an instance of the Order model"));
+  }
   if (!order) {
-    throw new Error("No order provided");
+    return Promise.reject(new Error("No order provided"));
   }
   if (!order.PaymentMethodId) {
     return Promise.reject(new Error('PaymentMethodId missing in the order'));
@@ -29,7 +32,11 @@ export const executeOrder = (user, order) => {
     currency: order.currency
   };
 
-  validatePayment(payment);
+  try {
+    validatePayment(payment);
+  } catch (error) {
+    return Promise.reject(error);
+  }
 
   return order.populate()
     .then(() => {
@@ -43,11 +50,12 @@ export const executeOrder = (user, order) => {
     })
     .then(() => {
       const paymentProvider = (order.paymentMethod) ? order.paymentMethod.service : 'manual';
-      return paymentProviders[paymentProvider].processOrder(order);
+      return paymentProviders[paymentProvider].processOrder(order); // eslint-disable-line import/namespace
     })
     .then(transactions => {
       order.transactions = transactions;
-      sendConfirmationEmail(order)
+      sendConfirmationEmail(order); // async
+      return null;
     });
 }
 

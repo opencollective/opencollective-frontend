@@ -36,7 +36,7 @@ export const cancel = (req, res, next) => {
   return models.Order.find({
     include: [
       { model: models.Collective, as: 'toCollective' },
-      { model: models.PaymentMethod },
+      { model: models.PaymentMethod, as: 'paymentMethod' },
       { model: models.User, as: 'createdByUser' },
       { model: models.Subscription,
         where: {
@@ -56,7 +56,7 @@ export const cancel = (req, res, next) => {
     const stripe = Stripe(stripeAccount.token)
 
     return stripe.customers.cancelSubscription(
-      order.PaymentMethod.customerId,
+      order.paymentMethod.customerId,
       order.Subscription.stripeSubscriptionId)
   })
 

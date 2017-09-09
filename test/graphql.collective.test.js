@@ -1,8 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import schema from '../server/graphql/schema';
 import models from '../server/models';
-import { graphql } from 'graphql';
 import sinon from 'sinon';
 import { appStripe } from '../server/gateways/stripe';
 import stripeMock from './mocks/stripe';

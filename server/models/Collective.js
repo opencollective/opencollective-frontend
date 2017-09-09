@@ -819,6 +819,7 @@ export default function(Sequelize, DataTypes) {
         return id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } });
       })
       .then(stripeAccount => {
+        debug("getHostStripeAccount", "using stripe account", stripeAccount && stripeAccount.username);
         if (!stripeAccount || !stripeAccount.token) {
           return Promise.reject(new Error(`The host for the ${this.name} collective has no Stripe account set up (HostId: ${HostId})`));
         } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.token, 'live')) {

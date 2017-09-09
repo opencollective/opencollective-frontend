@@ -55,7 +55,7 @@ describe('lib/email', () => {
     const template = 'thankyou';
     const collective = { name: "La Primaire", slug: "laprimaire" };
     const data = {
-      order: { amount: 5000, currency: 'EUR'},
+      order: { totalAmount: 5000, currency: 'EUR'},
       transaction: { uuid: '17811b3e-0ac4-4101-81d4-86e9e0aefd7b' },
       config: { host: config.host },
       interval: 'month',
@@ -65,16 +65,10 @@ describe('lib/email', () => {
     const options = {
       from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
     };
-    const amount = Number(50).toLocaleString('fr-BE', {
-      style: 'currency',
-      currency: 'EUR',
-      currencyDisplay: 'symbol',
-      minimumFractionDigits: 0
-    })
     return emailLib.send(template, data.user.email, data, options)
       .tap(() => {
         let amountStr = 50;
-        amountStr = amountStr.toLocaleString('EUR', {
+        amountStr = amountStr.toLocaleString('fr-BE', {
           style: 'currency',
           currency: 'EUR',
           minimumFractionDigits : 0,
@@ -90,7 +84,7 @@ describe('lib/email', () => {
   it('sends the thankyou.wwcode email template', () => {
 
     const paymentData = {
-      amount: 5000,
+      totalAmount: 5000,
       currency: 'USD'
      };
 
@@ -105,16 +99,10 @@ describe('lib/email', () => {
         slug: "wwcodeaustin"
       }
     };
-    const amount = Number(50).toLocaleString('USD', {
-      style: 'currency',
-      currency: 'USD',
-      currencyDisplay: 'symbol',
-      minimumFractionDigits: 0
-    })
     return emailLib.send('thankyou', data.user.email, data)
       .tap(() => {
         let amountStr = 50;
-        amountStr = amountStr.toLocaleString('USD', {
+        amountStr = amountStr.toLocaleString('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits : 0,
@@ -129,7 +117,7 @@ describe('lib/email', () => {
   it('sends the thankyou.brusselstogether email template', () => {
 
     const paymentData = {
-      amount: 5000,
+      totalAmount: 5000,
       currency: 'EUR'
      };
 

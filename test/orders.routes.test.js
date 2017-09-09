@@ -4,16 +4,16 @@ import request from 'supertest-as-promised';
 import sinon from 'sinon';
 import * as utils from '../test/utils';
 import roles from '../server/constants/roles';
-import paymentsLib from '../server/lib/payments';
+import * as payments from '../server/lib/payments';
 import models from '../server/models';
 
 const AMOUNT = 1099;
 const CURRENCY = 'EUR';
-const STRIPE_TOKEN = 'superStripeToken';
+const STRIPE_TOKEN = 'tok_123456781234567812345678';
 const application = utils.data('application');
 
 describe('orders.routes.test.js', () => {
-  let user, user2, host, collective, sandbox, processPaymentStub;
+  let user, user2, host, collective, sandbox, executeOrderStub;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -22,7 +22,7 @@ describe('orders.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    processPaymentStub = sandbox.stub(paymentsLib, 'processPayment', () => Promise.resolve());
+    executeOrderStub = sandbox.stub(payments, 'executeOrder', () => Promise.resolve());
   });
 
   beforeEach(() => utils.resetTestDB());
@@ -138,8 +138,8 @@ describe('orders.routes.test.js', () => {
               })
               .expect(200)
               .then(() => {
-                expect(processPaymentStub.callCount).to.equal(1);
-                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.callCount).to.equal(1);
+                expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: host.id,
                   ToCollectiveId: collective.id,
                   currency: collective.currency,
@@ -163,8 +163,8 @@ describe('orders.routes.test.js', () => {
               })
               .expect(200)
               .then(() => {
-                expect(processPaymentStub.callCount).to.equal(1);
-                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.callCount).to.equal(1);
+                expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: host.id,
                   ToCollectiveId: collective.id,
                   currency: collective.currency,
@@ -191,8 +191,8 @@ describe('orders.routes.test.js', () => {
                 where: { email: 'newuser@sponsor.com' }
                 }))
               .then(newUser => {
-                expect(processPaymentStub.callCount).to.equal(1);
-                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.callCount).to.equal(1);
+                expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: newUser.id,
                   ToCollectiveId: collective.id,
                   currency: collective.currency,
@@ -217,8 +217,8 @@ describe('orders.routes.test.js', () => {
               })
               .expect(200)
               .then(() => {
-                expect(processPaymentStub.callCount).to.equal(1);
-                expect(processPaymentStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.callCount).to.equal(1);
+                expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: user2.id,
                   ToCollectiveId: collective.id,
                   currency: collective.currency,

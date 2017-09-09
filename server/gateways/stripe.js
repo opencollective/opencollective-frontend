@@ -37,6 +37,7 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
  * Create stripe subscription with plan
  */
 export const createSubscription = (stripeAccount, customerId, subscription) => {
+  debug("createSubscription");
   return appStripe.customers.createSubscription(customerId, subscription, { stripe_account: stripeAccount.username });
 };
 
@@ -55,6 +56,7 @@ export const getSubscriptionsList = (stripeAccount, limit) => {
   if (!limit) {
     limit = 10;
   }
+  debug("getSubscriptionsList");
   return appStripe.subscriptions.list({ limit }, { stripe_account: stripeAccount.username });
 };
 
@@ -62,6 +64,7 @@ export const getSubscriptionsList = (stripeAccount, limit) => {
  * Delete a subscription
  */
 export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
+  debug("cancelSubscription");
   return appStripe.subscriptions.del(stripeSubscriptionId, { stripe_account: stripeAccount.username });
 };
 
@@ -72,7 +75,7 @@ export const cancelSubscription = (stripeAccount, stripeSubscriptionId) => {
 export const createCustomer = (stripeAccount, token, options = {}) => {
   const collective = options.collective || {};
   const email = options.email || '';
-  debug(">>> stripe: createCustomer using stripeAccount", stripeAccount && { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "and token", token);
+  debug("createCustomer", "stripeAccount", stripeAccount && { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, "and token", token);
   return appStripe.customers.create({
     source: token,
     description:  `https://opencollective.com/${collective.slug}`,
@@ -84,6 +87,7 @@ export const createCustomer = (stripeAccount, token, options = {}) => {
  * Fetch customer
  */
 export const retrieveCustomer = (stripeAccount, customerId) => {
+  debug("retrieveCustomer");
   return appStripe.customers.retrieve(customerId, { stripe_account: stripeAccount.username });
 };
 
@@ -108,6 +112,7 @@ export const createCharge = (stripeAccount, charge) => {
  * Fetch charge
  */
 export const retrieveCharge = (stripeAccount, chargeId) => {
+  debug("retrieveCharge");
   return client(stripeAccount).charges.retrieve(chargeId);
 };
 
@@ -115,6 +120,7 @@ export const retrieveCharge = (stripeAccount, chargeId) => {
  * Retrieve a balance transaction (for fees)
  */
 export const retrieveBalanceTransaction = (stripeAccount, txn) => {
+  debug("retrieveBalanceTransaction", { username: stripeAccount.username, CollectiveId: stripeAccount.CollectiveId }, txn);
   return appStripe.balance.retrieveTransaction(txn, { stripe_account: stripeAccount.username });
 };
 
