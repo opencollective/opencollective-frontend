@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import { appendTier, defaultHostCollectiveId } from '../lib/utils';
+import { appendTier, defaultHostCollectiveId, getLinkHeader, getRequestedUrl } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -482,4 +482,44 @@ export const getCollectiveTags = (req, res, next) => {
   return queries.getUniqueCollectiveTags()
   .then(tags => res.send(tags))
   .catch(next);
+};
+
+export const getTransactions = (req, res, next) => {
+  const where = {
+    ToCollectiveId: req.collective.id
+  };
+
+  if (req.query.donation || req.query.type === 'donations') {
+    where.amount = {
+      $gt: 0
+    };
+  } else if (req.query.expense || req.query.type === 'expenses') {
+    where.amount = {
+      $lt: 0
+    };
+  }
+
+  if (req.query.exclude) {
+    where.$or = [ { type: { $ne: req.query.exclude } }, { type: { $eq: null } } ];
+  }
+
+  const query = _.merge({
+    where,
+    include: { model: models.Order },
+    order: [[req.sorting.key, req.sorting.dir]]
+  }, req.pagination);
+
+  models.Transaction
+    .findAndCountAll(query)
+    .then((transactions) => {
+
+      // Set headers for pagination.
+      req.pagination.total = transactions.count;
+      res.set({
+        Link: getLinkHeader(getRequestedUrl(req), req.pagination)
+      });
+
+      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': (transaction.Order && transaction.Order.title) || transaction.description })));
+    })
+    .catch(next);
 };

@@ -173,7 +173,8 @@ export default (app) => {
    * Transactions (financial).
    */
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
-
+  app.get('/groups/:collectiveid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), collectives.getTransactions); // Get a group's transactions.
+  
   /**
    * Expenses
    */

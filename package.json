@@ -130,7 +130,7 @@
     "pretest": "npm run hint",
     "test": "npm run test:unit && npm run coverage",
     "test:unit:dev": "mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
-    "test:unit": "nyc --cache=true --reporter=lcov mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
+    "test:unit": "nyc mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
@@ -156,6 +156,13 @@
     "cron:monthly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh monthly",
     "cron:yearly": "PG_MAX_CONNECTIONS=1 ./scripts/cron.sh yearly",
     "compile:email": "babel-node scripts/compile-email.js"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "cache": true
   },
   "license": "MIT",
   "repository": {

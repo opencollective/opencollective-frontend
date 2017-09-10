@@ -358,37 +358,35 @@ describe('collectives.routes.test.js', () => {
 
     describe('Transactions/Budget', () => {
 
-      const transactions = [];
       let totTransactions = 0;
       let totDonations = 0;
 
+      const transactions = transactionsData.map(transaction => {
+        console.log(">>> transaction.amount", transaction.amount);
+        if (transaction.amount < 0)
+          totTransactions += transaction.amount;
+        else
+          totDonations += transaction.amount;
+
+        transaction.netAmountInCollectiveCurrency = transaction.amount;
+        return transaction;
+      });
+
       // Create collective2
       beforeEach('create collective 2', () =>
-        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "collective 2", slug: "collective2"}));
+        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "collective 2", slug: "collective2"})
+      );
 
         // Create transactions for publicCollective.
-      beforeEach('create transactions for public collective', (done) => {
-        async.each(transactionsData, (transaction, cb) => {
-          if (transaction.amount < 0)
-            totTransactions += transaction.amount;
-          else
-            totDonations += transaction.amount;
-
-          request(app)
-            .post(`/collectives/${publicCollective.id}/transactions`)
-            .set('Authorization', `Bearer ${user.jwt()}`)
-            .send({
-              api_key: application.api_key,
-              transaction: _.extend({}, transaction, { netAmountInCollectiveCurrency: transaction.amount, approved: true })
-            })
-            .expect(200)
-            .end((e, res) => {
-              expect(e).to.not.exist;
-              transactions.push(res.body);
-              cb();
-            });
-        }, done);
-      });
+      beforeEach('create transactions for public collective', () => models.Transaction
+        .createMany(transactions, {
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          ToCollectiveId: publicCollective.id,
+          HostCollectiveId: host.CollectiveId,
+          approved: true
+        })
+      );
 
       // Create a subscription for PublicCollective.
       beforeEach(() => models.Subscription

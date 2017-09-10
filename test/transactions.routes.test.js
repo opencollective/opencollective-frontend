@@ -107,4 +107,118 @@ describe('transactions.routes.test.js', () => {
 
   });
 
+  describe('Pagination', () => {
+
+    const perPage = 3;
+
+    it('successfully get a group\'s transactions with per_page', (done) => {
+      request(app)
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
+        .send({
+          per_page: perPage,
+          sort: 'id',
+          direction: 'asc'
+        })
+        .set('Authorization', `Bearer ${user.jwt()}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          expect(res.body.length).to.equal(perPage);
+          expect(res.body[0].id).to.equal(1);
+
+          // Check pagination header.
+          const { headers } = res;
+          expect(headers).to.have.property('link');
+          expect(headers.link).to.contain('next');
+          expect(headers.link).to.contain('page=2');
+          expect(headers.link).to.contain('current');
+          expect(headers.link).to.contain('page=1');
+          expect(headers.link).to.contain(`per_page=${perPage}`);
+          expect(headers.link).to.contain(`/groups/${publicCollective.id}/transactions`);
+          const tot = transactionsData.length;
+          expect(headers.link).to.contain(`/groups/${publicCollective.id}/transactions?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
+
+          done();
+        });
+    });
+
+    it('successfully get the second page of a group\'s transactions', (done) => {
+      const page = 2;
+      request(app)
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
+        .send({
+          per_page: perPage,
+          page,
+          sort: 'id',
+          direction: 'asc'
+        })
+        .set('Authorization', `Bearer ${user.jwt()}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          expect(res.body.length).to.equal(perPage);
+          expect(res.body[0].id).to.equal(perPage + 1);
+
+          // Check pagination header.
+          const { headers } = res;
+          expect(headers.link).to.contain('page=3');
+          expect(headers.link).to.contain('page=2');
+          done();
+        });
+    });
+
+    it('successfully get a group\'s transactions using since_id', (done) => {
+      const sinceId = 5;
+
+      request(app)
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
+        .send({
+          since_id: sinceId,
+          sort: 'id',
+          direction: 'asc'
+        })
+        .set('Authorization', `Bearer ${user.jwt()}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          const transactions = res.body;
+          expect(transactions[0].id > sinceId).to.be.true;
+          const last = 0;
+          _.each(transactions, (t) => {
+            expect(t.id >= last).to.be.true;
+          });
+
+          // Check pagination header.
+          const { headers } = res;
+          expect(headers.link).to.be.empty;
+          done();
+        });
+
+    });
+
+  });
+
+  describe('Sorting', () => {
+
+    it('successfully get a group\'s transactions with sorting', (done) => {
+      request(app)
+        .get(`/groups/${publicCollective.id}/transactions?api_key=${application.api_key}`)
+        .send({
+          sort: 'createdAt',
+          direction: 'asc'
+        })
+        .set('Authorization', `Bearer ${user.jwt()}`)
+        .expect(200)
+        .end((e, res) => {
+          expect(e).to.not.exist;
+          const transactions = res.body;
+          let last = new Date(transactions[0].createdAt);
+          _.each(transactions, (a) => {
+            expect((new Date(a.createdAt) >= new Date(last))).to.be.true;
+            last = a.createdAt;
+          });
+          done();
+        });
+    });
+  });
 });
