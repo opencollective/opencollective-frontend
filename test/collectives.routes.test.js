@@ -361,7 +361,6 @@ describe('collectives.routes.test.js', () => {
       let totDonations = 0;
 
       const transactions = transactionsData.map(transaction => {
-        console.log(">>> transaction.amount", transaction.amount);
         if (transaction.amount < 0)
           totTransactions += transaction.amount;
         else
