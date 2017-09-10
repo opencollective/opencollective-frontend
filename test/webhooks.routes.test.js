@@ -11,7 +11,7 @@ import models from '../server/models';
 import stripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
 import * as payments from '../server/lib/payments';
-import './webhooks.routes.test.nock.js';
+import initNock from './webhooks.routes.test.nock.js';
 
 /**
  * Mock data
@@ -26,12 +26,12 @@ const STRIPE_URL = 'https://api.stripe.com:443';
 const CURRENCY = 'USD';
 const INTERVAL = 'month';
 
-
 describe('webhooks.routes.test.js', () => {
   const nocks = {};
   let sandbox, user, host, paymentMethod, collective, order, emailSendSpy, stripeToken;
 
   before(async () => {
+    initNock();
     sandbox = sinon.sandbox.create();
     stripeToken = await utils.createStripeToken();
   });
@@ -70,6 +70,11 @@ describe('webhooks.routes.test.js', () => {
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
+
+    const customWebhookEvent = _.extend({}, webhookEvent, {
+      id: webhookEvent.id.replace(/0/g, 3),
+      type: 'invoice.payment_succeeded'
+    });  
 
     beforeEach('Nock for retrieving charge', () => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
@@ -136,17 +141,12 @@ describe('webhooks.routes.test.js', () => {
     // Now we send the webhook
     beforeEach('send webhook', (done) => {
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${webhookEvent.id}`)
-        .reply(200,
-          _.extend({},
-            webhookEvent, {
-            type: 'invoice.payment_succeeded'
-          })
-        );
+        .get(`/v1/events/${customWebhookEvent.id}`)
+        .reply(200, customWebhookEvent);
 
       request(app)
         .post('/webhooks/stripe')
-        .send(webhookEvent)
+        .send(customWebhookEvent)
         .expect(200)
         .end((err) => {
           expect(err).to.not.exist;
@@ -200,7 +200,7 @@ describe('webhooks.routes.test.js', () => {
         .tap((res) => {
           const e = res.rows[0].data.event;
           expect(res.count).to.equal(1);
-          expect(e.id).to.be.equal(webhookEvent.id);
+          expect(e.id).to.be.equal(customWebhookEvent.id);
           done();
         })
         .catch(done);
@@ -208,14 +208,15 @@ describe('webhooks.routes.test.js', () => {
 
     it('fail to create a second transaction with the same charge id', done => {
       const anotherWebhookEvent = _.cloneDeep(webhookEvent);
+      anotherWebhookEvent.id = anotherWebhookEvent.id.replace(/0/g, 4);
       anotherWebhookEvent.data.object.charge = 'ch_17KUJnBgJgc4Ba6uvdu1hxm4';
       nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${webhookEvent.id}`)
+        .get(`/v1/events/${anotherWebhookEvent.id}`)
         .reply(200, anotherWebhookEvent);
 
       request(app)
         .post('/webhooks/stripe')
-        .send(webhookEvent)
+        .send(anotherWebhookEvent)
         .expect(400, {
           error: {
             code: 400,

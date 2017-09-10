@@ -280,7 +280,7 @@ describe('transactions.routes.test.js', () => {
           .end((e, res) => {
             expect(e).to.not.exist;
             expect(res.body.length).to.equal(perPage);
-            expect(res.body[0].id).to.equal(perPage * 2 + 1);
+            expect(res.body[0].id).to.equal(perPage + 1);
 
             // Check pagination header.
             const { headers } = res;

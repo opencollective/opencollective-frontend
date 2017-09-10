@@ -10,7 +10,7 @@ import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import crypto from 'crypto';
 import config from 'config';
-import './email.routes.test.nock.js';
+import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
   const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
@@ -62,6 +62,8 @@ describe("email.routes.test", () => {
   let sandbox;
 
   before(() => utils.resetTestDB());
+
+  before(initNock);
 
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
