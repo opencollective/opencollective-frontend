@@ -61,16 +61,20 @@ export function collectiveid(req, res, next, collectiveIdOrSlug) {
  * transactionuuid
  */
 export function transactionuuid(req, res, next, transactionuuid) {
-  if (!isUUID(transactionuuid))
-    return next(new errors.BadRequest("Must provide transaction uuid"));
+  if (!isUUID(transactionuuid)) {
+    next(new errors.BadRequest("Must provide transaction uuid"));
+    return null;    
+  }
 
   Transaction.findOne({ where: { uuid: transactionuuid } })
     .then((transaction) => {
       if (!transaction) {
-        return next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));
+        next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));
+        return null;
       } else {
         req.transaction = transaction;
         next();
+        return null;
       }
     })
     .catch(next);
@@ -89,10 +93,12 @@ export function paranoidtransactionid(req, res, next, id) {
     })
     .then((transaction) => {
       if (!transaction) {
-        return next(new errors.NotFound(`Transaction ${id} not found`));
+        next(new errors.NotFound(`Transaction ${id} not found`));
+        return null;
       } else {
         req.paranoidtransaction = transaction;
         next();
+        return null;
       }
     })
     .catch(next);
@@ -117,10 +123,12 @@ export function expenseid(req, res, next, expenseid) {
     }))
     .then((expense) => {
       if (!expense) {
-        return next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInCollective}`));
+        next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInCollective}`));
+        return null;
       } else {
         req.expense = expense;
         next();
+        return null;
       }
     })
     .catch(next);

@@ -129,25 +129,6 @@ export const deleteTransaction = (req, res, next) => {
 };
 
 /**
- * Create a transaction and add it to a collective.
- */
-export const createTransaction = (req, res, next) => {
-  const { transaction } = req.required;
-  const { collective } = req;
-
-  // Caller.
-  const user = req.remoteUser || req.user || transaction.user || {};
-  return models.Transaction.createFromPayload({
-      transaction,
-      FromCollectiveId: user.CollectiveId,
-      ToCollectiveId: collective.id,
-      CreatedByUserId: user.id
-    })
-    .then(t => res.send(t))
-    .catch(next);
-};
-
-/**
  * Create a collective.
  */
 export const create = (req, res, next) => {

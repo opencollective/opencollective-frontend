@@ -174,10 +174,6 @@ export default (app) => {
    */
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
 
-  // TODO remove once app is deprecated, replaced by POST /collectives/:collectiveid/expenses and POST /collectives/:collectiveid/donations/manual
-  app.post('/collectives/:collectiveid/transactions', required('transaction'), auth.canEditCollective, collectives.createTransaction); // Create a transaction for a collective.
-
-
   /**
    * Expenses
    */
