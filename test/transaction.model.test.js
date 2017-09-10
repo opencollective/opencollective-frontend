@@ -66,6 +66,7 @@ describe('transaction model', () => {
       return Transaction.findAll()
       .then(transactions => {
         expect(transactions.length).to.equal(2);
+        expect(transactions[0] instanceof models.Transaction).to.be.true;
         expect(transactions[0].description).to.equal(transactionsData[7].description);
         expect(transactions[0].amount).to.equal(-transactionsData[7].amount);
         expect(transactions[1].amount).to.equal(transactionsData[7].amount);
