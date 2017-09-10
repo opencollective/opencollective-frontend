@@ -172,7 +172,6 @@ export default (app) => {
   /**
    * Transactions (financial).
    */
-  app.get('/collectives/:collectiveid/transactions', mw.paginate(), mw.sorting({key: 'createdAt', dir: 'DESC'}), collectives.getTransactions); // Get a collective's transactions.
   app.get('/transactions/:transactionuuid', transactions.getOne); // Get the transaction details
 
   // TODO remove once app is deprecated, replaced by POST /collectives/:collectiveid/expenses and POST /collectives/:collectiveid/donations/manual

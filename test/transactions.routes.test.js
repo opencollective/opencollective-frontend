@@ -129,56 +129,26 @@ describe('transactions.routes.test.js', () => {
    */
   describe('#get', () => {
 
-    let transaction;
+    let transaction, defaultAttributes;
 
-    beforeEach('create multiple transactions for publicCollective', (done) => {
-      async.each(transactionsData, (t, cb) => {
-        request(app)
-          .post(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-          .set('Authorization', `Bearer ${user3.jwt()}`)
-          .send({ transaction: t })
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            transaction = res.body;
-            cb();
-          });
-      }, done);
+    before(() => {
+      defaultAttributes = {
+        CreatedByUserId: user3.id,
+        FromCollectiveId: user3.CollectiveId,
+        HostCollectiveId: user.CollectiveId
+      };
     });
 
-    beforeEach('create a transaction for collective2', (done) => {
-      async.each(transactionsData, (transaction, cb) => {
-        request(app)
-          .post(`/collectives/${collective2.id}/transactions?api_key=${application.api_key}`)
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .send({
-            transaction
-          })
-          .expect(200)
-          .end(e => {
-            expect(e).to.not.exist;
-            cb();
-          });
-      }, done);
-    });
+    beforeEach('create multiple transactions for publicCollective', () => models.Transaction
+      .createMany(transactionsData, { ToCollectiveId: publicCollective.id, ...defaultAttributes })
+      .then(transactions => {
+        transaction = transactions[0]
+      })
+    );
 
-    it('successfully get a collective\'s transactions', (done) => {
-      request(app)
-        .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-        .expect(200)
-        .end((e, res) => {
-          expect(e).to.not.exist;
-
-          const transactions = res.body;
-          expect(transactions).to.have.length(transactionsData.length);
-          transactions.forEach((t) => {
-            expect(t.ToCollectiveId).to.equal(publicCollective.id);
-          });
-
-          done();
-
-        });
-    });
+    beforeEach('create multiple transactions for collective2', () => models.Transaction
+      .createMany(transactionsData, { ToCollectiveId: collective2.id, ...defaultAttributes })
+    );
 
     it('cannot get the transaction details by id', (done) => {
       request(app)
@@ -228,123 +198,6 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.toCollective.slug).to.equal(publicCollective.slug);
           done();
         });
-    });
-
-    describe('Pagination', () => {
-
-      const perPage = 3;
-
-      it('successfully get a collective\'s transactions with per_page', (done) => {
-        request(app)
-          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-          .send({
-            per_page: perPage,
-            sort: 'id',
-            direction: 'asc'
-          })
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            expect(res.body.length).to.equal(perPage);
-            expect(res.body[0].id).to.equal(1);
-
-            // Check pagination header.
-            const { headers } = res;
-            expect(headers).to.have.property('link');
-            expect(headers.link).to.contain('next');
-            expect(headers.link).to.contain('page=2');
-            expect(headers.link).to.contain('current');
-            expect(headers.link).to.contain('page=1');
-            expect(headers.link).to.contain(`per_page=${perPage}`);
-            expect(headers.link).to.contain(`/collectives/${publicCollective.id}/transactions`);
-            const tot = transactionsData.length;
-            expect(headers.link).to.contain(`/collectives/${publicCollective.id}/transactions?page=${Math.ceil(tot / perPage)}&per_page=${perPage}>; rel="last"`);
-
-            done();
-          });
-      });
-
-      it('successfully get the second page of a collective\'s transactions', (done) => {
-        const page = 2;
-        request(app)
-          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-          .send({
-            per_page: perPage,
-            page,
-            sort: 'id',
-            direction: 'asc'
-          })
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            expect(res.body.length).to.equal(perPage);
-            expect(res.body[0].id).to.equal(perPage + 1);
-
-            // Check pagination header.
-            const { headers } = res;
-            expect(headers.link).to.contain('page=3');
-            expect(headers.link).to.contain('page=2');
-            done();
-          });
-      });
-
-      it('successfully get a collective\'s transactions using since_id', (done) => {
-        const sinceId = 5;
-
-        request(app)
-          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-          .send({
-            since_id: sinceId,
-            sort: 'id',
-            direction: 'asc'
-          })
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            const transactions = res.body;
-            expect(transactions[0].id > sinceId).to.be.true;
-            const last = 0;
-            _.each(transactions, (t) => {
-              expect(t.id >= last).to.be.true;
-            });
-
-            // Check pagination header.
-            const { headers } = res;
-            expect(headers.link).to.be.empty;
-            done();
-          });
-
-      });
-
-    });
-
-    describe('Sorting', () => {
-
-      it('successfully get a collective\'s transactions with sorting', (done) => {
-        request(app)
-          .get(`/collectives/${publicCollective.id}/transactions?api_key=${application.api_key}`)
-          .send({
-            sort: 'createdAt',
-            direction: 'asc'
-          })
-          .set('Authorization', `Bearer ${user.jwt()}`)
-          .expect(200)
-          .end((e, res) => {
-            expect(e).to.not.exist;
-            const transactions = res.body;
-            let last = new Date(transactions[0].createdAt);
-            _.each(transactions, (a) => {
-              expect((new Date(a.createdAt) >= new Date(last))).to.be.true;
-              last = a.createdAt;
-            });
-
-            done();
-          });
-      });
-
     });
 
   });

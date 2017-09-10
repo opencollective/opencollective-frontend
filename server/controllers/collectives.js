@@ -92,49 +92,6 @@ export const getUsers = (req, res, next) => {
 };
 
 /**
- * Get collective's transactions.
- */
-export const getTransactions = (req, res, next) => {
-  const where = {
-    ToCollectiveId: req.collective.id
-  };
-
-  if (req.query.donation || req.query.type === 'donations') {
-    where.amount = {
-      $gt: 0
-    };
-  } else if (req.query.expense || req.query.type === 'expenses') {
-    where.amount = {
-      $lt: 0
-    };
-  }
-
-  if (req.query.exclude) {
-    where.$or = [ { type: { $ne: req.query.exclude } }, { type: { $eq: null } } ];
-  }
-
-  const query = _.merge({
-    where,
-    include: { model: models.Order },
-    order: [[req.sorting.key, req.sorting.dir]]
-  }, req.pagination);
-
-  Transaction
-    .findAndCountAll(query)
-    .then((transactions) => {
-
-      // Set headers for pagination.
-      req.pagination.total = transactions.count;
-      res.set({
-        Link: getLinkHeader(getRequestedUrl(req), req.pagination)
-      });
-
-      res.send(transactions.rows.map(transaction => Object.assign({}, transaction.info, {'description': (transaction.Donation && transaction.Donation.description) || transaction.description })));
-    })
-    .catch(next);
-};
-
-/**
  * Delete a transaction.
  */
 export const deleteTransaction = (req, res, next) => {
