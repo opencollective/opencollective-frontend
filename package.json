@@ -90,6 +90,7 @@
     "uuid": "3.0.1"
   },
   "devDependencies": {
+    "babel-plugin-istanbul": "^4.1.4",
     "chai": "3.5.0",
     "chance": "0.8.0",
     "cheerio": "0.19.0",
@@ -129,7 +130,7 @@
     "pretest": "npm run hint",
     "test": "npm run test:unit && npm run coverage",
     "test:unit:dev": "mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
-    "test:unit": "nyc mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
+    "test:unit": "nyc --cache=true --reporter=lcov mocha --compilers js:babel-core/register --require babel-polyfill --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "db:migrate": "sequelize db:migrate --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",
     "db:migrate:undo": "sequelize db:migrate:undo --config config/sequelize_cli.json --models-path server/models/ --env  $SEQUELIZE_ENV",

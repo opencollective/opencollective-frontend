@@ -11,14 +11,13 @@ const transactionsData = utils.data('transactions1').transactions;
 
 describe('transactions.routes.test.js', () => {
 
-  let sandbox, publicCollective, collective2, user, user2, host;
+  let publicCollective, collective2, user, host;
 
   before(() => utils.resetTestDB());
 
 
   // Create users
   before('create user', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => user = u));
-  before('create user2', () => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
   before('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
   // Create collectives
@@ -28,7 +27,7 @@ describe('transactions.routes.test.js', () => {
   // Add users to collectives
   before('add host to collective2', () => collective2.addUserWithRole(host, roles.HOST));
   before('add host to publicCollective', () => publicCollective.addUserWithRole(host, roles.HOST));
-  before('add user2 to publicCollective as a member', () => publicCollective.addUserWithRole(user2, roles.ADMIN));
+  before('add user to publicCollective as a member', () => publicCollective.addUserWithRole(user, roles.ADMIN));
 
   /**
    * Get collective's transactions.
@@ -39,8 +38,8 @@ describe('transactions.routes.test.js', () => {
 
     before(() => {
       defaultAttributes = {
-        CreatedByUserId: user2.id,
-        FromCollectiveId: user2.CollectiveId,
+        CreatedByUserId: user.id,
+        FromCollectiveId: user.CollectiveId,
         HostCollectiveId: host.CollectiveId
       };
     });
@@ -77,7 +76,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
           expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
-          expect(transactionDetails.createdByUser.billingAddress).to.equal(user2.billingAddress);
+          expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.toCollective.slug).to.equal(publicCollective.slug);
           expect(transactionDetails.createdByUser).to.not.have.property('email');
           expect(transactionDetails.createdByUser).to.not.have.property('paypalEmail');
@@ -100,7 +99,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.description).to.equal(transaction.description);
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
           expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
-          expect(transactionDetails.createdByUser.billingAddress).to.equal(user2.billingAddress);
+          expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
           expect(transactionDetails.toCollective.slug).to.equal(publicCollective.slug);
           done();
         });
