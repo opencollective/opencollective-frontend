@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import { appendTier, defaultHostCollectiveId, getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { appendTier, defaultHostCollectiveId } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -22,7 +22,6 @@ const {
   Activity,
   Notification,
   Collective,
-  Transaction,
   ConnectedAccount,
   User
 } = models;

@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import app from '../server/index';
-import async from 'async';
 import sinon from 'sinon';
 import {expect} from 'chai';
 import request from 'supertest';
