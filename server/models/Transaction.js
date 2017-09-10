@@ -250,7 +250,7 @@ export default (Sequelize, DataTypes) => {
       transactions.push(oppositeTransaction);
       transactions.push(transaction);
     }
-    return Transaction.createMany(transactions).then(transactions => transactions[index]);
+    return Promise.each(transactions, t => Transaction.create(t)).then(transactions => transactions[index]);
   };
 
   Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) => {

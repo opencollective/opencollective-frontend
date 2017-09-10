@@ -3,15 +3,14 @@ import app from '../server/index';
 import request from 'supertest-as-promised';
 import Promise from 'bluebird';
 import sinon from 'sinon';
-import nock from 'nock';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
-import MailgunNock from './mocks/mailgun.nock.js';
 import webhookBodyPayload from './mocks/mailgun.webhook.payload';
 import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import crypto from 'crypto';
 import config from 'config';
+import './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
   const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
@@ -64,15 +63,11 @@ describe("email.routes.test", () => {
 
   before(() => utils.resetTestDB());
 
-  after(() => nock.cleanAll());
-
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
-    MailgunNock();
   });
 
   afterEach(() => {
-    nock.cleanAll();
     sandbox.restore();
   });
 

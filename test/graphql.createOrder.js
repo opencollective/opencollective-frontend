@@ -397,7 +397,7 @@ describe('createOrder', () => {
     const orderCreated = res.data.createOrder;
     const fromCollective = orderCreated.fromCollective;
     const toCollective = orderCreated.toCollective;
-    const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
+    const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }, order: [['id','ASC']]});
     expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
     expect(transactions.length).to.equal(2);
     expect(transactions[0].type).to.equal('EXPENSE');
