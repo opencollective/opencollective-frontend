@@ -31,6 +31,16 @@ const {
 describe('expenses.routes.test.js', () => {
   let sandbox, host, member, otherUser, expenseFiler, collective, emailSendMessageSpy;
 
+  const addFunds = (amount) => models.Transaction.create({
+    CreatedByUserId: host.id,
+    FromCollectiveId: host.CollectiveId,
+    ToCollectiveId: collective.id,
+    HostCollectiveId: host.CollectiveId,
+    amount,
+    description: "add funds",
+    netAmountInCollectiveCurrency: amount
+  });
+
   before(() => {
     sandbox = sinon.sandbox.create();
     emailSendMessageSpy = sandbox.spy(emailLib, 'sendMessage');
@@ -604,20 +614,7 @@ describe('expenses.routes.test.js', () => {
               describe('WHEN collective has sufficient funds for expense but not for fees', () => {
 
                 // add just enough money that fees can't be paid
-                beforeEach('create a transaction', () => {
-                  return request(app)
-                    .post(`/collectives/${collective.id}/transactions`)
-                    .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({
-                      api_key: application.api_key,
-                      transaction: {
-                        description: "add funds",
-                        amount: 12000,
-                        netAmountInCollectiveCurrency: 12000
-                      }
-                    })
-                    .expect(200);
-                })
+                beforeEach('create a transaction', () => addFunds(12000));
 
                 it('THEN returns 400', () => payReq.expect(400, {
                   error: {
@@ -631,20 +628,7 @@ describe('expenses.routes.test.js', () => {
               describe('WHEN collective has sufficient funds', () => {
                 
                 // add some money, so collective has some funds
-                beforeEach('create a transaction', () => {
-                  return request(app)
-                    .post(`/collectives/${collective.id}/transactions`)
-                    .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({
-                      api_key: application.api_key,
-                      transaction: {
-                        description: "add funds",
-                        amount: 12500,
-                        netAmountInCollectiveCurrency: 12500
-                      }
-                    })
-                    .expect(200);
-                })
+                beforeEach('create a transaction', () => addFunds(12500));
 
                 describe('WHEN user has no paymentMethod', () => {
                   it('returns 400', () => payReq.expect(400, {
@@ -806,20 +790,7 @@ describe('expenses.routes.test.js', () => {
               describe('WHEN collective has sufficient funds', () => {
 
                 // add some money, so we can approve a manual expense against it
-                beforeEach('create a transaction', () => {
-                  return request(app)
-                    .post(`/collectives/${collective.id}/transactions`)
-                    .set('Authorization', `Bearer ${host.jwt()}`)
-                    .send({
-                      api_key: application.api_key,
-                      transaction: {
-                        description: "add funds",
-                        amount: 10000,
-                        netAmountInCollectiveCurrency: 10000
-                      }
-                    })
-                    .expect(200);
-                })
+                beforeEach('create a transaction', () => addFunds(10000));
 
                 describe('THEN returns 200', () => {
                   beforeEach(() => payReq.expect(200));
