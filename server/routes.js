@@ -150,24 +150,24 @@ export default (app) => {
   /**
    * Collectives.
    */
-  app.post('/collectives', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), collectives.createFromGithub); // Create a collective from a github repo
-  app.post('/collectives', required('collective'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
-  app.get('/collectives/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
-  app.get('/collectives/:collectiveid', collectives.getOne);
-  app.get('/collectives/:collectiveid/:tierSlug(backers|users)', cache(60), collectives.getUsers); // Get collective backers
-  app.get('/collectives/:collectiveid/:tierSlug(backers|users).csv', cache(60), mw.format('csv'), collectives.getUsers);
-  app.put('/collectives/:collectiveid', auth.canEditCollective, required('collective'), collectives.update); // Update a collective.
-  app.put('/collectives/:collectiveid/settings', auth.canEditCollective, required('collective'), collectives.updateSettings); // Update collective settings
-  app.delete('/collectives/:collectiveid', NotImplemented); // Delete a collective.
+  app.post('/groups', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), collectives.createFromGithub); // Create a collective from a github repo
+  app.post('/groups', required('collective'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
+  app.get('/groups/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
+  app.get('/groups/:collectiveid', collectives.getOne);
+  app.get('/groups/:collectiveid/:tierSlug(backers|users)', cache(60), collectives.getUsers); // Get collective backers
+  app.get('/groups/:collectiveid/:tierSlug(backers|users).csv', cache(60), mw.format('csv'), collectives.getUsers);
+  app.put('/groups/:collectiveid', auth.canEditCollective, required('collective'), collectives.update); // Update a collective.
+  app.put('/groups/:collectiveid/settings', auth.canEditCollective, required('collective'), collectives.updateSettings); // Update collective settings
+  app.delete('/groups/:collectiveid', NotImplemented); // Delete a collective.
 
-  app.get('/collectives/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
+  app.get('/groups/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);
 
   /**
    * Member.
    *
    *  Relations between a collective and a user.
    */
-  app.post('/collectives/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
+  app.post('/groups/:collectiveid/users/:userid', auth.canEditCollective, collectives.addUser); // Add a user to a collective.
 
   /**
    * Transactions (financial).
@@ -180,29 +180,29 @@ export default (app) => {
    */
    // TODO: Built a better frontend and remove hack 
    // mw.paginate({default: 50}) is a hack to unblock hosts from finding expenses that have more than 20 expenses
-  app.get('/collectives/:collectiveid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
-  app.get('/collectives/:collectiveid/expenses/:expenseid', expenses.getOne); // Get an expense.
-  app.post('/collectives/:collectiveid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
-  app.put('/collectives/:collectiveid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
-  app.delete('/collectives/:collectiveid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
-  app.post('/collectives/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
-  app.post('/collectives/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
+  app.get('/groups/:collectiveid/expenses', mw.paginate({default: 50}), mw.sorting({key: 'incurredAt', dir: 'DESC'}), expenses.list); // Get expenses.
+  app.get('/groups/:collectiveid/expenses/:expenseid', expenses.getOne); // Get an expense.
+  app.post('/groups/:collectiveid/expenses', required('expense'), mw.getOrCreateUser, expenses.create); // Create an expense as visitor or logged in user
+  app.put('/groups/:collectiveid/expenses/:expenseid', auth.canEditExpense, required('expense'), expenses.update); // Update an expense.
+  app.delete('/groups/:collectiveid/expenses/:expenseid', auth.canEditExpense, expenses.deleteExpense); // Delete an expense.
+  app.post('/groups/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
+  app.post('/groups/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
 
   
   /**
    * Orders
    */
-  app.post('/collectives/:collectiveid/orders/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
-  // app.post('/collectives/:collectiveid/donations/paypal', required('payment'), orders.paypal); // Make a paypal order.
-  // app.get('/collectives/:collectiveid/transactions/:paranoidtransactionid/callback', orders.paypalCallback); // Callback after a payment
+  app.post('/groups/:collectiveid/orders/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
+  // app.post('/groups/:collectiveid/donations/paypal', required('payment'), orders.paypal); // Make a paypal order.
+  // app.get('/groups/:collectiveid/transactions/:paranoidtransactionid/callback', orders.paypalCallback); // Callback after a payment
 
   /**
    * Notifications.
    *
    *  A user can subscribe by email to any type of activity of a Collective.
    */
-  app.post('/collectives/:collectiveid/activities/:activityType/subscribe', auth.mustBePartOfTheCollective, notifications.subscribe); // Subscribe to a collective's activities
-  app.post('/collectives/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
+  app.post('/groups/:collectiveid/activities/:activityType/subscribe', auth.mustBePartOfTheCollective, notifications.subscribe); // Subscribe to a collective's activities
+  app.post('/groups/:collectiveid/activities/:activityType/unsubscribe', notifications.unsubscribe); // Unsubscribe to a collective's activities
 
   /**
    * Separate route for uploading images to S3
