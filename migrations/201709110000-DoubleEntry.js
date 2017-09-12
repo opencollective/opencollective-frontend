@@ -52,7 +52,7 @@ const updateTransactions = (sequelize) => {
   const limit = DRY_RUN ? 'LIMIT 10' : '';
 
   return sequelize.query(`SELECT * FROM "Transactions" ${limit}`, { type: sequelize.QueryTypes.SELECT })
-  .then(rows => rows && Promise.map(rows, processTransaction))
+  .then(rows => rows && Promise.map(rows, processTransaction, { concurrency: 10 }))
   .then(() => sequelize.query(`UPDATE "Transactions" SET type='CREDIT' WHERE type='DONATION'`))
   .then(() => sequelize.query(`UPDATE "Transactions" SET type='DEBIT' WHERE type='EXPENSE'`))
 }
