@@ -111,9 +111,9 @@ const getPlatformStats = () => {
   return Promise.all([
     sumTransactions('netAmountInCollectiveCurrency', {}, 'USD'),                      // total host balance
     sumTransactions('netAmountInCollectiveCurrency', { ...dateRange}, 'USD'),   // delta host balance last month
-    sumTransactions('amount', { type: 'DONATION', ...dateRange}, 'USD'), // total donations last month
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...dateRange}, 'USD'),  // total net amount paid out last month
+    sumTransactions('amount', { type: 'CREDIT', ...dateRange}, 'USD'), // total donations last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'CREDIT', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'DEBIT', ...dateRange}, 'USD'),  // total net amount paid out last month
     sumTransactions("hostFeeInHostCurrency", dateRange, 'USD'),
     sumTransactions("paymentProcessorFeeInHostCurrency", dateRange, 'USD'),
     sumTransactions("platformFeeInHostCurrency", dateRange, 'USD'),
@@ -134,9 +134,9 @@ const getHostStats = (host, collectiveids) => {
   return Promise.all([
     sumTransactions('netAmountInCollectiveCurrency', where, host.currency),                      // total host balance
     sumTransactions('netAmountInCollectiveCurrency', { ...where, ...dateRange}, host.currency),   // delta host balance last month
-    sumTransactions('amount', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total donations last month
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
-    sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
+    sumTransactions('amount', { type: 'CREDIT', ...where, ...dateRange}, host.currency), // total donations last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'CREDIT', ...where, ...dateRange}, host.currency), // total net amount received last month
+    sumTransactions('netAmountInCollectiveCurrency', { type: 'DEBIT', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
     sumTransactions("hostFeeInHostCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("paymentProcessorFeeInHostCurrency", {...where, ...dateRange}, host.currency),
     sumTransactions("platformFeeInHostCurrency", {...where, ...dateRange}, host.currency),
@@ -179,7 +179,7 @@ const processHost = (host) => {
     }
 
     // We prepare expenses for the PDF export
-    if (t.type === 'EXPENSE') {
+    if (t.type === 'DEBIT') {
       t.page = page++;
       data.stats.numberPaidExpenses++;
       if (page - 1 % expensesPerPage === 0) {

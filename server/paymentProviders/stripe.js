@@ -141,7 +141,7 @@ export default {
             paymentMethod
           };
           payload.transaction = {
-            type: constants.type.DONATION,
+            type: constants.type.CREDIT,
             OrderId: order.id,
             amount: order.totalAmount,
             currency: order.currency,

@@ -183,7 +183,7 @@ export default function(Sequelize, DataTypes) {
         const where = {
           PaymentMethodId: this.id,
           CreatedByUserId: user.id,
-          type: TransactionTypes.DONATION,
+          type: TransactionTypes.CREDIT,
           createdAt: { $gte: firstOfTheMonth }
         };
         return sumTransactions('amount', where, this.currency)

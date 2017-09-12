@@ -129,7 +129,7 @@ export const resetTestDatabase = function(req, res, next) {
     .then(donation => models.Transaction.create({
       amount: 100,
       GroupId: testGroup.id,
-      type: type.DONATION,
+      type: type.CREDIT,
       currency: "EUR",
       UserId: testBacker.id,
       DonationId: donation.id,
@@ -144,7 +144,7 @@ export const resetTestDatabase = function(req, res, next) {
     }))
     .then(donation => models.Transaction.create({
       amount: 200,
-      type: type.DONATION,
+      type: type.CREDIT,
       currency: "EUR",
       UserId: testBacker2.id,
       DonationId: donation.id,
@@ -210,7 +210,7 @@ export const exportPDF = function(req, res, next) {
   const paper = req.query.papaer || 'Letter';
   const format = req.query.format || 'html';
   const wwcodeids = ['524','47','292','275','521','525','522','262','51','295','280','283','286','510','14','515','516','518','519','520','523','512','511','513','517','59','584','299','430','48','260','261','298','272','293','273','294','263','274','276','277','301','195','241','265','297','259','266','279','267','278','12','269','270','281','10','282','3','284','264','287','268','4','300','289','13','291','285','288','271','290','15','2'];
-  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'EXPENSE' }, include: ["User", "Expense", "Collective"] }).then(transactions => {
+  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'DEBIT' }, include: ["User", "Expense", "Collective"] }).then(transactions => {
     console.log("transactions", JSON.stringify(transactions));
     const data = { host: { name: "WWCode", currency: 'USD' }, year: (new Date).getFullYear(), month };
     let page = 1;

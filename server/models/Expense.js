@@ -2,7 +2,7 @@ import Temporal from 'sequelize-temporal';
 import {type} from '../constants/transactions';
 
 import status from '../constants/expense_status';
-const expenseType = type.EXPENSE;
+const expenseType = type.DEBIT;
 import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {

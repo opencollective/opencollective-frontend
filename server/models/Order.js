@@ -121,7 +121,7 @@ export default function(Sequelize, DataTypes) {
         return models.Transaction.sum('amount', {
           where: {
             OrderId: this.id,
-            type: type.DONATION
+            type: type.CREDIT
           }
         })
       },
@@ -133,7 +133,7 @@ export default function(Sequelize, DataTypes) {
 
       info() {
         return {
-          type: type.DONATION,
+          type: type.CREDIT,
           id: this.id,
           CreatedByUserId: this.CreatedByUserId,
           TierId: this.TierId,

@@ -76,7 +76,7 @@ describe('graphql.transaction.test.js', () => {
       expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
       expect(order).to.have.property('paymentMethod');
       expect(order.createdByUser.id).to.equal(4720); // Lindsey user
-      expect(order.host.id).to.equal(848); // wwcode host collective
+      expect(order.host.id).to.equal(696); // wwcode host collective
       expect(order.createdByUser.email).to.equal(null); // can't see email if not logged in
       expect(order.host.email).to.equal(null);
     });

@@ -18,7 +18,7 @@ export function getBackersStats(startDate = new Date('2015-01-01'), endDate = ne
 
   const getBackersIds = (startDate, endDate) => {
     const where = {
-        type: 'DONATION',
+        type: 'CREDIT',
         createdAt: { $gte: startDate, $lt: endDate }
       };
 

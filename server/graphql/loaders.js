@@ -69,7 +69,7 @@ export const loaders = (req) => {
         where: {
           FromCollectiveId: { $in: keys.map(k => k.FromCollectiveId) },
           CollectiveId: { $in: keys.map(k => k.CollectiveId) },
-          type: type.DONATION
+          type: type.CREDIT
         },
         group: ['FromCollectiveId', 'CollectiveId']
       })

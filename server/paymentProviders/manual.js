@@ -17,7 +17,7 @@ export default {
       FromCollectiveId: order.FromCollectiveId,
       CollectiveId: order.CollectiveId,
       transaction: {
-        type: TransactionTypes.DONATION,
+        type: TransactionTypes.CREDIT,
         OrderId: order.id,
         amount: order.totalAmount,
         currency: order.currency,

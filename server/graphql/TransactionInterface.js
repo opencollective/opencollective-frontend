@@ -23,9 +23,9 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
   description: "Transaction interface",
   resolveType: (transaction) => {
     switch (transaction.type) {
-      case 'DONATION':
+      case 'CREDIT':
         return TransactionOrderType;
-      case 'EXPENSE':
+      case 'DEBIT':
         return TransactionExpenseType;
       default:
         return null;

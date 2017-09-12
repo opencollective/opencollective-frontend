@@ -37,7 +37,7 @@ export default {
         paymentMethod: order.PaymentMethod
       };
       payload.transaction = {
-        type: TransactionTypes.DONATION,
+        type: TransactionTypes.CREDIT,
         OrderId: order.id,
         amount: order.totalAmount,
         currency: order.currency,

@@ -88,7 +88,7 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     hostCurrency,
     paymentProcessorFeeInHostCurrency,
     ExpenseId: expense.id,
-    type: type.EXPENSE,
+    type: type.DEBIT,
     amount: -expense.amount,
     currency: expense.currency,
     description: expense.description,
