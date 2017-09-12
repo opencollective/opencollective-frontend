@@ -16,9 +16,9 @@ class TransactionDetails extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'hostFeeInTxnCurrency': { id: 'transaction.hostFeeInTxnCurrency', defaultMessage: 'host fee' },
-      'platformFeeInTxnCurrency': { id: 'transaction.platformFeeInTxnCurrency', defaultMessage: 'Open Collective fee' },
-      'paymentProcessorFeeInTxnCurrency': { id: 'transaction.paymentProcessorFeeInTxnCurrency', defaultMessage: 'payment processor fee' }
+      'hostFeeInHostCurrency': { id: 'transaction.hostFeeInHostCurrency', defaultMessage: 'host fee' },
+      'platformFeeInHostCurrency': { id: 'transaction.platformFeeInHostCurrency', defaultMessage: 'Open Collective fee' },
+      'paymentProcessorFeeInHostCurrency': { id: 'transaction.paymentProcessorFeeInHostCurrency', defaultMessage: 'payment processor fee' }
     });
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
   }
@@ -37,7 +37,7 @@ class TransactionDetails extends React.Component {
       })
     }
 
-    addFees(['hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'paymentProcessorFeeInTxnCurrency']);
+    addFees(['hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
     const amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' - ') : null;
 

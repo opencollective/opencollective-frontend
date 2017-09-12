@@ -509,16 +509,16 @@ const getCollectiveTransactionsQuery = gql`
       amount
       currency
       netAmountInCollectiveCurrency
-      hostFeeInTxnCurrency
-      platformFeeInTxnCurrency
-      paymentProcessorFeeInTxnCurrency
+      hostFeeInHostCurrency
+      platformFeeInHostCurrency
+      paymentProcessorFeeInHostCurrency
       paymentMethod {
         service
       }
-      user {
+      fromCollective {
         id
         name
-        username
+        slug
         image
       }
       host {
@@ -551,9 +551,9 @@ const getTransactionQuery = gql`
       amount
       currency
       netAmountInCollectiveCurrency
-      hostFeeInTxnCurrency
-      platformFeeInTxnCurrency
-      paymentProcessorFeeInTxnCurrency
+      hostFeeInHostCurrency
+      platformFeeInHostCurrency
+      paymentProcessorFeeInHostCurrency
       paymentMethod {
         name
       }

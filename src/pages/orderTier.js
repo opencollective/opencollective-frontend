@@ -48,7 +48,7 @@ class OrderTierPage extends React.Component {
 
   async createOrder(order) {
     const { intl, slug } = this.props;
-    order.toCollective = { slug };
+    order.collective = { slug };
     console.log(">>> createOrder", order);
     try {
       this.setState({ loading: true});

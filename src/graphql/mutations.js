@@ -23,7 +23,7 @@ const createOrderQuery = gql`
         id,
         slug
       }
-      toCollective {
+      collective {
         id,
         slug
       }

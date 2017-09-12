@@ -34,7 +34,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { intl, data } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -61,11 +61,8 @@ class TransactionsPage extends React.Component {
         <Body>
 
           <CollectiveCover
-            href={`/${collective.slug}`}
-            logo={collective.image}
-            title={intl.formatMessage(this.messages['title'], { n: transactions.length })}
+            collective={collective}
             className="small"
-            backgroundImage={collective.backgroundImage}
             style={get(collective, 'settings.style.hero.cover')}
             />
 

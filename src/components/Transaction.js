@@ -19,11 +19,11 @@ class Transaction extends React.Component {
     this.state = { view: 'compact' };
     this.toggleDetails = this.toggleDetails.bind(this);
     this.messages = defineMessages({
-      'expense': { id: 'transaction.expense', defaultMessage: 'expense' },
-      'donation': { id: 'transaction.donation', defaultMessage: 'donation' },
-      'donation.title': { id: 'transaction.donation.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
-      'expense.meta': { id: 'transaction.expense.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
-      'donation.meta': { id: 'transaction.donation.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
+      'debit': { id: 'transaction.debit', defaultMessage: 'debit' },
+      'credit': { id: 'transaction.credit', defaultMessage: 'credit' },
+      'credit.title': { id: 'transaction.credit.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
+      'debit.meta': { id: 'transaction.debit.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
+      'credit.meta': { id: 'transaction.credit.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
       'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
       'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
     });
@@ -40,13 +40,13 @@ class Transaction extends React.Component {
     const type = transaction.type.toLowerCase();
 
     let title = transaction.title;
-    if (type === 'donation' && (!title || title.match(/donation to /i))) {
-      title = intl.formatMessage(this.messages['donation.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
+    if (type === 'credit' && (!title || title.match(/donation to /i))) {
+      title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
     }
 
     const meta = [];
     meta.push(transaction.category);
-    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.user.name, createdAt: new Date(transaction.createdAt) }));
+    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
 
     return (
       <div className={`transaction ${type} ${this.state.view}View`}>
@@ -66,11 +66,11 @@ class Transaction extends React.Component {
           a {
             cursor: pointer;
           }
-          .user {
+          .fromCollective {
             float: left;
             margin-right: 1rem;
           }
-          .user img {
+          .fromCollective img {
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -92,10 +92,10 @@ class Transaction extends React.Component {
             font-weight: 300;
             float:right;
           }
-          .expense .amount {
+          .debit .amount {
             color: #e21a60;
           }
-          .donation .amount {
+          .credit .amount {
             color: #72ce00;
           }
 
@@ -118,9 +118,9 @@ class Transaction extends React.Component {
             {...this.currencyStyle}
             />
         </div>
-        <div className="user">
-          <a href={`/${transaction.user.username}`} title={transaction.user.name}>
-            <img src={imagePreview(transaction.user.image,pickAvatar(transaction.user.id), { width: 80 })} />
+        <div className="fromCollective">
+          <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
+            <img src={imagePreview(transaction.fromCollective.image,pickAvatar(transaction.fromCollective.id), { width: 80 })} />
           </a>
         </div>
         <div className="body">
