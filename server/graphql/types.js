@@ -127,7 +127,7 @@ export const MemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           return req.loaders.transactions.totalAmountDonatedFromTo.load({
             FromCollectiveId: member.MemberCollectiveId,
-            ToCollectiveId: member.CollectiveId,
+            CollectiveId: member.CollectiveId,
           });
         }
       },
@@ -380,11 +380,11 @@ export const OrderType = new GraphQLObjectType({
           return order.getFromCollective();
         }
       },
-      toCollective: {
+      collective: {
         description: 'Collective that receives the order',
         type: CollectiveInterfaceType,
         resolve(order) {
-          return order.getToCollective();
+          return order.getCollective();
         }
       },
       tier: {

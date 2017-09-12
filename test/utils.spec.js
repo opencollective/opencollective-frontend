@@ -17,7 +17,7 @@ describe("utils", () => {
             amount: 1000,
             currency: 'USD',
             description: 'Pizza',
-            paymentProcessorFeeInTxnCurrency: 5,
+            paymentProcessorFeeInHostCurrency: 5,
             collective: {
               slug: 'testcollective'
             },

@@ -287,7 +287,7 @@ describe('Mutation Tests', () => {
           mutation createOrder($order: OrderInputType!) {
             createOrder(order: $order) {
               id,
-              toCollective {
+              collective {
                 id
               }
               tier {
@@ -301,7 +301,7 @@ describe('Mutation Tests', () => {
 
         const result = await utils.graphqlQuery(query, { order: {} });
         expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.contain('toCollective');
+        expect(result.errors[0].message).to.contain('collective');
       });
 
       describe('when collective/tier doesn\'t exist', () => {
@@ -311,7 +311,7 @@ describe('Mutation Tests', () => {
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
                 id,
-                toCollective {
+                collective {
                   id
                 }
                 tier {
@@ -324,7 +324,7 @@ describe('Mutation Tests', () => {
           `;
           const order = {
             user: { email: user1.email },
-            toCollective: { slug: "notfound" },
+            collective: { slug: "notfound" },
             tier: { id: 1 },
             quantity:1 
           };
@@ -338,7 +338,7 @@ describe('Mutation Tests', () => {
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
                 id,
-                toCollective {
+                collective {
                   id
                 }
                 tier {
@@ -352,7 +352,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: "user@email.com" },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 1002 },
             quantity: 1
           };
@@ -368,7 +368,7 @@ describe('Mutation Tests', () => {
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
                 id,
-                toCollective {
+                collective {
                   id
                 }
                 tier {
@@ -382,7 +382,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: "user@email.com" },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 1 },
             quantity: 101
           };
@@ -397,7 +397,7 @@ describe('Mutation Tests', () => {
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
                 id,
-                toCollective {
+                collective {
                   id
                 }
                 tier {
@@ -411,7 +411,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user:{ email: "user@email.com" },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 2 },
             quantity: 2
           };
@@ -428,7 +428,7 @@ describe('Mutation Tests', () => {
           mutation createMember {
             createMember(
               member: { email: "${user2.email}" },
-              collective: { slug: "${event1.slug}" },
+              collective: { id: ${event1.id} },
               role: "FOLLOWER"
             ) {
               id,
@@ -467,28 +467,26 @@ describe('Mutation Tests', () => {
 
       it('removes a member', async () => {
         const removeMemberQuery = `
-          mutation removeMember($id: Int!) {
-            removeMember(id: $id) { id }
+          mutation removeMember($member: CollectiveAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
+            removeMember(member: $member, collective: $collective, role: $role) { id }
           }
         `;
 
-        const error1 = await utils.graphqlQuery(removeMemberQuery, { id: 3 });
+        const error1 = await utils.graphqlQuery(removeMemberQuery, { member: { id: 3 }, collective: { id: event1.id }, role: "FOLLOWER" });
         expect(error1.errors[0].message).to.equal('Member not found');
 
-        const error2 = await utils.graphqlQuery(removeMemberQuery, { id: 2 });
-        expect(error2.errors[0].message).to.equal('You need to be logged in to remove a member');
-
-        const error3 = await utils.graphqlQuery(removeMemberQuery, { id: 2 }, user2);
-        expect(error3.errors[0].message).to.equal('You need to be logged in as this user or as a core contributor or as a host of the collective id 4');
-        
         await models.Member.create({
-          CreatedByUserId: 1,
+          CreatedByUserId: user1.id,
+          MemberCollectiveId: user1.CollectiveId,
           CollectiveId: event1.id,
           role: 'FOLLOWER'
         });
 
+        const error3 = await utils.graphqlQuery(removeMemberQuery, { member: { id: user1.id }, collective: { id: event1.id }, role: "FOLLOWER" }, user2);
+        expect(error3.errors[0].message).to.equal(`You need to be logged in as this user or as a core contributor or as a host of the collective id ${event1.id}`);
+        
         const membersBefore = await models.Member.count();
-        const res = await utils.graphqlQuery(removeMemberQuery, { id: 3 }, user1);
+        const res = await utils.graphqlQuery(removeMemberQuery, { member: { id: user1.id }, collective: { id: event1.id }, role: "FOLLOWER" }, user1);
         res.errors && console.error(res.errors);
         const membersAfter = await models.Member.count();
         expect(membersBefore - membersAfter).to.equal(1);
@@ -519,7 +517,7 @@ describe('Mutation Tests', () => {
                   id,
                   slug
                 },
-                toCollective {
+                collective {
                   id,
                   slug
                 }
@@ -529,7 +527,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: user2.email },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 1 },
             quantity: 2
           };
@@ -541,7 +539,7 @@ describe('Mutation Tests', () => {
                 "id": user2.CollectiveId,
                 "slug": user2.collective.slug
               },
-              "toCollective": {
+              "collective": {
                 "id": event1.id,
                 "slug": event1.slug
               },
@@ -583,7 +581,7 @@ describe('Mutation Tests', () => {
 
         const order = {
           user: { email: "newuser@email.com" },
-          toCollective: { slug: event1.slug },
+          collective: { slug: event1.slug },
           tier: { id: 1 },
           quantity: 2
         };
@@ -628,7 +626,7 @@ describe('Mutation Tests', () => {
                   maxQuantity,
                   availableQuantity
                 },
-                toCollective {
+                collective {
                   id,
                   slug
                 }
@@ -649,7 +647,7 @@ describe('Mutation Tests', () => {
                 expYear: 2020
               }
             },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 2 },
             quantity:2
           };
@@ -668,7 +666,7 @@ describe('Mutation Tests', () => {
                 "email": null,
                 "id": 3
               },
-              "toCollective": {
+              "collective": {
                 "id": 5,
                 "slug": "jan-meetup"
               }
@@ -679,7 +677,7 @@ describe('Mutation Tests', () => {
           executeOrderStub.reset();
           expect(executeOrderArgument[1].id).to.equal(1);
           expect(executeOrderArgument[1].TierId).to.equal(2);
-          expect(executeOrderArgument[1].ToCollectiveId).to.equal(5);
+          expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(3);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');
@@ -702,7 +700,7 @@ describe('Mutation Tests', () => {
                   maxQuantity,
                   availableQuantity
                 },
-                toCollective {
+                collective {
                   id,
                   slug
                 }
@@ -722,7 +720,7 @@ describe('Mutation Tests', () => {
                 expYear: 2020
               }
             },
-            toCollective: { slug: event1.slug },
+            collective: { slug: event1.slug },
             tier: { id: 2 },
             quantity: 2
           };
@@ -743,7 +741,7 @@ describe('Mutation Tests', () => {
                   "email": null,
                   "id": 4
                 },
-                "toCollective": {
+                "collective": {
                   "id": 5,
                   "slug": "jan-meetup"
                 }
@@ -754,7 +752,7 @@ describe('Mutation Tests', () => {
           expect(executeOrderStub.callCount).to.equal(1);
           expect(executeOrderArgument[1].id).to.equal(1);
           expect(executeOrderArgument[1].TierId).to.equal(2);
-          expect(executeOrderArgument[1].ToCollectiveId).to.equal(5);
+          expect(executeOrderArgument[1].CollectiveId).to.equal(5);
           expect(executeOrderArgument[1].CreatedByUserId).to.equal(4);
           expect(executeOrderArgument[1].totalAmount).to.equal(4000);
           expect(executeOrderArgument[1].currency).to.equal('USD');

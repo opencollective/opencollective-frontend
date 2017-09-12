@@ -308,7 +308,7 @@ describe('collectives.routes.test.js', () => {
         netAmountInCollectiveCurrency: transactionsData[8].amount,
         CreatedByUserId: user.id,
         FromCollectiveId: user.CollectiveId,
-        ToCollectiveId: publicCollective.id,
+        CollectiveId: publicCollective.id,
         HostCollectiveId: host.CollectiveId
       }));
 
@@ -380,7 +380,7 @@ describe('collectives.routes.test.js', () => {
         .createMany(transactions, {
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: publicCollective.id,
+          CollectiveId: publicCollective.id,
           HostCollectiveId: host.CollectiveId,
           approved: true
         })
@@ -394,14 +394,14 @@ describe('collectives.routes.test.js', () => {
           currency: 'USD',
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: publicCollective.id,
+          CollectiveId: publicCollective.id,
           SubscriptionId: subscription.id
         }))
         .then(order => models.Transaction.createFromPayload({
             transaction: Object.assign({}, transactionsData[7], { netAmountInCollectiveCurrency: transactionsData[7].amount, OrderId: order.id}),
             CreatedByUserId: user.id,
             FromCollectiveId: user.CollectiveId,
-            ToCollectiveId: publicCollective.id,
+            CollectiveId: publicCollective.id,
           })));
 
       it('successfully get a collective with remaining budget and yearlyIncome', (done) => {

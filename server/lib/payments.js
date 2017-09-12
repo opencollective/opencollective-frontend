@@ -75,30 +75,30 @@ const validatePayment = (payment) => {
 
 const sendConfirmationEmail = (order) => {
 
-  const { toCollective, tier, interval } = order;
+  const { collective, tier, interval } = order;
   const user = order.createdByUser;
 
-  if (toCollective.type === types.EVENT) {
+  if (collective.type === types.EVENT) {
     return emailLib.send(
       'ticket.confirmed',
       user.email,
       { order: order.info,
         user: user.info,
-        collective: toCollective.info,
+        collective: collective.info,
         tier: tier.info
       }, {
-        from: `${toCollective.name} <hello@${toCollective.slug}.opencollective.com>`
+        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
       })
   } else {
     // normal order
-    return toCollective.getRelatedCollectives(2, 0)
+    return collective.getRelatedCollectives(2, 0)
     .then((relatedCollectives) => emailLib.send(
       'thankyou',
       user.email,
       { order: order.info,
         transaction: pick(order.transaction, ['createdAt', 'uuid']),
         user: user.info,
-        collective: toCollective.info,
+        collective: collective.info,
         relatedCollectives,
         interval,
         monthlyInterval: (interval === 'month'),
@@ -106,7 +106,7 @@ const sendConfirmationEmail = (order) => {
         subscriptionsLink: user.generateLoginLink('/subscriptions')
       },
       {
-        from: `${toCollective.name} <hello@${toCollective.slug}.opencollective.com>`
+        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
       }
     ));
   }

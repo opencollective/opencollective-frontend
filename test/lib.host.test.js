@@ -14,7 +14,7 @@ describe('hostlib', () => {
   let collectiveids;
 
   const where = {
-    ToCollectiveId: { $in: collectiveids },
+    CollectiveId: { $in: collectiveids },
     createdAt: { $gte: startDate, $lt: endDate}
   };
 
@@ -34,7 +34,7 @@ describe('hostlib', () => {
 
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
     collectiveids = collectives.map(g => g.id);
-    where.ToCollectiveId = { $in: collectiveids };
+    where.CollectiveId = { $in: collectiveids };
     expect(collectives.length).to.equal(74);
     return true;
   }).catch(console.error));
@@ -59,7 +59,7 @@ describe('hostlib', () => {
     return true;
   }));
 
-  it('get the total net amount of host fees', () => hostlib.sumTransactions("hostFeeInTxnCurrency", where).then(res => {
+  it('get the total net amount of host fees', () => hostlib.sumTransactions("hostFeeInHostCurrency", where).then(res => {
     expect(res.byCurrency).to.have.length(2);
     expect(res.totalInHostCurrency).to.equal(12083);
     const cad = res.byCurrency.find(a => a.currency === 'CAD');

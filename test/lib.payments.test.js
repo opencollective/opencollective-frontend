@@ -49,7 +49,7 @@ describe('lib.payments.test.js', () => {
   beforeEach('create an order', () => models.Order.create({
     CreatedByUserId: user.id,
     FromCollectiveId: user.CollectiveId,
-    ToCollectiveId: collective.id,
+    CollectiveId: collective.id,
     totalAmount: AMOUNT,
     currency: CURRENCY
   }).then(o => o.setPaymentMethod({ token: STRIPE_TOKEN })).tap(t => order = t))
@@ -109,7 +109,7 @@ describe('lib.payments.test.js', () => {
       describe('it fails', () => {
 
         it('if the host has no stripe account', () => {
-          order.ToCollectiveId = user2.CollectiveId;
+          order.CollectiveId = user2.CollectiveId;
           return payments
             .executeOrder(user, order)
             .catch(err => expect(err.message).to.equal('The host for the anotheruser collective has no Stripe account set up (HostId: null)'));
@@ -143,7 +143,7 @@ describe('lib.payments.test.js', () => {
                 expect(res.count).to.equal(1);
                 const order = res.rows[0];
                 expect(order).to.have.property('CreatedByUserId', user.id);
-                expect(order).to.have.property('ToCollectiveId', collective.id);
+                expect(order).to.have.property('CollectiveId', collective.id);
                 expect(order).to.have.property('currency', CURRENCY);
                 expect(order).to.have.property('totalAmount', AMOUNT);
               }));
@@ -199,7 +199,7 @@ describe('lib.payments.test.js', () => {
             .create({
               CreatedByUserId: user2.id,
               FromCollectiveId: user2.CollectiveId,
-              ToCollectiveId: collective2.id,
+              CollectiveId: collective2.id,
               totalAmount: AMOUNT2,
               currency: collective2.currency
             })
@@ -222,7 +222,7 @@ describe('lib.payments.test.js', () => {
             .then((res) => {
               expect(res.count).to.equal(2);
               expect(res.rows[1]).to.have.property('CreatedByUserId', user2.id);
-              expect(res.rows[1]).to.have.property('ToCollectiveId', collective2.id);
+              expect(res.rows[1]).to.have.property('CollectiveId', collective2.id);
               expect(res.rows[1]).to.have.property('currency', CURRENCY);
               expect(res.rows[1]).to.have.property('totalAmount', AMOUNT2);
               expect(res.rows[1]).to.have.property('SubscriptionId');

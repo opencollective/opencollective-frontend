@@ -173,7 +173,7 @@ describe("notification.model.test.js", () => {
           return Order.create({
             CreatedByUserId: user.id,
             FromCollectiveId: user.CollectiveId,
-            ToCollectiveId: collective.id,
+            CollectiveId: collective.id,
             TierId: tier.id
           })
         });

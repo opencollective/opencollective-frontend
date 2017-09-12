@@ -45,14 +45,14 @@ describe('transactions.routes.test.js', () => {
     });
 
     before('create multiple transactions for publicCollective', () => models.Transaction
-      .createMany(transactionsData, { ToCollectiveId: publicCollective.id, ...defaultAttributes })
+      .createMany(transactionsData, { CollectiveId: publicCollective.id, ...defaultAttributes })
       .then(transactions => {
         transaction = transactions[0]
       })
     );
 
     before('create multiple transactions for collective2', () => models.Transaction
-      .createMany(transactionsData, { ToCollectiveId: collective2.id, ...defaultAttributes })
+      .createMany(transactionsData, { CollectiveId: collective2.id, ...defaultAttributes })
     );
 
     it('cannot get the transaction details by id', (done) => {
@@ -77,7 +77,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
           expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
           expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
-          expect(transactionDetails.toCollective.slug).to.equal(publicCollective.slug);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           expect(transactionDetails.createdByUser).to.not.have.property('email');
           expect(transactionDetails.createdByUser).to.not.have.property('paypalEmail');
           expect(transactionDetails.host).to.not.have.property('email');
@@ -100,7 +100,7 @@ describe('transactions.routes.test.js', () => {
           expect(transactionDetails.host.id).to.equal(host.CollectiveId);
           expect(transactionDetails.host.billingAddress).to.equal(host.billingAddress);
           expect(transactionDetails.createdByUser.billingAddress).to.equal(user.billingAddress);
-          expect(transactionDetails.toCollective.slug).to.equal(publicCollective.slug);
+          expect(transactionDetails.collective.slug).to.equal(publicCollective.slug);
           done();
         });
     });

@@ -1,9 +1,9 @@
-Subject: New donation to {{collective.name}}: {{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}}{{#if user.name}} from {{user.name}}{{/if}}
+Subject: New donation to {{collective.name}}: {{{currency transaction.amountInHostCurrency currency=transaction.hostCurrency}}}{{#if user.name}} from {{user.name}}{{/if}}
 
 {{> header}}
 
 <center>
-  <h1>{{{currency transaction.amountInTxnCurrency currency=transaction.txnCurrency}}}</h1>
+  <h1>{{{currency transaction.amountInHostCurrency currency=transaction.hostCurrency}}}</h1>
   <div>{{transaction.description}}</div>
 
   <br /><br />

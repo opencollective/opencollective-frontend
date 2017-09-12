@@ -23,7 +23,7 @@ const donation = {
     OrderId: {
       $not: null
     },
-    platformFeeInTxnCurrency: {
+    platformFeeInHostCurrency: {
       $gt: 0
     }
   }

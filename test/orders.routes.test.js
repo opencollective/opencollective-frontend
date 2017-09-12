@@ -60,7 +60,7 @@ describe('orders.routes.test.js', () => {
           return models.Member.create({
             CreatedByUserId: user2.id,
             FromCollectiveId: user2.CollectiveId,
-            ToCollectiveId: collective.id,
+            CollectiveId: collective.id,
             role: roles.ADMIN
           })
           .then(() => request(app)
@@ -141,7 +141,7 @@ describe('orders.routes.test.js', () => {
                 expect(executeOrderStub.callCount).to.equal(1);
                 expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: host.id,
-                  ToCollectiveId: collective.id,
+                  CollectiveId: collective.id,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
                   description: 'desc',
@@ -166,7 +166,7 @@ describe('orders.routes.test.js', () => {
                 expect(executeOrderStub.callCount).to.equal(1);
                 expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: host.id,
-                  ToCollectiveId: collective.id,
+                  CollectiveId: collective.id,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
                   description: 'desc',
@@ -194,7 +194,7 @@ describe('orders.routes.test.js', () => {
                 expect(executeOrderStub.callCount).to.equal(1);
                 expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: newUser.id,
-                  ToCollectiveId: collective.id,
+                  CollectiveId: collective.id,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
                   description: payment.description,
@@ -220,7 +220,7 @@ describe('orders.routes.test.js', () => {
                 expect(executeOrderStub.callCount).to.equal(1);
                 expect(executeOrderStub.firstCall.args[0]).to.contain({
                   CreatedByUserId: user2.id,
-                  ToCollectiveId: collective.id,
+                  CollectiveId: collective.id,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
                   description: payment.description,

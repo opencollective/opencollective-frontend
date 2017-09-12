@@ -486,7 +486,7 @@ export const getCollectiveTags = (req, res, next) => {
 
 export const getTransactions = (req, res, next) => {
   const where = {
-    ToCollectiveId: req.collective.id
+    CollectiveId: req.collective.id
   };
 
   if (req.query.donation || req.query.type === 'donations') {

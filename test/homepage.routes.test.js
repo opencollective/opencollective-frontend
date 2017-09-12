@@ -33,7 +33,7 @@ describe('homepage.routes.test.js', () => {
           amount:100000,
           PaymentMethodId: paymentMethod.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: collective.id,
+          CollectiveId: collective.id,
           CreatedByUserId: user.id,
           HostCollectiveId: user.id
         })

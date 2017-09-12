@@ -23,12 +23,12 @@ describe('discover', () => {
     transactionsData[8].CreatedByUserId = user.id;
     transactionsData[8].HostCollectiveId = user.CollectiveId;
     transactionsData[8].FromCollectiveId = user.CollectiveId;
-    transactionsData[8].ToCollectiveId = collective1.id;
+    transactionsData[8].CollectiveId = collective1.id;
     transactionsData[8].PaymentMethodId = paymentMethod1.id;
     models.Transaction.create(transactionsData[8]).tap(() => done()).catch(done);
   });
   beforeEach((done) => {
-    transactionsData[8].ToCollectiveId = collective2.id;
+    transactionsData[8].CollectiveId = collective2.id;
     transactionsData[8].PaymentMethodId = paymentMethod1.id;
     models.Transaction.create(transactionsData[8]).tap(() => done()).catch(done);
   });

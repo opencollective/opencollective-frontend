@@ -127,7 +127,7 @@ describe('graphql.tiers.test', () => {
           user: {
             email: user.email,
           },
-          toCollective: { slug: collective1.slug },
+          collective: { slug: collective1.slug },
           tier: { id: tier1.id },
           paymentMethod: {
             service: 'stripe',
@@ -171,10 +171,10 @@ describe('graphql.tiers.test', () => {
         expect(result.errors).to.not.exist;
 
         const members = await models.Member.findAll({where: { MemberCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
-        const orders = await models.Order.findAll({where: { FromCollectiveId: user1.CollectiveId, ToCollectiveId: collective1.id }});
+        const orders = await models.Order.findAll({where: { FromCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
         const subscription = await models.Subscription.findById(orders[0].SubscriptionId);
         const order = await models.Order.findById(orders[0].id);
-        const transactions = await models.Transaction.findAll({where: { FromCollectiveId: user1.CollectiveId, ToCollectiveId: collective1.id }});
+        const transactions = await models.Transaction.findAll({where: { FromCollectiveId: user1.CollectiveId, CollectiveId: collective1.id }});
 
         expect(members).to.have.length(1);
         expect(orders).to.have.length(1);

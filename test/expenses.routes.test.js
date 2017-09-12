@@ -34,7 +34,7 @@ describe('expenses.routes.test.js', () => {
   const addFunds = (amount) => models.Transaction.create({
     CreatedByUserId: host.id,
     FromCollectiveId: host.CollectiveId,
-    ToCollectiveId: collective.id,
+    CollectiveId: collective.id,
     HostCollectiveId: host.CollectiveId,
     amount,
     description: "add funds",
@@ -680,17 +680,17 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('amountInTxnCurrency', -10939)
-                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 415)
+                  expect(transaction).to.have.property('amountInHostCurrency', -10939)
+                  expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 415)
                   expect(transaction).to.have.property('netAmountInCollectiveCurrency', -12378);
-                  expect(transaction).to.have.property('txnCurrency', host.collective.currency);
-                  expect(transaction).to.have.property('txnCurrencyFxRate', 0.911577028258888);
+                  expect(transaction).to.have.property('hostCurrency', host.collective.currency);
+                  expect(transaction).to.have.property('hostCurrencyFxRate', 0.911577028258888);
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -12000);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.description);
                   expect(transaction).to.have.property('CreatedByUserId', expense.UserId);
-                  expect(transaction).to.have.property('ToCollectiveId', expense.CollectiveId);
+                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
 
                 function expectTransactionPaidActivity(collective, user, transaction) {
@@ -813,17 +813,17 @@ describe('expenses.routes.test.js', () => {
                 });
 
                 function expectTransactionCreated(expense, transaction) {
-                  expect(transaction).to.have.property('amountInTxnCurrency', -3737)
-                  expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 0)
+                  expect(transaction).to.have.property('amountInHostCurrency', -3737)
+                  expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 0)
                   expect(transaction).to.have.property('netAmountInCollectiveCurrency', -3737);
-                  expect(transaction).to.have.property('txnCurrency', expense.currency);
-                  expect(transaction).to.have.property('txnCurrencyFxRate', 1)
+                  expect(transaction).to.have.property('hostCurrency', expense.currency);
+                  expect(transaction).to.have.property('hostCurrencyFxRate', 1)
                   expect(transaction).to.have.property('ExpenseId', expense.id);
                   expect(transaction).to.have.property('amount', -expense.amount);
                   expect(transaction).to.have.property('currency', expense.currency);
                   expect(transaction).to.have.property('description', expense.description);
                   expect(transaction).to.have.property('CreatedByUserId', expense.UserId);
-                  expect(transaction).to.have.property('ToCollectiveId', expense.CollectiveId);
+                  expect(transaction).to.have.property('CollectiveId', expense.CollectiveId);
                 }
 
                 function expectTransactionPaidActivity(collective, user, transaction) {

@@ -62,7 +62,7 @@ describe('Collective model', () => {
   },{
     createdAt: new Date('2016-06-15'),
     amount: 25000,
-    amountInTxnCurrency: 25000,
+    amountInHostCurrency: 25000,
     netAmountInCollectiveCurrency: 22500,
     currency: 'USD',
     type: 'donation',
@@ -71,7 +71,7 @@ describe('Collective model', () => {
   },{
     createdAt: new Date('2016-07-16'),
     amount: 50000,
-    amountInTxnCurrency: 50000,
+    amountInHostCurrency: 50000,
     netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
     type: 'donation',
@@ -81,7 +81,7 @@ describe('Collective model', () => {
   {
     createdAt: new Date('2016-08-18'),
     amount: 500,
-    amountInTxnCurrency: 50000,
+    amountInHostCurrency: 50000,
     netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
     type: 'donation',
@@ -107,8 +107,8 @@ describe('Collective model', () => {
     }))
     .then(g => opensourceCollective = g)
     .then(() => collective.addUserWithRole(user1, 'BACKER'))
-    .then(() => Transaction.createMany([transactions[2]], { ToCollectiveId: opensourceCollective.id, HostCollectiveId: host.CollectiveId }))
-    .then(() => Transaction.createMany(transactions, { ToCollectiveId: collective.id, HostCollectiveId: host.CollectiveId })));
+    .then(() => Transaction.createMany([transactions[2]], { CollectiveId: opensourceCollective.id, HostCollectiveId: host.CollectiveId }))
+    .then(() => Transaction.createMany(transactions, { CollectiveId: collective.id, HostCollectiveId: host.CollectiveId })));
 
   it('creates a unique slug', () => {
     return Collective
@@ -267,8 +267,8 @@ describe('Collective model', () => {
             expect(donations.length).to.equal(1);
             expect(donations[0]).to.have.property("amount");
             expect(donations[0]).to.have.property("currency");
-            expect(donations[0]).to.have.property("toCollective");
-            expect(donations[0].toCollective).to.have.property("name");
+            expect(donations[0]).to.have.property("collective");
+            expect(donations[0].collective).to.have.property("name");
           })
       });
     });
@@ -281,14 +281,14 @@ describe('Collective model', () => {
     before('creating order for backer tier', () => models.Order.create({
       CreatedByUserId: user1.id,
       FromCollectiveId: user1.CollectiveId,
-      ToCollectiveId: collective.id,
+      CollectiveId: collective.id,
       TierId: 1
     }));
 
     before('creating order for sponsor tier', () => models.Order.create({
       CreatedByUserId: user2.id,
       FromCollectiveId: user2.CollectiveId,
-      ToCollectiveId: collective.id,
+      CollectiveId: collective.id,
       TierId: 2
     }));
 
@@ -299,7 +299,7 @@ describe('Collective model', () => {
           expect(tiers).to.have.length(2);
           expect(tiers[0].users).to.have.length(1);
           const backer = tiers[0].users[0];
-          expect(parseInt(backer.totalDonations, 10)).to.equal(transactions[2].amountInTxnCurrency + transactions[3].amountInTxnCurrency);
+          expect(parseInt(backer.totalDonations, 10)).to.equal(transactions[2].amountInHostCurrency + transactions[3].amountInHostCurrency);
           expect(new Date(backer.firstDonation).getTime()).to.equal(new Date(transactions[2].createdAt).getTime());
           expect(new Date(backer.lastDonation).getTime()).to.equal(new Date(transactions[3].createdAt).getTime());
           done();

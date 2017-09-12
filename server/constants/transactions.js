@@ -1,6 +1,6 @@
 export const type = {
-  DONATION: 'DONATION',
-  EXPENSE: 'EXPENSE'
+  CREDIT: 'CREDIT',
+  DEBIT: 'DEBIT'
 };
 
 export const OC_FEE_PERCENT = 5;

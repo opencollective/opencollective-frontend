@@ -69,7 +69,7 @@ describe('subscriptions.routes.test.js', () => {
             ...order,
             CreatedByUserId: user.id,
             FromCollectiveId: user.CollectiveId,
-            ToCollectiveId: collective.id,
+            CollectiveId: collective.id,
             SubscriptionId: subscription.id
           })
         ))
@@ -98,7 +98,7 @@ describe('subscriptions.routes.test.js', () => {
           res.body.forEach(sub => {
             expect(sub).to.be.have.property('stripeSubscriptionId')
             expect(sub).to.be.have.property('Order')
-            expect(sub.Order).to.be.have.property('toCollective')
+            expect(sub.Order).to.be.have.property('collective')
           });
           done();
         });
@@ -147,7 +147,7 @@ describe('subscriptions.routes.test.js', () => {
           ...ordersData[0],
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: collective.id,
+          CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
           SubscriptionId: sub.id
         }))

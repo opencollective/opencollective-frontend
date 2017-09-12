@@ -42,11 +42,11 @@ describe("paymentmethod.model.test.js", () => {
     {
       CreatedByUserId: user.id,
       FromCollectiveId: organization.id,
-      ToCollectiveId: collective.id,
+      CollectiveId: collective.id,
       PaymentMethodId: paymentMethod.id,
       currency: collective.currency,
       HostCollectiveId: collective.id,
-      type: 'DONATION'
+      type: 'CREDIT'
     }));
 
     it(`computes the balance in the currency of the payment method's collective`, () => paymentMethod

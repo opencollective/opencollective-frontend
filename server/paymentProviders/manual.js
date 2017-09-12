@@ -7,7 +7,7 @@ export default {
     recurring: false
   },
   processOrder: (order) => {
-    const collective = order.toCollective;
+    const collective = order.collective;
     const user = order.createdByUser;
 
     let isFromCollectiveHost, transaction;
@@ -15,17 +15,17 @@ export default {
     const payload = {
       CreatedByUserId: user.id,
       FromCollectiveId: order.FromCollectiveId,
-      ToCollectiveId: order.ToCollectiveId,
+      CollectiveId: order.CollectiveId,
       transaction: {
         type: TransactionTypes.DONATION,
         OrderId: order.id,
         amount: order.totalAmount,
         currency: order.currency,
-        txnCurrency: order.currency,
-        amountInTxnCurrency: order.totalAmount,
-        txnCurrencyFxRate: 1,
-        platformFeeInTxnCurrency: 0,
-        paymentProcessorFeeInTxnCurrency: 0,
+        hostCurrency: order.currency,
+        amountInHostCurrency: order.totalAmount,
+        hostCurrencyFxRate: 1,
+        platformFeeInHostCurrency: 0,
+        paymentProcessorFeeInHostCurrency: 0,
       }
     }
     return collective
@@ -33,7 +33,7 @@ export default {
       .then(HostId => HostId === order.FromCollectiveId)
       .tap(isHost => isFromCollectiveHost = isHost)
       .then(isFromCollectiveHost => {
-        payload.transaction.hostFeeInTxnCurrency = isFromCollectiveHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.totalAmount);
+        payload.transaction.hostFeeInHostCurrency = isFromCollectiveHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.totalAmount);
         console.log(">>> Transaction.createFromPayload ", payload);
         return models.Transaction.createFromPayload(payload);
       })

@@ -114,9 +114,9 @@ const getPlatformStats = () => {
     sumTransactions('amount', { type: 'DONATION', ...dateRange}, 'USD'), // total donations last month
     sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...dateRange}, 'USD'), // total net amount received last month (after processing fee and host fees)
     sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...dateRange}, 'USD'),  // total net amount paid out last month
-    sumTransactions("hostFeeInTxnCurrency", dateRange, 'USD'),
-    sumTransactions("paymentProcessorFeeInTxnCurrency", dateRange, 'USD'),
-    sumTransactions("platformFeeInTxnCurrency", dateRange, 'USD'),
+    sumTransactions("hostFeeInHostCurrency", dateRange, 'USD'),
+    sumTransactions("paymentProcessorFeeInHostCurrency", dateRange, 'USD'),
+    sumTransactions("platformFeeInHostCurrency", dateRange, 'USD'),
     getBackersStats(startDate, endDate)
   ]);
 }
@@ -137,9 +137,9 @@ const getHostStats = (host, collectiveids) => {
     sumTransactions('amount', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total donations last month
     sumTransactions('netAmountInCollectiveCurrency', { type: 'DONATION', ...where, ...dateRange}, host.currency), // total net amount received last month
     sumTransactions('netAmountInCollectiveCurrency', { type: 'EXPENSE', ...where, ...dateRange}, host.currency),  // total net amount paid out last month
-    sumTransactions("hostFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
-    sumTransactions("paymentProcessorFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
-    sumTransactions("platformFeeInTxnCurrency", {...where, ...dateRange}, host.currency),
+    sumTransactions("hostFeeInHostCurrency", {...where, ...dateRange}, host.currency),
+    sumTransactions("paymentProcessorFeeInHostCurrency", {...where, ...dateRange}, host.currency),
+    sumTransactions("platformFeeInHostCurrency", {...where, ...dateRange}, host.currency),
     getBackersStats(startDate, endDate, collectiveids)
   ]);
 }
@@ -225,7 +225,7 @@ const processHost = (host) => {
         else return value;
       }
 
-      const csv = exportToCSV(transactions, ['id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency', 'note' ], getColumnName, processValue);
+      const csv = exportToCSV(transactions, ['id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'note' ], getColumnName, processValue);
   
       attachments.push({
         filename: csv_filename,

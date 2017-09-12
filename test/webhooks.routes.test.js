@@ -89,7 +89,7 @@ describe('webhooks.routes.test.js', () => {
         .create({
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: collective.id,
+          CollectiveId: collective.id,
           totalAmount: webhookSubscription.amount,
           currency: CURRENCY
         })
@@ -170,17 +170,17 @@ describe('webhooks.routes.test.js', () => {
         expect(res.count).to.equal(4);
         const transaction = res.rows[1];
         expect(transaction.OrderId).to.be.equal(order.id);
-        expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
+        expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
         expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
-        expect(transaction.type).to.be.equal(type.DONATION);
-        expect(transaction).to.have.property('amountInTxnCurrency', 28652); // taken from stripe mocks
-        expect(transaction).to.have.property('txnCurrency', 'EUR');
-        expect(transaction).to.have.property('hostFeeInTxnCurrency', 2865);
-        expect(transaction).to.have.property('platformFeeInTxnCurrency', 1433);
-        expect(transaction).to.have.property('paymentProcessorFeeInTxnCurrency', 856);
-        expect(transaction).to.have.property('txnCurrencyFxRate', 1.22155521429569);
+        expect(transaction.type).to.be.equal(type.CREDIT);
+        expect(transaction).to.have.property('amountInHostCurrency', 28652); // taken from stripe mocks
+        expect(transaction).to.have.property('hostCurrency', 'EUR');
+        expect(transaction).to.have.property('hostFeeInHostCurrency', 2865);
+        expect(transaction).to.have.property('platformFeeInHostCurrency', 1433);
+        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 856);
+        expect(transaction).to.have.property('hostCurrencyFxRate', 1.22155521429569);
         expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Order.Subscription.isActive).to.be.equal(true);
@@ -265,19 +265,19 @@ describe('webhooks.routes.test.js', () => {
           .tap(res => {
             expect(res.count).to.be.equal(6); // third transaction
             const transaction = res.rows[2];
-            expect(transaction.ToCollectiveId).to.be.equal(order.ToCollectiveId);
+            expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
             expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
             expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
             expect(transaction.currency).to.be.equal(CURRENCY);
-            expect(transaction.type).to.be.equal(type.DONATION);
+            expect(transaction.type).to.be.equal(type.CREDIT);
             expect(transaction.amount).to.be.equal(webhookSubscription.amount);
 
-            expect(res.rows[0]).to.have.property('amountInTxnCurrency', 28652); // taken from stripe mocks
-            expect(res.rows[0]).to.have.property('txnCurrency', 'EUR');
-            expect(res.rows[0]).to.have.property('hostFeeInTxnCurrency', 2865);
-            expect(res.rows[0]).to.have.property('platformFeeInTxnCurrency', 1433);
-            expect(res.rows[0]).to.have.property('paymentProcessorFeeInTxnCurrency', 856);
-            expect(transaction).to.have.property('txnCurrencyFxRate', 1.22155521429569);
+            expect(res.rows[0]).to.have.property('amountInHostCurrency', 28652); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('hostCurrency', 'EUR');
+            expect(res.rows[0]).to.have.property('hostFeeInHostCurrency', 2865);
+            expect(res.rows[0]).to.have.property('platformFeeInHostCurrency', 1433);
+            expect(res.rows[0]).to.have.property('paymentProcessorFeeInHostCurrency', 856);
+            expect(transaction).to.have.property('hostCurrencyFxRate', 1.22155521429569);
             expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704);
             expect(transaction.Order.Subscription.isActive).to.be.equal(true);
             expect(transaction.Order.Subscription).to.have.property('activatedAt');

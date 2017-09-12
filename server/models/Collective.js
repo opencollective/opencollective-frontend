@@ -343,7 +343,7 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getIncomingOrders = function(options) {
     const query = deepmerge({
-      where: { ToCollectiveId: this.id }
+      where: { CollectiveId: this.id }
     }, options);
     return models.Order.findAll(query);
   };
@@ -393,15 +393,15 @@ export default function(Sequelize, DataTypes) {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
         return models.Order.findOne({
           attributes: [ 'TierId' ],
-          where: { FromCollectiveId: backerCollective.id, ToCollectiveId: this.id },
+          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id },
           include
         }).then(order => {
           if (!order) {
-            console.error("Collective.getTiersWithUsers: no order for ", { FromCollectiveId: backerCollective.id, ToCollectiveId: this.id });
+            console.error("Collective.getTiersWithUsers: no order for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
             return null;
           }
           if (!order.TierId) {
-            console.error("Collective.getTiersWithUsers: no order.TierId for ", { FromCollectiveId: backerCollective.id, ToCollectiveId: this.id });
+            console.error("Collective.getTiersWithUsers: no order.TierId for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
             return null;
           }
           const TierId = order.TierId;
@@ -425,7 +425,7 @@ export default function(Sequelize, DataTypes) {
     return models.Order.findOne({
       where: {
         FromCollectiveId: backerCollective.id,
-        ToCollectiveId: this.id
+        CollectiveId: this.id
       },
       include: [ { model: models.Tier, where: { type: 'TIER' } } ]
     }).then(order => order && order.Tier);
@@ -435,7 +435,7 @@ export default function(Sequelize, DataTypes) {
    * Returns whether the backer is still active
    */
   Collective.prototype.isBackerActive = function(backerCollective, until) {
-    const where = { FromCollectiveId: backerCollective.id, ToCollectiveId: this.id };
+    const where = { FromCollectiveId: backerCollective.id, CollectiveId: this.id };
     if (until) {
       where.createdAt = { $lt: until };
     }
@@ -597,7 +597,7 @@ export default function(Sequelize, DataTypes) {
     const where = {
       amount: { $lt: 0 },
       createdAt: { $lt: endDate },
-      ToCollectiveId: this.id
+      CollectiveId: this.id
     };
     if (status) where.status = status;
     if (startDate) where.createdAt.$gte = startDate;
@@ -612,7 +612,7 @@ export default function(Sequelize, DataTypes) {
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total']
       ],
       where: {
-        ToCollectiveId: this.id,
+        CollectiveId: this.id,
         createdAt: { $lt: until }
       }
     })
@@ -632,7 +632,7 @@ export default function(Sequelize, DataTypes) {
         FROM "Transactions" t
         LEFT JOIN "Orders" d ON d.id = t."OrderId"
         LEFT JOIN "Subscriptions" s ON s.id = d."SubscriptionId"
-        WHERE t."ToCollectiveId"=:CollectiveId
+        WHERE t."CollectiveId"=:CollectiveId
           AND s."isActive" IS TRUE
           AND s.interval = 'month'
           AND s."deletedAt" IS NULL
@@ -645,7 +645,7 @@ export default function(Sequelize, DataTypes) {
           COALESCE(SUM(t."netAmountInCollectiveCurrency"),0) FROM "Transactions" t
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-          WHERE t."ToCollectiveId" = :CollectiveId
+          WHERE t."CollectiveId" = :CollectiveId
             AND t.amount > 0
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
@@ -655,7 +655,7 @@ export default function(Sequelize, DataTypes) {
           COALESCE(SUM(t."netAmountInCollectiveCurrency"),0) FROM "Transactions" t
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
-          WHERE t."ToCollectiveId" = :CollectiveId
+          WHERE t."CollectiveId" = :CollectiveId
             AND t.amount > 0
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
@@ -674,7 +674,7 @@ export default function(Sequelize, DataTypes) {
     const where = {
       amount: { $gt: 0 },
       createdAt: { $lt: endDate },
-      ToCollectiveId: this.id
+      CollectiveId: this.id
     };
     if (startDate) where.createdAt.$gte = startDate;
     return models.Transaction.find({
@@ -708,7 +708,7 @@ export default function(Sequelize, DataTypes) {
     endDate = endDate || new Date;
     const where = {
       createdAt: { $lt: endDate },
-      ToCollectiveId: this.id
+      CollectiveId: this.id
     };
     if (startDate) where.createdAt.$gte = startDate;
     if (type === 'donation') where.amount = { $gt: 0 };
@@ -730,7 +730,7 @@ export default function(Sequelize, DataTypes) {
         createdAt: { $gte: since || 0, $lt: until || new Date}
       },
       order: [ ['amount','DESC'] ],
-      include: [ { model: models.Collective, as: 'toCollective', where: { tags: { $contains: tags } } } ]
+      include: [ { model: models.Collective, as: 'collective', where: { tags: { $contains: tags } } } ]
     });
   };
 
@@ -742,7 +742,7 @@ export default function(Sequelize, DataTypes) {
           [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'backersCount']
         ],
         where: {
-          ToCollectiveId: this.id,
+          CollectiveId: this.id,
           amount: {
             $gt: 0
           },
@@ -964,7 +964,7 @@ export default function(Sequelize, DataTypes) {
     Collective.hasMany(m.Member);
     Collective.hasMany(m.Activity);
     Collective.hasMany(m.Notification);
-    Collective.hasMany(m.Transaction, { foreignKey: 'ToCollectiveId', as: 'transactions' }); // collective.getTransactions()
+    Collective.hasMany(m.Transaction, { foreignKey: 'CollectiveId', as: 'transactions' }); // collective.getTransactions()
     Collective.hasMany(m.Tier, { as: 'tiers' });    
   }
 

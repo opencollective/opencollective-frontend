@@ -31,13 +31,13 @@ export const loaders = (req) => {
       ),
       balance: new DataLoader(ids => models.Transaction.findAll({
           attributes: [
-            'ToCollectiveId',
+            'CollectiveId',
             [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'total' ]
           ],
-          where: { ToCollectiveId: { $in: ids } },
-          group: ['ToCollectiveId']
+          where: { CollectiveId: { $in: ids } },
+          group: ['CollectiveId']
         })
-        .then(results => sortResults(ids, results, 'ToCollectiveId'))
+        .then(results => sortResults(ids, results, 'CollectiveId'))
         .map(result => get(result, 'dataValues.totalAmount') || 0)
       )
     },
@@ -65,21 +65,21 @@ export const loaders = (req) => {
         .map(result => get(result, 'dataValues.totalAmount') || 0)
       ),
       totalAmountDonatedFromTo: new DataLoader(keys => models.Transaction.findAll({
-        attributes: ['FromCollectiveId', 'ToCollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
+        attributes: ['FromCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
         where: {
           FromCollectiveId: { $in: keys.map(k => k.FromCollectiveId) },
-          ToCollectiveId: { $in: keys.map(k => k.ToCollectiveId) },
+          CollectiveId: { $in: keys.map(k => k.CollectiveId) },
           type: type.DONATION
         },
-        group: ['FromCollectiveId', 'ToCollectiveId']
+        group: ['FromCollectiveId', 'CollectiveId']
       })
       .then(results => {
         const resultsByKey = {};
         results.forEach(r => {
-          resultsByKey[`${r.FromCollectiveId}-${r.ToCollectiveId}`] = r.totalAmount;
+          resultsByKey[`${r.FromCollectiveId}-${r.CollectiveId}`] = r.totalAmount;
         });
         return keys.map(key => {
-          return resultsByKey[`${key.FromCollectiveId}-${key.ToCollectiveId}`] || 0;
+          return resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0;
         })
       }))
     }

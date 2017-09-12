@@ -11,5 +11,5 @@
   },
   "production": {
     "use_env_variable": "PG_URL"
-  },
+  }
 }

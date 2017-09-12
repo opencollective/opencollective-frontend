@@ -1,5 +1,7 @@
 'use strict';
-
+/**
+ * Moving 'brand', 'country', 'funding', 'fullName', 'expMonth', 'expYear' into PaymentMethod.data
+ */
 const Promise = require('bluebird');
 
 const pick = (obj, attributes) => {
@@ -32,17 +34,12 @@ const updatePaymentMethods = (sequelize) => {
       });
   };
 
-  return sequelize.query(`SELECT * FROM "PaymentMethods" WHERE "CollectiveId" IS NOT NULL AND "expYear" IS NOT NULL LIMIT 3`, { type: sequelize.QueryTypes.SELECT })
+  return sequelize.query(`SELECT * FROM "PaymentMethods" WHERE "CollectiveId" IS NOT NULL AND "expYear" IS NOT NULL`, { type: sequelize.QueryTypes.SELECT })
   .then(pms => pms && Promise.map(pms, updatePaymentMethod))
 }
 
 module.exports = {
   up: function (queryInterface, DataTypes) {
-    if(false) {
-      return updatePaymentMethods(queryInterface.sequelize).then(() => {
-        throw new Error("Dry run");
-      })
-    }
     return queryInterface.addColumn('PaymentMethods', 'currency', { type: DataTypes.STRING(3) })
     .then(() => updatePaymentMethods(queryInterface.sequelize))
     .then(() => queryInterface.removeColumn('PaymentMethods', 'funding'))

@@ -11,7 +11,7 @@ describe("order.model.test.js", () => {
   before('create an order', () => models.Order.create({
     CreatedByUserId: user.id,
     FromCollectiveId: user.CollectiveId,
-    ToCollectiveId: collective.id,
+    CollectiveId: collective.id,
     TierId: tier.id,
     totalAmount: 1000,
     currency: 'USD'
@@ -21,7 +21,7 @@ describe("order.model.test.js", () => {
     order.populate().then(order => {
       expect(order.createdByUser.id).to.equal(user.id);
       expect(order.fromCollective.id).to.equal(user.CollectiveId);
-      expect(order.toCollective.id).to.equal(collective.id);
+      expect(order.collective.id).to.equal(collective.id);
       expect(order.tier.id).to.equal(tier.id);
       expect(order.paymentMethod).to.not.exist;
       done();

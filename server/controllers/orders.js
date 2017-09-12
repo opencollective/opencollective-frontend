@@ -29,7 +29,7 @@ export const manual = (req, res, next) => {
     .then(() => models.Order.create({
       CreatedByUserId: user.id,
       FromCollectiveId: user.CollectiveId,
-      ToCollectiveId: collective.id,
+      CollectiveId: collective.id,
       currency: collective.currency,
       totalAmount,
       description,

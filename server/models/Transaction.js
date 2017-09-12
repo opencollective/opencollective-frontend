@@ -15,7 +15,7 @@ export default (Sequelize, DataTypes) => {
 
   const Transaction = Sequelize.define('Transaction', {
 
-    type: DataTypes.STRING, // EXPENSE or DONATION
+    type: DataTypes.STRING, // DEBIT or CREDIT
 
     uuid: {
       type: DataTypes.UUID,
@@ -39,6 +39,8 @@ export default (Sequelize, DataTypes) => {
       allowNull: false
     },
 
+    // Source of the money for a DEBIT
+    // Recipient of the money for a CREDIT
     FromCollectiveId: {
       type: DataTypes.INTEGER,
       references: {
@@ -50,7 +52,7 @@ export default (Sequelize, DataTypes) => {
       allowNull: false
     },
 
-    ToCollectiveId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Collectives',
@@ -98,24 +100,24 @@ export default (Sequelize, DataTypes) => {
     },
 
     // stores the currency that the transaction happened in (currency of the host)
-    txnCurrency: {
+    hostCurrency: {
       type: DataTypes.STRING,
       set(val) {
         if (val && val.toUpperCase) {
-          this.setDataValue('txnCurrency', val.toUpperCase());
+          this.setDataValue('hostCurrency', val.toUpperCase());
         }
       }
     },
 
     // stores the foreign exchange rate at the time of transaction between donation currency and transaction currency
-    // txnCurrencyFxRate = amount/amountInTxnCurrency
-    txnCurrencyFxRate: DataTypes.FLOAT,
+    // hostCurrencyFxRate = amount/amountInHostCurrency
+    hostCurrencyFxRate: DataTypes.FLOAT,
 
     // amount in currency of the host
-    amountInTxnCurrency: DataTypes.INTEGER,
-    platformFeeInTxnCurrency: DataTypes.INTEGER,
-    hostFeeInTxnCurrency: DataTypes.INTEGER,
-    paymentProcessorFeeInTxnCurrency: DataTypes.INTEGER,
+    amountInHostCurrency: DataTypes.INTEGER,
+    platformFeeInHostCurrency: DataTypes.INTEGER,
+    hostFeeInHostCurrency: DataTypes.INTEGER,
+    paymentProcessorFeeInHostCurrency: DataTypes.INTEGER,
     netAmountInCollectiveCurrency: DataTypes.INTEGER, // stores the net amount received by the collective
 
     data: DataTypes.JSON,
@@ -133,12 +135,12 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
-      netAmountInTxnCurrency() {
-        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency - this.hostFeeInTxnCurrency;
+      netAmountInHostCurrency() {
+        return this.amountInHostCurrency - this.paymentProcessorFeeInHostCurrency - this.platformFeeInHostCurrency - this.hostFeeInHostCurrency;
       },
 
-      amountSentToHostInTxnCurrency() {
-        return this.amountInTxnCurrency - this.paymentProcessorFeeInTxnCurrency - this.platformFeeInTxnCurrency;
+      amountSentToHostInHostCurrency() {
+        return this.amountInHostCurrency - this.paymentProcessorFeeInHostCurrency - this.platformFeeInHostCurrency;
       },
 
       // Info.
@@ -153,15 +155,15 @@ export default (Sequelize, DataTypes) => {
           createdAt: this.createdAt,
           CreatedByUserId: this.CreatedByUserId,
           FromCollectiveId: this.FromCollectiveId,
-          ToCollectiveId: this.ToCollectiveId,
+          CollectiveId: this.CollectiveId,
           platformFee: this.platformFee,
           hostFee: this.hostFee,
-          paymentProcessorFeeInTxnCurrency: this.paymentProcessorFeeInTxnCurrency,
-          amountInTxnCurrency: this.amountInTxnCurrency,
+          paymentProcessorFeeInHostCurrency: this.paymentProcessorFeeInHostCurrency,
+          amountInHostCurrency: this.amountInHostCurrency,
           netAmountInCollectiveCurrency: this.netAmountInCollectiveCurrency,
-          netAmountInTxnCurrency: this.netAmountInTxnCurrency,
-          amountSentToHostInTxnCurrency: this.amountSentToHostInTxnCurrency,
-          txnCurrency: this.txnCurrency
+          netAmountInHostCurrency: this.netAmountInHostCurrency,
+          amountSentToHostInHostCurrency: this.amountSentToHostInHostCurrency,
+          hostCurrency: this.hostCurrency
         };
       }
     },
@@ -190,7 +192,7 @@ export default (Sequelize, DataTypes) => {
     return models.Expense.findOne({ where: { id: this.ExpenseId } })
       .then(expense => {
         if (!expense) return null;
-        if (viewer && viewer.isAdmin(this.ToCollectiveId)) return expense.info;
+        if (viewer && viewer.isAdmin(this.CollectiveId)) return expense.info;
         if (viewer && viewer.id === expense.UserId) return expense.info;
         return expense.public;
       });
@@ -198,9 +200,9 @@ export default (Sequelize, DataTypes) => {
 
   Transaction.prototype.getSource = function() {
     switch (this.type) {
-      case 'EXPENSE':
+      case 'DEBIT':
         return this.getExpense();
-      case 'DONATION':
+      case 'CREDIT':
         return this.getOrder();
     }        
   };
@@ -220,19 +222,47 @@ export default (Sequelize, DataTypes) => {
   /**
    * Create the opposite transaction from the perspective of the FromCollective
    * There is no fees
-   * @POST Two transactions are created. Returns the initial transaction FromCollectiveId -> ToCollectiveId
+   * @POST Two transactions are created. Returns the initial transaction FromCollectiveId -> CollectiveId
+   * 
+   * Examples (simplified with round numbers):
+   * - Expense1 from User1 paid by Collective1
+   *   - amount: $10
+   *   - PayPal Fees: $1
+   *   - Host Fees: $0
+   *   - Platform Fees: $0
+   *   => DEBIT: Collective: C1, FromCollective: U1
+   *      amount: -$10, netAmountInCollectiveCurrency: -$11, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   *   => CREDIT: Collective: U1, FromCollective: C1
+   *      amount: $11, netAmountInCollectiveCurrency: $10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: 0, hostFeeInHostCurrency: 0
+   * 
+   * - Donation1 from User1 to Collective1
+   *   - amount: $10
+   *   - Stripe Fees: $1
+   *   - Host Fees: $1
+   *   - Platform Fees: $1
+   *   => DEBIT: Collective: U1, FromCollective: C1
+   *      amount: -$7, netAmountInCollectiveCurrency: -$10, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   *   => CREDIT: Collective: C1, FromCollective: U1
+   *      amount: $10, netAmountInCollectiveCurrency: $7, paymentProcessorFeeInHostCurrency: $1, platformFeeInHostCurrency: $1, hostFeeInHostCurrency: $1
+   * 
+   * Note:
+   * We should simplify a Transaction to:
+   * CollectiveId, DEBIT/CREDIT, amount, currency, OrderId where amount is always the net amount in the currency of CollectiveId
+   * and we should move paymentProcessorFee, platformFee, hostFee to the Order model and rename them to *InHostCurrency to avoid confusion.
+   * 
    */
+
   Transaction.createDoubleEntry = (transaction) => {
+
+    transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
+
     const oppositeTransaction = {
       ...transaction,
-      type: (-transaction.amount > 0) ? type.DONATION : type.EXPENSE,
-      FromCollectiveId: transaction.ToCollectiveId,
-      ToCollectiveId: transaction.FromCollectiveId,
-      amount: -transaction.amount,
-      netAmountInCollectiveCurrency: -transaction.amount,
-      paymentProcessorFeeInTxnCurrency: 0,
-      platformFeeInTxnCurrency: 0,
-      hostFeeInTxnCurrency: 0
+      type: (-transaction.amount > 0) ? type.CREDIT : type.DEBIT,
+      FromCollectiveId: transaction.CollectiveId,
+      CollectiveId: transaction.FromCollectiveId,
+      amount: -transaction.netAmountInCollectiveCurrency,
+      netAmountInCollectiveCurrency: -transaction.amount
     }
 
     debug("createDoubleEntry", transaction, "opposite", oppositeTransaction);
@@ -253,34 +283,34 @@ export default (Sequelize, DataTypes) => {
     return Promise.mapSeries(transactions, t => Transaction.create(t)).then(results => results[index]);
   };
 
-  Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, ToCollectiveId, transaction, paymentMethod }) => {
+  Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, CollectiveId, transaction, paymentMethod }) => {
 
     if (!transaction.amount) {
       return Promise.reject(new Error("transaction.amount cannot be null or zero"));
     }
 
-    return models.Member.findOne({ where: { role: 'HOST', CollectiveId: ToCollectiveId } }).then(member => {
+    return models.Member.findOne({ where: { role: 'HOST', CollectiveId: CollectiveId } }).then(member => {
       if (!member) {
-        throw new Error(`Cannot create a transaction: collective id ${ToCollectiveId} doesn't have a host`);
+        throw new Error(`Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`);
       }
 
       transaction.HostCollectiveId = member.MemberCollectiveId;
       // attach other objects manually. Needed for afterCreate hook to work properly
       transaction.CreatedByUserId = CreatedByUserId;
       transaction.FromCollectiveId = FromCollectiveId;
-      transaction.ToCollectiveId = ToCollectiveId;
+      transaction.CollectiveId = CollectiveId;
       transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
-      transaction.type = (transaction.amount > 0) ? type.DONATION : type.EXPENSE;
+      transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
 
-      if (transaction.amount > 0 && transaction.txnCurrencyFxRate) {
+      if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
         // populate netAmountInCollectiveCurrency for donations
-        // @aseem: why the condition on && transaction.txnCurrencyFxRate ?
+        // @aseem: why the condition on && transaction.hostCurrencyFxRate ?
           transaction.netAmountInCollectiveCurrency =
-            Math.round((transaction.amountInTxnCurrency
-              - transaction.platformFeeInTxnCurrency
-              - transaction.hostFeeInTxnCurrency
-              - transaction.paymentProcessorFeeInTxnCurrency)
-            * transaction.txnCurrencyFxRate);
+            Math.round((transaction.amountInHostCurrency
+              - transaction.platformFeeInHostCurrency
+              - transaction.hostFeeInHostCurrency
+              - transaction.paymentProcessorFeeInHostCurrency)
+            * transaction.hostCurrencyFxRate);
       }
       return Transaction.createDoubleEntry(transaction);
     });
@@ -293,7 +323,7 @@ export default (Sequelize, DataTypes) => {
     return Transaction.findById(transaction.id, {
       include: [
         { model: models.Collective, as: 'fromCollective' },
-        { model: models.Collective, as: 'toCollective' },
+        { model: models.Collective, as: 'collective' },
         { model: models.User, as: 'createdByUser' },
         { model: models.PaymentMethod }
       ]
@@ -309,7 +339,7 @@ export default (Sequelize, DataTypes) => {
         data: {
           transaction: transaction.info,
           user: transaction.User && transaction.User.minimal,
-          collective: transaction.toCollective && transaction.toCollective.minimal
+          collective: transaction.collective && transaction.collective.minimal
         }
       };
       if (transaction.createdByUser) {

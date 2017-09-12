@@ -7,7 +7,7 @@ export default (req, res, next) => {
    * (a collective is considered as active if it has ever received any funding from its host or through a order)
    */
   const getTotalCollectives = () => {
-    return models.Transaction.aggregate('ToCollectiveId', 'count', {
+    return models.Transaction.aggregate('CollectiveId', 'count', {
       distinct: true,
       where: {
         amount: { $gt: 0 }

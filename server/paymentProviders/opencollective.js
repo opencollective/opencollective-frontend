@@ -13,7 +13,7 @@ export default {
         [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount']
       ],
       where: {
-        ToCollectiveId: paymentMethod.CollectiveId
+        CollectiveId: paymentMethod.CollectiveId
       }
     })
     .then(result => {
@@ -21,19 +21,19 @@ export default {
     });
   },
   processOrder: (order) => {
-    // Get the host of the fromCollective and toCollective
+    // Get the host of the fromCollective and collective
     return Promise.props({
       fromCollectiveHost: order.fromCollective.getHostCollective(),
-      toCollectiveHost: order.toCollective.getHostCollective(),
+      collectiveHost: order.collective.getHostCollective(),
     })
     .then(results => {
-      if (results.fromCollectiveHost.id !== results.toCollectiveHost.id) {
-        return Promise.reject(new Error(`Cannot transfer money between different hosts (${results.fromCollectiveHost.name} -> ${results.toCollectiveHost.name})`))
+      if (results.fromCollectiveHost.id !== results.collectiveHost.id) {
+        return Promise.reject(new Error(`Cannot transfer money between different hosts (${results.fromCollectiveHost.name} -> ${results.collectiveHost.name})`))
       }
       const payload = {
         CreatedByUserId: order.CreatedByUserId,
         FromCollectiveId: order.FromCollectiveId,
-        ToCollectiveId: order.ToCollectiveId,
+        CollectiveId: order.CollectiveId,
         paymentMethod: order.PaymentMethod
       };
       payload.transaction = {
@@ -41,11 +41,11 @@ export default {
         OrderId: order.id,
         amount: order.totalAmount,
         currency: order.currency,
-        txnCurrency: results.toCollectiveHost.currency,
-        amountInTxnCurrency: order.totalAmount,
-        hostFeeInTxnCurrency: 0,
-        platformFeeInTxnCurrency: 0,
-        paymentProcessorFeeInTxnCurrency: 0,
+        hostCurrency: results.collectiveHost.currency,
+        amountInHostCurrency: order.totalAmount,
+        hostFeeInHostCurrency: 0,
+        platformFeeInHostCurrency: 0,
+        paymentProcessorFeeInHostCurrency: 0,
         description: order.description,
       };
       return models.Transaction.createFromPayload(payload);

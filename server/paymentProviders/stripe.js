@@ -32,7 +32,7 @@ export default {
 
     const {
       fromCollective,
-      toCollective,
+      collective,
       paymentMethod,
       subscription,
       tier
@@ -87,7 +87,7 @@ export default {
             trial_end: getSubscriptionTrialEndDate(order.createdAt, subscription.interval),
             metadata: {
               from: `${config.host.website}/${fromCollective.slug}`,
-              to: `${config.host.website}/${toCollective.slug}`,
+              to: `${config.host.website}/${collective.slug}`,
               PaymentMethodId: paymentMethod.id
             }
           }))
@@ -96,7 +96,7 @@ export default {
         .then(subscription => models.Activity.create({
           type: activities.SUBSCRIPTION_CONFIRMED,
           data: {
-            collective: toCollective.minimal,
+            collective: collective.minimal,
             user: user.minimal,
             tier,
             subscription
@@ -121,7 +121,7 @@ export default {
           application_fee: parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10),
           metadata: {
             from: `${config.host.website}/${order.fromCollective.slug}`,
-            to: `${config.host.website}/${order.toCollective.slug}`,
+            to: `${config.host.website}/${order.collective.slug}`,
             customerEmail: user.email,
             PaymentMethodId: paymentMethod.id
           }
@@ -133,11 +133,11 @@ export default {
         .then(balanceTransaction => {
           // create a transaction
           const fees = stripe.extractFees(balanceTransaction);
-          const hostFeePercent = toCollective.hostFeePercent;
+          const hostFeePercent = collective.hostFeePercent;
           const payload = {
             CreatedByUserId: user.id,
             FromCollectiveId: order.FromCollectiveId,
-            ToCollectiveId: toCollective.id,
+            CollectiveId: collective.id,
             paymentMethod
           };
           payload.transaction = {
@@ -145,12 +145,12 @@ export default {
             OrderId: order.id,
             amount: order.totalAmount,
             currency: order.currency,
-            txnCurrency: balanceTransaction.currency,
-            amountInTxnCurrency: balanceTransaction.amount,
-            txnCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
-            hostFeeInTxnCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
-            platformFeeInTxnCurrency: fees.applicationFee,
-            paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+            hostCurrency: balanceTransaction.currency,
+            amountInHostCurrency: balanceTransaction.amount,
+            hostCurrencyFxRate: order.totalAmount / balanceTransaction.amount,
+            hostFeeInHostCurrency: parseInt(balanceTransaction.amount * hostFeePercent / 100, 10),
+            platformFeeInHostCurrency: fees.applicationFee,
+            paymentProcessorFeeInHostCurrency: fees.stripeFee,
             description: order.description,
             data: { charge, balanceTransaction },
           };
@@ -159,7 +159,7 @@ export default {
     };
 
     let hostStripeAccount, transactions;
-    return toCollective.getHostStripeAccount()
+    return collective.getHostStripeAccount()
       .then(stripeAccount => hostStripeAccount = stripeAccount)
 
       // get or create a customer under the platform stripe account
@@ -185,10 +185,10 @@ export default {
       .tap(t => transactions = t)
 
       // if this is a subscription, we create it now on Stripe
-      .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, toCollective) : null)
+      .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, collective) : null)
 
       // add user to the collective
-      .tap(() => toCollective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
+      .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
 
       // Mark order row as processed
       .tap(() => order.update({ processedAt: new Date() }))

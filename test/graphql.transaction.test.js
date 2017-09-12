@@ -70,8 +70,8 @@ describe('graphql.transaction.test.js', () => {
       expect(result.errors).to.not.exist;
       const transactions = result.data.Collective.transactions;
       expect(transactions.length).to.equal(limit);
-      const expense = transactions.find(t => t.type === 'EXPENSE');
-      const order = transactions.find(t => t.type === 'DONATION');
+      const expense = transactions.find(t => t.type === 'DEBIT');
+      const order = transactions.find(t => t.type === 'CREDIT');
       expect(expense).to.have.property('attachment');
       expect(expense.attachment).to.equal(null); // can't see attachment if not logged in
       expect(order).to.have.property('paymentMethod');
@@ -135,13 +135,13 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset, type: 'DONATION' });
+      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset, type: 'CREDIT' });
       result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);
       transactions.map(t => {
-        expect(t.type).to.equal('DONATION');
+        expect(t.type).to.equal('CREDIT');
       });
     });
 
@@ -163,7 +163,7 @@ describe('graphql.transaction.test.js', () => {
               id
               slug
             }
-            toCollective {
+            collective {
               id
               slug
             }
@@ -194,14 +194,14 @@ describe('graphql.transaction.test.js', () => {
       const transactions = result.data.allTransactions;
       expect(transactions.length).to.equal(limit);
       expect(transactions[0].id).to.equal(7661);
-      const expense = transactions.find(t => t.type === 'EXPENSE');
+      const expense = transactions.find(t => t.type === 'DEBIT');
       expect(expense.attachment).to.equal(null);
       return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
         const result2 = await utils.graphqlQuery(query, { slug: "wwcodeaustin" }, user);
         result2.errors && console.error(result2.errors[0]);
         const transactions2 = result2.data.allTransactions;
         expect(result.errors).to.not.exist;
-        const expense2 = transactions2.find(t => t.type === 'EXPENSE');
+        const expense2 = transactions2.find(t => t.type === 'DEBIT');
         expect(expense2.attachment).to.equal('******');
       })
       

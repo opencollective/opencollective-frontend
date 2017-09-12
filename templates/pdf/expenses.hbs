@@ -102,7 +102,7 @@ td.tdpadding {
         <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
         <td valign="top"><a href="{{@root.config.host.website}}/{{collective.slug}}">{{collective.shortSlug}}</a></td>
         <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=collective.currency precision=2}}}</td>
-        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
+        <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInHostCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
         <td valign="top" width="100%">{{description}}</td>
         <td valign="top" align="center">{{page}}</td>
       </tr>
@@ -142,9 +142,9 @@ td.tdpadding {
           <tr>
             <th>Fees</th>
             <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
-            <td>-{{{currency paymentProcessorFeeInTxnCurrency currency=@root.host.currency precision=2}}}</td>
+            <td>-{{{currency paymentProcessorFeeInHostCurrency currency=@root.host.currency precision=2}}}</td>
           </tr>
-          <tr><th nowrap>Net amount in {{@root.host.currency}}</th><td></td><td>{{{currency netAmountInTxnCurrency currency=@root.host.currency precision=2}}}{{#if note}}*{{/if}}</td></tr>
+          <tr><th nowrap>Net amount in {{@root.host.currency}}</th><td></td><td>{{{currency netAmountInHostCurrency currency=@root.host.currency precision=2}}}{{#if note}}*{{/if}}</td></tr>
           <tr><th nowrap>Payout method</th><td></td><td nowrap>{{Expense.payoutMethod}}</td></tr>
           <tr><th>Recipient</th><td></td><td nowrap>{{User.name}} &lt;{{User.email}}&gt;</td></tr>
         </table>

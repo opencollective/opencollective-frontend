@@ -180,7 +180,7 @@ export const OrderInputType = new GraphQLInputObjectType({
     paymentMethod: { type: PaymentMethodInputType },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
-    toCollective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+    collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
     tier: { type: TierInputType }
   })
 });

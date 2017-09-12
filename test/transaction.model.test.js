@@ -26,7 +26,7 @@ describe('transaction model', () => {
         defaultTransactionData = {
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
-          ToCollectiveId: collective.id,
+          CollectiveId: collective.id,
           HostCollectiveId: host.CollectiveId
         };
       })
@@ -56,11 +56,12 @@ describe('transaction model', () => {
   });
 
   it('createFromPayload creates a double entry transaction', () => {
+    console.log(">>> transaction data", transactionsData[7]);
     return Transaction.createFromPayload({
       transaction: transactionsData[7],
       CreatedByUserId: user.id,
       FromCollectiveId: user.CollectiveId,
-      ToCollectiveId: collective.id
+      CollectiveId: collective.id
     })
     .then(() => {
       return Transaction.findAll()
@@ -69,7 +70,7 @@ describe('transaction model', () => {
         expect(transactions[0] instanceof models.Transaction).to.be.true;
         expect(transactions[0].description).to.equal(transactionsData[7].description);
         expect(transactions[0].amount).to.equal(-transactionsData[7].amount);
-        expect(transactions[1].amount).to.equal(transactionsData[7].amount);
+        expect(transactions[1].amount).to.equal(-transactions[0].netAmountInCollectiveCurrency);
       })
     })
   })
@@ -86,10 +87,10 @@ describe('transaction model', () => {
       transaction: transactionsData[7],
       CreatedByUserId: user.id,
       FromCollectiveId: user.CollectiveId,
-      ToCollectiveId: collective.id
+      CollectiveId: collective.id
     })
     .then(transaction => {
-      expect(transaction.ToCollectiveId).to.equal(collective.id);
+      expect(transaction.CollectiveId).to.equal(collective.id);
     })
     .catch(done);
   });

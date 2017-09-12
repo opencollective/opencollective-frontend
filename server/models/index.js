@@ -106,7 +106,7 @@ export function setupModels(client) {
   m.Notification.belongsTo(m.Collective);
 
   // Transaction.
-  m.Transaction.belongsTo(m.Collective, { foreignKey: 'ToCollectiveId', as: 'toCollective' });
+  m.Transaction.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
 
   m.Transaction.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
@@ -122,7 +122,7 @@ export function setupModels(client) {
   // Order.
   m.Order.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
   m.Order.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
-  m.Order.belongsTo(m.Collective, { foreignKey: 'ToCollectiveId', as: 'toCollective' });
+  m.Order.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Order.belongsTo(m.Tier);
   // m.Collective.hasMany(m.Order); // makes the test `mocha test/graphql.transaction.test.js -g "insensitive" fail
   m.Transaction.belongsTo(m.Order);

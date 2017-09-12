@@ -22,10 +22,10 @@ const order = {
         }
     },
     "tier": {
-        "id": 71,
+        "id": 70,
         "amount": null
     },
-    "toCollective": {
+    "collective": {
         "slug": "brusselstogether"
     }
   }
@@ -45,7 +45,7 @@ const createOrderQuery = `
         id
         name
       }
-      toCollective {
+      collective {
         id
         slug
         currency
@@ -93,26 +93,26 @@ describe('createOrder', () => {
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
     const fromCollective = res.data.createOrder.fromCollective;
-    const toCollective = res.data.createOrder.toCollective;
+    const collective = res.data.createOrder.collective;
     const transaction = await models.Transaction.findOne({
-      where: { ToCollectiveId: toCollective.id, amount: order.totalAmount }
+      where: { CollectiveId: collective.id, amount: order.totalAmount }
     });
     expect(transaction.FromCollectiveId).to.equal(fromCollective.id);
-    expect(transaction.ToCollectiveId).to.equal(toCollective.id);
-    expect(transaction.currency).to.equal(toCollective.currency);
-    expect(transaction.hostFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.platformFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.data.charge.currency).to.equal(toCollective.currency.toLowerCase());
+    expect(transaction.CollectiveId).to.equal(collective.id);
+    expect(transaction.currency).to.equal(collective.currency);
+    // expect(transaction.hostFeeInHostCurrency).to.equal(0.05 * order.totalAmount); // need to update BrusselsTogether.hostFee in opencollective_dvl DB
+    expect(transaction.platformFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInTxnCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
 
     // no customer should be created on the connected account for one time charges
     expect(transaction.data.charge.customer).to.equal(null);
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
-    const hostMember = await models.Member.findOne({ where: { CollectiveId: toCollective.id, role: 'HOST' } });
+    const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
     const hostStripeAccount = await models.ConnectedAccount.findOne({
-      where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
+      where: { service: 'stripe', CollectiveId: hostMember.MemberCollectiveId }
     });
     const charge = await Stripe(hostStripeAccount.token).charges.retrieve(transaction.data.charge.id);
     expect(charge.source.last4).to.equal('4242');
@@ -130,24 +130,24 @@ describe('createOrder', () => {
     const res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
-    const toCollective = res.data.createOrder.toCollective;
+    const collective = res.data.createOrder.collective;
     const transaction = await models.Transaction.findOne({
-      where: { ToCollectiveId: toCollective.id, amount: order.totalAmount }
+      where: { CollectiveId: collective.id, amount: order.totalAmount }
     });
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
-    expect(transaction.ToCollectiveId).to.equal(toCollective.id);
-    expect(transaction.currency).to.equal(toCollective.currency);
-    expect(transaction.hostFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.platformFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.data.charge.currency).to.equal(toCollective.currency.toLowerCase());
+    expect(transaction.CollectiveId).to.equal(collective.id);
+    expect(transaction.currency).to.equal(collective.currency);
+    expect(transaction.hostFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.platformFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInTxnCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
 
     // no customer should be created on the connected account for one time charges
     expect(transaction.data.charge.customer).to.equal(null);
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
-    const hostMember = await models.Member.findOne({ where: { CollectiveId: toCollective.id, role: 'HOST' } });
+    const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
     const hostStripeAccount = await models.ConnectedAccount.findOne({
       where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
     });
@@ -193,24 +193,24 @@ describe('createOrder', () => {
     res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;
-    const toCollective = res.data.createOrder.toCollective;
+    const collective = res.data.createOrder.collective;
     const transaction = await models.Transaction.findOne({
-      where: { ToCollectiveId: toCollective.id, amount: order.totalAmount }
+      where: { CollectiveId: collective.id, amount: order.totalAmount }
     });
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
-    expect(transaction.ToCollectiveId).to.equal(toCollective.id);
-    expect(transaction.currency).to.equal(toCollective.currency);
-    expect(transaction.hostFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.platformFeeInTxnCurrency).to.equal(0.05 * order.totalAmount);
-    expect(transaction.data.charge.currency).to.equal(toCollective.currency.toLowerCase());
+    expect(transaction.CollectiveId).to.equal(collective.id);
+    expect(transaction.currency).to.equal(collective.currency);
+    expect(transaction.hostFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.platformFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
-    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInTxnCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
+    expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
 
     // no customer should be created on the connected account for one time charges
     expect(transaction.data.charge.customer).to.equal(null);
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
-    const hostMember = await models.Member.findOne({ where: { CollectiveId: toCollective.id, role: 'HOST' } });
+    const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
     const hostStripeAccount = await models.ConnectedAccount.findOne({
       where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
     });
@@ -236,7 +236,7 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
 
     const orderCreated = res.data.createOrder;
-    const toCollective = orderCreated.toCollective;
+    const collective = orderCreated.collective;
     const subscription = orderCreated.subscription;
     expect(orderCreated.processedAt).to.not.be.null;
     expect(subscription.interval).to.equal('month');
@@ -244,16 +244,16 @@ describe('createOrder', () => {
     expect(subscription.amount).to.equal(order.totalAmount);
 
     const transaction = await models.Transaction.findOne({
-      where: { ToCollectiveId: toCollective.id, FromCollectiveId: xdamman.CollectiveId, amount: order.totalAmount }
+      where: { CollectiveId: collective.id, FromCollectiveId: xdamman.CollectiveId, amount: order.totalAmount }
     });
 
     // make sure the transaction has been recorded
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
-    expect(transaction.ToCollectiveId).to.equal(toCollective.id);
-    expect(transaction.currency).to.equal(toCollective.currency);
+    expect(transaction.CollectiveId).to.equal(collective.id);
+    expect(transaction.currency).to.equal(collective.currency);
 
     // make sure the subscription has been recorded in the connected Stripe Account of the host
-    const hostMember = await models.Member.findOne({ where: { CollectiveId: toCollective.id, role: 'HOST' } });
+    const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
     const hostStripeAccount = await models.ConnectedAccount.findOne({
       where: { service: 'stripe', CollectiveId: hostMember.CollectiveId }
     });
@@ -293,15 +293,15 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
     const orderCreated = res.data.createOrder;
     const fromCollective = orderCreated.fromCollective;
-    const toCollective = orderCreated.toCollective;
+    const collective = orderCreated.collective;
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
     expect(transactions.length).to.equal(2);
-    expect(transactions[0].type).to.equal('EXPENSE');
-    expect(transactions[0].FromCollectiveId).to.equal(toCollective.id);
-    expect(transactions[0].ToCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].type).to.equal('DONATION');
+    expect(transactions[0].type).to.equal('DEBIT');
+    expect(transactions[0].FromCollectiveId).to.equal(collective.id);
+    expect(transactions[0].CollectiveId).to.equal(fromCollective.id);
+    expect(transactions[1].type).to.equal('CREDIT');
     expect(transactions[1].FromCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].ToCollectiveId).to.equal(toCollective.id);
+    expect(transactions[1].CollectiveId).to.equal(collective.id);
   });
 
   it('creates an order as a logged in user for an existing organization', async () => {
@@ -338,16 +338,16 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
     const orderCreated = res.data.createOrder;
     const fromCollective = orderCreated.fromCollective;
-    const toCollective = orderCreated.toCollective;
+    const collective = orderCreated.collective;
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
     expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
     expect(transactions.length).to.equal(2);
-    expect(transactions[0].type).to.equal('EXPENSE');
-    expect(transactions[0].FromCollectiveId).to.equal(toCollective.id);
-    expect(transactions[0].ToCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].type).to.equal('DONATION');
+    expect(transactions[0].type).to.equal('DEBIT');
+    expect(transactions[0].FromCollectiveId).to.equal(collective.id);
+    expect(transactions[0].CollectiveId).to.equal(fromCollective.id);
+    expect(transactions[1].type).to.equal('CREDIT');
     expect(transactions[1].FromCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].ToCollectiveId).to.equal(toCollective.id);
+    expect(transactions[1].CollectiveId).to.equal(collective.id);
   });
 
   it(`creates an order as a logged in user for an existing collective using the collective's payment method`, async () => {
@@ -398,16 +398,16 @@ describe('createOrder', () => {
     
     const orderCreated = res.data.createOrder;
     const fromCollective = orderCreated.fromCollective;
-    const toCollective = orderCreated.toCollective;
+    const collective = orderCreated.collective;
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }, order: [['id','ASC']]});
     expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
     expect(transactions.length).to.equal(2);
-    expect(transactions[0].type).to.equal('EXPENSE');
-    expect(transactions[0].FromCollectiveId).to.equal(toCollective.id);
-    expect(transactions[0].ToCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].type).to.equal('DONATION');
+    expect(transactions[0].type).to.equal('DEBIT');
+    expect(transactions[0].FromCollectiveId).to.equal(collective.id);
+    expect(transactions[0].CollectiveId).to.equal(fromCollective.id);
+    expect(transactions[1].type).to.equal('CREDIT');
     expect(transactions[1].FromCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].ToCollectiveId).to.equal(toCollective.id);
+    expect(transactions[1].CollectiveId).to.equal(collective.id);
 
     // Should fail if order.totalAmount > PaymentMethod.getBalanceForUser
     res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
@@ -420,7 +420,7 @@ describe('createOrder', () => {
 
     const xdamman = await models.User.findById(2);
     const fromCollective = await models.Collective.findOne({ where: { slug: 'opensource' }})
-    const toCollective = await models.Collective.findOne({ where: { slug: 'apex' }})
+    const collective = await models.Collective.findOne({ where: { slug: 'apex' }})
 
     await models.Member.create({
       CreatedByUserId: xdamman.id,
@@ -436,7 +436,7 @@ describe('createOrder', () => {
     });
 
     order.fromCollective = { id: fromCollective.id };
-    order.toCollective = { id: toCollective.id };
+    order.collective = { id: collective.id };
     order.paymentMethod = { uuid: paymentMethod.uuid };
     order.interval = null;
     order.totalAmount = 10000000;
@@ -461,12 +461,12 @@ describe('createOrder', () => {
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
     expect(orderCreated.createdByUser.id).to.equal(xdamman.id);
     expect(transactions.length).to.equal(2);
-    expect(transactions[0].type).to.equal('EXPENSE');
-    expect(transactions[0].FromCollectiveId).to.equal(toCollective.id);
-    expect(transactions[0].ToCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].type).to.equal('DONATION');
+    expect(transactions[0].type).to.equal('DEBIT');
+    expect(transactions[0].FromCollectiveId).to.equal(collective.id);
+    expect(transactions[0].CollectiveId).to.equal(fromCollective.id);
+    expect(transactions[1].type).to.equal('CREDIT');
     expect(transactions[1].FromCollectiveId).to.equal(fromCollective.id);
-    expect(transactions[1].ToCollectiveId).to.equal(toCollective.id);
+    expect(transactions[1].CollectiveId).to.equal(collective.id);
 
   });
   

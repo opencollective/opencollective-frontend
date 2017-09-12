@@ -67,7 +67,7 @@ const queries = {
       const query = {
         include: [
           {
-            model: models.Collective, as: 'toCollective',
+            model: models.Collective, as: 'collective',
             where: { slug: args.slug.toLowerCase() }
           }
         ],
@@ -95,6 +95,33 @@ const queries = {
     }
   },
 
+  /*
+   * Returns all collectives
+   */
+  allCollectives: {
+    type: new GraphQLList(CollectiveInterfaceType),
+    args: {
+      tags: { type: new GraphQLList(GraphQLString) },
+      type: {
+        type: GraphQLString,
+        description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
+      },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = {
+        where: {},
+        limit: args.limit || 10
+      };
+
+      if (args.tags) query.where.tags = { $overlap: args.tags };
+      if (args.type) query.where.type = args.type;
+      if (args.offset) query.offset = args.offset;
+
+      return models.Collective.findAll(query);
+    }
+  },
   /*
    * Given a collective slug, returns all events
    */

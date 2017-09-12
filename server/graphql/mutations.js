@@ -261,12 +261,12 @@ const mutations = {
       const checkPermission = () => {
         if (!req.remoteUser) throw new errors.Unauthorized("You need to be logged in to create a member");
         if (req.remoteUser.isAdmin(collective.id)) return true;
-        throw new errors.Unauthorized(`You need to be logged in as a core contributor or as a host of the ${args.collective.slug} collective`);
+        throw new errors.Unauthorized(`You need to be logged in as a core contributor or as a host of the ${collective.slug} collective`);
       }
 
-      return req.loaders.collective.findBySlug.load(args.collective.slug)
+      return req.loaders.collective.findById.load(args.collective.id)
       .then(c => {
-        if (!c) throw new Error(`Collective with slug ${args.collective.slug} not found`);
+        if (!c) throw new Error(`Collective with id ${args.collective.id} not found`);
         collective = c;
       })
       .then(() => {
@@ -300,7 +300,9 @@ const mutations = {
   removeMember: {
     type: MemberType,
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) }
+      member: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+      collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+      role: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args, req) {
       let membership;
@@ -313,7 +315,13 @@ const mutations = {
         throw new errors.Unauthorized(`You need to be logged in as this user or as a core contributor or as a host of the collective id ${membership.CollectiveId}`);
       }
 
-      return models.Member.findById(args.id)
+      return models.Member.findOne({
+          where: {
+            MemberCollectiveId: args.member.id,
+            CollectiveId: args.collective.id,
+            role: args.role
+          }
+        })
         .then(m => {
           if (!m) throw new errors.NotFound("Member not found");
           membership = m;
@@ -341,19 +349,19 @@ const mutations = {
       }
 
       let id, method;
-      if (order.toCollective.id) {
+      if (order.collective.id) {
         method = 'findById';
-        id = order.toCollective.id;
-      } else if (order.toCollective.slug) {
+        id = order.collective.id;
+      } else if (order.collective.slug) {
         method = 'findBySlug';
-        id = order.toCollective.slug;
+        id = order.collective.slug;
       }
 
       // Check the existence of the recipient Collective
       return req.loaders.collective[method].load(id)
       .then(c => {
         if (!c) {
-          throw new Error(`No collective found with slug: ${order.toCollective.slug}`);
+          throw new Error(`No collective found with slug: ${order.collective.slug}`);
         }
         collective = c;
 
@@ -463,7 +471,7 @@ const mutations = {
         const orderData = {
           CreatedByUserId: user.id,
           FromCollectiveId: fromCollective.id,
-          ToCollectiveId: collective.id,
+          CollectiveId: collective.id,
           TierId: tier.id,
           quantity,
           totalAmount,

@@ -38,14 +38,14 @@ export const TransactionInterfaceType = new GraphQLInterfaceType({
       amount: { type: GraphQLInt },
       currency: { type: GraphQLString },
       netAmountInCollectiveCurrency: { type: GraphQLInt },
-      hostFeeInTxnCurrency: { type: GraphQLInt },
-      platformFeeInTxnCurrency: { type: GraphQLInt },
-      paymentProcessorFeeInTxnCurrency: { type: GraphQLInt },
+      hostFeeInHostCurrency: { type: GraphQLInt },
+      platformFeeInHostCurrency: { type: GraphQLInt },
+      paymentProcessorFeeInHostCurrency: { type: GraphQLInt },
       createdByUser: { type: UserType },
       host: { type: UserCollectiveType },
       paymentMethod: { type: PaymentMethodType },
       fromCollective: { type: CollectiveInterfaceType },
-      toCollective: { type: CollectiveInterfaceType },
+      collective: { type: CollectiveInterfaceType },
       type: { type: GraphQLString },
       description: { type: GraphQLString },
       privateMessage: { type: GraphQLString },
@@ -86,34 +86,34 @@ const TransactionFields = () => {
         return transaction.currency;
       }
     },
-    txnCurrency: {
+    hostCurrency: {
       type: GraphQLString,
       resolve(transaction) {
-        return transaction.txnCurrency;
+        return transaction.hostCurrency;
       }
     },
-    txnCurrencyFxRate: {
+    hostCurrencyFxRate: {
       type: GraphQLFloat,
       resolve(transaction) {
-        return transaction.txnCurrencyFxRate;
+        return transaction.hostCurrencyFxRate;
       }
     },
-    hostFeeInTxnCurrency: {
+    hostFeeInHostCurrency: {
       type: GraphQLInt,
       resolve(transaction) {
-        return transaction.hostFeeInTxnCurrency;
+        return transaction.hostFeeInHostCurrency;
       }
     },
-    platformFeeInTxnCurrency: {
+    platformFeeInHostCurrency: {
       type: GraphQLInt,
       resolve(transaction) {
-        return transaction.platformFeeInTxnCurrency;
+        return transaction.platformFeeInHostCurrency;
       }
     },
-    paymentProcessorFeeInTxnCurrency: {
+    paymentProcessorFeeInHostCurrency: {
       type: GraphQLInt,
       resolve(transaction) {
-        return transaction.paymentProcessorFeeInTxnCurrency;
+        return transaction.paymentProcessorFeeInHostCurrency;
       }
     },
     netAmountInCollectiveCurrency: {
@@ -140,10 +140,10 @@ const TransactionFields = () => {
         return transaction.getFromCollective();
       }
     },
-    toCollective: {
+    collective: {
       type: CollectiveInterfaceType,
       resolve(transaction) {
-        return transaction.getToCollective();
+        return transaction.getCollective();
       }
     },
     createdAt: {

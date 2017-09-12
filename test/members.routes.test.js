@@ -20,18 +20,18 @@ const createTransactions = () => {
   const transactions = [{
     CreatedByUserId: users[2].id,
     FromCollectiveId: users[2].CollectiveId,
-    ToCollectiveId: collective.id,
+    CollectiveId: collective.id,
     amount: 2000,
-    amountInTxnCurrency: 2000,
+    amountInHostCurrency: 2000,
     createdAt: '2016-05-07 19:52:21.203+00',
     updatedAt: '2016-05-07 19:52:21.203+00'
   },
   {
     CreatedByUserId: users[3].id,
     FromCollectiveId: users[3].CollectiveId,
-    ToCollectiveId: collective.id,
+    CollectiveId: collective.id,
     amount: 10000,
-    amountInTxnCurrency: 10000,
+    amountInHostCurrency: 10000,
     createdAt: '2016-05-07 19:52:21.203+00',
     updatedAt: '2016-05-07 19:52:21.203+00'
   }];
@@ -233,14 +233,14 @@ describe('members.routes.test.js', () => {
 
     // Add users to tiers
     beforeEach('add users to tiers', () => Promise.all([
-      models.Order.create({ CreatedByUserId: users[2].id, FromCollectiveId: users[2].CollectiveId, ToCollectiveId: 1, TierId: 1, processedAt: new Date }),
-      models.Order.create({ CreatedByUserId: users[3].id, FromCollectiveId: users[3].CollectiveId, ToCollectiveId: 1, TierId: 2, processedAt: new Date })
+      models.Order.create({ CreatedByUserId: users[2].id, FromCollectiveId: users[2].CollectiveId, CollectiveId: 1, TierId: 1, processedAt: new Date }),
+      models.Order.create({ CreatedByUserId: users[3].id, FromCollectiveId: users[3].CollectiveId, CollectiveId: 1, TierId: 2, processedAt: new Date })
     ]));
 
     // Add active and non active subscription
     beforeEach('add active subscription', () => Promise.all([
-      models.Order.create({FromCollectiveId: users[2].CollectiveId, ToCollectiveId: collective.id, CreatedByUserId: users[2].id, TierId: 1, Subscription: { isActive: true }}, { include: [ { model: models.Subscription } ] }),
-      models.Order.create({FromCollectiveId: users[3].CollectiveId, ToCollectiveId: collective.id, CreatedByUserId: users[3].id, TierId: 2, Subscription: { isActive: false }}, { include: [ { model: models.Subscription } ] })
+      models.Order.create({FromCollectiveId: users[2].CollectiveId, CollectiveId: collective.id, CreatedByUserId: users[2].id, TierId: 1, Subscription: { isActive: true }}, { include: [ { model: models.Subscription } ] }),
+      models.Order.create({FromCollectiveId: users[3].CollectiveId, CollectiveId: collective.id, CreatedByUserId: users[3].id, TierId: 2, Subscription: { isActive: false }}, { include: [ { model: models.Subscription } ] })
     ]));
 
     it('get the list of backers with their corresponding tier', () =>

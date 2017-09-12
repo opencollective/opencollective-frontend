@@ -174,7 +174,7 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order1'), { 
-            ToCollectiveId: event1.id,
+            CollectiveId: event1.id,
             FromCollectiveId: user2.CollectiveId,
             TierId: ticket1.id, 
             CreatedByUserId: user2.id,
@@ -183,7 +183,7 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order2'), { 
-            ToCollectiveId: event1.id,
+            CollectiveId: event1.id,
             FromCollectiveId: user3.CollectiveId,
             TierId: ticket1.id, 
             CreatedByUserId: user3.id,
@@ -194,7 +194,7 @@ describe('Query Tests', () => {
         // because it's not confirmed
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order2'), { 
-            ToCollectiveId: event1.id,
+            CollectiveId: event1.id,
             FromCollectiveId: user1.CollectiveId,
             TierId: ticket1.id, 
             CreatedByUserId: user1.id,
@@ -203,7 +203,7 @@ describe('Query Tests', () => {
 
         beforeEach(() => models.Order.create(
           Object.assign(utils.data('order3'), { 
-            ToCollectiveId: event1.id,
+            CollectiveId: event1.id,
             FromCollectiveId: user3.CollectiveId,
             TierId: ticket2.id, 
             CreatedByUserId: user3.id,

@@ -95,7 +95,7 @@ export default function stripeWebhook(req, res, next) {
       Order.findOne({
         include: [
           { model: User, as: 'createdByUser' },
-          { model: Collective, as: 'toCollective' },
+          { model: Collective, as: 'collective' },
           { model: Subscription, where: { stripeSubscriptionId } }
         ]
       })
@@ -190,7 +190,7 @@ export default function stripeWebhook(req, res, next) {
     createTransaction: ['retrieveBalance', (cb, results) => {
       const order = results.fetchOrder;
       const { stripeSubscription } = results.fetchEvent;
-      const collective = order.toCollective || {};
+      const collective = order.collective || {};
       const paymentMethod = results.fetchPaymentMethod;
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
@@ -202,12 +202,12 @@ export default function stripeWebhook(req, res, next) {
         OrderId: order.id,
         amount: stripeSubscription.amount,
         currency: stripeSubscription.currency,
-        txnCurrency: balanceTransaction.currency,
-        amountInTxnCurrency: balanceTransaction.amount,
-        txnCurrencyFxRate: order.totalAmount/balanceTransaction.amount,
-        hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
-        platformFeeInTxnCurrency: fees.applicationFee,
-        paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+        hostCurrency: balanceTransaction.currency,
+        amountInHostCurrency: balanceTransaction.amount,
+        hostCurrencyFxRate: order.totalAmount/balanceTransaction.amount,
+        hostFeeInHostCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
+        platformFeeInHostCurrency: fees.applicationFee,
+        paymentProcessorFeeInHostCurrency: fees.stripeFee,
         data: {charge, balanceTransaction},
         description: `${order.Subscription.interval}ly recurring subscription`,
       };
@@ -215,7 +215,7 @@ export default function stripeWebhook(req, res, next) {
       models.Transaction.createFromPayload({
         CreatedByUserId: order.CreatedByUserId,
         FromCollectiveId: order.FromCollectiveId,
-        ToCollectiveId: order.ToCollectiveId,
+        CollectiveId: order.CollectiveId,
         transaction: newTransaction,
         paymentMethod
       })
@@ -229,7 +229,7 @@ export default function stripeWebhook(req, res, next) {
       // We only send an invoice for orders > $10 equivalent
       if (order.totalAmount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
       const user = order.createdByUser || {};
-      const collective = order.toCollective || {};
+      const collective = order.collective || {};
       const subscription = order.Subscription;
       collective.getRelatedCollectives(2, 0)
       .then((relatedCollectives) => emailLib.send(

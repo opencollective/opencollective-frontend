@@ -28,6 +28,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
+    // User|Organization|Collective that is author of this Order
     FromCollectiveId: {
       type: DataTypes.INTEGER,
       references: {
@@ -38,7 +39,7 @@ export default function(Sequelize, DataTypes) {
       onUpdate: 'CASCADE'
     },
 
-    ToCollectiveId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
         model: 'Collectives',
@@ -137,7 +138,7 @@ export default function(Sequelize, DataTypes) {
           CreatedByUserId: this.CreatedByUserId,
           TierId: this.TierId,
           FromCollectiveId: this.FromCollectiveId,
-          ToCollectiveId: this.ToCollectiveId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           totalAmount: this.totalAmount,
           description: this.description,
@@ -215,10 +216,10 @@ export default function(Sequelize, DataTypes) {
 
   /**
    * Populate all the foreign keys if necessary
-   * (order.fromCollective, order.toCollective, order.createdByUser, order.tier)
+   * (order.fromCollective, order.collective, order.createdByUser, order.tier)
    * @param {*} order 
    */
-  Order.prototype.populate = function(foreignKeys = ['FromCollectiveId', 'ToCollectiveId', 'CreatedByUserId', 'TierId', 'PaymentMethodId']) {
+  Order.prototype.populate = function(foreignKeys = ['FromCollectiveId', 'CollectiveId', 'CreatedByUserId', 'TierId', 'PaymentMethodId']) {
     return Promise.map(foreignKeys, fk => {
       const attribute = (fk.substr(0,1).toLowerCase() + fk.substr(1)).replace(/Id$/, '');
       const model = fk.replace(/(from|to|createdby)/i, '').replace(/Id$/,'');
