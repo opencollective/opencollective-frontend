@@ -164,3 +164,27 @@ export const signin = (req, res, next) => {
     .then(() => res.send({ success: true }))
     .catch(next);
 }
+
+/**
+ * Deprecated (for old website)
+ */
+
+
+/**
+ * Show.
+ */
+export const show = (req, res, next) => {
+  
+    const userData = req.user.show;
+  
+    if (req.remoteUser && req.remoteUser.id === req.user.id) {
+      models.ConnectedAccount.findOne({ where: { CollectiveId: req.remoteUser.CollectiveId }})
+        .then((account) => {
+          const response = Object.assign(userData, req.user.info, { stripeAccount: account });
+          res.send(response);
+        })
+        .catch(next);
+    } else {
+      res.send(userData);
+    }
+  };

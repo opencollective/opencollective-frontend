@@ -120,6 +120,7 @@ export default (app) => {
    */
   app.post('/users', required('user'), users.create); // Create a user.
   app.get('/users/exists', required('email'), users.exists); // Checks the existence of a user based on email.
+  app.get('/users/:userid', users.show); // Get a user.  
   app.put('/users/:userid/paypalemail', auth.mustBeLoggedInAsUser, required('paypalEmail'), users.updatePaypalEmail); // Update a user paypal email.
   app.get('/users/:userid/email', NotImplemented); // Confirm a user's email.
 
@@ -190,9 +191,9 @@ export default (app) => {
 
   
   /**
-   * Orders
+   * Orders (backward compatible with old website for manual add funds)
    */
-  app.post('/groups/:collectiveid/orders/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
+  app.post('/groups/:collectiveid/donations/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
   // app.post('/groups/:collectiveid/donations/paypal', required('payment'), orders.paypal); // Make a paypal order.
   // app.get('/groups/:collectiveid/transactions/:paranoidtransactionid/callback', orders.paypalCallback); // Callback after a payment
 

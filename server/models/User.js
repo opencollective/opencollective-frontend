@@ -192,6 +192,7 @@ export default (Sequelize, DataTypes) => {
       show() {
         return {
           id: this.id,
+          CollectiveId: this.CollectiveId,
           firstName: this.firstName,
           lastName: this.lastName,
           createdAt: this.createdAt,
