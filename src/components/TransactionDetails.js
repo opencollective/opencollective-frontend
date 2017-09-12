@@ -88,7 +88,7 @@ class TransactionDetails extends React.Component {
           }
         `}</style>
 
-        {type === 'expense' &&
+        {type === 'debit' &&
           <div className="frame">
             {transaction.attachment &&
               <a href={transaction.attachment} target="_blank" title="Open receipt in a new window">
@@ -126,7 +126,7 @@ class TransactionDetails extends React.Component {
             </span>
           </div>
         </div>
-        { type === 'donation' && LoggedInUser && LoggedInUser.canEditCollective &&
+        { type === 'credit' && LoggedInUser && LoggedInUser.canEditCollective &&
           <div className="col invoice">
             <label><FormattedMessage id='transaction.invoice' defaultMessage='invoice' /></label>
             <div>

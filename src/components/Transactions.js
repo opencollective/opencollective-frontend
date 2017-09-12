@@ -62,11 +62,11 @@ class Transactions extends React.Component {
             <Button className="filterBtn" bsStyle={!this.state.type ? 'primary' : 'default'} onClick={() => this.refetch()}>
               <FormattedMessage id='transactions.all' defaultMessage='all' />
             </Button>
-            <Button className="filterBtn" bsStyle={this.state.type === 'DONATION' ? 'primary' : 'default'} onClick={() => this.refetch('DONATION')}>
-              <FormattedMessage id='transactions.donations' defaultMessage='donations' />
+            <Button className="filterBtn" bsStyle={this.state.type === 'CREDIT' ? 'primary' : 'default'} onClick={() => this.refetch('CREDIT')}>
+              <FormattedMessage id='transactions.credits' defaultMessage='credits' />
             </Button>
-            <Button className="filterBtn" bsStyle={this.state.type === 'EXPENSE' ? 'primary' : 'default'} onClick={() => this.refetch('EXPENSE')}>
-              <FormattedMessage id='transactions.expenses' defaultMessage='expenses' />
+            <Button className="filterBtn" bsStyle={this.state.type === 'DEBIT' ? 'primary' : 'default'} onClick={() => this.refetch('DEBIT')}>
+              <FormattedMessage id='transactions.debits' defaultMessage='debits' />
             </Button>
           </ButtonGroup>
         </div>
