@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
-import { get } from 'lodash';
 import { addGetTransaction } from '../graphql/queries';
 
 class TransactionDetails extends React.Component {
@@ -10,6 +9,7 @@ class TransactionDetails extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     transaction: PropTypes.object,
+    LoggedInUser: PropTypes.object,
     mode: PropTypes.string // open or closed
   }
 
@@ -24,22 +24,22 @@ class TransactionDetails extends React.Component {
   }
 
   render() {
-    const { intl, collective, transaction } = this.props;
+    const { intl, collective, transaction, LoggedInUser } = this.props;
 
     const type = transaction.type.toLowerCase();
 
-    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: collective.currency, ...this.currencyStyle})];
+    const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle})];
     const addFees = (feesArray) => {
       feesArray.forEach(feeName => {
         if (transaction[feeName]) {
-          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: transaction.currency, ...this.currencyStyle})} (${intl.formatMessage(this.messages[feeName])})`);
+          amountDetails.push(`${intl.formatNumber(transaction[feeName] / 100, { currency: collective.currency, ...this.currencyStyle})} (${intl.formatMessage(this.messages[feeName])})`);
         }
       })
     }
 
     addFees(['hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'paymentProcessorFeeInTxnCurrency']);
 
-    const amountDetailsStr = amountDetails.join(' - ')
+    const amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' - ') : null;
 
     return (
         <div className={`TransactionDetails ${this.props.mode}`}>
@@ -111,16 +111,31 @@ class TransactionDetails extends React.Component {
         <div className="col">
           <label><FormattedMessage id='transaction.amount' defaultMessage='amount' /></label>
           <div className="amountDetails">
-            <span>{amountDetailsStr}</span>
-            <span className="netAmountInCollectiveCurrency">&nbsp;=&nbsp;
+            { amountDetailsStr &&
+              <span>
+                <span>{amountDetailsStr}</span>
+                <span className="netAmountInGroupCurrency">&nbsp;=&nbsp;</span>
+              </span>
+            }
+            <span className="netAmountInGroupCurrency">
               <FormattedNumber
-                value={transaction.netAmountInCollectiveCurrency / 100}
-                currency={transaction.currency}
+                value={transaction.netAmountInGroupCurrency / 100}
+                currency={collective.currency}
                 {...this.currencyStyle}
                 />
             </span>
           </div>
         </div>
+        { type === 'donation' && LoggedInUser && LoggedInUser.canEditCollective &&
+          <div className="col invoice">
+            <label><FormattedMessage id='transaction.invoice' defaultMessage='invoice' /></label>
+            <div>
+              <a href={`/${collective.slug}/transactions/${transaction.uuid}/invoice.pdf`}>
+                <FormattedMessage id='transaction.downloadPDF' defaultMessage='Download PDF' />
+              </a>
+            </div>
+          </div>
+        }
       </div>
     );
   }

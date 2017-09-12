@@ -26,8 +26,8 @@ app.prepare()
 
   server.use((req, res, next) => {
     const accept = accepts(req)
-    const locale = accept.language(dev ? ['en'] : languages)
-    req.locale = locale
+    const locale = accept.language(dev ? ['en'] : languages)  || 'en-US';
+    req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale)
     req.messages = dev ? {} : getMessages(locale)
     next();

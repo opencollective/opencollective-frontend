@@ -436,6 +436,7 @@ const getAttendeesQuery = gql`
       startsAt
       location {
         name
+        address
       }
       orders {
         id

@@ -23,7 +23,7 @@ class EventPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   render() {
@@ -44,11 +44,18 @@ class EventPage extends React.Component {
       LoggedInUser.canEditEvent = (event.createdByUser && event.createdByUser.id === LoggedInUser.id) 
         || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length
         || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length;
+
+      if (LoggedInUser.canEditEvent) {
+        // We refetch the data to get the email addresses of the participants
+        // We need to bypass the cache otherwise it won't update the list of participants with the email addresses
+        data.refetch({ options: { fetchPolicy: 'network-only' }});
+      }
+  
     }
 
     return (
       <div>
-        <Event event={event} LoggedInUser={LoggedInUser} />
+        <Event event={event} LoggedInUser={LoggedInUser} client={this.props.client} />
       </div>
     );
   }

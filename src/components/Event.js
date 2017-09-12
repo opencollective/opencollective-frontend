@@ -21,6 +21,8 @@ import { pick, uniqBy, get, union } from 'lodash';
 import { capitalize } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
+import { uniq } from 'underscore';
+import { exportMembers } from '../lib/export_file';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -60,7 +62,8 @@ class Event extends React.Component {
       order: {},
       api: { status: 'idle' },
       event: this.props.event,
-      actions: this.defaultActions
+      // actions: this.defaultActions
+      actions: this.getDefaultActions(this.props)
     };
 
     // To test confirmation screen, uncomment the following:
@@ -172,7 +175,7 @@ class Event extends React.Component {
 
   componentWillReceiveProps(props) {
     if (props) {
-      this.setState({actions: this.getDefaultActions(props) });
+      this.setState({ actions: this.getDefaultActions(props) });
     }
   }
 
@@ -303,7 +306,28 @@ class Event extends React.Component {
 
     return (
       <div>
-
+        <style jsx>{`
+          .adminActions {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+          }
+          .adminActions ul {
+            overflow: hidden;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            margin: 0 2rem;
+          }
+        `}</style>
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
@@ -392,6 +416,15 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
+                      { canEditEvent &&
+                      <div className="adminActions" id="adminActions">
+                        <ul>
+                          <li><a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a></li>
+                          <li><a href={`mailto:${this.event.slug}@${this.event.collective.slug}.opencollective.com`}>Send email</a></li>
+                          <li><a onClick={ () => exportMembers(this.event) }>Export CSV</a></li>
+                        </ul>
+                      </div>
+                      }
                       <Responses responses={responses.guests} />
                     </section>
                   }

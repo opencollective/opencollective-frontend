@@ -55,7 +55,7 @@ export default ComposedComponent => {
         // Run all graphql queries
         const app = (
           <ApolloProvider client={apollo}>
-            <ComposedComponent url={url} client={apollo} {...composedInitialProps} />
+            <ComposedComponent client={apollo} url={url} {...composedInitialProps} />
           </ApolloProvider>
         )
         if (composedInitialProps.ssr === undefined || composedInitialProps.ssr === true) {
