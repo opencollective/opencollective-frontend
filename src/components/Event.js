@@ -14,12 +14,13 @@ import InterestedForm from '../components/InterestedForm';
 import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
 import { filterCollection } from '../lib/utils';
-import { addRegisterToEventMutations } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { pick, uniqBy, get, union } from 'lodash';
 import { capitalize } from '../lib/utils';
+import { Router } from '../server/pages';
+import { addEventMutations } from '../graphql/mutations';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -34,10 +35,10 @@ class Event extends React.Component {
     super(props);
     this.setInterested = this.setInterested.bind(this);
     this.removeInterested = this.removeInterested.bind(this);
-    this.updateResponse = this.updateResponse.bind(this);
+    this.updateOrder = this.updateOrder.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
-    this.handleGetTicketClick = this.handleGetTicketClick.bind(this);
-    this.rsvp = this.rsvp.bind(this);
+    this.handleOrderTier = this.handleOrderTier.bind(this);
+    this.createOrder = this.createOrder.bind(this);
     this.closeModal = this.closeModal.bind(this);
 
     this.defaultActions = [
@@ -56,7 +57,7 @@ class Event extends React.Component {
     this.state = {
       view: 'default',
       showInterestedForm: false,
-      response: {},
+      order: {},
       api: { status: 'idle' },
       event: this.props.event,
       actions: this.defaultActions
@@ -64,7 +65,7 @@ class Event extends React.Component {
 
     // To test confirmation screen, uncomment the following:
     // this.state.view = "GetTicket";
-    // this.state.response = {
+    // this.state.order = {
     //   user: { email: "etienne@gmail.com"},
     //   tier: this.state.event && this.state.event.tiers[1],
     //   quantity: 2
@@ -77,7 +78,7 @@ class Event extends React.Component {
   }
 
   async removeInterested() {
-    const res = await this.props.removeMember({ id: this.props.LoggedInUser.id }, { slug: this.state.event.slug }, 'FOLLOWER');
+    const res = await this.props.removeMember({ id: this.props.LoggedInUser.CollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
     const memberRemoved = res.data.removeMember;
     const event = { ... this.state.event };
     event.members = event.members.filter(member => member.id !== memberRemoved.id);
@@ -92,16 +93,16 @@ class Event extends React.Component {
    * If user is logged in, we directly create a response 
    * Otherwise, we show the form to enter an email address
    */
-  async setInterested(user) {
-    user = user || this.props.LoggedInUser && { id: this.props.LoggedInUser.id };
-    if (user) {
-      const tokens = user.email && user.email.substr(0, user.email.indexOf('@')).split('.');
-      if (tokens && tokens.length > 1) {
-        user.firstName = capitalize(tokens[0] || '');
-        user.lastName = capitalize(tokens[1] || '');
+  async setInterested(member) {
+    member = member || this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId };
+    if (member) {
+      const parts = member.email && member.email.substr(0, member.email.indexOf('@')).split('.');
+      if (parts && parts.length > 1) {
+        member.firstName = capitalize(parts[0] || '');
+        member.lastName = capitalize(parts[1] || '');
       }
       try {
-        const res = await this.props.createMember(user, { slug: this.state.event.slug }, 'FOLLOWER');
+        const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
         const event = { ... this.state.event };
         event.members = [ ...event.members, res.data.createMember ];
         this.setState({ showInterestedForm: false, event });
@@ -111,6 +112,7 @@ class Event extends React.Component {
         actions[0].onClick = this.removeInterested;
         this.setState({ actions, showInterestedForm: false });
       } catch (e) {
+        console.error(e);
         let message = '';
         if (e && e.graphQLErrors) {
           message = ` (error: ${e.graphQLErrors[0].message})`;
@@ -124,29 +126,21 @@ class Event extends React.Component {
     }
   }
 
-  async rsvp(response) {
+  async createOrder(order) {
+    order.tier = order.tier || {};
+    const OrderInputType = {
+      ... order,
+      collective: { slug: this.collective.slug },
+      tier: { id: order.tier.id }
+    };
+
+    this.setState( { status: 'loading' });
     try {
-      response = {
-        user: response.user,
-        collective: { slug: this.state.event.slug },
-        tier: { id: response.tier.id, amount: response.tier.amount },
-        quantity: response.quantity,
-        description: response.description,
-        publicMessage: response.publicMessage
-      }
-      console.log(">>> Event.rsvp: this.props.createOrder:", response);
-      const res = await this.props.createOrder(response);
-      console.log(">>> rsvp res: ", res);
-      this.setState({ response, view: 'default', modal: 'TicketsConfirmed' });
-      window.scrollTo(0,0);
-    } catch (e) {
-      window.lastError = e;
-      console.log(">>> rsvp error: ", e);
-      let message = '';
-      if (e && e.graphQLErrors) {
-        message = ` (error: ${e.graphQLErrors[0].message})`;
-      }
-      this.error(`An error occured 😳. We couldn't register you. Please try again in a few.${message}`);
+      await this.props.createOrder(OrderInputType);
+      this.setState({ status: 'idle', order, view: 'default', modal: 'TicketsConfirmed' });
+    } catch (err) {
+      console.error(">>> createOrder error: ", err);
+      throw new Error(err.graphQLErrors[0].message);
     }
   }
 
@@ -165,7 +159,7 @@ class Event extends React.Component {
           component: <a href={editUrl}>EDIT</a>
         });
       }
-      if (this.state.event.members.find( member => member.user.id === LoggedInUser.id && member.role === 'FOLLOWER')) {
+      if (this.state.event.members.find( member => member.member.id === LoggedInUser.CollectiveId && member.role === 'FOLLOWER')) {
         actions[0].className = 'selected';
         actions[0].icon = 'star';
         actions[0].onClick = this.removeInterested;
@@ -226,24 +220,45 @@ class Event extends React.Component {
     }, 5000);
   }
 
-  updateResponse(response) {
-    this.setState({ response });
-  }
-
   resetResponse() {
     this.setState({ response: {} });
     this.changeView('default');
   }
 
-  handleGetTicketClick(response) {
-    console.log(">>> handleGetTicketClick", response);
-    // If the total amount is 0 and the user is logged in, we can directly RSVP.
-    if (response.totalAmount === 0 && this.props.LoggedInUser) {
-      response.user = { id: this.props.LoggedInUser.id };
-      return this.rsvp(response);
+  updateOrder(tier) {
+    const order = {
+      tier: { id: tier.id },
+      quantity: tier.quantity,
+      totalAmount: (tier.quantity || 1) * tier.amount,
+      interval: tier.interval
     }
-    this.setState({ response, showInterestedForm: false });
-    this.changeView('GetTicket');
+    this.setState({ order });
+    // if (typeof window !== undefined) {
+    //   window.state = this.state;
+    // }
+  }
+
+  handleOrderTier(tier) {
+    console.log(">>> handleOrderTier", tier);
+    this.updateOrder(tier);
+
+    const { event, order } = this.state;
+    order.tier = { id: tier.id };
+    
+    // If the total amount is 0 and the user is logged in, we can directly RSVP.
+    if (order.totalAmount === 0 && this.props.LoggedInUser) {
+      order.user = { id: this.props.LoggedInUser.id };
+      return this.createOrder(order);
+    }
+    this.setState({ order, showInterestedForm: false });
+    let route = `/${event.slug}/order/${order.tier.id}`;
+    if (order.totalAmount) {
+      route += `/${order.totalAmount / 100}`;
+    }
+    if (order.interval) {
+      route += `/${order.interval}`;
+    }
+    Router.pushRoute(route);
   }
 
   render() {
@@ -256,14 +271,15 @@ class Event extends React.Component {
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
       guests.interested.push({
-        ...follower,
+        user: follower.member,
         status: 'INTERESTED'
       });
     });
     guests.confirmed = [];
     event.orders.map(order => {
       guests.confirmed.push({
-        ...order,
+        user: order.fromCollective,
+        createdAt: order.createdAt,
         status: 'YES'
       })
     });
@@ -292,7 +308,7 @@ class Event extends React.Component {
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
           event={event}
-          response={this.state.response} />
+          response={this.state.order} />
 
         <div className="EventPage">
 
@@ -313,10 +329,7 @@ class Event extends React.Component {
 
               {this.state.view === 'default' &&
                 <CollectiveCover
-                  href={`/${event.parentCollective.slug}`}
-                  logo={event.image || event.parentCollective.image}
-                  title={event.name}
-                  backgroundImage={backgroundImage}
+                  collective={event}
                   style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}                  
                   />
               }
@@ -333,9 +346,9 @@ class Event extends React.Component {
               {this.state.view == 'GetTicket' &&
                 <div className="content" >              
                   <OrderForm
-                    onSubmit={this.rsvp}
-                    quantity={this.state.response.quantity}
-                    tier={this.state.response.tier || event.tiers[0]}
+                    onSubmit={this.createOrder}
+                    quantity={this.state.order.quantity}
+                    tier={this.state.order.tier || event.tiers[0]}
                     LoggedInUser={LoggedInUser}
                     />
                 </div>
@@ -359,8 +372,8 @@ class Event extends React.Component {
                           key={tier.id}
                           className="tier"
                           tier={tier}
-                          onChange={(response) => this.updateResponse(response)}
-                          onClick={(response) => this.handleGetTicketClick(response)}
+                          onChange={(response) => this.updateOrder(response)}
+                          onClick={(response) => this.handleOrderTier(response)}
                           />
                       )}
                     </div>
@@ -407,4 +420,4 @@ class Event extends React.Component {
   }
 }
 
-export default addRegisterToEventMutations(Event);
+export default addEventMutations(Event);

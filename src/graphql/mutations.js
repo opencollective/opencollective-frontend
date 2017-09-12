@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import { pick } from 'lodash';
 
 const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType) {
+  mutation createOrder($order: OrderInputType!) {
     createOrder(order: $order) {
       id,
       createdAt,
@@ -30,6 +30,33 @@ const createOrderQuery = gql`
     }
   }
 `;
+
+const createMemberQuery = gql`
+mutation createMember($member: CollectiveAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
+  createMember(member: $member, collective: $collective, role: $role) {
+    id
+    createdAt
+    member {
+      id
+      name
+      image
+      slug
+      twitterHandle
+      description
+    }
+    role
+  }
+}
+`;
+
+const removeMemberQuery = gql`
+  mutation removeMember($member: CollectiveAttributesInputType!, $collective: CollectiveAttributesInputType!, $role: String!) {
+    removeMember(member: $member, collective: $collective, role: $role) {
+      id
+    }
+  }
+`;
+
 
 const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
@@ -94,7 +121,19 @@ export const addCreateOrderMutation = graphql(createOrderQuery, {
   })
 });
 
-export const addRegisterToEventMutations = compose(addCreateOrderMutation);
+export const addCreateMemberMutation = graphql(createMemberQuery, {
+  props: ( { mutate }) => ({
+    createMember: (member, collective, role) => mutate({ variables: { member, collective, role } })
+  })
+});
+
+export const addRemoveMemberMutation = graphql(removeMemberQuery, {
+  props: ( { mutate }) => ({
+    removeMember: (member, collective, role) => mutate({ variables: { member, collective, role } })
+  })
+});
+
+export const addEventMutations = compose(addCreateOrderMutation, addCreateMemberMutation, addRemoveMemberMutation);
 
 export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   props: ( { mutate }) => ({

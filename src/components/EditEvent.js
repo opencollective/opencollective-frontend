@@ -99,11 +99,7 @@ class EditEvent extends React.Component {
         <Body>
 
           <CollectiveCover
-            href={`/${parentCollective.slug}`}
-            logo={parentCollective.image}
-            title={title}
-            className="small"
-            backgroundImage={parentCollective.backgroundImage}
+            collective={parentCollective}
             style={get(parentCollective, 'settings.style.hero.cover')}
             />
 

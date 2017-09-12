@@ -360,11 +360,11 @@ const getEventCollectiveQuery = gql`
         id
         createdAt
         role
-        user {
+        member {
           id
           name
           image
-          username
+          slug
           twitterHandle
           description
         }
@@ -375,11 +375,11 @@ const getEventCollectiveQuery = gql`
         quantity
         processedAt
         publicMessage
-        user {
+        fromCollective {
           id
           name
           image
-          username
+          slug
           twitterHandle
           description
         }

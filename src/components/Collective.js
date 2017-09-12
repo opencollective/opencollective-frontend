@@ -13,6 +13,7 @@ import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import MenuBar from './MenuBar';
+import CollectiveCard from './CollectiveCard';
 import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
@@ -117,7 +118,7 @@ class Collective extends React.Component {
     // If the total amount is 0 and the user is logged in, we can directly RSVP.
     if (order.totalAmount === 0 && this.props.LoggedInUser) {
       order.user = { id: this.props.LoggedInUser.id };
-      return this.rsvp(order);
+      return this.createOrder(order);
     }
     this.setState({ order });
     let route = `/${this.props.collective.slug}/order/${order.tier.id}`;
@@ -247,6 +248,27 @@ class Collective extends React.Component {
                     <Members className={tierSlug} members={members[tierSlug]} />
                   </section>
                 ))}
+
+                { this.collective.memberOf.length > 0 &&
+                  <section id="hosting">
+                    <h1>
+                      <FormattedMessage
+                        id="collective"
+                        values={{ n: this.collective.memberOf.length }}
+                        defaultMessage={`{n, plural, one {collective} other {collectives}}`}
+                        />
+                    </h1>
+                    {this.collective.memberOf.map((membership) =>
+                      <CollectiveCard
+                        key={membership.id}
+                        className="membership"
+                        collective={membership.collective}
+                        membership={membership}
+                        />
+                    )}
+
+                  </section>
+                }
 
               </div>
             </div>
