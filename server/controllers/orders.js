@@ -27,7 +27,7 @@ export const manual = (req, res, next) => {
 
   return promise
     .then(() => models.Order.create({
-      CreatedByUserId: user.id,
+      CreatedByUserId: req.remoteUser.id,
       FromCollectiveId: user.CollectiveId,
       CollectiveId: collective.id,
       currency: collective.currency,
@@ -35,7 +35,7 @@ export const manual = (req, res, next) => {
       description,
       privateMessage
     }))
-    .then(order => executeOrder(order))
+    .then(order => executeOrder(user, order))
     .then(() => res.send({success: true}))
     .catch(err => next(new errors.BadRequest(err.message)));
 };

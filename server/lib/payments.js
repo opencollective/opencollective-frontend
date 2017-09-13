@@ -19,9 +19,6 @@ export const executeOrder = (user, order) => {
   if (!order) {
     return Promise.reject(new Error("No order provided"));
   }
-  if (!order.PaymentMethodId) {
-    return Promise.reject(new Error('PaymentMethodId missing in the order'));
-  }
   if (order.processedAt) {
     return Promise.reject(new Error(`This order (#${order.id}) has already been processed at ${order.processedAt}`));
   }
