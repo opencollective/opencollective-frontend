@@ -38,14 +38,20 @@ class OrderTierPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, data } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    if (!data.Tier && data.fetchData) {
+      data.fetchData();
+    }
     this.setState({LoggedInUser});
   }
 
   async createOrder(order) {
-    const { intl, slug } = this.props;
-    order.collective = { slug };
+    const { intl, data } = this.props;
+    order.collective = { id: data.Collective.id };
+    if (this.state.LoggedInUser) {
+      delete order.user;
+    }
     console.log(">>> createOrder", order);
     try {
       this.setState({ loading: true});
@@ -53,7 +59,7 @@ class OrderTierPage extends React.Component {
       console.log(">>> createOrder response", res);
       const response = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      // window.location.replace(`https://opencollective.com/${response.fromCollective.slug}`);
+      window.location.replace(`${window.location.protocol}//${window.location.host}/${response.fromCollective.slug}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });

@@ -30,10 +30,12 @@ class OrderForm extends React.Component {
       user: {},
       fromCollective: {},
       creditcard: { save: true },
-      order: order || { totalAmount: tier.amount * (tier.quantity || 1)},
+      order: order || {},
       tier,
       result: {}
     };
+
+    this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -101,24 +103,62 @@ class OrderForm extends React.Component {
   }
 
   componentDidMount() {
-    if (typeof Stripe !== 'undefined') {
-      const stripePublishableKey = (window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
+    if (typeof Stripe !== undefined) {
+      const stripePublishableKey = (typeof window !== undefined && window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
       Stripe.setPublishableKey(stripePublishableKey);
     }
+    this.componentWillReceiveProps(this.props);
   }
 
-  // Prefill the form with logged in user if any
   componentWillReceiveProps(props) {
-    if (!this.state.fromCollective.email && props.LoggedInUser) {
-      const user = pick(props.LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
-      const fromCollective = { id: props.LoggedInUser.CollectiveId, type: 'USER' };
-      this.setState({
-        user,
-        fromCollective,
-        LoggedInUser: props.LoggedInUser
-      });
+    const { LoggedInUser } = props;
+    if (!LoggedInUser) return;
+    const fromCollective = { id: LoggedInUser.CollectiveId, type: 'USER' };
+
+    const newState = {
+      ...this.state,
+      fromCollective,
+      LoggedInUser,
+      isNewUser: false
+    };
+
+    if (!this.state.fromCollective.email) {
+      newState.user = pick(LoggedInUser, ['firstName', 'lastName', 'email', 'organization', 'website', 'twitterHandle', 'description']);
     }
+
+    const fromCollectiveOptions = [], paymentMethodsOptions = [], collectivesById = {};
+
+    fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
+    collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
+    LoggedInUser.memberOf.map(membership => {
+      if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
+      const value = membership.collective.id;
+      const label = membership.collective.name;
+      collectivesById[value] = membership.collective;
+      fromCollectiveOptions.push({ [value]: label });
+    })
+    fromCollectiveOptions.push({ createOrganization: 'Create an organization' });
+
+    let paymentMethods = [];
+    if (LoggedInUser && this.state.fromCollective) {
+      paymentMethods = collectivesById[this.state.fromCollective.id || LoggedInUser.collective.id].paymentMethods || [];
+      if (paymentMethods.length > 0) {
+        newState.creditcard = { uuid: paymentMethods[0].uuid };
+      }
+    }
+
+    paymentMethods.map(option => {
+      const value = option.uuid
+      const label = `💳  \xA0\xA0${option.data.brand} ${option.data.funding} ${option.name} - exp ${option.data.expMonth}/${option.data.expYear}`;
+      paymentMethodsOptions.push({ [value]: label });
+    });
+    paymentMethodsOptions.push({[null]: 'other'});
+
+    this.collectivesById = collectivesById;
+    this.paymentMethodsOptions = paymentMethodsOptions;
+    this.fromCollectiveOptions = fromCollectiveOptions;
+    this.setState(newState);
   }
 
   handleChange(obj, attr, value) {
@@ -155,10 +195,11 @@ class OrderForm extends React.Component {
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
-    const { sanitizedCard, order, tier, fromCollective } = this.state;
+    const { sanitizedCard, order, tier, fromCollective, user } = this.state;
 
     const quantity = tier.quantity || 1;
     const OrderInputType = {
+      user,
       fromCollective,
       publicMessage: order.publicMessage,
       quantity,
@@ -194,7 +235,7 @@ class OrderForm extends React.Component {
       }
       const newState = {...this.state};
       if (card.uuid && card.uuid.length === 36) {
-        newState.sanitizedCard = card;
+        newState.sanitizedCard = { uuid: card.uuid };
         this.setState(newState);
         return true;
       } else if (isValidCard(card)) {
@@ -257,32 +298,6 @@ class OrderForm extends React.Component {
       }
     }
 
-    const fromCollectiveOptions = [], collectivesById = {};
-    if (LoggedInUser) {
-      fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
-      collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
-      LoggedInUser.memberOf.map(membership => {
-        if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
-        const value = membership.collective.id;
-        const label = membership.collective.name;
-        collectivesById[value] = membership.collective;
-        fromCollectiveOptions.push({ [value]: label });
-      })
-    }
-    fromCollectiveOptions.push({ createOrganization: 'Create an organization' });
-
-    let paymentMethods = [];
-    if (LoggedInUser && this.state.fromCollective) {
-      paymentMethods = collectivesById[this.state.fromCollective.id].paymentMethods
-    }
-    const paymentMethodsOptions = [];
-    paymentMethods.map(option => {
-      const value = option.uuid
-      const label = `💳  \xA0\xA0${option.data.brand} ${option.data.funding} ${option.data.identifier} - exp ${option.data.expMonth}/${option.data.expYear}`;
-      paymentMethodsOptions.push({ [value]: label });
-    });
-    paymentMethodsOptions.push({[null]: 'other'});
-
     return (
       <div className="OrderForm">
         <style jsx>{`
@@ -343,8 +358,8 @@ class OrderForm extends React.Component {
                 type="select"
                 label={intl.formatMessage(this.messages['order.profile'])}
                 name="fromCollectiveSelector"
-                onChange={value => this.handleChange("fromCollective", collectivesById[value])}
-                options={fromCollectiveOptions}
+                onChange={value => this.handleChange("fromCollective", this.collectivesById[value])}
+                options={this.fromCollectiveOptions}
                 />
             }
             {!LoggedInUser &&
@@ -376,7 +391,18 @@ class OrderForm extends React.Component {
             <h2>Payment details</h2>
             <Row>
               <Col sm={12}>
-                { paymentMethods.length === 0 &&
+                { LoggedInUser && LoggedInUser.collective.paymentMethods.length > 0 &&
+                  <InputField
+                    type="select"
+                    className="horizontal"
+                    type="select"
+                    label={intl.formatMessage(this.messages['creditcard.label'])}
+                    name="creditcardSelector"
+                    onChange={value => this.handleChange("creditcard", "uuid", value)}
+                    options={this.paymentMethodsOptions}
+                    />
+                }
+                { !this.state.creditcard.uuid &&
                   <div>
                     <InputField
                       label={intl.formatMessage(this.messages['creditcard.label'])}
@@ -395,17 +421,6 @@ class OrderForm extends React.Component {
                       />
                   </div>
                 }
-                { paymentMethods.length > 0 &&
-                  <InputField
-                    type="select"
-                    className="horizontal"
-                    type="select"
-                    label={intl.formatMessage(this.messages['creditcard.label'])}
-                    name="creditcardSelector"
-                    onChange={value => this.handleChange("creditcard", "uuid", value)}
-                    options={paymentMethodsOptions}
-                    />
-                }              
               </Col>
             </Row>
           </div>
@@ -420,7 +435,7 @@ class OrderForm extends React.Component {
                 <Col sm={9}>
                   <TierComponent
                     tier={this.state.tier}
-                    interval={this.state.order.interval}
+                    interval={this.state.order.interval || this.state.tier.interval}
                     quantity={quantity}
                     amount={this.state.order.totalAmount / quantity}
                     onChange={(tier) => this.handleChange("tier", tier)}

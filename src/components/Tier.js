@@ -37,6 +37,7 @@ class Tier extends React.Component {
         this.handleChange('amount', this.presets[Math.floor(this.presets.length / 2)]);
       }
     }
+
     this.anchor = this.tier.name.toLowerCase().replace(/ /g,'-');
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
@@ -80,6 +81,11 @@ class Tier extends React.Component {
 
     return (
       <div className={`${this.props.className} tier ${this.props.onClick ? 'withCTA' : ''}`} id={this.anchor}>
+        <style jsx global>{`
+          .tier .inputAmount .form-group {
+            margin: 0;
+          }
+        `}</style>
         <style jsx>{`
           .tier {
             width: 100%;
