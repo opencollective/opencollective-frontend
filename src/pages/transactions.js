@@ -3,14 +3,14 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveTransactionsData, addGetLoggedInUserFunction } from '../graphql/queries';
+import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Error from '../components/Error';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
-import Transactions from '../components/Transactions';
+import TransactionsWithData from '../components/TransactionsWithData';
 import { get } from 'lodash';
-import {defineMessages} from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 
 class TransactionsPage extends React.Component {
 
@@ -21,9 +21,6 @@ class TransactionsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.messages = defineMessages({
-      title: { id: 'transactions.title', defaultMessage: `{n, plural, one {Latest transaction} other {Latest transactions}}` }
-    });
   }
 
   async componentDidMount() {
@@ -36,6 +33,7 @@ class TransactionsPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
+    console.log(">>> data.Collective", data.Collective);
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
@@ -44,7 +42,6 @@ class TransactionsPage extends React.Component {
     }
 
     const collective = data.Collective;
-    const transactions = data.allTransactions;
 
     return (
       <div className="TransactionsPage">
@@ -62,18 +59,17 @@ class TransactionsPage extends React.Component {
 
           <CollectiveCover
             collective={collective}
+            href={`/${collective.slug}`}
+            title={<FormattedMessage id="collective.transactions.title" defaultMessage="{n, plural, one {Latest transaction} other {Latest transactions}}" values={{n: 2 }} />}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
             />
 
           <div className="content" >
 
-            <Transactions
+            <TransactionsWithData
               collective={collective}
-              transactions={transactions}
-              refetch={data.refetch}
-              fetchMore={this.props.fetchMore}
-              LoggedInUser={LoggedInUser}
+              LoggedInUser={this.state.LoggedInUser}
               />
 
           </div>
@@ -88,4 +84,4 @@ class TransactionsPage extends React.Component {
 
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveTransactionsData(withIntl(TransactionsPage))));
+export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(TransactionsPage))));

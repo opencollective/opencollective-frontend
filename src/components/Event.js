@@ -17,11 +17,10 @@ import { filterCollection } from '../lib/utils';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import { pick, uniqBy, get, union } from 'lodash';
+import { uniqBy, get, union } from 'lodash';
 import { capitalize } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
-import { uniq } from 'underscore';
 import { exportMembers } from '../lib/export_file';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -414,7 +413,7 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
-                      { canEditEvent &&
+                      { LoggedInUser.canEditEvent &&
                       <div className="adminActions" id="adminActions">
                         <ul>
                           <li><a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a></li>

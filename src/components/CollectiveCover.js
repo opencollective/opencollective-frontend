@@ -191,7 +191,7 @@ class CollectiveCover extends React.Component {
                 }
               </div>
             }
-            { stats && stats.yearlyBudget > 0 &&
+            { collective.type === 'COLLECTIVE' && stats && stats.yearlyBudget > 0 &&
               <div className="stats">
                 <div className="yearlyBudget value">
                   <Currency value={stats.yearlyBudget} currency={collective.currency} />
@@ -199,7 +199,7 @@ class CollectiveCover extends React.Component {
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>
             }
-            { stats && stats.totalAmountSent > 0 &&
+            { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 &&
               <div className="stats">
                 <div className="totalAmountSent value">
                   <Currency value={stats.totalAmountSent} currency={collective.currency} />

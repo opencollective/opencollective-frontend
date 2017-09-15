@@ -9,10 +9,7 @@ import Footer from '../components/Footer';
 import NotFound from '../components/NotFound';
 import OrderForm from '../components/OrderForm';
 import CollectiveCover from '../components/CollectiveCover';
-import { get } from 'lodash';
 import { defineMessages } from 'react-intl';
-import gql from 'graphql-tag'
-import { graphql } from 'react-apollo'
 
 class OrderTierPage extends React.Component {
 
@@ -95,6 +92,7 @@ class OrderTierPage extends React.Component {
         <Body>
           <CollectiveCover
             collective={collective}
+            href={`/${collective.slug}`}
             title={intl.formatMessage(this.messages[`${Tier.type.toLowerCase()}.title`], { name: Tier.name })}
             className="small"
             />

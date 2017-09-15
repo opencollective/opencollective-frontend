@@ -9,9 +9,13 @@ class Members extends React.Component {
   }
 
   render() {
+    const { className } = this.props;
     const members = [...this.props.members];
     members.sort((a, b) => b.totalDonations - a.totalDonations);
     if (!members || members.length === 0) return (<div />);
+    const size = members.length > 50 ? 'small' : 'large';
+    const viewMode = className && className.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
+
     console.log(">>> ", this.props.className, ":", members);
     return (
       <div className={`Members ${this.props.className}`} >
@@ -29,7 +33,12 @@ class Members extends React.Component {
         }
         `}</style>
         {members.map((member, index) =>
-          <Member key={`member${index}`} className={this.props.className} member={member} />
+          <Member
+            key={`member${index}`}
+            className={`${this.props.className} ${size}`}
+            member={member}
+            viewMode={viewMode}
+            />
         )}
       </div>
     )

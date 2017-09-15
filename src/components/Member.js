@@ -14,7 +14,8 @@ const star = '/static/images/icons/star.svg';
 class Member extends React.Component {
 
   static propTypes = {
-    member: PropTypes.object.isRequired
+    member: PropTypes.object.isRequired,
+    viewMode: PropTypes.string
   }
 
   constructor(props) {
@@ -33,6 +34,7 @@ class Member extends React.Component {
   }
 
   render() {
+    const { viewMode } = this.props;
     const membership = this.props.member;
     const { member, description } = membership;
 
@@ -46,20 +48,26 @@ class Member extends React.Component {
     const className = this.props.className;
 
     return (
-      <div className={`Member ${className}`}>
+      <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
         <style jsx>{`
         .Member {
           width: 100%;
-          margin: 10px;
+          margin: 1rem;
           max-width: 300px;
           float: left;
           position: relative;
         }
 
-        .Member.sponsors {
-          width: 200px;
+        .Member.small {
+          width: 48px;
+          margin: 0.5rem 0.25rem;
         }
-        
+
+        .Member.viewMode-ORGANIZATION {
+          width: 200px;
+          margin: 0.5rem;
+        }
+
         .avatar {
           float: left;
           width: 45px;
@@ -76,6 +84,14 @@ class Member extends React.Component {
         .bubble {
             padding: 1rem;
             overflow: hidden;
+        }
+
+        .small .avatar {
+          margin: 0;
+        }
+
+        .small .bubble {
+          display: none;
         }
 
         .name {
@@ -97,7 +113,7 @@ class Member extends React.Component {
         }
         `}</style>          
         <div>
-          { className !== 'sponsors' &&
+          { viewMode === 'USER' &&
             <a onClick={this.onClick} title={title}>
               <div className="avatar" style={{ backgroundImage: `url(${image})`} } />
               <div className="bubble">
@@ -111,7 +127,7 @@ class Member extends React.Component {
               </div>
             </a>
           }
-          { className === 'sponsors' &&
+          { viewMode === 'ORGANIZATION' &&
             <CollectiveCard collective={member} membership={membership} />
           }
         </div>

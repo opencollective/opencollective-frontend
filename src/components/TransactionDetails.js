@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
-import { addGetTransaction } from '../graphql/queries';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
 class TransactionDetails extends React.Component {
 
@@ -25,7 +26,7 @@ class TransactionDetails extends React.Component {
 
   render() {
     const { intl, collective, transaction, LoggedInUser } = this.props;
-
+    console.log(">>> transaction", transaction)
     const type = transaction.type.toLowerCase();
 
     const amountDetails = [intl.formatNumber(transaction.amount / 100, { currency: transaction.currency, ...this.currencyStyle})];
@@ -106,7 +107,7 @@ class TransactionDetails extends React.Component {
         </div>
         <div className="col">
           <label><FormattedMessage id='transaction.paymentMethod' defaultMessage='payment method' /></label>
-          {capitalize(transaction.paymentMethod.name)}
+          {transaction.paymentMethod && capitalize(transaction.paymentMethod.service)}
         </div>
         <div className="col">
           <label><FormattedMessage id='transaction.amount' defaultMessage='amount' /></label>
@@ -114,12 +115,12 @@ class TransactionDetails extends React.Component {
             { amountDetailsStr &&
               <span>
                 <span>{amountDetailsStr}</span>
-                <span className="netAmountInGroupCurrency">&nbsp;=&nbsp;</span>
+                <span className="netAmountInCollectiveCurrency">&nbsp;=&nbsp;</span>
               </span>
             }
-            <span className="netAmountInGroupCurrency">
+            <span className="netAmountInCollectiveCurrency">
               <FormattedNumber
-                value={transaction.netAmountInGroupCurrency / 100}
+                value={transaction.netAmountInCollectiveCurrency / 100}
                 currency={collective.currency}
                 {...this.currencyStyle}
                 />
@@ -140,5 +141,67 @@ class TransactionDetails extends React.Component {
     );
   }
 }
+
+
+const getTransactionQuery = gql`
+query Transaction($id: Int!) {
+  Transaction(id: $id) {
+    id
+    uuid
+    description
+    publicMessage
+    privateMessage
+    createdAt
+    type
+    amount
+    currency
+    netAmountInCollectiveCurrency
+    hostFeeInHostCurrency
+    platformFeeInHostCurrency
+    paymentProcessorFeeInHostCurrency
+    paymentMethod {
+      name
+    }
+    user {
+      id
+      name
+      username
+      image
+    }
+    host {
+      id
+      name
+    }
+    ... on Expense {
+      category
+      attachment
+    }
+    ... on Donation {
+      subscription {
+        interval
+      }
+    }
+  }
+}
+`;
+
+export const addGetTransaction = (component) => {
+const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
+
+// if we don't have an accessToken, there is no need to get the details of a transaction
+// as we won't have access to any more information than the allTransactions query
+if (!accessToken) return component;
+
+return graphql(getTransactionQuery, {
+  options(props) {
+    return {
+      variables: {
+        id: props.transaction.id
+      }
+    }
+  }
+})(component);
+}
+
 
 export default addGetTransaction(injectIntl(TransactionDetails));

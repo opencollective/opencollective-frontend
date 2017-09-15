@@ -81,11 +81,6 @@ class EditEventForm extends React.Component {
 
     this.fields = [
       {
-        name: 'slug',
-        pre: `https://opencollective.com/${event.parentCollective.slug}/events/`,
-        placeholder: ''
-      },
-      {
         name: 'name',
         placeholder: ''
       },

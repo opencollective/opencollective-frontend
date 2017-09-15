@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
 import { pickAvatar } from '../lib/collective.lib';
-import { get } from 'lodash';
-import TransactionDetails from './TransactionDetails';
+import ExpenseDetails from './ExpenseDetails';
 
-class Transaction extends React.Component {
+class Expense extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    transaction: PropTypes.object,
+    expense: PropTypes.object,
     LoggedInUser: PropTypes.object
   }
 
@@ -19,39 +18,33 @@ class Transaction extends React.Component {
     this.state = { view: 'compact' };
     this.toggleDetails = this.toggleDetails.bind(this);
     this.messages = defineMessages({
-      'debit': { id: 'transaction.debit', defaultMessage: 'debit' },
-      'credit': { id: 'transaction.credit', defaultMessage: 'credit' },
-      'credit.title': { id: 'transaction.credit.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
-      'debit.meta': { id: 'transaction.debit.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
-      'credit.meta': { id: 'transaction.credit.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
-      'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
-      'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
+      'pending': { id: 'expense.pending', defaultMessage: 'pending' },
+      'paid': { id: 'expense.paid', defaultMessage: 'paid' },
+      'approved': { id: 'expense.approved', defaultMessage: 'approved' },
+      'rejected': { id: 'expense.rejected', defaultMessage: 'rejected' },
+      'closeDetails': { id: 'expense.closeDetails', defaultMessage: 'Close Details' },
+      'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' }
     });
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
   }
 
   toggleDetails() {
-    this.setState({loadDetails: true, view: this.state.view === 'details' ? 'compact' : 'details'})
+    this.setState({
+      loadDetails: true,
+      view: this.state.view === 'details' ? 'compact' : 'details'
+    })
   }
 
   render() {
-    const { intl, collective, transaction, LoggedInUser } = this.props;
+    const { intl, collective, expense, LoggedInUser } = this.props;
 
-    const type = transaction.type.toLowerCase();
-
-    let title = transaction.description;
-    if (type === 'credit' && (!title || title.match(/donation to /i))) {
-      title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
-    }
-
-    const meta = [];
-    meta.push(transaction.category);
-    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
+    const title = expense.description;
+    const status = expense.status.toLowerCase();
 
     return (
-      <div className={`transaction ${type} ${this.state.view}View`}>
+      <div className={`expense ${status} ${this.state.view}View`}>
         <style jsx>{`
-          .transaction {
+          .expense {
             width: 100%;
             margin: 0.5em 0;
             padding: 0.5em;
@@ -59,7 +52,7 @@ class Transaction extends React.Component {
             overflow: hidden;
             max-height: 6rem;
           }
-          .transaction.detailsView {
+          .expense.detailsView {
             background-color: #fafafa;
             max-height: 20rem;
           }
@@ -92,18 +85,22 @@ class Transaction extends React.Component {
             font-weight: 300;
             float:right;
           }
-          .debit .amount {
+          .rejected .amount, .rejected .status {
             color: #e21a60;
           }
-          .credit .amount {
+          .paid .amount, .approved .status {
             color: #72ce00;
           }
 
+          .status {
+            text-transform: uppercase;
+          }
+
           @media(max-width: 600px) {
-            .transaction {
+            .expense {
               max-height: 13rem;
             }
-            .transaction.detailsView {
+            .expense.detailsView {
               max-height: 45rem;
             }
             .details {
@@ -113,28 +110,29 @@ class Transaction extends React.Component {
         `}</style>
         <div className="amount">
           <FormattedNumber
-            value={transaction.amount / 100}
-            currency={transaction.currency}
+            value={expense.amount / 100}
+            currency={expense.currency}
             {...this.currencyStyle}
             />
         </div>
         <div className="fromCollective">
-          <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
-            <img src={imagePreview(transaction.fromCollective.image,pickAvatar(transaction.fromCollective.id), { width: 80 })} />
+          <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
+            <img src={imagePreview(expense.fromCollective.image, pickAvatar(expense.fromCollective.id), { width: 80 })} />
           </a>
         </div>
         <div className="body">
-        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
+        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
           {capitalize(title)}
         </a>
           <div className="meta">
-            {capitalize(meta.join(' '))}
+            <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
+            {capitalize(expense.category)}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
           {this.state.loadDetails && 
-            <TransactionDetails
+            <ExpenseDetails
               LoggedInUser={LoggedInUser}
-              transaction={transaction}
+              expense={expense}
               collective={collective}
               mode={this.state.view === 'details' ? 'open' : 'closed'}
               />}
@@ -144,4 +142,4 @@ class Transaction extends React.Component {
   }
 }
 
-export default injectIntl(Transaction);
+export default injectIntl(Expense);
