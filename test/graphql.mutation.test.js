@@ -136,7 +136,7 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(query, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
-        expect(createdEvent.slug).to.equal(`scouts/events/${event.slug}`);
+        expect(createdEvent.slug).to.equal(`${event.slug}-${event.ParentCollectiveId}ev`);
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
 
         event.id = createdEvent.id;
@@ -173,7 +173,7 @@ describe('Mutation Tests', () => {
 
         const r4 = await utils.graphqlQuery(updateQuery, { collective: event }, user1);
         const updatedEvent = r4.data.editCollective;
-        expect(updatedEvent.slug).to.equal(`${collective1.slug}/events/${event.slug}`);
+        expect(updatedEvent.slug).to.equal(`${event.slug}-${event.ParentCollectiveId}ev`);
         expect(updatedEvent.tiers.length).to.equal(event.tiers.length);
         expect(updatedEvent.tiers[0].amount).to.equal(event.tiers[0].amount);
 
@@ -183,8 +183,8 @@ describe('Mutation Tests', () => {
     describe('edit tiers', () => {
 
       const editTiersQuery = `
-      mutation editTiers($collectiveSlug: String!, $tiers: [TierInputType]) {
-        editTiers(collectiveSlug: $collectiveSlug, tiers: $tiers) {
+      mutation editTiers($id: Int!, $tiers: [TierInputType]) {
+        editTiers(id: $id, tiers: $tiers) {
           id
           name
           type
@@ -201,19 +201,19 @@ describe('Mutation Tests', () => {
       ];
 
       it('fails if not authenticated', async () => {
-        const result = await utils.graphqlQuery(editTiersQuery, { collectiveSlug: collective1.slug, tiers });
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers });
         expect(result.errors).to.exist;
         expect(result.errors[0].message).to.equal("You need to be logged in to edit tiers");
       });
 
       it('fails if not authenticated as host or member of collective', async () => {
-        const result = await utils.graphqlQuery(editTiersQuery, { collectiveSlug: collective1.slug }, user2);
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id }, user2);
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host of the scouts collective");
+        expect(result.errors[0].message).to.equal("You need to be logged in as a core contributor or as a host of the Scouts d'Arlon collective");
       });
 
       it('add new tiers and update existing', async () => {
-        const result = await utils.graphqlQuery(editTiersQuery, { collectiveSlug: collective1.slug, tiers }, user1);
+        const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result.errors && console.error(result.errors[0]);
         expect(tiers).to.have.length(2);
         tiers.sort((a, b) => a.id - b.id)
@@ -222,7 +222,7 @@ describe('Mutation Tests', () => {
         tiers[0].goal = 20000;
         tiers[1].amount = 100000;
         tiers.push({name: "free ticket", type: "TICKET", amount: 0});
-        const result2 = await utils.graphqlQuery(editTiersQuery, { collectiveSlug: collective1.slug, tiers }, user1);
+        const result2 = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result2.errors && console.error(result2.errors[0]);
         const updatedTiers = result2.data.editTiers;
         updatedTiers.sort((a, b) => a.id - b.id);
@@ -324,13 +324,13 @@ describe('Mutation Tests', () => {
           `;
           const order = {
             user: { email: user1.email },
-            collective: { slug: "notfound" },
+            collective: { id: 12324 },
             tier: { id: 1 },
             quantity:1 
           };
           const result = await utils.graphqlQuery(query, { order });
           expect(result.errors.length).to.equal(1);
-          expect(result.errors[0].message).to.equal('No collective found with slug: notfound');
+          expect(result.errors[0].message).to.equal(`No collective found with id: ${order.collective.id}`);
         });
 
         it('when tier doesn\'t exist', async () => {
@@ -352,7 +352,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: "user@email.com" },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 1002 },
             quantity: 1
           };
@@ -382,7 +382,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: "user@email.com" },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 1 },
             quantity: 101
           };
@@ -411,7 +411,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user:{ email: "user@email.com" },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 2 },
             quantity: 2
           };
@@ -527,7 +527,7 @@ describe('Mutation Tests', () => {
 
           const order = {
             user: { email: user2.email },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 1 },
             quantity: 2
           };
@@ -581,7 +581,7 @@ describe('Mutation Tests', () => {
 
         const order = {
           user: { email: "newuser@email.com" },
-          collective: { slug: event1.slug },
+          collective: { id: event1.id },
           tier: { id: 1 },
           quantity: 2
         };
@@ -647,7 +647,7 @@ describe('Mutation Tests', () => {
                 expYear: 2020
               }
             },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 2 },
             quantity:2
           };
@@ -720,7 +720,7 @@ describe('Mutation Tests', () => {
                 expYear: 2020
               }
             },
-            collective: { slug: event1.slug },
+            collective: { id: event1.id },
             tier: { id: 2 },
             quantity: 2
           };

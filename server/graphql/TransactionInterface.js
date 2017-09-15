@@ -162,7 +162,7 @@ const TransactionFields = () => {
   }
 }
 export const TransactionExpenseType = new GraphQLObjectType({
-  name: 'Expense',
+  name: 'ExpenseTransaction',
   description: 'Expense model',
   interfaces: [ TransactionInterfaceType ],
   fields: () => {
@@ -197,7 +197,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
 });
 
 export const TransactionOrderType = new GraphQLObjectType({
-  name: 'Order',
+  name: 'OrderTransaction',
   description: 'Order model',
   interfaces: [ TransactionInterfaceType ],
   fields: () => {

@@ -35,8 +35,8 @@ const updateTransactions = (sequelize) => {
     const oppositeTransaction = {
       ...transaction,
       type: (-transaction.amount > 0) ? 'CREDIT' : 'DEBIT',
-      FromCollectiveId: transaction.ToCollectiveId,
-      ToCollectiveId: transaction.FromCollectiveId,
+      FromCollectiveId: transaction.CollectiveId,
+      CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
       uuid: uuid.v4()
@@ -46,7 +46,6 @@ const updateTransactions = (sequelize) => {
       console.log("Processing", transaction);
     }
     return insert(sequelize, "Transactions", oppositeTransaction);
-
   };
 
   const limit = DRY_RUN ? 'LIMIT 10' : '';
@@ -60,8 +59,6 @@ const updateTransactions = (sequelize) => {
 module.exports = {
   up: function (queryInterface, DataTypes) {
     return updateTransactions(queryInterface.sequelize)
-    .then(() => queryInterface.renameColumn("Orders", "ToCollectiveId", "CollectiveId"))
-    .then(() => queryInterface.renameColumn("Transactions", "ToCollectiveId", "CollectiveId"))
     .then(() => queryInterface.renameColumn("Transactions", "txnCurrency", "hostCurrency"))
     .then(() => queryInterface.renameColumn("Transactions", "amountInTxnCurrency", "amountInHostCurrency"))
     .then(() => queryInterface.renameColumn("Transactions", "platformFeeInTxnCurrency", "platformFeeInHostCurrency"))

@@ -48,17 +48,17 @@ export default {
      * and saves it under PaymentMethod.data[hostStripeAccount.username]
      * @param {*} hostStripeAccount
      */
-    const getOrCreateCustomerIdForHost = (hostStripeAccount) => {
+    const getOrCreatecustomerIdForHost = (hostStripeAccount) => {
       const data = paymentMethod.data || {};
-      data.CustomerIdForHost = data.CustomerIdForHost || {};
-      return data.CustomerIdForHost[hostStripeAccount.username] || stripe.createToken(hostStripeAccount, paymentMethod.customerId)
+      data.customerIdForHost = data.customerIdForHost || {};
+      return data.customerIdForHost[hostStripeAccount.username] || stripe.createToken(hostStripeAccount, paymentMethod.customerId)
       .then(token => stripe.createCustomer(hostStripeAccount, token.id, {
         email: user.email,
         collective: order.fromCollective.info
       }))
       .then(customer => customer.id)
       .tap(customerId => {
-        data.CustomerIdForHost[hostStripeAccount.username] = customerId;
+        data.customerIdForHost[hostStripeAccount.username] = customerId;
         paymentMethod.data = data;
         paymentMethod.save();
       })
@@ -74,7 +74,7 @@ export default {
         })
         .tap(plan => hostStripePlan = plan)
         // create a customer on the host stripe account
-        .then(() => getOrCreateCustomerIdForHost(hostStripeAccount))
+        .then(() => getOrCreatecustomerIdForHost(hostStripeAccount))
         .tap(customerId => {
           hostStripeCustomerId = customerId
         })
@@ -138,7 +138,7 @@ export default {
             CreatedByUserId: user.id,
             FromCollectiveId: order.FromCollectiveId,
             CollectiveId: collective.id,
-            paymentMethod
+            PaymentMethodId: paymentMethod.id
           };
           payload.transaction = {
             type: constants.type.CREDIT,
@@ -194,7 +194,7 @@ export default {
       .tap(() => order.update({ processedAt: new Date() }))
 
       // Mark paymentMethod as confirmed
-      .tap(() => paymentMethod.update({confirmedAt: new Date}))
+      .tap(() => paymentMethod.update({ confirmedAt: new Date }))
 
       .then(() => transactions); // make sure we return the transactions created
   }

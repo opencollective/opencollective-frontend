@@ -15,7 +15,8 @@ import {
 
 import {
   UserType,
-  TierType
+  TierType,
+  ExpenseType
 } from './types';
 
 import models from '../models';
@@ -28,8 +29,8 @@ const queries = {
         type: new GraphQLNonNull(GraphQLString)
       }
     },
-    resolve(_, args, req) {
-      return req.loaders.collective.findBySlug.load(args.slug.toLowerCase());
+    resolve(_, args) {
+      return models.Collective.findBySlug(args.slug);
     }
   },
 
@@ -58,19 +59,14 @@ const queries = {
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
     args: {
-      slug: { type: new GraphQLNonNull(GraphQLString) },
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
     resolve(_, args) {
       const query = {
-        include: [
-          {
-            model: models.Collective, as: 'collective',
-            where: { slug: args.slug.toLowerCase() }
-          }
-        ],
+        where: { CollectiveId: args.CollectiveId },
         order: [ ['id', 'DESC'] ]
       };
       if (args.type) query.where = { type: args.type };
@@ -81,7 +77,40 @@ const queries = {
   },
 
   /*
-   * Given an id, returns a transaction
+   * Given a collective slug, returns all expenses
+   */
+  allExpenses: {
+    type: new GraphQLList(ExpenseType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      status: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = { where: { CollectiveId: args.CollectiveId } }
+      if (args.status) query.where.status = args.status;
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      return models.Expense.findAll(query);
+    }
+  },
+
+  /*
+   * Given an Expense id, returns the expense details
+   */
+  Expense: {
+    type: ExpenseType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args) {
+      return models.Expense.findById(args.id);
+    }
+  },
+
+  /*
+   * Given a Transaction id, returns a transaction details
    */
   Transaction: {
     type: TransactionInterfaceType,

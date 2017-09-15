@@ -34,7 +34,7 @@ export default {
         CreatedByUserId: order.CreatedByUserId,
         FromCollectiveId: order.FromCollectiveId,
         CollectiveId: order.CollectiveId,
-        paymentMethod: order.PaymentMethod
+        PaymentMethodId: order.PaymentMethodId
       };
       payload.transaction = {
         type: TransactionTypes.CREDIT,

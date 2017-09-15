@@ -224,7 +224,7 @@ export default (Sequelize, DataTypes) => {
    * There is no fees
    * @POST Two transactions are created. Returns the initial transaction FromCollectiveId -> CollectiveId
    * 
-   * Examples (simplified with round numbers):
+   * Examples (simplified with rounded numbers):
    * - Expense1 from User1 paid by Collective1
    *   - amount: $10
    *   - PayPal Fees: $1
@@ -248,7 +248,7 @@ export default (Sequelize, DataTypes) => {
    * Note:
    * We should simplify a Transaction to:
    * CollectiveId, DEBIT/CREDIT, amount, currency, OrderId where amount is always the net amount in the currency of CollectiveId
-   * and we should move paymentProcessorFee, platformFee, hostFee to the Order model and rename them to *InHostCurrency to avoid confusion.
+   * and we should move paymentProcessorFee, platformFee, hostFee to the Order model
    * 
    */
 
@@ -283,7 +283,7 @@ export default (Sequelize, DataTypes) => {
     return Promise.mapSeries(transactions, t => Transaction.create(t)).then(results => results[index]);
   };
 
-  Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, CollectiveId, transaction, paymentMethod }) => {
+  Transaction.createFromPayload = ({ CreatedByUserId, FromCollectiveId, CollectiveId, transaction, PaymentMethodId }) => {
 
     if (!transaction.amount) {
       return Promise.reject(new Error("transaction.amount cannot be null or zero"));
@@ -299,7 +299,7 @@ export default (Sequelize, DataTypes) => {
       transaction.CreatedByUserId = CreatedByUserId;
       transaction.FromCollectiveId = FromCollectiveId;
       transaction.CollectiveId = CollectiveId;
-      transaction.PaymentMethodId = transaction.PaymentMethodId || (paymentMethod ? paymentMethod.id : null);
+      transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
       transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
 
       if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {

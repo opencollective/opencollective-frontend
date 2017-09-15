@@ -9,6 +9,8 @@ import errors from '../lib/errors';
 import emailLib from '../lib/email';
 import currencies from '../constants/currencies';
 import config from 'config';
+import debugLib from 'debug';
+const debug = debugLib("webhook");
 
 const {
   Activity,
@@ -16,8 +18,7 @@ const {
   Collective,
   Subscription,
   Transaction,
-  User,
-  PaymentMethod
+  User
 } = models;
 
 export default function stripeWebhook(req, res, next) {
@@ -56,6 +57,7 @@ export default function stripeWebhook(req, res, next) {
          * https://dashboard.stripe.com/acct_15avvkAcWgwn5pBt/events/evt_17oYejAcWgwn5pBtRo5gRiyY
          */
         if (planId(stripeSubscription.plan) !== stripeSubscription.plan.id) {
+          debug("fetchEvent", "unrecognized plan id", planId(stripeSubscription.plan), stripeSubscription.plan.id);
           return res.sendStatus(200);
         }
 
@@ -63,6 +65,7 @@ export default function stripeWebhook(req, res, next) {
          * In case we get $0 order, return 200. Otherwise, Stripe will keep pinging us.
          */
         if (event.data.object.amount_due === 0) {
+          debug("fetchEvent", "event.data.object.amount_due is 0");
           return res.sendStatus(200);
         }
 
@@ -96,7 +99,8 @@ export default function stripeWebhook(req, res, next) {
         include: [
           { model: User, as: 'createdByUser' },
           { model: Collective, as: 'collective' },
-          { model: Subscription, where: { stripeSubscriptionId } }
+          { model: Subscription, where: { stripeSubscriptionId } },
+          { model: models.PaymentMethod, as: 'paymentMethod' }
         ]
       })
       .then((order) => {
@@ -110,12 +114,14 @@ export default function stripeWebhook(req, res, next) {
          * the retry on Stripe side (and the email from Stripe support).
          */
         if (!order && !isProduction) {
+          debug("fetchOrder", "order not found with subscription id", stripeSubscriptionId);
           return res.sendStatus(200);
         }
 
         if (!order) {
           return cb(new errors.BadRequest('Order not found: unknown subscription id'));
         }
+
         return cb(null, order);
       })
       .catch(cb)
@@ -124,6 +130,7 @@ export default function stripeWebhook(req, res, next) {
     confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       const orderId = results.fetchOrder.id;
+      debug("confirmUniqueChargeId"´, chargeId);
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 
@@ -143,23 +150,33 @@ export default function stripeWebhook(req, res, next) {
       })
     }],
 
-    fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
-      const { customer } = results.fetchEvent.event.data.object;
+    // Extra check - This may not be needed.
+    validatePaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
+
+      const customer = results.fetchEvent.event.data.object.customer;
+      const order = results.fetchOrder;
 
       if (!customer) {
         return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
       }
-      PaymentMethod.findOne({ where: { customerId: customer } })
-      .then((paymentMethod) => {
-        if (!paymentMethod) {
-          return cb(new errors.BadRequest('PaymentMethod not found: unknown customer'));
-        }
-        return cb(null, paymentMethod);
-      })
-      .catch(cb)
+      debug("validatePaymentMethod", "customer:", customer);
+      if (!order.paymentMethod) {
+        return cb(new errors.BadRequest('PaymentMethod not found'));        
+      }
+
+      // We need to iterate through the PaymentMethod.data.customerIdForHost[stripeAccount]
+      if (order.paymentMethod.data.customerIdForHost) {
+        Object.keys(order.paymentMethod.data.customerIdForHost).forEach(hostStripeAccountId => {
+          if (order.paymentMethod.data.customerIdForHost[hostStripeAccountId] === customer) {
+            return cb();
+          }
+        });
+      } else {
+        return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
+      }
     }],
 
-    retrieveCharge: ['fetchPaymentMethod', (cb, results) => {
+    retrieveCharge: ['validatePaymentMethod', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       appStripe.charges.retrieve(chargeId, {
         stripe_account: body.user_id
@@ -168,6 +185,7 @@ export default function stripeWebhook(req, res, next) {
         if (!charge) {
           return cb(new errors.BadRequest(`ChargeId not found: ${chargeId}`));
         }
+        debug("retrieveCharge", charge);
         return cb(null, charge);
       })
       .catch(cb);
@@ -191,7 +209,6 @@ export default function stripeWebhook(req, res, next) {
       const order = results.fetchOrder;
       const { stripeSubscription } = results.fetchEvent;
       const collective = order.collective || {};
-      const paymentMethod = results.fetchPaymentMethod;
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
       const fees = extractFees(balanceTransaction);
@@ -212,12 +229,16 @@ export default function stripeWebhook(req, res, next) {
         description: `${order.Subscription.interval}ly recurring subscription`,
       };
 
+      debug("stripeSubscription", stripeSubscription);
+      debug("balanceTransaction", balanceTransaction);
+      debug("newTransaction", newTransaction);
+
       models.Transaction.createFromPayload({
         CreatedByUserId: order.CreatedByUserId,
         FromCollectiveId: order.FromCollectiveId,
         CollectiveId: order.CollectiveId,
         transaction: newTransaction,
-        paymentMethod
+        PaymentMethodId: order.PaymentMethodId
       })
       .then(t => cb(null, t))
       .catch(cb);
@@ -257,6 +278,7 @@ export default function stripeWebhook(req, res, next) {
     /**
      * We need to return a 200 to tell stripe to not retry the webhook.
      */
+    debug(">>> success");
     res.sendStatus(200);
   });
 

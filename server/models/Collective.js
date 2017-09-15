@@ -915,6 +915,9 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.findBySlug = (slug, options = {}) => {
+    if (!slug || slug.length < 1) {
+      return Promise.resolve(null);
+    }
     return Collective.findOne({ where: { slug: slug.toLowerCase() }, ...options })
       .then(collective => {
         if (!collective) {

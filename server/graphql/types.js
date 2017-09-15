@@ -170,6 +170,110 @@ export const LocationType = new GraphQLObjectType({
   })
 });
 
+export const ExpenseType = new GraphQLObjectType({
+  name: 'Expense',
+  description: 'This represents an Expense',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+        resolve(expense) {
+          return expense.id;
+        }
+      },
+      amount: {
+        type: GraphQLInt,
+        resolve(expense) {
+          return expense.amount;
+        }
+      },
+      currency: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.currency;
+        }
+      },
+      createdAt: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.createdAt;
+        }
+      },
+      description: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.description;
+        }
+      },
+      category: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.category;
+        }
+      },
+      status: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.status;
+        }
+      },
+      payoutMethod: {
+        type: GraphQLString,
+        resolve(expense) {
+          return expense.payoutMethod;
+        }
+      },
+      privateMessage: {
+        type: GraphQLString,
+        resolve(expense, args, req) {
+          if (!req.remoteUser) return null;
+          if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
+            return expense.privateMessage;
+          }
+        }
+      },
+      attachment: {
+        type: GraphQLString,
+        resolve(expense, args, req) {
+          if (!req.remoteUser) return null;
+          if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
+            return expense.attachment;
+          }
+        }
+      },
+      user: {
+        type: UserType,
+        resolve(expense) {
+          return expense.getUser();
+        }
+      },
+      fromCollective: {
+        type: CollectiveInterfaceType,
+        resolve(expense) {
+          return expense.getUser().then(u => models.Collective.findById(u.CollectiveId));
+        }
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(expense) {
+          return expense.getCollective();
+        }
+      },
+      transaction: {
+        type: CollectiveInterfaceType,
+        resolve(expense) {
+          return models.Transaction.findOne({
+            where: {
+              CollectiveId: expense.CollectiveId,
+              ExpenseId: expense.id
+            }
+          });
+        }
+      }
+    }
+  }
+});
+
 export const TierType = new GraphQLObjectType({
   name: 'Tier',
   description: 'This represents an Tier',
@@ -203,6 +307,12 @@ export const TierType = new GraphQLObjectType({
         type: GraphQLString,
         resolve(tier) {
           return tier.description
+        }
+      },
+      button: {
+        type: GraphQLString,
+        resolve(tier) {
+          return tier.button
         }
       },
       amount: {

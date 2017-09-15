@@ -47,7 +47,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     name: DataTypes.STRING, // custom human readable identifier for the payment method 
-    customerId: DataTypes.STRING, // stores the id of the customer from the payment processor
+    customerId: DataTypes.STRING, // stores the id of the customer from the payment processor at the platform level
     token: DataTypes.STRING,
     primary: DataTypes.BOOLEAN,
 

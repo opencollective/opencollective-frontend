@@ -265,7 +265,7 @@ describe('createOrder', () => {
     expect(stripeSubscription.plan.id).to.equal('EUR-MONTH-1000');
     expect(stripeSubscription.plan.interval).to.equal('month');
 
-    expect(paymentMethod.data.CustomerIdForHost[hostStripeAccount.username]).to.equal(stripeSubscription.customer);
+    expect(paymentMethod.data.customerIdForHost[hostStripeAccount.username]).to.equal(stripeSubscription.customer);
   });
 
   it('creates an order as a new user for a new organization', async () => {

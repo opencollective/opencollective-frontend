@@ -44,6 +44,18 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective.getBackersCount();
         }
       },
+      expenses: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Expense.count({ where: { CollectiveId: collective.id } });
+        }
+      },
+      transactions: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Transaction.count({ where: { CollectiveId: collective.id } });
+        }
+      },
       totalAmountReceived: {
         description: 'Net amount received',
         type: GraphQLInt,

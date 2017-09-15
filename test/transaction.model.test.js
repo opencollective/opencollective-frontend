@@ -56,7 +56,6 @@ describe('transaction model', () => {
   });
 
   it('createFromPayload creates a double entry transaction', () => {
-    console.log(">>> transaction data", transactionsData[7]);
     return Transaction.createFromPayload({
       transaction: transactionsData[7],
       CreatedByUserId: user.id,

@@ -18,8 +18,7 @@
  *    - PENDING: waiting to be processed
  *    - PROCESSED: a one time order that has been fully processed
  *
- *  - Member.isActive
- *  - Member.slug: backers, sponsors, gold-sponsors, etc. (used for mailing lists and urls)
+ *  - Tier.slug: backers, sponsors, gold-sponsors, etc. (used for mailing lists and urls)
  *  - Member.description
  *  - Member.role: 
  *    - HOST: is holding money on behalf of the collective
@@ -42,17 +41,24 @@ const cache = {
 const pluralize = (str) => `${str}s`.replace(/s+$/,'s');
 
 const slugify = (str) => {
+
+  if (str === null) return '';
+
+  const tokens = str.split(' ');
+  let text = '', i = 0;
+  while(text.length < 32) {
+    text += ' ' + tokens[i++];
+  }
+
   const from  = "ąàáäâãåæćęęèéëêìíïîłńòóöôõøśùúüûñçżź",
         to    = "aaaaaaaaceeeeeeiiiilnoooooosuuuunczz",
         regex = new RegExp('[' + from.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1') + ']', 'g');
 
-  if (str === null) return '';
-
-  str = String(str).toLowerCase().replace(regex, function(c) {
+  text = String(text).toLowerCase().replace(regex, function(c) {
     return to.charAt(from.indexOf(c)) || '-';
   });
 
-  return str.replace(/[^\w\s-]/g, '').replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();  
+  return text.trim().replace(/[^\w\s-]/g, '').replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
 }
 
 const insert = (sequelize, table, entry) => {
@@ -86,22 +92,6 @@ const updateNotifications = (sequelize) => {
     .then(() => sequelize.query(`UPDATE "Notifications" SET type='collective.transaction.created' WHERE type='group.transaction.created'`))
     .then(() => sequelize.query(`UPDATE "Notifications" SET type='collective.expense.created' WHERE type='group.expense.created'`))
     .then(() => sequelize.query(`UPDATE "Notifications" SET type='collective.donation.created' WHERE type='group.donation.created'`))
-}
-
-
-const getParentCollective = (sequelize, ParentCollectiveId) => {
-  if (cache.collectives[ParentCollectiveId]) return Promise.resolve(cache.collectives[ParentCollectiveId]);
-  return sequelize.query(`
-    SELECT "slug" FROM "Collectives" WHERE "id"=:ParentCollectiveId
-  `, { type: sequelize.QueryTypes.SELECT, replacements: { ParentCollectiveId }})
-  .then(rows => {
-    if (rows && rows.length > 0) {
-      cache.collectives[ParentCollectiveId] = rows[0];
-      return rows[0];
-    } else {
-      console.error(`No collective found for collective id ${ParentCollectiveId}`);
-    }
-  });
 }
 
 const getCollectiveIdForEventId = (sequelize, EventId) => {
@@ -179,12 +169,8 @@ const createCollectivesForEvents = (sequelize) => {
       .then(HostCollectiveId => {
         collective.HostCollectiveId = HostCollectiveId;
       })
-      .then(() => getParentCollective(sequelize, collective.ParentCollectiveId))
-      .then(parentCollective => {
-        if (!parentCollective) {
-          return console.error(">>> Couldn't find a parentCollective for", event);
-        }
-        collective.slug = `${parentCollective.slug}/events/${event.slug}`;
+      .then(() => {
+        collective.slug = `${event.slug || slugify(event.name)}-${collective.ParentCollectiveId}ev`; // makes sure the slug of an event is unique within the name space of the parent collective
         return insert(sequelize, "Collectives", collective);
       })
   }
@@ -195,15 +181,18 @@ const createCollectivesForEvents = (sequelize) => {
   .then(() => updateTiersForEvents());
 }
 
-
 const createCollectivesForUsers = (sequelize) => {
 
   const createCollectiveForUser = (user) => {
+    let name = user.firstName;
+    if (user.lastName) {
+      name += ` ${user.lastName}`;
+    }
 
     const collective = {
       isActive: true,
       type: user.isOrganization ? 'ORGANIZATION' : 'USER',
-      name: `${user.firstName} ${user.lastName}`,
+      name: name || user.username,
       slug: user.username,
       logo: user.image, // logo will be renamed to image later on
       CreatedByUserId: user.id,
@@ -214,6 +203,11 @@ const createCollectivesForUsers = (sequelize) => {
       longDescription: user.longDescription,
       website: user.website
     };
+
+    if (!collective.name) {
+      console.log(">>> no name for user collective (skipping)", collective, "user.id:", user.id);
+      return Promise.resolve();
+    }
 
     if (user.currency) {
       collective.currency = user.currency;
@@ -237,7 +231,7 @@ const createCollectivesForUsers = (sequelize) => {
           const member = {
             CreatedByUserId: user.id,
             MemberCollectiveId: CollectiveId,
-            CollectiveId,
+            CollectiveId: CollectiveId,
             role: 'HOST',
             createdAt: user.createdAt,
             updatedAt: new Date
@@ -279,17 +273,17 @@ const updateResponses = (sequelize) => {
   const updateResponse = (response) => {
     return Promise.props({
       FromCollectiveId: getCollectiveIdForUserId(sequelize, response.UserId),
-      ToCollectiveId: getCollectiveIdForEventId(sequelize, response.EventId)
+      CollectiveId: getCollectiveIdForEventId(sequelize, response.EventId)
     })
       .then(props => {
-        const { FromCollectiveId, ToCollectiveId } = props;
+        const { FromCollectiveId, CollectiveId } = props;
         if (response.status === 'INTERESTED') {
           // We add them as "FOLLOWER" of the new Event Collective in the Members table
           const member = {
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
             CreatedByUserId: response.UserId,
-            CollectiveId: ToCollectiveId,
+            CollectiveId: CollectiveId,
             MemberCollectiveId: FromCollectiveId,
             role: 'FOLLOWER'
           };
@@ -297,16 +291,16 @@ const updateResponses = (sequelize) => {
         } else if (response.amount > 0) {
           // If the ticket is a paid ticket, there is already an Order recorded, so we just update it
           return sequelize.query(`
-            UPDATE "Orders" SET "TierId"=:TierId, "FromCollectiveId"=:FromCollectiveId, "ToCollectiveId"=:ToCollectiveId WHERE "ResponseId"=:id
-          `, { replacements: { id: response.id, TierId: response.TierId, FromCollectiveId, ToCollectiveId }})
+            UPDATE "Orders" SET "TierId"=:TierId, "FromCollectiveId"=:FromCollectiveId, "CollectiveId"=:CollectiveId WHERE "ResponseId"=:id
+          `, { replacements: { id: response.id, TierId: response.TierId, FromCollectiveId, CollectiveId }})
           .catch(e => {
             console.error(e);
-            console.log("Replacements: ", { response, FromCollectiveId, ToCollectiveId });
+            console.log("Replacements: ", { response, FromCollectiveId, CollectiveId });
           });
         } else {
           const order = {
             FromCollectiveId,
-            ToCollectiveId,
+            CollectiveId: CollectiveId,
             CreatedByUserId: response.UserId,
             TierId: response.TierId,
             createdAt: response.createdAt,
@@ -441,6 +435,7 @@ const updateCollectives = (sequelize) => {
         type: 'TIER',
         name: 'donor',
         slug: 'donors',
+        button: 'Make a donation',
         CollectiveId: collective.id,
         currency: collective.currency
       })
@@ -464,11 +459,11 @@ const updateCollectives = (sequelize) => {
     });
     const stats = { totalDonations: 0, totalDonations: 0 };
     return sequelize.query(`
-      SELECT c.id as "FromCollectiveId", o.id, o."createdAt", o."totalAmount", s.interval, o."ToCollectiveId", o."TierId", o."PaymentMethodId", o."processedAt"
+      SELECT c.id as "FromCollectiveId", o.id, o."createdAt", o."totalAmount", s.interval, o."CollectiveId", o."TierId", o."PaymentMethodId", o."processedAt"
       FROM "Orders" o
       LEFT JOIN "Subscriptions" s on o."SubscriptionId" = s.id
       LEFT JOIN "Collectives" c ON c."CreatedByUserId" = o."CreatedByUserId"
-      WHERE o."ToCollectiveId"=:CollectiveId AND o."CreatedByUserId"=:CreatedByUserId`, {
+      WHERE o."CollectiveId"=:CollectiveId AND o."CreatedByUserId"=:CreatedByUserId`, {
       type: sequelize.QueryTypes.SELECT,
       replacements: { CollectiveId, CreatedByUserId }
     })
@@ -478,13 +473,13 @@ const updateCollectives = (sequelize) => {
         tier = { id: order.TierId }
       } else {
         tier = tiers.find(tier => {
-          if (tier.CollectiveId !== order.ToCollectiveId) return false;
+          if (tier.CollectiveId !== order.CollectiveId) return false;
           if (tier.amount && order.totalAmount < tier.amount) return false;
           if (tier.interval && (tier.interval !== order.interval)) return false;
           return true;
         });
         if (!tier) {
-          console.log("No tier found for order", JSON.stringify(order), "tiers", JSON.stringify(tiers.filter(t => t.CollectiveId === order.ToCollectiveId)))
+          console.log("No tier found for order", JSON.stringify(order), "tiers", JSON.stringify(tiers.filter(t => t.CollectiveId === order.CollectiveId)))
         }
       }
       if (!tier || !tier.id) {
@@ -614,7 +609,7 @@ const up = (queryInterface, Sequelize) => {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE'
     }))
-    .then(() => queryInterface.renameColumn('Orders', 'GroupId', 'ToCollectiveId'))
+    .then(() => queryInterface.renameColumn('Orders', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.addColumn('Orders', 'publicMessage', { type: Sequelize.STRING }))
     .then(() => queryInterface.renameColumn('Orders', 'notes', 'privateMessage'))
     .then(() => queryInterface.renameColumn('Orders', 'amount', 'totalAmount'))
@@ -622,7 +617,6 @@ const up = (queryInterface, Sequelize) => {
     .then(() => queryInterface.addColumn('Orders', 'quantity', { type: Sequelize.INTEGER, min: 0 }))
     .then(() => queryInterface.renameColumn('Responses', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.renameColumn('Activities', 'GroupId', 'CollectiveId'))
-    .then(() => queryInterface.renameColumn('Comments', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.renameColumn('ConnectedAccounts', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.renameColumn('ConnectedAccounts', 'UserId', 'CreatedByUserId'))
     .then(() => queryInterface.renameColumn('ConnectedAccounts', 'provider', 'service')) // for consistency with PaymentMethod.service
@@ -632,7 +626,7 @@ const up = (queryInterface, Sequelize) => {
     .then(() => queryInterface.renameColumn('Notifications', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.renameColumn('Transactions', 'netAmountInGroupCurrency', 'netAmountInCollectiveCurrency'))
     .then(() => queryInterface.renameColumn('Transactions', 'DonationId', 'OrderId'))
-    .then(() => queryInterface.renameColumn('Transactions', 'GroupId', 'ToCollectiveId'))
+    .then(() => queryInterface.renameColumn('Transactions', 'GroupId', 'CollectiveId'))
     .then(() => queryInterface.addColumn('Transactions', 'FromCollectiveId', {
       type: Sequelize.INTEGER,
       references: { model: 'Collectives', key: 'id' },
@@ -674,7 +668,7 @@ const up = (queryInterface, Sequelize) => {
     }))
     .then(() => queryInterface.removeIndex('Members', 'UserGroups_3way'))
     .then(() => queryInterface.addIndex('Members', ['MemberCollectiveId', 'CollectiveId', 'role'], { indexName: 'MemberCollectiveId-CollectiveId-role' }))
-    .then(() => queryInterface.addIndex('Transactions', ['ToCollectiveId', 'FromCollectiveId', 'deletedAt'], { indexName: 'ToCollectiveId-FromCollectiveId-type' }))
+    .then(() => queryInterface.addIndex('Transactions', ['CollectiveId', 'FromCollectiveId', 'deletedAt'], { indexName: 'CollectiveId-FromCollectiveId-type' }))
     .then(() => queryInterface.addIndex('Tiers', ['CollectiveId', 'deletedAt'], { indexName: 'CollectiveId-deletedAt' }))
     .then(() => queryInterface.addColumn('PaymentMethods', 'CollectiveId', {
       type: Sequelize.INTEGER,
@@ -717,6 +711,7 @@ const up = (queryInterface, Sequelize) => {
     .then(() => queryInterface.dropTable('Applications'))
     .then(() => queryInterface.dropTable('Events'))
     .then(() => queryInterface.dropTable('Comments'))
+    .then(() => queryInterface.dropTable('Paykeys'))
     .then(() => queryInterface.dropTable('Responses'))
     .catch(e => {
       console.error("Error during migration.", e);

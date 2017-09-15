@@ -26,9 +26,6 @@ export const loaders = (req) => {
         .findAll({ where: { id: { $in: ids }}})
         .then(collectives => sortResults(ids, collectives))
       ),
-      findBySlug: new DataLoader(slugs => models.Collective.findAll({ where: { slug: { $in: slugs }}})
-        .then(collectives => sortResults(slugs, collectives, 'slug'))
-      ),
       balance: new DataLoader(ids => models.Transaction.findAll({
           attributes: [
             'CollectiveId',
@@ -76,7 +73,7 @@ export const loaders = (req) => {
       .then(results => {
         const resultsByKey = {};
         results.forEach(r => {
-          resultsByKey[`${r.FromCollectiveId}-${r.CollectiveId}`] = r.totalAmount;
+          resultsByKey[`${r.FromCollectiveId}-${r.CollectiveId}`] = r.dataValues.totalAmount;
         });
         return keys.map(key => {
           return resultsByKey[`${key.FromCollectiveId}-${key.CollectiveId}`] || 0;

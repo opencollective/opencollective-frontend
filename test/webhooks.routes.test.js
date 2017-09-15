@@ -12,6 +12,7 @@ import stripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
 import * as payments from '../server/lib/payments';
 import initNock from './webhooks.routes.test.nock.js';
+import { appStripe } from '../server/gateways/stripe';
 
 /**
  * Mock data
@@ -30,10 +31,10 @@ describe('webhooks.routes.test.js', () => {
   const nocks = {};
   let sandbox, user, host, paymentMethod, collective, order, emailSendSpy, stripeToken;
 
-  before(async () => {
+  before(() => {
     initNock();
     sandbox = sinon.sandbox.create();
-    stripeToken = await utils.createStripeToken();
+    sandbox.stub(appStripe.events, "retrieve", (eventId) => Promise.resolve(stripeMock.webhook));
   });
 
   after(() => sandbox.restore());
@@ -71,16 +72,22 @@ describe('webhooks.routes.test.js', () => {
 
   describe('success', () => {
 
-    const customWebhookEvent = _.extend({}, webhookEvent, {
+    const charge2WebhookEvent = _.extend({}, webhookEvent, {
       id: webhookEvent.id.replace(/0/g, 3),
       type: 'invoice.payment_succeeded'
     });  
-
+    charge2WebhookEvent.data.object.charge = charge2WebhookEvent.data.object.charge.replace('xm4', 'xm5');
+    charge2WebhookEvent.data.object.customer = "cus_BM7mwnm6mLe271";
+    
     beforeEach('Nock for retrieving charge', () => {
       nocks['charge.retrieve'] = nock(STRIPE_URL)
         .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
         .twice()
         .reply(200, stripeMock.charges.create);
+    });
+
+    beforeEach('Generate a new stripe token', async () => {
+      stripeToken = await utils.createStripeToken();
     });
 
     // Now we make the order using above beforeEach calls
@@ -140,13 +147,9 @@ describe('webhooks.routes.test.js', () => {
 
     // Now we send the webhook
     beforeEach('send webhook', (done) => {
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${customWebhookEvent.id}`)
-        .reply(200, customWebhookEvent);
-
       request(app)
         .post('/webhooks/stripe')
-        .send(customWebhookEvent)
+        .send(charge2WebhookEvent)
         .expect(200)
         .end((err) => {
           expect(err).to.not.exist;
@@ -167,7 +170,7 @@ describe('webhooks.routes.test.js', () => {
         }]
       })
       .tap((res) => {
-        expect(res.count).to.equal(4);
+        expect(res.count).to.equal(2);
         const transaction = res.rows[1];
         expect(transaction.OrderId).to.be.equal(order.id);
         expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
@@ -175,13 +178,13 @@ describe('webhooks.routes.test.js', () => {
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
         expect(transaction.type).to.be.equal(type.CREDIT);
-        expect(transaction).to.have.property('amountInHostCurrency', 28652); // taken from stripe mocks
+        expect(transaction).to.have.property('amountInHostCurrency', 28782); // taken from stripe mocks
         expect(transaction).to.have.property('hostCurrency', 'EUR');
-        expect(transaction).to.have.property('hostFeeInHostCurrency', 2865);
-        expect(transaction).to.have.property('platformFeeInHostCurrency', 1433);
-        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 856);
-        expect(transaction).to.have.property('hostCurrencyFxRate', 1.22155521429569);
-        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704)
+        expect(transaction).to.have.property('hostFeeInHostCurrency', 2878);
+        expect(transaction).to.have.property('platformFeeInHostCurrency', 1439);
+        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 860);
+        expect(transaction).to.have.property('hostCurrencyFxRate', 1.21603780140366);
+        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28705)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Order.Subscription.isActive).to.be.equal(true);
         expect(transaction.Order.Subscription).to.have.property('activatedAt');
@@ -200,23 +203,16 @@ describe('webhooks.routes.test.js', () => {
         .tap((res) => {
           const e = res.rows[0].data.event;
           expect(res.count).to.equal(1);
-          expect(e.id).to.be.equal(customWebhookEvent.id);
+          expect(e.id).to.be.equal(charge2WebhookEvent.id);
           done();
         })
         .catch(done);
     });
 
     it('fail to create a second transaction with the same charge id', done => {
-      const anotherWebhookEvent = _.cloneDeep(webhookEvent);
-      anotherWebhookEvent.id = anotherWebhookEvent.id.replace(/0/g, 4);
-      anotherWebhookEvent.data.object.charge = 'ch_17KUJnBgJgc4Ba6uvdu1hxm4';
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${anotherWebhookEvent.id}`)
-        .reply(200, anotherWebhookEvent);
-
       request(app)
         .post('/webhooks/stripe')
-        .send(anotherWebhookEvent)
+        .send(charge2WebhookEvent)
         .expect(400, {
           error: {
             code: 400,
@@ -272,13 +268,13 @@ describe('webhooks.routes.test.js', () => {
             expect(transaction.type).to.be.equal(type.CREDIT);
             expect(transaction.amount).to.be.equal(webhookSubscription.amount);
 
-            expect(res.rows[0]).to.have.property('amountInHostCurrency', 28652); // taken from stripe mocks
+            expect(res.rows[0]).to.have.property('amountInHostCurrency', 28782); // taken from stripe mocks
             expect(res.rows[0]).to.have.property('hostCurrency', 'EUR');
-            expect(res.rows[0]).to.have.property('hostFeeInHostCurrency', 2865);
-            expect(res.rows[0]).to.have.property('platformFeeInHostCurrency', 1433);
-            expect(res.rows[0]).to.have.property('paymentProcessorFeeInHostCurrency', 856);
-            expect(transaction).to.have.property('hostCurrencyFxRate', 1.22155521429569);
-            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28704);
+            expect(res.rows[0]).to.have.property('hostFeeInHostCurrency', 2878);
+            expect(res.rows[0]).to.have.property('platformFeeInHostCurrency', 1439);
+            expect(res.rows[0]).to.have.property('paymentProcessorFeeInHostCurrency', 860);
+            expect(transaction).to.have.property('hostCurrencyFxRate', 1.21603780140366);
+            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28705);
             expect(transaction.Order.Subscription.isActive).to.be.equal(true);
             expect(transaction.Order.Subscription).to.have.property('activatedAt');
             expect(transaction.Order.Subscription.interval).to.be.equal('month');
