@@ -46,7 +46,7 @@ const slugify = (str) => {
 
   const tokens = str.split(' ');
   let text = '', i = 0;
-  while(text.length < 32) {
+  while(text.length < 32 && i < tokens.length) {
     text += ' ' + tokens[i++];
   }
 
@@ -436,6 +436,7 @@ const updateCollectives = (sequelize) => {
         name: 'donor',
         slug: 'donors',
         button: 'Make a donation',
+        presets: `[${[1000, 5000, 15000]}]`,
         CollectiveId: collective.id,
         currency: collective.currency
       })
