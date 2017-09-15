@@ -40,7 +40,7 @@ class EventPage extends React.Component {
     const event = data.Event;
 
     if (LoggedInUser && !LoggedInUser.canEditEvent) {
-      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
+      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser && event.createdByUser.id === LoggedInUser.id);
       if (LoggedInUser.canEditEvent) {
         // We refetch the data to get the email addresses of the participants
         // We need to bypass the cache otherwise it won't update the list of participants with the email addresses

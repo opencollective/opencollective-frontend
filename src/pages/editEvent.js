@@ -39,7 +39,7 @@ class EditEventPage extends React.Component {
     const event = data.Event;
 
     if (LoggedInUser) {
-      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser.id === LoggedInUser.id);
+      LoggedInUser.canEditEvent = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1 || event.createdByUser &&  event.createdByUser.id === LoggedInUser.id);
     }
 
     return (
