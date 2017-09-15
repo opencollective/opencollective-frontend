@@ -127,12 +127,18 @@ export function authenticateUser(req, res, next) {
   if (req.remoteUser && req.remoteUser.id) return next();
 
   parseJwtNoExpiryCheck(req, res, (e) => {
-    // If a token was submitted but is invalid, we return an error
-    if (e) return next(e);
+    // If a token was submitted but is invalid, we continue without authenticating the user
+    if (e) {
+      console.error(e);
+      return next();
+    }
 
     checkJwtExpiry(req, res, (e) => {
-      // If a token was submitted and is expired, we return an error
-      if (e) return next(e);
+      // If a token was submitted and is expired, we continue without authenticating the user
+      if (e) {
+        console.error(e);
+        return next();
+      }
       _authenticateUserByJwt(req, res, next);
     });
 
