@@ -126,11 +126,24 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       members: {
         type: new GraphQLList(MemberType),
         args: {
-          limit: { type: GraphQLInt }
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
         }
       },
-      memberOf: { type: new GraphQLList(MemberType)},
-      followers: { type: new GraphQLList(MemberType) },
+      memberOf: {
+        type: new GraphQLList(MemberType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        }
+      },
+      followers: {
+        type: new GraphQLList(MemberType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        }
+      },
       maxQuantity: { type: GraphQLInt },
       tiers: { type: new GraphQLList(TierType) },
       orders: { type: new GraphQLList(OrderType) },
@@ -282,23 +295,32 @@ const CollectiveFields = () => {
       description: 'Get all the members of this collective (admins, members, backers, followers)',
       type: new GraphQLList(MemberType),
       args: {
-        limit: { type: GraphQLInt }
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
-        return models.Member.findAll({ where: { CollectiveId: collective.id }, limit: args.limit });
+        return models.Member.findAll({ where: { CollectiveId: collective.id }, limit: args.limit, offset: args.offset });
       }
     },
     memberOf: {
       description: 'Get all the collective this collective is a member of (as a member, backer, follower, etc.)',
       type: new GraphQLList(MemberType),
-      resolve(collective) {
-        return models.Member.findAll({ where: { MemberCollectiveId: collective.id } });
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt }
+      },
+      resolve(collective, args) {
+        return models.Member.findAll({ where: { MemberCollectiveId: collective.id }, limit: args.limit, offset: args.offset });
       }
     },
     followers: {
       type: new GraphQLList(MemberType),
-      resolve(collective) {
-        return models.Member.findAll({ where: { CollectiveId: collective.id, role: roles.FOLLOWER } });
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt }
+      },
+      resolve(collective, args) {
+        return models.Member.findAll({ where: { CollectiveId: collective.id, role: roles.FOLLOWER }, limit: args.limit, offset: args.offset });
       }
     },
     maxQuantity: {
