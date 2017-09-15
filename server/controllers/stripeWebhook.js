@@ -130,7 +130,7 @@ export default function stripeWebhook(req, res, next) {
     confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       const orderId = results.fetchOrder.id;
-      debug("confirmUniqueChargeId"´, chargeId);
+      debug("confirmUniqueChargeId", chargeId);
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 

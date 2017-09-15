@@ -34,7 +34,7 @@ describe('webhooks.routes.test.js', () => {
   before(() => {
     initNock();
     sandbox = sinon.sandbox.create();
-    sandbox.stub(appStripe.events, "retrieve", (eventId) => Promise.resolve(stripeMock.webhook));
+    sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.webhook));
   });
 
   after(() => sandbox.restore());
