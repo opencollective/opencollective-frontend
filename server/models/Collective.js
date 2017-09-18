@@ -646,7 +646,7 @@ export default function(Sequelize, DataTypes) {
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
           WHERE t."CollectiveId" = :CollectiveId
-            AND t.amount > 0
+            AND t.type = 'CREDIT'
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
             AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
@@ -656,7 +656,7 @@ export default function(Sequelize, DataTypes) {
           LEFT JOIN "Orders" d ON t."OrderId" = d.id
           LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
           WHERE t."CollectiveId" = :CollectiveId
-            AND t.amount > 0
+            AND t.type = 'CREDIT'
             AND t."deletedAt" IS NULL
             AND t."createdAt" > (current_date - INTERVAL '12 months')
             AND s.interval = 'month' AND s."isActive" IS FALSE AND s."deletedAt" IS NULL)
@@ -950,7 +950,7 @@ export default function(Sequelize, DataTypes) {
               const backers = usersByRole[roles.BACKER] || [];
               collectiveInfo.backersAndSponsorsCount = backers.length;
               collectiveInfo.membersCount = (usersByRole[roles.ADMIN] || []).length;
-              collectiveInfo.sponsorsCount = backers.filter((b) => b.tier && b.tier.class === 'sponsor').length;
+              collectiveInfo.sponsorsCount = backers.filter((b) => b.tier && b.tier.name.match(/sponsor/i)).length;
               collectiveInfo.backersCount = collectiveInfo.backersAndSponsorsCount - collectiveInfo.sponsorsCount;
               collectiveInfo.githubContributorsCount = (collective.data && collective.data.githubContributors) ? Object.keys(collective.data.githubContributors).length : 0;
               collectiveInfo.contributorsCount = collectiveInfo.membersCount + collectiveInfo.githubContributorsCount + collectiveInfo.backersAndSponsorsCount;

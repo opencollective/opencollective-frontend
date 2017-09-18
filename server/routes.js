@@ -107,7 +107,7 @@ export default (app) => {
   /**
    * Homepage
    */
-  app.get('/homepage', getHomePage);
+  app.get('/homepage', getHomePage); // This query takes 5s to execute!!!
 
 
   /**

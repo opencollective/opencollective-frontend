@@ -16,7 +16,8 @@ import {
 import {
   UserType,
   TierType,
-  ExpenseType
+  ExpenseType,
+  MemberType
 } from './types';
 
 import models from '../models';
@@ -151,6 +152,29 @@ const queries = {
       return models.Collective.findAll(query);
     }
   },
+
+  /*
+   * Given a collective slug, returns all members
+   */
+  allMembers: {
+    type: new GraphQLList(MemberType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      TierId: { type: GraphQLInt },
+      role: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = { where: { CollectiveId: args.CollectiveId } }
+      if (args.TierId) query.where.TierId = args.TierId;
+      if (args.role) query.where.role = args.role;
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      return models.Member.findAll(query);
+    }
+  },
+
   /*
    * Given a collective slug, returns all events
    */

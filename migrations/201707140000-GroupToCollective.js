@@ -669,7 +669,10 @@ const up = (queryInterface, Sequelize) => {
     }))
     .then(() => queryInterface.removeIndex('Members', 'UserGroups_3way'))
     .then(() => queryInterface.addIndex('Members', ['MemberCollectiveId', 'CollectiveId', 'role'], { indexName: 'MemberCollectiveId-CollectiveId-role' }))
+    .then(() => queryInterface.addIndex('Members', ['CollectiveId', 'role'], { indexName: 'CollectiveId-role' }))
+    .then(() => queryInterface.addIndex('Users', ['CollectiveId'], { indexName: 'CollectiveId' }))
     .then(() => queryInterface.addIndex('Transactions', ['CollectiveId', 'FromCollectiveId', 'deletedAt'], { indexName: 'CollectiveId-FromCollectiveId-type' }))
+    .then(() => queryInterface.addIndex('Transactions', ['CollectiveId', 'type'], { indexName: 'CollectiveId-type' }))
     .then(() => queryInterface.addIndex('Tiers', ['CollectiveId', 'deletedAt'], { indexName: 'CollectiveId-deletedAt' }))
     .then(() => queryInterface.addColumn('PaymentMethods', 'CollectiveId', {
       type: Sequelize.INTEGER,

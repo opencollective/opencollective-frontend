@@ -23,6 +23,6 @@ const server = app.listen(port, () => {
   console.log('OpenCollective API listening at http://%s:%s in %s environment.\n', host, server.address().port, app.set('env'));
 });
 
-server.timeout = 15000; // sets timeout to 15 seconds
+server.timeout = 25000; // sets timeout to 25 seconds
 
 export default app;
