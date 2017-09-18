@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import { appendTier, defaultHostCollectiveId, getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { defaultHostCollectiveId, getLinkHeader, getRequestedUrl } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -64,7 +64,7 @@ const _getUsersData = (collective, tier) => {
   return collective.getSuperCollectiveCollectivesIds()
     .then(ids => {
       if (tier === 'backers') {
-        return queries.getBackersOfCollectiveWithTotalDonations(ids).then(backerCollectives => appendTier(collective, backerCollectives))
+        return queries.getBackersOfCollectiveWithTotalDonations(ids).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives))
       } else {
         return queries.getMembersOfCollectiveWithRole(ids);
       }

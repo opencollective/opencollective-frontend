@@ -218,5 +218,29 @@ export default function(Sequelize, DataTypes) {
     }
   };
 
+  /**
+   * Append tier to each backer in an array of backers
+   */
+  Tier.appendTier = (collective, backerCollectives) => {
+    const backerCollectivesIds = backerCollectives.map(b => b.id);
+    return models.Member.findAll({
+      where: {
+        MemberCollectiveId: { $in: backerCollectivesIds },
+        CollectiveId: collective.id
+      },
+      include: [ { model: models.Tier }]
+    })
+    .then(memberships => {
+      const membershipsForBackerCollective = {};
+      memberships.map(m => {
+        membershipsForBackerCollective[m.MemberCollectiveId] = m.Tier;
+      })
+      return backerCollectives.map(backerCollective => {
+        backerCollective.tier = membershipsForBackerCollective[backerCollective.id];
+        return backerCollective;
+      })
+    });
+  }
+
   return Tier;
 }

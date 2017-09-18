@@ -10,7 +10,7 @@ import { difference, uniq } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
-import { appendTier, capitalize } from '../lib/utils';
+import { capitalize } from '../lib/utils';
 import slugify from 'slug';
 import activities from '../constants/activities';
 import Promise from 'bluebird';
@@ -936,7 +936,7 @@ export default function(Sequelize, DataTypes) {
               collective.getYearlyIncome(),
               queries
                 .getBackersOfCollectiveWithTotalDonations(collective.id)
-                .then(users => appendTier(collective, users))
+                .then(users => models.Tier.appendTier(collective, users))
             ])
             .then(results => {
               const usersByRole = {};

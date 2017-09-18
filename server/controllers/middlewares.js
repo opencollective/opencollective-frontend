@@ -1,4 +1,4 @@
-import {appendTier, paginateOffset} from '../lib/utils';
+import { paginateOffset } from '../lib/utils';
 import json2csv from 'json2csv';
 import moment from 'moment';
 import _ from 'lodash';
@@ -16,7 +16,7 @@ const {
  */
 export const fetchUsers = (req, res, next) => {
   queries.getBackersOfCollectiveWithTotalDonations(req.collective.id)
-    .then(backerCollectives => appendTier(backerCollectives, req.collective.tiers))
+    .then(backerCollectives => models.Tier.appendTier(req.collective, backerCollectives))
     .then(backerCollectives => {
       req.users = backerCollectives;
     })

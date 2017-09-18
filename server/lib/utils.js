@@ -146,15 +146,6 @@ export const paginateOffset = (page, perPage) => {
   }
 };
 
-/**
- * Append tier to each backer in an array of backers
- */
-export const appendTier = (collective, backerCollectives) => {
-  return Promise.each(backerCollectives, backerCollective => collective.getBackerTier(backerCollective).then(tier => {
-      backerCollective.tier = tier;
-      return backerCollective;
-    }));
-};
 
 /**
  * Returns stats for each tier compared to previousMonth
