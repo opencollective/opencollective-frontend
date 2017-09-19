@@ -76,6 +76,7 @@ describe('graphql.collective.test.js', () => {
             image
             stats {
               backers
+              sponsors
               yearlyBudget
             }
             __typename
@@ -127,8 +128,9 @@ describe('graphql.collective.test.js', () => {
     expect(userCollective.createdByUser.firstName).to.equal('Xavier');
     expect(userCollective.createdByUser.email).to.be.null;
     expect(memberships[1].collective.stats).to.deep.equal({
-      backers: 25,
-      yearlyBudget: 338413
+      backers: 24,
+      sponsors: 1,
+      yearlyBudget: 329733
     });
   });
 

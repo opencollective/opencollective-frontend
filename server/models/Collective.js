@@ -713,23 +713,45 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
-  Collective.prototype.getBackersCount = function(until) {
-    until = until || new Date;
+  /**
+   * Get the total number of backers (individuals or organizations that have given money to the collective)
+   * @params: { type, until }
+   * type: COLLECTIVE/USER/ORGANIZATION or an array of types
+   * until: date till when to count the number of backers
+   */
+  Collective.prototype.getBackersCount = function(options) {
 
-    return models.Transaction.findOne({
-        attributes: [
-          [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'backersCount']
-        ],
-        where: {
-          CollectiveId: this.id,
-          amount: {
-            $gt: 0
-          },
-          createdAt: { $lt: until }
+    const query = {
+      attributes: [
+        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'backersCount']
+      ],
+      where: {
+        CollectiveId: this.id,
+        type: 'CREDIT'
+      }
+    };
+
+    if (options.until) {
+      query.where.createdAt = { $lt: options.until };
+    }
+
+    if (options.type) {
+      const types = (typeof options.type === 'string') ? [options.type] : options.type;
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true,
+          where: { type: { $in: types }}
         }
-      })
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+    }
+
+    return models.Transaction.findOne(query)
     .then((result) => {
-      return Promise.resolve(Number(result.dataValues.backersCount));
+      return Promise.resolve(Number(result.backersCount));
     });
   };
 

@@ -84,7 +84,8 @@ const getHostCollectiveId = (sequelize, CollectiveId) => {
 
 const updateMembersRole = (sequelize) => {
   return sequelize.query(`UPDATE "Members" SET role='ADMIN' WHERE role='MEMBER'`)
-    .then(() => sequelize.query(`UPDATE "Notifications" SET type='mailinglist.admins' WHERE type='mailinglist.members'`));
+  .then(() => sequelize.query(`UPDATE "Members" SET "deletedAt"=:deletedAt WHERE id IN (SELECT m.id FROM "Members" m LEFT JOIN "Collectives" c ON c.id = m."CollectiveId" WHERE c."deletedAt" IS NOT NULL)`, { replacements: { deletedAt: new Date }}))
+  .then(() => sequelize.query(`UPDATE "Notifications" SET type='mailinglist.admins' WHERE type='mailinglist.members'`));
 }
 
 const updateNotifications = (sequelize) => {
@@ -351,7 +352,6 @@ const updateCollectives = (sequelize) => {
     const getTierName = (tier) => {
       const name = tier.name && tier.name.toLowerCase();
       if (name.match(/sponsor/)) return 'sponsor';
-      if (name.match(/donor/)) return 'donor';
       if (name.match(/member/)) return 'member';
       return 'backer';
     }
@@ -408,39 +408,6 @@ const updateCollectives = (sequelize) => {
       return res;
     });
 
-    if (tiers.length === 0) {
-      tiers.push({
-        name: 'backer',
-        type: 'TIER',
-        slug: 'backers',
-        amount: 200,
-        interval: 'month',
-        CollectiveId: collective.id,
-        currency: collective.currency
-      });
-      tiers.push({
-        name: 'sponsor',
-        type: 'TIER',
-        slug: 'sponsors',
-        amount: 10000,
-        interval: 'month',
-        CollectiveId: collective.id,
-        currency: collective.currency
-      });
-    }
-
-    const donorTier = tiers.find(t => t.slug === 'donors');
-    if (!donorTier) {
-      tiers.push({
-        type: 'TIER',
-        name: 'donor',
-        slug: 'donors',
-        button: 'Make a donation',
-        presets: `[${[1000, 5000, 15000]}]`,
-        CollectiveId: collective.id,
-        currency: collective.currency
-      })
-    }
     return Promise.map(tiers, tier => {
         tier.createdAt = new Date;
         Object.keys(tier).map(key => {
@@ -480,7 +447,8 @@ const updateCollectives = (sequelize) => {
           return true;
         });
         if (!tier) {
-          console.log("No tier found for order", JSON.stringify(order), "tiers", JSON.stringify(tiers.filter(t => t.CollectiveId === order.CollectiveId)))
+          console.log("No custom tier found for order", JSON.stringify(order));
+          // console.log("Custom tiers for Collective: ", JSON.stringify(tiers.filter(t => t.CollectiveId === order.CollectiveId)));
         }
       }
       if (!tier || !tier.id) {

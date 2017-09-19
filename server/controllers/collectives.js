@@ -66,7 +66,7 @@ const _getUsersData = (collective, tier) => {
       if (tier === 'backers') {
         return queries.getBackersOfCollectiveWithTotalDonations(ids).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives))
       } else {
-        return queries.getMembersOfCollectiveWithRole(ids);
+        return queries.getMembersOfCollectiveWithRole(ids).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives));
       }
     });
 };
@@ -93,14 +93,17 @@ export const getUsers = (req, res, next) => {
   }
 
   return promise
-    .map(user => {
+    .map(userCollective => {
       const u = {
-        ...user.dataValues,
-        role: user.dataValues.role,
-        tier: user.tier && user.tier.name.toLowerCase(),
-        avatar: user.image
+        ...userCollective.dataValues,
+        role: userCollective.dataValues.role,
+        tier: userCollective.tier && userCollective.tier.slug,
+        avatar: userCollective.image
       };
       delete u.image;
+      if (!u.tier) {
+        u.tier = (u.type === 'USER') ? 'backer' : 'sponsor';
+      }
       if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }

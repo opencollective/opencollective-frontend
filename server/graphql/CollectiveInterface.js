@@ -38,10 +38,22 @@ export const CollectiveStatsType = new GraphQLObjectType({
           return collective.id;
         }
       },
+      balance: {
+        type: GraphQLInt,
+        resolve(collective, args, req) {
+          return req.loaders.collective.balance.load(collective.id);
+        }
+      },
       backers: {
         type: GraphQLInt,
         resolve(collective) {
-          return collective.getBackersCount();
+          return collective.getBackersCount({ type: types.USER });
+        }
+      },
+      sponsors: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.getBackersCount({ type: [types.ORGANIZATION, types.COLLECTIVE] });
         }
       },
       expenses: {
@@ -156,7 +168,6 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      balance: { type: GraphQLInt },
       role: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
@@ -358,12 +369,6 @@ const CollectiveFields = () => {
         if (args.offset) query.offset = args.offset;
         query.order = [ ['id', 'DESC'] ];
         return collective.getTransactions(query);
-      }
-    },
-    balance: {
-      type: GraphQLInt,
-      resolve(collective, args, req) {
-        return req.loaders.collective.balance.load(collective.id);
       }
     },
     role: {
