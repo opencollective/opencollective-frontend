@@ -205,7 +205,7 @@ class CollectiveCard extends React.Component {
               <FormattedDate value={membership.createdAt} month='long' year='numeric' />
             </div>
           </div>
-          { membership.role === 'BACKER' &&
+          { membership.role === 'BACKER' && membership.totalDonations &&
             <div className="totalDonations">
               <div className="totalDonationsAmount">
                 <Currency value={membership.totalDonations} currency={currency} />

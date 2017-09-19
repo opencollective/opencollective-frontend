@@ -48,6 +48,9 @@ class OrderForm extends React.Component {
       'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
+      'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
+      'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
+      'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
@@ -103,8 +106,8 @@ class OrderForm extends React.Component {
   }
 
   componentDidMount() {
-    if (typeof Stripe !== undefined) {
-      const stripePublishableKey = (typeof window !== undefined && window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
+    if (typeof Stripe !== "undefined") {
+      const stripePublishableKey = (typeof window !== "undefined" && window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
       Stripe.setPublishableKey(stripePublishableKey);
     }
@@ -138,7 +141,8 @@ class OrderForm extends React.Component {
       collectivesById[value] = membership.collective;
       fromCollectiveOptions.push({ [value]: label });
     })
-    fromCollectiveOptions.push({ createOrganization: 'Create an organization' });
+    collectivesById[0] = null;
+    fromCollectiveOptions.push({ 0: 'Create an organization' });
 
     let paymentMethods = [];
     if (LoggedInUser && this.state.fromCollective) {
@@ -164,13 +168,14 @@ class OrderForm extends React.Component {
   handleChange(obj, attr, value) {
     this.resetError();
     const newState = { ... this.state };
-
     if (value === 'null') {
       value = null;
     }
 
     if (value !== undefined) {
       newState[obj][attr] = value;
+    } else if (attr === null) {
+      newState[obj] = {};
     } else {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
@@ -186,7 +191,7 @@ class OrderForm extends React.Component {
     }
 
     this.setState(newState);
-    if (typeof window !== undefined) {
+    if (typeof window !== "undefined") {
       window.state = newState;
     }
   }
@@ -385,7 +390,46 @@ class OrderForm extends React.Component {
               </Row>
             ))}
         </div>
-
+        { !this.state.fromCollective.id &&
+          <div className="organizationDetailsForm">
+            <h2><FormattedMessage id="tier.order.organizationdetails" defaultMessage="Organization details" /></h2>
+            <Row key={`organization.name.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_name"
+                  label={intl.formatMessage(this.messages['order.organization.name'])}
+                  onChange={(value) => this.handleChange("fromCollective", "name", value)}
+                  />
+              </Col>
+            </Row>
+            <Row key={`organization.website.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_website"
+                  pre="http://"
+                  label={intl.formatMessage(this.messages['order.organization.website'])}
+                  onChange={(value) => this.handleChange("fromCollective", "website", value)}
+                  />
+              </Col>
+            </Row>
+            <Row key={`organization.twitterHandle.input`}>
+              <Col sm={12}>
+                <InputField
+                  className="horizontal"
+                  type="text"
+                  name="organization_twitterHandle"
+                  pre="@"
+                  label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
+                  onChange={(value) => this.handleChange("fromCollective", "twitterHandle", value)}
+                  />
+              </Col>
+            </Row>
+          </div>
+        }
         { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
             <h2>Payment details</h2>

@@ -5,9 +5,8 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import OrderForm from '../components/OrderForm';
-import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
-import Members from '../components/Members';
+import MembersWithData from '../components/MembersWithData';
 import { addCreateOrderMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import { get } from 'lodash';
@@ -20,6 +19,7 @@ import withIntl from '../lib/withIntl';
 import ExpensesWithData from './ExpensesWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
+import { Link } from '../server/pages';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -129,11 +129,6 @@ class Collective extends React.Component {
     console.log("CollectivePage> this.collective", this.collective, "state", this.state);
     const { intl, LoggedInUser } = this.props;
 
-    const members = {};
-    this.collective.tiers.map(tier => {
-      members[tier.slug] = this.collective.members.filter(member => member.tier && member.tier.id === tier.id);
-    });
-
     const tiers = [...this.collective.tiers].sort((a, b) => {
       return (a.amount < b.amount) ? 1 : -1;
     })
@@ -148,6 +143,25 @@ class Collective extends React.Component {
               values={{ n: this.collective.stats.backers}}
               />
           </HashLink>        
+      },
+      {
+        className: 'whiteblue',
+        component: <HashLink to={`#sponsors`}>
+            <FormattedMessage
+              id="collective.sponsors"
+              defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
+              values={{ n: this.collective.stats.sponsors}}
+              />
+          </HashLink>
+      },
+      {
+        className: 'whiteblue',
+        component: <Link route={`/${this.collective.slug}/contribute`}><a>
+            <FormattedMessage
+              id="collective.contribute"
+              defaultMessage={`contribute`}
+              /></a>
+          </Link>
       }
     ];
 
@@ -219,7 +233,11 @@ class Collective extends React.Component {
                     <h1>{tier.name}</h1>
                     <p>{tier.description}</p>
                     <Button bsStyle="primary" onClick={() => this.handleOrderTier(tier)}>{tier.button}</Button>
-                    <Members className={tier.slug} members={members[tier.slug]} />
+                    <MembersWithData
+                      collective={this.collective}
+                      tier={tier}
+                      limit={100}
+                      />
                   </div>
                 </section>
               ))}

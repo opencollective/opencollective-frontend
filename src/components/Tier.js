@@ -8,6 +8,7 @@ import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'r
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
+import { get } from 'lodash';
 
 class Tier extends React.Component {
 
@@ -38,7 +39,7 @@ class Tier extends React.Component {
       }
     }
 
-    this.anchor = this.tier.name.toLowerCase().replace(/ /g,'-');
+    this.anchor = (get(this.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({

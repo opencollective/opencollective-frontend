@@ -26,7 +26,6 @@ class Member extends React.Component {
       INTERESTED: { id: 'member.status.interested', defaultMessage: '{name} is interested' },
       YES: { id: 'member.status.yes', defaultMessage: '{name} is going' }
     });
-
   }
 
   onClick() {
@@ -44,9 +43,12 @@ class Member extends React.Component {
     if (!name) return (<div/>);
 
     const image = member.image || pickAvatar(name);
-    const title = member.description;
+    let title = member.name;
+    if (member.description) {
+      title += ` - ${member.description}`;
+    }
     const className = this.props.className;
-
+    const tierName = membership.tier ? singular(membership.tier.name) : membership.role;
     return (
       <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
         <style jsx>{`
@@ -82,8 +84,8 @@ class Member extends React.Component {
         }
 
         .bubble {
-            padding: 1rem;
-            overflow: hidden;
+          padding: 1rem;
+          overflow: hidden;
         }
 
         .small .avatar {
@@ -95,8 +97,8 @@ class Member extends React.Component {
         }
 
         .name {
-            font-family: 'montserratlight';
-            font-size: 1.7rem;
+          font-family: 'montserratlight';
+          font-size: 1.7rem;
         }
 
         .description, .since {
@@ -120,7 +122,7 @@ class Member extends React.Component {
                 <div className="name">{name}</div>
                 <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
                 <div className="since" style={{color: colors.darkgray}}>
-                  {capitalize(singular(membership.tier.name))} &nbsp;
+                  {tierName && capitalize(tierName)} &nbsp;
                   <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
                   <FormattedDate value={membership.createdAt} month='long' year='numeric' />
                 </div>

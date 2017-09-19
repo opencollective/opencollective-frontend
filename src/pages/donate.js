@@ -34,7 +34,7 @@ class DonatePage extends React.Component {
     };
 
     this.messages = defineMessages({
-      'donate.title': { id: 'donate.title', defaultMessage: 'Become a donor' },
+      'contribute.title': { id: 'contribute.title', defaultMessage: 'Contribute financially' },
       'tier.name.donation': { id: 'tier.name.donation', defaultMessage: 'donation' },
       'tier.button.donation': { id: 'tier.button.donation', defaultMessage: 'donate' },
       'tier.description.donation': { id: 'tier.description.donation', defaultMessage: 'Thank you for your kind donation 🙏' }
@@ -60,10 +60,8 @@ class DonatePage extends React.Component {
     }
 
     const collective = data.Collective;
-    const tiers = collective.tiers;
 
-    let tier = tiers.find(t => t.slug === 'donors');
-    tier = { ...tier } || {
+    const tier = {
       name: intl.formatMessage(this.messages['tier.name.donation']),
       presets: [1000, 5000, 10000],
       currency: collective.currency,
@@ -72,7 +70,6 @@ class DonatePage extends React.Component {
     };
     tier.currency = tier.currency || collective.currency;
     this.order.tier = tier;
-    console.log("tier", tier, "tiers", tiers);
 
     return (
       <div>
@@ -88,10 +85,9 @@ class DonatePage extends React.Component {
         <Body>
           <CollectiveCover
             href={`/${collective.slug}`}
-            logo={collective.image}
-            title={intl.formatMessage(this.messages[`donate.title`])}
+            collective={collective}
             className="small"
-            backgroundImage={collective.backgroundImage}
+            title={intl.formatMessage(this.messages['contribute.title'])}
             style={get(collective, 'settings.style.hero.cover')}
             />
 

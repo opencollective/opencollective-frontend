@@ -16,7 +16,6 @@ class Members extends React.Component {
     const size = members.length > 50 ? 'small' : 'large';
     const viewMode = className && className.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
 
-    console.log(">>> ", this.props.className, ":", members);
     return (
       <div className={`Members ${this.props.className}`} >
         <style jsx>{`

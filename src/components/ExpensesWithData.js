@@ -6,11 +6,11 @@ import Expenses from '../components/Expenses';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-class ExpensesPage extends React.Component {
+class ExpensesWithData extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    limit: PropTypes.int,
+    limit: PropTypes.number,
     LoggedInUser: PropTypes.object
   }
 
@@ -102,4 +102,4 @@ export const addExpensesData = graphql(getExpensesQuery, {
 });
 
 
-export default addExpensesData(withIntl(ExpensesPage));
+export default addExpensesData(withIntl(ExpensesWithData));

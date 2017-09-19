@@ -29,7 +29,6 @@ export const getLoggedInUserQuery = gql`
           slug
           type
           name
-          balance
           currency
           paymentMethods {
             uuid
@@ -236,6 +235,8 @@ const getCollectiveQuery = gql`
         id
         yearlyBudget
         backers
+        sponsors
+        balance
         transactions
         expenses
         totalAmountSent
@@ -275,29 +276,6 @@ const getCollectiveQuery = gql`
             id
             backers
             yearlyBudget
-          }
-        }
-      }
-      members {
-        id
-        createdAt
-        role
-        totalDonations
-        tier {
-          id
-          name
-          currency
-        }
-        member {
-          id
-          name
-          type
-          image
-          slug
-          twitterHandle
-          description
-          ... on User {
-            email
           }
         }
       }

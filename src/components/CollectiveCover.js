@@ -186,7 +186,7 @@ class CollectiveCover extends React.Component {
                 ))}
                 { membersPreview.length < members.length &&
                   <div className="MoreBackers">
-                    + {members.length - membersPreview.length}
+                    + {(stats.backers || members.length) - membersPreview.length}
                   </div>
                 }
               </div>
