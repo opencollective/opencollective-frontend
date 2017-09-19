@@ -75,12 +75,32 @@ export const getUsers = (req, res, next) => {
   let promise = _getUsersData(req.collective, req.params.tierSlug);
 
   if (req.query.filter && req.query.filter === 'active') {
-    promise = promise.filter(backer => req.collective.isBackerActive(backer));
+    const activeUsersByCollectiveId = {};
+    promise = promise.then(userCollectives => {
+      const UserCollectiveIds = userCollectives.map(u => u.id);
+      return models.Order.findAll({
+        where: { FromCollectiveId: { $in: UserCollectiveIds}},
+        include: [
+          { model: models.Subscription, where: { isActive: true } }
+        ]
+      }).then(orders => {
+        orders.map(o => {
+          activeUsersByCollectiveId[o.FromCollectiveId] = Boolean(o.Subscription && o.Subscription.isActive);
+        })
+        return userCollectives.filter(u => activeUsersByCollectiveId[u.id]);
+      })
+    });
   }
 
   return promise
     .map(user => {
-      const u = {...user.dataValues, role: user.dataValues.role, tier: user.tier && user.tier.info};
+      const u = {
+        ...user.dataValues,
+        role: user.dataValues.role,
+        tier: user.tier && user.tier.name.toLowerCase(),
+        avatar: user.image
+      };
+      delete u.image;
       if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }

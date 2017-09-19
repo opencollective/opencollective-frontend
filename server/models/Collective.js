@@ -431,27 +431,6 @@ export default function(Sequelize, DataTypes) {
     }).then(order => order && order.Tier);
   };
 
-  /**
-   * Returns whether the backer is still active
-   */
-  Collective.prototype.isBackerActive = function(backerCollective, until) {
-    const where = { FromCollectiveId: backerCollective.id, CollectiveId: this.id };
-    if (until) {
-      where.createdAt = { $lt: until };
-    }
-
-    return models.Order
-      .findOne({
-        where,
-        include: [ { model: models.Subscription, where: { isActive: true } } ]
-      })
-      .then(order => {
-        if (!order) return false;
-        if (!order.Subscription) return false;
-        return order.Subscription.isActive;
-      })
-  };
-
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
     const lists = {};
     lists[roles.BACKER] = 'backers';

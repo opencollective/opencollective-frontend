@@ -198,7 +198,7 @@ const getTopSponsors = () => {
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
   return sequelize.query(`
-    SELECT c.*, max(m.role)
+    SELECT c.*, max(m.role) as role
     FROM "Collectives" c LEFT JOIN "Members" m ON c.id = m."MemberCollectiveId"
     WHERE m."CollectiveId" IN (:collectiveids) AND m."deletedAt" IS NULL AND c."deletedAt" IS NULL
     GROUP BY c.id
