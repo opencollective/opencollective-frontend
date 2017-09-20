@@ -154,7 +154,7 @@ class TopBar extends React.Component {
             <li><a href="https://medium.com/open-collective">Blog</a></li>
           </ul>
           <div className="separator"></div>
-          { !LoggedInUser && <a href="/login?next=/">Login</a> }
+          { !LoggedInUser && <a href="/signin?next=/">Login</a> }
           { LoggedInUser && <TopBarProfileMenu LoggedInUser={LoggedInUser} /> }
         </div>
       </div>

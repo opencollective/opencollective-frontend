@@ -5,6 +5,7 @@ import { addGetLoggedInUserFunction } from '../graphql/queries';
 import { addCreateOrderMutation } from '../graphql/mutations';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import { Router } from '../server/pages';
 
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
@@ -62,7 +63,7 @@ class DonatePage extends React.Component {
       console.log(">>> createOrder response", res);
       const response = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      window.location.replace(`${window.location.protocol}//${window.location.host}/${response.fromCollective.slug}`);
+      Router.pushRoute(`/${response.fromCollective.slug}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
@@ -130,22 +131,23 @@ class DonatePage extends React.Component {
 const addData = graphql(gql`
   query Collective($slug: String!) {
     Collective(slug: $slug) {
-      id,
-      slug,
-      name,
-      description,
-      twitterHandle,
-      image,
-      backgroundImage,
-      settings,
-      currency,
+      id
+      slug
+      name
+      type
+      description
+      twitterHandle
+      image
+      backgroundImage
+      settings
+      currency
       tiers {
-        id,
-        name,
-        slug,
-        amount,
-        currency,
-        interval,
+        id
+        name
+        slug
+        amount
+        currency
+        interval
         presets
       }
     }

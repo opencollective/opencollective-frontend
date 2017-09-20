@@ -18,7 +18,6 @@ class Collectives extends React.Component {
       <div className="Collectives" >
         <style jsx>{`
         .Collectives {
-          max-width: 640px;
           margin: 3rem auto 3rem;
           text-align: center;
           overflow: hidden;

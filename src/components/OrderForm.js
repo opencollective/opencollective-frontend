@@ -471,11 +471,11 @@ class OrderForm extends React.Component {
         }
         
         <div className="order">
-          <h2>Order details</h2>
+          <h2>Contribution details</h2>
           <Row>
             <Col sm={12}>
               <div className="form-group">
-                <label className="col-sm-3 control-label">Order</label>
+                <label className="col-sm-3 control-label">Contribution</label>
                 <Col sm={9}>
                   <TierComponent
                     tier={this.state.tier}

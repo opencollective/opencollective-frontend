@@ -10,6 +10,7 @@ import NotFound from '../components/NotFound';
 import OrderForm from '../components/OrderForm';
 import CollectiveCover from '../components/CollectiveCover';
 import { defineMessages } from 'react-intl';
+import { Router } from '../server/pages';
 
 class OrderTierPage extends React.Component {
 
@@ -59,7 +60,7 @@ class OrderTierPage extends React.Component {
       console.log(">>> createOrder response", res);
       const response = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      window.location.replace(`${window.location.protocol}//${window.location.host}/${response.fromCollective.slug}`);
+      Router.pushRoute(`/${response.fromCollective.slug}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });

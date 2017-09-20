@@ -180,7 +180,7 @@ class EditCollective extends React.Component {
             {!canEditCollective &&
               <div className="login">
                 <p>You need to be logged in as the creator of this collective<br />or as a core contributor of the {collective.name} collective.</p>
-                <p><Button bsStyle="primary" href={`/login?next=${collective.slug}/edit`}>Login</Button></p>
+                <p><Button bsStyle="primary" href={`/signin?next=${collective.slug}/edit`}>Login</Button></p>
               </div>
             }   
             { canEditCollective &&

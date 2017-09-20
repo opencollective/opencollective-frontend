@@ -210,7 +210,7 @@ class CollectiveCard extends React.Component {
               <div className="totalDonationsAmount">
                 <Currency value={membership.totalDonations} currency={currency} />
               </div>
-              <FormattedMessage id='membership.totalDonations.title' defaultMessage={`total donations`} />
+              <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
             </div>
           }
         </div>

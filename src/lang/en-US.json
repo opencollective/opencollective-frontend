@@ -13,7 +13,7 @@
   "collective.stats.backers": "backers",
   "collective.stats.yearlyBudget": "yearly budget",
   "membership.since": "since",
-  "membership.totalDonations.title": "total donations",
+  "membership.totalDonations.title": "amount contributed",
   "collective.stats.yearlyBudget.label": "Estimated annual budget based on current donations",
   "collective.stats.totalAmountSent.label": "Total amount donated",
   "creditcard.error": "Invalid credit card",
