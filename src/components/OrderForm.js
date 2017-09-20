@@ -107,7 +107,7 @@ class OrderForm extends React.Component {
 
   componentDidMount() {
     if (typeof Stripe !== "undefined") {
-      const stripePublishableKey = (typeof window !== "undefined" && window.location.hostname === 'localhost') ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
+      const stripePublishableKey = (typeof window !== "undefined" && (window.location.hostname === 'localhost' || window.location.hostname === 'staging.opencollective.com')) ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
       Stripe.setPublishableKey(stripePublishableKey);
     }
