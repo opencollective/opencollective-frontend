@@ -380,13 +380,10 @@ const mutations = {
         return models.Tier.getOrFind(where);
       })
       .then(t => {
-        if (!t) {
-          throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
-        }
-        tier = t;
-        paymentRequired = order.totalAmount > 0 || t.amount > 0;
+        tier = t; // we may not have a tier
+        paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
         // interval of the tier can only be overridden if it is null (e.g. for custom donations)
-        interval = tier.interval || order.interval;
+        interval = tier && tier.interval || order.interval;
       })
 
       // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
@@ -399,10 +396,16 @@ const mutations = {
         }
       })
       
-      // check for available quantity of the tier
-      .then(() => tier.checkAvailableQuantity(order.quantity))
-      .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
+      // check for available quantity of the tier if any
+      .then(() => {
+        if (!tier) return;
+        if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
+          Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
+        }
+        return tier.checkAvailableQuantity(order.quantity)
+          .then(enoughQuantityAvailable => enoughQuantityAvailable ? 
             Promise.resolve() : Promise.reject(new Error(`No more tickets left for ${tier.name}`)))
+      })
 
       // find or create user, check permissions to set `fromCollective`
       .then(() => {
@@ -441,15 +444,10 @@ const mutations = {
       })
       .then(c => fromCollective = c)
       .then(() => {
-        if (tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
-          Promise.reject(new Error(`You can buy up to ${tier.maxQuantityPerUser} ${pluralize('ticket', tier.maxQuantityPerUser)} per person`));
-        }
-      })     
-      .then(() => {
-        const currency = tier.currency || collective.currency;
+        const currency = tier && tier.currency || collective.currency;
         const quantity = order.quantity || 1;
         let totalAmount;
-        if (tier.amount) {
+        if (tier && tier.amount) {
           totalAmount = tier.amount * quantity;
         } else {
           totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
@@ -467,7 +465,7 @@ const mutations = {
           CreatedByUserId: user.id,
           FromCollectiveId: fromCollective.id,
           CollectiveId: collective.id,
-          TierId: tier.id,
+          TierId: tier && tier.id,
           quantity,
           totalAmount,
           currency,
