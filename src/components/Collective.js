@@ -95,7 +95,7 @@ class Collective extends React.Component {
       interval: tier.interval
     }
     this.setState({ order });
-    // if (typeof window !== undefined) {
+    // if (typeof window !== "undefined") {
     //   window.state = this.state;
     // }
   }

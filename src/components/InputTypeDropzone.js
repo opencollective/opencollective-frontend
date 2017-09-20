@@ -15,7 +15,7 @@ class InputTypeDropzone extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = { value: props.value || {} };
+    this.state = { value: props.value };
   }
 
   /**
@@ -83,6 +83,7 @@ class InputTypeDropzone extends React.Component {
           .dropzone {
             border: 2px dashed transparent;
             position: relative;
+            min-height: 100px;
           }
           .dropzone .placeholder {
             position:absolute;
@@ -95,10 +96,10 @@ class InputTypeDropzone extends React.Component {
             height: 100%;
             background: rgba(255,255,255,0.4);
           }
-          .dropzone:hover {
+          .dropzone:hover, .dropzone.empty {
             border: 2px dashed grey;
           }
-          .dropzone:hover .placeholder {
+          .dropzone:hover .placeholder, .dropzone.empty .placeholder {
             display: flex;
           }
         `}</style>
@@ -106,7 +107,7 @@ class InputTypeDropzone extends React.Component {
           multiple={false}
           onDrop={this.handleChange}
           placeholder={this.props.placeholder}
-          className={`${this.props.name}-dropzone dropzone`}
+          className={`${this.props.name}-dropzone dropzone ${!this.state.value && 'empty'}`}
           style={{}}
           {...options}
         >

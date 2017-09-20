@@ -2,6 +2,7 @@ import withData from '../lib/withData'
 import withIntl from '../lib/withIntl';
 import React from 'react'
 import { addGetLoggedInUserFunction } from '../graphql/queries';
+import { addCreateOrderMutation } from '../graphql/mutations';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -25,6 +26,7 @@ class DonatePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.createOrder = this.createOrder.bind(this);
     const interval = (props.interval || "").toLowerCase().replace(/ly$/,'');
     this.order = {
       quantity: props.quantity || 1,
@@ -45,6 +47,26 @@ class DonatePage extends React.Component {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     this.setState({LoggedInUser});
+  }
+
+  async createOrder(order) {
+    const { intl, data } = this.props;
+    order.collective = { id: data.Collective.id };
+    if (this.state.LoggedInUser) {
+      delete order.user;
+    }
+    console.log(">>> createOrder", order);
+    try {
+      this.setState({ loading: true});
+      const res = await this.props.createOrder(order);
+      console.log(">>> createOrder response", res);
+      const response = res.data.createOrder;
+      this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
+      window.location.replace(`${window.location.protocol}//${window.location.host}/${response.fromCollective.slug}`);
+    } catch (e) {
+      console.error(">>> createOrder error: ", e);
+      this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
+    }
   }
 
   render() {
@@ -130,4 +152,4 @@ const addData = graphql(gql`
   }
 `);
 
-export default withData(addGetLoggedInUserFunction(addData(withIntl(DonatePage))));
+export default withData(addGetLoggedInUserFunction(addData(addCreateOrderMutation(withIntl(DonatePage)))));

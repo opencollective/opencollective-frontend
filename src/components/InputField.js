@@ -178,16 +178,36 @@ class InputField extends React.Component {
         break;
       case 'dropzone':
         this.input = (
-        <FormGroup>
-          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-          <InputTypeDropzone
-            value={this.state.value}
-            name={field.name}
-            onChange={event => this.handleChange(event)}
-            placeholder={field.placeholder}
-            options={field.options}
-            />
-          {field.description && <HelpBlock>{field.description}</HelpBlock>}
+          <FormGroup>
+          {field.className === 'horizontal' &&
+            <div>
+              <Col componentClass={ControlLabel} sm={3}>
+                {capitalize(field.label)}
+              </Col>
+              <Col sm={9}>
+                <InputTypeDropzone
+                  value={this.state.value}
+                  name={field.name}
+                  onChange={event => this.handleChange(event)}
+                  placeholder={field.placeholder}
+                  options={field.options}
+                  />
+              </Col>
+            </div>
+          }
+          {field.className !== 'horizontal' &&
+            <div>
+              {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+              <InputTypeDropzone
+                value={this.state.value}
+                name={field.name}
+                onChange={event => this.handleChange(event)}
+                placeholder={field.placeholder}
+                options={field.options}
+                />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </div>
+          }
         </FormGroup>
         )
         break;        

@@ -87,7 +87,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    this.setState(obj);
+    this.setState({ ...obj, modified: true });
     window.state = this.state;
   }
 
@@ -153,15 +153,16 @@ class EditCollectiveForm extends React.Component {
       images: [
         {
           name: 'image',
-          className: type,
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
+          className: 'horizontal',
           when: () => this.state.section === 'images'
         },
         {
           name: 'backgroundImage',
           type: 'dropzone',
           placeholder: 'Drop an image or click to upload',
+          className: 'horizontal',
           when: () => this.state.section === 'images'
         }
       ],
@@ -223,10 +224,8 @@ class EditCollectiveForm extends React.Component {
           margin-top: 0;
         }
 
-        .inputField.image {
-          float: left;
-          margin-right: 3rem;
-          max-width: 200px
+        .image .InputTypeDropzone {
+          width: 100px;
         }
 
         .backgroundImage-dropzone {

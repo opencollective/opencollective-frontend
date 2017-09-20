@@ -39,7 +39,7 @@ class EditPaymentMethods extends React.Component {
   editPaymentMethod(index, obj) {
     console.log(">>> editPaymentMethod", index, obj);
     if (obj === null) return this.removePaymentMethod(index);
-    const paymentMethods = this.state.paymentMethods;
+    const paymentMethods = [...this.state.paymentMethods];
     paymentMethods[index] = { ... paymentMethods[index], ...obj };
     console.log(">>> payments methods", paymentMethods);
     this.setState({paymentMethods});
@@ -47,7 +47,7 @@ class EditPaymentMethods extends React.Component {
   }
 
   addPaymentMethod(paymentMethod) {
-    const paymentMethods = this.state.paymentMethods;
+    const paymentMethods = [...this.state.paymentMethods];
     paymentMethods.push(paymentMethod || {});
     this.setState({paymentMethods});
   }
@@ -62,7 +62,6 @@ class EditPaymentMethods extends React.Component {
 
   renderPaymentMethod(paymentMethod, index) {
     const { intl, collective } = this.props;
-    console.log(">>> editPaymentMethods.renderPaymentMethod:", paymentMethod);
     return (
       <div className="paymentMethod" key={`paymentMethod-${index}`}>
         <EditPaymentMethod

@@ -44,7 +44,7 @@ class EditPaymentMethod extends React.Component {
 
   render() {
     const { intl, paymentMethod, currency } = this.props;
-
+    const label = paymentMethod.data && `💳  \xA0\xA0${paymentMethod.data.brand} ${paymentMethod.data.funding} ${paymentMethod.name} - exp ${paymentMethod.data.expMonth}/${paymentMethod.data.expYear}`;
     return (
       <div className="EditPaymentMethod">
         <style global jsx>{`
@@ -53,39 +53,46 @@ class EditPaymentMethod extends React.Component {
           }
         `}</style>
 
-        <div className="createdAt col">{paymentMethod.createdAt}</div>
-        <div className="identifier col">{paymentMethod.identifier}</div>
-        { !this.state.editMode &&
-        <div className="actions">
-          <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>        
-        </div>
-        }
-
-        { this.state.editMode &&
-          <div>
+        <div>
+          { this.state.editMode &&
+          <InputField
+            label="Credit Card"
+            type="creditcard"
+            name="creditcard"
+            value={paymentMethod}
+            className="horizontal"
+            onChange={(creditcard) => this.handleChange({ card: creditcard })}
+            />
+          }
+          { !this.state.editMode &&
+            <Row>
+              <Col sm={12}>
+                <div className="form-group">
+                  <label className="col-sm-3 control-label">Credit Card</label>
+                  <Col sm={9}>
+                    <div className="name col">{label}</div>
+                    <div className="actions">
+                      <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>
+                    </div>
+                  </Col>
+                </div>
+              </Col>
+            </Row>
+          }
+          { this.props.monthlyLimitPerMember &&
             <InputField
-              label="Credit Card"
-              type="creditcard"
-              name="creditcard"
-              value={paymentMethod}
               className="horizontal"
-              onChange={(creditcard) => this.handleChange({ card: creditcard })}
+              label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
+              type="currency"
+              name="monthlyLimitPerMember"
+              pre={getCurrencySymbol(currency)}
+              value={paymentMethod.monthlyLimitPerMember}
+              description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
+              onChange={(value) => this.handleChange({'monthlyLimitPerMember': value})}
               />
-            { this.props.monthlyLimitPerMember &&
-              <InputField
-                className="horizontal"
-                label={capitalize(intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.label']))}
-                type="currency"
-                name="monthlyLimitPerMember"
-                pre={getCurrencySymbol(currency)}
-                value={paymentMethod.monthlyLimitPerMember}
-                description={intl.formatMessage(this.messages['paymentMethod.monthlyLimitPerMember.description'])}
-                onChange={(value) => this.handleChange({'monthlyLimitPerMember': value})}
-                />
-            }
+          }
 
-          </div>
-        }
+        </div>
 
       </div>
     );

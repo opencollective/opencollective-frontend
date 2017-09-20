@@ -99,7 +99,7 @@ class LoginForm extends React.Component {
     }
 
     this.setState(newState);
-    if (typeof window !== undefined) {
+    if (typeof window !== "undefined") {
       window.state = newState;
     }
   }
