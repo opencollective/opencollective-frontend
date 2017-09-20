@@ -26,7 +26,7 @@ const order = {
         "amount": null
     },
     "collective": {
-        "slug": "brusselstogether"
+        "id": 207
     }
   }
 
