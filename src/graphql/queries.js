@@ -16,6 +16,7 @@ export const getLoggedInUserQuery = gql`
         name
         type
         paymentMethods {
+          id
           uuid
           name
           data
@@ -31,6 +32,7 @@ export const getLoggedInUserQuery = gql`
           name
           currency
           paymentMethods {
+            id
             uuid
             name
             data
