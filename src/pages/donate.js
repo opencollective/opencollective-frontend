@@ -37,6 +37,8 @@ class DonatePage extends React.Component {
     };
 
     this.messages = defineMessages({
+      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
+      'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'contribute.title': { id: 'contribute.title', defaultMessage: 'Contribute financially' },
       'tier.name.donation': { id: 'tier.name.donation', defaultMessage: 'donation' },
       'tier.button.donation': { id: 'tier.button.donation', defaultMessage: 'donate' },

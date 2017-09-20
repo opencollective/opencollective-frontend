@@ -48,6 +48,7 @@ class OrderForm extends React.Component {
       'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
+      'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
       'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
@@ -58,7 +59,6 @@ class OrderForm extends React.Component {
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'sponsor.title': { id: 'tier.order.sponsor.title', defaultMessage: 'Become a {name}' },
-      'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
       'firstName.label': { id: 'user.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'user.lastName.label', defaultMessage: 'last name' },
@@ -110,9 +110,6 @@ class OrderForm extends React.Component {
       const stripePublishableKey = (typeof window !== "undefined" && (window.location.hostname === 'localhost' || window.location.hostname === 'staging.opencollective.com')) ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
       Stripe.setPublishableKey(stripePublishableKey);
-      console.log(">>> OrderForm: componentDidMount: window", window);
-      console.log(">>> OrderForm: componentDidMount: hostname", window.location.hostname);
-      console.log(">>> stripePublishableKey", stripePublishableKey);
     }
     this.componentWillReceiveProps(this.props);
   }
