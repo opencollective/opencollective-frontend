@@ -465,7 +465,7 @@ class OrderForm extends React.Component {
             <h2>Payment details</h2>
             <Row>
               <Col sm={12}>
-                { LoggedInUser && LoggedInUser.collective.paymentMethods.length > 1 &&
+                { this.paymentMethodsOptions &&
                   <InputField
                     type="select"
                     className="horizontal"
