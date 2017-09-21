@@ -38,6 +38,18 @@ const cache = {
   HostCollectiveIdForGroupId: {}
 };
 
+const HostCollectiveIdForUserId = {
+    772: 83,   // wwcode
+    3676: 83,  // opensource
+    3676: 566, // operation code
+    1635: 207, // brusselstogether
+    5161: 697, // affcny
+    6478: 816, // dotnet
+    6848: 868, // open collective europe
+    6694: 842, // open collective uk
+    7566: 932  // changex
+  };
+
 const pluralize = (str) => `${str}s`.replace(/s+$/,'s');
 
 const slugify = (str) => {
@@ -68,12 +80,19 @@ const insert = (sequelize, table, entry) => {
 }
 
 const getHostCollectiveId = (sequelize, CollectiveId) => {
+
   if (cache.HostCollectiveIdForGroupId[CollectiveId]) return Promise.resolve(cache.HostCollectiveIdForGroupId[CollectiveId]);
   return sequelize.query(`
-    SELECT c.id as "HostCollectiveId" FROM "Members" m LEFT JOIN "Collectives" c ON c."CreatedByUserId" = m."CreatedByUserId" WHERE m."CollectiveId"=:CollectiveId AND m.role='HOST'
+    SELECT c.id as "HostCollectiveId", c."CreatedByUserId" as "UserId" FROM "Members" m LEFT JOIN "Collectives" c ON c."CreatedByUserId" = m."CreatedByUserId" WHERE m."CollectiveId"=:CollectiveId AND m.role='HOST'
   `, { type: sequelize.QueryTypes.SELECT, replacements: { CollectiveId }})
   .then(ug => {
-    const HostCollectiveId = ug[0] && ug[0].HostCollectiveId || null;
+    let HostCollectiveId;
+    const userid = ug[0] && ug[0].UserId || null;
+    if (userid && HostCollectiveIdForUserId[userid]) {
+      HostCollectiveId = HostCollectiveIdForUserId[userid];
+    } else {
+      HostCollectiveId = ug[0] && ug[0].HostCollectiveId || null;
+    }
     if (!HostCollectiveId) {
       console.error(`No host found for collective id ${CollectiveId}`);
     }
@@ -185,6 +204,7 @@ const createCollectivesForEvents = (sequelize) => {
 const createCollectivesForUsers = (sequelize) => {
 
   const createCollectiveForUser = (user) => {
+
     let name = user.firstName;
     if (user.lastName) {
       name += ` ${user.lastName}`;
@@ -220,9 +240,17 @@ const createCollectivesForUsers = (sequelize) => {
       collective.description = user.description.replace(/<[^>]+>/g,''); // remove <html>
     }
 
-    return insert(sequelize, "Collectives", collective)
-    .then(() => {
-      return getCollectiveIdForUserId(sequelize, user.id).then(CollectiveId => {
+    // don't create a collective for hosts that already have a collective
+    let promise;
+    if (HostCollectiveIdForUserId[user.id]) {
+      console.log(">>> User Id", user.id, "already has a collective id", HostCollectiveIdForUserId[user.id]);
+      promise = Promise.resolve(HostCollectiveIdForUserId[user.id]);
+    } else {
+      promise = insert(sequelize, "Collectives", collective).then(() => getCollectiveIdForUserId(sequelize, user.id));
+    }
+
+    return promise
+      .then(CollectiveId => {
         const promises = [];
         promises.push(sequelize.query(`UPDATE "Users" SET "CollectiveId"=:CollectiveId WHERE id=:UserId`, { replacements: { CollectiveId, UserId: user.id } }));
         promises.push(sequelize.query(`UPDATE "Members" SET "MemberCollectiveId"=:CollectiveId WHERE "CreatedByUserId"=:UserId`, { replacements: { CollectiveId, UserId: user.id } }));
@@ -249,10 +277,9 @@ const createCollectivesForUsers = (sequelize) => {
         }
         return Promise.all(promises);
       })
-    })
-    .catch(e => {
-      console.log(">>> Error inserting collective for user", user.username, "collective", collective, "error:", e);
-    });
+      .catch(e => {
+        console.log(">>> Error inserting collective for user", user.username, "collective", collective, "error:", e);
+      });
   }
 
   return sequelize.query(`
@@ -447,7 +474,7 @@ const updateCollectives = (sequelize) => {
           return true;
         });
         if (!tier) {
-          console.log("No custom tier found for order", JSON.stringify(order));
+          // console.log("No custom tier found for order", JSON.stringify(order));
           // console.log("Custom tiers for Collective: ", JSON.stringify(tiers.filter(t => t.CollectiveId === order.CollectiveId)));
         }
       }

@@ -1,6 +1,26 @@
 const _ = require('lodash');
-const config = require('config');
 import models from '../server/models';
+
+const testStripeAccounts = {
+  'opensource': {
+    service: 'stripe',
+    username: 'acct_18KWlTLzdXg9xKNS',
+    token: 'sk_test_iDWQubtz4ixk0FQg1csgCi6p',
+    data: {
+      publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
+    },
+    CollectiveId: 83
+  },
+  'brussesltogether': {
+    service: 'stripe',
+    username: 'acct_198T7jD8MNtzsDcg',
+    token: 'sk_test_Hcsz2JJdMzEsU28c6I8TyYYK',
+    data: {
+      publishableKey: 'pk_test_OSQ8IaRSyLe9FVHMivgRjQng'
+    },
+    CollectiveId: 207
+  }
+}
 
 const done = (err) => {
   if (err) console.log('err', err);
@@ -8,25 +28,8 @@ const done = (err) => {
   process.exit();
 }
 
-const isTest = (str) => _.contains(str, 'test');
-
-const publicKey = 'pk_test_5aBB887rPuzvWzbdRiSzV3QB';
-const secret = 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j';
-
-
-if (!isTest(publicKey) || !isTest(secret)) {
-  console.log('can only replace with test keys');
-  process.exit();
-}
-
-models.ConnectedAccount.findAll({ where: { service: 'stripe' } })
-.map((stripeAccount) => {
-
-  stripeAccount.token = secret;
-  stripeAccount.data = stripeAccount.data || {};
-  stripeAccount.data.publishableKey = publicKey;
-
-  return stripeAccount.save();
-})
+models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
+.then(() => models.ConnectedAccount.create(testStripeAccounts.opensource))
+.then(() => models.ConnectedAccount.create(testStripeAccounts.brussesltogether))
 .then(() => done())
 .catch(done)
