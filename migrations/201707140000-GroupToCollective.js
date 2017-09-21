@@ -214,7 +214,7 @@ const createCollectivesForUsers = (sequelize) => {
       isActive: true,
       type: user.isOrganization ? 'ORGANIZATION' : 'USER',
       name: name || user.username,
-      slug: user.username,
+      slug: user.username.toLowerCase(),
       logo: user.image, // logo will be renamed to image later on
       CreatedByUserId: user.id,
       tags: '{user}',

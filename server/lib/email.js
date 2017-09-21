@@ -103,7 +103,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
 
   if (process.env.NODE_ENV === 'staging') {
     subject = `[STAGING] ${subject}`;
-  } else if (process.env.NODE_ENV !== 'production'){
+  } else if (process.env.NODE_ENV !== 'production') {
     subject = `[TESTING] ${subject}`;
   }
 
@@ -130,6 +130,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
       let to;
       if (recipients.length > 0) {
         to = recipients.join(', ');
+      }
+      if (process.env.NODE_ENV !== 'production') {
+        to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
       }
       const from = options.from || config.email.from;
       const bcc = options.bcc;
