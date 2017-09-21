@@ -24,7 +24,7 @@ export const getOrCreatePlan = (stripeAccount, plan) => {
 
   return appStripe.plans.retrieve(plan.id, { stripe_account: stripeAccount.username })
     .catch((err) => {
-      if (err.type === 'StripeInvalidRequestError' && _.contains(err.message, 'No such plan')) {
+      if (err.type === 'StripeInvalidRequestError' && _.contains(err.message.toLowerCase(), 'no such plan')) {
         return appStripe.plans.create(plan, { stripe_account: stripeAccount.username });
       }
 

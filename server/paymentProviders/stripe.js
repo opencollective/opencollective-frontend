@@ -48,7 +48,7 @@ export default {
      * and saves it under PaymentMethod.data[hostStripeAccount.username]
      * @param {*} hostStripeAccount
      */
-    const getOrCreatecustomerIdForHost = (hostStripeAccount) => {
+    const getOrCreateCustomerIdForHost = (hostStripeAccount) => {
       const data = paymentMethod.data || {};
       data.customerIdForHost = data.customerIdForHost || {};
       return data.customerIdForHost[hostStripeAccount.username] || stripe.createToken(hostStripeAccount, paymentMethod.customerId)
@@ -172,7 +172,7 @@ export default {
       })
 
       // create a customer on the host stripe account
-      .then(() => getOrCreatecustomerIdForHost(hostStripeAccount))
+      .then(() => getOrCreateCustomerIdForHost(hostStripeAccount))
       .tap(customerId => hostStripeCustomerId = customerId)
 
       // both one-time and subscriptions get charged immediately
