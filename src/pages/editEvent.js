@@ -40,8 +40,8 @@ class EditEventPage extends React.Component {
 
     if (LoggedInUser) {
       LoggedInUser.canEditEvent = (event.createdByUser && event.createdByUser.id === LoggedInUser.id) 
-        || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length
-        || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length;
+        || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length > 0
+        || intersection(LoggedInUser.roles[parentCollectiveSlug], ['HOST','ADMIN']).length > 0;
     }
 
     return (

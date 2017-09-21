@@ -37,6 +37,10 @@ class Expenses extends React.Component {
   render() {
     const { collective, expenses, LoggedInUser } = this.props;
 
+    if (!expenses) {
+      return (<div />);
+    }
+
     return (
       <div className="Expenses">
         <style jsx>{`

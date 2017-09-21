@@ -57,11 +57,12 @@ class Transaction extends React.Component {
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
-            max-height: 6rem;
+            max-height: 6.3rem;
+            position: relative;
           }
           .transaction.detailsView {
             background-color: #fafafa;
-            max-height: 20rem;
+            max-height: 26rem;
           }
           a {
             cursor: pointer;
@@ -90,7 +91,9 @@ class Transaction extends React.Component {
             font-family: montserratlight, arial;
             font-size: 1.6rem;
             font-weight: 300;
-            float:right;
+            position: absolute;
+            right: 0.5rem;
+            top: 1rem;
           }
           .debit .amount {
             color: #e21a60;

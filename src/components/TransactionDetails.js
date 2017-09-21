@@ -49,7 +49,7 @@ class TransactionDetails extends React.Component {
             font-size: 1.2rem;
             overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 15rem;
+            max-height: 19rem;
           }
           .TransactionDetails.closed {
             max-height: 0;

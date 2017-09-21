@@ -181,6 +181,18 @@ class Collective extends React.Component {
             text-align: center;
             font-size: 1.4rem;
           }
+          section {
+            max-width: 900px;
+            margin: 0 auto;
+          }
+          #budget .col {
+            float: left;
+            max-width: 400px;
+            margin: 2rem;
+          }
+          #budget .actions {
+            text-align: center;
+          }
         `}</style>
 
         <Header
@@ -263,36 +275,43 @@ class Collective extends React.Component {
                 </section>
               }
 
-              <section id="expenses">
-                <h1>
-                  <FormattedMessage
-                    id="collective.expenses.title"
-                    values={{ n: this.collective.stats.expenses }}
-                    defaultMessage={`{n, plural, one {Latest transaction} other {Latest expenses}}`}
+              <section id="budget">
+                <div id="expenses" className="col">
+                  <h1>
+                    <FormattedMessage
+                      id="collective.expenses.title"
+                      values={{ n: this.collective.stats.expenses }}
+                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest expenses}}`}
+                      />
+                  </h1>
+                  <ExpensesWithData
+                    collective={this.collective}
+                    LoggedInUser={LoggedInUser}
+                    limit={5}
                     />
-                </h1>
-                <ExpensesWithData
-                  collective={this.collective}
-                  LoggedInUser={LoggedInUser}
-                  limit={5}
-                  />
-              </section>
+                  <div className="actions">
+                    <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
+                  </div>
+                </div>
 
-              <section id="transactions">
-                <h1>
-                  <FormattedMessage
-                    id="collective.transactions.title"
-                    values={{ n: this.collective.stats.transactions }}
-                    defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
+                <div id="transactions" className="col">
+                  <h1>
+                    <FormattedMessage
+                      id="collective.transactions.title"
+                      values={{ n: this.collective.stats.transactions }}
+                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
+                      />
+                  </h1>
+                  <TransactionsWithData
+                    collective={this.collective}
+                    LoggedInUser={LoggedInUser}
+                    limit={5}
                     />
-                </h1>
-                <TransactionsWithData
-                  collective={this.collective}
-                  LoggedInUser={LoggedInUser}
-                  limit={5}
-                  />
+                    <div className="actions">
+                    <Button bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
+                  </div>
+                </div>
               </section>
-
 
             </div>
           </div>

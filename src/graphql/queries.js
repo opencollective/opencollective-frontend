@@ -467,6 +467,7 @@ const getCollectiveCoverQuery = gql`
   query CollectiveCover($slug: String!) {
     Collective(slug: $slug) {
       id
+      type
       slug
       name
       currency

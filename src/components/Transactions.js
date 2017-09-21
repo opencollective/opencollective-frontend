@@ -37,6 +37,10 @@ class Transactions extends React.Component {
   render() {
     const { collective, transactions, LoggedInUser } = this.props;
 
+    if (!transactions) {
+      return (<div />);
+    }
+
     return (
       <div className="Transactions">
         <style jsx>{`
