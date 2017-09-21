@@ -209,7 +209,10 @@ const createCollectivesForUsers = (sequelize) => {
     if (user.lastName) {
       name += ` ${user.lastName}`;
     }
-
+    if (!user.username) {
+      console.log(">>> can't create a collective for a user without a username", user);
+      return;
+    }
     const collective = {
       isActive: true,
       type: user.isOrganization ? 'ORGANIZATION' : 'USER',
