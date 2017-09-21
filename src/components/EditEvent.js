@@ -107,7 +107,7 @@ class EditEvent extends React.Component {
             {!canEditEvent &&
               <div className="login">
                 <p>You need to be logged in as the creator of this event<br />or as a core contributor of the {event.parentCollective.name} collective.</p>
-                <p><Button bsStyle="primary" href={`/signin?next=${event.slug}/edit`}>Login</Button></p>
+                <p><Button bsStyle="primary" href={`/signin?next=/${event.slug}/edit`}>Login</Button></p>
               </div>
             }   
             { canEditEvent &&

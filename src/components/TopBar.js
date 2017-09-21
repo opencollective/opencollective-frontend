@@ -1,5 +1,6 @@
 import React from 'react';
 import TopBarProfileMenu from './TopBarProfileMenu';
+import { Link } from '../server/pages';
 
 const logo = '/static/images/opencollective-icon.svg';
 
@@ -15,6 +16,9 @@ class TopBar extends React.Component {
   componentDidMount() {
     this.onClickOutsideRef = this.onClickOutside.bind(this);
     document.addEventListener('click', this.onClickOutsideRef);
+    if (typeof window !== 'undefined') {
+      this.redirect = window.location.href.replace(/^https?:\/\/[^\/]+/,'');
+    }
   }
 
   componentWillUnmount() {
@@ -154,7 +158,7 @@ class TopBar extends React.Component {
             <li><a href="https://medium.com/open-collective">Blog</a></li>
           </ul>
           <div className="separator"></div>
-          { !LoggedInUser && <a href="/signin?next=/">Login</a> }
+          { !LoggedInUser && <Link route="signin" params={ { next: this.redirect } }><a>Login</a></Link> }
           { LoggedInUser && <TopBarProfileMenu LoggedInUser={LoggedInUser} /> }
         </div>
       </div>

@@ -14,11 +14,10 @@ class LoginPage extends React.Component {
   }
 
   componentDidMount() {
-    console.log(">>> props", this.props);    
     if (this.props.token) {
       window.localStorage.setItem('accessToken', this.props.token);
-      const redirect = this.props.next || '/';
-      Router.pushRoute(redirect.replace(/^https?:\/\/[^\/]+/,''));
+      const redirect = (this.props.next || '/').replace(/^https?:\/\/[^\/]+/,'');
+      Router.pushRoute(redirect);
     }
   }
 
@@ -41,7 +40,7 @@ class LoginPage extends React.Component {
         `}
         </style>
         <Body>
-          <SignInForm />
+          <SignInForm next={this.props.next} />
         </Body>
         <Footer />
 

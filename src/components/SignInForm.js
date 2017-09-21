@@ -5,8 +5,6 @@ import ActionButton from '../components/Button';
 import { Button, HelpBlock, Row, Col, Form, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { isValidEmail } from '../lib/utils';
-import { getStripeToken, isValidCard } from '../lib/stripe';
-import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 
@@ -14,6 +12,7 @@ class LoginForm extends React.Component {
 
   static propTypes = {
     signin: PropTypes.bool,
+    next: PropTypes.string,
     onChange: PropTypes.func.isRequired
   }
 
@@ -113,7 +112,7 @@ class LoginForm extends React.Component {
   }
 
   signin() {
-    signin(this.state.user, window.location.href).then(() => {
+    signin(this.state.user, this.props.next).then(() => {
       this.setState({ loginSent: true, signup: false, isNewUser: false });
     })
   }
