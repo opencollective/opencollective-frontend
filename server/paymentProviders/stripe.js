@@ -40,7 +40,7 @@ export default {
 
     const user = order.createdByUser;
 
-    let hostStripePlan, hostStripeToken, hostStripeCustomerId;
+    let hostStripePlan, hostStripeCustomerId;
 
     /**
      * Get the customerId for the Stripe Account of the Host
@@ -73,11 +73,6 @@ export default {
           currency: order.currency
         })
         .tap(plan => hostStripePlan = plan)
-        // create a customer on the host stripe account
-        .then(() => getOrCreatecustomerIdForHost(hostStripeAccount))
-        .tap(customerId => {
-          hostStripeCustomerId = customerId
-        })
         .then(() => stripe.createSubscription(
           hostStripeAccount,
           hostStripeCustomerId,
@@ -116,7 +111,7 @@ export default {
         {
           amount: order.totalAmount,
           currency: order.currency,
-          source: hostStripeToken.id,
+          customer: hostStripeCustomerId,
           description: order.description,
           application_fee: parseInt(order.totalAmount * constants.OC_FEE_PERCENT / 100, 10),
           metadata: {
@@ -176,9 +171,9 @@ export default {
         }
       })
 
-      // create a token for the host stripe account
-      .then(() => stripe.createToken(hostStripeAccount, paymentMethod.customerId))
-      .tap(token => hostStripeToken = token)
+      // create a customer on the host stripe account
+      .then(() => getOrCreatecustomerIdForHost(hostStripeAccount))
+      .tap(customerId => hostStripeCustomerId = customerId)
 
       // both one-time and subscriptions get charged immediately
       .then(() => createChargeAndTransactions(hostStripeAccount))
