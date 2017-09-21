@@ -42,7 +42,7 @@ export function checkUserExistence(email) {
   if (!isValidEmail(email)) return Promise.resolve(false);
   return fetch(`/api/users/exists?email=${email}`)
     .then(checkResponseStatus)
-    .then(json => Boolean(json.exists));  
+    .then(json => Boolean(json.exists));
 }
 
 export function signin(user, redirect) {

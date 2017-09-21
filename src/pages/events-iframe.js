@@ -27,7 +27,7 @@ class Events extends React.Component {
               <a href={`/${event.collective.slug}/events/${event.slug}`} target="_top">{event.name}</a>, &nbsp;
               <FormattedDate value={event.startsAt} day='numeric' month='long' />, &nbsp;
               {event.location.name}
-            </li>);    
+            </li>);
   }
 
   componentDidUpdate() {

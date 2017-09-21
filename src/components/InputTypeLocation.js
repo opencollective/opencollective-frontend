@@ -33,7 +33,7 @@ class InputTypeLocation extends React.Component {
       long: value.location.lng
     };
     this.setState({value: location});
-    return this.props.onChange(location);    
+    return this.props.onChange(location);
   }
 
   render() {

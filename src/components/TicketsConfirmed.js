@@ -98,7 +98,7 @@ class TicketsConfirmed extends React.Component {
 
           .AddToCalendarBtn {
             text-align: center;
-            margin: 3rem 0 0;            
+            margin: 3rem 0 0;
           }
           `}</style>
           <style jsx global>{`

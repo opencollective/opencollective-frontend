@@ -126,7 +126,7 @@ class TopBar extends React.Component {
           height: 30px;
           height: 40px;
           background-color: #e6e6e6;
-          vertical-align: middle;          
+          vertical-align: middle;
         }
         .nav a {
           box-sizing: border-box;
@@ -141,7 +141,7 @@ class TopBar extends React.Component {
         }
         .nav a:last-child {
           margin-right: 0;
-          padding-right: 0;          
+          padding-right: 0;
         }
 
         @media(max-width: 380px) {

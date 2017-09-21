@@ -82,7 +82,7 @@ class Button extends React.Component {
           color: ${colors.blue};
           background: white;
           background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
-          border: solid 1px rgba(0, 0, 0, 0.15);          
+          border: solid 1px rgba(0, 0, 0, 0.15);
         }
         .whiteblue.small {
           width: 20rem;
@@ -90,12 +90,12 @@ class Button extends React.Component {
         .whiteblue:hover {
           background-image: linear-gradient(to bottom, #ffffff, #f3f6f8);
           box-shadow: 0 0 4px 0 rgba(63, 175, 240, 0.4);
-          border: solid 1px #3faff0;          
+          border: solid 1px #3faff0;
         }
         .whiteblue:active {
           background-image: linear-gradient(to top, #ffffff, #f3f6f8);
           box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.05);
-          border: solid 1px rgba(0, 0, 0, 0.15);          
+          border: solid 1px rgba(0, 0, 0, 0.15);
         }
         .blue {
           color: white;
@@ -105,11 +105,11 @@ class Button extends React.Component {
           background-image: linear-gradient(to bottom, #52bbf8, #2fa8ee);
         }
         .blue:hover {
-          background-image: linear-gradient(to bottom, #7acfff, #4cbeff);          
+          background-image: linear-gradient(to bottom, #7acfff, #4cbeff);
         }
         .blue:active {
           background-image: linear-gradient(to top, #52bbf8, #2fa8ee);
-          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.1);          
+          box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.1);
         }
         .gray {
           color: ${colors.darkgray};

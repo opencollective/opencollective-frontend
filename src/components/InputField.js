@@ -210,7 +210,7 @@ class InputField extends React.Component {
           }
         </FormGroup>
         )
-        break;        
+        break;
 
       case 'currency':
         this.input = (

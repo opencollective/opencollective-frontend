@@ -48,7 +48,7 @@ class ExpenseDetails extends React.Component {
           .col {
             float: left;
             display: flex;
-            flex-direction: column;         
+            flex-direction: column;
             margin-right: 1rem;
             margin-top: 1rem;
           }

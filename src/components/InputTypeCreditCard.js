@@ -60,7 +60,7 @@ class InputTypeCreditCard extends React.Component {
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <style jsx>{`
         .CreditCardForm {
-          max-width: 350px;          
+          max-width: 350px;
         }
         .CreditCardForm :global(.form-group) {
           margin: 0;

@@ -80,6 +80,14 @@ class Transaction extends React.Component {
           }
           .body {
             overflow: hidden;
+            font-size: 1.5rem;
+          }
+          .description {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 85%;
+            overflow: hidden;
+            display: block;
           }
           .meta {
             color: #919599;
@@ -89,7 +97,7 @@ class Transaction extends React.Component {
             width: 10rem;
             text-align: right;
             font-family: montserratlight, arial;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 300;
             position: absolute;
             right: 0.5rem;
@@ -127,9 +135,11 @@ class Transaction extends React.Component {
           </a>
         </div>
         <div className="body">
-        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
-          {capitalize(title)}
-        </a>
+          <div className="description">
+            <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
+              {capitalize(title)}
+            </a>
+          </div>
           <div className="meta">
             {capitalize(meta.join(' '))}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>

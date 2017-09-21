@@ -87,7 +87,7 @@ class Profile extends React.Component {
                 <div id="collectives">
                   <style jsx>{`
                     #collectives :global(.tier) {
-                      margin: 4rem auto;            
+                      margin: 4rem auto;
                     }
                   `}</style>
                   {this.user.collectives.map((collective) =>

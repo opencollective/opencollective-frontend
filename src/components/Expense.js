@@ -51,6 +51,7 @@ class Expense extends React.Component {
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
             max-height: 6rem;
+            position: relative;
           }
           .expense.detailsView {
             background-color: #fafafa;
@@ -72,6 +73,14 @@ class Expense extends React.Component {
           }
           .body {
             overflow: hidden;
+            font-size: 1.5rem;
+          }
+          .description {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 85%;
+            overflow: hidden;
+            display: block;
           }
           .meta {
             color: #919599;
@@ -81,9 +90,11 @@ class Expense extends React.Component {
             width: 10rem;
             text-align: right;
             font-family: montserratlight, arial;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 300;
-            float:right;
+            position: absolute;
+            right: 0.5rem;
+            top: 1rem;
           }
           .rejected .amount, .rejected .status {
             color: #e21a60;
@@ -121,12 +132,14 @@ class Expense extends React.Component {
           </a>
         </div>
         <div className="body">
-        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
-          {capitalize(title)}
-        </a>
+          <div className="description">
+            <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/expenses/${expense.uuid}` once we have a page for it */}
+              {capitalize(title)}
+            </a>
+          </div>
           <div className="meta">
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
-            {capitalize(expense.category)}
+            {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
           {this.state.loadDetails && 

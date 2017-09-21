@@ -28,7 +28,7 @@ class EventTemplatePicker extends React.Component {
   }
 
   renderEventEntry(event) {
-    return (<option key={event.id} value={event.id}>{event.name}</option>);    
+    return (<option key={event.id} value={event.id}>{event.name}</option>);
   }
 
   render() {

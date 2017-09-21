@@ -190,7 +190,7 @@ class Tier extends React.Component {
             font-size: 1.2rem;
             color: #494b4d;
             background-color: transparent;
-            border: solid 1px #dcdfe1;            
+            border: solid 1px #dcdfe1;
           }
         `}</style>
         <div>
