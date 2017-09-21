@@ -366,18 +366,9 @@ const mutations = {
 
       })
       // Check the existence of the tier
-      // We may have to find it since it can be omitted (e.g. /donate page)
-      // This is questionable: e.g. if someone donates $100/month, should we consider that donor as a sponsor?
       .then(() => {
-        const where = {
-          amount: order.totalAmount / (order.quantity || 1),
-          interval: order.interval,
-          CollectiveId: collective.id          
-        };
-        if (order.tier && order.tier.id) {
-          where.id = order.tier.id;
-        }
-        return models.Tier.getOrFind(where);
+        if (!order.tier) return;
+        return models.Tier.findById(order.tier.id);
       })
       .then(t => {
         tier = t; // we may not have a tier
@@ -475,6 +466,7 @@ const mutations = {
           privateMessage: order.privateMessage,
           processedAt: paymentRequired ? null : new Date
         };
+
         return models.Order.create(orderData)
       })
 
