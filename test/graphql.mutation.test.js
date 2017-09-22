@@ -511,7 +511,10 @@ describe('Mutation Tests', () => {
                   name,
                   description,
                   maxQuantity,
-                  availableQuantity
+                  stats {
+                    totalOrders
+                    availableQuantity
+                  }
                 },
                 fromCollective {
                   id,
@@ -545,11 +548,14 @@ describe('Mutation Tests', () => {
               },
               "id": 1,
               "tier": {
-                "availableQuantity": 8,
                 "description": "free tickets for all",
                 "id": 1,
                 "maxQuantity": 10,
-                "name": "Free ticket"
+                "name": "Free ticket",
+                "stats": {
+                  "availableQuantity": 8,
+                  "totalOrders": 0
+                }
               },
               "createdByUser": {
                 "email": null,
@@ -563,17 +569,19 @@ describe('Mutation Tests', () => {
           const query = `
             mutation createOrder($order: OrderInputType!) {
               createOrder(order: $order) {
-                id,
+                id
                 createdByUser {
-                  id,
+                  id
                   email
-                },
+                }
                 tier {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
-                  availableQuantity
+                  id
+                  name
+                  description
+                  maxQuantity
+                  stats {
+                    availableQuantity
+                  }
                 }
               }
             }
@@ -592,11 +600,13 @@ describe('Mutation Tests', () => {
             "createOrder": {
               "id": 1,
               "tier": {
-                "availableQuantity": 8,
                 "description": "free tickets for all",
                 "id": 1,
                 "maxQuantity": 10,
-                "name": "Free ticket"
+                "name": "Free ticket",
+                "stats": {                  
+                  "availableQuantity": 8,
+                }
               },
               "createdByUser": {
                 "email": null,
@@ -624,7 +634,9 @@ describe('Mutation Tests', () => {
                   name,
                   description,
                   maxQuantity,
-                  availableQuantity
+                  stats {
+                    availableQuantity
+                  }
                 },
                 collective {
                   id,
@@ -656,7 +668,9 @@ describe('Mutation Tests', () => {
             "createOrder": {
               "id": 1,
               "tier": {
-                "availableQuantity": 98,
+                "stats": {
+                  "availableQuantity": 98,
+                },
                 "description": "$20 ticket",
                 "id": 2,
                 "maxQuantity": 100,
@@ -698,7 +712,9 @@ describe('Mutation Tests', () => {
                   name,
                   description,
                   maxQuantity,
-                  availableQuantity
+                  stats {
+                    availableQuantity
+                  }
                 },
                 collective {
                   id,
@@ -731,11 +747,13 @@ describe('Mutation Tests', () => {
               "createOrder": {
                 "id": 1,
                 "tier": {
-                  "availableQuantity": 98,
                   "description": "$20 ticket",
                   "id": 2,
                   "maxQuantity": 100,
-                  "name": "paid ticket"
+                  "name": "paid ticket",
+                  "stats": {
+                    "availableQuantity": 98,                    
+                  }
                 },
                 "createdByUser": {
                   "email": null,

@@ -26,9 +26,7 @@ const queries = {
   Collective: {
     type: CollectiveInterfaceType,
     args: {
-      slug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
+      slug: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args) {
       return models.Collective.findBySlug(args.slug);
@@ -38,9 +36,7 @@ const queries = {
   Tier: {
     type: TierType,
     args: {
-      id: {
-        type: new GraphQLNonNull(GraphQLInt)
-      }
+      id: { type: new GraphQLNonNull(GraphQLInt) }
     },
     resolve(_, args) {
       return models.Tier.findById(args.id);
@@ -162,6 +158,7 @@ const queries = {
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
+      type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
@@ -169,6 +166,17 @@ const queries = {
       const query = { where: { CollectiveId: args.CollectiveId } }
       if (args.TierId) query.where.TierId = args.TierId;
       if (args.role) query.where.role = args.role;
+      if (args.type) {
+        const types = args.type.split(',');
+        query.include = [
+          {
+            model: models.Collective,
+            as: 'memberCollective',
+            required: true,
+            where: { type: { $in: types } }
+          }
+        ]
+      }
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       return models.Member.findAll(query);

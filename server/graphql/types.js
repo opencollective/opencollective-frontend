@@ -152,7 +152,7 @@ export const MemberType = new GraphQLObjectType({
       tier: {
         type: TierType,
         resolve(member, args, req) {
-          return member.TierId && req.loaders.tiers.load(member.TierId);
+          return member.TierId && req.loaders.tiers.findById.load(member.TierId);
         }
       }
     }
@@ -274,6 +274,37 @@ export const ExpenseType = new GraphQLObjectType({
   }
 });
 
+export const StatsTierType = new GraphQLObjectType({
+  name: 'StatsTierType',
+  description: 'Stats about a tier',
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.id;
+        }
+      },
+      totalOrders: {
+        description: 'total number of individual orders',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          return req.loaders.tiers.totalOrders.load(tier.id);
+        }
+      },
+      availableQuantity: {
+        type: GraphQLInt,
+        resolve(tier) {
+          return tier.availableQuantity()
+          // graphql doesn't like infinity value
+          .then(availableQuantity => availableQuantity === Infinity ? 10000000 : availableQuantity);
+        }
+      }
+    }
+  }
+});
+
 export const TierType = new GraphQLObjectType({
   name: 'Tier',
   description: 'This represents an Tier',
@@ -351,24 +382,10 @@ export const TierType = new GraphQLObjectType({
           return tier.maxQuantityPerUser;
         }
       },
-      availableQuantity: {
-        type: GraphQLInt,
-        resolve(tier) {
-          return tier.availableQuantity()
-          // graphql doesn't like infinity value
-          .then(availableQuantity => availableQuantity === Infinity ? 10000000 : availableQuantity);
-        }
-      },
       goal: {
         type: GraphQLInt,
         resolve(tier) {
           return tier.goal;
-        }
-      },
-      totalAmount: {
-        type: GraphQLInt,
-        resolve(tier) {
-          return tier.totalAmount();
         }
       },
       password: {
@@ -403,8 +420,43 @@ export const TierType = new GraphQLObjectType({
       },
       orders: {
         type: new GraphQLList(OrderType),
+        args: {
+          limit: { type: GraphQLInt }
+        },
+        resolve(tier, args) {
+          return tier.getOrders({
+            where: { processedAt: { $ne: null } },
+            limit: args.limit
+          });
+        }
+      },
+      stats: {
+        type: StatsTierType,
         resolve(tier) {
-          return tier.getOrders({ where: { processedAt: { $ne: null } } });
+          return tier;
+        }
+      }
+    }
+  }
+});
+
+export const StatsOrderType = new GraphQLObjectType({
+  name: 'StatsOrderType',
+  description: 'Stats about an order',
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching (key: __typename+id)
+      id: {
+        type: GraphQLInt,
+        resolve(order) {
+          return order.id;
+        }
+      },
+      totalTransactions: {
+        description: 'total of all the transactions for this order (includes past recurring transactions)',
+        type: GraphQLInt,
+        resolve(order, args, req) {
+          return req.loaders.transactions.totalAmountForOrderId.load(order.id);
         }
       }
     }
@@ -449,11 +501,10 @@ export const OrderType = new GraphQLObjectType({
           return order.getSubscription();
         }
       },
-      totalTransactions: {
-        description: 'total of all the transactions for this order (includes past recurring transactions)',
-        type: GraphQLInt,
-        resolve(order, args, req) {
-          return req.loaders.transactions.totalAmountForOrderId.load(order.id);
+      stats: {
+        type: StatsOrderType,
+        resolve(order) {
+          return order;
         }
       },
       createdByUser: {

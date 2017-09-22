@@ -252,7 +252,10 @@ describe('Query Tests', () => {
                   name,
                   description,
                   maxQuantity,
-                  availableQuantity,
+                  stats {
+                    availableQuantity,
+                    totalOrders
+                  }
                   orders {
                     id,
                     description,
@@ -291,7 +294,10 @@ describe('Query Tests', () => {
                       name: tier3.name,
                       description: tier3.description,
                       "maxQuantity": 10,
-                      "availableQuantity": 10,
+                      "stats": {
+                        "availableQuantity": 10,
+                        "totalOrders": 0
+                      },
                       orders: []
                     }
                   ]
@@ -317,7 +323,10 @@ describe('Query Tests', () => {
                       "name": ticket1.name,
                       "description":"free tickets for all",
                       "maxQuantity": 10,
-                      "availableQuantity": 7,
+                      "stats": {
+                        "availableQuantity": 7,
+                        "totalOrders": 3
+                      },
                       "orders": [
                         {
                           "id": 1,
@@ -342,7 +351,10 @@ describe('Query Tests', () => {
                       "name": ticket2.name,
                       "description": "$20 ticket",
                       "maxQuantity": 100,
-                      "availableQuantity": 98,
+                      "stats": {
+                        "availableQuantity": 98,
+                        "totalOrders": 1
+                      },
                       "orders": [
                         {
                           "id": 4,

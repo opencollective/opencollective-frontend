@@ -368,7 +368,11 @@ const mutations = {
       // Check the existence of the tier
       .then(() => {
         if (!order.tier) return;
-        return models.Tier.findById(order.tier.id);
+        return models.Tier.findById(order.tier.id)
+          .then(tier => {
+            if (!tier) throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${collective.slug}`);
+            return tier;
+          })
       })
       .then(t => {
         tier = t; // we may not have a tier

@@ -29,13 +29,13 @@ export const loaders = (req) => {
       balance: new DataLoader(ids => models.Transaction.findAll({
           attributes: [
             'CollectiveId',
-            [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'total' ]
+            [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'balance' ]
           ],
           where: { CollectiveId: { $in: ids } },
           group: ['CollectiveId']
         })
         .then(results => sortResults(ids, results, 'CollectiveId'))
-        .map(result => get(result, 'dataValues.totalAmount') || 0)
+        .map(result => get(result, 'dataValues.balance') || 0)
       )
     },
     // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
@@ -44,10 +44,21 @@ export const loaders = (req) => {
       .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId'))
       .map(result => result || {})
     ),
-    tiers: new DataLoader(ids => models.Tier
-      .findAll({ where: { id: { $in: ids }}})
-      .then(results => sortResults(ids, results, 'id'))
-    ),
+    tiers: {
+      findById: new DataLoader(ids => models.Tier
+        .findAll({ where: { id: { $in: ids }}})
+        .then(results => sortResults(ids, results, 'id'))),
+      totalOrders: new DataLoader(ids => models.Order.findAll({
+        attributes: [
+          'TierId',
+          [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
+        ],
+        where: { TierId: { $in: ids } },
+        group: ['TierId']
+      })
+      .then(results => sortResults(ids, results, 'TierId'))
+      .map(result => get(result, 'dataValues.count') || 0))
+  },
     paymentMethods: new DataLoader(ids => models.PaymentMethod
       .findAll({ where: { id: { $in: ids }}})
       .then(results => sortResults(ids, results, 'id'))

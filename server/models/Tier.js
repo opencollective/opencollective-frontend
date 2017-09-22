@@ -175,12 +175,6 @@ export default function(Sequelize, DataTypes) {
     .then(available => (available - quantityNeeded >= 0))
   };
 
-  // Get the total amount of money raised with this tier
-  // TODO: Implement
-  Tier.prototype.totalAmount = function() {
-    return 0; // xdamman: NOT IMPLEMENTED (need to add ResponseId to Transaction model)
-  };
-
   /**
    * Class Methods
    */

@@ -334,6 +334,7 @@ const updateResponses = (sequelize) => {
             CollectiveId: CollectiveId,
             CreatedByUserId: response.UserId,
             TierId: response.TierId,
+            quantity: response.quantity || 1,
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
             deletedAt: response.deletedAt,
@@ -345,8 +346,8 @@ const updateResponses = (sequelize) => {
   }
 
   return sequelize.query(`SELECT r.*, t.amount FROM "Responses" r LEFT JOIN "Tiers" t ON r."TierId"=t.id`, { type: sequelize.QueryTypes.SELECT })
-  .then(responses => Promise.map(responses, updateResponse, { concurrency: 10 }))
-
+    .then(responses => Promise.map(responses, updateResponse, { concurrency: 10 }))
+    .then(() => sequelize.query(`UPDATE "Orders" SET quantity=1 WHERE quantity IS NULL OR quantity=0`));
 }
 
 const updateStripeAccounts = (sequelize) => {
