@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
 import ActionButton from '../components/Button';
-import { Button, HelpBlock, Row, Col, Form, FormControl } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 
@@ -15,6 +15,7 @@ class OrderForm extends React.Component {
 
   static propTypes = {
     order: PropTypes.object.isRequired, // { tier: {}, quantity: Int, interval: String, totalAmount: Int }
+    collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     onSubmit: PropTypes.func.isRequired
   }
@@ -200,7 +201,6 @@ class OrderForm extends React.Component {
     if (value === 'null') {
       value = null;
     }
-
     if (value !== undefined) {
       newState[obj][attr] = value;
     } else if (attr === null) {
@@ -309,9 +309,10 @@ class OrderForm extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, collective } = this.props;
     const { LoggedInUser } = this.state;
     const quantity = this.state.order.quantity || 1;
+    const currency = this.state.tier.currency || collective.currency;
     const showNewCreditCardForm = !this.state.creditcard.uuid || this.state.creditcard.uuid === 'other';
 
     const inputEmail = {
@@ -533,26 +534,51 @@ class OrderForm extends React.Component {
           </Row>
         </div>
 
-        <div className="actions">
-          <div className="submit">
-            <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
-              {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : this.state.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
-            </ActionButton>
+        { this.state.order.totalAmount > 0 && !collective.host &&
+          <div className="error">
+            <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
           </div>
-          <div className="result">
-              {this.state.loading && <div className="loading">Processing...</div>}
-              {this.state.result.success &&
-                <div className="success">
-                  {this.state.result.success}
-                </div>
-              }
-              {this.state.result.error && 
-                <div className="error">
-                  {this.state.result.error}
-                </div>
-              }
+        }
+        { (collective.host || this.state.order.totalAmount === 0) &&
+          <div className="actions">
+            <div className="submit">
+              <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
+                {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : this.state.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+              </ActionButton>
+            </div>
+            <div className="disclaimer">
+              <FormattedMessage
+                id="collective.host.disclaimer"
+                defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
+                values={
+                  {
+                    hostname: collective.host.name,
+                    amount: formatCurrency(this.state.order.totalAmount, currency),
+                    interval: this.state.tier.interval,
+                    collective: collective.name
+                  }
+                } />
+                { this.state.tier.interval &&
+                  <div>
+                    <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
+                  </div>
+                }
+            </div>
+            <div className="result">
+                {this.state.loading && <div className="loading">Processing...</div>}
+                {this.state.result.success &&
+                  <div className="success">
+                    {this.state.result.success}
+                  </div>
+                }
+                {this.state.result.error && 
+                  <div className="error">
+                    {this.state.result.error}
+                  </div>
+                }
+            </div>
           </div>
-        </div>
+        }
           
       </Form>
         

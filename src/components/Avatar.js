@@ -1,3 +1,3 @@
 export default ({src, radius}) => (
-  <img src={src} width={radius} height={radius} style={{borderRadius: '50%' }} />
+  <img className="avatar" src={src} width={radius} height={radius} style={{borderRadius: '50%' }} />
 )

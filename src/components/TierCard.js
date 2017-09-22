@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../constants/colors';
-import { formatCurrency } from '../lib/utils';
-import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { getCurrencySymbol, capitalize } from '../lib/utils';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import withIntl from '../lib/withIntl';
 import Avatar from './Avatar';
+import Logo from './Logo';
 import { Router } from '../server/pages';
+import { Link } from '../server/pages';
 
 class Tier extends React.Component {
 
@@ -30,10 +28,59 @@ class Tier extends React.Component {
       'year': { id: 'tier.interval.year', defaultMessage: 'year' },
       'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
       'interval.month': { id: 'tier.interval.monthly', defaultMessage: 'monthly' },
-      'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' }
+      'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' },
+      'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
+      'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
+      'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'}
     });
 
   }
+
+  showLastOrders(fromCollectiveTypeArray, limit) {
+    const { tier, intl } = this.props;
+    const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => fromCollectiveTypeArray.indexOf(c.type) !== -1);
+    if (fromCollectives.length === 0) return;
+    const additionalCollectives = fromCollectives.length - fromCollectives.slice(0, limit).length;
+    return (
+      <div>
+        <style jsx>{`
+          .fromCollectives {
+            display: flex;
+            flex-wrap: wrap;
+          }
+          .totalOrders {
+            width: 81px;
+            height: 14px;
+            font-family: Rubik;
+            font-size: 12px;
+            text-align: left;
+            color: #9ea2a6;
+            color: var(--cool-grey);
+            margin: 0 1rem;
+          }
+        `}</style>
+        <div className="fromCollectives">
+          { fromCollectives.slice(0, limit).map(fromCollective => (
+            <div className="image" key={`image-${fromCollective.id}`}>
+              <Link route={`/${fromCollective.slug}`}><a title={fromCollective.name}>
+                { fromCollectiveTypeArray.indexOf('USER') !== -1 &&
+                  <Avatar src={fromCollective.image} radius={32} />
+                }
+                { fromCollectiveTypeArray.indexOf('USER') === -1 &&
+                  <Logo src={fromCollective.image} height={32} />
+                }
+              </a></Link>
+            </div>
+          ))}
+        </div>
+        { additionalCollectives > 0 &&
+          <div className="totalOrders">
+            + {additionalCollectives} {intl.formatMessage(this.messages[`collective.types.${fromCollectiveTypeArray[0].toLowerCase()}`], { n: additionalCollectives })}
+          </div>
+        }
+      </div>
+    );
+  }  
 
   render() {
 
@@ -50,11 +97,13 @@ class Tier extends React.Component {
             --attention: #e69900;
             --gunmetal: #505559;
           }
-          .avatar img {
-            border: 2px solid white;
+          .image img {
+            border: 2px solid white;            
+          }
+          .avatar {
             margin-left: -15px;
           }
-          .avatar:first img {
+          .avatar:first {
             margin-left: 0;
           }
         `}</style>
@@ -109,19 +158,6 @@ class Tier extends React.Component {
             align-items: center;
             margin: 3rem;
           }
-          .lastOrders {
-            display: flex;
-          }
-          .totalOrders {
-            width: 81px;
-            height: 14px;
-            font-family: Rubik;
-            font-size: 12px;
-            text-align: left;
-            color: #9ea2a6;
-            color: var(--cool-grey);
-            margin: 0 1rem;
-          }
           .action {
             margin-top: 1rem;
             width: 280px;
@@ -160,14 +196,8 @@ class Tier extends React.Component {
             <div className="divider" />
             <div className="footer">
               <div className="lastOrders">
-                {tier.orders.map(order => (
-                  <div className="avatar" key={`avatar-${order.fromCollective.id}`}>
-                    <Avatar src={order.fromCollective.image} radius={32} />
-                  </div>
-                ))}
-              </div>
-              <div className="totalOrders">
-                <FormattedMessage id="tier.totalOrders" values={ { n: (tier.stats.totalOrders - tier.orders.length) } } defaultMessage="+ {n} people" />
+              {this.showLastOrders(['USER'], 10)}
+              {this.showLastOrders(['ORGANIZATION', 'COLLECTIVE'], 10)}
               </div>
             </div>
           </div>

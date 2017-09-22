@@ -118,6 +118,7 @@ class DonatePage extends React.Component {
 
           <div className="content">
             <OrderForm
+              collective={collective}
               order={this.order}
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}

@@ -371,6 +371,7 @@ class Event extends React.Component {
               {this.state.view == 'GetTicket' &&
                 <div className="content" >              
                   <OrderForm
+                    collective={this.event}
                     onSubmit={this.createOrder}
                     quantity={this.state.order.quantity}
                     tier={this.state.order.tier || event.tiers[0]}

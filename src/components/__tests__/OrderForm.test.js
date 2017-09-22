@@ -35,7 +35,12 @@ describe("OrderForm component", () => {
       interval: 'month'
     }
   }
-
+  const collective = {
+    host: {
+      name: "host name",
+      slug: "host"
+    }
+  }
   const order = {
     totalAmount: 1000,
     interval: 'month',
@@ -58,13 +63,13 @@ describe("OrderForm component", () => {
 
   describe('error messages', () => {
     it('creditcard.missing', () => {
-      const component = mountComponent({ order })
+      const component = mountComponent({ collective, order })
       component.find('.submit button').simulate('click');
       expect(component.find('.result .error').text()).toEqual("Mmmm... 🤔 looks like you forgot to provide your credit card details.");
     });
 
     it('creditcard.error', (done) => {
-      const component = mountComponent({ order })
+      const component = mountComponent({ collective, order })
 
       const card = {
         CCnumber: '424242424242424',

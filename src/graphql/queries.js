@@ -264,10 +264,17 @@ const getCollectiveQuery = gql`
           fromCollective {
             id
             slug
+            type
             name
             image
           }
         }
+      }
+      host {
+        id
+        slug
+        name
+        image
       }
       memberOf {
         id
@@ -461,6 +468,11 @@ const getCollectiveTierQuery = gql`
       backgroundImage
       settings
       image
+      host {
+        id
+        name
+        slug
+      }
     }
     Tier(id: $TierId) {
       id
