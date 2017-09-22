@@ -66,7 +66,7 @@ const queries = {
         where: { CollectiveId: args.CollectiveId },
         order: [ ['id', 'DESC'] ]
       };
-      if (args.type) query.where = { type: args.type };
+      if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       return models.Transaction.findAll(query);

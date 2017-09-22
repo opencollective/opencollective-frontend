@@ -135,6 +135,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
+      host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
         args: {
@@ -300,6 +301,14 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.slug;
+      }
+    },
+    host: {
+      description: 'Get the host collective that is receiving the money on behalf of this collective',
+      type: CollectiveInterfaceType,
+      resolve(collective, args, req) {
+        if (!collective.HostCollectiveId) return null;
+        return req.loaders.collective.findById.load(collective.HostCollectiveId);
       }
     },
     members: {

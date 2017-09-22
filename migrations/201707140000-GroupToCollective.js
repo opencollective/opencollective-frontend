@@ -83,15 +83,15 @@ const getHostCollectiveId = (sequelize, CollectiveId) => {
 
   if (cache.HostCollectiveIdForGroupId[CollectiveId]) return Promise.resolve(cache.HostCollectiveIdForGroupId[CollectiveId]);
   return sequelize.query(`
-    SELECT c.id as "HostCollectiveId", c."CreatedByUserId" as "UserId" FROM "Members" m LEFT JOIN "Collectives" c ON c."CreatedByUserId" = m."CreatedByUserId" WHERE m."CollectiveId"=:CollectiveId AND m.role='HOST'
+    SELECT m."MemberCollectiveId" as "HostCollectiveId", c."CreatedByUserId" as "UserId" FROM "Members" m LEFT JOIN "Collectives" c ON c."CreatedByUserId" = m."CreatedByUserId" WHERE m."CollectiveId"=:CollectiveId AND m.role='HOST'
   `, { type: sequelize.QueryTypes.SELECT, replacements: { CollectiveId }})
   .then(ug => {
     let HostCollectiveId;
-    const userid = ug[0] && ug[0].UserId || null;
+    const userid = ug[0] && ug[0].UserId;
     if (userid && HostCollectiveIdForUserId[userid]) {
       HostCollectiveId = HostCollectiveIdForUserId[userid];
     } else {
-      HostCollectiveId = ug[0] && ug[0].HostCollectiveId || null;
+      HostCollectiveId = ug[0] && ug[0].HostCollectiveId;
     }
     if (!HostCollectiveId) {
       console.error(`No host found for collective id ${CollectiveId}`);
@@ -525,7 +525,10 @@ const updateCollectives = (sequelize) => {
       .tap(id => HostCollectiveId = id)
       .then(ParentCollectiveId => {
         const createdAt = collective.createdAt || collective.updatedAt;
-        // if (!HostCollectiveId) throw new Error(`Unable to update collective ${collective.id}: No HostCollectiveId for collective ${collective.slug}`);
+        if (!HostCollectiveId) {
+          console.log(`Unable to update collective ${collective.id}: No HostCollectiveId for collective ${collective.slug}`);
+          return null;
+        }
         return sequelize.query(`UPDATE "Collectives" SET "HostCollectiveId"=:HostCollectiveId, "ParentCollectiveId"=:ParentCollectiveId, "createdAt"=:createdAt WHERE id=:id AND type='COLLECTIVE'`,
           { replacements: { id: collective.id, HostCollectiveId, ParentCollectiveId, createdAt } });
       })
