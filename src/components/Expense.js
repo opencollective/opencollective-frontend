@@ -96,10 +96,10 @@ class Expense extends React.Component {
             right: 0.5rem;
             top: 1rem;
           }
-          .rejected .amount, .rejected .status {
+          .rejected .status {
             color: #e21a60;
           }
-          .paid .amount, .approved .status {
+          .approved .status {
             color: #72ce00;
           }
 

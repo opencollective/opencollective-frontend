@@ -14,7 +14,7 @@ class MembersWithData extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    tier: PropTypes.object,    
+    tier: PropTypes.object,
     limit: PropTypes.number,
     LoggedInUser: PropTypes.object
   }
@@ -43,7 +43,7 @@ class MembersWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, tier, role } = this.props;
+    const { data, LoggedInUser, tier, role, type } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -59,8 +59,11 @@ class MembersWithData extends React.Component {
     }
 
     members.sort((a, b) => b.totalDonations - a.totalDonations);
-    const size = members.length > 50 ? 'small' : 'large';
-    const viewMode = tier && tier.name.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
+    const size = members.length > 50 ? "small" : "large";
+    let viewMode = (type && type.split(',')[0]) || "USER";
+    if (tier && tier.name.match(/sponsor/i)) {
+      viewMode = "ORGANIZATION";
+    }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
       <div className="MembersContainer">
@@ -111,6 +114,7 @@ class MembersWithData extends React.Component {
               key={member.id}
               member={member}
               className={`${this.props.className} ${size}`}
+              collective={this.props.collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
               />
@@ -131,11 +135,12 @@ class MembersWithData extends React.Component {
 }
 
 const getMembersQuery = gql`
-query Members($CollectiveId: Int!, $TierId: Int!, $role: String, $limit: Int, $offset: Int) {
-  allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, limit: $limit, offset: $offset) {
+query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $limit: Int, $offset: Int) {
+  allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, type: $type, limit: $limit, offset: $offset) {
     id
     role
     createdAt
+    totalDonations
     tier {
       id
       name
@@ -157,6 +162,8 @@ export const addMembersData = graphql(getMembersQuery, {
         CollectiveId: props.collective.id,
         TierId: props.tier && props.tier.id,
         offset: 0,
+        type: props.type,
+        role: props.role,
         limit: props.limit || MEMBERS_PER_PAGE * 2
       }
     }

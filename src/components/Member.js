@@ -7,14 +7,13 @@ import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'rea
 import { pickAvatar } from '../lib/collective.lib';
 import { firstSentence, singular, capitalize } from '../lib/utils';
 import CollectiveCard from './CollectiveCard';
-
-const star = '/static/images/icons/star.svg';
-
+import Currency from './Currency';
 
 class Member extends React.Component {
 
   static propTypes = {
     member: PropTypes.object.isRequired,
+    collective: PropTypes.object.isRequired,
     viewMode: PropTypes.string
   }
 
@@ -33,8 +32,9 @@ class Member extends React.Component {
   }
 
   render() {
-    const { viewMode } = this.props;
-    const membership = this.props.member;
+    const { viewMode, collective } = this.props;
+    const membership = { ...this.props.member };
+    membership.collective = collective;
     const { member, description } = membership;
 
     const user = member.user || {};
@@ -85,6 +85,7 @@ class Member extends React.Component {
 
         .bubble {
           padding: 1rem;
+          text-align: left;
           overflow: hidden;
         }
 
@@ -101,18 +102,11 @@ class Member extends React.Component {
           font-size: 1.7rem;
         }
 
-        .description, .since {
+        .description, .meta {
           font-family: 'lato';
           font-size: 1.4rem;
         }
 
-        .star {
-          width: 14px;
-          height: 14px;
-          position: absolute;
-          top: 45px;
-          left: 0;
-        }
         `}</style>          
         <div>
           { viewMode === 'USER' &&
@@ -121,11 +115,18 @@ class Member extends React.Component {
               <div className="bubble">
                 <div className="name">{name}</div>
                 <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
-                <div className="since" style={{color: colors.darkgray}}>
+                <div className="meta since" style={{color: colors.darkgray}}>
                   {tierName && capitalize(tierName)} &nbsp;
                   <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
                   <FormattedDate value={membership.createdAt} month='long' year='numeric' />
                 </div>
+                { membership.totalDonations > 0 &&
+                  <div className="meta totalDonations" style={{color: colors.darkgray}}>
+                    <FormattedMessage id='membership.totalDonations' defaultMessage={`Total amount contributed`} />
+                    <span>: </span>
+                    <Currency value={membership.totalDonations} currency={collective.currency} />
+                  </div>
+                }
               </div>
             </a>
           }

@@ -30,8 +30,8 @@ class EditTiers extends React.Component {
     this.defaultType = this.props.defaultType || 'TICKET';
 
     this.messages = defineMessages({
-      'TIER': { id: 'tier.type.tier', defaultMessage: 'tier' },
-      'TICKET': { id: 'tier.type.ticket', defaultMessage: 'ticket' },
+      'TIER': { id: 'tier.type.tier', defaultMessage: 'tier (only one per order)' },
+      'TICKET': { id: 'tier.type.ticket', defaultMessage: 'ticket (allow multiple tickets per order)' },
       'TIER.remove': { id: 'tier.type.tier.remove', defaultMessage: 'remove tier' },
       'TICKET.remove': { id: 'tier.type.ticket.remove', defaultMessage: 'remove ticket' },
       'BACKER.remove': { id: 'tier.type.backer.remove', defaultMessage: 'remove tier' },
@@ -50,7 +50,10 @@ class EditTiers extends React.Component {
       'year': { id: 'tier.interval.year', defaultMessage: 'yearly' },
       'description.label': { id: 'tier.description.label', defaultMessage: 'description' },
       'startsAt.label': { id: 'tier.startsAt.label', defaultMessage: 'start date and time' },
-      'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'end date and time' },
+      'endsAt.label': { id: 'tier.endsAt.label', defaultMessage: 'Expiration' },
+      'endsAt.description': { id: 'tier.endsAt.description', defaultMessage: 'Date and time until when this tier should be available' },
+      'maxQuantity.label': { id: 'tier.maxQuantity.label', defaultMessage: 'Available quantity' },
+      'maxQuantity.description': { id: 'tier.maxQuantity.description', defaultMessage: 'Leave it empty for unlimited' }
     });
 
     const getOptions = (arr) => {
@@ -90,6 +93,12 @@ class EditTiers extends React.Component {
         options: getOptions(['onetime','month','year']),
         label: intl.formatMessage(this.messages['interval.label']),
         when: (tier) => tier.type && tier.type !== 'TICKET'
+      },
+      {
+        name: 'maxQuantity',
+        type: 'text',
+        label: intl.formatMessage(this.messages['maxQuantity.label']),
+        description: intl.formatMessage(this.messages['maxQuantity.description'])
       }
     ];
   }
@@ -106,7 +115,7 @@ class EditTiers extends React.Component {
     console.log("editTier", index, fieldname, value);
     tiers[index] = { ...tiers[index], type: tiers[index]['type'] || this.defaultType, [fieldname]:value} ;
     this.setState({tiers});
-    this.onChange(tiers);
+    this.onChange({tiers});
   }
 
   addTier(tier) {
@@ -120,7 +129,7 @@ class EditTiers extends React.Component {
     if (index < 0 || index > tiers.length) return;
     tiers = [...tiers.slice(0, index), ...tiers.slice(index+1)];
     this.setState({tiers});
-    this.onChange(tiers);
+    this.onChange({tiers});
   }
 
   renderTier(tier, index) {
@@ -138,6 +147,7 @@ class EditTiers extends React.Component {
             key={field.name}
             name={field.name}
             label={field.label}
+            description={field.description}
             type={field.type}
             defaultValue={field.defaultValue}
             value={tier[field.name]}

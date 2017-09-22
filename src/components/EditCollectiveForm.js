@@ -87,6 +87,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
+    console.log(">>> handleObjectChange", obj);
     this.setState({ ...obj, modified: true });
     window.state = this.state;
   }

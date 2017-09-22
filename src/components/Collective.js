@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import OrderForm from '../components/OrderForm';
+import TierCard from '../components/TierCard';
 import NotificationBar from '../components/NotificationBar';
 import MembersWithData from '../components/MembersWithData';
 import { addCreateOrderMutation } from '../graphql/mutations';
@@ -136,26 +136,34 @@ class Collective extends React.Component {
     const actions = [
       {
         className: 'whiteblue',
-        component: <HashLink to={`#backers`}>
-            <FormattedMessage
-              id="collective.backers"
-              defaultMessage={`{n} {n, plural, one {backer} other {backers}}`}
-              values={{ n: this.collective.stats.backers}}
-              />
-          </HashLink>        
-      },
-      {
-        className: 'whiteblue',
         component: <HashLink to={`#sponsors`}>
-            <FormattedMessage
-              id="collective.sponsors"
-              defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
-              values={{ n: this.collective.stats.sponsors}}
-              />
+              { this.collective.stats.sponsors > 0 &&
+                <div>
+                  <FormattedMessage
+                    id="collective.stats.sponsors"
+                    defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
+                    values={{ n: this.collective.stats.sponsors}}
+                    />
+                </div>
+              }
+              <FormattedMessage
+                id="collective.stats.backers"
+                defaultMessage={`{n} {n, plural, one {backer} other {backers}}`}
+                values={{ n: this.collective.stats.backers}}
+                />
           </HashLink>
       },
       {
         className: 'whiteblue',
+        component: <HashLink to={`#budget`}>
+            <FormattedMessage
+              id="collective.budget"
+              defaultMessage="budget"
+              />
+          </HashLink>
+      },
+      {
+        className: 'blue',
         component: <Link route={`/${this.collective.slug}/contribute`}><a>
             <FormattedMessage
               id="collective.contribute"
@@ -177,11 +185,16 @@ class Collective extends React.Component {
     return (
       <div className="CollectivePage">
         <style jsx>{`
+          .sidebar {
+            float: right;
+            margin: 3rem;
+          }
           .tier {
             text-align: center;
             font-size: 1.4rem;
           }
           section {
+            clear: both;
             max-width: 900px;
             margin: 0 auto;
           }
@@ -223,36 +236,43 @@ class Collective extends React.Component {
 
             <div>
 
-              { this.state.view === 'OrderTier' &&
-                <div className="content" >              
-                  <OrderForm
-                    onSubmit={this.createOrder}
-                    order={this.state.order}
-                    LoggedInUser={this.props.LoggedInUser}
+              <section id="about">
+                <div className="sidebar">
+                  { tiers.map(tier => (
+                    <TierCard collective={this.collective} tier={tier} />
+                  ))}
+                </div>
+
+                <div className="content" >
+                  <div className="longDescription" >
+                    <Markdown source={this.collective.longDescription || this.collective.description} />
+                  </div>
+                </div>
+              </section>
+
+              <section id="sponsors" className="tier">
+                <div className="content" >
+                  <h1>Sponsors</h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="ORGANIZATION,COLLECTIVE"
+                    role='BACKER'
+                    limit={100}
                     />
                 </div>
-              }
+              </section>
 
-              <div className="content" >
-                <div className="longDescription" >
-                  <Markdown source={this.collective.longDescription || this.collective.description} />
+              <section id="backers" className="tier">
+                <div className="content" >
+                  <h1>Backers</h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="USER"
+                    role='BACKER'
+                    limit={100}
+                    />
                 </div>
-              </div>
-
-              { tiers.map(tier => (
-                <section id={tier.slug} className="tier">
-                  <div className="content" >
-                    <h1>{tier.name}</h1>
-                    <p>{tier.description}</p>
-                    <Button bsStyle="primary" onClick={() => this.handleOrderTier(tier)}>{tier.button}</Button>
-                    <MembersWithData
-                      collective={this.collective}
-                      tier={tier}
-                      limit={100}
-                      />
-                  </div>
-                </section>
-              ))}
+              </section>
 
               { this.collective.memberOf.length > 0 &&
                 <section id="hosting">

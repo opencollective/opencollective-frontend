@@ -151,14 +151,33 @@ class InputField extends React.Component {
       case 'datetime':
         this.input = (
         <FormGroup>
-          {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-          <DateTime
-            name={field.name}
-            value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
-            isValidDate={field.validate}
-            onChange={date => this.handleChange(date.toISOString())} 
-            />
-          {field.description && <HelpBlock>{field.description}</HelpBlock>}
+          {field.className === 'horizontal' &&
+            <div>
+              <Col componentClass={ControlLabel} sm={3}>
+                {capitalize(field.label)}
+              </Col>
+              <Col sm={9}>
+                <DateTime
+                  name={field.name}
+                  value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
+                  isValidDate={field.validate}
+                  onChange={date => this.handleChange(date.toISOString())}
+                  />
+              </Col>
+            </div>
+          }
+          {field.className !== 'horizontal' &&
+            <div>
+              {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
+              <DateTime
+                name={field.name}
+                value={moment.tz(new Date(this.state.value || field.defaultValue), context.timezone)}
+                isValidDate={field.validate}
+                onChange={date => this.handleChange(date.toISOString())}
+                />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </div>
+          }
         </FormGroup>
         )
         break;
@@ -223,7 +242,7 @@ class InputField extends React.Component {
           help={field.description}
           placeholder={field.placeholder}
           className={field.className}
-          value={(this.state.value||0)/100}
+          defaultValue={(field.value || field.defaultValue || 0)/100}
         />
         )
         break;
@@ -298,7 +317,6 @@ class InputField extends React.Component {
             width: 100%;
           }
           .inputField {
-            overflow: hidden;
             margin: 1rem 0;
           }
         `}</style>

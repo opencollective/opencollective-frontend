@@ -28,7 +28,7 @@ class CollectiveCard extends React.Component {
 
     const logo = collective.image || pickLogo(collective.id);
     const tierName = membership.tier ? membership.tier.name : membership.role;
-    const currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : collective.currency;
+    const currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
 
     return (
       <a className={`CollectiveCard ${collective.type}`} onClick={this.onClick} >

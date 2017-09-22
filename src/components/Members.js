@@ -5,11 +5,12 @@ import Member from './Member';
 class Members extends React.Component {
 
   static propTypes = {
-    members: PropTypes.arrayOf(PropTypes.object).isRequired
+    members: PropTypes.arrayOf(PropTypes.object).isRequired,
+    collective: PropTypes.object.isRequired
   }
 
   render() {
-    const { className } = this.props;
+    const { className, collective } = this.props;
     const members = [...this.props.members];
     members.sort((a, b) => b.totalDonations - a.totalDonations);
     if (!members || members.length === 0) return (<div />);
@@ -36,6 +37,7 @@ class Members extends React.Component {
             key={`member${index}`}
             className={`${this.props.className} ${size}`}
             member={member}
+            collective={collective}
             viewMode={viewMode}
             />
         )}
