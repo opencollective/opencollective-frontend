@@ -800,10 +800,13 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getHostId = function() {
+    if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
+
     const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where
+      where,
+      logging: console.log
     }).then(member => member && member.MemberCollectiveId);
   };
 
@@ -812,17 +815,17 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getHostStripeAccount = function() {
-    let HostId;
+    let HostCollectiveId;
     return this.getHostId()
       .then(id => {
-        HostId = id
-        debug("getHostStripeAccount", "HostId", id);
+        HostCollectiveId = id
+        debug("getHostStripeAccount for collective", this.slug, `(id: ${this.id})`, "HostCollectiveId", id);
         return id && models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: id } });
       })
       .then(stripeAccount => {
         debug("getHostStripeAccount", "using stripe account", stripeAccount && stripeAccount.username);
         if (!stripeAccount || !stripeAccount.token) {
-          return Promise.reject(new Error(`The host for the ${this.name} collective has no Stripe account set up (HostId: ${HostId})`));
+          return Promise.reject(new Error(`The host for the ${this.name} collective has no Stripe account set up (HostCollectiveId: ${HostCollectiveId})`));
         } else if (process.env.NODE_ENV !== 'production' && _.includes(stripeAccount.token, 'live')) {
           return Promise.reject(new Error(`You can't use a Stripe live key on ${process.env.NODE_ENV}`));
         } else {

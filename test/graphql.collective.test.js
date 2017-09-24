@@ -51,7 +51,9 @@ describe('graphql.collective.test.js', () => {
             id
             publicMessage
             createdAt
+            stats {
             totalTransactions
+            }
             fromCollective {
               id
               name
