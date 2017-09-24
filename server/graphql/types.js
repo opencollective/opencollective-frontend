@@ -171,7 +171,7 @@ export const LocationType = new GraphQLObjectType({
 });
 
 export const ExpenseType = new GraphQLObjectType({
-  name: 'Expense',
+  name: 'ExpenseType',
   description: 'This represents an Expense',
   fields: () => {
     return {

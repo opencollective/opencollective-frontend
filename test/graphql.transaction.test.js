@@ -128,14 +128,14 @@ describe('graphql.transaction.test.js', () => {
       const limit = 10;
       const offset = 5;
       const query = `
-        query allTransactions($slug: String!, $limit: Int, $offset: Int, $type: String) {
-          allTransactions(slug: $slug, limit: $limit, offset: $offset, type: $type) {
+        query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int, $type: String) {
+          allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset, type: $type) {
             id,
             type
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset, type: 'CREDIT' });
+      const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset, type: 'CREDIT' });
       result.errors && console.log(result.errors);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
@@ -149,8 +149,8 @@ describe('graphql.transaction.test.js', () => {
       const limit = 10;
       const offset = 5;
       const query = `
-        query allTransactions($slug: String!, $limit: Int, $offset: Int) {
-          allTransactions(slug: $slug, limit: $limit, offset: $offset) {
+        query allTransactions($CollectiveId: Int!, $limit: Int, $offset: Int) {
+          allTransactions(CollectiveId: $CollectiveId, limit: $limit, offset: $offset) {
             id,
             type,
             createdByUser {
@@ -188,7 +188,7 @@ describe('graphql.transaction.test.js', () => {
           }
         }
       `;
-      const result = await utils.graphqlQuery(query, { slug: "wwcodeaustin", limit, offset });
+      const result = await utils.graphqlQuery(query, { CollectiveId: 2, limit, offset });
       result.errors && console.error(result.errors[0]);
       expect(result.errors).to.not.exist;
       const transactions = result.data.allTransactions;
@@ -197,7 +197,7 @@ describe('graphql.transaction.test.js', () => {
       const expense = transactions.find(t => t.type === 'DEBIT');
       expect(expense.attachment).to.equal(null);
       return models.User.findOne({ where: { id: expense.createdByUser.id } }).then(async (user) => {
-        const result2 = await utils.graphqlQuery(query, { slug: "wwcodeaustin" }, user);
+        const result2 = await utils.graphqlQuery(query, { CollectiveId: 2 }, user);
         result2.errors && console.error(result2.errors[0]);
         const transactions2 = result2.data.allTransactions;
         expect(result.errors).to.not.exist;
