@@ -554,7 +554,7 @@ describe('Mutation Tests', () => {
                 "name": "Free ticket",
                 "stats": {
                   "availableQuantity": 8,
-                  "totalOrders": 0
+                  "totalOrders": 1
                 }
               },
               "createdByUser": {
