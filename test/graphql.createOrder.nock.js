@@ -2,297 +2,516 @@ import nock from 'nock';
 
 export default function() {
 
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKT2DjPFcHOcTmfCxCpyZP","object":"token","card":{"id":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292772,"livemode":false,"type":"card","used":false});
-
-    nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKT2DjPFcHOcTmfCxCpyZP&description=https%3A%2F%2Fopencollective.com%2Fjohn-smith&email=jsmith%40email.com")
-    .reply(200, {"id":"cus_BJyPTmamzhTAA6","object":"customer","account_balance":0,"created":1504292774,"currency":null,"default_source":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","delinquent":false,"description":"https://opencollective.com/jsmith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyPTmamzhTAA6","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyPTmamzhTAA6/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyPTmamzhTAA6/subscriptions"}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKT2DjPFcHOcTmfCxCpyZP&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyPTmamzhTAA6","object":"customer","account_balance":0,"created":1504292774,"currency":null,"default_source":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","delinquent":false,"description":"https://opencollective.com/jsmith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyPTmamzhTAA6","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyPTmamzhTAA6/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyPTmamzhTAA6/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKT2DjPFcHOcTmfCxCpyZP&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyPTmamzhTAA6","object":"customer","account_balance":0,"created":1504292774,"currency":null,"default_source":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","delinquent":false,"description":"https://opencollective.com/jsmith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyPTmamzhTAA6","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyPTmamzhTAA6/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyPTmamzhTAA6/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKT5D8MNtzsDcgvYij5uhg&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyPTmamzhTAA6","object":"customer","account_balance":0,"created":1504292774,"currency":null,"default_source":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","delinquent":false,"description":"https://opencollective.com/jsmith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKT1DjPFcHOcTmOKGr2Yjz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyPTmamzhTAA6","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyPTmamzhTAA6/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyPTmamzhTAA6/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyPTmamzhTAA6")
-    .times(2)
-    .reply(200, {"id":"tok_1AxKT5D8MNtzsDcgvYij5uhg","object":"token","card":{"id":"card_1AxKT5D8MNtzsDcgJDLbUaL1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292775,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', /amount=20000&currency=EUR&source=tok_1AxKT5D8MNtzsDcgvYij5uhg&description=Donation%20to%20BrusselsTogether%20\(donor\)&application_fee=[0-9]+&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=[0-9]+/)
-    .reply(200, {"id":"ch_1AxKT5D8MNtzsDcg8rQ3dhmS","object":"charge","amount":20000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKT5D8MNtzsDcglgMkSN8N","balance_transaction":"txn_1AxKT5D8MNtzsDcgnrbjh49r","captured":true,"created":1504292775,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/jsmith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKT5D8MNtzsDcg8rQ3dhmS/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKT5D8MNtzsDcgJDLbUaL1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/charges', /amount=1000&currency=EUR&source=tok_1AxKT5D8MNtzsDcgvYij5uhg&description=Monthly%20donation%20to%20BrusselsTogether%20\(donor\)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=[0-9]+/)
-    .reply(200, {"id":"ch_1AxKT5D8MNtzsDcg8rQ3dhmS","object":"charge","amount":20000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKT5D8MNtzsDcglgMkSN8N","balance_transaction":"txn_1AxKT5D8MNtzsDcgnrbjh49r","captured":true,"created":1504292775,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/jsmith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKT5D8MNtzsDcg8rQ3dhmS/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKT5D8MNtzsDcgJDLbUaL1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', /amount=154300&currency=EUR&source=tok_1AxKT5D8MNtzsDcgvYij5uhg&description=Donation%20to%20BrusselsTogether%20\(donor\)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fjohn-smith&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=jsmith%40email.com&metadata%5BPaymentMethodId%5D=[0-9]+/)
-    .reply(200, {"id":"ch_1AxKT5D8MNtzsDcg8rQ3dhmS","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKT5D8MNtzsDcglgMkSN8N","balance_transaction":"txn_1AxKT5D8MNtzsDcgnrbjh49r","captured":true,"created":1504292775,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/jsmith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKT5D8MNtzsDcg8rQ3dhmS/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKT5D8MNtzsDcgJDLbUaL1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKT5D8MNtzsDcgnrbjh49r')
-    .reply(200, {"id":"txn_1AxKT5D8MNtzsDcgnrbjh49r","object":"balance_transaction","amount":154300,"available_on":1504828800,"created":1504292775,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":142085,"source":"ch_1AxKT5D8MNtzsDcg8rQ3dhmS","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKT5D8MNtzsDcg8rQ3dhmS"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/charges/ch_1AxKT5D8MNtzsDcg8rQ3dhmS')
-    .reply(200, {"id":"ch_1AxKT5D8MNtzsDcg8rQ3dhmS","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKT5D8MNtzsDcglgMkSN8N","balance_transaction":"txn_1AxKT5D8MNtzsDcgnrbjh49r","captured":true,"created":1504292775,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/jsmith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKT5D8MNtzsDcg8rQ3dhmS/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKT5D8MNtzsDcgJDLbUaL1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKTFDjPFcHOcTmXfeIlswP","object":"token","card":{"id":"card_1AxKTEDjPFcHOcTmrI7GIz4f","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292785,"livemode":false,"type":"card","used":false});
-
-    nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTFDjPFcHOcTmXfeIlswP&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyQ3EVC7JrNwk","object":"customer","account_balance":0,"created":1504292786,"currency":null,"default_source":"card_1AxKTEDjPFcHOcTmrI7GIz4f","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTEDjPFcHOcTmrI7GIz4f","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQ3EVC7JrNwk","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQ3EVC7JrNwk/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQ3EVC7JrNwk/subscriptions"}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQ3EVC7JrNwk")
-    .reply(200, {"id":"tok_1AxKTHD8MNtzsDcgo0VrtcqF","object":"token","card":{"id":"card_1AxKTHD8MNtzsDcgHNgqWc0p","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292787,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=154300&currency=EUR&source=tok_1AxKTHD8MNtzsDcgo0VrtcqF&description=Donation%20to%20BrusselsTogether%20(donor)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4167")
-    .reply(200, {"id":"ch_1AxKTID8MNtzsDcgGnof1E6E","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTID8MNtzsDcgqKurBIIp","balance_transaction":"txn_1AxKTID8MNtzsDcgamyXbheG","captured":true,"created":1504292788,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4167"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTID8MNtzsDcgGnof1E6E/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTHD8MNtzsDcgHNgqWc0p","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKTID8MNtzsDcgamyXbheG')
-    .reply(200, {"id":"txn_1AxKTID8MNtzsDcgamyXbheG","object":"balance_transaction","amount":154300,"available_on":1504828800,"created":1504292788,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":142085,"source":"ch_1AxKTID8MNtzsDcgGnof1E6E","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKTID8MNtzsDcgGnof1E6E"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/charges/ch_1AxKTID8MNtzsDcgGnof1E6E')
-    .reply(200, {"id":"ch_1AxKTID8MNtzsDcgGnof1E6E","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTID8MNtzsDcgqKurBIIp","balance_transaction":"txn_1AxKTID8MNtzsDcgamyXbheG","captured":true,"created":1504292788,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4167"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTID8MNtzsDcgGnof1E6E/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTHD8MNtzsDcgHNgqWc0p","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKTRDjPFcHOcTmmOJe3XqM","object":"token","card":{"id":"card_1AxKTRDjPFcHOcTmJrmwggZr","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292797,"livemode":false,"type":"card","used":false});
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTRDjPFcHOcTmmOJe3XqM&description=https%3A%2F%2Fopencollective.com%2Fundefined&email=")
-    .reply(200, {"id":"cus_BJyQCvyvaeXZw0","object":"customer","account_balance":0,"created":1504292797,"currency":null,"default_source":"card_1AxKTRDjPFcHOcTmJrmwggZr","delinquent":false,"description":"https://opencollective.com/undefined","discount":null,"email":null,"livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTRDjPFcHOcTmJrmwggZr","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQCvyvaeXZw0","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQCvyvaeXZw0/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQCvyvaeXZw0/subscriptions"}});
-  nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQCvyvaeXZw0")
-    .reply(200, {"id":"tok_1AxKTTD8MNtzsDcg96oBoHNz","object":"token","card":{"id":"card_1AxKTTD8MNtzsDcga9hXPAN4","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292799,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=154300&currency=EUR&source=tok_1AxKTTD8MNtzsDcg96oBoHNz&description=Donation%20to%20BrusselsTogether%20(donor)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4167")
-    .reply(200, {"id":"ch_1AxKTUD8MNtzsDcgHZvcumEW","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTUD8MNtzsDcgAZfB9A27","balance_transaction":"txn_1AxKTUD8MNtzsDcgobnIYezy","captured":true,"created":1504292800,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4167"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTUD8MNtzsDcgHZvcumEW/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTTD8MNtzsDcga9hXPAN4","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKTUD8MNtzsDcgobnIYezy')
-    .reply(200, {"id":"txn_1AxKTUD8MNtzsDcgobnIYezy","object":"balance_transaction","amount":154300,"available_on":1504828800,"created":1504292800,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":142085,"source":"ch_1AxKTUD8MNtzsDcgHZvcumEW","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKTUD8MNtzsDcgHZvcumEW"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/charges/ch_1AxKTUD8MNtzsDcgHZvcumEW')
-    .reply(200, {"id":"ch_1AxKTUD8MNtzsDcgHZvcumEW","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTUD8MNtzsDcgAZfB9A27","balance_transaction":"txn_1AxKTUD8MNtzsDcgobnIYezy","captured":true,"created":1504292800,"currency":"eur","customer":null,"description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4167"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTUD8MNtzsDcgHZvcumEW/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTTD8MNtzsDcga9hXPAN4","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKTdDjPFcHOcTmA8wkYgpR","object":"token","card":{"id":"card_1AxKTcDjPFcHOcTmCJm1HfAw","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292809,"livemode":false,"type":"card","used":false});
-  nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTdDjPFcHOcTmA8wkYgpR&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyQ7nTUwrMxHM","object":"customer","account_balance":0,"created":1504292810,"currency":null,"default_source":"card_1AxKTcDjPFcHOcTmCJm1HfAw","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTcDjPFcHOcTmCJm1HfAw","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQ7nTUwrMxHM","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQ7nTUwrMxHM/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQ7nTUwrMxHM/subscriptions"}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQ7nTUwrMxHM")
-    .reply(200, {"id":"tok_1AxKTfD8MNtzsDcgCWYKPPyf","object":"token","card":{"id":"card_1AxKTfD8MNtzsDcgnonW3zaf","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292811,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=1000&currency=EUR&source=tok_1AxKTfD8MNtzsDcgCWYKPPyf&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4167")
-    .reply(200, {"id":"ch_1AxKTfD8MNtzsDcgLkWZ9E2d","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTgD8MNtzsDcg8rQGp2sK","balance_transaction":"txn_1AxKTgD8MNtzsDcgext1znat","captured":true,"created":1504292811,"currency":"eur","customer":null,"description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4167"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTfD8MNtzsDcgLkWZ9E2d/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTfD8MNtzsDcgnonW3zaf","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKTgD8MNtzsDcgext1znat')
-    .reply(200, {"id":"txn_1AxKTgD8MNtzsDcgext1znat","object":"balance_transaction","amount":1000,"available_on":1504828800,"created":1504292811,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":896,"source":"ch_1AxKTfD8MNtzsDcgLkWZ9E2d","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKTfD8MNtzsDcgLkWZ9E2d"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/plans/EUR-MONTH-1000')
-    .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQ7nTUwrMxHM")
-    .reply(200, {"id":"tok_1AxKTiD8MNtzsDcgCDfLCOCX","object":"token","card":{"id":"card_1AxKTiD8MNtzsDcg6Yh3qizm","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292814,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTiD8MNtzsDcgCDfLCOCX&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyQVA8hlDFlWT","object":"customer","account_balance":0,"created":1504292814,"currency":null,"default_source":"card_1AxKTiD8MNtzsDcg6Yh3qizm","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTiD8MNtzsDcg6Yh3qizm","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQVA8hlDFlWT","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQVA8hlDFlWT/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQVA8hlDFlWT/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyQVA8hlDFlWT/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4167/)
-    .reply(200, {"id":"sub_BJyQGzLbysaPvz","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292815,"current_period_end":1506884809,"current_period_start":1504292815,"customer":"cus_BJyQVA8hlDFlWT","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKTjD8MNtzsDcgioUK57sH","object":"subscription_item","created":1504292816,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyQGzLbysaPvz"},"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4167"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292815,"status":"trialing","tax_percent":null,"trial_end":1506884809,"trial_start":1504292815});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyPTmamzhTAA6/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4167/)
-    .reply(200, {"id":"sub_BJyQGzLbysaPvz","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292815,"current_period_end":1506884809,"current_period_start":1504292815,"customer":"cus_BJyPTmamzhTAA6","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKTjD8MNtzsDcgioUK57sH","object":"subscription_item","created":1504292816,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyQGzLbysaPvz"},"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4167"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292815,"status":"trialing","tax_percent":null,"trial_end":1506884809,"trial_start":1504292815});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/subscriptions/sub_BJyQGzLbysaPvz')
-    .reply(200, {"id":"sub_BJyQGzLbysaPvz","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292815,"current_period_end":1506884809,"current_period_start":1504292815,"customer":"cus_BJyQVA8hlDFlWT","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKTjD8MNtzsDcgioUK57sH","object":"subscription_item","created":1504292816,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyQGzLbysaPvz"},"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4167"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292815,"status":"trialing","tax_percent":null,"trial_end":1506884809,"trial_start":1504292815});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKTrDjPFcHOcTm2LucVJ2A","object":"token","card":{"id":"card_1AxKTrDjPFcHOcTmtcSuYyiJ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292823,"livemode":false,"type":"card","used":false});
-  nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTrDjPFcHOcTm2LucVJ2A&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=jsmith%40email.com")
-    .reply(200, {"id":"cus_BJyQGTr6Kbw1HH","object":"customer","account_balance":0,"created":1504292825,"currency":null,"default_source":"card_1AxKTrDjPFcHOcTmtcSuYyiJ","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTrDjPFcHOcTmtcSuYyiJ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQGTr6Kbw1HH","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQGTr6Kbw1HH/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQGTr6Kbw1HH/subscriptions"}});
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQGTr6Kbw1HH")
-    .reply(200, {"id":"tok_1AxKTuD8MNtzsDcg7pkCMQzd","object":"token","card":{"id":"card_1AxKTuD8MNtzsDcgD6sAi0lQ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292826,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=1000&currency=EUR&source=tok_1AxKTuD8MNtzsDcg7pkCMQzd&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=jsmith%40email.com&metadata%5BPaymentMethodId%5D=4169")
-    .reply(200, {"id":"ch_1AxKTvD8MNtzsDcg0aVnrVIC","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKTvD8MNtzsDcgh9AMBq6f","balance_transaction":"txn_1AxKTvD8MNtzsDcgRhYjvp10","captured":true,"created":1504292827,"currency":"eur","customer":null,"description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4169"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKTvD8MNtzsDcg0aVnrVIC/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKTuD8MNtzsDcgD6sAi0lQ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKTvD8MNtzsDcgRhYjvp10')
-    .reply(200, {"id":"txn_1AxKTvD8MNtzsDcgRhYjvp10","object":"balance_transaction","amount":1000,"available_on":1504828800,"created":1504292827,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":896,"source":"ch_1AxKTvD8MNtzsDcg0aVnrVIC","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKTvD8MNtzsDcg0aVnrVIC"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/plans/EUR-MONTH-1000')
-    .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQGTr6Kbw1HH")
-    .reply(200, {"id":"tok_1AxKTwD8MNtzsDcgGOyx17t6","object":"token","card":{"id":"card_1AxKTwD8MNtzsDcgn2tTnroz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292828,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKTwD8MNtzsDcgGOyx17t6&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=jsmith%40email.com")
-    .reply(200, {"id":"cus_BJyQ7BydrxggVO","object":"customer","account_balance":0,"created":1504292829,"currency":null,"default_source":"card_1AxKTwD8MNtzsDcgn2tTnroz","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKTwD8MNtzsDcgn2tTnroz","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQ7BydrxggVO","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQ7BydrxggVO/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQ7BydrxggVO/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyQ7BydrxggVO/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4169/)
-    .reply(200, {"id":"sub_BJyQ89tfURY8V5","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292830,"current_period_end":1506884824,"current_period_start":1504292830,"customer":"cus_BJyQ7BydrxggVO","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKTyD8MNtzsDcgPj64F6wk","object":"subscription_item","created":1504292830,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyQ89tfURY8V5"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4169"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292830,"status":"trialing","tax_percent":null,"trial_end":1506884824,"trial_start":1504292830});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKU6DjPFcHOcTmh1MFbuNH","object":"token","card":{"id":"card_1AxKU5DjPFcHOcTmIhS7VFOR","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292838,"livemode":false,"type":"card","used":false});
-
-    nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKU6DjPFcHOcTmh1MFbuNH&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyQWc8yn6V32a","object":"customer","account_balance":0,"created":1504292839,"currency":null,"default_source":"card_1AxKU5DjPFcHOcTmIhS7VFOR","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKU5DjPFcHOcTmIhS7VFOR","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyQWc8yn6V32a","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyQWc8yn6V32a/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyQWc8yn6V32a/subscriptions"}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQWc8yn6V32a")
-    .reply(200, {"id":"tok_1AxKU8D8MNtzsDcgHcpYef7U","object":"token","card":{"id":"card_1AxKU8D8MNtzsDcg5CoUzTwY","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292840,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=1000&currency=EUR&source=tok_1AxKU8D8MNtzsDcgHcpYef7U&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4168")
-    .reply(200, {"id":"ch_1AxKU8D8MNtzsDcgrMcieD5j","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKU9D8MNtzsDcgMLaS7dyJ","balance_transaction":"txn_1AxKU9D8MNtzsDcgOciLwOdn","captured":true,"created":1504292840,"currency":"eur","customer":null,"description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKU8D8MNtzsDcgrMcieD5j/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKU8D8MNtzsDcg5CoUzTwY","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKU9D8MNtzsDcgOciLwOdn')
-    .reply(200, {"id":"txn_1AxKU9D8MNtzsDcgOciLwOdn","object":"balance_transaction","amount":1000,"available_on":1504828800,"created":1504292840,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":896,"source":"ch_1AxKU8D8MNtzsDcgrMcieD5j","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKU8D8MNtzsDcgrMcieD5j"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/plans/EUR-MONTH-1000')
-    .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyQWc8yn6V32a")
-    .reply(200, {"id":"tok_1AxKUBD8MNtzsDcg4VamLqiV","object":"token","card":{"id":"card_1AxKUBD8MNtzsDcgXw7LQum7","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292843,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKUBD8MNtzsDcg4VamLqiV&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyREFua2PXSEx","object":"customer","account_balance":0,"created":1504292843,"currency":null,"default_source":"card_1AxKUBD8MNtzsDcgXw7LQum7","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKUBD8MNtzsDcgXw7LQum7","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyREFua2PXSEx","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyREFua2PXSEx/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyREFua2PXSEx/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyREFua2PXSEx/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4168/)
-    .reply(200, {"id":"sub_BJyRMWn7IBCLbm","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292844,"current_period_end":1506884838,"current_period_start":1504292844,"customer":"cus_BJyREFua2PXSEx","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKUCD8MNtzsDcgAlpaq0je","object":"subscription_item","created":1504292845,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyRMWn7IBCLbm"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4168"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292844,"status":"trialing","tax_percent":null,"trial_end":1506884838,"trial_start":1504292844});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
-    .reply(200, {"id":"tok_1AxKUKDjPFcHOcTm2kqHDqUj","object":"token","card":{"id":"card_1AxKUKDjPFcHOcTmTKtxhoI8","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292852,"livemode":false,"type":"card","used":false});
-
-    nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKUKDjPFcHOcTm2kqHDqUj&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyRwH3hkX6XDI","object":"customer","account_balance":0,"created":1504292855,"currency":null,"default_source":"card_1AxKUKDjPFcHOcTmTKtxhoI8","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKUKDjPFcHOcTmTKtxhoI8","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyRwH3hkX6XDI","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyRwH3hkX6XDI/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyRwH3hkX6XDI/subscriptions"}});
-
-    nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyRwH3hkX6XDI")
-    .reply(200, {"id":"tok_1AxKUOD8MNtzsDcgjv9rdStf","object":"token","card":{"id":"card_1AxKUOD8MNtzsDcgkorVl8IX","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292856,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/charges', "amount=20000&currency=EUR&source=tok_1AxKUOD8MNtzsDcgjv9rdStf&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=1000&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4168")
-    .reply(200, {"id":"ch_1AxKUOD8MNtzsDcg0T2pD53i","object":"charge","amount":20000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1AxKUOD8MNtzsDcghsOcstZn","balance_transaction":"txn_1AxKUPD8MNtzsDcgfuzkYdAq","captured":true,"created":1504292856,"currency":"eur","customer":null,"description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4168"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1AxKUOD8MNtzsDcg0T2pD53i/refunds"},"review":null,"shipping":null,"source":{"id":"card_1AxKUOD8MNtzsDcgkorVl8IX","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":null,"cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/balance/history/txn_1AxKUPD8MNtzsDcgfuzkYdAq')
-    .reply(200, {"id":"txn_1AxKUPD8MNtzsDcgfuzkYdAq","object":"balance_transaction","amount":20000,"available_on":1504828800,"created":1504292856,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":1605,"fee_details":[{"amount":605,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":1000,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":18395,"source":"ch_1AxKUOD8MNtzsDcg0T2pD53i","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1AxKUOD8MNtzsDcg0T2pD53i"},"status":"pending","type":"charge"});
-
-  nock('https://api.stripe.com:443')
-    .get('/v1/plans/EUR-MONTH-20000')
-    .reply(200, {"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/tokens', "customer=cus_BJyRwH3hkX6XDI")
-    .reply(200, {"id":"tok_1AxKUQD8MNtzsDcgXXERSEUr","object":"token","card":{"id":"card_1AxKUQD8MNtzsDcglFTDZkvH","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"187.162.203.97","created":1504292858,"livemode":false,"type":"card","used":false});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers', "source=tok_1AxKUQD8MNtzsDcgXXERSEUr&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
-    .reply(200, {"id":"cus_BJyR9LjYdo11nW","object":"customer","account_balance":0,"created":1504292859,"currency":null,"default_source":"card_1AxKUQD8MNtzsDcglFTDZkvH","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1AxKUQD8MNtzsDcglFTDZkvH","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BJyR9LjYdo11nW","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BJyR9LjYdo11nW/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BJyR9LjYdo11nW/subscriptions"}});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyR9LjYdo11nW/subscriptions', /plan=EUR-MONTH-20000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fjohn-smith&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4168/)
-    .reply(200, {"id":"sub_BJyRI8rCNWCu2z","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292860,"current_period_end":1506884853,"current_period_start":1504292860,"customer":"cus_BJyR9LjYdo11nW","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKUSD8MNtzsDcg6wPqdzCE","object":"subscription_item","created":1504292860,"metadata":{},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyRI8rCNWCu2z"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4168"},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292860,"status":"trialing","tax_percent":null,"trial_end":1506884853,"trial_start":1504292860});
-
-  nock('https://api.stripe.com:443')
-    .post('/v1/customers/cus_BJyR9LjYdo11nW/subscriptions', /plan=EUR-MONTH-20000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4168/)
-    .reply(200, {"id":"sub_BJyRI8rCNWCu2z","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1504292860,"current_period_end":1506884853,"current_period_start":1504292860,"customer":"cus_BJyR9LjYdo11nW","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1AxKUSD8MNtzsDcg6wPqdzCE","object":"subscription_item","created":1504292860,"metadata":{},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BJyRI8rCNWCu2z"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4168"},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1504292860,"status":"trialing","tax_percent":null,"trial_end":1506884853,"trial_start":1504292860});
-
-  nock('http://api.fixer.io:80')
-    .get(/20[0-9]{2}\-[0-9]{2}\-[0-9]{2}/)
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
-
-  nock('http://api.fixer.io:80')
-    .get('/latest')
-    .query({"base":"EUR","symbols":"USD"})
-    .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
+  nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5j8xDjPFcHOcTm3ogdnq0K","object":"token","card":{"id":"card_1B5j8xDjPFcHOcTmDV3bGhAI","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294251,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_HnSajTDP4vmt6P']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j8xDjPFcHOcTm3ogdnq0K&description=https%3A%2F%2Fopencollective.com%2Fjohn-smith&email=jsmith%40email.com")
+  .reply(200, {"id":"cus_BSeRpSPOYoLmLY","object":"customer","account_balance":0,"created":1506294253,"currency":null,"default_source":"card_1B5j8xDjPFcHOcTmDV3bGhAI","delinquent":false,"description":"https://opencollective.com/john-smith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j8xDjPFcHOcTmDV3bGhAI","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeRpSPOYoLmLY","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeRpSPOYoLmLY/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeRpSPOYoLmLY/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_IjXG74Fh3wsAXT']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeRpSPOYoLmLY")
+  .reply(200, {"id":"tok_1B5j90D8MNtzsDcgsUwmv6vS","object":"token","card":{"id":"card_1B5j90D8MNtzsDcgJLjwX3Ch","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294254,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_7jpxo4tPWiIvKM',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j90D8MNtzsDcgsUwmv6vS&description=https%3A%2F%2Fopencollective.com%2Fjohn-smith&email=jsmith%40email.com")
+  .reply(200, {"id":"cus_BSeR3FwUymkCBn","object":"customer","account_balance":0,"created":1506294254,"currency":null,"default_source":"card_1B5j90D8MNtzsDcgJLjwX3Ch","delinquent":false,"description":"https://opencollective.com/john-smith","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j90D8MNtzsDcgJLjwX3Ch","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeR3FwUymkCBn","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeR3FwUymkCBn/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeR3FwUymkCBn/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_GHMHEPn8kR4e9Z',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=154300&currency=EUR&customer=cus_BSeR3FwUymkCBn&description=Donation%20to%20BrusselsTogether%20(donor)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fjohn-smith&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=jsmith%40email.com&metadata%5BPaymentMethodId%5D=4157")
+  .reply(200, {"id":"ch_1B5j91D8MNtzsDcgNMsUgI8L","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j92D8MNtzsDcgeoTqTy5g","balance_transaction":"txn_1B5j92D8MNtzsDcgQzIcmfrn","captured":true,"created":1506294255,"currency":"eur","customer":"cus_BSeR3FwUymkCBn","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/john-smith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4157"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j91D8MNtzsDcgNMsUgI8L/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j90D8MNtzsDcgJLjwX3Ch","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeR3FwUymkCBn","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_CW6j9Ey72xztXd',
+  'Stripe-Version',
+  '2015-04-07']);
+
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5j92D8MNtzsDcgQzIcmfrn')
+  .reply(200, {"id":"txn_1B5j92D8MNtzsDcgQzIcmfrn","object":"balance_transaction","amount":154300,"available_on":1506816000,"created":1506294255,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":142085,"source":"ch_1B5j91D8MNtzsDcgNMsUgI8L","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5j91D8MNtzsDcgNMsUgI8L"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_ImiVyseI7YetGj',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/charges/ch_1B5j91D8MNtzsDcgNMsUgI8L')
+  .reply(200, {"id":"ch_1B5j91D8MNtzsDcgNMsUgI8L","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j92D8MNtzsDcgeoTqTy5g","balance_transaction":"txn_1B5j92D8MNtzsDcgQzIcmfrn","captured":true,"created":1506294255,"currency":"eur","customer":"cus_BSeR3FwUymkCBn","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/john-smith","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4157"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j91D8MNtzsDcgNMsUgI8L/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j90D8MNtzsDcgJLjwX3Ch","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeR3FwUymkCBn","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_l7JQVb9eFW7a9O',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5j9BDjPFcHOcTmFbNsU8aR","object":"token","card":{"id":"card_1B5j9BDjPFcHOcTm5ToPXwII","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294265,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_wEoeZwQFQeF6qY']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9BDjPFcHOcTmFbNsU8aR&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeSCs7JcUA1ig","object":"customer","account_balance":0,"created":1506294266,"currency":null,"default_source":"card_1B5j9BDjPFcHOcTm5ToPXwII","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9BDjPFcHOcTm5ToPXwII","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSCs7JcUA1ig","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSCs7JcUA1ig/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSCs7JcUA1ig/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_B1Rhb4QoC6wxuX']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeSCs7JcUA1ig")
+  .reply(200, {"id":"tok_1B5j9DD8MNtzsDcg1RLXrid7","object":"token","card":{"id":"card_1B5j9DD8MNtzsDcgIsuIhM0Z","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294267,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_bWDWh4oX1Ee7R8',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9DD8MNtzsDcg1RLXrid7&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeS6B0ahHn6zv","object":"customer","account_balance":0,"created":1506294268,"currency":null,"default_source":"card_1B5j9DD8MNtzsDcgIsuIhM0Z","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9DD8MNtzsDcgIsuIhM0Z","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeS6B0ahHn6zv","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeS6B0ahHn6zv/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeS6B0ahHn6zv/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_hFouJL6YUOFWip',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=154300&currency=EUR&customer=cus_BSeS6B0ahHn6zv&description=Donation%20to%20BrusselsTogether%20(donor)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4156")
+  .reply(200, {"id":"ch_1B5j9ED8MNtzsDcg5C3JAnTX","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9FD8MNtzsDcgBuv8ZmJx","balance_transaction":"txn_1B5j9FD8MNtzsDcgvY8hIzz7","captured":true,"created":1506294268,"currency":"eur","customer":"cus_BSeS6B0ahHn6zv","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4156"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9ED8MNtzsDcg5C3JAnTX/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9DD8MNtzsDcgIsuIhM0Z","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeS6B0ahHn6zv","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_UELdsMwVIAlNyd',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5j9FD8MNtzsDcgvY8hIzz7')
+  .reply(200, {"id":"txn_1B5j9FD8MNtzsDcgvY8hIzz7","object":"balance_transaction","amount":154300,"available_on":1506816000,"created":1506294268,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":142085,"source":"ch_1B5j9ED8MNtzsDcg5C3JAnTX","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5j9ED8MNtzsDcg5C3JAnTX"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_0ftGy2fMq3261m',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/charges/ch_1B5j9ED8MNtzsDcg5C3JAnTX')
+  .reply(200, {"id":"ch_1B5j9ED8MNtzsDcg5C3JAnTX","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9FD8MNtzsDcgBuv8ZmJx","balance_transaction":"txn_1B5j9FD8MNtzsDcgvY8hIzz7","captured":true,"created":1506294268,"currency":"eur","customer":"cus_BSeS6B0ahHn6zv","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4156"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9ED8MNtzsDcg5C3JAnTX/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9DD8MNtzsDcgIsuIhM0Z","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeS6B0ahHn6zv","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_vv8lBajc7UAqeq',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5j9ODjPFcHOcTmpCZFH9Uh","object":"token","card":{"id":"card_1B5j9ODjPFcHOcTmVOjSeJmS","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294278,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_NHmux8PUynUoZf']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9ODjPFcHOcTmpCZFH9Uh&description=https%3A%2F%2Fopencollective.com%2Fundefined&email=")
+  .reply(200, {"id":"cus_BSeSEx7Q0oBxoO","object":"customer","account_balance":0,"created":1506294279,"currency":null,"default_source":"card_1B5j9ODjPFcHOcTmVOjSeJmS","delinquent":false,"description":"https://opencollective.com/undefined","discount":null,"email":null,"livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9ODjPFcHOcTmVOjSeJmS","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSEx7Q0oBxoO","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSEx7Q0oBxoO/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSEx7Q0oBxoO/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_17gkzDiP7gY3Ev']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeSEx7Q0oBxoO")
+  .reply(200, {"id":"tok_1B5j9QD8MNtzsDcg5PAvI2zI","object":"token","card":{"id":"card_1B5j9QD8MNtzsDcgD0KIRS3e","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294280,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_l4I6FsnYrmwwAz',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9QD8MNtzsDcg5PAvI2zI&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeSxLkS6frBjo","object":"customer","account_balance":0,"created":1506294281,"currency":null,"default_source":"card_1B5j9QD8MNtzsDcgD0KIRS3e","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9QD8MNtzsDcgD0KIRS3e","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSxLkS6frBjo","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSxLkS6frBjo/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSxLkS6frBjo/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_Zcl3512dLv5OGG',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=154300&currency=EUR&customer=cus_BSeSxLkS6frBjo&description=Donation%20to%20BrusselsTogether%20(donor)&application_fee=7715&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4156")
+  .reply(200, {"id":"ch_1B5j9SD8MNtzsDcgQOlOGenX","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9SD8MNtzsDcgC3y21QZ1","balance_transaction":"txn_1B5j9SD8MNtzsDcg4BTmqeWc","captured":true,"created":1506294282,"currency":"eur","customer":"cus_BSeSxLkS6frBjo","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4156"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9SD8MNtzsDcgQOlOGenX/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9QD8MNtzsDcgD0KIRS3e","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSxLkS6frBjo","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_IPmDMoqVHZx8p4',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5j9SD8MNtzsDcg4BTmqeWc')
+  .reply(200, {"id":"txn_1B5j9SD8MNtzsDcg4BTmqeWc","object":"balance_transaction","amount":154300,"available_on":1506816000,"created":1506294282,"currency":"eur","description":"Donation to BrusselsTogether (donor)","fee":12215,"fee_details":[{"amount":4500,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":7715,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":142085,"source":"ch_1B5j9SD8MNtzsDcgQOlOGenX","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5j9SD8MNtzsDcgQOlOGenX"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_IoCB5VD4CTXWgS',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/charges/ch_1B5j9SD8MNtzsDcgQOlOGenX')
+  .reply(200, {"id":"ch_1B5j9SD8MNtzsDcgQOlOGenX","object":"charge","amount":154300,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9SD8MNtzsDcgC3y21QZ1","balance_transaction":"txn_1B5j9SD8MNtzsDcg4BTmqeWc","captured":true,"created":1506294282,"currency":"eur","customer":"cus_BSeSxLkS6frBjo","description":"Donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4156"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9SD8MNtzsDcgQOlOGenX/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9QD8MNtzsDcgD0KIRS3e","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSxLkS6frBjo","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_zsznppdgok717y',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5j9bDjPFcHOcTmKT132dUU","object":"token","card":{"id":"card_1B5j9bDjPFcHOcTmrEnSLdK2","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294291,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_Kr6Te4y2yNWmOE']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9bDjPFcHOcTmKT132dUU&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeSUHTkNxqYr8","object":"customer","account_balance":0,"created":1506294292,"currency":null,"default_source":"card_1B5j9bDjPFcHOcTmrEnSLdK2","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9bDjPFcHOcTmrEnSLdK2","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSUHTkNxqYr8","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSUHTkNxqYr8/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSUHTkNxqYr8/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_RQuDXIjbMrYEc4']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeSUHTkNxqYr8")
+  .reply(200, {"id":"tok_1B5j9dD8MNtzsDcgOvkiUy1j","object":"token","card":{"id":"card_1B5j9dD8MNtzsDcgmlFcz9qx","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294293,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_rpVTOLPphKtIfy',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9dD8MNtzsDcgOvkiUy1j&description=https%3A%2F%2Fopencollective.com%2Fxdamman&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeSINyKvEIHi9","object":"customer","account_balance":0,"created":1506294293,"currency":null,"default_source":"card_1B5j9dD8MNtzsDcgmlFcz9qx","delinquent":false,"description":"https://opencollective.com/xdamman","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9dD8MNtzsDcgmlFcz9qx","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSINyKvEIHi9","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSINyKvEIHi9/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSINyKvEIHi9/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_nRrDL4pzMyNk5A',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=1000&currency=EUR&customer=cus_BSeSINyKvEIHi9&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4156")
+  .reply(200, {"id":"ch_1B5j9eD8MNtzsDcgWxuO1wwq","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9fD8MNtzsDcg2ffprqQM","balance_transaction":"txn_1B5j9fD8MNtzsDcgBCkfO77N","captured":true,"created":1506294294,"currency":"eur","customer":"cus_BSeSINyKvEIHi9","description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4156"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9eD8MNtzsDcgWxuO1wwq/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9dD8MNtzsDcgmlFcz9qx","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSINyKvEIHi9","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_o5GKsTNWPNwHrt',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5j9fD8MNtzsDcgBCkfO77N')
+  .reply(200, {"id":"txn_1B5j9fD8MNtzsDcgBCkfO77N","object":"balance_transaction","amount":1000,"available_on":1506816000,"created":1506294294,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":896,"source":"ch_1B5j9eD8MNtzsDcgWxuO1wwq","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5j9eD8MNtzsDcgWxuO1wwq"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_3Yn7kEt56Mr6Zr',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/plans/EUR-MONTH-1000')
+  .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_XuOo1qS8bOloS0',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers/cus_BSeSINyKvEIHi9/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fxdamman&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4156/)
+  .reply(200, {"id":"sub_BSeSbgHtfS4sgC","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506294297,"current_period_end":1506899091,"current_period_start":1506294297,"customer":"cus_BSeSINyKvEIHi9","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B5j9hD8MNtzsDcgOeQaQGoP","object":"subscription_item","created":1506294297,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BSeSbgHtfS4sgC"},"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4156"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506294297,"status":"trialing","tax_percent":null,"trial_end":1506899091,"trial_start":1506294297}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_0COLHVmz4JdeaP',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/subscriptions/sub_BSeSbgHtfS4sgC')
+  .reply(200, {"id":"sub_BSeSbgHtfS4sgC","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506294297,"current_period_end":1506899091,"current_period_start":1506294297,"customer":"cus_BSeSINyKvEIHi9","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B5j9hD8MNtzsDcgOeQaQGoP","object":"subscription_item","created":1506294297,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BSeSbgHtfS4sgC"},"livemode":false,"metadata":{"from":"http://localhost:3000/xdamman","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4156"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506294297,"status":"trialing","tax_percent":null,"trial_end":1506899091,"trial_start":1506294297}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_assmVifCUSXBfh',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5j9pDjPFcHOcTm45gGZfDg","object":"token","card":{"id":"card_1B5j9pDjPFcHOcTmftU4MHf1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294305,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_n8aPyUScdWqSES']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9pDjPFcHOcTm45gGZfDg&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=jsmith%40email.com")
+  .reply(200, {"id":"cus_BSeSTM5ahueqN7","object":"customer","account_balance":0,"created":1506294307,"currency":null,"default_source":"card_1B5j9pDjPFcHOcTmftU4MHf1","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9pDjPFcHOcTmftU4MHf1","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSTM5ahueqN7","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSTM5ahueqN7/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSTM5ahueqN7/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_2J68y4BPYmMYqx']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeSTM5ahueqN7")
+  .reply(200, {"id":"tok_1B5j9sD8MNtzsDcghOJSoOFI","object":"token","card":{"id":"card_1B5j9sD8MNtzsDcgjSEGkC84","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294308,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_7OEJqVKDrvuK2c',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5j9sD8MNtzsDcghOJSoOFI&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=jsmith%40email.com")
+  .reply(200, {"id":"cus_BSeSKsqIhPGdT5","object":"customer","account_balance":0,"created":1506294308,"currency":null,"default_source":"card_1B5j9sD8MNtzsDcgjSEGkC84","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"jsmith@email.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5j9sD8MNtzsDcgjSEGkC84","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSKsqIhPGdT5","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeSKsqIhPGdT5/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeSKsqIhPGdT5/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_WuOrOrrmiWfs95',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=1000&currency=EUR&customer=cus_BSeSKsqIhPGdT5&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=jsmith%40email.com&metadata%5BPaymentMethodId%5D=4158")
+  .reply(200, {"id":"ch_1B5j9tD8MNtzsDcgEjc2ZdFR","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5j9uD8MNtzsDcgPlDU3jGm","balance_transaction":"txn_1B5j9uD8MNtzsDcgJitah7qW","captured":true,"created":1506294309,"currency":"eur","customer":"cus_BSeSKsqIhPGdT5","description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"jsmith@email.com","PaymentMethodId":"4158"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5j9tD8MNtzsDcgEjc2ZdFR/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5j9sD8MNtzsDcgjSEGkC84","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeSKsqIhPGdT5","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_JWr0VFdFRgNqvu',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5j9uD8MNtzsDcgJitah7qW')
+  .reply(200, {"id":"txn_1B5j9uD8MNtzsDcgJitah7qW","object":"balance_transaction","amount":1000,"available_on":1506816000,"created":1506294309,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":896,"source":"ch_1B5j9tD8MNtzsDcgEjc2ZdFR","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5j9tD8MNtzsDcgEjc2ZdFR"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_vKaHqAf0qJURkh',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/plans/EUR-MONTH-1000')
+  .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_BkUGW9UvZB9m3o',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers/cus_BSeSKsqIhPGdT5/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4158/)
+  .reply(200, {"id":"sub_BSeSqdA9wQ8Yfa","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506294312,"current_period_end":1506899106,"current_period_start":1506294312,"customer":"cus_BSeSKsqIhPGdT5","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B5j9wD8MNtzsDcghrce6yQV","object":"subscription_item","created":1506294312,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BSeSqdA9wQ8Yfa"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4158"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506294312,"status":"trialing","tax_percent":null,"trial_end":1506899106,"trial_start":1506294312}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_0kLXogfXMh5kvL',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5jA4DjPFcHOcTmwvUagDQs","object":"token","card":{"id":"card_1B5jA4DjPFcHOcTmyuuJWZFr","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294320,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_kgnEpAKCe0ZeTK']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+   'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5jA4DjPFcHOcTmwvUagDQs&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeTy8b9kzew1L","object":"customer","account_balance":0,"created":1506294322,"currency":null,"default_source":"card_1B5jA4DjPFcHOcTmyuuJWZFr","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5jA4DjPFcHOcTmyuuJWZFr","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTy8b9kzew1L","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeTy8b9kzew1L/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeTy8b9kzew1L/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_VrLRj1u65cDVLV']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeTy8b9kzew1L")
+  .reply(200, {"id":"tok_1B5jA7D8MNtzsDcgEm3g1fqw","object":"token","card":{"id":"card_1B5jA6D8MNtzsDcgc5NscftQ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294323,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_7cRSr6WcY0nbfU',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5jA7D8MNtzsDcgEm3g1fqw&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeTa7dWu6rNSG","object":"customer","account_balance":0,"created":1506294323,"currency":null,"default_source":"card_1B5jA6D8MNtzsDcgc5NscftQ","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5jA6D8MNtzsDcgc5NscftQ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTa7dWu6rNSG","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeTa7dWu6rNSG/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeTa7dWu6rNSG/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_lzViIPage4byXc',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=1000&currency=EUR&customer=cus_BSeTa7dWu6rNSG&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=50&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4157")
+  .reply(200, {"id":"ch_1B5jA8D8MNtzsDcgtWcrtY08","object":"charge","amount":1000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5jA8D8MNtzsDcgzD4J7IKM","balance_transaction":"txn_1B5jA8D8MNtzsDcgaHWqHqSN","captured":true,"created":1506294324,"currency":"eur","customer":"cus_BSeTa7dWu6rNSG","description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4157"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5jA8D8MNtzsDcgtWcrtY08/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5jA6D8MNtzsDcgc5NscftQ","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTa7dWu6rNSG","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_GWO08E32FRw4Xk',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5jA8D8MNtzsDcgaHWqHqSN')
+  .reply(200, {"id":"txn_1B5jA8D8MNtzsDcgaHWqHqSN","object":"balance_transaction","amount":1000,"available_on":1506816000,"created":1506294324,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":104,"fee_details":[{"amount":54,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"},{"amount":50,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"}],"net":896,"source":"ch_1B5jA8D8MNtzsDcgtWcrtY08","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5jA8D8MNtzsDcgtWcrtY08"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_85GwcSCSUUO00s',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/plans/EUR-MONTH-1000')
+  .reply(200, {"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_Z3q5oj1Gcd8Nay',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers/cus_BSeTa7dWu6rNSG/subscriptions', /plan=EUR-MONTH-1000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4157/)
+  .reply(200, {"id":"sub_BSeT841QpU6Row","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506294326,"current_period_end":1506899120,"current_period_start":1506294326,"customer":"cus_BSeTa7dWu6rNSG","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B5jAAD8MNtzsDcgetnoi1ws","object":"subscription_item","created":1506294327,"metadata":{},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BSeT841QpU6Row"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4157"},"plan":{"id":"EUR-MONTH-1000","object":"plan","amount":1000,"created":1503518941,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-1000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506294326,"status":"trialing","tax_percent":null,"trial_end":1506899120,"trial_start":1506294326}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_XQjP2UPPBg4423',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "card%5Bnumber%5D=4242424242424242&card%5Bexp_month%5D=12&card%5Bexp_year%5D=2028&card%5Bcvc%5D=222")
+  .reply(200, {"id":"tok_1B5jAIDjPFcHOcTmlsbjEeuH","object":"token","card":{"id":"card_1B5jAIDjPFcHOcTm1JQO1482","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"unchecked","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294334,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_K1I2nVAzvUUccP']);
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+  .get('/latest')
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-22","rates":{"USD":1.1961}}, [ 'Server',
+ 'nosniff' ]);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5jAIDjPFcHOcTmlsbjEeuH&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeTgr9sETRdnb","object":"customer","account_balance":0,"created":1506294337,"currency":null,"default_source":"card_1B5jAIDjPFcHOcTm1JQO1482","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5jAIDjPFcHOcTm1JQO1482","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTgr9sETRdnb","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"ftgJeBXvQSZ4HMCg","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeTgr9sETRdnb/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeTgr9sETRdnb/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_GjzWIJOFJpORhk']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/tokens', "customer=cus_BSeTgr9sETRdnb")
+  .reply(200, {"id":"tok_1B5jAMD8MNtzsDcgBhMsA7ev","object":"token","card":{"id":"card_1B5jALD8MNtzsDcgcOdky9H3","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"client_ip":"68.173.154.69","created":1506294338,"livemode":false,"type":"card","used":false}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_gIaFg7WliloFl0',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers', "source=tok_1B5jAMD8MNtzsDcgBhMsA7ev&description=https%3A%2F%2Fopencollective.com%2Fnewco&email=fd81e8b367fee82f45af1816e5ec9147%40gmail.com")
+  .reply(200, {"id":"cus_BSeTxl6ekrtTlE","object":"customer","account_balance":0,"created":1506294338,"currency":null,"default_source":"card_1B5jALD8MNtzsDcgcOdky9H3","delinquent":false,"description":"https://opencollective.com/newco","discount":null,"email":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","livemode":false,"metadata":{},"shipping":null,"sources":{"object":"list","data":[{"id":"card_1B5jALD8MNtzsDcgcOdky9H3","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTxl6ekrtTlE","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null}],"has_more":false,"total_count":1,"url":"/v1/customers/cus_BSeTxl6ekrtTlE/sources"},"subscriptions":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/customers/cus_BSeTxl6ekrtTlE/subscriptions"}}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_plSrzerbWWDl4c',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/charges', "amount=20000&currency=EUR&customer=cus_BSeTxl6ekrtTlE&description=Monthly%20donation%20to%20BrusselsTogether%20(donor)&application_fee=1000&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BcustomerEmail%5D=fd81e8b367fee82f45af1816e5ec9147%40gmail.com&metadata%5BPaymentMethodId%5D=4157")
+  .reply(200, {"id":"ch_1B5jAND8MNtzsDcgvfiuNJMr","object":"charge","amount":20000,"amount_refunded":0,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","application_fee":"fee_1B5jAND8MNtzsDcg14nMdbfU","balance_transaction":"txn_1B5jAND8MNtzsDcgvypyLu1e","captured":true,"created":1506294339,"currency":"eur","customer":"cus_BSeTxl6ekrtTlE","description":"Monthly donation to BrusselsTogether (donor)","destination":null,"dispute":null,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","customerEmail":"fd81e8b367fee82f45af1816e5ec9147@gmail.com","PaymentMethodId":"4157"},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","seller_message":"Payment complete.","type":"authorized"},"paid":true,"receipt_email":null,"receipt_number":null,"refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1B5jAND8MNtzsDcgvfiuNJMr/refunds"},"review":null,"shipping":null,"source":{"id":"card_1B5jALD8MNtzsDcgcOdky9H3","object":"card","address_city":null,"address_country":null,"address_line1":null,"address_line1_check":null,"address_line2":null,"address_state":null,"address_zip":null,"address_zip_check":null,"brand":"Visa","country":"US","customer":"cus_BSeTxl6ekrtTlE","cvc_check":"pass","dynamic_last4":null,"exp_month":12,"exp_year":2028,"fingerprint":"nt4eriIIhN3fiPZF","funding":"credit","last4":"4242","metadata":{},"name":null,"tokenization_method":null},"source_transfer":null,"statement_descriptor":null,"status":"succeeded","transfer_group":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_P0ZrIkJxuox8IT',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/balance/history/txn_1B5jAND8MNtzsDcgvypyLu1e')
+  .reply(200, {"id":"txn_1B5jAND8MNtzsDcgvypyLu1e","object":"balance_transaction","amount":20000,"available_on":1506816000,"created":1506294339,"currency":"eur","description":"Monthly donation to BrusselsTogether (donor)","fee":1605,"fee_details":[{"amount":1000,"application":"ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue","currency":"eur","description":"OpenCollective application fee","type":"application_fee"},{"amount":605,"application":null,"currency":"eur","description":"Stripe processing fees","type":"stripe_fee"}],"net":18395,"source":"ch_1B5jAND8MNtzsDcgvfiuNJMr","sourced_transfers":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/transfers?source_transaction=ch_1B5jAND8MNtzsDcgvfiuNJMr"},"status":"pending","type":"charge"}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_4GYyF32x3QFOuG',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .get('/v1/plans/EUR-MONTH-20000')
+  .reply(200, {"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_gGWxZvoJaB0mPu',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('https://api.stripe.com:443', {"encodedQueryParams":true})
+  .post('/v1/customers/cus_BSeTxl6ekrtTlE/subscriptions', /plan=EUR-MONTH-20000&application_fee_percent=5&trial_end=[0-9]{10}&metadata%5Bfrom%5D=http%3A%2F%2Flocalhost%3A3000%2Fnewco&metadata%5Bto%5D=http%3A%2F%2Flocalhost%3A3000%2Fbrusselstogether&metadata%5BPaymentMethodId%5D=4157/)
+  .reply(200, {"id":"sub_BSeT7o3apk1bwX","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506294341,"current_period_end":1506899135,"current_period_start":1506294341,"customer":"cus_BSeTxl6ekrtTlE","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B5jAPD8MNtzsDcgDIi225L1","object":"subscription_item","created":1506294342,"metadata":{},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BSeT7o3apk1bwX"},"livemode":false,"metadata":{"from":"http://localhost:3000/newco","to":"http://localhost:3000/brusselstogether","PaymentMethodId":"4157"},"plan":{"id":"EUR-MONTH-20000","object":"plan","amount":20000,"created":1504282114,"currency":"eur","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"EUR-MONTH-20000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506294341,"status":"trialing","tax_percent":null,"trial_end":1506899135,"trial_start":1506294341}, [ 'Server',
+   'X-Stripe-Privileged-Session-Required,stripe-manage-version,X-Stripe-External-Auth-Required',
+  'Request-Id',
+  'req_E9kGRDNSlSUk4F',
+  'Stripe-Version',
+  '2015-04-07']);
+
+nock('http://api.fixer.io:80')
+  .get(/20[0-9]{2}\-[0-9]{2}\-[0-9]{2}/)
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
+
+nock('http://api.fixer.io:80')
+  .get('/latest')
+  .times(2)
+  .query({"base":"EUR","symbols":"USD"})
+  .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
+
 }

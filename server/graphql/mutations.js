@@ -409,7 +409,7 @@ const mutations = {
       })
       .then(u => {
         user = u;
-        if (!order.fromCollective || !order.fromCollective.name) {
+        if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
           return {
             id: user.CollectiveId,
             CreatedByUserId: user.id

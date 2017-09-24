@@ -106,8 +106,8 @@ describe('createOrder', () => {
     expect(transaction.data.charge.status).to.equal('succeeded');
     expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
 
-    // no customer should be created on the connected account for one time charges
-    expect(transaction.data.charge.customer).to.equal(null);
+    // we create a customer on the host stripe account even for one time charges
+    expect(transaction.data.charge.customer).to.not.be.null;
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
     const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
@@ -137,14 +137,11 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.hostFeeInHostCurrency).to.equal(0);
     expect(transaction.platformFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
     expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
     expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
-
-    // no customer should be created on the connected account for one time charges
-    expect(transaction.data.charge.customer).to.equal(null);
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
     const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
@@ -200,14 +197,11 @@ describe('createOrder', () => {
     expect(transaction.FromCollectiveId).to.equal(xdamman.CollectiveId);
     expect(transaction.CollectiveId).to.equal(collective.id);
     expect(transaction.currency).to.equal(collective.currency);
-    expect(transaction.hostFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
+    expect(transaction.hostFeeInHostCurrency).to.equal(0);
     expect(transaction.platformFeeInHostCurrency).to.equal(0.05 * order.totalAmount);
     expect(transaction.data.charge.currency).to.equal(collective.currency.toLowerCase());
     expect(transaction.data.charge.status).to.equal('succeeded');
     expect(transaction.data.balanceTransaction.net - transaction.hostFeeInHostCurrency).to.equal(transaction.netAmountInCollectiveCurrency);
-
-    // no customer should be created on the connected account for one time charges
-    expect(transaction.data.charge.customer).to.equal(null);
 
     // make sure the payment has been recorded in the connected Stripe Account of the host
     const hostMember = await models.Member.findOne({ where: { CollectiveId: collective.id, role: 'HOST' } });
@@ -311,7 +305,7 @@ describe('createOrder', () => {
     const newco = await models.Collective.create({
       type: 'ORGANIZATION',
       name: "newco",
-      CreatedByUserId: xdamman.id
+      CreatedByUserId: 8 // Aseem
     });
 
     order.fromCollective = { id: newco.id };
@@ -386,7 +380,7 @@ describe('createOrder', () => {
     // Should fail if order.totalAmount > PaymentMethod.monthlyLimitPerMember
     res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $238) is higher than your monthly spending limit on this payment method ($100)");
+    expect(res.errors[0].message).to.equal("The total amount of this order (€200 ~= $239) is higher than your monthly spending limit on this payment method ($100)");
     
     await paymentMethod.update({ monthlyLimitPerMember: 25000 }); // $250 limit
     res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
