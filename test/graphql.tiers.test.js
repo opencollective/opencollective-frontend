@@ -127,7 +127,7 @@ describe('graphql.tiers.test', () => {
           user: {
             email: user.email,
           },
-          collective: { slug: collective1.slug },
+          collective: { id: collective1.id },
           tier: { id: tier1.id },
           paymentMethod: {
             service: 'stripe',
