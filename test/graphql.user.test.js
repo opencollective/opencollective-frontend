@@ -101,7 +101,7 @@ describe('Query Tests', () => {
               country: 'US',
             }
           },
-          collective: { slug: collective1.slug },
+          collective: { id: collective1.id },
           tier: { id: tier.id }
         }
       }
