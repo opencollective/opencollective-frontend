@@ -36,8 +36,7 @@ describe('hostlib', () => {
     collectiveids = collectives.map(g => g.id);
     where.CollectiveId = { $in: collectiveids };
     expect(collectives.length).to.equal(74);
-    return true;
-  }).catch(console.error));
+  }));
 
   it('get the backers stats', () => hostlib.getBackersStats(startDate, endDate, collectiveids).then(stats => {
     expect(stats.new).to.equal(4);

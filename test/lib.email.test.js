@@ -75,7 +75,7 @@ describe('lib/email', () => {
           maximumFractionDigits : 0
         });
         expect(nm.sendMail.lastCall.args[0].from).to.equal(options.from);
-        expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
+        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Merci pour votre donation de ${amountStr}/mois à La Primaire`);
         expect(nm.sendMail.lastCall.args[0].headers['o:tag']).to.equal(template);
       });
@@ -108,7 +108,7 @@ describe('lib/email', () => {
           minimumFractionDigits : 0,
           maximumFractionDigits : 0
         });
-        expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
+        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to WWCode Austin`);
         expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
       });
@@ -146,7 +146,7 @@ describe('lib/email', () => {
         });
         
         expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
-        expect(nm.sendMail.lastCall.args[0].to).to.equal(data.user.email);
+        expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
         expect(nm.sendMail.lastCall.args[0].subject).to.contain(`Thank you for your ${amountStr}/month donation to #BrusselsTogether`);
         expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
         expect(nm.sendMail.lastCall.args[0].html).to.contain(`${config.host.website}/${data.collective.slug}/transactions/${data.transaction.uuid}/invoice.pdf`);
