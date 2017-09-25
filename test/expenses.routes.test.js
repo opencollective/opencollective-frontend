@@ -28,6 +28,9 @@ const {
   User
 } = models;
 
+/**
+ * We keep this for backward compatibility with old website
+ */
 describe('expenses.routes.test.js', () => {
   let sandbox, host, member, otherUser, expenseFiler, collective, emailSendMessageSpy;
 
@@ -73,7 +76,7 @@ describe('expenses.routes.test.js', () => {
     describe('#getOne', () => {
       beforeEach(() => {
         req = request(app)
-          .get(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
+          .get(`/groups/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -83,7 +86,7 @@ describe('expenses.routes.test.js', () => {
     describe('#approve', () => {
       beforeEach(() => {
         req = request(app)
-          .post(`/collectives/${collective.id}/expenses/123/approve?api_key=${application.api_key}`)
+          .post(`/groups/${collective.id}/expenses/123/approve?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -93,7 +96,7 @@ describe('expenses.routes.test.js', () => {
     describe('#delete', () => {
       beforeEach(() => {
         req = request(app)
-          .delete(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
+          .delete(`/groups/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -103,7 +106,7 @@ describe('expenses.routes.test.js', () => {
     describe('#update', () => {
       beforeEach(() => {
         req = request(app)
-          .put(`/collectives/${collective.id}/expenses/123?api_key=${application.api_key}`)
+          .put(`/groups/${collective.id}/expenses/123?api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${host.jwt()}`);
       });
 
@@ -116,7 +119,7 @@ describe('expenses.routes.test.js', () => {
     let createReq;
 
     beforeEach(() => {
-      createReq = request(app).post(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`);
+      createReq = request(app).post(`/groups/${collective.id}/expenses?api_key=${application.api_key}`);
     });
 
     describe('WHEN not authenticated but providing an expense', () => {
@@ -224,7 +227,7 @@ describe('expenses.routes.test.js', () => {
 
           describe('#getOne', () => {
             it('THEN returns the expense without the attachment if not logged in', () => request(app)
-              .get(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+              .get(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenseData = res.body;
@@ -232,7 +235,7 @@ describe('expenses.routes.test.js', () => {
                 expect(expenseData).to.not.have.property('attachment');
               }));
             it('THEN returns the expense with the attachment if logged in', () => request(app)
-              .get(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+              .get(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
               .set('Authorization', `Bearer ${member.jwt()}`)
               .expect(200)
               .then(res => {
@@ -245,7 +248,7 @@ describe('expenses.routes.test.js', () => {
             beforeEach('create expense', () => createExpense(collective, expenseFiler));
             beforeEach('create expense 2', () => createExpense(collective, expenseFiler));
             it('THEN returns all expenses without user.email', () => request(app)
-              .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
+              .get(`/groups/${collective.id}/expenses?api_key=${application.api_key}`)
               .expect(200)
               .then(res => {
                 const expenses = res.body;
@@ -256,7 +259,7 @@ describe('expenses.routes.test.js', () => {
               }));
 
             it('THEN returns 200 with all expenses with user.email and user.paypalEmail', () => request(app)
-              .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
+              .get(`/groups/${collective.id}/expenses?api_key=${application.api_key}`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .expect(200)
               .then(res => {
@@ -272,7 +275,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
+                .get(`/groups/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ per_page })
                 .expect(200)
                 .then(res => response = res));
@@ -289,9 +292,9 @@ describe('expenses.routes.test.js', () => {
                 expect(headers.link).to.contain('current');
                 expect(headers.link).to.contain('page=1');
                 expect(headers.link).to.contain(`per_page=${per_page}`);
-                expect(headers.link).to.contain(`/collectives/${collective.id}/expenses`);
+                expect(headers.link).to.contain(`/groups/${collective.id}/expenses`);
                 const tot = 3;
-                expect(headers.link).to.contain(`/collectives/${collective.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
+                expect(headers.link).to.contain(`/groups/${collective.id}/expenses?page=${Math.ceil(tot/per_page)}&per_page=${per_page}>; rel="last"`);
               });
             });
 
@@ -300,7 +303,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
+                .get(`/groups/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ page, per_page: 1 })
                 .expect(200)
                 .then(res => response = res));
@@ -324,7 +327,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .get(`/collectives/${collective.id}/expenses?api_key=${application.api_key}`)
+                .get(`/groups/${collective.id}/expenses?api_key=${application.api_key}`)
                 .send({ since_id })
                 .expect(200)
                 .then(res => response = res));
@@ -342,7 +345,7 @@ describe('expenses.routes.test.js', () => {
           describe('#delete', () => {
             describe('WHEN not authenticated', () =>
               it('THEN returns 401', () => request(app)
-                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .expect(401)));
 
             describe('WHEN expense does not belong to collective', () => {
@@ -352,7 +355,7 @@ describe('expenses.routes.test.js', () => {
 
               it('THEN returns 404', () => {
                 return request(app)
-                .delete(`/collectives/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
+                .delete(`/groups/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(404);
               });
@@ -361,14 +364,14 @@ describe('expenses.routes.test.js', () => {
             describe('WHEN user is not the host, not a member and not the author of the expense', () => {
 
               beforeEach('set status to rejected', () =>
-                request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                request(app).post(`/groups/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({ approved: false })
                 .expect(200)
               );
 
               it('THEN returns 403', () => request(app)
-                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${otherUser.jwt()}`)
                 .expect(403));
             });
@@ -377,13 +380,13 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach('reject expense', () => request(app)
-                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                .post(`/groups/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: false})
                 .expect(200));
 
               beforeEach('delete expense', () => request(app)
-                .delete(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .delete(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(200)
                 .toPromise()
@@ -402,7 +405,7 @@ describe('expenses.routes.test.js', () => {
           describe('#update', () => {
             describe('WHEN not authenticated', () =>
               it('THEN returns 401', () => request(app)
-                .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .put(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .expect(401)));
 
             describe('WHEN expense does not belong to collective', () => {
@@ -411,7 +414,7 @@ describe('expenses.routes.test.js', () => {
               beforeEach(() => createExpense().tap(e => otherExpense = e));
 
               it('THEN returns 404', () => request(app)
-                .put(`/collectives/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
+                .put(`/groups/${collective.id}/expenses/${otherExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .expect(404));
             });
@@ -421,7 +424,7 @@ describe('expenses.routes.test.js', () => {
 
               beforeEach(() => {
                 updateReq = request(app)
-                  .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                  .put(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                   .set('Authorization', `Bearer ${host.jwt()}`);
               });
 
@@ -432,7 +435,7 @@ describe('expenses.routes.test.js', () => {
               let response;
 
               beforeEach(() => request(app)
-                .put(`/collectives/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
+                .put(`/groups/${collective.id}/expenses/${actualExpense.id}?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({expense: { description: 'new description' }})
                 .expect(200)
@@ -452,7 +455,7 @@ describe('expenses.routes.test.js', () => {
             let approveReq;
 
             beforeEach(() => {
-              approveReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
+              approveReq = request(app).post(`/groups/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`);
             });
 
             beforeEach(() => Notification.create({type: 'collective.expense.approved', CollectiveId: collective.id, UserId: host.id}));
@@ -536,7 +539,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach('send pay POST request', () => {
               payReq = request(app)
-                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`)
+                .post(`/groups/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send();
             });
@@ -558,7 +561,7 @@ describe('expenses.routes.test.js', () => {
                   () => Promise.resolve(preapprovalDetailsMock));
 
               return request(app)
-                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve`)
+                .post(`/groups/${collective.id}/expenses/${actualExpense.id}/approve`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: true, api_key:application.api_key})
                 .expect(200);
@@ -569,7 +572,7 @@ describe('expenses.routes.test.js', () => {
             let payReq;
 
             beforeEach('send pay POST request', () => {
-              payReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
+              payReq = request(app).post(`/groups/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
             });
 
             describe('WHEN not authenticated', () =>
@@ -722,7 +725,7 @@ describe('expenses.routes.test.js', () => {
 
             beforeEach('create an expense', () => {
               return request(app)
-                .post(`/collectives/${collective.id}/expenses`)
+                .post(`/groups/${collective.id}/expenses`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({ api_key: application.api_key, expense: expense2 })
                 .expect(200)
@@ -734,7 +737,7 @@ describe('expenses.routes.test.js', () => {
                 .stub(paypalAdaptive, 'preapprovalDetails')
                 .yields(null, preapprovalDetailsMock);
               return request(app)
-                .post(`/collectives/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
+                .post(`/groups/${collective.id}/expenses/${actualExpense.id}/approve?api_key=${application.api_key}`)
                 .set('Authorization', `Bearer ${host.jwt()}`)
                 .send({approved: true})
                 .expect(200);
@@ -745,7 +748,7 @@ describe('expenses.routes.test.js', () => {
             let payReq;
 
             beforeEach(() => {
-              payReq = request(app).post(`/collectives/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
+              payReq = request(app).post(`/groups/${collective.id}/expenses/${actualExpense.id}/pay?api_key=${application.api_key}`);
             });
 
             describe('WHEN not authenticated', () =>
@@ -886,7 +889,7 @@ describe('expenses.routes.test.js', () => {
       .then(() => u ? u : expenseFiler)
       .tap(u => user = u)
       .then(() => request(app)
-        .post(`/collectives/${collective.id}/expenses`)
+        .post(`/groups/${collective.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({expense: expense3, api_key: application.api_key})
         .expect(200))
