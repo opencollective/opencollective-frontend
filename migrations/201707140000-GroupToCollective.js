@@ -39,8 +39,8 @@ const cache = {
 };
 
 const HostCollectiveIdForUserId = {
-    772: 83,   // wwcode
-    3676: 83,  // opensource
+    3   : 51,  // wwcode
+    772 : 83,  // opensource
     3676: 566, // operation code
     1635: 207, // brusselstogether
     5161: 697, // affcny

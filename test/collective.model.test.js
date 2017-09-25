@@ -44,7 +44,7 @@ describe('Collective model', () => {
     amount: -1000,
     netAmountInCollectiveCurrency: -1000,
     currency: 'USD',
-    type: 'expense',
+    type: 'DEBIT',
     description: 'pizza',
     tags: ['food'],
     CreatedByUserId: 1,
@@ -54,7 +54,7 @@ describe('Collective model', () => {
     amount: -15000,
     netAmountInCollectiveCurrency: -15000,
     currency: 'USD',
-    type: 'expense',
+    type: 'DEBIT',
     description: 'stickers',
     tags: ['marketing'],
     CreatedByUserId: 1,
@@ -65,7 +65,7 @@ describe('Collective model', () => {
     amountInHostCurrency: 25000,
     netAmountInCollectiveCurrency: 22500,
     currency: 'USD',
-    type: 'donation',
+    type: 'CREDIT',
     CreatedByUserId: 1,
     FromCollectiveId: 1
   },{
@@ -74,7 +74,7 @@ describe('Collective model', () => {
     amountInHostCurrency: 50000,
     netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
-    type: 'donation',
+    type: 'CREDIT',
     CreatedByUserId: 1,
     FromCollectiveId: 1
   },
@@ -84,7 +84,7 @@ describe('Collective model', () => {
     amountInHostCurrency: 50000,
     netAmountInCollectiveCurrency: 45000,
     currency: 'USD',
-    type: 'donation',
+    type: 'CREDIT',
     CreatedByUserId: 2,
     FromCollectiveId: 2
   }];
@@ -107,8 +107,8 @@ describe('Collective model', () => {
     }))
     .then(g => opensourceCollective = g)
     .then(() => collective.addUserWithRole(user1, 'BACKER'))
-    .then(() => Transaction.createMany([transactions[2]], { CollectiveId: opensourceCollective.id, HostCollectiveId: host.CollectiveId }))
-    .then(() => Transaction.createMany(transactions, { CollectiveId: collective.id, HostCollectiveId: host.CollectiveId })));
+    .then(() => Transaction.createManyDoubleEntry([transactions[2]], { CollectiveId: opensourceCollective.id, HostCollectiveId: host.CollectiveId }))
+    .then(() => Transaction.createManyDoubleEntry(transactions, { CollectiveId: collective.id, HostCollectiveId: host.CollectiveId })));
 
   it('creates a unique slug', () => {
     return Collective
@@ -163,7 +163,7 @@ describe('Collective model', () => {
 
   it('computes the number of backers until a certain month', (done) => {
     const until = new Date('2016-07-01');
-    collective.getBackersCount(until).then(count => {
+    collective.getBackersCount({until}).then(count => {
       const backers = {};
       transactions.map(t => {
         if (t.amount > 0 && t.createdAt < until)
@@ -212,12 +212,14 @@ describe('Collective model', () => {
       });
   });
 
-  it('get the related collectives', (done) => {
-    Collective.createMany(utils.data('relatedCollectives'))
+  it('get the related collectives', () => {
+    const defaultValues = {HostCollectiveId: host.CollectiveId, PaymentMethodId: 1 };
+    return Collective.createMany(utils.data('relatedCollectives'))
+    .then(collectives => collectives.map(c => c.id))
+    .map(CollectiveId => Transaction.createDoubleEntry({...transactions[2], CollectiveId, ...defaultValues}))
     .then(() => collective.getRelatedCollectives(3, 0))
     .then(relatedCollectives => {
       expect(relatedCollectives).to.have.length(3);
-      done();
     })
   });
 
@@ -227,8 +229,8 @@ describe('Collective model', () => {
       return Collective.getTopBackers()
         .then(backers => {
           backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(2);
-          expect(backers[0].totalDonations).to.equal(100000);
+          expect(backers.length).to.equal(3);
+          expect(backers[0].totalDonations).to.equal(175000);
           expect(backers[0]).to.have.property('website');
         });
     });
@@ -237,8 +239,8 @@ describe('Collective model', () => {
       return Collective.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'))
         .then(backers => {
           backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(50000);
+          expect(backers.length).to.equal(2);
+          expect(backers[0].totalDonations).to.equal(125000);
         });
     });
 
@@ -255,7 +257,7 @@ describe('Collective model', () => {
       return Collective.findOne({where: { type: 'USER' }}).then(userCollective => {
         return userCollective.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
           .then(donations => {
-            expect(donations.length).to.equal(5);
+            expect(donations.length).to.equal(8);
           })
       });
     });

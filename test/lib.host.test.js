@@ -5,10 +5,13 @@ import * as utils from '../test/utils';
 import * as hostlib from '../server/lib/hostlib';
 import * as currencyLib from '../server/lib/currency';
 
-
+/**
+ * The goal here is to test a host with collectives in multiple currencies
+ * We use sanitized data from wwcode for this
+ */
 describe('hostlib', () => {
   
-  const hostid = 848; // WWCode collective host
+  const hostid = 51; // WWCode collective host
   const startDate = new Date("2017-02-01");
   const endDate = new Date("2017-03-01");
   let collectiveids;
@@ -39,9 +42,11 @@ describe('hostlib', () => {
   }));
 
   it('get the backers stats', () => hostlib.getBackersStats(startDate, endDate, collectiveids).then(stats => {
+    console.log(">>> stats", stats)
     expect(stats.new).to.equal(4);
     expect(stats.repeat).to.equal(5);
-    expect(stats.total).to.equal(44);
+    expect(stats.inactive).to.equal(87);
+    expect(stats.total).to.equal(96);
     return true;
   }));
 

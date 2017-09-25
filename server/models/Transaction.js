@@ -219,6 +219,15 @@ export default (Sequelize, DataTypes) => {
     }).catch(console.error);
   };
 
+  Transaction.createManyDoubleEntry = (transactions, defaultValues) => {
+    return Promise.map(transactions, transaction => {
+      for (const attr in defaultValues) {
+        transaction[attr] = defaultValues[attr];
+      }
+      return Transaction.createDoubleEntry(transaction);
+    }).catch(console.error);
+  };
+
   /**
    * Create the opposite transaction from the perspective of the FromCollective
    * There is no fees

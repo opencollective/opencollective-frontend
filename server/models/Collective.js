@@ -719,7 +719,7 @@ export default function(Sequelize, DataTypes) {
    * type: COLLECTIVE/USER/ORGANIZATION or an array of types
    * until: date till when to count the number of backers
    */
-  Collective.prototype.getBackersCount = function(options) {
+  Collective.prototype.getBackersCount = function(options = {}) {
 
     const query = {
       attributes: [
@@ -751,7 +751,8 @@ export default function(Sequelize, DataTypes) {
 
     return models.Transaction.findOne(query)
     .then((result) => {
-      return Promise.resolve(Number(result.backersCount));
+      debug("getBackersCount", result.dataValues);
+      return Promise.resolve(Number(result.dataValues.backersCount));
     });
   };
 
@@ -882,7 +883,8 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.getTopBackers = (since, until, tags, limit) => {
-    return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5);
+    return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5)
+      .tap(backers => debug("getTopBackers", backers.map(b => b.dataValues)));
   };
 
   /*
