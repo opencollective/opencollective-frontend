@@ -811,10 +811,6 @@ export default function(Sequelize, DataTypes) {
     }).then(member => member && member.MemberCollectiveId);
   };
 
-  Collective.prototype.hasHost = function() {
-    return this.getHostId().then(id => Promise.resolve(Boolean(id)));
-  };
-
   Collective.prototype.getHostStripeAccount = function() {
     let HostCollectiveId;
     return this.getHostId()

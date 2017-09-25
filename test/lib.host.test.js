@@ -36,7 +36,7 @@ describe('hostlib', () => {
   before(() => utils.loadDB("wwcode_test"));
 
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
-    collectiveids = collectives.map(g => g.id).filter(id => id !== 51); // We remove wwcode HQ
+    collectiveids = collectives.map(g => g.id).filter(id => id !== hostid); // We remove the host collective
     where.CollectiveId = { $in: collectiveids };
     expect(collectives.length).to.equal(74);
   }));

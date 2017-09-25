@@ -33,9 +33,14 @@ const _addUserToCollective = (collective, user, options) => {
       return Promise.resolve();
     }
 
-    return collective.hasHost()
-    .then(hasHost => {
-      if (hasHost) {
+    return models.Member.findOne({
+      where: {
+        CollectiveId: collective.id,
+        role: roles.HOST
+      }
+    })
+    .then(host => {
+      if (host) {
         return Promise.reject(new errors.BadRequest('Collective already has a host'));
       }
       return Promise.resolve();

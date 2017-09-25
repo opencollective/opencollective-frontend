@@ -439,6 +439,7 @@ export default {
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -20000,
+        "type": "DEBIT",
         "amountInHostCurrency": -20000,
         "currency": "USD",
         "hostCurrency": "USD",
@@ -447,18 +448,21 @@ export default {
       {
         "description": "Flight SFO-BRU",
         "amount": -91859,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-02-22T08:00:00.000Z"
       },
       {
         "description": "Byword",
         "amount": -1199,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-03-04T08:00:00.000Z",
       },
       {
         "description": "Tipbox.is domain + dedicated server",
         "amount": -58861,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-06T07:00:00.000Z"
       },
@@ -466,29 +470,34 @@ export default {
         "description": "Working lunch with @mdp",
         "tags": ["food"],
         "amount": -3600,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-07T07:00:00.000Z"
       },
       {
         "description": "Homepage design end",
         "amount": -30000,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-28T07:00:00.000Z"
       },
       {
         "description": "Homepage frontend code",
         "amount": -30000,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-29T07:00:00.000Z"
       },
       {
         "description": "Donation to that great project",
         "amount": 999,
+        "type": "CREDIT",
         "currency": "USD",
       },
       {
         "description": "Donation to that great project",
         "amount": 99900,
+        "type": "CREDIT",
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z",
