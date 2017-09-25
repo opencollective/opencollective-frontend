@@ -8,11 +8,11 @@ export default (req, res, next) => {
   let orderBy;
   switch (sort) {
     case 'newest':
-      orderBy = 'g."createdAt"';
+      orderBy = 'c."createdAt"';
       break;
     case 'most popular':
     default:
-      orderBy = 't."totalDonations"';
+      orderBy = '"totalDonations"';
       break;
   }
 

@@ -490,13 +490,15 @@ export default {
       },
       {
         "description": "Donation to that great project",
-        "amount": 999,
+        "amount": 5000,
+        "netAmountInCollectiveCurrency": 4500,
         "type": "CREDIT",
         "currency": "USD",
       },
       {
         "description": "Donation to that great project",
-        "amount": 99900,
+        "amount": 10000,
+        "netAmountInCollectiveCurrency": 9000,
         "type": "CREDIT",
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
