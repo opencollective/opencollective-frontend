@@ -19,6 +19,15 @@ const testStripeAccounts = {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVHMivgRjQng'
     },
     CollectiveId: 207
+  },
+  'wwcode': {
+    service: 'stripe',
+    username: 'acct_xxxxxxxxxxxxxxxx',
+    token: 'sk_test_Hcsz2JJdMzEsU2xxxxxxxxxx',
+    data: {
+      publishableKey: 'pk_test_OSQ8IaRSyLe9FVxxxxxxxxxx'
+    },
+    CollectiveId: 51
   }
 }
 
@@ -29,7 +38,8 @@ const done = (err) => {
 }
 
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
-.then(() => models.ConnectedAccount.create(testStripeAccounts.opensource))
+.then(() => models.ConnectedAccount.create(testStripeAccounts.opensource)) // will fail if the open source collective is not present (e.g. when migrating wwcode_test)
 .then(() => models.ConnectedAccount.create(testStripeAccounts.brussesltogether))
+.then(() => models.ConnectedAccount.create(testStripeAccounts.wwcode))
 .then(() => done())
 .catch(done)
