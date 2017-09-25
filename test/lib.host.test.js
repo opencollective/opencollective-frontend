@@ -36,17 +36,16 @@ describe('hostlib', () => {
   before(() => utils.loadDB("wwcode_test"));
 
   beforeEach('get hosted collectives', () => hostlib.getHostedCollectives(hostid).then(collectives => {
-    collectiveids = collectives.map(g => g.id);
+    collectiveids = collectives.map(g => g.id).filter(id => id !== 51); // We remove wwcode HQ
     where.CollectiveId = { $in: collectiveids };
     expect(collectives.length).to.equal(74);
   }));
 
   it('get the backers stats', () => hostlib.getBackersStats(startDate, endDate, collectiveids).then(stats => {
-    console.log(">>> stats", stats)
     expect(stats.new).to.equal(4);
     expect(stats.repeat).to.equal(5);
-    expect(stats.inactive).to.equal(87);
-    expect(stats.total).to.equal(96);
+    expect(stats.inactive).to.equal(35);
+    expect(stats.total).to.equal(44);
     return true;
   }));
 
