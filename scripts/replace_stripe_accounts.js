@@ -37,9 +37,21 @@ const done = (err) => {
   process.exit();
 }
 
+const createConnectedAccount = (hostname) => {
+  return models.ConnectedAccount
+    .create(testStripeAccounts[hostname])
+    .catch(e => {
+      // will fail if the host is not present (e.g. when migrating wwcode_test)
+      console.log(`[warning] Unable to create a connected account for ${hostname}`);
+      if (process.env.DEBUG) {
+        console.error(e);
+      }
+    });
+}
+
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
-.then(() => models.ConnectedAccount.create(testStripeAccounts.opensource)) // will fail if the open source collective is not present (e.g. when migrating wwcode_test)
-.then(() => models.ConnectedAccount.create(testStripeAccounts.brussesltogether))
-.then(() => models.ConnectedAccount.create(testStripeAccounts.wwcode))
+.then(() => createConnectedAccount('opensource'))
+.then(() => createConnectedAccount('brussesltogether'))
+.then(() => createConnectedAccount('wwcode'))
 .then(() => done())
 .catch(done)
