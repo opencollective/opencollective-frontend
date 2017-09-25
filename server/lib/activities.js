@@ -92,7 +92,7 @@ export default {
 
       // Currently used for both new donation and expense
       case activities.COLLECTIVE_TRANSACTION_CREATED:
-        if (activity.data.transaction.type === type.DONATION) {
+        if (activity.data.transaction.type === type.CREDIT) {
           return `New Donation: ${userString} gave ${currency} ${amount} to ${collective}!`;
         }
         break;
@@ -223,7 +223,7 @@ export default {
       case activities.COLLECTIVE_TRANSACTION_CREATED:
 
         switch (activity.data.transaction.type) {
-          case type.DONATION:
+          case type.CREDIT:
             if (userTwitter) {
               tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${collectiveTwitter ? `@${collectiveTwitter}` : collectiveName} 👍 ${publicUrl}`);
               tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
@@ -231,7 +231,7 @@ export default {
             }
             return `New Donation: ${userString} gave ${currency} ${amount} to ${collective}!${tweetThis}`;
 
-          case type.EXPENSE:
+          case type.DEBIT:
             return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
         }
 
