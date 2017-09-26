@@ -160,6 +160,7 @@ export default function(Sequelize, DataTypes) {
         }
       })
       .then(usedQuantity => {
+        debug("availableQuantity", "usedQuantity:", usedQuantity, "maxQuantity", this.maxQuantity);
         if (this.maxQuantity && usedQuantity) {
           return this.maxQuantity - usedQuantity;
         } else if (this.maxQuantity) {
@@ -180,36 +181,6 @@ export default function(Sequelize, DataTypes) {
    */
   Tier.createMany = (tiers, defaultValues = {}) => {
     return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
-  };
-
-  Tier.getOrFind = (tier) => {
-    const { id, amount, interval, CollectiveId } = tier;
-    debug("getOrFind", tier);
-    if (id) {
-      return Tier.findOne({ where: { id, CollectiveId } })
-        .then(tier => {
-          debug("Tier found:", tier && tier.dataValues);
-          return tier;
-        });
-    } else {
-      // We pick the first tier that has an amount less than or equal to `amount` (for the same collective and interval)
-      return Tier.findOne({
-          where: {
-            type: types.TIER,
-            CollectiveId,
-            interval: interval || { $is: null },
-            amount: {
-              $or: [
-                { $lte: amount },
-                { $is: null }
-              ]
-          }
-        }, order: [['amount','DESC']] })
-        .then(tier => {
-          debug("Tier found:", tier && tier.dataValues);
-          return tier;
-        });
-    }
   };
 
   /**
