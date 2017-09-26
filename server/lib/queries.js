@@ -142,6 +142,10 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
     tagClause = 'AND c.tags && $tag'; // && operator means "overlaps", e.g. ARRAY[1,4,3] && ARRAY[2,1] == true
   }
 
+  if (typeof tag === 'string') {
+    tag = [ tag ];
+  }
+
   return sequelize.query(`
     with "totalDonations" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "totalDonations"
@@ -149,18 +153,18 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
       LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
       WHERE
         c."isActive" IS TRUE 
+        ${excludeClause}
         AND c."deletedAt" IS NULL
         AND t.type='CREDIT'
         AND t."PaymentMethodId" IS NOT NULL
         ${tagClause}
-        ${excludeClause}
         GROUP BY t."CollectiveId"
     )
-    select td.*, c.id, c.settings, c.data FROM "totalDonations" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id ${minTotalDonationInCentsClause}
+    select c.*, td.* FROM "totalDonations" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id ${minTotalDonationInCentsClause}
     ORDER ${orderClause} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset || 0}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
-    bind: { tag: [tag] },
+    bind: { tag },
     model: models.Collective
   });
 };

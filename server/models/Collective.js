@@ -930,10 +930,12 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.getCollectivesSummaryByTag = (tags, limit=3, excludeList=[], minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
+    debug("getCollectivesSummaryByTag", tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset);
     return queries.getCollectivesByTag(tags, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset)
       .then(collectives => {
+        debug("getCollectivesSummaryByTag", collectives && collectives.length, "collectives found");
         return Promise.all(collectives.map(collective => {
-
+          debug("getCollectivesSummaryByTag", "collective", collective.slug);
           return Promise.all([
               collective.getYearlyIncome(),
               queries

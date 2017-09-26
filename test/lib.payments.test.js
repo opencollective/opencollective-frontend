@@ -112,7 +112,7 @@ describe('lib.payments.test.js', () => {
           order.CollectiveId = user2.CollectiveId;
           return payments
             .executeOrder(user, order)
-            .catch(err => expect(err.message).to.equal('The host for the anotheruser collective has no Stripe account set up (HostId: null)'));
+            .catch(err => expect(err.message).to.equal('The host for the anotheruser collective has no Stripe account set up (HostCollectiveId: null)'));
         })
 
         it('if stripe has live key and not in production', () => models.ConnectedAccount
@@ -127,6 +127,16 @@ describe('lib.payments.test.js', () => {
 
           describe('1st payment', () => {
             
+            beforeEach('add transaction for collective 2', () => models.Transaction.createDoubleEntry({
+              CollectiveId: collective2.id,
+              CreatedByUserId: user2.id,
+              FromCollectiveId: user2.CollectiveId,
+              netAmountInCollectiveCurrency: 10000,
+              amount: 10000,
+              type: 'CREDIT',
+              PaymentMethodId: order.PaymentMethodId,
+              HostCollectiveId: host.CollectiveId
+            }));
             beforeEach('execute order', () => payments.executeOrder(user, order));
 
             it('successfully creates a paymentMethod with the CreatedByUserId', () => models.PaymentMethod
@@ -158,7 +168,7 @@ describe('lib.payments.test.js', () => {
               expect(member).to.exist;
             }));
 
-            it('successfully sends out an email to donor', (done) => {
+            it('successfully sends out an email to donor1', (done) => {
               setTimeout(() => {
                 expect(emailSendSpy.lastCall.args[0]).to.equal('thankyou');
                 expect(emailSendSpy.lastCall.args[1]).to.equal(user.email);

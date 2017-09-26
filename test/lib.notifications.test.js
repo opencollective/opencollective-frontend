@@ -89,7 +89,7 @@ describe('lib.notifications.test.js', () => {
         emailAttributes = emailLib.getTemplateAttributes(template.html);
       })
       .then(() => request(app)
-        .post(`/collectives/${collective.id}/expenses`)
+        .post(`/groups/${collective.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
@@ -111,7 +111,7 @@ describe('lib.notifications.test.js', () => {
       .then(() => {
         setTimeout(() => {
           const options = nm.sendMail.lastCall.args[0];
-          expect(options.to).to.equal(user.email);
+          expect(options.to).to.equal("emailbcc+internal_user-at-opencollective.com@opencollective.com");
           expect(options.subject).to.equal(`[TESTING] ${emailAttributes.subject}`);
           expect(options.html).to.contain(expense.description);
           expect(options.html).to.contain("APPROVE");

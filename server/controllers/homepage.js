@@ -33,17 +33,23 @@ const getTopCollectives = memoize((tag) => {
   return models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true);
 })
 
+const clearCache = () => {
+  getTopCollectives.Cache = WeakMap;
+  getTopCollectives('open source');
+  getTopCollectives('meetup');
+}
+
 // Update the cache every hour
 getTotalCollectives();
 getTopCollectives('open source');
 getTopCollectives('meetup');
-setInterval(() => {
-  getTopCollectives.Cache = WeakMap;
-  getTopCollectives('open source');
-  getTopCollectives('meetup');
-}, 1000 * 60 * 60);
+setInterval(clearCache, 1000 * 60 * 60);
 
 export default (req, res, next) => {
+
+  if (process.env.NODE_ENV !== 'production') {
+    clearCache();
+  }
 
   Promise.all([
     getTotalCollectives(),

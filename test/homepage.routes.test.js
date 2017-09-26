@@ -12,8 +12,14 @@ describe('homepage.routes.test.js', () => {
 
   let user, collective, paymentMethod;
 
+  beforeEach((done) => {
+    setTimeout(done, 1000);
+  });
   beforeEach(() => utils.resetTestDB());
-
+  beforeEach((done) => {
+    setTimeout(done, 1000);
+  });
+  
   beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
   beforeEach(() =>
     models.Collective
@@ -29,8 +35,10 @@ describe('homepage.routes.test.js', () => {
       }))
       .tap(p => paymentMethod = p)
       .then(() => {
-        return models.Transaction.create({
-          amount:100000,
+        return models.Transaction.createDoubleEntry({
+          amount: 100000,
+          netAmountInCollectiveCurrency: 100000,
+          type: 'CREDIT',
           PaymentMethodId: paymentMethod.id,
           FromCollectiveId: user.CollectiveId,
           CollectiveId: collective.id,
