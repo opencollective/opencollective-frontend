@@ -53,21 +53,18 @@ describe('homepage.routes.test.js', () => {
    */
   describe('#get /homepage', () => {
 
-    it('gets the homepage data', (done) => {
-      request(app)
-        .get(`/homepage?api_key=${application.api_key}`)
-        .expect(200)
-        .end((err, res) => {
-          const { body } = res;
-          console.log(">>> body: ", body);
-          expect(body.stats).to.have.property('totalCollectives');
-          expect(body.collectives).to.have.property('opensource');
-          expect(body.collectives).to.have.property('meetup');
-          expect(body.collectives.opensource.length).to.equal(1);
-          expect(body.collectives.opensource[0].name).to.equal(collectiveData.name);
-          done();
-        })
-    });
+    it('gets the homepage data', () => request(app)
+      .get(`/homepage?api_key=${application.api_key}`)
+      .expect(200)
+      .then((res) => {
+        const { body } = res;
+        console.log(">>> body: ", body);
+        expect(body.stats).to.have.property('totalCollectives');
+        expect(body.collectives).to.have.property('opensource');
+        expect(body.collectives).to.have.property('meetup');
+        expect(body.collectives.opensource.length).to.equal(1);
+        expect(body.collectives.opensource[0].name).to.equal(collectiveData.name);
+      }))
 
   });
 

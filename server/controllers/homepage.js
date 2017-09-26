@@ -1,6 +1,7 @@
 import queries from '../lib/queries';
 import models from '../models';
 import { memoize } from 'lodash';
+memoize.Cache = Map;
 
 const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget);
 
@@ -33,22 +34,35 @@ const getTopCollectives = memoize((tag) => {
   return models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true);
 })
 
-const clearCache = () => {
-  getTopCollectives.Cache = WeakMap;
-  getTopCollectives('open source');
-  getTopCollectives('meetup');
+const refreshCache = () => {
+  console.log(">>> Refreshing cache for homepage");
+  getTopCollectives.cache.clear();
+  getTotalCollectives.cache.clear();
+  getTotalDonors.cache.clear();
+  getTopCollectives('open source'),
+  getTopCollectives('meetup'),
+  getTotalDonors(),
+  getTotalCollectives()
 }
 
+// We only use the cache on staging and production
+const useCache = ['production', 'staging'].indexOf(process.env.NODE_ENV) !== -1;
+
 // Update the cache every hour
-getTotalCollectives();
-getTopCollectives('open source');
-getTopCollectives('meetup');
-setInterval(clearCache, 1000 * 60 * 60);
+if (useCache) {
+  getTotalCollectives();
+  getTopCollectives('open source');
+  getTopCollectives('meetup');
+  setInterval(refreshCache, 1000 * 60 * 60);
+}
 
 export default (req, res, next) => {
 
-  if (process.env.NODE_ENV !== 'production') {
-    clearCache();
+  // We skip the cache when testing
+  if (!useCache) {
+    getTopCollectives.cache.clear();
+    getTotalCollectives.cache.clear();
+    getTotalDonors.cache.clear();
   }
 
   Promise.all([
