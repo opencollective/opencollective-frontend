@@ -13,11 +13,6 @@ import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
 
-const DEFAULT_TIERS = [
-  { "type": "TIER", "name": "backer", "amount": 1000, "interval": "month", currency: "USD" },
-  { "type": "TIER", "name": "sponsor", "amount": 10000, "interval": "month", currency: "USD" }
-];
-
 const {
   Activity,
   Notification,
@@ -236,14 +231,11 @@ export const createFromGithub = (req, res, next) => {
   const { connectedAccountId } = req.jwtPayload;
 
   let creatorUser, creatorCollective, options, creatorCollectiveConnectedAccount;
-  const { collective } = payload;
+  const collective = payload.group;
   const githubUser = payload.user;
   const contributors = payload.users;
   const creatorGithubUsername = payload.github_username;
   let createdCollective;
-
-  // Default tiers
-  collective.tiers = collective.tiers || DEFAULT_TIERS;
 
   ConnectedAccount
     .findOne({
@@ -274,19 +266,19 @@ export const createFromGithub = (req, res, next) => {
         return creatorCollective.save();
       }
     })
-    .then(() => Collective.findOne({where: {slug: collective.slug.toLowerCase()}}))
+    .then(() => Collective.findOne({ where: { slug: collective.slug.toLowerCase() }}))
     .then(existingCollective => {
       if (existingCollective) {
         collective.slug = `${collective.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Collective.create(Object.assign({}, collective, { LastEditedByUserId: creatorUser.id }));
+      return Collective.create(Object.assign({}, collective, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => Collective.findById(defaultHostCollectiveId())) // make sure the host exists
     .tap(host => {
       if (host) {
-        return _addUserToCollective(createdCollective, { CollectiveId: host.id }, { role: roles.HOST, remoteUser: creatorUser })
+        return _addUserToCollective(createdCollective, { id: host.CreatedByUserId, CollectiveId: host.id }, { role: roles.HOST, remoteUser: creatorUser })
       } else {
         return null;
       }
@@ -328,7 +320,7 @@ export const createFromGithub = (req, res, next) => {
             return ca.getCollective();
           }
         })
-        .then(userCollective => (userCollective && userCollective.CreatedByUserId) || User.createUserWithCollective(Object.assign(userAttr)).then(user => {
+        .then(userCollective => (userCollective && userCollective.CreatedByUserId) ? userCollective : User.createUserWithCollective(Object.assign(userAttr)).then(user => {
           contributorUser = user;
           return user.collective
         }))
@@ -346,7 +338,7 @@ export const createFromGithub = (req, res, next) => {
           return contributorUserCollective.save();
         })
         .then(() => contributorUserCollective.addConnectedAccount(connectedAccount))
-        .then(() => _addUserToCollective(createdCollective, { CollectiveId: contributorUserCollective.id }, options));
+        .then(() => _addUserToCollective(createdCollective, { id: contributorUserCollective.CreatedByUserId, CollectiveId: contributorUserCollective.id }, options));
       } else {
         return Promise.resolve();
       }
