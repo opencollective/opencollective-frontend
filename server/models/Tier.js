@@ -1,7 +1,6 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import { capitalize, pluralize } from '../lib/utils';
-import types from '../constants/tiers';
 import debugLib from 'debug';
 const debug = debugLib('tier');
 import CustomDataTypes from './DataTypes';
