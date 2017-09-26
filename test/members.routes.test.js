@@ -70,7 +70,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a non-existing user to a collective', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/98765?api_key=${application.api_key}`)
+        .post(`/groups/${collective.id}/users/98765?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -78,7 +78,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a user to a non-existing collective', (done) => {
       request(app)
-        .post(`/collectives/98765/users/${users[1].id}?api_key=${application.api_key}`)
+        .post(`/groups/98765/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(404)
         .end(done);
@@ -86,7 +86,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a user with a non-existing role', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[1].id}`)
+        .post(`/groups/${collective.id}/users/${users[1].id}`)
         .send({
           api_key: application.api_key,
           role: 'nonexistingrole'
@@ -98,7 +98,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a user to a collective if not a member of the collective', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[2].id}`)
+        .post(`/groups/${collective.id}/users/${users[2].id}`)
         .send({
           api_key: application.api_key,
           role: 'ADMIN'
@@ -110,7 +110,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a user to a collective if no host', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[1].id}`)
+        .post(`/groups/${collective.id}/users/${users[1].id}`)
         .send({
           api_key: application.api_key,
           role: 'nonexistingrole'
@@ -122,7 +122,7 @@ describe('members.routes.test.js', () => {
 
     it('fails adding a host if the collective already has one', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[1].id}`)
+        .post(`/groups/${collective.id}/users/${users[1].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(400, {
           error: {
@@ -140,7 +140,7 @@ describe('members.routes.test.js', () => {
 
     it('successfully add a user to a collective', (done) => {
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[1].id}?api_key=${application.api_key}`)
+        .post(`/groups/${collective.id}/users/${users[1].id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .expect(200)
         .end((e, res) => {
@@ -158,7 +158,7 @@ describe('members.routes.test.js', () => {
     it('successfully add a user to a collective with a role', (done) => {
       const role = roles.ADMIN;
       request(app)
-        .post(`/collectives/${collective.id}/users/${users[2].id}`)
+        .post(`/groups/${collective.id}/users/${users[2].id}`)
         .set('Authorization', `Bearer ${users[0].jwt()}`)
         .send({
           api_key: application.api_key,
@@ -194,7 +194,7 @@ describe('members.routes.test.js', () => {
       })
       .then(() => {
         request(app)
-          .post(`/collectives/${collective.id}/users/${users[2].id}`)
+          .post(`/groups/${collective.id}/users/${users[2].id}`)
           .set('Authorization', `Bearer ${users[0].jwt()}`)
           .send({
             api_key: application.api_key,
@@ -223,7 +223,7 @@ describe('members.routes.test.js', () => {
   /**
    * Get a collective's users
    */
-  describe('/collectives/:slug/users', () => {
+  describe('/groups/:slug/users', () => {
 
     beforeEach(createTransactions);
 
@@ -233,8 +233,8 @@ describe('members.routes.test.js', () => {
 
     // Add users to tiers
     beforeEach('add users to tiers', () => Promise.all([
-      models.Order.create({ CreatedByUserId: users[2].id, FromCollectiveId: users[2].CollectiveId, CollectiveId: 1, TierId: 1, processedAt: new Date }),
-      models.Order.create({ CreatedByUserId: users[3].id, FromCollectiveId: users[3].CollectiveId, CollectiveId: 1, TierId: 2, processedAt: new Date })
+      models.Member.update({ TierId: 1 }, { where: { MemberCollectiveId: users[2].CollectiveId, CollectiveId: collective.id }}),
+      models.Member.update({ TierId: 2 }, { where: { MemberCollectiveId: users[3].CollectiveId, CollectiveId: collective.id }})
     ]));
 
     // Add active and non active subscription
@@ -245,7 +245,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers with their corresponding tier', () =>
       request(app)
-        .get(`/collectives/${collective.slug}/backers?api_key=${application.api_key}`)
+        .get(`/groups/${collective.slug}/backers?api_key=${application.api_key}`)
         .expect(200)
         .toPromise()
         .tap(res => {
@@ -254,27 +254,27 @@ describe('members.routes.test.js', () => {
           backers.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
           expect(backers[0].role).to.equal('BACKER');
           expect(backers[1].role).to.equal('BACKER');
-          expect(backers[1].tier.name).to.equal('backer');
-          expect(backers[0].tier.name).to.equal('sponsor');
+          expect(backers[1].tier).to.equal('backers');
+          expect(backers[0].tier).to.equal('sponsors');
         })
     );
 
     it('get the list of *active* backers with their corresponding tier', (done) => {
       request(app)
-        .get(`/collectives/${collective.slug}/backers?filter=active&api_key=${application.api_key}`)
+        .get(`/groups/${collective.slug}/backers?filter=active&api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const backers = res.body;
           expect(backers).to.have.length(1);
           backers.sort((a,b) => (a.firstName < b.firstName) ? -1 : 1);
-          expect(backers[0].tier.name).to.equal('backer');
+          expect(backers[0].tier).to.equal('backers');
         })
         .end(done);
     });
 
     it('get the list of backers in csv format without emails if not logged in as admin', (done) => {
       request(app)
-        .get(`/collectives/${collective.slug}/backers.csv?api_key=${application.api_key}`)
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .expect(200)
         .expect((res) => {
           const headers = res.text.split('\n')[0].replace(/"/g, '').split(',');
@@ -286,9 +286,9 @@ describe('members.routes.test.js', () => {
           expect(backers.length).to.equal(2);
           backers.sort((a,b) => (a.substr(0,1) < b.substr(0,1)) ? -1 : 1);
           expect(getValue(0, "role")).to.equal('"BACKER"');
-          expect(getValue(0, "tier")).to.equal('"backer"');
+          expect(getValue(0, "tier")).to.equal('"backers"');
           expect(getValue(1, "role")).to.equal('"BACKER"');
-          expect(getValue(1, "tier")).to.equal('"sponsor"');
+          expect(getValue(1, "tier")).to.equal('"sponsors"');
           expect(headers).to.not.contain('"email"');
         })
         .end(done);
@@ -296,7 +296,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers in csv format without emails if logged in as backer', (done) => {
       request(app)
-        .get(`/collectives/${collective.slug}/backers.csv?api_key=${application.api_key}`)
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[2].jwt()}`) // BACKER
         .expect(200)
         .expect((res) => {
@@ -308,7 +308,7 @@ describe('members.routes.test.js', () => {
 
     it('get the list of backers in csv format with emails if logged in as admin', (done) => {
       request(app)
-        .get(`/collectives/${collective.slug}/backers.csv?api_key=${application.api_key}`)
+        .get(`/groups/${collective.slug}/backers.csv?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${users[1].jwt()}`) // ADMIN
         .expect(200)
         .expect((res) => {

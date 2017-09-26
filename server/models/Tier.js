@@ -217,6 +217,7 @@ export default function(Sequelize, DataTypes) {
    */
   Tier.appendTier = (collective, backerCollectives) => {
     const backerCollectivesIds = backerCollectives.map(b => b.id);
+    debug("appendTier", collective.name, "backers: ", backerCollectives.length);
     return models.Member.findAll({
       where: {
         MemberCollectiveId: { $in: backerCollectivesIds },
@@ -231,6 +232,7 @@ export default function(Sequelize, DataTypes) {
       })
       return backerCollectives.map(backerCollective => {
         backerCollective.tier = membershipsForBackerCollective[backerCollective.id];
+        debug("appendTier for", backerCollective.name,":", backerCollective.tier && backerCollective.tier.slug);
         return backerCollective;
       })
     });
