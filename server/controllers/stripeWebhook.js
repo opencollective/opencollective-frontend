@@ -104,6 +104,7 @@ export default function stripeWebhook(req, res, next) {
         ]
       })
       .then((order) => {
+        debug("fetchOrder", order && order.dataValues);
         /**
          * Stripe doesn't make a difference between development, test, staging
          * environments. If we get a webhook from another env,
@@ -157,7 +158,7 @@ export default function stripeWebhook(req, res, next) {
       const order = results.fetchOrder;
 
       if (!customer) {
-        return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
+        return cb(new errors.BadRequest(`Customer Id not found. Order id: ${order.id}`));
       }
       debug("validatePaymentMethod", "customer:", customer);
       if (!order.paymentMethod) {
@@ -166,13 +167,17 @@ export default function stripeWebhook(req, res, next) {
 
       // We need to iterate through the PaymentMethod.data.customerIdForHost[stripeAccount]
       if (order.paymentMethod.data.customerIdForHost) {
+        debug("validatePaymentMethod", "order.paymentMethod.data.customerIdForHost", order.paymentMethod.data.customerIdForHost);
         Object.keys(order.paymentMethod.data.customerIdForHost).forEach(hostStripeAccountId => {
+          debug(order.paymentMethod.data.customerIdForHost[hostStripeAccountId],"===", customer);
+          debug("hostStripeAccountId", hostStripeAccountId);
           if (order.paymentMethod.data.customerIdForHost[hostStripeAccountId] === customer) {
             return cb();
           }
         });
+        // return cb(new errors.BadRequest(`Customer Id not found`));
       } else {
-        return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
+        return cb(new errors.BadRequest(`Customer Id not found. Order id: ${order.id}`));
       }
     }],
 
@@ -185,7 +190,7 @@ export default function stripeWebhook(req, res, next) {
         if (!charge) {
           return cb(new errors.BadRequest(`ChargeId not found: ${chargeId}`));
         }
-        debug("retrieveCharge", charge);
+        debug("retrieveCharge", charge && charge.id);
         return cb(null, charge);
       })
       .catch(cb);

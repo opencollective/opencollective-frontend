@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import request from 'supertest';
-import nock from 'nock';
 import _ from 'lodash';
 import sinon from 'sinon';
 import app from '../server/index';
@@ -8,7 +7,7 @@ import activities from '../server/constants/activities';
 import { type } from '../server/constants/transactions';
 import * as utils from '../test/utils';
 import models from '../server/models';
-import stripeMock from './mocks/stripe';
+import originalStripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
 import * as payments from '../server/lib/payments';
 import initNock from './webhooks.routes.test.nock.js';
@@ -19,25 +18,33 @@ import { appStripe } from '../server/gateways/stripe';
  */
 const userData = utils.data('user1');
 const collectiveData = utils.data('collective1');
-const webhookEvent = stripeMock.webhook;
-const webhookInvoice = webhookEvent.data.object;
-const webhookSubscription = webhookInvoice.lines.data[0];
 
-const STRIPE_URL = 'https://api.stripe.com:443';
 const CURRENCY = 'USD';
 const INTERVAL = 'month';
 
-describe('webhooks.routes.test.js', () => {
-  const nocks = {};
-  let sandbox, user, host, paymentMethod, collective, order, emailSendSpy, stripeToken;
+const hostStripeAccount = {
+  service: 'stripe',
+  token: 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j',
+  username: 'acct_198T7jD8MNtzsDcg'
+};
 
-  before(() => {
+describe('webhooks.routes.test.js', () => {
+  let sandbox, user, host, paymentMethod, collective, order, emailSendSpy, stripeToken, stripeMock, webhookEvent, webhookInvoice, webhookSubscription;
+
+  beforeEach(() => {
     initNock();
+    stripeMock = _.cloneDeep(originalStripeMock);
+    webhookEvent = stripeMock.webhook;
+    webhookInvoice = webhookEvent.data.object;
+    webhookSubscription = webhookInvoice.lines.data[0];
     sandbox = sinon.sandbox.create();
     sandbox.stub(appStripe.events, "retrieve", () => Promise.resolve(stripeMock.webhook));
+    sandbox.stub(appStripe.charges, "retrieve", () => Promise.resolve(stripeMock.charges.create));
+    sandbox.stub(appStripe.customers, "createSubscription", () => Promise.resolve(stripeMock.createSubscription));
+    sandbox.stub(appStripe.balance, "retrieveTransaction", () => Promise.resolve(stripeMock.balance));
   });
 
-  after(() => sandbox.restore());
+  afterEach(() => sandbox.restore());
 
   beforeEach(() => {
     emailSendSpy = sandbox.spy(emailLib, 'send');
@@ -48,7 +55,10 @@ describe('webhooks.routes.test.js', () => {
   beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
 
   beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
-  beforeEach(() => models.User.createUserWithCollective({ email: 'host@opencollective.com'}).tap(u => host = u));
+  beforeEach(() => models.User.createUserWithCollective({ email: 'host@opencollective.com'}).tap(u => {
+    host = u;
+    hostStripeAccount.CollectiveId = host.CollectiveId;
+  }));
 
   // Create a collective.
   beforeEach('create a collective', () => models.Collective.create(collectiveData).then(c => collective = c));
@@ -61,33 +71,21 @@ describe('webhooks.routes.test.js', () => {
 
   // create a stripe account
   beforeEach(() =>
-    models.ConnectedAccount.create({
-      service: 'stripe',
-      token: 'sk_test_XOFJ9lGbErcK5akcfdYM1D7j',
-      username: 'acct_198T7jD8MNtzsDcg',
-      CollectiveId: host.CollectiveId
-    }));
+    models.ConnectedAccount.create(hostStripeAccount));
 
   afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   describe('success', () => {
-
-    const charge2WebhookEvent = _.extend({}, webhookEvent, {
-      id: webhookEvent.id.replace(/0/g, 3),
-      type: 'invoice.payment_succeeded'
-    });  
-    charge2WebhookEvent.data.object.charge = charge2WebhookEvent.data.object.charge.replace('xm4', 'xm5');
-    charge2WebhookEvent.data.object.customer = "cus_BM7mwnm6mLe271";
-    
-    beforeEach('Nock for retrieving charge', () => {
-      nocks['charge.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/ch_17KUJnBgJgc4Ba6uvdu1hxm4')
-        .twice()
-        .reply(200, stripeMock.charges.create);
-    });
-
+    let charge2WebhookEvent;
     beforeEach('Generate a new stripe token', async () => {
       stripeToken = await utils.createStripeToken();
+      charge2WebhookEvent = _.extend({}, webhookEvent, {
+        id: webhookEvent.id.replace(/0/g, 3),
+        type: 'invoice.payment_succeeded'
+      });
+      const newChargeId = charge2WebhookEvent.data.object.charge.replace('xm4', 'xm5');
+      charge2WebhookEvent.data.object.charge = newChargeId;
+      stripeMock.charges.create.id = newChargeId;
     });
 
     // Now we make the order using above beforeEach calls
@@ -136,6 +134,7 @@ describe('webhooks.routes.test.js', () => {
         .tap((res) => {
           expect(res.count).to.equal(1);
           paymentMethod = res.rows[0];
+          charge2WebhookEvent.data.object.customer = paymentMethod.data.customerIdForHost[hostStripeAccount.username];
           done();
         })
         .catch(done);
@@ -170,7 +169,7 @@ describe('webhooks.routes.test.js', () => {
         }]
       })
       .tap((res) => {
-        expect(res.count).to.equal(2);
+        expect(res.count).to.equal(4);
         const transaction = res.rows[1];
         expect(transaction.OrderId).to.be.equal(order.id);
         expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
@@ -178,13 +177,13 @@ describe('webhooks.routes.test.js', () => {
         expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
         expect(transaction.currency).to.be.equal(CURRENCY);
         expect(transaction.type).to.be.equal(type.CREDIT);
-        expect(transaction).to.have.property('amountInHostCurrency', 28782); // taken from stripe mocks
-        expect(transaction).to.have.property('hostCurrency', 'EUR');
-        expect(transaction).to.have.property('hostFeeInHostCurrency', 2878);
-        expect(transaction).to.have.property('platformFeeInHostCurrency', 1439);
-        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 860);
-        expect(transaction).to.have.property('hostCurrencyFxRate', 1.21603780140366);
-        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28705)
+        expect(transaction).to.have.property('amountInHostCurrency', 140000); // taken from stripe mocks
+        expect(transaction).to.have.property('hostCurrency', 'USD');
+        expect(transaction).to.have.property('hostFeeInHostCurrency', 14000);
+        expect(transaction).to.have.property('platformFeeInHostCurrency', 7000);
+        expect(transaction).to.have.property('paymentProcessorFeeInHostCurrency', 15500);
+        expect(transaction).to.have.property('hostCurrencyFxRate', 0.25);
+        expect(transaction).to.have.property('netAmountInCollectiveCurrency', 25875)
         expect(transaction.amount).to.be.equal(webhookSubscription.amount);
         expect(transaction.Order.Subscription.isActive).to.be.equal(true);
         expect(transaction.Order.Subscription).to.have.property('activatedAt');
@@ -203,7 +202,7 @@ describe('webhooks.routes.test.js', () => {
         .tap((res) => {
           const e = res.rows[0].data.event;
           expect(res.count).to.equal(1);
-          expect(e.id).to.be.equal(charge2WebhookEvent.id);
+          expect(e.id).to.be.equal(webhookEvent.id);
           done();
         })
         .catch(done);
@@ -217,79 +216,10 @@ describe('webhooks.routes.test.js', () => {
           error: {
             code: 400,
             type: 'bad_request',
-            message: 'This chargeId: ch_17KUJnBgJgc4Ba6uvdu1hxm4 already exists.'
+            message: `This chargeId: ${stripeMock.charges.create.id} already exists.`
           }
         })
         .end(done)
-    });
-
-    it('should create a second transaction after the first webhook with different chargeid', done => {
-      const newWebhookEvent = _.cloneDeep(webhookEvent);
-      newWebhookEvent.data.object.charge = 'ch_charge2';
-      newWebhookEvent.id = 'evt_0002';
-
-      nocks['events2.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${newWebhookEvent.id}`)
-        .reply(200,
-          _.extend({},
-            newWebhookEvent, {
-            type: 'invoice.payment_succeeded'
-          })
-        );
-      nocks['charge2.retrieve'] = nock(STRIPE_URL)
-        .get('/v1/charges/ch_charge2')
-        .reply(200, stripeMock.charges.create);
-
-      nocks['balance.retrieveTransaction'] = nock(STRIPE_URL)
-        .get('/v1/balance/history/txn_165j8oIqnMN1wWwOKlPn1D4y')
-        .reply(200, stripeMock.balance);
-
-      request(app)
-        .post('/webhooks/stripe')
-        .send(newWebhookEvent)
-        .expect(200)
-        .end(err => {
-          expect(err).to.not.exist;
-          models.Transaction.findAndCountAll({
-            include: [{ 
-              model: models.Order,
-              include: [{
-                model: models.Subscription
-              }]
-            }]
-          })
-          .tap(res => {
-            expect(res.count).to.be.equal(6); // third transaction
-            const transaction = res.rows[2];
-            expect(transaction.CollectiveId).to.be.equal(order.CollectiveId);
-            expect(transaction.CreatedByUserId).to.be.equal(order.CreatedByUserId);
-            expect(transaction.PaymentMethodId).to.be.equal(paymentMethod.id);
-            expect(transaction.currency).to.be.equal(CURRENCY);
-            expect(transaction.type).to.be.equal(type.CREDIT);
-            expect(transaction.amount).to.be.equal(webhookSubscription.amount);
-
-            expect(res.rows[0]).to.have.property('amountInHostCurrency', 28782); // taken from stripe mocks
-            expect(res.rows[0]).to.have.property('hostCurrency', 'EUR');
-            expect(res.rows[0]).to.have.property('hostFeeInHostCurrency', 2878);
-            expect(res.rows[0]).to.have.property('platformFeeInHostCurrency', 1439);
-            expect(res.rows[0]).to.have.property('paymentProcessorFeeInHostCurrency', 860);
-            expect(transaction).to.have.property('hostCurrencyFxRate', 1.21603780140366);
-            expect(transaction).to.have.property('netAmountInCollectiveCurrency', 28705);
-            expect(transaction.Order.Subscription.isActive).to.be.equal(true);
-            expect(transaction.Order.Subscription).to.have.property('activatedAt');
-            expect(transaction.Order.Subscription.interval).to.be.equal('month');
-
-            expect(emailSendSpy.callCount).to.equal(3);
-            expect(emailSendSpy.thirdCall.args[0])
-            expect(emailSendSpy.thirdCall.args[0]).to.equal('thankyou');
-            expect(emailSendSpy.thirdCall.args[2].firstPayment).to.be.false;
-            expect(emailSendSpy.thirdCall.args[1]).to.equal(user.email);
-
-            done();
-          })
-          .catch(done);
-
-        });
     });
 
     it('successfully sends out an invoice by email to donor', () => {
@@ -309,10 +239,6 @@ describe('webhooks.routes.test.js', () => {
     const env = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
 
-    nocks['events.retrieve'] = nock(STRIPE_URL)
-      .get(`/v1/events/${event.id}`)
-      .reply(200, event);
-
     request(app)
       .post('/webhooks/stripe')
       .send(event)
@@ -320,7 +246,6 @@ describe('webhooks.routes.test.js', () => {
       .end((err) => {
         expect(err).to.not.exist;
         process.env.NODE_ENV = env;
-        expect(nocks['events.retrieve'].isDone()).to.be.false;
         done();
       });
   });
@@ -328,19 +253,11 @@ describe('webhooks.routes.test.js', () => {
   describe('errors', () => {
 
     it('returns an error if the event is not `invoice.payment_succeeded`', (done) => {
-      const event = _.extend({}, webhookEvent, {
-        type: 'application_fee.created'
-      });
-
-      event.id = event.id.replace(/0/g, 1);
-
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${event.id}`)
-        .reply(200, event);
+      stripeMock.webhook.type = 'application_fee.created';
 
       request(app)
         .post('/webhooks/stripe')
-        .send(event)
+        .send(stripeMock.webhook)
         .expect(400, {
           error: {
             code: 400,
@@ -352,16 +269,15 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('returns an error if the event does not exist', (done) => {
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/123`)
-        .reply(200, {
-          error: {
-            type: 'invalid_request_error',
-            message: 'No such event',
-            param: 'id',
-            requestId: 'req_7Y8TeQytYKcs1k'
-          }
-        });
+
+      stripeMock.webhook = {
+        error: {
+          type: 'invalid_request_error',
+          message: 'No such event',
+          param: 'id',
+          requestId: 'req_7Y8TeQytYKcs1k'
+        }
+      };
 
       request(app)
         .post('/webhooks/stripe')
@@ -375,10 +291,6 @@ describe('webhooks.routes.test.js', () => {
     it('returns an error if the subscription id does not appear in an exisiting transaction in production', (done) => {
       const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
       e.data.object.lines.data[0].id = 'abc';
-
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${webhookEvent.id}`)
-        .reply(200, e);
 
       const env = app.set('env');
       app.set('env', 'production');
@@ -400,30 +312,21 @@ describe('webhooks.routes.test.js', () => {
 
     });
 
-    it('returns 200 if the subscription id does not appear in an existing transaction in NON-production', (done) => {
-      const e = _.extend({}, webhookEvent, { type: 'invoice.payment_succeeded' });
-      e.data.object.lines.data[0].id = 'abc';
-
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${webhookEvent.id}`)
-        .reply(200, e);
-
+    it('returns 200 if the subscription id does not appear in an existing order in NON-production', (done) => {
+      stripeMock.webhook.type = 'invoice.payment_succeeded';
+      stripeMock.webhook.data.object.lines.data[0].id = 'abc';
       request(app)
         .post('/webhooks/stripe')
-        .send(e)
+        .send(stripeMock.webhook)
         .expect(200)
         .end(done);
-
     });
 
     it('returns 200 if the plan id is not valid', (done) => {
       const e = _.extend({}, webhookEvent);
       e.id = e.id.replace(/0/g, 2);
       e.data.object.lines.data[0].plan.id = 'abc';
-
-      nocks['events.retrieve'] = nock(STRIPE_URL)
-        .get(`/v1/events/${e.id}`)
-        .reply(200, e);
+      stripeMock.webhook.data.object.lines.data[0].plan.id = 'abc';
 
       request(app)
         .post('/webhooks/stripe')

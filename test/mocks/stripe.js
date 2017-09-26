@@ -231,6 +231,8 @@ export default {
     "type": "invoice.payment_succeeded"
   },
 
+  "createSubscription": {"id":"sub_BM7mrzF0w129va","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506398222,"current_period_end":1506916617,"current_period_start":1506398222,"customer":"cus_BT6ORKojThuNLn","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B6ABuD8MNtzsDcgL7axnWRL","object":"subscription_item","created":1506398222,"metadata":{},"plan":{"id":"USD-MONTH-35000","object":"plan","amount":35000,"created":1504702187,"currency":"usd","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"USD-MONTH-35000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BM7mrzF0w129va"},"livemode":false,"metadata":{"from":"http://localhost:3000/philmod","to":"http://localhost:3000/scouts","PaymentMethodId":"4"},"plan":{"id":"USD-MONTH-35000","object":"plan","amount":35000,"created":1504702187,"currency":"usd","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"USD-MONTH-35000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506398222,"status":"trialing","tax_percent":null,"trial_end":1506916617,"trial_start":1506398222},
+
   "webhook": {
     "created": 1326853478,
     "livemode": false,
