@@ -21,10 +21,6 @@ const order = {
           "funding": "credit"
         }
     },
-    "tier": {
-        "id": 70,
-        "amount": null
-    },
     "collective": {
         "id": 207
     }
@@ -440,7 +436,7 @@ describe('createOrder', () => {
     // Should fail if not enough funds in the fromCollective
     let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal("You don't have enough funds available ($3,317 left) to execute this order ($100,000)");
+    expect(res.errors[0].message).to.equal("You don't have enough funds available ($7,157 left) to execute this order ($100,000)");
 
     order.totalAmount = 20000;
 
@@ -449,7 +445,7 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
 
     const availableBalance = await paymentMethod.getBalanceForUser(xdamman);
-    expect(availableBalance.amount).to.equal(311666);
+    expect(availableBalance.amount).to.equal(695731);
     
     const orderCreated = res.data.createOrder;
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
