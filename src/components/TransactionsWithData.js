@@ -73,11 +73,11 @@ query Transactions($CollectiveId: Int!, $type: String, $limit: Int, $offset: Int
       id
       name
     }
-    ... on ExpenseTransaction {
+    ... on Expense {
       category
       attachment
     }
-    ... on OrderTransaction {
+    ... on Order {
       subscription {
         interval
       }
