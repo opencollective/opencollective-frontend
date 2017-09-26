@@ -12,6 +12,9 @@ const CURRENCY = 'EUR';
 const STRIPE_TOKEN = 'tok_123456781234567812345678';
 const application = utils.data('application');
 
+/**
+ * Keep this for backward compatibility with old website (add funds)
+ */
 describe('orders.routes.test.js', () => {
   let user, user2, host, collective, sandbox, executeOrderStub;
 
@@ -64,7 +67,7 @@ describe('orders.routes.test.js', () => {
             role: roles.ADMIN
           })
           .then(() => request(app)
-            .post(`/collectives/${collective.id}/orders/manual`)
+            .post(`/groups/${collective.id}/donations/manual`)
             .set('Authorization', `Bearer ${user2.jwt()}`)
             .send({
               api_key: application.api_key,
@@ -78,7 +81,7 @@ describe('orders.routes.test.js', () => {
         it('when user is a BACKER', () => {
           return collective.addUserWithRole(user2, roles.BACKER)
           .then(() => request(app)
-            .post(`/collectives/${collective.id}/orders/manual`)
+            .post(`/groups/${collective.id}/donations/manual`)
             .set('Authorization', `Bearer ${user2.jwt()}`)
             .send({
               api_key: application.api_key,
@@ -95,7 +98,7 @@ describe('orders.routes.test.js', () => {
         describe('fails when amount', () => {
           it('is missing', () => {
             request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${user.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -109,7 +112,7 @@ describe('orders.routes.test.js', () => {
 
           it('is 0', () => {
             request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${user.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -124,8 +127,8 @@ describe('orders.routes.test.js', () => {
 
         describe('when amount is greater than 0', () => {
 
-          it('calls processPayment successfully when order from host', () => request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+          it('calls executeOrder successfully when order from host', () => request(app)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -139,7 +142,7 @@ describe('orders.routes.test.js', () => {
               .expect(200)
               .then(() => {
                 expect(executeOrderStub.callCount).to.equal(1);
-                expect(executeOrderStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.firstCall.args[1]).to.contain({
                   CreatedByUserId: host.id,
                   CollectiveId: collective.id,
                   currency: collective.currency,
@@ -151,7 +154,7 @@ describe('orders.routes.test.js', () => {
               .catch());
 
           it('calls processPayment successfully when no email is sent with the order', () => request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -164,7 +167,7 @@ describe('orders.routes.test.js', () => {
               .expect(200)
               .then(() => {
                 expect(executeOrderStub.callCount).to.equal(1);
-                expect(executeOrderStub.firstCall.args[0]).to.contain({
+                expect(executeOrderStub.firstCall.args[1]).to.contain({
                   CreatedByUserId: host.id,
                   CollectiveId: collective.id,
                   currency: collective.currency,
@@ -177,7 +180,7 @@ describe('orders.routes.test.js', () => {
 
           it('calls processPayment successfully when manual order is from a new user but submitted by host', () => {
             return request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -192,9 +195,10 @@ describe('orders.routes.test.js', () => {
                 }))
               .then(newUser => {
                 expect(executeOrderStub.callCount).to.equal(1);
-                expect(executeOrderStub.firstCall.args[0]).to.contain({
-                  CreatedByUserId: newUser.id,
+                expect(executeOrderStub.firstCall.args[1]).to.contain({
+                  CreatedByUserId: host.id,
                   CollectiveId: collective.id,
+                  FromCollectiveId: newUser.CollectiveId,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
                   description: payment.description,
@@ -204,9 +208,9 @@ describe('orders.routes.test.js', () => {
               .catch();
           });
 
-          it('calls processPayment successfully when manual order is from an existing user who is not the host but submitted by host', () => {
+          it('calls executeOrder successfully when manual order is from an existing user who is not the host but submitted by host', () => {
             return request(app)
-              .post(`/collectives/${collective.id}/orders/manual`)
+              .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
                 api_key: application.api_key,
@@ -218,8 +222,9 @@ describe('orders.routes.test.js', () => {
               .expect(200)
               .then(() => {
                 expect(executeOrderStub.callCount).to.equal(1);
-                expect(executeOrderStub.firstCall.args[0]).to.contain({
-                  CreatedByUserId: user2.id,
+                expect(executeOrderStub.firstCall.args[1]).to.contain({
+                  CreatedByUserId: host.id,
+                  FromCollectiveId: user2.CollectiveId,
                   CollectiveId: collective.id,
                   currency: collective.currency,
                   totalAmount: AMOUNT,
