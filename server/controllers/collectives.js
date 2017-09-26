@@ -22,7 +22,7 @@ const {
 } = models;
 
 const _addUserToCollective = (collective, user, options) => {
-
+  console.log(">>> _addUserToCollective", { id: collective.id, slug: collective.slug }, "user: ", { id: user.id, CollectiveId: user.CollectiveId, email: user.email }, "role: ", options && options.role);
   const checkIfCollectiveHasHost = () => {
     if (options.role !== roles.HOST) {
       return Promise.resolve();
@@ -231,7 +231,7 @@ export const createFromGithub = (req, res, next) => {
   const { connectedAccountId } = req.jwtPayload;
 
   let creatorUser, creatorCollective, options, creatorCollectiveConnectedAccount;
-  const collective = payload.group;
+  const collectiveData = payload.group;
   const githubUser = payload.user;
   const contributors = payload.users;
   const creatorGithubUsername = payload.github_username;
@@ -243,6 +243,7 @@ export const createFromGithub = (req, res, next) => {
       include: { model: Collective }
     })
     .then(ca => {
+      console.log(">>> connected account found", ca && ca.dataValues);
       creatorCollective = ca.Collective;
       creatorCollectiveConnectedAccount = ca;
       return models.User.findById(creatorCollective.CreatedByUserId);
@@ -253,6 +254,7 @@ export const createFromGithub = (req, res, next) => {
         role: roles.ADMIN,
         remoteUser: creatorUser
       };
+      console.log(">>> creatorUser", user && user.dataValues);
     })
     .tap(() => {
       if (githubUser) {
@@ -266,19 +268,21 @@ export const createFromGithub = (req, res, next) => {
         return creatorCollective.save();
       }
     })
-    .then(() => Collective.findOne({ where: { slug: collective.slug.toLowerCase() }}))
+    .then(() => Collective.findOne({ where: { slug: collectiveData.slug.toLowerCase() }}))
     .then(existingCollective => {
       if (existingCollective) {
-        collective.slug = `${collective.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
+        collectiveData.slug = `${collectiveData.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Collective.create(Object.assign({}, collective, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
+      return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
+    .tap(g => console.log(">>> createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => Collective.findById(defaultHostCollectiveId())) // make sure the host exists
     .tap(host => {
+      console.log(">>> host", host && host.dataValues);
       if (host) {
-        return _addUserToCollective(createdCollective, { id: host.CreatedByUserId, CollectiveId: host.id }, { role: roles.HOST, remoteUser: creatorUser })
+        return _addUserToCollective(createdCollective, { id: creatorUser.id, CollectiveId: host.id }, { role: roles.HOST, remoteUser: creatorUser })
       } else {
         return null;
       }
@@ -294,8 +298,8 @@ export const createFromGithub = (req, res, next) => {
       }
     }))
     .then(() => {
-      if (collective.tiers) {
-        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id, currency: collective.currency })
+      if (collectiveData.tiers) {
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
       }
       return null;
     })
@@ -311,7 +315,14 @@ export const createFromGithub = (req, res, next) => {
       };
       let connectedAccount, contributorUser, contributorUserCollective;
       return ConnectedAccount.findOne({ where: caAttr })
-        .then(ca => ca || ConnectedAccount.create(caAttr))
+        .then(ca => {
+          if (ca) {
+            console.log(">>> Connected Account for ", caAttr, ca && ca.dataValues);
+            return ca;
+          }
+          console.log(">>> Creating Connected Account", caAttr);
+          return ConnectedAccount.create(caAttr);
+        })
         .then(ca => {
           connectedAccount = ca;
           if (!ca.CollectiveId) {
@@ -320,10 +331,19 @@ export const createFromGithub = (req, res, next) => {
             return ca.getCollective();
           }
         })
-        .then(userCollective => (userCollective && userCollective.CreatedByUserId) ? userCollective : User.createUserWithCollective(Object.assign(userAttr)).then(user => {
-          contributorUser = user;
-          return user.collective
-        }))
+        .then(userCollective => {
+          if (userCollective && userCollective.CreatedByUserId) {
+            console.log(">>> User Collective Found", userCollective && userCollective.dataValues);
+            return userCollective;
+          }
+          console.log(">>> createUserWithCollective", userAttr);
+          return User
+            .createUserWithCollective(Object.assign({}, userAttr))
+            .then(user => {
+              contributorUser = user;
+              return user.collective;
+            }) 
+        })
         .then(userCollective => contributorUserCollective = userCollective)
         .then(() => fetchGithubUser(contributor))
         .tap(json => {
@@ -337,7 +357,10 @@ export const createFromGithub = (req, res, next) => {
           contributorUserCollective.email = json.email;
           return contributorUserCollective.save();
         })
-        .then(() => contributorUserCollective.addConnectedAccount(connectedAccount))
+        .then(() => {
+          console.log(">>> addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective.dataValues)
+          return contributorUserCollective.addConnectedAccount(connectedAccount)
+        })
         .then(() => _addUserToCollective(createdCollective, { id: contributorUserCollective.CreatedByUserId, CollectiveId: contributorUserCollective.id }, options));
       } else {
         return Promise.resolve();
@@ -349,6 +372,7 @@ export const createFromGithub = (req, res, next) => {
         lastName: creatorUser.lastName,
         collective: createdCollective.info
       };
+      console.log(">>> sending github.signup to", creatorUser.email, "with data", data);
       return emailLib.send('github.signup', creatorUser.email, data);
     })
     .tap(() => res.send(createdCollective.info))
