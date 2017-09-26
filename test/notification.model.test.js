@@ -47,7 +47,7 @@ describe("notification.model.test.js", () => {
 
   it('subscribes to the notifications for the `collective.transaction.approved` email', () =>
     request(app)
-      .post(`/collectives/${collective.id}/activities/collective.transaction.approved/subscribe`)
+      .post(`/groups/${collective.id}/activities/collective.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
@@ -66,7 +66,7 @@ describe("notification.model.test.js", () => {
 
   it(`disables notification for the ${notificationData.type} email`, () =>
     request(app)
-      .post(`/collectives/${collective.id}/activities/${notificationData.type}/unsubscribe`)
+      .post(`/groups/${collective.id}/activities/${notificationData.type}/unsubscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(200)
@@ -80,7 +80,7 @@ describe("notification.model.test.js", () => {
 
   it('fails to add another notification if one exists', () =>
     request(app)
-      .post(`/collectives/${collective.id}/activities/${notificationData.type}/subscribe`)
+      .post(`/groups/${collective.id}/activities/${notificationData.type}/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(400)
@@ -98,7 +98,7 @@ describe("notification.model.test.js", () => {
 
   it('fails to add a notification if not a member of the collective', () =>
     request(app)
-      .post(`/collectives/${collective2.id}/activities/collective.transaction.approved/subscribe`)
+      .post(`/groups/${collective2.id}/activities/collective.transaction.approved/subscribe`)
       .set('Authorization', `Bearer ${user.jwt()}`)
       .send({ api_key: application.api_key })
       .expect(403)
@@ -111,7 +111,7 @@ describe("notification.model.test.js", () => {
 
   it('automatically subscribe new members to `collective.transaction.created`, `collective.expense.created` and `collective.monthlyreport` events', () =>
     request(app)
-      .post('/collectives')
+      .post('/groups')
       .send({
         api_key: application.api_key,
         collective: Object.assign(collective3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.ADMIN}]})
