@@ -68,7 +68,7 @@ describe('transaction model', () => {
         expect(transactions.length).to.equal(2);
         expect(transactions[0] instanceof models.Transaction).to.be.true;
         expect(transactions[0].description).to.equal(transactionsData[7].description);
-        expect(transactions[0].amount).to.equal(-transactionsData[7].amount);
+        expect(transactions[0].amount).to.equal(-transactionsData[7].netAmountInCollectiveCurrency);
         expect(transactions[1].amount).to.equal(-transactions[0].netAmountInCollectiveCurrency);
       })
     })
@@ -77,7 +77,7 @@ describe('transaction model', () => {
   it('createFromPayload() generates a new activity', (done) => {
 
     const createActivityStub = sinon.stub(Transaction, 'createActivity', (t) => {
-      expect(Math.abs(t.amount)).to.equal(Math.abs(transactionsData[7].amount));
+      expect(Math.abs(t.amount)).to.equal(Math.abs(transactionsData[7].netAmountInCollectiveCurrency));
       createActivityStub.restore();
       done();
     });
