@@ -294,7 +294,7 @@ describe('users.routes.test.js', () => {
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal(user.email);
+          expect(options.to).to.equal("emailbcc+user1-at-opencollective.com@opencollective.com");
         }));
   });
 
@@ -353,7 +353,7 @@ describe('users.routes.test.js', () => {
           const $ = cheerio.load(options.html);
           const href = $('a').attr('href');
           expect(href).to.contain(`${config.host.website}/signin/`);
-          expect(options.to).to.equal(user.email);
+          expect(options.to).to.equal("emailbcc+user1-at-opencollective.com@opencollective.com");
         });
     });
 

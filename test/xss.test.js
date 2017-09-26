@@ -31,7 +31,7 @@ describe('XSS.test', () => {
 
   beforeEach('create collective with user as first member', (done) => {
     request(app)
-      .post('/collectives')
+      .post('/groups')
       .send({
         api_key: application.api_key,
         collective: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.ADMIN}]})
