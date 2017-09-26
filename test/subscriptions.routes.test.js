@@ -192,7 +192,7 @@ describe('subscriptions.routes.test.js', () => {
         .set('Authorization', `Bearer ${expiredToken}`)
         .end((err, res) => {
           expect(res.body.error.code).to.be.equal(401);
-          expect(res.body.error.message).to.be.equal('jwt expired');
+          expect(res.body.error.message).to.be.equal('User is not authenticated');
           done();
         });
     });
