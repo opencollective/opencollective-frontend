@@ -10,12 +10,12 @@ describe('currencylib', () => {
   before(() => {
 
     nock('http://api.fixer.io:80')
-      .get('/2017-02-01')
+      .get(/.*/)
       .query({"base":"EUR","symbols":"USD"})
       .reply(200, {"base":"EUR","date":"2017-02-01","rates":{"USD":1.079}});
     
     nock('http://api.fixer.io:80')
-      .get('/2017-03-01')
+      .get(/.*/)
       .query({"base":"EUR","symbols":"USD"})
       .reply(200, {"base":"EUR","date":"2017-03-01","rates":{"USD":1.0533}});
     
