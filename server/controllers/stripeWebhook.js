@@ -165,6 +165,11 @@ export default function stripeWebhook(req, res, next) {
         return cb(new errors.BadRequest('PaymentMethod not found'));        
       }
 
+      // For old subscriptions, they still reference the old customerId on the host stripe account
+      if (order.paymentMethod.customerId === customer) {
+        return cb();
+      }
+
       // We need to iterate through the PaymentMethod.data.customerIdForHost[stripeAccount]
       if (order.paymentMethod.data.customerIdForHost) {
         debug("validatePaymentMethod", "order.paymentMethod.data.customerIdForHost", order.paymentMethod.data.customerIdForHost);
