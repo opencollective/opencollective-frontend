@@ -285,6 +285,7 @@ describe('members.routes.test.js', () => {
           }
           expect(backers.length).to.equal(2);
           backers.sort((a,b) => (a.substr(0,1) < b.substr(0,1)) ? -1 : 1);
+          console.log(">>> backers", backers);
           expect(getValue(0, "role")).to.equal('"BACKER"');
           expect(getValue(0, "tier")).to.equal('"backers"');
           expect(getValue(1, "role")).to.equal('"BACKER"');
