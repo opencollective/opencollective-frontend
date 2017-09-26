@@ -152,7 +152,7 @@ export default (app) => {
    * Collectives.
    */
   app.post('/groups', ifParam('flow', 'github'), aN.parseJwtNoExpiryCheck, aN.checkJwtExpiry, required('payload'), collectives.createFromGithub); // Create a collective from a github repo
-  app.post('/groups', required('collective'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
+  app.post('/groups', required('group'), collectives.create); // Create a collective, optionally include `users` with `role` to add them. No need to be authenticated.
   app.get('/groups/tags', collectives.getCollectiveTags); // List all unique tags on all collectives
   app.get('/groups/:collectiveid', collectives.getOne);
   app.get('/groups/:collectiveid/:tierSlug(backers|users)', cache(60), collectives.getUsers); // Get collective backers

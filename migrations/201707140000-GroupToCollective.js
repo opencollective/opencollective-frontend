@@ -552,7 +552,8 @@ const up = (queryInterface, Sequelize) => {
         type: Sequelize.INTEGER,
         references: { model: 'Users', key: 'id' },
         onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
+        allowNull: true // non authenticated users can create a collective
       }))
       .then(() => queryInterface.renameColumn(toTable, 'lastEditedByUserId', 'LastEditedByUserId')) // Foreign Keys should respect the pattern "UserId" (camel case)
       .then(() => queryInterface.addColumn(toTable, 'HostCollectiveId', {

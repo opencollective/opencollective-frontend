@@ -64,7 +64,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: true // non authenticated users can create a collective
     },
 
     LastEditedByUserId: {

@@ -160,8 +160,8 @@ export const deleteTransaction = (req, res, next) => {
  * Create a collective.
  */
 export const create = (req, res, next) => {
-  const { collective } = req.required;
-  const { users = [] } = collective;
+  const collectiveData = req.required.group;
+  const { users = [] } = collectiveData;
   let createdCollective, creator, host;
 
   if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a collective');
@@ -174,44 +174,41 @@ export const create = (req, res, next) => {
     emailLib.send('collective.confirm', user.email, data);
   };
 
-  // Default tiers
-  collective.tiers = collective.tiers || DEFAULT_TIERS;
-
   return Collective
-    .create(collective)
+    .create(collectiveData)
     .tap(g => createdCollective = g)
     .tap(g => {
       return Promise.each(users, user => {
         if (user.email) {
-          return User.findOne({where: { email: user.email.toLowerCase() }})
+          return User.findOne({ where: { email: user.email.toLowerCase() }})
           .then(u => u || User.createUserWithCollective(user))
           .then(u => {
+            if (user.role === roles.HOST && !collectiveData.HostId) {
+              return;
+            }
             if (!creator) {
               creator = u;
             }
-            if (user.role === roles.HOST && !collective.HostCollectiveId) {
-              collective.HostCollectiveId = u.CollectiveId;
-              return;
-            } else {
-              return _addUserToCollective(g, u, {role: user.role, remoteUser: creator})
-            }
+            return _addUserToCollective(g, u, { role: user.role, remoteUser: creator })
           })
-          .then(() => createdCollective.update({ LastEditedByUserId: creator.id }))
+          .then(() => createdCollective.update({ CreatedByUserId: creator.id, LastEditedByUserId: creator.id }))
         } else {
           return null;
         }
       })
     })
     .tap(collective => {
-      return Collective.findOne({ where: { id: collective.HostCollectiveId || defaultHostCollectiveId() }}).tap(h => {
+      return models.User.findOne({ where: { id: collectiveData.HostId || 772 }}).tap(h => {
         host = h;
-        _addUserToCollective(collective, { CollectiveId: host.id }, { role: roles.HOST, remoteUser: creator })
+        collective.HostCollectiveId = h.CollectiveId;
+        collective.save();
+        _addUserToCollective(collective, h, { role: roles.HOST, remoteUser: creator })
         return null;
       })
     })
     .then(() => {
-      if (collective.tiers) {
-        return models.Tier.createMany(collective.tiers, { CollectiveId: createdCollective.id, currency: collective.currency })
+      if (collectiveData.tiers) {
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
       }
       return null;
     })
