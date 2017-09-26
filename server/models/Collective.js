@@ -750,9 +750,12 @@ export default function(Sequelize, DataTypes) {
     }
 
     return models.Transaction.findOne(query)
-    .then((result) => {
-      debug("getBackersCount", result.dataValues);
-      return Promise.resolve(Number(result.dataValues.backersCount));
+    .then(res => {
+      // when it's a raw query, the result is not in dataValues
+      const result = res.dataValues || res || {};
+      debug("getBackersCount", result);
+      if (!result.backersCount) return 0;
+      return Promise.resolve(Number(result.backersCount));
     });
   };
 

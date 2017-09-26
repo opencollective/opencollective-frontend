@@ -130,9 +130,9 @@ describe('graphql.collective.test.js', () => {
     expect(userCollective.createdByUser.firstName).to.equal('Xavier');
     expect(userCollective.createdByUser.email).to.be.null;
     expect(memberships[1].collective.stats).to.deep.equal({
-      backers: 24,
+      backers: 25,
       sponsors: 1,
-      yearlyBudget: 329733
+      yearlyBudget: 331461
     });
   });
 
