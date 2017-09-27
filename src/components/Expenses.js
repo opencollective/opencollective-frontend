@@ -44,6 +44,9 @@ class Expenses extends React.Component {
     return (
       <div className="Expenses">
         <style jsx>{`
+          .Expenses {
+            min-width: 40rem;
+          }
           :global(.loadMoreBtn) {
             margin: 1rem;
             text-align: center;
@@ -83,7 +86,7 @@ class Expenses extends React.Component {
             LoggedInUser={LoggedInUser}
             />
         )}
-        { expenses.length % 10 === 0 &&
+        { expenses.length >= 10 && expenses.length % 10 === 0 &&
           <div className="loadMoreBtn">
             <Button bsStyle='default' onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}

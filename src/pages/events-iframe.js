@@ -1,10 +1,8 @@
 import React from 'react';
-import { addEventsData } from '../graphql/queries';
-import withData from '../lib/withData';
 import { IntlProvider, addLocaleData } from 'react-intl';
-import { FormattedDate, FormattedMessage } from 'react-intl';
 import Head from 'next/head';
-
+import EventsWithData from '../components/EventsWithData';
+import withData from '../lib/withData'
 import 'intl';
 import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
 import en from 'react-intl/locale-data/en';
@@ -22,14 +20,6 @@ class Events extends React.Component {
     return { collectiveSlug, id }
   }
 
-  renderEventEntry(event) {
-    return (<li key={event.id}>
-              <a href={`/${event.collective.slug}/events/${event.slug}`} target="_top">{event.name}</a>, &nbsp;
-              <FormattedDate value={event.startsAt} day='numeric' month='long' />, &nbsp;
-              {event.location.name}
-            </li>);
-  }
-
   componentDidUpdate() {
     if (!window.parent) return;
     if (!this.refs.events) return;
@@ -38,19 +28,6 @@ class Events extends React.Component {
   }
 
   render() {
-    const { loading, allEvents } = this.props.data;
-
-    if (loading) return (<div />);
-
-    const now = new Date, pastEvents = [], futureEvents = [];
-    allEvents.map(event => {
-      if (new Date(event.startsAt) > now)
-        futureEvents.push(event);
-      else
-        pastEvents.push(event);
-    })
-    pastEvents.reverse();
-
     return (
       <IntlProvider locale="en-US" messages={enUS}>
         <div>
@@ -152,38 +129,7 @@ class Events extends React.Component {
           }
           `}
           </style>
-          <div className="events" ref="events">
-            {futureEvents.length === 0 && pastEvents.length === 0 &&
-              <div className="createEvent">
-                <p><FormattedMessage id='events.widget.noEventScheduled' defaultMessage={`No event has been scheduled yet.`} /></p>
-                <a href={`/${this.props.collectiveSlug}/events/new`} className="btn btn-default" target="_top"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a>
-              </div>
-            }
-            { (futureEvents.length > 0 || pastEvents.length > 0) &&
-              <div>
-              <div className="title">
-                <h2><FormattedMessage id='events.title.futureEvents' values={{n: futureEvents.length}} defaultMessage={`Next {n, plural, one {event} other {events}}`} /></h2>
-                <div className="action"><a href={`/${this.props.collectiveSlug}/events/new`} target="_blank"><FormattedMessage id='events.widget.createEvent' defaultMessage={`Create an Event`} /></a></div>
-              </div>
-              <ul>
-              {futureEvents.length === 0 &&
-              <div>No event planned.</div>
-              }
-              {futureEvents.map(this.renderEventEntry)}
-              </ul>
-              {pastEvents.length > 0 &&
-                <div className="pastEvents">
-                  <div className="title">
-                    <h2><FormattedMessage id='events.title.pastEvents' values={{n: pastEvents.length}} defaultMessage={`Past {n, plural, one {event} other {events}}`} /></h2>
-                  </div>
-                  <ul>
-                  {pastEvents.map(this.renderEventEntry)}
-                  </ul>
-                </div>
-              }
-            </div>
-            }
-          </div>
+          <EventsWithData collectiveSlug={this.props.collectiveSlug} />
         </div>
       </IntlProvider>
     );
@@ -191,4 +137,4 @@ class Events extends React.Component {
 
 }
 
-export default withData(addEventsData(Events));
+export default withData(Events);

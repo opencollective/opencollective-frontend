@@ -5,14 +5,14 @@ import colors from '../constants/colors';
 class TicketController extends React.Component {
 
   static propTypes = {
-    value: PropTypes.number,
+    defaultValue: PropTypes.number,
     className: PropTypes.object,
     onChange: PropTypes.func
   }
 
   constructor(props) {
     super(props);
-    this.state = { value: props.value || 1 };
+    this.state = { value: props.defaultValue || 1 };
   }
 
   changeValue(delta) {

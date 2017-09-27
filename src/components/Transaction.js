@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
-import { pickAvatar } from '../lib/collective.lib';
+import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
+import { capitalize } from '../lib/utils';
 import { get } from 'lodash';
 import TransactionDetails from './TransactionDetails';
+import Avatar from './Avatar';
 
 class Transaction extends React.Component {
 
@@ -71,13 +71,6 @@ class Transaction extends React.Component {
             float: left;
             margin-right: 1rem;
           }
-          .fromCollective img {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            border: 1px solid #d4d7d9;
-            padding: 4px;
-          }
           .body {
             overflow: hidden;
             font-size: 1.5rem;
@@ -131,7 +124,7 @@ class Transaction extends React.Component {
         </div>
         <div className="fromCollective">
           <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
-            <img src={imagePreview(transaction.fromCollective.image,pickAvatar(transaction.fromCollective.id), { width: 80 })} />
+            <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} radius={40} />
           </a>
         </div>
         <div className="body">

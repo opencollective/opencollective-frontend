@@ -7,7 +7,7 @@ import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
-import { get, pick } from 'lodash';
+import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
 
@@ -25,6 +25,9 @@ class OrderForm extends React.Component {
     const { intl, order } = props;
 
     const tier = order.tier || {};
+    tier.amount = tier.amount || order.totalAmount;
+    tier.interval = tier.interval || order.interval;
+
     this.state = {
       isNewUser: true,
       loginSent: false,
@@ -35,7 +38,7 @@ class OrderForm extends React.Component {
       tier,
       result: {}
     };
-
+    
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
 
     this.handleChange = this.handleChange.bind(this);
@@ -311,7 +314,6 @@ class OrderForm extends React.Component {
   render() {
     const { intl, collective } = this.props;
     const { LoggedInUser } = this.state;
-    const quantity = this.state.order.quantity || 1;
     const currency = this.state.tier.currency || collective.currency;
     const showNewCreditCardForm = !this.state.creditcard.uuid || this.state.creditcard.uuid === 'other';
 
@@ -378,6 +380,10 @@ class OrderForm extends React.Component {
         .value {
           padding-top: 7px;
           display: inline-block;
+        }
+        .disclaimer {
+          margin: 0.5rem;
+          font-size: 1.2rem;
         }
         @media (min-width: 768px) {
           .actions {
@@ -466,7 +472,7 @@ class OrderForm extends React.Component {
             <h2>Payment details</h2>
             <Row>
               <Col sm={12}>
-                { this.paymentMethodsOptions &&
+                { this.paymentMethodsOptions && this.paymentMethodsOptions > 1 &&
                   <InputField
                     type="select"
                     className="horizontal"
@@ -509,10 +515,12 @@ class OrderForm extends React.Component {
                 <label className="col-sm-3 control-label">Contribution</label>
                 <Col sm={9}>
                   <TierComponent
-                    tier={this.state.tier}
-                    interval={this.state.order.interval || this.state.tier.interval}
-                    quantity={quantity}
-                    amount={this.state.order.totalAmount / quantity}
+                    tier={this.props.order.tier}
+                    defaultValue={{
+                      quantity: this.props.order.quantity,
+                      interval: this.props.order.interval,
+                      amount: this.props.order.totalAmount / this.props.order.quantity
+                    }}
                     onChange={(tier) => this.handleChange("tier", tier)}
                     />
                 </Col>

@@ -8,6 +8,7 @@ import { pickAvatar } from '../lib/collective.lib';
 import { firstSentence, singular, capitalize } from '../lib/utils';
 import CollectiveCard from './CollectiveCard';
 import Currency from './Currency';
+import Avatar from './Avatar';
 
 class Member extends React.Component {
 
@@ -70,17 +71,11 @@ class Member extends React.Component {
           margin: 0.5rem;
         }
 
-        .avatar {
+        .Member :global(.Avatar) {
           float: left;
           width: 45px;
           height: 45px;
-          border-radius: 50%;
           margin-top: 1rem;
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: cover;
-          border: 2px solid #fff;
-          box-shadow: 0 0 0 1px #75cc1f;
         }
 
         .bubble {
@@ -111,7 +106,7 @@ class Member extends React.Component {
         <div>
           { viewMode === 'USER' &&
             <a onClick={this.onClick} title={title}>
-              <div className="avatar" style={{ backgroundImage: `url(${image})`} } />
+              <Avatar src={image} radius={45} />
               <div className="bubble">
                 <div className="name">{name}</div>
                 <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>

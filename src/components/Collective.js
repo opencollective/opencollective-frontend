@@ -17,6 +17,7 @@ import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from './ExpensesWithData';
+import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
@@ -247,6 +248,13 @@ class Collective extends React.Component {
                   <div className="longDescription" >
                     <Markdown source={this.collective.longDescription || this.collective.description} />
                   </div>
+                </div>
+              </section>
+
+              <section id="events" className="events">
+                <div className="content">
+                  <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
+                  <EventsWithData collectiveSlug={this.collective.slug} />
                 </div>
               </section>
 

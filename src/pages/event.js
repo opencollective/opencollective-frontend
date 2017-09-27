@@ -17,7 +17,7 @@ class EventPage extends React.Component {
   }
 
   static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
-    return { parentCollectiveSlug, eventSlug, slug: `${parentCollectiveSlug}/events/${eventSlug}` }
+    return { parentCollectiveSlug, eventSlug }
   }
 
   async componentDidMount() {

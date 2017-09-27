@@ -1,45 +1,42 @@
-import withData from '../lib/withData'
-import withIntl from '../lib/withIntl';
-import React from 'react'
+import React from 'react';
 import { addGetLoggedInUserFunction } from '../graphql/queries';
 import { addCreateOrderMutation } from '../graphql/mutations';
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Router } from '../server/pages';
-
-import NotFound from '../components/NotFound';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
+import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import OrderForm from '../components/OrderForm';
 import CollectiveCover from '../components/CollectiveCover';
 import { defineMessages } from 'react-intl';
-import { get } from 'lodash';
+import { Router } from '../server/pages';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
-class DonatePage extends React.Component {
+class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, amount, interval, description } }) {
-    return { slug: collectiveSlug, totalAmount: amount * 100, interval, description }
+  static getInitialProps ({ query: { collectiveSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
+    return { slug: collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
   }
 
   constructor(props) {
     super(props);
-    this.state = {};
     this.createOrder = this.createOrder.bind(this);
+    this.state = { result: {}, loading: false };
     const interval = (props.interval || "").toLowerCase().replace(/ly$/,'');
     this.order = {
-      quantity: props.quantity || 1,
+      quantity: parseInt(props.quantity, 10) || 1,
       interval: (['month','year'].indexOf(interval) !== -1) ? interval : null,
-      totalAmount: props.totalAmount || null,
-      description: props.description
+      totalAmount: parseInt(props.totalAmount, 10) || null
     };
+    console.log("orderTier", "constructor", this.order);
 
     this.messages = defineMessages({
-      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
-      'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
-      'contribute.title': { id: 'contribute.title', defaultMessage: 'Contribute financially' },
+      'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
+      'tier.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
+      'donation.title': { id: 'tier.order.donation.title', defaultMessage: 'Contribute' },
+      'order.success': { id: 'tier.order.success', defaultMessage: 'order processed with success' },
+      'order.error': { id: 'tier.order.error', defaultMessage: '😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we\'ll figure things out.' },
       'tier.name.donation': { id: 'tier.name.donation', defaultMessage: 'donation' },
       'tier.button.donation': { id: 'tier.button.donation', defaultMessage: 'donate' },
       'tier.description.donation': { id: 'tier.description.donation', defaultMessage: 'Thank you for your kind donation 🙏' }
@@ -47,8 +44,11 @@ class DonatePage extends React.Component {
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, data } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser();
+    if (!data.Tier && data.fetchData) {
+      data.fetchData();
+    }
     this.setState({LoggedInUser});
   }
 
@@ -73,47 +73,51 @@ class DonatePage extends React.Component {
   }
 
   render() {
-    const { data, slug, intl } = this.props;
-    const { LoggedInUser } = this.state;
-
-    if (data.loading) return (<Loading />);
-    if (!data.Collective) return (<NotFound />);
-
-    if (data.error) {
-      console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
-    }
-
+    const { intl, data } = this.props;
+    const { loading } = data;
     const collective = data.Collective;
+    if (loading) return (<div />);
 
-    const tier = {
+    let tier;
+    if (this.props.TierId) {
+      tier = collective.tiers.find(t => t.id === this.props.TierId);
+    }
+    tier = tier || {
       name: intl.formatMessage(this.messages['tier.name.donation']),
       presets: [1000, 5000, 10000],
+      type: 'DONATION',
       currency: collective.currency,
       button: intl.formatMessage(this.messages['tier.button.donation']),
       description: intl.formatMessage(this.messages['tier.description.donation'])
     };
-    tier.currency = tier.currency || collective.currency;
+
     this.order.tier = tier;
 
     return (
       <div>
+        <style jsx>{`
+          .success {
+            color: green;
+          }
+          .error {
+            color: red;
+          }
+        `}</style>
         <Header
           title={collective.name}
           description={collective.description}
           twitterHandle={collective.twitterHandle}
           image={collective.image || collective.backgroundImage}
-          className={this.state.status}
+          className={this.state.loading && 'loading'}
           LoggedInUser={this.state.LoggedInUser}
           />
 
         <Body>
           <CollectiveCover
-            href={`/${collective.slug}`}
             collective={collective}
+            href={`/${collective.slug}`}
+            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], { name: tier.name })}
             className="small"
-            title={intl.formatMessage(this.messages['contribute.title'])}
-            style={get(collective, 'settings.style.hero.cover')}
             />
 
           <div className="content">
@@ -123,38 +127,49 @@ class DonatePage extends React.Component {
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
               />
+            <div className="result">
+              <div className="success">{this.state.result.success}</div>
+              <div className="error">{this.state.result.error}</div>
+            </div>
           </div>
         </Body>
         <Footer />
       </div>
     );
   }
+
 }
 
 const addData = graphql(gql`
-  query Collective($slug: String!) {
-    Collective(slug: $slug) {
+query Collective($slug: String!) {
+  Collective(slug: $slug) {
+    id
+    slug
+    name
+    type
+    description
+    twitterHandle
+    image
+    host {
       id
-      slug
       name
-      type
-      description
-      twitterHandle
+      slug
       image
-      backgroundImage
-      settings
+    }
+    backgroundImage
+    settings
+    currency
+    tiers {
+      id
+      name
+      slug
+      amount
       currency
-      tiers {
-        id
-        name
-        slug
-        amount
-        currency
-        interval
-        presets
-      }
+      interval
+      presets
     }
   }
+}
 `);
 
-export default withData(addGetLoggedInUserFunction(addData(addCreateOrderMutation(withIntl(DonatePage)))));
+export default withData(withIntl(addGetLoggedInUserFunction(addData(addCreateOrderMutation(CreateOrderPage)))));

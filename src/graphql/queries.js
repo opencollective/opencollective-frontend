@@ -306,8 +306,8 @@ const getCollectiveQuery = gql`
 `;
 
 const getEventCollectiveQuery = gql`
-  query Collective($slug: String!) {
-    Collective(slug: $slug) {
+  query Collective($eventSlug: String!) {
+    Collective(slug: $eventSlug) {
       id
       slug
       createdByUser {
@@ -384,42 +384,6 @@ const getEventCollectiveQuery = gql`
   }
 `;
 
-const getEventsQuery = gql`
-  query allEvents($parentCollectiveSlug: String) {
-    allEvents(slug: $parentCollectiveSlug) {
-      id
-      slug
-      name
-      description
-      longDescription
-      startsAt
-      endsAt
-      timezone
-      location {
-        name
-        address
-        lat
-        long
-      }
-      tiers {
-        id
-        type
-        name
-        description
-        amount
-      }
-      parentCollective {
-        id
-        slug
-        name
-        mission
-        backgroundImage
-        image
-      }
-    }
-  }
-`;
-
 const getAttendeesQuery = gql`
   query Collective($slug: String!) {
     Collective(slug: $slug) {
@@ -454,39 +418,6 @@ const getAttendeesQuery = gql`
   }
 `;
 
-const getCollectiveTierQuery = gql`
-  query CollectiveTier($slug: String! $TierId: Int!) {
-    Collective(slug: $slug) {
-      id
-      slug
-      name
-      type
-      image
-      description
-      twitterHandle
-      currency
-      backgroundImage
-      settings
-      image
-      host {
-        id
-        name
-        slug
-      }
-    }
-    Tier(id: $TierId) {
-      id
-      type
-      name
-      description
-      amount
-      currency
-      interval
-      presets
-    }
-  }
-`;
-
 const getCollectiveCoverQuery = gql`
   query CollectiveCover($slug: String!) {
     Collective(slug: $slug) {
@@ -506,8 +437,6 @@ export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
-export const addCollectiveTierData = graphql(getCollectiveTierQuery);
-export const addEventsData = graphql(getEventsQuery);
 export const addAttendeesData = graphql(getAttendeesQuery);
 export const addTiersData = graphql(getTiersQuery);
 export const addUserData = graphql(getUserQuery);

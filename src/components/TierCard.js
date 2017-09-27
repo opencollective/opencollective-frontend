@@ -100,10 +100,10 @@ class Tier extends React.Component {
           .image img {
             border: 2px solid white;            
           }
-          .avatar {
+          .TierCard .Avatar {
             margin-left: -15px;
           }
-          .avatar:first {
+          .TierCard .Avatar:first {
             margin-left: 0;
           }
         `}</style>

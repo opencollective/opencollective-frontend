@@ -15,25 +15,25 @@ class Tier extends React.Component {
   static propTypes = {
     tier: PropTypes.object.isRequired,
     className: PropTypes.string,
-    interval: PropTypes.string,
-    quantity: PropTypes.number,
-    amount: PropTypes.number,
+    defaultValue: PropTypes.object,
     onChange: PropTypes.func, // onChange({ id, quantity, amount, interval })
     onClick: PropTypes.func // onClick({ id, quantity, amount, interval })
   }
 
   constructor(props) {
     super(props);
+    const { defaultValue } = this.props;
+
     this.onChange = this.props.onChange || function() {}; 
     this.handleChange = this.handleChange.bind(this);
     this.tier = props.tier;
-    const quantity = this.props.quantity || 1;
-    const amount = this.props.amount || quantity * this.tier.amount;
-    const id = this.tier.id;
-    this.state = { quantity, amount, id };
+    this.defaultValue = props.defaultValue || {};
+    this.defaultValue.quantity = defaultValue.quantity || 1;
+    this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : defaultValue.amount;
+    this.state = { ...this.defaultValue };
     if (this.tier.presets) {
       this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
-      this.state.interval = this.props.interval || null;
+      this.state.interval = this.defaultValue.interval || null;
       if (!this.state.amount) {
         this.handleChange('amount', this.presets[Math.floor(this.presets.length / 2)]);
       }
@@ -117,8 +117,6 @@ class Tier extends React.Component {
             justify-content: space-between;
             flex-direction: row;
             height: 6rem;
-            position: absolute;
-            bottom: 0;
             width: 100%;
           }
           .ctabtn {
@@ -247,7 +245,7 @@ class Tier extends React.Component {
           </div>
           { type === 'TICKET' &&
             <div id="actions" className="actions">
-              <TicketController value={this.quantity} onChange={(value) => this.handleTicketsChange(value)} />
+              <TicketController defaultValue={this.defaultValue.quantity} onChange={(value) => this.handleTicketsChange(value)} />
               {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
             </div>
           }

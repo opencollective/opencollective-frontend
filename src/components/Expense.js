@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
-import { pickAvatar } from '../lib/collective.lib';
+import { capitalize } from '../lib/utils';
+import Avatar from './Avatar';
 import ExpenseDetails from './ExpenseDetails';
 
 class Expense extends React.Component {
@@ -64,13 +64,6 @@ class Expense extends React.Component {
             float: left;
             margin-right: 1rem;
           }
-          .fromCollective img {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            border: 1px solid #d4d7d9;
-            padding: 4px;
-          }
           .body {
             overflow: hidden;
             font-size: 1.5rem;
@@ -128,7 +121,7 @@ class Expense extends React.Component {
         </div>
         <div className="fromCollective">
           <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
-            <img src={imagePreview(expense.fromCollective.image, pickAvatar(expense.fromCollective.id), { width: 80 })} />
+            <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} />
           </a>
         </div>
         <div className="body">

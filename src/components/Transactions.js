@@ -44,6 +44,9 @@ class Transactions extends React.Component {
     return (
       <div className="Transactions">
         <style jsx>{`
+          .Transactions {
+            min-width: 40rem;
+          }
           :global(.loadMoreBtn) {
             margin: 1rem;
             text-align: center;
