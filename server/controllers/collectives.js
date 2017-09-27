@@ -243,7 +243,7 @@ export const createFromGithub = (req, res, next) => {
       include: { model: Collective }
     })
     .then(ca => {
-      console.log(">>> connected account found", ca && ca.dataValues);
+      console.log(">>> connected account found", ca && ca.username);
       creatorCollective = ca.Collective;
       creatorCollectiveConnectedAccount = ca;
       return models.User.findById(creatorCollective.CreatedByUserId);
@@ -309,7 +309,7 @@ export const createFromGithub = (req, res, next) => {
       const userAttr = {
         image: `https://images.githubusercontent.com/${contributor}`
       };
-      let connectedAccount, contributorUser, contributorUserCollective;
+      let connectedAccount, contributorUserCollective;
       return ConnectedAccount.findOne({ where: caAttr })
         .then(ca => {
           if (ca) {
@@ -332,27 +332,24 @@ export const createFromGithub = (req, res, next) => {
             console.log(">>> User Collective Found", userCollective && userCollective.dataValues);
             return userCollective;
           }
-          console.log(">>> createUserWithCollective", userAttr);
-          return User
-            .createUserWithCollective(Object.assign({}, userAttr))
-            .then(user => {
-              contributorUser = user;
-              return user.collective;
-            }) 
+          // If we cannot find an existing user for this contributor,
+          // we fetch extra info from Github API and create a new user
+          return fetchGithubUser(contributor)
+            .then(json => {
+              if (json && json.name) {
+                userAttr.name = json.name;
+                userAttr.website = json.blog;
+                userAttr.email = json.email;
+              }
+              console.log(">>> createUserWithCollective", userAttr);
+              return User
+                .createUserWithCollective(Object.assign({}, userAttr))
+                .then(user => {
+                  return user.collective;
+                })
+            });
         })
         .then(userCollective => contributorUserCollective = userCollective)
-        .then(() => fetchGithubUser(contributor))
-        .tap(json => {
-          if (json.name && contributorUser) {
-            const nameTokens = json.name.split(' ');
-            contributorUser.firstName = nameTokens.shift();
-            contributorUser.lastName = nameTokens.join(' ');
-            contributorUser.save();
-          }
-          contributorUserCollective.website = json.blog;
-          contributorUserCollective.email = json.email;
-          return contributorUserCollective.save();
-        })
         .then(() => {
           console.log(">>> addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective.dataValues)
           return contributorUserCollective.addConnectedAccount(connectedAccount)
