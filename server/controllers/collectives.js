@@ -279,10 +279,12 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => Collective.findById(defaultHostCollectiveId())) // make sure the host exists
-    .tap(host => {
-      console.log(">>> host", host && host.dataValues);
-      if (host) {
-        return _addUserToCollective(createdCollective, { id: creatorUser.id, CollectiveId: host.id }, { role: roles.HOST, remoteUser: creatorUser })
+    .tap(hostCollective => {
+      console.log(">>> hostCollective", hostCollective && hostCollective.dataValues);
+      if (hostCollective) {
+        createdCollective.HostCollectiveId = hostCollective.id;
+        createdCollective.save();
+        return _addUserToCollective(createdCollective, { id: hostCollective.CreatedByUserId, CollectiveId: hostCollective.id }, { role: roles.HOST, remoteUser: creatorUser })
       } else {
         return null;
       }
@@ -297,12 +299,6 @@ export const createFromGithub = (req, res, next) => {
         user: creatorUser.info
       }
     }))
-    .then(() => {
-      if (collectiveData.tiers) {
-        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
-      }
-      return null;
-    })
     .then(() => Promise.map(contributors, contributor => {
     // since we added the creator above with an email, avoid double adding
     if (contributor !== creatorGithubUsername && contributor !== creatorCollectiveConnectedAccount.username) {
