@@ -35,8 +35,11 @@ const cache = {
   collectives: {},
   CollectiveIdForEventId: {},
   CollectiveIdForUserId: {},
-  HostCollectiveIdForGroupId: {}
+  HostCollectiveIdForGroupId: {},
+  CreatedByUserIdForCollectiveId: {}
 };
+
+cache.CreatedByUserIdForCollectiveId[83] = 2;
 
 const HostCollectiveIdForUserId = {
     3   : 51,  // wwcode
@@ -99,6 +102,20 @@ const getHostCollectiveId = (sequelize, CollectiveId) => {
     cache.HostCollectiveIdForGroupId[CollectiveId] = HostCollectiveId;
     return HostCollectiveId;
   });
+}
+
+const getCreatedByUserIdForCollective = (sequelize, collective) => {
+  if (collective.LastEditedByUserId) return Promise.resolve(collective.LastEditedByUserId);
+  if (cache.CreatedByUserIdForCollectiveId[collective.id]) return Promise.resolve(cache.CreatedByUserIdForCollectiveId[collective.id]);
+  return sequelize.query(`SELECT "CreatedByUserId" FROM "Members" WHERE "CollectiveId"=:CollectiveId AND role='MEMBER' ORDER BY id ASC LIMIT 1`, {
+    replacements: { CollectiveId: collective.id },
+    type: sequelize.QueryTypes.SELECT
+  }).then(members => {
+    const UserId = (members && members.length > 0) ? members[0].CreatedByUserId : null;
+    console.log(">>> getCreatedByUserIdForCollective", collective.id, " => UserId:", UserId);
+    cache.CreatedByUserIdForCollectiveId[collective.id] = UserId;
+    return UserId;
+  })
 }
 
 const updateMembersRole = (sequelize) => {
@@ -518,23 +535,26 @@ const updateCollectives = (sequelize) => {
     // We don't process EVENT, USER or ORGANIZATION collectives
     if (collective.type !== 'COLLECTIVE') return Promise.resolve();
 
-    let HostCollectiveId;
+    let HostCollectiveId, CreatedByUserId;
     return addTiers(collective)
       .then((tiers) => addUsersToTiers(collective, tiers))
       .then(() => getHostCollectiveId(sequelize, collective.id))
       .tap(id => HostCollectiveId = id)
-      .then(ParentCollectiveId => {
+      .then(() => getCreatedByUserIdForCollective(sequelize, collective))
+      .then(UserId => CreatedByUserId = UserId)
+      .then(() => {
+        const ParentCollectiveId = HostCollectiveId;
         const createdAt = collective.createdAt || collective.updatedAt;
         if (!HostCollectiveId) {
           console.log(`Unable to update collective ${collective.id}: No HostCollectiveId for collective ${collective.slug}`);
           return null;
         }
-        return sequelize.query(`UPDATE "Collectives" SET "HostCollectiveId"=:HostCollectiveId, "ParentCollectiveId"=:ParentCollectiveId, "createdAt"=:createdAt WHERE id=:id AND type='COLLECTIVE'`,
-          { replacements: { id: collective.id, HostCollectiveId, ParentCollectiveId, createdAt } });
+        return sequelize.query(`UPDATE "Collectives" SET "HostCollectiveId"=:HostCollectiveId, "ParentCollectiveId"=:ParentCollectiveId, "createdAt"=:createdAt, "CreatedByUserId"=:CreatedByUserId WHERE id=:id AND type='COLLECTIVE'`,
+          { replacements: { id: collective.id, HostCollectiveId, ParentCollectiveId, createdAt, CreatedByUserId } });
       })
   }
 
-  return sequelize.query(`SELECT id, slug, type, mission, description, currency, tiers, "createdAt", "updatedAt" FROM "Collectives"`, { type: sequelize.QueryTypes.SELECT })
+  return sequelize.query(`SELECT id, slug, type, mission, description, currency, tiers, "createdAt", "updatedAt", "LastEditedByUserId" FROM "Collectives"`, { type: sequelize.QueryTypes.SELECT })
   .then(collectives => collectives && Promise.map(collectives, updateCollective, { concurrency: 10 }))
 }
 

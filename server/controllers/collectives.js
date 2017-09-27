@@ -12,6 +12,7 @@ import fetchGithubUser from '../lib/github';
 import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
+import debugLib from 'debug';
 
 const {
   Activity,
@@ -229,7 +230,7 @@ export const createFromGithub = (req, res, next) => {
 
   const { payload } = req.required;
   const { connectedAccountId } = req.jwtPayload;
-
+  const debug = debugLib("github");
   let creatorUser, creatorCollective, options, creatorCollectiveConnectedAccount;
   const collectiveData = payload.group;
   const githubUser = payload.user;
@@ -243,7 +244,7 @@ export const createFromGithub = (req, res, next) => {
       include: { model: Collective }
     })
     .then(ca => {
-      console.log(">>> connected account found", ca && ca.username);
+      debug("connected account found", ca && ca.username);
       creatorCollective = ca.Collective;
       creatorCollectiveConnectedAccount = ca;
       return models.User.findById(creatorCollective.CreatedByUserId);
@@ -254,7 +255,7 @@ export const createFromGithub = (req, res, next) => {
         role: roles.ADMIN,
         remoteUser: creatorUser
       };
-      console.log(">>> creatorUser", user && user.dataValues);
+      debug("creatorUser", user && user.dataValues);
     })
     .tap(() => {
       if (githubUser) {
@@ -271,16 +272,16 @@ export const createFromGithub = (req, res, next) => {
     .then(() => Collective.findOne({ where: { slug: collectiveData.slug.toLowerCase() }}))
     .then(existingCollective => {
       if (existingCollective) {
-        collectiveData.slug = `${collectiveData.slug}+${Math.floor((Math.random() * 1000) + 1)}`;
+        collectiveData.slug = `${collectiveData.slug}-${Math.floor((Math.random() * 1000) + 1)}`;
       }
       return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
-    .tap(g => console.log(">>> createdCollective", g && g.dataValues))
+    .tap(g => debug("createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
     .then(() => Collective.findById(defaultHostCollectiveId())) // make sure the host exists
     .tap(hostCollective => {
-      console.log(">>> hostCollective", hostCollective && hostCollective.dataValues);
+      debug("hostCollective", hostCollective && hostCollective.dataValues);
       if (hostCollective) {
         createdCollective.HostCollectiveId = hostCollective.id;
         createdCollective.save();
@@ -313,10 +314,10 @@ export const createFromGithub = (req, res, next) => {
       return ConnectedAccount.findOne({ where: caAttr })
         .then(ca => {
           if (ca) {
-            console.log(">>> Connected Account for ", caAttr, ca && ca.dataValues);
+            debug("Connected Account for ", caAttr, ca && ca.dataValues);
             return ca;
           }
-          console.log(">>> Creating Connected Account", caAttr);
+          debug("Creating Connected Account", caAttr);
           return ConnectedAccount.create(caAttr);
         })
         .then(ca => {
@@ -329,7 +330,7 @@ export const createFromGithub = (req, res, next) => {
         })
         .then(userCollective => {
           if (userCollective && userCollective.CreatedByUserId) {
-            console.log(">>> User Collective Found", userCollective && userCollective.dataValues);
+            debug("User Collective Found", userCollective && userCollective.dataValues);
             return userCollective;
           }
           // If we cannot find an existing user for this contributor,
@@ -341,7 +342,7 @@ export const createFromGithub = (req, res, next) => {
                 userAttr.website = json.blog;
                 userAttr.email = json.email;
               }
-              console.log(">>> createUserWithCollective", userAttr);
+              debug("createUserWithCollective", userAttr);
               return User
                 .createUserWithCollective(Object.assign({}, userAttr))
                 .then(user => {
@@ -351,7 +352,7 @@ export const createFromGithub = (req, res, next) => {
         })
         .then(userCollective => contributorUserCollective = userCollective)
         .then(() => {
-          console.log(">>> addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective.dataValues)
+          debug("addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective.dataValues)
           return contributorUserCollective.addConnectedAccount(connectedAccount)
         })
         .then(() => _addUserToCollective(createdCollective, { id: contributorUserCollective.CreatedByUserId, CollectiveId: contributorUserCollective.id }, options));
@@ -365,7 +366,7 @@ export const createFromGithub = (req, res, next) => {
         lastName: creatorUser.lastName,
         collective: createdCollective.info
       };
-      console.log(">>> sending github.signup to", creatorUser.email, "with data", data);
+      debug("sending github.signup to", creatorUser.email, "with data", data);
       return emailLib.send('github.signup', creatorUser.email, data);
     })
     .tap(() => res.send(createdCollective.info))
