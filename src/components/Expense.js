@@ -86,7 +86,7 @@ class Expense extends React.Component {
             font-size: 1.5rem;
             font-weight: 300;
             position: absolute;
-            right: 0.5rem;
+            right: 1rem;
             top: 1rem;
           }
           .rejected .status {

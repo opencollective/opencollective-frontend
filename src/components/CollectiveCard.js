@@ -6,6 +6,7 @@ import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import { firstSentence } from '../lib/utils';
+import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
 
@@ -29,7 +30,12 @@ class CollectiveCard extends React.Component {
     const logo = collective.image || pickLogo(collective.id);
     const tierName = membership.tier ? membership.tier.name : membership.role;
     const currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
-
+    const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
+    if (!coverStyle.backgroundImage) {
+      coverStyle.backgroundImage = `url('${collective.backgroundImage || defaultBackgroundImage[collective.type || 'COLLECTIVE']}')`;
+      coverStyle.backgroundSize = 'cover';
+      coverStyle.backgroundPosition = 'center center';
+    }
     return (
       <a className={`CollectiveCard ${collective.type}`} onClick={this.onClick} >
         <style jsx>{`
@@ -176,7 +182,7 @@ class CollectiveCard extends React.Component {
         }
         `}</style>
         <div className='head'>
-          <div className='background' style={get(collective, 'settings.style.hero.cover')}></div>
+          <div className='background' style={coverStyle}></div>
           <div className='image' style={{backgroundImage: `url(${logo})`}}></div>
         </div>
         <div className='body'>

@@ -82,35 +82,6 @@ class EventsWithData extends React.Component {
         .createEvent {
           text-align: center;
         }
-        .btn {
-          display: inline-block;
-          padding: 6px 12px;
-          margin-bottom: 0;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 1.42857143;
-          text-align: center;
-          white-space: nowrap;
-          vertical-align: middle;
-          touch-action: manipulation;
-          cursor: pointer;
-          user-select: none;
-          background-image: none;
-          border: 1px solid transparent;
-          border-radius: 4px;
-        }
-        .btn-default {
-          color: #333;
-          background-color: #fff;
-          border-color: #ccc;
-        }
-        .btn-default:hover {
-          color: #333;
-          background-color: #e6e6e6;
-          border-color: #adadad;
-          text-decoration: none;
-          outline: 0;
-        }
         `}
         </style>
         <div className="events" ref="events">

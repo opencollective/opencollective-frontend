@@ -199,13 +199,26 @@ class Collective extends React.Component {
             max-width: 900px;
             margin: 0 auto;
           }
+          #budget {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+          }
           #budget .col {
-            float: left;
             max-width: 400px;
-            margin: 2rem;
           }
           #budget .actions {
             text-align: center;
+          }
+          #budget .actions :global(button) {
+            margin: 0.5rem;
+          }
+          .cardsList {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: center;            
           }
         `}</style>
 
@@ -261,12 +274,14 @@ class Collective extends React.Component {
               <section id="sponsors" className="tier">
                 <div className="content" >
                   <h1>Sponsors</h1>
-                  <MembersWithData
-                    collective={this.collective}
-                    type="ORGANIZATION,COLLECTIVE"
-                    role='BACKER'
-                    limit={100}
-                    />
+                  <div className="cardsList">
+                    <MembersWithData
+                      collective={this.collective}
+                      type="ORGANIZATION,COLLECTIVE"
+                      role='BACKER'
+                      limit={100}
+                      />
+                  </div>
                 </div>
               </section>
 
@@ -291,15 +306,16 @@ class Collective extends React.Component {
                       defaultMessage={`{n, plural, one {collective} other {collectives}}`}
                       />
                   </h1>
-                  {this.collective.memberOf.map((membership) =>
-                    <CollectiveCard
-                      key={membership.id}
-                      className="membership"
-                      collective={membership.collective}
-                      membership={membership}
-                      />
-                  )}
-
+                  <div className="cardsList">
+                    {this.collective.memberOf.map((membership) =>
+                      <CollectiveCard
+                        key={membership.id}
+                        className="membership"
+                        collective={membership.collective}
+                        membership={membership}
+                        />
+                    )}
+                  </div>
                 </section>
               }
 
@@ -319,6 +335,7 @@ class Collective extends React.Component {
                     />
                   <div className="actions">
                     <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
+                    <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
                   </div>
                 </div>
 
