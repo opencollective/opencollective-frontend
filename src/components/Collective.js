@@ -191,12 +191,8 @@ class Collective extends React.Component {
             flex-direction: column;
             align-items: center;
           }
-          .content {
-            margin: 0;
-          }
-          .content p {
-            overflow: hidden;
-            text-overflow: ellipsis;
+          .longDescription {
+            margin-top: 3rem;
           }
           .tier {
             text-align: center;
@@ -207,20 +203,20 @@ class Collective extends React.Component {
             max-width: 900px;
             margin: 0 auto;
           }
-          #budget {
+          .columns {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: space-around;
           }
-          #budget .col {
+          .columns .col {
             max-width: 400px;
             width: 100%;
           }
-          #budget .actions {
+          .columns .actions {
             text-align: center;
           }
-          #budget .actions :global(button) {
+          .columns .actions :global(button) {
             margin: 0.5rem;
           }
           .cardsList {
@@ -255,7 +251,8 @@ class Collective extends React.Component {
 
             <CollectiveCover
               collective={this.collective}
-              style={get(this.collective, 'settings.style.hero.cover') || get(this.collective.parentCollective, 'settings.style.hero.cover')}                  
+              style={get(this.collective, 'settings.style.hero.cover') || get(this.collective.parentCollective, 'settings.style.hero.cover')}
+              cta={<HashLink to={`#contribute`}><FormattedMessage id="collective.contribute" defaultMessage="contribute" /></HashLink>}
               />
 
             <MenuBar
@@ -266,7 +263,7 @@ class Collective extends React.Component {
             <div>
 
               <section id="about">
-                <div className="sidebar">
+                <div className="sidebar" id="contribute">
                   { tiers.map(tier => (
                     <TierCard collective={this.collective} tier={tier} />
                   ))}
@@ -276,38 +273,31 @@ class Collective extends React.Component {
                   <div className="longDescription" >
                     <Markdown source={this.collective.longDescription || this.collective.description} />
                   </div>
-                </div>
-              </section>
-
-              <section id="events" className="events">
-                <div className="content">
-                  <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
-                  <EventsWithData collectiveSlug={this.collective.slug} />
+                  <div id="events">
+                    <h1><FormattedMessage id="collective.events.title" defaultMessage="Events" /></h1>
+                    <EventsWithData collectiveSlug={this.collective.slug} />
+                  </div>
                 </div>
               </section>
 
               <section id="sponsors" className="tier">
-                <div className="content" >
-                  <h1>Sponsors</h1>
-                  <MembersWithData
-                    collective={this.collective}
-                    type="ORGANIZATION,COLLECTIVE"
-                    role='BACKER'
-                    limit={100}
-                    />
-                </div>
+                <h1>Sponsors</h1>
+                <MembersWithData
+                  collective={this.collective}
+                  type="ORGANIZATION,COLLECTIVE"
+                  role='BACKER'
+                  limit={100}
+                  />
               </section>
 
               <section id="backers" className="tier">
-                <div className="content" >
-                  <h1>Backers</h1>
-                  <MembersWithData
-                    collective={this.collective}
-                    type="USER"
-                    role='BACKER'
-                    limit={100}
-                    />
-                </div>
+                <h1>Backers</h1>
+                <MembersWithData
+                  collective={this.collective}
+                  type="USER"
+                  role='BACKER'
+                  limit={100}
+                  />
               </section>
 
               { this.collective.memberOf.length > 0 &&
@@ -332,40 +322,43 @@ class Collective extends React.Component {
               }
 
               <section id="budget">
-                <div id="expenses" className="col">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.expenses.title"
-                      values={{ n: this.collective.stats.expenses }}
-                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest expenses}}`}
+                <h1><FormattedMessage id="collective.budget.title" defaultMessage="Budget" /></h1>
+                <div className="columns">
+                  <div id="expenses" className="col">
+                    <h2>
+                      <FormattedMessage
+                        id="collective.expenses.title"
+                        values={{ n: this.collective.stats.expenses }}
+                        defaultMessage={`{n, plural, one {Latest transaction} other {Latest expenses}}`}
+                        />
+                    </h2>
+                    <ExpensesWithData
+                      collective={this.collective}
+                      LoggedInUser={LoggedInUser}
+                      limit={5}
                       />
-                  </h1>
-                  <ExpensesWithData
-                    collective={this.collective}
-                    LoggedInUser={LoggedInUser}
-                    limit={5}
-                    />
-                  <div className="actions">
-                    <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
-                    <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
-                  </div>
-                </div>
-
-                <div id="transactions" className="col">
-                  <h1>
-                    <FormattedMessage
-                      id="collective.transactions.title"
-                      values={{ n: this.collective.stats.transactions }}
-                      defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
-                      />
-                  </h1>
-                  <TransactionsWithData
-                    collective={this.collective}
-                    LoggedInUser={LoggedInUser}
-                    limit={5}
-                    />
                     <div className="actions">
-                    <Button bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
+                      <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
+                      <Button bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
+                    </div>
+                  </div>
+
+                  <div id="transactions" className="col">
+                    <h2>
+                      <FormattedMessage
+                        id="collective.transactions.title"
+                        values={{ n: this.collective.stats.transactions }}
+                        defaultMessage={`{n, plural, one {Latest transaction} other {Latest transactions}}`}
+                        />
+                    </h2>
+                    <TransactionsWithData
+                      collective={this.collective}
+                      LoggedInUser={LoggedInUser}
+                      limit={5}
+                      />
+                      <div className="actions">
+                      <Button bsStyle="default" onClick={() => Router.pushRoute(`/${this.collective.slug}/transactions`)}><FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /></Button>
+                    </div>
                   </div>
                 </div>
               </section>

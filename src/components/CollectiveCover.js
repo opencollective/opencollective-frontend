@@ -8,11 +8,13 @@ import { Router } from '../server/pages';
 import Currency from './Currency';
 import { defaultBackgroundImage } from '../constants/collectives';
 import { pickAvatar } from '../lib/collective.lib';
+import CTAButton from './Button';
 
 class CollectiveCover extends React.Component {
 
   static propTypes = {
     href: PropTypes.string,
+    cta: PropTypes.node,
     title: PropTypes.string,
     style: PropTypes.object,
   }
@@ -57,6 +59,11 @@ class CollectiveCover extends React.Component {
 
     return (
       <div className={`CollectiveCover ${className} ${type}`}>
+        <style jsx global>{`
+          .CollectiveCover .ctabtn a {
+            color: white !important;
+          }
+        `}</style>
         <style jsx>{`
         .cover {
           display: flex;
@@ -86,6 +93,7 @@ class CollectiveCover extends React.Component {
           display: flex;
           flex-direction: column;
           justify-content: space-around;
+          align-items: center;
           color: black;
           margin-top: 70px;
         }
@@ -182,6 +190,19 @@ class CollectiveCover extends React.Component {
           line-height: 1.25;
           margin: 1px;
         }
+        .CollectiveCover :global(.ctabtn) {
+          margin: 2rem 0 0 0;
+          width: 25rem;
+          font-family: Lato;
+          text-transform: uppercase;
+          background-color: #75cc1f;
+          font-size: 1.6rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: white !important;
+          border-radius: 2.8rem;
+        }
         @media(max-width: 600px) {
           h1 {
             font-size: 2.5rem;
@@ -229,6 +250,9 @@ class CollectiveCover extends React.Component {
                 </div>
                 <FormattedMessage id="collective.stats.totalAmountSent.label" defaultMessage="Total amount donated" />
               </div>
+            }
+            { this.props.cta &&
+              <CTAButton className="ctabtn green">{this.props.cta}</CTAButton>
             }
           </div>
         </div>

@@ -31,11 +31,25 @@ export default class Body extends React.Component {
         button {
           cursor: pointer;
         }
+
+        section h1 {
+          font-size: 1.8rem;
+        }
+
+        section h2 {
+          font-size: 1.6rem;
+        }
+
         .content {
           max-width: 768px;
           padding: 2rem 3rem;
           margin: 0 auto;
           line-height: 1.5;
+        }
+
+        .content p {
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .content h2 {

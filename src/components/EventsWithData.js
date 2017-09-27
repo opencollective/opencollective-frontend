@@ -50,7 +50,7 @@ class EventsWithData extends React.Component {
 
     return (
       <div className="Events">
-        <style jsx global>{`
+        <style jsx>{`
         .Events {
           font-size: 1.4rem;
           line-height: 1.5;

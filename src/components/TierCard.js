@@ -8,6 +8,7 @@ import Logo from './Logo';
 import { Router } from '../server/pages';
 import { Link } from '../server/pages';
 import Currency from './Currency';
+import colors from '../constants/colors';
 
 class Tier extends React.Component {
 
@@ -138,14 +139,18 @@ class Tier extends React.Component {
             position: absolute;
             top: 3rem;
             right: 3rem;
-            height: 32px;
+            width: 6rem;
             font-family: Rubik;
-            font-size: 16px;
+            font-size: 1.6rem;
             font-weight: 500;
-            line-height: 2;
+            line-height: 1;
             text-align: right;
             color: #45484c;
             color: var(--charcoal-grey-three);
+          }
+          .interval {
+            font-size: 1.2rem;
+            color: ${colors.darkgray};
           }
           .limited {
             margin: 0rem 3rem;
@@ -202,11 +207,13 @@ class Tier extends React.Component {
           <div className="amount">
             <Currency value={tier.amount} currency={tier.currency || collective.currency} precision={0} />
             { tier.interval &&
-              <FormattedMessage
-                id="tier.interval"
-                defaultMessage="/{interval, select, month {month} year {year} other {}}"
-                values={{ interval: tier.interval }}
-                />
+              <div className="interval">
+                <FormattedMessage
+                  id="tier.interval"
+                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                  values={{ interval: tier.interval }}
+                  />
+                </div>
             }
           </div>
         }

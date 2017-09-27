@@ -46,7 +46,18 @@ export function prettyUrl(url) {
 
 export function formatCurrency(amount, currency = 'USD', options = {}) {
   amount = amount / 100;
-  return amount.toLocaleString(currency, {
+  let locale;
+  switch (currency) {
+    case 'USD':
+      locale = 'en-US';
+      break;
+    case 'EUR':
+      locale = 'en-EU';
+      break;
+    default:
+      locale = currency;
+  }
+  return amount.toLocaleString(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits : options.minimumFractionDigits || options.precision || 0,
