@@ -207,6 +207,7 @@ class Collective extends React.Component {
           }
           #budget .col {
             max-width: 400px;
+            width: 100%;
           }
           #budget .actions {
             text-align: center;

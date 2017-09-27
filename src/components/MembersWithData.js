@@ -86,6 +86,10 @@ class MembersWithData extends React.Component {
           .Members {
             overflow: hidden;
             margin: 1rem 0;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
           }
         `}</style>
 

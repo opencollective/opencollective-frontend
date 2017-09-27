@@ -7,6 +7,7 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { Router } from '../server/pages';
 import { Link } from '../server/pages';
+import Currency from './Currency';
 
 class Tier extends React.Component {
 
@@ -91,6 +92,7 @@ class Tier extends React.Component {
         <style jsx global>{`
           html {
             --charcoal-grey-two: #373a3d;
+            --charcoal-grey-three: #45484c;
             --main-custom-color: #8f47b3;
             --silver-four: #e1e4e6;
             --cool-grey: #9ea2a6;
@@ -118,6 +120,7 @@ class Tier extends React.Component {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
           }
           .title {
             margin: 3rem 0rem 1rem 3rem;
@@ -129,6 +132,19 @@ class Tier extends React.Component {
             text-align: left;
             color: #373a3d;
             color: var(--charcoal-grey-two);
+          }
+          .amount {
+            position: absolute;
+            top: 3rem;
+            right: 3rem;
+            height: 32px;
+            font-family: Rubik;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 2;
+            text-align: right;
+            color: #45484c;
+            color: var(--charcoal-grey-three);
           }
           .limited {
             margin: 0rem 3rem;
@@ -179,6 +195,18 @@ class Tier extends React.Component {
         <div className="title">
           {tier.name}
         </div>
+        { tier.amount > 0 &&
+          <div className="amount">
+            <Currency value={tier.amount} currency={tier.currency || collective.currency} precision={0} />
+            { tier.interval &&
+              <FormattedMessage
+                id="tier.interval"
+                defaultMessage="/{interval, select, month {month} year {year} other {}}"
+                values={{ interval: tier.interval }}
+                />
+            }
+          </div>
+        }
         { tier.maxQuantity > 0 &&
           <div className="limited">
             <FormattedMessage
@@ -203,7 +231,10 @@ class Tier extends React.Component {
           </div>
         }
         <a className="action" onClick={() => Router.pushRoute(`/${collective.slug}/order/${tier.id}`)}>
-          <FormattedMessage id="tier.contribute" defaultMessage="contribute" />
+          { tier.button && tier.button}
+          { !tier.button &&
+            <FormattedMessage id="tier.contribute" defaultMessage="contribute" />
+          }
         </a>
       </div>
     );
