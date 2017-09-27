@@ -112,6 +112,7 @@ class Tier extends React.Component {
         <style jsx>{`
           .TierCard {
             width: 280px;
+            overflow: hidden;
             border-radius: 8px;
             background-color: #ffffff;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
@@ -159,6 +160,8 @@ class Tier extends React.Component {
           }
           .body {
             margin: 1rem 3rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-size: 1.4rem;
             color: var(--gunmetal);
           }
@@ -178,7 +181,7 @@ class Tier extends React.Component {
             margin-top: 1rem;
             width: 280px;
             height: 56px;
-            border-radius: 8px;
+            border-radius: 0 0 8px 8px;
             background-color: #8f47b3;
             background-color: var(--main-custom-color);
             box-shadow: inset 0 -4px 0 0 rgba(37, 39, 41, 0.15);

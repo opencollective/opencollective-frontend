@@ -68,7 +68,6 @@ class Member extends React.Component {
 
         .Member.viewMode-ORGANIZATION {
           width: 200px;
-          margin: 0.5rem;
         }
 
         .Member :global(.Avatar) {

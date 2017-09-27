@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 import { union, get } from 'lodash';
-import { prettyUrl} from '../lib/utils';
+import { prettyUrl, formatCurrency } from '../lib/utils';
 import { Router } from '../server/pages';
 import Currency from './Currency';
 import { defaultBackgroundImage } from '../constants/collectives';
@@ -34,6 +34,7 @@ class CollectiveCover extends React.Component {
       stats
     } = collective;
 
+    const formattedYearlyIncome = stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency);
     const backgroundImage = collective.backgroundImage || get(collective,'parentCollective.backgroundImage') || defaultBackgroundImage[collective.type];
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
@@ -158,7 +159,29 @@ class CollectiveCover extends React.Component {
         .stats .value {
           font-size: 3rem;
         }
-
+        .counter {
+          margin: 1rem 0px;
+        }
+        .counter .-character {
+          font-family: Lato;
+          font-size: 22px;
+          font-weight: bold;
+          margin: 1px;
+        }
+        .counter .-digit {
+          display: inline-block;
+          width: 20px;
+          height: 28px;
+          border-radius: 3px;
+          background-color: rgba(0, 0, 0, 0.6);
+          border: solid 1px #000000;
+          font-family: Lato;
+          font-size: 22px;
+          color: #ffffff;
+          font-weight: bold;
+          line-height: 1.25;
+          margin: 1px;
+        }
         @media(max-width: 600px) {
           h1 {
             font-size: 2.5rem;
@@ -193,8 +216,8 @@ class CollectiveCover extends React.Component {
             }
             { collective.type === 'COLLECTIVE' && stats && stats.yearlyBudget > 0 &&
               <div className="stats">
-                <div className="yearlyBudget value">
-                  <Currency value={stats.yearlyBudget} currency={collective.currency} />
+                <div className="yearlyBudget value counter">
+                  { formattedYearlyIncome.split('').map((character) => <span className={/[^0-9]/.test(character) ? '-character' : '-digit'}>{character}</span>) }
                 </div>
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>

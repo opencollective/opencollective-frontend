@@ -1,9 +1,3 @@
-import { defineMessages } from 'react-intl';
-
-const messages = defineMessages({
-  free: { id: 'utils.free', defaultMessage: 'free' }
-});
-
 export function truncate(str, length) {
   if (!str || str.length <= length) {
     return str;
@@ -50,14 +44,13 @@ export function prettyUrl(url) {
   return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '').replace(/\/$/,'');
 }
 
-export function formatCurrency(amount, currency = 'USD', intl) {
-  if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
+export function formatCurrency(amount, currency = 'USD', options = {}) {
   amount = amount / 100;
   return amount.toLocaleString(currency, {
     style: 'currency',
     currency,
-    minimumFractionDigits : 0,
-    maximumFractionDigits : 2
+    minimumFractionDigits : options.minimumFractionDigits || options.precision || 0,
+    maximumFractionDigits : options.precision || 0
   })
 };
 

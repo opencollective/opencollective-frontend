@@ -26,13 +26,20 @@ class CollectiveCard extends React.Component {
 
   render() {
     const { collective, membership } = this.props;
+    let currency;
 
+    if (membership) {
+      currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
+    } else {
+      currency = collective.currency;
+    }
     const logo = collective.image || pickLogo(collective.id);
-    const tierName = membership.tier ? membership.tier.name : membership.role;
-    const currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
+    const tierName = membership && (membership.tier ? membership.tier.name : membership.role);
+
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
-    if (!coverStyle.backgroundImage) {
-      coverStyle.backgroundImage = `url('${collective.backgroundImage || defaultBackgroundImage[collective.type || 'COLLECTIVE']}')`;
+    const backgroundImage = collective.backgroundImage || collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type];
+    if (!coverStyle.backgroundImage && backgroundImage) {
+      coverStyle.backgroundImage = `url('${backgroundImage}')`;
       coverStyle.backgroundSize = 'cover';
       coverStyle.backgroundPosition = 'center center';
     }
@@ -40,13 +47,14 @@ class CollectiveCard extends React.Component {
       <a className={`CollectiveCard ${collective.type}`} onClick={this.onClick} >
         <style jsx>{`
         .CollectiveCard {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
           cursor: pointer;
           vertical-align: top;
           position: relative;
           box-sizing: border-box;
-          display: inline-block;
           width: 200px;
-          margin: 7px;
           border-radius: 5px;
           background-color: #ffffff;
           box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
@@ -58,7 +66,7 @@ class CollectiveCard extends React.Component {
           position: relative;
           overflow: hidden;
           width: 100%;
-          height: 120px;
+          height: 12rem;
           border-bottom: 5px solid #46b0ed;
         }
 
@@ -88,6 +96,7 @@ class CollectiveCard extends React.Component {
 
         .body {
           padding: 1rem;
+          min-height: 10rem;
         }
       
         .name, .description {
@@ -111,7 +120,7 @@ class CollectiveCard extends React.Component {
           font-weight: normal;
           text-align: center;
           color: #787d80;
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           line-height: 1.3;
           margin: 0 5px;
         }
@@ -119,6 +128,7 @@ class CollectiveCard extends React.Component {
         .footer {
           font-size: 1.1rem;
           width: 100%;
+          min-height: 6rem;
           text-align: center;
         }
 
@@ -131,6 +141,7 @@ class CollectiveCard extends React.Component {
         .stats {
           display: flex;
           width: 100%;
+          height: 6rem;
           justify-content: space-around;
         }
 
@@ -204,14 +215,16 @@ class CollectiveCard extends React.Component {
               </div>
             </div>
           }
-          <div className="membership">
-            <div className='role'>{tierName}</div>
-            <div className='since'>
-              <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-              <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+          { membership &&
+            <div className="membership">
+              <div className='role'>{tierName}</div>
+              <div className='since'>
+                <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
+                <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+              </div>
             </div>
-          </div>
-          { membership.role === 'BACKER' && membership.totalDonations &&
+          }
+          { membership && membership.role === 'BACKER' && membership.totalDonations &&
             <div className="totalDonations">
               <div className="totalDonationsAmount">
                 <Currency value={membership.totalDonations} currency={currency} />

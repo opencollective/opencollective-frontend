@@ -84,12 +84,12 @@ class MembersWithData extends React.Component {
             width: 33%;
           }
           .Members {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: center;   
             overflow: hidden;
             margin: 1rem 0;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: space-around;
           }
         `}</style>
 
@@ -112,7 +112,7 @@ class MembersWithData extends React.Component {
           </div>
         }
 
-        <div className="Members">
+        <div className="Members cardsList">
           {members.map((member) =>
             <Member
               key={member.id}
@@ -151,9 +151,11 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
     }
     member {
       id
+      type
       name
       slug
       image
+      backgroundImage
     }
   }
 }

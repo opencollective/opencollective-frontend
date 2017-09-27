@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import TicketController from './TicketController';
 import CTAButton from './Button';
-import { formatCurrency } from '../lib/utils';
+import Currency from './Currency';
 import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
@@ -196,7 +196,7 @@ class Tier extends React.Component {
             <div className="title" >{capitalize(name)}</div>
             { !this.presets &&
               <div className="title" >
-                {formatCurrency(this.state.amount, currency, this.props.intl)}
+                <Currency value={this.state.amount} currency={currency} />
                 { interval && '/' }
                 {interval && interval === 'month' && intl.formatMessage(this.messages['month'])}
                 {interval && interval === 'year' && intl.formatMessage(this.messages['year'])}

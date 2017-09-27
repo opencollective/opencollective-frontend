@@ -165,10 +165,10 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={`/${this.collective.slug}/contribute`}><a>
+        component: <Link route={`/${this.collective.slug}/donate`}><a>
             <FormattedMessage
-              id="collective.contribute"
-              defaultMessage={`contribute`}
+              id="collective.donate"
+              defaultMessage={`donate`}
               /></a>
           </Link>
       }
@@ -187,8 +187,16 @@ class Collective extends React.Component {
       <div className="CollectivePage">
         <style jsx>{`
           .sidebar {
-            float: right;
-            margin: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          .content {
+            margin: 0;
+          }
+          .content p {
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .tier {
             text-align: center;
@@ -219,7 +227,13 @@ class Collective extends React.Component {
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            justify-content: center;            
+            justify-content: center;
+          }
+          @media(min-width: 600px) {
+            .sidebar {
+              float: right;
+              margin: 3rem;
+            }
           }
         `}</style>
 
@@ -275,14 +289,12 @@ class Collective extends React.Component {
               <section id="sponsors" className="tier">
                 <div className="content" >
                   <h1>Sponsors</h1>
-                  <div className="cardsList">
-                    <MembersWithData
-                      collective={this.collective}
-                      type="ORGANIZATION,COLLECTIVE"
-                      role='BACKER'
-                      limit={100}
-                      />
-                  </div>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="ORGANIZATION,COLLECTIVE"
+                    role='BACKER'
+                    limit={100}
+                    />
                 </div>
               </section>
 
@@ -313,7 +325,6 @@ class Collective extends React.Component {
                         key={membership.id}
                         className="membership"
                         collective={membership.collective}
-                        membership={membership}
                         />
                     )}
                   </div>
