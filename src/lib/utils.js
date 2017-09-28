@@ -44,8 +44,7 @@ export function prettyUrl(url) {
   return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '').replace(/\/$/,'');
 }
 
-export function formatCurrency(amount, currency = 'USD', options = {}) {
-  amount = amount / 100;
+function getLocaleFromCurrency(currency) {
   let locale;
   switch (currency) {
     case 'USD':
@@ -57,7 +56,18 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
     default:
       locale = currency;
   }
-  return amount.toLocaleString(locale, {
+  return locale;
+}
+
+export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
+  const d = new Date(date);
+  const locale = (typeof window !== 'undefined') ? window.navigator.language : options.locale || 'en-US';
+  return d.toLocaleDateString(locale, options);
+}
+
+export function formatCurrency(amount, currency = 'USD', options = {}) {
+  amount = amount / 100;
+  return amount.toLocaleString(getLocaleFromCurrency(currency), {
     style: 'currency',
     currency,
     minimumFractionDigits : options.minimumFractionDigits || options.precision || 0,

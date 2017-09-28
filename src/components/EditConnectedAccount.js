@@ -15,7 +15,6 @@ class EditConnectedAccount extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
 
     this.state = { editMode: props.editMode || false };
     this.connect = this.connect.bind(this);

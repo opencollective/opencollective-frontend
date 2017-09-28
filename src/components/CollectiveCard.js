@@ -225,7 +225,7 @@ class CollectiveCard extends React.Component {
               </div>
             </div>
           }
-          { membership && membership.role === 'BACKER' && membership.totalDonations &&
+          { membership && membership.role === 'BACKER' && membership.totalDonations > 0 &&
             <div className="totalDonations">
               <div className="totalDonationsAmount">
                 <Currency value={membership.totalDonations} currency={currency} />

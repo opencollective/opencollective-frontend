@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 import { Router } from '../server/pages';
 
-import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
-import { formatCurrency, firstSentence, singular, capitalize } from '../lib/utils';
+import { defineMessages, injectIntl } from 'react-intl';
+import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';
 import CollectiveCard from './CollectiveCard';
-import Currency from './Currency';
 import Avatar from './Avatar';
 
 class Member extends React.Component {
@@ -22,6 +21,7 @@ class Member extends React.Component {
     this.onClick = this.onClick.bind(this);
 
     this.messages = defineMessages({
+      'membership.since': { id: 'membership.since', defaultMessage: 'since {createdAt}'},
       'membership.totalDonations': { id: 'membership.totalDonations', defaultMessage: 'Total amount contributed' }
     });
   }
@@ -41,7 +41,14 @@ class Member extends React.Component {
 
     if (!name) return (<div/>);
 
+    const tierName = membership.tier ? singular(membership.tier.name) : membership.role;
     const className = this.props.className;
+    let memberSinceStr = ``;
+    if (tierName) {
+      memberSinceStr = capitalize(tierName);
+    }
+    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], { createdAt: formatDate(membership.createdAt) })}`;
+    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.totalDonations, collective.currency)}`;
     let title = member.name;
     if (member.description) {
       title += `
@@ -50,10 +57,10 @@ ${member.description}`;
     if (className.match(/small/)) {
       title += `
 
-${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.totalDonations, collective.currency)}`
+${memberSinceStr}
+${totalDonationsStr}`
     }
 
-    const tierName = membership.tier ? singular(membership.tier.name) : membership.role;
     return (
       <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
         <style jsx>{`
@@ -114,15 +121,11 @@ ${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurre
                 <div className="name">{name}</div>
                 <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>
                 <div className="meta since" style={{color: colors.darkgray}}>
-                  {tierName && capitalize(tierName)} &nbsp;
-                  <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-                  <FormattedDate value={membership.createdAt} month='long' year='numeric' />
+                  {memberSinceStr}
                 </div>
                 { membership.totalDonations > 0 &&
                   <div className="meta totalDonations" style={{color: colors.darkgray}}>
-                    <FormattedMessage id='membership.totalDonations' defaultMessage={`Total amount contributed`} />
-                    <span>: </span>
-                    <Currency value={membership.totalDonations} currency={collective.currency} />
+                    {totalDonationsStr}
                   </div>
                 }
               </div>
