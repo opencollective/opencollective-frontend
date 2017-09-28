@@ -132,7 +132,7 @@ describe('graphql.collective.test.js', () => {
     expect(memberships[1].collective.stats).to.deep.equal({
       backers: 25,
       sponsors: 1,
-      yearlyBudget: 331461
+      yearlyBudget: 330620
     });
   });
 
