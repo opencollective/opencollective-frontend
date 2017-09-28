@@ -4,8 +4,7 @@ import colors from '../constants/colors';
 import { Router } from '../server/pages';
 
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
-import { pickAvatar } from '../lib/collective.lib';
-import { firstSentence, singular, capitalize } from '../lib/utils';
+import { formatCurrency, firstSentence, singular, capitalize } from '../lib/utils';
 import CollectiveCard from './CollectiveCard';
 import Currency from './Currency';
 import Avatar from './Avatar';
@@ -23,8 +22,7 @@ class Member extends React.Component {
     this.onClick = this.onClick.bind(this);
 
     this.messages = defineMessages({
-      INTERESTED: { id: 'member.status.interested', defaultMessage: '{name} is interested' },
-      YES: { id: 'member.status.yes', defaultMessage: '{name} is going' }
+      'membership.totalDonations': { id: 'membership.totalDonations', defaultMessage: 'Total amount contributed' }
     });
   }
 
@@ -33,7 +31,7 @@ class Member extends React.Component {
   }
 
   render() {
-    const { viewMode, collective } = this.props;
+    const { viewMode, collective, intl } = this.props;
     const membership = { ...this.props.member };
     membership.collective = collective;
     const { member, description } = membership;
@@ -43,12 +41,18 @@ class Member extends React.Component {
 
     if (!name) return (<div/>);
 
-    const image = member.image || pickAvatar(name);
+    const className = this.props.className;
     let title = member.name;
     if (member.description) {
-      title += ` - ${member.description}`;
+      title += `
+${member.description}`;
     }
-    const className = this.props.className;
+    if (className.match(/small/)) {
+      title += `
+
+${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.totalDonations, collective.currency)}`
+    }
+
     const tierName = membership.tier ? singular(membership.tier.name) : membership.role;
     return (
       <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
@@ -105,7 +109,7 @@ class Member extends React.Component {
         <div>
           { viewMode === 'USER' &&
             <a onClick={this.onClick} title={title}>
-              <Avatar src={image} radius={45} />
+              <Avatar src={member.image} radius={45} />
               <div className="bubble">
                 <div className="name">{name}</div>
                 <div className="description" style={{color: colors.darkgray}}>{firstSentence(description || member.description, 64)}</div>

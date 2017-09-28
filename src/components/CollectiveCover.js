@@ -115,7 +115,7 @@ class CollectiveCover extends React.Component {
         .logo {
           max-width: 20rem;
           max-height: 10rem;
-          margin: 0 auto;
+          margin: 2rem auto;
           display: block;
         }
         .USER .logo {

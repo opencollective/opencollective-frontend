@@ -60,7 +60,7 @@ class CollectiveCard extends React.Component {
           box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
           overflow: hidden;
           text-decoration: none !important;
-          margin: 1rem;
+          margin: 1rem 1rem 1rem 0;
         }
 
         .head {

@@ -153,6 +153,7 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
       id
       type
       name
+      description
       slug
       image
       backgroundImage
