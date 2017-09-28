@@ -157,8 +157,8 @@ export default (app) => {
   app.get('/groups/:collectiveid', collectives.getOne);
   app.get('/groups/:collectiveid/:tierSlug(backers|users)', cache(60), collectives.getUsers); // Get collective backers
   app.get('/groups/:collectiveid/:tierSlug(backers|users).csv', cache(60), mw.format('csv'), collectives.getUsers);
-  app.put('/groups/:collectiveid', auth.canEditCollective, required('collective'), collectives.update); // Update a collective.
-  app.put('/groups/:collectiveid/settings', auth.canEditCollective, required('collective'), collectives.updateSettings); // Update collective settings
+  app.put('/groups/:collectiveid', auth.canEditCollective, required('group'), collectives.update); // Update a collective.
+  app.put('/groups/:collectiveid/settings', auth.canEditCollective, required('group'), collectives.updateSettings); // Update collective settings
   app.delete('/groups/:collectiveid', NotImplemented); // Delete a collective.
 
   app.get('/groups/:collectiveid/services/meetup/sync', mw.fetchUsers, syncMeetup);

@@ -3,7 +3,7 @@
  */
 import _ from 'lodash';
 import async from 'async';
-import { defaultHostCollectiveId, getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { defaultHostUser, getLinkHeader, getRequestedUrl } from '../lib/utils';
 import Promise from 'bluebird';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
@@ -23,7 +23,6 @@ const {
 } = models;
 
 const _addUserToCollective = (collective, user, options) => {
-  console.log(">>> _addUserToCollective", { id: collective.id, slug: collective.slug }, "user: ", { id: user.id, CollectiveId: user.CollectiveId, email: user.email }, "role: ", options && options.role);
   const checkIfCollectiveHasHost = () => {
     if (options.role !== roles.HOST) {
       return Promise.resolve();
@@ -212,7 +211,7 @@ export const create = (req, res, next) => {
       })
     })
     .tap(collective => {
-      return models.User.findOne({ where: { id: collectiveData.HostId || 772 }}).tap(h => {
+      return models.User.findOne({ where: { id: collectiveData.HostId || defaultHostUser().id }}).tap(h => {
         host = h;
         collective.HostCollectiveId = h.CollectiveId;
         collective.save();
@@ -255,7 +254,7 @@ export const createFromGithub = (req, res, next) => {
   const contributors = payload.users;
   const creatorGithubUsername = payload.github_username;
   let createdCollective;
-
+  
   collectiveData.tiers = [
     {
       type: 'TIER',
@@ -314,17 +313,7 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => debug("createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
-    .then(() => Collective.findById(defaultHostCollectiveId())) // make sure the host exists
-    .tap(hostCollective => {
-      debug("hostCollective", hostCollective && hostCollective.dataValues);
-      if (hostCollective) {
-        createdCollective.HostCollectiveId = hostCollective.id;
-        createdCollective.save();
-        return _addUserToCollective(createdCollective, { id: hostCollective.CreatedByUserId, CollectiveId: hostCollective.id }, { role: roles.HOST, remoteUser: creatorUser })
-      } else {
-        return null;
-      }
-    })
+    .then(() => _addUserToCollective(createdCollective, defaultHostUser(), { role: roles.HOST, remoteUser: creatorUser }))
     .then(() => {
       if (collectiveData.tiers) {
         return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
@@ -429,13 +418,13 @@ export const update = (req, res, next) => {
     'isActive'
   ];
 
-  const updatedCollectiveAttrs = _.pick(req.required.collective, whitelist);
+  const updatedCollectiveAttrs = _.pick(req.required.group, whitelist);
 
   updatedCollectiveAttrs.LastEditedByUserId = req.remoteUser.id;
 
   // Need to handle settings separately, since it's an object
-  if (req.required.collective.settings) {
-    updatedCollectiveAttrs.settings = Object.assign(req.collective.settings || {}, req.required.collective.settings);
+  if (req.required.group.settings) {
+    updatedCollectiveAttrs.settings = Object.assign(req.collective.settings || {}, req.required.group.settings);
   }
 
   return req.collective.update(updatedCollectiveAttrs)
@@ -444,7 +433,7 @@ export const update = (req, res, next) => {
 };
 
 export const updateSettings = (req, res, next) => {
-  putThankDonationOptInIntoNotifTable(req.collective.id, req.required.collective.settings)
+  putThankDonationOptInIntoNotifTable(req.collective.id, req.required.group.settings)
     .then(() => doUpdate(['settings'], req, res, next))
     .catch(next);
 };
@@ -470,11 +459,11 @@ function putThankDonationOptInIntoNotifTable(CollectiveId, collectiveSettings) {
 
 function doUpdate(whitelist, req, res, next) {
   whitelist.forEach((prop) => {
-    if (req.required.collective[prop]) {
+    if (req.required.group[prop]) {
       if (req.collective[prop] && typeof req.collective[prop] === 'object') {
-        req.collective[prop] = Object.assign(req.collective[prop], req.required.collective[prop]);
+        req.collective[prop] = Object.assign(req.collective[prop], req.required.group[prop]);
       } else {
-        req.collective[prop] = req.required.collective[prop];
+        req.collective[prop] = req.required.group[prop];
       }
     }
   });

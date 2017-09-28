@@ -174,6 +174,7 @@ describe('groups.routes.test.js', () => {
     describe('Successfully create a group and ', () => {
 
       const { ConnectedAccount } = models;
+      let githubUser;
 
       beforeEach(() => {
         const { User } = models;
@@ -189,6 +190,7 @@ describe('groups.routes.test.js', () => {
           preCA = ca;
           return User.createUserWithCollective({email: 'githubuser@gmail.com'});
         })
+        .tap(user => githubUser = user)
         .then(user => user.collective.addConnectedAccount(preCA));
       });
 
@@ -239,7 +241,7 @@ describe('groups.routes.test.js', () => {
         .then(userCollective => models.User.findById(userCollective.CreatedByUserId))
         .then(user => user.getCollectives({ paranoid: false })) // because we are setting deletedAt
         .tap(groups => expect(groups).to.have.length(1))
-        .tap(groups => expect(groups[0].LastEditedByUserId).to.equal(3))
+        .tap(groups => expect(groups[0].LastEditedByUserId).to.equal(githubUser.id)) // github user created above
         .then(() => models.Member.findAll())
         .then(Members => {
           expect(Members).to.have.length(3);
@@ -581,7 +583,7 @@ describe('groups.routes.test.js', () => {
           expect(res.body).to.have.property('backgroundImage', groupNew.backgroundImage);
           expect(res.body).to.have.property('isActive', groupNew.isActive);
           expect(res.body).to.not.have.property('otherprop');
-          expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(collective.createdAt).getTime());
+          expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(group.createdAt).getTime());
           expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());
           done();
         });
