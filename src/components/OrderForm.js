@@ -119,12 +119,10 @@ class OrderForm extends React.Component {
   }
 
   populatePaymentMethods(CollectiveId) {
-    if (!this.collectivesById || !CollectiveId) return;
     const { LoggedInUser } = this.state;
     let paymentMethods = [], paymentMethodsOptions = [];
 
     const collective = this.collectivesById[CollectiveId];
-    paymentMethods = collective.paymentMethods || [];
 
     const generateOptionsForCollective = (collective) => {
       return (collective.paymentMethods || []).map(pm => {
@@ -136,7 +134,10 @@ class OrderForm extends React.Component {
       });
     }
 
-    paymentMethodsOptions = generateOptionsForCollective(collective);
+    if (collective) {
+      paymentMethods = collective.paymentMethods || [];
+      paymentMethodsOptions = generateOptionsForCollective(collective);
+    }
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
       paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods];
       paymentMethodsOptions = [...paymentMethodsOptions, ... generateOptionsForCollective(this.collectivesById[LoggedInUser.CollectiveId])];
@@ -155,6 +156,7 @@ class OrderForm extends React.Component {
     fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
     collectivesById[LoggedInUser.CollectiveId] = LoggedInUser.collective;
     LoggedInUser.memberOf.map(membership => {
+      if (membership.collective.type === 'COLLECTIVE') return;
       if (['ADMIN','HOST'].indexOf(membership.role) === -1) return;
       const value = membership.collective.id;
       const label = membership.collective.name;
@@ -177,14 +179,18 @@ class OrderForm extends React.Component {
 
   selectProfile(CollectiveId) {
     const collective = this.collectivesById[CollectiveId];
-    const newState = {
-      ...this.state,
-      isNewUser: false,
-      fromCollective: {
+    let fromCollective = {};
+    if (collective) {
+      fromCollective = {
         id: CollectiveId,
         type: collective.type,
         name: collective.name
       }
+    }
+    const newState = {
+      ...this.state,
+      isNewUser: false,
+      fromCollective
     };
     this.populatePaymentMethods(CollectiveId);
     if (this.paymentMethods.length > 0) {

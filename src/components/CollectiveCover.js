@@ -36,7 +36,7 @@ class CollectiveCover extends React.Component {
       stats
     } = collective;
 
-    const formattedYearlyIncome = stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency);
+    const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency);
     const backgroundImage = collective.backgroundImage || get(collective,'parentCollective.backgroundImage') || defaultBackgroundImage[collective.type];
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
