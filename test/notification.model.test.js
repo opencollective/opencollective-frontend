@@ -114,7 +114,10 @@ describe("notification.model.test.js", () => {
       .post('/groups')
       .send({
         api_key: application.api_key,
-        collective: Object.assign(collective3Data, { users: [{ email: user2.email, role: roles.HOST},{ email: utils.data("user3").email, role: roles.ADMIN}]})
+        group: Object.assign(collective3Data, { users: [
+          { email: user2.email, role: roles.HOST },
+          { email: utils.data("user3").email, role: roles.ADMIN }
+        ]})
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
