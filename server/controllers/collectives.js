@@ -196,11 +196,12 @@ export const create = (req, res, next) => {
           return User.findOne({ where: { email: user.email.toLowerCase() }})
           .then(u => u || User.createUserWithCollective(user))
           .then(u => {
-            if (user.role === roles.HOST && !collectiveData.HostId) {
-              return;
-            }
             if (!creator) {
               creator = u;
+            }
+            if (user.role === roles.HOST && !collectiveData.HostId) {
+              collectiveData.HostId = u.id;
+              return;
             }
             return _addUserToCollective(g, u, { role: user.role, remoteUser: creator })
           })

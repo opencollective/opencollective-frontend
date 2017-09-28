@@ -34,7 +34,7 @@ describe('XSS.test', () => {
       .post('/groups')
       .send({
         api_key: application.api_key,
-        collective: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.ADMIN}]})
+        group: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e) => {
