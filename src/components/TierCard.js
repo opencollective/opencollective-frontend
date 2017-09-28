@@ -9,6 +9,7 @@ import { Router } from '../server/pages';
 import { Link } from '../server/pages';
 import Currency from './Currency';
 import colors from '../constants/colors';
+import { formatCurrency } from '../lib/utils';
 
 class Tier extends React.Component {
 
@@ -21,7 +22,6 @@ class Tier extends React.Component {
   constructor(props) {
     super(props);
     this.anchor = (get(this.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
@@ -61,7 +61,7 @@ class Tier extends React.Component {
             margin: 0 1rem;
           }
         `}</style>
-        <div className="fromCollectives">
+        <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
           { fromCollectives.slice(0, limit).map(fromCollective => (
             <div className="image" key={`image-${fromCollective.id}`}>
               <Link route={`/${fromCollective.slug}`}><a title={fromCollective.name}>
@@ -103,11 +103,14 @@ class Tier extends React.Component {
           .image img {
             border: 2px solid white;            
           }
+          .TierCard .fromCollectives {
+            margin: 1rem 0;
+          }
           .TierCard .Avatar {
             margin-left: -15px;
           }
-          .TierCard .Avatar:first {
-            margin-left: 0;
+          .TierCard .fromCollectives.user:first-child {
+            margin-left: 15px;
           }
         `}</style>
         <style jsx>{`
@@ -180,7 +183,7 @@ class Tier extends React.Component {
           .footer {
             display: flex;
             align-items: center;
-            margin: 3rem;
+            margin: 2rem 3rem;
           }
           .action {
             margin-top: 1rem;
@@ -227,7 +230,7 @@ class Tier extends React.Component {
           </div>
         }
         <div className="body">
-          {tier.description}
+          {tier.description || <FormattedMessage id="tier.defaultDescription" defaultMessage="Become a {name} for {amount} per {interval} and help us sustain our activities!" values={{ name: tier.name, amount: formatCurrency(tier.amount, tier.currency || collective.currency), interval: tier.interval}}/>}
         </div>
         { tier.stats.totalOrders > 0 &&
           <div>
