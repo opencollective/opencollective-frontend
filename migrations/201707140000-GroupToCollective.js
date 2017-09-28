@@ -456,6 +456,29 @@ const updateCollectives = (sequelize) => {
       return res;
     });
 
+    if (tiers.length === 0) {
+      tiers = [
+        {
+          type: 'TIER',
+          name: 'backer',
+          slug: 'backers',
+          amount: 500,
+          interval: 'month',
+          currency: collective.currency,
+          CollectiveId: collective.id
+        },
+        {
+          type: 'TIER',
+          name: 'sponsor',
+          slug: 'sponsors',
+          amount: 10000,
+          interval: 'month',
+          currency: collective.currency,
+          CollectiveId: collective.id
+        }
+      ];
+    }
+
     return Promise.map(tiers, tier => {
         tier.createdAt = new Date;
         Object.keys(tier).map(key => {

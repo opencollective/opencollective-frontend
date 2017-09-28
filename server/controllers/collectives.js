@@ -170,6 +170,23 @@ export const create = (req, res, next) => {
     emailLib.send('collective.confirm', user.email, data);
   };
 
+  collectiveData.tiers = [
+    {
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      interval: 'month'
+    },
+    {
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      interval: 'month'
+    }
+  ];
+
   return Collective
     .create(collectiveData)
     .tap(g => createdCollective = g)
@@ -238,6 +255,23 @@ export const createFromGithub = (req, res, next) => {
   const creatorGithubUsername = payload.github_username;
   let createdCollective;
 
+  collectiveData.tiers = [
+    {
+      type: 'TIER',
+      name: 'backer',
+      slug: 'backers',
+      amount: 500,
+      interval: 'month'
+    },
+    {
+      type: 'TIER',
+      name: 'sponsor',
+      slug: 'sponsors',
+      amount: 10000,
+      interval: 'month'
+    }
+  ];
+
   ConnectedAccount
     .findOne({
       where: { id: connectedAccountId },
@@ -289,6 +323,12 @@ export const createFromGithub = (req, res, next) => {
       } else {
         return null;
       }
+    })
+    .then(() => {
+      if (collectiveData.tiers) {
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
+      }
+      return null;
     })
     .tap((host) => Activity.create({
       type: activities.COLLECTIVE_CREATED,

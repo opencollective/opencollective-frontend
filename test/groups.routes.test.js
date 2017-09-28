@@ -17,7 +17,7 @@ const application = utils.data('application');
 const userData = utils.data('user1');
 const userData2 = utils.data('user2');
 const userData3 = utils.data('user3');
-const publicCollectiveData = utils.data('collective1');
+const publicGroupData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
 /**
@@ -54,39 +54,39 @@ describe('groups.routes.test.js', () => {
    */
   describe('#create', () => {
 
-    it('fails creating a collective if no api_key', () =>
+    it('fails creating a group if no api_key', () =>
       request(app)
         .post('/groups')
         .send({
-          collective: publicCollectiveData
+          group: publicGroupData
         })
         .expect(400)
     );
 
-    describe('successfully create a collective', () => {
-      let collective;
+    describe('successfully create a group', () => {
+      let group;
 
       beforeEach('subscribe host to collective.created notification', () => models.Notification.create({UserId: host.id, type: 'collective.created', channel: 'email'}));
 
       beforeEach('spy on emailLib', () => sinon.spy(emailLib, 'sendMessageFromActivity'));
-      beforeEach('create the collective', (done) => {
+      beforeEach('create the group', (done) => {
         const users = [
               _.assign(_.omit(userData2, 'password'), { role: roles.ADMIN }),
               _.assign(_.omit(userData3, 'password'), { role: roles.ADMIN })];
 
-        collective = Object.assign({}, publicCollectiveData, {users})
-        collective.HostCollectiveId = host.CollectiveId;
+        group = Object.assign({}, publicGroupData, {users})
+        group.HostId = host.id;
 
         request(app)
           .post('/groups')
           .send({
             api_key: application.api_key,
-            collective
+            group
           })
           .expect(200)
           .end((e, res) => {
             expect(e).to.not.exist;
-            collective = res.body;
+            group = res.body;
             done();
           })
       });
@@ -106,29 +106,29 @@ describe('groups.routes.test.js', () => {
 
       });
 
-      it('returns the attributes of the collective', () => {
-        expect(collective).to.have.property('id');
-        expect(collective).to.have.property('name');
-        expect(collective).to.have.property('mission');
-        expect(collective).to.have.property('description');
-        expect(collective).to.have.property('longDescription');
-        expect(collective).to.have.property('image');
-        expect(collective).to.have.property('backgroundImage');
-        expect(collective).to.have.property('createdAt');
-        expect(collective).to.have.property('updatedAt');
-        expect(collective).to.have.property('twitterHandle');
-        expect(collective).to.have.property('website');
-        expect(collective).to.have.property('isActive', true);
+      it('returns the attributes of the group', () => {
+        expect(group).to.have.property('id');
+        expect(group).to.have.property('name');
+        expect(group).to.have.property('mission');
+        expect(group).to.have.property('description');
+        expect(group).to.have.property('longDescription');
+        expect(group).to.have.property('image');
+        expect(group).to.have.property('backgroundImage');
+        expect(group).to.have.property('createdAt');
+        expect(group).to.have.property('updatedAt');
+        expect(group).to.have.property('twitterHandle');
+        expect(group).to.have.property('website');
+        expect(group).to.have.property('isActive', true);
       });
 
       it('assigns the users as members', () => {
         return Promise.all([
           models.Member.findOne({ where: { MemberCollectiveId: host.CollectiveId, role: roles.HOST } }),
-          models.Member.count({ where: { CollectiveId: collective.id, role: roles.ADMIN } }),
-          models.Collective.find({ where: { slug: collective.slug } })
+          models.Member.count({ where: { CollectiveId: group.id, role: roles.ADMIN } }),
+          models.Collective.find({ where: { slug: group.slug } })
           ])
         .then(results => {
-          expect(results[0].CollectiveId).to.equal(collective.id);
+          expect(results[0].CollectiveId).to.equal(group.id);
           expect(results[1]).to.equal(2);
           expect(results[2].LastEditedByUserId).to.equal(3);
         });
@@ -143,35 +143,35 @@ describe('groups.routes.test.js', () => {
    */
   describe('#createFromGithub', () => {
 
-    it('fails creating a collective if param value is not github', () =>
+    it('fails creating a group if param value is not github', () =>
       request(app)
         .post('/groups?flow=blah')
         .send({
-          payload: publicCollectiveData
+          payload: publicGroupData
         })
         .expect(400)
     );
 
-    it('fails creating a collective if no api key', () =>
+    it('fails creating a group if no api key', () =>
       request(app)
         .post('/groups?flow=github')
         .send({
-          payload: publicCollectiveData
+          payload: publicGroupData
         })
         .expect(400)
     );
 
-    it('fails creating a collective without payload', () =>
+    it('fails creating a group without payload', () =>
       request(app)
         .post('/groups?flow=github')
         .send({
-          collective: publicCollectiveData,
+          group: publicGroupData,
           api_key: application.api_key
         })
         .expect(400)
     );
 
-    describe('Successfully create a collective and ', () => {
+    describe('Successfully create a group and ', () => {
 
       const { ConnectedAccount } = models;
 
@@ -202,7 +202,7 @@ describe('groups.routes.test.js', () => {
         .set('Authorization', `Bearer ${user.jwt({ scope: 'connected-account', username: 'asood123', connectedAccountId: 1 })}`)
         .send({
           payload: {
-            collective: {
+            group: {
               name:'Loot',
               slug:'Loot',
               mission: 'mission statement'
@@ -238,8 +238,8 @@ describe('groups.routes.test.js', () => {
         .tap(userCollective => expect(userCollective).to.exist)
         .then(userCollective => models.User.findById(userCollective.CreatedByUserId))
         .then(user => user.getCollectives({ paranoid: false })) // because we are setting deletedAt
-        .tap(collectives => expect(collectives).to.have.length(1))
-        .tap(collectives => expect(collectives[0].LastEditedByUserId).to.equal(3))
+        .tap(groups => expect(groups).to.have.length(1))
+        .tap(groups => expect(groups[0].LastEditedByUserId).to.equal(3))
         .then(() => models.Member.findAll())
         .then(Members => {
           expect(Members).to.have.length(3);
@@ -273,13 +273,13 @@ describe('groups.routes.test.js', () => {
       stubStripe();
     });
 
-    // Create the public collective with user.
-    beforeEach('create public collective with host', (done) => {
+    // Create the public group with user.
+    beforeEach('create public group with host', (done) => {
       request(app)
         .post('/groups')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, { isActive: true, slug: 'another', HostCollectiveId: host.CollectiveId, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
+          group: Object.assign({}, publicGroupData, { isActive: true, slug: 'another', HostId: host.id, users: [ Object.assign({}, userData, { role: roles.ADMIN} )]})
         })
         .expect(200)
         .end((e, res) => {
@@ -305,8 +305,8 @@ describe('groups.routes.test.js', () => {
       token: 'tok_123456781234567812345678'
     }))
 
-    // Create a transaction for collective1.
-    beforeEach('create a transaction for collective 1', () =>
+    // Create a transaction for group1.
+    beforeEach('create a transaction for group 1', () =>
       models.Transaction.create({
         ...transactionsData[8],
         netAmountInCollectiveCurrency: transactionsData[8].amount,
@@ -322,13 +322,13 @@ describe('groups.routes.test.js', () => {
       CollectiveId: publicCollective.id
     }));
 
-    it('fails getting an undefined collective', () =>
+    it('fails getting an undefined group', () =>
       request(app)
         .get(`/groups/undefined?api_key=${application.api_key}`)
         .expect(404)
     );
 
-    it('successfully get a collective', (done) => {
+    it('successfully get a group', (done) => {
       request(app)
         .get(`/groups/${publicCollective.id}?api_key=${application.api_key}`)
         .expect(200)
@@ -346,7 +346,7 @@ describe('groups.routes.test.js', () => {
         });
     });
 
-    it('successfully get a collective by its slug (case insensitive)', (done) => {
+    it('successfully get a group by its slug (case insensitive)', (done) => {
       request(app)
         .get(`/groups/${publicCollective.slug.toUpperCase()}?api_key=${application.api_key}`)
         .expect(200)
@@ -374,13 +374,13 @@ describe('groups.routes.test.js', () => {
         return transaction;
       });
 
-      // Create collective2
-      beforeEach('create collective 2', () =>
-        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "collective 2", slug: "collective2"})
+      // Create group2
+      beforeEach('create group 2', () =>
+        models.Collective.create({HostCollectiveId: host.CollectiveId, name: "group 2", slug: "group2"})
       );
 
         // Create transactions for publicCollective.
-      beforeEach('create transactions for public collective', () => models.Transaction
+      beforeEach('create transactions for public group', () => models.Transaction
         .createMany(transactions, {
           CreatedByUserId: user.id,
           FromCollectiveId: user.CollectiveId,
@@ -408,7 +408,7 @@ describe('groups.routes.test.js', () => {
             CollectiveId: publicCollective.id,
           })));
 
-      it('successfully get a collective with remaining budget and yearlyIncome', (done) => {
+      it('successfully get a group with remaining budget and yearlyIncome', (done) => {
         request(app)
           .get(`/groups/${publicCollective.id}`)
           .send({
@@ -424,7 +424,7 @@ describe('groups.routes.test.js', () => {
           });
       });
 
-      it('successfully get a collective\'s backers', (done) => {
+      it('successfully get a group\'s backers', (done) => {
         request(app)
           .get(`/groups/${publicCollective.id}/backers?api_key=${application.api_key}`)
           .expect(200)
@@ -448,33 +448,33 @@ describe('groups.routes.test.js', () => {
    */
   describe('#update', () => {
 
-    let collective;
+    let group;
     let user2;
     let user3;
     let user4;
-    const collectiveNew = {
+    const groupNew = {
       name: 'new name',
       mission: 'new mission',
       description: 'new desc',
       longDescription: 'long description',
       budget: 1000000,
       burnrate: 10000,
-      image: 'http://opencollective.com/assets/image.svg',
-      backgroundImage: 'http://opencollective.com/assets/backgroundImage.png',
+      image: 'http://opengroup.com/assets/image.svg',
+      backgroundImage: 'http://opengroup.com/assets/backgroundImage.png',
       isActive: true,
       settings: { lang: 'fr' },
       otherprop: 'value'
     };
 
-    // Create the collective with user.
-    beforeEach('create public collective with host', (done) => {
+    // Create the group with user.
+    beforeEach('create public group with host', (done) => {
       request(app)
         .post('/groups')
         .send({
           api_key: application.api_key,
-          collective: Object.assign({}, publicCollectiveData, {
-            slug: 'public-collective',
-            name: 'public collective with host',
+          group: Object.assign({}, publicGroupData, {
+            slug: 'public-group',
+            name: 'public group with host',
             HostCollectiveId: host.CollectiveId,
             users: [ Object.assign({}, userData, { role: roles.ADMIN} ) ]
           })
@@ -485,7 +485,7 @@ describe('groups.routes.test.js', () => {
           models.Collective
             .findById(parseInt(res.body.id))
             .then((g) => {
-              collective = g;
+              group = g;
               done();
             })
             .catch(done);
@@ -498,105 +498,105 @@ describe('groups.routes.test.js', () => {
     // Create another user that is a backer.
     beforeEach(() => models.User.createUserWithCollective(utils.data('user3'))
       .tap(u => user3 = u)
-      .then(() => collective.addUserWithRole(user3, roles.BACKER)));
+      .then(() => group.addUserWithRole(user3, roles.BACKER)));
 
     // Create another user that is a member.
     beforeEach(() => models.User.createUserWithCollective(utils.data('user4'))
       .tap(u => user4 = u)
-      .then(() => collective.addUserWithRole(user4, roles.ADMIN)));
+      .then(() => group.addUserWithRole(user4, roles.ADMIN)));
 
-    it('fails updating a collective if not authenticated', (done) => {
+    it('fails updating a group if not authenticated', (done) => {
       request(app)
-        .put(`/groups/${collective.id}`)
+        .put(`/groups/${group.id}`)
         .send({
           api_key: application.api_key,
-          collective: collectiveNew
+          group: groupNew
         })
         .expect(401)
         .end(done);
     });
 
-    it('fails updating a collective if the user authenticated has no access', (done) => {
+    it('fails updating a group if the user authenticated has no access', (done) => {
       request(app)
-        .put(`/groups/${collective.id}`)
+        .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .send({
           api_key: application.api_key,
-          collective: collectiveNew
+          group: groupNew
         })
         .expect(403)
         .end(done);
     });
 
-    it('fails updating a collective if the user authenticated is a viewer', (done) => {
+    it('fails updating a group if the user authenticated is a viewer', (done) => {
       request(app)
-        .put(`/groups/${collective.id}`)
+        .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user3.jwt()}`)
         .send({
           api_key: application.api_key,
-          collective: collectiveNew
+          group: groupNew
         })
         .expect(403)
         .end(done);
     });
 
-    it('fails updating a collective if no data passed', (done) => {
+    it('fails updating a group if no data passed', (done) => {
       request(app)
-        .put(`/groups/${collective.id}?api_key=${application.api_key}`)
+        .put(`/groups/${group.id}?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(400)
         .end(done);
     });
 
-    it('successfully updates a collective if authenticated as a ADMIN', (done) => {
+    it('successfully updates a group if authenticated as a ADMIN', (done) => {
       request(app)
-        .put(`/groups/${collective.id}`)
+        .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user4.jwt()}`)
         .send({
           api_key: application.api_key,
-          collective: collectiveNew
+          group: groupNew
         })
         .expect(200)
         .end(done);
     });
 
-    it('successfully udpates a collective if authenticated as a user', (done) => {
+    it('successfully udpates a group if authenticated as a user', (done) => {
       request(app)
-        .put(`/groups/${collective.id}`)
+        .put(`/groups/${group.id}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
-          collective: collectiveNew
+          group: groupNew
         })
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('id', collective.id);
-          expect(res.body).to.have.property('name', collectiveNew.name);
-          expect(res.body).to.have.property('mission', collectiveNew.mission);
-          expect(res.body).to.have.property('description', collectiveNew.description);
-          expect(res.body).to.have.property('longDescription', collectiveNew.longDescription);
-          expect(res.body.settings).to.have.property('lang', collectiveNew.settings.lang);
-          expect(res.body).to.have.property('image', collectiveNew.image);
-          expect(res.body).to.have.property('backgroundImage', collectiveNew.backgroundImage);
-          expect(res.body).to.have.property('isActive', collectiveNew.isActive);
+          expect(res.body).to.have.property('id', group.id);
+          expect(res.body).to.have.property('name', groupNew.name);
+          expect(res.body).to.have.property('mission', groupNew.mission);
+          expect(res.body).to.have.property('description', groupNew.description);
+          expect(res.body).to.have.property('longDescription', groupNew.longDescription);
+          expect(res.body.settings).to.have.property('lang', groupNew.settings.lang);
+          expect(res.body).to.have.property('image', groupNew.image);
+          expect(res.body).to.have.property('backgroundImage', groupNew.backgroundImage);
+          expect(res.body).to.have.property('isActive', groupNew.isActive);
           expect(res.body).to.not.have.property('otherprop');
           expect(new Date(res.body.createdAt).getTime()).to.equal(new Date(collective.createdAt).getTime());
-          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(collective.updatedAt).getTime());
+          expect(new Date(res.body.updatedAt).getTime()).to.not.equal(new Date(group.updatedAt).getTime());
           done();
         });
     });
 
-    it('successfully create a collective with HOST and assign same person to be a ADMIN and a BACKER', () =>
+    it('successfully create a group with HOST and assign same person to be a ADMIN and a BACKER', () =>
       /* TODO: this works but we'll need to do a lot refactoring.
-       * Need to find a way to call this with one line: like collective.addUser()
+       * Need to find a way to call this with one line: like group.addUser()
        */
       models.Member.create({
         MemberCollectiveId: user3.CollectiveId,
-        CollectiveId: collective.id,
+        CollectiveId: group.id,
         role: roles.ADMIN
       })
-      .then(() => models.Member.findAll({ where: { MemberCollectiveId: user3.CollectiveId, CollectiveId: collective.id }}))
+      .then(() => models.Member.findAll({ where: { MemberCollectiveId: user3.CollectiveId, CollectiveId: group.id }}))
       .tap(rows => expect(rows.length).to.equal(2)));
   });
 
