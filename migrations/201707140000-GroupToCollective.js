@@ -53,7 +53,27 @@ const HostCollectiveIdForUserId = {
     7566: 932  // changex
   };
 
+const originalDefaultTiers = [
+  {"name":"backer","range":[2,100000],"presets":[2,10,25],"interval":"monthly"},
+  {"name":"sponsor","range":[100,500000],"presets":[100,250,500],"interval":"monthly"}
+];
+
 const pluralize = (str) => `${str}s`.replace(/s+$/,'s');
+
+const isDeepEqual = (arr1, arr2) => {
+  if (arr1.length !== arr2.length) return false;
+  if (arr1.length === 0) return arr1 === arr2;
+  arr1.sort();
+  arr2.sort();
+  for (let i=0; i < arr1.length; i++) {
+    if (Object.keys(arr1[i]).length !== Object.keys(arr2[i]).length) return false;
+    Object.keys(arr1[i]).forEach(attr => {
+      if(arr1[i][attr] !== arr2[i][attr])
+        return false;
+    })
+  }
+  return true;
+}
 
 const slugify = (str) => {
 
@@ -396,6 +416,11 @@ const updateCollectives = (sequelize) => {
 
   const addTiers = (collective) => {
     let tiers = collective.tiers || [];
+
+    if (isDeepEqual(tiers, originalDefaultTiers)) {
+      console.log(">>> Collective", collective.slug, " still has default tiers, replacing");
+      tiers = [];
+    }
 
     const getTierName = (tier) => {
       const name = tier.name && tier.name.toLowerCase();
