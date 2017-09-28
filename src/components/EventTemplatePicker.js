@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { addEventsData } from '../graphql/queries';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
 class EventTemplatePicker extends React.Component {
 
@@ -48,5 +49,45 @@ class EventTemplatePicker extends React.Component {
   }
 
 }
+
+
+const getEventsQuery = gql`
+query allEvents($collectiveSlug: String) {
+  allEvents(slug: $collectiveSlug) {
+    id
+    slug
+    name
+    description
+    longDescription
+    startsAt
+    endsAt
+    timezone
+    location {
+      name
+      address
+      lat
+      long
+    }
+    tiers {
+      id
+      type
+      name
+      description
+      amount
+    }
+    parentCollective {
+      id
+      slug
+      name
+      mission
+      backgroundImage
+      image
+    }
+  }
+}
+`;
+
+const addEventsData = graphql(getEventsQuery);
+
 
 export default addEventsData(EventTemplatePicker);

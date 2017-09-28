@@ -97,9 +97,8 @@ class CreateEvent extends React.Component {
             margin: 0 auto;
           }
           .EventTemplatePicker .field {
-            margin: 1rem;
+            margin: 0;
           }
-
           .login {
             margin: 0 auto;
             text-align: center;
@@ -119,10 +118,7 @@ class CreateEvent extends React.Component {
 
           <CollectiveCover
             href={`/${collective.slug}`}
-            logo={collective.image}
-            title={title}
-            className="small"
-            backgroundImage={collective.backgroundImage}
+            collective={collective}
             style={get(collective, 'settings.style.hero.cover')}
             />
 

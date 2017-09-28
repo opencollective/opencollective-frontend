@@ -28,7 +28,7 @@ class TicketsConfirmed extends React.Component {
   }
 
   render() {
-    const { event, response, intl } = this.props;
+    const { event, response } = this.props;
     
     return (
       <Modal onClose={this.props.onClose} show={this.props.show} className="TicketsConfirmedModal" title={(<FormattedMessage id="TicketsConfirmed.ticketsAcquired" values={{quantity: response.quantity}} defaultMessage='{quantity, plural, one {ticket} other {tickets}} acquired!' />)} >

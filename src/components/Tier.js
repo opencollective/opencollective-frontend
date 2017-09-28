@@ -22,14 +22,13 @@ class Tier extends React.Component {
 
   constructor(props) {
     super(props);
-    const { defaultValue } = this.props;
 
     this.onChange = this.props.onChange || function() {}; 
     this.handleChange = this.handleChange.bind(this);
     this.tier = props.tier;
     this.defaultValue = props.defaultValue || {};
-    this.defaultValue.quantity = defaultValue.quantity || 1;
-    this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : defaultValue.amount;
+    this.defaultValue.quantity = this.defaultValue.quantity || 1;
+    this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : this.defaultValue.amount;
     this.state = { ...this.defaultValue };
     if (this.tier.presets) {
       this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
@@ -95,9 +94,6 @@ class Tier extends React.Component {
             position: relative;
             border: 1px solid ${colors.lightgray};
             color: ${colors.black};
-          }
-          .tier.withCTA {
-            padding-bottom: 6rem;
           }
           .header {
             margin: 1rem;
@@ -196,7 +192,8 @@ class Tier extends React.Component {
             <div className="title" >{capitalize(name)}</div>
             { !this.presets &&
               <div className="title" >
-                <Currency value={this.state.amount} currency={currency} />
+                { !this.state.amount && !this.presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
+                { this.state.amount > 0 && <Currency value={this.state.amount} currency={currency} /> }
                 { interval && '/' }
                 {interval && interval === 'month' && intl.formatMessage(this.messages['month'])}
                 {interval && interval === 'year' && intl.formatMessage(this.messages['year'])}
@@ -246,7 +243,7 @@ class Tier extends React.Component {
           { type === 'TICKET' &&
             <div id="actions" className="actions">
               <TicketController defaultValue={this.defaultValue.quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{quantity:this.state.quantity}} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
+              {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity: this.state.quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick && 

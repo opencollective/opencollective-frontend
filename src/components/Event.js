@@ -22,6 +22,7 @@ import { capitalize } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportMembers } from '../lib/export_file';
+import { Link } from '../server/pages';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -58,7 +59,7 @@ class Event extends React.Component {
     this.state = {
       view: 'default',
       showInterestedForm: false,
-      order: {},
+      order: { tier: {} },
       api: { status: 'idle' },
       event: this.props.event
     }
@@ -152,13 +153,13 @@ class Event extends React.Component {
 
   getDefaultActions(props) {
     const { LoggedInUser } = props || this.props;
-    const editUrl = `/${this.state.event.slug}/edit`;
+    const editRoute = `/${this.state.event.parentCollective.slug}/events/${this.state.event.slug}/edit`;
     if (LoggedInUser) {
       const actions = [ ...this.defaultActions ];
       if (LoggedInUser.canEditEvent) {
         actions.push({
           className: 'whiteblue small',
-          component: <a href={editUrl}>EDIT</a>
+          component: <Link route={editRoute}><a>EDIT</a></Link>
         });
       }
       if (this.state.event.members.find( member => member.member.id === LoggedInUser.CollectiveId && member.role === 'FOLLOWER')) {

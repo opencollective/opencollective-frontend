@@ -15,7 +15,7 @@ class EditEventPage extends React.Component {
   }
 
   static getInitialProps ({ query: { parentCollectiveSlug, eventSlug } }) {
-    return { parentCollectiveSlug, slug: eventSlug }
+    return { parentCollectiveSlug, eventSlug }
   }
 
   async componentDidMount() {
