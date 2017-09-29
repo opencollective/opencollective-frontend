@@ -284,7 +284,8 @@ const createCollectivesForUsers = (sequelize) => {
     let promise;
     if (HostCollectiveIdForUserId[user.id]) {
       console.log(">>> User Id", user.id, "already has a collective id", HostCollectiveIdForUserId[user.id]);
-      promise = Promise.resolve(HostCollectiveIdForUserId[user.id]);
+      const data = JSON.stringify({ UserId: user.id });
+      promise = sequelize.query(`UPDATE "Collectives" SET data=:data WHERE id=:CollectiveId`, { replacements: { CollectiveId: HostCollectiveIdForUserId[user.id], data }}).then(() => HostCollectiveIdForUserId[user.id]);
     } else {
       promise = insert(sequelize, "Collectives", collective).then(() => getCollectiveIdForUserId(sequelize, user.id));
     }
