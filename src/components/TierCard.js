@@ -40,7 +40,7 @@ class Tier extends React.Component {
 
   showLastOrders(fromCollectiveTypeArray, limit) {
     const { tier, intl } = this.props;
-    const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => fromCollectiveTypeArray.indexOf(c.type) !== -1);
+    const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1);
     if (fromCollectives.length === 0) return;
     const additionalCollectives = fromCollectives.length - fromCollectives.slice(0, limit).length;
     return (

@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import InputField from '../components/InputField';
-import ActionButton from '../components/Button';
-import { Button, HelpBlock, Row, Col, Form, FormControl } from 'react-bootstrap';
+import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { isValidEmail } from '../lib/utils';
 import withIntl from '../lib/withIntl';
-import { checkUserExistence, signin } from '../lib/api';
+import * as api from '../lib/api';
 
 class LoginForm extends React.Component {
 
@@ -33,6 +32,7 @@ class LoginForm extends React.Component {
     this.resetError = this.resetError.bind(this);
 
     this.messages = defineMessages({
+      'api.error.unreachable': { id: 'api.error.unreachable', defaultMessage: "Can't reach the API. Please try again in a few." },
       'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
       'firstName.label': { id: 'user.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'user.lastName.label', defaultMessage: 'last name' },
@@ -77,9 +77,10 @@ class LoginForm extends React.Component {
   }
 
   handleChange(obj, attr, value) {
+    const { intl } = this.props;
+
     this.resetError();
     const newState = { ... this.state };
-
     if (value !== undefined) {
       newState[obj][attr] = value;
     } else {
@@ -88,11 +89,16 @@ class LoginForm extends React.Component {
 
     if (attr === 'email') {
       if (isValidEmail(value)) {
-        checkUserExistence(value).then(exists => {
+        api.checkUserExistence(value).then(exists => {
           if (exists) {
             this.setState({ signup: false, loginSent: false });
           }
           this.setState({ isNewUser: !exists });
+        })
+        .catch(e => {
+          if (e.message === "ECONNREFUSED") {
+            this.error(intl.formatMessage(this.messages['api.error.unreachable']));
+          }
         });
       }
     }
@@ -112,7 +118,7 @@ class LoginForm extends React.Component {
   }
 
   signin() {
-    signin(this.state.user, this.props.next).then(() => {
+    api.signin(this.state.user, this.props.next).then(() => {
       this.setState({ loginSent: true, signup: false, isNewUser: false });
     })
   }
@@ -196,43 +202,56 @@ class LoginForm extends React.Component {
           }
         }
         `}</style>
-        <Form horizontal onSubmit={this.handleSubmit}>
-          <div className="userDetailsForm">
-            <h2><FormattedMessage id="loginform.title" defaultMessage="Login" /></h2>
-              <Row key={`email.input`}>
-                <Col sm={12}>
-                  <InputField
-                    className="horizontal"
-                    {...inputEmail}
-                    />
-                </Col>
-              </Row>
-            {this.state.isNewUser && this.state.signup && 
-              <div>
-                { this.fields.map(field => (
-                  <Row key={`${field.name}.input`}>
-                    <Col sm={12}>
-                      <InputField
-                        className="horizontal"
-                        {...field}
-                        defaultValue={this.state.user[field.name]}
-                        onChange={(value) => this.handleChange("user", field.name, value)}
-                        />
-                    </Col>
-                  </Row>
-                ))}
-                <Row>
-                  <Col sm={3}></Col>
-                  <Col sm={9}>
-                    <Button bsStyle="primary" onClick={() => this.handleSubmit()}>Sign Up</Button>
+        <div className="content">
+          <Form horizontal onSubmit={this.handleSubmit}>
+            <div className="userDetailsForm">
+              <h2><FormattedMessage id="loginform.title" defaultMessage="Login" /></h2>
+                <Row key={`email.input`}>
+                  <Col sm={12}>
+                    <InputField
+                      className="horizontal"
+                      {...inputEmail}
+                      />
                   </Col>
                 </Row>
+              {this.state.isNewUser && this.state.signup &&
+                <div>
+                  { this.fields.map(field => (
+                    <Row key={`${field.name}.input`}>
+                      <Col sm={12}>
+                        <InputField
+                          className="horizontal"
+                          {...field}
+                          defaultValue={this.state.user[field.name]}
+                          onChange={(value) => this.handleChange("user", field.name, value)}
+                          />
+                      </Col>
+                    </Row>
+                  ))}
+                  <Row>
+                    <Col sm={3}></Col>
+                    <Col sm={9}>
+                      <Button bsStyle="primary" onClick={() => this.handleSubmit()}>Sign Up</Button>
+                    </Col>
+                  </Row>
+                </div>
+              }
+          </div>
+          <div className="result">
+            { this.state.loading && <div className="loading">Loading...</div> }
+            {this.state.result.success &&
+              <div className="success">
+                {this.state.result.success}
               </div>
             }
+            { this.state.result.error &&
+              <div className="error">
+                {this.state.result.error}
+              </div>
+            }
+          </div>
+        </Form>
         </div>
-          
-      </Form>
-        
       </div>
     )
   }

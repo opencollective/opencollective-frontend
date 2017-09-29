@@ -579,13 +579,13 @@ class OrderForm extends React.Component {
                 }
             </div>
             <div className="result">
-                {this.state.loading && <div className="loading">Processing...</div>}
+                { this.state.loading && <div className="loading">Processing...</div> }
                 {this.state.result.success &&
                   <div className="success">
                     {this.state.result.success}
                   </div>
                 }
-                {this.state.result.error && 
+                { this.state.result.error &&
                   <div className="error">
                     {this.state.result.error}
                   </div>

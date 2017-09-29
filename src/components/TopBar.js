@@ -1,45 +1,9 @@
 import React from 'react';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import { Link } from '../server/pages';
 
 const logo = '/static/images/opencollective-icon.svg';
 
 class TopBar extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      showProfileMenu: false
-    };
-  }
-
-  componentDidMount() {
-    this.onClickOutsideRef = this.onClickOutside.bind(this);
-    document.addEventListener('click', this.onClickOutsideRef);
-    if (typeof window !== 'undefined') {
-      this.redirect = window.location.href.replace(/^https?:\/\/[^\/]+/,'');
-    }
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('click', this.onClickOutsideRef);
-  }
-
-  onClickOutside() {
-    this.setState({showProfileMenu: false});
-  }
-
-  toggleProfileMenu(e) {
-    if (e.target.className.indexOf('LoginTopBarProfileButton') !== -1) {
-      this.setState({showProfileMenu: !this.state.showProfileMenu});
-      e.nativeEvent.stopImmediatePropagation();
-    }
-  }
-
-  onClickLogout(e) {
-    this.props.logout();
-    this.toggleProfileMenu(e);
-  }
 
   onClickSubscriptions(e) {
     this.props.pushState(null, '/subscriptions')
@@ -80,7 +44,6 @@ class TopBar extends React.Component {
 
   render() {
     const { className, LoggedInUser } = this.props;
-    const { showProfileMenu } = this.state;
 
     return (
       <div className={`${className} TopBar`}>
@@ -128,7 +91,14 @@ class TopBar extends React.Component {
           background-color: #e6e6e6;
           vertical-align: middle;
         }
-        .nav a {
+        @media(max-width: 380px) {
+          ul {
+            display: none;
+          }
+        }
+        `}</style>
+        <style jsx global>{`
+        .TopBar .nav a {
           box-sizing: border-box;
           display: inline-block;
           font-size: 12px;
@@ -139,15 +109,9 @@ class TopBar extends React.Component {
           padding: 4px 16px;
           cursor: pointer;
         }
-        .nav a:last-child {
+        .TopBar .nav a:last-child {
           margin-right: 0;
           padding-right: 0;
-        }
-
-        @media(max-width: 380px) {
-          ul {
-            display: none;
-          }
         }
         `}</style>
         <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
@@ -158,8 +122,7 @@ class TopBar extends React.Component {
             <li><a href="https://medium.com/open-collective">Blog</a></li>
           </ul>
           <div className="separator"></div>
-          { !LoggedInUser && <Link route="signin" params={ { next: this.redirect } }><a>Login</a></Link> }
-          { LoggedInUser && <TopBarProfileMenu LoggedInUser={LoggedInUser} /> }
+          <TopBarProfileMenu LoggedInUser={LoggedInUser} />
         </div>
       </div>
     )

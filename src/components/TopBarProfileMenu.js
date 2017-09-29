@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '../server/pages';
 
 class TopBarProfileMenu extends React.Component {
 
@@ -10,6 +11,7 @@ class TopBarProfileMenu extends React.Component {
   }
 
   logout() {
+    this.setState({ showProfileMenu: false, LoggedInUser: null })
     window.localStorage.removeItem('accessToken');
     window.location.replace(window.location.href);
   }
@@ -17,6 +19,15 @@ class TopBarProfileMenu extends React.Component {
   componentDidMount() {
     this.onClickOutsideRef = this.onClickOutside.bind(this);
     document.addEventListener('click', this.onClickOutsideRef);
+    if (typeof window !== 'undefined') {
+      this.redirect = window.location.href.replace(/^https?:\/\/[^\/]+/,'');
+    }
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.LoggedInUser) {
+      this.setState({ LoggedInUser: newProps.LoggedInUser });
+    }
   }
 
   componentWillUnmount() {
@@ -24,7 +35,7 @@ class TopBarProfileMenu extends React.Component {
   }
 
   onClickOutside() {
-    this.setState({showProfileMenu: false});
+    this.setState({ showProfileMenu: false });
   }
 
   toggleProfileMenu(e) {
@@ -35,7 +46,7 @@ class TopBarProfileMenu extends React.Component {
   }
 
   renderProfileMenu() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser } = this.state;
 
     return (
       <div className='LoginTopBarProfileMenu' onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
@@ -155,8 +166,11 @@ class TopBarProfileMenu extends React.Component {
 
   render() {
 
-    const { showProfileMenu } = this.state;
-    const { LoggedInUser } = this.props;
+    const { showProfileMenu, LoggedInUser } = this.state;
+
+    if (!LoggedInUser) return (
+      <Link route="signin" params={ { next: this.redirect } }><a>Login</a></Link>
+    );
 
     return (
       <div className={`LoginTopBarProfileButton ${showProfileMenu ? '-active' : ''}`} onClick={this.toggleProfileMenu}>

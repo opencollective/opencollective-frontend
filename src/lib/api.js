@@ -6,14 +6,13 @@ import { isValidEmail } from './utils';
  * need to throw an error ourselves.
  */
 export function checkResponseStatus(response) {
-  console.log(">>> checkStatus", response);
   const { status } = response;
   if (status >= 200 && status < 300) {
     return response.json();
   } else {
     return response.json()
     .then((json) => {
-      const error = new Error(json.error.message);
+      const error = new Error(json.error ? json.error.message : json.code);
       error.json = json;
       error.response = response;
       throw error;
