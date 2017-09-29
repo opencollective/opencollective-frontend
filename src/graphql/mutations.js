@@ -9,15 +9,6 @@ const createOrderQuery = gql`
       createdAt,
       createdByUser {
         id,
-        username,
-        email
-      },
-      tier {
-        id,
-        name,
-        description,
-        maxQuantity,
-        availableQuantity
       },
       fromCollective {
         id,
