@@ -50,6 +50,7 @@ export default class Body extends React.Component {
         .content p {
           overflow: hidden;
           text-overflow: ellipsis;
+          margin: 1.5rem 0;
         }
 
         .content h2 {
@@ -62,6 +63,14 @@ export default class Body extends React.Component {
 
         .content > ul {
           padding-left: 3rem;
+        }
+
+        .content ul p {
+          display: initial;
+        }
+
+        .content li {
+          margin: 1.5rem 0;
         }
 
         .content img {

@@ -30,13 +30,6 @@ class CreateEvent extends React.Component {
     this.resetError = this.resetError.bind(this);
   }
 
-  validate(EventInputType) {
-    if (!EventInputType.slug) {
-      return this.error('you need to define a URL for your event')
-    }
-    return true;
-  }
-
   error(msg) {
     this.setState({ result: { error: msg }})
   }
@@ -46,16 +39,15 @@ class CreateEvent extends React.Component {
   }
 
   async createEvent(EventInputType) {
-    if (!this.validate(EventInputType)) return;
-
+    const { parentCollective } = this.props;
     this.setState( { status: 'loading' });
     EventInputType.type = 'EVENT';
-    EventInputType.ParentCollectiveId = this.props.parentCollective.id;
+    EventInputType.ParentCollectiveId = parentCollective.id;
     console.log(">>> createEvent", EventInputType);
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;
-      const eventUrl = `${window.location.protocol}//${window.location.host}/${event.slug}`;
+      const eventUrl = `${window.location.protocol}//${window.location.host}/${parentCollective.slug}/events/${event.slug}`;
       this.setState({ status: 'idle', result: { success: `Event created with success: ${eventUrl}` }});
       window.location.replace(eventUrl);
     } catch (err) {
@@ -68,15 +60,16 @@ class CreateEvent extends React.Component {
 
   async handleTemplateChange(event) {
     delete event.id;
+    delete event.slug;
     event.slug = event.slug.replace(/.*\//, '');
-    this.setState({event, tiers: event.tiers});
+    this.setState({ event, tiers: event.tiers });
   }
 
   render() {
+    const { parentCollective, LoggedInUser } = this.props;
+    const canCreateEvent = LoggedInUser && LoggedInUser.canCreateEvent;
 
-    const canCreateEvent = this.props.LoggedInUser && this.props.LoggedInUser.canCreateEvent;
-
-    const collective = this.props.parentCollective || {};
+    const collective = parentCollective || {};
     const title = `Create a New ${collective.name} Event`;
 
     return (
@@ -106,7 +99,7 @@ class CreateEvent extends React.Component {
         `}</style>
 
           <Header
-            title={collective.name}
+            title={title}
             description={collective.description}
             twitterHandle={collective.twitterHandle}
             image={collective.image || collective.backgroundImage}
@@ -118,6 +111,7 @@ class CreateEvent extends React.Component {
 
           <CollectiveCover
             href={`/${collective.slug}`}
+            title={title}
             collective={collective}
             style={get(collective, 'settings.style.hero.cover')}
             />

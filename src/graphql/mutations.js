@@ -61,18 +61,8 @@ const removeMemberQuery = gql`
 const createCollectiveQuery = gql`
   mutation createCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
-      id,
-      slug,
-      name,
-      tiers {
-        id,
-        name,
-        amount
-      },
-      parentCollective {
-        id,
-        slug
-      }
+      id
+      slug
     }
   }
 `;
@@ -80,18 +70,8 @@ const createCollectiveQuery = gql`
 const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
-      id,
-      slug,
-      name,
-      tiers {
-        id,
-        name,
-        amount
-      },
-      parentCollective {
-        id,
-        slug
-      }
+      id
+      slug
     }
   }
 `;
