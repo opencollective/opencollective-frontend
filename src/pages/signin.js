@@ -16,8 +16,11 @@ class LoginPage extends React.Component {
   componentDidMount() {
     if (this.props.token) {
       window.localStorage.setItem('accessToken', this.props.token);
-      const redirect = (this.props.next || '/').replace(/^https?:\/\/[^\/]+/,'');
-      Router.pushRoute(redirect);
+      const redirect = (this.props.next || '/');
+      // This returns a Apollo/GraphQL error on production/staging env: Server response was missing for query 'undefined'
+      // Somehow, it doesn't run the graphql query to fetch the collective data and therefore the 404 is thrown
+      // Router.replaceRoute(redirect.replace(/^https?:\/\/[^\/]+/,''));
+      window.location.replace(redirect);
     }
   }
 
