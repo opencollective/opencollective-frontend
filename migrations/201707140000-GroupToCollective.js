@@ -227,7 +227,7 @@ const createCollectivesForEvents = (sequelize) => {
         collective.HostCollectiveId = HostCollectiveId;
       })
       .then(() => {
-        collective.slug = `${event.slug || slugify(event.name)}-${collective.ParentCollectiveId}ev`; // makes sure the slug of an event is unique within the name space of the parent collective
+        collective.slug = `${event.slug || slugify(event.name)}`;
         return insert(sequelize, "Collectives", collective);
       })
   }
