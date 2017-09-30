@@ -66,6 +66,9 @@ const getTotalAnnualBudget = () => {
   .then(res => Math.round(parseInt(res[0].yearlyIncome, 10)));
 };
 
+/**
+ * Get the total of donations across the platform
+ */
 const getTotalDonations = () => {
   return sequelize.query(`
     SELECT SUM(${generateFXConversionSQL()}) AS "totalDonationsInUSD"
@@ -77,6 +80,67 @@ const getTotalDonations = () => {
   })
   .then(res => Math.round(res[0].totalDonationsInUSD));
 };
+
+/**
+ * Returns the total amount of donations made by collective type (USER/ORGANIZATION/COLLECTIVE) (in cents in the currency of the CollectiveId)
+ * @param {*} CollectiveId 
+ */
+const getTotalDonationsByCollectiveType = (CollectiveId) => {
+  return sequelize.query(`
+    SELECT MAX(c.type) as type, SUM("netAmountInCollectiveCurrency") as "totalDonations" FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id WHERE c.type='USER' AND t."CollectiveId"=:CollectiveId and t.type='CREDIT' GROUP BY c.type ORDER BY "totalDonations" DESC
+  `, {
+    replacements: { CollectiveId },
+    type: sequelize.QueryTypes.SELECT
+  })
+}
+
+/**
+ * Returns an array with the top (default 3) donors for a given CollectiveId (where the money comes from)
+ * @param {*} CollectiveId 
+ * @param {*} options 
+ */
+const getTopDonorsForCollective = (CollectiveId, options = {}) => {
+  options.limit = options.limit || 3;
+  return sequelize.query(`
+    SELECT MAX(c.slug) as slug, MAX(c.image) as image, MAX(c.name) as name, SUM("netAmountInCollectiveCurrency") as "totalDonations" FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id WHERE t."CollectiveId"=:CollectiveId and t.type='CREDIT' GROUP BY c.id ORDER BY "totalDonations" DESC LIMIT :limit
+  `, {
+    replacements: { CollectiveId, limit: options.limit },
+    type: sequelize.QueryTypes.SELECT
+  });
+}
+
+/**
+ * Returns an array with the top (default 3) vendors for a given CollectiveId (where the money goes)
+ * @param {*} CollectiveId 
+ * @param {*} options 
+ */
+const getTopVendorsForCollective = (CollectiveId, options = {}) => {
+  options.limit = options.limit || 3;
+  return sequelize.query(`
+    SELECT MAX(c.slug) as slug, MAX(c.image) as image, MAX(c.name) as name, SUM("netAmountInCollectiveCurrency") as "totalExpenses" FROM "Transactions" t LEFT JOIN "Collectives" c ON t."FromCollectiveId" = c.id WHERE t."CollectiveId"=:CollectiveId and t.type='DEBIT' GROUP BY c.id ORDER BY "totalExpenses" ASC LIMIT :limit
+  `, {
+    replacements: { CollectiveId, limit: options.limit },
+    type: sequelize.QueryTypes.SELECT
+  });
+}
+
+/**
+ * Get the top expense categories for a given collective with total amount and total number of expenses
+ * @param {*} CollectiveId 
+ * @param {*} options 
+ */
+const getTopExpenseCategories = (CollectiveId, options = {}) => {
+  options.limit = options.limit || 3;
+  const since = (options.since) ? `AND e."createdAt" >= '${options.since.toISOString()}'`: '';
+  const until = (options.until) ? `AND e."createdAt" < '${options.until.toISOString()}'` : '';
+
+  return sequelize.query(`
+    SELECT category, COUNT(*) as "count", SUM("amount") as "totalExpenses" FROM "Expenses" e WHERE "CollectiveId"=:CollectiveId ${since} ${until} GROUP BY category ORDER BY "totalExpenses" DESC LIMIT :limit
+  `, {
+    replacements: { CollectiveId, limit: options.limit },
+    type: sequelize.QueryTypes.SELECT
+  });  
+}
 
 /**
  * Returns the top backers (Collectives) in a given time range in given tags
@@ -264,6 +328,10 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, until) => {
 };
 
 export default {
+  getTotalDonationsByCollectiveType,
+  getTopDonorsForCollective,
+  getTopVendorsForCollective,
+  getTopExpenseCategories,
   getTotalDonations,
   getTotalAnnualBudget,
   getMembersOfCollectiveWithRole,

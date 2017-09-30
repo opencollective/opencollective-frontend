@@ -67,24 +67,6 @@ describe('graphql.collective.test.js', () => {
           }
           __typename
         }
-        memberOf {
-          id
-          createdAt
-          role
-          collective {
-            id
-            slug
-            description
-            image
-            stats {
-              backers
-              sponsors
-              yearlyBudget
-            }
-            __typename
-          }
-          __typename
-        }
         members {
           id
           createdAt
@@ -100,40 +82,42 @@ describe('graphql.collective.test.js', () => {
           }
           __typename
         }
-        paymentMethods {
-          id
-          name
-          service
-        }
-        connectedAccounts {
-          id
-          service
+        stats {
+          backers
+          sponsors
+          yearlyBudget
+          topExpenses
+          topFundingSources
         }
         __typename
       }
     }`;
 
-    const result = await utils.graphqlQuery(query, { slug: "xdamman" });
+    const result = await utils.graphqlQuery(query, { slug: "apex" });
     result.errors && console.error(result.errors);
     expect(result.errors).to.not.exist;
-    const userCollective = result.data.Collective;
-    expect(userCollective.twitterHandle).to.equal('xdamman');
-    expect(userCollective.website).to.equal('http://xdamman.com');
-    expect(userCollective.memberOf).to.have.length(4);
-    const memberships = userCollective.memberOf;
+    const collective = result.data.Collective;
+    expect(collective.website).to.equal('http://apex.run');
+    expect(collective.members).to.have.length(29);
+    const memberships = collective.members;
     memberships.sort((a, b) => a.id - b.id)
-    expect(memberships[0].role).to.equal('ADMIN');
-    expect(memberships[1].role).to.equal('BACKER');
+    expect(memberships[0].role).to.equal('HOST');
+    expect(memberships[1].role).to.equal('ADMIN');
     expect(memberships[2].role).to.equal('ADMIN');
     expect(memberships[3].role).to.equal('BACKER');
-    expect(memberships[1].collective.slug).to.equal('apex');
-    expect(userCollective.createdByUser.firstName).to.equal('Xavier');
-    expect(userCollective.createdByUser.email).to.be.null;
-    expect(memberships[1].collective.stats).to.deep.equal({
+    expect(memberships[4].role).to.equal('BACKER');
+    expect(memberships[5].role).to.equal('BACKER');
+    expect(memberships[6].role).to.equal('BACKER');
+    expect(memberships[3].member.slug).to.equal('xdamman');
+    expect(collective.createdByUser.email).to.be.null;
+    expect(collective.tiers).to.have.length(2);
+    expect(collective.stats).to.deep.equal({
       backers: 25,
       sponsors: 1,
-      yearlyBudget: 330620
-    });
+      yearlyBudget: 330620,
+      topExpenses: {"byCategory":[{"category":"Engineering","count":6,"totalExpenses":324729}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-170914},{"slug":"opensource","image":"https://res.cloudinary.com/opencollective/image/upload/v1479171624/OSC_fwut73.png","name":"Open Source Collective","totalExpenses":-110000}]},
+      topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":38646},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":26040}],"byCollectiveType":[{"type":"USER","totalDonations":163077}]}
+      });
   });
 
   it('edits members', async () => {

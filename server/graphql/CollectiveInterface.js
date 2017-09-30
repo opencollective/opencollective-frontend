@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 
 import GraphQLJSON from 'graphql-type-json';
+import queries from '../lib/queries';
 
 import {
   LocationType,
@@ -86,6 +87,36 @@ export const CollectiveStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(collective) {
           return collective.getYearlyIncome();
+        }
+      },
+      topExpenses: {
+        type: GraphQLJSON,
+        resolve(collective) {
+          return Promise.all([
+            queries.getTopExpenseCategories(collective.id),
+            queries.getTopVendorsForCollective(collective.id)
+          ]).then(results => {
+            const res = {
+              byCategory: results[0],
+              byCollective: results[1]
+            }
+            return res;
+          })
+        }
+      },
+      topFundingSources: {
+        type: GraphQLJSON,
+        resolve(collective) {
+          return Promise.all([
+            queries.getTopDonorsForCollective(collective.id),
+            queries.getTotalDonationsByCollectiveType(collective.id)
+          ]).then(results => {
+            const res = {
+              byCollective: results[0],
+              byCollectiveType: results[1]
+            };
+            return res;
+          })
         }
       }
     }
