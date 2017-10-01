@@ -1,9 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TopBarProfileMenu from './TopBarProfileMenu';
+import { FormattedMessage } from 'react-intl';
 
 const logo = '/static/images/opencollective-icon.svg';
 
 class TopBar extends React.Component {
+
+  static propTypes = {
+    LoggedInUser: PropTypes.object
+  }
 
   onClickSubscriptions(e) {
     this.props.pushState(null, '/subscriptions')
@@ -22,20 +28,20 @@ class TopBar extends React.Component {
           </div>
           <ul>
           {this.showCreateBtn && <li><a href='/create'>create a collective</a></li>}
-          <li><a href='/discover'>Discover</a></li>
+          <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
             <li><a href='#' onClick={this.onClickSubscriptions.bind(this)}>Subscriptions</a></li>
           </ul>
         </div>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span>my account</span>
+            <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
             <div className='-dash'></div>
           </div>
           <ul>
-            <li><a href={`/${LoggedInUser.username}`}>Profile</a></li>
+            <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="Profile" /></a></li>
           </ul>
           <ul>
-            <li><a className='-blue' href='#' onClick={this.onClickLogout.bind(this)}>Logout</a></li>
+            <li><a className='-blue' href='#' onClick={this.onClickLogout.bind(this)}><FormattedMessage id="menu.logout" defaultMessage="Logout" /></a></li>
           </ul>
         </div>
       </div>
@@ -49,12 +55,12 @@ class TopBar extends React.Component {
       <div className={`${className} TopBar`}>
         <style jsx>{`
         .TopBar {
-          height: 60px;
+          height: 6rem;
           width: 100%;
           position: relative;
         }
         .logo {
-          margin: 10px;
+          margin: 1rem;
         }
         .loading .logo {
           animation: oc-rotate 0.8s infinite linear;
@@ -66,47 +72,43 @@ class TopBar extends React.Component {
         .nav {
           box-sizing: border-box;
           position: absolute;
-          top: 0px;
-          right: 20px;
-          padding-top: 10px;
+          top: 0;
+          right: 2rem;
+          padding-top: 1rem;
         }
         ul {
           display: inline-block;
-          min-width: 200px;
+          min-width: 20rem;
           list-style: none;
           text-align: right;
           margin: 0;
-          padding-left: 10px;
-          padding-right: 10px;
+          padding-left: 1rem;
         }
         li {
           display: inline-block;
+          text-transform: capitalize;
         }
         .separator {
           display: inline-block;
-          width: 1px;
-          margin: 0 5px;
-          height: 30px;
-          height: 40px;
+          width: 0.1rem;
+          margin: 0 1rem;
+          height: 3rem;
+          height: 4rem;
           background-color: #e6e6e6;
           vertical-align: middle;
         }
-        @media(max-width: 380px) {
+        @media(max-width: 380) {
           ul {
             display: none;
           }
         }
-        `}</style>
-        <style jsx global>{`
         .TopBar .nav a {
           box-sizing: border-box;
           display: inline-block;
-          font-size: 12px;
-          letter-spacing: 1px;
-          text-align: center;
+          font-size: 1.2rem;
+          letter-spacing: 0.1rem;
           color: #b4bbbf;
-          text-transform: capitalize;
-          padding: 4px 16px;
+          padding: 0.4rem 1.6rem;
           cursor: pointer;
         }
         .TopBar .nav a:last-child {
@@ -117,9 +119,9 @@ class TopBar extends React.Component {
         <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
         <div className="nav">
           <ul className="mediumScreenOnly">
-            <li><a href="/learn-more">How it works</a></li>
-            <li><a href="/discover">Discover</a></li>
-            <li><a href="https://medium.com/open-collective">Blog</a></li>
+            <li><a className="menuItem" href="/learn-more"><FormattedMessage id="menu.howItWorks" defaultMessage="How it works" /></a></li>
+            <li><a className="menuItem" href="/discover"><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+            <li><a className="menuItem" href="https://medium.com/open-collective"><FormattedMessage id="menu.blog" defaultMessage="Blog" /></a></li>
           </ul>
           <div className="separator"></div>
           <TopBarProfileMenu LoggedInUser={LoggedInUser} />

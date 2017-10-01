@@ -1,3 +1,6 @@
-export default ({src, height}) => (
-  <img className="logo" src={src} height={height} />
-)
+export default ({ src, style = {}, height }) => {
+  style.height = style.height || height;
+  return (
+    <img className="logo" src={src} style={style} />
+  );
+}

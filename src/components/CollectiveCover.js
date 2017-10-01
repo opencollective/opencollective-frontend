@@ -6,8 +6,9 @@ import { union, get } from 'lodash';
 import { prettyUrl, formatCurrency } from '../lib/utils';
 import { Router } from '../server/pages';
 import Currency from './Currency';
+import Avatar from './Avatar';
+import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
-import { pickAvatar } from '../lib/collective.lib';
 import CTAButton from './Button';
 
 class CollectiveCover extends React.Component {
@@ -212,7 +213,10 @@ class CollectiveCover extends React.Component {
         <div className="cover">
           <div className="backgroundCover" style={style} />
           <div className="content">
-            <Link route={href}><a><img src={logo} className="logo" /></a></Link>
+            <Link route={href}><a>
+              { collective.type === 'USER' && <Avatar src={logo} className="logo" radius="10rem" /> }
+              { collective.type !== 'USER' && <Logo src={logo} className="logo" height="10rem" /> }
+            </a></Link>
             <h1>{title}</h1>
             { description && <p className="description">{description}</p> }
             { (twitterHandle || website) &&
@@ -225,7 +229,7 @@ class CollectiveCover extends React.Component {
               <div className="members">
                 { membersPreview.map(member => (
                   <a onClick={() => Router.pushRoute(`/${member.member.slug}`)} title={`${member.member.name} ${member.description || member.member.description || ''}`} key={member.member.slug}>
-                    <div className="avatar" style={{ backgroundImage: `url(${member.member.image || pickAvatar(member.member.id)})`}}></div>
+                    <Avatar src={member.member.image} key={member.member.id} radius={36} />
                   </a>
                 ))}
                 { membersPreview.length < members.length &&

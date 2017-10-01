@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
 import { Router } from '../server/pages';
+import withIntl from '../lib/withIntl';
 
 class LoginPage extends React.Component {
 
@@ -52,4 +53,4 @@ class LoginPage extends React.Component {
   }
 }
 
-export default LoginPage;
+export default withIntl(LoginPage);

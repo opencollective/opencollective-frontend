@@ -449,30 +449,32 @@ export const addGetLoggedInUserFunction = (component) => {
     props: ({ data }) => ({
       data,
       getLoggedInUser: () => {
-        if (window.localStorage.getItem('accessToken')) {
-          return new Promise(async (resolve) => {
-              let res;
-              try {
-                res = await data.refetch();
-                if (res.data && res.data.LoggedInUser) {
-                  const LoggedInUser = {...res.data.LoggedInUser};
-                  if (LoggedInUser && LoggedInUser.memberOf) {
-                    const roles = {};
-                    LoggedInUser.memberOf.map(member => {
-                      roles[member.collective.slug] = roles[member.collective.slug] || [];
-                      roles[member.collective.slug].push(member.role);
-                    });
-                    LoggedInUser.roles = roles;
-                  }
-                  console.log(">>> LoggedInUser", LoggedInUser);
-                  return resolve(LoggedInUser);
-                }
-              } catch (e) {
-                console.error(">>> getLoggedInUser error : ", e);
+        if (!window.localStorage.getItem('accessToken')) {
+          return Promise.resolve(null);
+        }
+        return new Promise(async (resolve) => {
+            let res;
+            try {
+              res = await data.refetch();
+              if (!res.data || !res.data.LoggedInUser) {
                 return resolve(null);
               }
-          });
-        }
+              const LoggedInUser = {...res.data.LoggedInUser};
+              if (LoggedInUser && LoggedInUser.memberOf) {
+                const roles = {};
+                LoggedInUser.memberOf.map(member => {
+                  roles[member.collective.slug] = roles[member.collective.slug] || [];
+                  roles[member.collective.slug].push(member.role);
+                });
+                LoggedInUser.roles = roles;
+              }
+              console.log(">>> LoggedInUser", LoggedInUser);
+              return resolve(LoggedInUser);
+            } catch (e) {
+              console.error(">>> getLoggedInUser error : ", e);
+              return resolve(null);
+            }
+        });
       }
     })
   })(component);
