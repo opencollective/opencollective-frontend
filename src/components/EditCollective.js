@@ -101,6 +101,9 @@ class EditCollective extends React.Component {
       console.log(">>> editCollective CollectiveInputType", CollectiveInputType);
       await this.props.editCollective(CollectiveInputType);
       this.setState({ status: 'idle', result: { success: `Collective saved` }});
+      setTimeout(() => {
+        this.setState({ status: 'idle', result: { success: null }});
+      }, 3000);
     } catch (err) {
       console.error(">>> editCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
