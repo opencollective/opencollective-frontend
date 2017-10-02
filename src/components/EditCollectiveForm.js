@@ -9,6 +9,7 @@ import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
+import { Link } from '../server/pages';
 
 class EditCollectiveForm extends React.Component {
 
@@ -219,6 +220,10 @@ class EditCollectiveForm extends React.Component {
           margin: 5rem auto 1rem;
           text-align: center;
         }
+        .backToProfile {
+          font-size: 1.3rem;
+          margin: 1rem;
+        }
         `}</style>
         <style global jsx>{`
         section#location {
@@ -328,6 +333,9 @@ class EditCollectiveForm extends React.Component {
         </div>
         <div className="actions">
           <Button bsStyle="primary" type="submit" ref="submit" onClick={this.handleSubmit} disabled={loading || !this.state.modified} >{submitBtnLabel}</Button>
+          <div className="backToProfile">
+            <Link route={`/${collective.slug}`}><a><FormattedMessage id="collective.edit.backToProfile" defaultMessage="or go back to the {type} page" values={{ type }} /></a></Link>
+          </div>
         </div>
       </div>
     );

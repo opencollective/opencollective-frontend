@@ -60,7 +60,6 @@ class EditMembers extends React.Component {
       {
         name: 'member.email',
         type: 'email',
-        when: (member) => !member.id,
         label: intl.formatMessage(this.messages['user.email.label'])
       }
     ];

@@ -99,11 +99,8 @@ class EditCollective extends React.Component {
         delete CollectiveInputType.backgroundImage;
       }
       console.log(">>> editCollective CollectiveInputType", CollectiveInputType);
-      const res = await this.props.editCollective(CollectiveInputType);
-      const collective = res.data.editCollective;
-      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}`;
-      // window.location.replace(collectiveUrl);
-      this.setState({ status: 'idle', result: { success: `Collective edited with success: ${collectiveUrl} (redirecting...)` }});
+      await this.props.editCollective(CollectiveInputType);
+      this.setState({ status: 'idle', result: { success: `Collective saved` }});
     } catch (err) {
       console.error(">>> editCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
