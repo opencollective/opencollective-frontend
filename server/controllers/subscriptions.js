@@ -54,9 +54,13 @@ export const cancel = (req, res, next) => {
   // cancel subscription on Stripe
   .then(stripeAccount => {
     const stripe = Stripe(stripeAccount.token)
-
+    let customerId = order.paymentMethod.customerId;
+    const customerIdForHost = order.paymentMethod.data.customerIdForHost;
+    if (customerIdForHost && customerIdForHost[stripeAccount.username]) {
+      customerId = customerIdForHost[stripeAccount.username];
+    }
     return stripe.customers.cancelSubscription(
-      order.paymentMethod.customerId,
+      customerId,
       order.Subscription.stripeSubscriptionId)
   })
 
