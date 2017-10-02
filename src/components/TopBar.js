@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
 
 const logo = '/static/images/opencollective-icon.svg';
 
@@ -9,6 +10,13 @@ class TopBar extends React.Component {
 
   static propTypes = {
     LoggedInUser: PropTypes.object
+  }
+
+  constructor(props) {
+    super(props);
+    this.messages = defineMessages({
+      'menu.homepage': { id: 'menu.homepage', defaultMessage: `Go to Open Collective Homepage`}
+    });
   }
 
   onClickSubscriptions(e) {
@@ -49,7 +57,7 @@ class TopBar extends React.Component {
   }
 
   render() {
-    const { className, LoggedInUser } = this.props;
+    const { className, LoggedInUser, intl } = this.props;
 
     return (
       <div className={`${className} TopBar`}>
@@ -116,7 +124,7 @@ class TopBar extends React.Component {
           padding-right: 0;
         }
         `}</style>
-        <img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" />
+        <a href="/" title={intl.formatMessage(this.messages['menu.homepage'])}><img src={logo} width="40" height="40" className="logo" alt="Open Collective logo" /></a>
         <div className="nav">
           <ul className="mediumScreenOnly">
             <li><a className="menuItem" href="/learn-more"><FormattedMessage id="menu.howItWorks" defaultMessage="How it works" /></a></li>
@@ -131,4 +139,4 @@ class TopBar extends React.Component {
   }
 }
 
-export default TopBar;
+export default withIntl(TopBar);

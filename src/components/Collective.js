@@ -329,7 +329,7 @@ class Collective extends React.Component {
                       <FormattedMessage
                         id="collective.expenses.title"
                         values={{ n: this.collective.stats.expenses }}
-                        defaultMessage={`{n, plural, one {Latest transaction} other {Latest expenses}}`}
+                        defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
                         />
                     </h2>
                     <ExpensesWithData
