@@ -24,7 +24,7 @@ class OrderForm extends React.Component {
     super(props);
     const { intl, order } = props;
 
-    const tier = order.tier || {};
+    const tier = { ...order.tier };
     tier.amount = tier.amount || order.totalAmount;
     tier.interval = tier.interval || order.interval;
 
@@ -528,7 +528,7 @@ class OrderForm extends React.Component {
                     tier={this.props.order.tier}
                     defaultValue={{
                       quantity: this.props.order.quantity,
-                      interval: this.props.order.interval,
+                      interval: this.props.order.tier.interval,
                       amount: this.props.order.totalAmount / this.props.order.quantity
                     }}
                     onChange={(tier) => this.handleChange("tier", tier)}

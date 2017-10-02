@@ -29,7 +29,6 @@ class CreateOrderPage extends React.Component {
       interval: (['month','year'].indexOf(interval) !== -1) ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null
     };
-    console.log("orderTier", "constructor", this.order);
 
     this.messages = defineMessages({
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
@@ -78,10 +77,12 @@ class CreateOrderPage extends React.Component {
     const collective = data.Collective;
     if (loading) return (<div />);
 
+    const TierId = parseInt(this.props.TierId);
     let tier;
-    if (this.props.TierId) {
-      tier = collective.tiers.find(t => t.id === this.props.TierId);
+    if (TierId) {
+      tier = collective.tiers.find(t => t.id === TierId);
     }
+
     tier = tier || {
       name: intl.formatMessage(this.messages['tier.name.donation']),
       presets: [1000, 5000, 10000],
@@ -161,6 +162,7 @@ query Collective($slug: String!) {
     currency
     tiers {
       id
+      type
       name
       slug
       amount

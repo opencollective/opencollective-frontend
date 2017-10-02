@@ -101,8 +101,8 @@ ${description}`
           overflow: hidden;
         }
         .small .cover {
-          height: 200px;
-          min-height: 200px;
+          height: 22rem;
+          min-height: 22rem;
         }
         .small .description, .small .contact, .small .stats, .small .members {
           display: none;
@@ -155,7 +155,7 @@ ${description}`
         }
         h1 {
           font-size: 3rem;
-          margin: 0;
+          margin: 1.5rem;
         }
         .contact {
           display: flex;
