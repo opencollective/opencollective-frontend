@@ -89,11 +89,12 @@
     "postinstall": "npm run build"
   },
   "devDependencies": {
-    "babel-jest": "20.0.3",
+    "babel-jest": "^21.2.0",
+    "chromeless": "^1.3.0",
     "file-loader": "0.10.1",
     "image-webpack-loader": "3.2.0",
-    "jest": "^20.0.4",
-    "jest-cli": "20.0.4",
+    "jest": "^21.2.1",
+    "jest-cli": "^21.2.1",
     "react-test-renderer": "15.5.4",
     "sinon": "^2.4.1"
   },
