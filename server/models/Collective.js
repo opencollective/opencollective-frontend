@@ -541,6 +541,7 @@ export default function(Sequelize, DataTypes) {
         if (tier.id) {
           return models.Tier.update(tier, { where: { id: tier.id }});
         } else {
+          if (!tier.name) return;
           tier.CollectiveId = this.id;
           tier.currency = tier.currency || this.currency;
           return models.Tier.create(tier);  

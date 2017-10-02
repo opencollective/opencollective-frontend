@@ -99,7 +99,7 @@ const mutations = {
         let msg;
         switch (e.name) {
           case "SequelizeUniqueConstraintError":
-            msg = `The slug ${e.fields.slug} is already taken. Please use another one.`
+            msg = `The slug ${e.fields.slug.replace(/\-[0-9]+ev$/, '')} is already taken. Please use another name for your ${collectiveData.type.toLowerCase()}.`;
             break;
           default:
             msg = e.message;

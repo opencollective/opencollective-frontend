@@ -59,7 +59,6 @@ describe('Mutation Tests', () => {
 
       const getEventData = (collective) => {
         return {
-          "slug": "meetup-3",
           "name": "BrusselsTogether Meetup 3",
           "type": "EVENT",
           "longDescription": "Hello Brussels!\n\nAccording to the UN, by 2050 66% of the world’s population will be urban dwellers, which will profoundly affect the role of modern city-states on Earth.\n\nToday, citizens are already anticipating this futurist trend by creating numerous initiatives inside their local communities and outside of politics.\n\nIf you want to be part of the change, please come have a look to our monthly events! You will have the opportunity to meet real actors of change and question them about their purpose. \n\nWe also offer the opportunity for anyone interested to come before the audience and share their ideas in 60 seconds at the end of the event.\n\nSee more about #BrusselsTogether radical way of thinking below.\n\nhttps://brusselstogether.org/\n\nGet your ticket below and get a free drink thanks to our sponsor! 🍻🎉\n\n**Schedule**\n\n7 pm - Doors open\n\n7:30 pm - Introduction to #BrusselsTogether\n\n7:40 pm - Co-Labs, Citizen Lab of Social Innovations\n\n7:55 pm - BeCode.org, growing today’s talented youth into tomorrow’s best developers.\n\n8:10 pm - OURB, A city building network\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n","location": {"name": "Brass'Art Digitaal Cafe","address":"Place communale de Molenbeek 28"},
@@ -136,7 +135,7 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(query, { collective: event }, user1);
         result.errors && console.error(result.errors[0]);
         const createdEvent = result.data.createCollective;
-        expect(createdEvent.slug).to.equal(`${event.slug}-${event.ParentCollectiveId}ev`);
+        expect(createdEvent.slug).to.equal(`brusselstogether-meetup-3-4ev`);
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
 
         event.id = createdEvent.id;
