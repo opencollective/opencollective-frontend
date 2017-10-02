@@ -242,7 +242,7 @@ const getUniqueCollectiveTags = () => {
 }
 
 /**
- * Returns top sponsors ordered by number of collectives they sponsor and total amount donated
+ * Returns top sponsors ordered by total amount donated and number of collectives they sponsor
  */
 const getTopSponsors = () => {
   return sequelize.query(`
@@ -251,7 +251,7 @@ const getTopSponsors = () => {
     FROM "Collectives" c LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
     WHERE c.type = 'ORGANIZATION' AND t.type='DEBIT' AND t.currency='USD' AND "PaymentMethodId" IS NOT NULL
     GROUP BY t."CollectiveId"
-    ORDER BY collectives DESC, "totalDonations" DESC LIMIT :limit
+    ORDER BY "totalDonations" DESC, collectives DESC LIMIT :limit
     `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
     {
       replacements: { limit: 6 },
