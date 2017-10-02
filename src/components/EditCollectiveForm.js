@@ -307,7 +307,7 @@ class EditCollectiveForm extends React.Component {
             </div>
           )}
           { this.state.section === 'members' &&
-            <EditMembers title="Edit members" members={this.members} onChange={this.handleObjectChange} />
+            <EditMembers title="Edit members" members={this.members} collective={collective} onChange={this.handleObjectChange} />
           }
           { this.state.section === 'tiers' &&
             <EditTiers

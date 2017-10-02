@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
 import InputField from '../components/InputField';
@@ -10,6 +10,7 @@ import InputField from '../components/InputField';
 class EditMembers extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object.isRequired,
     members: PropTypes.arrayOf(PropTypes.object).isRequired,
     onChange: PropTypes.func.isRequired
   };
@@ -29,10 +30,10 @@ class EditMembers extends React.Component {
 
     this.messages = defineMessages({
       'members.role.label': { id: 'members.role.label', defaultMessage: 'role' },
-      'members.add': { id: 'members.add', defaultMessage: 'add member' },
+      'members.add': { id: 'members.add', defaultMessage: 'add another member' },
       'members.remove': { id: 'members.remove', defaultMessage: 'remove member' },
-      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'core contributor' },
-      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'contributor' },
+      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' },
       'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
     });
@@ -126,7 +127,7 @@ class EditMembers extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, collective } = this.props;
 
     return (
       <div className="EditMembers">
@@ -142,6 +143,9 @@ class EditMembers extends React.Component {
             text-align: right;
             margin-top: -1rem;
           }
+          p {
+            font-size: 1.3rem;
+          }
           :global(.member) {
             margin: 3rem 0;
           }
@@ -149,6 +153,9 @@ class EditMembers extends React.Component {
 
         <div className="members">
           <h2>{this.props.title}</h2>
+          { collective.type === 'COLLECTIVE' &&
+          <p><FormattedMessage id="members.edit.description" defaultMessage="Note: Only Core Contributors can edit this collective and approve or reject expenses." /></p>
+          }
           {this.state.members.map(this.renderTier)}
         </div>
         <div className="editMembersActions">

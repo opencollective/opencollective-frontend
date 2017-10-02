@@ -10,6 +10,8 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
 import CTAButton from './Button';
+import { defineMessages } from 'react-intl';
+import withIntl from '../lib/withIntl';
 
 class CollectiveCover extends React.Component {
 
@@ -18,6 +20,27 @@ class CollectiveCover extends React.Component {
     cta: PropTypes.node,
     title: PropTypes.string,
     style: PropTypes.object,
+  }
+
+  constructor(props) {
+    super(props);
+    this.messages = defineMessages({
+      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' }
+    });
+  }
+
+  getMemberTooltip(member) {
+    const { intl } = this.props;
+    let tooltip = member.member.name;
+    tooltip += `
+${intl.formatMessage(this.messages[member.role])}`;
+    const description = member.description || member.member.description;
+    if (description) {
+      tooltip += `
+${description}`
+    }
+    return tooltip;
   }
 
   render() {
@@ -33,7 +56,6 @@ class CollectiveCover extends React.Component {
       type,
       website,
       twitterHandle,
-      members,
       stats
     } = collective;
 
@@ -50,12 +72,13 @@ class CollectiveCover extends React.Component {
     const logo = collective.image || get(collective.parentCollective, 'image');
 
     let membersPreview = [];
-    if (members) {
-      const admins = members.filter(m => m.role === 'ADMIN');
-      const contributors = members.filter(m => m.role === 'CONTRIBUTOR');
-      const backers = members.filter(m => m.role === 'BACKER');
+    if (collective.members) {
+      const admins = collective.members.filter(m => m.role === 'ADMIN');
+      const members = collective.members.filter(m => m.role === 'MEMBER');
+      const contributors = collective.members.filter(m => m.role === 'CONTRIBUTOR');
+      const backers = collective.members.filter(m => m.role === 'BACKER');
       backers.sort((a, b) => b.totalDonations - a.totalDonations);
-      membersPreview = union(admins, contributors, backers).slice(0, 5);
+      membersPreview = union(admins, members, contributors, backers).slice(0, 5);
     }
 
     return (
@@ -145,6 +168,9 @@ class CollectiveCover extends React.Component {
           justify-content: center;
           margin: 2rem 0;
         }
+        .members a {
+          margin: 0.3rem;
+        }
         .avatar {
           float: left;
           width: 36px;
@@ -228,13 +254,13 @@ class CollectiveCover extends React.Component {
             { membersPreview.length > 0 &&
               <div className="members">
                 { membersPreview.map(member => (
-                  <a onClick={() => Router.pushRoute(`/${member.member.slug}`)} title={`${member.member.name} ${member.description || member.member.description || ''}`} key={member.member.slug}>
+                  <a onClick={() => Router.pushRoute(`/${member.member.slug}`)} title={this.getMemberTooltip(member)} key={member.member.slug}>
                     <Avatar src={member.member.image} key={member.member.id} radius={36} />
                   </a>
                 ))}
-                { membersPreview.length < members.length &&
+                { membersPreview.length < collective.members.length &&
                   <div className="MoreBackers">
-                    + {(stats.backers || members.length) - membersPreview.length}
+                    + {(stats.backers || collective.members.length) - membersPreview.length}
                   </div>
                 }
               </div>
@@ -265,4 +291,4 @@ class CollectiveCover extends React.Component {
   }
 }
 
-export default CollectiveCover;
+export default withIntl(CollectiveCover);
