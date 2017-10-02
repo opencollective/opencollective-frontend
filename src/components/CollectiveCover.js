@@ -33,8 +33,10 @@ class CollectiveCover extends React.Component {
   getMemberTooltip(member) {
     const { intl } = this.props;
     let tooltip = member.member.name;
-    tooltip += `
-${intl.formatMessage(this.messages[member.role])}`;
+    if (this.messages[member.role]) {
+      tooltip += `
+  ${intl.formatMessage(this.messages[member.role])}`;
+    }
     const description = member.description || member.member.description;
     if (description) {
       tooltip += `
