@@ -280,25 +280,29 @@ class Collective extends React.Component {
                 </div>
               </section>
 
-              <section id="sponsors" className="tier">
-                <h1>Sponsors</h1>
-                <MembersWithData
-                  collective={this.collective}
-                  type="ORGANIZATION,COLLECTIVE"
-                  role='BACKER'
-                  limit={100}
-                  />
-              </section>
+              { this.collective.stats.sponsors > 0 &&
+                <section id="sponsors" className="tier">
+                  <h1>Sponsors</h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="ORGANIZATION,COLLECTIVE"
+                    role='BACKER'
+                    limit={100}
+                    />
+                </section>
+              }
 
-              <section id="backers" className="tier">
-                <h1>Backers</h1>
-                <MembersWithData
-                  collective={this.collective}
-                  type="USER"
-                  role='BACKER'
-                  limit={100}
-                  />
-              </section>
+              { this.collective.stats.backers > 0 &&
+                <section id="backers" className="tier">
+                  <h1>Backers</h1>
+                  <MembersWithData
+                    collective={this.collective}
+                    type="USER"
+                    role='BACKER'
+                    limit={100}
+                    />
+                </section>
+              }
 
               { this.collective.memberOf.length > 0 &&
                 <section id="hosting">
