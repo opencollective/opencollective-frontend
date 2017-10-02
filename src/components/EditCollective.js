@@ -11,6 +11,7 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
+import { capitalize } from '../lib/utils';
 
 class EditCollective extends React.Component {
 
@@ -99,8 +100,9 @@ class EditCollective extends React.Component {
         delete CollectiveInputType.backgroundImage;
       }
       console.log(">>> editCollective CollectiveInputType", CollectiveInputType);
-      await this.props.editCollective(CollectiveInputType);
-      this.setState({ status: 'idle', result: { success: `Collective saved` }});
+      const res = await this.props.editCollective(CollectiveInputType);
+      const type = res.data.editCollective.type.toLowerCase();
+      this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});
       setTimeout(() => {
         this.setState({ status: 'idle', result: { success: null }});
       }, 3000);

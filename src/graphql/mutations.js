@@ -62,6 +62,7 @@ const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
+      type
       slug
     }
   }

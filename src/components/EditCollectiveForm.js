@@ -210,6 +210,7 @@ class EditCollectiveForm extends React.Component {
         .FormInputs {
           max-width: 700px;
           margin: 0 auto;
+          overflow: hidden;
         }
 
         :global(textarea[name=longDescription]) {
