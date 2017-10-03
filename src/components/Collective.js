@@ -21,6 +21,7 @@ import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
 import { Button } from 'react-bootstrap';
 import { Link } from '../server/pages';
+import Currency from './Currency';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -225,6 +226,13 @@ class Collective extends React.Component {
             flex-direction: row;
             justify-content: center;
           }
+          .balance {
+            text-align: center;
+          }
+          .balance label {
+            margin: 0 0.5rem;
+            font-weight: 500;
+          }
           @media(min-width: 600px) {
             .sidebar {
               float: right;
@@ -333,6 +341,10 @@ class Collective extends React.Component {
 
               <section id="budget">
                 <h1><FormattedMessage id="collective.budget.title" defaultMessage="Budget" /></h1>
+                <div className="balance">
+                  <label><FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" /></label>
+                  <Currency value={this.collective.stats.balance} currency={this.collective.currency} />
+                </div>
                 <div className="columns">
                   <div id="expenses" className="col">
                     <h2>
