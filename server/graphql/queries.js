@@ -21,6 +21,7 @@ import {
 } from './types';
 
 import models from '../models';
+import rawQueries from '../lib/queries';
 
 const queries = {
   Collective: {
@@ -132,6 +133,9 @@ const queries = {
         type: GraphQLString,
         description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
       },
+      ParentCollectiveId: { type: GraphQLInt },
+      orderBy: { type: GraphQLString },
+      orderDirection: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
@@ -141,9 +145,14 @@ const queries = {
         limit: args.limit || 10
       };
 
+      if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.tags) query.where.tags = { $overlap: args.tags };
       if (args.type) query.where.type = args.type;
       if (args.offset) query.offset = args.offset;
+
+      if (args.ParentCollectiveId && args.orderBy === 'balance') {
+        return rawQueries.getChildCollectivesWithBalance(args.ParentCollectiveId, args);
+      }
 
       return models.Collective.findAll(query);
     }

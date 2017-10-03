@@ -40,30 +40,42 @@ export const CollectiveStatsType = new GraphQLObjectType({
         }
       },
       balance: {
+        description: "Amount of money in cents in the currency of the collective currently available to spend",
         type: GraphQLInt,
         resolve(collective, args, req) {
           return req.loaders.collective.balance.load(collective.id);
         }
       },
       backers: {
+        description: "Number of individuals that have given money to this collective",
         type: GraphQLInt,
         resolve(collective) {
           return collective.getBackersCount({ type: types.USER });
         }
       },
       sponsors: {
+        description: "Number of organizations that have given money to this collective",
         type: GraphQLInt,
         resolve(collective) {
           return collective.getBackersCount({ type: [types.ORGANIZATION, types.COLLECTIVE] });
         }
       },
+      collectives: {
+        description: "Number of collectives that have this collective has a parent (e.g. hosted by this collective)",
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Collective.count({ where: { ParentCollectiveId: collective.id, isActive: true } });
+        }
+      },
       expenses: {
+        description: "Number of expenses submitted to this collective to date",
         type: GraphQLInt,
         resolve(collective) {
           return models.Expense.count({ where: { CollectiveId: collective.id } });
         }
       },
       transactions: {
+        description: "Number of transactions",
         type: GraphQLInt,
         resolve(collective) {
           return models.Transaction.count({ where: { CollectiveId: collective.id } });
@@ -171,14 +183,18 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         type: new GraphQLList(MemberType),
         args: {
           limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt }
+          offset: { type: GraphQLInt },
+          role: { type: GraphQLString },
+          roles: { type: new GraphQLList(GraphQLString) }
         }
       },
       memberOf: {
         type: new GraphQLList(MemberType),
         args: {
           limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt }
+          offset: { type: GraphQLInt },
+          role: { type: GraphQLString },
+          roles: { type: new GraphQLList(GraphQLString) }
         }
       },
       followers: {
@@ -347,10 +363,17 @@ const CollectiveFields = () => {
       type: new GraphQLList(MemberType),
       args: {
         limit: { type: GraphQLInt },
-        offset: { type: GraphQLInt }
+        offset: { type: GraphQLInt },
+        role: { type: GraphQLString },
+        roles: { type: new GraphQLList(GraphQLString) }
       },
       resolve(collective, args) {
-        return models.Member.findAll({ where: { CollectiveId: collective.id }, limit: args.limit, offset: args.offset });
+        const where = { CollectiveId: collective.id };
+        const roles = args.roles || args.role && [ args.role ];
+        if (roles && roles.length > 0) {
+          where.role = { $in: args.roles };
+        }
+        return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
       }
     },
     memberOf: {
@@ -358,10 +381,17 @@ const CollectiveFields = () => {
       type: new GraphQLList(MemberType),
       args: {
         limit: { type: GraphQLInt },
-        offset: { type: GraphQLInt }
+        offset: { type: GraphQLInt },
+        role: { type: GraphQLString },
+        roles: { type: new GraphQLList(GraphQLString) }
       },
       resolve(collective, args) {
-        return models.Member.findAll({ where: { MemberCollectiveId: collective.id }, limit: args.limit, offset: args.offset });
+        const where = { MemberCollectiveId: collective.id };
+        const roles = args.roles || args.role && [ args.role ];
+        if (roles && roles.length > 0) {
+          where.role = { $in: args.roles };
+        }
+        return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
       }
     },
     followers: {

@@ -180,6 +180,36 @@ const getTopBackers = (since, until, tags, limit) => {
   }
 
 /**
+ * Get top collectives ordered by available balance
+ */
+const getChildCollectivesWithBalance = (ParentCollectiveId, options) => {
+  const orderDirection = options.orderDirection || "DESC";
+  const orderBy = options.orderBy || "balance";
+  const limit = options.limit || 20;
+  const offset = options.offset || 0;
+  return sequelize.query(`
+    with "balance" AS (
+      SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "balance"
+      FROM "Collectives" c
+      LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
+      WHERE
+        c.type = 'COLLECTIVE'
+        AND c."isActive" IS TRUE
+        AND c."ParentCollectiveId"=:ParentCollectiveId
+        AND c."deletedAt" IS NULL
+        AND t.type='CREDIT'
+        GROUP BY t."CollectiveId"
+    )
+    select c.*, td.* FROM "balance" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id
+    ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
+  `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
+  {
+    replacements: { ParentCollectiveId },
+    model: models.Collective
+  });
+};
+
+/**
  * Get top collectives based on total donations
  */
 const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, randomOrder, orderBy, orderDir, offset) => {
@@ -340,6 +370,7 @@ export default {
   getTopSponsors,
   getTopBackers,
   getCollectivesByTag,
+  getChildCollectivesWithBalance,
   getUniqueCollectiveTags
 };
 

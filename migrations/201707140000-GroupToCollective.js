@@ -738,6 +738,8 @@ const up = (queryInterface, Sequelize) => {
       onUpdate: 'CASCADE'
     }))
     .then(() => queryInterface.removeIndex('Members', 'UserGroups_3way'))
+    .then(() => queryInterface.addIndex('Collectives', ['type', 'tags'], { indexName: 'type-tags' }))
+    .then(() => queryInterface.addIndex('Collectives', ['ParentCollectiveId'], { indexName: 'ParentCollectiveId' }))
     .then(() => queryInterface.addIndex('Members', ['MemberCollectiveId', 'CollectiveId', 'role'], { indexName: 'MemberCollectiveId-CollectiveId-role' }))
     .then(() => queryInterface.addIndex('Members', ['CollectiveId', 'role'], { indexName: 'CollectiveId-role' }))
     .then(() => queryInterface.addIndex('Users', ['CollectiveId'], { indexName: 'CollectiveId' }))
