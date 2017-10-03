@@ -238,6 +238,7 @@ const getCollectiveQuery = gql`
         yearlyBudget
         backers
         sponsors
+        collectives
         balance
         transactions
         expenses
@@ -285,32 +286,6 @@ const getCollectiveQuery = gql`
           slug
           type
           image
-        }
-      }
-      memberOf {
-        id
-        createdAt
-        role
-        totalDonations
-        tier {
-          id
-          name
-        }
-        collective {
-          id
-          type
-          slug
-          name
-          currency
-          description
-          settings
-          image
-          backgroundImage
-          stats {
-            id
-            backers
-            yearlyBudget
-          }
         }
       }
     }

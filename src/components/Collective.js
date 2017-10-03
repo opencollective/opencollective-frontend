@@ -12,10 +12,10 @@ import Markdown from 'react-markdown';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
 import MenuBar from './MenuBar';
-import CollectiveCard from './CollectiveCard';
 import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
+import CollectivesWithData from './CollectivesWithData';
 import ExpensesWithData from './ExpensesWithData';
 import EventsWithData from './EventsWithData';
 import TransactionsWithData from './TransactionsWithData';
@@ -282,7 +282,13 @@ class Collective extends React.Component {
 
               { this.collective.stats.sponsors > 0 &&
                 <section id="sponsors" className="tier">
-                  <h1>Sponsors</h1>
+                  <h1>
+                    <FormattedMessage
+                      id="sponsor"
+                      values={{ n: this.collective.stats.sponsors }}
+                      defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
+                      />
+                  </h1>
                   <MembersWithData
                     collective={this.collective}
                     type="ORGANIZATION,COLLECTIVE"
@@ -294,7 +300,13 @@ class Collective extends React.Component {
 
               { this.collective.stats.backers > 0 &&
                 <section id="backers" className="tier">
-                  <h1>Backers</h1>
+                  <h1>
+                    <FormattedMessage
+                      id="backer"
+                      values={{ n: this.collective.stats.backers }}
+                      defaultMessage={`{n} {n, plural, one {backer} other {backers}}`}
+                      />
+                  </h1>
                   <MembersWithData
                     collective={this.collective}
                     type="USER"
@@ -304,23 +316,17 @@ class Collective extends React.Component {
                 </section>
               }
 
-              { this.collective.memberOf.length > 0 &&
+              { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
                     <FormattedMessage
                       id="collective"
-                      values={{ n: this.collective.memberOf.length }}
-                      defaultMessage={`{n, plural, one {collective} other {collectives}}`}
+                      values={{ n: this.collective.stats.collectives }}
+                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
                       />
                   </h1>
                   <div className="cardsList">
-                    {this.collective.memberOf.map((membership) =>
-                      <CollectiveCard
-                        key={membership.id}
-                        className="membership"
-                        collective={membership.collective}
-                        />
-                    )}
+                    <CollectivesWithData ParentCollectiveId={this.collective.id} orderBy="balance" orderDirection="DESC" />
                   </div>
                 </section>
               }
