@@ -287,7 +287,13 @@ class OrderForm extends React.Component {
         this.setState(newState);
         return true;
       } else if (isValidCard(card)) {
-        const res = await getStripeToken(card)
+        let res;
+        try {
+          res = await getStripeToken(card);
+        } catch (e) {
+          this.setState({ result: { error: e }})
+          return false;
+        }
         const last4 = card.number.replace(/ /g, '').substr(-4);
         const sanitizedCard = {
           name: last4,
@@ -584,7 +590,7 @@ class OrderForm extends React.Component {
             </div>
             <div className="result">
                 { this.state.loading && <div className="loading">Processing...</div> }
-                {this.state.result.success &&
+                { this.state.result.success &&
                   <div className="success">
                     {this.state.result.success}
                   </div>
