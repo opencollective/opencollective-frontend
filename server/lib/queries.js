@@ -216,7 +216,8 @@ const getCollectivesByTag = (tag, limit, excludeList, minTotalDonationInCents, r
       FROM "Collectives" c
       LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
       WHERE
-        c."isActive" IS TRUE 
+        c.type = 'COLLECTIVE'
+        AND c."isActive" IS TRUE
         ${excludeClause}
         AND c."deletedAt" IS NULL
         AND t.type='CREDIT'
