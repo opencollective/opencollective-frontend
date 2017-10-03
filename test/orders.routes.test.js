@@ -153,7 +153,7 @@ describe('orders.routes.test.js', () => {
               })
               .catch());
 
-          it('calls processPayment successfully when no email is sent with the order', () => request(app)
+          it('calls executeOrder successfully when no email is sent with the order', () => request(app)
               .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)
               .send({
@@ -178,7 +178,7 @@ describe('orders.routes.test.js', () => {
               })
               .catch());
 
-          it('calls processPayment successfully when manual order is from a new user but submitted by host', () => {
+          it('calls executeOrder successfully when manual order is from a new user but submitted by host', () => {
             return request(app)
               .post(`/groups/${collective.id}/donations/manual`)
               .set('Authorization', `Bearer ${host.jwt()}`)

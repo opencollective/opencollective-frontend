@@ -49,7 +49,7 @@ export default (Sequelize, DataTypes) => {
       },
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
-      allowNull: false
+      allowNull: true // when a host adds funds, we need to create a transaction to add money to the system (to the host collective)
     },
 
     CollectiveId: {

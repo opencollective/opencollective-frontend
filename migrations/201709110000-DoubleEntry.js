@@ -39,13 +39,32 @@ const updateTransactions = (sequelize) => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
+      hostFeeInTxnCurrency: null,
       uuid: uuid.v4()
     }
     if (DRY_RUN) {
       console.log("------------------------------------")
       console.log("Processing", transaction);
     }
-    return insert(sequelize, "Transactions", oppositeTransaction);
+
+    // if the donation is from the host (add funds), we need to add the funds first to the Host Collective
+    if (transaction.FromCollectiveId === transaction.HostCollectiveId && transaction.amount > 0 && !transaction.PaymentMethodId && !transaction.platformFeeInHostCurrency) {
+      const addFundsTransaction = {
+        ...transaction,
+        type: 'CREDIT',
+        CollectiveId: transaction.HostCollectiveId,
+        HostCollectiveId: transaction.HostCollectiveId,
+        FromCollectiveId: null, // money doesn't come from a collective but from an external source (Host's bank account)
+        currency: transaction.currency,
+        netAmountInCollectiveCurrency: transaction.amount,
+        uuid: uuid.v4()
+      };
+      console.log(">>> adding funds", addFundsTransaction);
+      return insert(sequelize, "Transactions", addFundsTransaction)
+      .then(() => insert(sequelize, "Transactions", oppositeTransaction));
+    } else {
+      return insert(sequelize, "Transactions", oppositeTransaction);
+    }
   };
 
   const limit = DRY_RUN ? 'LIMIT 10' : '';

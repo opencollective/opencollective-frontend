@@ -132,7 +132,6 @@ const getCreatedByUserIdForCollective = (sequelize, collective) => {
     type: sequelize.QueryTypes.SELECT
   }).then(members => {
     const UserId = (members && members.length > 0) ? members[0].CreatedByUserId : null;
-    console.log(">>> getCreatedByUserIdForCollective", collective.id, " => UserId:", UserId);
     cache.CreatedByUserIdForCollectiveId[collective.id] = UserId;
     return UserId;
   })
@@ -283,7 +282,6 @@ const createCollectivesForUsers = (sequelize) => {
     // don't create a collective for hosts that already have a collective
     let promise;
     if (HostCollectiveIdForUserId[user.id]) {
-      console.log(">>> User Id", user.id, "already has a collective id", HostCollectiveIdForUserId[user.id]);
       const data = JSON.stringify({ UserId: user.id });
       promise = sequelize.query(`UPDATE "Collectives" SET data=:data WHERE id=:CollectiveId`, { replacements: { CollectiveId: HostCollectiveIdForUserId[user.id], data }}).then(() => HostCollectiveIdForUserId[user.id]);
     } else {
