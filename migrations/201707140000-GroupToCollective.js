@@ -137,6 +137,15 @@ const getCreatedByUserIdForCollective = (sequelize, collective) => {
   })
 }
 
+// From Aseem:
+const updateExpenseTransactions = (sequelize) => {
+  return sequelize.query(`
+  UPDATE "Transactions" as t 
+  SET "UserId" = e."UserId" FROM "Expenses" as e
+  WHERE t."UserId" = t."HostId" AND t."UserId" != e."UserId" AND t."ExpenseId" IS NOT NULL and t."ExpenseId" = e.id;
+  `);
+}
+
 const updateMembersRole = (sequelize) => {
   return sequelize.query(`UPDATE "Members" SET role='ADMIN' WHERE role='MEMBER'`)
   .then(() => sequelize.query(`UPDATE "Members" SET "deletedAt"=:deletedAt WHERE id IN (SELECT m.id FROM "Members" m LEFT JOIN "Collectives" c ON c.id = m."CollectiveId" WHERE c."deletedAt" IS NOT NULL)`, { replacements: { deletedAt: new Date }}))
@@ -646,7 +655,8 @@ const up = (queryInterface, Sequelize) => {
       .then(() => queryInterface.addColumn(toTable, 'geoLocationLatLong', { type: Sequelize.GEOMETRY('POINT') }))
   }
 
-  return updateTableSchema('Groups', 'Collectives')
+  return updateExpenseTransactions(queryInterface.sequelize)
+    .then(() => updateTableSchema('Groups', 'Collectives'))
     .then(() => updateTableSchema('GroupHistories', 'CollectiveHistories'))
     .then(() => queryInterface.addColumn('Users', 'CollectiveId', {
       type: Sequelize.INTEGER,
