@@ -19,7 +19,7 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, fetchMore, refetch } = this.props;
+    const { data, LoggedInUser, collective, fetchMore } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -34,7 +34,7 @@ class TransactionsPage extends React.Component {
         <Transactions
           collective={collective}
           transactions={transactions}
-          refetch={refetch}
+          refetch={data.refetch}
           fetchMore={fetchMore}
           LoggedInUser={LoggedInUser}
           />
