@@ -12,6 +12,8 @@ import { defineMessages } from 'react-intl';
 import { Router } from '../server/pages';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import Loading from '../components/Loading';
+import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
@@ -73,9 +75,9 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { intl, data } = this.props;
-    const { loading } = data;
     const collective = data.Collective;
-    if (loading) return (<div />);
+    if (data.loading) return (<Loading />);
+    if (!data.Collective) return (<NotFound />);
 
     const TierId = parseInt(this.props.TierId);
     let tier;

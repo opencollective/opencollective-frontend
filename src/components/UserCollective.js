@@ -105,6 +105,9 @@ class UserCollective extends React.Component {
           .message .thankyou {
             font-weight: bold;
           }
+          .message .editBtn {
+            margin: 2rem;
+          }
         `}</style>
 
         <Header
@@ -137,26 +140,34 @@ class UserCollective extends React.Component {
             <div>
 
               <div className="content" >
-                { query && query.status === 'orderCreated' &&
-                  <div className="message">
-                    <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                    <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
-                  </div>
-                }
-                { this.collective.longDescription &&
-                  <div className="collectiveDescription" >
-                    <Markdown source={this.collective.longDescription} />
-                  </div>
-                }
-                { (!this.collective.image || !this.collective.longDescription) &&
-                  <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\_(ツ)_/¯`} />
-                }
-                { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
-                  <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
-                }
-                { LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
-                  <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
-                }
+                <div className="message">
+                  { query && query.status === 'orderCreated' &&
+                    <div>
+                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
+                      <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
+                    </div>
+                  }
+                  { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
+                    <div>
+                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\_(ツ)_/¯`} />
+                    </div>
+                  }
+                  { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                    <div>
+                      <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
+                    </div>
+                  }
+                  { LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                    <div className="editBtn">
+                      <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+                    </div>
+                  }
+                  { this.collective.longDescription &&
+                    <div className="collectiveDescription" >
+                      <Markdown source={this.collective.longDescription} />
+                    </div>
+                  }
+                </div>
                 <div id="tiers">
                   <style jsx>{`
                     #tiers {
