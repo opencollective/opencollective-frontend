@@ -61,7 +61,6 @@ class CreateEvent extends React.Component {
   async handleTemplateChange(event) {
     delete event.id;
     delete event.slug;
-    event.slug = event.slug.replace(/.*\//, '');
     this.setState({ event, tiers: event.tiers });
   }
 
