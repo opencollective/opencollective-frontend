@@ -62,9 +62,9 @@ const updateTransactions = (sequelize) => {
         currency: transaction.currency,
         netAmountInCollectiveCurrency: transaction.amount,
         uuid: uuid.v4(),
-        hostFeeInHostCurrency: null,
-        platformFeeInHostCurrency: null,
-        paymentProcessorFeeInHostCurrency: null
+        hostFeeInTxnCurrency: null,
+        platformFeeInTxnCurrency: null,
+        paymentProcessorFeeInTxnCurrency: null
       };
       // console.log(">>> adding funds", addFundsTransaction);
       return insert(sequelize, "Transactions", addFundsTransaction)
