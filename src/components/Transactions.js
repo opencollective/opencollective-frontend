@@ -19,14 +19,14 @@ class Transactions extends React.Component {
     super(props);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false };
+    this.state = { loading: false, fetchingMore: false };
   }
 
   fetchMore(e) {
     e.target.blur();
-    this.setState({ loading: true });
+    this.setState({ fetchingMore: true });
     this.props.fetchMore().then(() => {
-      this.setState({ loading: false });
+      this.setState({ fetchingMore: false });
     });
   }
 
@@ -130,8 +130,8 @@ class Transactions extends React.Component {
           { transactions.length >= 10 && transactions.length % 10 === 0 &&
             <div className="loadMoreBtn">
               <Button bsStyle='default' onClick={this.fetchMore}>
-                {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-                {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+                {this.state.fetchingMore && <FormattedMessage id='loading' defaultMessage='loading' />}
+                {!this.state.fetchingMore && <FormattedMessage id='loadMore' defaultMessage='load more' />}
               </Button>
             </div>
           }

@@ -245,7 +245,7 @@ class Collective extends React.Component {
           title={this.collective.name}
           description={this.collective.description || this.collective.longDescription}
           twitterHandle={this.collective.twitterHandle || get(this.collective.parentCollective, 'twitterHandle')}
-          image={get(this.collective.parentCollective, 'image') || backgroundImage}
+          image={this.collective.image || get(this.collective.parentCollective, 'image') || backgroundImage}
           className={this.state.status}
           LoggedInUser={this.props.LoggedInUser}
           href={`/${this.collective.slug}`}
