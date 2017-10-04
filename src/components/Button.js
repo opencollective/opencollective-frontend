@@ -78,6 +78,9 @@ class Button extends React.Component {
           height: 1.6rem;
           margin: 0 0.5rem;
         }
+        .allcaps {
+          text-transform: 'uppercase';
+        }
         .whiteblue, .whiteblue :global(a) {
           color: ${colors.blue};
           background: white;

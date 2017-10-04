@@ -9,11 +9,13 @@ import NotificationBar from '../components/NotificationBar';
 import Memberships from '../components/Memberships';
 import Markdown from 'react-markdown';
 import withIntl from '../lib/withIntl';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';
 import MenuBar from './MenuBar';
 import MessageModal from './MessageModal';
+import { Button } from 'react-bootstrap';
+import { Router, Link } from '../server/pages';
 
 class UserCollective extends React.Component {
 
@@ -35,8 +37,8 @@ class UserCollective extends React.Component {
     this.messages = defineMessages({
       'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing since {year}`},
       'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing since {year}`},
-      'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `EDIT ORGANIZATION`},
-      'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `EDIT PROFILE`},
+      'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `edit organization`},
+      'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `edit profile`},
       'user.collective.memberOf.host.title': { id: 'user.collective.memberOf.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.admin.title': { id: 'user.collective.memberOf.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
@@ -63,8 +65,8 @@ class UserCollective extends React.Component {
   }
 
   render() {
-
-    const { intl, LoggedInUser } = this.props;
+    let collectiveCreated = {};
+    const { intl, LoggedInUser, query } = this.props;
 
     const type = this.collective.type.toLowerCase();
 
@@ -81,9 +83,13 @@ class UserCollective extends React.Component {
 
     if (LoggedInUser && LoggedInUser.canEditCollective) {
       actions.push({
-        className: 'whiteblue small',
-        component: <a href={`/${this.collective.slug}/edit`}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</a>
+        className: 'whiteblue small allcaps',
+        component: <Link route={`/${this.collective.slug}/edit`}><a>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</a></Link>
       });
+    }
+
+    if (query && query.CollectiveId) {
+      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective || {};
     }
 
     return (
@@ -93,6 +99,12 @@ class UserCollective extends React.Component {
           h1 {
             font-size: 2rem;
           }
+          .message {
+            text-align: center;
+          }
+          .message .thankyou {
+            font-weight: bold;
+          }
         `}</style>
 
         <Header
@@ -101,7 +113,7 @@ class UserCollective extends React.Component {
           twitterHandle={this.collective.twitterHandle || get(this.collective.parentCollective, 'twitterHandle')}
           image={get(this.collective.parentCollective, 'image')}
           className={this.state.status}
-          LoggedInUser={this.props.LoggedInUser}
+          LoggedInUser={LoggedInUser}
           href={`/${this.collective.slug}`}
           />
 
@@ -125,12 +137,26 @@ class UserCollective extends React.Component {
             <div>
 
               <div className="content" >
+                { query && query.status === 'orderCreated' &&
+                  <div className="message">
+                    <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
+                    <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
+                  </div>
+                }
                 { this.collective.longDescription &&
                   <div className="collectiveDescription" >
                     <Markdown source={this.collective.longDescription} />
                   </div>
                 }
-
+                { (!this.collective.image || !this.collective.longDescription) &&
+                  <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\_(ツ)_/¯`} />
+                }
+                { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                  <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
+                }
+                { LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
+                  <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
+                }
                 <div id="tiers">
                   <style jsx>{`
                     #tiers {

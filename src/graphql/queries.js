@@ -288,6 +288,22 @@ const getCollectiveQuery = gql`
           image
         }
       }
+      ... on User {
+        memberOf {
+          id
+          role
+          createdAt
+          collective {
+            id
+            name
+            slug
+            type
+            image
+            description
+            backgroundImage
+          }
+        }
+      }
     }
   }
 `;

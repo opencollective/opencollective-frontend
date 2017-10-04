@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from './Button';
 import colors from '../constants/colors';
 
 class MenuBar extends React.Component {
@@ -40,6 +39,10 @@ class MenuBar extends React.Component {
           border-right: 1px solid #E6E6E6;
         }
 
+        .allcaps {
+          text-transform: uppercase;
+        }
+
         @media(max-width: 600px) {
           .content {
             flex-direction: column;
@@ -56,7 +59,7 @@ class MenuBar extends React.Component {
             {this.props.info}
           </div>
           {this.props.actions.map((action, index) =>
-            <div className="item">
+            <div className={`item ${action.className}`}>
               { action.onClick &&
                 <a
                   key={`actionItem${index}`}

@@ -17,8 +17,8 @@ class CollectivePage extends React.Component {
     this.state = {};
   }
 
-  static getInitialProps ({ query: { slug, message } }) {
-    return { slug, message }
+  static getInitialProps ({ query }) {
+    return { slug: query.slug, query }
   }
 
   async componentDidMount() {
@@ -28,7 +28,7 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug, message } = this.props;
+    const { data, slug, query } = this.props;
     const { LoggedInUser } = this.state;
 
     console.log(">>> this.props", this.props);
@@ -49,8 +49,8 @@ class CollectivePage extends React.Component {
 
     return (
       <div>
-        {collective.type === 'COLLECTIVE' && <Collective collective={collective} LoggedInUser={LoggedInUser} message={message} />}
-        {['USER', 'ORGANIZATION'].includes(collective.type) && <UserCollective collective={collective} LoggedInUser={LoggedInUser} message={message} />}
+        {collective.type === 'COLLECTIVE' && <Collective collective={collective} LoggedInUser={LoggedInUser} query={query} />}
+        {['USER', 'ORGANIZATION'].includes(collective.type) && <UserCollective collective={collective} LoggedInUser={LoggedInUser} query={query} />}
       </div>
     );
   }
