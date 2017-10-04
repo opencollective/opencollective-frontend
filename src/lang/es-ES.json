@@ -239,7 +239,7 @@
   "transactions.expenses": "gastos",
   "transactions.loading": "cargando",
   "transactions.loadMore": "ver más",
-  "transactions.title": "{n, plural, one {Última transacción} other {Últimas transacciones}}"
+  "transactions.title": "{n, plural, one {Última transacción} other {Últimas transacciones}}",
   "transactions.viewAll": "Ver Todas las Transacciones",
   "user.collective.edit": "EDITAR PERFIL",
   "user.collective.memberOf.admin.title": "Colaboro con {n, plural, one {este colectivo} other {estos colectivos}}",
