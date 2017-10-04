@@ -32,6 +32,7 @@ const updateTransactions = (sequelize) => {
 
     totalTransactions++;
 
+    transaction.txnCurrencyFxRate = transaction.txnCurrencyFxRate || 1;
     transaction.TransactionGroup = uuid.v4();
 
     const updateOriginalTransaction = () => sequelize.query(`UPDATE "Transactions" SET "TransactionGroup"=:TransactionGroup WHERE id=:id`, { replacements: { id: transaction.id, TransactionGroup: transaction.TransactionGroup }});
@@ -43,7 +44,7 @@ const updateTransactions = (sequelize) => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInTxnCurrency:  -transaction.netAmountInCollectiveCurrency / transaction.txnCurrencyFxRate,
+      amountInTxnCurrency: -transaction.netAmountInCollectiveCurrency / transaction.txnCurrencyFxRate,
       hostFeeInTxnCurrency: null,
       uuid: uuid.v4()
     }

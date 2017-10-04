@@ -266,6 +266,7 @@ export default (Sequelize, DataTypes) => {
 
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
     transaction.TransactionGroup = uuid.v4();
+    transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
     const oppositeTransaction = {
       ...transaction,
@@ -274,7 +275,7 @@ export default (Sequelize, DataTypes) => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInHostCurrency:  -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
+      amountInHostCurrency: -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
       hostFeeInHostCurrency: null,
       platformFeeInHostCurrency: null,
       paymentProcessorFeeInHostCurrency: null
