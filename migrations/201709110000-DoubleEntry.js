@@ -32,6 +32,10 @@ const updateTransactions = (sequelize) => {
 
     totalTransactions++;
 
+    transaction.TransactionGroup = uuid.v4();
+
+    const updateOriginalTransaction = () => sequelize.query(`UPDATE "Transactions" SET "TransactionGroup"=:TransactionGroup WHERE id=:id`, { replacements: { id: transaction.id, TransactionGroup: transaction.TransactionGroup }});
+
     const oppositeTransaction = {
       ...transaction,
       type: (-transaction.amount > 0) ? 'CREDIT' : 'DEBIT',
@@ -57,13 +61,16 @@ const updateTransactions = (sequelize) => {
         FromCollectiveId: null, // money doesn't come from a collective but from an external source (Host's bank account)
         currency: transaction.currency,
         netAmountInCollectiveCurrency: transaction.amount,
-        uuid: uuid.v4()
+        uuid: uuid.v4(),
+        hostFeeInHostCurrency: null,
+        platformFeeInHostCurrency: null,
+        paymentProcessorFeeInHostCurrency: null
       };
       // console.log(">>> adding funds", addFundsTransaction);
       return insert(sequelize, "Transactions", addFundsTransaction)
-      .then(() => insert(sequelize, "Transactions", oppositeTransaction));
+      .then(() => insert(sequelize, "Transactions", oppositeTransaction)).then(updateOriginalTransaction);
     } else {
-      return insert(sequelize, "Transactions", oppositeTransaction);
+      return insert(sequelize, "Transactions", oppositeTransaction).then(updateOriginalTransaction);
     }
   };
 
@@ -77,7 +84,9 @@ const updateTransactions = (sequelize) => {
 
 module.exports = {
   up: function (queryInterface, DataTypes) {
-    return updateTransactions(queryInterface.sequelize)
+    // temporary column for binding transactions together, eventually they should all have the same OrderId if they are part of a same Order
+    return queryInterface.addColumn("Transactions", "TransactionGroup", { type: DataTypes.UUID })
+    .then(() => updateTransactions(queryInterface.sequelize))
     .then(() => queryInterface.renameColumn("Transactions", "txnCurrency", "hostCurrency"))
     .then(() => queryInterface.renameColumn("Transactions", "amountInTxnCurrency", "amountInHostCurrency"))
     .then(() => queryInterface.renameColumn("Transactions", "platformFeeInTxnCurrency", "platformFeeInHostCurrency"))

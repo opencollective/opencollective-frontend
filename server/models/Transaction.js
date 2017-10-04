@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import { type } from '../constants/transactions';
 import CustomDataTypes from './DataTypes';
+import uuid from 'node-uuid';
 import debugLib from 'debug';
 const debug = debugLib("transaction");
 
@@ -264,6 +265,7 @@ export default (Sequelize, DataTypes) => {
   Transaction.createDoubleEntry = (transaction) => {
 
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
+    transaction.TransactionGroup = uuid.v4();
 
     const oppositeTransaction = {
       ...transaction,
@@ -271,11 +273,14 @@ export default (Sequelize, DataTypes) => {
       FromCollectiveId: transaction.CollectiveId,
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
-      netAmountInCollectiveCurrency: -transaction.amount
-    }
+      netAmountInCollectiveCurrency: -transaction.amount,
+      hostFeeInHostCurrency: null,
+      platformFeeInHostCurrency: null,
+      paymentProcessorFeeInHostCurrency: null
+    };
 
     debug("createDoubleEntry", transaction, "opposite", oppositeTransaction);
-    
+
     // We first record the negative transaction 
     // and only then we can create the transaction to add money somewhere else
     const transactions = [];
