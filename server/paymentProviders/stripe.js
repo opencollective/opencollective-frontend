@@ -183,7 +183,7 @@ export default {
       .tap(() => subscription ? createSubscription(hostStripeAccount, subscription, order, paymentMethod, collective) : null)
 
       // add user to the collective
-      .tap(() => collective.findOrAddUserWithRole(user, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
+      .tap(() => collective.findOrAddUserWithRole({ id: user.id, CollectiveId: fromCollective.id}, roles.BACKER, { CreatedByUserId: user.id, TierId: order.TierId }))
 
       // Mark order row as processed
       .tap(() => order.update({ processedAt: new Date() }))

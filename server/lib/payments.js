@@ -24,8 +24,8 @@ export const executeOrder = (user, order) => {
   }
 
   const payment = {
-    amount: order.totalAmount,                  
-    interval: order.interval, 
+    amount: order.totalAmount,
+    interval: order.interval,
     currency: order.currency
   };
 

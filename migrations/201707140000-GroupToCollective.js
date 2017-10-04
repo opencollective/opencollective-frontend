@@ -417,7 +417,7 @@ const updateCollectives = (sequelize) => {
     let tiers = collective.tiers || [];
 
     if (isDeepEqual(tiers, originalDefaultTiers)) {
-      console.log(">>> Collective", collective.slug, " still has default tiers, replacing");
+      // console.log(">>> Collective", collective.slug, " still has default tiers, replacing");
       tiers = [];
     }
 

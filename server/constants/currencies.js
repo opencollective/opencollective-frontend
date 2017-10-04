@@ -1,4 +1,4 @@
-// FX Rates as of 11/1/2016
+// FX Rates as of 10/3/2017
 export default {
   AUD: { fxrate: 1.25, format: value => `${value} AUD` },
   CAD: { fxrate: 1.23, format: value => `${value} CAD` },

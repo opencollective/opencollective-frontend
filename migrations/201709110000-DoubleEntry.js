@@ -59,7 +59,7 @@ const updateTransactions = (sequelize) => {
         netAmountInCollectiveCurrency: transaction.amount,
         uuid: uuid.v4()
       };
-      console.log(">>> adding funds", addFundsTransaction);
+      // console.log(">>> adding funds", addFundsTransaction);
       return insert(sequelize, "Transactions", addFundsTransaction)
       .then(() => insert(sequelize, "Transactions", oppositeTransaction));
     } else {
