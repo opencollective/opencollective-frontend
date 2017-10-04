@@ -43,6 +43,7 @@ const updateTransactions = (sequelize) => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
+      amountInTxnCurrency:  -transaction.netAmountInCollectiveCurrency / transaction.txnCurrencyFxRate,
       hostFeeInTxnCurrency: null,
       uuid: uuid.v4()
     }

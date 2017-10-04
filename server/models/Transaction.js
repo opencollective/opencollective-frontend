@@ -274,6 +274,7 @@ export default (Sequelize, DataTypes) => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
+      amountInHostCurrency:  -transaction.netAmountInCollectiveCurrency / transaction.hostCurrencyFxRate,
       hostFeeInHostCurrency: null,
       platformFeeInHostCurrency: null,
       paymentProcessorFeeInHostCurrency: null
