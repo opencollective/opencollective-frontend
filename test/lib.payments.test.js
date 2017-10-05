@@ -16,6 +16,13 @@ const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
 import stripeMocks from './mocks/stripe';
 import emailLib from '../server/lib/email';
+import nock from 'nock';
+
+nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+.get('/latest')
+.times(20)
+.query({"base":"EUR","symbols":"USD"})
+.reply(200, {"base":"EUR","date":"2017-10-05","rates":{"USD":1.1742}});
 
 describe('lib.payments.test.js', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
@@ -175,7 +182,7 @@ describe('lib.payments.test.js', () => {
                 expect(emailSendSpy.lastCall.args[2].relatedCollectives).to.have.length(1);
                 expect(emailSendSpy.lastCall.args[2].relatedCollectives[0]).to.have.property('settings');
                 done();
-              }, 80);
+              }, 150);
             });
   
           });
