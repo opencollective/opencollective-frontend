@@ -149,7 +149,7 @@ class UserCollective extends React.Component {
                   }
                   { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
-                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={`Your profile looks a bit empty ¯\_(ツ)_/¯`} />
+                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={"Your profile looks a bit empty ¯\_(ツ)_/¯"} />
                     </div>
                   }
                   { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
