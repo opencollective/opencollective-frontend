@@ -10,6 +10,7 @@ import models from '../server/models';
 import originalStripeMock from './mocks/stripe';
 import emailLib from '../server/lib/email';
 import * as payments from '../server/lib/payments';
+import nock from 'nock';
 import initNock from './webhooks.routes.test.nock.js';
 import { appStripe } from '../server/gateways/stripe';
 
@@ -45,6 +46,10 @@ describe('webhooks.routes.test.js', () => {
   });
 
   afterEach(() => sandbox.restore());
+
+  after(() => {
+    nock.cleanAll();
+  });
 
   beforeEach(() => {
     emailSendSpy = sandbox.spy(emailLib, 'send');

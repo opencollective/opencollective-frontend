@@ -5,6 +5,7 @@ import * as utils from './utils';
 import Stripe from 'stripe';
 import config from 'config';
 
+import nock from 'nock';
 import initNock from './graphql.createOrder.nock';
 
 const order = {
@@ -71,6 +72,10 @@ const createOrderQuery = `
 describe('createOrder', () => {
 
   before(initNock);
+
+  after(() => {
+    nock.cleanAll();
+  });
 
   beforeEach(() => utils.loadDB('opencollective_dvl'));
 

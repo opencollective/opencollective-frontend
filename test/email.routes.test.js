@@ -10,6 +10,7 @@ import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import crypto from 'crypto';
 import config from 'config';
+import nock from 'nock';
 import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
@@ -71,6 +72,10 @@ describe("email.routes.test", () => {
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  after(() => {
+    nock.cleanAll();
   });
 
   before('create collective and members', (done) => {
