@@ -69,6 +69,7 @@ class Tier extends React.Component {
   handleChange(field, value) {
     const state = this.state;
     state[field] = value;
+    console.log(">>> Tier.handleChange new state", state);
     this.setState(state);
     this.onChange(state);
   }
