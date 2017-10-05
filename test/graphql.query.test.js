@@ -233,34 +233,30 @@ describe('Query Tests', () => {
           const query = `
             query allEvents {
               allEvents(slug: "${collective1.slug}") {
-                id,
-                name,
-                description,
+                id
+                name
+                description
                 location {
-                  name,
-                  address,
-                  lat,
-                  long
-                },
-                backgroundImage,
+                  name
+                  address
+                }
+                backgroundImage
                 createdByUser {
-                  id,
+                  id
                   firstName
                 }
                 tiers {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
+                  name
+                  description
+                  maxQuantity
                   stats {
-                    availableQuantity,
+                    availableQuantity
                     totalOrders
                   }
                   orders {
-                    id,
-                    description,
+                    description
                     createdByUser {
-                      id,
+                      id
                       firstName
                     }
                   }
@@ -274,99 +270,153 @@ describe('Query Tests', () => {
             data: {
               allEvents: [
                 {
-                  "id": 8,
-                  "name": "Feb meetup",
-                  "description": "February monthly meetup",
-                  "backgroundImage": null,
-                  "location": {
-                    "name": "Puck Fair",
-                    "address": "505 Broadway, NY 10012",
-                    "lat": null,
-                    "long": null
-                  },
-                  "createdByUser": {
-                    "id": 1,
-                    "firstName": "Phil"
-                  },
-                  "tiers":[
-                    {
-                      id: 3,
-                      name: tier3.name,
-                      description: tier3.description,
-                      "maxQuantity": 10,
-                      "stats": {
-                        "availableQuantity": 10,
-                        "totalOrders": 0
-                      },
-                      orders: []
-                    }
-                  ]
+                    "id": 8,
+                    "name": "Feb meetup",
+                    "description": "February monthly meetup",
+                    "location": {
+                        "name": "Puck Fair",
+                        "address": "505 Broadway, NY 10012"
+                    },
+                    "backgroundImage": null,
+                    "createdByUser": {
+                        "id": 1,
+                        "firstName": "Phil"
+                    },
+                    "tiers": [
+                        {
+                            "name": "Free ticket",
+                            "description": "free tickets for all",
+                            "maxQuantity": 10,
+                            "stats": {
+                                "availableQuantity": 10,
+                                "totalOrders": 0
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                  id: 7,
-                  name: "January meetup",
-                  "description":"January monthly meetup",
-                  "location" : {
-                    "name": "Balanced NYC",
-                    "address": "547 Broadway, NY 10012",
-                    "lat": 39.807222,
-                    "long": -76.984722
-                  },
-                  "backgroundImage": "http://opencollective.com/backgroundimage.png",
-                  "createdByUser": {
-                    "id":1,
-                    "firstName":"Phil"
-                  },
-                  "tiers": [
-                    {
-                      "id": 1,
-                      "name": ticket1.name,
-                      "description":"free tickets for all",
-                      "maxQuantity": 10,
-                      "stats": {
-                        "availableQuantity": 7,
-                        "totalOrders": 3
-                      },
-                      "orders": [
+                    "id": 7,
+                    "name": "January meetup",
+                    "description": "January monthly meetup",
+                    "location": {
+                        "name": "Balanced NYC",
+                        "address": "547 Broadway, NY 10012"
+                    },
+                    "backgroundImage": "http://opencollective.com/backgroundimage.png",
+                    "createdByUser": {
+                        "id": 1,
+                        "firstName": "Phil"
+                    },
+                    "tiers": [
                         {
-                          "id": 1,
-                          "description": "I work on bitcoin",
-                          "createdByUser": {
-                            "id": 2,
-                            "firstName": "Anish"
-                          }
+                            "name": "Free ticket",
+                            "description": "free tickets for all",
+                            "maxQuantity": 10,
+                            "stats": {
+                                "availableQuantity": 7,
+                                "totalOrders": 3
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
                         },
                         {
-                          "id": 2,
-                          "description": "I have been working on open source for over a decade",
-                          "createdByUser": {
-                            "id": 3,
-                            "firstName": "Xavier"
-                          }
+                            "name": "paid ticket",
+                            "description": "$20 ticket",
+                            "maxQuantity": 100,
+                            "stats": {
+                                "availableQuantity": 98,
+                                "totalOrders": 1
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
                         }
-                      ]
-                    },
-                    {
-                      "id": 2,
-                      "name": ticket2.name,
-                      "description": "$20 ticket",
-                      "maxQuantity": 100,
-                      "stats": {
-                        "availableQuantity": 98,
-                        "totalOrders": 1
-                      },
-                      "orders": [
-                        {
-                          "id": 4,
-                          "description": null,
-                          "createdByUser": {
-                            "id": 3,
-                            "firstName": "Xavier"
-                          }
-                        }
-                      ]
-                    }
-                  ]
+                    ]
                 }
               ]
             }
