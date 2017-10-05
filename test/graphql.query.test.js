@@ -7,7 +7,7 @@ import * as utils from './utils';
 import models from '../server/models';
 
 describe('Query Tests', () => {
-  let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2, tier3;
+  let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2;
 
   /* SETUP
     collective1: 2 events
@@ -169,10 +169,9 @@ describe('Query Tests', () => {
           .tap(t => ticket2 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('ticket1'), { CollectiveId: event2.id }))
-          .tap(t => tier3 = t));
+          Object.assign(utils.data('ticket1'), { CollectiveId: event2.id })));
 
-        beforeEach(() => models.Order.create(
+          beforeEach(() => models.Order.create(
           Object.assign(utils.data('order1'), { 
             CollectiveId: event1.id,
             FromCollectiveId: user2.CollectiveId,
