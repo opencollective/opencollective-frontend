@@ -277,6 +277,7 @@ nock('https://api.stripe.com:443', {"encodedQueryParams":true})
 
 nock('http://api.fixer.io:80')
   .get(/20[0-9]{2}\-[0-9]{2}\-[0-9]{2}/)
+  .times(5)
   .query({"base":"EUR","symbols":"USD"})
   .reply(200, {"base":"EUR","date":"2017-09-01","rates":{"USD":1.192}});
 
