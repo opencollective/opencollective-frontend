@@ -180,6 +180,7 @@ const getCollectiveToEditQuery = gql`
         id
         createdAt
         role
+        description
         totalDonations
         tier {
           id
@@ -280,8 +281,10 @@ const getCollectiveQuery = gql`
       members {
         id
         role
+        description
         member {
           id
+          description
           name
           slug
           type
