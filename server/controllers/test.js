@@ -128,6 +128,7 @@ export const resetTestDatabase = function(req, res, next) {
     }))
     .then(order => models.Transaction.create({
       amount: 100,
+      description: "Donation 1",
       CollectiveId: testGroup.id,
       type: type.CREDIT,
       currency: "EUR",
@@ -144,6 +145,7 @@ export const resetTestDatabase = function(req, res, next) {
     }))
     .then(order => models.Transaction.create({
       amount: 200,
+      description: "Donation 2",
       type: type.CREDIT,
       currency: "EUR",
       CreatedByUserId: testBacker2.id,
@@ -185,7 +187,9 @@ export const resetTestDatabase = function(req, res, next) {
 export const getTestUserLoginUrl = function(req, res, next) {
   if (envsAndDatabases[process.env.NODE_ENV]) {
     return models.User.findOne({where: {email: 'testuser@opencollective.com'}})
-    .then(user => res.redirect(user.generateLoginLink('')))
+    .then(user => user.generateLoginLink(''))
+    .then(link => link.replace('signin','login'))
+    .then(link => res.redirect(link))
     .catch(next)
   }
   return next(new errors.BadRequest(`Unsupported NODE_ENV ${process.env.NODE_ENV} for retreiving test API login token`));
