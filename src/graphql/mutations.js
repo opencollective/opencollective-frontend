@@ -62,6 +62,7 @@ const editCollectiveQuery = gql`
   mutation editCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
+      type
       slug
     }
   }
@@ -164,6 +165,7 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
           return {
             id: member.id,
             role: member.role,
+            description: member.description,
             member: {
               name: member.member.name,
               email: member.member.email
@@ -172,7 +174,6 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         });
       }
       CollectiveInputType.location = pick(collective.location, ['name','address','lat','long']);
-      console.log(">>> this.props.editCollective", CollectiveInputType)
       return await mutate({ variables: { collective: CollectiveInputType } })
     }
   })

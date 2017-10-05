@@ -12,6 +12,8 @@ import { defineMessages } from 'react-intl';
 import { Router } from '../server/pages';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import Loading from '../components/Loading';
+import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
@@ -29,7 +31,6 @@ class CreateOrderPage extends React.Component {
       interval: (['month','year'].indexOf(interval) !== -1) ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null
     };
-    console.log("orderTier", "constructor", this.order);
 
     this.messages = defineMessages({
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
@@ -63,9 +64,9 @@ class CreateOrderPage extends React.Component {
       this.setState({ loading: true});
       const res = await this.props.createOrder(order);
       console.log(">>> createOrder response", res);
-      const response = res.data.createOrder;
+      const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute(`/${response.fromCollective.slug}`);
+      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
@@ -74,14 +75,16 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { intl, data } = this.props;
-    const { loading } = data;
     const collective = data.Collective;
-    if (loading) return (<div />);
+    if (data.loading) return (<Loading />);
+    if (!data.Collective) return (<NotFound />);
 
+    const TierId = parseInt(this.props.TierId);
     let tier;
-    if (this.props.TierId) {
-      tier = collective.tiers.find(t => t.id === this.props.TierId);
+    if (TierId) {
+      tier = collective.tiers.find(t => t.id === TierId);
     }
+
     tier = tier || {
       name: intl.formatMessage(this.messages['tier.name.donation']),
       presets: [1000, 5000, 10000],
@@ -161,6 +164,7 @@ query Collective($slug: String!) {
     currency
     tiers {
       id
+      type
       name
       slug
       amount

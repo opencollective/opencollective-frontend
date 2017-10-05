@@ -298,6 +298,7 @@ class InputField extends React.Component {
           pre={field.pre}
           button={field.button}
           name={field.name}
+          disabled={field.disabled}
           label={field.label && `${capitalize(field.label)}`}
           help={field.description}
           autoFocus={field.focus}

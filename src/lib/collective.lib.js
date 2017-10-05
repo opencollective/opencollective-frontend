@@ -19,7 +19,7 @@ export function pickLogo(NameOrId) {
   return pickRandomImage(logos, NameOrId);
 }
 
-export function pickRandomImage(images, NameOrId) {
+export function pickRandomImage(images, NameOrId = 0) {
   let number = 0;
   if (isNaN(NameOrId)) {
     for (let i = 0; i < NameOrId.length; i++) {

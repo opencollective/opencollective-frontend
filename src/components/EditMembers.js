@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { get } from 'lodash';
 import InputField from '../components/InputField';
@@ -10,6 +10,7 @@ import InputField from '../components/InputField';
 class EditMembers extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object.isRequired,
     members: PropTypes.arrayOf(PropTypes.object).isRequired,
     onChange: PropTypes.func.isRequired
   };
@@ -19,9 +20,9 @@ class EditMembers extends React.Component {
     const { intl } = props;
 
     this.state = { members: [...props.members] || [{}] };
-    this.renderTier = this.renderTier.bind(this);
+    this.renderMember = this.renderMember.bind(this);
     this.addMember = this.addMember.bind(this);
-    this.removeTier = this.removeTier.bind(this);
+    this.removeMember = this.removeMember.bind(this);
     this.editMember = this.editMember.bind(this);
     this.onChange = props.onChange.bind(this);
 
@@ -29,11 +30,12 @@ class EditMembers extends React.Component {
 
     this.messages = defineMessages({
       'members.role.label': { id: 'members.role.label', defaultMessage: 'role' },
-      'members.add': { id: 'members.add', defaultMessage: 'add member' },
+      'members.add': { id: 'members.add', defaultMessage: 'add another member' },
       'members.remove': { id: 'members.remove', defaultMessage: 'remove member' },
-      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'core contributor' },
-      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'contributor' },
+      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' },
       'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
+      'user.description.label': { id: 'user.description.label', defaultMessage: 'description' },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
     });
 
@@ -55,13 +57,18 @@ class EditMembers extends React.Component {
       },
       {
         name: 'member.name',
+        disabled: (member) => (member.id > 0),
         label: intl.formatMessage(this.messages['user.name.label'])
       },
       {
         name: 'member.email',
         type: 'email',
-        when: (member) => !member.id,
+        disabled: (member) => (member.id > 0),
         label: intl.formatMessage(this.messages['user.email.label'])
+      },
+      {
+        name: 'description',
+        label: intl.formatMessage(this.messages['user.description.label'])
       }
     ];
   }
@@ -91,7 +98,7 @@ class EditMembers extends React.Component {
     this.setState({members});
   }
 
-  removeTier(index) {
+  removeMember(index) {
     let members = this.state.members;
     if (index < 0 || index > members.length) return;
     members = [...members.slice(0, index), ...members.slice(index+1)];
@@ -99,13 +106,13 @@ class EditMembers extends React.Component {
     this.onChange({members});
   }
 
-  renderTier(member, index) {
+  renderMember(member, index) {
     const { intl } = this.props;
 
     return (
       <div className="member" key={`member-${index}`}>
         <div className="memberActions">
-          <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>{intl.formatMessage(this.messages[`members.remove`])}</a>
+          <a className="removeMember" href="#" onClick={() => this.removeMember(index)}>{intl.formatMessage(this.messages[`members.remove`])}</a>
         </div>
         <Form horizontal>
           {this.fields.map(field => (!field.when || field.when(member)) && <InputField
@@ -114,8 +121,8 @@ class EditMembers extends React.Component {
             name={field.name}
             label={field.label}
             type={field.type}
-            defaultValue={field.defaultValue}
-            value={get(member,field.name)}
+            disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
+            defaultValue={field.defaultValue || get(member,field.name)}
             options={field.options}
             pre={field.pre}
             placeholder={field.placeholder}
@@ -127,7 +134,7 @@ class EditMembers extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, collective } = this.props;
 
     return (
       <div className="EditMembers">
@@ -143,6 +150,9 @@ class EditMembers extends React.Component {
             text-align: right;
             margin-top: -1rem;
           }
+          p {
+            font-size: 1.3rem;
+          }
           :global(.member) {
             margin: 3rem 0;
           }
@@ -150,7 +160,10 @@ class EditMembers extends React.Component {
 
         <div className="members">
           <h2>{this.props.title}</h2>
-          {this.state.members.map(this.renderTier)}
+          { collective.type === 'COLLECTIVE' &&
+          <p><FormattedMessage id="members.edit.description" defaultMessage="Note: Only Core Contributors can edit this collective and approve or reject expenses." /></p>
+          }
+          {this.state.members.map(this.renderMember)}
         </div>
         <div className="editMembersActions">
           <Button bsStyle="primary" onClick={() => this.addMember({})}>{intl.formatMessage(this.messages[`members.add`])}</Button>

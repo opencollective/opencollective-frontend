@@ -37,6 +37,8 @@ class Transaction extends React.Component {
   render() {
     const { intl, collective, transaction, LoggedInUser } = this.props;
 
+    if (!transaction.fromCollective) return (<div />); // This only occurs for host collectives when they add funds
+
     const type = transaction.type.toLowerCase();
 
     let title = transaction.description;

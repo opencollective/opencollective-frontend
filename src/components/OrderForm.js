@@ -24,7 +24,7 @@ class OrderForm extends React.Component {
     super(props);
     const { intl, order } = props;
 
-    const tier = order.tier || {};
+    const tier = { ...order.tier };
     tier.amount = tier.amount || order.totalAmount;
     tier.interval = tier.interval || order.interval;
 
@@ -40,6 +40,8 @@ class OrderForm extends React.Component {
     };
     
     this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
+
+    this.paymentMethodsOptions = [];
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -110,6 +112,7 @@ class OrderForm extends React.Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
     if (typeof Stripe !== "undefined") {
       const stripePublishableKey = (typeof window !== "undefined" && (window.location.hostname === 'localhost' || window.location.hostname === 'staging.opencollective.com')) ? 'pk_test_5aBB887rPuzvWzbdRiSzV3QB' : 'pk_live_qZ0OnX69UlIL6pRODicRzsZy';
       // eslint-disable-next-line
@@ -119,7 +122,7 @@ class OrderForm extends React.Component {
   }
 
   populatePaymentMethods(CollectiveId) {
-    const { LoggedInUser } = this.state;
+    const { LoggedInUser } = this.props;
     let paymentMethods = [], paymentMethodsOptions = [];
 
     const collective = this.collectivesById[CollectiveId];
@@ -172,8 +175,9 @@ class OrderForm extends React.Component {
   componentWillReceiveProps(props) {
     const { LoggedInUser } = props;
     if (!LoggedInUser) return;
-    this.setState({ LoggedInUser }); // Error: Can only update a mounted or mounting component
     this.populateOrganizations(LoggedInUser);
+    if (!this._isMounted) return;
+    this.setState({ LoggedInUser }); // Error: Can only update a mounted or mounting component
     this.selectProfile(LoggedInUser.CollectiveId);
   }
 
@@ -198,6 +202,7 @@ class OrderForm extends React.Component {
     } else {
       newState.creditcard = { save: true }; // reset to default value
     }
+
     this.setState(newState);
     if (typeof window !== "undefined") {
       window.state = newState;
@@ -282,7 +287,13 @@ class OrderForm extends React.Component {
         this.setState(newState);
         return true;
       } else if (isValidCard(card)) {
-        const res = await getStripeToken(card)
+        let res;
+        try {
+          res = await getStripeToken(card);
+        } catch (e) {
+          this.setState({ result: { error: e }})
+          return false;
+        }
         const last4 = card.number.replace(/ /g, '').substr(-4);
         const sanitizedCard = {
           name: last4,
@@ -318,8 +329,7 @@ class OrderForm extends React.Component {
   }
 
   render() {
-    const { intl, collective } = this.props;
-    const { LoggedInUser } = this.state;
+    const { intl, collective, LoggedInUser } = this.props;
     const currency = this.state.tier.currency || collective.currency;
     const showNewCreditCardForm = !this.state.creditcard.uuid || this.state.creditcard.uuid === 'other';
 
@@ -400,7 +410,7 @@ class OrderForm extends React.Component {
         <Form horizontal>
           <div className="userDetailsForm">
             <h2><FormattedMessage id="tier.order.userdetails" defaultMessage="User details" /></h2>
-            {LoggedInUser &&
+            { LoggedInUser &&
               <InputField
                 className="horizontal"
                 type="select"
@@ -410,7 +420,7 @@ class OrderForm extends React.Component {
                 options={this.fromCollectiveOptions}
                 />
             }
-            {!LoggedInUser &&
+            { !LoggedInUser &&
               <Row key={`email.input`}>
                 <Col sm={12}>
                   <InputField
@@ -420,7 +430,7 @@ class OrderForm extends React.Component {
                 </Col>
               </Row>
             }
-            {!LoggedInUser && this.state.isNewUser && this.fields.map(field => (
+            { !LoggedInUser && this.state.isNewUser && this.fields.map(field => (
               <Row key={`${field.name}.input`}>
                 <Col sm={12}>
                   <InputField
@@ -478,7 +488,7 @@ class OrderForm extends React.Component {
             <h2>Payment details</h2>
             <Row>
               <Col sm={12}>
-                { this.paymentMethodsOptions && this.paymentMethodsOptions > 1 &&
+                { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
                   <InputField
                     type="select"
                     className="horizontal"
@@ -524,7 +534,7 @@ class OrderForm extends React.Component {
                     tier={this.props.order.tier}
                     defaultValue={{
                       quantity: this.props.order.quantity,
-                      interval: this.props.order.interval,
+                      interval: this.props.order.tier.interval,
                       amount: this.props.order.totalAmount / this.props.order.quantity
                     }}
                     onChange={(tier) => this.handleChange("tier", tier)}
@@ -580,7 +590,7 @@ class OrderForm extends React.Component {
             </div>
             <div className="result">
                 { this.state.loading && <div className="loading">Processing...</div> }
-                {this.state.result.success &&
+                { this.state.result.success &&
                   <div className="success">
                     {this.state.result.success}
                   </div>

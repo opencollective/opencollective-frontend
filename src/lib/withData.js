@@ -59,7 +59,11 @@ export default ComposedComponent => {
           </ApolloProvider>
         )
         if (composedInitialProps.ssr === undefined || composedInitialProps.ssr === true) {
-          await getDataFromTree(app)
+          try {
+            await getDataFromTree(app)
+          } catch (e) {
+            console.error(">>> apollo error: ", e);
+          }
           // getDataFromTree does not call componentWillUnmount
           // head side effect therefore need to be cleared manually
           Head.rewind()

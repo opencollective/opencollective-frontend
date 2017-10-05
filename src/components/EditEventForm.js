@@ -58,7 +58,7 @@ class EditEventForm extends React.Component {
   }
 
   handleTiersChange(tiers) {
-    this.setState({tiers});
+    this.setState(tiers);
   }
 
   async handleSubmit() {

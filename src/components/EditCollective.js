@@ -11,6 +11,7 @@ import { defaultBackgroundImage } from '../constants/collectives';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
+import { capitalize } from '../lib/utils';
 
 class EditCollective extends React.Component {
 
@@ -100,10 +101,11 @@ class EditCollective extends React.Component {
       }
       console.log(">>> editCollective CollectiveInputType", CollectiveInputType);
       const res = await this.props.editCollective(CollectiveInputType);
-      const collective = res.data.editCollective;
-      const collectiveUrl = `${window.location.protocol}//${window.location.host}/${collective.slug}`;
-      // window.location.replace(collectiveUrl);
-      this.setState({ status: 'idle', result: { success: `Collective edited with success: ${collectiveUrl} (redirecting...)` }});
+      const type = res.data.editCollective.type.toLowerCase();
+      this.setState({ status: 'idle', result: { success: `${capitalize(type)} saved` }});
+      setTimeout(() => {
+        this.setState({ status: 'idle', result: { success: null }});
+      }, 3000);
     } catch (err) {
       console.error(">>> editCollective error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;

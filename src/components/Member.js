@@ -22,6 +22,9 @@ class Member extends React.Component {
 
     this.messages = defineMessages({
       'membership.since': { id: 'membership.since', defaultMessage: 'since {createdAt}'},
+      'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
+      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' },
+      'BACKER': { id: 'roles.backer.label', defaultMessage: 'Backer' },
       'membership.totalDonations': { id: 'membership.totalDonations', defaultMessage: 'Total amount contributed' }
     });
   }
@@ -41,7 +44,7 @@ class Member extends React.Component {
 
     if (!name) return (<div/>);
 
-    const tierName = membership.tier ? singular(membership.tier.name) : membership.role;
+    const tierName = membership.tier ? singular(membership.tier.name) : this.messages[membership.role] ? intl.formatMessage(this.messages[membership.role]) : membership.role;
     const className = this.props.className;
     let memberSinceStr = ``;
     if (tierName) {

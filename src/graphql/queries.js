@@ -180,6 +180,7 @@ const getCollectiveToEditQuery = gql`
         id
         createdAt
         role
+        description
         totalDonations
         tier {
           id
@@ -235,10 +236,11 @@ const getCollectiveQuery = gql`
       createdAt
       stats {
         id
+        balance
         yearlyBudget
         backers
         sponsors
-        balance
+        collectives
         transactions
         expenses
         totalAmountSent
@@ -276,29 +278,32 @@ const getCollectiveQuery = gql`
         name
         image
       }
-      memberOf {
+      members {
         id
-        createdAt
         role
-        totalDonations
-        tier {
+        description
+        member {
           id
-          name
-        }
-        collective {
-          id
-          type
-          slug
-          name
-          currency
           description
-          settings
+          name
+          slug
+          type
           image
-          backgroundImage
-          stats {
+        }
+      }
+      ... on User {
+        memberOf {
+          id
+          role
+          createdAt
+          collective {
             id
-            backers
-            yearlyBudget
+            name
+            slug
+            type
+            image
+            description
+            backgroundImage
           }
         }
       }

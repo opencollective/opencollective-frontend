@@ -4,3 +4,7 @@ export const defaultBackgroundImage = {
   ORGANIZATION: '/static/images/defaultBackgroundImage-profile.svg',
   USER: '/static/images/defaultBackgroundImage-profile.svg'
 };
+
+export const defaultImage = {
+  ORGANIZATION: '/static/images/default-organization-logo.png'
+};
