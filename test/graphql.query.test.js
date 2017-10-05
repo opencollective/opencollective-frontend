@@ -171,7 +171,7 @@ describe('Query Tests', () => {
         beforeEach(() => models.Tier.create(
           Object.assign(utils.data('ticket1'), { CollectiveId: event2.id })));
 
-          beforeEach(() => models.Order.create(
+        beforeEach(() => models.Order.create(
           Object.assign(utils.data('order1'), { 
             CollectiveId: event1.id,
             FromCollectiveId: user2.CollectiveId,

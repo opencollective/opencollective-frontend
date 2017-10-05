@@ -82,94 +82,94 @@ export const resetTestDatabase = function(req, res, next) {
 
   let testHost, testGroup, testMember, testBacker, testBacker2;
   return sequelize.sync({force: true})
-    .then(() => models.User.create(userData))
+    .then(() => models.User.createUserWithCollective(userData))
     .tap(u => testHost = u)
     .then(() => {
-      groupData.HostId = testHost.id;
-      return models.Group.create(groupData);
+      groupData.HostCollectiveId = testHost.CollectiveId;
+      return models.Collective.create(groupData);
     })
     .then(g => testGroup = g)
     .then(() => testGroup.addUserWithRole(testHost, roles.HOST))
-    .then(() => models.User.create(memberData))
+    .then(() => models.User.createUserWithCollective(memberData))
     .tap(m => testMember = m)
     .then(() => testGroup.addUserWithRole(testMember, roles.MEMBER))
-    .then(() => models.User.create(backerData))
+    .then(() => models.User.createUserWithCollective(backerData))
     .then(b => {
       testBacker = b;
       return testGroup.addUserWithRole(testBacker, roles.BACKER);
     })
-    .then(() => models.User.create(backer2Data))
+    .then(() => models.User.createUserWithCollective(backer2Data))
     .then(b => {
       testBacker2 = b;
       return testGroup.addUserWithRole(testBacker2, roles.BACKER);
     })
-    .then(() => models.StripeAccount.create({
-      accessToken: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
-      refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
-      stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC',
-      stripeUserId: 'acct_17TL97HrqFRlDDP2',
-      scope: 'read_write'
-    }))
-    .then(stripeAccount => testHost.setStripeAccount(stripeAccount))
     .then(() => models.ConnectedAccount.create({
-      provider: 'paypal',
+      service: 'stripe',
+      token: 'sk_test_WhpjxwngkrwC7S0A3AMTKjTs',
+      refreshToken: 'rt_7imjrsTAPAcFc8koqCWKDEI8PNd3bumf102Z975H3E11mBWE',
+      data: { stripePublishableKey: 'pk_test_M41BhQOKfRljIeHUJUXjA6YC', scope: 'read_write' },
+      username: 'acct_17TL97HrqFRlDDP2',
+      CollectivedId: testHost.CollectiveId
+    }))
+    .then(() => models.ConnectedAccount.create({
+      service: 'paypal',
       // Sandbox api keys
       clientId: 'AZaQpRstiyI1ymEOGUXXuLUzjwm3jJzt0qrI__txWlVM29f0pTIVFk5wM9hLY98w5pKCE7Rik9QYvdYA',
-      secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
+      token: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8',
+      CollectiveId: testHost.CollectivedId
     }))
-    .then((connectedAccount) => connectedAccount.setUser(testHost))
-    .then(() => models.PaymentMethod.create({ service: 'paypal', token: 'abc', UserId: testHost.id}))
-    .then(() => models.Donation.create({
-      title: "Donation 1",
-      amount: 100,
+    .then(() => models.PaymentMethod.create({ service: 'paypal', token: 'abc', CollectiveId: testHost.CollectiveId}))
+    .then(() => models.Order.create({
+      description: "Donation 1",
+      totalAmount: 100,
       currency: 'EUR',
-      GroupId: testGroup.id,
-      UserId: testBacker.id
+      CollectiveId: testGroup.id,
+      CreatedByUserId: testBacker.id
     }))
-    .then(donation => models.Transaction.create({
+    .then(order => models.Transaction.create({
       amount: 100,
-      GroupId: testGroup.id,
+      CollectiveId: testGroup.id,
       type: type.CREDIT,
       currency: "EUR",
-      UserId: testBacker.id,
-      DonationId: donation.id,
-      HostId: testHost.id
+      CreatedByUserId: testBacker.id,
+      OrderId: order.id,
+      HostCollectiveId: testHost.CollectiveId
     }))
-    .then(() => models.Donation.create({
-      title: "Donation 2",
-      amount: 200,
+    .then(() => models.Order.create({
+      description: "Donation 2",
+      totalAmount: 200,
       currency: 'EUR',
-      GroupId: testGroup.id,
-      UserId: testBacker2.id
+      CollectiveId: testGroup.id,
+      CreatedByUserId: testBacker2.id
     }))
-    .then(donation => models.Transaction.create({
+    .then(order => models.Transaction.create({
       amount: 200,
       type: type.CREDIT,
       currency: "EUR",
-      UserId: testBacker2.id,
-      DonationId: donation.id,
-      GroupId: testGroup.id,
-      HostId: testHost.id
+      CreatedByUserId: testBacker2.id,
+      OrderId: order.id,
+      CollectiveId: testGroup.id,
+      HostCollectiveId: testHost.CollectiveId
     }))
     .then(() => models.Expense.create({
-      title: "Expense 2",
+      description: "Expense 2",
       amount: 100,
       currency: "EUR",
       incurredAt: "2016-03-01T08:00:00.000Z",
       createdAt: "2016-03-01T08:00:00.000Z",
-      GroupId: testGroup.id,
+      CollectiveId: testGroup.id,
       UserId: testHost.id,
       lastEditedById: testHost.id,
       payoutMethod: 'paypal'
     }))
     // We add a second expense that incurred before the first expense we created
     .then(() => models.Expense.create({
-      title: "Expense 1",
+      description: "Expense 1",
       amount: 200,
       currency: "EUR",
       incurredAt: "2016-02-29T08:00:00.000Z",
       createdAt: "2016-03-01T08:00:00.000Z",
-      GroupId: testGroup.id,
+      CollectiveId: testGroup.id,
       UserId: testMember.id,
       lastEditedById: testMember.id,
       payoutMethod: 'manual'
