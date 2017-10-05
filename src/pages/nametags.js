@@ -173,7 +173,7 @@ class Nametags extends React.Component {
           }
 
           .showMarks .nametag {
-            border: 1px dashed rgba(0,0,0,0.3);            
+            border: 1px dashed rgba(0,0,0,0.3);
           }
 
           .nametag h1 {

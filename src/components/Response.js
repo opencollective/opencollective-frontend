@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import colors from '../constants/colors';
 
 import { defineMessages, injectIntl } from 'react-intl';
-import { pickAvatar } from '../lib/user.lib';
+import { pickAvatar } from '../lib/collective.lib';
 
 const star = '/static/images/icons/star.svg';
 
@@ -27,12 +27,12 @@ class Response extends React.Component {
     const { intl, response } = this.props;
     const { user, description, status } = response;
 
-    const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.username || user.email && user.email.substr(0, user.email.indexOf('@'));
+    const name = ((user.name && user.name.match(/^null/)) ? null : user.name) || user.email && user.email.substr(0, user.email.indexOf('@'));
 
     if (!name) return (<div/>);
 
-    const avatar = user.avatar || pickAvatar(name);
-    const linkTo = `/${user.username}`;
+    const image = user.image || pickAvatar(name);
+    const linkTo = `/${user.slug}`;
     const title = intl.formatMessage(this.messages[status], { name });
 
     return (
@@ -80,7 +80,7 @@ class Response extends React.Component {
           `}</style>
           <div className="Response">
             { status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" /> }
-            <img src={avatar} />
+            <img src={image} />
             <div className="bubble">
               <div className="name">{name}</div>
               <div className="description" style={{color: colors.darkgray}}>{description || user.description}</div>

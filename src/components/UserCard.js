@@ -52,7 +52,7 @@ export default ({ user, type }) => (
           margin: 0;
         }
       `}</style>
-      <img src={user.avatar} />
+      <img src={user.image} />
       <p className='name'>{user.name}</p>
       <div className='tier border-top border-gray px3 py2'>
         <p className='name'>{user.tier.name}</p>

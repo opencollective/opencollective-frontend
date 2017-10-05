@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
-import { imagePreview, capitalize } from '../lib/utils';
-import { pickAvatar } from '../lib/user.lib';
+import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
+import { capitalize } from '../lib/utils';
 import { get } from 'lodash';
 import TransactionDetails from './TransactionDetails';
+import Avatar from './Avatar';
 
 class Transaction extends React.Component {
 
@@ -19,11 +19,11 @@ class Transaction extends React.Component {
     this.state = { view: 'compact' };
     this.toggleDetails = this.toggleDetails.bind(this);
     this.messages = defineMessages({
-      'expense': { id: 'transaction.expense', defaultMessage: 'expense' },
-      'donation': { id: 'transaction.donation', defaultMessage: 'donation' },
-      'donation.title': { id: 'transaction.donation.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
-      'expense.meta': { id: 'transaction.expense.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
-      'donation.meta': { id: 'transaction.donation.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
+      'debit': { id: 'transaction.debit', defaultMessage: 'debit' },
+      'credit': { id: 'transaction.credit', defaultMessage: 'credit' },
+      'credit.title': { id: 'transaction.credit.title', defaultMessage: '{interval, select, month {monthly} year {yearly} other {}} donation to {collective}' },
+      'debit.meta': { id: 'transaction.debit.meta', defaultMessage: 'Expense submitted by {name}, paid on {createdAt, date, medium}' },
+      'credit.meta': { id: 'transaction.credit.meta', defaultMessage: 'Donation made by {name} on {createdAt, date, medium}' },
       'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
       'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
     });
@@ -37,16 +37,18 @@ class Transaction extends React.Component {
   render() {
     const { intl, collective, transaction, LoggedInUser } = this.props;
 
+    if (!transaction.fromCollective) return (<div />); // This only occurs for host collectives when they add funds
+
     const type = transaction.type.toLowerCase();
 
-    let title = transaction.title;
-    if (type === 'donation' && (!title || title.match(/donation to /i))) {
-      title = intl.formatMessage(this.messages['donation.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
+    let title = transaction.description;
+    if (type === 'credit' && (!title || title.match(/donation to /i))) {
+      title = intl.formatMessage(this.messages['credit.title'], {collective: collective.name, interval: get(transaction, 'subscription.interval')})
     }
 
     const meta = [];
     meta.push(transaction.category);
-    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.user.name, createdAt: new Date(transaction.createdAt) }));
+    meta.push(intl.formatMessage(this.messages[`${type}.meta`], { name: transaction.fromCollective.name, createdAt: new Date(transaction.createdAt) }));
 
     return (
       <div className={`transaction ${type} ${this.state.view}View`}>
@@ -57,28 +59,30 @@ class Transaction extends React.Component {
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
-            max-height: 6rem;
+            max-height: 6.3rem;
+            position: relative;
           }
           .transaction.detailsView {
             background-color: #fafafa;
-            max-height: 20rem;
+            max-height: 26rem;
           }
           a {
             cursor: pointer;
           }
-          .user {
+          .fromCollective {
             float: left;
             margin-right: 1rem;
           }
-          .user img {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            border: 1px solid #d4d7d9;
-            padding: 4px;
-          }
           .body {
             overflow: hidden;
+            font-size: 1.5rem;
+          }
+          .description {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 85%;
+            overflow: hidden;
+            display: block;
           }
           .meta {
             color: #919599;
@@ -88,14 +92,16 @@ class Transaction extends React.Component {
             width: 10rem;
             text-align: right;
             font-family: montserratlight, arial;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 300;
-            float:right;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
           }
-          .expense .amount {
+          .debit .amount {
             color: #e21a60;
           }
-          .donation .amount {
+          .credit .amount {
             color: #72ce00;
           }
 
@@ -118,20 +124,28 @@ class Transaction extends React.Component {
             {...this.currencyStyle}
             />
         </div>
-        <div className="user">
-          <a href={`/${transaction.user.username}`} title={transaction.user.name}>
-            <img src={imagePreview(transaction.user.avatar,pickAvatar(transaction.user.id), { width: 80 })} />
+        <div className="fromCollective">
+          <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
+            <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} radius={40} />
           </a>
         </div>
         <div className="body">
-        <a onClick={this.toggleDetails}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
-          {capitalize(title)}
-        </a>
+          <div className="description">
+            <a onClick={this.toggleDetails} title={capitalize(title)}>{/* should link to `/${collective.slug}/transactions/${transaction.uuid}` once we have a page for it */}
+              {capitalize(title)}
+            </a>
+          </div>
           <div className="meta">
             {capitalize(meta.join(' '))}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
-          {this.state.loadDetails && <TransactionDetails LoggedInUser={LoggedInUser} transaction={transaction} collective={collective} mode={this.state.view === 'details' ? 'open' : 'closed'} />}
+          {this.state.loadDetails && 
+            <TransactionDetails
+              LoggedInUser={LoggedInUser}
+              transaction={transaction}
+              collective={collective}
+              mode={this.state.view === 'details' ? 'open' : 'closed'}
+              />}
         </div>
       </div>
     );

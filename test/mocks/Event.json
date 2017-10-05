@@ -1,36 +1,51 @@
 {
   "data": {
-    "Event": {
-      "id": 11,
-      "slug": "meetup-5",
-      "createdByUser": {
-        "id": 2957,
-        "__typename": "User"
-      },
-      "name": "BrusselsTogether Meetup 5",
-      "description": "Hello Brussels 👋\n\nWe meet every first Wednesday of the month to talk about the Brussels development community.\n\n![](https://cl.ly/3p013o452u3Y/Screen%20Shot%202017-05-17%20at%202.42.35%20PM.png)\n\nJoin us to discuss with MakeSense, Our House Project and many more change makers.\n\nSchedule\n\n7 pm - Doors open \n\n7:30 pm - #BrusselsTogether - On a mission to make Brussels a great city to live and work\n\n7:40 pm - MakeSense - Turning your talents into unique superpowers to solve challenges of social entrepreneurs\n\n7:55 pm - Our House Project - Enabling effective refugee integration\n\n8:10 pm - Zero Waste X\n\n8:30 pm - How do YOU make Brussels better \nPitch your idea in 60 seconds or less\n\nThank you for your support :pray:\nGet your early bird ticket now for €5 while they last (€10 at the door). We also have a limited number of free tickets for students and people with low income as we want to make sure we don't exclude anyone. Event is also free for the members of BrusselsTogether ([become a member](https://opencollective.com/brusselstogether/donate/10/monthly)).\n\n**Why making this a paid event?**\nIf we really want this movement to succeed and to have an impact, we need to finance it, together.\nWe are a non profit and all our expenses are posted publicly on our [open collective](https://opencollective.com/brusselstogether).\n\nThank you for your support 🙏",
-      "startsAt": "Wed Jun 07 2017 13:00:00 GMT-0400 (EDT)",
-      "endsAt": "Wed Jun 07 2017 15:00:00 GMT-0400 (EDT)",
+    "Collective": {
+      "id": 786,
+      "slug": "brusselstogether/events/meetup-4",
+      "createdByUser": null,
+      "name": "BrusselsTogether Meetup 4",
+      "image": null,
+      "description": null,
+      "longDescription": "Hello Brussels 👋\n\n#BrusselsTogether is growing everyday with tons of new people and ideas to renovate our dear city!\n\nThere are now 9 projects on [#BrusselsTogether](https://opencollective.com/brusselstogether). Although they operate in different areas (civic innovation, urbanism, social inclusiveness), they all share the same purpose: rebuild the city from the bottom-up. \n\nThe next meetup will take place at the all-new BeCentral, a grass-roots initiative aiming to boost Belgium as a digital front-runner. \n\nJoin us to discover 3 ambitious projects happening in Brussels.\n\nSchedule: \n\n7 pm - Doors open \n\n7:30 pm - Introduction to #brusselstogether\n\n7:40 pm - [Share Food](https://www.facebook.com/sharefoodbrussels/) - Sharing instead of wasting\n\n7:55 pm - [Communa ASBL](https://www.facebook.com/asblCommuna/) - Turning empty buildings into socio-cultural centers \n\n8:10 pm - [Veganizer](https://opencollective.com/veganizerbxl) - Let's make Brussels more Vegan Friendly! \n\n8:30 pm - How do *YOU* make Brussels better. Pitch your idea in 60 seconds or less!\n\nGet your early bird ticket now for €5 while they last (€10 at the door). We also have a limited number of free tickets for students and people with low income as we want to make sure we don't exclude anyone. Event is also free for the members of BrusselsTogether ([become a member](https://opencollective.com/brusselstogether/donate/10/monthly)).\n\n**Why making this a paid event?**\nIf we really want this movement to succeed and to have an impact, we need to finance it, together.\nWe are a non profit and all our expenses are posted publicly on our [open collective](https://opencollective.com/brusselstogether).\n\nThank you for your support 🙏",
+      "startsAt": "Wed May 03 2017 13:00:00 GMT-0400 (EDT)",
+      "endsAt": "Wed May 03 2017 15:00:00 GMT-0400 (EDT)",
       "timezone": "Europe/Brussels",
+      "currency": "EUR",
+      "settings": {
+        "style": {
+          "hero": {
+            "cover": {
+              "transform": "scale(1.06)",
+              "backgroundImage": "url(http://localhost:3000/public/images/collectives/default-header-bg.jpg)"
+            },
+            "a": {}
+          }
+        }
+      },
       "location": {
-        "name": "Elzenhof Elsene",
-        "address": "Kroonlaan 12, 1050 Elsene",
-        "lat": 50.8325036,
-        "long": 4.3758299,
+        "name": "BeCentral",
+        "address": "Cantersteen 12, 1000 Brussels",
+        "lat": 50.845568,
+        "long": 4.357482,
         "__typename": "LocationType"
       },
       "tiers": [
         {
-          "id": 29,
-          "name": "early bird ticket",
-          "description": "Get those while you can. RSVP before June 1st and get the ticket at €5",
-          "amount": 500,
+          "id": 24,
+          "slug": null,
+          "type": "TICKET",
+          "name": "free ticket",
+          "description": "For students and low income people only.",
+          "amount": null,
           "currency": "EUR",
           "maxQuantity": null,
           "__typename": "Tier"
         },
         {
-          "id": 30,
+          "id": 22,
+          "slug": null,
+          "type": "TICKET",
           "name": "regular ticket",
           "description": "Get your ticket for a great evening of inspiration and meeting great people. Includes a free drink and a free high five!",
           "amount": 1000,
@@ -39,114 +54,197 @@
           "__typename": "Tier"
         },
         {
-          "id": 31,
+          "id": 20,
+          "slug": null,
+          "type": "TIER",
           "name": "sponsor",
           "description": "Sponsor the drinks. Pretty sure everyone will love you.",
           "amount": 15000,
           "currency": "EUR",
           "maxQuantity": null,
           "__typename": "Tier"
-        },
-        {
-          "id": 32,
-          "name": "free ticket",
-          "description": "For students and low income people only.",
-          "amount": null,
-          "currency": "EUR",
-          "maxQuantity": null,
-          "__typename": "Tier"
         }
       ],
-      "collective": {
+      "parentCollective": {
         "id": 207,
         "slug": "brusselstogether",
         "name": "BrusselsTogether",
         "mission": "We are on a mission to make Brussels a great city to live and work",
         "currency": "EUR",
         "backgroundImage": "https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg",
-        "logo": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
-        "stripePublishableKey": "pk_test_5aBB887rPuzvWzbdRiSzV3QB",
+        "image": "https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png",
+        "settings": {
+          "style": {
+            "hero": {
+              "cover": {
+                "transform": "scale(1.06)",
+                "backgroundImage": "url(https://cl.ly/3s3h0W0S1R3A/brusselstogether-backgroundImage.jpg)",
+                "background": "rgb(0,0,255)"
+              },
+              "a": {}
+            }
+          },
+          "HostId": 1635,
+          "superCollectiveTag": "#brusselstogether"
+        },
         "__typename": "Collective"
       },
-      "responses": [
+      "members": [],
+      "orders": [
         {
-          "createdAt": "Wed Jun 07 2017 12:43:47 GMT-0400 (EDT)",
-          "quantity": 1,
-          "status": "YES",
-          "description": null,
+          "id": 3754,
+          "createdAt": "Wed May 03 2017 08:47:27 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Wed May 03 2017 08:47:27 GMT-0400 (EDT)",
+          "publicMessage": null,
           "user": {
-            "name": "Rick",
-            "avatar": "https://opencollective-production.s3-us-west-1.amazonaws.com/610ddba481394d48bfedcb734ed8bd67_1d38d340-e177-11e6-a815-370fd440a75b.jpeg",
-            "username": "rikmende",
-            "twitterHandle": "RikMende",
-            "description": "Co-Captain @Armada Digital (goal: coop) | Love to promote #Indieweb #CivicTech #Dataviz #RSS Curious about #Blockchain and the future of work by enabling #platformcoop",
+            "id": 4610,
+            "name": "camille rouffiange",
+            "image": null,
+            "username": "obronicoco",
+            "twitterHandle": "obronicoco",
+            "description": null,
             "__typename": "User"
           },
           "tier": {
+            "id": 24,
             "name": "free ticket",
             "__typename": "Tier"
           },
-          "__typename": "Response"
+          "__typename": "OrderType"
         },
         {
-          "createdAt": "Wed Jun 07 2017 12:43:31 GMT-0400 (EDT)",
-          "quantity": 1,
-          "status": "YES",
-          "description": null,
+          "id": 2616,
+          "createdAt": "Fri Apr 28 2017 14:25:18 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Fri Apr 28 2017 14:25:23 GMT-0400 (EDT)",
+          "publicMessage": null,
           "user": {
-            "name": "Larry Moffett",
-            "avatar": null,
-            "username": "larrybru",
-            "twitterHandle": "larrybru",
-            "description": "Organizer of the Brussels Maker Faire",
+            "id": 4503,
+            "name": "Véronique Bockstal",
+            "image": null,
+            "username": "vbockstal",
+            "twitterHandle": "vbockstal",
+            "description": "CEO BeCentral ",
+            "__typename": "User"
+          },
+          "tier": null,
+          "__typename": "OrderType"
+        },
+        {
+          "id": 2614,
+          "createdAt": "Fri Apr 28 2017 10:38:36 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Fri Apr 28 2017 10:38:42 GMT-0400 (EDT)",
+          "publicMessage": null,
+          "user": {
+            "id": 4499,
+            "name": "Tina Hendriks",
+            "image": null,
+            "username": "tinahendriks",
+            "twitterHandle": null,
+            "description": null,
+            "__typename": "User"
+          },
+          "tier": null,
+          "__typename": "OrderType"
+        },
+        {
+          "id": 2613,
+          "createdAt": "Fri Apr 28 2017 09:54:50 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Fri Apr 28 2017 09:54:56 GMT-0400 (EDT)",
+          "publicMessage": null,
+          "user": {
+            "id": 4497,
+            "name": "Alexandra Saveljeva",
+            "image": null,
+            "username": "alexandrasaveljeva",
+            "twitterHandle": null,
+            "description": "Artist,Filmmaker, Chairperson of NGO\"Bioetika\" in Latvia. Doing internship in WYA,organising European Arts Forum 2017",
+            "__typename": "User"
+          },
+          "tier": null,
+          "__typename": "OrderType"
+        },
+        {
+          "id": 2549,
+          "createdAt": "Thu Apr 20 2017 17:27:53 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Thu Apr 20 2017 17:27:58 GMT-0400 (EDT)",
+          "publicMessage": null,
+          "user": {
+            "id": 1949,
+            "name": "Caroline Sedda",
+            "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6c38469a-e7a5-4d72-ab3a-9220758a93e8",
+            "username": "carolinesedda",
+            "twitterHandle": null,
+            "description": null,
+            "__typename": "User"
+          },
+          "tier": null,
+          "__typename": "OrderType"
+        },
+        {
+          "id": 2548,
+          "createdAt": "Thu Apr 20 2017 17:27:48 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Thu Apr 20 2017 17:27:53 GMT-0400 (EDT)",
+          "publicMessage": null,
+          "user": {
+            "id": 1949,
+            "name": "Caroline Sedda",
+            "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6c38469a-e7a5-4d72-ab3a-9220758a93e8",
+            "username": "carolinesedda",
+            "twitterHandle": null,
+            "description": null,
+            "__typename": "User"
+          },
+          "tier": null,
+          "__typename": "OrderType"
+        },
+        {
+          "id": 2496,
+          "createdAt": "Tue Apr 18 2017 08:48:58 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Tue Apr 18 2017 08:49:05 GMT-0400 (EDT)",
+          "publicMessage": null,
+          "user": {
+            "id": 4291,
+            "name": "Ticto",
+            "image": "https://scontent-lga3-1.xx.fbcdn.net/v/t1.0-9/14067500_501520080041378_2203538491740676884_n.png?oh=5da2ebdcc9db0a3c7c58a8c08a111427&oe=5987FC2D",
+            "username": "ticto",
+            "twitterHandle": "tictonews",
+            "description": "Been in and around startups for a while. CEO at Ticto!",
             "__typename": "User"
           },
           "tier": {
-            "name": "early bird ticket",
+            "id": 20,
+            "name": "sponsor",
             "__typename": "Tier"
           },
-          "__typename": "Response"
+          "__typename": "OrderType"
         },
         {
-          "createdAt": "Wed Jun 07 2017 11:09:38 GMT-0400 (EDT)",
-          "quantity": 1,
-          "status": "YES",
-          "description": null,
+          "id": 2422,
+          "createdAt": "Tue Apr 11 2017 00:35:25 GMT-0400 (EDT)",
+          "quantity": null,
+          "processedAt": "Tue Apr 11 2017 00:35:31 GMT-0400 (EDT)",
+          "publicMessage": null,
           "user": {
-            "name": "Jean-François De Hertogh",
-            "avatar": null,
-            "username": "jfdehertogh1",
-            "twitterHandle": "jfdehertogh",
-            "description": "Contributor #BrusselsTogether",
+            "id": 4157,
+            "name": "Axel Addington",
+            "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6e52448c-416d-435d-b68b-e7a0bdd47a34",
+            "username": "axeladdington",
+            "twitterHandle": null,
+            "description": "Trends profiler &amp; values designer",
             "__typename": "User"
           },
-          "tier": {
-            "name": "free ticket",
-            "__typename": "Tier"
-          },
-          "__typename": "Response"
-        },
-        {
-          "createdAt": "Wed Jun 07 2017 11:05:51 GMT-0400 (EDT)",
-          "quantity": 1,
-          "status": "YES",
-          "description": null,
-          "user": {
-            "name": "Xavier Damman",
-            "avatar": "https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg",
-            "username": "xdamman",
-            "twitterHandle": "xdamman",
-            "description": "Entrepreneur sharing ideas in copyleft",
-            "__typename": "User"
-          },
-          "tier": {
-            "name": "free ticket",
-            "__typename": "Tier"
-          },
-          "__typename": "Response"
+          "tier": null,
+          "__typename": "OrderType"
         }
       ],
-      "__typename": "Event"
+      "__typename": "Collective"
     }
   }
 }

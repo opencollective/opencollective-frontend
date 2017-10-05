@@ -1,9 +1,3 @@
-import { defineMessages } from 'react-intl';
-
-const messages = defineMessages({
-  free: { id: 'utils.free', defaultMessage: 'free' }
-});
-
 export function truncate(str, length) {
   if (!str || str.length <= length) {
     return str;
@@ -30,11 +24,10 @@ export function filterCollection(array, cond, inverse) {
   return array.filter((r) => inverse ? !test(r, cond) : test(r, cond))
 }
 
-
-export function isValidEmail(email) {
-  if (!email) return false;
-  return Boolean(email.match(/.+@.+\..+/));
-}
+export const isValidEmail = (email) => {
+  if (typeof email !== 'string') return false;
+  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+};
 
 export function getCurrencySymbol(currency) {
  const r = Number(0).toLocaleString(currency, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0});
@@ -46,20 +39,60 @@ export function imagePreview(src, defaultImage, options = { width: 640 }) {
   return defaultImage;
 }
 
-export function formatCurrency(amount, currency = 'USD', intl) {
-  if (!amount) return intl ? intl.formatMessage(messages.free) : messages.free.defaultMessage;
+export function prettyUrl(url) {
+  if (!url) return '';
+  return url.replace(/^https?:\/\/(www\.)?/i,'').replace(/\?.+/, '').replace(/\/$/,'');
+}
+
+function getLocaleFromCurrency(currency) {
+  let locale;
+  switch (currency) {
+    case 'USD':
+      locale = 'en-US';
+      break;
+    case 'EUR':
+      locale = 'en-EU';
+      break;
+    default:
+      locale = currency;
+  }
+  return locale;
+}
+
+export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
+  const d = new Date(date);
+  const locale = (typeof window !== 'undefined') ? window.navigator.language : options.locale || 'en-US';
+  return d.toLocaleDateString(locale, options);
+}
+
+export function formatCurrency(amount, currency = 'USD', options = {}) {
   amount = amount / 100;
-  return amount.toLocaleString(currency, {
+  return amount.toLocaleString(getLocaleFromCurrency(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits : 0,
-    maximumFractionDigits : 2
+    minimumFractionDigits : options.minimumFractionDigits || options.precision || 0,
+    maximumFractionDigits : options.precision || 0
   })
 };
+
+export const singular = (str) => {
+  if (!str) return '';
+  return str.replace(/ies$/,'y').replace(/s$/,'');
+}
 
 export const pluralize = (str, n) => {
   return (n > 1) ? `${str}s` : str;
 }
+
+export const translateApiUrl = (url) => {
+  const withoutParams = process.env.API_URL + (url.replace('/api/', '/'));
+  const hasParams = `${url}`.match(/\?/) 
+  if (process.env.API_KEY) {
+    return `${withoutParams}${hasParams ? '&' : '?'}api_key=${process.env.API_KEY}`;
+  } else {
+    return withoutParams;
+  }
+};
 
 export const capitalize = (str) => {
   if (!str) return '';

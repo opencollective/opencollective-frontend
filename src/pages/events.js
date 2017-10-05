@@ -15,7 +15,7 @@ class Events extends React.Component {
     return (<li key={event.id}>
               <Link href={{path: `/events`, query: { collectiveSlug: event.collective.slug, eventSlug: event.slug}}} as={`/${event.collective.slug}/events/${event.slug}`}>{event.name}</Link>, &nbsp;
               <FormattedDate value={event.startsAt} day='numeric' month='long' />
-            </li>);    
+            </li>);
   }
 
   render() {

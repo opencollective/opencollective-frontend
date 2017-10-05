@@ -35,7 +35,7 @@ class Header extends React.Component {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900|Rubik" />
         <title>{title}</title>
         {this.meta.map(({name, content}) => <meta property={name} content={content} />)}
       </Head>
@@ -57,24 +57,6 @@ class Header extends React.Component {
         src: url('/static/fonts/montserrat/lato-regular.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
-      }
-
-      html {
-        font-size: 62.5%;
-        height: 100%;
-        width: 100%;
-      }
-
-      body {
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-        font-family: Lato,Helvetica,sans-serif;
-        font-weight: 300;
-        font-size: 1.6rem;
-        line-height: 1.5;
-        overflow-x: hidden;
       }
 
       body.showModal {
@@ -110,11 +92,6 @@ class Header extends React.Component {
         }
       }
 
-      a {
-        text-decoration: none !important;
-        cursor: pointer;
-      }
-
       section {
         margin: 3rem 0px;
         overflow: hidden;
@@ -129,41 +106,6 @@ class Header extends React.Component {
         margin: 40px 0px 20px;
         font-size: 1.8rem;
         font-weight: bold;
-      }
-
-      .content {
-        max-width: 768px;
-        padding: 1rem;
-        margin: 0 auto;
-        line-height: 1.5;
-      }
-
-      .content h2 {
-        font-size: 1.8rem;
-      }
-
-      .content h3 {
-        font-size: 1.7rem;
-      }
-
-      .content > ul {
-        padding-left: 3rem;
-      }
-
-      .content img {
-        max-width: 100%;
-      }
-
-      .content code {
-        background-color: #f6f8fa;
-        padding: 0.5rem;
-        overflow: scroll;
-        max-width: 100%;
-      }
-
-      .content code:first-child:last-child {
-        display: inline-block;
-        padding: 1rem;
       }
 
       .getTicketForm {
@@ -184,14 +126,6 @@ class Header extends React.Component {
         width: 100%;
         height: 100%;
         background: rgba(0,0,0,0);
-      }
-
-      .tier {
-        margin: 40px auto;
-      }
-
-      button {
-        cursor: pointer;
       }
 
       .row {

@@ -8,7 +8,8 @@ class InputTypeLocation extends React.Component {
   static propTypes = {
     value: PropTypes.object,
     className: PropTypes.string,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    options: PropTypes.object
   };
 
   constructor(props) {
@@ -32,10 +33,13 @@ class InputTypeLocation extends React.Component {
       long: value.location.lng
     };
     this.setState({value: location});
-    return this.props.onChange(location);    
+    return this.props.onChange(location);
   }
 
   render() {
+
+    const options = this.props.options || {};
+
     return (
       <div className="InputTypeLocation" className={this.props.className}>
         <style jsx global>{`
@@ -108,7 +112,11 @@ class InputTypeLocation extends React.Component {
           background: #ccc;
         }
         `}</style>
-        <Geosuggest onSuggestSelect={event => this.handleChange(event)} />
+        <Geosuggest
+          onSuggestSelect={event => this.handleChange(event)}
+          placeholder={this.props.placeholder}
+          {...options}
+          />
         <Location location={this.state.value} showTitle={false} />
       </div>
     );

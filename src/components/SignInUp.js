@@ -4,7 +4,6 @@ import colors from '../constants/colors';
 import Button from './Button';
 import _ from 'lodash';
 import { isValidEmail, capitalize } from '../lib/utils';
-import CreditCardForm from './CreditCardForm';
 import { defineMessages, injectIntl } from 'react-intl';
 
 class SignInUp extends React.Component {
@@ -15,7 +14,6 @@ class SignInUp extends React.Component {
     emailOnly: PropTypes.bool,
     showLabels: PropTypes.bool,
     requireCreditCard: PropTypes.bool,
-    stripePublishableKey: PropTypes.string,
     className: PropTypes.string
   }
 
@@ -32,7 +30,7 @@ class SignInUp extends React.Component {
       'firstName.label': { id: 'signinup.firstName.label', defaultMessage: 'first name' },
       'lastName.label': { id: 'signinup.lastName.label', defaultMessage: 'last name' },
       'description.label': { id: 'signinup.description.label', defaultMessage: 'one liner' },
-      'description.description': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
+      'description.help': { id: 'signinup.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'twitterHandle.label': { id: 'signinup.twitterHandle.label', defaultMessage: 'twitter' }
     });
 
@@ -71,7 +69,7 @@ class SignInUp extends React.Component {
       <div className="field" key={field.name} >
         {this.props.showLabels && this.messages[`${field.name}.label`] && <label>{`${capitalize(intl.formatMessage(this.messages[`${field.name}.label`]))}:`}</label>}
         <input type="text" ref={field.name} placeholder={field.placeholder} onChange={(event) => debouncedHandleEvent(field.name, event.target.value)} />
-        {this.messages[`${field.name}.description`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.description`])}</span>}
+        {this.messages[`${field.name}.help`] && <span className="description">{intl.formatMessage(this.messages[`${field.name}.help`])}</span>}
       </div>
     );
   }
@@ -95,8 +93,6 @@ class SignInUp extends React.Component {
 
   render() {
     const { description } = this.props;
-
-    const showCreditCardForm = this.props.requireCreditCard && !this.state.user.creditCards;
 
     const isFormValid = isValidEmail(this.state.user.email) && (!this.props.requireCreditCard || this.state.user.card);
     const isLoading = this.state.loading;
@@ -129,32 +125,22 @@ class SignInUp extends React.Component {
           }
         `}</style>
         <form onSubmit={this.handleSubmit}>
-        {this.renderInputField({
-          name: 'email',
-          label: 'Email',
-          placeholder: 'youare@wesome.com',
-          description
-        })
-        }
-        {!this.props.emailOnly && 
-          <div className="signup">
-            {this.fields.map(this.renderInputField)}
+          {this.renderInputField({
+            name: 'email',
+            label: 'Email',
+            placeholder: 'youare@wesome.com',
+            description
+          })
+          }
+          {!this.props.emailOnly && 
+            <div className="signup">
+              {this.fields.map(this.renderInputField)}
+            </div>
+          }
+
+          <div id="actions" className="actions">
+            <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} />
           </div>
-        }
-        {showCreditCardForm &&
-          <CreditCardForm
-            addCardLabel={submitBtnLabel}
-            onCardAdded={this.handleCardAdded}
-            stripePublishableKey={this.props.stripePublishableKey}
-            number={process.env.NODE_ENV === 'development' ? '4242424242424242' : undefined}
-            expiration={process.env.NODE_ENV === 'development' ? '11/20' : undefined}
-            disabled={!isFormValid || isLoading}
-            />
-        }
-        {!showCreditCardForm &&
-        <div id="actions" className="actions">
-          <Button type="submit" disabled={!isFormValid || isLoading} className="green" label={submitBtnLabel} />
-        </div>}
         </form>
       </div>
     );
@@ -162,8 +148,7 @@ class SignInUp extends React.Component {
 }
 
 SignInUp.defaultProps = {
-  showLabels: true,
-  stripePublishableKey: 'pk_test_5aBB887rPuzvWzbdRiSzV3QB'
+  showLabels: true
 }
 
 export default injectIntl(SignInUp);

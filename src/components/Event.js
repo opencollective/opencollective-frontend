@@ -9,17 +9,20 @@ import Location from '../components/Location';
 import HashLink from 'react-scrollchor';
 import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
-import GetTicketForm from '../components/GetTicketForm';
+import OrderForm from '../components/OrderForm';
 import InterestedForm from '../components/InterestedForm';
 import Sponsors from '../components/Sponsors';
 import Responses from '../components/Responses';
 import { filterCollection } from '../lib/utils';
-import { addCreateResponseMutation } from '../graphql/mutations';
 import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import { uniq } from 'underscore';
+import { uniqBy, get, union } from 'lodash';
+import { capitalize } from '../lib/utils';
+import { Router } from '../server/pages';
+import { addEventMutations } from '../graphql/mutations';
 import { exportMembers } from '../lib/export_file';
+import { Link } from '../server/pages';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
 
@@ -32,12 +35,12 @@ class Event extends React.Component {
 
   constructor(props) {
     super(props);
-    this.event = this.props.event; // pre-loaded by SSR
     this.setInterested = this.setInterested.bind(this);
-    this.updateResponse = this.updateResponse.bind(this);
+    this.removeInterested = this.removeInterested.bind(this);
+    this.updateOrder = this.updateOrder.bind(this);
     this.resetResponse = this.resetResponse.bind(this);
-    this.handleGetTicketClick = this.handleGetTicketClick.bind(this);
-    this.rsvp = this.rsvp.bind(this);
+    this.handleOrderTier = this.handleOrderTier.bind(this);
+    this.createOrder = this.createOrder.bind(this);
     this.closeModal = this.closeModal.bind(this);
 
     this.defaultActions = [
@@ -56,48 +59,68 @@ class Event extends React.Component {
     this.state = {
       view: 'default',
       showInterestedForm: false,
-      response: {},
+      order: { tier: {} },
       api: { status: 'idle' },
-      actions: this.getDefaultActions(this.props)
-    };
+      event: this.props.event
+    }
+
+    this.state.actions = this.getDefaultActions(this.props);
 
     // To test confirmation screen, uncomment the following:
-    // this.state.modal = "TicketsConfirmed";
-    // this.state.response = {
+    // this.state.view = "GetTicket";
+    // this.state.order = {
     //   user: { email: "etienne@gmail.com"},
-    //   tier: this.event && this.event.tiers[0],
+    //   tier: this.state.event && this.state.event.tiers[1],
     //   quantity: 2
     // };
 
   }
 
   componentDidMount() {
-    window.oc = { event: this.event }; // for easy debugging
+    window.oc = { event: this.state.event }; // for easy debugging
+  }
+
+  async removeInterested() {
+    const res = await this.props.removeMember({ id: this.props.LoggedInUser.CollectiveId }, { id: this.state.event.id }, 'FOLLOWER');
+    const memberRemoved = res.data.removeMember;
+    const event = { ... this.state.event };
+    event.members = event.members.filter(member => member.id !== memberRemoved.id);
+    const actions = this.state.actions;
+    actions[0].className = '';
+    actions[0].icon = '';
+    actions[0].onClick = this.setInterested;
+    this.setState({ showInterestedForm: false, event, actions });
   }
 
   /**
    * If user is logged in, we directly create a response 
    * Otherwise, we show the form to enter an email address
    */
-  async setInterested(user) {
-    if (user || this.user) {
-      this.setState({ showInterestedForm: false });
-      const tokens = user.email.substr(0, user.email.indexOf('@')).split('.');
-      user.firstName = tokens[0] || '';
-      user.lastName = tokens[1] || '';
-      const response = {
-        status: 'INTERESTED',
-        user
-      };
+  async setInterested(member) {
+    member = member || this.props.LoggedInUser && { id: this.props.LoggedInUser.CollectiveId };
+    if (member) {
+      const parts = member.email && member.email.substr(0, member.email.indexOf('@')).split('.');
+      if (parts && parts.length > 1) {
+        member.firstName = capitalize(parts[0] || '');
+        member.lastName = capitalize(parts[1] || '');
+      }
       try {
-        await this.createResponse(response);
-        this.event.responses.push(response);
+        const res = await this.props.createMember(member, { id: this.state.event.id }, 'FOLLOWER');
+        const event = { ... this.state.event };
+        event.members = [ ...event.members, res.data.createMember ];
+        this.setState({ showInterestedForm: false, event });
         const actions = this.state.actions;
         actions[0].className = 'selected';
         actions[0].icon = 'star';
+        actions[0].onClick = this.removeInterested;
         this.setState({ actions, showInterestedForm: false });
       } catch (e) {
-        this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.`);
+        console.error(e);
+        let message = '';
+        if (e && e.graphQLErrors) {
+          message = ` (error: ${e.graphQLErrors[0].message})`;
+        }
+        this.error(`An error occured 😳. We couldn't register you as interested. Please try again in a few.${message}`);
       }
       return;
     } else {
@@ -106,13 +129,21 @@ class Event extends React.Component {
     }
   }
 
-  async rsvp(response) {
+  async createOrder(order) {
+    order.tier = order.tier || {};
+    const OrderInputType = {
+      ... order,
+      collective: { slug: this.collective.slug },
+      tier: { id: order.tier.id }
+    };
+
+    this.setState( { status: 'loading' });
     try {
-      await this.createResponse(response);
-      this.setState({ response, view: 'default', modal: 'TicketsConfirmed' });
-      window.scrollTo(0,0);
-    } catch (e) {
-      this.error(`An error occured 😳. We couldn't register you. Please try again in a few.`);
+      await this.props.createOrder(OrderInputType);
+      this.setState({ status: 'idle', order, view: 'default', modal: 'TicketsConfirmed' });
+    } catch (err) {
+      console.error(">>> createOrder error: ", err);
+      throw new Error(err.graphQLErrors[0].message);
     }
   }
 
@@ -122,12 +153,21 @@ class Event extends React.Component {
 
   getDefaultActions(props) {
     const { LoggedInUser } = props || this.props;
-    const editUrl = `/${this.event.collective.slug}/events/${this.event.slug}/edit`;
-    if (LoggedInUser && LoggedInUser.canEditEvent) {
-      return [...this.defaultActions, {
-        className: 'whiteblue small',
-        component: <a href={editUrl}>EDIT</a>
-      }]
+    const editRoute = `/${this.state.event.parentCollective.slug}/events/${this.state.event.slug}/edit`;
+    if (LoggedInUser) {
+      const actions = [ ...this.defaultActions ];
+      if (LoggedInUser.canEditEvent) {
+        actions.push({
+          className: 'whiteblue small',
+          component: <Link route={editRoute}><a>EDIT</a></Link>
+        });
+      }
+      if (this.state.event.members.find( member => member.member.id === LoggedInUser.CollectiveId && member.role === 'FOLLOWER')) {
+        actions[0].className = 'selected';
+        actions[0].icon = 'star';
+        actions[0].onClick = this.removeInterested;
+      }
+      return actions;
     } else {
       return this.defaultActions;
     }
@@ -159,8 +199,7 @@ class Event extends React.Component {
   async createResponse(response) {
     response.tier = response.tier || {};
     const ResponseInputType = {
-      collective: { slug: this.event.collective.slug },
-      event: { slug: this.event.slug },
+      collective: { slug: this.state.event.slug },
       tier: { id: response.tier.id },
       quantity: response.quantity,
       user: response.user,
@@ -184,38 +223,88 @@ class Event extends React.Component {
     }, 5000);
   }
 
-  updateResponse(response) {
-    this.setState({ response });
-  }
-
   resetResponse() {
     this.setState({ response: {} });
     this.changeView('default');
   }
 
-  handleGetTicketClick(response) {
-    this.setState({ response, showInterestedForm: false });
-    this.changeView('GetTicket');
+  updateOrder(tier) {
+    const order = {
+      tier: { id: tier.id },
+      quantity: tier.quantity,
+      totalAmount: (tier.quantity || 1) * tier.amount,
+      interval: tier.interval
+    }
+    this.setState({ order });
+    // if (typeof window !== "undefined") {
+    //   window.state = this.state;
+    // }
+  }
+
+  handleOrderTier(tier) {
+    this.updateOrder(tier);
+
+    const { event, order } = this.state;
+    order.tier = { id: tier.id };
+    
+    // If the total amount is 0 and the user is logged in, we can directly RSVP.
+    if (order.totalAmount === 0 && this.props.LoggedInUser) {
+      order.user = { id: this.props.LoggedInUser.id };
+      return this.createOrder(order);
+    }
+    this.setState({ order, showInterestedForm: false });
+    const route = `/${event.parentCollective.slug}/events/${event.slug}/order/${order.tier.id}`;
+    const params = {
+      eventSlug: event.slug,
+      collectiveSlug: event.parentCollective.slug,
+      TierId: order.tier.id,
+      quantity: order.quantity,
+      totalAmount: order.totalAmount,
+      interval: order.interval
+    }
+    console.log(">>> pushing route", route, "with params", params);
+    Router.pushRoute('orderEventTier', params);
   }
 
   render() {
+    const { event } = this.state;
     const { LoggedInUser } = this.props;
-    const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent;
     const responses = {};
-    responses.sponsors = filterCollection(this.event.responses, { tier: { name: /sponsor/i }});
-    responses.guests = filterCollection(uniq(this.event.responses, (r) => `${r.status}:${r.user.username}` ), { tier: { name: /sponsor/i }}, true);
-    responses.going = filterCollection(responses.guests, {'status':'YES'});
-    responses.interested = filterCollection(responses.guests, {'status':'INTERESTED'});
+    responses.sponsors = filterCollection(event.orders, { tier: { name: /sponsor/i }});
+
+    const guests = {};
+    guests.interested = [];
+    filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
+      guests.interested.push({
+        user: follower.member,
+        status: 'INTERESTED'
+      });
+    });
+    guests.confirmed = [];
+    event.orders.map(order => {
+      guests.confirmed.push({
+        user: order.fromCollective,
+        createdAt: order.createdAt,
+        status: 'YES'
+      })
+    });
+
+    const allGuests = union(guests.interested, guests.confirmed).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    responses.guests = uniqBy(allGuests, (r) => r.user.id);
+    responses.going = filterCollection(responses.guests, { status: 'YES' });
+    responses.interested = filterCollection(responses.guests, { status: 'INTERESTED' });
 
     const info = (
       <HashLink to="#location">
-        <FormattedDate value={this.event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
-        <FormattedTime value={this.event.startsAt} timeZone={this.event.timezone} />&nbsp; - &nbsp;
-        {this.event.location.name}
+        <FormattedDate value={event.startsAt} weekday='short' day='numeric' month='long' />, &nbsp;
+        <FormattedTime value={event.startsAt} timeZone={event.timezone} />&nbsp; - &nbsp;
+        {event.location.name}
       </HashLink>
     );
 
-    const backgroundImage = this.event.backgroundImage || this.event.collective.backgroundImage || defaultBackgroundImage;
+    const backgroundImage = event.backgroundImage || event.parentCollective.backgroundImage || defaultBackgroundImage;
+
+    console.log("event", event);
 
     return (
       <div>
@@ -240,22 +329,25 @@ class Event extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
+          #tickets :global(.tier) {
+            margin: 4rem auto;
+          }
         `}</style>
         <TicketsConfirmed
           show={this.state.modal === 'TicketsConfirmed'}
           onClose={this.closeModal}
-          event={this.event}
-          response={this.state.response} />
+          event={event}
+          response={this.state.order} />
 
         <div className="EventPage">
 
           <Header
-            title={this.event.name}
-            description={this.event.description}
-            twitterHandle={this.event.collective.twitterHandle}
-            image={this.event.collective.logo || backgroundImage}
+            title={event.name}
+            description={event.description || event.longDescription}
+            twitterHandle={event.parentCollective.twitterHandle}
+            image={event.parentCollective.image || backgroundImage}
             className={this.state.status}
-            LoggedInUser={this.props.LoggedInUser}
+            LoggedInUser={LoggedInUser}
             />
 
           <Body>
@@ -266,10 +358,8 @@ class Event extends React.Component {
 
               {this.state.view === 'default' &&
                 <CollectiveCover
-                  collective={this.event.collective}
-                  logo={this.event.collective.logo}
-                  title={this.event.name}
-                  backgroundImage={backgroundImage}
+                  collective={event}
+                  style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}                  
                   />
               }
 
@@ -283,36 +373,38 @@ class Event extends React.Component {
               }
 
               {this.state.view == 'GetTicket' &&
-                <GetTicketForm
-                  onCancel={this.resetResponse}
-                  onSubmit={this.rsvp}
-                  quantity={this.state.response.quantity}
-                  stripePublishableKey={this.event.collective.stripePublishableKey}
-                  tier={this.state.response.tier || this.event.tiers[0]}
-                  />
+                <div className="content" >              
+                  <OrderForm
+                    collective={event}
+                    onSubmit={this.createOrder}
+                    quantity={this.state.order.quantity}
+                    tier={this.state.order.tier || event.tiers[0]}
+                    LoggedInUser={LoggedInUser}
+                    />
+                </div>
               }
 
               {this.state.view == 'default' &&
                 <div>
                   <div className="content" >
                     <div className="eventDescription" >
-                      <Markdown source={this.event.description} />
+                      <Markdown source={event.description || event.longDescription} />
                     </div>
 
                     <div id="tickets">
-                      {this.event.tiers.map((tier) =>
+                      {event.tiers.map((tier) =>
                         <Tier
                           key={tier.id}
                           className="tier"
                           tier={tier}
-                          onChange={(response) => this.updateResponse(response)}
-                          onClick={(response) => this.handleGetTicketClick(response)}
+                          onChange={(response) => this.updateOrder(response)}
+                          onClick={(response) => this.handleOrderTier(response)}
                           />
                       )}
                     </div>
                   </div>
 
-                  <Location location={this.event.location} />
+                  <Location location={event.location} />
 
                   { responses.guests.length > 0 &&
                     <section id="responses">
@@ -325,12 +417,12 @@ class Event extends React.Component {
                           </span>
                         }
                       </h1>
-                      { canEditEvent &&
+                      { LoggedInUser && LoggedInUser.canEditEvent &&
                       <div className="adminActions" id="adminActions">
                         <ul>
-                          <li><a href={`/${this.event.collective.slug}/events/${this.event.slug}/nametags.pdf`}>Print name tags</a></li>
-                          <li><a href={`mailto:${this.event.slug}@${this.event.collective.slug}.opencollective.com`}>Send email</a></li>
-                          <li><a onClick={ () => exportMembers(this.event) }>Export CSV</a></li>
+                          <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
+                          <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
+                          <li><a onClick={ () => exportMembers(event) }>Export CSV</a></li>
                         </ul>
                       </div>
                       }
@@ -362,4 +454,4 @@ class Event extends React.Component {
   }
 }
 
-export default addCreateResponseMutation(Event);
+export default addEventMutations(Event);

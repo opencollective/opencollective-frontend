@@ -10,7 +10,6 @@ class GetTicketForm extends React.Component {
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     quantity: PropTypes.number,
-    stripePublishableKey: PropTypes.string,
     tier: PropTypes.object.isRequired
   }
 
@@ -59,7 +58,6 @@ class GetTicketForm extends React.Component {
           label={this.buttonLabel}
           onSubmit={this.handleSubmit}
           requireCreditCard={(this.state.response.amount > 0)}
-          stripePublishableKey={this.props.stripePublishableKey}
           />
       </div>
     );

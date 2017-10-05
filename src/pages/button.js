@@ -33,7 +33,7 @@ class ButtonPage extends React.Component {
             }
 
             .donate.btn.blue {
-              background-image: url(/static/images/buttons/donate-button-blue.svg);              
+              background-image: url(/static/images/buttons/donate-button-blue.svg);
             }
 
             .donate.btn.white {
@@ -41,7 +41,7 @@ class ButtonPage extends React.Component {
             }
 
             .contribute.btn.blue {
-              background-image: url(/static/images/buttons/contribute-button-blue.svg);              
+              background-image: url(/static/images/buttons/contribute-button-blue.svg);
             }
 
             .contribute.btn.white {

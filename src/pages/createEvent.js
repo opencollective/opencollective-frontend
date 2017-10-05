@@ -5,6 +5,7 @@ import CreateEvent from '../components/CreateEvent';
 import { addGetLoggedInUserFunction, addCollectiveData } from '../graphql/queries';
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
+import { intersection } from 'lodash';
 
 class CreateEventPage extends React.Component {
 
@@ -13,15 +14,15 @@ class CreateEventPage extends React.Component {
     this.state = { loading: true };
   }
 
-  static getInitialProps ({ query: { collectiveSlug } }) {
-    return { collectiveSlug }
+  static getInitialProps ({ query: { parentCollectiveSlug } }) {
+    return { slug: parentCollectiveSlug }
   }
 
   async componentDidMount() {
-    const { getLoggedInUser } = this.props;
-    const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
+    const { getLoggedInUser, slug } = this.props;
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     if (LoggedInUser) {
-      LoggedInUser.canCreateEvent = Boolean(LoggedInUser.membership);
+      LoggedInUser.canCreateEvent = Boolean(intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length);
     }
     this.setState({LoggedInUser, loading: false});
   }
@@ -40,7 +41,7 @@ class CreateEventPage extends React.Component {
 
     return (
       <div>
-        <CreateEvent collective={data.Collective} LoggedInUser={this.state.LoggedInUser} />
+        <CreateEvent parentCollective={data.Collective} LoggedInUser={this.state.LoggedInUser} />
       </div>
     );
   }

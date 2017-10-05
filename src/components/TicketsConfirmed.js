@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Modal from './Modal';
 import AddToCalendar from 'react-add-to-calendar';
 
-import { formatCurrency } from '../lib/utils';
+import Currency from './Currency';
 import { FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
 
 class TicketsConfirmed extends React.Component {
@@ -28,7 +28,7 @@ class TicketsConfirmed extends React.Component {
   }
 
   render() {
-    const { event, response, intl } = this.props;
+    const { event, response } = this.props;
     
     return (
       <Modal onClose={this.props.onClose} show={this.props.show} className="TicketsConfirmedModal" title={(<FormattedMessage id="TicketsConfirmed.ticketsAcquired" values={{quantity: response.quantity}} defaultMessage='{quantity, plural, one {ticket} other {tickets}} acquired!' />)} >
@@ -98,7 +98,7 @@ class TicketsConfirmed extends React.Component {
 
           .AddToCalendarBtn {
             text-align: center;
-            margin: 3rem 0 0;            
+            margin: 3rem 0 0;
           }
           `}</style>
           <style jsx global>{`
@@ -150,7 +150,12 @@ class TicketsConfirmed extends React.Component {
                 <FormattedMessage id="TicketsConfirmed.tickets" values={{quantity: response.quantity}} defaultMessage='{quantity} {quantity, plural, one {ticket} other {tickets}}' />
               </div>
               <div className="amount">
-                {response.tier && formatCurrency(response.quantity * response.tier.amount, response.tier.currency, intl)}
+                { response.tier.amount > 0 &&
+                  <Currency value={response.quantity * response.tier.amount} currency={response.tier.currency} />
+                }
+                { !response.tier.amount || response.tier.amount === 0 &&
+                  <FormattedMessage id="amount.free" defaultMessage="free" />
+                }
               </div>
             </div>
             <div className="content">
