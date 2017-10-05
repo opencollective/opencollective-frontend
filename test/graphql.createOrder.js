@@ -436,7 +436,7 @@ describe('createOrder', () => {
     // Should fail if not enough funds in the fromCollective
     let res = await utils.graphqlQuery(createOrderQuery, { order }, xdamman);
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal("You don't have enough funds available ($7,157 left) to execute this order ($100,000)");
+    expect(res.errors[0].message).to.equal("You don't have enough funds available ($5,394 left) to execute this order ($100,000)");
 
     order.totalAmount = 20000;
 
