@@ -445,7 +445,7 @@ describe('createOrder', () => {
     expect(res.errors).to.not.exist;
 
     const availableBalance = await paymentMethod.getBalanceForUser(xdamman);
-    expect(availableBalance.amount).to.equal(695731);
+    expect(availableBalance.amount).to.equal(519433);
     
     const orderCreated = res.data.createOrder;
     const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
