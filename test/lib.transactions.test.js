@@ -16,7 +16,7 @@ describe('lib.transactions.test.js', () => {
 
   before(() => utils.loadDB("wwcode_test"));
 
-  beforeEach('get transactions', () => models.Transaction.findAll({where}).then(ts => {
+  beforeEach('get transactions', () => models.Transaction.findAll({ where }).then(ts => {
     transactions = ts;
     expect(transactions.length).to.equal(20);
     return true;
@@ -25,7 +25,7 @@ describe('lib.transactions.test.js', () => {
   it('exports transactions', (done) => {
     const csv = tlib.exportTransactions(transactions);
     const lines = csv.split('\n');
-    expect(lines.length).to.equal(21);
+    expect(lines.length).to.equal(41);
     expect(lines[0].split('","').length).to.equal(12);
     done();
   });

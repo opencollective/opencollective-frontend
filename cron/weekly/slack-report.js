@@ -11,7 +11,7 @@ onlyExecuteInProdOnMondays();
 const {
   Activity,
   Expense,
-  Group,
+  Collective,
   Transaction
 } = models;
 
@@ -20,10 +20,10 @@ const updatedLastWeek = getTimeFrame('updatedAt');
 
 const donation = {
   where: {
-    DonationId: {
+    OrderId: {
       $not: null
     },
-    platformFeeInTxnCurrency: {
+    platformFeeInHostCurrency: {
       $gt: 0
     }
   }
@@ -44,8 +44,8 @@ const excludeOcTeam = { where: {
       41, // asood123
     ]
   },
-  GroupId: {
-    $not: 1 // OpenCollective group
+  CollectiveId: {
+    $not: 1 // OpenCollective collective
   }
 } };
 
@@ -57,7 +57,7 @@ const approvedLastWeekExpenses = _.merge({}, lastWeekExpenses, approvedExpense);
 const rejectedLastWeekExpenses = _.merge({}, lastWeekExpenses, rejectedExpense);
 const paidLastWeekExpenses = _.merge({}, lastWeekExpenses, paidExpense);
 
-const groupByCurrency = {
+const collectiveByCurrency = {
   plain: false,
   group: ['currency'],
   attributes: ['currency'],
@@ -79,7 +79,7 @@ Promise.props({
   donationCount: Transaction.count(lastWeekDonations),
 
   donationAmount: Transaction
-    .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, groupByCurrency))
+    .aggregate('amount', 'SUM', _.merge({}, lastWeekDonations, collectiveByCurrency))
     .map(row => `${row.SUM/100} ${row.currency}`),
 
   stripeReceivedCount: Activity.count(_.merge({}, createdLastWeek, stripeReceived)),
@@ -97,34 +97,34 @@ Promise.props({
   paidExpenseCount: Expense.count(paidLastWeekExpenses),
 
   pendingExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, groupByCurrency))
+    .aggregate('amount', 'SUM', _.merge({}, pendingLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   approvedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, groupByCurrency))
+    .aggregate('amount', 'SUM', _.merge({}, approvedLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   rejectedExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, groupByCurrency))
+    .aggregate('amount', 'SUM', _.merge({}, rejectedLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   paidExpenseAmount: Expense
-    .aggregate('amount', 'SUM', _.merge({}, paidLastWeekExpenses, groupByCurrency))
+    .aggregate('amount', 'SUM', _.merge({}, paidLastWeekExpenses, collectiveByCurrency))
     .map(row => `${-row.SUM/100} ${row.currency}`),
 
   // Collective statistics
 
   activeCollectivesWithTransactions: Transaction
-    .findAll(_.merge({attributes: ['GroupId'] }, updatedLastWeek, distinct, excludeOcTeam))
-    .map(row => row.GroupId),
+    .findAll(_.merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .map(row => row.CollectiveId),
 
   activeCollectivesWithExpenses: Expense
-    .findAll(_.merge({attributes: ['GroupId'] }, updatedLastWeek, distinct, excludeOcTeam))
-    .map(row => row.GroupId),
+    .findAll(_.merge({attributes: ['CollectiveId'] }, updatedLastWeek, distinct, excludeOcTeam))
+    .map(row => row.CollectiveId),
 
-  newCollectives: Group
+  newCollectives: Collective
     .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
-    .map(group => group.dataValues.slug)
+    .map(collective => collective.dataValues.slug)
 
 }).then(results => {
   results.activeCollectiveCount = _.union(results.activeCollectivesWithTransactions, results.activeCollectivesWithExpenses).length

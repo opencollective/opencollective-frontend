@@ -1,4 +1,4 @@
-Subject: {{group.name}}: Your Collective is pending approval
+Subject: {{collective.name}}: Your Collective is pending approval
 
 {{> header}}
 
@@ -18,7 +18,7 @@ li {
 <p>Hi!</p>
 {{/if}}
 
-<p>Thanks for signing up on Open Collective! Your collective has been created: <strong><a href="{{config.host.website}}/{{group.slug}}">{{group.name}}</a></strong>.</p>
+<p>Thanks for signing up on Open Collective! Your collective has been created: <strong><a href="{{config.host.website}}/{{collective.slug}}">{{collective.name}}</a></strong>.</p>
 
 <p>While you wait for approval to start receiving donations, check out our helpful how-to guide: <strong><a href="https://medium.com/open-collective/ten-steps-to-successful-open-source-crowdfunding-fa2b43e82687">Ten Steps to Successful Open Source Crowdfunding</a></strong>.</p>
 
@@ -28,9 +28,9 @@ li {
 
 <li><strong>Feature your backers & sponsors on your Github & website.</strong> We'll submit a PR to your README. Find instructions to add your backers to your website <a href="https://github.com/OpenCollective/OpenCollective/wiki/Website-banner">here</a>.
 
-<li><strong>Submit expenses:</strong> <a href="{{config.host.website}}/{{group.slug}}/expenses">{{config.host.website}}/{{group.slug}}/expenses</a>, to let potential backers know what they're helping to fund.
+<li><strong>Submit expenses:</strong> <a href="{{config.host.website}}/{{collective.slug}}/expenses">{{config.host.website}}/{{collective.slug}}/expenses</a>, to let potential backers know what they're helping to fund.
 
-<li><strong>Spread the word.</strong> You can <a href="{{config.host.website}}/{{group.slug}}/connect/twitter">connect your Twitter account to your collective</a> and automatically thank your backers. You can also <a href="https://github.com/OpenCollective/OpenCollective/wiki/Slack-and-Gitter">connect your Slack/Gitter</a> for notifications.
+<li><strong>Spread the word.</strong> You can <a href="{{config.host.website}}/{{collective.slug}}/connect/twitter">connect your Twitter account to your collective</a> and automatically thank your backers. You can also <a href="https://github.com/OpenCollective/OpenCollective/wiki/Slack-and-Gitter">connect your Slack/Gitter</a> for notifications.
 
 </ol>
 

@@ -1,3 +1,5 @@
+import CustomDataTypes from './DataTypes';
+
 export default (Sequelize, DataTypes) => {
 
   const Subscription = Sequelize.define('Subscription', {
@@ -7,18 +9,10 @@ export default (Sequelize, DataTypes) => {
       validate: { min: 0 }
     },
 
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD',
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
-        }
-      }
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     interval: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(8),
       validate: {
         isIn: {
           args: [['month', 'year']],
@@ -40,23 +34,22 @@ export default (Sequelize, DataTypes) => {
 
     deactivatedAt: DataTypes.DATE
   }, {
-    paranoid: true,
-
-    instanceMethods: {
-      activate() {
-        this.isActive = true;
-        this.activatedAt = new Date();
-
-        return this.save();
-      },
-      deactivate() {
-        this.isActive = false;
-        this.deactivatedAt = new Date();
-
-        return this.save();
-      }
-    }
+    paranoid: true
   });
+
+  Subscription.prototype.activate = function() {
+    this.isActive = true;
+    this.activatedAt = new Date();
+
+    return this.save();
+  };
+
+  Subscription.prototype.deactivate = function() {
+    this.isActive = false;
+    this.deactivatedAt = new Date();
+
+    return this.save();
+  };
 
   return Subscription;
 };

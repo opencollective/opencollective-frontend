@@ -58,7 +58,12 @@ handlebars.registerHelper('currency', (value, props) => {
     if (!currency) return value / 100;
     value = value/100; // converting cents
 
-    return value.toLocaleString(currency, {
+    let locale = 'en-US';
+    if (currency === 'EUR') {
+      locale = 'fr-FR';
+    }
+
+    return value.toLocaleString(locale, {
       style: 'currency',
       currency,
       minimumFractionDigits : precision || 0,

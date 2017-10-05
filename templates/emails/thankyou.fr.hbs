@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}/{{interval}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}/{{interval}} à {{collective.name}}
 {{else}}
-Subject: Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} à {{group.name}}
+Subject: Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} à {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -15,17 +15,17 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 {{/if}}
 
 {{#if interval}}
-<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
+<p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}} par {{interval}}. Votre premier paiement vient d'être reçu. Votre don nous aidera à continuer nos activités.</p>
 
 <p>Veuillez noter que vos futurs paiements seront effectués au premier du mois. <a href='https://opencollective.com/faq#charge-date-notice'>Pourquoi?</a></p>
 
 {{else}}
-<p>Merci pour votre donation de {{{currency donation.amount currency=donation.currency}}}.
+<p>Merci pour votre donation de {{{currency order.totalAmount currency=order.currency}}}.
   Votre don nous aidera à continuer nos activités.</p>
 {{/if}}
 
 <p>Vous pouvez suivre nos prochaines activités et comment on va utiliser l'argent recolté sur notre page OpenCollective:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 {{#if subscriptionsLink}}
@@ -37,7 +37,7 @@ Subject: Merci pour votre donation de {{{currency donation.amount currency=donat
 <p>Encore merci et gros bisous de nous tous! 😘,</p>
 
 <p>
-  – Le collectif {{group.name}}
+  – Le collectif {{collective.name}}
 </p>
 
 {{> footer}}

@@ -1,8 +1,6 @@
 import url from 'url';
 import Promise from 'bluebird';
-import slug from 'slug';
 import clearbit from '../gateways/clearbit';
-import { sequelize } from '../models';
 import config from 'config';
 
 export default {
@@ -72,26 +70,26 @@ export default {
       const sources = [];
 
       if (person) {
-        const personAvatarSources = ['twitter', 'aboutme', 'gravatar', 'github'];
+        const personAvatarSources = ['twitter', 'aboutme', 'grimage', 'github'];
         personAvatarSources.forEach((source) => {
-          if (person[source] && person[source].avatar) {
-            sources.push({src: person[source].avatar, source});
+          if (person[source] && person[source].image) {
+            sources.push({src: person[source].image, source});
           }
         });
-        if (person.avatar) {
-          sources.push({src: person.avatar, source: 'clearbit'});
+        if (person.image) {
+          sources.push({src: person.image, source: 'clearbit'});
         }
       }
 
       if (company) {
         const companyAvatarSources = ['twitter', 'angellist'];
         companyAvatarSources.forEach((source) => {
-          if (company[source] && company[source].avatar) {
-            sources.push({src: company[source].avatar, source});
+          if (company[source] && company[source].image) {
+            sources.push({src: company[source].image, source});
           }
         });
-        if (company.logo) {
-          sources.push({src: company.logo, source: 'clearbit'});
+        if (company.image) {
+          sources.push({src: company.image, source: 'clearbit'});
         }
       }
 
@@ -107,61 +105,11 @@ export default {
   },
 
   /*
-   * If there is a username suggested, we'll check that it's valid or increase it's count
-   * Otherwise, we'll suggest something.
-   */
-
-  suggestUsername(user) {
-    // generate potential usernames
-    const potentialUserNames = [
-      user.username,
-      user.suggestedUsername,
-      user.avatar ? this.getUsernameFromGithubURL(user.avatar) : null,
-      user.twitterHandle ? user.twitterHandle.replace(/@/g, '') : null,
-      user.name ? user.name.replace(/ /g, '') : null,
-      user.email ? user.email.split(/@|\+/)[0] : null]
-      .filter(username => username ? true : false) // filter out any nulls
-      .map(username => slug(username).toLowerCase(/\./g,'')) // lowercase them all
-      // remove any '+' signs
-      .map(username => username.indexOf('+') !== -1 ? username.substr(0, username.indexOf('+')) : username);
-
-    // In theory, this should never happen because we already have an email
-    // TODO: add a random username to make sure that every user has a username
-    if (potentialUserNames.length === 0) {
-      console.error(`No potential username found for user: ${user.email}`);
-      return Promise.resolve()
-    }
-
-    // fetch any matching usernames or slugs for the top choice in the list above
-    return sequelize.query(`
-        SELECT username as username FROM "Users" where username like '${potentialUserNames[0]}%'
-        UNION ALL
-        SELECT slug as username FROM "Groups" where slug like '${potentialUserNames[0]}%'
-      `, {
-        type: sequelize.QueryTypes.SELECT
-      })
-    .then(userObjectList => userObjectList.map(user => user.username))
-    .then(usernameList => this.usernameSuggestionHelper(potentialUserNames[0], usernameList, 0));
-  },
-
-  /*
-   * Checks a given username in a list and if found, increments count and recursively checks again
-   */
-  usernameSuggestionHelper(usernameToCheck, usernameList, count) {
-    const username = count > 0 ? `${usernameToCheck}${count}` : usernameToCheck;
-    if (usernameList.indexOf(username) === -1) {
-      return username;
-    } else {
-      return this.usernameSuggestionHelper(`${usernameToCheck}`, usernameList, count+1);
-    }
-  },
-
-  /*
-   * Extract username from github avatar url
+   * Extract username from github image url
    * Needed to get usernames for github signups
    */ 
   getUsernameFromGithubURL(url) {
-    const githubUrl = 'avatars.githubusercontent.com/';
+    const githubUrl = 'images.githubusercontent.com/';
     if (url && url.indexOf(githubUrl) !== -1) {
       const tokens = url.split(githubUrl);
       if (tokens.length === 2 && tokens[1] !== '') {
@@ -180,7 +128,7 @@ export default {
         if (userData) {
           user.firstName = user.firstName || userData.name.givenName;
           user.lastName = user.lastName || userData.name.familyName;
-          user.avatar = user.avatar || userData.avatar;
+          user.image = user.image || userData.image;
           user.twitterHandle = user.twitterHandle || userData.twitter.handle;
           user.website = user.website || userData.site;
           return user.save();

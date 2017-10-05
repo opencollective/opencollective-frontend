@@ -10,25 +10,25 @@ import models from '../server/models';
 
 const application = utils.data('application');
 const userData = utils.data('user6');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 
 const {
   User,
-  Group
+  Collective
 } = models;
 
 describe('lib.notifications.test.js', () => {
 
-  let user, group, nm;
+  let user, collective, nm;
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create user and group', () => {
-    const promises = [User.create(userData), Group.create(groupData)];
+  beforeEach('create user and collective', () => {
+    const promises = [User.createUserWithCollective(userData), Collective.create(collectiveData)];
     return Promise.all(promises).then(results => {
       user = results[0];
-      group = results[1];
-      return group.addUserWithRole(user, 'HOST')
+      collective = results[1];
+      return collective.addUserWithRole(user, 'HOST')
     })
   });
 
@@ -71,25 +71,25 @@ describe('lib.notifications.test.js', () => {
     nodemailer.createTransport.restore();
   });
 
-  it('sends a new `group.expense.created` email notification', done => {
+  it('sends a new `collective.expense.created` email notification', done => {
     let emailAttributes;
     const expense = utils.data('expense1');
 
     const templateData = {
       expense,
       user,
-      group,
+      collective,
       config
     };
 
     templateData.expense.id = 1;
 
-    emailLib.generateEmailFromTemplate('group.expense.created', user.email, templateData)
+    emailLib.generateEmailFromTemplate('collective.expense.created', user.email, templateData)
       .then(template => {
         emailAttributes = emailLib.getTemplateAttributes(template.html);
       })
       .then(() => request(app)
-        .post(`/groups/${group.id}/expenses`)
+        .post(`/groups/${collective.id}/expenses`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .send({
           api_key: application.api_key,
@@ -97,7 +97,7 @@ describe('lib.notifications.test.js', () => {
         })
         .expect(200))
       .then(res => {
-        expect(res.body).to.have.property('GroupId', group.id);
+        expect(res.body).to.have.property('CollectiveId', collective.id);
         expect(res.body).to.have.property('UserId', user.id); // ...
       })
       .then(() => models.Expense.findAll())
@@ -111,9 +111,9 @@ describe('lib.notifications.test.js', () => {
       .then(() => {
         setTimeout(() => {
           const options = nm.sendMail.lastCall.args[0];
-          expect(options.to).to.equal(user.email);
+          expect(options.to).to.equal("emailbcc+internal_user-at-opencollective.com@opencollective.com");
           expect(options.subject).to.equal(`[TESTING] ${emailAttributes.subject}`);
-          expect(options.html).to.contain(expense.title);
+          expect(options.html).to.contain(expense.description);
           expect(options.html).to.contain("APPROVE");
           expect(options.html).to.contain("REJECT");
           done();

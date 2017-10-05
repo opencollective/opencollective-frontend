@@ -9,20 +9,20 @@ const done = (err) => {
 };
 
 // Get all donations that have a subscription
-models.Donation.findAll({ 
+models.Order.findAll({ 
   where: { 
     SubscriptionId: { $ne: null }
   },
   include: [ { model: models.Subscription }]
 })
-.map(donation => {
-  if (!donation.title.match(/^Donation/)) {
-    console.log(`Donation id ${donation.id} already processed`);
+.map(order => {
+  if (!order.description.match(/^Donation/)) {
+    console.log(`Donation id ${order.id} already processed`);
     return;
   }
-  const title = capitalize(`${donation.Subscription.interval}ly ${donation.title.toLowerCase()}`);
-  console.log(`Updating donation #${donation.id}'s title to ${title}`);
-  return donation.update({ title });
+  const description = capitalize(`${order.Subscription.interval}ly ${order.description.toLowerCase()}`);
+  console.log(`Updating donation #${order.id}'s description to ${description}`);
+  return order.update({ description });
 })
 .then(() => done())
 .catch(done);

@@ -20,7 +20,7 @@ data['ticket.confirmed'] = {
     amount: 5000,
     currency: "USD"
   },
-  group: {
+  collective: {
     slug: "sustainoss",
     name: "SustainOSS"
   }
@@ -38,11 +38,11 @@ data['user.monthlyreport'] = {
       interval: 'month',
       createdAt: Date.now(),
       currency: 'USD',
-      group: {
+      collective: {
         publicUrl: 'cycle.js.org',
         name: 'Between the Wires',
         slug: 'cyclejs',
-        logo: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+        image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
         backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
         mission: 'We are on a mission to explore and develop new technologies for psychological, emotional and spiritual flourishing.',
         stats: {
@@ -62,11 +62,11 @@ data['user.monthlyreport'] = {
       interval: 'month',
       createdAt: Date.now(),
       currency: 'USD',
-      group: {
+      collective: {
         publicUrl: 'cycle.js.org',
         name: 'Between the Wires',
         slug: 'cyclejs',
-        logo: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+        image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
         backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
         mission: 'We are on a mission to explore and develop new technologies for psychological, emotional and spiritual flourishing.',
         stats: {
@@ -82,10 +82,10 @@ data['user.monthlyreport'] = {
       }
     },
   ],
-  relatedGroups: [
+  relatedCollectives: [
     {
       currency: 'USD',
-      logo: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
       backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',
@@ -97,7 +97,7 @@ data['user.monthlyreport'] = {
     },
     {
       currency: 'USD',
-      logo: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
       backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',
@@ -109,7 +109,7 @@ data['user.monthlyreport'] = {
     },
     {
       currency: 'USD',
-      logo: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
+      image: 'http://opencollective.com/proxy/images/?src=https%3A%2F%2Fcldup.com%2F1Hzq0cyqgW.png&height=320',
       backgroundImage: 'http://opencollective.com/proxy/images/?src=https://cldup.com/Gj243bgI0f.jpg&width=1024',
       slug: 'cyclejs',
       name: 'Cycle.js',

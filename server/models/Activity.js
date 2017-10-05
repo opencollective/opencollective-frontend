@@ -43,40 +43,40 @@ Types:
   - user.paymentMethod.updated
       data: user, paymentMethod (updated values)
   - user.paymentMethod.deleted
-      data: user, paymentMethod.number (only 4 last number)
+      data: user, paymentMethod.name (only 4 last number)
 
-  + group.created
-      data: group, user.info
+  + collective.created
+      data: collective, user.info
       UserId: the creator
-  - group.updated
-      data: group (updated values), user.info
-  - group.deleted
-      data: group.name, user.info
+  - collective.updated
+      data: collective (updated values), user.info
+  - collective.deleted
+      data: collective.name, user.info
 
-  + group.user.added
-      data: group, user (caller), target (the new user), groupuser
+  + collective.user.added
+      data: collective, user (caller), target (the new user), collectiveuser
       2* Userid: the new user + the caller
-  - group.user.updated
-      data: group, user (caller), target (the updated user), groupuser (updated values)
+  - collective.user.updated
+      data: collective, user (caller), target (the updated user), collectiveuser (updated values)
       2* Userid: the updated user + the caller
-  - group.user.deleted
-      data: group, user (caller), target (the deleted user)
+  - collective.user.deleted
+      data: collective, user (caller), target (the deleted user)
       2* Userid: the deleted user + the caller
 
-  - constants.GROUP_TRANSACTION_CREATED
-      data: group, transaction, user (the caller), target (potentially)
+  - constants.COLLECTIVE_TRANSACTION_CREATED
+      data: collective, transaction, user (the caller), target (potentially)
       UserId: the one who initiate the transaction
-      GroupId:
+      CollectiveId:
       TransactionId:
-  - group.transaction.deleted
-      data: group, transaction, user (the caller)
+  - collective.transaction.deleted
+      data: collective, transaction, user (the caller)
       UserId: the one who initiate the delete
-      GroupId:
+      CollectiveId:
       TransactionId:
-  - constants.GROUP_EXPENSE_PAID
-      data: group, transaction, user (the caller), pay (paypal payload)
+  - constants.COLLECTIVE_EXPENSE_PAID
+      data: collective, transaction, user (the caller), pay (paypal payload)
       UserId:
-      GroupId:
+      CollectiveId:
       TransactionId:
 
   + constants.WEBHOOK_STRIPE_RECEIVED

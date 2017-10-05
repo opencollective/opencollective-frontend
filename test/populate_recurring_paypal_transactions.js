@@ -40,7 +40,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
   const billingAgreementId = 'billingAgreementId-abc';
 
   let user;
-  let group;
+  let collective;
   let transaction;
   let subscription;
   let runScript;
@@ -49,15 +49,15 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
 
   beforeEach(() => models.User.create(data('user1')).tap(u => user = u));
 
-  beforeEach(() => models.Group.create(data('group1')).tap(g => group = g));
+  beforeEach(() => models.Collective.create(data('collective1')).tap(g => collective = g));
 
-  beforeEach(() => group.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
 
   beforeEach(() =>
     models.ConnectedAccount.create({
-      provider: 'paypal',
+      service: 'paypal',
       clientId: 'abc',
-      secret: 'def'
+      token: 'def'
     })
     .then(account => account.setUser(user)));
 
@@ -74,8 +74,9 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
         }
       }))
     .then(subscription => models.Transaction.createFromPayload({
-      group,
-      user,
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      CollectiveId: collective.id,
       subscription,
       transaction: fixture
     }))
@@ -83,7 +84,7 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       models.Transaction.findOne({
         where: { id: res.id },
         include: [
-          { model: models.Group },
+          { model: models.Collective },
           { model: models.User }
         ]
       }))
@@ -154,8 +155,8 @@ describe.skip('scripts/populate_recurring_paypal_transactions', () => {
       expect(res.count).to.be.equal(2); // only adds one
       expect(res.rows[0].data.transaction_id).to.be.equal(paypalTransaction.completed.transaction_id);
       expect(res.rows[1].data.transaction_id).to.be.equal(transaction_id); // new one
-      expect(res.rows[1]).to.have.property('UserId');
-      expect(res.rows[1]).to.have.property('GroupId');
+      expect(res.rows[1]).to.have.property('CreatedByUserId');
+      expect(res.rows[1]).to.have.property('CollectiveId');
       expect(res.rows[1]).to.have.property('SubscriptionId');
     });
   });

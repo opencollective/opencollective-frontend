@@ -10,7 +10,7 @@ export default function required(properties) {
 
 /**
  * Check that the middlewares have populated the needed values 
- * (such as `req.remoteUser` or `reg.group` or any other model)
+ * (such as `req.remoteUser` or `reg.collective` or any other model)
  */
 export function required_valid(properties) {
   properties = [].slice.call(arguments);

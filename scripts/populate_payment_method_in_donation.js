@@ -14,18 +14,18 @@ const done = (err) => {
 function run() {
   let updatedCount = 0;
   // get all donations that don't have a PaymentMethod
-  return models.Donation.findAll({where: {PaymentMethodId: null}})
-  .each(donation => {
+  return models.Order.findAll({where: {PaymentMethodId: null}})
+  .each(order => {
     // for each donation, find a transaction and copy over PaymentMethod
-    return models.Transaction.findAll({where: {DonationId: donation.id}})
+    return models.Transaction.findAll({where: {OrderId: order.id}})
     .then(transactions => {
       if (transactions && transactions.length >= 1 && transactions[0].PaymentMethodId != null) {
         updatedCount += 1;
-        console.log(`Setting DonationId: ${donation.id} with PaymentMethodId: ${transactions[0].PaymentMethodId}`);
-        donation.PaymentMethodId = transactions[0].PaymentMethodId;
-        return donation.save();
+        console.log(`Setting OrderId: ${order.id} with PaymentMethodId: ${transactions[0].PaymentMethodId}`);
+        order.PaymentMethodId = transactions[0].PaymentMethodId;
+        return order.save();
       } else {
-        console.log(`Didn't update DonationId: ${donation.id}`);
+        console.log(`Didn't update OrderId: ${order.id}`);
       }
     })
   })

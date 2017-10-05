@@ -1,0 +1,30 @@
+Subject: New collective pending {{collective.name}}
+
+{{> header}}
+
+<style>
+  th { text-align: left; }
+</style>
+
+<h2>Creator</h2>
+<table>
+  <tr><th>Name</th><td>{{user.name}}</td></tr>
+  <tr><th>Email</th><td>{{user.email}}</td></tr>
+  <tr><th>Website</th><td>{{user.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{user.twitterHandle}}</td></tr>
+</table>
+
+<h2>Collective</h2>
+<table>
+  <tr><th>Name</th><td>{{collective.name}}</td></tr>
+  <tr><th>Website</th><td>{{collective.website}}</td></tr>
+  <tr><th>Twitter</th><td>{{collective.twitterHandle}}</td></tr>
+  <tr><th>Mission</th><td>{{collective.mission}}</td></tr>
+  <tr><th>Tags</th><td>{{{json collective.tags}}}</td></tr>
+</table>
+
+<p>
+Please reply to this email to confirm the creation of this collective.
+</p>
+
+{{> footer}}

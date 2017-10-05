@@ -1,12 +1,12 @@
 import Temporal from 'sequelize-temporal';
-import currencies from '../constants/currencies';
 import {type} from '../constants/transactions';
 
 import status from '../constants/expense_status';
-const expenseType = type.EXPENSE;
-const allowedCurrencies = Object.keys(currencies);
+const expenseType = type.DEBIT;
+import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {
+
 
   const Expense = Sequelize.define('Expense', {
     id: {
@@ -26,10 +26,10 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    GroupId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Groups',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
@@ -37,16 +37,7 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    currency: {
-      type: DataTypes.STRING,
-      validate: {
-        isIn: {
-          args: [allowedCurrencies],
-          msg: `Must be in ${allowedCurrencies}`
-        }
-      },
-      allowNull: false
-    },
+    currency: CustomDataTypes(DataTypes).currency,
 
     amount: {
       type: DataTypes.INTEGER,
@@ -54,7 +45,7 @@ export default function (Sequelize, DataTypes) {
       allowNull: false
     },
 
-    title: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -71,7 +62,7 @@ export default function (Sequelize, DataTypes) {
       defaultValue: 'manual'
     },
 
-    notes: DataTypes.TEXT,
+    privateMessage: DataTypes.STRING,
     attachment: DataTypes.STRING,
     category: DataTypes.STRING,
     vat: DataTypes.INTEGER,
@@ -128,15 +119,15 @@ export default function (Sequelize, DataTypes) {
           type: expenseType,
           id: this.id,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
-          title: this.title,
+          description: this.description,
           attachment: this.attachment,
           category: this.category,
           payoutMethod: this.payoutMethod,
           vat: this.vat,
-          notes: this.notes,
+          privateMessage: this.privateMessage,
           lastEditedById: this.lastEditedById,
           status: this.status,
           incurredAt: this.incurredAt,
@@ -149,10 +140,10 @@ export default function (Sequelize, DataTypes) {
           type: expenseType,
           id: this.id,
           UserId: this.UserId,
-          GroupId: this.GroupId,
+          CollectiveId: this.CollectiveId,
           currency: this.currency,
           amount: this.amount,
-          title: this.title,
+          description: this.description,
           category: this.category,
           payoutMethod: this.payoutMethod,
           vat: this.vat,
@@ -164,27 +155,29 @@ export default function (Sequelize, DataTypes) {
         }
       }
     },
-
-    instanceMethods: {
-      setApproved(lastEditedById) {
-        this.status = status.APPROVED;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      },
-
-      setRejected(lastEditedById) {
-        this.status = status.REJECTED;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      },
-
-      setPaid(lastEditedById) {
-        this.status = status.PAID;
-        this.lastEditedById = lastEditedById;
-        return this.save();
-      }
-    }
   });
+
+  /**
+   * Instance Methods
+   */
+  Expense.prototype.setApproved = function(lastEditedById) {
+    this.status = status.APPROVED;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
+  Expense.prototype.setRejected = function(lastEditedById) {
+    this.status = status.REJECTED;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
+  Expense.prototype.setPaid = function(lastEditedById) {
+    this.status = status.PAID;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
   Temporal(Expense, Sequelize);
   return Expense;
 }

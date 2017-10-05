@@ -6,83 +6,63 @@ import { graphql } from 'graphql';
 import * as utils from './utils';
 import models from '../server/models';
 
-
 describe('Query Tests', () => {
-  let user1, user2, user3, group1, group2, group3, event1, event2, tier1, tier2, tier3;
+  let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2;
 
   /* SETUP
-    group1: 2 events
+    collective1: 2 events
       event1: 2 tiers
-        tier1: 2 responses
-        tier2: 1 response
+        ticket1: 2 orders
+        ticket2: 1 order
       event2: 1 tier
-        tier3: no response
-    group2: 1 event
+        tier3: no order
+    collective2: 1 event
       event3: no tiers // event3 not declared above due to linting
-    group3: no events
+    collective3: no events
   */
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user1 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user1 = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
 
-  beforeEach(() => models.User.create(utils.data('user3')).tap(u => user3 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user3')).tap(u => user3 = u));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap(g => group1 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap(g => collective1 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group2')).tap(g => group2 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
 
-  beforeEach(() => models.Group.create(utils.data('group4')).tap(g => group3 = g));
+  beforeEach(() => models.Collective.create(utils.data('collective4')).tap(g => collective3 = g));
 
   describe('Root query tests', () => {
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event1'), { createdByUserId: user1.id, GroupId: group1.id }))
+    beforeEach(() => models.Collective.create(
+      Object.assign(utils.data('event1'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
       .tap(e => event1 = e));
 
-    beforeEach(() => models.Event.create(
-      Object.assign(utils.data('event2'), { createdByUserId: user1.id, GroupId: group1.id }))
+    beforeEach(() => models.Collective.create(
+      Object.assign(utils.data('event2'), { CreatedByUserId: user1.id, ParentCollectiveId: collective1.id }))
       .tap(e => event2 = e));
 
-    beforeEach(() => models.Event.create(
-      Object.assign({}, utils.data('event2'), { slug: "another-event", createdByUserId: user2.id, GroupId: group2.id })));
+    beforeEach(() => models.Collective.create(
+      Object.assign({}, utils.data('event2'), { slug: "another-event", CreatedByUserId: user2.id, ParentCollectiveId: collective2.id })));
       //.tap(e => event3 = e)); leaving it here, so setup above makes sense.
-
-    describe('throws an error', () => {
-
-      it('when given only an existing event slug', async () => {
-        const query = `
-          query getOneEvent {
-            Event(eventSlug: "${event1.slug}") {
-              id,
-              name,
-              description
-            }
-          }
-        `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal('Field \"Event\" argument \"collectiveSlug\" of type \"String!\" is required but not provided.');
-      })
-    })
 
     describe('returns nothing', () => {
 
       it('when given a non-existent slug', async () => {
         const query = `
           query getMultipleEvents {
-            allEvents(collectiveSlug: "non-existent-slug") {
+            allEvents(slug: "non-existent-slug") {
               id,
               name,
               description
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
             allEvents: []
@@ -93,15 +73,15 @@ describe('Query Tests', () => {
       it('when given an existing collective slug when it has no events', async () => {
         const query = `
           query getMultipleEvents {
-            allEvents(collectiveSlug: "${group3.slug}") {
+            allEvents(slug: "${collective3.slug}") {
               id,
               name,
               description
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
             allEvents: []
@@ -115,11 +95,11 @@ describe('Query Tests', () => {
       it('when given an event slug and collectiveSlug (case insensitive)', async () => {
         const query = `
           query getOneEvent {
-            Event(collectiveSlug: "Scouts", eventSlug:"Jan-Meetup") {
+            Collective(slug:"Jan-Meetup") {
               id,
               name,
               description,
-              collective {
+              parentCollective {
                 slug,
                 twitterHandle
               }
@@ -127,16 +107,16 @@ describe('Query Tests', () => {
             }
           }
         `;
-        const context = { remoteUser: null };
-        const result = await graphql(schema, query, null, context);
+        const req = utils.makeRequest(null);
+        const result = await graphql(schema, query, null, req);
         expect(result).to.deep.equal({
           data: {
-            Event: {
+            Collective: {
               description: "January monthly meetup",
-              id: 1,
+              id: 7,
               name: "January meetup",
               timezone: "America/New_York",
-              collective: {
+              parentCollective: {
                 slug: 'scouts',
                 twitterHandle: 'scouts'
               }
@@ -150,26 +130,26 @@ describe('Query Tests', () => {
         it('when given only a collective slug', async () => {
           const query = `
             query getMultipleEvents {
-              allEvents(collectiveSlug: "${group1.slug}") {
+              allEvents(slug: "${collective1.slug}") {
                 id,
                 name,
                 description
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
           expect(result).to.deep.equal({
             data: {
               allEvents: [
                 {
                   description: "February monthly meetup",
-                  id: 2,
+                  id: 8,
                   name: "Feb meetup"               
                 },
                 {
                   description: "January monthly meetup",
-                  id: 1,
+                  id: 7,
                   name: "January meetup"
                 }
               ]
@@ -178,206 +158,264 @@ describe('Query Tests', () => {
         });
       });
 
-      describe('returns multiple events with tiers and responses', () => {
+      describe('returns multiple events with tiers and orders', () => {
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier1'), { EventId: event1.id }))
-          .tap(t => tier1 = t));
+          Object.assign(utils.data('ticket1'), { CollectiveId: event1.id }))
+          .tap(t => ticket1 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier2'), { EventId: event1.id }))
-          .tap(t => tier2 = t));
+          Object.assign(utils.data('ticket2'), { CollectiveId: event1.id }))
+          .tap(t => ticket2 = t));
 
         beforeEach(() => models.Tier.create(
-          Object.assign(utils.data('tier1'), { EventId: event2.id }))
-          .tap(t => tier3 = t));
+          Object.assign(utils.data('ticket1'), { CollectiveId: event2.id })));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response1'), { 
-            EventId: event1.id, 
-            TierId: tier1.id, 
-            GroupId: group1.id, 
-            UserId: user2.id,
-            confirmedAt: new Date()
+          beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order1'), { 
+            CollectiveId: event1.id,
+            FromCollectiveId: user2.CollectiveId,
+            TierId: ticket1.id, 
+            CreatedByUserId: user2.id,
+            processedAt: new Date()
           })));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response2'), { 
-            EventId: event1.id, 
-            TierId: tier1.id, 
-            GroupId: group1.id, 
-            UserId: user3.id,
-            confirmedAt: new Date()
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order2'), { 
+            CollectiveId: event1.id,
+            FromCollectiveId: user3.CollectiveId,
+            TierId: ticket1.id, 
+            CreatedByUserId: user3.id,
+            processedAt: new Date()
           })));
 
-        // this response shouldn't show up in the query
+        // this order shouldn't show up in the query
         // because it's not confirmed
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response2'), { 
-            EventId: event1.id, 
-            TierId: tier1.id, 
-            GroupId: group1.id, 
-            UserId: user1.id,
-            confirmedAt: null
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order2'), { 
+            CollectiveId: event1.id,
+            FromCollectiveId: user1.CollectiveId,
+            TierId: ticket1.id, 
+            CreatedByUserId: user1.id,
+            processedAt: null
           })));
 
-        beforeEach(() => models.Response.create(
-          Object.assign(utils.data('response3'), { 
-            EventId: event1.id, 
-            TierId: tier2.id, 
-            GroupId: group1.id, 
-            UserId: user3.id,
-            confirmedAt: new Date()
+        beforeEach(() => models.Order.create(
+          Object.assign(utils.data('order3'), { 
+            CollectiveId: event1.id,
+            FromCollectiveId: user3.CollectiveId,
+            TierId: ticket2.id, 
+            CreatedByUserId: user3.id,
+            processedAt: new Date()
           })));
         
-        it('sends response data', async () => {
+        it('sends order data', async () => {
           const query = `
-            query getMultipleEvents {
-              Event(collectiveSlug: "${group1.slug}", eventSlug: "${event1.slug}") {
-                responses {
+            query getOneCollective {
+              Collective(slug: "${event1.slug}") {
+                orders {
                   createdAt,
-                  status
+                  processedAt
                 }
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
-          const response = result.data.Event.responses[0];
-          expect(response).to.have.property("createdAt");
-          expect(response).to.have.property("status");
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
+          result.errors && console.error(result.errors);
+          const order = result.data.Collective.orders[0];
+          expect(order).to.have.property("createdAt");
+          expect(order).to.have.property("processedAt");
         });
 
         it('when given only a collective slug', async () => {
           const query = `
-            query getOneEvent {
-              allEvents(collectiveSlug: "${group1.slug}") {
-                id,
-                name,
-                description,
+            query allEvents {
+              allEvents(slug: "${collective1.slug}") {
+                id
+                name
+                description
                 location {
-                  name,
-                  address,
-                  lat,
-                  long
-                },
-                backgroundImage,
-                createdByUser {
-                  id,
                   name
+                  address
+                }
+                backgroundImage
+                createdByUser {
+                  id
+                  firstName
                 }
                 tiers {
-                  id,
-                  name,
-                  description,
-                  maxQuantity,
-                  availableQuantity,
-                  responses {
-                    id,
-                    status,
-                    description,
-                    user {
-                      id,
-                      name
+                  name
+                  description
+                  maxQuantity
+                  stats {
+                    availableQuantity
+                    totalOrders
+                  }
+                  orders {
+                    description
+                    createdByUser {
+                      id
+                      firstName
                     }
                   }
                 }
               }
             }
           `;
-          const context = { remoteUser: null };
-          const result = await graphql(schema, query, null, context);
+          const req = utils.makeRequest(null);
+          const result = await graphql(schema, query, null, req);
           expect(result).to.deep.equal({
             data: {
               allEvents: [
                 {
-                  "id": 2,
-                  "name": "Feb meetup",
-                  "description": "February monthly meetup",
-                  "backgroundImage": null,
-                  "location": {
-                    "name": "Puck Fair",
-                    "address": "505 Broadway, NY 10012",
-                    "lat": null,
-                    "long": null
-                  },
-                  "createdByUser": {
-                    "id": 1,
-                    "name": "Phil Mod"
-                  },
-                  "tiers":[
-                    {
-                      id: 3,
-                      name: tier3.name,
-                      description: tier3.description,
-                      "maxQuantity": 10,
-                      "availableQuantity": 10,
-                      responses: []
-                    }
-                  ]
+                    "id": 8,
+                    "name": "Feb meetup",
+                    "description": "February monthly meetup",
+                    "location": {
+                        "name": "Puck Fair",
+                        "address": "505 Broadway, NY 10012"
+                    },
+                    "backgroundImage": null,
+                    "createdByUser": {
+                        "id": 1,
+                        "firstName": "Phil"
+                    },
+                    "tiers": [
+                        {
+                            "name": "Free ticket",
+                            "description": "free tickets for all",
+                            "maxQuantity": 10,
+                            "stats": {
+                                "availableQuantity": 10,
+                                "totalOrders": 0
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                  id: 1,
-                  name: "January meetup",
-                  "description":"January monthly meetup",
-                  "location" : {
-                    "name": "Balanced NYC",
-                    "address": "547 Broadway, NY 10012",
-                    "lat": 39.807222,
-                    "long": -76.984722
-                  },
-                  "backgroundImage": "http://opencollective.com/backgroundimage.png",
-                  "createdByUser": {
-                    "id":1,
-                    "name":"Phil Mod"
-                  },
-                  "tiers": [
-                    {
-                      "id": 1,
-                      "name": tier1.name,
-                      "description":"free tickets for all",
-                      "maxQuantity": 10,
-                      "availableQuantity": 7,
-                      "responses": [
+                    "id": 7,
+                    "name": "January meetup",
+                    "description": "January monthly meetup",
+                    "location": {
+                        "name": "Balanced NYC",
+                        "address": "547 Broadway, NY 10012"
+                    },
+                    "backgroundImage": "http://opencollective.com/backgroundimage.png",
+                    "createdByUser": {
+                        "id": 1,
+                        "firstName": "Phil"
+                    },
+                    "tiers": [
                         {
-                          "id": 1,
-                          "status": "INTERESTED",
-                          "description": "I work on bitcoin",
-                          "user": {
-                            "id": 2,
-                            "name": "Anish Bas"
-                          },
+                            "name": "Free ticket",
+                            "description": "free tickets for all",
+                            "maxQuantity": 10,
+                            "stats": {
+                                "availableQuantity": 7,
+                                "totalOrders": 3
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
                         },
                         {
-                          "id": 2,
-                          "status": "YES",
-                          "description": "I have been working on open source for over a decade",
-                          "user": {
-                            "id": 3,
-                            "name": "Xavier Damman"
-                          }
+                            "name": "paid ticket",
+                            "description": "$20 ticket",
+                            "maxQuantity": 100,
+                            "stats": {
+                                "availableQuantity": 98,
+                                "totalOrders": 1
+                            },
+                            "orders": [
+                                {
+                                    "description": "I work on bitcoin",
+                                    "createdByUser": {
+                                        "id": 2,
+                                        "firstName": "Anish"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                },
+                                {
+                                    "description": "I have been working on open source for over a decade",
+                                    "createdByUser": {
+                                        "id": 1,
+                                        "firstName": "Phil"
+                                    }
+                                },
+                                {
+                                    "description": null,
+                                    "createdByUser": {
+                                        "id": 3,
+                                        "firstName": "Xavier"
+                                    }
+                                }
+                            ]
                         }
-                      ]
-                    },
-                    {
-                      "id": 2,
-                      "name": tier2.name,
-                      "description": "$20 ticket",
-                      "maxQuantity": 100,
-                      "availableQuantity": 98,
-                      "responses": [
-                        {
-                          "id": 4,
-                          "status": "YES",
-                          "description": null,
-                          "user": {
-                            "id": 3,
-                            "name": "Xavier Damman"
-                          }
-                        }
-                      ]
-                    }
-                  ]
+                    ]
                 }
               ]
             }

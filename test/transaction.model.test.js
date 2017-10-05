@@ -7,29 +7,30 @@ import models from '../server/models';
 const {Transaction} = models;
 
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
 describe('transaction model', () => {
 
-  let user, host, group, defaultTransactionData;
+  let user, host, collective, defaultTransactionData;
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create user', () => models.User.create(userData).tap(u => user = u));
-  beforeEach('create host', () => models.User.create(utils.data('host1')).tap(u => host = u));
+  beforeEach('create user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
+  beforeEach('create host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
 
-  beforeEach('create group2 and add host', () =>
-    models.Group.create(groupData)
-      .tap(g => group = g)
+  beforeEach('create collective2 and add host', () =>
+    models.Collective.create(collectiveData)
+      .tap(g => collective = g)
       .tap(() => {
         defaultTransactionData = {
-          UserId: user.id,
-          HostId: host.id,
-          GroupId: group.id
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          CollectiveId: collective.id,
+          HostCollectiveId: host.CollectiveId
         };
       })
-      .then(() => group.addUserWithRole(host, roles.HOST)));
+      .then(() => collective.addUserWithRole(host, roles.HOST)));
 
   it('automatically generates uuid', done => {
     Transaction.create({
@@ -48,45 +49,47 @@ describe('transaction model', () => {
       ...defaultTransactionData,
       amount: 10000
     })
-    .then(transaction => transaction.getHost())
-    .then(h => {
-      expect(h.id).to.equal(host.id);
+    .then(transaction => {
+      expect(transaction.HostCollectiveId).to.equal(host.CollectiveId);
       done();
     })
   });
 
-  it('createFromPayload creates a new Transaction', done => {
-    Transaction.createFromPayload({
+  it('createFromPayload creates a double entry transaction', () => {
+    return Transaction.createFromPayload({
       transaction: transactionsData[7],
-      user,
-      group
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      CollectiveId: collective.id
     })
     .then(() => {
-      Transaction.findAll()
+      return Transaction.findAll()
       .then(transactions => {
-        expect(transactions.length).to.equal(1);
+        expect(transactions.length).to.equal(2);
+        expect(transactions[0] instanceof models.Transaction).to.be.true;
         expect(transactions[0].description).to.equal(transactionsData[7].description);
-        done();
+        expect(transactions[0].amount).to.equal(-transactionsData[7].netAmountInCollectiveCurrency);
+        expect(transactions[1].amount).to.equal(-transactions[0].netAmountInCollectiveCurrency);
       })
     })
-    .catch(done);
   })
 
   it('createFromPayload() generates a new activity', (done) => {
 
     const createActivityStub = sinon.stub(Transaction, 'createActivity', (t) => {
-      expect(t.amount).to.equal(transactionsData[7].amount);
+      expect(Math.abs(t.amount)).to.equal(Math.abs(transactionsData[7].netAmountInCollectiveCurrency));
       createActivityStub.restore();
       done();
     });
 
     Transaction.createFromPayload({
       transaction: transactionsData[7],
-      user,
-      group
+      CreatedByUserId: user.id,
+      FromCollectiveId: user.CollectiveId,
+      CollectiveId: collective.id
     })
     .then(transaction => {
-      expect(transaction.GroupId).to.equal(group.id);
+      expect(transaction.CollectiveId).to.equal(collective.id);
     })
     .catch(done);
   });

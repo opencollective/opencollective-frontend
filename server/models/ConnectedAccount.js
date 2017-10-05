@@ -3,35 +3,37 @@ import config from 'config';
 /**
  * Model.
  */
-
 export default (Sequelize, DataTypes) => {
 
-  const allowedTypes = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
+  const supportedServices = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
 
   return Sequelize.define('ConnectedAccount', {
-    provider: {
+
+    service: {
       type: DataTypes.STRING,
       validate: {
         isIn: {
-          args: [allowedTypes],
-          msg: `Must be in ${allowedTypes}`
+          args: [supportedServices],
+          msg: `Must be in ${supportedServices}`
         }
       }
     },
 
-    username: DataTypes.STRING, // paypal email
+    username: DataTypes.STRING, // paypal email / Stripe UserId / Twitter username / ...
 
     clientId: DataTypes.STRING, // paypal app id
 
     // either paypal secret OR an accessToken to do requests to the provider on behalf of the user
-    secret: DataTypes.STRING,
+    token: DataTypes.STRING,
+    refreshToken: DataTypes.STRING, // used for Stripe
 
-    data: DataTypes.JSON,
+    data: DataTypes.JSON, // Extra service provider specific data, e.g. Stripe: { publishableKey, scope, tokenType }
 
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -44,15 +46,17 @@ export default (Sequelize, DataTypes) => {
       info() {
         return {
           id: this.id,
-          provider: this.provider,
-          username: this.username
+          service: this.service,
+          username: this.username,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt
         };
       },
 
       paypalConfig() {
         return {
           client_id: this.clientId,
-          client_secret: this.secret,
+          client_secret: this.token,
           mode: config.paypal.rest.mode
         }
       }

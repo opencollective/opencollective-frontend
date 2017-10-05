@@ -4,7 +4,6 @@ import errors from '../../lib/errors';
 import {required_valid} from '../required_param';
 import roles from '../../constants/roles';
 import {authenticateUser} from './authentication';
-import { hasRole } from '../../lib/auth';
 
 const {
   Forbidden, // I know who you are, but you permanently don't have access to this resource
@@ -13,7 +12,7 @@ const {
 
 const {
   HOST,
-  MEMBER,
+  ADMIN,
   BACKER
 } = roles;
 
@@ -27,10 +26,10 @@ export function authorizeApiKey(req, res, next) {
   // TODO: we should remove those exceptions
   // those routes should only be accessed via the website (which automatically adds the api_key)
   const exceptions = [
-    { method: 'GET', regex: /^\/groups\/[0-9]+\/transactions\/[0-9]+\/callback\?token=.+&paymentId=.+&PayerID=.+/ }, // PayPal callback
-    { method: 'GET', regex: /^\/groups\/[0-9]+\/transactions\/[0-9]+\/callback\?token=.+/ }, // PayPal callback
+    { method: 'GET', regex: /^\/collectives\/[0-9]+\/transactions\/[0-9]+\/callback\?token=.+&paymentId=.+&PayerID=.+/ }, // PayPal callback
+    { method: 'GET', regex: /^\/collectives\/[0-9]+\/transactions\/[0-9]+\/callback\?token=.+/ }, // PayPal callback
     { method: 'POST', regex: /^\/webhooks\/[mailgun|stripe]/ },
-    { method: 'GET', regex: /^\/stripe\/oauth\/callback/ },
+    { method: 'GET', regex: /^\/connected-accounts\/stripe\/callback/ },
     { method: 'GET', regex: /^\/services\/email\/approve\?messageId=.+/ },
     { method: 'GET', regex: /^\/services\/email\/unsubscribe\/(.+)\/([a-zA-Z0-9-_]+)\/([a-zA-Z0-9-_\.]+)\/.+/ }
   ];
@@ -76,61 +75,50 @@ export function mustHaveRole(possibleRoles) {
     possibleRoles = [possibleRoles];
 
   return (req, res, next) => {
-    required_valid('remoteUser', 'group')(req, res, (e) => {
+    required_valid('remoteUser', 'collective')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
-
-      return hasRole(req.remoteUser.id, req.group.id, possibleRoles)
-      .then(hasRole => {
-        if (!hasRole) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
-        else return next(null, true);
-      })
-      .catch(next);
+      if (!req.remoteUser.hasRole(possibleRoles, req.collective.id)) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
+      else return next(null, true);
     })
   };
 }
 
-export function canEditGroup(req, res, next) {
-  return mustHaveRole([HOST, MEMBER])(req, res, next);
+export function canEditCollective(req, res, next) {
+  return mustHaveRole([HOST, ADMIN])(req, res, next);
 }
 
-export function mustBePartOfTheGroup(req, res, next) {
-  return mustHaveRole([HOST, MEMBER, BACKER])(req, res, next);
+export function mustBePartOfTheCollective(req, res, next) {
+  return mustHaveRole([HOST, ADMIN, BACKER])(req, res, next);
 }
 
 /**
- * Only the author of the object or the host or an admin member of the group can edit the object
+ * Only the author of the object or the host or an admin member of the collective can edit the object
  */
 export function canEditObject(object) {
   return (req, res, next) => {
     required_valid('remoteUser', object)(req, res, (e) => {
       if (e) return next(e, false);
       if (req[object].UserId === req.remoteUser.id) return next(null, true);
-      mustHaveRole([HOST, MEMBER])(req, res, (err) => {
-        if (err) return next(new Forbidden(`Logged in user must be the author of the ${object} or the host or an admin of this group`), false);
+      mustHaveRole([HOST, ADMIN])(req, res, (err) => {
+        if (err) return next(new Forbidden(`Logged in user must be the author of the ${object} or the host or an admin of this collective`), false);
         return next(null, true);
       });
     });
   }
 }
 
-/**
- * Only the author of the comment or the host or an admin member of the group can edit an expense
- */
-export function canEditComment(req, res, next) {
-  return canEditObject('comment')(req, res, next);
-}
 
 /**
- * Only the author of the expense or the host or an admin member of the group can edit an expense
+ * Only the author of the expense or the host or an admin member of the collective can edit an expense
  */
 export function canEditExpense(req, res, next) {
   return canEditObject('expense')(req, res, next);
 }
 
 /**
- * Only the author of the donation or the host or an admin member of the group can edit a donation
+ * Only the author of the order or the host or an admin member of the collective can edit a order
  */
-export function canEditDonation (req, res, next) {
-  return canEditObject('donation')(req, res, next);
+export function canEditOrder (req, res, next) {
+  return canEditObject('order')(req, res, next);
 }

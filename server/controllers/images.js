@@ -13,6 +13,18 @@ export default function uploadImage(req, res, next) {
     }));
   }
 
+  if (!file.mimetype || !(file.mimetype.match(/image\/.*/i) || file.mimetype.match(/application\/pdf/i))) {
+    return next(new errors.ValidationFailed('invalid mimetype', {
+      file: 'Mimetype of the file should be image/png, image/jpeg or application/pdf'
+    }))
+  }
+
+  if (file.size > 1024 * 1024 * 10) {
+    return next(new errors.ValidationFailed('invalid filesize', {
+      file: 'Filesize cannot exceed 10MB'
+    }))
+  }
+
   if (!knox) {
     return next(new errors.ServerError('AWS Knox client not initialized'));
   }
@@ -20,7 +32,6 @@ export default function uploadImage(req, res, next) {
   /**
    * We will replace the name to avoid collisions
    */
-
   const ext = path.extname(file.originalname);
   const filename = ['/', uuid.v1(), ext].join('');
 

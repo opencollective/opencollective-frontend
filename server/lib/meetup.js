@@ -5,13 +5,13 @@ import requestPromise from 'request-promise';
 
 class Meetup {
 
-  constructor(meetupAccount, group) {
-    if (!meetupAccount || !meetupAccount.secret)
-      return Promise.reject(new errors.ValidationFailed("This group doesn't have a meetup.com account connected"));
+  constructor(meetupAccount, collective) {
+    if (!meetupAccount || !meetupAccount.token)
+      return Promise.reject(new errors.ValidationFailed("This collective doesn't have a meetup.com account connected"));
 
-    this.group = group;
+    this.collective = collective;
     this.settings = {
-      api_key: meetupAccount.secret,
+      api_key: meetupAccount.token,
       slug: meetupAccount.username
     };
   }
@@ -22,7 +22,7 @@ class Meetup {
    */
   makeHeader() {
     let header = '', usersList = '', tier = {};
-    const users = values(this.group.users);
+    const users = values(this.collective.users);
 
     // Order backers by totalDonations DESC
     users.sort((a, b) => b.totalDonations - a.totalDonations);
@@ -42,7 +42,7 @@ class Meetup {
       header += `<p>Thank you to our ${tier.name}s ${usersList}</p> `;
     }
 
-    header += `<p><a href="https://opencollective.com/${this.group.slug}#${tier.name}s"><img src="https://opencollective.com/${this.group.slug}/${tier.name}s.png?width=700"></a></p>`;
+    header += `<p><a href="https://opencollective.com/${this.collective.slug}#${tier.name}s"><img src="https://opencollective.com/${this.collective.slug}/${tier.name}s.png?width=700"></a></p>`;
 
     return header;
   }
@@ -81,7 +81,7 @@ class Meetup {
   syncCollective(action = 'addHeader') {
 
     if (!this.settings.api_key)
-      return Promise.reject(new errors.ValidationFailed("This group doesn't have a meetup.com account connected"));
+      return Promise.reject(new errors.ValidationFailed("This collective doesn't have a meetup.com account connected"));
 
     const urlname = this.settings.slug;
 

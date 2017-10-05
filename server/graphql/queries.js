@@ -6,26 +6,41 @@ import {
 } from 'graphql';
 
 import {
-  CollectiveType,
-  TransactionInterfaceType,
+  CollectiveInterfaceType
+} from './CollectiveInterface';
+
+import {
+  TransactionInterfaceType  
+} from './TransactionInterface';
+
+import {
   UserType,
-  EventType
+  TierType,
+  ExpenseType,
+  MemberType
 } from './types';
 
 import models from '../models';
+import rawQueries from '../lib/queries';
 
 const queries = {
   Collective: {
-    type: CollectiveType,
+    type: CollectiveInterfaceType,
     args: {
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
+      slug: { type: new GraphQLNonNull(GraphQLString) }
     },
     resolve(_, args) {
-      return models.Group.findOne({
-        where: { slug: args.collectiveSlug.toLowerCase() }
-      })
+      return models.Collective.findBySlug(args.slug);
+    }
+  },
+
+  Tier: {
+    type: TierType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args) {
+      return models.Tier.findById(args.id);
     }
   },
 
@@ -37,49 +52,63 @@ const queries = {
   },
 
   /*
-   * Given a collective slug, returns all users
-   */
-  allUsers: {
-    type: new GraphQLList(UserType),
-    args: {
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
-    },
-    resolve(_, args, req) {
-      return models.Group.findOne({ where: { slug: args.collectiveSlug.toLowerCase() } })
-        .then(group => group.getUsersForViewer(req.remoteUser));
-    }
-  },
-  /*
    * Given a collective slug, returns all transactions
    */
   allTransactions: {
     type: new GraphQLList(TransactionInterfaceType),
     args: {
-      collectiveSlug: { type: new GraphQLNonNull(GraphQLString) },
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       type: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
     resolve(_, args) {
       const query = {
-        include: [
-          {
-            model: models.Group,
-            where: { slug: args.collectiveSlug.toLowerCase() }
-          }
-        ],
+        where: { CollectiveId: args.CollectiveId },
         order: [ ['id', 'DESC'] ]
       };
-      if (args.type) query.where = { type: args.type };
+      if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       return models.Transaction.findAll(query);
     }
   },
+
   /*
-   * Given an id, returns a transaction
+   * Given a collective slug, returns all expenses
+   */
+  allExpenses: {
+    type: new GraphQLList(ExpenseType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      status: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = { where: { CollectiveId: args.CollectiveId } }
+      if (args.status) query.where.status = args.status;
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      return models.Expense.findAll(query);
+    }
+  },
+
+  /*
+   * Given an Expense id, returns the expense details
+   */
+  Expense: {
+    type: ExpenseType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) }
+    },
+    resolve(_, args) {
+      return models.Expense.findById(args.id);
+    }
+  },
+
+  /*
+   * Given a Transaction id, returns a transaction details
    */
   Transaction: {
     type: TransactionInterfaceType,
@@ -92,51 +121,102 @@ const queries = {
       return models.Transaction.findOne({ where: { id: args.id }});
     }
   },
+
   /*
-   * Given a collective slug and an event slug, returns the event
+   * Returns all collectives
    */
-  Event: {
-    type: EventType,
+  allCollectives: {
+    type: new GraphQLList(CollectiveInterfaceType),
     args: {
-      eventSlug: {
-        type: new GraphQLNonNull(GraphQLString),
-        description: 'Event slug'
+      tags: { type: new GraphQLList(GraphQLString) },
+      type: {
+        type: GraphQLString,
+        description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
       },
-      collectiveSlug: {
-        type: new GraphQLNonNull(GraphQLString)
-      }
+      ParentCollectiveId: { type: GraphQLInt },
+      orderBy: { type: GraphQLString },
+      orderDirection: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
     },
     resolve(_, args) {
-      return models.Event.findOne({
-        where: { slug: args.eventSlug.toLowerCase() },
-        include: [{
-          model: models.Group,
-          where: { slug: args.collectiveSlug.toLowerCase() }
-        }]
-      })
+      const query = {
+        where: {},
+        limit: args.limit || 10
+      };
+
+      if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
+      if (args.tags) query.where.tags = { $overlap: args.tags };
+      if (args.type) query.where.type = args.type;
+      if (args.offset) query.offset = args.offset;
+
+      if (args.ParentCollectiveId && args.orderBy === 'balance') {
+        return rawQueries.getChildCollectivesWithBalance(args.ParentCollectiveId, args);
+      }
+
+      return models.Collective.findAll(query);
     }
   },
+
+  /*
+   * Given a collective slug, returns all members
+   */
+  allMembers: {
+    type: new GraphQLList(MemberType),
+    args: {
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      TierId: { type: GraphQLInt },
+      role: { type: GraphQLString },
+      type: { type: GraphQLString },
+      limit: { type: GraphQLInt },
+      offset: { type: GraphQLInt }
+    },
+    resolve(_, args) {
+      const query = { where: { CollectiveId: args.CollectiveId } }
+      if (args.TierId) query.where.TierId = args.TierId;
+      if (args.role) query.where.role = args.role;
+      if (args.type) {
+        const types = args.type.split(',');
+        query.include = [
+          {
+            model: models.Collective,
+            as: 'memberCollective',
+            required: true,
+            where: { type: { $in: types } }
+          }
+        ]
+      }
+      if (args.limit) query.limit = args.limit;
+      if (args.offset) query.offset = args.offset;
+      return models.Member.findAll(query);
+    }
+  },
+
   /*
    * Given a collective slug, returns all events
    */
   allEvents: {
-    type: new GraphQLList(EventType),
+    type: new GraphQLList(CollectiveInterfaceType),
     args: {
-      collectiveSlug: {
+      slug: {
         type: GraphQLString
       }
     },
     resolve(_, args) {
-      const where = {};
-      if (args.collectiveSlug) {
-        where.slug = args.collectiveSlug.toLowerCase();
+      if (args.slug) {
+        return models.Collective
+          .findBySlug(args.slug, { attributes: ['id'] })
+          .then(collective => models.Collective.findAll({
+            where: { ParentCollectiveId: collective.id, type: 'EVENT' },
+            order: [['startsAt', 'DESC'], ['createdAt', 'DESC']]
+          }))
+          .catch(e => {
+            console.error(e.message);
+            return [];
+          })
+      } else {
+        return models.Collective.findAll({ where: { type: 'EVENT' }});
       }
-      return models.Event.findAll({
-        include: [{
-          model: models.Group,
-          where
-        }]
-      })
     }
   }
 }

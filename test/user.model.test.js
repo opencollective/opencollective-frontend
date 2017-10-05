@@ -5,7 +5,7 @@ import models from '../server/models';
 
 const userData = utils.data('user1');
 
-const { User, Group, Transaction } = models;
+const { User } = models;
 
 describe('user.models.test.js', () => {
   let sandbox;
@@ -38,7 +38,7 @@ describe('user.models.test.js', () => {
         .create({ firstName: userData.firstName, email: 'johndoe'})
         .catch(err => expect(err).to.exist));
 
-    it('fails if neither email or username is given', () => {
+    it('fails if no email is given', () => {
       User
         .create({ firstName: 'blah' })
         .catch(err => expect(err).to.exist);
@@ -87,49 +87,19 @@ describe('user.models.test.js', () => {
         });
     });
 
-    it('creates a unique username', () => {
-      return User
-        .create({username: 'xdamman'})
-        .tap(user => {
-          expect(user.username).to.equal('xdamman')
-        })
-        .then(() => User.create({ email: 'xavier.damman@gmail.com'}))
-        .then(user => {
-          expect(user.username).to.equal('xavierdamman')
-        })
-        .then(() => User.create({email: 'xdamman2@gmail.com'}))
-        .then(() => User.create({ twitterHandle: '@xdamman'}))
-        .then(user => {
-          expect(user.username).to.equal('xdamman1')
-          expect(user.twitterHandle).to.equal('xdamman')
-        })
-        .then(() => User.create({ firstName: 'Xavier', lastName: 'Damman'}))
-        .then(user => {
-          expect(user.username).to.equal('xavierdamman1')
-        })
-        .then(() => User.create({'username': 'hélène & les g.arçons'}))
-        .then(user => {
-          expect(user.username).to.equal('helene-and-les-garcons');
-        })
-    })
-
-    it('creates a valid username from an email', () => {
+    it('creates a user and subscribes it to user.yearlyreport and user.monthlyreport', () => {
       return User
         .create({email: 'xdamman+opencollective@gmail.com'})
-        .tap(user => {
-          expect(user.username).to.equal('xdamman')
-        })
-    })
-
-    it('creates a user and subscribes it to user.yearlyreport', () => {
-      return User
-        .create({email: 'xdamman+opencollective@gmail.com'})
-        .tap(user => {
-          models.Notification.findOne({ UserId: user.id }).then(notification => {
-            expect(notification.channel).to.equal('email');
-            expect(notification.type).to.equal('user.yearlyreport');
+        .tap(() => {
+          return new Promise(resolve => {
+            setTimeout(resolve, 10);
           })
         })
+        .then(user => models.Notification.findAll({ where: { UserId: user.id, channel: "email" }, order: [['type','ASC']]}).then(notifications => {
+          expect(notifications.length).to.equal(2);
+          expect(notifications[0].type).to.equal('user.monthlyreport');
+          expect(notifications[1].type).to.equal('user.yearlyreport');
+        }))
     })
     
   });
@@ -147,11 +117,6 @@ describe('user.models.test.js', () => {
         expect(user.info).to.have.property('paypalEmail');
         expect(user.public).to.not.have.property('email');
         expect(user.public).to.not.have.property('paypalEmail');
-        expect(user.public).to.have.property('website');
-        expect(user.public).to.have.property('twitterHandle');
-        expect(user.public.twitterHandle).to.equal(userData.twitterHandle);
-        expect(userData.website).to.be.undefined;
-        expect(user.website).to.equal(`https://twitter.com/${userData.twitterHandle}`);
         done();
       });
     });
@@ -192,98 +157,25 @@ describe('user.models.test.js', () => {
 
   describe('class methods', () => {
 
-    const users = [ utils.data('user1'), utils.data('user2') ];
-    const transactions = [{
-      createdAt: new Date('2016-06-14'),
-      amount: 10000,
-      netAmountInGroupCurrency: 10000,
-      currency: 'USD',
-      type: 'donation',
-      UserId: 1,
-      GroupId: 1
-    },{
-      createdAt: new Date('2016-06-15'),
-      amount: 15000,
-      netAmountInGroupCurrency: 15000,
-      currency: 'USD',
-      type: 'donation',
-      UserId: 1,
-      GroupId: 2
-    },{
-      createdAt: new Date('2016-07-15'),
-      amount: 25000,
-      netAmountInGroupCurrency: 25000,
-      currency: 'USD',
-      type: 'donation',
-      UserId: 2,
-      GroupId: 1
-    },{
-      createdAt: new Date('2016-07-16'),
-      amount: 50000,
-      netAmountInGroupCurrency: 50000,
-      currency: 'USD',
-      type: 'donation',
-      UserId: 2,
-      GroupId: 2
-    }];
-
     beforeEach(() => utils.resetTestDB());
-    beforeEach(() => User.createMany(users));
-    beforeEach(() => Group.create(utils.data('group1')));
-    beforeEach(() => Group.create(utils.data('group2')));
-    beforeEach(() => Transaction.createMany(transactions, { HostId: 1 }));
+    beforeEach(() => User.createUserWithCollective(utils.data('user1')));
 
-    it('gets the top backers', () => {
-      return User.getTopBackers()
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(2);
-          expect(backers[0].totalDonations).to.equal(75000);
-          expect(backers[0]).to.have.property('firstName');
-          expect(backers[0]).to.have.property('avatar');
-          expect(backers[0]).to.have.property('website');
-          expect(backers[0]).to.have.property('twitterHandle');
-        });
-    });
-
-    it('gets the top backers in a given month', () => {
-      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'))
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(25000);
-        });
-    });
-
-    it('gets the top backers in open source', () => {
-      return User.getTopBackers(new Date('2016-06-01'), new Date('2016-07-01'), ['open source'])
-        .then(backers => {
-          backers = backers.map(g => g.dataValues);
-          expect(backers.length).to.equal(1);
-          expect(backers[0].totalDonations).to.equal(10000);
-        });
-    });
-
-    it('gets the latest donations of a user', () => {
-      return User.findOne().then(user => {
-        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'))
-          .then(donations => {
-            expect(donations.length).to.equal(2);
-          })
-      });
-    });
-
-    it('gets the latest donations of a user to open source', () => {
-      return User.findOne().then(user => {
-        return user.getLatestDonations(new Date('2016-06-01'), new Date('2016-08-01'), ['open source'])
-          .then(donations => {
-            expect(donations.length).to.equal(1);
-            expect(donations[0]).to.have.property("amount");
-            expect(donations[0]).to.have.property("currency");
-            expect(donations[0]).to.have.property("Group");
-            expect(donations[0].Group).to.have.property("name");
-          })
-      });
+    it('creates a new user collective and generates a unique slug', () => {
+      const email = 'xavier.damman@email.com';
+      return User.createUserWithCollective({ email })
+        .then(user => {
+          expect(user.email).to.equal(email);
+          expect(user.collective.slug).to.equal('xavierdamman');
+          expect(user.collective.type).to.equal('USER');
+          return User.createUserWithCollective({ firstName: 'Xavier', lastName: 'Damman', email: 'xavierdamman+test@mail.com' });
+        })
+        .then(user2 => {
+          expect(user2.collective.slug).to.equal('xavier-damman');
+          expect(user2.collective.name).to.equal('Xavier Damman');        
+          expect(user2.firstName).to.equal('Xavier');
+          expect(user2.lastName).to.equal('Damman');
+          expect(user2.name).to.equal('Xavier Damman');
+        })
     });
 
   });

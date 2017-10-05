@@ -10,13 +10,13 @@ import config from 'config';
 const getConfig = (connectedAccount) => ({
   mode: config.paypal.rest.mode,
   client_id: connectedAccount.clientId,
-  client_secret: connectedAccount.secret
+  client_secret: connectedAccount.token
 });
 
-const getCallbackUrl = (group, transaction) => `${config.host.api}/groups/${group.id}/transactions/${transaction.id}/callback`;
+const getCallbackUrl = (collective, transaction) => `${config.host.api}/collectives/${collective.id}/transactions/${transaction.id}/callback`;
 
-const createBillingPlan = (planDescription, group, transaction, subscription, paypalConfig, cb) => {
-  const callbackUrl = getCallbackUrl(group, transaction);
+const createBillingPlan = (planDescription, collective, transaction, subscription, paypalConfig, cb) => {
+  const callbackUrl = getCallbackUrl(collective, transaction);
 
   const { amount } = transaction;
   const { currency } = transaction;
@@ -72,15 +72,15 @@ const createBillingAgreement = (agreementDescription, planId, paypalConfig, cb) 
 /**
  * Create a subscription payment and return the links to the paypal approval
  */
-const createSubscription = (connectedAccount, group, transaction, subscription, callback) => {
+const createSubscription = (connectedAccount, collective, transaction, subscription, callback) => {
   const paypalConfig = getConfig(connectedAccount);
-  const description = `donation of ${transaction.currency} ${transaction.amount} / ${subscription.interval} to ${group.name}`;
+  const description = `donation of ${transaction.currency} ${transaction.amount} / ${subscription.interval} to ${collective.name}`;
 
   async.auto({
     createBillingPlan: (cb) => {
       createBillingPlan(
         description,
-        group,
+        collective,
         transaction,
         subscription,
         paypalConfig,
@@ -119,9 +119,9 @@ const createSubscription = (connectedAccount, group, transaction, subscription, 
  * Create a single payment
  * https://developer.paypal.com/docs/rest/api/payments/#payment.create
  */
-const createPayment = (connectedAccount, group, transaction, callback) => {
+const createPayment = (connectedAccount, collective, transaction, callback) => {
   const { amount, currency } = transaction;
-  const callbackUrl = getCallbackUrl(group, transaction);
+  const callbackUrl = getCallbackUrl(collective, transaction);
   const paypalConfig = getConfig(connectedAccount);
 
   const payment = {
@@ -138,7 +138,7 @@ const createPayment = (connectedAccount, group, transaction, callback) => {
         currency,
         total: amount
       },
-      description: `Donation to ${group.name} (${currency} ${amount})`
+      description: `Donation to ${collective.name} (${currency} ${amount})`
     }]
   };
 

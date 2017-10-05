@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  * This script subscribes all members of a collective (core contributors)
- * to the `group.monthlyreport` notification (for all collectives)
+ * to the `collective.monthlyreport` notification (for all collectives)
  */
 import Promise from 'bluebird';
 import models from '../server/models';
 
 const debug = require('debug')('subscribe');
 
-const UserGroup = models.UserGroup;
+const Member = models.Member;
 const Notification = models.Notification;
 
 const processRows = (rows) => {
@@ -16,7 +16,7 @@ const processRows = (rows) => {
 };
 
 const init = () => {
-  UserGroup.findAll()
+  Member.findAll()
   .then(processRows)
   .then(() => process.exit(0));
 }
@@ -24,14 +24,14 @@ const init = () => {
 const processRow = (row) => {
   const lists = {};
   lists['BACKER'] = 'backers';
-  lists['MEMBER'] = 'members';
+  lists['ADMIN'] = 'members';
   const type = `mailinglist.${lists[row.role]}`;
-  debug(`Subscribing UserId ${row.UserId} to ${type} of GroupId ${row.GroupId}`);
+  debug(`Subscribing UserId ${row.UserId} to ${type} of CollectiveId ${row.CollectiveId}`);
   return Notification.create({
     UserId: row.UserId,
-    GroupId: row.GroupId,
+    CollectiveId: row.CollectiveId,
     type
-  }).catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of GroupId ${row.GroupId}`));
+  }).catch(() => console.error(`UserId ${row.UserId} already subscribed to ${type} of CollectiveId ${row.CollectiveId}`));
 };
 
 

@@ -1,22 +1,23 @@
 /**
  * Dependencies.
  */
-import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import moment from 'moment';
 import Promise from 'bluebird';
-import slug from 'slug';
 
-import {decrypt, encrypt} from '../lib/utils';
+import { decrypt, encrypt } from '../lib/utils';
 import errors from '../lib/errors';
-import queries from '../lib/queries';
 import userLib from '../lib/userlib';
 import knox from '../gateways/knox';
 import imageUrlLib from '../lib/imageUrlToAmazonUrl';
 
-import { hasRole } from '../lib/auth';
+import roles from '../constants/roles';
+import { extend, defaults, intersection } from 'lodash';
+
+import debugLib from 'debug';
+const debug = debugLib('user');
 
 /**
  * Constants.
@@ -31,11 +32,6 @@ export default (Sequelize, DataTypes) => {
   const models = Sequelize.models;
 
   const User = Sequelize.define('User', {
-
-    _access: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
 
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
@@ -54,18 +50,6 @@ export default (Sequelize, DataTypes) => {
         }
       }
     },
-
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      set(val) {
-        if (typeof val === 'string') {
-          this.setDataValue('username', slug(val).toLowerCase());
-        }
-      }
-    },
-
-    avatar: DataTypes.STRING,
 
     email: {
       type: DataTypes.STRING,
@@ -86,39 +70,7 @@ export default (Sequelize, DataTypes) => {
       }
     },
 
-    mission: DataTypes.STRING,
-    description: DataTypes.STRING,
-    longDescription: DataTypes.TEXT,
-    isOrganization: DataTypes.BOOLEAN, // e.g. DigitalOcean, PubNub, ...
-    currency: {
-      type: DataTypes.STRING,
-      validate: {
-        len: 3
-      },
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
-        }
-      }
-    },
-    twitterHandle: {
-      type: DataTypes.STRING, // without the @ symbol. Ex: 'asood123'
-      set(val) {
-        if (typeof val === 'string') {
-          this.setDataValue('twitterHandle', val.replace(/^@/,''));
-        }
-      }
-    },
-
     billingAddress: DataTypes.STRING, // Used for the invoices, we should create a separate table for addresses (billing/shipping)
-
-    website: {
-      type: DataTypes.STRING,
-      get() {
-        if (this.getDataValue('website')) return this.getDataValue('website');
-        return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
-      }
-    },
 
     paypalEmail: {
       type: DataTypes.STRING,
@@ -175,16 +127,6 @@ export default (Sequelize, DataTypes) => {
 
     resetPasswordSentAt: DataTypes.DATE,
 
-    referrerId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
-    },
-
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -200,22 +142,46 @@ export default (Sequelize, DataTypes) => {
 
     getterMethods: {
 
+      // Collective of type USER corresponding to this user
+      userCollective() {
+        return models.Collective.findById(this.CollectiveId);
+      },
+
+      username() {
+        return this.userCollective.then(collective => collective.slug);
+      },
+
+      name() {
+        return this.userCollective.then(collective => collective.name);
+      },
+
+      twitterHandle() {
+        return this.userCollective.then(collective => collective.twitterHandle);
+      },
+
+      website() {
+        return this.userCollective.then(collective => collective.website);
+      },
+
+      description() {
+        return this.userCollective.then(collective => collective.description);
+      },
+
+      longDescription() {
+        return this.userCollective.then(collective => collective.longDescription);
+      },
+
+      image() {
+        return this.userCollective.then(collective => collective.image);
+      },
+
       // Info (private).
       info() {
         return {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
-          username: this.username,
           email: this.email,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
-          isOrganization: this.isOrganization,
-          avatar: this.avatar,
-          twitterHandle: this.twitterHandle,
-          website: this.website,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
           paypalEmail: this.paypalEmail
@@ -226,17 +192,9 @@ export default (Sequelize, DataTypes) => {
       show() {
         return {
           id: this.id,
+          CollectiveId: this.CollectiveId,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
-          username: this.username,
-          avatar: this.avatar,
-          twitterHandle: this.twitterHandle,
-          website: this.website,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
-          isOrganization: this.isOrganization,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         };
@@ -245,8 +203,6 @@ export default (Sequelize, DataTypes) => {
       minimal() {
         return {
           id: this.id,
-          username: this.username,
-          avatar: this.avatar,
           firstName: this.firstName,
           lastName: this.lastName,
           name: this.name,
@@ -255,283 +211,17 @@ export default (Sequelize, DataTypes) => {
         };
       },
 
-      // Used for the public group
+      // Used for the public collective
       public() {
         return {
           id: this.id,
-          avatar: this.avatar,
           firstName: this.firstName,
-          lastName: this.lastName,
-          name: this.name,
-          username: this.username,
-          website: this.website,
-          mission: this.mission,
-          description: this.description,
-          longDescription: this.longDescription,
-          isOrganization: this.isOrganization,
-          twitterHandle: this.twitterHandle
+          lastName: this.lastName
         };
-      }
-    },
-
-    instanceMethods: {
-      // JWT token.
-      jwt(payload, expiresInHours) {
-        const { secret } = config.keys.opencollective;
-        expiresInHours = expiresInHours || 24*30; // 1 month
-
-        // We are sending too much data (large jwt) but the app and website
-        // need the id and email. We will refactor that progressively to have
-        // a smaller token.
-        const data = _.extend({}, payload, {
-          id: this.id,
-          email: this.email
-        });
-
-        return jwt.sign(data, secret, {
-          expiresIn: 60 * 60 * expiresInHours,
-          subject: this.id, // user
-          issuer: config.host.api
-        });
-      },
-
-      hasMissingInfo() {
-        return !(this.firstName && this.avatar);
-      },
-
-      encryptId() {
-        return encrypt(String(this.id));
-      },
-
-      generateResetUrl(plainToken) {
-        const encId = this.encryptId();
-        return `${config.host.webapp}/reset/${encId}/${plainToken}/`;
-      },
-
-      checkResetToken(token, cb) {
-        const today = moment();
-        const resetPasswordSentAt = moment(this.resetPasswordSentAt);
-        const daysDifference = today.diff(resetPasswordSentAt, 'days');
-
-        if (daysDifference > 0) {
-          return cb(new errors.BadRequest('The reset token has expired'));
-        }
-
-        if (!this.resetPasswordTokenHash) {
-          return cb(new errors.BadRequest('The reset token does not exist'))
-        }
-
-        bcrypt.compare(token, this.resetPasswordTokenHash, (err, matched) => {
-          if (err) return cb(err);
-          if (!matched) return cb(new errors.BadRequest('The reset token is invalid'));
-
-          cb();
-        });
-      },
-
-      generateLoginLink(redirect) {
-        const expiresInHours = 24*30;
-        const token = this.jwt({ scope: 'login' }, expiresInHours);
-
-        return `${config.host.website}/login/${token}?next=${redirect}`;
-      },
-
-      generateConnectedAccountVerifiedToken(connectedAccountId, username) {
-        const expiresInHours = 24;
-        return this.jwt({ scope: 'connected-account', connectedAccountId, username }, expiresInHours);
-      },
-
-      getLatestDonations(since, until, tags) {
-        tags = tags || [];
-        return models.Transaction.findAll({
-          where: {
-            UserId: this.id,
-            createdAt: { $gte: since || 0, $lt: until || new Date}
-          },
-          order: [ ['amount','DESC'] ],
-          include: [ { model: models.Group, where: { tags: { $contains: tags } } } ]
-        });
-      },
-
-      getCollectivesWithRoles() {
-        return this.getGroups({
-          include: [{ model: models.UserGroup, where: { UserId: this.id }}]
-        })
-        .then(groups => groups.map(g => {
-          g.role = g.UserGroup.role;
-          return g;
-        }))
-      },
-
-      getRoles() {
-        return models.UserGroup.findAll({
-          where: {
-            UserId: this.id
-          }
-        });
-      },
-
-      unsubscribe(GroupId, type, channel = 'email') {
-        const notification = {
-          UserId: this.id,
-          GroupId,
-          type,
-          channel
-        };
-        return models.Notification.findOne({ where: notification })
-        .then(result => {
-          if (result) return result.update({active: false})
-          else {
-            notification.active = false;
-            return models.Notification.create(notification);
-          }
-        })
-      },
-
-      canEditGroup(groupid) {
-        return hasRole(this.id, groupid, ['MEMBER', 'HOST']);
-      },
-
-      updateWhiteListedAttributes(attributes) {
-
-        let update = false;
-        const allowedFields = 
-          [ 'username',
-            'firstName',
-            'lastName',
-            'description',
-            'longDescription',
-            'twitterHandle',
-            'website',
-            'avatar',
-            'paypalEmail'];
-
-        if (attributes.name) {
-          const nameTokens = attributes.name.split(' ');
-          this.firstName = nameTokens.shift();
-          this.lastName = nameTokens.join(' ');
-          update = true;
-        }
-
-        return Promise.map(allowedFields, prop => {
-          if (attributes[prop]) {
-            this[prop] = attributes[prop];
-            update = true;
-          }
-
-          if (prop === 'username') {
-            return Sequelize.query(`
-              with usernames as (SELECT username FROM "Users" UNION SELECT slug as username FROM "Groups")
-              SELECT COUNT(*) FROM usernames WHERE username='${attributes[prop]}'
-              `, {
-                type: Sequelize.QueryTypes.SELECT
-              })
-            .then(res => {
-              const count = res[0].count;
-              if (count > 0) throw new errors.BadRequest(`username ${attributes[prop]} is already taken`);
-            })
-          }
-        })
-        .then(() => this.avatar || userLib.fetchAvatar(this.email))
-        .then(avatar => {
-          if (avatar && avatar.indexOf('/public') !== 0 && avatar.indexOf(config.aws.s3.bucket) === -1) {
-            return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, avatar)
-              .then((aws_src, error) => {
-                this.avatar = error ? this.avatar : aws_src;
-                update = true;
-              });
-          } else {
-            Promise.resolve();
-          }
-        })
-        .then(() => {
-          if (update) {
-            return this.save();
-          } else {
-            return this
-          }
-        })
-      },
-
-    },
-
-    classMethods: {
-
-      createMany: (users, defaultValues = {}) => {
-        return Promise.map(users, u => User.create(_.defaults({},u,defaultValues)), {concurrency: 1});
-      },
-
-      auth(usernameOrEmail, password, cb) {
-        const msg = 'Invalid username/email or password.';
-        usernameOrEmail = usernameOrEmail.toLowerCase();
-
-        User.find({
-          where: ['username = ? OR email = ?', usernameOrEmail, usernameOrEmail]
-        })
-        .then((user) => {
-          if (!user) return cb(new errors.BadRequest(msg));
-
-          bcrypt.compare(password, user.password_hash, (err, matched) => {
-            if (!err && matched) {
-              user.updateAttributes({
-                seenAt: new Date()
-              })
-                .tap(user => cb(null, user))
-                .catch(cb);
-            } else {
-              cb(new errors.BadRequest(msg));
-            }
-          });
-        })
-        .catch(cb);
-      },
-
-      decryptId(encrypted) {
-        return decrypt(encrypted);
-      },
-
-      getTopBackers(since, until, tags, limit) {
-        return queries.getTopBackers(since || 0, until || new Date, tags, limit || 5);
-      },
-
-      findOrCreateByEmail(email, otherAttributes) {
-        return User.findOne({
-          where: {
-            $or: {
-              email,
-              paypalEmail: email
-            }
-          }
-        })
-        .then(user => user || models.User.create(Object.assign({}, { email }, otherAttributes)))
-      },
-
-      splitName(name) {
-        let firstName = null, lastName = null;
-        if (name) {
-          const tokens = name.split(' ');
-          firstName = tokens[0];
-          lastName = tokens.length > 1 ? tokens.slice(1).join(' ') : null;
-        }
-        return { firstName, lastName };
       }
     },
 
     hooks: {
-      beforeCreate: (instance) => {
-        if (!instance.username) {
-          return userLib.suggestUsername(instance)
-            .then(username => {
-              if (!username) {
-                return Promise.reject(new Error('A user must have a username'));
-              }
-              instance.username = username;
-              return Promise.resolve();
-            });
-        }
-        return Promise.resolve();
-
-      },
       afterCreate: (instance) => {
         models.Notification.createMany([{ type: 'user.yearlyreport' }, { type: 'user.monthlyreport' }], { channel: 'email', UserId: instance.id })
           .then(() => userLib.updateUserInfoFromClearbit(instance));
@@ -539,6 +229,326 @@ export default (Sequelize, DataTypes) => {
       }
     }
   });
+
+  /**
+   * Instance Methods
+   */
+  User.prototype.jwt = function(payload, expiresInHours) {
+    const { secret } = config.keys.opencollective;
+    expiresInHours = expiresInHours || 24*30; // 1 month
+
+    // We are sending too much data (large jwt) but the app and website
+    // need the id and email. We will refactor that progressively to have
+    // a smaller token.
+    const data = extend({}, payload, {
+      id: this.id,
+      email: this.email
+    });
+
+    return jwt.sign(data, secret, {
+      expiresIn: 60 * 60 * expiresInHours,
+      subject: this.id, // user
+      issuer: config.host.api
+    });
+  };
+
+  User.prototype.hasMissingInfo = function() {
+    return !(this.firstName && this.image);
+  };
+
+  User.prototype.encryptId = function() {
+    return encrypt(String(this.id));
+  };
+
+  User.prototype.generateResetUrl = function(plainToken) {
+    const encId = this.encryptId();
+    return `${config.host.webapp}/reset/${encId}/${plainToken}/`;
+  };
+
+  User.prototype.checkResetToken = function(token, cb) {
+    const today = moment();
+    const resetPasswordSentAt = moment(this.resetPasswordSentAt);
+    const daysDifference = today.diff(resetPasswordSentAt, 'days');
+
+    if (daysDifference > 0) {
+      return cb(new errors.BadRequest('The reset token has expired'));
+    }
+
+    if (!this.resetPasswordTokenHash) {
+      return cb(new errors.BadRequest('The reset token does not exist'))
+    }
+
+    bcrypt.compare(token, this.resetPasswordTokenHash, (err, matched) => {
+      if (err) return cb(err);
+      if (!matched) return cb(new errors.BadRequest('The reset token is invalid'));
+
+      cb();
+    });
+  };
+
+  User.prototype.generateLoginLink = function(redirect) {
+    const expiresInHours = 24*30;
+    const token = this.jwt({ scope: 'login' }, expiresInHours);
+
+    return `${config.host.website}/signin/${token}?next=${redirect}`;
+  };
+
+  User.prototype.generateConnectedAccountVerifiedToken = function(connectedAccountId, username) {
+    const expiresInHours = 24;
+    return this.jwt({ scope: 'connected-account', connectedAccountId, username }, expiresInHours);
+  };
+
+  User.prototype.getMemberships = function(options = {}) {
+    const query = {          
+      where: {
+        MemberCollectiveId: this.CollectiveId
+      },
+      ...options
+    };
+    return models.Member.findAll(query);
+  };
+
+  User.prototype.getCollectives = function(options = {}) {
+    return this.getMemberships({
+      ... options,
+      include: [ { model: models.Collective, as: 'collective' } ]
+    }).map(membership => membership.collective);
+  };
+
+  User.prototype.unsubscribe = function(CollectiveId, type, channel = 'email') {
+    const notification = {
+      UserId: this.id,
+      CollectiveId,
+      type,
+      channel
+    };
+    return models.Notification.findOne({ where: notification })
+    .then(result => {
+      if (result) return result.update({active: false})
+      else {
+        notification.active = false;
+        return models.Notification.create(notification);
+      }
+    })
+  };
+
+  // should be deprecated
+  User.prototype.updateWhiteListedAttributes = function(attributes) {
+
+    let update = false;
+    const allowedFields = 
+      [ 'slug',
+        'firstName',
+        'lastName',
+        'description',
+        'longDescription',
+        'twitterHandle',
+        'website',
+        'image',
+        'paypalEmail'];
+
+    if (attributes.name) {
+      const nameTokens = attributes.name.split(' ');
+      this.firstName = nameTokens.shift();
+      this.lastName = nameTokens.join(' ');
+      update = true;
+    }
+
+    return Promise.map(allowedFields, prop => {
+      if (attributes[prop]) {
+        this[prop] = attributes[prop];
+        update = true;
+      }
+
+      if (prop === 'slug') {
+        return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[prop]}'`, {
+            type: Sequelize.QueryTypes.SELECT
+          })
+        .then(res => {
+          const count = res[0].count;
+          if (count > 0) throw new errors.BadRequest(`slug ${attributes[prop]} is already taken`);
+        })
+      }
+    })
+    .then(() => this.image || userLib.fetchAvatar(this.email))
+    .then(image => {
+      if (image && image.indexOf('/public') !== 0 && image.indexOf(config.aws.s3.bucket) === -1) {
+        return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, image)
+          .then((aws_src, error) => {
+            this.image = error ? this.image : aws_src;
+            update = true;
+          });
+      } else {
+        Promise.resolve();
+      }
+    })
+    .then(() => {
+      if (update) {
+        return this.save();
+      } else {
+        return this
+      }
+    })
+  };
+
+  User.prototype.populateRoles = function() {
+
+    if (this.rolesByCollectiveId) {
+      debug("roles already populated", this.rolesByCollectiveId);
+      return Promise.resolve(this.rolesByCollectiveId);
+    }
+
+    return this.rolesByCollectiveId || models.Member.findAll({ where: { MemberCollectiveId: this.CollectiveId }})
+      .then(memberships => {
+        const rolesByCollectiveId = {};
+        memberships.map(m => {
+          rolesByCollectiveId[m.CollectiveId] = rolesByCollectiveId[m.CollectiveId] || [];
+          rolesByCollectiveId[m.CollectiveId].push(m.role);
+        });
+        this.rolesByCollectiveId = rolesByCollectiveId;
+        debug("populateRoles", this.rolesByCollectiveId);
+        return this;
+      })
+  }
+
+  User.prototype.hasRole = function(roles, CollectiveId) {
+    if (!CollectiveId) return false;
+    if (this.CollectiveId === CollectiveId) return true;
+    if (!this.rolesByCollectiveId) {
+      console.error(">>> User model error: User.rolesByCollectiveId hasn't been populated.", new Error().stack);
+      return false;
+    }
+    if (typeof roles === 'string') {
+      roles = [roles];
+    }
+    const result = intersection(this.rolesByCollectiveId[CollectiveId], roles).length > 0;
+    debug("hasRole", "userid:", this.id, "has role", roles," in CollectiveId", CollectiveId, "?", result);    
+    return result;
+  }
+
+  // Adding some sugars
+  User.prototype.isAdmin = function(CollectiveId) {
+    const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
+    debug("isAdmin of CollectiveId", CollectiveId,"?", result);
+    return result;
+  }
+
+  User.prototype.isMember = function(CollectiveId) {
+    const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN, roles.MEMBER], CollectiveId);
+    debug("isMember of CollectiveId", CollectiveId,"?", result);
+    return result;
+  }
+
+  User.prototype.getPersonalDetails = function(remoteUser) {
+    if (!remoteUser) return Promise.resolve({});
+    return this.populateRoles()
+      .then(() => {
+        // all the CollectiveIds that the remoteUser is admin of.
+        const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
+        const memberOfCollectives = Object.keys(this.rolesByCollectiveId);
+        const canAccess = intersection(adminOfCollectives, memberOfCollectives).length > 0
+        debug("getPersonalDetails", "remoteUser id:", remoteUser.id, "is admin of collective ids:", adminOfCollectives, "this user id:", this.id, "is member of", memberOfCollectives, "canAccess?", canAccess);
+        return canAccess;
+      })
+  }
+
+
+  /**
+   * Class Methods
+   */
+  User.createMany = (users, defaultValues = {}) => {
+    return Promise.map(users, u => User.create(defaults({},u,defaultValues)), { concurrency: 1 });
+  };
+
+  User.auth = (email, password, cb) => {
+    if (!email) return cb(new errors.BadRequest(msg));
+
+    const msg = 'Invalid email or password.';
+    email = email.toLowerCase();
+
+    User.find({
+      where: ['email = ?', email]
+    })
+    .then((user) => {
+      if (!user) return cb(new errors.BadRequest(msg));
+
+      bcrypt.compare(password, user.password_hash, (err, matched) => {
+        if (!err && matched) {
+          user.updateAttributes({
+            seenAt: new Date()
+          })
+            .tap(user => cb(null, user))
+            .catch(cb);
+        } else {
+          cb(new errors.BadRequest(msg));
+        }
+      });
+    })
+    .catch(cb);
+  };
+
+  User.decryptId = (encrypted) => {
+    return decrypt(encrypted);
+  };
+
+  User.findOrCreateByEmail = (email, otherAttributes) => {
+    return User.findOne({
+      where: {
+        $or: {
+          email,
+          paypalEmail: email
+        }
+      }
+    })
+    .then(user => user || models.User.createUserWithCollective(Object.assign({}, { email }, otherAttributes)))
+  };
+
+  User.createUserWithCollective = (userData) => {
+    if (!userData) return Promise.reject(new Error("Cannot create a user: no user data provided"));
+
+    let user;
+    return User.create(userData)
+      .then(u => {
+        user = u;
+        let name = userData.firstName;
+        if (name && userData.lastName) {
+          name += ` ${userData.lastName}`;
+        }
+        const userCollective = {
+          type: 'USER',
+          name: userData.name || name || user.email && user.email.split(/@|\+/)[0],
+          image: userData.image,
+          mission: userData.mission,
+          description: userData.description,
+          longDescription: userData.longDescription,
+          website: userData.website,
+          twitterHandle: userData.twitterHandle,
+          isActive: true,
+          CreatedByUserId: user.id,
+          data: { UserId: user.id }
+        };
+        return models.Collective.create(userCollective);
+      })
+      .tap(collective => {
+        user.CollectiveId = collective.id;
+        return user.save();
+      })
+      .then(collective => {
+        user.collective = collective;
+        return user;
+      })
+  };
+
+  User.splitName = (name) => {
+    let firstName = null, lastName = null;
+    if (name) {
+      const tokens = name.split(' ');
+      firstName = tokens[0];
+      lastName = tokens.length > 1 ? tokens.slice(1).join(' ') : null;
+    }
+    return { firstName, lastName };
+  };
+
 
   return User;
 };

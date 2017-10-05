@@ -1,4 +1,4 @@
-Subject: Subscription canceled to {{group.name}}
+Subject: Subscription canceled to {{collective.name}}
 
 {{> header}}
 
@@ -10,16 +10,16 @@ Subject: Subscription canceled to {{group.name}}
 <p>Hi!</p>
 {{/if}}
 
-<p> We wanted to confirm that your subscription to {{group.name}} for {{{currency subscription.amount currency=subscription.currency}}}/{{subscription.interval}} has been canceled. </p>
+<p> We wanted to confirm that your subscription to {{collective.name}} for {{{currency subscription.amount currency=subscription.currency}}}/{{subscription.interval}} has been canceled. </p>
 
 <p> We are sad 😞 to see you go. If you have any feedback about your experience - good, bad, or ugly - we want to hear about it. Just hit 'reply' and type away. </p>
  
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} open collective
+  – The {{collective.name}} open collective
 </p>
 
-{{> relatedgroups}}
+{{> relatedcollectives}}
 
 {{> footer}}

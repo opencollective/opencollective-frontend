@@ -11,24 +11,24 @@ import Promise from 'bluebird';
  * @param {*} transactions 
  */
 export function exportTransactions(transactions, attributes) {
-  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInGroupCurrency', 'txnCurrency', 'txnCurrencyFxRate', 'paymentProcessorFeeInTxnCurrency', 'hostFeeInTxnCurrency', 'platformFeeInTxnCurrency', 'netAmountInTxnCurrency' ];
+  attributes = attributes || ['id', 'createdAt', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency' ];
 
   return exportToCSV(transactions, attributes);
 }
 
 /**
- * Get transactions between startDate and endDate for groupids
- * @param {*} groupids 
+ * Get transactions between startDate and endDate for collectiveids
+ * @param {*} collectiveids 
  * @param {*} startDate 
  * @param {*} endDate 
  * @param {*} limit 
  */
-export function getTransactions(groupids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
+export function getTransactions(collectiveids, startDate = new Date("2015-01-01"), endDate = new Date, options) {
   const where = options.where || {};
   const query = {
     where: {
       ...where,
-      GroupId: { $in: groupids },
+      CollectiveId: { $in: collectiveids },
       createdAt: { $gte: startDate, $lt: endDate }
     },
     order: [ ['createdAt', 'DESC' ]]
@@ -39,11 +39,11 @@ export function getTransactions(groupids, startDate = new Date("2015-01-01"), en
 }
 
 export function createFromPaidExpense(host, paymentMethod, expense, paymentResponses, preapprovalDetails, UserId) {
-  const txnCurrency = host.currency;
+  const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
   let fxrate;
-  let paymentProcessorFeeInGroupCurrency = 0;
-  let paymentProcessorFeeInTxnCurrency = 0;
+  let paymentProcessorFeeInCollectiveCurrency = 0;
+  let paymentProcessorFeeInHostCurrency = 0;
   let getFxRatePromise;
 
   // If PayPal
@@ -69,11 +69,11 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     }
 
     const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
-    paymentProcessorFeeInGroupCurrency = senderFees.amount * 100; // paypal sends this in float
+    paymentProcessorFeeInCollectiveCurrency = senderFees.amount * 100; // paypal sends this in float
 
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
     fxrate = parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
-    paymentProcessorFeeInTxnCurrency = 1/fxrate * paymentProcessorFeeInGroupCurrency;
+    paymentProcessorFeeInHostCurrency = 1/fxrate * paymentProcessorFeeInCollectiveCurrency;
 
     getFxRatePromise = Promise.resolve(fxrate);
   } else {
@@ -81,40 +81,45 @@ export function createFromPaidExpense(host, paymentMethod, expense, paymentRespo
     getFxRatePromise = getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
   }
 
-  // We assume that all expenses are in Group currency
+  // We assume that all expenses are in Collective currency
   // (otherwise, ledger breaks with a triple currency conversion)
   const transaction = {
-    netAmountInGroupCurrency: -1 * (expense.amount + paymentProcessorFeeInGroupCurrency),
-    txnCurrency,
-    paymentProcessorFeeInTxnCurrency,
+    netAmountInCollectiveCurrency: -1 * (expense.amount + paymentProcessorFeeInCollectiveCurrency),
+    hostCurrency,
+    paymentProcessorFeeInHostCurrency,
     ExpenseId: expense.id,
-    type: type.EXPENSE,
+    type: type.DEBIT,
     amount: -expense.amount,
     currency: expense.currency,
-    description: expense.title,
-    UserId,
-    GroupId: expense.GroupId,
-    HostId: host.id
+    description: expense.description,
+    CreatedByUserId: UserId,
+    CollectiveId: expense.CollectiveId,
+    HostCollectiveId: host.id,
+    PaymentMethodId: paymentMethod ? paymentMethod.id : null
   };
 
   return getFxRatePromise
     .then(fxrate => {
       if (!isNaN(fxrate)) {
-        transaction.txnCurrencyFxRate = fxrate;
-        transaction.amountInTxnCurrency = -Math.round(fxrate * expense.amount); // amountInTxnCurrency is an INTEGER (in cents)
+        transaction.hostCurrencyFxRate = fxrate;
+        transaction.amountInHostCurrency = -Math.round(fxrate * expense.amount); // amountInHostCurrency is an INTEGER (in cents)
       }
       return transaction;
     })
-    .then(transaction => models.Transaction.create(transaction))
-    .tap(t => paymentMethod ? t.setPaymentMethod(paymentMethod) : null)
+    .then(() => models.User.findById(UserId))
+    .then(user => {
+      transaction.FromCollectiveId = user.CollectiveId;
+      return transaction;
+    })
+    .then(transaction => models.Transaction.createDoubleEntry(transaction))
     .then(t => createPaidExpenseActivity(t, paymentResponses, preapprovalDetails));
 }
 
 function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDetails) {
   const payload = {
-    type: constants.activities.GROUP_EXPENSE_PAID,
-    UserId: transaction.UserId,
-    GroupId: transaction.GroupId,
+    type: constants.activities.COLLECTIVE_EXPENSE_PAID,
+    UserId: transaction.CreatedByUserId,
+    CollectiveId: transaction.CollectiveId,
     TransactionId: transaction.id,
     data: {
       transaction: transaction.info
@@ -128,7 +133,7 @@ function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDet
   }
   return transaction.getUser()
     .tap(user => payload.data.user = user.minimal)
-    .then(() => transaction.getGroup())
-    .tap(group => payload.data.group = group.minimal)
+    .then(() => transaction.getCollective())
+    .tap(collective => payload.data.collective = collective.minimal)
     .then(() => models.Activity.create(payload));
 }

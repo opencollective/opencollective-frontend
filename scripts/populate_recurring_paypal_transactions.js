@@ -47,7 +47,7 @@ const findUnregisteredTransaction = (transactions, paypalTransactions) => {
   });
 }
 
-const updateTransactions = (subscription, group, user, paypalTransactions) => {
+const updateTransactions = (subscription, collective, user, paypalTransactions) => {
   // Find the missing transactions in our db and create them
   const missingPaypalTransactions = findUnregisteredTransaction(subscription.Transactions, paypalTransactions);
 
@@ -65,7 +65,7 @@ const updateTransactions = (subscription, group, user, paypalTransactions) => {
 
     return models.Transaction.createFromPayload({
         transaction,
-        group,
+        collective,
         user
       });
   });
@@ -91,7 +91,7 @@ export const findSubscriptions = () => {
     include: [{
       model: models.Transaction,
       include: [
-        { model: models.Group },
+        { model: models.Collective },
         { model: models.User }
       ]
     }]
@@ -109,7 +109,7 @@ const log = (message) => {
 };
 
 export const handlePaypalTransactions = (paypalTransactions, transaction, subscription, billingAgreementId) => {
-  const group = transaction.Group;
+  const collective = transaction.Collective;
   const user = transaction.User;
   const completedList = _.filter(paypalTransactions, { status: 'Completed'});
   const created = _.find(paypalTransactions, { status: 'Created'});
@@ -141,7 +141,7 @@ export const handlePaypalTransactions = (paypalTransactions, transaction, subscr
     if (completedList.length === 0) {
       return log(`Subscription should not be active, subscription.id: ${subscription.id}, billingAgreementId: ${billingAgreementId}`);
     } else {
-      return updateTransactions(subscription, group, user, completedList);
+      return updateTransactions(subscription, collective, user, completedList);
     }
   }
 
@@ -150,7 +150,7 @@ export const handlePaypalTransactions = (paypalTransactions, transaction, subscr
 export const populateTransactions = (subscription) => {
   const billingAgreementId = subscription.data.billingAgreementId;
   const transaction = subscription.Transactions[0] || {};
-  const group = transaction.Group;
+  const collective = transaction.Collective;
   const user = transaction.User;
 
   if (!billingAgreementId) {
@@ -161,11 +161,11 @@ export const populateTransactions = (subscription) => {
     return log(`No user, subscription.id ${subscription.id}, transaction.id ${transaction.id}`)
   }
 
-  if (!group) {
-    return log(`No group, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
+  if (!collective) {
+    return log(`No collective, subscription.id ${subscription.id}, transaction.id ${transaction.id}`);
   }
 
-  return group.getConnectedAccount()
+  return collective.getConnectedAccount()
     .then(connectedAccount => searchTransactions(billingAgreementId, connectedAccount.paypalConfig))
     .then((paypalTransactions) => {
       return handlePaypalTransactions(

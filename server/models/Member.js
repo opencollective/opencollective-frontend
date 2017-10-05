@@ -1,0 +1,102 @@
+import roles from '../constants/roles';
+
+export default function(Sequelize, DataTypes) {
+
+  const Member= Sequelize.define('Member', {
+
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+
+    CreatedByUserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    MemberCollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    CollectiveId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Collectives',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    TierId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Tiers',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
+    },
+
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'member',
+      validate: {
+        isIn: {
+          args: [[roles.HOST, roles.ADMIN, roles.MEMBER, roles.BACKER, roles.CONTRIBUTOR, roles.FOLLOWER]],
+          msg: 'Must be host, admin, member, backer, contributor or follower'
+        }
+      }
+    },
+
+    description: DataTypes.STRING,
+
+    // Dates.
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW
+    }
+  }, {
+    paranoid: true,
+    indexes: [
+       {
+          fields: ['MemberCollectiveId', 'CollectiveId', 'role'],
+          name: 'MemberCollectiveId-CollectiveId-role',
+      }
+    ],
+    getterMethods: {
+      // Info.
+      info() {
+        return {
+          role: this.role,
+          description: this.description,
+          CreatedByUserId: this.CreatedByUserId,
+          CollectiveId: this.CollectiveId,
+          MemberCollectiveId: this.MemberCollectiveId,
+          createdAt: this.createdAt,
+          updatedAt: this.updatedAt,
+          deletedAt: this.deletedAt
+        };
+      }
+    }
+  });
+
+  return Member
+}

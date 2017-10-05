@@ -30,7 +30,7 @@ export default (Sequelize, activity) => {
 
     // process notification entries
     .then(() => {
-      if (!activity.GroupId || !activity.type) {
+      if (!activity.CollectiveId || !activity.type) {
         return Promise.resolve([]);
       }
       const where = {
@@ -42,10 +42,11 @@ export default (Sequelize, activity) => {
         active: true
       };
 
-      if (activity.type === activityType.GROUP_CREATED) {
+      // TODO host.id is not referencing a user anymore
+      if (activity.type === activityType.COLLECTIVE_CREATED) {
         where.UserId = activity.data.host.id;
       } else {
-        where.GroupId = activity.GroupId;
+        where.CollectiveId = activity.CollectiveId;
       }
 
       return Sequelize.models.Notification.findAll({
@@ -71,7 +72,7 @@ export default (Sequelize, activity) => {
         }
       }))
     .catch(err => {
-      console.error(`Error while publishing activity type ${activity.type} for group ${activity.GroupId}`, err);
+      console.error(`Error while publishing activity type ${activity.type} for collective ${activity.CollectiveId}`, err);
     });
 };
 

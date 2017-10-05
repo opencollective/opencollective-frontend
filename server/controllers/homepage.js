@@ -1,36 +1,76 @@
 import queries from '../lib/queries';
 import models from '../models';
+import { memoize } from 'lodash';
+memoize.Cache = Map;
+
+const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget);
+
+/**
+ * get total number of active collectives
+ * (a collective is considered as active if it has ever received any funding from its host or through a order)
+ */
+const getTotalCollectives = memoize(() => {
+  console.log(">>> update total number of collectives")
+  return models.Transaction.aggregate('CollectiveId', 'count', {
+    distinct: true,
+    where: {
+      amount: { $gt: 0 }
+    }
+  })
+});
+
+const getTotalDonors = memoize(() => {
+  return models.Transaction.aggregate('FromCollectiveId', 'count', {
+    distinct: true,
+    where: {
+      amount: { $gt: 0 },
+      PaymentMethodId: { $ne: null }
+    }
+  })
+});
+
+const getTopCollectives = memoize((tag) => {
+  console.log(">>> update top collectives in ", tag);
+  return models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true);
+})
+
+const refreshCache = () => {
+  console.log(">>> Refreshing cache for homepage");
+  getTopCollectives.cache.clear();
+  getTotalCollectives.cache.clear();
+  getTotalDonors.cache.clear();
+  getTopCollectives('open source'),
+  getTopCollectives('meetup'),
+  getTotalDonors(),
+  getTotalCollectives()
+}
+
+// We only use the cache on staging and production
+const useCache = ['production', 'staging'].indexOf(process.env.NODE_ENV) !== -1;
+
+// Update the cache every hour
+if (useCache) {
+  getTotalCollectives();
+  getTopCollectives('open source');
+  getTopCollectives('meetup');
+  setInterval(refreshCache, 1000 * 60 * 60);
+}
 
 export default (req, res, next) => {
-  /**
-   * get total number of active collectives
-   * (a collective is considered as active if it has ever received any funding from its host or through a donation)
-   */
-  const getTotalCollectives = () => {
-    return models.Transaction.aggregate('GroupId', 'count', {
-      distinct: true,
-      where: {
-        amount: { $gt: 0 }
-      }
-    })
-  };
 
-  const getTotalDonors = () => {
-    return models.Transaction.aggregate('UserId', 'count', {
-      distinct: true,
-      where: {
-        amount: { $gt: 0 },
-        PaymentMethodId: { $ne: null }
-      }
-    })
-  };
+  // We skip the cache when testing
+  if (!useCache) {
+    getTopCollectives.cache.clear();
+    getTotalCollectives.cache.clear();
+    getTotalDonors.cache.clear();
+  }
 
   Promise.all([
     getTotalCollectives(),
     getTotalDonors(),
-    queries.getTotalAnnualBudget(),
-    models.Group.getGroupsSummaryByTag('open source', 3, [], 100000, true),
-    models.Group.getGroupsSummaryByTag('meetup', 3, [], 100000, true),
+    getTotalAnnualBudget(),
+    getTopCollectives('open source'),
+    getTopCollectives('meetup'),
     queries.getTopSponsors()
   ])
   .then(results => {

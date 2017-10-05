@@ -6,30 +6,44 @@ import models from '../server/models';
 
 const application = utils.data('application');
 const userData = utils.data('user1');
-const groupData = utils.data('group1');
+const collectiveData = utils.data('collective1');
 
 describe('homepage.routes.test.js', () => {
 
-  let user, group, paymentMethod;
+  let user, collective, paymentMethod;
 
+  beforeEach((done) => {
+    setTimeout(done, 1000);
+  });
   beforeEach(() => utils.resetTestDB());
-
-  beforeEach(() => models.User.create(userData).tap(u => user = u));
+  beforeEach((done) => {
+    setTimeout(done, 1000);
+  });
+  
+  beforeEach(() => models.User.createUserWithCollective(userData).tap(u => user = u));
   beforeEach(() =>
-    models.Group
-      .create(groupData).tap(g => {
-        group = g;
-        return group.addUserWithRole(user, 'HOST');
+    models.Collective
+      .create(collectiveData).tap(g => {
+        collective = g;
+        return collective.addUserWithRole(user, 'HOST');
       })
-      .then(() => models.PaymentMethod.create({UserId: user.id}))
+      .then(() => models.PaymentMethod.create({
+        CreatedByUserId: user.id,
+        CollectiveId: user.CollectiveId,
+        service: 'stripe',
+        token: 'tok_123456781234567812345678'
+      }))
       .tap(p => paymentMethod = p)
       .then(() => {
-        return models.Transaction.create({
-          amount:100000,
+        return models.Transaction.createDoubleEntry({
+          amount: 100000,
+          netAmountInCollectiveCurrency: 100000,
+          type: 'CREDIT',
           PaymentMethodId: paymentMethod.id,
-          GroupId: group.id,
-          UserId: user.id,
-          HostId: user.id
+          FromCollectiveId: user.CollectiveId,
+          CollectiveId: collective.id,
+          CreatedByUserId: user.id,
+          HostCollectiveId: user.id
         })
       })
   );
@@ -39,20 +53,18 @@ describe('homepage.routes.test.js', () => {
    */
   describe('#get /homepage', () => {
 
-    it('gets the homepage data', (done) => {
-      request(app)
-        .get(`/homepage?api_key=${application.api_key}`)
-        .expect(200)
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.stats).to.have.property('totalCollectives');
-          expect(body.collectives).to.have.property('opensource');
-          expect(body.collectives).to.have.property('meetup');
-          expect(body.collectives.opensource.length).to.equal(1);
-          expect(body.collectives.opensource[0].name).to.equal(groupData.name);
-          done();
-        })
-    });
+    it('gets the homepage data', () => request(app)
+      .get(`/homepage?api_key=${application.api_key}`)
+      .expect(200)
+      .then((res) => {
+        const { body } = res;
+        console.log(">>> body: ", body);
+        expect(body.stats).to.have.property('totalCollectives');
+        expect(body.collectives).to.have.property('opensource');
+        expect(body.collectives).to.have.property('meetup');
+        expect(body.collectives.opensource.length).to.equal(1);
+        expect(body.collectives.opensource[0].name).to.equal(collectiveData.name);
+      }))
 
   });
 

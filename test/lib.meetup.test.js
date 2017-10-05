@@ -5,7 +5,7 @@ import nockMeetup from './mocks/meetup.nock';
 
 // nock.recorder.rec();
 
-const group = {
+const collective = {
   slug: 'opencollective',
   users: [{
     name: 'Github',
@@ -30,10 +30,10 @@ const group = {
 };
 
 const meetupAccount = {
-  provider: 'meetup',
+  service: 'meetup',
   username: 'opencollective',
-  secret: '620459537f4174273a5d4g535321445',
-  GroupId: 1
+  token: '620459537f4174273a5d4g535321445',
+  CollectiveId: 1
 }
 
 describe('meetup lib', () => {
@@ -53,25 +53,25 @@ describe('meetup lib', () => {
   });
 
   it("generates the list of sponsors sorted by total donations", () => {
-    const meetup = new Meetup(meetupAccount, group);
+    const meetup = new Meetup(meetupAccount, collective);
     const header = meetup.makeHeader();
-    const expectedHeader = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/${group.slug}#sponsors"><img src="https://opencollective.com/${group.slug}/sponsors.png?width=700"></a></p>`;
+    const expectedHeader = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/${collective.slug}#sponsors"><img src="https://opencollective.com/${collective.slug}/sponsors.png?width=700"></a></p>`;
     expect(header).to.equal(expectedHeader);
   });
 
   it("shows the list of backers if no sponsors", () => {
-    const groupWithoutSponsors = Object.assign({}, group, { users: group.users.slice(1,3)});
-    const meetup = new Meetup(meetupAccount, groupWithoutSponsors);
+    const collectiveWithoutSponsors = Object.assign({}, collective, { users: collective.users.slice(1,3)});
+    const meetup = new Meetup(meetupAccount, collectiveWithoutSponsors);
     const header = meetup.makeHeader();
     const expectedHeader = `<p>Thank you to our backers <a href="https://twitter.com/piamancini">Pia</a> and <a href="https://twitter.com/xdamman">Xavier</a></p> <p><a href="https://opencollective.com/opencollective#backers"><img src="https://opencollective.com/opencollective/backers.png?width=700"></a></p>`;
     expect(header).to.equal(expectedHeader);
   });
 
   it("adds/removes the header when no backers", () => {
-    const groupWithoutBackers = Object.assign({}, group, { users: [] });
+    const collectiveWithoutBackers = Object.assign({}, collective, { users: [] });
     const description = "<p>Hello World</p>";
 
-    const meetup = new Meetup(meetupAccount, groupWithoutBackers);
+    const meetup = new Meetup(meetupAccount, collectiveWithoutBackers);
     const header = meetup.makeHeader();
     const descriptionWithHeader = meetup.generateNewDescription('addHeader', description);
     const descriptionWithoutHeader = meetup.generateNewDescription('removeHeader', descriptionWithHeader);
@@ -82,7 +82,7 @@ describe('meetup lib', () => {
   });
 
   it("adds the header to the next meetup", (done) => {
-    const meetup = new Meetup(meetupAccount, group);
+    const meetup = new Meetup(meetupAccount, collective);
     meetup.syncCollective('addHeader').then(result => {
       expect(result.length).to.equal(1);
       const expectedDescription = `<p>Thank you to our sponsors Gitlab and <a href="https://github.com">Github</a></p> <p><a href="https://opencollective.com/opencollective#sponsors"><a href="https://opencollective.com/opencollective/sponsors.png?width=700" class="linkified">https://opencollective.com/opencollective/sponsors.png?width=700</a></a></p> <p>We\'ll share how meetups are currently using OpenCollective to raise money - through donations and/or memberships - and increasing their impact on the world.</p> <p>Also a good chance to meet our core team - Xavier, Pia and Aseem.</p>`;
@@ -93,7 +93,7 @@ describe('meetup lib', () => {
   });
 
   it("removes the header from the next meetup", (done) => {
-    const meetup = new Meetup(meetupAccount, group);
+    const meetup = new Meetup(meetupAccount, collective);
     meetup.syncCollective('removeHeader').then(result => {
       expect(result.length).to.equal(1);
       const expectedDescription = `<p>We\'ll share how meetups are currently using OpenCollective to raise money - through donations and/or memberships - and increasing their impact on the world.</p> <p>Also a good chance to meet our core team - Xavier, Pia and Aseem.</p>`;

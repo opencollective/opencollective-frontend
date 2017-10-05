@@ -49,21 +49,21 @@ export const resetTestDatabase = function(req, res, next) {
     email: 'member@opencollective.com',
     firstName: 'Xavier',
     lastName: 'Damman',
-    avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   }
 
   const backerData = {
     email: 'backer@opencollective.com',
     firstName: 'Aseem',
     lastName: 'Sood',
-    avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/908fbcbca45e4a52a4309d00e980018c_e554f450-2127-11e6-9a76-e98f5a4a50b6.jpeg'
+    image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/908fbcbca45e4a52a4309d00e980018c_e554f450-2127-11e6-9a76-e98f5a4a50b6.jpeg'
   }
 
   const backer2Data = {
     email: 'backer2@opencollective.com',
     firstName: 'Pia',
     lastName: 'Mancini',
-    avatar: 'https://opencollective-production.s3-us-west-1.amazonaws.com/9EflVQqM_400x400jpg_2aee92e0-858d-11e6-9fd7-73dd31eb7c0c.jpeg'
+    image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/9EflVQqM_400x400jpg_2aee92e0-858d-11e6-9fd7-73dd31eb7c0c.jpeg'
   }
 
   const groupData = {
@@ -118,7 +118,7 @@ export const resetTestDatabase = function(req, res, next) {
       secret: 'EILQQAMVCuCTyNDDOWTGtS7xBQmfzdMcgSVZJrCaPzRbpGjQFdd8sylTGE-8dutpcV0gJkGnfDE0PmD8'
     }))
     .then((connectedAccount) => connectedAccount.setUser(testHost))
-    .then(() => models.PaymentMethod.create({ service: 'paypal', UserId: testHost.id}))
+    .then(() => models.PaymentMethod.create({ service: 'paypal', token: 'abc', UserId: testHost.id}))
     .then(() => models.Donation.create({
       title: "Donation 1",
       amount: 100,
@@ -129,7 +129,7 @@ export const resetTestDatabase = function(req, res, next) {
     .then(donation => models.Transaction.create({
       amount: 100,
       GroupId: testGroup.id,
-      type: type.DONATION,
+      type: type.CREDIT,
       currency: "EUR",
       UserId: testBacker.id,
       DonationId: donation.id,
@@ -144,7 +144,7 @@ export const resetTestDatabase = function(req, res, next) {
     }))
     .then(donation => models.Transaction.create({
       amount: 200,
-      type: type.DONATION,
+      type: type.CREDIT,
       currency: "EUR",
       UserId: testBacker2.id,
       DonationId: donation.id,
@@ -210,7 +210,7 @@ export const exportPDF = function(req, res, next) {
   const paper = req.query.papaer || 'Letter';
   const format = req.query.format || 'html';
   const wwcodeids = ['524','47','292','275','521','525','522','262','51','295','280','283','286','510','14','515','516','518','519','520','523','512','511','513','517','59','584','299','430','48','260','261','298','272','293','273','294','263','274','276','277','301','195','241','265','297','259','266','279','267','278','12','269','270','281','10','282','3','284','264','287','268','4','300','289','13','291','285','288','271','290','15','2'];
-  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'EXPENSE' }, include: ["User", "Expense", "Group"] }).then(transactions => {
+  getTransactions(wwcodeids, startDate, endDate, { where: { type: 'DEBIT' }, include: ["User", "Expense", "Collective"] }).then(transactions => {
     console.log("transactions", JSON.stringify(transactions));
     const data = { host: { name: "WWCode", currency: 'USD' }, year: (new Date).getFullYear(), month };
     let page = 1;
@@ -221,12 +221,12 @@ export const exportPDF = function(req, res, next) {
     data.totalPaidExpenses = transactions.length;
     data.transactions = transactions.map(t => {
       t.page = page++;
-      t.group = t.Group;
-      t.group.shortSlug = t.group.slug.replace(/^wwcode-?(.)/, '$1');
-      t.notes = t.Expense && t.Expense.notes;
+      t.collective = t.Collective;
+      t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
+      t.privateMessage = t.Expense && t.Expense.privateMessage;
       if (t.data && t.data.fxrateSource) {
-        t.notes = (t.notes) ? `${t.notes} (${note})` : note;
-        data.notes = note;
+        t.privateMessage = (t.privateMessage) ? `${t.privateMessage} (${note})` : note;
+        data.privateMessage = note;
       }
       if (page - 1 % transactionsPerTOCPage === 0) {
         currentPage++;

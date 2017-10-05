@@ -12,7 +12,7 @@ export default {
 
     let userString = '', hostString = '';
     let userId;
-    let groupName = '';
+    let collectiveName = '';
     let publicUrl = '';
     let amount = null;
     let interval = '';
@@ -20,9 +20,8 @@ export default {
     let currency = '';
     let description = '';
     let eventType = '';
-    let provider = '';
+    let service = '';
     let connectedAccountUsername = '';
-    let title = '';
     let connectedAccountLink = '';
     let lastEditedById = 0;
 
@@ -33,10 +32,10 @@ export default {
       userId = activity.data.user.id;
     }
 
-    // get group data
-    if (activity.data.group) {
-      groupName = activity.data.group.name;
-      ({ publicUrl } = activity.data.group);
+    // get collective data
+    if (activity.data.collective) {
+      collectiveName = activity.data.collective.name;
+      ({ publicUrl } = activity.data.collective);
     }
 
     // get host data
@@ -45,9 +44,9 @@ export default {
     }
 
     // get donation data
-    if (activity.data.donation) {
-      amount = activity.data.donation.amount/100;
-      ({ currency } = activity.data.donation);
+    if (activity.data.order) {
+      amount = activity.data.order.totalAmount/100;
+      ({ currency } = activity.data.order);
     }
 
     // get subscription data
@@ -69,15 +68,15 @@ export default {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       ({ currency } = activity.data.expense);
-      ({ title } = activity.data.expense);
+      ({ description } = activity.data.expense);
       ({ lastEditedById } = activity.data.expense);
     }
 
     // get connected account data
     if (activity.data.connectedAccount) {
-      ({ provider } = activity.data.connectedAccount);
+      ({ service } = activity.data.connectedAccount);
       connectedAccountUsername = activity.data.connectedAccount.username;
-      if (provider === 'github') {
+      if (service === 'github') {
         connectedAccountLink = linkify(format, `https://github.com/${connectedAccountUsername}`, null);
       }
     }
@@ -87,30 +86,30 @@ export default {
       eventType = activity.data.event.type;
     }
 
-    const group = linkify(format, publicUrl, groupName);
+    const collective = linkify(format, publicUrl, collectiveName);
 
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSACTION_CREATED:
-        if (activity.data.transaction.type === type.DONATION) {
-          return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!`;
+      case activities.COLLECTIVE_TRANSACTION_CREATED:
+        if (activity.data.transaction.type === type.CREDIT) {
+          return `New Donation: ${userString} gave ${currency} ${amount} to ${collective}!`;
         }
         break;
 
-      case activities.GROUP_EXPENSE_CREATED:
-        return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${title}!`
+      case activities.COLLECTIVE_EXPENSE_CREATED:
+        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
 
-      case activities.GROUP_EXPENSE_REJECTED:
-        return `Expense rejected: ${currency} ${amount} for ${title} in ${group} by userId: ${lastEditedById}!`
+      case activities.COLLECTIVE_EXPENSE_REJECTED:
+        return `Expense rejected: ${currency} ${amount} for ${description} in ${collective} by userId: ${lastEditedById}!`
 
-      case activities.GROUP_EXPENSE_APPROVED:
-        return `Expense approved: ${currency} ${amount} for ${title} in ${group} by userId: ${lastEditedById}!`
+      case activities.COLLECTIVE_EXPENSE_APPROVED:
+        return `Expense approved: ${currency} ${amount} for ${description} in ${collective} by userId: ${lastEditedById}!`
 
       case activities.CONNECTED_ACCOUNT_CREATED:
-        return `New Connected Account created by ${connectedAccountUsername} on ${provider}. ${connectedAccountLink}`;
+        return `New Connected Account created by ${connectedAccountUsername} on ${service}. ${connectedAccountLink}`;
 
-      case activities.GROUP_EXPENSE_PAID: {
+      case activities.COLLECTIVE_EXPENSE_PAID: {
         const details = activity.data.preapprovalDetails;
         let remainingClause = '';
         if (details && details.maxTotalAmountOfAllPayments && details.curPaymentsAmount) {
@@ -119,7 +118,7 @@ export default {
         } else {
           remainingClause = `[Manual payment]`;
         }
-        return `Expense paid on ${group}: ${currency} ${amount} for '${description}' ${remainingClause}`;
+        return `Expense paid on ${collective}: ${currency} ${amount} for '${description}' ${remainingClause}`;
       }
 
       case activities.USER_CREATED:
@@ -129,16 +128,16 @@ export default {
         return `Stripe event received: ${eventType}`;
 
       case activities.SUBSCRIPTION_CONFIRMED:
-        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!`;
+        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${collective}!`;
 
       case activities.SUBSCRIPTION_CANCELED:
-        return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${group}`;
+        return `Subscription ${activity.data.subscription.id} canceled: ${currency} ${recurringAmount} from ${userString} to ${collective}`;
 
-      case activities.GROUP_CREATED:
-        return `New collective created by ${userString}: ${group} ${hostString}`.trim();
+      case activities.COLLECTIVE_CREATED:
+        return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
 
-      case activities.GROUP_USER_ADDED:
-        return `New user: ${userString} (UserId: ${userId}) added to group: ${group}`;
+      case activities.COLLECTIVE_USER_ADDED:
+        return `New user: ${userString} (UserId: ${userId}) added to collective: ${collective}`;
 
       default:
         return `New event: ${activity.type}`;
@@ -153,7 +152,7 @@ export default {
   formatMessageForPublicChannel: (activity, format) => {
 
     let userString = '', hostString  = '';
-    let groupName = '';
+    let collectiveName = '';
     let publicUrl = '';
     let amount = null;
     let interval = '';
@@ -161,9 +160,8 @@ export default {
     let currency = '';
     let description = '';
     let userTwitter = '';
-    let groupTwitter = '';
+    let collectiveTwitter = '';
     let tweet = '';
-    let title = '';
 
     // get user data
     if (activity.data.user) {
@@ -171,11 +169,11 @@ export default {
       userTwitter = activity.data.user.twitterHandle;
     }
 
-    // get group data
-    if (activity.data.group) {
-      groupName = activity.data.group.name;
-      ({ publicUrl } = activity.data.group);
-      groupTwitter = activity.data.group.twitterHandle;
+    // get collective data
+    if (activity.data.collective) {
+      collectiveName = activity.data.collective.name;
+      ({ publicUrl } = activity.data.collective);
+      collectiveTwitter = activity.data.collective.twitterHandle;
     }
 
     // get host data
@@ -184,9 +182,9 @@ export default {
     }
 
     // get donation data
-    if (activity.data.donation) {
-      amount = activity.data.donation.amount/100;
-      ({ currency } = activity.data.donation);
+    if (activity.data.order) {
+      amount = activity.data.order.totalAmount/100;
+      ({ currency } = activity.data.order);
     }
 
     // get subscription data
@@ -210,57 +208,57 @@ export default {
     if (activity.data.expense) {
       amount = activity.data.expense.amount/100;
       ({ currency } = activity.data.expense);
-      ({ title } = activity.data.expense);
+      ({ description } = activity.data.expense);
     }
 
-    let group;
+    let collective;
     if (linkify) {
-      group = linkify(format, publicUrl, groupName);
+      collective = linkify(format, publicUrl, collectiveName);
     } else {
-      group = groupName;
+      collective = collectiveName;
     }
     switch (activity.type) {
 
       // Currently used for both new donation and expense
-      case activities.GROUP_TRANSACTION_CREATED:
+      case activities.COLLECTIVE_TRANSACTION_CREATED:
 
         switch (activity.data.transaction.type) {
-          case type.DONATION:
+          case type.CREDIT:
             if (userTwitter) {
-              tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
+              tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${collectiveTwitter ? `@${collectiveTwitter}` : collectiveName} 👍 ${publicUrl}`);
               tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
               tweetThis = ` [${tweetLink}]`;
             }
-            return `New Donation: ${userString} gave ${currency} ${amount} to ${group}!${tweetThis}`;
+            return `New Donation: ${userString} gave ${currency} ${amount} to ${collective}!${tweetThis}`;
 
-          case type.EXPENSE:
-            return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${description}!`
+          case type.DEBIT:
+            return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
         }
 
         break;
 
-      case activities.GROUP_EXPENSE_CREATED:
-        return `New Expense: ${userString} submitted an expense to ${group}: ${currency} ${amount} for ${title}!`
+      case activities.COLLECTIVE_EXPENSE_CREATED:
+        return `New Expense: ${userString} submitted an expense to ${collective}: ${currency} ${amount} for ${description}!`
 
-      case activities.GROUP_EXPENSE_REJECTED:
-        return `Expense rejected: ${currency} ${amount} for ${title} in ${group}!`
+      case activities.COLLECTIVE_EXPENSE_REJECTED:
+        return `Expense rejected: ${currency} ${amount} for ${description} in ${collective}!`
 
-      case activities.GROUP_EXPENSE_APPROVED:
-        return `Expense approved: ${currency} ${amount} for ${title} in ${group}!`
+      case activities.COLLECTIVE_EXPENSE_APPROVED:
+        return `Expense approved: ${currency} ${amount} for ${description} in ${collective}!`
 
-      case activities.GROUP_EXPENSE_PAID:
-        return `Expense paid on ${group}: ${currency} ${amount} for '${description}'`;
+      case activities.COLLECTIVE_EXPENSE_PAID:
+        return `Expense paid on ${collective}: ${currency} ${amount} for '${description}'`;
 
       case activities.SUBSCRIPTION_CONFIRMED:
         if (userTwitter) {
-          tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${groupTwitter ? `@${groupTwitter}` : groupName} 👍 ${publicUrl}`);
+          tweet = encodeURIComponent(`@${userTwitter} thanks for your ${currencies[currency].format(recurringAmount)} donation to ${collectiveTwitter ? `@${collectiveTwitter}` : collectiveName} 👍 ${publicUrl}`);
           tweetLink = linkify(format, `https://twitter.com/intent/tweet?status=${tweet}`,"Thank that person on Twitter");
           tweetThis = ` [${tweetLink}]`;
         }
-        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${group}!${tweetThis}`;
+        return `New subscription confirmed: ${currency} ${recurringAmount} from ${userString} to ${collective}!${tweetThis}`;
 
-      case activities.GROUP_CREATED:
-        return `New collective created by ${userString}: ${group} ${hostString}`.trim();
+      case activities.COLLECTIVE_CREATED:
+        return `New collective created by ${userString}: ${collective} ${hostString}`.trim();
 
       default:
         return '';

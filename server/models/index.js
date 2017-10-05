@@ -6,7 +6,7 @@ import Sequelize from 'sequelize';
 import { database as config } from 'config';
 
 // this is needed to prevent sequelize from converting integers to strings, when model definition isn't clear
-// like in case of the key totalDonations and raw query (like User.getTopBackers())
+// like in case of the key totalOrders and raw query (like User.getTopBackers())
 pg.defaults.parseInt8 = true;
 
 /**
@@ -53,22 +53,18 @@ export function setupModels(client) {
 
   [
     'Activity',
-    'Comment',
     'ConnectedAccount',
-    'Donation',
-    'Event',
+    'Order',
     'Expense',
-    'Group',
+    'Collective',
     'Notification',
     'PaymentMethod',
-    'Response',
+    'Member',
     'Session',
-    'StripeAccount',
     'Subscription',
     'Tier',
     'Transaction',
-    'User',
-    'UserGroup'
+    'User'
   ].forEach((model) => {
     m[model] = client.import(`${__dirname}/${model}`);
   });
@@ -78,100 +74,73 @@ export function setupModels(client) {
    */
 
   // PaymentMethod.
-  m.PaymentMethod.belongsTo(m.User);
+  m.PaymentMethod.belongsTo(m.Collective);
 
-  // Referrer
-  m.User.belongsTo(m.User, { as: 'referrer' });
-
-  // Group.
-  m.Group.belongsToMany(m.User, {through: {model: m.UserGroup, unique:false}, as: 'users'});
-  m.User.belongsToMany(m.Group, {through: {model: m.UserGroup, unique: false}, as: 'groups'});
-  m.User.hasMany(m.UserGroup);
-  m.Group.hasMany(m.UserGroup);
-
-  // StripeAccount
-  m.User.belongsTo(m.StripeAccount); // Add a StripeAccountId to User
+  // User
+  m.User.hasMany(m.Activity);
+  m.User.hasMany(m.Notification);
+  m.User.hasMany(m.Transaction, { foreignKey: 'CreatedByUserId', as: 'transactions' });
+  m.User.hasMany(m.Order, { foreignKey: 'CreatedByUserId', as: 'orders' });
+  m.User.hasMany(m.PaymentMethod, { foreignKey: 'CreatedByUserId' });
+  m.User.hasMany(m.Member, { foreignKey: 'CreatedByUserId' });
+  m.User.hasMany(m.ConnectedAccount, { foreignKey: 'CreatedByUserId' });
+  m.User.belongsTo(m.Collective, { as: 'collective', foreignKey: 'CollectiveId', constraints: false });
+  
+  // Members
+  m.Member.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
+  m.Member.belongsTo(m.Collective, { foreignKey: 'MemberCollectiveId', as: 'memberCollective' });
+  m.Member.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
+  m.Member.belongsTo(m.Tier);
 
   // ConnectedAccount
-  m.User.hasMany(m.ConnectedAccount);
-  m.ConnectedAccount.belongsTo(m.User);
-  m.Group.hasMany(m.ConnectedAccount);
-  m.ConnectedAccount.belongsTo(m.Group);
+  m.ConnectedAccount.belongsTo(m.Collective);
 
   // Activity.
-  m.Activity.belongsTo(m.Group);
-  m.Group.hasMany(m.Activity);
-
+  m.Activity.belongsTo(m.Collective);
   m.Activity.belongsTo(m.User);
-  m.User.hasMany(m.Activity);
-
   m.Activity.belongsTo(m.Transaction);
 
   // Notification.
-  m.User.hasMany(m.Notification);
   m.Notification.belongsTo(m.User);
 
-  m.Notification.belongsTo(m.Group);
-  m.Group.hasMany(m.Notification);
+  m.Notification.belongsTo(m.Collective);
 
   // Transaction.
-  m.Transaction.belongsTo(m.Group);
-  m.Group.hasMany(m.Transaction);
-  m.Transaction.belongsTo(m.User);
-  m.Transaction.belongsTo(m.User, { as: 'Host' });
-  m.User.hasMany(m.Transaction);
+  m.Transaction.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
+  m.Transaction.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
+
+  m.Transaction.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
+  m.Transaction.belongsTo(m.Collective, { foreignKey: 'HostCollectiveId', as: 'host' });
   m.Transaction.belongsTo(m.PaymentMethod);
   m.PaymentMethod.hasMany(m.Transaction);
 
   // Expense
   m.Expense.belongsTo(m.User);
-  m.Expense.belongsTo(m.Group);
+  m.Expense.belongsTo(m.Collective);
   m.Transaction.belongsTo(m.Expense);
 
-  // Comment
-  m.Comment.belongsTo(m.User);
-  m.Comment.belongsTo(m.Group);
-  m.Comment.belongsTo(m.Expense);
-  m.Expense.hasMany(m.Comment);
-  m.User.hasMany(m.Comment);
-  m.Group.hasMany(m.Comment);
-
-  // Donation.
-  m.Donation.belongsTo(m.User);
-  m.User.hasMany(m.Donation);
-  m.Donation.belongsTo(m.Group);
-  m.Group.hasMany(m.Donation);
-  m.Transaction.belongsTo(m.Donation);
-  m.Donation.hasMany(m.Transaction);
-  m.Donation.belongsTo(m.Response);
-  m.Response.hasOne(m.Donation);
+  // Order.
+  m.Order.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
+  m.Order.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
+  m.Order.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
+  m.Order.belongsTo(m.Tier);
+  // m.Collective.hasMany(m.Order); // makes the test `mocha test/graphql.transaction.test.js -g "insensitive" fail
+  m.Transaction.belongsTo(m.Order);
+  m.Order.hasMany(m.Transaction);
+  m.Tier.hasMany(m.Order);
 
   // Subscription
-  m.Donation.belongsTo(m.Subscription);
-  m.Subscription.hasOne(m.Donation);
+  m.Order.belongsTo(m.Subscription); // adds SubscriptionId to the Orders table
+  m.Subscription.hasOne(m.Order);
 
   // PaymentMethod
-  m.Donation.belongsTo(m.PaymentMethod);
-  m.PaymentMethod.hasMany(m.Donation);
+  m.Order.belongsTo(m.PaymentMethod, { foreignKey: 'PaymentMethodId', as: 'paymentMethod' });
+  m.PaymentMethod.hasMany(m.Order);
   m.Transaction.belongsTo(m.PaymentMethod);
 
-  // Event
-  m.Event.belongsTo(m.Group);
-  m.Group.hasMany(m.Event);
-
   // Tier
-  m.Tier.belongsTo(m.Event);
-  m.Event.hasMany(m.Tier);
+  m.Tier.belongsTo(m.Collective);
 
-  // Response
-  m.Response.belongsTo(m.Event);
-  m.Response.belongsTo(m.Tier);
-  m.Response.belongsTo(m.Group);
-  m.Response.belongsTo(m.User);
-  m.Event.hasMany(m.Response);
-  m.Tier.hasMany(m.Response);
-  m.Group.hasMany(m.Response);
-  m.User.hasMany(m.Response);
-
+  Object.keys(m).forEach((modelName) => m[modelName].associate && m[modelName].associate(m));
   return m;
 }

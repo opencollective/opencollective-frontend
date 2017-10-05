@@ -3,12 +3,11 @@ import Promise from 'bluebird';
 import activities from '../constants/activities';
 import includes from 'lodash/collection/includes';
 import status from '../constants/expense_status';
-import {getLinkHeader, getRequestedUrl} from '../lib/utils';
-import {createFromPaidExpense as createTransaction} from '../lib/transactions';
+import { getLinkHeader, getRequestedUrl } from '../lib/utils';
+import { createFromPaidExpense as createTransaction } from '../lib/transactions';
 import paypalAdaptive from '../gateways/paypalAdaptive';
 import payExpense from '../lib/payExpense';
 import errors from '../lib/errors';
-import sequelize from 'sequelize';
 import models from '../models';
 import * as auth from '../middleware/security/auth';
 
@@ -17,16 +16,16 @@ import * as auth from '../middleware/security/auth';
  */
 export const create = (req, res, next) => {
   const user = req.remoteUser || req.user;
-  const { group } = req;
+  const { collective } = req;
   const attributes = Object.assign({}, req.required.expense, {
     UserId: user.id,
-    GroupId: group.id,
+    CollectiveId: collective.id,
     lastEditedById: user.id
   });
   // TODO make sure that the payoutMethod is also properly stored in DB, then propagated to Transaction when paying
   models.Expense.create(attributes)
-    .then(expense => models.Expense.findById(expense.id, { include: [ models.Group, models.User ]}))
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_CREATED))
+    .then(expense => models.Expense.findById(expense.id, { include: [ models.Collective, models.User ]}))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED))
     .tap(expense => res.send(expense))
     .catch(next);
 };
@@ -52,7 +51,7 @@ export const getOne = (req, res) => {
 export const list = (req, res, next) => {
 
   const query = Object.assign({
-    where: { GroupId: req.group.id },
+    where: { CollectiveId: req.collective.id },
     order: [[req.sorting.key, req.sorting.dir]],
     include: [ { model: models.User }]
   }, req.pagination);
@@ -62,30 +61,19 @@ export const list = (req, res, next) => {
   }
 
   return models.Expense.findAndCountAll(query)
-    .then(expenses => {
-      const ids = _.pluck(expenses.rows, 'id');
-      return models.Comment.findAll({
-        attributes: ['ExpenseId', [sequelize.fn('COUNT', sequelize.col('ExpenseId')), 'comments']],
-        where: { ExpenseId: { $in: ids }},
-        group: ['ExpenseId']
+    .then(result => {
+      result.rows = result.rows.map(instance => {
+        const expense = instance.info;
+        expense.user =  (req.remoteUser && req.remoteUser.isAdmin(instance.CollectiveId)) ? instance.User.info : instance.User.public;
+        return expense;
       })
-      .then(commentIds => {
-        const commentsCount =  _.groupBy(commentIds, 'ExpenseId');
-        expenses.rows = expenses.rows.map(expense => {
-          const r = expense.info;
-          r.user = req.canEditGroup ? expense.User.info : expense.User.public;
-          commentsCount[r.id] = commentsCount[r.id] || [{ dataValues: { comments: 0 } }];
-          r.commentsCount = parseInt(commentsCount[r.id][0].dataValues.comments,10);
-          return r;
-        });
-        return expenses;
-      })
+      return result;
     })
-    .then(expenses => {
+    .then(result => {
       // Set headers for pagination.
-      req.pagination.total = expenses.count;
+      req.pagination.total = result.count;
       res.set({ Link: getLinkHeader(getRequestedUrl(req), req.pagination) });
-      res.send(expenses.rows);
+      res.send(result.rows);
     })
     .catch(next);
 };
@@ -101,7 +89,7 @@ export const deleteExpense = (req, res, next) => {
     .then(() => expense.lastEditedById = user.id)
     .then(() => expense.save())
     .then(() => expense.destroy())
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_DELETED))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_DELETED))
     .tap(() => res.send({success: true}))
     .catch(next);
 };
@@ -111,7 +99,7 @@ export const update = (req, res, next) => {
   const newExpense = req.required.expense;
   const user = req.remoteUser || req.user;
   const modifiableProps = {
-    approved: ['payoutMethod', 'category', 'title', 'incurredAt', 'notes'],
+    approved: ['payoutMethod', 'category', 'description', 'incurredAt', 'privateMessage'],
     pending: ['amount', 'currency', 'vat', 'attachment']
   }
 
@@ -126,7 +114,7 @@ export const update = (req, res, next) => {
   origExpense.updatedAt = new Date();
   origExpense.lastEditedById = user.id;
   return origExpense.save()
-    .tap(expense => createActivity(expense, activities.GROUP_EXPENSE_UPDATED))
+    .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_UPDATED))
     .tap(expense => res.send(expense.info))
     .catch(next);
 };
@@ -142,10 +130,10 @@ export const setApprovalStatus = (req, res, next) => {
     .then(() => {
       if (req.required.approved === false) {
         return expense.setRejected(user.id)
-          .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_REJECTED))
+          .tap(exp => createActivity(exp, activities.COLLECTIVE_EXPENSE_REJECTED))
       } else {
         return expense.setApproved(user.id)
-          .tap(exp => createActivity(exp, activities.GROUP_EXPENSE_APPROVED))
+          .tap(exp => createActivity(exp, activities.COLLECTIVE_EXPENSE_APPROVED))
       }
     })
     .then(() => res.send({success: true}))
@@ -160,16 +148,16 @@ export const pay = (req, res, next) => {
   const { expense } = req;
   const { payoutMethod } = req.expense;
   const isManual = !includes(models.PaymentMethod.payoutMethods, payoutMethod);
-  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse, group;
+  let paymentMethod, email, paymentResponses, preapprovalDetailsResponse, collective;
 
   assertExpenseStatus(expense, status.APPROVED)
-    // check that a group's balance is greater than the expense
-    .then(() => models.Group.findById(expense.GroupId))
+    // check that a collective's balance is greater than the expense
+    .then(() => models.Collective.findById(expense.CollectiveId))
     .then(g => {
-      group = g;
-      return group.getBalance()
+      collective = g;
+      return collective.getBalance()
     })
-    .then(balance => checkIfEnoughFundsInGroup(expense, balance))
+    .then(balance => checkIfEnoughFundsInCollective(expense, balance))
     .then(() => isManual ? null : getPaymentMethod())
     .tap(m => paymentMethod = m)
     .then(getBeneficiaryEmail)
@@ -180,13 +168,13 @@ export const pay = (req, res, next) => {
     // TODO: Remove preapprovalDetails call once the new paypal preapproval flow is solid
     .then(() => isManual ? null : paypalAdaptive.preapprovalDetails(paymentMethod.token))
     .tap(d => preapprovalDetailsResponse = d)
-    .then(() => group.getHost())
-    .then((host) => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
+    .then(() => collective.getHostCollective())
+    .then(host => createTransaction(host, paymentMethod, expense, paymentResponses, preapprovalDetailsResponse, expense.UserId))
     .tap(() => expense.setPaid(user.id))
     .tap(() => res.json(expense))
     .catch(err => next(formatError(err, paymentResponses)));
 
-  function checkIfEnoughFundsInGroup(expense, balance) {
+  function checkIfEnoughFundsInCollective(expense, balance) {
     const estimatedFees = isManual ? 0 : Math.ceil(expense.amount*.029 + 30); // 2.9% + 30 is a typical fee.
 
     if (balance >= (expense.amount + estimatedFees)) { 
@@ -201,7 +189,7 @@ export const pay = (req, res, next) => {
     return models.PaymentMethod.findOne({
       where: {
         service: payoutMethod,
-        UserId: req.remoteUser.id,
+        CollectiveId: req.remoteUser.CollectiveId,
         confirmedAt: {$ne: null}
       },
       order: [['confirmedAt', 'DESC']]
@@ -227,7 +215,7 @@ export const pay = (req, res, next) => {
    */
   function pay() {
     const preapprovalKey = paymentMethod.token;
-    return payExpense(payoutMethod)(req.group, expense, email, preapprovalKey);
+    return payExpense(payoutMethod)(req.collective, expense, email, preapprovalKey);
   }
 };
 
@@ -248,9 +236,9 @@ function createActivity(expense, type) {
   return models.Activity.create({
     type,
     UserId: expense.User.id,
-    GroupId: expense.Group.id,
+    CollectiveId: expense.Collective.id,
     data: {
-      group: expense.Group.minimal,
+      collective: expense.Collective.minimal,
       user: expense.User.minimal,
       expense: expense.info
     }

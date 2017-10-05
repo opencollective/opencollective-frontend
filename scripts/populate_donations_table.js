@@ -13,8 +13,8 @@ const done = (err) => {
 // Updates a transaction row, given a donation
 const updateTransaction = (donation, transaction) => {
   transaction.type = constants.type.DONATION;
-  transaction.DonationId = donation.id;
-  transaction.platformFee = donation.amount*0.05;
+  transaction.OrderId = order.id;
+  transaction.platformFee = order.amount*0.05;
   return transaction.save();
 };
 
@@ -22,14 +22,14 @@ const updateTransaction = (donation, transaction) => {
 const createDonation = (transaction) => {
   const donation = {
     UserId: transaction.UserId,
-    GroupId: transaction.GroupId,
+    CollectiveId: transaction.CollectiveId,
     currency: transaction.currency,
     amount: transaction.amount*100,
     title: transaction.description,
     SubscriptionId: transaction.SubscriptionId,
   };
 
-  return models.Donation.create(donation);
+  return models.Order.create(order);
 }
 
 // Get all transactions
@@ -38,7 +38,7 @@ models.Transaction.findAll({
     amount: {
       $gt: 0
     },
-    DonationId: null // this ensures that we don't reprocess a transaction
+    OrderId: null // this ensures that we don't reprocess a transaction
   },
   order: 'id'
 })
@@ -48,20 +48,20 @@ models.Transaction.findAll({
   // one-time donations
   if (!transaction.SubscriptionId) {
     return createDonation(transaction)
-    .then(donation => updateTransaction(donation, transaction))
+    .then(order => updateTransaction(donation, transaction))
   } else {
     // recurring donations
 
     // check if a donation for this SubscriptionId already exists
-    return models.Donation.findOne({
+    return models.Order.findOne({
       where: {
         SubscriptionId: transaction.SubscriptionId
       }
     })
-    .then(donation => {
-      if (!donation) {
+    .then(order => {
+      if (!order) {
         return createDonation(transaction)
-        .then(donation => updateTransaction(donation, transaction))
+        .then(order => updateTransaction(donation, transaction))
       } else {
         return updateTransaction(donation, transaction);
       }

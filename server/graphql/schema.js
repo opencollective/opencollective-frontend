@@ -4,10 +4,18 @@ import {
 } from 'graphql';
 
 import {
+  CollectiveInterfaceType,
+  CollectiveType,
+  CollectiveStatsType,
+  UserCollectiveType,
+  EventCollectiveType,
+} from './CollectiveInterface';
+
+import {
   TransactionInterfaceType,
-  TransactionDonationType,
+  TransactionOrderType,
   TransactionExpenseType
-} from './types';
+} from './TransactionInterface';
 
 import query from './queries';
 import mutation from './mutations';
@@ -29,7 +37,16 @@ const Mutation = new GraphQLObjectType({
 })
 
 const Schema = new GraphQLSchema({
-  types: [TransactionInterfaceType, TransactionDonationType, TransactionExpenseType],
+  types: [
+    CollectiveInterfaceType,
+    CollectiveType,
+    CollectiveStatsType,
+    UserCollectiveType,
+    EventCollectiveType,
+    TransactionInterfaceType,
+    TransactionOrderType,
+    TransactionExpenseType
+  ],
   query: Query,
   mutation: Mutation
 });

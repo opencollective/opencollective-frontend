@@ -11,9 +11,7 @@ import middleware from '../server/middleware/sanitizer';
 const application = utils.data('application');
 const userData = utils.data('user3');
 const userData2 = utils.data('user2');
-const groupData = utils.data('group2');
-
-let user;
+const collectiveData = utils.data('collective2');
 
 describe('XSS.test', () => {
   let sandbox;
@@ -29,14 +27,14 @@ describe('XSS.test', () => {
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach('create a user', () => models.User.create(userData).tap(u => user = u));
+  beforeEach('create a user', () => models.User.create(userData));
 
-  beforeEach('create group with user as first member', (done) => {
+  beforeEach('create collective with user as first member', (done) => {
     request(app)
       .post('/groups')
       .send({
         api_key: application.api_key,
-        group: Object.assign(groupData, { users: [{ email: userData2.email, role: roles.MEMBER}]})
+        group: Object.assign(collectiveData, { users: [{ email: userData2.email, role: roles.HOST}]})
       })
       .expect(200)
       .end((e) => {
@@ -96,63 +94,17 @@ describe('XSS.test', () => {
         .post(`/users?api_key=${application.api_key}`)
         .send({
           user: {
+            firstName: "<script>alert(\"hi\")</script>Janel",
             email: "aseem@opencollective.com",
           }
         })
         .end((err, res) => {
           const { body } = res;
           expect(body.email).to.equal('aseem@opencollective.com');
-          done();
-        });
-    });
-    
-    it('name field', (done) => {
-      request(app)
-        .put(`/users/${user.id}?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          user: {
-            name: "<script>alert(\"hi\")</script>Janel"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.name).to.equal('Janel');
+          expect(body.firstName).to.equal('Janel');
           done();
         });
     });
   });
 
-  describe('sanitizes group', () => {
-    it('name field', (done) => {
-      request(app)
-        .put(`/groups/1?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          group: {
-            name: "<script>alert(\"hi\")</script>hello"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.name).to.equal('hello');
-          done();
-        });
-    });
-  it('name field', (done) => {
-      request(app)
-        .put(`/groups/1?api_key=${application.api_key}`)
-        .set('Authorization', `Bearer ${user.jwt()}`)
-        .send({
-          group: {
-            description: "<script>alert(\"hi\")</script> yo"
-          }
-        })
-        .end((err, res) => {
-          const { body } = res;
-          expect(body.description).to.equal(' yo');
-          done();
-        });
-    });
-  });
 });

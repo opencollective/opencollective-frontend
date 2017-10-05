@@ -1,7 +1,13 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
+import { capitalize, pluralize } from '../lib/utils';
+import debugLib from 'debug';
+const debug = debugLib('tier');
+import CustomDataTypes from './DataTypes';
 
 export default function(Sequelize, DataTypes) {
+
+  const { models } = Sequelize;
 
   const Tier = Sequelize.define('Tier', {
     id: {
@@ -10,18 +16,17 @@ export default function(Sequelize, DataTypes) {
       autoIncrement: true
     },
 
-    EventId: {
+    CollectiveId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Events',
+        model: 'Collectives',
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-      allowNull: true
+      onUpdate: 'CASCADE'
     },
 
-    // human readable way to uniquely access a tier for a given group or group/event combo
+    // human readable way to uniquely access a tier for a given collective or collective/event combo
     slug: {
       type: DataTypes.STRING,
       set(slug) {
@@ -43,23 +48,30 @@ export default function(Sequelize, DataTypes) {
     },
 
     type: {
-      type: DataTypes.STRING, // BACKER, SPONSOR, TICKET, GOAL, ...
-      defaultValue: 'TICKET'
+      type: DataTypes.STRING, // TIER, TICKET
+      defaultValue: 'TIER'
     },
 
     description: DataTypes.STRING,
+    button: DataTypes.STRING,
 
     amount: {
       type: DataTypes.INTEGER, // In cents
       min: 0
     },
 
-    currency: {
-      type: DataTypes.STRING,
-      defaultValue: 'USD',
-      set(val) {
-        if (val && val.toUpperCase) {
-          this.setDataValue('currency', val.toUpperCase());
+    presets: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER)
+    },
+  
+    currency: CustomDataTypes(DataTypes).currency,
+
+    interval: {
+      type: DataTypes.STRING(8),
+      validate: {
+        isIn: {
+          args: [['month', 'year']],
+          msg: 'Must be month or year'
         }
       }
     },
@@ -116,7 +128,6 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           id: this.id,
-          EventId: this.EventId,
           name: this.name,
           description: this.description,
           amount: this.amount,
@@ -127,45 +138,75 @@ export default function(Sequelize, DataTypes) {
           createdAt: this.createdAt,
           updatedAt: this.updatedAt
         }
-      }
-    },
-
-    classMethods: {
-      createMany: (tiers, defaultValues = {}) => {
-        return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
-      }
-    },
-
-    instanceMethods: {
-      // TODO: Check for maxQuantityPerUser
-      availableQuantity() {
-        return Sequelize.models.Response.sum('quantity', { 
-            where: {
-              TierId: this.id,
-              confirmedAt: { $ne: null }
-            }
-          })
-          .then(usedQuantity => {
-            if (this.maxQuantity && usedQuantity) {
-              return this.maxQuantity - usedQuantity;
-            } else if (this.maxQuantity) {
-              return this.maxQuantity;
-            } else {
-              return Infinity;
-            }
-          })
       },
-      checkAvailableQuantity(quantityNeeded) {
-        return this.availableQuantity()
-        .then(available => (available - quantityNeeded >= 0))
-      },
-      // Get the total amount of money raised with this tier
-      // TODO: Implement
-      totalAmount() {
-        return 0; // xdamman: NOT IMPLEMENTED (need to add ResponseId to Transaction model)
+
+      title() {
+        return capitalize(pluralize(this.name));
       }
     }
   });
+
+  /**
+   * Instance Methods
+   */
+
+   // TODO: Check for maxQuantityPerUser
+  Tier.prototype.availableQuantity = function() {
+    return models.Order.sum('quantity', { 
+        where: {
+          TierId: this.id,
+          processedAt: { $ne: null }
+        }
+      })
+      .then(usedQuantity => {
+        debug("availableQuantity", "usedQuantity:", usedQuantity, "maxQuantity", this.maxQuantity);
+        if (this.maxQuantity && usedQuantity) {
+          return this.maxQuantity - usedQuantity;
+        } else if (this.maxQuantity) {
+          return this.maxQuantity;
+        } else {
+          return Infinity;
+        }
+      })
+  };
+
+  Tier.prototype.checkAvailableQuantity = function(quantityNeeded = 1) {
+    return this.availableQuantity()
+    .then(available => (available - quantityNeeded >= 0))
+  };
+
+  /**
+   * Class Methods
+   */
+  Tier.createMany = (tiers, defaultValues = {}) => {
+    return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), {concurrency: 1});
+  };
+
+  /**
+   * Append tier to each backer in an array of backers
+   */
+  Tier.appendTier = (collective, backerCollectives) => {
+    const backerCollectivesIds = backerCollectives.map(b => b.id);
+    debug("appendTier", collective.name, "backers: ", backerCollectives.length);
+    return models.Member.findAll({
+      where: {
+        MemberCollectiveId: { $in: backerCollectivesIds },
+        CollectiveId: collective.id
+      },
+      include: [ { model: models.Tier }]
+    })
+    .then(memberships => {
+      const membershipsForBackerCollective = {};
+      memberships.map(m => {
+        membershipsForBackerCollective[m.MemberCollectiveId] = m.Tier;
+      })
+      return backerCollectives.map(backerCollective => {
+        backerCollective.tier = membershipsForBackerCollective[backerCollective.id];
+        debug("appendTier for", backerCollective.name,":", backerCollective.tier && backerCollective.tier.slug);
+        return backerCollective;
+      })
+    });
+  }
 
   return Tier;
 }

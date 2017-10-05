@@ -5,7 +5,7 @@ process.env.PORT = 3066;
 import models, {sequelize} from '../../server/models';
 import _ from 'lodash';
 import Promise from 'bluebird';
-import { formatCurrency, formatArrayToString, getTier, formatCurrencyObject } from '../../server/lib/utils';
+import { formatCurrency, formatArrayToString, formatCurrencyObject } from '../../server/lib/utils';
 import emailLib from '../../server/lib/email';
 
 const d = new Date;
@@ -17,26 +17,26 @@ console.log("startDate", startDate, "endDate", endDate);
 const GetUserTransactionsQuery = `
 with "UserTransactions" as (
   SELECT
-    "GroupId",
-    SUM("amountInTxnCurrency") as "amountInTxnCurrency",
-    MAX("txnCurrency") as "txnCurrency",
-    SUM("platformFeeInTxnCurrency") as "platformFeeInTxnCurrency",
-    MAX("hostFeeInTxnCurrency") as "hostFeeInTxnCurrency",
-    MAX("paymentProcessorFeeInTxnCurrency") as "paymentProcessorFeeInTxnCurrency"
+    "CollectiveId",
+    SUM("amountInHostCurrency") as "amountInHostCurrency",
+    MAX("hostCurrency") as "hostCurrency",
+    SUM("platformFeeInHostCurrency") as "platformFeeInHostCurrency",
+    MAX("hostFeeInHostCurrency") as "hostFeeInHostCurrency",
+    MAX("paymentProcessorFeeInHostCurrency") as "paymentProcessorFeeInHostCurrency"
   FROM "Transactions"
-  WHERE "UserId"=:userid AND amount > 0 AND "deletedAt" IS NULL AND "PaymentMethodId" IS NOT NULL
-  GROUP BY "GroupId"
+  WHERE "CreatedByUserId"=:userid AND amount > 0 AND "deletedAt" IS NULL AND "PaymentMethodId" IS NOT NULL
+  GROUP BY "CollectiveId"
 )
 SELECT
   ut.*,
   host.username as "hostSlug",
   CONCAT(host."firstName", ' ', host."lastName") as "hostName",
-  host.avatar as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
-  g.slug, g.name, g.mission, g.logo, g."backgroundImage", g."twitterHandle", g.tiers, g.settings, g.data 
+  host.image as "hostLogo", host."twitterHandle" as "hostTwitterHandle", host.description as "hostDescription", host.mission as "hostMission",
+  g.slug, g.name, g.mission, g.image, g."backgroundImage", g."twitterHandle", g.settings, g.data
 FROM "UserTransactions" ut 
-LEFT JOIN "Groups" g ON ut."GroupId" = g.id
-LEFT JOIN "UserGroups" ug ON ut."GroupId" = ug."GroupId" AND ug.role='HOST'
-LEFT JOIN "Users" host ON ug."UserId" = host.id`;
+LEFT JOIN "Collectives" g ON ut."CollectiveId" = g.id
+LEFT JOIN "Members" ug ON ut."CollectiveId" = ug."CollectiveId" AND ug.role='HOST'
+LEFT JOIN "Users" host ON ug."CreatedByUserId" = host.id`;
 
 const buildTweet = (collectives, totalDonations) => {
   let tweet;
@@ -81,7 +81,7 @@ const processUser = (user) => {
         hosts[row.hostSlug] = {
           slug: row.hostSlug,
           name: row.hostName.trim() || row.hostSlug,
-          logo: row.hostLogo,
+          image: row.hostLogo,
           twitterHandle: row.hostTwitterHandle,
           description: row.hostDescription || row.hostMission,
           collectives: {}
@@ -92,30 +92,28 @@ const processUser = (user) => {
         slug: row.slug,
         name: row.name || row.slug,
         mission: row.mission,
-        logo: row.logo,
+        image: row.image,
         backgroundImage: row.backgroundImage || 'https://opencollective.com/public/images/collectives/default-header-bg.jpg',
         twitterHandle: row.twitterHandle,
         settings: row.settings,
         data: row.data,
-        totalDonations: Number(row.amountInTxnCurrency),
-        currency: row.txnCurrency
+        totalDonations: Number(row.amountInHostCurrency),
+        currency: row.hostCurrency
       };
 
       hosts[row.hostSlug].collectives[row.slug] = collectives[row.slug];
 
-      hosts[row.hostSlug].collectives[row.slug].tier = getTier({ totalDonations: Number(row.amountInTxnCurrency)}, row.tiers);
+      if (typeof totalDonations[row.hostCurrency] === 'undefined')
+        totalDonations[row.hostCurrency] = 0;
 
-      if (typeof totalDonations[row.txnCurrency] === 'undefined')
-        totalDonations[row.txnCurrency] = 0;
+      _.set(hosts, [row.hostSlug, 'totalFees', row.hostCurrency], 0);
+      _.set(hosts, ['stripe', 'totalFees', row.hostCurrency], 0);
+      _.set(hosts, ['opencollective', 'totalFees', row.hostCurrency], 0);
 
-      _.set(hosts, [row.hostSlug, 'totalFees', row.txnCurrency], 0);
-      _.set(hosts, ['stripe', 'totalFees', row.txnCurrency], 0);
-      _.set(hosts, ['opencollective', 'totalFees', row.txnCurrency], 0);
-
-      totalDonations[row.txnCurrency] += Number(row.amountInTxnCurrency);
-      hosts[row.hostSlug]['totalFees'][row.txnCurrency] += Number(row.hostFeeInTxnCurrency);
-      hosts['opencollective']['totalFees'][row.txnCurrency] += Number(row.platformFeeInTxnCurrency);
-      hosts['stripe']['totalFees'][row.txnCurrency] += Number(row.paymentProcessorFeeInTxnCurrency);
+      totalDonations[row.hostCurrency] += Number(row.amountInHostCurrency);
+      hosts[row.hostSlug]['totalFees'][row.hostCurrency] += Number(row.hostFeeInHostCurrency);
+      hosts['opencollective']['totalFees'][row.hostCurrency] += Number(row.platformFeeInHostCurrency);
+      hosts['stripe']['totalFees'][row.hostCurrency] += Number(row.paymentProcessorFeeInHostCurrency);
     })
 
     const fees = {

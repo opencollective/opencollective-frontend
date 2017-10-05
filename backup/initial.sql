@@ -26,30 +26,30 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- Name: enum_Groups_membership_type; Type: TYPE; Schema: public; Owner: philmod
+-- Name: enum_Collectives_membership_type; Type: TYPE; Schema: public; Owner: philmod
 --
 
-CREATE TYPE "enum_Groups_membership_type" AS ENUM (
+CREATE TYPE "enum_Collectives_membership_type" AS ENUM (
     'donation',
     'monthlyfee',
     'yearlyfee'
 );
 
 
-ALTER TYPE public."enum_Groups_membership_type" OWNER TO philmod;
+ALTER TYPE public."enum_Collectives_membership_type" OWNER TO philmod;
 
 --
--- Name: enum_UserGroups_role; Type: TYPE; Schema: public; Owner: philmod
+-- Name: enum_Roles_role; Type: TYPE; Schema: public; Owner: philmod
 --
 
-CREATE TYPE "enum_UserGroups_role" AS ENUM (
+CREATE TYPE "enum_Roles_role" AS ENUM (
     'admin',
     'writer',
     'viewer'
 );
 
 
-ALTER TYPE public."enum_UserGroups_role" OWNER TO philmod;
+ALTER TYPE public."enum_Roles_role" OWNER TO philmod;
 
 SET default_tablespace = '';
 
@@ -64,7 +64,7 @@ CREATE TABLE "Activities" (
     type character varying(255),
     data json,
     "createdAt" timestamp with time zone,
-    "GroupId" integer,
+    "CollectiveId" integer,
     "UserId" integer,
     "TransactionId" integer
 );
@@ -94,18 +94,18 @@ ALTER SEQUENCE "Activities_id_seq" OWNED BY "Activities".id;
 
 
 --
--- Name: ApplicationGroup; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
+-- Name: ApplicationCollective; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
 --
 
-CREATE TABLE "ApplicationGroup" (
+CREATE TABLE "ApplicationCollective" (
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
-    "GroupId" integer NOT NULL,
+    "CollectiveId" integer NOT NULL,
     "ApplicationId" integer NOT NULL
 );
 
 
-ALTER TABLE public."ApplicationGroup" OWNER TO philmod;
+ALTER TABLE public."ApplicationCollective" OWNER TO philmod;
 
 --
 -- Name: Applications; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
@@ -163,7 +163,7 @@ CREATE TABLE "Cards" (
     "confirmedAt" timestamp with time zone,
     "deletedAt" timestamp with time zone,
     "UserId" integer,
-    "GroupId" integer
+    "CollectiveId" integer
 );
 
 
@@ -191,16 +191,16 @@ ALTER SEQUENCE "Cards_id_seq" OWNED BY "Cards".id;
 
 
 --
--- Name: Groups; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
+-- Name: Collectives; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
 --
 
-CREATE TABLE "Groups" (
+CREATE TABLE "Collectives" (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     description character varying(255),
     budget double precision,
     currency character varying(255) DEFAULT 'USD'::character varying,
-    membership_type "enum_Groups_membership_type",
+    membership_type "enum_Collectives_membership_type",
     membershipfee double precision,
     "createdAt" timestamp with time zone,
     "updatedAt" timestamp with time zone,
@@ -209,13 +209,13 @@ CREATE TABLE "Groups" (
 );
 
 
-ALTER TABLE public."Groups" OWNER TO philmod;
+ALTER TABLE public."Collectives" OWNER TO philmod;
 
 --
--- Name: Groups_id_seq; Type: SEQUENCE; Schema: public; Owner: philmod
+-- Name: Collectives_id_seq; Type: SEQUENCE; Schema: public; Owner: philmod
 --
 
-CREATE SEQUENCE "Groups_id_seq"
+CREATE SEQUENCE "Collectives_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -223,13 +223,13 @@ CREATE SEQUENCE "Groups_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."Groups_id_seq" OWNER TO philmod;
+ALTER TABLE public."Collectives_id_seq" OWNER TO philmod;
 
 --
--- Name: Groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: philmod
+-- Name: Collectives_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: philmod
 --
 
-ALTER SEQUENCE "Groups_id_seq" OWNED BY "Groups".id;
+ALTER SEQUENCE "Collectives_id_seq" OWNED BY "Collectives".id;
 
 
 --
@@ -333,7 +333,7 @@ CREATE TABLE "Transactions" (
     "approvedAt" timestamp with time zone,
     "reimbursedAt" timestamp with time zone,
     "updatedAt" timestamp with time zone NOT NULL,
-    "GroupId" integer,
+    "CollectiveId" integer,
     "UserId" integer,
     "CardId" integer
 );
@@ -363,20 +363,20 @@ ALTER SEQUENCE "Transactions_id_seq" OWNED BY "Transactions".id;
 
 
 --
--- Name: UserGroups; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
+-- Name: Roles; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
 --
 
-CREATE TABLE "UserGroups" (
-    role "enum_UserGroups_role",
+CREATE TABLE "Roles" (
+    role "enum_Roles_role",
     "createdAt" timestamp with time zone,
     "updatedAt" timestamp with time zone,
     "deletedAt" timestamp with time zone,
     "UserId" integer NOT NULL,
-    "GroupId" integer NOT NULL
+    "CollectiveId" integer NOT NULL
 );
 
 
-ALTER TABLE public."UserGroups" OWNER TO philmod;
+ALTER TABLE public."Roles" OWNER TO philmod;
 
 --
 -- Name: Users; Type: TABLE; Schema: public; Owner: philmod; Tablespace: 
@@ -388,7 +388,7 @@ CREATE TABLE "Users" (
     first_name character varying(255),
     last_name character varying(255),
     username character varying(255),
-    avatar character varying(255),
+    image character varying(255),
     email character varying(255) NOT NULL,
     _salt character varying(255) DEFAULT '$2a$10$z7WeTPzeRqOEAHa7iou9be'::character varying,
     refresh_token character varying(255) DEFAULT '$2a$10$0clIXo.fK5iqIdrS1Uy8zO'::character varying,
@@ -449,7 +449,7 @@ ALTER TABLE ONLY "Cards" ALTER COLUMN id SET DEFAULT nextval('"Cards_id_seq"'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: philmod
 --
 
-ALTER TABLE ONLY "Groups" ALTER COLUMN id SET DEFAULT nextval('"Groups_id_seq"'::regclass);
+ALTER TABLE ONLY "Collectives" ALTER COLUMN id SET DEFAULT nextval('"Collectives_id_seq"'::regclass);
 
 
 --
@@ -484,7 +484,7 @@ ALTER TABLE ONLY "Users" ALTER COLUMN id SET DEFAULT nextval('"Users_id_seq"'::r
 -- Data for Name: Activities; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Activities" (id, type, data, "createdAt", "GroupId", "UserId", "TransactionId") FROM stdin;
+COPY "Activities" (id, type, data, "createdAt", "CollectiveId", "UserId", "TransactionId") FROM stdin;
 \.
 
 
@@ -496,10 +496,10 @@ SELECT pg_catalog.setval('"Activities_id_seq"', 1, false);
 
 
 --
--- Data for Name: ApplicationGroup; Type: TABLE DATA; Schema: public; Owner: philmod
+-- Data for Name: ApplicationCollective; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "ApplicationGroup" ("createdAt", "updatedAt", "GroupId", "ApplicationId") FROM stdin;
+COPY "ApplicationCollective" ("createdAt", "updatedAt", "CollectiveId", "ApplicationId") FROM stdin;
 \.
 
 
@@ -522,7 +522,7 @@ SELECT pg_catalog.setval('"Applications_id_seq"', 1, false);
 -- Data for Name: Cards; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Cards" (id, number, token, "serviceId", service, data, "createdAt", "updatedAt", "confirmedAt", "deletedAt", "UserId", "GroupId") FROM stdin;
+COPY "Cards" (id, number, token, "serviceId", service, data, "createdAt", "updatedAt", "confirmedAt", "deletedAt", "UserId", "CollectiveId") FROM stdin;
 \.
 
 
@@ -534,18 +534,18 @@ SELECT pg_catalog.setval('"Cards_id_seq"', 1, false);
 
 
 --
--- Data for Name: Groups; Type: TABLE DATA; Schema: public; Owner: philmod
+-- Data for Name: Collectives; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Groups" (id, name, description, budget, currency, membership_type, membershipfee, "createdAt", "updatedAt", "deletedAt", "StripeManagedAccountId") FROM stdin;
+COPY "Collectives" (id, name, description, budget, currency, membership_type, membershipfee, "createdAt", "updatedAt", "deletedAt", "StripeManagedAccountId") FROM stdin;
 \.
 
 
 --
--- Name: Groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: philmod
+-- Name: Collectives_id_seq; Type: SEQUENCE SET; Schema: public; Owner: philmod
 --
 
-SELECT pg_catalog.setval('"Groups_id_seq"', 1, false);
+SELECT pg_catalog.setval('"Collectives_id_seq"', 1, false);
 
 
 --
@@ -582,7 +582,7 @@ SELECT pg_catalog.setval('"StripeManagedAccounts_id_seq"', 1, false);
 -- Data for Name: Transactions; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Transactions" (id, type, description, amount, currency, vendor, paidby, tags, status, comment, link, approved, "createdAt", "approvedAt", "reimbursedAt", "updatedAt", "GroupId", "UserId", "CardId") FROM stdin;
+COPY "Transactions" (id, type, description, amount, currency, vendor, paidby, tags, status, comment, link, approved, "createdAt", "approvedAt", "reimbursedAt", "updatedAt", "CollectiveId", "UserId", "CardId") FROM stdin;
 \.
 
 
@@ -594,10 +594,10 @@ SELECT pg_catalog.setval('"Transactions_id_seq"', 1, false);
 
 
 --
--- Data for Name: UserGroups; Type: TABLE DATA; Schema: public; Owner: philmod
+-- Data for Name: Roles; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "UserGroups" (role, "createdAt", "updatedAt", "deletedAt", "UserId", "GroupId") FROM stdin;
+COPY "Roles" (role, "createdAt", "updatedAt", "deletedAt", "UserId", "CollectiveId") FROM stdin;
 \.
 
 
@@ -605,7 +605,7 @@ COPY "UserGroups" (role, "createdAt", "updatedAt", "deletedAt", "UserId", "Group
 -- Data for Name: Users; Type: TABLE DATA; Schema: public; Owner: philmod
 --
 
-COPY "Users" (id, _access, first_name, last_name, username, avatar, email, _salt, refresh_token, password_hash, "createdAt", "updatedAt", "seenAt", "deletedAt", "ApplicationId") FROM stdin;
+COPY "Users" (id, _access, first_name, last_name, username, image, email, _salt, refresh_token, password_hash, "createdAt", "updatedAt", "seenAt", "deletedAt", "ApplicationId") FROM stdin;
 \.
 
 
@@ -625,11 +625,11 @@ ALTER TABLE ONLY "Activities"
 
 
 --
--- Name: ApplicationGroup_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
+-- Name: ApplicationCollective_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
 --
 
-ALTER TABLE ONLY "ApplicationGroup"
-    ADD CONSTRAINT "ApplicationGroup_pkey" PRIMARY KEY ("GroupId", "ApplicationId");
+ALTER TABLE ONLY "ApplicationCollective"
+    ADD CONSTRAINT "ApplicationCollective_pkey" PRIMARY KEY ("CollectiveId", "ApplicationId");
 
 
 --
@@ -649,11 +649,11 @@ ALTER TABLE ONLY "Cards"
 
 
 --
--- Name: Groups_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
+-- Name: Collectives_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
 --
 
-ALTER TABLE ONLY "Groups"
-    ADD CONSTRAINT "Groups_pkey" PRIMARY KEY (id);
+ALTER TABLE ONLY "Collectives"
+    ADD CONSTRAINT "Collectives_pkey" PRIMARY KEY (id);
 
 
 --
@@ -689,11 +689,11 @@ ALTER TABLE ONLY "Transactions"
 
 
 --
--- Name: UserGroups_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
+-- Name: Roles_pkey; Type: CONSTRAINT; Schema: public; Owner: philmod; Tablespace: 
 --
 
-ALTER TABLE ONLY "UserGroups"
-    ADD CONSTRAINT "UserGroups_pkey" PRIMARY KEY ("UserId", "GroupId");
+ALTER TABLE ONLY "Roles"
+    ADD CONSTRAINT "Roles_pkey" PRIMARY KEY ("UserId", "CollectiveId");
 
 
 --
@@ -721,11 +721,11 @@ ALTER TABLE ONLY "Users"
 
 
 --
--- Name: Activities_GroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: Activities_CollectiveId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
 ALTER TABLE ONLY "Activities"
-    ADD CONSTRAINT "Activities_GroupId_fkey" FOREIGN KEY ("GroupId") REFERENCES "Groups"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT "Activities_CollectiveId_fkey" FOREIGN KEY ("CollectiveId") REFERENCES "Collectives"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -745,27 +745,27 @@ ALTER TABLE ONLY "Activities"
 
 
 --
--- Name: ApplicationGroup_ApplicationId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: ApplicationCollective_ApplicationId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
-ALTER TABLE ONLY "ApplicationGroup"
-    ADD CONSTRAINT "ApplicationGroup_ApplicationId_fkey" FOREIGN KEY ("ApplicationId") REFERENCES "Applications"(id);
-
-
---
--- Name: ApplicationGroup_GroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
---
-
-ALTER TABLE ONLY "ApplicationGroup"
-    ADD CONSTRAINT "ApplicationGroup_GroupId_fkey" FOREIGN KEY ("GroupId") REFERENCES "Groups"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY "ApplicationCollective"
+    ADD CONSTRAINT "ApplicationCollective_ApplicationId_fkey" FOREIGN KEY ("ApplicationId") REFERENCES "Applications"(id);
 
 
 --
--- Name: Cards_GroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: ApplicationCollective_CollectiveId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+--
+
+ALTER TABLE ONLY "ApplicationCollective"
+    ADD CONSTRAINT "ApplicationCollective_CollectiveId_fkey" FOREIGN KEY ("CollectiveId") REFERENCES "Collectives"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: Cards_CollectiveId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
 ALTER TABLE ONLY "Cards"
-    ADD CONSTRAINT "Cards_GroupId_fkey" FOREIGN KEY ("GroupId") REFERENCES "Groups"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT "Cards_CollectiveId_fkey" FOREIGN KEY ("CollectiveId") REFERENCES "Collectives"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -777,11 +777,11 @@ ALTER TABLE ONLY "Cards"
 
 
 --
--- Name: Groups_StripeManagedAccountId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: Collectives_StripeManagedAccountId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
-ALTER TABLE ONLY "Groups"
-    ADD CONSTRAINT "Groups_StripeManagedAccountId_fkey" FOREIGN KEY ("StripeManagedAccountId") REFERENCES "StripeManagedAccounts"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY "Collectives"
+    ADD CONSTRAINT "Collectives_StripeManagedAccountId_fkey" FOREIGN KEY ("StripeManagedAccountId") REFERENCES "StripeManagedAccounts"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -801,11 +801,11 @@ ALTER TABLE ONLY "Transactions"
 
 
 --
--- Name: Transactions_GroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: Transactions_CollectiveId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
 ALTER TABLE ONLY "Transactions"
-    ADD CONSTRAINT "Transactions_GroupId_fkey" FOREIGN KEY ("GroupId") REFERENCES "Groups"(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT "Transactions_CollectiveId_fkey" FOREIGN KEY ("CollectiveId") REFERENCES "Collectives"(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -817,19 +817,19 @@ ALTER TABLE ONLY "Transactions"
 
 
 --
--- Name: UserGroups_GroupId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: Roles_CollectiveId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
-ALTER TABLE ONLY "UserGroups"
-    ADD CONSTRAINT "UserGroups_GroupId_fkey" FOREIGN KEY ("GroupId") REFERENCES "Groups"(id);
+ALTER TABLE ONLY "Roles"
+    ADD CONSTRAINT "Roles_CollectiveId_fkey" FOREIGN KEY ("CollectiveId") REFERENCES "Collectives"(id);
 
 
 --
--- Name: UserGroups_UserId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
+-- Name: Roles_UserId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: philmod
 --
 
-ALTER TABLE ONLY "UserGroups"
-    ADD CONSTRAINT "UserGroups_UserId_fkey" FOREIGN KEY ("UserId") REFERENCES "Users"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY "Roles"
+    ADD CONSTRAINT "Roles_UserId_fkey" FOREIGN KEY ("UserId") REFERENCES "Users"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

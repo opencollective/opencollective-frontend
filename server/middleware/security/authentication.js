@@ -1,15 +1,14 @@
-import _ from 'lodash';
+import { get, contains } from 'lodash';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import request from 'request-promise';
 import qs from 'querystring';
-
-import {createOrUpdate as createOrUpdateConnectedAccount} from '../../controllers/connectedAccounts';
+import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controllers/connectedAccounts';
 import models from '../../models';
 import errors from '../../lib/errors';
-import required from '../required_param';
 import debug from 'debug';
+import * as stripe from '../../controllers/stripe';
 
 const {
   User
@@ -18,7 +17,6 @@ const {
 const {
   BadRequest,
   CustomError,
-  ServerError,
   Unauthorized
 } = errors;
 
@@ -90,42 +88,10 @@ export function authenticateUserByJwtNoExpiry() {
 }
 
 /**
- * Authenticate user by username/email/password.
+ * Authenticate the user using the JWT token and populates:
+ *  - req.remoteUser
+ *  - req.remoteUser.memberships[CollectiveId] = [roles]
  */
-export const authenticateUserByPassword = (req, res, next) => {
-  required('password')(req, res, (e) => {
-    if (e) {
-      return next(e);
-    }
-
-    const username = (req.body && req.body.username) || req.query.username;
-    const email = (req.body && req.body.email) || req.query.email;
-    const password = (req.body && req.body.password) || req.query.password;
-
-    User
-      .auth((username || email), password, (e, user) => {
-        const errorMsg = 'Invalid username/email or password';
-
-        if (e) {
-          if (e.code === 400) {
-            return next(new BadRequest(errorMsg));
-          } else {
-            return next(new ServerError(e.message));
-          }
-        }
-
-        if (!user) {
-          return next(new BadRequest(errorMsg));
-        }
-
-        req.remoteUser = user;
-        req.user = req.remoteUser;
-
-        next();
-      });
-  });
-};
-
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = req.jwtPayload.sub;
@@ -133,10 +99,19 @@ export const _authenticateUserByJwt = (req, res, next) => {
     .findById(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
-      user.update({seenAt: new Date()});
+      user.update({ seenAt: new Date() });
       req.remoteUser = user;
-      debug('auth')('logged in user', req.remoteUser.username);
+      return user.populateRoles();
+    })
+    .then(() => {
+      debug('auth')('logged in user', req.remoteUser.id, "roles:", req.remoteUser.rolesByCollectiveId);
+
+      // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
+      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
+      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
+      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
       next();
+      return null;
     })
     .catch(next);
 };
@@ -152,12 +127,18 @@ export function authenticateUser(req, res, next) {
   if (req.remoteUser && req.remoteUser.id) return next();
 
   parseJwtNoExpiryCheck(req, res, (e) => {
-    // If a token was submitted but is invalid, we return an error
-    if (e) return next(e);
+    // If a token was submitted but is invalid, we continue without authenticating the user
+    if (e) {
+      console.error(e);
+      return next();
+    }
 
     checkJwtExpiry(req, res, (e) => {
-      // If a token was submitted and is expired, we return an error
-      if (e) return next(e);
+      // If a token was submitted and is expired, we continue without authenticating the user
+      if (e) {
+        console.error(e);
+        return next();
+      }
       _authenticateUserByJwt(req, res, next);
     });
 
@@ -186,7 +167,7 @@ export function authenticateInternalUserByJwt() {
 }
 
 export const _authenticateInternalUserById = (req, res, next) => {
-  if (req.jwtPayload && _.contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
+  if (req.jwtPayload && contains([1,2,4,5,6,7,8,30,40,212,772], req.jwtPayload.sub)) {
     next();
   } else {
     throw new Unauthorized();
@@ -197,6 +178,11 @@ export const authenticateService = (req, res, next) => {
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
   const { service } = req.params;
+
+  if ( service === 'stripe') {
+    return stripe.authorize(req, res, next);
+  }
+
   switch (service) {
     case 'github':
       // 'repo' gives us access to organizational repositories as well
@@ -214,6 +200,11 @@ export const authenticateService = (req, res, next) => {
 
 export const authenticateServiceCallback = (req, res, next) => {
   const { service } = req.params;
+
+  if (service === 'stripe') {
+    return stripe.callback(req, res, next);
+  }
+
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
   console.log("authenticateServiceCallback calling Passport with options", opts);
   passport.authenticate(service, opts, (err, accessToken, data) => {
@@ -241,8 +232,8 @@ export const authenticateServiceCallback = (req, res, next) => {
 
 function getOAuthCallbackUrl(req) {
   const { utm_source } = req.query;
-  const { slug } = req.query;
-  const params = qs.stringify({ utm_source, slug });
+  const { CollectiveId } = req.query;
+  const params = qs.stringify({ utm_source, CollectiveId });
   const { service } = req.params;
   return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
 }

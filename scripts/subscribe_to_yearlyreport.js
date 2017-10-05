@@ -30,7 +30,7 @@ const processRow = (row) => {
   return;
 
   /* Don't run this again because it would add duplicate rows
-   * For some reason, the unique key on type,userid,groupid doesn't complain if groupid is null
+   * For some reason, the unique key on type,userid,collectiveid doesn't complain if collectiveid is null
   return Notification.create({
     UserId: row.id,
     type

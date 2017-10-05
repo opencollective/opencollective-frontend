@@ -1,6 +1,7 @@
 import {
   GraphQLInt,
   GraphQLFloat,
+  GraphQLBoolean,
   GraphQLList,
   GraphQLInputObjectType,
   GraphQLNonNull,
@@ -9,6 +10,7 @@ import {
   GraphQLError
 } from 'graphql';
 
+import GraphQLJSON from 'graphql-type-json';
 import { Kind } from 'graphql/language';
 
 const EmailType = new GraphQLScalarType({
@@ -34,14 +36,21 @@ const EmailType = new GraphQLScalarType({
     }
 });
 
-export const CardInputType = new GraphQLInputObjectType({
-  name: 'CardInputType',
-  description: 'Input type for Card',
+export const PaymentMethodInputType = new GraphQLInputObjectType({
+  name: 'PaymentMethodInputType',
+  description: 'Input type for PaymentMethod (paypal/stripe)',
   fields: () => ({
-    token: { type: new GraphQLNonNull(GraphQLString)},
-    expMonth: { type: new GraphQLNonNull(GraphQLInt)},
-    expYear: { type: new GraphQLNonNull(GraphQLInt)},
-    number: { type: new GraphQLNonNull(GraphQLInt)}
+    id: { type: GraphQLInt },
+    uuid: { type: GraphQLString }, // used to fetch an existing payment method
+    token: { type: GraphQLString },
+    service: { type: GraphQLString },
+    customerId: { type: GraphQLString },
+    data: { type: GraphQLJSON },
+    name: { type: GraphQLString },
+    primary: { type: GraphQLBoolean },
+    monthlyLimitPerMember: { type: GraphQLInt },
+    currency: { type: GraphQLString },
+    save: { type: GraphQLBoolean }
   })
 });
 
@@ -54,13 +63,24 @@ export const UserInputType = new GraphQLInputObjectType({
       firstName: { type: GraphQLString },
       lastName: { type: GraphQLString },
       name: { type: GraphQLString },
-      avatar: { type: GraphQLString },
+      image: { type: GraphQLString },
       username: { type: GraphQLString },
       description: { type: GraphQLString },
       twitterHandle: { type: GraphQLString },
       website: { type: GraphQLString },
-      paypalEmail: { type: GraphQLString },
-      card: { type: CardInputType }
+      paypalEmail: { type: GraphQLString }
+  })
+});
+
+export const MemberInputType = new GraphQLInputObjectType({
+  name: 'MemberInputType',
+  description: 'Input type for MemberType',
+  fields: () => ({
+      id: { type: GraphQLInt },
+      member: { type: CollectiveAttributesInputType },
+      collective: { type: CollectiveAttributesInputType },
+      role: { type: GraphQLString },
+      description: { type: GraphQLString }
   })
 });
 
@@ -69,18 +89,45 @@ export const CollectiveInputType = new GraphQLInputObjectType({
   description: 'Input type for CollectiveType',
   fields: () => ({
     id:   { type: GraphQLInt },
-    slug: { type: new GraphQLNonNull(GraphQLString) }
+    slug: { type: GraphQLString },
+    type: { type: GraphQLString },
+    name: { type: GraphQLString },
+    description: { type: GraphQLString },
+    longDescription: { type: GraphQLString },
+    location: { type: LocationInputType},
+    startsAt: { type: GraphQLString },
+    endsAt: { type: GraphQLString },
+    timezone: { type: GraphQLString },
+    maxAmount: { type: GraphQLInt },
+    currency: { type: GraphQLString },
+    image: { type: GraphQLString },
+    backgroundImage: { type: GraphQLString },
+    tiers: { type: new GraphQLList(TierInputType) },
+    members: { type: new GraphQLList(MemberInputType) },
+    paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
+    ParentCollectiveId: { type: GraphQLInt },
+    // not very logical to have this here. Might need some refactoring. Used to add/edit members and to create a new user on a new order
+    email: { type: GraphQLString },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString }
   })
 });
 
-export const EventAttributesInputType = new GraphQLInputObjectType({
-  name: 'EventAttributes',
-  description: 'Input type for attributes of EventInputType',
+export const CollectiveAttributesInputType = new GraphQLInputObjectType({
+  name: 'CollectiveAttributesInputType',
+  description: 'Input type for attributes of CollectiveInputType',
   fields: () => ({
     id: { type: GraphQLInt },
     slug: { type: GraphQLString },
+    type: { type: GraphQLString },
     name: { type: GraphQLString },
+    firstName: { type: GraphQLString }, // for Collective type USER
+    lastName: { type: GraphQLString }, // for Collective type USER
+    email: { type: GraphQLString }, // for Collective type USER
     description: { type: GraphQLString },
+    longDescription: { type: GraphQLString },
+    website: { type: GraphQLString },
+    twitterHandle: { type: GraphQLString },
     location: { type: LocationInputType },
     startsAt: { type: GraphQLString },
     endsAt: { type: GraphQLString },
@@ -101,25 +148,6 @@ export const LocationInputType = new GraphQLInputObjectType({
   })
 });
 
-export const EventInputType = new GraphQLInputObjectType({
-  name: 'EventInputType',
-  description: 'Input type for EventType',
-  fields: () => ({
-    id: { type: GraphQLInt },
-    slug: { type: GraphQLString },
-    name: { type: new GraphQLNonNull(GraphQLString) },
-    description: { type: new GraphQLNonNull(GraphQLString) },
-    location: { type: LocationInputType},
-    startsAt: { type: new GraphQLNonNull(GraphQLString) },
-    endsAt: { type: GraphQLString },
-    timezone: { type: GraphQLString },
-    maxAmount: { type: GraphQLInt },
-    currency: { type: GraphQLString },
-    tiers: { type: new GraphQLList(TierInputType) },
-    collective: { type: new GraphQLNonNull(CollectiveInputType) },
-  })
-});
-
 export const TierInputType = new GraphQLInputObjectType({
   name: 'TierInputType',
   description: 'Input type for TierType',
@@ -129,6 +157,7 @@ export const TierInputType = new GraphQLInputObjectType({
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     amount: { type: GraphQLInt },
+    interval: { type: GraphQLString },
     currency: { type: GraphQLString },
     maxQuantity: { type: GraphQLInt },
     maxQuantityPerUser: { type: GraphQLInt },
@@ -139,15 +168,20 @@ export const TierInputType = new GraphQLInputObjectType({
   })
 });
 
-export const ResponseInputType = new GraphQLInputObjectType({
-  name: 'ResponseInputType',
-  description: 'Input type for ResponseType',
+export const OrderInputType = new GraphQLInputObjectType({
+  name: 'OrderInputType',
+  description: 'Input type for OrderType',
   fields: () => ({
     quantity: { type: GraphQLInt },
-    user: { type: new GraphQLNonNull(UserInputType) },
-    collective: { type: new GraphQLNonNull(CollectiveInputType) },
-    tier: { type: TierInputType },
-    event: { type: new GraphQLNonNull(EventAttributesInputType) },
-    status: { type: new GraphQLNonNull(GraphQLString) }
+    totalAmount: { type: GraphQLInt },
+    interval: { type: GraphQLString },
+    description: { type: GraphQLString },
+    publicMessage: { type: GraphQLString },
+    privateMessage: { type: GraphQLString },
+    paymentMethod: { type: PaymentMethodInputType },
+    user: { type: UserInputType },
+    fromCollective: { type: CollectiveAttributesInputType },
+    collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
+    tier: { type: TierInputType }
   })
 });

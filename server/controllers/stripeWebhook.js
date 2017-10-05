@@ -2,23 +2,23 @@
 import async from 'async';
 import _ from 'lodash';
 import activities from '../constants/activities';
-import {planId} from '../lib/utils';
-import {appStripe, extractFees} from '../gateways/stripe';
-import models, {sequelize} from '../models';
+import { planId } from '../lib/utils';
+import { appStripe, extractFees } from '../gateways/stripe';
+import models, { sequelize } from '../models';
 import errors from '../lib/errors';
-import {type} from '../constants/transactions';
 import emailLib from '../lib/email';
 import currencies from '../constants/currencies';
 import config from 'config';
+import debugLib from 'debug';
+const debug = debugLib("webhook");
 
 const {
   Activity,
-  Donation,
-  Group,
+  Order,
+  Collective,
   Subscription,
   Transaction,
-  User,
-  PaymentMethod
+  User
 } = models;
 
 export default function stripeWebhook(req, res, next) {
@@ -57,13 +57,15 @@ export default function stripeWebhook(req, res, next) {
          * https://dashboard.stripe.com/acct_15avvkAcWgwn5pBt/events/evt_17oYejAcWgwn5pBtRo5gRiyY
          */
         if (planId(stripeSubscription.plan) !== stripeSubscription.plan.id) {
+          debug("fetchEvent", "unrecognized plan id", planId(stripeSubscription.plan), stripeSubscription.plan.id);
           return res.sendStatus(200);
         }
 
         /*
-         * In case we get $0 donation, return 200. Otherwise, Stripe will keep pinging us.
+         * In case we get $0 order, return 200. Otherwise, Stripe will keep pinging us.
          */
         if (event.data.object.amount_due === 0) {
+          debug("fetchEvent", "event.data.object.amount_due is 0");
           return res.sendStatus(200);
         }
 
@@ -90,17 +92,19 @@ export default function stripeWebhook(req, res, next) {
       .catch(cb);
     }],
 
-    fetchDonation: ['createActivity', (cb, results) => {
+    fetchOrder: ['createActivity', (cb, results) => {
       const stripeSubscriptionId = results.fetchEvent.stripeSubscription.id;
 
-      Donation.findOne({
+      Order.findOne({
         include: [
-          { model: Group },
-          { model: User },
-          { model: Subscription, where: { stripeSubscriptionId } }
+          { model: User, as: 'createdByUser' },
+          { model: Collective, as: 'collective' },
+          { model: Subscription, where: { stripeSubscriptionId } },
+          { model: models.PaymentMethod, as: 'paymentMethod' }
         ]
       })
-      .then((donation) => {
+      .then((order) => {
+        debug("fetchOrder", order && order.dataValues);
         /**
          * Stripe doesn't make a difference between development, test, staging
          * environments. If we get a webhook from another env,
@@ -110,25 +114,28 @@ export default function stripeWebhook(req, res, next) {
          * For non-production environments, we will simply return 200 to avoid
          * the retry on Stripe side (and the email from Stripe support).
          */
-        if (!donation && !isProduction) {
+        if (!order && !isProduction) {
+          debug("fetchOrder", "order not found with subscription id", stripeSubscriptionId);
           return res.sendStatus(200);
         }
 
-        if (!donation) {
-          return cb(new errors.BadRequest('Donation not found: unknown subscription id'));
+        if (!order) {
+          return cb(new errors.BadRequest('Order not found: unknown subscription id'));
         }
-        return cb(null, donation);
+
+        return cb(null, order);
       })
       .catch(cb)
     }],
 
-    confirmUniqueChargeId: ['fetchDonation', (cb, results) => {
+    confirmUniqueChargeId: ['fetchOrder', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
-      const donationId = results.fetchDonation.id;
+      const orderId = results.fetchOrder.id;
+      debug("confirmUniqueChargeId", chargeId);
       sequelize.query(`
         SELECT * FROM "Transactions"
         WHERE 
-          "DonationId" = ${donationId} AND
+          "OrderId" = ${orderId} AND
           CAST(data->'charge'->'id' AS TEXT) like '%${chargeId}%' AND
           "deletedAt" IS NULL
         `.replace(/\s\s+/g, ' '),
@@ -144,31 +151,42 @@ export default function stripeWebhook(req, res, next) {
       })
     }],
 
-    fetchPaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
-      const userId = results.fetchDonation.UserId;
-      const { customer } = results.fetchEvent.event.data.object;
+    // Extra check - This may not be needed.
+    validatePaymentMethod: ['confirmUniqueChargeId', (cb, results) => {
 
+      const customer = results.fetchEvent.event.data.object.customer;
+      const order = results.fetchOrder;
 
       if (!customer) {
-        return cb(new errors.BadRequest(`Customer Id not found. Event id: ${results.fetchEvent.event.id}`));
+        return cb(new errors.BadRequest(`Customer Id not found. Order id: ${order.id}`));
+      }
+      debug("validatePaymentMethod", "customer:", customer);
+      if (!order.paymentMethod) {
+        return cb(new errors.BadRequest('PaymentMethod not found'));        
       }
 
-      PaymentMethod.findOne({
-        where: {
-          customerId: customer,
-          UserId: userId
-        }
-      })
-      .then((paymentMethod) => {
-        if (!paymentMethod) {
-          return cb(new errors.BadRequest('PaymentMethod not found: unknown customer'));
-        }
-        return cb(null, paymentMethod);
-      })
-      .catch(cb)
+      // For old subscriptions, they still reference the old customerId on the host stripe account
+      if (order.paymentMethod.customerId === customer) {
+        return cb();
+      }
+
+      // We need to iterate through the PaymentMethod.data.customerIdForHost[stripeAccount]
+      if (order.paymentMethod.data.customerIdForHost) {
+        debug("validatePaymentMethod", "order.paymentMethod.data.customerIdForHost", order.paymentMethod.data.customerIdForHost);
+        Object.keys(order.paymentMethod.data.customerIdForHost).forEach(hostStripeAccountId => {
+          debug(order.paymentMethod.data.customerIdForHost[hostStripeAccountId],"===", customer);
+          debug("hostStripeAccountId", hostStripeAccountId);
+          if (order.paymentMethod.data.customerIdForHost[hostStripeAccountId] === customer) {
+            return cb();
+          }
+        });
+        // return cb(new errors.BadRequest(`Customer Id not found`));
+      } else {
+        return cb(new errors.BadRequest(`Customer Id not found. Order id: ${order.id}`));
+      }
     }],
 
-    retrieveCharge: ['fetchPaymentMethod', (cb, results) => {
+    retrieveCharge: ['validatePaymentMethod', (cb, results) => {
       const chargeId = results.fetchEvent.event.data.object.charge;
       appStripe.charges.retrieve(chargeId, {
         stripe_account: body.user_id
@@ -177,6 +195,7 @@ export default function stripeWebhook(req, res, next) {
         if (!charge) {
           return cb(new errors.BadRequest(`ChargeId not found: ${chargeId}`));
         }
+        debug("retrieveCharge", charge && charge.id);
         return cb(null, charge);
       })
       .catch(cb);
@@ -197,65 +216,67 @@ export default function stripeWebhook(req, res, next) {
     }],
 
     createTransaction: ['retrieveBalance', (cb, results) => {
-      const donation = results.fetchDonation;
+      const order = results.fetchOrder;
       const { stripeSubscription } = results.fetchEvent;
-      const user = donation.User || {};
-      const group = donation.Group || {};
-      const paymentMethod = results.fetchPaymentMethod;
+      const collective = order.collective || {};
       const charge = results.retrieveCharge;
       const balanceTransaction = results.retrieveBalance;
       const fees = extractFees(balanceTransaction);
-      const { hostFeePercent } = group;
+      const { hostFeePercent } = collective;
 
       // Now we record a new transaction
       const newTransaction = {
-        type: type.DONATION,
-        DonationId: donation.id,
+        OrderId: order.id,
         amount: stripeSubscription.amount,
         currency: stripeSubscription.currency,
-        txnCurrency: balanceTransaction.currency,
-        amountInTxnCurrency: balanceTransaction.amount,
-        txnCurrencyFxRate: donation.amount/balanceTransaction.amount,
-        hostFeeInTxnCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
-        platformFeeInTxnCurrency: fees.applicationFee,
-        paymentProcessorFeeInTxnCurrency: fees.stripeFee,
+        hostCurrency: balanceTransaction.currency,
+        amountInHostCurrency: balanceTransaction.amount,
+        hostCurrencyFxRate: order.totalAmount/balanceTransaction.amount,
+        hostFeeInHostCurrency: parseInt(balanceTransaction.amount*hostFeePercent/100, 10),
+        platformFeeInHostCurrency: fees.applicationFee,
+        paymentProcessorFeeInHostCurrency: fees.stripeFee,
         data: {charge, balanceTransaction},
-        description: `${donation.Subscription.interval}ly recurring subscription`,
+        description: `${order.Subscription.interval}ly recurring subscription`,
       };
 
+      debug("stripeSubscription", stripeSubscription);
+      debug("balanceTransaction", balanceTransaction);
+      debug("newTransaction", newTransaction);
+
       models.Transaction.createFromPayload({
+        CreatedByUserId: order.CreatedByUserId,
+        FromCollectiveId: order.FromCollectiveId,
+        CollectiveId: order.CollectiveId,
         transaction: newTransaction,
-        user,
-        group,
-        paymentMethod
+        PaymentMethodId: order.PaymentMethodId
       })
       .then(t => cb(null, t))
       .catch(cb);
     }],
 
     sendInvoice: ['createTransaction', (cb, results) => {
-      const donation = results.fetchDonation;
+      const order = results.fetchOrder;
       const transaction = results.createTransaction;
-      // We only send an invoice for donations > $10 equivalent
-      if (donation.amount < 10 * currencies[donation.currency].fxrate * 100) return cb(null);
-      const user = donation.User || {};
-      const group = donation.Group || {};
-      const subscription = donation.Subscription;
-      group.getRelatedGroups(2, 0)
-      .then((relatedGroups) => emailLib.send(
+      // We only send an invoice for orders > $10 equivalent
+      if (order.totalAmount < 10 * currencies[order.currency].fxrate * 100) return cb(null);
+      const user = order.createdByUser || {};
+      const collective = order.collective || {};
+      const subscription = order.Subscription;
+      collective.getRelatedCollectives(2, 0)
+      .then((relatedCollectives) => emailLib.send(
         'thankyou',
         user.email,
-        { donation: donation.info,
+        { order: order.info,
           transaction: transaction.info,
           user: user.info,
           firstPayment: false,
-          group: group.info,
-          relatedGroups,
+          collective: collective.info,
+          relatedCollectives,
           config: { host: config.host },
           interval: subscription && subscription.interval,
           subscriptionsLink: user.generateLoginLink('/subscriptions')
         }, {
-          from: `${group.name} <hello@${group.slug}.opencollective.com>`
+          from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
         }))
       .then(() => cb())
       .catch(cb);
@@ -267,6 +288,7 @@ export default function stripeWebhook(req, res, next) {
     /**
      * We need to return a 200 to tell stripe to not retry the webhook.
      */
+    debug(">>> success");
     res.sendStatus(200);
   });
 

@@ -3,21 +3,10 @@ import qs from 'querystring';
 import config from 'config';
 import models from '../models';
 import errors from '../lib/errors';
-import roles from '../constants/roles';
+import jwt from 'jsonwebtoken';
 
 const AUTHORIZE_URI = 'https://connect.stripe.com/oauth/authorize';
 const TOKEN_URI = 'https://connect.stripe.com/oauth/token';
-
-const checkIfUserIsHost = UserId =>
-  models.UserGroup.find({
-    where: {
-      UserId,
-      role: roles.HOST
-    }
-  })
-  .then(userGroup => {
-    if (!userGroup) throw new errors.BadRequest(`User ${UserId} is not a host`);
-  });
 
 const getToken = code => () => axios
   .post(TOKEN_URI, {
@@ -28,53 +17,81 @@ const getToken = code => () => axios
   })
   .then(res => res.data);
 
-const createStripeAccount = data => models.StripeAccount.create({
-  accessToken: data.access_token,
-  refreshToken: data.refresh_token,
-  tokenType: data.token_type,
-  stripePublishableKey: data.stripe_publishable_key,
-  stripeUserId: data.stripe_user_id,
-  scope: data.scope
-});
-
 /**
  * Ask stripe for authorization OAuth
  */
 export const authorize = (req, res, next) => {
-  checkIfUserIsHost(req.remoteUser.id)
+
+  if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
+    return next(new errors.Unauthorized('You must be logged in as an admin of this collective to be able to connect it to a Stripe Account'));
+  }
+
+  return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: req.query.CollectiveId }})
+    .then(ExistingStripeAccount => {
+      if (ExistingStripeAccount) throw new errors.ValidationFailed(null, ['CollectiveId'], 'Collective already has a stripe account connected');
+      return true;
+    })
     .then(() => {
+
+      // Since we pass the redirectUrl in clear to the frontend, we cannot pass the CollectiveId in the state query variable
+      // It would be trivial to change that value and attach a Stripe Account to someone else's collective
+      // That's why we encode the state in a JWT
+      const state = jwt.sign({
+        CollectiveId: req.query.CollectiveId,
+        CreatedByUserId: req.remoteUser.id
+      }, config.keys.opencollective.secret, {
+        expiresIn: '45m' // People may need some time to set up their Stripe Account if they don't have one already
+      });
+
       const params = qs.stringify({
         response_type: 'code',
         scope: 'read_write',
         client_id: config.stripe.clientId,
         redirect_uri: config.stripe.redirectUri,
-        state: req.remoteUser.id
+        state
       });
 
-      res.send({
-        redirectUrl: `${AUTHORIZE_URI}?${params}`
-      });
+      return res.send(200, { redirectUrl: `${AUTHORIZE_URI}?${params}` });
     })
-    .catch(next);
+    .catch(next)
 };
 
 /**
- * Callback for the stripe OAuth
+ * Callback for the stripe OAuth (webhook)
  */
 export const callback = (req, res, next) => {
-  const userId = req.query.state;
+  let state, collective;
 
-  if (!userId) {
+  try {
+    state = jwt.verify(req.query.state, config.keys.opencollective.secret);
+  } catch (e) {
+    return next(new errors.BadRequest(`Invalid JWT: ${e.message}`));
+  }
+
+  const { CollectiveId, CreatedByUserId } = state;
+
+  if (!CollectiveId) {
     return next(new errors.BadRequest('No state in the callback'));
   }
-  let host;
 
-  checkIfUserIsHost(userId)
-    .then(() => models.User.findById(userId))
-    .tap(h => host = h)
+  const createStripeAccount = data => models.ConnectedAccount.create({
+    service: 'stripe',
+    CollectiveId,
+    CreatedByUserId,
+    username: data.stripe_user_id,
+    token: data.access_token,
+    refreshToken: data.refresh_token,
+    data: {
+      publishableKey: data.stripe_publishable_key,
+      tokenType: data.token_type,
+      scope: data.scope
+    }
+  });
+
+  models.Collective.findById(CollectiveId)
+    .then(c => collective = c)
     .then(getToken(req.query.code))
     .then(createStripeAccount)
-    .then(stripeAccount => host.setStripeAccount(stripeAccount))
-    .then(() => res.redirect(`${config.host.website}/${host.username}/settings?stripeStatus=success`))
+    .then(() => res.redirect(`${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
     .catch(next);
 };

@@ -2,8 +2,7 @@ import Url from 'url';
 import config from 'config';
 import crypto from 'crypto';
 import base64url from 'base64url';
-import moment from 'moment';
-import _ from 'lodash';
+import Promise from 'bluebird';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
 import fs from 'fs';
@@ -147,63 +146,6 @@ export const paginateOffset = (page, perPage) => {
   }
 };
 
-/**
- * Try to find in which tier a backer falls into based on the tiers definition
- */
-export const getTier = (user, tiers) => {
-
-  let defaultTier;
-  switch (user.role) {
-    case 'MEMBER':
-      return 'core contributor';
-    case 'HOST':
-      defaultTier = 'host';
-      break;
-   default:
-      defaultTier = 'backer';
-      break;
-  }
-
-  if (!tiers || !user.totalDonations) return defaultTier;
-
-  // we make a copy of tiers before we sort it
-  tiers = _.clone(tiers);
-
-  // We order the tiers by start range DESC
-  tiers.sort((a,b) => {
-    return b.range[0] - a.range[0];
-  });
-
-  // We get the first tier for which the totalDonations is higher than the minimum amount for that tier
-  const tier = tiers.find((tier) => (user.totalDonations / 100 >= tier.range[0]));
-
-  return (tier && tier.name) ? tier.name : defaultTier;
-
-};
-
-/**
- * Append tier to each backer in an array of backers
- */
-export const appendTier = (backers, tiers) => {
-  backers = backers.map((backer) => {
-    backer.tier = getTier(backer, tiers);
-    return backer;
-  });
-  return backers;
-};
-
-/**
- * Returns whether the backer is still an active member of its tier
- */
-export const isBackerActive = (backer, tiers, until) => {
-  tiers = _.groupBy(tiers, 'name'); // this makes a copy
-  const now = moment(until);
-  if (tiers[backer.tier] && tiers[backer.tier][0].interval === 'monthly' && now.diff(moment(backer.lastDonation), 'days') > 31)
-    return false
-  else
-    return true;
-}
-
 
 /**
  * Returns stats for each tier compared to previousMonth
@@ -249,7 +191,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
     // We sort users by total donations DESC
     tier.users.sort((a,b) => b.totalDonations - a.totalDonations );
 
-    tier.users = tier.users.filter(u => {
+    tier.users = Promise.filter(tier.users, u => {
       if (userids[u.id]) {
         debug(">>> user ", u.username, "is a duplicate");
         return false;
@@ -257,35 +199,39 @@ export const getTiersStats = (tiers, startDate, endDate) => {
       userids[u.id] = true;
 
       u.index = index++;
-      u.activeLastMonth = isBackerActive(u, tiers, endDate);
-      u.activePreviousMonth = (u.firstDonation < startDate) && isBackerActive(u, tiers, startDate);
 
-      if (tier.name.match(/sponsor/i))
-        u.isSponsor = true;
-      if (u.firstDonation > startDate) {
-        u.isNew = true;
-        stats.backers.new++;
-      }
-      if (u.activePreviousMonth && !u.activeLastMonth) {
-        u.isLost = true;
-        stats.backers.lost++;
-      }
+      return Promise.all([tier.isActive(u, endDate), tier.isActive(u, startDate)])
+        .then(results => {
+          u.activeLastMonth = results[0];
+          u.activePreviousMonth = (u.firstDonation < startDate) && results[1];
 
-      debug("----------- ", u.username, "----------");
-      debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
-      debug("totalDonations", u.totalDonations/100);
-      debug("active last month?", u.activeLastMonth);
-      debug("active previous month?", u.activePreviousMonth);
-      debug("is new?", u.isNew === true);
-      debug("is lost?", u.isLost === true);
-      if (u.activePreviousMonth)
-        stats.backers.previousMonth++;
-      if (u.activeLastMonth) {
-        stats.backers.lastMonth++;
-        return true;
-      } else if (u.isLost) {
-        return true;
-      }
+          if (tier.name.match(/sponsor/i))
+            u.isSponsor = true;
+          if (u.firstDonation > startDate) {
+            u.isNew = true;
+            stats.backers.new++;
+          }
+          if (u.activePreviousMonth && !u.activeLastMonth) {
+            u.isLost = true;
+            stats.backers.lost++;
+          }
+
+          debug("----------- ", u.username, "----------");
+          debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
+          debug("totalDonations", u.totalDonations/100);
+          debug("active last month?", u.activeLastMonth);
+          debug("active previous month?", u.activePreviousMonth);
+          debug("is new?", u.isNew === true);
+          debug("is lost?", u.isLost === true);
+          if (u.activePreviousMonth)
+            stats.backers.previousMonth++;
+          if (u.activeLastMonth) {
+            stats.backers.lastMonth++;
+            return true;
+          } else if (u.isLost) {
+            return true;
+          }
+        });
     });
 
     tier.users.sort((a, b) => {
@@ -380,23 +326,28 @@ export function exportToPDF(template, data, options) {
 }
 
 /**
- * Default host id, set this for new groups created through Github
+ * Default host id, set this for new collectives created through Github
  */
-export const defaultHostId = () => {
+export const defaultHostUser = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
-    return 772;
+    return { id: 772, CollectiveId: 83 }; // Open Source Host Collective User
   }
-  return 1;
+  return { id: 1, CollectiveId: 1 };
 };
 
 /**
- * Demo host id, set this for new groups created through the flow
+ * Demo host id, set this for new collectives created through the flow
  */
 export const demoHostId = () => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
     return 254;
   }
   return 1;
+};
+
+export const isValidEmail = (email) => {
+  if (typeof email !== 'string') return false;
+  return email.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
 };
 
 /**
@@ -448,9 +399,20 @@ export function formatArrayToString(arr) {
 
 export function formatCurrency(amount, currency, precision = 0) {
   amount = amount/100; // converting cents
-
-  return amount.toLocaleString(currency, {
+  let locale;
+  switch (currency) {
+    case 'USD':
+      locale = 'en-US';
+      break;
+    case 'EUR':
+      locale = 'en-EU';
+      break;
+    default:
+      locale = currency;
+  }
+  return amount.toLocaleString(locale, {
     style: 'currency',
+    currencyDisplay: 'symbol',
     currency,
     minimumFractionDigits : precision,
     maximumFractionDigits : precision

@@ -18,25 +18,23 @@ describe('paymentMethods.routes.test.js', () => {
   beforeEach(() => utils.resetTestDB());
 
   // Create users.
-  beforeEach(() => models.User.create(utils.data('user1')).tap(u => user = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap(u => user = u));
 
-  beforeEach(() => models.User.create(utils.data('user2')).tap(u => user2 = u));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user2')).tap(u => user2 = u));
 
   // Create paymentMethod.
   beforeEach(() => {
-    const data = _.extend(paypalPaymentMethod, { UserId: user.id });
+    const data = _.extend(paypalPaymentMethod, { CreatedByUserId: user.id, CollectiveId: user.CollectiveId });
     return models.PaymentMethod.create(data).tap(pm => paymentMethod1 = pm);
   });
 
   beforeEach(() => {
-    const data = _.extend(stripePaymentMethod, { UserId: user.id });
+    const data = _.extend(stripePaymentMethod, { CreatedByUserId: user.id, CollectiveId: user.CollectiveId });
     return models.PaymentMethod.create(data);
   });
 
-  /**
-   * Get user's groups.
-   */
-  describe('#getUserGroups', () => {
+
+  describe('#getMembers', () => {
 
     it('fails getting another user\'s paymentMethods', (done) => {
       request(app)

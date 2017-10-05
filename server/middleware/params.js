@@ -2,14 +2,12 @@ import _ from 'lodash';
 import models from '../models';
 import errors from '../lib/errors';
 import { isUUID } from '../lib/utils';
-import { hasRole } from '../lib/auth';
 
 const {
   User,
-  Group,
+  Collective,
   Transaction,
-  Expense,
-  Comment
+  Expense
 } = models;
 
 /**
@@ -51,55 +49,32 @@ export function userid(req, res, next, userIdOrName) {
 }
 
 /**
- * groupid
+ * collectiveid
  */
-export function groupid(req, res, next, groupIdOrSlug) {
-  getByKeyValue(Group, isNaN(groupIdOrSlug) ? 'slug' : 'id', groupIdOrSlug)
-    .then(group => req.group = group)
-    .then(() => {
-      if (req.remoteUser) {
-        return hasRole(req.remoteUser.id, req.group.id, ['MEMBER','HOST'])
-      }
-    })
-    .then(canEdit => {
-      if (canEdit) {
-        req.canEditGroup = canEdit;
-      }
-    })
+export function collectiveid(req, res, next, collectiveIdOrSlug) {
+  getByKeyValue(Collective, isNaN(collectiveIdOrSlug) ? 'slug' : 'id', collectiveIdOrSlug)
+    .then(collective => req.collective = collective)
     .asCallback(next);
-}
-
-/**
- * commentid
- */
-export function commentid(req, res, next, commentid) {
-  parseId(commentid)
-    .then(where => Comment.findOne({where}))
-    .then((comment) => {
-      if (!comment) {
-        return next(new errors.NotFound(`Comment '${commentid}' not found`));
-      } else {
-        req.comment = comment;
-        next();
-      }
-    })
-    .catch(next);
 }
 
 /**
  * transactionuuid
  */
 export function transactionuuid(req, res, next, transactionuuid) {
-  if (!isUUID(transactionuuid))
-    return next(new errors.BadRequest("Must provide transaction uuid"));
+  if (!isUUID(transactionuuid)) {
+    next(new errors.BadRequest("Must provide transaction uuid"));
+    return null;    
+  }
 
-  Transaction.findOne({where: { uuid: transactionuuid }})
+  Transaction.findOne({ where: { uuid: transactionuuid } })
     .then((transaction) => {
       if (!transaction) {
-        return next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));
+        next(new errors.NotFound(`Transaction '${transactionuuid}' not found`));
+        return null;
       } else {
         req.transaction = transaction;
         next();
+        return null;
       }
     })
     .catch(next);
@@ -118,10 +93,12 @@ export function paranoidtransactionid(req, res, next, id) {
     })
     .then((transaction) => {
       if (!transaction) {
-        return next(new errors.NotFound(`Transaction ${id} not found`));
+        next(new errors.NotFound(`Transaction ${id} not found`));
+        return null;
       } else {
         req.paranoidtransaction = transaction;
         next();
+        return null;
       }
     })
     .catch(next);
@@ -131,25 +108,27 @@ export function paranoidtransactionid(req, res, next, id) {
  * ExpenseId.
  */
 export function expenseid(req, res, next, expenseid) {
-  let queryInGroup, NotFoundInGroup = '';
-  if (req.params.groupid) {
-    queryInGroup = { GroupId: req.params.groupid };
-    NotFoundInGroup = `in group ${req.params.groupid}`;
+  let queryInCollective, NotFoundInCollective = '';
+  if (req.params.collectiveid) {
+    queryInCollective = { CollectiveId: req.params.collectiveid };
+    NotFoundInCollective = `in collective ${req.params.collectiveid}`;
   }
   parseId(expenseid)
     .then(where => Expense.findOne({
-      where: Object.assign({}, where, queryInGroup),
+      where: Object.assign({}, where, queryInCollective),
       include: [
-        { model: models.Group },
+        { model: models.Collective },
         { model: models.User }
       ]
     }))
     .then((expense) => {
       if (!expense) {
-        return next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInGroup}`));
+        next(new errors.NotFound(`Expense '${expenseid}' not found ${NotFoundInCollective}`));
+        return null;
       } else {
         req.expense = expense;
         next();
+        return null;
       }
     })
     .catch(next);

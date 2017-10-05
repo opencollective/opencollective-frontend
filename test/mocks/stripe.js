@@ -13,12 +13,18 @@ export default {
 
   },
 
+  "tokens": {
+    "create": {
+      "id": "tok_6IJf9vLMFVsKzX"
+    }
+  },
+
   "customers": {
 
     "create": {
       "object": "customer",
       "created": 1432412123,
-      "id": "cus_6IJf9vLMFVsKzX",
+      "id": "cus_BM7mGwp1Ea8RtL",
       "livemode": false,
       "description": "Customer for test@example.com",
       "email": "philippe.modard+customer@gmail.com",
@@ -67,11 +73,11 @@ export default {
         "exp_year": 2016,
         "fingerprint": "QgShyKJhtqpJa9D7",
         "country": "US",
-        "customer": "cus_6IJf9vLMFVsKzX"
+        "customer": "cus_BM7mGwp1Ea8RtL"
       },
       "captured": true,
-      "balance_transaction": "txn_165j8oIqnMN1wWwOKlPn1D4y",
-      "customer": "cus_6IJf9vLMFVsKzX",
+      "balance_transaction": "txn_1AzPXID8MNtzsDcgpAUVjNJm",
+      "customer": "cus_BM7mGwp1Ea8RtL",
       "metadata": {}
     },
 
@@ -87,7 +93,7 @@ export default {
   },
 
   "balance": {
-    "id": "txn_165j8oIqnMN1wWwOKlPn1D4y",
+    "id": "txn_1AzPXID8MNtzsDcgpAUVjNJm",
     "object": "balance_transaction",
     "source": "ch_17KUJnBgJgc4Ba6uvdu1hxm4",
     "amount": 140000,
@@ -200,9 +206,9 @@ export default {
         "amount": 25,
         "amount_refunded": 0,
         "application": "ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue",
-        "balance_transaction": "txn_165j8oIqnMN1wWwOKlPn1D4y",
+        "balance_transaction": "txn_1AzPXID8MNtzsDcgpAUVjNJm",
         "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4",
-        "customer": "cus_6IJf9vLMFVsKzX",
+        "customer": "cus_BM7mGwp1Ea8RtL",
         "created": 1450706839,
         "currency": "usd",
         "livemode": false,
@@ -225,6 +231,8 @@ export default {
     "type": "invoice.payment_succeeded"
   },
 
+  "createSubscription": {"id":"sub_BM7mrzF0w129va","object":"subscription","application_fee_percent":5,"cancel_at_period_end":false,"canceled_at":null,"created":1506398222,"current_period_end":1506916617,"current_period_start":1506398222,"customer":"cus_BT6ORKojThuNLn","discount":null,"ended_at":null,"items":{"object":"list","data":[{"id":"si_1B6ABuD8MNtzsDcgL7axnWRL","object":"subscription_item","created":1506398222,"metadata":{},"plan":{"id":"USD-MONTH-35000","object":"plan","amount":35000,"created":1504702187,"currency":"usd","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"USD-MONTH-35000","statement_descriptor":null,"trial_period_days":null},"quantity":1}],"has_more":false,"total_count":1,"url":"/v1/subscription_items?subscription=sub_BM7mrzF0w129va"},"livemode":false,"metadata":{"from":"http://localhost:3000/philmod","to":"http://localhost:3000/scouts","PaymentMethodId":"4"},"plan":{"id":"USD-MONTH-35000","object":"plan","amount":35000,"created":1504702187,"currency":"usd","interval":"month","interval_count":1,"livemode":false,"metadata":{},"name":"USD-MONTH-35000","statement_descriptor":null,"trial_period_days":null},"quantity":1,"start":1506398222,"status":"trialing","tax_percent":null,"trial_end":1506916617,"trial_start":1506398222},
+
   "webhook": {
     "created": 1326853478,
     "livemode": false,
@@ -242,10 +250,10 @@ export default {
         "application_fee": null,
         "attempt_count": 0,
         "attempted": true,
-        "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4_2",
+        "charge": "ch_17KUJnBgJgc4Ba6uvdu1hxm4",
         "closed": true,
         "currency": "usd",
-        "customer": "cus_6IJf9vLMFVsKzX",
+        "customer": "cus_BM7mGwp1Ea8RtL",
         "date": 1450707776,
         "description": null,
         "discount": null,
@@ -254,7 +262,7 @@ export default {
         "lines": {
           "data": [
             {
-              "id": "sub_7ZdqElVkS7b8Ep",
+              "id": "sub_BM7mrzF0w129va",
               "object": "line_item",
               "amount": 35000,
               "currency": "usd",

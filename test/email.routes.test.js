@@ -1,17 +1,17 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import app from '../server/index';
 import request from 'supertest-as-promised';
 import Promise from 'bluebird';
 import sinon from 'sinon';
-import nock from 'nock';
 import models from '../server/models';
 import emailLib from '../server/lib/email';
-import MailgunNock from './mocks/mailgun.nock.js';
 import webhookBodyPayload from './mocks/mailgun.webhook.payload';
 import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import crypto from 'crypto';
 import config from 'config';
+import nock from 'nock';
+import initNock from './email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
   const uid = `${email}.${slug}.${template}.${config.keys.opencollective.secret}`;
@@ -19,8 +19,7 @@ const generateToken = (email, slug, template) => {
 }
 
 const {
-  User,
-  Group
+  Collective
 } = models;
 
 const usersData = [
@@ -28,14 +27,14 @@ const usersData = [
     firstName: 'Xavier',
     lastName: 'Damman',
     email: 'xdamman+test@gmail.com',
-    role: 'MEMBER',
-    avatar: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
+    role: 'ADMIN',
+    image: 'https://pbs.twimg.com/profile_images/3075727251/5c825534ad62223ae6a539f6a5076d3c.jpeg'
   },
   {
     firstName: 'Aseem',
     lastName: 'Sood',
     email: 'asood123+test@gmail.com',
-    role: 'MEMBER'
+    role: 'ADMIN'
   },
   {
     firstName: 'Pia',
@@ -51,13 +50,13 @@ const usersData = [
   }
 ];
 
-const groupData = {
+const collectiveData = {
   slug: 'testcollective',
   name: 'Test Collective',
   settings: {}
 };
 
-let group, users = [];
+let collective, users = [];
 
 describe("email.routes.test", () => {
 
@@ -65,26 +64,28 @@ describe("email.routes.test", () => {
 
   before(() => utils.resetTestDB());
 
-  after(() => nock.cleanAll());
+  before(initNock);
 
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
-    MailgunNock();
   });
 
   afterEach(() => {
-    nock.cleanAll();
     sandbox.restore();
   });
 
-  before('create group and members', (done) => {
+  after(() => {
+    nock.cleanAll();
+  });
 
-    Group.create(groupData)
-      .tap(g => group = g )
-      .then(() => User.createMany(usersData))
+  before('create collective and members', (done) => {
+
+    Collective.create(collectiveData)
+      .tap(g => collective = g )
+      .then(() => Promise.map(usersData, models.User.createUserWithCollective))
       .tap(users => {
         return Promise.map(users, (user, index) => {
-          return group.addUserWithRole(user, usersData[index].role);
+          return collective.addUserWithRole(user, usersData[index].role);
         });
       })
       .tap(usersRows => {
@@ -94,7 +95,7 @@ describe("email.routes.test", () => {
           return Promise.map(lists, (list) => models.Notification.create({
               channel: 'email',
               UserId: user.id,
-              GroupId: group.id,
+              CollectiveId: collective.id,
               type: list
             })
           );
@@ -110,7 +111,7 @@ describe("email.routes.test", () => {
 
     return request(app)
       .post('/webhooks/mailgun')
-      .send(Object.assign({}, webhookBodyPayload, {recipient: 'info@testcollective.opencollective.com'}))
+      .send(Object.assign({}, webhookBodyPayload, { recipient: 'info@testcollective.opencollective.com' }))
       .then((res) => {
         expect(res.statusCode).to.equal(200);
         expect(spy.args[0][0]).to.equal('info@testcollective.opencollective.com');
@@ -127,7 +128,7 @@ describe("email.routes.test", () => {
       .send(webhookBodyPayload)
       .then((res) => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.args[0][1]).to.equal('organizers@testcollective.opencollective.com');
+        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
         const emailSentTo = [spy.args[0][3].bcc,spy.args[1][3].bcc];
         expect(emailSentTo.indexOf(usersData[0].email) !== -1).to.be.true;
         expect(emailSentTo.indexOf(usersData[1].email) !== -1).to.be.true;
@@ -168,8 +169,8 @@ describe("email.routes.test", () => {
       .get(`/services/email/approve?messageId=eyJwIjpmYWxzZSwiayI6Ijc3NjFlZTBjLTc1NGQtNGIwZi05ZDlkLWU1NTgxODJkMTlkOSIsInMiOiI2NDhjZDg1ZTE1IiwiYyI6InNhb3JkIn0=&approver=${encodeURIComponent(usersData[1].email)}`)
       .then(() => {
         expect(spy.callCount).to.equal(2);
-        expect(spy.args[0][1]).to.equal('organizers@testcollective.opencollective.com');
-        expect(spy.args[0][2].subject).to.equal('test collective organizers');
+        expect(spy.args[0][1]).to.equal('admins@testcollective.opencollective.com');
+        expect(spy.args[0][2].subject).to.equal('test collective admins');
         expect([spy.args[0][3].bcc, spy.args[1][3].bcc]).to.contain(usersData[0].email);
         expect(spy.args[0][3].from).to.equal('testcollective collective <hello@testcollective.opencollective.com>');
       });
@@ -187,16 +188,16 @@ describe("email.routes.test", () => {
 
   describe("unsubscribe", () => {
 
-    const template = 'mailinglist.members';
+    const template = 'mailinglist.admins';
 
     const generateUnsubscribeUrl = (email) => {
-      const token = generateToken(email, groupData.slug, template);
-      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${groupData.slug}/${template}/${token}`;
+      const token = generateToken(email, collectiveData.slug, template);
+      return `/services/email/unsubscribe/${encodeURIComponent(email)}/${collectiveData.slug}/${template}/${token}`;
     }
 
     it("returns an error if invalid token", () => {
       return request(app)
-        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${groupData.slug}/${template}/xxxxxxxxxx`)
+        .get(`/services/email/unsubscribe/${encodeURIComponent(usersData[0].email)}/${collectiveData.slug}/${template}/xxxxxxxxxx`)
         .then((res) => {
           expect(res.statusCode).to.equal(400);
           expect(res.body.error.message).to.equal('Invalid token');
@@ -213,7 +214,7 @@ describe("email.routes.test", () => {
         for (const i in spy.args) {
           const emailBody = spy.args[i][2];
           expect(emailBody).to.contain(generateUnsubscribeUrl(spy.args[i][3].bcc));
-          expect(emailBody).to.contain("To unsubscribe from the organizers mailing list");
+          expect(emailBody).to.contain("To unsubscribe from the admins mailing list");
         }
       });
     });
@@ -221,8 +222,8 @@ describe("email.routes.test", () => {
     it("unsubscribes", () => {
       const where = {
         UserId: users[0].id,
-        GroupId: group.id,
-        type: 'mailinglist.members'
+        CollectiveId: collective.id,
+        type: 'mailinglist.admins'
       };
 
       return request(app)

@@ -8,7 +8,6 @@ export default {
     "paypalEmail": "paypal+wwcode@opencollective.com",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
-    "isOrganization": true,
     "twitterHandle": "wwcode",
     "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA",
     "currency": "USD"
@@ -23,7 +22,6 @@ export default {
     "password": "passpass",
     "description": "engineer",
     "longDescription": "This is a long description with some *markdown* **style**",
-    "isOrganization": false,
     "twitterHandle": "philmod",
     "billingAddress": "Paradize street\nSan Francisco CA 94100\nUSA"
   },
@@ -67,7 +65,7 @@ export default {
     "email": "internal_user@opencollective.com"
   },
 
-  "group1": {
+  "collective1": {
     "name": "Scouts d'Arlon",
     "mission": "toujours prêt",
     "description": "Troupe Scoute Albert Schweitzer",
@@ -77,28 +75,13 @@ export default {
     "twitterHandle": "scouts",
     "website": "http://scouts.org.uk/home/",
     "slug": "scouts",
-    "tiers": [{
-      "name": "backer",
-      "title": "Backers",
-      "description": "One time tier",
-      "range": [0, 100],
-      "button": "Become a backer",
-      "interval": "one-time"
-    }, {
-      "name": "sponsor",
-      "title":" Sponsors",
-      "description": "Monthly tier",
-      "range": [50, 10000],
-      "interval": "monthly",
-      "button": "Become a sponsor"
-    }],
     "hostFeePercent": 10,
     "tags": ["open source", "test"],
     "isSupercollective": false,
     "isActive": true
   },
 
-  "group2": {
+  "collective2": {
     "name": "WWCode Austin",
     "slug": "wwcode-austin",
     "mission": "more women in tech",
@@ -106,32 +89,17 @@ export default {
     "currency": "EUR",
     "budget": 1000000,
     "burnrate": 1000,
-    "tiers": [{
-      "name": "donor",
-      "title": "Donors",
-      "description": "One time tier",
-      "range": [0, 100],
-      "interval": "one-time",
-      "button": "Become a sponsor"
-    }, {
-      "name": "sponsor",
-      "title": "Sponsors",
-      "description": "Monthly tier",
-      "range": [0, 100],
-      "interval": "monthly",
-      "button": "Become a member"
-    }],
     "hostFeePercent": 0,
     "tags": ["meetup", "test"],
     "isSupercollective": false,
     "isActive": true
   },
 
-  "group3": {
+  "collective3": {
     "name": "Yeoman"
   },
 
-  "group4": {
+  "collective4": {
     "name": "Open source collective",
     "slug": "meetups",
     "settings": {
@@ -140,7 +108,7 @@ export default {
     "isSupercollective": true
   },
 
-  "group5": {
+  "collective5": {
     "name": "Brussels Together",
     "slug": "brusselstogether",
     "settings": {
@@ -149,12 +117,12 @@ export default {
     "isSupercollective": true
   },
 
-  "relatedGroups": [
+  "relatedCollectives": [
     {
       name: 'Reinventing Brussels',
       slug: 'reinventingbrussels',
       mission: 'connect all the initiatives that create a welcoming &amp; sustainable city with deep human values',
-      logo: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
+      image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/1738fae0-9a20-11e6-8650-f92e594d5de8.png',
       currency: 'EUR',
       settings: { "style": { "hero": { "cover": { "background": "rgb(36,189,213)" } } } },
       tags: ['#brusselstogether'],
@@ -164,7 +132,7 @@ export default {
       name: 'Refugees Got Talent',
       slug: 'refugeesgottalent',
       mission: 'offer a space and artistic material to refugees artists, so they can practice their art again.',
-      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
       isActive: true
@@ -173,7 +141,7 @@ export default {
       name: 'Brussels Smart City',
       slug: 'brusselssmartcity',
       mission: 'improve the life of Brussels Citizens by the use of technology',
-      logo: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
+      image: 'https://cl.ly/0Q3N193Z1e3u/BrusselsTogetherLogo.png',
       currency: 'EUR',
       tags: ['#brusselstogether'],
       backgroundImage: 'http://www.hiddendistrict.be/wp-content/uploads/2015/01/Brussels_view-1000x500.jpg',
@@ -190,10 +158,18 @@ export default {
   },
 
   "paymentMethod2": {
-    "token": "stripetoken123",
+    "token": "tok_123456781234567812345678",
     "service": "stripe",
     "customerId": "cus_123",
-    "confirmedAt": "2017-01-30T07:31:37.747Z"
+    "confirmedAt": "2017-01-30T07:31:37.747Z",
+    "name": "4242",
+    "data": {
+      "brand": "visa",
+      "country": "US",
+      "funding": "credit",
+      "expMonth": 1,
+      "expYear": 2022
+    }
   },
 
   "activities1": {
@@ -201,29 +177,29 @@ export default {
       {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "John", "lastName": "Doe", "name": "John Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
       {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
-      {"type": "group.created", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.user.added", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.user.added", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 3, "GroupId": 1, "data": {}},
-      {"type": "group.updated", "UserId": 1, "GroupId": 1, "data": {}},
-      {"type": "group.deleted", "UserId": 3, "GroupId": 1, "data": {}},
+      {"type": "collective.created", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.user.added", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.user.added", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 3, "CollectiveId": 1, "data": {}},
+      {"type": "collective.updated", "UserId": 1, "CollectiveId": 1, "data": {}},
+      {"type": "collective.deleted", "UserId": 3, "CollectiveId": 1, "data": {}},
       {
-        "type": "group.transaction.created",
+        "type": "collective.transaction.created",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user": {
             "email":"john@doe.com"
             },
           "transaction": {
-            "type": "DONATION",
-            "amount":1042,
+            "type": "CREDIT",
+            "amount": 1042,
             "currency": "USD"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -231,20 +207,20 @@ export default {
         }
       },
       {
-        "type": "group.transaction.created",
+        "type": "collective.transaction.created",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user":{
             "email":"john@doe.com"
             },
           "transaction": {
-            "type": "EXPENSE",
+            "type": "DEBIT",
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -252,20 +228,20 @@ export default {
         }
       },
       {
-        "type": "group.expense.paid",
+        "type": "collective.expense.paid",
         "userId": 3,
-        "GroupId": 1,
+        "CollectiveId": 1,
         "data": {
           "user":{
             "email":"john@doe.com"
             },
           "transaction": {
-            "type": "EXPENSE",
+            "type": "DEBIT",
             "amount":-1298,
             "currency": "USD",
             "description": "pizza"
             },
-          "group": {
+          "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
             "publicUrl": "https://opencollective.com/pubquiz"
@@ -291,11 +267,11 @@ export default {
             "email":"jussi@kuohujoki.fi"
           },
           "transaction": {
-            "type": "DONATION",
+            "type": "CREDIT",
             "amount": 1234,
             "currency": "EUR"
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -309,14 +285,14 @@ export default {
             "email":"jussi@kuohujoki.fi",
             "twitterHandle": "xdamman"
           },
-          "donation": {
-            "amount": 1234,
+          "order": {
+            "totalAmount": 1234,
             "currency": "EUR"
           },
           "subscription": {
             "interval": "month"
           },
-          "group": {
+          "collective": {
             "name": "Yeoman",
             "slug": "yeoman",
             "twitterHandle": "yeoman",
@@ -331,15 +307,15 @@ export default {
             "email":"jussi@kuohujoki.fi",
             "twitterHandle": "xdamman"
           },
-          "donation": {
-            "amount": 1234,
+          "order": {
+            "totalAmount": 1234,
             "currency": "EUR"
           },
           "subscription": {
             "interval": "month",
             "id": 4
           },
-          "group": {
+          "collective": {
             "name": "Yeoman",
             "slug": "yeoman",
             "twitterHandle": "yeoman",
@@ -348,12 +324,12 @@ export default {
         }
       },
       {
-        "type": "group.created",
+        "type": "collective.created",
         "data": {
           "user": {
             "email":"jussi@kuohujoki.fi"
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -361,13 +337,13 @@ export default {
         }
       },
       {
-        "type": "group.user.added",
+        "type": "collective.user.added",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "slug": "blah",
             "publicUrl": "https://opencollective.com/blah"
@@ -375,57 +351,57 @@ export default {
         }
       },
       {
-        "type": "group.expense.created",
+        "type": "collective.expense.created",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza"
+            "description": "for pizza"
           }
         }
       },
       {
-        "type": "group.expense.rejected",
+        "type": "collective.expense.rejected",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza",
+            "description": "for pizza",
             "lastEditedById": 2
           }
         }
       },
       {
-        "type": "group.expense.approved",
+        "type": "collective.expense.approved",
         "data": {
           "user": {
-            "avatar": "http://avatar.githubusercontent.com/asood123",
+            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
           },
-          "group": {
+          "collective": {
             "name": "Blah",
             "publicUrl": "blah.com"
           },
           "expense": {
             "amount": 1234,
             "currency": "EUR",
-            "title": "for pizza",
+            "description": "for pizza",
             "lastEditedById": 2
           }
         }
@@ -433,40 +409,28 @@ export default {
     ]
   },
 
-  "donations": [
+  "orders": [
       {
-        "title": "Donation to that great project",
+        "description": "Donation to that great project",
         "amount": 100,
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
-        "title": "Donation to that other great project",
+        "description": "Donation to that other great project",
         "amount": 999,
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z"
       },
       {
-        "title": "Donation to that amazing project",
+        "description": "Donation to that amazing project",
         "amount": 12000,
         "currency": "USD",
         "paypalEmail": "user2paypal@gmail.com",
         "createdAt": "2016-09-29T07:00:00.000Z"
       }
-  ],
-
-  "comments": [
-    {
-      "text": "Where did you buy this?"
-    },
-    {
-      "text": "I think we should go with a V-neck model"
-    },
-    {
-      "text": "No way!"
-    }
   ],
 
   "transactions1": {
@@ -475,26 +439,30 @@ export default {
         "description": "Homepage design",
         "tags": ["consultancy"],
         "amount": -20000,
-        "amountInTxnCurrency": -20000,
+        "type": "DEBIT",
+        "amountInHostCurrency": -20000,
         "currency": "USD",
-        "txnCurrency": "USD",
+        "hostCurrency": "USD",
         "createdAt": "2015-01-23T08:00:00.000Z",
       },
       {
         "description": "Flight SFO-BRU",
         "amount": -91859,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-02-22T08:00:00.000Z"
       },
       {
         "description": "Byword",
         "amount": -1199,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-03-04T08:00:00.000Z",
       },
       {
         "description": "Tipbox.is domain + dedicated server",
         "amount": -58861,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-06T07:00:00.000Z"
       },
@@ -502,29 +470,36 @@ export default {
         "description": "Working lunch with @mdp",
         "tags": ["food"],
         "amount": -3600,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-07T07:00:00.000Z"
       },
       {
         "description": "Homepage design end",
         "amount": -30000,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-28T07:00:00.000Z"
       },
       {
         "description": "Homepage frontend code",
         "amount": -30000,
+        "type": "DEBIT",
         "currency": "USD",
         "createdAt": "2015-04-29T07:00:00.000Z"
       },
       {
         "description": "Donation to that great project",
-        "amount": 999,
+        "amount": 5000,
+        "netAmountInCollectiveCurrency": 4500,
+        "type": "CREDIT",
         "currency": "USD",
       },
       {
         "description": "Donation to that great project",
-        "amount": 99900,
+        "amount": 10000,
+        "netAmountInCollectiveCurrency": 9000,
+        "type": "CREDIT",
         "currency": "USD",
         "paypalEmail": "userpaypal@gmail.com",
         "createdAt": "2015-05-29T07:00:00.000Z",
@@ -536,18 +511,17 @@ export default {
   "emailData": {
     "transaction": {
       "id": 1,
-      "type": "DONATION",
+      "type": "CREDIT",
       "description": "Donation to Scouts d'Arlon",
       "amount": 10.99,
       "vat": null,
       "currency": "USD",
       "tags": ["Donation"],
       "status": null,
-      "comment":null,
       "link": null,
       "createdAt": "2016-01-30T07:31:37.965Z",
       "UserId": 1,
-      "GroupId": 1
+      "CollectiveId": 1
     },
 
     "user": {
@@ -556,17 +530,16 @@ export default {
       "lastName":"Mod",
       "username":"philmod",
       "email":"user1@opencollective.com",
-      "avatar":null,
+      "image":null,
       "twitterHandle":"philmod",
       "website":"http://startupmanifesto.be",
       "description": "engineer",
-      "isOrganization": false,
       "createdAt":"2016-01-30T07:31:37.747Z",
       "updatedAt":"2016-01-30T07:31:37.889Z",
       "paypalEmail":"philmod+paypal@email.com"
     },
 
-    "group": {
+    "collective": {
       "id": 1,
       "name": "Scouts d'Arlon",
       "mission": "toujours prêt",
@@ -575,11 +548,8 @@ export default {
       "budget": 100000,
       "burnrate": 1000,
       "currency": "USD",
-      "logo": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
-      "video": null,
-      "image": null,
+      "image": "http://photos4.meetupstatic.com/photos/event/9/a/f/a/highres_18399674.jpeg",
       "backgroundImage": null,
-      "expensePolicy": null,
       "createdAt": "2016-01-30T07:31:37.802Z",
       "updatedAt": "2016-01-30T07:31:37.802Z",
       "slug": "WWCodeAtl",
@@ -595,8 +565,8 @@ export default {
     "stripeSubscriptionId": "sub_tokentest"
   },
   "expense1": {
-    "title": "Lunch with Jenn",
-    "notes": "Some very long and super interesting extra notes for the whole world to see",
+    "description": "Expense 1: Lunch with Jenn",
+    "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
     "currency": "EUR",
@@ -606,8 +576,8 @@ export default {
     "attachment": "https://opencollective-production.s3-us-west-1.amazonaws.com/d6618050-82be-11e6-a262-73c13d37e1af.JPG"
   },
   "expense2": {
-    "title": "tshirts",
-    "notes": "longgggg note",
+    "description": "tshirts",
+    "privateMessage": "longgggg note",
     "category": "Engineering",
     "amount": 3737,
     "currency": "USD",
@@ -616,8 +586,8 @@ export default {
     "payoutMethod": "manual"
   },
   "expense3": {
-    "title": "Lunch with Jenn",
-    "notes": "Some very long and super interesting extra notes for the whole world to see",
+    "description": "Expense 3: Lunch with Jenn",
+    "privateMessage": "Some very long and super interesting extra notes for the whole world to see",
     "category": "Engineering",
     "amount": 12000,
     "currency": "USD",
@@ -627,6 +597,7 @@ export default {
   },
 
   "event1": {
+    type: "EVENT",
     name: "January meetup",
     slug: "jan-meetup",
     description: "January monthly meetup",
@@ -641,6 +612,7 @@ export default {
   },
 
   "event2": {
+    type: "EVENT",
     name: "Feb meetup",
     slug: "feb-meetup",
     description: "February monthly meetup",
@@ -651,35 +623,56 @@ export default {
   },
 
   "tier1": {
-    name: "Free tier",
+    name: "backer",
+    type: "TIER",
+    slug: "backers",
+    description: "$10/month",
+    amount: 1000,
+    interval: 'month',
+    currency: "USD",
+    maxQuantity: 10,
+  },
+
+  "tier2": {
+    name: "sponsor",
+    type: "TIER",
+    slug: "sponsors",
+    description: "$1,000/year sponsorship",
+    amount: 10000,
+    interval: 'year',
+    currency: "USD",
+    maxQuantity: 100
+  },
+
+  "ticket1": {
+    name: "Free ticket",
+    type: "TICKET",
     description: "free tickets for all",
     amount: 0,
     currency: "USD",
     maxQuantity: 10,
   },
 
-  "tier2": {
-    name: "paid tier",
+  "ticket2": {
+    name: "paid ticket",
+    type: "TICKET",
     description: "$20 ticket",
     amount: 2000,
     currency: "USD",
     maxQuantity: 100
   },
 
-  "response1": {
-    status: "INTERESTED",
+  "order1": {
     quantity: 1,
     description: "I work on bitcoin"
   },
 
-  "response2": {
-    status: "YES",
+  "order2": {
     quantity: 2,
     description: "I have been working on open source for over a decade"
   },
 
-  "response3": {
-    status: "YES",
+  "order3": {
     quantity: 2
   }
 }

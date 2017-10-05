@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -16,33 +16,33 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 
 {{#if interval}}
   {{#if firstPayment }}
-    <p>We would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us continue our activities.</p>
+    <p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}.
+      Your first payment was received on {{{moment order.createdAt}}}. Your donation helps us continue our activities.</p>
       {{> charge_date_notice}}
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your donation helps us continue our activities.</p>
   {{/if}}
 {{else}}
-<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
   Your gift will help us continue our activities.</p>
 {{/if}}
 
 <p>You can follow our future activities and how we will be spending the money on our open collective page:
-  <a href="https://opencollective.com/{{group.slug}}">https://opencollective.com/{{group.slug}}</a>.
+  <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 </p>
 
 {{> subscriptions}}
 
-<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{group.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
+<p>P.S: You can download a receipt for your donation in PDF <a href="{{config.host.website}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a></p>
 
 <p>Warmly,</p>
 
 <p>
-  – The {{group.name}} open collective
+  – The {{collective.name}} open collective
 </p>
 
-{{> relatedgroups}}
+{{> relatedcollectives}}
 
 {{> footer}}
 

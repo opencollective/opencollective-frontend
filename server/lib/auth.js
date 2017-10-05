@@ -1,17 +1,21 @@
 import models from '../models';
+import Promise from 'bluebird';
 
-export function hasRole(userId, groupId, possibleRoles) {
-  if (typeof possibleRoles === 'string') {
-    possibleRoles = [possibleRoles];
-  }
-
-  const query = {
+/**
+ * Returns the subset of UserCollectiveIds that the remoteUser has access to
+ */
+export function getListOfAccessibleUsers(remoteUser, UserCollectiveIds) {
+  if (!remoteUser) return Promise.resolve([]);
+  if (!remoteUser.rolesByCollectiveId) return Promise.resolve([]);
+  // all the CollectiveIds that the remoteUser is admin of.
+  const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId => remoteUser.isAdmin(CollectiveId));
+  return models.Member.findAll({
+    attributes: ['MemberCollectiveId'],
     where: {
-      UserId: userId,
-      GroupId: groupId,
-      role: { $in: possibleRoles }
-    }
-  };
-  return models.UserGroup.findOne(query)
-  .then(ug => Boolean(ug))
+      MemberCollectiveId: { $in: UserCollectiveIds },
+      CollectiveId: { $in: adminOfCollectives }
+    },
+    group: ['MemberCollectiveId']
+  })
+  .then(results => results.map(r => r.MemberCollectiveId))
 }

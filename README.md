@@ -6,6 +6,17 @@
 [![Dependency Status](https://david-dm.org/opencollective/opencollective-api.svg)](https://david-dm.org/opencollective/opencollective-api)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCollective/opencollective-api/badge.svg)](https://coveralls.io/github/OpenCollective/opencollective-api)
 
+# TODO
+
+- Update card on Stripe for active subscriptions
+
+## Payment flows:
+- Pay with new credit card
+- Pay with existing credit card attached to user
+- Pay with existing credit card attached to organization
+- Pay with balance of a collective
+
+
 ## How to get started
 
 Note: If you see a step below that could be improved (or is outdated), please update instructions. We rarely go through this process ourselves, so your fresh pair of eyes and your recent experience with it, makes you the best candidate to improve them for other users. 
@@ -68,7 +79,7 @@ Run the script afterwards:
 You can now login on development (website repo) with `user@opencollective.com` and the token will show up in your console.
 You can auth to the paypal sandbox with `ops@opencollective.com` and `paypal123`.
 
-Feel free to modify `scripts/create_user_and_group.js` to create your own user/group.
+Feel free to modify `scripts/create_user_and_collective.js` to create your own user/collective.
 
 ## Documentation
 WIP
@@ -117,3 +128,7 @@ The migration script uses `SEQUELIZE_ENV` to know which Postgres config to take 
 
 3) `npm run db:migrate`
 
+# TODO
+
+- The User model is confusing with the concept of User Collective, we should rename the "User" model to "Login" or "Email" so that we could have multiple emails per User.
+- CreatedByUserId is confusing

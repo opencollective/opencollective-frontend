@@ -29,9 +29,9 @@
   },
   "aws": {
     "s3": {
-      "key": "",
-      "secret": "",
-      "bucket": ""
+      "bucket": "opencollective-test",
+      "secret": "unknown",
+      "key": "unknown"
     }
   },
   "paypal": {
@@ -48,7 +48,9 @@
     "feeOC": 5
   },
   "stripe": {
-    "redirectUri": "http://localhost:3060/stripe/oauth/callback"
+    "redirectUri": "http://localhost:3060/connected-accounts/stripe/callback",
+    "clientId": "xxx",
+    "secret": "xxx"
   },
   "slack": {
     "privateActivityChannel": "#activity-private-test",

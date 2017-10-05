@@ -24,10 +24,10 @@ th {
   color: #555;
   font-size: 12px;
 }
-.DONATION {
+.CREDIT {
   color: #66C71A;
 }
-.EXPENSE {
+.DEBIT {
   color: red;
 }
 .small-table th, .small-table td {
@@ -107,10 +107,10 @@ th {
   </tr>
 {{#each transactions}}
   <tr>
-    <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{{moment createdAt format="MM/DD"}}}</a></td>
-    <td valign="top"><a href="{{@root.config.host.website}}/{{group.slug}}">{{group.shortSlug}}</a></td>
-    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=group.currency precision=2}}}</td>
-    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInTxnCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
+    <td valign="top"><a href="{{@root.config.host.website}}/{{collective.slug}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{{moment createdAt format="MM/DD"}}}</a></td>
+    <td valign="top"><a href="{{@root.config.host.website}}/{{collective.slug}}">{{collective.shortSlug}}</a></td>
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency amount currency=collective.currency precision=2}}}</td>
+    <td valign="top" align="right" valign="top" nowrap class="{{type}}">{{{currency netAmountInHostCurrency currency=../host.currency precision=2}}}{{#if notes}}**{{/if}}</td>    
     <td valign="top" width="100%">{{description}}</td>
   </tr>
 {{else}}

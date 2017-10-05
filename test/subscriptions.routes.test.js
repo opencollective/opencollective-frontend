@@ -12,16 +12,16 @@ import * as utils from '../test/utils';
 import stripeMock from './mocks/stripe';
 import models from '../server/models';
 import roles from '../server/constants/roles';
-import paymentsLib from '../server/lib/payments';
+import * as payments from '../server/lib/payments';
 
 
 const application = utils.data('application');
 
 const STRIPE_URL = 'https://api.stripe.com:443';
-const donationsData = utils.data('donations');
+const ordersData = utils.data('orders');
 
 describe('subscriptions.routes.test.js', () => {
-  let group, user, paymentMethod, sandbox;
+  let collective, user, paymentMethod, sandbox;
 
   before(() => {
     sandbox = sinon.sandbox.create();
@@ -30,23 +30,24 @@ describe('subscriptions.routes.test.js', () => {
   after(() => sandbox.restore());
 
   beforeEach(() => {
-    sandbox.stub(paymentsLib, 'processPayment');
+    sandbox.stub(payments, 'executeOrder');
   });
 
   beforeEach(() => utils.resetTestDB());
 
-  beforeEach(() => models.User.create(utils.data('user1')).tap((u => user = u)));
+  beforeEach(() => models.User.createUserWithCollective(utils.data('user1')).tap((u => user = u)));
 
-  beforeEach(() => models.Group.create(utils.data('group1')).tap((g => group = g)));
+  beforeEach(() => models.Collective.create(utils.data('collective1')).tap((g => collective = g)));
 
-  beforeEach(() => group.addUserWithRole(user, roles.HOST));
+  beforeEach(() => collective.addUserWithRole(user, roles.HOST));
 
   // create stripe account
   beforeEach(() => {
-    models.StripeAccount.create({
-      accessToken: 'sktest_123'
+    models.ConnectedAccount.create({
+      service: 'stripe',
+      token: 'sktest_123',
+      CollectiveId: user.CollectiveId
     })
-    .then((account) => user.setStripeAccount(account));
   });
 
   // Create a paymentMethod.
@@ -60,14 +61,15 @@ describe('subscriptions.routes.test.js', () => {
    * Get the subscriptions of a user
    */
   describe('#getAll', () => {
-    // Create donation for group1.
+    // Create order for collective1.
     beforeEach(() =>
-      Promise.map(donationsData, donation =>
+      Promise.map(ordersData, order =>
         models.Subscription.create(utils.data('subscription1'))
-          .then(subscription => models.Donation.create({
-            ...donation,
-            UserId: user.id,
-            GroupId: group.id,
+          .then(subscription => models.Order.create({
+            ...order,
+            CreatedByUserId: user.id,
+            FromCollectiveId: user.CollectiveId,
+            CollectiveId: collective.id,
             SubscriptionId: subscription.id
           })
         ))
@@ -92,11 +94,11 @@ describe('subscriptions.routes.test.js', () => {
         .expect(200)
         .end((err, res) => {
           expect(err).to.not.exist;
-          expect(res.body.length).to.be.equal(donationsData.length);
+          expect(res.body.length).to.be.equal(ordersData.length);
           res.body.forEach(sub => {
             expect(sub).to.be.have.property('stripeSubscriptionId')
-            expect(sub).to.be.have.property('Donation')
-            expect(sub.Donation).to.be.have.property('Group')
+            expect(sub).to.be.have.property('Order')
+            expect(sub.Order).to.be.have.property('collective')
           });
           done();
         });
@@ -109,7 +111,7 @@ describe('subscriptions.routes.test.js', () => {
   describe('#cancel', () => {
 
     const subscription = utils.data('subscription1');
-    let donation, nm;
+    let order, nm;
     const nocks = {};
 
     // create a fake nodemailer transport
@@ -139,17 +141,17 @@ describe('subscriptions.routes.test.js', () => {
       nodemailer.createTransport.restore();
     });
 
-
     beforeEach(() => {
       return models.Subscription.create(subscription)
-        .then(sub => models.Donation.create({
-          ...donationsData[0],
-          UserId: user.id,
-          GroupId: group.id,
+        .then(sub => models.Order.create({
+          ...ordersData[0],
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          CollectiveId: collective.id,
           PaymentMethodId: paymentMethod.id,
           SubscriptionId: sub.id
         }))
-        .tap(d => donation = d)
+        .tap(d => order = d)
         .catch()
     });
 
@@ -163,7 +165,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('fails if if no authorization provided', (done) => {
       request(app)
-        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${order.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .expect(401, {
           error: {
             code: 401,
@@ -186,11 +188,11 @@ describe('subscriptions.routes.test.js', () => {
       });
 
       request(app)
-        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${order.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${expiredToken}`)
         .end((err, res) => {
           expect(res.body.error.code).to.be.equal(401);
-          expect(res.body.error.message).to.be.equal('jwt expired');
+          expect(res.body.error.message).to.be.equal('User is not authenticated');
           done();
         });
     });
@@ -212,7 +214,7 @@ describe('subscriptions.routes.test.js', () => {
 
     it('cancels the subscription', (done) => {
        request(app)
-        .post(`/subscriptions/${donation.SubscriptionId}/cancel?api_key=${application.api_key}`)
+        .post(`/subscriptions/${order.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((err, res) => {
@@ -230,17 +232,17 @@ describe('subscriptions.routes.test.js', () => {
             .then(() => models.Activity.findOne({where: {type: 'subscription.canceled'}}))
             .then(activity => {
               expect(activity).to.be.defined;
-              expect(activity.GroupId).to.be.equal(group.id);
+              expect(activity.CollectiveId).to.be.equal(collective.id);
               expect(activity.UserId).to.be.equal(user.id);
-              expect(activity.data.subscription.id).to.be.equal(donation.SubscriptionId);
-              expect(activity.data.group.id).to.be.equal(group.id);
+              expect(activity.data.subscription.id).to.be.equal(order.SubscriptionId);
+              expect(activity.data.collective.id).to.be.equal(collective.id);
               expect(activity.data.user.id).to.be.equal(user.id);
             })
             .then(() => {
               const subject = nm.sendMail.lastCall.args[0].subject;
               const html = nm.sendMail.lastCall.args[0].html;
               expect(subject).to.contain('Subscription canceled to Scouts');
-              expect(html).to.contain('€20/month has been canceled');
+              expect(html).to.contain('20/month has been canceled');
               done();
             })
             .catch(done);

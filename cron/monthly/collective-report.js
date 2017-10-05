@@ -30,13 +30,13 @@ console.log("startDate", startDate,"endDate", endDate);
 const debug = debugLib('monthlyreport');
 
 const {
-  Group,
+  Collective,
   Notification,
   User
 } = models;
 
-const processGroups = (groups) => {
-    return Promise.map(groups, processGroup);
+const processCollectives = (collectives) => {
+    return Promise.map(collectives, processCollective);
 };
 
 
@@ -59,11 +59,11 @@ const init = () => {
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
 
-  Group.findAll(query)
-  .tap(groups => {
-      console.log(`Preparing the ${month} report for ${groups.length} groups`);
+  Collective.findAll(query)
+  .tap(collectives => {
+      console.log(`Preparing the ${month} report for ${collectives.length} collectives`);
   })
-  .then(processGroups)
+  .then(processCollectives)
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
     console.log(`Total run time: ${timeLapsed}s`);
@@ -77,7 +77,7 @@ const getTopBackers = (startDate, endDate, tags) => {
   const cacheKey = `${startDate.getTime()}${endDate.getTime()}${tags.join(',')}`;
   if (topBackersCache[cacheKey]) return Promise.resolve(topBackersCache[cacheKey]);
   else {
-    return User.getTopBackers(startDate, endDate, tags, 5)
+    return Collective.getTopBackers(startDate, endDate, tags, 5)
       .then(backers => {
         if (!backers) return []; 
         return Promise.map(backers, backer => processBacker(backer, startDate, endDate, tags))
@@ -99,21 +99,21 @@ const formatCurrency =  (amount, currency) => {
   })
 }
 
-const generateDonationsString = (backer, donations) => {
+const generateDonationsString = (backer, orders) => {
   if (!backer.name) {
     debug(`Skipping ${backer.username} because it doesn't have a name (${backer.name})`);
     return;
   }
   const donationsTextArray = [], donationsHTMLArray = [];
-  donations = donations.filter(donation => (donation.amount > 0));
-  if (donations.length === 0) {
+  orders = orders.filter(order => (order.totalAmount > 0));
+  if (orders.length === 0) {
     debug(`Skipping ${backer.name} because there is no donation`);
     return;
   }
-  for (let i=0; i<Math.min(3, donations.length); i++) {
-    const donation = donations[i];
-    donationsHTMLArray.push(`${formatCurrency(donation.amount,donation.currency)} to <a href="https://opencollective.com/${donation.Group.slug}">${donation.Group.name}</a>`);
-    donationsTextArray.push(`${formatCurrency(donation.amount,donation.currency)} to https://opencollective.com/${donation.Group.slug}`);
+  for (let i=0; i<Math.min(3, orders.length); i++) {
+    const order = orders[i];
+    donationsHTMLArray.push(`${formatCurrency(order.totalAmount, order.currency)} to <a href="https://opencollective.com/${order.Collective.slug}">${order.Collective.name}</a>`);
+    donationsTextArray.push(`${formatCurrency(order.totalAmount, order.currency)} to https://opencollective.com/${order.Collective.slug}`);
   }
   const joinStringArray = (arr) => {
     return arr.join(', ').replace(/,([^, ]*)$/,' and $1');
@@ -128,57 +128,57 @@ const processBacker = (backer, startDate, endDate, tags) => {
   return backer.getLatestDonations(startDate, endDate, tags)
     .then((donations) => generateDonationsString(backer, donations))
     .then(donationsString => {
-      backer.website = (backer.username) ? `https://opencollective.com/${backer.username}` : backer.website || backer.twitterHandle;
+      backer.website = (backer.slug) ? `https://opencollective.com/${backer.slug}` : backer.website || backer.twitterHandle;
       if (!donationsString || !backer.website) return null;
-      backer = _.pick(backer, ['name','username','avatar','website']);
+      backer = _.pick(backer, ['name','slug','image','website']);
       backer.donationsString = donationsString;
       return backer;
     })
 };
 
-const processGroup = (group) => {
+const processCollective = (collective) => {
   const promises = [
-    getTopBackers(startDate, endDate, group.tags),
-    group.getTiersWithUsers({ attributes: ['id','username','name', 'avatar','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
-    group.getBalance(endDate),
-    group.getTotalTransactions(startDate, endDate, 'donation'),
-    group.getTotalTransactions(startDate, endDate, 'expense'),
-    group.getExpenses(null, startDate, endDate),
-    group.getRelatedGroups(3, 0, 'g."createdAt"', 'DESC')
+    getTopBackers(startDate, endDate, collective.tags),
+    collective.getTiersWithUsers({ attributes: ['id','username','name', 'image','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    collective.getBalance(endDate),
+    collective.getTotalTransactions(startDate, endDate, 'donation'),
+    collective.getTotalTransactions(startDate, endDate, 'expense'),
+    collective.getExpenses(null, startDate, endDate),
+    collective.getRelatedCollectives(3, 0, 'g."createdAt"', 'DESC')
   ];
 
   let emailData = {};
 
   return Promise.all(promises)
           .then(results => {
-            console.log('***', group.name, '***');
-            const data = { config: { host: config.host }, month, group: {} };
-            data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(group.slug) === -1)); // we omit own backers
+            console.log('***', collective.name, '***');
+            const data = { config: { host: config.host }, month, collective: {} };
+            data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(collective.slug) === -1)); // we omit own backers
             const res = getTiersStats(results[1], startDate, endDate);
-            data.group = _.pick(group, ['id', 'name', 'slug', 'currency','publicUrl']);
-            data.group.tiers = res.tiers;
-            data.group.stats = res.stats;
-            data.group.stats.balance = results[2];
-            data.group.stats.totalDonations = results[3];
-            data.group.stats.totalExpenses = results[4];
-            data.group.expenses = results[5];
-            data.relatedGroups = results[6];
+            data.collective = _.pick(collective, ['id', 'name', 'slug', 'currency','publicUrl']);
+            data.collective.tiers = res.tiers;
+            data.collective.stats = res.stats;
+            data.collective.stats.balance = results[2];
+            data.collective.stats.totalDonations = results[3];
+            data.collective.stats.totalExpenses = results[4];
+            data.collective.expenses = results[5];
+            data.relatedCollectives = results[6];
             emailData = data;
-            console.log(data.group.stats);
-            return group;
+            console.log(data.collective.stats);
+            return collective;
           })
           .then(getRecipients)
           .then(recipients => sendEmail(recipients, emailData))
           .catch(e => {
-            console.error("Error in processing group", group.slug, e);
+            console.error("Error in processing collective", collective.slug, e);
           });
 };
 
-const getRecipients = (group) => {
+const getRecipients = (collective) => {
   return Notification.findAll({
     where: {
-      GroupId: group.id,
-      type: 'group.monthlyreport'
+      CollectiveId: collective.id,
+      type: 'collective.monthlyreport'
     },
     include: [{ model: User }]
   }).then(results => results.map(r => r.User.dataValues));
@@ -192,7 +192,7 @@ const sendEmail = (recipients, data) => {
       debug("Skipping ", recipient.email);
       return Promise.resolve();
     }
-    return emailLib.send('group.monthlyreport', recipient.email, data);
+    return emailLib.send('collective.monthlyreport', recipient.email, data);
   });
 }
 

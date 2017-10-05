@@ -111,9 +111,9 @@ models.sequelize.query(`
     SELECT
     d.id as donationid,
     d."UserId",
-    d."GroupId",
+    d."CollectiveId",
     d.currency,
-    d.title,
+    d.description,
     d."SubscriptionId",
     d."createdAt",
     s.interval,
@@ -122,11 +122,11 @@ models.sequelize.query(`
     s."activatedAt",
     t.id as "TransactionId",
     pm."customerId"
-  FROM "Donations" d
+  FROM "Orders" d
 
   LEFT JOIN "Subscriptions" s on d."SubscriptionId" = s.id
-  LEFT JOIN "UserGroups" ug on d."GroupId" = ug."GroupId"
-  LEFT JOIN "Transactions" t on (d.id = t."DonationId"
+  LEFT JOIN "Members" ug on d."CollectiveId" = ug."CollectiveId"
+  LEFT JOIN "Transactions" t on (d.id = t."OrderId"
                   AND t.id = (SELECT MAX(id) FROM "Transactions" t WHERE t."SubscriptionId" = s.id))
   LEFT join "PaymentMethods" pm on t."PaymentMethodId" = pm.id
 
@@ -138,6 +138,6 @@ models.sequelize.query(`
     AND ug.role LIKE 'HOST'
     AND ug."UserId" = 40
 
-  order by d."GroupId""
+  order by d."CollectiveId""
 `)
 */
