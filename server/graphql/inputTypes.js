@@ -79,7 +79,8 @@ export const MemberInputType = new GraphQLInputObjectType({
       id: { type: GraphQLInt },
       member: { type: CollectiveAttributesInputType },
       collective: { type: CollectiveAttributesInputType },
-      role: { type: GraphQLString }
+      role: { type: GraphQLString },
+      description: { type: GraphQLString }
   })
 });
 

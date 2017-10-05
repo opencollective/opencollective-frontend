@@ -149,6 +149,12 @@ export const MemberType = new GraphQLObjectType({
           return member.role;
         }
       },
+      description: {
+        type: GraphQLString,
+        resolve(member) {
+          return member.description;
+        }
+      },
       tier: {
         type: TierType,
         resolve(member, args, req) {

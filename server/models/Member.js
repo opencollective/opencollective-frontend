@@ -62,6 +62,8 @@ export default function(Sequelize, DataTypes) {
       }
     },
 
+    description: DataTypes.STRING,
+
     // Dates.
     createdAt: {
       type: DataTypes.DATE,
@@ -84,6 +86,7 @@ export default function(Sequelize, DataTypes) {
       info() {
         return {
           role: this.role,
+          description: this.description,
           CreatedByUserId: this.CreatedByUserId,
           CollectiveId: this.CollectiveId,
           MemberCollectiveId: this.MemberCollectiveId,

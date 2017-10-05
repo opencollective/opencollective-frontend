@@ -6,7 +6,7 @@ import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import queries from '../lib/queries';
-import { difference, uniq } from 'lodash';
+import { difference, uniq, pick } from 'lodash';
 import { types } from '../constants/collectives';
 import roles from '../constants/roles';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
@@ -502,9 +502,10 @@ export default function(Sequelize, DataTypes) {
       .then(() => {
         return Promise.map(members, (member) => {
           if (member.id) {
-            // Edit an existing membership (e.g. edit the role)
-            debug("editMembers", "update member", member.id, member);
-            return models.Member.update(member, { where: { id: member.id }});
+            // Edit an existing membership (edit the role/description)
+            const editableAttributes = pick(member, ['role', 'description']);
+            debug("editMembers", "update member", member.id, editableAttributes);
+            return models.Member.update(editableAttributes, { where: { id: member.id }});
           } else {
             // Create new membership
             member.CollectiveId = this.id;
