@@ -99,6 +99,9 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
+    if (this.props.type === 'number') {
+      value = parseInt(value) || null;
+    }
     if (this.validate(value)) {
       this.setState({ validationState: null });
     } else {

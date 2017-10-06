@@ -22,6 +22,7 @@ class LoginForm extends React.Component {
     this.state = {
       isNewUser: null,
       loginSent: false,
+      loading: false,
       user: {},
       result: {}
     };
@@ -118,8 +119,9 @@ class LoginForm extends React.Component {
   }
 
   signin() {
+    this.setState({ loading: true });
     api.signin(this.state.user, this.props.next).then(() => {
-      this.setState({ loginSent: true, signup: false, isNewUser: false });
+      this.setState({ loginSent: true, signup: false, isNewUser: false, loading: false });
     })
   }
 
@@ -142,16 +144,19 @@ class LoginForm extends React.Component {
       onChange: (value) => this.handleChange("user", "email", value)
     };
 
-    if (!this.state.signup) {
+    if (this.state.loading) {
+      inputEmail.button = <Button disabled={true}><FormattedMessage id="loading" defaultMessage="loading" /></Button>;
+      inputEmail.description = <Button disabled={true}><FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." /></Button>;
+    } else if (!this.state.signup) {
       if (this.state.isNewUser === true) {
-        inputEmail.button = <Button onClick={() => this.setState({ signup: true })}>Sign Up</Button>;
-        inputEmail.description = `There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`;
+        inputEmail.button = <Button onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
+        inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage={`There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`} />;
       } else if (this.state.isNewUser === false) {
         inputEmail.button = <Button onClick={() => this.signin()} focus={true}>Login</Button>;
-        inputEmail.description = `Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`;
+        inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage={`Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`} />;
         if (this.state.loginSent) {
-          inputEmail.button = <Button disabled={true}>Login</Button>;
-          inputEmail.description = `Login email sent. Please follow the instructions in that email to proceed.`
+          inputEmail.button = <Button disabled={true}><FormattedMessage id="loginform.title" defaultMessage="login" /></Button>;
+          inputEmail.description = <FormattedMessage id="signin.emailSent.description" defaultMessage={`Login email sent. Please follow the instructions in that email to proceed.`} />
         }
       }
     }
@@ -205,7 +210,7 @@ class LoginForm extends React.Component {
         <div className="content">
           <Form horizontal onSubmit={this.handleSubmit}>
             <div className="userDetailsForm">
-              <h2><FormattedMessage id="loginform.title" defaultMessage="Login" /></h2>
+              <h2><FormattedMessage id="loginform.title" defaultMessage="login" /></h2>
                 <Row key={`email.input`}>
                   <Col sm={12}>
                     <InputField
@@ -238,7 +243,6 @@ class LoginForm extends React.Component {
               }
           </div>
           <div className="result">
-            { this.state.loading && <div className="loading">Loading...</div> }
             {this.state.result.success &&
               <div className="success">
                 {this.state.result.success}
