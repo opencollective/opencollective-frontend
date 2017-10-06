@@ -442,7 +442,7 @@ const mutations = {
         const currency = tier && tier.currency || collective.currency;
         const quantity = order.quantity || 1;
         let totalAmount;
-        if (tier && tier.amount) {
+        if (tier && tier.amount && !tier.presets) { // if the tier has presets, we can't enforce tier.amount
           totalAmount = tier.amount * quantity;
         } else {
           totalAmount = order.totalAmount; // e.g. the donor tier doesn't set an amount
