@@ -131,7 +131,7 @@ class Collective extends React.Component {
     const { intl, LoggedInUser } = this.props;
 
     const tiers = [...this.collective.tiers].sort((a, b) => {
-      return (a.amount < b.amount) ? 1 : -1;
+      return (a.amount > b.amount) ? 1 : -1;
     })
 
     const actions = [
