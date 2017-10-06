@@ -41,7 +41,7 @@ class EditCollectiveForm extends React.Component {
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
-    this.members = collective.members && collective.members.filter(m => ['ADMIN','CONTRIBUTOR'].includes(m.role));
+    this.members = collective.members && collective.members.filter(m => ['ADMIN','MEMBER'].includes(m.role));
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
