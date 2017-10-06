@@ -24,12 +24,6 @@ describe("Tier component", () => {
     }
   }
 
-  const order = {
-    totalAmount: 1000,
-    interval: 'month',
-    tier: tiers.donor,
-  };
-
   const expectValue = (component, className, value) => {
     expect(component.find(`.${className} .value`).text()).toEqual(value);
   }
@@ -72,7 +66,6 @@ describe("Tier component", () => {
       expect(component.find('.presetBtn').at(1).text()).toEqual('$50');
       expect(component.find('input[name="amount"]').node.value).toEqual('50');
       component.find('.presetBtn').last().simulate('click');
-      expect(component.find('input[name="amount"]').node.value).toEqual('100');
       // click on "yearly"
       component.find('.intervalBtn').last().simulate('click');
       expect(component.find('.ctabtn').text()).toEqual('donate');
@@ -98,8 +91,7 @@ describe("Tier component", () => {
         console.log(">>> onClick", tier);
         expect(tier).toEqual({
           quantity: 1,
-          amount: 1000,
-          id: backerTier.id
+          amount: 1000
         })
         done();
       }
