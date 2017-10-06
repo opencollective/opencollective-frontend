@@ -3,8 +3,13 @@ general:
     ignore:
       - staging
       - production
+dependencies:
+  pre:
+    - ./scripts/setup_circleci.sh
+  cache_directories:
+    - "~/cache"
 machine:
   node:
-    version: 7.7.4
+    version: 8.4.0
   environment:
     NODE_ENV: circleci
