@@ -2,8 +2,8 @@ const { Chromeless } = require('chromeless')
 import { expect } from 'chai';
 
 const chromeless = new Chromeless();
-// const WEBSITE_URL = "https://staging.opencollective.com";
-const WEBSITE_URL = "http://localhost:3030";
+const WEBSITE_URL = "https://staging.opencollective.com";
+// const WEBSITE_URL = "http://localhost:3030";
 
 describe("collective page logged out", () => {
 
