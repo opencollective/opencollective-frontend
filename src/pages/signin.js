@@ -35,7 +35,10 @@ class LoginPage extends React.Component {
     }
     return (
       <div className="LoginPage">
-        <Header />
+        <Header
+          title="Sign Up"
+          description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
+        />
         <style jsx>{`
         h1 {
           text-align:center;
