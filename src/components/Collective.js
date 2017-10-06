@@ -359,8 +359,8 @@ class Collective extends React.Component {
                       limit={5}
                       />
                     <div className="actions">
-                      <Button id="ViewAllExpensesBtn" bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
-                      <Button id="SubmitExpenseBtn" bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
+                      <Button className="ViewAllExpensesBtn" bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses`)}><FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" /></Button>
+                      <Button className="SubmitExpenseBtn" bsStyle="default" onClick={() => window.location.replace(`${window.location.protocol}//${window.location.host}/${this.collective.slug}/expenses/new`)}><FormattedMessage id="expenses.submit" defaultMessage="Submit an Expense" /></Button>
                     </div>
                   </div>
 

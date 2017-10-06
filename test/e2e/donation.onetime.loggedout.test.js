@@ -1,10 +1,19 @@
-const { Chromeless } = require('chromeless')
+import path from 'path';
+import { Chromeless } from 'chromeless';
 import { expect } from 'chai';
 
-const chromeless = new Chromeless();
 const WEBSITE_URL = "https://staging.opencollective.com";
+const screenshotsDirectory = (process.env.CIRCLE_ARTIFACTS) ? process.env.CIRCLE_ARTIFACTS : '/tmp';
 
 describe("make a donation", () => {
+  let chromeless;
+
+  before((done) => {
+    chromeless = new Chromeless();
+    done();
+  })
+
+  after(() => chromeless.end());
 
   it("makes a one time donation", async function() {
     
@@ -30,7 +39,7 @@ describe("make a donation", () => {
         .type("Public message", "textarea[name='publicMessage']")
         .click('.submit button')
         .wait('.UserCollectivePage', 10000)
-        .screenshot();
+        .screenshot({ filePath: path.join(screenshotsDirectory, 'onetime_donation.png')});
 
       console.log(">>> screenshot", screenshot);
       const url = await chromeless.evaluate(() => window.location.href)
@@ -41,14 +50,13 @@ describe("make a donation", () => {
       expect(thankyou).to.be.true;
       const messageContent = await chromeless.evaluate(() => document.querySelector('.message').innerText);
       expect(messageContent).to.contain('webpack');
-      await chromeless.end()    
     }
 
     try {
       await run();
     } catch (e) {
       // Sadly this doesn't work yet: https://github.com/graphcool/chromeless/issues/279
-      const screenshot = await chromeless.screenshot();
+      const screenshot = await chromeless.screenshot({ filePath: path.join(screenshotsDirectory, 'collective_page.png')});
       console.error(">>> error: ", e);
       console.log(">>> screenshot", screenshot);
     }
