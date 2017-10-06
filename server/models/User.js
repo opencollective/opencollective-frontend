@@ -335,7 +335,6 @@ export default (Sequelize, DataTypes) => {
   // should be deprecated
   User.prototype.updateWhiteListedAttributes = function(attributes) {
 
-    let update = false;
     const allowedFields = 
       [ 'slug',
         'firstName',
@@ -351,43 +350,46 @@ export default (Sequelize, DataTypes) => {
       const nameTokens = attributes.name.split(' ');
       this.firstName = nameTokens.shift();
       this.lastName = nameTokens.join(' ');
-      update = true;
     }
+    const updatedAttributes = { User: {}, Collective: {} };
+    const userAttributes = ['firstName', 'lastName', 'image', 'paypalEmail'];
 
-    return Promise.map(allowedFields, prop => {
-      if (attributes[prop]) {
-        this[prop] = attributes[prop];
-        update = true;
+    return Promise.map(allowedFields, attr => {
+      if (attributes[attr]) {
+        const model = (userAttributes.indexOf(attr) !== -1) ? 'User' : 'Collective';
+        updatedAttributes[model][attr] = attributes[attr];
       }
 
-      if (prop === 'slug') {
-        return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[prop]}'`, {
+      if (attr === 'slug') {
+        return Sequelize.query(`SELECT COUNT(*) FROM "Collectives" WHERE slug='${attributes[attr]}'`, {
             type: Sequelize.QueryTypes.SELECT
           })
         .then(res => {
           const count = res[0].count;
-          if (count > 0) throw new errors.BadRequest(`slug ${attributes[prop]} is already taken`);
+          if (count > 0) throw new errors.BadRequest(`slug ${attributes[attr]} is already taken`);
         })
       }
     })
-    .then(() => this.image || userLib.fetchAvatar(this.email))
+    .then(() => updatedAttributes.User.image || userLib.fetchAvatar(this.email))
     .then(image => {
-      if (image && image.indexOf('/public') !== 0 && image.indexOf(config.aws.s3.bucket) === -1) {
-        return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, image)
-          .then((aws_src, error) => {
-            this.image = error ? this.image : aws_src;
-            update = true;
-          });
-      } else {
-        Promise.resolve();
+      if (process.env.NODE_ENV === 'development' || !image || image.indexOf('/public') === 0 || image.indexOf(config.aws.s3.bucket) !== -1) {
+        return;
       }
+      debug("updateWhiteListedAttributes", "uploading image", image);
+      return Promise.promisify(imageUrlLib.imageUrlToAmazonUrl, { context: imageUrlLib })(knox, image)
+        .then((aws_src, error) => {
+          updatedAttributes.User.image = error ? updatedAttributes.User.image : aws_src;
+        });
     })
     .then(() => {
-      if (update) {
-        return this.save();
-      } else {
-        return this
+      debug("updateWhiteListedAttributes", updatedAttributes);
+      if (Object.keys(updatedAttributes.Collective).length > 0) {
+        models.Collective.update(updatedAttributes.Collective, { where: { id: this.CollectiveId }});
       }
+      if (Object.keys(updatedAttributes.User).length > 0) {
+        return this.update(updatedAttributes.User);
+      }
+      return this;
     })
   };
 
