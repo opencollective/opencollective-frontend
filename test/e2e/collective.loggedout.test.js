@@ -59,7 +59,7 @@ describe("logged out", () => {
       .wait('.SubmitExpenseBtn')
       .scrollToElement('.SubmitExpenseBtn')
       .click('.SubmitExpenseBtn')
-      .wait(1000)
+      .wait(1500)
       .screenshot({ filePath: path.join(screenshotsDirectory, 'click_submit_new_expense.png')});
 
     console.log(">>> screenshot", screenshot);
