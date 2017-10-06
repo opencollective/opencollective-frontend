@@ -96,7 +96,7 @@ class EditTiers extends React.Component {
       },
       {
         name: 'maxQuantity',
-        type: 'text',
+        type: 'number',
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description'])
       }
@@ -113,6 +113,9 @@ class EditTiers extends React.Component {
 
   editTier(index, fieldname, value) {
     const tiers = this.state.tiers;
+    if (value === 'onetime') {
+      value = null;
+    }
     console.log("editTier", index, fieldname, value);
     tiers[index] = { ...tiers[index], type: tiers[index]['type'] || this.defaultType, [fieldname]:value} ;
     this.setState({tiers});

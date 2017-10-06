@@ -26,7 +26,7 @@ class CollectiveCover extends React.Component {
     super(props);
     this.messages = defineMessages({
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
-      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' }
+      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' }
     });
   }
 
@@ -77,10 +77,9 @@ ${description}`
     if (collective.members) {
       const admins = collective.members.filter(m => m.role === 'ADMIN');
       const members = collective.members.filter(m => m.role === 'MEMBER');
-      const contributors = collective.members.filter(m => m.role === 'CONTRIBUTOR');
       const backers = collective.members.filter(m => m.role === 'BACKER');
       backers.sort((a, b) => b.totalDonations - a.totalDonations);
-      membersPreview = union(admins, members, contributors, backers).slice(0, 5);
+      membersPreview = union(admins, members, backers).slice(0, 5);
     }
 
     return (
@@ -270,7 +269,7 @@ ${description}`
             { collective.type === 'COLLECTIVE' && stats && stats.yearlyBudget > 0 &&
               <div className="stats">
                 <div className="yearlyBudget value counter">
-                  { formattedYearlyIncome.split('').map((character) => <span className={/[^0-9]/.test(character) ? '-character' : '-digit'}>{character}</span>) }
+                  { formattedYearlyIncome.split('').map((character, index) => <span key={`char-${index}`} className={/[^0-9]/.test(character) ? '-character' : '-digit'}>{character}</span>) }
                 </div>
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>

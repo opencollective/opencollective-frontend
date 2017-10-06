@@ -33,7 +33,7 @@ class EditMembers extends React.Component {
       'members.add': { id: 'members.add', defaultMessage: 'add another member' },
       'members.remove': { id: 'members.remove', defaultMessage: 'remove member' },
       'ADMIN': { id: 'roles.admin.label', defaultMessage: 'Core Contributor' },
-      'CONTRIBUTOR': { id: 'roles.contributor.label', defaultMessage: 'Contributor' },
+      'MEMBER': { id: 'roles.member.label', defaultMessage: 'Contributor' },
       'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
       'user.description.label': { id: 'user.description.label', defaultMessage: 'description' },
       'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
@@ -51,7 +51,7 @@ class EditMembers extends React.Component {
       {
         name: 'role',
         type: 'select',
-        options: getOptions(['ADMIN', 'CONTRIBUTOR']),
+        options: getOptions(['ADMIN', 'MEMBER']),
         defaultValue: this.defaultType,
         label: intl.formatMessage(this.messages['members.role.label'])
       },
