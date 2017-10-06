@@ -27,7 +27,11 @@ class Header extends React.Component {
   }
 
   render() {
-    const { title, className } = this.props;
+    const { className } = this.props;
+    let title = this.props.title || "Open Collective - open your finances to your community";
+    if (!title.match(/open collective/i)) {
+      title += ` - Open Collective`;
+    }
     return (
     <header>
 
