@@ -10,7 +10,6 @@ const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget);
  * (a collective is considered as active if it has ever received any funding from its host or through a order)
  */
 const getTotalCollectives = memoize(() => {
-  console.log(">>> update total number of active collectives")
   return queries.getTotalNumberOfActiveCollectives();
 });
 
@@ -19,12 +18,10 @@ const getTotalDonors = memoize(() => {
 });
 
 const getTopCollectives = memoize((tag) => {
-  console.log(">>> update top collectives in ", tag);
   return models.Collective.getCollectivesSummaryByTag(tag, 3, [], 100000, true);
 })
 
 const refreshCache = () => {
-  console.log(">>> Refreshing cache for homepage");
   getTopCollectives.cache.clear();
   getTotalCollectives.cache.clear();
   getTotalDonors.cache.clear();
