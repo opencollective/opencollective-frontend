@@ -53,7 +53,7 @@ const updateOrders = (sequelize) => {
       });
   };
   const limit = DRY_RUN ? "LIMIT 150" : "";
-  return sequelize.query(`SELECT id, "CreatedByUserId" FROM "Orders" WHERE "FromCollectiveId" is NULL AND "PaymentMethodId" IS NOT NULL ${limit}`, { type: sequelize.QueryTypes.SELECT })
+  return sequelize.query(`SELECT id, "CreatedByUserId" FROM "Orders" WHERE "FromCollectiveId" is NULL IS NOT NULL ${limit}`, { type: sequelize.QueryTypes.SELECT })
   .then(rows => rows && Promise.map(rows, updateOrder, { concurrency: 10 }))
 }
 
