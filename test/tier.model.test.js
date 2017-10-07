@@ -55,6 +55,7 @@ describe('Collective model', () => {
       quantity: 2,
       TierId: tiers[0].id,
       processedAt: new Date,
+      FromCollectiveId: 1,
       CollectiveId: collective.id 
     }))
   )

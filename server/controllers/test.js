@@ -123,6 +123,7 @@ export const resetTestDatabase = function(req, res, next) {
       description: "Donation 1",
       totalAmount: 100,
       currency: 'EUR',
+      FromCollectiveId: testBacker.CollectiveId,
       CollectiveId: testGroup.id,
       CreatedByUserId: testBacker.id
     }))
@@ -141,6 +142,7 @@ export const resetTestDatabase = function(req, res, next) {
       totalAmount: 200,
       currency: 'EUR',
       CollectiveId: testGroup.id,
+      FromCollectiveId: testBacker2.CollectiveId,
       CreatedByUserId: testBacker2.id
     }))
     .then(order => models.Transaction.create({
