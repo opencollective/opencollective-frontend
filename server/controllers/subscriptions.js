@@ -55,7 +55,7 @@ export const cancel = (req, res, next) => {
   .then(stripeAccount => {
     const stripe = Stripe(stripeAccount.token)
     let customerId = order.paymentMethod.customerId;
-    const customerIdForHost = order.paymentMethod.data.customerIdForHost;
+    const customerIdForHost = order.paymentMethod.data && order.paymentMethod.data.customerIdForHost;
     if (customerIdForHost && customerIdForHost[stripeAccount.username]) {
       customerId = customerIdForHost[stripeAccount.username];
     }
