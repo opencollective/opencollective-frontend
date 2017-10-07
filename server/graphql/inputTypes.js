@@ -92,6 +92,8 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     slug: { type: GraphQLString },
     type: { type: GraphQLString },
     name: { type: GraphQLString },
+    website: { type: GraphQLString },
+    twitterHandle: { type: GraphQLString },
     description: { type: GraphQLString },
     longDescription: { type: GraphQLString },
     location: { type: LocationInputType},
