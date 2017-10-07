@@ -174,17 +174,26 @@ export const signin = (req, res, next) => {
  * Show.
  */
 export const show = (req, res, next) => {
-  
-    const userData = req.user.show;
-  
-    if (req.remoteUser && req.remoteUser.id === req.user.id) {
-      models.ConnectedAccount.findOne({ where: { CollectiveId: req.remoteUser.CollectiveId }})
-        .then((account) => {
-          const response = Object.assign(userData, req.user.info, { stripeAccount: account });
-          res.send(response);
-        })
-        .catch(next);
-    } else {
-      res.send(userData);
-    }
-  };
+
+  const userData = req.user.show;
+
+  if (req.remoteUser && req.remoteUser.id === req.user.id) {
+    Promise.all([
+      models.Collective.findById(req.user.CollectiveId),
+      models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: req.remoteUser.CollectiveId }})
+    ])
+      .then(results => {
+        const userExtendedData = {
+          username: results[0].slug,
+          name: results[0].name,
+          avatar: results[0].image,
+          stripeAccount: results[1]
+        };
+        const response = Object.assign(userData, req.user.info, userExtendedData);
+        res.send(response);
+      })
+      .catch(next);
+  } else {
+    res.send(userData);
+  }
+};
