@@ -104,15 +104,7 @@ export const getUsers = (req, res, next) => {
       if (!u.tier) {
         u.tier = (u.type === 'USER') ? 'backer' : 'sponsor';
       }
-      if (req.collective && req.remoteUser && req.remoteUser.isAdmin(req.collective.id)) {
-        return models.User.findOne({ where: { CollectiveId: userCollective.id }})
-          .then(user => {
-            if (user) {
-              u.email = user.email;
-              return u;
-            }
-          })
-      } else {
+      if (!req.collective || !req.remoteUser || !req.remoteUser.isAdmin(req.collective.id)) {
         delete u.email;
       }
       return u;
