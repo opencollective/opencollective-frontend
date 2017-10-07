@@ -407,6 +407,30 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, until) => {
   });
 };
 
+const getTotalNumberOfActiveCollectives = () => {
+  return sequelize.query(`
+    SELECT COUNT(DISTINCT("CollectiveId")) as count
+    FROM "Transactions" t
+      LEFT JOIN "Collectives" c ON t."CollectiveId" = c.id
+    WHERE c.type='COLLECTIVE'
+  `, {
+    type: sequelize.QueryTypes.SELECT
+  })
+  .then(res => parseInt(res[0].count));
+}
+
+const getTotalNumberOfDonors = () => {
+  return sequelize.query(`
+    SELECT COUNT(DISTINCT("FromCollectiveId")) as count
+    FROM "Transactions" t
+      LEFT JOIN "Collectives" c ON t."CollectiveId" = c.id
+    WHERE c.type='COLLECTIVE'
+  `, {
+    type: sequelize.QueryTypes.SELECT
+  })
+  .then(res => parseInt(res[0].count));
+}
+
 export default {
   getTotalDonationsByCollectiveType,
   getTotalAnnualBudgetForHost,
@@ -420,6 +444,8 @@ export default {
   getTopSponsors,
   getTopBackers,
   getCollectivesByTag,
+  getTotalNumberOfActiveCollectives,
+  getTotalNumberOfDonors,
   getChildCollectivesWithBalance,
   getUniqueCollectiveTags
 };

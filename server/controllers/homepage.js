@@ -10,23 +10,12 @@ const getTotalAnnualBudget = memoize(queries.getTotalAnnualBudget);
  * (a collective is considered as active if it has ever received any funding from its host or through a order)
  */
 const getTotalCollectives = memoize(() => {
-  console.log(">>> update total number of collectives")
-  return models.Transaction.aggregate('CollectiveId', 'count', {
-    distinct: true,
-    where: {
-      amount: { $gt: 0 }
-    }
-  })
+  console.log(">>> update total number of active collectives")
+  return queries.getTotalNumberOfActiveCollectives();
 });
 
 const getTotalDonors = memoize(() => {
-  return models.Transaction.aggregate('FromCollectiveId', 'count', {
-    distinct: true,
-    where: {
-      amount: { $gt: 0 },
-      PaymentMethodId: { $ne: null }
-    }
-  })
+  return queries.getTotalNumberOfDonors();
 });
 
 const getTopCollectives = memoize((tag) => {
