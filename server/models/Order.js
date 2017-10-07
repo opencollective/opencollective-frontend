@@ -36,7 +36,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
 
     CollectiveId: {
@@ -46,7 +47,8 @@ export default function(Sequelize, DataTypes) {
         key: 'id'
       },
       onDelete: 'SET NULL',
-      onUpdate: 'CASCADE'
+      onUpdate: 'CASCADE',
+      allowNull: false
     },
     
     TierId: {
