@@ -141,6 +141,8 @@ export const addEditCollectiveMutation = graphql(editCollectiveQuery, {
         'name',
         'description',
         'longDescription',
+        'website',
+        'twitterHandle',
         'location',
         'startsAt',
         'endsAt',
