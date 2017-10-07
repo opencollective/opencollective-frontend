@@ -47,13 +47,15 @@ const updateOrders = (sequelize) => {
         if (!res) return;
         const count = res[0][0].count;
         if (count % 2 !== 0) {
-          throw new Error("OrderId", order.id, "has an uneven number of transactions:", count);
+          console.log("OrderId:", order.id, "Number of transactions: ", count);
+          if (order.PaymentMethodId) {
+            throw new Error(`OrderId ${order.id} has an uneven number of transactions: ${count}`);
+          }
         }
-        console.log("OrderId:", order.id, "Number of transactions: ", count);
       });
   };
   const limit = DRY_RUN ? "LIMIT 150" : "";
-  return sequelize.query(`SELECT id, "CreatedByUserId" FROM "Orders" WHERE "FromCollectiveId" is NULL IS NOT NULL ${limit}`, { type: sequelize.QueryTypes.SELECT })
+  return sequelize.query(`SELECT id, "CreatedByUserId", "PaymentMethodId" FROM "Orders" WHERE "FromCollectiveId" is NULL ${limit}`, { type: sequelize.QueryTypes.SELECT })
   .then(rows => rows && Promise.map(rows, updateOrder, { concurrency: 10 }))
 }
 
