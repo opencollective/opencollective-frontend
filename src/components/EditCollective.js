@@ -12,6 +12,7 @@ import { getStripeToken, isValidCard } from '../lib/stripe';
 import { defineMessages } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import { capitalize } from '../lib/utils';
+import { Router } from '../server/pages';
 
 class EditCollective extends React.Component {
 
@@ -120,8 +121,8 @@ class EditCollective extends React.Component {
       try {
         await this.props.deleteCollective(this.props.collective.id);
         this.setState({ status: 'idle', result: { success: `Collective deleted with success` }});
-        const collectiveUrl = `${window.location.protocol}//${window.location.host}/${this.props.collective.parentCollective.slug}`;
-        window.location.replace(collectiveUrl);
+        const collectiveRoute = `/${this.props.collective.parentCollective.slug}`;
+        Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error(">>> deleteCollective error: ", JSON.stringify(err));
         const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;

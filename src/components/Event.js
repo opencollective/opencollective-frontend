@@ -21,7 +21,7 @@ import { uniqBy, get, union } from 'lodash';
 import { capitalize } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
-import { exportMembers } from '../lib/export_file';
+import { exportRSVPs } from '../lib/export_file';
 import { Link } from '../server/pages';
 
 const defaultBackgroundImage = '/static/images/defaultBackgroundImage.png';
@@ -359,6 +359,7 @@ class Event extends React.Component {
               {this.state.view === 'default' &&
                 <CollectiveCover
                   collective={event}
+                  title={event.name}
                   style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}                  
                   />
               }
@@ -422,7 +423,7 @@ class Event extends React.Component {
                         <ul>
                           <li><a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>Print name tags</a></li>
                           <li><a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>Send email</a></li>
-                          <li><a onClick={ () => exportMembers(event) }>Export CSV</a></li>
+                          <li><a onClick={ () => exportRSVPs(event) }>Export CSV</a></li>
                         </ul>
                       </div>
                       }

@@ -31,20 +31,20 @@ function formatDate(d) {
   return [d.getFullYear(), (mm < 10) ? `0${mm}` : mm, (dd < 10) ? `0${dd}` : dd].join('-');
 }
 
-export async function exportMembers(event) {
+export async function exportRSVPs(event) {
   const date = formatDate(new Date);
-  const rows = event.responses.map(r => {
+  const rows = event.orders.map(r => {
     return {
       createdAt: formatDate(new Date(r.createdAt)),
       tier: r.tier && r.tier.name,
       status: r.status,
       quantity: r.quantity,
-      name: r.user.name,
-      email: r.user.email,
-      twitter: r.user.twitterHandle && `https://twitter.com/${r.user.twitterHandle}`,
-      description: r.description || r.user.description
+      name: r.fromCollective.name,
+      email: r.fromCollective.email,
+      twitter: r.fromCollective.twitterHandle && `https://twitter.com/${r.fromCollective.twitterHandle}`,
+      description: r.description || r.fromCollective.description
     }
   });
   const csv = json2csv(rows);
-  return exportFile('text/plain;charset=utf-8', `${date.replace('-','')}-${event.collective.slug}-${event.slug}.csv`, csv);
+  return exportFile('text/plain;charset=utf-8', `${date.replace('-','')}-${event.parentCollective.slug}-${event.slug}.csv`, csv);
 }
