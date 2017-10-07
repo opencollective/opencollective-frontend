@@ -112,6 +112,8 @@ export const getUsers = (req, res, next) => {
               return u;
             }
           })
+      } else {
+        delete u.email;
       }
       return u;
     })
