@@ -154,6 +154,7 @@ ${description}`
         }
         h1 {
           font-size: 3rem;
+          color: white;
           margin: 1.5rem;
         }
         .contact {

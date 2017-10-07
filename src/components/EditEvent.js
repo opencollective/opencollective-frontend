@@ -8,6 +8,7 @@ import CollectiveCover from '../components/CollectiveCover';
 import { Button } from 'react-bootstrap';
 import { get } from 'lodash';
 import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../graphql/mutations';
+import { Router } from '../server/pages';
 
 class EditEvent extends React.Component {
 
@@ -29,9 +30,9 @@ class EditEvent extends React.Component {
       EventInputType.ParentCollectiveId = this.props.event.parentCollective.id;
       const res = await this.props.editCollective(EventInputType);
       const event = res.data.editCollective;
-      const eventUrl = `${window.location.protocol}//${window.location.host}/${event.slug}`;
-      window.location.replace(eventUrl);
-      this.setState({ result: { success: `Event edited with success: ${eventUrl} (redirecting...)` }});
+      const eventRoute = `/${this.props.event.parentCollective.slug}/events/${event.slug}`;
+      Router.pushRoute(eventRoute);
+      this.setState({ result: { success: `Event edited with success` }});
     } catch (err) {
       console.error(">>> editEvent error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
@@ -46,8 +47,8 @@ class EditEvent extends React.Component {
       try {
         await this.props.deleteCollective(this.props.event.id);
         this.setState({ status: 'idle', result: { success: `Event deleted with success` }});
-        const collectiveUrl = `${window.location.protocol}//${window.location.host}/${this.props.event.parentCollective.slug}`;
-        window.location.replace(collectiveUrl);
+        const collectiveRoute = `/${this.props.event.parentCollective.slug}`;
+        Router.pushRoute(collectiveRoute);
       } catch (err) {
         console.error(">>> deleteEvent error: ", JSON.stringify(err));
         const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
