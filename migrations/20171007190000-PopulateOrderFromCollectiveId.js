@@ -23,7 +23,7 @@ const updateOrders = (sequelize) => {
     }
     cache.getUserCollectiveId[UserId] = CollectiveId;
     return CollectiveId;
-  });
+  })
 }
 
   const updateOrder = (order) => {
@@ -38,9 +38,22 @@ const updateOrders = (sequelize) => {
           replacements: { id: order.id, CollectiveId }
         });
       })
+      .then(() => {
+        return sequelize.query(`SELECT COUNT(*) FROM "Transactions" WHERE "OrderId"=:id`, {
+          replacements: { id: order.id }
+        })
+      })
+      .then(res => {
+        if (!res) return;
+        const count = res[0][0].count;
+        if (count % 2 !== 0) {
+          throw new Error("OrderId", order.id, "has an uneven number of transactions:", count);
+        }
+        console.log("OrderId:", order.id, "Number of transactions: ", count);
+      });
   };
-
-  return sequelize.query(`SELECT id, "CreatedByUserId" FROM "Orders" WHERE "FromCollectiveId" is NULL`, { type: sequelize.QueryTypes.SELECT })
+  const limit = DRY_RUN ? "LIMIT 150" : "";
+  return sequelize.query(`SELECT id, "CreatedByUserId" FROM "Orders" WHERE "FromCollectiveId" is NULL AND "PaymentMethodId" IS NOT NULL ${limit}`, { type: sequelize.QueryTypes.SELECT })
   .then(rows => rows && Promise.map(rows, updateOrder, { concurrency: 10 }))
 }
 
@@ -57,6 +70,9 @@ module.exports = {
     return updateOrders(queryInterface.sequelize)
       .then(() => {
         console.log(">>> ", ordersProcessed.length, "orders processed");
+        if (DRY_RUN) {
+          throw new Error("Throwing to make sure we can retry this migration");
+        }
       });
   },
   down
