@@ -146,7 +146,7 @@ class LoginForm extends React.Component {
 
     if (this.state.loading) {
       inputEmail.button = <Button disabled={true}><FormattedMessage id="loading" defaultMessage="loading" /></Button>;
-      inputEmail.description = <Button disabled={true}><FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." /></Button>;
+      inputEmail.description = <FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." />;
     } else if (!this.state.signup) {
       if (this.state.isNewUser === true) {
         inputEmail.button = <Button onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
