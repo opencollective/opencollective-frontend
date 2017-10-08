@@ -362,6 +362,7 @@ class Event extends React.Component {
                 <CollectiveCover
                   collective={event}
                   title={event.name}
+                  href={`/${event.parentCollective.slug}`}
                   style={get(event, 'settings.style.hero.cover') || get(event.parentCollective, 'settings.style.hero.cover')}                  
                   />
               }
