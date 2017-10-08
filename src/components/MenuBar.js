@@ -59,7 +59,7 @@ class MenuBar extends React.Component {
             {this.props.info}
           </div>
           {this.props.actions.map((action, index) =>
-            <div className={`item ${action.className}`}>
+            <div className={`item ${action.className}`} key={`item-${index}`}>
               { action.onClick &&
                 <a
                   key={`actionItem${index}`}

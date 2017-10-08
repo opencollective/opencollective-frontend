@@ -10,7 +10,7 @@ class TransactionsPage extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
-    limit: PropTypes.int,
+    limit: PropTypes.number,
     LoggedInUser: PropTypes.object
   }
 
