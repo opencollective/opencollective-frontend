@@ -29,7 +29,7 @@ class Tier extends React.Component {
     this.defaultValue = props.defaultValue || {};
     this.defaultValue.quantity = this.defaultValue.quantity || 1;
     this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : this.defaultValue.amount;
-    this.state = { ...this.defaultValue };
+    this.state = { ...this.defaultValue, id: props.tier.id };
     if (this.tier.presets) {
       this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
       this.state.interval = this.defaultValue.interval || null;

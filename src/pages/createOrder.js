@@ -17,8 +17,8 @@ import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
-    return { slug: collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
   }
 
   constructor(props) {
@@ -158,6 +158,13 @@ query Collective($slug: String!) {
       name
       slug
       image
+    }
+    parentCollective {
+      id
+      slug
+      name
+      image
+      backgroundImage
     }
     backgroundImage
     settings

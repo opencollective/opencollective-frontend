@@ -18,7 +18,7 @@ import Markdown from 'react-markdown';
 import TicketsConfirmed from '../components/TicketsConfirmed';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import { uniqBy, get, union } from 'lodash';
-import { capitalize } from '../lib/utils';
+import { capitalize, trimObject } from '../lib/utils';
 import { Router } from '../server/pages';
 import { addEventMutations } from '../graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
@@ -253,16 +253,14 @@ class Event extends React.Component {
       return this.createOrder(order);
     }
     this.setState({ order, showInterestedForm: false });
-    const route = `/${event.parentCollective.slug}/events/${event.slug}/order/${order.tier.id}`;
-    const params = {
+    const params = trimObject({
       eventSlug: event.slug,
       collectiveSlug: event.parentCollective.slug,
       TierId: order.tier.id,
       quantity: order.quantity,
       totalAmount: order.totalAmount,
       interval: order.interval
-    }
-    console.log(">>> pushing route", route, "with params", params);
+    });
     Router.pushRoute('orderEventTier', params);
   }
 

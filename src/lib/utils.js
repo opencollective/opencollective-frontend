@@ -6,6 +6,16 @@ export function truncate(str, length) {
   return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
 }
 
+export function trimObject(obj) {
+  const res = {};
+  Object.keys(obj).forEach(attr => {
+    if (typeof obj[attr] !== 'undefined') {
+      res[attr] = obj[attr];
+    }
+  });
+  return res;
+}
+
 export function filterCollection(array, cond, inverse) {
   if (!array || !cond) return array;
 
