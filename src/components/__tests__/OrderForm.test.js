@@ -65,10 +65,14 @@ describe("OrderForm component", () => {
   );
 
   describe('error messages', () => {
-    it('creditcard.missing', () => {
+    it('creditcard.missing', (done) => {
       const component = mountComponent({ collective, order })
-      component.find('.submit button').simulate('click');
-      expect(component.find('.result .error').text()).toEqual("Invalid credit card");
+      fillValue(component, 'email', 'testuser@email.com');
+      setTimeout(() => {
+        component.find('.submit button').simulate('click');
+        expect(component.find('.result .error').text()).toEqual("Invalid credit card");
+        done()
+      }, 500);
     });
 
     it('creditcard.error', (done) => {
@@ -81,6 +85,7 @@ describe("OrderForm component", () => {
         CCcvc: 111
       };
 
+      fillValue(component, 'email', 'testuser@email.com');
       for (const prop in card) {
         fillValue(component, prop, card[prop]);
       }

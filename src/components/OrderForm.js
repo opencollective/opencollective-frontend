@@ -241,6 +241,7 @@ class OrderForm extends React.Component {
   }
 
   async handleSubmit() {
+    console.log(">>> handleSubmit", this.state)
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
