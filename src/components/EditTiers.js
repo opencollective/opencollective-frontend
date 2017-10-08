@@ -105,9 +105,10 @@ class EditTiers extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.tiers) {
-      console.log(">>> editTiers componentWillReceiveProps", nextProps);
-      const tiers = nextProps.tiers && nextProps.tiers.map(tier => Object.assign({}, tier));
-      this.setState({tiers});
+      const tiers = nextProps.tiers.map(tier => Object.assign({}, tier)).sort((a, b) => {
+        return (a.amount > b.amount) ? 1 : -1;        
+      });
+      this.setState({ tiers });
     }
   }
 
