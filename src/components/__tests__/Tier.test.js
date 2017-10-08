@@ -91,6 +91,7 @@ describe("Tier component", () => {
         console.log(">>> onClick", tier);
         expect(tier).toEqual({
           quantity: 1,
+          id: 1,
           amount: 1000
         })
         done();

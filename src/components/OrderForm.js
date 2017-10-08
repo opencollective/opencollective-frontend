@@ -5,7 +5,7 @@ import InputField from '../components/InputField';
 import ActionButton from '../components/Button';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { capitalize, formatCurrency } from '../lib/utils';
+import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
@@ -58,6 +58,7 @@ class OrderForm extends React.Component {
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
       'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
+      'error.email.invalid': { id: 'error.email.invalid', defaultMessage: 'Invalid email address' },
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
@@ -240,6 +241,7 @@ class OrderForm extends React.Component {
   }
 
   async handleSubmit() {
+    console.log(">>> handleSubmit", this.state)
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
@@ -274,7 +276,10 @@ class OrderForm extends React.Component {
 
   async validate() {
     const { intl } = this.props;
-
+    if (this.state.isNewUser && !isValidEmail(this.state.user.email)) {
+      this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) }});
+      return false;
+    }
     if (this.state.order.totalAmount > 0) {
       const card = this.state.creditcard;
       if (!card) {
@@ -315,6 +320,8 @@ class OrderForm extends React.Component {
         this.setState({ result: { error: intl.formatMessage(this.messages['creditcard.error']) }})
         return false;
       }
+    } else {
+      return true;
     }
   }
 
@@ -570,36 +577,38 @@ class OrderForm extends React.Component {
                 {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : this.state.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
               </ActionButton>
             </div>
-            <div className="disclaimer">
-              <FormattedMessage
-                id="collective.host.disclaimer"
-                defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
-                values={
-                  {
-                    hostname: collective.host.name,
-                    amount: formatCurrency(this.state.order.totalAmount, currency),
-                    interval: this.state.tier.interval,
-                    collective: collective.name
+            { this.state.order.totalAmount > 0 &&
+              <div className="disclaimer">
+                <FormattedMessage
+                  id="collective.host.disclaimer"
+                  defaultMessage="By clicking above, you are pledging to give the host ({hostname}) {amount} {interval, select, month {per month} year {per year} other {}} for {collective}."
+                  values={
+                    {
+                      hostname: collective.host.name,
+                      amount: formatCurrency(this.state.order.totalAmount, currency),
+                      interval: this.state.tier.interval,
+                      collective: collective.name
+                    }
+                  } />
+                  { this.state.tier.interval &&
+                    <div>
+                      <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
+                    </div>
                   }
-                } />
-                { this.state.tier.interval &&
-                  <div>
-                    <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
-                  </div>
-                }
-            </div>
+              </div>
+            }
             <div className="result">
-                { this.state.loading && <div className="loading">Processing...</div> }
-                { this.state.result.success &&
-                  <div className="success">
-                    {this.state.result.success}
-                  </div>
-                }
-                { this.state.result.error &&
-                  <div className="error">
-                    {this.state.result.error}
-                  </div>
-                }
+              { this.state.loading && <div className="loading">Processing...</div> }
+              { this.state.result.success &&
+                <div className="success">
+                  {this.state.result.success}
+                </div>
+              }
+              { this.state.result.error &&
+                <div className="error">
+                  {this.state.result.error}
+                </div>
+              }
             </div>
           </div>
         }

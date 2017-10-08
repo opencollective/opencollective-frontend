@@ -17,8 +17,8 @@ import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
-    return { slug: collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
   }
 
   constructor(props) {
@@ -66,7 +66,7 @@ class CreateOrderPage extends React.Component {
       console.log(">>> createOrder response", res);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}`);
+      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}&TierId=${order.tier.id}&type=${data.Collective.type}&totalAmount=${order.totalAmount}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
@@ -158,6 +158,13 @@ query Collective($slug: String!) {
       name
       slug
       image
+    }
+    parentCollective {
+      id
+      slug
+      name
+      image
+      backgroundImage
     }
     backgroundImage
     settings
