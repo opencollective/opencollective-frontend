@@ -66,7 +66,7 @@ class CreateOrderPage extends React.Component {
       console.log(">>> createOrder response", res);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}&TierId=${order.tier.id}&type=${data.Collective.type}&totalAmount=${order.totalAmount}`);
+      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}&TierId=${order.tier && order.tier.id}&type=${data.Collective.type}&totalAmount=${order.totalAmount}`);
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
