@@ -313,7 +313,7 @@ export const createFromGithub = (req, res, next) => {
     .tap(g => debug("createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)
     .then(() => _addUserToCollective(createdCollective, creatorUser, options))
-    .then(() => _addUserToCollective(createdCollective, defaultHostUser(), { role: roles.HOST, remoteUser: creatorUser }))
+    .then(() => _addUserToCollective(createdCollective, defaultHostUser("opensource"), { role: roles.HOST, remoteUser: creatorUser }))
     .then(() => {
       if (collectiveData.tiers) {
         return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })

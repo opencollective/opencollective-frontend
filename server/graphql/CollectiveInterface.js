@@ -2,6 +2,7 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLString,
+  GraphQLBoolean,
   GraphQLInterfaceType,
   GraphQLObjectType
 } from 'graphql';
@@ -164,6 +165,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       createdByUser: { type: UserType },
       parentCollective: { type: CollectiveInterfaceType },
       type: { type: GraphQLString },
+      isActive: { type: GraphQLBoolean },
       name: { type: GraphQLString },
       description: { type: GraphQLString },
       longDescription: { type: GraphQLString },
@@ -261,6 +263,12 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.type;
+      }
+    },
+    isActive: {
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return collective.isActive;
       }
     },
     name: {

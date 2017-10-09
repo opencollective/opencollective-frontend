@@ -599,6 +599,7 @@ export default {
   "event1": {
     type: "EVENT",
     name: "January meetup",
+    isActive: true,
     slug: "jan-meetup",
     description: "January monthly meetup",
     startsAt: "2017-01-06 UTC+0300",
