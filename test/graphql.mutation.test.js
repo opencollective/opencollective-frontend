@@ -215,16 +215,16 @@ describe('Mutation Tests', () => {
         const result = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result.errors && console.error(result.errors[0]);
         expect(tiers).to.have.length(2);
-        tiers.sort((a, b) => a.id - b.id)
-        expect(tiers[0].interval).to.equal('month');
-        expect(tiers[1].interval).to.equal('year');
+        tiers.sort((a, b) => b.amount - a.amount);
+        expect(tiers[0].interval).to.equal('year');
+        expect(tiers[1].interval).to.equal('month');
         tiers[0].goal = 20000;
         tiers[1].amount = 100000;
         tiers.push({name: "free ticket", type: "TICKET", amount: 0});
         const result2 = await utils.graphqlQuery(editTiersQuery, { id: collective1.id, tiers }, user1);
         result2.errors && console.error(result2.errors[0]);
         const updatedTiers = result2.data.editTiers;
-        updatedTiers.sort((a, b) => a.id - b.id);
+        updatedTiers.sort((a, b) => b.amount - a.amount);
         expect(updatedTiers).to.have.length(3);
         expect(updatedTiers[0].goal).to.equal(tiers[0].goal);
         expect(updatedTiers[1].amount).to.equal(tiers[1].amount);
