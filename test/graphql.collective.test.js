@@ -114,7 +114,7 @@ describe('graphql.collective.test.js', () => {
     expect(collective.stats).to.deep.equal({
       backers: 25,
       sponsors: 1,
-      yearlyBudget: 330620,
+      yearlyBudget: 330563,
       topExpenses: {"byCategory":[{"category":"Engineering","count":6,"totalExpenses":324729}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-280914}]},
       topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":38646},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":26040}],"byCollectiveType":[{"type":"USER","totalDonations":163077}]}
       });
