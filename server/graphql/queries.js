@@ -90,6 +90,7 @@ const queries = {
       if (args.status) query.where.status = args.status;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
+      query.order = [["createdAt", "DESC"]];
       return models.Expense.findAll(query);
     }
   },
