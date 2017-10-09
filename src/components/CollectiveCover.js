@@ -249,7 +249,7 @@ ${description}`
             { description && <p className="description">{description}</p> }
             { (twitterHandle || website) &&
               <div className="contact">
-                { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">@{twitterHandle}</a></div> }
+                { twitterHandle && <div className="twitterHandle"><a href={`https://twitter.com/${twitterHandle}`} target="_blank">{twitterHandle.startsWith('hashtag/') ? '#' + twitterHandle.replace(/^hashtag\//, '') : '@' + twitterHandle}</a></div> }
                 { website && <div className="website"><a href={website} target="_blank">{prettyUrl(website) }</a></div> }
               </div>
             }
