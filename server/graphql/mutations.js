@@ -360,6 +360,10 @@ const mutations = {
         }
         collective = c;
 
+        if (!collective.isActive) {
+          throw new Error(`This collective is not active`);
+        }
+
         if (order.fromCollective && order.fromCollective.id === collective.id) {
           throw new Error(`Well tried. But no you can't order yourself something ;-)`);
         }
