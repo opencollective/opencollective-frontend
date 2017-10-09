@@ -328,9 +328,13 @@ export function exportToPDF(template, data, options) {
 /**
  * Default host id, set this for new collectives created through Github
  */
-export const defaultHostUser = () => {
+export const defaultHostUser = (tag) => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
-    return { id: 772, CollectiveId: 83 }; // Open Source Host Collective User
+    if (tag === 'opensource') {
+      return { id: 772, CollectiveId: 83 }; // Open Source Host Collective User
+    } else {
+      return { id: 7944, CollectiveId: 8674 }; // Open Source Host Collective User
+    }
   }
   return { id: 1, CollectiveId: 1 };
 };
