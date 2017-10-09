@@ -41,7 +41,7 @@ psql -U postgres
 ```
 
 ### Configuration and secrets
-- From the OpenCollective DropBox: `cp $DROPBOX/Engineering/config/DOTenv .env`
+- From the OpenCollective DropBox: `cp $DROPBOX/OpenCollective/Engineering/Keys/config/DOTenv .env`
 - There are other config files there, but for now they seem to be duplicated in `config`
 
 ### Node and npm
