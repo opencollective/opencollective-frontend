@@ -33,7 +33,9 @@ class Tier extends React.Component {
       'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' },
       'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
       'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
-      'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'}
+      'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'},
+      'tier.error.hostMissing' : { id: 'tier.error.hostMissing', defaultMessage: "Your collective needs a host before you can start accepting money." },
+      'tier.error.collectiveInactive' : { id: 'tier.error.collectiveInactive', defaultMessage: "Your collective needs to be activated by your host before you can start accepting money." }
     });
 
   }
@@ -82,11 +84,24 @@ class Tier extends React.Component {
         }
       </div>
     );
-  }  
+  }
 
   render() {
 
-    const { collective, tier } = this.props;
+    const { collective, tier, intl } = this.props;
+    const disabled = tier.amount > 0 && !collective.isActive;
+    let errorMsg;
+    if (!collective.host) {
+      errorMsg = `hostMissing`;
+    } else if (!collective.isActive) {
+      errorMsg = 'collectiveInactive';
+    }
+    const tooltip = disabled && intl.formatMessage(this.messages[`tier.error.${errorMsg}`]);
+
+    const onClick = () => {
+      if (disabled) return;
+      Router.pushRoute(`/${collective.slug}/order/${tier.id}`);
+    }
 
     return (
       <div className={`${this.props.className} TierCard`} id={this.anchor}>
@@ -202,6 +217,10 @@ class Tier extends React.Component {
             justify-content: center;
             align-items: center;
           }
+          .action.disabled {
+            background-color: var(--silver-four);
+            cursor: not-allowed;
+          }
         `}</style>
         <div className="title">
           {tier.name}
@@ -243,7 +262,7 @@ class Tier extends React.Component {
             </div>
           </div>
         }
-        <a className="action" onClick={() => Router.pushRoute(`/${collective.slug}/order/${tier.id}`)}>
+        <a className={`action ${disabled ? 'disabled' : ''}`} title={tooltip} onClick={onClick} >
           { tier.button && tier.button}
           { !tier.button &&
             <FormattedMessage id="tier.contribute" defaultMessage="contribute" />

@@ -81,7 +81,7 @@ ${description}`
       backers.sort((a, b) => b.totalDonations - a.totalDonations);
       membersPreview = union(admins, members, backers).slice(0, 5);
     }
-    const additionalBackers = (stats.backers || collective.members.length) - membersPreview.length;
+    const additionalBackers = stats && ((stats.backers || collective.members.length) - membersPreview.length);
     return (
       <div className={`CollectiveCover ${className} ${type}`}>
         <style jsx global>{`
