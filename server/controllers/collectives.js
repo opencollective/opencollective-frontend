@@ -13,6 +13,7 @@ import queries from '../lib/queries';
 import models from '../models';
 import errors from '../lib/errors';
 import debugLib from 'debug';
+import config from 'config';
 
 const {
   Activity,
@@ -94,11 +95,15 @@ export const getUsers = (req, res, next) => {
 
   return promise
     .map(userCollective => {
+      let avatar = userCollective.image;
+      if (avatar && avatar.match(/^\//)) {
+        avatar = `${config.host.website}${avatar}`
+      }
       const u = {
         ...userCollective.dataValues,
         role: userCollective.dataValues.role,
         tier: userCollective.tier && userCollective.tier.slug,
-        avatar: userCollective.image
+        avatar
       };
       delete u.image;
       if (!u.tier) {
