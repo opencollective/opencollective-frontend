@@ -93,8 +93,10 @@ export const callback = (req, res, next) => {
       collective = c;
       if (collective.type === 'COLLECTIVE') {
         collective.HostCollectiveId = collective.id; // This collective becomes a HOST
+        collective.ParentCollectiveId = collective.id; // This collective becomes a HOST
+        collective.save();
         models.Member.create({
-          CreatedByUserId: req.remoteUser.id,
+          CreatedByUserId,
           CollectiveId: collective.id,
           MemberCollectiveId: collective.id,
           role: 'HOST'
