@@ -346,13 +346,16 @@ const getTopSponsors = () => {
 const getMembersOfCollectiveWithRole = (CollectiveIds) => {
   const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
   return sequelize.query(`
-    SELECT c.*, MAX(u.email) as email, max(m.role) as role
-    FROM "Collectives" c
-      LEFT JOIN "Members" m ON c.id = m."MemberCollectiveId"
-      LEFT JOIN "Users" u ON u."CollectiveId" = c.id
-    WHERE m."CollectiveId" IN (:collectiveids) AND m."deletedAt" IS NULL AND c."deletedAt" IS NULL
-    GROUP BY c.id
-  `, {
+    WITH memberships AS (
+      SELECT c.*, MAX(u.email) as email, string_agg(distinct m.role,',') as roles
+      FROM "Collectives" c
+        LEFT JOIN "Members" m ON c.id = m."MemberCollectiveId"
+        LEFT JOIN "Users" u ON u."CollectiveId" = c.id
+      WHERE m."CollectiveId" IN (207) AND m."deletedAt" IS NULL AND c."deletedAt" IS NULL
+      GROUP BY c.id
+    )
+    SELECT (CASE WHEN roles LIKE '%HOST%' THEN 'HOST' WHEN roles LIKE '%ADMIN%' THEN 'ADMIN' ELSE 'BACKER' END) as role, * FROM memberships
+`, {
     replacements: { collectiveids },
     type: sequelize.QueryTypes.SELECT,
     model: models.Collective
