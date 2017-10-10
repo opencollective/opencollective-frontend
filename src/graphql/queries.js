@@ -460,6 +460,7 @@ export const addGetLoggedInUserFunction = (component) => {
               if (LoggedInUser && LoggedInUser.memberOf) {
                 const roles = {};
                 LoggedInUser.memberOf.map(member => {
+                  if (!member.collective) return;
                   roles[member.collective.slug] = roles[member.collective.slug] || [];
                   roles[member.collective.slug].push(member.role);
                 });
