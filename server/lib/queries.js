@@ -351,7 +351,7 @@ const getMembersOfCollectiveWithRole = (CollectiveIds) => {
       FROM "Collectives" c
         LEFT JOIN "Members" m ON c.id = m."MemberCollectiveId"
         LEFT JOIN "Users" u ON u."CollectiveId" = c.id
-      WHERE m."CollectiveId" IN (207) AND m."deletedAt" IS NULL AND c."deletedAt" IS NULL
+      WHERE m."CollectiveId" IN (:collectiveids) AND m."deletedAt" IS NULL AND c."deletedAt" IS NULL
       GROUP BY c.id
     )
     SELECT (CASE WHEN roles LIKE '%HOST%' THEN 'HOST' WHEN roles LIKE '%ADMIN%' THEN 'ADMIN' ELSE 'BACKER' END) as role, * FROM memberships
