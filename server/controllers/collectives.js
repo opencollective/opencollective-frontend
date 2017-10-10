@@ -101,7 +101,6 @@ export const getUsers = (req, res, next) => {
       }
       const u = {
         ...userCollective.dataValues,
-        role: userCollective.dataValues.role,
         tier: userCollective.tier && userCollective.tier.slug,
         avatar
       };
