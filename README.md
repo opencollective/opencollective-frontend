@@ -48,6 +48,8 @@ psql -U postgres
 
 `npm install`
 
+(you might need to run `npm install -g nodemon` as well.)
+
 If you haven't already: `export PATH=./node_modules/bin:$PATH`. You probably want to add
 that to your shell profile.
 
