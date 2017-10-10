@@ -8,11 +8,17 @@ import stripeMock from './mocks/stripe';
 import * as utils from './utils';
 
 describe('graphql.collective.test.js', () => {
-  let pubnubCollective;
+  let pubnubCollective, pubnubAdmin, adminMembership;
 
-  beforeEach(() => utils.loadDB('opencollective_dvl'));
-
-  beforeEach(() => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
+  before(() => utils.loadDB('opencollective_dvl'));
+  before(() => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
+  before(() => models.User.createUserWithCollective({ email: 'admin@pubnub.com'}).then(c => pubnubAdmin = c));
+  before(() => models.Member.create({
+      CreatedByUserId: pubnubAdmin.id,
+      MemberCollectiveId: pubnubAdmin.CollectiveId,
+      CollectiveId: pubnubCollective.id,
+      role: 'ADMIN'
+    }).then(m => adminMembership = m));
 
   it('gets the collective info for the collective page', async () => {
 
@@ -122,14 +128,6 @@ describe('graphql.collective.test.js', () => {
 
   it('edits members', async () => {
 
-    const pubnubAdmin = await models.User.createUserWithCollective({ email: 'admin@pubnub.com'});
-    const adminMembership = await models.Member.create({
-      CreatedByUserId: pubnubAdmin.id,
-      MemberCollectiveId: pubnubAdmin.CollectiveId,
-      CollectiveId: pubnubCollective.id,
-      role: 'ADMIN'
-    });
-
     const collective = {
       "id": pubnubCollective.id,
       "type": "ORGANIZATION",
@@ -228,14 +226,6 @@ describe('graphql.collective.test.js', () => {
       }
     }
     `;
-
-    const pubnubAdmin = await models.User.createUserWithCollective({ email: 'admin@pubnub.com'});
-    await models.Member.create({
-      CreatedByUserId: pubnubAdmin.id,
-      MemberCollectiveId: pubnubAdmin.CollectiveId,
-      CollectiveId: pubnubCollective.id,
-      role: 'ADMIN'
-    });
 
     res = await utils.graphqlQuery(query, { collective }, pubnubAdmin);
     res.errors && console.error(res.errors);

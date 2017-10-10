@@ -85,13 +85,35 @@ const queries = {
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
-    resolve(_, args) {
-      const query = { where: { CollectiveId: args.CollectiveId } }
+    resolve(_, args, req) {
+      const query = { where: {} };
       if (args.status) query.where.status = args.status;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       query.order = [["createdAt", "DESC"]];
-      return models.Expense.findAll(query);
+      return req.loaders.collective.findById.load(args.CollectiveId)
+        .then(collective => {
+          if (!collective) {
+            throw new Error('Collective not found');
+          }
+          const getCollectiveIds = () => {
+            // if is host, we get all the expenses across all the hosted collectives
+            if (collective.HostCollectiveId === collective.id) {
+              return models.Member.findAll({
+                where: {
+                  MemberCollectiveId: collective.id,
+                  role: 'HOST'
+                }
+              }).map(members => members.CollectiveId)
+            } else {
+              return Promise.resolve([args.CollectiveId]);
+            }
+          }
+          return getCollectiveIds().then(collectiveIds => {
+            query.where.CollectiveId = { $in: collectiveIds };
+            return models.Expense.findAll(query);
+          })
+        })
     }
   },
 
