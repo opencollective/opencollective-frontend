@@ -89,7 +89,20 @@ export const callback = (req, res, next) => {
   });
 
   models.Collective.findById(CollectiveId)
-    .then(c => collective = c)
+    .then(c => {
+      collective = c;
+      if (collective.type === 'COLLECTIVE') {
+        collective.HostCollectiveId = collective.id; // This collective becomes a HOST
+        collective.ParentCollectiveId = collective.id; // This collective becomes a HOST
+        collective.save();
+        models.Member.create({
+          CreatedByUserId,
+          CollectiveId: collective.id,
+          MemberCollectiveId: collective.id,
+          role: 'HOST'
+        })
+      }
+    })
     .then(getToken(req.query.code))
     .then(createStripeAccount)
     .then(() => res.redirect(`${config.host.website}/${collective.slug}?message=StripeAccountConnected`))
