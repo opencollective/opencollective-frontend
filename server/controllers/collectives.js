@@ -488,7 +488,21 @@ export const getOne = (req, res, next) => {
   const aggregate = (array, attribute) => {
     return array.map(d => d[attribute]).reduce((a, b) => a + b, 0);
   };
-
+  const getHostAdmins = () => {
+    return models.Member.findAll({
+      where: {
+        CollectiveId: req.collective.HostCollectiveId,
+        role: 'ADMIN'
+      },
+      include: [ { model: models.Collective, as: 'memberCollective' } ]
+    }).map(member => {
+      return {
+        UserId: member.memberCollective.data && member.memberCollective.data.UserId,
+        UserCollectiveId: member.MemberCollectiveId,
+        slug: member.memberCollective.slug
+      }
+    })
+  }
   const getRelatedCollectives = () => {
     // don't fetch related collectives for supercollectives for now
     if (req.collective.isSupercollective) return Promise.resolve();
@@ -503,7 +517,8 @@ export const getOne = (req, res, next) => {
     req.collective.getTwitterSettings(),
     getRelatedCollectives(),
     req.collective.getSuperCollectiveData(),
-    req.collective.getHostCollective()
+    req.collective.getHostCollective(),
+    getHostAdmins()
     ])
   .then(values => {
     collective.hasPaypal = values[0] && values[0].service === 'paypal';
@@ -517,6 +532,7 @@ export const getOne = (req, res, next) => {
     collective.related = values[6];
     collective.superCollectiveData = values[7];
     collective.host = values[8] && values[8].info;
+    collective.host.admins = values[9];
     if (collective.superCollectiveData) {
       collective.collectivesCount = collective.superCollectiveData.length;
       collective.contributorsCount += aggregate(collective.superCollectiveData, 'contributorsCount');
