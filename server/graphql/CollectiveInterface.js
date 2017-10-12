@@ -425,7 +425,7 @@ const CollectiveFields = () => {
     tiers: {
       type: new GraphQLList(TierType),
       resolve(collective) {
-        return collective.getTiers({ order: [['name', 'ASC']] });
+        return collective.getTiers({ order: [['amount', 'ASC']] });
       }
     },
     orders: {
