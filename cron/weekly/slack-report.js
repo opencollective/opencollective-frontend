@@ -35,15 +35,6 @@ const rejectedExpense = { where: { status: expenseStatus.REJECTED } };
 const paidExpense = { where : { status: expenseStatus.PAID } };
 
 const excludeOcTeam = { where: {
-  UserId: {
-    $notIn: [
-      2,  // xdamman
-      8,  // aseem
-      30, // pmancini
-      40, // opencollective
-      41, // asood123
-    ]
-  },
   CollectiveId: {
     $not: 1 // OpenCollective collective
   }
