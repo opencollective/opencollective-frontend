@@ -78,6 +78,10 @@ export function mustHaveRole(possibleRoles) {
     required_valid('remoteUser', 'collective')(req, res, (e) => {
       if (e) return next(e);
       if (!req.remoteUser) return next(new Forbidden()); // this shouldn't happen, need to investigate why it does
+      // If must be HOST, the logged in user can also be an ADMIN of the HOST
+      if (possibleRoles.indexOf(roles.HOST) !== -1) {
+        if (req.remoteUser.hasRole([roles.ADMIN], req.collective.HostCollectiveId)) return next(null, true);
+      }
       if (!req.remoteUser.hasRole(possibleRoles, req.collective.id)) return next(new Forbidden(`Logged in user must be ${possibleRoles.join(' or ')} of this collective`));
       else return next(null, true);
     })
