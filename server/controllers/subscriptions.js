@@ -16,7 +16,7 @@ export const getAll = (req, res, next) => {
       include: [
         { model: models.Transaction,
           where: {
-            type: 'DEBIT'
+            type: 'CREDIT'
           },
           required: false
         },
