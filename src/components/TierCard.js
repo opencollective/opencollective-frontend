@@ -21,7 +21,7 @@ class Tier extends React.Component {
 
   constructor(props) {
     super(props);
-    this.anchor = (get(this.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    this.anchor = (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
@@ -157,7 +157,6 @@ class Tier extends React.Component {
             position: absolute;
             top: 3rem;
             right: 3rem;
-            width: 6rem;
             font-family: Rubik;
             font-size: 1.6rem;
             font-weight: 500;

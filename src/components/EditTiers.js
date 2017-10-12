@@ -103,15 +103,6 @@ class EditTiers extends React.Component {
     ];
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.tiers) {
-      const tiers = nextProps.tiers.map(tier => Object.assign({}, tier)).sort((a, b) => {
-        return (a.amount > b.amount) ? 1 : -1;        
-      });
-      this.setState({ tiers });
-    }
-  }
-
   editTier(index, fieldname, value) {
     const tiers = this.state.tiers;
     if (value === 'onetime') {
