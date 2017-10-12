@@ -66,8 +66,9 @@ ${description}`
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundPosition: collective.type === 'COLLECTIVE' ? 'center center' : 'center -40px',
+      backgroundPosition: (collective.type === 'USER' || collective.type === 'ORGANIZATION') ? 'center -40px' : 'center center',
       backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
       ...customStyles
     };
 

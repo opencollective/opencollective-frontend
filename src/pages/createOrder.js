@@ -95,6 +95,7 @@ class CreateOrderPage extends React.Component {
     };
 
     this.order.tier = tier;
+    const href = (collective.type === 'EVENT') ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`;
 
     return (
       <div>
@@ -118,7 +119,7 @@ class CreateOrderPage extends React.Component {
         <Body>
           <CollectiveCover
             collective={collective}
-            href={`/${collective.slug}`}
+            href={href}
             title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], { name: tier.name })}
             className="small"
             />

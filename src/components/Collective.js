@@ -130,10 +130,6 @@ class Collective extends React.Component {
     console.log("CollectivePage> this.collective", this.collective, "state", this.state);
     const { intl, LoggedInUser } = this.props;
 
-    const tiers = [...this.collective.tiers].sort((a, b) => {
-      return (a.amount > b.amount) ? 1 : -1;
-    })
-
     const actions = [
       {
         className: 'whiteblue',
@@ -271,7 +267,7 @@ class Collective extends React.Component {
 
               <section id="about">
                 <div className="sidebar" id="contribute">
-                  { tiers.map(tier => (
+                  { this.collective.tiers.map(tier => (
                     <TierCard collective={this.collective} tier={tier} />
                   ))}
                 </div>
