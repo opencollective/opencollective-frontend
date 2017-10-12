@@ -34,7 +34,7 @@ function run() {
           } 
         }
       },
-      { model: models.Collective },
+      { model: models.Collective, as: 'collective'},
       { model: models.PaymentMethod }
     ]
   })
