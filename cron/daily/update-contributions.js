@@ -15,7 +15,10 @@ Collective.findAll({
     'name',
     'settings',
     'data'
-  ]
+  ], 
+  where: {
+    type: "COLLECTIVE"
+  }
 })
   .tap(collectives => {
     log.verbose('collectives', `Found ${collectives.length} collective(s) to inspect`);
