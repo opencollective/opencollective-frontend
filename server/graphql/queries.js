@@ -65,7 +65,7 @@ const queries = {
     resolve(_, args) {
       const query = {
         where: { CollectiveId: args.CollectiveId },
-        order: [ ['id', 'DESC'] ]
+        order: [ ['createdAt', 'DESC'] ]
       };
       if (args.type) query.where.type = args.type;
       if (args.limit) query.limit = args.limit;
@@ -90,7 +90,7 @@ const queries = {
       if (args.status) query.where.status = args.status;
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [["createdAt", "DESC"]];
+      query.order = [["incurredAt", "DESC"]];
       return req.loaders.collective.findById.load(args.CollectiveId)
         .then(collective => {
           if (!collective) {
