@@ -52,18 +52,18 @@ describe('lib.payments.test.js', () => {
     done();
   });
 
-  beforeEach('create a user', () => models.User.createUserWithCollective(userData).tap(u => user = u));
-  beforeEach('create a user', () => models.User.createUserWithCollective({email: EMAIL}).tap(u => user2 = u));
-  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).tap(u => host = u));
-  beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).tap(g => collective = g));
-  beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).tap(g => collective2 = g));
+  beforeEach('create a user', () => models.User.createUserWithCollective(userData).then(u => user = u));
+  beforeEach('create a user', () => models.User.createUserWithCollective({email: EMAIL}).then(u => user2 = u));
+  beforeEach('create a host', () => models.User.createUserWithCollective(utils.data('host1')).then(u => host = u));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective1')).then(g => collective = g));
+  beforeEach('create a collective', () => models.Collective.create(utils.data('collective2')).then(g => collective2 = g));
   beforeEach('create an order', () => models.Order.create({
     CreatedByUserId: user.id,
     FromCollectiveId: user.CollectiveId,
     CollectiveId: collective.id,
     totalAmount: AMOUNT,
     currency: CURRENCY
-  }).then(o => o.setPaymentMethod({ token: STRIPE_TOKEN })).tap(t => order = t))
+  }).then(o => o.setPaymentMethod({ token: STRIPE_TOKEN })).then(t => order = t))
   beforeEach('add user to collective as host', () => collective.addUserWithRole(host, roles.HOST));
   beforeEach('add user to collective2 as host', () => collective2.addUserWithRole(host, roles.HOST));
 
