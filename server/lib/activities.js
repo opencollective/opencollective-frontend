@@ -27,8 +27,11 @@ export default {
 
 
     // get user data
+    if (activity.data.fromCollective) {
+      userString = getUserString(format, activity.data.fromCollective, true);
+    }
+
     if (activity.data.user) {
-      userString = getUserString(format, activity.data.user, true);
       userId = activity.data.user.id;
     }
 
@@ -164,9 +167,9 @@ export default {
     let tweet = '';
 
     // get user data
-    if (activity.data.user) {
-      userString = getUserString(format, activity.data.user);
-      userTwitter = activity.data.user.twitterHandle;
+    if (activity.data.fromCollective) {
+      userString = getUserString(format, activity.data.fromCollective);
+      userTwitter = activity.data.fromCollective.twitterHandle;
     }
 
     // get collective data

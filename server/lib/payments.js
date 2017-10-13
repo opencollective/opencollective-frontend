@@ -72,7 +72,7 @@ const validatePayment = (payment) => {
 
 const sendConfirmationEmail = (order) => {
 
-  const { collective, tier, interval } = order;
+  const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
 
   if (collective.type === types.EVENT) {
@@ -96,6 +96,7 @@ const sendConfirmationEmail = (order) => {
         transaction: pick(order.transaction, ['createdAt', 'uuid']),
         user: user.info,
         collective: collective.info,
+        fromCollective: fromCollective.minimal,
         relatedCollectives,
         interval,
         monthlyInterval: (interval === 'month'),

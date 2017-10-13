@@ -8,8 +8,8 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 
 {{> toplogo}}
 
-{{#if user.name}}
-<p>Dear {{user.name}},</p>
+{{#if fromCollective.name}}
+<p>Dear {{fromCollective.name}},</p>
 {{else}}
 <p>Hi!</p>
 {{/if}}

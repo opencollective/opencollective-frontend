@@ -271,6 +271,7 @@ export default function stripeWebhook(req, res, next) {
           user: user.info,
           firstPayment: false,
           collective: collective.info,
+          fromCollective: order.fromCollective.minimal,
           relatedCollectives,
           config: { host: config.host },
           interval: subscription && subscription.interval,
