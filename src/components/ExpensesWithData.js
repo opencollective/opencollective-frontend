@@ -60,7 +60,12 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int) 
     collective {
       id
       slug
+      currency
       name
+      host {
+        id
+        slug
+      }
       stats {
         id
         balance

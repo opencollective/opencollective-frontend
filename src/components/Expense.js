@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
-import { capitalize } from '../lib/utils';
+import { capitalize, formatCurrency } from '../lib/utils';
 import Avatar from './Avatar';
 import ExpenseDetails from './ExpenseDetails';
+import ApproveExpenseBtn from './ApproveExpenseBtn';
+import RejectExpenseBtn from './RejectExpenseBtn';
+import PayExpenseBtn from './PayExpenseBtn';
+import { Link } from '../server/pages';
 
 class Expense extends React.Component {
 
@@ -50,7 +54,6 @@ class Expense extends React.Component {
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
-            max-height: 6rem;
             position: relative;
           }
           .expense.detailsView {
@@ -79,6 +82,14 @@ class Expense extends React.Component {
             color: #919599;
             font-size: 1.2rem;
           }
+          .meta .collective {
+            margin-right: 0.2rem;
+            float: left;
+          }
+          .amount .balance {
+            font-size: 1.2rem;
+            color: #919599;
+          }
           .amount {
             width: 10rem;
             text-align: right;
@@ -99,6 +110,11 @@ class Expense extends React.Component {
           .status {
             text-transform: uppercase;
           }
+          
+          .actions > div {
+            display: flex;
+            margin: 0.5rem 0;
+          }
 
           @media(max-width: 600px) {
             .expense {
@@ -112,12 +128,22 @@ class Expense extends React.Component {
             }
           }
         `}</style>
+        <style jsx global>{`
+          .expense .actions > div > div {
+            margin-right: 0.5rem;
+          }
+        `}</style>
         <div className="amount">
           <FormattedNumber
             value={expense.amount / 100}
             currency={expense.currency}
             {...this.currencyStyle}
             />
+            { collective.isHost &&
+              <div className="balance">
+                    {`balance: ${formatCurrency(expense.collective.stats.balance, expense.collective.currency)}`}
+              </div>
+            }
         </div>
         <div className="fromCollective">
           <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
@@ -131,6 +157,11 @@ class Expense extends React.Component {
             </a>
           </div>
           <div className="meta">
+            { collective.isHost &&
+              <div className="collective">
+                <Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> |
+              </div>
+            }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
@@ -143,9 +174,19 @@ class Expense extends React.Component {
               mode={this.state.view === 'details' ? 'open' : 'closed'}
               />
           }
-          { LoggedInUser.canEditExpense(expense) &&
-            <div>can edit expense</div>
+          <div className="actions">
+          { expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+            <div>
+              <ApproveExpenseBtn id={expense.id} />
+              <RejectExpenseBtn id={expense.id} />
+            </div>
           }
+          { expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
+            <div>
+              <PayExpenseBtn expense={expense} />
+            </div>
+          }
+          </div>
         </div>
       </div>
     );
