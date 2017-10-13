@@ -7,6 +7,7 @@ import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {
 
+  const { models } = Sequelize;  
 
   const Expense = Sequelize.define('Expense', {
     id: {
@@ -177,6 +178,29 @@ export default function (Sequelize, DataTypes) {
     this.lastEditedById = lastEditedById;
     return this.save();
   };
+
+  Expense.prototype.getPaymentMethod = function() {
+    // Use first paymentMethod found
+    return models.PaymentMethod.findOne({
+      where: {
+        service: this.payoutMethod,
+        CollectiveId: this.CollectiveId,
+        confirmedAt: { $ne: null }
+      },
+      order: [['confirmedAt', 'DESC']]
+    })
+    .tap(paymentMethod => {
+      if (!paymentMethod) {
+        throw new Error('No payment method found');
+      } else if (paymentMethod.endDate && (paymentMethod.endDate < new Date())) {
+        throw new Error('Payment method expired');
+      }
+    });
+  }
+
+  Expense.prototype.getPaypalEmail = function() {
+    return this.getUser().then(user => user.paypalEmail || user.email);
+  }
 
   Temporal(Expense, Sequelize);
   return Expense;

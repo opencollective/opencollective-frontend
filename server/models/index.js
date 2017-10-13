@@ -116,7 +116,7 @@ export function setupModels(client) {
 
   // Expense
   m.Expense.belongsTo(m.User);
-  m.Expense.belongsTo(m.Collective);
+  m.Expense.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Transaction.belongsTo(m.Expense);
 
   // Order.
