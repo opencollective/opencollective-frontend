@@ -135,13 +135,17 @@ class Expense extends React.Component {
             {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
-          {this.state.loadDetails && 
+          { this.state.loadDetails && 
             <ExpenseDetails
               LoggedInUser={LoggedInUser}
               expense={expense}
               collective={collective}
               mode={this.state.view === 'details' ? 'open' : 'closed'}
-              />}
+              />
+          }
+          { LoggedInUser.canEditExpense(expense) &&
+            <div>can edit expense</div>
+          }
         </div>
       </div>
     );

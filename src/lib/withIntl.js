@@ -35,7 +35,8 @@ export default (Page) => {
     }
 
     render () {
-      const {locale, messages, now, ...props} = this.props
+      const { locale, messages, now, ...props } = this.props;
+      // const locale = (typeof window !== 'undefined') ? window.navigator.languages[0] : this.props.locale || 'en';
       return (
         <IntlProvider locale={locale} messages={messages} initialNow={now}>
           <IntlPage {...props} />

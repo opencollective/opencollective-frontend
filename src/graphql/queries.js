@@ -1,5 +1,6 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import { intersection } from 'lodash';
 
 export const getLoggedInUserQuery = gql`
   query LoggedInUser {
@@ -465,6 +466,21 @@ export const addGetLoggedInUserFunction = (component) => {
                   roles[member.collective.slug].push(member.role);
                 });
                 LoggedInUser.roles = roles;
+
+                /**
+                 * CanEditExpense if LoggedInUser is:
+                 * - author of the expense and expense.status === 'PENDING'
+                 * - admin or host of expense.collective
+                 * - admin or host of expense.collective.host
+                 */
+                LoggedInUser.canEditExpense = (expense) => {
+                  if (expense.user && expense.user.id === LoggedInUser.id && expense.status === 'PENDING') return true;
+                  if (expense.collective) {
+                    if (intersection(roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;
+                    if (expense.collective.host && intersection(roles[expense.collective.host.slug], ['HOST', 'ADMIN']).length > 0) return true;
+                  } 
+                  return false;
+                }
               }
               console.log(">>> LoggedInUser", LoggedInUser);
               return resolve(LoggedInUser);

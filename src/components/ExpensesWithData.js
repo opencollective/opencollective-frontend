@@ -57,8 +57,18 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int) 
     amount
     currency
     payoutMethod
+    collective {
+      id
+      slug
+      name
+      stats {
+        id
+        balance
+      }
+    }
     fromCollective {
       id
+      type
       name
       slug
       image
