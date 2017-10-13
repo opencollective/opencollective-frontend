@@ -3,6 +3,7 @@ import { createOrder } from './mutations/orders';
 import { createMember, removeMember } from './mutations/members';
 import { editTiers } from './mutations/tiers';
 import { createExpense, editExpense, updateExpenseStatus, payExpense, deleteExpense } from './mutations/expenses';
+import statuses from '../constants/expense_status';
 
 import {
   GraphQLNonNull,
@@ -64,7 +65,7 @@ const mutations = {
       id: { type: new GraphQLNonNull(GraphQLInt) }
     },
     resolve(_, args, req) {
-      return updateExpenseStatus(req.remoteUser, args.id);
+      return updateExpenseStatus(req.remoteUser, args.id, statuses.APPROVED);
     }
   },
   rejectExpense: {
@@ -73,7 +74,7 @@ const mutations = {
       id: { type: new GraphQLNonNull(GraphQLInt) }
     },
     resolve(_, args, req) {
-      return updateExpenseStatus(req.remoteUser, args.id);
+      return updateExpenseStatus(req.remoteUser, args.id, statuses.REJECTED);
     }
   },
   payExpense: {
