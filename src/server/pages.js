@@ -3,7 +3,11 @@ import nextRoutes from 'next-routes';
 const pages = nextRoutes();
 
 pages
+  .add('widgets', '/widgets')
+  .add('tos', '/tos')
+  .add('privacypolicy', '/privacypolicy')
   .add('signin', '/signin/:token?')
+  .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('events-iframe', '/:collectiveSlug/events/iframe')
   .add('event', '/:parentCollectiveSlug/events/:eventSlug')
@@ -16,8 +20,8 @@ pages
   .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval?', 'createOrder')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('transactions', '/:collectiveSlug/transactions')
+  .add('expenses', '/:collectiveSlug/expenses')
   .add('nametags', '/:parentCollectiveSlug/events/:eventSlug/nametags')
-  .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('collective', '/:slug')
   .add('editCollective', '/:slug/edit')
 
