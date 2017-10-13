@@ -89,8 +89,9 @@ class LoginForm extends React.Component {
     }
 
     if (attr === 'email') {
-      if (isValidEmail(value)) {
-        api.checkUserExistence(value).then(exists => {
+      const email = value && value.trim();
+      if (isValidEmail(email)) {
+        api.checkUserExistence(email).then(exists => {
           if (exists) {
             this.setState({ signup: false, loginSent: false });
           }
@@ -119,6 +120,10 @@ class LoginForm extends React.Component {
   }
 
   signin() {
+    this.state.user.email = this.state.user.email && this.state.user.email.trim();
+    if (!isValidEmail(this.state.user.email)) {
+      return;
+    }
     this.setState({ loading: true });
     api.signin(this.state.user, this.props.next).then(() => {
       this.setState({ loginSent: true, signup: false, isNewUser: false, loading: false });
@@ -152,7 +157,7 @@ class LoginForm extends React.Component {
         inputEmail.button = <Button onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
         inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage={`There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`} />;
       } else if (this.state.isNewUser === false) {
-        inputEmail.button = <Button onClick={() => this.signin()} focus={true}>Login</Button>;
+        inputEmail.button = <Button onClick={() => this.signin()}>Login</Button>;
         inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage={`Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`} />;
         if (this.state.loginSent) {
           inputEmail.button = <Button disabled={true}><FormattedMessage id="loginform.title" defaultMessage="login" /></Button>;
