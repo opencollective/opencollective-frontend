@@ -166,7 +166,6 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
           email: this.email,
           createdAt: this.createdAt,
           updatedAt: this.updatedAt,
@@ -191,7 +190,6 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
           email: this.email,
           paypalEmail: this.paypalEmail
         };

@@ -27,8 +27,8 @@ export default {
 
 
     // get user data
-    if (activity.data.fromCollective) {
-      userString = getUserString(format, activity.data.fromCollective, true);
+    if (activity.data.user) {
+      userString = getUserString(format, activity.data.fromCollective, activity.data.user.email);
     }
 
     if (activity.data.user) {
@@ -43,7 +43,7 @@ export default {
 
     // get host data
     if (activity.data.host) {
-      hostString = `on ${getUserString(format, activity.data.host, true)}`;
+      hostString = `on ${getUserString(format, activity.data.host, activity.data.host.email)}`;
     }
 
     // get donation data
@@ -167,9 +167,11 @@ export default {
     let tweet = '';
 
     // get user data
-    if (activity.data.fromCollective) {
+    if (activity.data.user) {
       userString = getUserString(format, activity.data.fromCollective);
-      userTwitter = activity.data.fromCollective.twitterHandle;
+      if (activity.data.fromCollective) {
+        userTwitter = activity.data.fromCollective.twitterHandle;
+      }
     }
 
     // get collective data
@@ -301,9 +303,9 @@ const linkify = (format, link, text) => {
 /**
  * Generates a userString given a user's info
  */
-const getUserString = (format, user, includeEmail) => {
-  const userString = user.name || user.twitterHandle || 'someone';
-  const link = user.twitterHandle ? `https://twitter.com/${user.twitterHandle}` : user.website;
+const getUserString = (format, userCollective = {}, email) => {
+  const userString = userCollective.name || userCollective.twitterHandle || 'someone';
+  const link = userCollective.twitterHandle ? `https://twitter.com/${userCollective.twitterHandle}` : userCollective.website;
 
   let returnVal;
   if (link) {
@@ -312,8 +314,8 @@ const getUserString = (format, user, includeEmail) => {
     returnVal = userString;
   }
 
-  if (includeEmail && user.email) {
-    returnVal += ` (${user.email})`;
+  if (email) {
+    returnVal += ` (${email})`;
   }
   return returnVal;
 }

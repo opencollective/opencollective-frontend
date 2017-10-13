@@ -27,7 +27,7 @@ Subject: Expense paid on {{collective.name}}: {{{currency transaction.netAmountI
   <h3> Hi there! Just a note to let you know that an expense was paid in {{collective.name}}. </h3>
   <h2>{{{currency transaction.netAmountInCollectiveCurrency currency=transaction.currency precision=2}}}</h2>
   <div>{{transaction.description}}</div>
-  <div>To: {{user.name}}</div>
+  <div>To: {{fromCollective.name}}</div>
   <div>Paypal email: {{user.paypalEmail}}</div>
 
   <br /><br />

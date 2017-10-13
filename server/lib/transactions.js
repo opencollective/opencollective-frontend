@@ -135,5 +135,7 @@ function createPaidExpenseActivity(transaction, paymentResponses, preapprovalDet
     .tap(user => payload.data.user = user.minimal)
     .then(() => transaction.getCollective())
     .tap(collective => payload.data.collective = collective.minimal)
+    .then(() => models.Collective.findById(transaction.FromCollectiveId))
+    .tap(fromCollective => payload.data.fromCollective = fromCollective.minimal)
     .then(() => models.Activity.create(payload));
 }
