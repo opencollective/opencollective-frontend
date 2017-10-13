@@ -1,4 +1,4 @@
-Subject: New donation to {{collective.name}}: {{{currency transaction.amountInHostCurrency currency=transaction.hostCurrency}}}{{#if user.name}} from {{user.name}}{{/if}}
+Subject: New donation to {{collective.name}}: {{{currency transaction.amountInHostCurrency currency=transaction.hostCurrency}}}{{#if fromCollective.name}} from {{fromCollective.name}}{{/if}}
 
 {{> header}}
 
@@ -8,8 +8,8 @@ Subject: New donation to {{collective.name}}: {{{currency transaction.amountInHo
 
   <br /><br />
 
-{{#if user.image}}
-  <a href="{{user.website}}">
+{{#if fromCollective.image}}
+  <a href="{{fromCollective.website}}">
     <img src="https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_124,r_max,w_124,bo_3px_solid_white/c_thumb,h_124,r_max,w_124,bo_2px_solid_rgb:66C71A/e_trim/f_auto/{{encodeURIComponent user.image}}" width="64" />
   </a>
 {{/if}}
