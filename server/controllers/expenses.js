@@ -233,16 +233,18 @@ function assertExpenseStatus(expense, statusToConfirm) {
 }
 
 function createActivity(expense, type) {
-  return models.Activity.create({
+  return models.Collective.findById(expense.User.CollectiveId)
+    .then(userCollective => models.Activity.create({
     type,
     UserId: expense.User.id,
     CollectiveId: expense.Collective.id,
     data: {
       collective: expense.Collective.minimal,
       user: expense.User.minimal,
+      fromCollective: userCollective.minimal,
       expense: expense.info
     }
-  });
+  }));
 }
 
 function formatError(err) {

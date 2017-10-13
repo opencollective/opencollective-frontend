@@ -355,6 +355,7 @@ export default (Sequelize, DataTypes) => {
         data: {
           transaction: transaction.info,
           user: transaction.User && transaction.User.minimal,
+          fromCollective: transaction.fromCollective && transaction.fromCollective.minimal,
           collective: transaction.collective && transaction.collective.minimal
         }
       };

@@ -36,21 +36,6 @@ export default (Sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
 
-    name: {
-      type: DataTypes.VIRTUAL(DataTypes.STRING, ['firstName','lastName']),
-      get() {
-        const firstName = this.get('firstName');
-        const lastName = this.get('lastName');
-        if (firstName && lastName) {
-          return `${firstName} ${lastName}`;
-        } else if (firstName || lastName) {
-          return firstName || lastName;
-        } else {
-          return null;
-        }
-      }
-    },
-
     email: {
       type: DataTypes.STRING,
       unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password
@@ -205,7 +190,6 @@ export default (Sequelize, DataTypes) => {
           id: this.id,
           firstName: this.firstName,
           lastName: this.lastName,
-          name: this.name,
           email: this.email,
           paypalEmail: this.paypalEmail
         };
@@ -494,6 +478,7 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.findOrCreateByEmail = (email, otherAttributes) => {
+    debug("findOrCreateByEmail", email, "other attributes: ", otherAttributes);
     return User.findOne({
       where: {
         $or: {
@@ -509,6 +494,7 @@ export default (Sequelize, DataTypes) => {
     if (!userData) return Promise.reject(new Error("Cannot create a user: no user data provided"));
 
     let user;
+    debug("createUserWithCollective", userData);
     return User.create(userData)
       .then(u => {
         user = u;

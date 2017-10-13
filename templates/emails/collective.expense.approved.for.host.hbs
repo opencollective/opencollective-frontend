@@ -26,7 +26,7 @@ Subject: New expense approved on {{collective.name}}: {{{currency expense.amount
 <center>
   <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
   <div>{{expense.description}}</div>
-  <div>Submitted by: {{user.name}}</div>
+  <div>Submitted by: {{fromCollective.name}}</div>
   <div>Paypal Email: {{user.paypalEmail}}</div>
   <p><font color="#999">{{expense.notes}}</font></p>
 

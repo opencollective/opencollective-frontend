@@ -184,6 +184,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
+      isHost: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
@@ -360,6 +361,13 @@ const CollectiveFields = () => {
       type: GraphQLString,
       resolve(collective) {
         return collective.slug;
+      }
+    },
+    isHost: {
+      description: 'Returns whether this collective can host other collectives (ie. has a Stripe Account connected)',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return (collective.HostCollectiveId === collective.id);
       }
     },
     host: {

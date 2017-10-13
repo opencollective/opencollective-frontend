@@ -98,6 +98,7 @@ export default function stripeWebhook(req, res, next) {
       Order.findOne({
         include: [
           { model: User, as: 'createdByUser' },
+          { model: Collective, as: 'fromCollective' },
           { model: Collective, as: 'collective' },
           { model: Subscription, where: { stripeSubscriptionId } },
           { model: models.PaymentMethod, as: 'paymentMethod' }
@@ -271,6 +272,7 @@ export default function stripeWebhook(req, res, next) {
           user: user.info,
           firstPayment: false,
           collective: collective.info,
+          fromCollective: order.fromCollective.minimal,
           relatedCollectives,
           config: { host: config.host },
           interval: subscription && subscription.interval,

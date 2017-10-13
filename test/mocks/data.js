@@ -174,7 +174,7 @@ export default {
 
   "activities1": {
     "activities": [
-      {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "John", "lastName": "Doe", "name": "John Doe", "email": "john@doe.com", "twitterHandle":"johndoe", "websiteUrl": "opencollective.com"}}},
+      {"type": "user.created", "UserId": 1, "data": {"user": {"firstName": "John", "lastName": "Doe", "email": "john@doe.com", "websiteUrl": "opencollective.com"}, "fromCollective": {"name": "John Doe", "twitterHandle":"johndoe"}}},
       {"type": "user.created", "UserId": 2, "data": {"user": {"email": "john@doe.com"}}},
       {"type": "user.created", "UserId": 3, "data": {}},
       {"type": "collective.created", "UserId": 1, "CollectiveId": 1, "data": {}},
@@ -199,6 +199,9 @@ export default {
             "amount": 1042,
             "currency": "USD"
             },
+          "fromCollective": {
+
+          },
           "collective": {
             "name": "Pub quiz",
             "slug": "pubquiz",
@@ -282,7 +285,9 @@ export default {
         "type": "subscription.confirmed",
         "data": {
           "user": {
-            "email":"jussi@kuohujoki.fi",
+            "email":"jussi@kuohujoki.fi"
+          },
+          "fromCollective": {
             "twitterHandle": "xdamman"
           },
           "order": {
@@ -304,7 +309,9 @@ export default {
         "type": "subscription.canceled",
         "data": {
           "user": {
-            "email":"jussi@kuohujoki.fi",
+            "email":"jussi@kuohujoki.fi"
+          },
+          "fromCollective": {
             "twitterHandle": "xdamman"
           },
           "order": {
@@ -372,8 +379,10 @@ export default {
         "type": "collective.expense.rejected",
         "data": {
           "user": {
-            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
+          },
+          "fromCollective": {
+            "image": "http://image.githubusercontent.com/asood123"
           },
           "collective": {
             "name": "Blah",
@@ -391,8 +400,10 @@ export default {
         "type": "collective.expense.approved",
         "data": {
           "user": {
-            "image": "http://image.githubusercontent.com/asood123",
             "id": 2
+          },
+          "fromCollective": {
+            "image": "http://image.githubusercontent.com/asood123"
           },
           "collective": {
             "name": "Blah",

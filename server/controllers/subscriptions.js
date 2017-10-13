@@ -41,6 +41,7 @@ export const cancel = (req, res, next) => {
   return models.Order.find({
     include: [
       { model: models.Collective, as: 'collective' },
+      { model: models.Collective, as: 'fromCollective' },
       { model: models.PaymentMethod, as: 'paymentMethod' },
       { model: models.User, as: 'createdByUser' },
       { model: models.Subscription,
@@ -79,7 +80,8 @@ export const cancel = (req, res, next) => {
         data: {
           subscription: order.Subscription,
           collective: order.collective.minimal,
-          user: order.createdByUser.minimal
+          user: order.createdByUser.minimal,
+          fromCollective: order.fromCollective.minimal
         }
       }))
   .then(() => res.send({ success: true }))
