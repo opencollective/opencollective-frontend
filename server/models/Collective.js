@@ -275,6 +275,7 @@ export default function(Sequelize, DataTypes) {
           name: this.name,
           image: this.image,
           slug: this.slug,
+          twitterHandle: this.twitterHandle,
           publicUrl: this.publicUrl,
           mission: this.mission,
           isSupercollective: this.isSupercollective

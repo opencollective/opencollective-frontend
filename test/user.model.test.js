@@ -174,7 +174,6 @@ describe('user.models.test.js', () => {
           expect(user2.collective.name).to.equal('Xavier Damman');        
           expect(user2.firstName).to.equal('Xavier');
           expect(user2.lastName).to.equal('Damman');
-          expect(user2.name).to.equal('Xavier Damman');
         })
     });
 
