@@ -18,14 +18,20 @@ import stripeMocks from './mocks/stripe';
 import emailLib from '../server/lib/email';
 import nock from 'nock';
 
-nock('http://api.fixer.io:80', {"encodedQueryParams":true})
-.get('/latest')
-.times(19)
-.query({"base":"EUR","symbols":"USD"})
-.reply(200, {"base":"EUR","date":"2017-10-05","rates":{"USD":1.1742}});
-
 describe('lib.payments.test.js', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
+
+  before(() => {
+    nock('http://api.fixer.io:80', {"encodedQueryParams":true})
+    .get('/latest')
+    .times(19)
+    .query({"base":"EUR","symbols":"USD"})
+    .reply(200, {"base":"EUR","date":"2017-10-05","rates":{"USD":1.1742}});
+  });
+
+  after(() => {
+    nock.cleanAll();
+  });
 
   beforeEach(() => utils.resetTestDB());
   
@@ -41,10 +47,6 @@ describe('lib.payments.test.js', () => {
   });
 
   afterEach(() => sandbox.restore());
-
-  after(() => {
-    nock.cleanAll();
-  });
 
   // Create a stub for clearbit
   beforeEach((done) => {

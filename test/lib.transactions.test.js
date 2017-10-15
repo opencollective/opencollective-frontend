@@ -18,9 +18,8 @@ describe('lib.transactions.test.js', () => {
 
   beforeEach('get transactions', () => models.Transaction.findAll({ where }).then(ts => {
     transactions = ts;
-    expect(transactions.length).to.equal(20);
-    return true;
-  }).catch(console.error));
+    expect(transactions.length).to.equal(40);
+  }));
 
   it('exports transactions', (done) => {
     const csv = tlib.exportTransactions(transactions);
