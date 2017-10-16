@@ -36,7 +36,7 @@ class Expenses extends React.Component {
       this.setState({ loading: false });
     });
   }
-
+  
   render() {
     const { collective, expenses, LoggedInUser } = this.props;
 

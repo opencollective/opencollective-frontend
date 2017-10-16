@@ -16,6 +16,7 @@ import withIntl from '../lib/withIntl';
 class CollectiveCover extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object.isRequired,
     href: PropTypes.string,
     cta: PropTypes.node,
     title: PropTypes.string,

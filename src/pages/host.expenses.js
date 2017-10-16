@@ -11,13 +11,13 @@ import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
+import CollectivePicker from '../components/CollectivePickerWithData';
 
 class ExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { collectiveSlug }, data, req: { url } } = props;
-    const includeHostedCollectives = Boolean(url.match(/\/collectives\//));
-    return { slug: collectiveSlug, data, includeHostedCollectives }
+    const { query: { hostCollectiveSlug }, data } = props;
+    return { slug: hostCollectiveSlug, data }
   }
 
   constructor(props) {
@@ -30,6 +30,10 @@ class ExpensesPage extends React.Component {
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
     LoggedInUser.canEditCollective = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1);
     this.setState({LoggedInUser});
+  }
+
+  pickCollective(CollectiveId) {
+    console.log(">>> pickCollective", CollectiveId);
   }
 
   render() {
@@ -67,6 +71,11 @@ class ExpensesPage extends React.Component {
             />
 
           <div className="content" >
+
+            <CollectivePicker
+              hostCollectiveSlug={this.props.slug}
+              onChange={(CollectiveId => this.pickCollective(CollectiveId))}
+              />
 
             <ExpensesWithData
               collective={collective}

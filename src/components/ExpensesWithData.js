@@ -47,8 +47,8 @@ class ExpensesWithData extends React.Component {
 
 
 const getExpensesQuery = gql`
-query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int) {
-  allExpenses(CollectiveId: $CollectiveId, status: $status, limit: $limit, offset: $offset) {
+query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
+  allExpenses(CollectiveId: $CollectiveId, status: $status, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
     id
     description
     status
@@ -90,7 +90,8 @@ export const addExpensesData = graphql(getExpensesQuery, {
       variables: {
         CollectiveId: props.collective.id,
         offset: 0,
-        limit: props.limit || EXPENSES_PER_PAGE * 2
+        limit: props.limit || EXPENSES_PER_PAGE * 2,
+        includeHostedCollectives: props.includeHostedCollectives || false
       }
     }
   },

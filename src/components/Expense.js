@@ -139,11 +139,6 @@ class Expense extends React.Component {
             currency={expense.currency}
             {...this.currencyStyle}
             />
-            { collective.isHost &&
-              <div className="balance">
-                    {`balance: ${formatCurrency(expense.collective.stats.balance, expense.collective.currency)}`}
-              </div>
-            }
         </div>
         <div className="fromCollective">
           <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
@@ -157,11 +152,6 @@ class Expense extends React.Component {
             </a>
           </div>
           <div className="meta">
-            { collective.isHost &&
-              <div className="collective">
-                <Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> |
-              </div>
-            }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
