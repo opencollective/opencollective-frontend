@@ -126,6 +126,69 @@ describe('graphql.collective.test.js', () => {
       });
   });
 
+  it('gets the expense stats across all hosted collectives', async () => {
+    const query = `
+    query Collective($slug: String!) {
+      Collective(slug: $slug) {
+        id
+        slug
+        stats {
+          collectives
+          expenses {
+            pending
+            approved
+            paid
+          }
+        }
+        collectives {
+          id
+          slug
+          stats {
+            expenses {
+              all
+              paid
+              pending
+              rejected
+              approved
+            }
+          }
+        }
+      }
+    }
+    `;
+    const result = await utils.graphqlQuery(query, { slug: "brusselstogether" });
+    result.errors && console.error(result.errors);
+    expect(result.errors).to.not.exist;
+    expect(result.data.Collective.collectives).to.deep.equal([
+      {
+        "id": 407,
+        "slug": "veganizerbxl",
+        "stats": {
+          "expenses": {
+            "all": 3,
+            "paid": 2,
+            "pending": 1,
+            "rejected": 0,
+            "approved": 0
+          }
+        }
+      },
+      {
+        "id": 207,
+        "slug": "brusselstogether",
+        "stats": {
+          "expenses": {
+            "all": 12,
+            "paid": 5,
+            "pending": 0,
+            "rejected": 3,
+            "approved": 4
+          }
+        }
+      }
+    ]);
+  })
+
   it('edits members', async () => {
 
     const collective = {

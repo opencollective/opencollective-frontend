@@ -2,7 +2,8 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLString,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLBoolean
 } from 'graphql';
 
 import {
@@ -81,6 +82,7 @@ const queries = {
     type: new GraphQLList(ExpenseType),
     args: {
       CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      includeHostedCollectives: { type: GraphQLBoolean },
       status: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
@@ -98,7 +100,10 @@ const queries = {
           }
           const getCollectiveIds = () => {
             // if is host, we get all the expenses across all the hosted collectives
-            if (collective.HostCollectiveId === collective.id) {
+            if (args.includeHostedCollectives) {
+              if (collective.HostCollectiveId !== collective.id) {
+                throw new Error("This collective is not a host");
+              }
               return models.Member.findAll({
                 where: {
                   MemberCollectiveId: collective.id,

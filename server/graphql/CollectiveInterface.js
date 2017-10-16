@@ -28,6 +28,64 @@ import { types } from '../constants/collectives';
 import models from '../models';
 import roles from '../constants/roles';
 
+
+export const ExpenseStatsType = new GraphQLObjectType({
+  name: "ExpenseStatsType",
+  description: "Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)",
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(collective) {
+          return collective.id;
+        }
+      },
+      all: {
+        type: GraphQLInt,
+        async resolve(collective, args, req) {
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          let count = 0;
+          Object.keys(expenses).forEach(status => count += status !== 'CollectiveId' && expenses[status] || 0);
+          return count;
+        }
+      },
+      pending: {
+        type: GraphQLInt,
+        description: "Returns the number of expenses that are pending",
+        async resolve(collective, args, req) {
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          return expenses.PENDING || 0;
+        }
+      },
+      approved: {
+        type: GraphQLInt,
+        description: "Returns the number of expenses that are approved",
+        async resolve(collective, args, req) {
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          return expenses.APPROVED || 0;
+        }
+      },
+      rejected: {
+        type: GraphQLInt,
+        description: "Returns the number of expenses that are rejected",
+        async resolve(collective, args, req) {
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          return expenses.REJECTED || 0;
+        }
+      },
+      paid: {
+        type: GraphQLInt,
+        description: "Returns the number of expenses that are paid",
+        async resolve(collective, args, req) {
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          return expenses.PAID || 0;
+        }
+      }
+    }
+  }
+});
+
 export const CollectiveStatsType = new GraphQLObjectType({
   name: "CollectiveStatsType",
   description: "Stats for the collective",
@@ -62,17 +120,17 @@ export const CollectiveStatsType = new GraphQLObjectType({
         }
       },
       collectives: {
-        description: "Number of collectives that have this collective has a parent (e.g. hosted by this collective)",
+        description: "Number of collectives hosted by this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Collective.count({ where: { ParentCollectiveId: collective.id, isActive: true } });
+          return models.Collective.count({ where: { HostCollectiveId: collective.id } });
         }
       },
       expenses: {
-        description: "Number of expenses submitted to this collective to date",
-        type: GraphQLInt,
+        description: "Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)",
+        type: ExpenseStatsType,
         resolve(collective) {
-          return models.Expense.count({ where: { CollectiveId: collective.id } });
+          return collective;
         }
       },
       transactions: {
@@ -188,6 +246,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
+        description: "List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)",
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
@@ -197,6 +256,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       },
       memberOf: {
         type: new GraphQLList(MemberType),
+        description: "List of all collectives that this collective is a member of with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)",
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
@@ -204,8 +264,17 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           roles: { type: new GraphQLList(GraphQLString) }
         }
       },
+      collectives: {
+        type: new GraphQLList(CollectiveType),
+        description: "List of all collectives hosted by this collective",
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        }
+      },
       followers: {
-        type: new GraphQLList(MemberType),
+        type: new GraphQLList(CollectiveInterfaceType),
+        description: "List of all followers of this collective",
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
@@ -414,14 +483,32 @@ const CollectiveFields = () => {
         return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
       }
     },
-    followers: {
-      type: new GraphQLList(MemberType),
+    collectives: {
+      type: new GraphQLList(CollectiveType),
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
       resolve(collective, args) {
-        return models.Member.findAll({ where: { CollectiveId: collective.id, role: roles.FOLLOWER }, limit: args.limit, offset: args.offset });
+        return models.Collective.findAll({
+          where: { HostCollectiveId: collective.id, type: types.COLLECTIVE },
+          limit: args.limit, offset: args.offset
+        })
+      }
+    },
+    followers: {
+      type: new GraphQLList(CollectiveInterfaceType),
+      args: {
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt }
+      },
+      resolve(collective, args) {
+        return models.Member.findAll({
+          where: { CollectiveId: collective.id, role: roles.FOLLOWER },
+          include: [ { model: models.Collective, as: 'memberCollective' } ],
+          limit: args.limit, offset: args.offset
+        })
+        .then(memberships => memberships.memberCollective);
       }
     },
     maxQuantity: {
