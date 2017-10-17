@@ -231,7 +231,9 @@ const getCollectiveQuery = gql`
         sponsors
         collectives
         transactions
-        expenses
+        expenses {
+          all
+        }
         totalAmountSent
       }
       tiers {
