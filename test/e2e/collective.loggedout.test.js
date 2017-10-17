@@ -161,7 +161,7 @@ describe("logged out", () => {
   it("goes to a custom donate URL", async function() {
     this.timeout(10000);
     const screenshot = await chromeless
-      .goto(`${WEBSITE_URL}/webpack/donate/10/month`)
+      .goto(`${WEBSITE_URL}/webpack/donate/50/month`)
       .wait('.presetBtn')
       .scrollToElement('.presetBtn')
       .screenshot({ filePath: path.join(screenshotsDirectory, 'custom_donation_page.png')});
