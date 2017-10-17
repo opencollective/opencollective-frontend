@@ -67,6 +67,7 @@ class Footer extends React.Component {
                 <li><a href="/learn-more">How It Works</a></li>
                 <li><a href="https://opencollective.com/#opensource">Use Cases</a></li>
                 <li><a href="https://opencollective.com/faq">FAQ</a></li>
+                <li><a href="https://forum.opencollective.com">Forum</a></li>
                 <li><Link href="/tos"><a>Terms Of Service</a></Link></li>
                 <li><a href="https://opencollective.com/about">About</a></li>
                 <li><a href="mailto:info@opencollective.com">Contact</a></li>
