@@ -122,11 +122,12 @@ describe('Mutation Tests', () => {
         const query = `
         mutation createCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
-            id,
-            slug,
+            id
+            slug
+            isActive
             tiers {
-              id,
-              name,
+              id
+              name
               amount
             }
           }
@@ -137,7 +138,7 @@ describe('Mutation Tests', () => {
         const createdEvent = result.data.createCollective;
         expect(createdEvent.slug).to.equal(`brusselstogether-meetup-3-4ev`);
         expect(createdEvent.tiers.length).to.equal(event.tiers.length);
-
+        expect(createdEvent.isActive).to.be.true;
         event.id = createdEvent.id;
         event.slug = 'newslug';
         event.tiers = createdEvent.tiers;
