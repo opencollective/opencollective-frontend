@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -9,6 +8,7 @@ import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
 import Memberships from '../components/Memberships';
 import Markdown from 'react-markdown';
+import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';

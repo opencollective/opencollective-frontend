@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+import withIntl from '../lib/withIntl';
 import Avatar from './Avatar';
 import Logo from './Logo';
 import { Router } from '../server/pages';
@@ -11,7 +11,7 @@ import Currency from './Currency';
 import colors from '../constants/colors';
 import { formatCurrency } from '../lib/utils';
 
-class TierCard extends React.Component {
+class Tier extends React.Component {
 
   static propTypes = {
     tier: PropTypes.object.isRequired,
@@ -272,4 +272,4 @@ class TierCard extends React.Component {
   }
 }
 
-export default withIntl(TierCard);
+export default withIntl(Tier);

@@ -4,17 +4,12 @@ import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
 import { capitalize } from '../lib/utils';
 import Avatar from './Avatar';
 import ExpenseDetails from './ExpenseDetails';
-import ApproveExpenseBtn from './ApproveExpenseBtn';
-import RejectExpenseBtn from './RejectExpenseBtn';
-import PayExpenseBtn from './PayExpenseBtn';
-import { Link } from '../server/pages';
 
 class Expense extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object,
     expense: PropTypes.object,
-    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -41,13 +36,7 @@ class Expense extends React.Component {
   }
 
   render() {
-    const {
-      intl,
-      collective,
-      expense,
-      includeHostedCollectives,
-      LoggedInUser
-    } = this.props;
+    const { intl, collective, expense, LoggedInUser } = this.props;
 
     const title = expense.description;
     const status = expense.status.toLowerCase();
@@ -61,6 +50,7 @@ class Expense extends React.Component {
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
+            max-height: 6rem;
             position: relative;
           }
           .expense.detailsView {
@@ -89,14 +79,6 @@ class Expense extends React.Component {
             color: #919599;
             font-size: 1.2rem;
           }
-          .meta .collective {
-            margin-right: 0.2rem;
-            float: left;
-          }
-          .amount .balance {
-            font-size: 1.2rem;
-            color: #919599;
-          }
           .amount {
             width: 10rem;
             text-align: right;
@@ -117,11 +99,6 @@ class Expense extends React.Component {
           .status {
             text-transform: uppercase;
           }
-          
-          .actions > div {
-            display: flex;
-            margin: 0.5rem 0;
-          }
 
           @media(max-width: 600px) {
             .expense {
@@ -133,11 +110,6 @@ class Expense extends React.Component {
             .details {
               max-height: 30rem;
             }
-          }
-        `}</style>
-        <style jsx global>{`
-          .expense .actions > div > div {
-            margin-right: 0.5rem;
           }
         `}</style>
         <div className="amount">
@@ -159,34 +131,17 @@ class Expense extends React.Component {
             </a>
           </div>
           <div className="meta">
-            { includeHostedCollectives &&
-              <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> | </span>
-            }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
           </div>
-          { this.state.loadDetails && 
+          {this.state.loadDetails && 
             <ExpenseDetails
               LoggedInUser={LoggedInUser}
               expense={expense}
               collective={collective}
               mode={this.state.view === 'details' ? 'open' : 'closed'}
-              />
-          }
-          <div className="actions">
-          { expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
-            <div>
-              <ApproveExpenseBtn id={expense.id} />
-              <RejectExpenseBtn id={expense.id} />
-            </div>
-          }
-          { expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
-            <div>
-              <PayExpenseBtn expense={expense} />
-            </div>
-          }
-          </div>
+              />}
         </div>
       </div>
     );

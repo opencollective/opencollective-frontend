@@ -11,7 +11,6 @@ class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
-    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -20,12 +19,7 @@ class ExpensesWithData extends React.Component {
   }
 
   render() {
-    const {
-      data,
-      LoggedInUser,
-      collective,
-      includeHostedCollectives
-    } = this.props;
+    const { data, LoggedInUser, collective } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -43,7 +37,6 @@ class ExpensesWithData extends React.Component {
           refetch={data.refetch}
           fetchMore={data.fetchMore}
           LoggedInUser={LoggedInUser}
-          includeHostedCollectives={includeHostedCollectives}
           />
 
       </div>
@@ -54,8 +47,8 @@ class ExpensesWithData extends React.Component {
 
 
 const getExpensesQuery = gql`
-query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
-  allExpenses(CollectiveId: $CollectiveId, status: $status, limit: $limit, offset: $offset, includeHostedCollectives: $includeHostedCollectives) {
+query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int) {
+  allExpenses(CollectiveId: $CollectiveId, status: $status, limit: $limit, offset: $offset) {
     id
     description
     status
@@ -64,23 +57,8 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     amount
     currency
     payoutMethod
-    collective {
-      id
-      slug
-      currency
-      name
-      host {
-        id
-        slug
-      }
-      stats {
-        id
-        balance
-      }
-    }
     fromCollective {
       id
-      type
       name
       slug
       image
@@ -97,8 +75,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
       variables: {
         CollectiveId: props.collective.id,
         offset: 0,
-        limit: props.limit || EXPENSES_PER_PAGE * 2,
-        includeHostedCollectives: props.includeHostedCollectives || false
+        limit: props.limit || EXPENSES_PER_PAGE * 2
       }
     }
   },
