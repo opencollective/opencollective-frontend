@@ -4,7 +4,9 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import { ButtonGroup, Button, Nav, NavItem, Badge } from 'react-bootstrap';
+import { Nav, NavItem, Badge } from 'react-bootstrap';
+import Currency from '../components/Currency';
+import { FormattedMessage } from 'react-intl';
 
 class CollectivePickerWithData extends React.Component {
 
@@ -15,40 +17,59 @@ class CollectivePickerWithData extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { CollectiveId: 0 };
     this.onChange = this.onChange.bind(this);
   }
 
   onChange(CollectiveId) {
-    console.log(">>> CollectivePicker: ", CollectiveId);
+    this.setState({ CollectiveId });
     this.props.onChange(CollectiveId);
   }
 
   render() {
     const { data: { error, Collective } } = this.props;
-    console.log(">>> data: ", this.props.data);
+
     if (error) {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
 
     const collectives = Collective.collectives;
-    console.log(">>> collectives", collectives);
+    const selectedCollective = this.state.CollectiveId > 0 && collectives.find(c => c.id === this.state.CollectiveId);
+
     return (
       <div className="CollectivesContainer">
-
+        <style jsx>{`
+          .collectivesFilter {
+            display: flex;
+            justify-content: center;
+          }
+          .collectiveBalance {
+            text-align: center;
+          }
+          .collectiveBalance label {
+            margin: 1rem 0.5rem 1rem 0;
+          }
+        `}</style>
       { collectives.length > 0 &&
         <div className="collectivesFilter">
-          <Nav bsStyle="pills" activeKey={null} onSelect={this.onChange}>
-            <NavItem eventKey={null} title={"show all expenses across all collectives"}>
+          <Nav bsStyle="pills" activeKey={this.state.CollectiveId} onSelect={this.onChange}>
+            <NavItem eventKey={0} title={"show all expenses across all collectives"}>
               all
             </NavItem>
-            { Object.keys(collectives).map(slug => (
-              <NavItem eventKey={slug} title={collectives[slug].name}>
-                {slug}
-                <Badge pullRight={true} >{collectives[slug].expenses.length}</Badge>
+            { collectives.filter(c => c.stats.expenses.pending > 0).map(collective => (
+              <NavItem eventKey={collective.id} title={collective.name}>
+                {collective.slug}
+                <Badge pullRight={true} >{collective.stats.expenses.pending}</Badge>
               </NavItem>
             ))}
           </Nav>
+        </div>
+      }
+      { selectedCollective &&
+        <div className="collectiveBalance">
+          <label><FormattedMessage id="collective.stats.balance.title" defaultMessage="Available balance:" /></label>
+          <Currency value={selectedCollective.stats.balance} currency={selectedCollective.currency} />
         </div>
       }
       </div>
@@ -64,8 +85,10 @@ query Collective($hostCollectiveSlug: String!) {
       id
       slug
       name
+      currency
       stats {
         id
+        balance
         expenses {
           id
           all

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
-import { capitalize, formatCurrency } from '../lib/utils';
+import { capitalize } from '../lib/utils';
 import Avatar from './Avatar';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
@@ -14,6 +14,7 @@ class Expense extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     expense: PropTypes.object,
+    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -40,7 +41,13 @@ class Expense extends React.Component {
   }
 
   render() {
-    const { intl, collective, expense, LoggedInUser } = this.props;
+    const {
+      intl,
+      collective,
+      expense,
+      includeHostedCollectives,
+      LoggedInUser
+    } = this.props;
 
     const title = expense.description;
     const status = expense.status.toLowerCase();
@@ -152,6 +159,9 @@ class Expense extends React.Component {
             </a>
           </div>
           <div className="meta">
+            { includeHostedCollectives &&
+              <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> | </span>
+            }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
             <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>

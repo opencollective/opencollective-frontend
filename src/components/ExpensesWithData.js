@@ -11,6 +11,7 @@ class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
+    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -19,7 +20,12 @@ class ExpensesWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective } = this.props;
+    const {
+      data,
+      LoggedInUser,
+      collective,
+      includeHostedCollectives
+    } = this.props;
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -37,6 +43,7 @@ class ExpensesWithData extends React.Component {
           refetch={data.refetch}
           fetchMore={data.fetchMore}
           LoggedInUser={LoggedInUser}
+          includeHostedCollectives={includeHostedCollectives}
           />
 
       </div>

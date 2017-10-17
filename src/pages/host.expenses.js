@@ -22,22 +22,24 @@ class ExpensesPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { CollectiveId: null };
   }
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    LoggedInUser.canEditCollective = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1);
+    if (LoggedInUser) {
+      LoggedInUser.canEditCollective = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1);
+    }
     this.setState({LoggedInUser});
   }
 
   pickCollective(CollectiveId) {
-    console.log(">>> pickCollective", CollectiveId);
+    this.setState({ CollectiveId });
   }
 
   render() {
-    const { data, includeHostedCollectives } = this.props;
+    const { data } = this.props;
     const { LoggedInUser } = this.state;
     if (!data.Collective) return (<NotFound />);
 
@@ -47,6 +49,8 @@ class ExpensesPage extends React.Component {
     }
 
     const collective = data.Collective;
+    const collectiveId = this.state.CollectiveId || collective.id;
+    const includeHostedCollectives = (collectiveId === collective.id);
 
     return (
       <div className="ExpensesPage">
@@ -78,7 +82,7 @@ class ExpensesPage extends React.Component {
               />
 
             <ExpensesWithData
-              collective={collective}
+              collective={{ id: collectiveId }}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={this.state.LoggedInUser}
               />
