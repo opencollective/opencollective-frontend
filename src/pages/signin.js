@@ -5,8 +5,8 @@ import Body from '../components/Body';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import SignInForm from '../components/SignInForm';
-import { Router } from '../server/pages';
 import withIntl from '../lib/withIntl';
+import { isValidUrl } from '../lib/utils';
 
 class LoginPage extends React.Component {
 
@@ -26,7 +26,7 @@ class LoginPage extends React.Component {
   }
 
   static getInitialProps ({ query: { token, next } }) {
-    return { token, next }
+    return { token, next: isValidUrl(next) && next.substr(0,1) === '/'  && next }
   }
 
   render() {
