@@ -126,6 +126,24 @@ describe('graphql.collective.test.js', () => {
       });
   });
 
+  it('gets the host collective for an event', async () => {
+    const query = `
+      query Collective($slug: String!) {
+        Collective(slug: $slug) {
+          host {
+            id
+            slug
+          }
+        }
+      }
+    `;
+    const result = await utils.graphqlQuery(query, { slug: "meetup-5" });
+    result.errors && console.error(result.errors);
+    expect(result.errors).to.not.exist;
+    expect(result.data.Collective.host.id).to.equal(207);
+    expect(result.data.Collective.host.slug).to.equal("brusselstogether");
+  });
+
   it('gets the expense stats across all hosted collectives', async () => {
     const query = `
     query Collective($slug: String!) {

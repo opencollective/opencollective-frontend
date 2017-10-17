@@ -46,7 +46,6 @@ export const ExpenseStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         async resolve(collective, args, req) {
           const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
-          console.log(">>> expenses for collective", collective.id, ":", expenses);
           let count = 0;
           Object.keys(expenses).forEach(status => count += status !== 'CollectiveId' && expenses[status] || 0);
           return count;
@@ -455,8 +454,16 @@ const CollectiveFields = () => {
       description: 'Get the host collective that is receiving the money on behalf of this collective',
       type: CollectiveInterfaceType,
       resolve(collective, args, req) {
-        if (!collective.HostCollectiveId) return null;
-        return req.loaders.collective.findById.load(collective.HostCollectiveId);
+        if (collective.HostCollectiveId) {
+          return req.loaders.collective.findById.load(collective.HostCollectiveId);
+        }
+
+        if (collective.ParentCollectiveId) {
+          return req.loaders.collective.findById.load(collective.ParentCollectiveId)
+            .then(parentCollective => req.loaders.collective.findById.load(parentCollective.HostCollectiveId));
+        }
+
+        return null;
       }
     },
     members: {
