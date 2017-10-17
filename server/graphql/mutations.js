@@ -71,6 +71,7 @@ const mutations = {
             .then(pc => {
               if (!pc) return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
               parentCollective = pc;
+              collectiveData.currency = collectiveData.currency || pc.currency;
               if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
                 collectiveData.isActive = true;
               }
