@@ -28,7 +28,7 @@ class CollectivePage extends React.Component {
   }
 
   render() {
-    const { data, slug, query } = this.props;
+    const { data, slug, query, intl } = this.props;
     const { LoggedInUser } = this.state;
 
     if (data.loading) return (<Loading />);
@@ -48,8 +48,20 @@ class CollectivePage extends React.Component {
 
     return (
       <div>
-        {collective.type === 'COLLECTIVE' && <Collective collective={collective} LoggedInUser={LoggedInUser} query={query} />}
-        {['USER', 'ORGANIZATION'].includes(collective.type) && <UserCollective collective={collective} LoggedInUser={LoggedInUser} query={query} />}
+        {collective.type === 'COLLECTIVE' &&
+          <Collective
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            query={query}
+            />
+        }
+        {['USER', 'ORGANIZATION'].includes(collective.type) &&
+          <UserCollective
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            query={query}
+            />
+        }
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 import { union, get } from 'lodash';
 import { prettyUrl, formatCurrency } from '../lib/utils';
@@ -10,12 +11,11 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage } from '../constants/collectives';
 import CTAButton from './Button';
-import { defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
 
 class CollectiveCover extends React.Component {
 
   static propTypes = {
+    collective: PropTypes.object.isRequired,
     href: PropTypes.string,
     cta: PropTypes.node,
     title: PropTypes.string,
