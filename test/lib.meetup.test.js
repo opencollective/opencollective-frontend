@@ -3,8 +3,6 @@ import { expect } from 'chai';
 import nock from 'nock';
 import nockMeetup from './mocks/meetup.nock';
 
-// nock.recorder.rec();
-
 const collective = {
   slug: 'opencollective',
   users: [{
@@ -38,7 +36,7 @@ const meetupAccount = {
 
 describe('meetup lib', () => {
 
-  before(() => nockMeetup());
+  before(nockMeetup);
 
   after(() => {
     nock.cleanAll();

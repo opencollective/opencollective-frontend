@@ -14,8 +14,8 @@ describe('graphql.collective.test.js', () => {
     before(() => models.Collective.findOne({ where: { slug: 'railsgirlsatl' }}).then(c => collective = c));
     
     const query = `
-    query allExpenses($CollectiveId: Int!, $limit: Int) {
-      allExpenses(CollectiveId: $CollectiveId, limit: $limit) {
+    query allExpenses($CollectiveId: Int!, $limit: Int, $includeHostedCollectives: Boolean) {
+      allExpenses(CollectiveId: $CollectiveId, limit: $limit, includeHostedCollectives: $includeHostedCollectives) {
         id
         description
         amount
@@ -36,7 +36,7 @@ describe('graphql.collective.test.js', () => {
       }
     }`;
     
-    it.skip('fails if collective not found', async () => {
+    it('fails if collective not found', async () => {
       const result = await utils.graphqlQuery(query, { CollectiveId: 999999 });
       result.errors && console.error(result.errors);
       expect(result.errors).to.exist;
@@ -53,12 +53,12 @@ describe('graphql.collective.test.js', () => {
     });
     
     it('gets the latest expenses from all the hosted collectives', async () => {
-      const result = await utils.graphqlQuery(query, { CollectiveId: host.id, limit: 5 });
+      const result = await utils.graphqlQuery(query, { CollectiveId: host.id, limit: 5, includeHostedCollectives: true });
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const expenses = result.data.allExpenses;
       expect(expenses).to.have.length(5);
-      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'railsgirlsatl', 'apex', 'railsgirlsatl', 'opensource' ]);
+      expect(expenses.map(e => e.collective.slug)).to.deep.equal([ 'apex', 'railsgirlsatl', 'apex', 'opensource', 'railsgirlsatl' ]);
     });
   });
 });

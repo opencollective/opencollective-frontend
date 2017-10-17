@@ -813,8 +813,7 @@ export default function(Sequelize, DataTypes) {
     const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where,
-      logging: console.log
+      where
     }).then(member => member && member.MemberCollectiveId);
   };
 

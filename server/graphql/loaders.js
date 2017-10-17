@@ -2,7 +2,7 @@ import models, { sequelize } from '../models';
 import { getListOfAccessibleUsers } from '../lib/auth';
 import { type } from '../constants/transactions';
 import DataLoader from 'dataloader';
-import { get } from 'lodash';
+import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
 const debug = debugLib('loaders');
 
@@ -36,7 +36,44 @@ export const loaders = (req) => {
         })
         .then(results => sortResults(ids, results, 'CollectiveId'))
         .map(result => get(result, 'dataValues.balance') || 0)
-      )
+      ),
+      stats: {
+        collectives: new DataLoader(ids => models.Collective.findAll({
+            attributes: [
+              'HostCollectiveId',
+              [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
+            ],
+            where: { HostCollectiveId: { $in: ids } },
+            group: ['HostCollectiveId']
+          })
+          .then(results => sortResults(ids, results, 'TierId'))
+          .map(result => get(result, 'dataValues.count') || 0)
+        ),
+        expenses: new DataLoader(ids => models.Expense.findAll({
+          attributes: [
+            'CollectiveId',
+            'status',
+            [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
+          ],
+          where: { CollectiveId: { $in: ids } },
+          group: ['CollectiveId', 'status']
+        })
+        .then(rows => {
+          const results = groupBy(rows, "CollectiveId");
+          return Object.keys(results).map(CollectiveId => {
+            const stats = {};
+            results[CollectiveId].map(e => e.dataValues).map(stat => {
+              stats[stat.status] = stat.count;
+            });
+            return {
+              CollectiveId: Number(CollectiveId),
+              ...stats
+            };
+          });
+        })
+        .then(results => sortResults(ids, results, 'CollectiveId'))
+        )
+      }
     },
     // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
     getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleUsers(req.remoteUser, UserCollectiveIds)
