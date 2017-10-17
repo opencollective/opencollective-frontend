@@ -16,6 +16,9 @@ export default (Page) => {
   const IntlPage = injectIntl(Page)
 
   return class PageWithIntl extends Component {
+
+    // Note: when adding withIntl to a child component, getInitialProps doesn't get called
+    // and it doesn't populate the messages in the props
     static async getInitialProps (context) {
       let props
       if (typeof Page.getInitialProps === 'function') {
@@ -36,9 +39,18 @@ export default (Page) => {
 
     render () {
       const { locale, messages, now, ...props } = this.props;
-      // const locale = (typeof window !== 'undefined') ? window.navigator.languages[0] : this.props.locale || 'en';
+
+      const intlProps = {};
+      if (locale) {
+        intlProps.locale = locale;
+      }
+      if (messages) {
+        intlProps.messages = messages;
+      }
+
+      // Note: If we don't add locale and messages as props, it falls back to the closest parent <IntlProvider />
       return (
-        <IntlProvider locale={locale} messages={messages} initialNow={now}>
+        <IntlProvider {...intlProps} initialNow={now}>
           <IntlPage {...props} />
         </IntlProvider>
       )
