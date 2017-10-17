@@ -276,6 +276,7 @@ export const createFromGithub = (req, res, next) => {
     }
   ];
 
+  // Find the creator's Connected Account
   ConnectedAccount
     .findOne({
       where: { id: connectedAccountId },
@@ -312,7 +313,7 @@ export const createFromGithub = (req, res, next) => {
       if (existingCollective) {
         collectiveData.slug = `${collectiveData.slug}-${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
+      return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id, HostCollectiveId: defaultHostUser('opensource').CollectiveId }));
     })
     .tap(g => debug("createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)
@@ -376,12 +377,10 @@ export const createFromGithub = (req, res, next) => {
                 userAttr.website = json.blog;
                 userAttr.email = json.email;
               }
-              debug("createUserWithCollective", userAttr);
-              return User
-                .createUserWithCollective(Object.assign({}, userAttr))
-                .then(user => {
-                  return user.collective;
-                })
+              debug("findOrCreateUserWithCollective", userAttr);
+              return User.findOne({where: { email: json.email } })
+              .then(u => u || User.createUserWithCollective(Object.assign({}, userAttr)))
+              .then(u => u.collective)
             });
         })
         .then(userCollective => contributorUserCollective = userCollective)

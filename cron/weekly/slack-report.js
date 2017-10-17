@@ -114,7 +114,7 @@ Promise.props({
     .map(row => row.CollectiveId),
 
   newCollectives: Collective
-    .findAll(_.merge({}, { attributes: ['slug']}, createdLastWeek))
+    .findAll(_.merge({}, { attributes: ['slug'], where: { type: 'COLLECTIVE' } }, createdLastWeek))
     .map(collective => collective.dataValues.slug)
 
 }).then(results => {
