@@ -17,7 +17,8 @@ import {
   MemberType,
   TierType,
   PaymentMethodType,
-  ConnectedAccountType
+  ConnectedAccountType,
+  ExpenseType
 } from './types';
 
 import {
@@ -44,7 +45,8 @@ export const ExpenseStatsType = new GraphQLObjectType({
       all: {
         type: GraphQLInt,
         async resolve(collective, args, req) {
-          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
+          console.log(">>> expenses for collective", collective.id, ":", expenses);
           let count = 0;
           Object.keys(expenses).forEach(status => count += status !== 'CollectiveId' && expenses[status] || 0);
           return count;
@@ -54,7 +56,7 @@ export const ExpenseStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the number of expenses that are pending",
         async resolve(collective, args, req) {
-          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
           return expenses.PENDING || 0;
         }
       },
@@ -62,7 +64,7 @@ export const ExpenseStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the number of expenses that are approved",
         async resolve(collective, args, req) {
-          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
           return expenses.APPROVED || 0;
         }
       },
@@ -70,7 +72,7 @@ export const ExpenseStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the number of expenses that are rejected",
         async resolve(collective, args, req) {
-          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
           return expenses.REJECTED || 0;
         }
       },
@@ -78,7 +80,7 @@ export const ExpenseStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the number of expenses that are paid",
         async resolve(collective, args, req) {
-          const expenses = await req.loaders.collective.stats.expenses.load(collective.id);
+          const expenses = await req.loaders.collective.stats.expenses.load(collective.id) || {};
           return expenses.PAID || 0;
         }
       }
@@ -290,6 +292,16 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           type: { type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt }
+        }
+      },
+      expenses: {
+        type: new GraphQLList(ExpenseType),
+        args: {
+          type: { type: GraphQLString },
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          status: { type: GraphQLString },
+          includeHostedCollectives: { type: GraphQLBoolean }          
         }
       },
       role: { type: GraphQLString },
@@ -546,6 +558,49 @@ const CollectiveFields = () => {
         if (args.offset) query.offset = args.offset;
         query.order = [ ['id', 'DESC'] ];
         return collective.getTransactions(query);
+      }
+    },
+    expenses: {
+      type: new GraphQLList(ExpenseType),
+      args: {
+        type: { type: GraphQLString },
+        limit: { type: GraphQLInt },
+        offset: { type: GraphQLInt },
+        includeHostedCollectives: { type: GraphQLBoolean },
+        status: { type: GraphQLString }          
+      },
+      resolve(collective, args, req) {
+        const query = { where: {} };
+        if (args.status) query.where.status = args.status;
+        if (args.limit) query.limit = args.limit;
+        if (args.offset) query.offset = args.offset;
+        query.order = [["incurredAt", "DESC"]];
+        return req.loaders.collective.findById.load(args.CollectiveId)
+          .then(collective => {
+            if (!collective) {
+              throw new Error('Collective not found');
+            }
+            const getCollectiveIds = () => {
+              // if is host, we get all the expenses across all the hosted collectives
+              if (args.includeHostedCollectives) {
+                if (collective.HostCollectiveId !== collective.id) {
+                  throw new Error("This collective is not a host");
+                }
+                return models.Member.findAll({
+                  where: {
+                    MemberCollectiveId: collective.id,
+                    role: 'HOST'
+                  }
+                }).map(members => members.CollectiveId)
+              } else {
+                return Promise.resolve([args.CollectiveId]);
+              }
+            }
+            return getCollectiveIds().then(collectiveIds => {
+              query.where.CollectiveId = { $in: collectiveIds };
+              return models.Expense.findAll(query);
+            })
+          })
       }
     },
     role: {
