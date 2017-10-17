@@ -12,6 +12,7 @@ class Expenses extends React.Component {
     expenses: PropTypes.array,
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
+    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
 
@@ -36,9 +37,14 @@ class Expenses extends React.Component {
       this.setState({ loading: false });
     });
   }
-
+  
   render() {
-    const { collective, expenses, LoggedInUser } = this.props;
+    const {
+      collective,
+      expenses,
+      LoggedInUser,
+      includeHostedCollectives
+    } = this.props;
 
     if (!expenses) {
       return (<div />);
@@ -120,6 +126,7 @@ class Expenses extends React.Component {
               key={expense.id}
               collective={collective}
               expense={expense}
+              includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={LoggedInUser}
               />
           )}
