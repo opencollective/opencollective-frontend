@@ -26,9 +26,9 @@ class CreateOrderPage extends React.Component {
     this.createOrder = this.createOrder.bind(this);
     this.state = { result: {}, loading: false };
     const interval = (props.interval || "").toLowerCase().replace(/ly$/,'');
-    this.order = {
+     this.order = {
       quantity: parseInt(props.quantity, 10) || 1,
-      interval: (['month','year'].indexOf(interval) !== -1) ? interval : null,
+      interval: (['month', 'year'].indexOf(interval) !== -1) ? interval : null,
       totalAmount: parseInt(props.totalAmount, 10) || null
     };
 
@@ -50,7 +50,7 @@ class CreateOrderPage extends React.Component {
     if (!data.Tier && data.fetchData) {
       data.fetchData();
     }
-    this.setState({LoggedInUser});
+    this.setState({ LoggedInUser });
   }
 
   async createOrder(order) {
@@ -90,6 +90,7 @@ class CreateOrderPage extends React.Component {
       presets: [1000, 5000, 10000],
       type: 'DONATION',
       currency: collective.currency,
+      interval: this.order.interval,
       button: intl.formatMessage(this.messages['tier.button.donation']),
       description: intl.formatMessage(this.messages['tier.description.donation'])
     };

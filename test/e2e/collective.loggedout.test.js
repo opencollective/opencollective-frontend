@@ -157,4 +157,21 @@ describe("logged out", () => {
       console.log(">>> screenshot", screenshot);
     }
   })
+
+  it("goes to a custom donate URL", async function() {
+    this.timeout(10000);
+    const screenshot = await chromeless
+      .goto(`${WEBSITE_URL}/webpack/donate/10/month`)
+      .wait('.presetBtn')
+      .scrollToElement('.presetBtn')
+      .screenshot({ filePath: path.join(screenshotsDirectory, 'custom_donation_page.png')});
+
+    console.log(">>> screenshot", screenshot);
+
+    const middlePresetSelected = await chromeless.exists('.presetBtnGroup button:nth-child(2).btn-primary');
+    expect(middlePresetSelected).to.be.true;
+
+    const monthlySelected = await chromeless.exists('.intervalBtnGroup button:nth-child(2).btn-primary');
+    expect(monthlySelected).to.be.true;
+  })
 });
