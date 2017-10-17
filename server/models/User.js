@@ -354,7 +354,7 @@ export default (Sequelize, DataTypes) => {
         })
       }
     })
-    .then(() => updatedAttributes.User.image || userLib.fetchAvatar(this.email))
+    .then(() => updatedAttributes.User.image || this.firstName && userLib.fetchAvatar(this.email)) // don't try to fetch avatar if user hasn't provided a first name (i.e. if they wanted to remain anonymous)
     .then(image => {
       if (process.env.NODE_ENV === 'development' || !image || image.indexOf('/public') === 0 || image.indexOf(config.aws.s3.bucket) !== -1) {
         return;
