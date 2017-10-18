@@ -29,8 +29,8 @@ function addAuthTokenToHeader(obj = {}) {
   };
 }
 
-export function fetchConnectedAccount(CollectiveId, service) {
-  return fetch(`/api/connected-accounts/${service}?CollectiveId=${CollectiveId}`, {
+export function connectAccount(CollectiveId, service) {
+  return fetch(`/api/connected-accounts/${service}/connect?CollectiveId=${CollectiveId}`, {
       method: 'get',
       headers: addAuthTokenToHeader()
     })

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
-import { fetchConnectedAccount } from '../lib/api';
+import { connectAccount } from '../lib/api';
 
 class EditConnectedAccount extends React.Component {
 
@@ -31,7 +31,7 @@ class EditConnectedAccount extends React.Component {
   }
 
   connect(service) {
-    fetchConnectedAccount(this.props.collective.id, service)
+    connectAccount(this.props.collective.id, service)
     .then(json => {
       console.log(`>>> /api/connected-accounts/${service} response`, json);
       return window.location.replace(json.redirectUrl);
