@@ -33,7 +33,7 @@ class CollectivePickerWithData extends React.Component {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
-    if (loading) {
+    if (loading || !Collective) {
       return (<div />);
     }
     const collectives = Collective.collectives;
@@ -60,7 +60,7 @@ class CollectivePickerWithData extends React.Component {
               all
             </NavItem>
             { collectives.filter(c => c.stats.expenses.pending > 0).map(collective => (
-              <NavItem eventKey={collective.id} title={collective.name}>
+              <NavItem key={collective.id} eventKey={collective.id} title={collective.name}>
                 {collective.slug}
                 <Badge pullRight={true} >{collective.stats.expenses.pending}</Badge>
               </NavItem>

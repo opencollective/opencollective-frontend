@@ -33,8 +33,10 @@ export const getLoggedInUserQuery = gql`
           name
           currency
           stats {
+            id
             balance
             expenses {
+              id
               pending
             }
           }
@@ -238,6 +240,7 @@ const getCollectiveQuery = gql`
         collectives
         transactions
         expenses {
+          id
           all
         }
         totalAmountSent
