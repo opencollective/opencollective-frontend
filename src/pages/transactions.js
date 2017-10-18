@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
 import NotFound from '../components/NotFound';
-import Error from '../components/Error';
+import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import TransactionsWithData from '../components/TransactionsWithData';
@@ -33,12 +33,12 @@ class TransactionsPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
-    console.log(">>> data.Collective", data.Collective);
+
     if (!data.Collective) return (<NotFound />);
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      return (<ErrorPage message="GraphQL error" />)
     }
 
     const collective = data.Collective;

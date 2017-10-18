@@ -5,7 +5,7 @@ import { addCollectiveData, addGetLoggedInUserFunction } from '../graphql/querie
 
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
-import Error from '../components/Error';
+import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
 import { intersection } from 'lodash';
@@ -36,7 +36,7 @@ class CollectivePage extends React.Component {
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      return (<ErrorPage message="GraphQL error" />)
     }
 
     const collective = data.Collective;

@@ -6,7 +6,7 @@ import { intersection } from 'lodash';
 
 import NotFound from '../components/NotFound';
 import Loading from '../components/Loading';
-import Error from '../components/Error';
+import ErrorPage from '../components/ErrorPage';
 import Event from '../components/Event';
 
 class EventPage extends React.Component {
@@ -35,7 +35,7 @@ class EventPage extends React.Component {
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
-      return (<Error message="GraphQL error" />)
+      return (<ErrorPage message="GraphQL error" />)
     }
 
     const event = data.Collective;
