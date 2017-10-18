@@ -501,7 +501,7 @@ class OrderForm extends React.Component {
         }
         { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
-            <h2>Payment details</h2>
+            <h2><FormattedMessage id="tier.order.paymentdetails" defaultMessage="Payment details" /></h2>
             <Row>
               <Col sm={12}>
                 { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&

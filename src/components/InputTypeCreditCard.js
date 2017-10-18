@@ -4,6 +4,8 @@ import stylesheet from '../styles/card.css';
 import CardReactFormContainer from 'card-react';
 import { FormGroup, FormControl } from 'react-bootstrap';
 import Payment from 'payment';
+import withIntl from '../lib/withIntl';
+import { defineMessages } from 'react-intl';
 
 class InputTypeCreditCard extends React.Component {
 
@@ -18,6 +20,12 @@ class InputTypeCreditCard extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.state = {};
+    this.messages = defineMessages({
+      'creditcard.number.placeholder': { id: 'creditcard.number.placeholder', defaultMessage: 'Card number' },
+      'creditcard.name.placeholder': { id: 'creditcard.name.placeholder', defaultMessage: 'Full name' },
+      'creditcard.expiry.placeholder': { id: 'creditcard.expiry.placeholder', defaultMessage: 'MM/YY' },
+      'creditcard.cvc.placeholder': { id: 'creditcard.cvc.placeholder', defaultMessage: 'CVC' },
+    });
   }
 
   handleChange(fieldname, value) {
@@ -51,7 +59,7 @@ class InputTypeCreditCard extends React.Component {
   }
 
   render() {
-
+    const { intl } = this.props;
     const options = this.props.options || [];
     const showNewCreditCardForm = !(this.state.uuid && this.state.uuid.length === 36);
 
@@ -126,7 +134,7 @@ class InputTypeCreditCard extends React.Component {
               <div className="ccform">
                 <FormGroup validationState={(!this.state.number || Payment.fns.validateCardNumber(this.state.number)) ? null : 'error'} controlId="CCnumber">
                   <FormControl
-                    placeholder="Card number"
+                    placeholder={intl.formatMessage(this.messages['creditcard.number.placeholder'])}
                     type="text"
                     name="CCnumber"
                     key="CCnumber"
@@ -136,9 +144,9 @@ class InputTypeCreditCard extends React.Component {
                   <FormControl.Feedback />
                 </FormGroup>
                 <div className="oneline">
-                  <FormControl placeholder="Full name" type="text" name="CCname" key="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
-                  <FormControl placeholder="MM/YY" type="text" name="CCexpiry" key="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
-                  <FormControl placeholder="CVC" type="text" name="CCcvc" key="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
+                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.name.placeholder'])} type="text" name="CCname" key="CCname" onChange={(e) => this.handleChange("fullName", e.target.value)} />
+                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.expiry.placeholder'])} type="text" name="CCexpiry" key="CCexpiry" className="ccinput" onChange={(e) => this.handleChange("expiry", e.target.value)} />
+                  <FormControl placeholder={intl.formatMessage(this.messages['creditcard.cvc.placeholder'])}type="text" name="CCcvc" key="CCcvc" className="ccinput" onChange={(e) => this.handleChange("cvc", e.target.value)} />
                 </div>
               </div>
           </CardReactFormContainer>
@@ -149,4 +157,4 @@ class InputTypeCreditCard extends React.Component {
   }
 }
 
-export default InputTypeCreditCard;
+export default withIntl(InputTypeCreditCard);
