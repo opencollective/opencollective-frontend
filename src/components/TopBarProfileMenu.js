@@ -33,10 +33,6 @@ class TopBarProfileMenu extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
-    console.log(">>> componentWillReceiveProps", newProps, typeof newProps.LoggedInUser, newProps.LoggedInUser);
-  }
-
   componentWillUnmount() {
     document.removeEventListener('click', this.onClickOutsideRef);
   }
@@ -148,23 +144,23 @@ class TopBarProfileMenu extends React.Component {
         `}</style>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span>collectives</span>
+            <span><FormattedMessage id="collective" defaultMessage="{n} {n, plural, one {collective} other {collectives}}" values={{ n: 2}} /></span>
             <div className='-dash'></div>
           </div>
           <ul>
-          {this.showCreateBtn && <li><a href='/create'>create a collective</a></li>}
-          <li><a href='/discover'>Discover</a></li>
-            <li><a href='/subscriptions'>Subscriptions</a></li>
+          {this.showCreateBtn && <li><a href='/create'><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
+          <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+            <li><a href='/subscriptions'><FormattedMessage id="menu.subscriptions" defaultMessage="my subscriptions" /></a></li>
           </ul>
         </div>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span>my account</span>
+            <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
             <div className='-dash'></div>
           </div>
           <ul>
-            <li><a href={`/${LoggedInUser.username}`}>Profile</a></li>
-            <li><a className='-blue' href='#' onClick={this.logout}>Logout</a></li>
+            <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
+            <li><a className='-blue' href='#' onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
           </ul>
         </div>
       </div>
@@ -250,7 +246,7 @@ class TopBarProfileMenu extends React.Component {
 
   render() {
 
-    const { showProfileMenu, loading } = this.state;
+    const { loading } = this.state;
     const { LoggedInUser } = this.props;
 
     let status;
@@ -294,7 +290,11 @@ class TopBarProfileMenu extends React.Component {
         }
 
         { status === 'loggedout' &&
-          <div className="LoginTopBarProfileButton"><Link route="signin" params={ { next: this.redirectAfterSignin } }><a>Login</a></Link></div>
+          <div className="LoginTopBarProfileButton">
+            <Link route="signin" params={ { next: this.redirectAfterSignin } }><a>
+              <FormattedMessage id="login.button" defaultMessage="login" />
+            </a></Link>
+          </div>
         }
 
         { status === 'loggedin' && this.renderLoggedInUser() }

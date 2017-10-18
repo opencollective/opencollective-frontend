@@ -142,6 +142,7 @@ class LoginForm extends React.Component {
     const inputEmail = {
       type: 'email',
       name: 'email',
+      button: <Button disabled={true}><FormattedMessage id="loginform.title" defaultMessage="login" /></Button>,
       required: true,
       focus: true,
       label: intl.formatMessage(this.messages['email.label']),
@@ -157,7 +158,7 @@ class LoginForm extends React.Component {
         inputEmail.button = <Button onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
         inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage={`There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`} />;
       } else if (this.state.isNewUser === false) {
-        inputEmail.button = <Button onClick={() => this.signin()}>Login</Button>;
+        inputEmail.button = <Button onClick={() => this.signin()}><FormattedMessage id="loginform.title" defaultMessage="login" /></Button>;
         inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage={`Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`} />;
         if (this.state.loginSent) {
           inputEmail.button = <Button disabled={true}><FormattedMessage id="loginform.title" defaultMessage="login" /></Button>;
@@ -241,7 +242,9 @@ class LoginForm extends React.Component {
                   <Row>
                     <Col sm={3}></Col>
                     <Col sm={9}>
-                      <Button bsStyle="primary" onClick={() => this.handleSubmit()}>Sign Up</Button>
+                      <Button bsStyle="primary" onClick={() => this.handleSubmit()}>
+                        <FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" />
+                      </Button>
                     </Col>
                   </Row>
                 </div>
