@@ -27,13 +27,15 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const { data: { error, Collective } } = this.props;
+    const { data: { loading, error, Collective } } = this.props;
 
     if (error) {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
-
+    if (loading) {
+      return (<div />);
+    }
     const collectives = Collective.collectives;
     const selectedCollective = this.state.CollectiveId > 0 && collectives.find(c => c.id === this.state.CollectiveId);
 

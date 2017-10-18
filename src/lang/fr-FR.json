@@ -223,8 +223,10 @@
   "menu.logout": "Se déconnecter",
   "menu.howItWorks": "Comment cela fonctionne",
   "menu.blog": "Blog",
+  "profilemenu.memberships.tooltip.balance": "Balance {balance}",
+  "profilemenu.memberships.tooltip.pendingExpenses": "{n} pending expenses",
   "menu.createCollective": "Create a Collective",
-  "menu.subscriptions": "my subscriptions",
+  "menu.subscriptions": "Abonnements",
   "loggingout": "se déconnecter",
   "transaction.debit": "débit",
   "transaction.credit": "crédit",
@@ -275,6 +277,6 @@
   "tier.button.donation": "faire une donation",
   "tier.description.donation": "Merci pour votre donation 🙏",
   "contribute.title": "Contribuer financièrement",
-  "collective.Expenses.title": "{n, plural, one {Dernière dépense} other {Dernières dépensess}}",
+  "collective.Expenses.title": "{n, plural, one {Dernière dépense} other {Dernières dépenses}}",
   "tiers.title": "Rejoins le collectif"
 }

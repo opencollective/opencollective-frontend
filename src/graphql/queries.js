@@ -32,6 +32,12 @@ export const getLoggedInUserQuery = gql`
           type
           name
           currency
+          stats {
+            balance
+            expenses {
+              pending
+            }
+          }
           paymentMethods {
             id
             uuid
