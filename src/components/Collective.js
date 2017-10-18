@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withIntl from '../lib/withIntl';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -14,7 +15,6 @@ import { Router } from '../server/pages';
 import MenuBar from './MenuBar';
 import HashLink from 'react-scrollchor';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import withIntl from '../lib/withIntl';
 import CollectivesWithData from './CollectivesWithData';
 import ExpensesWithData from './ExpensesWithData';
 import EventsWithData from './EventsWithData';
@@ -268,7 +268,10 @@ class Collective extends React.Component {
               <section id="about">
                 <div className="sidebar" id="contribute">
                   { this.collective.tiers.map(tier => (
-                    <TierCard collective={this.collective} tier={tier} />
+                    <TierCard
+                      collective={this.collective}
+                      tier={tier}
+                      />
                   ))}
                 </div>
 
@@ -345,7 +348,7 @@ class Collective extends React.Component {
                     <h2>
                       <FormattedMessage
                         id="collective.expenses.title"
-                        values={{ n: this.collective.stats.expenses }}
+                        values={{ n: this.collective.stats.expenses.all }}
                         defaultMessage={`{n, plural, one {Latest expense} other {Latest expenses}}`}
                         />
                     </h2>
