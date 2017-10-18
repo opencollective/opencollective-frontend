@@ -73,6 +73,7 @@ class OrderForm extends React.Component {
       'twitterHandle.label': { id: 'user.twitterHandle.label', defaultMessage: 'twitter' },
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
+      'email.description': { id: 'user.email.description', defaultMessage: '* required' },
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
@@ -345,7 +346,8 @@ class OrderForm extends React.Component {
       name: 'email',
       required: true,
       focus: true,
-      label: intl.formatMessage(this.messages['email.label']),
+      label: `${intl.formatMessage(this.messages['email.label'])}*`,
+      description: intl.formatMessage(this.messages['email.description']),
       defaultValue: this.state.order['email'],
       onChange: (value) => this.handleChange("user", "email", value)
     };
@@ -408,6 +410,11 @@ class OrderForm extends React.Component {
           margin: 0.5rem;
           font-size: 1.2rem;
         }
+        p {
+          font-style: italic;
+          margin-top: -2.5rem;
+          color: #737373;
+        }
         @media (min-width: 768px) {
           .actions {
             margin: 6rem 0 6rem 26%;
@@ -417,6 +424,7 @@ class OrderForm extends React.Component {
         <Form horizontal>
           <div className="userDetailsForm">
             <h2><FormattedMessage id="tier.order.userdetails" defaultMessage="User details" /></h2>
+            <p><FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /></p>
             { LoggedInUser &&
               <InputField
                 className="horizontal"
@@ -453,6 +461,7 @@ class OrderForm extends React.Component {
         { !this.state.fromCollective.id &&
           <div className="organizationDetailsForm">
             <h2><FormattedMessage id="tier.order.organizationdetails" defaultMessage="Organization details" /></h2>
+            <p><FormattedMessage id="tier.order.organizationdetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
             <Row key={`organization.name.input`}>
               <Col sm={12}>
                 <InputField
