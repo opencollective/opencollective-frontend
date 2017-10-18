@@ -44,11 +44,9 @@ class Tier extends React.Component {
     this.messages = defineMessages({
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
       'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
-      'month': { id: 'tier.interval.month', defaultMessage: 'month' },
-      'year': { id: 'tier.interval.year', defaultMessage: 'year' },
       'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
-      'interval.month': { id: 'tier.interval.monthly', defaultMessage: 'monthly' },
-      'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' }
+      'interval.month': { id: 'tier.interval.month', defaultMessage: 'month' },
+      'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' }
     });
 
   }
@@ -196,8 +194,8 @@ class Tier extends React.Component {
                 { !this.state.amount && !this.presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { this.state.amount > 0 && <Currency value={this.state.amount} currency={currency} /> }
                 { interval && '/' }
-                {interval && interval === 'month' && intl.formatMessage(this.messages['month'])}
-                {interval && interval === 'year' && intl.formatMessage(this.messages['year'])}
+                {interval && interval === 'month' && intl.formatMessage(this.messages[`interval.month`])}
+                {interval && interval === 'year' && intl.formatMessage(this.messages[`interval.year`])}
               </div>
             }
           </div>

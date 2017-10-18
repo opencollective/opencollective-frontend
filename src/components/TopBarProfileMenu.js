@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from '../server/pages';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { formatCurrency } from '../lib/utils';
+import { Badge } from 'react-bootstrap';
 
 class TopBarProfileMenu extends React.Component {
 
@@ -14,6 +17,10 @@ class TopBarProfileMenu extends React.Component {
     this.state = { showProfileMenu: false, loading: true };
     this.toggleProfileMenu = this.toggleProfileMenu.bind(this);
     this.logout = this.logout.bind(this);
+    this.messages = defineMessages({
+      'tooltip.balance': { id: 'profilemenu.memberships.tooltip.balance', defaultMessage: 'Balance {balance}' },
+      'tooltip.pendingExpenses': { id: 'profilemenu.memberships.tooltip.pendingExpenses', defaultMessage: '{n} pending expenses' },
+    });
   }
 
   logout() {
@@ -33,10 +40,6 @@ class TopBarProfileMenu extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
-    console.log(">>> componentWillReceiveProps", newProps, typeof newProps.LoggedInUser, newProps.LoggedInUser);
-  }
-
   componentWillUnmount() {
     document.removeEventListener('click', this.onClickOutsideRef);
   }
@@ -52,8 +55,35 @@ class TopBarProfileMenu extends React.Component {
     }
   }
 
+  tooltip(membership) {
+    const { intl } = this.props;
+    const { collective } = membership;
+    const balance = collective.stats.balance;
+    let str = intl.formatMessage(this.messages['tooltip.balance'], { balance: formatCurrency(balance, collective.currency) });
+    const pendingExpenses = collective.stats.expenses.pending;
+    if (pendingExpenses > 0) {
+      str += ` - ${intl.formatMessage(this.messages['tooltip.pendingExpenses'], { n: pendingExpenses })}`;
+    }
+    return str;
+  }
+
   renderProfileMenu() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, intl } = this.props;
+    const score = (c) => {
+      switch (c.role) {
+        case 'HOST':
+          return 0;
+        case 'ADMIN':
+          return 1;
+        case 'MEMBER':
+          return 2;
+        case 'BACKER':
+          return 3;
+      }
+    }
+    const collectives = [ ...LoggedInUser.memberOf ].sort((a, b) => {
+      return (`${score(a)}-${a.collective.slug}` > `${score(b)}-${b.collective.slug}`) ? 1 : -1
+    }); // order by role then az
 
     return (
       <div className='LoginTopBarProfileMenu' onClick={(e) => e.nativeEvent.stopImmediatePropagation()}>
@@ -96,7 +126,8 @@ class TopBarProfileMenu extends React.Component {
           box-sizing: border-box;
           float: left;
           width: 100%;
-          padding: 0 0.5rem;
+          padding: 0.1rem 0.5rem;
+          display: flex;
         }
         a {
           box-sizing: border-box;
@@ -145,26 +176,40 @@ class TopBarProfileMenu extends React.Component {
           padding-right: 0;
         }
 
+        a.admin {
+          color: red;
+        }
+
+        a.member {
+          color: green;
+        }
+
         `}</style>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span>collectives</span>
+            <span><FormattedMessage id="collective" defaultMessage="{n} {n, plural, one {collective} other {collectives}}" values={{ n: 2}} /></span>
             <div className='-dash'></div>
           </div>
           <ul>
-          {this.showCreateBtn && <li><a href='/create'>create a collective</a></li>}
-          <li><a href='/discover'>Discover</a></li>
-            <li><a href='/subscriptions'>Subscriptions</a></li>
+          {this.showCreateBtn && <li><a href='/create'><FormattedMessage id="menu.createCollective" defaultMessage="Create a Collective" /></a></li>}
+          <li><a href='/discover'><FormattedMessage id="menu.discover" defaultMessage="discover" /></a></li>
+          { collectives.map(membership => (
+            <li><Link route={`/${membership.collective.slug}`}><a title={this.tooltip(membership)} className={membership.role.toLowerCase()}>{membership.collective.slug}</a>
+            </Link>
+            { membership.collective.stats.expenses.pending > 0 && <Badge>{membership.collective.stats.expenses.pending}</Badge> }
+            </li>
+          ))}
           </ul>
         </div>
         <div>
           <div className='LoginTopBarProfileMenuHeading'>
-            <span>my account</span>
+            <span><FormattedMessage id="menu.myAccount" defaultMessage="My account" /></span>
             <div className='-dash'></div>
           </div>
           <ul>
-            <li><a href={`/${LoggedInUser.username}`}>Profile</a></li>
-            <li><a className='-blue' href='#' onClick={this.logout}>Logout</a></li>
+            <li><a href={`/${LoggedInUser.username}`}><FormattedMessage id="menu.profile" defaultMessage="profile" /></a></li>
+            <li><a href='/subscriptions'><FormattedMessage id="menu.subscriptions" defaultMessage="Subscriptions" /></a></li>
+            <li><a className='-blue' href='#' onClick={this.logout}><FormattedMessage id="menu.logout" defaultMessage="logout" /></a></li>
           </ul>
         </div>
       </div>
@@ -250,7 +295,7 @@ class TopBarProfileMenu extends React.Component {
 
   render() {
 
-    const { showProfileMenu, loading } = this.state;
+    const { loading } = this.state;
     const { LoggedInUser } = this.props;
 
     let status;
@@ -294,7 +339,11 @@ class TopBarProfileMenu extends React.Component {
         }
 
         { status === 'loggedout' &&
-          <div className="LoginTopBarProfileButton"><Link route="signin" params={ { next: this.redirectAfterSignin } }><a>Login</a></Link></div>
+          <div className="LoginTopBarProfileButton">
+            <Link route="signin" params={ { next: this.redirectAfterSignin } }><a>
+              <FormattedMessage id="login.button" defaultMessage="login" />
+            </a></Link>
+          </div>
         }
 
         { status === 'loggedin' && this.renderLoggedInUser() }
@@ -304,4 +353,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default TopBarProfileMenu;
+export default withIntl(TopBarProfileMenu);

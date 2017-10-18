@@ -24,13 +24,6 @@ class TierCard extends React.Component {
     this.anchor = (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
-      'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
-      'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
-      'month': { id: 'tier.interval.month', defaultMessage: 'month' },
-      'year': { id: 'tier.interval.year', defaultMessage: 'year' },
-      'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
-      'interval.month': { id: 'tier.interval.monthly', defaultMessage: 'monthly' },
-      'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' },
       'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
       'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
       'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'},

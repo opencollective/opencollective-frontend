@@ -323,6 +323,9 @@ class InputField extends React.Component {
           .inputField {
             margin: 1rem 0;
           }
+          .inputField, .inputField textarea {
+            font-size: 1.6rem;
+          }
         `}</style>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         {this.input}

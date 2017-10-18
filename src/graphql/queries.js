@@ -32,6 +32,14 @@ export const getLoggedInUserQuery = gql`
           type
           name
           currency
+          stats {
+            id
+            balance
+            expenses {
+              id
+              pending
+            }
+          }
           paymentMethods {
             id
             uuid
@@ -232,6 +240,7 @@ const getCollectiveQuery = gql`
         collectives
         transactions
         expenses {
+          id
           all
         }
         totalAmountSent

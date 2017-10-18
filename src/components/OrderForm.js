@@ -55,6 +55,7 @@ class OrderForm extends React.Component {
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
+      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
       'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
@@ -156,6 +157,7 @@ class OrderForm extends React.Component {
   }
 
   populateOrganizations(LoggedInUser) {
+    const { intl } = this.props;
     const fromCollectiveOptions = [], collectivesById = {};
 
     fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
@@ -169,7 +171,7 @@ class OrderForm extends React.Component {
       fromCollectiveOptions.push({ [value]: label });
     })
     collectivesById[0] = null;
-    fromCollectiveOptions.push({ 0: 'Create an organization' });
+    fromCollectiveOptions.push({ 0: intl.formatMessage(this.messages['order.organization.create']) });
     this.collectivesById = collectivesById;
     this.fromCollectiveOptions = fromCollectiveOptions;
   }
@@ -411,7 +413,6 @@ class OrderForm extends React.Component {
           font-size: 1.2rem;
         }
         p {
-          font-style: italic;
           margin-top: -2.5rem;
           color: #737373;
         }
@@ -501,7 +502,7 @@ class OrderForm extends React.Component {
         }
         { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
-            <h2>Payment details</h2>
+            <h2><FormattedMessage id="tier.order.paymentdetails" defaultMessage="Payment details" /></h2>
             <Row>
               <Col sm={12}>
                 { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
@@ -525,7 +526,7 @@ class OrderForm extends React.Component {
                       onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
                       />
                     <InputField
-                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() })}
+                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() || 'user' })}
                       className="horizontal"
                       name="saveCreditCard"
                       type="checkbox"
