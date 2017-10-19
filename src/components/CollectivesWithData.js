@@ -141,13 +141,13 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
       }
     }
   },
-  props: ({ data }) => ({
+  props: ({ data, ownProps }) => ({
     data,
     fetchMore: () => {
       return data.fetchMore({
         variables: {
           offset: data.allCollectives.length,
-          limit: COLLECTIVE_CARDS_PER_PAGE
+          limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
