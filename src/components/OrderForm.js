@@ -55,6 +55,7 @@ class OrderForm extends React.Component {
       'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
+      'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
       'order.organization.name': { id: 'tier.order.organization.name', defaultMessage: `name` },
       'order.organization.website': { id: 'tier.order.organization.website', defaultMessage: `website` },
       'order.organization.twitterHandle': { id: 'tier.order.organization.twitterHandle', defaultMessage: `Twitter` },
@@ -74,6 +75,8 @@ class OrderForm extends React.Component {
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'email.description': { id: 'user.email.description', defaultMessage: '* required' },
+      'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'Welcome back! Click on \"Login\" (or hit Enter) and we will send you a link to login by email.' },
+      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.'},
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
@@ -156,6 +159,7 @@ class OrderForm extends React.Component {
   }
 
   populateOrganizations(LoggedInUser) {
+    const { intl } = this.props;
     const fromCollectiveOptions = [], collectivesById = {};
 
     fromCollectiveOptions.push({ [LoggedInUser.CollectiveId]: LoggedInUser.collective.name });
@@ -169,7 +173,7 @@ class OrderForm extends React.Component {
       fromCollectiveOptions.push({ [value]: label });
     })
     collectivesById[0] = null;
-    fromCollectiveOptions.push({ 0: 'Create an organization' });
+    fromCollectiveOptions.push({ 0: intl.formatMessage(this.messages['order.organization.create']) });
     this.collectivesById = collectivesById;
     this.fromCollectiveOptions = fromCollectiveOptions;
   }
@@ -354,10 +358,10 @@ class OrderForm extends React.Component {
     if (!this.state.isNewUser) {
       inputEmail.button = <Button onClick={() => this.signin()} focus={true}>Login</Button>;
       if (!this.state.loginSent) {
-        inputEmail.description = `Oh oh, looks like you already have an account on Open Collective with this email address. Please login.`
+        inputEmail.description = intl.formatMessage(this.messages['email.description.login']);
       } else {
         inputEmail.button = <Button disabled={true}>Login</Button>;
-        inputEmail.description = `Login email sent. Please follow the instructions in that email to proceed.`
+        inputEmail.description = intl.formatMessage(this.messages['email.description.signup']);
       }
     }
 
@@ -411,7 +415,6 @@ class OrderForm extends React.Component {
           font-size: 1.2rem;
         }
         p {
-          font-style: italic;
           margin-top: -2.5rem;
           color: #737373;
         }
@@ -423,8 +426,11 @@ class OrderForm extends React.Component {
         `}</style>
         <Form horizontal>
           <div className="userDetailsForm">
-            <h2><FormattedMessage id="tier.order.userdetails" defaultMessage="User details" /></h2>
-            <p><FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /></p>
+            <h2><FormattedMessage id="tier.order.userDetails" defaultMessage="User details" /></h2>
+            <p>
+              { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
+              { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
+            </p>
             { LoggedInUser &&
               <InputField
                 className="horizontal"
@@ -460,8 +466,8 @@ class OrderForm extends React.Component {
         </div>
         { !this.state.fromCollective.id &&
           <div className="organizationDetailsForm">
-            <h2><FormattedMessage id="tier.order.organizationdetails" defaultMessage="Organization details" /></h2>
-            <p><FormattedMessage id="tier.order.organizationdetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
+            <h2><FormattedMessage id="tier.order.organizationDetails" defaultMessage="Organization details" /></h2>
+            <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
             <Row key={`organization.name.input`}>
               <Col sm={12}>
                 <InputField
@@ -501,7 +507,7 @@ class OrderForm extends React.Component {
         }
         { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
-            <h2>Payment details</h2>
+            <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
             <Row>
               <Col sm={12}>
                 { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
@@ -525,7 +531,7 @@ class OrderForm extends React.Component {
                       onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
                       />
                     <InputField
-                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() })}
+                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() || 'user' })}
                       className="horizontal"
                       name="saveCreditCard"
                       type="checkbox"
@@ -540,7 +546,7 @@ class OrderForm extends React.Component {
         }
         
         <div className="order">
-          <h2>Contribution details</h2>
+          <h2><FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /></h2>
           <Row>
             <Col sm={12}>
               <div className="form-group">

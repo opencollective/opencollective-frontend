@@ -139,8 +139,8 @@ class MembersWithData extends React.Component {
 }
 
 const getMembersQuery = gql`
-query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $limit: Int, $offset: Int) {
-  allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, type: $type, limit: $limit, offset: $offset) {
+query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String) {
+  allMembers(CollectiveId: $CollectiveId, TierId: $TierId, role: $role, type: $type, limit: $limit, offset: $offset, orderBy: $orderBy) {
     id
     role
     createdAt
@@ -171,6 +171,7 @@ export const addMembersData = graphql(getMembersQuery, {
         offset: 0,
         type: props.type,
         role: props.role,
+        orderBy: props.orderBy,
         limit: props.limit || MEMBERS_PER_PAGE * 2
       }
     }

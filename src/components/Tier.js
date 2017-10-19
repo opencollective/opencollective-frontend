@@ -4,7 +4,8 @@ import colors from '../constants/colors';
 import TicketController from './TicketController';
 import CTAButton from './Button';
 import Currency from './Currency';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
@@ -44,11 +45,9 @@ class Tier extends React.Component {
     this.messages = defineMessages({
       'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
       'interval.label': { id: 'tier.interval.label', defaultMessage: 'interval' },
-      'month': { id: 'tier.interval.month', defaultMessage: 'month' },
-      'year': { id: 'tier.interval.year', defaultMessage: 'year' },
       'interval.onetime': { id: 'tier.interval.onetime', defaultMessage: 'one time' },
-      'interval.month': { id: 'tier.interval.monthly', defaultMessage: 'monthly' },
-      'interval.year': { id: 'tier.interval.yearly', defaultMessage: 'yearly' }
+      'interval.month': { id: 'tier.interval.month', defaultMessage: 'month' },
+      'interval.year': { id: 'tier.interval.year', defaultMessage: 'year' }
     });
 
   }
@@ -196,8 +195,8 @@ class Tier extends React.Component {
                 { !this.state.amount && !this.presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { this.state.amount > 0 && <Currency value={this.state.amount} currency={currency} /> }
                 { interval && '/' }
-                {interval && interval === 'month' && intl.formatMessage(this.messages['month'])}
-                {interval && interval === 'year' && intl.formatMessage(this.messages['year'])}
+                {interval && interval === 'month' && intl.formatMessage(this.messages[`interval.month`])}
+                {interval && interval === 'year' && intl.formatMessage(this.messages[`interval.year`])}
               </div>
             }
           </div>
@@ -206,7 +205,7 @@ class Tier extends React.Component {
             { this.presets &&
               <div>
                 <div className="inputRow">
-                  <label>Select amount</label>
+                  <label><FormattedMessage id="tier.amount.select" defaultMessage="Select amount" /></label>
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { this.presets.map(preset => !isNaN(preset) && (
@@ -229,7 +228,7 @@ class Tier extends React.Component {
                     </div>
                 </div>
                 <div className="inputRow">
-                  <label>Select frequency</label>
+                  <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                   <ButtonGroup className="intervalBtnGroup">
                     { intervals.map(interval => (
                       <Button className="intervalBtn" bsStyle={this.state.interval === interval ? 'primary' : 'default'} onClick={() => this.handleChange('interval', interval)}>
@@ -258,4 +257,4 @@ class Tier extends React.Component {
   }
 }
 
-export default injectIntl(Tier);
+export default withIntl(Tier);

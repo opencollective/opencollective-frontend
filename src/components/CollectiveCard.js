@@ -209,13 +209,21 @@ class CollectiveCard extends React.Component {
             <div className="stats">
               <div className="backers">
                 <div className="value">{collective.stats.backers}</div>
-                <div className="label"><FormattedMessage id='collective.stats.backers' defaultMessage={`backers`} /></div>
+                <div className="label">
+                  <FormattedMessage
+                    id="collective.stats.backers"
+                    defaultMessage="{n} {n, plural, one {backer} other {backers}}"
+                    values={{ n: collective.stats.backers }}
+                    />
+                </div>
               </div>
               <div className="yearlyBudget">
                 <div className="value">
                   <Currency value={collective.stats.yearlyBudget} currency={currency} />
                 </div>
-                <div className="label"><FormattedMessage id='collective.stats.yearlyBudget' defaultMessage={`yearly budget`} /></div>
+                <div className="label">
+                  <FormattedMessage id='collective.stats.yearlyBudget' defaultMessage={`yearly budget`} />
+                </div>
               </div>
             </div>
           }
