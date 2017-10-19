@@ -273,7 +273,7 @@
   "user.collective.menu.follower": "siguiendo {n} {n, plural, one {colectivo} other {colectivos}}",
   "collective.user.orderCreated.thankyou": "Gracias por tu contribución! 🙏",
   "collective.user.orderCreated.message": "Hemos agregado a {collective} a tu perfil",
-  "collective.user.emptyProfile": "Tu perfil está un poco vacío ¯\_(ツ)_/¯",
+  "collective.user.emptyProfile": "Tu perfil está un poco vacío ¯_(ツ)_/¯",
   "collective.user.loggedout.editProfile": "Por favor ingresa para poder editar tu perfil",
   "utils.free": "gratis",
   "tier.order.donation.title": "Contribuye",
