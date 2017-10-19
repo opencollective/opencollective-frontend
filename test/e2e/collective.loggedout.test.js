@@ -58,8 +58,9 @@ describe("logged out", () => {
       .goto(`${WEBSITE_URL}/webpack`)
       .wait('.SubmitExpenseBtn')
       .scrollToElement('.SubmitExpenseBtn')
+      .wait(500)
       .click('.SubmitExpenseBtn')
-      .wait(2500)
+      .wait(3000)
       .screenshot({ filePath: path.join(screenshotsDirectory, 'click_submit_new_expense.png')});
 
     console.log(">>> screenshot", screenshot);

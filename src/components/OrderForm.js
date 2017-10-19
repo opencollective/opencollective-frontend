@@ -75,6 +75,8 @@ class OrderForm extends React.Component {
       'twitterHandle.description': { id: 'user.twitterHandle.description', defaultMessage: 'If any' },
       'email.label': { id: 'user.email.label', defaultMessage: 'email' },
       'email.description': { id: 'user.email.description', defaultMessage: '* required' },
+      'email.description.login': { id: 'signin.createAccount.description', defaultMessage: 'Welcome back! Click on \"Login\" (or hit Enter) and we will send you a link to login by email.' },
+      'email.description.signup': { id: 'signin.emailSent.description', defaultMessage: 'Login email sent. Please follow the instructions in that email to proceed.'},
       'description.label': { id: 'user.description.label', defaultMessage: 'Short bio' },
       'description.description': { id: 'user.description.description', defaultMessage: 'Present yourself in 60 characters or less, if you can!' },
       'totalAmount.label': { id: 'tier.totalAmount.label', defaultMessage: 'Total amount' },
@@ -356,10 +358,10 @@ class OrderForm extends React.Component {
     if (!this.state.isNewUser) {
       inputEmail.button = <Button onClick={() => this.signin()} focus={true}>Login</Button>;
       if (!this.state.loginSent) {
-        inputEmail.description = `Oh oh, looks like you already have an account on Open Collective with this email address. Please login.`
+        inputEmail.description = intl.formatMessage(this.messages['email.description.login']);
       } else {
         inputEmail.button = <Button disabled={true}>Login</Button>;
-        inputEmail.description = `Login email sent. Please follow the instructions in that email to proceed.`
+        inputEmail.description = intl.formatMessage(this.messages['email.description.signup']);
       }
     }
 
