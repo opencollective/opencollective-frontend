@@ -389,7 +389,7 @@ export default function(Sequelize, DataTypes) {
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
-      .then(() => queries.getBackersOfCollectiveWithTotalDonations(this.id, options.until))
+      .then(() => queries.getBackersOfCollectiveWithTotalDonations(this.id, options))
       // Map the users to their respective tier
       .map(backerCollective => {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
