@@ -29,13 +29,13 @@ export default {
       }
     }
     return collective
-      .getHostId()
-      .tap(HostId => {
-        if (HostId !== user.CollectiveId) {
+      .getHostCollectiveId()
+      .tap(HostCollectiveId => {
+        if (HostCollectiveId !== user.CollectiveId) {
           throw new Error("Cannot manually add funds to a collective that you are not hosting");
         }
       })
-      .then(HostId => HostId === order.FromCollectiveId)
+      .then(HostCollectiveId => HostCollectiveId === order.FromCollectiveId)
       .tap(isHost => isFromCollectiveHost = isHost)
       .then(isFromCollectiveHost => {
         payload.transaction.hostFeeInHostCurrency = isFromCollectiveHost ? 0 : Math.trunc(collective.hostFeePercent/100 * order.totalAmount);
