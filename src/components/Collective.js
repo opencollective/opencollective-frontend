@@ -138,15 +138,15 @@ class Collective extends React.Component {
                 <div>
                   <FormattedMessage
                     id="collective.stats.sponsors"
-                    defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
+                    defaultMessage="{n} {n, plural, one {sponsor} other {sponsors}}"
                     values={{ n: this.collective.stats.sponsors}}
                     />
                 </div>
               }
               <FormattedMessage
                 id="collective.stats.backers"
-                defaultMessage={`{n} {n, plural, one {backer} other {backers}}`}
-                values={{ n: this.collective.stats.backers}}
+                defaultMessage="{n} {n, plural, one {backer} other {backers}}"
+                values={{ n: this.collective.stats.backers }}
                 />
           </HashLink>
       },
@@ -286,6 +286,26 @@ class Collective extends React.Component {
                 </div>
               </section>
 
+              { this.collective.stats.collectives > 0 &&
+                <section id="hosting">
+                  <h1>
+                    <FormattedMessage
+                      id="collective"
+                      values={{ n: this.collective.stats.collectives }}
+                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
+                      />
+                  </h1>
+                  <div className="cardsList">
+                    <CollectivesWithData
+                      ParentCollectiveId={this.collective.id}
+                      orderBy="balance"
+                      orderDirection="DESC"
+                      limit={20}
+                      />
+                  </div>
+                </section>
+              }
+
               { this.collective.stats.sponsors > 0 &&
                 <section id="sponsors" className="tier">
                   <h1>
@@ -320,21 +340,6 @@ class Collective extends React.Component {
                     limit={100}
                     orderBy="totalDonations"
                     />
-                </section>
-              }
-
-              { this.collective.stats.collectives > 0 &&
-                <section id="hosting">
-                  <h1>
-                    <FormattedMessage
-                      id="collective"
-                      values={{ n: this.collective.stats.collectives }}
-                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
-                      />
-                  </h1>
-                  <div className="cardsList">
-                    <CollectivesWithData ParentCollectiveId={this.collective.id} orderBy="balance" orderDirection="DESC" />
-                  </div>
                 </section>
               }
 
