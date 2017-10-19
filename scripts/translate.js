@@ -44,3 +44,4 @@ const translatedMessages = (locale) => {
 mkdirpSync(LANG_DIR);
 fs.writeFileSync(LANG_DIR + 'en-US.json', JSON.stringify(defaultMessages, null, 2));
 fs.writeFileSync(LANG_DIR + 'fr-FR.json', JSON.stringify(translatedMessages('fr-FR'), null, 2));
+fs.writeFileSync(LANG_DIR + 'es-ES.json', JSON.stringify(translatedMessages('es-ES'), null, 2));
