@@ -45,10 +45,9 @@ export const getPreapprovalKey = function(req, res, next) {
     clientDetails: req.remoteUser.id
   };
 
-  let response;
+  let paymentMethod;
 
   return paypalAdaptive.preapproval(payload)
-  .tap(r => response = r)
   .then(response => PaymentMethod.create({
     CreatedByUserId: req.remoteUser.id,
     service: 'paypal',
@@ -56,39 +55,20 @@ export const getPreapprovalKey = function(req, res, next) {
     token: response.preapprovalKey,
     expiryDate
   }))
-  .then(() => res.json(response))
-  .catch(next);
-};
 
-/**
- * Confirm a preapproval.
- */
-export const confirmPreapproval = function(req, res, next) {
-  let paymentMethod;
-
-  // fetch original payment method
-  return PaymentMethod.findOne({
-    where: {
-      service: 'paypal',
-      CollectiveId: req.remoteUser.CollectiveId,
-      token: req.params.preapprovalkey
-    }
+  // Confirm preapprovalKey with PayPal
+  .then(getPreapprovalDetailsAndUpdatePaymentMethod)
+  .then(pm => {
+    paymentMethod = pm;
+    return Activity.create({
+      type: 'user.paymentMethod.created',
+      UserId: req.remoteUser.id,
+      data: {
+        user: req.remoteUser.minimal,
+        paymentMethod: paymentMethod.minimal
+      }
+    });
   })
-  .tap(pm => paymentMethod = pm)
-  .then(pm => pm ? 
-    Promise.resolve() : 
-    Promise.reject(new errors.NotFound('This preapprovalKey does not exist.')))
-
-  .then(() => getPreapprovalDetailsAndUpdatePaymentMethod(req.params.preapprovalkey, req.remoteUser.CollectiveId, paymentMethod))
-
-  .then(() => Activity.create({
-    type: 'user.paymentMethod.created',
-    UserId: req.remoteUser.id,
-    data: {
-      user: req.remoteUser.minimal,
-      paymentMethod: paymentMethod.minimal
-    }
-  }))
   
   // clean any old payment methods
   .then(() => PaymentMethod.findAll({
@@ -102,33 +82,28 @@ export const confirmPreapproval = function(req, res, next) {
   .then(oldPMs => oldPMs && oldPMs.map(pm => pm.destroy()))
 
   .then(() => res.send(paymentMethod.info))
-  .catch(next)
+  .catch(next);
 };
 
+
 /*
- * Takes a Payment Response
+ * Confirms that the preapprovalKey has been approved by PayPal
+ * and updates the paymentMethod
  */
-const getPreapprovalDetailsAndUpdatePaymentMethod = function(preapprovalKey, CollectiveId, paymentMethod = null) {
+const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
 
   let preapprovalDetailsResponse;
-  return paypalAdaptive.preapprovalDetails(preapprovalKey)
+  
+  return paypalAdaptive.preapprovalDetails(paymentMethod.token)
     .tap(response => preapprovalDetailsResponse = response)
     .then(response => response.approved === 'false' ? 
       Promise.reject(new errors.BadRequest('This preapprovalkey is not approved yet.')) : 
       Promise.resolve())
-    .then(() => paymentMethod ? paymentMethod :  PaymentMethod.findOne({
-        where: {
-          service: 'paypal',
-          CollectiveId,
-          token: preapprovalKey
-        }
-      }))
-    .then(paymentMethod => paymentMethod.update({
+    .then(() => paymentMethod.update({
         confirmedAt: new Date(),
         name: preapprovalDetailsResponse.senderEmail,
         data: {
           response: preapprovalDetailsResponse,
         }
       }))
-    .then(() => preapprovalDetailsResponse);
 }

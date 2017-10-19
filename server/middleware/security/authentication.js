@@ -9,6 +9,7 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import debug from 'debug';
 import * as stripe from '../../controllers/stripe';
+import * as paypal from '../../controllers/paypal';
 
 const {
   User
@@ -181,6 +182,10 @@ export const authenticateService = (req, res, next) => {
 
   if ( service === 'stripe') {
     return stripe.authorize(req, res, next);
+  }
+
+  if (service === 'paypal') {
+    return paypal.getPreapprovalKey(req, res, next);
   }
 
   switch (service) {
