@@ -424,8 +424,11 @@ class OrderForm extends React.Component {
         `}</style>
         <Form horizontal>
           <div className="userDetailsForm">
-            <h2><FormattedMessage id="tier.order.userdetails" defaultMessage="User details" /></h2>
-            <p><FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /></p>
+            <h2><FormattedMessage id="tier.order.userDetails" defaultMessage="User details" /></h2>
+            <p>
+              { !LoggedInUser && <FormattedMessage id="tier.order.userdetails.description" defaultMessage="If you wish to remain anonymous, only provide an email address without any other personal details." /> }
+              { LoggedInUser && <FormattedMessage id="tier.order.userdetails.description.loggedin" defaultMessage="If you wish to remain anonymous, logout and use another email address without providing any other personal details." /> }
+            </p>
             { LoggedInUser &&
               <InputField
                 className="horizontal"
@@ -461,8 +464,8 @@ class OrderForm extends React.Component {
         </div>
         { !this.state.fromCollective.id &&
           <div className="organizationDetailsForm">
-            <h2><FormattedMessage id="tier.order.organizationdetails" defaultMessage="Organization details" /></h2>
-            <p><FormattedMessage id="tier.order.organizationdetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
+            <h2><FormattedMessage id="tier.order.organizationDetails" defaultMessage="Organization details" /></h2>
+            <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
             <Row key={`organization.name.input`}>
               <Col sm={12}>
                 <InputField
@@ -502,7 +505,7 @@ class OrderForm extends React.Component {
         }
         { this.state.order.totalAmount > 0 &&
           <div className="paymentDetails">
-            <h2><FormattedMessage id="tier.order.paymentdetails" defaultMessage="Payment details" /></h2>
+            <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
             <Row>
               <Col sm={12}>
                 { this.paymentMethodsOptions && this.paymentMethodsOptions.length > 1 &&
@@ -541,7 +544,7 @@ class OrderForm extends React.Component {
         }
         
         <div className="order">
-          <h2>Contribution details</h2>
+          <h2><FormattedMessage id="tier.order.contributionDetails" defaultMessage="Contribution details" /></h2>
           <Row>
             <Col sm={12}>
               <div className="form-group">

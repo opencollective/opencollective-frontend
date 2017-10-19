@@ -4,7 +4,8 @@ import colors from '../constants/colors';
 import TicketController from './TicketController';
 import CTAButton from './Button';
 import Currency from './Currency';
-import { defineMessages, injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
 import { getCurrencySymbol, capitalize } from '../lib/utils';
@@ -204,7 +205,7 @@ class Tier extends React.Component {
             { this.presets &&
               <div>
                 <div className="inputRow">
-                  <label>Select amount</label>
+                  <label><FormattedMessage id="tier.amount.select" defaultMessage="Select amount" /></label>
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { this.presets.map(preset => !isNaN(preset) && (
@@ -227,7 +228,7 @@ class Tier extends React.Component {
                     </div>
                 </div>
                 <div className="inputRow">
-                  <label>Select frequency</label>
+                  <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                   <ButtonGroup className="intervalBtnGroup">
                     { intervals.map(interval => (
                       <Button className="intervalBtn" bsStyle={this.state.interval === interval ? 'primary' : 'default'} onClick={() => this.handleChange('interval', interval)}>
@@ -256,4 +257,4 @@ class Tier extends React.Component {
   }
 }
 
-export default injectIntl(Tier);
+export default withIntl(Tier);
