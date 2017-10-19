@@ -365,7 +365,7 @@ const getMembersOfCollectiveWithRole = (CollectiveIds) => {
 /**
  * Returns all the users of a collective with their `totalDonations` and `role` (HOST/ADMIN/BACKER)
  */
-const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options) => {
+const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) => {
   const { until } = options;
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
 
