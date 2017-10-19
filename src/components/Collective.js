@@ -318,6 +318,7 @@ class Collective extends React.Component {
                     type="USER"
                     role='BACKER'
                     limit={100}
+                    orderBy="totalDonations"
                     />
                 </section>
               }
