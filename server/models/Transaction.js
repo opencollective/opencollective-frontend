@@ -305,30 +305,32 @@ export default (Sequelize, DataTypes) => {
       return Promise.reject(new Error("transaction.amount cannot be null or zero"));
     }
 
-    return models.Member.findOne({ where: { role: 'HOST', CollectiveId: CollectiveId } }).then(member => {
-      if (!member) {
-        throw new Error(`Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`);
-      }
+    return models.Collective.findById(CollectiveId)
+      .then(c => c.getHostCollectiveId())
+      .then(HostCollectiveId => {
+        if (!HostCollectiveId) {
+          throw new Error(`Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`);
+        }
 
-      transaction.HostCollectiveId = member.MemberCollectiveId;
-      // attach other objects manually. Needed for afterCreate hook to work properly
-      transaction.CreatedByUserId = CreatedByUserId;
-      transaction.FromCollectiveId = FromCollectiveId;
-      transaction.CollectiveId = CollectiveId;
-      transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
-      transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
+        transaction.HostCollectiveId = HostCollectiveId;
+        // attach other objects manually. Needed for afterCreate hook to work properly
+        transaction.CreatedByUserId = CreatedByUserId;
+        transaction.FromCollectiveId = FromCollectiveId;
+        transaction.CollectiveId = CollectiveId;
+        transaction.PaymentMethodId = transaction.PaymentMethodId || PaymentMethodId;
+        transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
 
-      if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
-        // populate netAmountInCollectiveCurrency for donations
-        // @aseem: why the condition on && transaction.hostCurrencyFxRate ?
-          transaction.netAmountInCollectiveCurrency =
-            Math.round((transaction.amountInHostCurrency
-              - transaction.platformFeeInHostCurrency
-              - transaction.hostFeeInHostCurrency
-              - transaction.paymentProcessorFeeInHostCurrency)
-            * transaction.hostCurrencyFxRate);
-      }
-      return Transaction.createDoubleEntry(transaction);
+        if (transaction.amount > 0 && transaction.hostCurrencyFxRate) {
+          // populate netAmountInCollectiveCurrency for donations
+          // @aseem: why the condition on && transaction.hostCurrencyFxRate ?
+            transaction.netAmountInCollectiveCurrency =
+              Math.round((transaction.amountInHostCurrency
+                - transaction.platformFeeInHostCurrency
+                - transaction.hostFeeInHostCurrency
+                - transaction.paymentProcessorFeeInHostCurrency)
+              * transaction.hostCurrencyFxRate);
+        }
+        return Transaction.createDoubleEntry(transaction);
     });
   };
 

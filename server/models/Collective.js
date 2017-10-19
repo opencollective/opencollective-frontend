@@ -807,7 +807,7 @@ export default function(Sequelize, DataTypes) {
     }).then(m => m && m.memberCollective);
   };
 
-  Collective.prototype.getHostId = function() {
+  Collective.prototype.getHostCollectiveId = function() {
     if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
 
     const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
@@ -819,7 +819,7 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.getHostStripeAccount = function() {
     let HostCollectiveId;
-    return this.getHostId()
+    return this.getHostCollectiveId()
       .then(id => {
         HostCollectiveId = id
         debug("getHostStripeAccount for collective", this.slug, `(id: ${this.id})`, "HostCollectiveId", id);
