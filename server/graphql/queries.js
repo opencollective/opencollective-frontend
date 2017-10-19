@@ -196,27 +196,42 @@ const queries = {
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
       type: { type: GraphQLString },
+      orderBy: { type: GraphQLString },
+      orderDirection: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
     resolve(_, args) {
-      const query = { where: { CollectiveId: args.CollectiveId } }
-      if (args.TierId) query.where.TierId = args.TierId;
-      if (args.role) query.where.role = args.role;
-      if (args.type) {
-        const types = args.type.split(',');
-        query.include = [
-          {
-            model: models.Collective,
-            as: 'memberCollective',
-            required: true,
-            where: { type: { $in: types } }
+      if (args.orderBy === 'totalDonations') {
+        return rawQueries.getBackersOfCollectiveWithTotalDonations(args.CollectiveId, args).map(collective => {
+          return {
+            id: collective.dataValues.MemberId,
+            role: collective.dataValues.role,
+            createdAt: collective.dataValues.createdAt,
+            totalDonations: collective.dataValues.totalDonations,
+            MemberCollectiveId: collective.dataValues.MemberCollectiveId,
+            member: collective
           }
-        ]
+        });
+      } else {
+        const query = { where: { CollectiveId: args.CollectiveId } }
+        if (args.TierId) query.where.TierId = args.TierId;
+        if (args.role) query.where.role = args.role;
+        if (args.type) {
+          const types = args.type.split(',');
+          query.include = [
+            {
+              model: models.Collective,
+              as: 'memberCollective',
+              required: true,
+              where: { type: { $in: types } }
+            }
+          ]
+        }
+        if (args.limit) query.limit = args.limit;
+        if (args.offset) query.offset = args.offset;
+        return models.Member.findAll(query);
       }
-      if (args.limit) query.limit = args.limit;
-      if (args.offset) query.offset = args.offset;
-      return models.Member.findAll(query);
     }
   },
 
