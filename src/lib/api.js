@@ -1,5 +1,13 @@
 import fetch from 'isomorphic-fetch';
 import { isValidEmail } from './utils';
+// Webpack error: Cannot find module 'webpack/lib/RequestShortener'
+// import queryString from 'query-string';
+
+const queryString = (params) => {
+  return Object.keys(params)
+  .map(k => `${k}=${encodeURIComponent(params[k])}`)
+  .join('&');  
+}
 
 /**
  * The Promise returned from fetch() won't reject on HTTP error status. We
@@ -30,7 +38,16 @@ function addAuthTokenToHeader(obj = {}) {
 }
 
 export function connectAccount(CollectiveId, service) {
-  return fetch(`/api/connected-accounts/${service}/connect?CollectiveId=${CollectiveId}`, {
+  const callback = `${window.location.href}/?paypalApprovalStatus=`;
+  const preapprovalTemplate = '${preapprovalKey}';
+
+  const params = {
+    returnUrl: `${callback}success&preapprovalKey=${preapprovalTemplate}`,
+    cancelUrl: `${callback}cancel`,
+    CollectiveId
+  };
+
+  return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
       method: 'get',
       headers: addAuthTokenToHeader()
     })

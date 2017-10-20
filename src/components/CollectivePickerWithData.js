@@ -4,9 +4,10 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import { Nav, NavItem, Badge } from 'react-bootstrap';
+import { Button, Nav, NavItem, Badge } from 'react-bootstrap';
 import Currency from '../components/Currency';
 import { FormattedMessage } from 'react-intl';
+import { connectAccount } from '../lib/api';
 
 class CollectivePickerWithData extends React.Component {
 
@@ -19,11 +20,21 @@ class CollectivePickerWithData extends React.Component {
     super(props);
     this.state = { CollectiveId: 0 };
     this.onChange = this.onChange.bind(this);
+    this.connectPaypal = this.connectPaypal.bind(this);
   }
 
   onChange(CollectiveId) {
     this.setState({ CollectiveId });
     this.props.onChange(CollectiveId);
+  }
+
+  async connectPaypal() {
+    try {
+      const json = await connectAccount(this.props.data.Collective.id, 'paypal');
+      window.location.replace(json.redirectUrl);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   render() {
@@ -53,6 +64,9 @@ class CollectivePickerWithData extends React.Component {
             margin: 1rem 0.5rem 1rem 0;
           }
         `}</style>
+        <div className="connectPaypal">
+          <Button bsStyle="primary" onClick={this.connectPaypal}>Connect Paypal</Button>
+        </div>
       { collectives.length > 0 &&
         <div className="collectivesFilter">
           <Nav bsStyle="pills" activeKey={this.state.CollectiveId} onSelect={this.onChange}>
