@@ -640,6 +640,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.uuid;
         }
       },
+      createdAt: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.createdAt;
+        }
+      },
       service: {
         type: GraphQLString,
         resolve(paymentMethod) {
@@ -672,8 +678,9 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       balance: {
         type: GraphQLInt,
+        description: "Returns the balance in the currency of this paymentMethod",
         resolve(paymentMethod, args, req) {
-          return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
+          return paymentMethod.getBalanceForUser(req.remoteUser);
         }
       },
       currency: {

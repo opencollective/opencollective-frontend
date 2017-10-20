@@ -313,7 +313,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      paymentMethods: { type: new GraphQLList(PaymentMethodType) },
+      paymentMethods: {
+        type: new GraphQLList(PaymentMethodType),
+        args: {
+          service: { type: GraphQLString }
+        }
+      },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) }
     }
   }
@@ -643,18 +648,22 @@ const CollectiveFields = () => {
     },
     paymentMethods: {
       type: new GraphQLList(PaymentMethodType),
+      args: {
+        service: { type: GraphQLString }
+      },
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
+        const where = {
+          CollectiveId: collective.id,
+          name: { $ne: null },
+          archivedAt: null
+        };
 
-        return models.PaymentMethod.findAll({
-          where: {
-            CollectiveId: collective.id,
-            service: 'stripe',
-            name: { $ne: null },
-            archivedAt: null
-          }
-            
-        });
+        if (args.service) {
+          where.service = args.service;
+        }
+
+        return models.PaymentMethod.findAll({ where });
       }
     },
     connectedAccounts: {

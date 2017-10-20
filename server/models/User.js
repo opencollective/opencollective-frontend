@@ -511,6 +511,7 @@ export default (Sequelize, DataTypes) => {
           longDescription: userData.longDescription,
           website: userData.website,
           twitterHandle: userData.twitterHandle,
+          currency: userData.currency,
           isActive: true,
           CreatedByUserId: user.id,
           data: { UserId: user.id }

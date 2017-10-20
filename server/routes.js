@@ -96,11 +96,12 @@ export default (app) => {
   }));
 
   /**
-   * Webhook for stripe when it gets a new subscription invoice
+   * Webhooks that should bypass api key check
    */
-  app.post('/webhooks/stripe', stripeWebhook);
-  app.post('/webhooks/mailgun', email.webhook);
-
+  app.post('/webhooks/stripe', stripeWebhook); // when it gets a new subscription invoice
+  app.post('/webhooks/mailgun', email.webhook); // when receiving an email
+  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback); // oauth callback
+  
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 
   /**
@@ -208,7 +209,6 @@ export default (app) => {
    */
   app.get('/:slug/connected-accounts', connectedAccounts.list);
   app.get('/connected-accounts/:service(github|twitter|meetup|stripe|paypal)/oauthUrl', aN.authenticateService);
-  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback);
   app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.verify);
 
 
