@@ -868,6 +868,7 @@ export default function(Sequelize, DataTypes) {
       .create({
         ...collectiveData,
         type: types.ORGANIZATION,
+        isActive: true,
         CreatedByUserId: adminUser.id
       })
       .tap(collective => {
