@@ -3,6 +3,8 @@ import request from 'request-promise';
 import Promise from 'bluebird';
 import models from '../models';
 import errors from '../lib/errors';
+import paymentProviders from '../paymentProviders';
+import { get } from 'lodash';
 
 const {
   ConnectedAccount,
@@ -83,9 +85,14 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
   }
 };
 
-export const get = (req, res, next) => {
+export const verify = (req, res, next) => {
   const payload = req.jwtPayload;
   const service = req.params.service;
+
+  if (get(paymentProviders, `${service}.oauth.verify`)) {
+    return paymentProviders[service].oauth.verify(req, res, next);
+  }
+
   if (!payload) return next(new errors.Unauthorized());
   if (payload.scope === 'connected-account' && payload.username) {
     res.send({service, username: payload.username, connectedAccountId: payload.connectedAccountId})
