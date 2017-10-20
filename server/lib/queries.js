@@ -423,7 +423,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
     replacements: {
       collectiveids,
       role: options.role || 'BACKER',
-      limit: options.limit || 100,
+      limit: options.limit || 100000, // we should reduce this to 100 by default but right now Webpack depends on it
       offset: options.offset || 0,
       types
     },
