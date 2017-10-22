@@ -218,6 +218,7 @@ export const create = (req, res, next) => {
       return models.User.findOne({ where: { id: collectiveData.HostId || defaultHostUser().id }}).tap(h => {
         host = h;
         collective.HostCollectiveId = h.CollectiveId;
+        collective.ParentCollectiveId = h.CollectiveId;
         if (collectiveData.HostId) {
           models.Collective.findById(h.CollectiveId).then(host => {
             collective.currency = host.currency;
@@ -320,7 +321,9 @@ export const createFromGithub = (req, res, next) => {
       if (existingCollective) {
         collectiveData.slug = `${collectiveData.slug}-${Math.floor((Math.random() * 1000) + 1)}`;
       }
-      return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id, HostCollectiveId: defaultHostUser('opensource').CollectiveId }));
+      collectiveData.HostCollectiveId = defaultHostUser('opensource').CollectiveId;
+      collectiveData.ParentCollectiveId = defaultHostUser('opensource').CollectiveId;
+      return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
     .tap(g => debug("createdCollective", g && g.dataValues))
     .tap(g => createdCollective = g)

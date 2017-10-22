@@ -445,6 +445,7 @@ export default function(Sequelize, DataTypes) {
       case roles.HOST:
         notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+        this.update({ HostCollectiveId: user.CollectiveId, ParentCollectiveId: this.ParentCollectiveId || user.CollectiveId });
         break;
       case roles.ADMIN:
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
@@ -800,9 +801,12 @@ export default function(Sequelize, DataTypes) {
 
   // get the host of the parent collective if any, or of this collective
   Collective.prototype.getHostCollective = function() {
+    if (this.HostCollectiveId) {
+      return models.Collective.findById(this.HostCollectiveId);
+    }
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id },
+      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [ { model: models.Collective, as: 'memberCollective' } ]
     }).then(m => m && m.memberCollective);
   };
