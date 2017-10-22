@@ -27,7 +27,7 @@ export default class IntlDocument extends Document {
     const page = this.props.__NEXT_DATA__.pathname.substr(1);
 
     const noScriptPages = ['nametags', 'events'];
-    if (noScriptPages.indexOf(page) !== -1) {
+    if (noScriptPages.indexOf(page) === -1) {
       const requiredScripts = Object.keys(scriptsUrls);
       requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
     }
