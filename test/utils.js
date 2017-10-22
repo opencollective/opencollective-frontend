@@ -7,6 +7,10 @@ console.log(">>> screenshotsDirectory", screenshotsDirectory);
 
 export function download(filename, url) {
   return new Promise((resolve, reject) => {
+    if (!process.env.DOWNLOAD_SCREENSHOT) {
+      console.log(">>> screenshot", url);
+      return false;
+    }
     console.log(">>> downloading", url);
     request.head(url, (err, res) => {
       if (err) return reject(err);
