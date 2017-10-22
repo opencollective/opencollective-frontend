@@ -105,8 +105,8 @@ export const loaders = (req) => {
     paymentMethods: {
       findById: new DataLoader(ids => models.PaymentMethod
         .findAll({ where: { id: { $in: ids }}})
-        .then(results => sortResults(ids, results, 'id')))
-      ,
+        .then(results => sortResults(ids, results, 'id'))
+      ),
       findByCollectiveId: new DataLoader(CollectiveIds => models.PaymentMethod
         .findAll({ where: {
           CollectiveId: { $in: CollectiveIds },
@@ -114,10 +114,6 @@ export const loaders = (req) => {
           archivedAt: null
         }})
         .then(results => sortResults(CollectiveIds, results, 'CollectiveId', []))
-        .then(results => {
-          console.log(">>> results: ", results);
-          return results;
-        })
       )
     },
     transactions: {
