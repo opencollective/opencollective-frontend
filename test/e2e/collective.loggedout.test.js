@@ -54,16 +54,17 @@ describe("logged out", () => {
   it("clicks on submit new expense", async function() {
     this.timeout(20000);
     const screenshot = await chromeless
-      .goto(`${WEBSITE_URL}/webpack`)
+      .goto(`${WEBSITE_URL}/tipbox`)
       .wait('.SubmitExpenseBtn')
+      .wait(200)
       .scrollToElement('.SubmitExpenseBtn')
-      .wait(750)
+      .wait(800)
       .click('.SubmitExpenseBtn')
-      .wait(1500)
+      .wait(500)
       .screenshot();
 
     download("new_expense", screenshot);
     const url = await chromeless.evaluate(() => window.location.href)
-    expect(url).to.contain(`${WEBSITE_URL}/webpack/expenses/new`);
+    expect(url).to.contain(`${WEBSITE_URL}/tipbox/expenses/new`);
   });
 });
