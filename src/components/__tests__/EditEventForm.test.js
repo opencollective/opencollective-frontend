@@ -27,7 +27,7 @@ describe("EditEventForm component", () => {
   );
 
   // @TODO: update: no need for slug anymore
-  it('show input type text with slug prefilled', () => {
+  it.skip('show input type text with slug prefilled', () => {
     component.find('a.removeTier').first().simulate('click');
     component.find('a.removeTier').first().simulate('click');
     component.find('.actions Button').simulate('click');
