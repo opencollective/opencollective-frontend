@@ -158,7 +158,7 @@ describe("OrderForm component", () => {
   describe('logged in', () => {
 
     // @TODO: update this test for new OrderForm
-    it.skip('let the user pick a credit card', (done) => {
+    it('let the user pick a credit card', (done) => {
 
       getStripeToken.reset();
 

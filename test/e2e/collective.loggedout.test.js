@@ -17,7 +17,7 @@ describe("logged out", () => {
 
   after(async () => await chromeless.end());
 
-  it.skip("load collective page", async function() {
+  it("load collective page", async function() {
     
     this.timeout(20000);
 
@@ -34,7 +34,7 @@ describe("logged out", () => {
     expect(balance).to.match(/\$[0-9]/);
   });
 
-  it.skip("filter transactions", async function() {
+  it("filter transactions", async function() {
     
     this.timeout(20000);
 
@@ -59,7 +59,7 @@ describe("logged out", () => {
       .scrollToElement('.SubmitExpenseBtn')
       .wait(500)
       .click('.SubmitExpenseBtn')
-      .wait(500)
+      .wait(1500)
       .screenshot();
 
     download("new_expense", screenshot);
