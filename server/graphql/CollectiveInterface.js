@@ -645,16 +645,7 @@ const CollectiveFields = () => {
       type: new GraphQLList(PaymentMethodType),
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
-
-        return models.PaymentMethod.findAll({
-          where: {
-            CollectiveId: collective.id,
-            service: 'stripe',
-            name: { $ne: null },
-            archivedAt: null
-          }
-            
-        });
+        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
       }
     },
     connectedAccounts: {

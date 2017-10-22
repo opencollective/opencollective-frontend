@@ -156,7 +156,7 @@ const TransactionFields = () => {
       type: PaymentMethodType,
       resolve(transaction, args, req) {
         if (!transaction.PaymentMethodId) return null;
-        return req.loaders.paymentMethods.load(transaction.PaymentMethodId);
+        return req.loaders.paymentMethods.findById.load(transaction.PaymentMethodId);
       }
     }    
   }

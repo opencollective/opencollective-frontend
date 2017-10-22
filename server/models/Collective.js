@@ -732,6 +732,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
+        FromCollectiveId: { $ne: this.HostCollectiveId },
         type: 'CREDIT'
       }
     };
