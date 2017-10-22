@@ -38,12 +38,9 @@ function addAuthTokenToHeader(obj = {}) {
 }
 
 export function connectAccount(CollectiveId, service) {
-  const callback = `${window.location.href}/?paypalApprovalStatus=`;
-  const preapprovalTemplate = '${preapprovalKey}';
 
   const params = {
-    returnUrl: `${callback}success&preapprovalKey=${preapprovalTemplate}`,
-    cancelUrl: `${callback}cancel`,
+    redirect: window.location.href.replace(/\?.*/,''),
     CollectiveId
   };
 
