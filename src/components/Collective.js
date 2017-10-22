@@ -289,6 +289,7 @@ class Collective extends React.Component {
               { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
+                    {this.collective.stats.collectives}&nbsp;
                     <FormattedMessage
                       id="collective"
                       values={{ n: this.collective.stats.collectives }}
