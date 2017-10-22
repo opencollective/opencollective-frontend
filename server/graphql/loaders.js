@@ -6,7 +6,7 @@ import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
 const debug = debugLib('loaders');
 
-const sortResults = (keys, results, attribute = 'id') => {
+const sortResults = (keys, results, attribute = 'id', defaultValue) => {
   debug("sortResults", attribute, results.length);
   const resultsById = {};
   results.forEach(r => {
@@ -14,9 +14,16 @@ const sortResults = (keys, results, attribute = 'id') => {
     if (!key) {
       return;
     }
-    resultsById[key] = r;
+    // If the default value is an array
+    // e.g. when we want to return all the paymentMethods for a list of collective ids.
+    if (defaultValue instanceof Array) {
+      resultsById[key] = resultsById[key] || [];
+      resultsById[key].push(r);
+    } else {
+      resultsById[key] = r;
+    }
   });
-  return keys.map(id => resultsById[id]); 
+  return keys.map(id => resultsById[id] || defaultValue);
 }
 
 export const loaders = (req) => {
@@ -78,8 +85,7 @@ export const loaders = (req) => {
     // This one is tricky. We need to make sure that the remoteUser can view the personal details of the user.
     getUserDetailsByCollectiveId: new DataLoader(UserCollectiveIds => getListOfAccessibleUsers(req.remoteUser, UserCollectiveIds)
       .then(accessibleUserCollectiveIds => models.User.findAll({ where: { CollectiveId: { $in: accessibleUserCollectiveIds } }}))
-      .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId'))
-      .map(result => result || {})
+      .then(results => sortResults(UserCollectiveIds, results, 'CollectiveId', {}))
     ),
     tiers: {
       findById: new DataLoader(ids => models.Tier
@@ -96,10 +102,24 @@ export const loaders = (req) => {
       .then(results => sortResults(ids, results, 'TierId'))
       .map(result => get(result, 'dataValues.count') || 0))
   },
-    paymentMethods: new DataLoader(ids => models.PaymentMethod
-      .findAll({ where: { id: { $in: ids }}})
-      .then(results => sortResults(ids, results, 'id'))
-    ),
+    paymentMethods: {
+      findById: new DataLoader(ids => models.PaymentMethod
+        .findAll({ where: { id: { $in: ids }}})
+        .then(results => sortResults(ids, results, 'id')))
+      ,
+      findByCollectiveId: new DataLoader(CollectiveIds => models.PaymentMethod
+        .findAll({ where: {
+          CollectiveId: { $in: CollectiveIds },
+          name: { $ne: null },
+          archivedAt: null
+        }})
+        .then(results => sortResults(CollectiveIds, results, 'CollectiveId', []))
+        .then(results => {
+          console.log(">>> results: ", results);
+          return results;
+        })
+      )
+    },
     transactions: {
       totalAmountForOrderId: new DataLoader(keys => models.Transaction.findAll({
           attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
