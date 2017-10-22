@@ -800,9 +800,12 @@ export default function(Sequelize, DataTypes) {
 
   // get the host of the parent collective if any, or of this collective
   Collective.prototype.getHostCollective = function() {
+    if (this.HostCollectiveId) {
+      return models.Collective.findById(this.HostCollectiveId);
+    }
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id },
+      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [ { model: models.Collective, as: 'memberCollective' } ]
     }).then(m => m && m.memberCollective);
   };
