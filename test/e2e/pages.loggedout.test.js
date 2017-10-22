@@ -32,5 +32,20 @@ describe("logged out", () => {
 
     const monthlySelected = await chromeless.exists('.intervalBtnGroup button:nth-child(2).btn-primary');
     expect(monthlySelected).to.be.true;
-  })
+  });
+
+  it("loads the /events iframe", async function() {
+    this.timeout(10000);
+    const screenshot = await chromeless
+      .goto(`${WEBSITE_URL}/brusselstogether/events`)
+      .wait('.pastEvents')
+      .scrollToElement('.pastEvents')
+      .screenshot();
+
+    download("events.iframe", screenshot);
+    const numberOfPastEvents = await chromeless.evaluate(() => document.querySelectorAll('.pastEvents li').length);
+    expect(numberOfPastEvents > 3).to.be.true;
+
+  });
+
 });
