@@ -10,8 +10,6 @@ export function download(filename, url) {
     console.log(">>> downloading", url);
     request.head(url, (err, res) => {
       if (err) return reject(err);
-      console.log('content-type:', res.headers['content-type']);
-      console.log('content-length:', res.headers['content-length']);
       const filepath = path.join(screenshotsDirectory, `${filename}.png`);
       console.log(">>> saved in", filepath, `${Math.round(Number(res.headers['content-length']) / 1024)}KB`);
       request(url).pipe(fs.createWriteStream(filepath)).on('close', (err) => {

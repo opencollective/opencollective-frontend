@@ -17,7 +17,7 @@ describe("logged out", () => {
 
   it("makes a one time donation", async function() {
     
-    this.timeout(30000);
+    this.timeout(25000);
 
     const run = async () => {
 
@@ -38,11 +38,10 @@ describe("logged out", () => {
         .click(".presetBtn")
         .type("Public message", "textarea[name='publicMessage']")
         .click('.submit button')
-        .wait(3000)
         .screenshot();
 
       download("createOrder", screenshot);
-      const screenshot2 = await chromeless.wait('.UserCollectivePage', 15000);
+      const screenshot2 = await chromeless.wait('.UserCollectivePage', 10000).screenshot();
       download("orderCreated", screenshot2);
       
       const url = await chromeless.evaluate(() => window.location.href)
