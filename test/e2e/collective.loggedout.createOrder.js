@@ -14,7 +14,7 @@ describe("collective.loggedout.createOrder", () => {
   })
 
   after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1000))
+    chromeless.end().then(() => setTimeout(done, 2000))
   });
   
   it("makes a one time donation", async function() {

@@ -14,7 +14,7 @@ describe("event.loggedout.register", () => {
   })
 
   after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1000))
+    chromeless.end().then(() => setTimeout(done, 2000))
   });
   
   it("register for a free event", async function() {
