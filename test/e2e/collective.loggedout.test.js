@@ -57,7 +57,7 @@ describe("logged out", () => {
       .goto(`${WEBSITE_URL}/webpack`)
       .wait('.SubmitExpenseBtn')
       .scrollToElement('.SubmitExpenseBtn')
-      .wait(500)
+      .wait(750)
       .click('.SubmitExpenseBtn')
       .wait(1500)
       .screenshot();
