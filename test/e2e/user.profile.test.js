@@ -4,7 +4,7 @@ import { download } from '../utils';
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
 
-describe("logged out", () => {
+describe("user.profile", () => {
   let chromeless;
 
   before((done) => {
@@ -15,8 +15,10 @@ describe("logged out", () => {
     done();
   })
 
-  after(async () => await chromeless.end());
-
+  after((done) => {
+    chromeless.end().then(() => setTimeout(done, 1000))
+  });
+  
   it("loads a profile of a user", async function() {
     this.timeout(10000);
     const screenshot = await chromeless
