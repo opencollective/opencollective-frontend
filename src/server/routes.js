@@ -6,8 +6,16 @@ import moment from 'moment';
 import pages from './pages';
 import { translateApiUrl } from '../lib/utils';
 import request from 'request';
+import controllers from './controllers';
 
 module.exports = (server, app) => {
+
+  server.get('*', (req, res, next) => {
+    // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
+    // note: only for production/staging (NextJS overrides this in development env)
+    res.setHeader('cache-control', 'max-age=30');
+    return next();
+  });
 
   server.get('/favicon.*', (req, res) => res.send(404));
 
@@ -22,12 +30,14 @@ module.exports = (server, app) => {
       .pipe(res);
   });
 
+  server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
+
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';
     res.sendFile(path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`));
   });
 
-  server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res) => {
+  server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res, next) => {
     const { collectiveSlug, eventSlug, format } = req.params;
     const params = {...req.params, ...req.query};
     app.renderToHTML(req, res, 'nametags', params)
@@ -42,6 +52,10 @@ module.exports = (server, app) => {
         res.setHeader('content-type','application/pdf');
         res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
         pdf.create(html, options).toStream((err, stream) => {
+          if (err) {
+            console.log(">>> error while generating pdf", req.url, err);
+            return next(err);
+          }
           stream.pipe(res);
         });
       });

@@ -29,17 +29,19 @@ class EventsWithData extends React.Component {
     return false;
   }
 
-  openEvent(e) {
-    if (this.isIframe) return;
-    const eventSlug = e.currentTarget.attributes.eventSlug.value;
-    Router.pushRoute('event', { eventSlug });
-    e.preventDefault();
-    return false;
+  openEvent(eventSlug) {
+    const { collectiveSlug } = this.props;
+    if (!this.isIframe) {
+      return true; // continue with default behavior of <a href>
+    } else {
+      Router.pushRoute('event', { parentCollectiveSlug: collectiveSlug, eventSlug });
+      return false;
+    }
   }
 
   renderEventEntry(event) {
     return (<li key={event.id}>
-              <a href={`/${event.parentCollective.slug}/events/${event.slug}`} eventSlug={event.slug} onClick={this.openEvent} target="_top">{event.name}</a>, &nbsp;
+              <a href={`/${event.parentCollective.slug}/events/${event.slug}`} onClick={() => this.openEvent(event.slug)} target="_top">{event.name}</a>, &nbsp;
               <FormattedDate value={event.startsAt} day='numeric' month='long' />, &nbsp;
               {event.location.name}
             </li>);

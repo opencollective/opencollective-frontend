@@ -1,19 +1,16 @@
 import React from 'react'
-import { addAttendeesData } from '../graphql/queries';
 import withData from '../lib/withData';
+import withIntl from '../lib/withIntl';
 import { capitalize, firstSentence } from '../lib/utils';
 import colors from '../constants/colors';
 import { FormattedDate } from 'react-intl';
-import { IntlProvider } from 'react-intl';
-
-import 'intl';
-import 'intl/locale-data/jsonp/en.js'; // for old browsers without window.Intl
-import enUS from '../lang/en-US.json';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
 class Nametags extends React.Component {
 
   static getInitialProps ({ query: { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight } }) {
-    return { collectiveSlug, eventSlug, template, format, nametagWidth, nametagHeight }
+    return { collectiveSlug, eventSlug, slug: eventSlug, template, format, nametagWidth, nametagHeight }
   }
 
   constructor(props) {
@@ -60,26 +57,26 @@ class Nametags extends React.Component {
     this.page.paddingTop = Math.floor((this.page.height - this.rows * this.dimensions.nametag.height) / 2);
   }
 
-  renderPage(pageNumber, responses) {
-    while (responses.length < this.nametagsPerPage) {
-      responses.push({});
+  renderPage(pageNumber, orders) {
+    while (orders.length < this.nametagsPerPage) {
+      orders.push({});
     }
     return (
       <div className="page" key={this.pageNumber}>
         <div className="nametags">
-          {responses.map(this.renderNametag)}
+          {orders.map(this.renderNametag)}
         </div>
       </div>
     )
   }
 
-  renderNametag(response, index) {
-    const user = response.user || {};
+  renderNametag(order, index) {
+    const userCollective = order.fromCollective || {};
     return (
       <div className="nametag" key={index}>
-        <h1><span className="firstName">{capitalize(user.firstName)}</span> <span className="lastName">{capitalize(user.lastName)}</span></h1>
-        {user.twitterHandle && <h2 className="twitterHandle">@{user.twitterHandle}</h2> }
-        <p className="description">{firstSentence(response.description || user.description, 60)}</p>
+        <h1><span className="firstName">{userCollective.name}</span></h1>
+        {userCollective.twitterHandle && <h2 className="twitterHandle">@{userCollective.twitterHandle}</h2> }
+        <p className="description">{firstSentence(order.description || userCollective.description, 60)}</p>
         <div className="eventInfo">
           <FormattedDate value={this.event.startsAt} day='numeric' month='long' year='numeric' /> - &nbsp;
           {this.event.name} - {this.event.location.name}
@@ -90,12 +87,11 @@ class Nametags extends React.Component {
 
   render() {
     if (this.props.data.loading) return <div>Loading</div>
-    const responses = [];
-    this.event = this.props.data.Event;
-    this.props.data.Event.responses.map(r => responses.push(r));
+    const orders = [];
+    this.event = this.props.data.Collective;
+    this.props.data.Collective.orders.map(r => orders.push(r));
 
     return (
-      <IntlProvider locale="en-US" messages={enUS}>
       <div className={`NametagsPages ${this.props.collectiveSlug} ${this.props.eventSlug} ${this.props.template}`}>
         <style jsx global>{`
           @font-face {
@@ -211,16 +207,50 @@ class Nametags extends React.Component {
         `}</style>
 
         <div className="pages">
-          {responses.map((response, index) => {
+          {orders.map((order, index) => {
             if (index % this.nametagsPerPage === 0) {
-              return this.renderPage(index/this.nametagsPerPage + 1, responses.slice(index, index + this.nametagsPerPage));
+              return this.renderPage(index/this.nametagsPerPage + 1, orders.slice(index, index + this.nametagsPerPage));
             }
           })}
         </div>
       </div>
-      </IntlProvider>
     );
   }
 }
 
-export default withData(addAttendeesData(Nametags));
+const getAttendeesQuery = gql`
+query Collective($slug: String!) {
+  Collective(slug: $slug) {
+    slug
+    name
+    startsAt
+    location {
+      name
+      address
+    }
+    orders {
+      id
+      createdAt
+      quantity
+      processedAt
+      description
+      fromCollective {
+        id
+        name
+        image
+        slug
+        twitterHandle
+        description
+      }
+      tier {
+        id
+        name
+      }
+    }
+  }
+}
+`;
+
+export const addAttendeesData = graphql(getAttendeesQuery);
+
+export default withData(withIntl(addAttendeesData(Nametags)));

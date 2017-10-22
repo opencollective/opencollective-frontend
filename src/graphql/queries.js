@@ -394,40 +394,6 @@ const getEventCollectiveQuery = gql`
   }
 `;
 
-const getAttendeesQuery = gql`
-  query Collective($slug: String!) {
-    Collective(slug: $slug) {
-      slug
-      name
-      startsAt
-      location {
-        name
-        address
-      }
-      orders {
-        id
-        createdAt
-        quantity
-        processedAt
-        description
-        user {
-          id
-          firstName
-          lastName
-          image
-          username
-          twitterHandle
-          description
-        }
-        tier {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
 const getCollectiveCoverQuery = gql`
   query CollectiveCover($slug: String!) {
     Collective(slug: $slug) {
@@ -448,7 +414,6 @@ export const addCollectiveData = graphql(getCollectiveQuery);
 export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
-export const addAttendeesData = graphql(getAttendeesQuery);
 export const addTiersData = graphql(getTiersQuery);
 export const addUserData = graphql(getUserQuery);
 
