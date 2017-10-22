@@ -59,7 +59,7 @@ describe("logged out", () => {
       .scrollToElement('.SubmitExpenseBtn')
       .wait(500)
       .click('.SubmitExpenseBtn')
-      .wait(200)
+      .wait(500)
       .screenshot();
 
     download("new_expense", screenshot);
