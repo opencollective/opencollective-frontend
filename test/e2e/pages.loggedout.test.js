@@ -16,7 +16,7 @@ describe("pages.loggedout", () => {
   })
 
   after((done) => {
-    chromeless.end().then(() => setTimeout(done, 2000))
+    chromeless.end().then(() => setTimeout(done, 1500))
   });
   
   it("goes to a custom donate URL", async function() {

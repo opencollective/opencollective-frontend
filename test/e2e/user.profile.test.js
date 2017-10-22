@@ -16,7 +16,7 @@ describe("user.profile", () => {
   })
 
   after((done) => {
-    chromeless.end().then(() => setTimeout(done, 2000))
+    chromeless.end().then(() => setTimeout(done, 1500))
   });
   
   it("loads a profile of a user", async function() {

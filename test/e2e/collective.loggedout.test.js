@@ -16,7 +16,7 @@ describe("collective.loggedout.test", () => {
   })
 
   after((done) => {
-    chromeless.end().then(() => setTimeout(done, 2000))
+    chromeless.end().then(() => setTimeout(done, 1500))
   });
   
   it("load collective page", async function() {
