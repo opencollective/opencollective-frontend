@@ -249,7 +249,8 @@ const getChildCollectivesWithBalance = (ParentCollectiveId, options) => {
         AND t.type='CREDIT'
         GROUP BY t."CollectiveId"
     )
-    select c.*, td.* FROM "balance" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id
+    SELECT c.*, td.* FROM "Collectives" c
+    LEFT JOIN "balance" td ON td."CollectiveId" = c.id
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
