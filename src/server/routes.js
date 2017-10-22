@@ -37,7 +37,7 @@ module.exports = (server, app) => {
     res.sendFile(path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`));
   });
 
-  server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res) => {
+  server.get('/:collectiveSlug/events/:eventSlug/nametags.pdf', (req, res, next) => {
     const { collectiveSlug, eventSlug, format } = req.params;
     const params = {...req.params, ...req.query};
     app.renderToHTML(req, res, 'nametags', params)
@@ -52,6 +52,10 @@ module.exports = (server, app) => {
         res.setHeader('content-type','application/pdf');
         res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
         pdf.create(html, options).toStream((err, stream) => {
+          if (err) {
+            console.log(">>> error while generating pdf", req.url, err);
+            return next(err);
+          }
           stream.pipe(res);
         });
       });
