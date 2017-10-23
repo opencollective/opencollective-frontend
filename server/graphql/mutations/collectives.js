@@ -2,6 +2,7 @@ import models from '../../models';
 import errors from '../../lib/errors';
 import slugify from 'slug';
 import { types } from '../../constants/collectives';
+import roles from '../../constants/roles';
 
 export function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -12,7 +13,7 @@ export function createCollective(_, args, req) {
     return Promise.reject(new errors.ValidationFailed("collective.name required"));
   }
 
-  let parentCollective, collective;
+  let hostCollective, parentCollective, collective;
 
   const location = args.collective.location;
 
@@ -28,6 +29,20 @@ export function createCollective(_, args, req) {
   }
 
   const promises = [];
+  if (args.collective.HostCollectiveId) {
+    promises.push(
+      req.loaders
+        .collective.findById.load(args.collective.HostCollectiveId)
+        .then(hc => {
+          if (!hc) return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
+          hostCollective = hc;
+          collectiveData.currency = collectiveData.currency || hc.currency;
+          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], hostCollective.id)) {
+            collectiveData.isActive = true;
+          }
+        })
+    );
+  }
   if (args.collective.ParentCollectiveId) {
     promises.push(
       req.loaders
@@ -35,6 +50,11 @@ export function createCollective(_, args, req) {
         .then(pc => {
           if (!pc) return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
           parentCollective = pc;
+          // The currency of the new created collective if not specified should be the one of its direct parent or the host (in this order)
+          collectiveData.currency = collectiveData.currency || pc.currency;
+          if (req.remoteUser.hasRole([roles.ADMIN, roles.HOST, roles.MEMBER], parentCollective.id)) {
+            collectiveData.isActive = true;
+          }
         })
     );
   }
@@ -70,7 +90,7 @@ export function createCollective(_, args, req) {
         break;
     }
     throw new Error(msg);
-  })  
+  })
 }
 
 export function editCollective(_, args, req) {

@@ -37,7 +37,7 @@ export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
       // https://github.com/sequelize/sequelize/issues/4631
       return User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) } } })
         .then(u => u || User.createUserWithCollective({
-          name: data.profile.displayName,
+          name: data.profile.displayName || data.profile.username,
           image,
           email: emails[0],
         }))

@@ -218,7 +218,15 @@ export const create = (req, res, next) => {
       return models.User.findOne({ where: { id: collectiveData.HostId || defaultHostUser().id }}).tap(h => {
         host = h;
         collective.HostCollectiveId = h.CollectiveId;
-        collective.save();
+        collective.ParentCollectiveId = h.CollectiveId;
+        if (collectiveData.HostId) {
+          models.Collective.findById(h.CollectiveId).then(host => {
+            collective.currency = host.currency;
+            collective.save();
+          })
+        } else {
+          collective.save();
+        }
         _addUserToCollective(collective, h, { role: roles.HOST, remoteUser: creator })
         return null;
       })
@@ -276,6 +284,7 @@ export const createFromGithub = (req, res, next) => {
     }
   ];
 
+  // Find the creator's Connected Account
   ConnectedAccount
     .findOne({
       where: { id: connectedAccountId },
@@ -312,6 +321,8 @@ export const createFromGithub = (req, res, next) => {
       if (existingCollective) {
         collectiveData.slug = `${collectiveData.slug}-${Math.floor((Math.random() * 1000) + 1)}`;
       }
+      collectiveData.HostCollectiveId = defaultHostUser('opensource').CollectiveId;
+      collectiveData.ParentCollectiveId = defaultHostUser('opensource').CollectiveId;
       return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
     .tap(g => debug("createdCollective", g && g.dataValues))
@@ -376,12 +387,10 @@ export const createFromGithub = (req, res, next) => {
                 userAttr.website = json.blog;
                 userAttr.email = json.email;
               }
-              debug("createUserWithCollective", userAttr);
-              return User
-                .createUserWithCollective(Object.assign({}, userAttr))
-                .then(user => {
-                  return user.collective;
-                })
+              debug("findOrCreateUserWithCollective", userAttr);
+              return User.findOne({where: { email: json.email } })
+              .then(u => u || User.createUserWithCollective(Object.assign({}, userAttr)))
+              .then(u => u.collective)
             });
         })
         .then(userCollective => contributorUserCollective = userCollective)

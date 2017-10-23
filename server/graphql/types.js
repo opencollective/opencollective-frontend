@@ -125,7 +125,7 @@ export const MemberType = new GraphQLObjectType({
       totalDonations: {
         type: GraphQLInt,
         resolve(member, args, req) {
-          return req.loaders.transactions.totalAmountDonatedFromTo.load({
+          return member.totalDonations || req.loaders.transactions.totalAmountDonatedFromTo.load({
             FromCollectiveId: member.MemberCollectiveId,
             CollectiveId: member.CollectiveId,
           });
@@ -134,13 +134,13 @@ export const MemberType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return req.loaders.collective.findById.load(member.CollectiveId);
+          return member.collective || req.loaders.collective.findById.load(member.CollectiveId);
         }
       },
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return req.loaders.collective.findById.load(member.MemberCollectiveId);
+          return member.member || req.loaders.collective.findById.load(member.MemberCollectiveId);
         }
       },
       role: {

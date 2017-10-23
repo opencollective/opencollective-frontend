@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-export default () => {
+export default function() {
 
 nock('http://api.meetup.com:80')
   .get('/opencollective/events')
@@ -82,5 +82,4 @@ nock('http://api.meetup.com:80')
   server: 'cloudflare-nginx',
   'cf-ray': '2e1421b104620c5f-AMS' });
 
-
-};
+}

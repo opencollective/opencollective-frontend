@@ -184,7 +184,13 @@ export default function(Sequelize, DataTypes) {
     website: {
       type: DataTypes.STRING,
       get() {
-        if (this.getDataValue('website')) return this.getDataValue('website');
+        let website = this.getDataValue('website');
+        if (website) {
+          if (!website.match(/^http/i)) {
+            website = `http://${website}`;
+          }
+          return website;
+        }
         return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
       }
     },
@@ -389,7 +395,7 @@ export default function(Sequelize, DataTypes) {
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
-      .then(() => queries.getBackersOfCollectiveWithTotalDonations(this.id, options.until))
+      .then(() => queries.getBackersOfCollectiveWithTotalDonations(this.id, options))
       // Map the users to their respective tier
       .map(backerCollective => {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
@@ -445,6 +451,7 @@ export default function(Sequelize, DataTypes) {
       case roles.HOST:
         notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+        this.update({ HostCollectiveId: user.CollectiveId, ParentCollectiveId: this.ParentCollectiveId || user.CollectiveId });
         break;
       case roles.ADMIN:
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
@@ -731,6 +738,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
+        FromCollectiveId: { $ne: this.HostCollectiveId },
         type: 'CREDIT'
       }
     };
@@ -800,27 +808,29 @@ export default function(Sequelize, DataTypes) {
 
   // get the host of the parent collective if any, or of this collective
   Collective.prototype.getHostCollective = function() {
+    if (this.HostCollectiveId) {
+      return models.Collective.findById(this.HostCollectiveId);
+    }
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id },
+      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [ { model: models.Collective, as: 'memberCollective' } ]
     }).then(m => m && m.memberCollective);
   };
 
-  Collective.prototype.getHostId = function() {
+  Collective.prototype.getHostCollectiveId = function() {
     if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
 
     const where = { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id };
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where,
-      logging: console.log
+      where
     }).then(member => member && member.MemberCollectiveId);
   };
 
   Collective.prototype.getHostStripeAccount = function() {
     let HostCollectiveId;
-    return this.getHostId()
+    return this.getHostCollectiveId()
       .then(id => {
         HostCollectiveId = id
         debug("getHostStripeAccount for collective", this.slug, `(id: ${this.id})`, "HostCollectiveId", id);
@@ -869,6 +879,7 @@ export default function(Sequelize, DataTypes) {
       .create({
         ...collectiveData,
         type: types.ORGANIZATION,
+        isActive: true,
         CreatedByUserId: adminUser.id
       })
       .tap(collective => {

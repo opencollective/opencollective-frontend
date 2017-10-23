@@ -62,7 +62,7 @@ describe('orders.routes.test.js', () => {
         it('when user is a ADMIN', () => {
           return models.Member.create({
             CreatedByUserId: user2.id,
-            FromCollectiveId: user2.CollectiveId,
+            MemberCollectiveId: user2.CollectiveId,
             CollectiveId: collective.id,
             role: roles.ADMIN
           })
