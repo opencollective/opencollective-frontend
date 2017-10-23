@@ -29,11 +29,9 @@ app.prepare()
     const locale = accept.language(languages)  || 'en-US';
     console.log(">>> url", req.url);
     console.log(">>> locale", locale);
-    // const locale = accept.language(dev ? ['en'] : languages)  || 'en-US';
     req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale)
     req.messages = getMessages(locale)
-    console.log(">>> req.messages['collective.events.title']", req.messages['collective.events.title'])
     // req.messages = dev ? {} : getMessages(locale)
     next();
   });

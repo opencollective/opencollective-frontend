@@ -10,7 +10,7 @@ import { IntlProvider, intlShape, addLocaleData } from 'react-intl';
 import { mount, shallow } from 'enzyme';
 
 import en from 'react-intl/locale-data/en';
-import messages from '../src/lang/en-US.json';
+import messages from '../src/lang/en.json';
 // import fr from 'react-intl/locale-data/fr';
 // import es from 'react-intl/locale-data/es';
 // import frFR from '../lang/fr-FR.json';

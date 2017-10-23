@@ -135,6 +135,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'website',
           type: 'text',
+          pre: 'http://',
           placeholder: ''
         },
         // {

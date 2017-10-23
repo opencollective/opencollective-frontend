@@ -264,7 +264,7 @@ class InputField extends React.Component {
             defaultValue={this.state.value || field.defaultValue}
             onChange={event => this.handleChange(event.target.value)}
             >
-            {field.options.map(option => {
+            { field.options && field.options.map(option => {
               const value = Object.keys(option)[0];
               const label = option[value];
               return (<option key={value} value={value}>{label}</option>)

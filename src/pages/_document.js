@@ -23,11 +23,14 @@ export default class IntlDocument extends Document {
       google: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI&libraries=places"
     };
 
-    // const page = this.props.__NEXT_DATA__.pathname.substr(1);
-    const requiredScripts = Object.keys(scriptsUrls);
-
     const scripts = [];
-    requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
+    const page = this.props.__NEXT_DATA__.pathname.substr(1);
+
+    const noScriptPages = ['nametags', 'events'];
+    if (noScriptPages.indexOf(page) === -1) {
+      const requiredScripts = Object.keys(scriptsUrls);
+      requiredScripts.forEach(script => scripts.push(scriptsUrls[script]));
+    }
 
     return (
       <html>

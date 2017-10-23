@@ -193,7 +193,10 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => (
                 <section id={role}>
                     <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1> 
-                    <Memberships className={role} memberships={memberOf[role]} />
+                    <Memberships
+                      className={role}
+                      memberships={memberOf[role]}
+                      />
                 </section>
               ))}
 
