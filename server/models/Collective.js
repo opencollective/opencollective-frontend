@@ -184,7 +184,13 @@ export default function(Sequelize, DataTypes) {
     website: {
       type: DataTypes.STRING,
       get() {
-        if (this.getDataValue('website')) return this.getDataValue('website');
+        let website = this.getDataValue('website');
+        if (website) {
+          if (!website.match(/^http/i)) {
+            website = `http://${website}`;
+          }
+          return website;
+        }
         return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
       }
     },
