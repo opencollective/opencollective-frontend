@@ -41,6 +41,7 @@ const createOrderQuery = `
       fromCollective {
         id
         name
+        website
       }
       collective {
         id
@@ -296,7 +297,7 @@ describe('createOrder', () => {
 
       order.fromCollective = {
         name: "NewCo",
-        website: "http://newco.com"
+        website: "newco.com"
       };
 
       order.paymentMethod = {
@@ -311,6 +312,7 @@ describe('createOrder', () => {
       const fromCollective = orderCreated.fromCollective;
       const collective = orderCreated.collective;
       const transactions = await models.Transaction.findAll({ where: { OrderId: orderCreated.id }});
+      expect(fromCollective.website).to.equal('http://newco.com'); // api should prepend http://
       expect(transactions.length).to.equal(2);
       expect(transactions[0].type).to.equal('DEBIT');
       expect(transactions[0].FromCollectiveId).to.equal(collective.id);
