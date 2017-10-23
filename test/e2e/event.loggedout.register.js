@@ -5,7 +5,7 @@ import { download } from '../utils';
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
 
-describe("logged out", () => {
+describe("event.loggedout.register", () => {
   let chromeless;
 
   before((done) => {
@@ -13,8 +13,10 @@ describe("logged out", () => {
     done();
   })
 
-  after(async () => await chromeless.end());
-
+  after((done) => {
+    chromeless.end().then(() => setTimeout(done, 1500))
+  });
+  
   it("register for a free event", async function() {
     this.timeout(40000);
     const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;

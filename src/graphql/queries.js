@@ -296,9 +296,11 @@ const getCollectiveQuery = gql`
           id
           role
           createdAt
+          totalDonations
           collective {
             id
             name
+            currency
             slug
             type
             image
