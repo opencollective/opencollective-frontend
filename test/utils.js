@@ -7,17 +7,22 @@ console.log(">>> screenshotsDirectory", screenshotsDirectory);
 
 export function closeChrome(chrome) {
   return new Promise((resolve, reject) => {
-    chrome.end().then(() => {
-      setTimeout(() => {
-        chrome.kill()
-          .then(() => resolve())
-          .catch(e => {
-            console.error(">>> error closing chrome", e);
-            reject(e);
-          });
-      }, 1500);
-    })
-  });
+    chrome.end()
+      .then(() => {
+        setTimeout(resolve, 100);
+      })
+      // .then(() => {
+        // setTimeout(() => {
+        // console.log(">>> killing chrome", typeof chrome);
+        // chrome.kill()
+          // .then(() => resolve())
+          // .catch(e => {
+            // console.error(">>> error closing chrome", e);
+            // reject(e);
+          // });
+      // }, 500);
+      // })
+    });
 }
 
 export function download(filename, url) {
