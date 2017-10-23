@@ -1,6 +1,5 @@
 import { Chromeless }  from 'chromeless';
-import { expect } from 'chai';
-import { download } from '../utils';
+import { download, closeChrome } from '../utils';
 
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
@@ -8,17 +7,18 @@ const WEBSITE_URL = "https://staging.opencollective.com";
 describe("event.loggedout.register", () => {
   let chromeless;
 
-  before((done) => {
+  beforeAll((done) => {
     chromeless = new Chromeless({ remote: true });
     done();
   })
 
-  after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1500))
+  afterAll(() => {
+    jest.setTimeout(3000);
+    return closeChrome(chromeless);
   });
   
-  it("register for a free event", async function() {
-    this.timeout(40000);
+  test("register for a free event", async () => {
+    jest.setTimeout(40000);
     const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
     let screenshot = await chromeless
       .goto(`${WEBSITE_URL}/opensource/events/webpack-webinar`)
@@ -41,7 +41,7 @@ describe("event.loggedout.register", () => {
 
     download("event.register", screenshot);
     const url = await chromeless.evaluate(() => window.location.href)
-    expect(url).to.contain(`${WEBSITE_URL}/opensource/events/webpack-webinar/order/78?quantity=2&totalAmount=0`);
+    expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/opensource/events/webpack-webinar/order/78?quantity=2&totalAmount=0`));
 
     screenshot = await chromeless
       .scrollToElement('#free.tier .btn.increase')
@@ -54,7 +54,7 @@ describe("event.loggedout.register", () => {
     download("event.registered", screenshot);
     const url2 = await chromeless.evaluate(() => window.location.href)
 
-    expect(url2).to.contain(`?status=orderCreated&CollectiveId=8735&TierId=78&type=EVENT&totalAmount=0`);
+    expect(url2).toEqual(expect.stringContaining(`?status=orderCreated&CollectiveId=8735&TierId=78&type=EVENT&totalAmount=0`));
   })
 
 });

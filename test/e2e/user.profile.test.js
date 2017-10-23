@@ -1,13 +1,12 @@
 import { Chromeless }  from 'chromeless';
-import { expect } from 'chai';
-import { download } from '../utils';
+import { download, closeChrome } from '../utils';
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
 
 describe("user.profile", () => {
   let chromeless;
 
-  before((done) => {
+  beforeAll((done) => {
     chromeless = new Chromeless({
       remote: true,
       viewport: { width: 768, height: 1024 }
@@ -15,12 +14,13 @@ describe("user.profile", () => {
     done();
   })
 
-  after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1500))
+  afterAll(() => {
+    jest.setTimeout(3000);
+    return closeChrome(chromeless);
   });
   
-  it("loads a profile of a user", async function() {
-    this.timeout(10000);
+  test("loads a profile of a user", async () => {
+    jest.setTimeout(10000);
     const screenshot = await chromeless
       .goto(`${WEBSITE_URL}/addyosmani`)
       .wait('#BACKER')
@@ -30,7 +30,7 @@ describe("user.profile", () => {
     download("user.profile", screenshot);
     
     const numberOfPastEvents = await chromeless.evaluate(() => document.querySelectorAll('#BACKER .CollectiveCard').length);
-    expect(numberOfPastEvents >= 3).to.be.true;
+    expect(numberOfPastEvents).toBeGreaterThan(2);
   });
 
 });

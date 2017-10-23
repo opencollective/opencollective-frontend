@@ -5,6 +5,21 @@ import request from 'request';
 const screenshotsDirectory = (process.env.CIRCLE_ARTIFACTS) ? process.env.CIRCLE_ARTIFACTS : '/tmp';
 console.log(">>> screenshotsDirectory", screenshotsDirectory);
 
+export function closeChrome(chrome) {
+  return new Promise((resolve, reject) => {
+    chrome.end().then(() => {
+      setTimeout(() => {
+        chrome.kill()
+          .then(() => resolve())
+          .catch(e => {
+            console.error(">>> error closing chrome", e);
+            reject(e);
+          });
+      }, 1500);
+    })
+  });
+}
+
 export function download(filename, url) {
   return new Promise((resolve, reject) => {
     if (!process.env.DOWNLOAD_SCREENSHOT) {
