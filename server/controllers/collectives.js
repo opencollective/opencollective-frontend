@@ -395,7 +395,7 @@ export const createFromGithub = (req, res, next) => {
         })
         .then(userCollective => contributorUserCollective = userCollective)
         .then(() => {
-          debug("addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective.dataValues)
+          debug("addConnectedAccount", connectedAccount && connectedAccount.dataValues, "to contributor user collective", contributorUserCollective && contributorUserCollective.dataValues)
           return contributorUserCollective.addConnectedAccount(connectedAccount)
         })
         .then(() => _addUserToCollective(createdCollective, { id: contributorUserCollective.CreatedByUserId, CollectiveId: contributorUserCollective.id }, options));
