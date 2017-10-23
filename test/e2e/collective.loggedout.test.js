@@ -1,13 +1,12 @@
 import { Chromeless }  from 'chromeless';
-import { expect } from 'chai';
-import { download } from '../utils';
+import { download, closeChrome } from '../utils';
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
 
 describe("collective.loggedout.test", () => {
   let chromeless;
 
-  before((done) => {
+  beforeAll((done) => {
     chromeless = new Chromeless({
       remote: true,
       viewport: { width: 768, height: 1024 }
@@ -15,13 +14,14 @@ describe("collective.loggedout.test", () => {
     done();
   })
 
-  after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1500))
+  afterAll(() => {
+    jest.setTimeout(3000);
+    return closeChrome(chromeless);
   });
   
-  it("load collective page", async function() {
+  test("load collective page", async () => {
     
-    this.timeout(20000);
+    jest.setTimeout(20000);
 
     const screenshot = await chromeless
       .goto(`${WEBSITE_URL}/webpack`)
@@ -33,12 +33,12 @@ describe("collective.loggedout.test", () => {
     download("collective_page", screenshot);
     const balance = await chromeless.evaluate(() => document.querySelector('.balance').innerText);
     console.log(">>> balance", balance);
-    expect(balance).to.match(/\$[0-9]/);
+    expect(balance).toMatch(/\$[0-9]/);
   });
 
-  it("filter transactions", async function() {
+  test("filter transactions", async () => {
     
-    this.timeout(20000);
+    jest.setTimeout(20000);
 
     const screenshot = await chromeless
       .goto(`${WEBSITE_URL}/webpack`)
@@ -50,11 +50,11 @@ describe("collective.loggedout.test", () => {
 
     download("filter_transactions", screenshot);
     const numberOfDebitTransactions = await chromeless.evaluate(() => document.querySelectorAll('.transaction.debit').length);
-    expect(numberOfDebitTransactions).to.equal(5);
+    expect(numberOfDebitTransactions).toEqual(5);
   });
 
-  it("clicks on submit new expense", async function() {
-    this.timeout(20000);
+  test("clicks on submit new expense", async () => {
+    jest.setTimeout(20000);
     const screenshot = await chromeless
       .goto(`${WEBSITE_URL}/tipbox`)
       .wait('.SubmitExpenseBtn')
@@ -67,6 +67,6 @@ describe("collective.loggedout.test", () => {
 
     download("new_expense", screenshot);
     const url = await chromeless.evaluate(() => window.location.href)
-    expect(url).to.contain(`${WEBSITE_URL}/tipbox/expenses/new`);
+    expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/tipbox/expenses/new`));
   });
 });

@@ -1,6 +1,5 @@
 import { Chromeless }  from 'chromeless';
-import { expect } from 'chai';
-import { download } from '../utils';
+import { download, closeChrome } from '../utils';
 
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
@@ -8,18 +7,19 @@ const WEBSITE_URL = "https://staging.opencollective.com";
 describe("collective.loggedout.createOrder", () => {
   let chromeless;
 
-  before((done) => {
+  beforeAll((done) => {
     chromeless = new Chromeless({ remote: true });
     done();
   })
 
-  after((done) => {
-    chromeless.end().then(() => setTimeout(done, 1500))
+  afterAll(() => {
+    jest.setTimeout(3000);
+    return closeChrome(chromeless);
   });
   
-  it("makes a one time donation", async function() {
+  test("makes a one time donation", async () => {
     
-    this.timeout(25000);
+    jest.setTimeout(25000);
 
     const run = async () => {
 
@@ -48,12 +48,12 @@ describe("collective.loggedout.createOrder", () => {
       
       const url = await chromeless.evaluate(() => window.location.href)
       console.log(">>> url", url);
-      expect(url).to.contain(`${WEBSITE_URL}/xdamman`);
-      expect(url).to.contain(`?status=orderCreated&CollectiveId=302`);
+      expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/xdamman`));
+      expect(url).toEqual(expect.stringContaining(`?status=orderCreated&CollectiveId=302`));
       const thankyou = await chromeless.exists('p.thankyou');
-      expect(thankyou).to.be.true;
+      expect(thankyou).toBeTruthy();
       const messageContent = await chromeless.evaluate(() => document.querySelector('.message').innerText);
-      expect(messageContent).to.contain('webpack');
+      expect(messageContent).toEqual(expect.stringContaining('webpack'));
     }
 
     try {
