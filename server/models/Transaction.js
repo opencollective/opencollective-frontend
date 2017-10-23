@@ -264,6 +264,7 @@ export default (Sequelize, DataTypes) => {
 
   Transaction.createDoubleEntry = (transaction) => {
 
+    transaction.type = (transaction.amount > 0) ? type.CREDIT : type.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
     transaction.TransactionGroup = uuid.v4();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;

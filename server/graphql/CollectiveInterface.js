@@ -313,7 +313,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      paymentMethods: { type: new GraphQLList(PaymentMethodType) },
+      paymentMethods: {
+        type: new GraphQLList(PaymentMethodType),
+        args: {
+          service: { type: GraphQLString }
+        }
+      },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) }
     }
   }
@@ -643,6 +648,9 @@ const CollectiveFields = () => {
     },
     paymentMethods: {
       type: new GraphQLList(PaymentMethodType),
+      args: {
+        service: { type: GraphQLString }
+      },
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
         return req.loaders.paymentMethods.findByCollectiveId.load(collective.id);

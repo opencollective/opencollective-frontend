@@ -1,7 +1,7 @@
 import Paypal from 'paypal-adaptive';
 import config from 'config';
 import Promise from 'bluebird';
-
+import { get } from 'lodash';
 const paypalAdaptiveClient = new Paypal({
   userId: config.paypal.classic.userId,
   password: config.paypal.classic.password,
@@ -27,7 +27,11 @@ const callPaypal = (endpointName, payload) => {
       console.log(`Paypal ${endpointName} response: ${JSON.stringify(res)}`); // leave this in permanently
       if (err) {
         console.log(`Paypal ${endpointName} error: ${JSON.stringify(err)}`); // leave this in permanently
-        return reject(new Error(res.error[0].message)); // error details are included in the response. sigh.
+        if (err.code === 'ENOTFOUND' && err.syscall === 'getaddrinfo') {
+          return reject(new Error(`Unable to reach ${err.hostname}`));
+        }
+        const errormsg = get(res, 'error[0].message') || JSON.stringify(err); // error details are included in the response, sometimes sigh.
+        return reject(new Error(errormsg));
       }
       resolve(res);
     });

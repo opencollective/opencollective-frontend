@@ -13,7 +13,6 @@ import uploadImage from './controllers/images';
 import * as mw from './controllers/middlewares';
 import * as notifications from './controllers/notifications';
 import getPaymentMethods from './controllers/paymentMethods';
-import * as paypal from './controllers/paypal';
 import * as subscriptions from './controllers/subscriptions';
 import * as test from './controllers/test';
 import * as users from './controllers/users';
@@ -97,11 +96,12 @@ export default (app) => {
   }));
 
   /**
-   * Webhook for stripe when it gets a new subscription invoice
+   * Webhooks that should bypass api key check
    */
-  app.post('/webhooks/stripe', stripeWebhook);
-  app.post('/webhooks/mailgun', email.webhook);
-
+  app.post('/webhooks/stripe', stripeWebhook); // when it gets a new subscription invoice
+  app.post('/webhooks/mailgun', email.webhook); // when receiving an email
+  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback); // oauth callback
+  
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
 
   /**
@@ -140,13 +140,6 @@ export default (app) => {
   app.post('/users/:userid/payment-methods', NotImplemented); // Create a user's paymentMethod.
   app.put('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Update a user's paymentMethod.
   app.delete('/users/:userid/payment-methods/:paymentMethodid', NotImplemented); // Delete a user's paymentMethod.
-
-  /**
-   * Paypal Preapproval.
-   */
-  app.get('/users/:userid/paypal/preapproval', auth.mustBeLoggedInAsUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
-  app.post('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.confirmPreapproval); // Confirm a preapproval key.
-  app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
 
   /**
    * Collectives.
@@ -215,9 +208,17 @@ export default (app) => {
    * Generic OAuth (ConnectedAccounts)
    */
   app.get('/:slug/connected-accounts', connectedAccounts.list);
-  app.get('/connected-accounts/:service(github|twitter|meetup|stripe)', aN.authenticateService);
-  app.get('/connected-accounts/:service/callback', aN.authenticateServiceCallback);
-  app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.get);
+  app.get('/connected-accounts/:service(github|twitter|meetup|stripe|paypal)/oauthUrl', aN.authenticateService);
+  app.get('/connected-accounts/:service/verify', aN.parseJwtNoExpiryCheck, connectedAccounts.verify);
+
+
+  // /**
+  //  * Paypal Preapproval.
+  //  */
+  // app.get('/users/:userid/paypal/preapproval', auth.mustBeLoggedInAsUser, paypal.getPreapprovalKey); // Get a user's preapproval key.
+  // app.post('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.confirmPreapproval); // Confirm a preapproval key.
+  // app.get('/users/:userid/paypal/preapproval/:preapprovalkey', auth.mustBeLoggedInAsUser, paypal.getDetails); // Get a preapproval key details.
+
 
   /**
    * External services

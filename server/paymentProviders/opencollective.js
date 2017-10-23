@@ -6,10 +6,10 @@ export default {
   features: {
     recurring: false
   },
+  // Returns the balance in the currency of the paymentMethod (ie. currency of the Collective)
   getBalance: (paymentMethod) => {
     return models.Transaction.find({
       attributes: [
-        [sequelize.fn('MAX', sequelize.col('currency')), 'currency'],
         [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount']
       ],
       where: {
@@ -17,7 +17,7 @@ export default {
       }
     })
     .then(result => {
-      return result.dataValues;
+      return result.dataValues.amount;
     });
   },
   processOrder: (order) => {
