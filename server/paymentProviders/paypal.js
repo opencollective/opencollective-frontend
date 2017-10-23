@@ -67,7 +67,7 @@ export default {
     })
     .then(() => {
       debug(`Total spent: ${formatCurrency(totalSpent, paymentMethod.currency)} across ${totalTransactions} transactions between ${firstTransactionAt} and ${lastTransactionAt}`);
-      return 2000 + totalSpent; // total spent has a negative value
+      return 200000 + totalSpent; // total spent has a negative value (in cents)
     })
   },
 
