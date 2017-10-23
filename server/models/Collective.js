@@ -184,7 +184,13 @@ export default function(Sequelize, DataTypes) {
     website: {
       type: DataTypes.STRING,
       get() {
-        if (this.getDataValue('website')) return this.getDataValue('website');
+        let website = this.getDataValue('website');
+        if (website) {
+          if (!website.match(/^http/i)) {
+            website = `http://${website}`;
+          }
+          return website;
+        }
         return (this.getDataValue('twitterHandle')) ? `https://twitter.com/${this.getDataValue('twitterHandle')}` : null;
       }
     },
@@ -445,6 +451,7 @@ export default function(Sequelize, DataTypes) {
       case roles.HOST:
         notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+        this.update({ HostCollectiveId: user.CollectiveId, ParentCollectiveId: this.ParentCollectiveId || user.CollectiveId });
         break;
       case roles.ADMIN:
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
@@ -731,6 +738,7 @@ export default function(Sequelize, DataTypes) {
       ],
       where: {
         CollectiveId: this.id,
+        FromCollectiveId: { $ne: this.HostCollectiveId },
         type: 'CREDIT'
       }
     };
@@ -800,9 +808,12 @@ export default function(Sequelize, DataTypes) {
 
   // get the host of the parent collective if any, or of this collective
   Collective.prototype.getHostCollective = function() {
+    if (this.HostCollectiveId) {
+      return models.Collective.findById(this.HostCollectiveId);
+    }
     return models.Member.findOne({
       attributes: ['MemberCollectiveId'],
-      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId || this.id },
+      where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [ { model: models.Collective, as: 'memberCollective' } ]
     }).then(m => m && m.memberCollective);
   };
@@ -868,6 +879,7 @@ export default function(Sequelize, DataTypes) {
       .create({
         ...collectiveData,
         type: types.ORGANIZATION,
+        isActive: true,
         CreatedByUserId: adminUser.id
       })
       .tap(collective => {

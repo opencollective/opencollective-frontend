@@ -246,10 +246,13 @@ const getChildCollectivesWithBalance = (ParentCollectiveId, options) => {
         AND c."isActive" IS TRUE
         AND c."ParentCollectiveId"=:ParentCollectiveId
         AND c."deletedAt" IS NULL
-        AND t.type='CREDIT'
         GROUP BY t."CollectiveId"
     )
-    select c.*, td.* FROM "balance" td LEFT JOIN "Collectives" c on td."CollectiveId" = c.id
+    SELECT c.*, td.* FROM "Collectives" c
+    LEFT JOIN "balance" td ON td."CollectiveId" = c.id
+    WHERE c."isActive" IS TRUE
+    AND c."ParentCollectiveId"=:ParentCollectiveId
+    AND c."deletedAt" IS NULL
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
@@ -423,7 +426,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
     replacements: {
       collectiveids,
       role: options.role || 'BACKER',
-      limit: options.limit || 100,
+      limit: options.limit || 100000, // we should reduce this to 100 by default but right now Webpack depends on it
       offset: options.offset || 0,
       types
     },

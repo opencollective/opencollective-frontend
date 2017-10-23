@@ -107,6 +107,7 @@ export const CollectiveInputType = new GraphQLInputObjectType({
     tiers: { type: new GraphQLList(TierInputType) },
     members: { type: new GraphQLList(MemberInputType) },
     paymentMethods: { type: new GraphQLList(PaymentMethodInputType) },
+    HostCollectiveId: { type: GraphQLInt },
     ParentCollectiveId: { type: GraphQLInt },
     // not very logical to have this here. Might need some refactoring. Used to add/edit members and to create a new user on a new order
     email: { type: GraphQLString },

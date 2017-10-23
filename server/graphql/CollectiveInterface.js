@@ -121,10 +121,10 @@ export const CollectiveStatsType = new GraphQLObjectType({
         }
       },
       collectives: {
-        description: "Number of collectives hosted by this collective",
+        description: "Number of collectives under this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Collective.count({ where: { HostCollectiveId: collective.id } });
+          return models.Collective.count({ where: { ParentCollectiveId: collective.id } });
         }
       },
       expenses: {
@@ -653,17 +653,7 @@ const CollectiveFields = () => {
       },
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
-        const where = {
-          CollectiveId: collective.id,
-          name: { $ne: null },
-          archivedAt: null
-        };
-
-        if (args.service) {
-          where.service = args.service;
-        }
-
-        return models.PaymentMethod.findAll({ where });
+        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
       }
     },
     connectedAccounts: {
