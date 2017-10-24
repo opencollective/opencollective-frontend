@@ -80,7 +80,7 @@
     "dev": "babel-node src/server",
     "build": "npm run build:server && next build build",
     "start": "node build/server",
-    "test": "jest src/* test/e2e/*",
+    "test": "jest src/*",
     "test:e2e": "jest test/e2e/*",
     "build:server": "./node_modules/.bin/babel -D ./src -d ./build",
     "build:langs": "./node_modules/.bin/babel src > /dev/null && ./node_modules/.bin/babel-node scripts/translate.js",

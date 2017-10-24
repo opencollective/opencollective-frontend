@@ -13,6 +13,7 @@ const COLLECTIVE_CARDS_PER_PAGE = 10;
 class CollectivesWithData extends React.Component {
 
   static propTypes = {
+    HostCollectiveId: PropTypes.number,
     ParentCollectiveId: PropTypes.number,
     limit: PropTypes.number
   }
@@ -109,8 +110,8 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
-  allCollectives(ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
+query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+  allCollectives(HostCollectiveId: $HostCollectiveId, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
     createdAt
@@ -134,6 +135,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
     return {
       variables: {
         ParentCollectiveId: props.ParentCollectiveId,
+        HostCollectiveId: props.HostCollectiveId,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,

@@ -19,7 +19,7 @@ class EventsWithData extends React.Component {
   }
 
   componentDidMount() {
-    this.isIframe = !(window.top.location.hostname.match(/opencollective\.com/i) || window.top.location.hostname === 'localhost');
+    this.isIframe = window.self !== window.top;
   }
 
   createEvent(e) {

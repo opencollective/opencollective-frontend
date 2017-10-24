@@ -1,11 +1,29 @@
 import fs from 'fs';
 import path from 'path';
 import request from 'request';
+import { Chromeless }  from 'chromeless';
 
 const screenshotsDirectory = (process.env.CIRCLE_ARTIFACTS) ? process.env.CIRCLE_ARTIFACTS : '/tmp';
 console.log(">>> screenshotsDirectory", screenshotsDirectory);
 
-export function closeChrome(chrome) {
+let chromelessInstance = null;
+
+export const chromeless = {
+
+  init: () => {
+    if (chromelessInstance instanceof Chromeless) return chromelessInstance;
+    const options = {
+      viewport: { width: 768, height: 1024 },
+      debug: true
+    };
+    if (process.env.CHROMELESS_ENDPOINT_URL) {
+      options.remote = true;
+    }
+    chromelessInstance = new Chromeless(options);
+    return chromelessInstance;
+  },
+
+  close: function(chrome) {
   return new Promise((resolve, reject) => {
     chrome.end()
       .then(() => {
@@ -23,7 +41,8 @@ export function closeChrome(chrome) {
       // }, 500);
       // })
     });
-}
+  }
+};
 
 export function download(filename, url) {
   return new Promise((resolve, reject) => {

@@ -16,7 +16,7 @@
   "collective.donate": "donate",
   "collective.contribute": "contribute",
   "collective.events.title": "Events",
-  "collective": "{n} {n, plural, one {collective} other {collectives}}",
+  "collective": "{n, plural, one {collective} other {collectives}}",
   "sponsor": "{n} {n, plural, one {sponsor} other {sponsors}}",
   "backer": "{n} {n, plural, one {backer} other {backers}}",
   "collective.budget.title": "Budget",
