@@ -163,7 +163,8 @@ export async function payExpense(remoteUser, expenseId) {
   const host = await expense.collective.getHostCollective();
   if (expense.payoutMethod === 'paypal') {
     const paypalEmail = await expense.getPaypalEmail();
-    const paymentMethod = await expense.getPaymentMethod();
+    const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
+
     try {
       const paymentResponse = await paymentProviders[expense.payoutMethod].pay(expense.collective, expense, paypalEmail, paymentMethod.token);
       const preapprovalDetailsResponse = await paypalAdaptive.preapprovalDetails(paymentMethod.token);

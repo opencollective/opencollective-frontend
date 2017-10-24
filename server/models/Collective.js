@@ -595,6 +595,25 @@ export default function(Sequelize, DataTypes) {
     return models.Transaction.findAll({ where, order: [['createdAt','DESC']] });
   };
 
+  // Returns the last payment method that has been confirmed attached to this collective
+  Collective.prototype.getPaymentMethod = async function(where) {
+    return models.PaymentMethod.findOne({
+      where: {
+        ...where,
+        CollectiveId: this.id,
+        confirmedAt: { $ne: null }
+      },
+      order: [['confirmedAt', 'DESC']]
+    })
+    .tap(paymentMethod => {
+      if (!paymentMethod) {
+        throw new Error(`No payment method found`);
+      } else if (paymentMethod.endDate && (paymentMethod.endDate < new Date())) {
+        throw new Error('Payment method expired');
+      }
+    });    
+  }
+
   Collective.prototype.getBalance = function(until) {
     until = until || new Date();
     return models.Transaction.find({

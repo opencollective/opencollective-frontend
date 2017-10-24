@@ -68,7 +68,7 @@ export function createCollective(_, args, req) {
       return req.remoteUser.hasRole(['ADMIN', 'HOST', 'BACKER'], parentCollective.id);
     } else {
       return req.remoteUser.hasRole(['ADMIN', 'HOST'], collectiveData.id);
-    } // flight number AA2313
+    }
   })
   .then(canCreateCollective => {
     if (!canCreateCollective) return Promise.reject(new errors.Unauthorized(`You must be logged in as a member of the ${parentCollective.slug} collective to create an event`));
