@@ -1,21 +1,13 @@
-import { Chromeless }  from 'chromeless';
-import { download, closeChrome } from '../utils';
+import { download, chromeless } from '../utils';
 
 const WEBSITE_URL = "https://staging.opencollective.com";
 // const WEBSITE_URL = "http://localhost:3030";
 
 describe("collective.loggedout.createOrder", () => {
-  let chromeless;
+  let browser;
 
-  beforeAll((done) => {
-    chromeless = new Chromeless({ remote: true });
-    done();
-  })
-
-  afterAll(() => {
-    jest.setTimeout(3000);
-    return closeChrome(chromeless);
-  });
+  beforeAll(() => browser = chromeless.init());
+  afterAll(() => chromeless.close(browser));
   
   test("makes a one time donation", async () => {
     
@@ -25,7 +17,7 @@ describe("collective.loggedout.createOrder", () => {
 
       const email = `testuser+${Math.round(Math.random()*1000000)}@gmail.com`;
 
-      const screenshot = await chromeless
+      const screenshot = await browser
         .goto(`${WEBSITE_URL}/webpack/donate`)
         .type(email, "input[name='email']")
         .type("Xavier", "input[name='firstName']")
@@ -43,24 +35,24 @@ describe("collective.loggedout.createOrder", () => {
         .screenshot();
 
       download("createOrder", screenshot);
-      const screenshot2 = await chromeless.wait('.UserCollectivePage', 10000).screenshot();
+      const screenshot2 = await browser.wait('.UserCollectivePage', 10000).screenshot();
       download("orderCreated", screenshot2);
       
-      const url = await chromeless.evaluate(() => window.location.href)
+      const url = await browser.evaluate(() => window.location.href)
       console.log(">>> url", url);
       expect(url).toEqual(expect.stringContaining(`${WEBSITE_URL}/xdamman`));
       expect(url).toEqual(expect.stringContaining(`?status=orderCreated&CollectiveId=302`));
-      const thankyou = await chromeless.exists('p.thankyou');
+      const thankyou = await browser.exists('p.thankyou');
       expect(thankyou).toBeTruthy();
-      const messageContent = await chromeless.evaluate(() => document.querySelector('.message').innerText);
+      const messageContent = await browser.evaluate(() => document.querySelector('.message').innerText);
       expect(messageContent).toEqual(expect.stringContaining('webpack'));
     }
 
     try {
       await run();
     } catch (e) {
-      // Sadly this doesn't work yet: https://github.com/graphcool/chromeless/issues/279
-      const screenshot = await chromeless.screenshot();
+      // Sadly this doesn't work yet: https://github.com/graphcool/browser/issues/279
+      const screenshot = await browser.screenshot();
       console.error(">>> error: ", e);
       console.log(">>> screenshot", screenshot);
     }
