@@ -64,6 +64,8 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     amount
     currency
     payoutMethod
+    privateMessage
+    attachment
     collective {
       id
       slug

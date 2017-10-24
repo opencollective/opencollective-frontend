@@ -86,6 +86,13 @@ class ExpenseDetails extends React.Component {
           {capitalize(expense.payoutMethod)}
         </div>
 
+        { expense.privateMessage &&
+          <div className="col">
+            <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
+            {capitalize(expense.privateMessage)}
+          </div>
+        }
+
         <div className="col">
           <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
           <div className="amountDetails">

@@ -41,7 +41,7 @@ class Header extends React.Component {
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900|Rubik" />
         <title>{title}</title>
-        {this.meta.map(({name, content}) => <meta property={name} content={content} />)}
+        { this.meta.map(({name, content}, index) => <meta property={name} content={content} key={`meta-${index}`} />) }
       </Head>
 
       <style jsx global>{`

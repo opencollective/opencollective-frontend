@@ -3,8 +3,8 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import { addCollectiveCoverData, addGetLoggedInUserFunction } from '../graphql/queries';
-import NotFound from '../components/NotFound';
+import { addGetLoggedInUserFunction } from '../graphql/queries';
+import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
@@ -12,12 +12,15 @@ import ExpensesWithData from '../components/ExpensesWithData';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import CollectivePicker from '../components/CollectivePickerWithData';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
+import ConnectPaypal from '../components/ConnectPaypal';
 
-class ExpensesPage extends React.Component {
+class HostExpensesPage extends React.Component {
 
   static getInitialProps (props) {
-    const { query: { hostCollectiveSlug }, data } = props;
-    return { slug: hostCollectiveSlug, data }
+    const { query, data } = props;
+    return { collectiveSlug: query.hostCollectiveSlug, data, query, ssr: false }
   }
 
   constructor(props) {
@@ -41,19 +44,20 @@ class ExpensesPage extends React.Component {
   render() {
     const { data } = this.props;
     const { LoggedInUser } = this.state;
-    if (!data.Collective) return (<NotFound />);
-
+    
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
       return (<ErrorPage message="GraphQL error" />)
     }
+    
+    if (!data.Collective) return (<Loading />);
 
     const collective = data.Collective;
     const collectiveId = this.state.CollectiveId || collective.id;
     const includeHostedCollectives = (collectiveId === collective.id);
 
     return (
-      <div className="ExpensesPage">
+      <div className="HostExpensesPage">
 
         <Header
           title={collective.name}
@@ -76,8 +80,12 @@ class ExpensesPage extends React.Component {
 
           <div className="content" >
 
+            <ConnectPaypal
+              collective={collective}
+              />
+
             <CollectivePicker
-              hostCollectiveSlug={this.props.slug}
+              hostCollectiveSlug={this.props.collectiveSlug}
               onChange={(CollectiveId => this.pickCollective(CollectiveId))}
               />
 
@@ -96,7 +104,31 @@ class ExpensesPage extends React.Component {
       </div>
     );
   }
-
 }
 
-export default withData(addGetLoggedInUserFunction(addCollectiveCoverData(withIntl(ExpensesPage))));
+const getDataQuery = gql`
+query Collective($collectiveSlug: String!) {
+  Collective(slug: $collectiveSlug) {
+    id
+    type
+    slug
+    name
+    currency
+    backgroundImage
+    settings
+    image
+    isHost
+    paymentMethods {
+      id
+      service
+      createdAt
+      balance
+      currency
+    }
+  }
+}
+`;
+
+export const addData = graphql(getDataQuery);
+
+export default withData(addGetLoggedInUserFunction(addData(withIntl(HostExpensesPage))));
