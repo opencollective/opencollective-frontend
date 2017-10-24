@@ -124,7 +124,14 @@ export const CollectiveStatsType = new GraphQLObjectType({
         description: "Number of collectives under this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Collective.count({ where: { ParentCollectiveId: collective.id } });
+          return models.Collective.count({ where: { ParentCollectiveId: collective.id, type: types.COLLECTIVE } });
+        }
+      },
+      events: {
+        description: "Number of events under this collective",
+        type: GraphQLInt,
+        resolve(collective) {
+          return models.Collective.count({ where: { ParentCollectiveId: collective.id, type: types.EVENT } });
         }
       },
       expenses: {

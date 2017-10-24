@@ -161,6 +161,7 @@ const queries = {
         type: GraphQLString,
         description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
       },
+      HostCollectiveId: { type: GraphQLInt },
       ParentCollectiveId: { type: GraphQLInt },
       orderBy: { type: GraphQLString },
       orderDirection: { type: GraphQLString },
@@ -173,6 +174,7 @@ const queries = {
         limit: args.limit || 10
       };
 
+      if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
       if (args.tags) query.where.tags = { $overlap: args.tags };
       if (args.type) query.where.type = args.type;
