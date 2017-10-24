@@ -61,6 +61,7 @@ const createConnectedAccount = (hostname) => {
 
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
 .then(() => createConnectedAccount('opensource'))
+.then(() => createConnectedAccount('other'))
 .then(() => createConnectedAccount('brussesltogether'))
 .then(() => createConnectedAccount('wwcode'))
 .then(() => done())
