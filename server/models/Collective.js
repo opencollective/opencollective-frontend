@@ -319,7 +319,15 @@ export default function(Sequelize, DataTypes) {
         });
         return null;
       }
-    }
+    },
+
+    indexes: [
+      { fields: ['HostCollectiveId'] },
+      { fields: ['ParentCollectiveId', 'type'] },
+      { fields: ['type', 'tags'] },
+      { fields: ['slug'], unique: true }
+    ]
+
   });
 
   /**
