@@ -258,6 +258,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          type: { type: GraphQLString },
           role: { type: GraphQLString },
           roles: { type: new GraphQLList(GraphQLString) }
         }
@@ -289,7 +290,13 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         }
       },
       maxQuantity: { type: GraphQLInt },
-      tiers: { type: new GraphQLList(TierType) },
+      tiers: {
+        type: new GraphQLList(TierType),
+        args: {
+          id: { type: GraphQLInt },
+          slug: { type: GraphQLString }
+        }
+      },
       orders: { type: new GraphQLList(OrderType) },
       stats: { type: CollectiveStatsType },
       transactions: {
@@ -479,16 +486,36 @@ const CollectiveFields = () => {
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        type: { type: GraphQLString },
         role: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) }
       },
       resolve(collective, args) {
-        const where = { CollectiveId: collective.id };
+        const query = {
+          limit: args.limit,
+          offset: args.offset
+        };
+
+        query.where = { CollectiveId: collective.id };
         const roles = args.roles || args.role && [ args.role ];
+
         if (roles && roles.length > 0) {
-          where.role = { $in: args.roles };
+          query.where.role = { $in: args.roles };
         }
-        return models.Member.findAll({ where, limit: args.limit, offset: args.offset });
+
+        if (args.type) {
+          const types = args.type.split(',');
+          query.include = [
+            {
+              model: models.Collective,
+              as: 'memberCollective',
+              required: true,
+              where: { type: { $in: types } }
+            }
+          ];
+        }
+
+        return models.Member.findAll(query);
       }
     },
     memberOf: {
@@ -545,8 +572,15 @@ const CollectiveFields = () => {
     },
     tiers: {
       type: new GraphQLList(TierType),
-      resolve(collective) {
-        return collective.getTiers({ order: [['amount', 'ASC']] });
+      args: {
+        id: { type: GraphQLInt },
+        slug: { type: GraphQLString }
+      },
+      resolve(collective, args) {
+        return collective.getTiers({
+          where: args,
+          order: [['amount', 'ASC']]
+        });
       }
     },
     orders: {

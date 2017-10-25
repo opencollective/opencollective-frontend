@@ -207,6 +207,32 @@ describe('graphql.collective.test.js', () => {
     ]);
   })
 
+  it('gets the members by type', async () => {
+    const query = `
+    query Collective($slug: String!, $type: String) {
+      Collective(slug: $slug) {
+        members(type: $type) {
+          id
+          member {
+            id
+            type
+            slug
+          }
+        }
+      }
+    }
+    `;
+    const fetchMembersByType = async (type) => {
+      const result = await utils.graphqlQuery(query, { slug: "brusselstogether", type });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      return result.data.Collective.members;
+    }
+
+    expect(await fetchMembersByType('USER')).to.have.length(37);
+    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(3);
+  });
+
   it('edits members', async () => {
 
     const collective = {

@@ -280,8 +280,8 @@ export const ExpenseType = new GraphQLObjectType({
   }
 });
 
-export const StatsTierType = new GraphQLObjectType({
-  name: 'StatsTierType',
+export const TierStatsType = new GraphQLObjectType({
+  name: 'TierStatsType',
   description: 'Stats about a tier',
   fields: () => {
     return {
@@ -297,6 +297,13 @@ export const StatsTierType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier, args, req) {
           return req.loaders.tiers.totalOrders.load(tier.id);
+        }
+      },
+      totalDistinctOrders: {
+        description: 'total number of people/organizations in this tier',
+        type: GraphQLInt,
+        resolve(tier, args, req) {
+          return req.loaders.tiers.totalDistinctOrders.load(tier.id);
         }
       },
       availableQuantity: {
@@ -437,7 +444,7 @@ export const TierType = new GraphQLObjectType({
         }
       },
       stats: {
-        type: StatsTierType,
+        type: TierStatsType,
         resolve(tier) {
           return tier;
         }
