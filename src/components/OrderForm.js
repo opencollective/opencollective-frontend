@@ -133,7 +133,7 @@ class OrderForm extends React.Component {
     const collective = this.collectivesById[CollectiveId];
 
     const generateOptionsForCollective = (collective) => {
-      return (collective.paymentMethods || []).map(pm => {
+      return paymentMethods.map(pm => {
         const value = pm.uuid
         const label = `💳  \xA0\xA0${collective.name} - ${pm.data.brand} ${pm.data.funding} ${pm.name} - exp ${pm.data.expMonth}/${pm.data.expYear}`;
         const option = {};
@@ -143,13 +143,15 @@ class OrderForm extends React.Component {
     }
 
     if (collective) {
-      paymentMethods = collective.paymentMethods || [];
+      paymentMethods = (collective.paymentMethods || []).filter(pm => pm.service === 'stripe');
       paymentMethodsOptions = generateOptionsForCollective(collective);
     }
+
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
       paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods];
       paymentMethodsOptions = [...paymentMethodsOptions, ... generateOptionsForCollective(this.collectivesById[LoggedInUser.CollectiveId])];
     }
+
     paymentMethodsOptions.push({'other': 'other'});
 
     this.paymentMethods = paymentMethods;
