@@ -31,6 +31,9 @@ module.exports = (server, app) => {
   });
 
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
+  server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
+  server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
+  server.get('/:collectiveSlug/tiers/:tierSlug.svg', controllers.collectives.banner);
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';
