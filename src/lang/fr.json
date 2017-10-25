@@ -84,7 +84,7 @@
   "paymentMethod.remove": "supprimer",
   "paymentMethod.monthlyLimitPerMember.label": "Limite mensuelle par membre",
   "paymentMethod.monthlyLimitPerMember.description": "Vous pouvez définir une limite mensuelle pour permettre aux membres de votre organisation d'utiliser cette carte de crédit. Si cette limite est définie à zéro, seulement vous et les autres administrateurs de cette organisation pourront utiliser cette carte.",
-  "paymentMethods.add": "ajouter une méthode de paiement",
+  "paymentMethods.add": "ajouter une autre méthode de paiement",
   "paymentMethods.remove": "supprimer une méthode de paiement",
   "tier.type.tier": "tier par défaut",
   "tier.type.ticket": "ticket",

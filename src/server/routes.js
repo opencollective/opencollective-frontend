@@ -7,10 +7,11 @@ import pages from './pages';
 import { translateApiUrl } from '../lib/utils';
 import request from 'request';
 import controllers from './controllers';
+import * as mw from './middlewares';
 
 module.exports = (server, app) => {
 
-  server.get('*', (req, res, next) => {
+  server.get('*', mw.ga, (req, res, next) => {
     // By default, we cache all GET calls for 30s at the CDN level (cloudflare) => we should increase this over time
     // note: only for production/staging (NextJS overrides this in development env)
     res.setHeader('cache-control', 'max-age=30');
@@ -30,7 +31,15 @@ module.exports = (server, app) => {
       .pipe(res);
   });
 
+  server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
+  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
+
+  server.get('/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)', controllers.collectives.banner);
+  server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
+  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = (req.query.color === 'blue') ? 'blue' : 'white';

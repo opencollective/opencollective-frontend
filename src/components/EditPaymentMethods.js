@@ -30,7 +30,7 @@ class EditPaymentMethods extends React.Component {
     this.defaultType = this.props.defaultType || 'TICKET';
 
     this.messages = defineMessages({
-      'paymentMethods.add': { id: 'paymentMethods.add', defaultMessage: 'add payment method' },
+      'paymentMethods.add': { id: 'paymentMethods.add', defaultMessage: 'add another payment method' },
       'paymentMethods.remove': { id: 'paymentMethods.remove', defaultMessage: 'remove payment method' },
     });
 
