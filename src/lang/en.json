@@ -84,7 +84,7 @@
   "paymentMethod.remove": "remove",
   "paymentMethod.monthlyLimitPerMember.label": "Monthly limit per member",
   "paymentMethod.monthlyLimitPerMember.description": "You can set a monthly limit to allow the other members of your organization to use this credit card. If set to zero, only you and the other administrators of this organization will be able to use this card.",
-  "paymentMethods.add": "add payment method",
+  "paymentMethods.add": "add another payment method",
   "paymentMethods.remove": "remove payment method",
   "tier.type.tier": "tier (only one per order)",
   "tier.type.ticket": "ticket (allow multiple tickets per order)",

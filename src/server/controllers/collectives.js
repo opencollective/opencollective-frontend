@@ -83,7 +83,7 @@ export async function banner(req, res) {
 
   const selector = tierSlug || backerType;
   if (showBtn && selector.length > 0) {
-    const btnImage = (selector.match(/sponsor/)) ? 'sponsor' : selector.replace(/s$/,'');
+    const btnImage = (selector.match(/sponsor/)) ? 'sponsor' : 'backer';
     const btn = {
       url: `${WEBSITE_URL}/public/images/become_${btnImage}.svg`,
       encoding: null,

@@ -125,7 +125,8 @@ class LoginForm extends React.Component {
       return;
     }
     this.setState({ loading: true });
-    api.signin(this.state.user, this.props.next).then(() => {
+    api.signin(this.state.user, this.props.next).then((result) => {
+      console.log(">>> api.signin result", result);
       this.setState({ loginSent: true, signup: false, isNewUser: false, loading: false });
     })
   }
