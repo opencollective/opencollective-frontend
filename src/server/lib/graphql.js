@@ -71,6 +71,8 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }) {
             type
             slug
             image
+            website
+            twitterHandle
           }
         }
       }
@@ -90,6 +92,8 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }) {
               type
               slug
               image
+              website
+              twitterHandle
             }
           }
         }
