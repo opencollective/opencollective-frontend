@@ -24,7 +24,7 @@ export async function badge(req, res) {
 
     const filename = `${stats.name}-${stats.count}-${color}.svg`;
     const imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
-    console.log(">>> badge imageUrl", imageUrl);
+
     try {
       const imageRequest = await r2(imageUrl).text;
       res.setHeader('content-type','image/svg+xml;charset=utf-8');
@@ -76,8 +76,9 @@ export async function banner(req, res) {
         image = getCloudinaryUrl(image, params);
       }
       const options = {url: image, encoding: null, ttl: 60 * 60 * 24 * 30 * 1000}; // 30 days caching
-      console.log(">>> load ", image);
       promises.push(requestPromise(options));
+    } else {
+      promises.push(Promise.resolve());
     }
   }
 
@@ -105,6 +106,7 @@ export async function banner(req, res) {
   .then(responses => {
     const images = [];
     for (let i=0;i<responses.length;i++) {
+      if (!responses[i]) continue;
       const { headers } = responses[i][0];
       const rawData = responses[i][1];
       const user = users[i];
