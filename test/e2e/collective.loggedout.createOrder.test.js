@@ -31,6 +31,7 @@ describe("collective.loggedout.createOrder", () => {
         .type("111", "input[name='CCcvc']")
         .click(".presetBtn")
         .type("Public message", "textarea[name='publicMessage']")
+        .scrollToElement('.submit button')
         .click('.submit button')
         .screenshot();
 
