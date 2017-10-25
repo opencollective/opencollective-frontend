@@ -90,17 +90,30 @@ export const loaders = (req) => {
     tiers: {
       findById: new DataLoader(ids => models.Tier
         .findAll({ where: { id: { $in: ids }}})
-        .then(results => sortResults(ids, results, 'id'))),
+        .then(results => sortResults(ids, results, 'id'))
+      ),
+      totalDistinctOrders: new DataLoader(ids => models.Order.findAll({
+          attributes: [
+            'TierId',
+            [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 0), 'count' ]
+          ],
+          where: { TierId: { $in: ids } },
+          group: ['TierId']
+        })
+        .then(results => sortResults(ids, results, 'TierId'))
+        .map(result => get(result, 'dataValues.count') || 0)
+      ),
       totalOrders: new DataLoader(ids => models.Order.findAll({
-        attributes: [
-          'TierId',
-          [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
-        ],
-        where: { TierId: { $in: ids } },
-        group: ['TierId']
-      })
-      .then(results => sortResults(ids, results, 'TierId'))
-      .map(result => get(result, 'dataValues.count') || 0))
+          attributes: [
+            'TierId',
+            [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
+          ],
+          where: { TierId: { $in: ids } },
+          group: ['TierId']
+        })
+        .then(results => sortResults(ids, results, 'TierId'))
+        .map(result => get(result, 'dataValues.count') || 0)
+      )
   },
     paymentMethods: {
       findById: new DataLoader(ids => models.PaymentMethod
