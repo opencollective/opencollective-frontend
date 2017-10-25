@@ -96,7 +96,7 @@ class InputTypeCreditCard extends React.Component {
         }
       `}</style>
 
-      {options.length > 0 &&
+      { options.length > 0 &&
           <FormControl
             componentClass="select"
             className="creditcardSelector"
@@ -104,7 +104,7 @@ class InputTypeCreditCard extends React.Component {
             name="creditcardSelector"
             onChange={event => this.handleChange("uuid", event.target.value)}
             >
-            {options.map(option => {
+            { options.map(option => {
               const value = option.uuid
               const label = `${option.data.brand} ${option.data.funding} ${option.data.identifier} ${option.data.expMonth}/${option.data.expYear}`;
               return (<option value={value}>{`💳 ${label}`}</option>)
