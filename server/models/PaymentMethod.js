@@ -164,7 +164,7 @@ export default function(Sequelize, DataTypes) {
     const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
     let getBalance;
     debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
-    if (paymentProvider.getBalance) {
+    if (paymentProvider && paymentProvider.getBalance) {
       getBalance = paymentProvider.getBalance;
     } else {
       getBalance = () => Promise.resolve(Infinity);
