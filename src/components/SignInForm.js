@@ -126,8 +126,10 @@ class LoginForm extends React.Component {
     }
     this.setState({ loading: true });
     api.signin(this.state.user, this.props.next).then((result) => {
-      console.log(">>> api.signin result", result);
       this.setState({ loginSent: true, signup: false, isNewUser: false, loading: false });
+      if (result.redirect) {
+        window.location.replace(result.redirect);
+      }
     })
   }
 
@@ -150,7 +152,7 @@ class LoginForm extends React.Component {
       defaultValue: this.state.user['email'],
       onChange: (value) => this.handleChange("user", "email", value)
     };
-
+    console.log(">>> render", this.state);
     if (this.state.loading) {
       inputEmail.button = <Button disabled={true}><FormattedMessage id="loading" defaultMessage="loading" /></Button>;
       inputEmail.description = <FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." />;
@@ -212,6 +214,11 @@ class LoginForm extends React.Component {
           .actions {
             margin: 6rem 0 6rem 26%;
           }
+        }
+        `}</style>
+        <style jsx global>{`
+        .LoginForm .form-horizontal .has-feedback .form-control-feedback {
+          left: 380px;
         }
         `}</style>
         <div className="content">
