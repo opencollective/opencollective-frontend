@@ -220,9 +220,12 @@ describe('expenses.routes.test.js', () => {
             expectExpenseActivity('collective.expense.created', actualExpense.id));
 
           it('THEN an email notification is sent', (done) => {
-            expect(emailSendMessageSpy.firstCall.args[1]).to.contain(actualExpense.description);
-            expect(emailSendMessageSpy.firstCall.args[2]).to.contain(actualExpense.attachment);
-            done();
+            setTimeout(() => {
+              const emailArgs = emailSendMessageSpy.args.find(call => call[1].match(new RegExp(actualExpense.description)));
+              expect(emailArgs).to.exist;
+              expect(emailArgs[2]).to.contain(actualExpense.attachment);
+              done();
+            }, 100);
           });
 
           describe('#getOne', () => {
