@@ -135,13 +135,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
         to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
       }
       const from = options.from || config.email.from;
+      const cc = options.cc;
       const bcc = options.bcc;
       const text = options.text;
       const attachments = options.attachments;
       const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
 
-      mailgun.sendMail({ from, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           return reject(err);
         } else {

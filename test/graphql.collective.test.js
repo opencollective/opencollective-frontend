@@ -12,7 +12,7 @@ describe('graphql.collective.test.js', () => {
 
   before(() => utils.loadDB('opencollective_dvl'));
   before(() => models.Collective.findOne({ where: { slug: 'pubnub' }}).then(c => pubnubCollective = c));
-  before(() => models.User.createUserWithCollective({ email: 'admin@pubnub.com'}).then(c => pubnubAdmin = c));
+  before(() => models.User.createUserWithCollective({ name: "PubNub Administrator", email: 'admin@pubnub.com'}).then(c => pubnubAdmin = c));
   before(() => models.Member.create({
       CreatedByUserId: pubnubAdmin.id,
       MemberCollectiveId: pubnubAdmin.CollectiveId,

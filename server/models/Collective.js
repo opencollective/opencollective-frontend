@@ -16,6 +16,7 @@ import activities from '../constants/activities';
 import Promise from 'bluebird';
 import userlib from '../lib/userlib';
 import CustomDataTypes from './DataTypes';
+import emailLib from '../lib/email';
 import debugLib from 'debug';
 const debug = debugLib('collective');
 
@@ -470,8 +471,32 @@ export default function(Sequelize, DataTypes) {
     debug("addUserWithRole", user.id, role, "member", member);
     return Promise.all([
       models.Member.create(member),
-      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' })
-    ]).then(results => results[0]);
+      models.Notification.createMany(notifications, { UserId: user.id, CollectiveId: this.id, channel: 'email' }),
+      models.User.findById(member.CreatedByUserId, { include: [ { model: models.Collective, as: 'collective' }] }),
+      models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
+    ])
+    .then(results => {
+      const remoteUser = results[2];
+      const recipient = results[3];
+      emailLib.send('collective.newmember', recipient.email, {
+        remoteUser: {
+          email: remoteUser.email,
+          collective: pick(remoteUser.collective, ['slug', 'name', 'image'])
+        },
+        role: role.toLowerCase(),
+        isAdmin: role === roles.ADMIN,
+        collective: {
+          slug: this.slug,
+          name: this.name,
+          type: this.type.toLowerCase()
+        },
+        recipient: {
+          collective: pick(recipient.collective, ['name', 'slug', 'website', 'twitterHandle', 'description', 'image'])
+        },
+        loginLink: results[3].generateLoginLink(`/${recipient.collective.slug}/edit`)
+      }, { cc: remoteUser.email });
+      return results[0];
+    });
   };
 
   // Used when creating a transactin to add a user to the collective as a backer if needed
