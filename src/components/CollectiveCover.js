@@ -80,7 +80,7 @@ ${description}`
       const members = collective.members.filter(m => m.role === 'MEMBER');
       const backers = collective.members.filter(m => m.role === 'BACKER');
       backers.sort((a, b) => b.totalDonations - a.totalDonations);
-      membersPreview = union(admins, members, backers).slice(0, 5);
+      membersPreview = union(admins, members, backers).filter(m => m.member).slice(0, 5);
     }
     const additionalBackers = stats && ((stats.backers || collective.members.length) - membersPreview.length);
     return (

@@ -51,7 +51,7 @@ describe("collective.loggedout.test", () => {
       .scrollToElement('.SubmitExpenseBtn')
       .wait(800)
       .click('.SubmitExpenseBtn')
-      .wait(500)
+      .wait(1000)
       .screenshot();
 
     download("new_expense", screenshot);
