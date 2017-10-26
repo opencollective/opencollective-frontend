@@ -213,7 +213,7 @@
   "tier.interval.select": "Choisir la fréquence de votre contribution",
   "tier.GetTicket": "{quantity, plural, one {réserver ticket} other {réserver tickets}}",
   "tier.GetTier": "deviens un {name}",
-  "order": "{n, plural, one {contribution} other {contributions}}",
+  "contribution": "{n, plural, one {contribution} other {contributions}}",
   "collective.types.organization": "{n, plural, one {organisation} other {organisations}}",
   "collective.types.user": "{n, plural, one {people} other {people}}",
   "collective.types.collective": "{n, plural, one {collectif} other {collectifs}}",

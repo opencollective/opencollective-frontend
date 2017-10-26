@@ -24,7 +24,7 @@ class TierCard extends React.Component {
     this.anchor = (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
-      'order': { id: 'order', defaultMessage: '{n, plural, one {order} other {orders}}' },
+      'contribution': { id: 'contribution', defaultMessage: '{n, plural, one {contribution} other {contributions}}' },
       'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
       'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
       'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'},
@@ -200,7 +200,6 @@ class TierCard extends React.Component {
             cursor: not-allowed;
           }
           .totalOrders {
-            width: 81px;
             height: 14px;
             font-family: Rubik;
             font-size: 12px;
@@ -215,6 +214,9 @@ class TierCard extends React.Component {
         { tier.amount > 0 &&
           <div className="amount">
             <Currency value={tier.amount} currency={tier.currency || collective.currency} precision={0} />
+            { tier.presets &&
+            <span>+</span>
+            }
             { tier.interval &&
               <div className="interval">
                 <FormattedMessage
@@ -245,7 +247,7 @@ class TierCard extends React.Component {
               <div className="lastOrders">
               { totalOrders > 0 &&
                 <div className="totalOrders">
-                  {totalOrders} {intl.formatMessage(this.messages[`order`], { n: totalOrders })}
+                  {totalOrders} {intl.formatMessage(this.messages[`contribution`], { n: totalOrders })}
                 </div>
               }
               {this.showLastOrders(['USER'], 10)}
