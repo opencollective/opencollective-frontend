@@ -228,11 +228,10 @@ describe('webhooks.routes.test.js', () => {
     });
 
     it('successfully sends out an invoice by email to donor', () => {
-      expect(emailSendSpy.callCount).to.equal(2);
-      expect(emailSendSpy.secondCall.args[0])
-      expect(emailSendSpy.secondCall.args[0]).to.equal('thankyou');
-      expect(emailSendSpy.secondCall.args[2].firstPayment).to.be.false;
-      expect(emailSendSpy.secondCall.args[1]).to.equal(user.email);
+      expect(emailSendSpy.callCount).to.equal(3);
+      const emailArgs = emailSendSpy.args.find(call => call[0] === 'thankyou');      
+      expect(emailArgs[2].firstPayment).to.be.false;
+      expect(emailArgs[1]).to.equal(user.email);
     });
   });
 
