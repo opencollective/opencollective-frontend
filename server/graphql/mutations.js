@@ -111,7 +111,7 @@ const mutations = {
       .then(() => models.Collective.create(collectiveData))
       .then(c => collective = c)
       .then(() => collective.editTiers(args.collective.tiers))
-      .then(() => collective.editMembers(args.collective.members))
+      .then(() => collective.editMembers(args.collective.members, { CreatedByUserId: req.remoteUser.id }))
       .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
       .then(() => collective)
       .catch(e => {
@@ -215,7 +215,7 @@ const mutations = {
       })
       .then(() => collective.update(updatedCollectiveData))
       .then(() => collective.editTiers(args.collective.tiers))
-      .then(() => collective.editMembers(args.collective.members))
+      .then(() => collective.editMembers(args.collective.members, { CreatedByUserId: req.remoteUser.id }))
       .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
       .then(() => collective);
     }
