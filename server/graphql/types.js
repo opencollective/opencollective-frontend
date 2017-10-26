@@ -86,7 +86,10 @@ export const UserType = new GraphQLObjectType({
       memberOf: {
         type: new GraphQLList(MemberType),
         resolve(user) {
-          return models.Member.findAll({ where: { MemberCollectiveId: user.CollectiveId }});
+          return models.Member.findAll({
+            where: { MemberCollectiveId: user.CollectiveId },
+            include: [ { model: models.Collective, as: 'collective', required: true } ]
+          });
         }
       },
       billingAddress: {
@@ -140,7 +143,7 @@ export const MemberType = new GraphQLObjectType({
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return member.member || req.loaders.collective.findById.load(member.MemberCollectiveId);
+          return member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
         }
       },
       role: {

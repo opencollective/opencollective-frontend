@@ -502,18 +502,21 @@ const CollectiveFields = () => {
         if (roles && roles.length > 0) {
           query.where.role = { $in: args.roles };
         }
-
+        
+        let conditionOnMemberCollective;
         if (args.type) {
           const types = args.type.split(',');
-          query.include = [
-            {
-              model: models.Collective,
-              as: 'memberCollective',
-              required: true,
-              where: { type: { $in: types } }
-            }
-          ];
+          conditionOnMemberCollective = { type: { $in: types } };
         }
+
+        query.include = [
+          {
+            model: models.Collective,
+            as: 'memberCollective',
+            required: true,
+            where: conditionOnMemberCollective
+          }
+        ];
 
         return models.Member.findAll(query);
       }
