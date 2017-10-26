@@ -30,8 +30,52 @@ import models from '../models';
 import roles from '../constants/roles';
 
 
-export const ExpenseStatsType = new GraphQLObjectType({
-  name: "ExpenseStatsType",
+export const BackersStatsType = new GraphQLObjectType({
+  name: "BackersStatsType",
+  description: "Breakdown of backers per type (ANY/USER/ORGANIZATION/COLLECTIVE)",
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching
+      id: {
+        type: GraphQLInt,
+        resolve(stats) {
+          return stats.id;
+        }
+      },
+      all: {
+        description: "Total number of backers that have given money to this collective",
+        type: GraphQLInt,
+        resolve(stats) {
+          return stats.all;
+        }
+      },
+      users: {
+        description: "Number of individuals that have given money to this collective",
+        type: GraphQLInt,
+        resolve(stats) {
+          return stats.USER;
+        }
+      },
+      organizations: {
+        description: "Number of organizations that have given money to this collective",
+        type: GraphQLInt,
+        resolve(stats) {
+          return stats.ORGANIZATION;
+        }
+      },
+      collectives: {
+        description: "Number of collectives that have given money to this collective",
+        type: GraphQLInt,
+        resolve(stats) {
+          return stats.COLLECTIVE;
+        }
+      }
+    }
+  }
+});
+
+export const ExpensesStatsType = new GraphQLObjectType({
+  name: "ExpensesStatsType",
   description: "Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)",
   fields: () => {
     return {
@@ -107,17 +151,10 @@ export const CollectiveStatsType = new GraphQLObjectType({
         }
       },
       backers: {
-        description: "Number of individuals that have given money to this collective",
-        type: GraphQLInt,
+        description: "Breakdown of all backers of this collective",
+        type: BackersStatsType,
         resolve(collective) {
-          return collective.getBackersCount({ type: types.USER });
-        }
-      },
-      sponsors: {
-        description: "Number of organizations that have given money to this collective",
-        type: GraphQLInt,
-        resolve(collective) {
-          return collective.getBackersCount({ type: [types.ORGANIZATION, types.COLLECTIVE] });
+          return collective.getBackersCount({ group: ['fromCollective.type'] });
         }
       },
       collectives: {
@@ -136,7 +173,7 @@ export const CollectiveStatsType = new GraphQLObjectType({
       },
       expenses: {
         description: "Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)",
-        type: ExpenseStatsType,
+        type: ExpensesStatsType,
         resolve(collective) {
           return collective;
         }

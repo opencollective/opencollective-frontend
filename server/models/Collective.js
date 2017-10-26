@@ -759,7 +759,7 @@ export default function(Sequelize, DataTypes) {
 
     const query = {
       attributes: [
-        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'backersCount']
+        [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('FromCollectiveId'))), 'count']
       ],
       where: {
         CollectiveId: this.id,
@@ -786,13 +786,43 @@ export default function(Sequelize, DataTypes) {
       query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
     }
 
-    return models.Transaction.findOne(query)
+    let promise;
+    if (options.group) {
+      query.attributes.push('fromCollective.type');
+      query.include = [
+        {
+          model: models.Collective,
+          as: 'fromCollective',
+          attributes: [],
+          required: true
+        }
+      ];
+      query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+      query.group = options.group;
+      promise = models.Transaction.findAll(query);
+    } else {
+      promise = models.Transaction.findOne(query);
+    }
+
+    return promise
     .then(res => {
-      // when it's a raw query, the result is not in dataValues
-      const result = res.dataValues || res || {};
-      debug("getBackersCount", result);
-      if (!result.backersCount) return 0;
-      return Promise.resolve(Number(result.backersCount));
+      if (options.group) {
+        const stats = { id: this.id };
+        let all = 0;
+        res.forEach(r => {
+          stats[r.type] = r.count;
+          all += r.count;
+        })
+        stats.all = all;
+        debug("getBackersCount", stats);
+        return stats;
+      } else {
+        // when it's a raw query, the result is not in dataValues
+        const result = res.dataValues || res || {};
+        debug("getBackersCount", result);
+        if (!result.count) return 0;
+        return Promise.resolve(Number(result.count));
+      }
     });
   };
 
