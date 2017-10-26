@@ -212,7 +212,7 @@ const queries = {
             createdAt: collective.dataValues.createdAt,
             totalDonations: collective.dataValues.totalDonations,
             MemberCollectiveId: collective.dataValues.MemberCollectiveId,
-            member: collective
+            memberCollective: collective
           }
         });
       } else {
