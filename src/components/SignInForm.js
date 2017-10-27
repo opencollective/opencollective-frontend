@@ -152,7 +152,7 @@ class LoginForm extends React.Component {
       defaultValue: this.state.user['email'],
       onChange: (value) => this.handleChange("user", "email", value)
     };
-    console.log(">>> render", this.state);
+
     if (this.state.loading) {
       inputEmail.button = <Button disabled={true}><FormattedMessage id="loading" defaultMessage="loading" /></Button>;
       inputEmail.description = <FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." />;
