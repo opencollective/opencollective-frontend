@@ -126,8 +126,10 @@ class LoginForm extends React.Component {
     }
     this.setState({ loading: true });
     api.signin(this.state.user, this.props.next).then((result) => {
-      console.log(">>> api.signin result", result);
       this.setState({ loginSent: true, signup: false, isNewUser: false, loading: false });
+      if (result.redirect) {
+        window.location.replace(result.redirect);
+      }
     })
   }
 
@@ -156,10 +158,10 @@ class LoginForm extends React.Component {
       inputEmail.description = <FormattedMessage id="signin.loading.description" defaultMessage="Please wait..." />;
     } else if (!this.state.signup) {
       if (this.state.isNewUser === true) {
-        inputEmail.button = <Button onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
+        inputEmail.button = <Button className="signup" onClick={() => this.setState({ signup: true })}><FormattedMessage id="signin.createAccount" defaultMessage="Sign Up" /></Button>;
         inputEmail.description = <FormattedMessage id="signin.createAccount.description" defaultMessage={`There is no user with this email address. Click on "Sign Up" to create a new Open Collective Account.`} />;
       } else if (this.state.isNewUser === false) {
-        inputEmail.button = <Button onClick={() => this.signin()}><FormattedMessage id="login.button" defaultMessage="login" /></Button>;
+        inputEmail.button = <Button className="login" onClick={() => this.signin()}><FormattedMessage id="login.button" defaultMessage="login" /></Button>;
         inputEmail.description = <FormattedMessage id="signin.login.description" defaultMessage={`Welcome back! Click on "Login" (or hit Enter) and we will send you a link to login by email.`} />;
         if (this.state.loginSent) {
           inputEmail.button = <Button disabled={true}><FormattedMessage id="login.button" defaultMessage="login" /></Button>;
@@ -212,6 +214,11 @@ class LoginForm extends React.Component {
           .actions {
             margin: 6rem 0 6rem 26%;
           }
+        }
+        `}</style>
+        <style jsx global>{`
+        .LoginForm .form-horizontal .has-feedback .form-control-feedback {
+          left: 380px;
         }
         `}</style>
         <div className="content">

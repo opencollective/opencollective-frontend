@@ -21,7 +21,7 @@ class TierCard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.anchor = (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    this.anchor = get(props.tier, 'slug') || (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
       'contribution': { id: 'contribution', defaultMessage: '{n, plural, one {contribution} other {contributions}}' },
