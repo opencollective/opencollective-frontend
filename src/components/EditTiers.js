@@ -133,7 +133,7 @@ class EditTiers extends React.Component {
 
     const type = tier.type || this.defaultType;
     return (
-      <div className="tier" key={`tier-${index}`}>
+      <div className={`tier ${tier.slug}`} key={`tier-${index}`}>
         <div className="tierActions">
           <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>{intl.formatMessage(this.messages[`${type}.remove`])}</a>
         </div>
@@ -184,7 +184,7 @@ class EditTiers extends React.Component {
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div className="editTiersActions">
-          <Button bsStyle="primary" onClick={() => this.addTier({})}>{intl.formatMessage(this.messages[`${defaultType}.add`])}</Button>
+          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>{intl.formatMessage(this.messages[`${defaultType}.add`])}</Button>
         </div>
 
       </div>
