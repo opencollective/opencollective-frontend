@@ -134,7 +134,9 @@ const getCollectiveToEditQuery = gql`
       stats {
         id
         yearlyBudget
-        backers
+        backers {
+          all
+        }
         totalAmountSent
       }
       tiers {
@@ -169,7 +171,9 @@ const getCollectiveToEditQuery = gql`
           image
           stats {
             id
-            backers
+            backers {
+              all
+            }
             yearlyBudget
           }
         }
@@ -237,8 +241,12 @@ const getCollectiveQuery = gql`
         id
         balance
         yearlyBudget
-        backers
-        sponsors
+        backers {
+          all
+          users
+          organizations
+          collectives
+        }
         collectives
         transactions
         expenses {
@@ -264,7 +272,7 @@ const getCollectiveQuery = gql`
           totalOrders
           availableQuantity
         }
-        orders(limit: 5) {
+        orders(limit: 30) {
           fromCollective {
             id
             slug

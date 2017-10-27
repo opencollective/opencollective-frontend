@@ -238,9 +238,10 @@ class InputField extends React.Component {
         this.input = (
         <FieldGroup
           onChange={event => this.handleChange(event.target.value*100)}
-          type={field.type}
+          type="number"
           pre={field.pre}
           name={field.name}
+          min={field.min / 100}
           label={field.label && `${capitalize(field.label)}`}
           help={field.description}
           placeholder={field.placeholder}
