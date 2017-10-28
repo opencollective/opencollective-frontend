@@ -16,6 +16,9 @@ describe("collective.loggedout.test", () => {
       .wait('section#organizations')
       .wait('section#backers')
       .wait('section#budget')
+      .wait('.balance')
+      .scrollToElement('.balance')
+      .wait(500)
       .screenshot();
 
     download("collective_page", screenshot);
