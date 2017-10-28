@@ -1,6 +1,5 @@
 import { download, chromeless } from '../utils';
-const WEBSITE_URL = "https://staging.opencollective.com";
-// const WEBSITE_URL = "http://localhost:3030";
+const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.com";
 
 describe("collective.loggedout.test", () => {
   let browser;
@@ -14,9 +13,9 @@ describe("collective.loggedout.test", () => {
 
     const screenshot = await browser
       .goto(`${WEBSITE_URL}/webpack`)
-      .wait('section#sponsors', 2000)
-      .wait('section#backers', 2000)
-      .wait('section#budget', 2000)
+      .wait('section#organizations')
+      .wait('section#backers')
+      .wait('section#budget')
       .screenshot();
 
     download("collective_page", screenshot);
@@ -31,10 +30,11 @@ describe("collective.loggedout.test", () => {
 
     const screenshot = await browser
       .goto(`${WEBSITE_URL}/webpack`)
-      .wait('#transactions .filterBtn', 4000)
+      .wait('#transactions .filterBtn')
       .scrollToElement('#transactions')
       .click('#transactions .filterBtn:nth-of-type(3)')
-      .wait('.transaction.debit', 4000)
+      .wait('.transaction.debit')
+      .wait(1000)
       .screenshot();
 
     download("filter_transactions", screenshot);
@@ -47,11 +47,10 @@ describe("collective.loggedout.test", () => {
     const screenshot = await browser
       .goto(`${WEBSITE_URL}/tipbox`)
       .wait('.SubmitExpenseBtn')
-      .wait(200)
       .scrollToElement('.SubmitExpenseBtn')
-      .wait(800)
+      .wait(500)
       .click('.SubmitExpenseBtn')
-      .wait(1000)
+      .wait(3000)
       .screenshot();
 
     download("new_expense", screenshot);
