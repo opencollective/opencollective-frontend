@@ -7,7 +7,8 @@ describe("collective.edit.test", () => {
   beforeAll(() => browser = chromeless.init());
   afterAll(() => chromeless.close(browser));
 
-  beforeEach(async () => {
+  // only need to login once
+  beforeAll(async () => {
     await browser
       .goto(`${WEBSITE_URL}/testcollective/edit`)
       .wait('.login .btn')
@@ -18,7 +19,7 @@ describe("collective.edit.test", () => {
       .click('button.login')
       .wait('.CollectiveCover');
   })
-    
+
   test("edit collective ", async () => {
     
     jest.setTimeout(30000);
@@ -101,7 +102,7 @@ describe("collective.edit.test", () => {
       .scrollToElement("button[type='submit']")
       .click("button[type='submit']")
       .wait(1000)
-      .goto(`${WEBSITE_URL}/testcollective`)
+      .goto(`${WEBSITE_URL}/testcollective?cacheburst=${Math.round(Math.random()*10000)}`)
       .wait('.CollectiveCover')
       .screenshot();
       
