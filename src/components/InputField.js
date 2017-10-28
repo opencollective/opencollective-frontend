@@ -246,6 +246,7 @@ class InputField extends React.Component {
           help={field.description}
           placeholder={field.placeholder}
           className={field.className}
+          value={(this.state.value || field.defaultValue || 0)/100}
           defaultValue={(field.value || field.defaultValue || 0)/100}
         />
         )
