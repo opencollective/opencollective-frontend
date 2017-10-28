@@ -148,7 +148,7 @@ class OrderForm extends React.Component {
     }
 
     if (LoggedInUser && CollectiveId !== LoggedInUser.CollectiveId) {
-      paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods];
+      paymentMethods = [... paymentMethods, ...LoggedInUser.collective.paymentMethods].filter(pm => pm.service === 'stripe');
       paymentMethodsOptions = [...paymentMethodsOptions, ... generateOptionsForCollective(this.collectivesById[LoggedInUser.CollectiveId])];
     }
 

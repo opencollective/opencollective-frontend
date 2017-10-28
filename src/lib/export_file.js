@@ -1,5 +1,3 @@
-import gql from 'graphql-tag'
-
 export function exportFile(mimeType, filename, text) {
   const element = document.createElement('a');
   element.setAttribute('href', `data:${mimeType},${encodeURIComponent(text)}`);
