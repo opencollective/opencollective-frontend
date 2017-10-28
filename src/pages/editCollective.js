@@ -31,7 +31,7 @@ class EditCollectivePage extends React.Component {
       return <Loading />;
     }
 
-    if (!data.loading && !data.Collective) {
+    if (!data.Collective) {
       return (<NotFound />)
     }
 
