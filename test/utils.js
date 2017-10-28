@@ -47,7 +47,7 @@ export const chromeless = {
 export function download(filename, url) {
   return new Promise((resolve, reject) => {
     if (!process.env.DOWNLOAD_SCREENSHOT) {
-      console.log(">>> screenshot", url);
+      console.log(`>>> ${filename} screenshot`, url);
       return false;
     }
     console.log(">>> downloading", url);
