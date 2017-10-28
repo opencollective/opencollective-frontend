@@ -122,7 +122,7 @@ class EditMembers extends React.Component {
             label={field.label}
             type={field.type}
             disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
-            defaultValue={field.defaultValue || get(member,field.name)}
+            defaultValue={get(member,field.name) || field.defaultValue}
             options={field.options}
             pre={field.pre}
             placeholder={field.placeholder}
