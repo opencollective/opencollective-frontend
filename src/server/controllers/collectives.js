@@ -13,7 +13,7 @@ const requestPromise = Promise.promisify(cachedRequest, { multiArgs: true });
 
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
 const cache = require('lru-cache')({
-  max: 100,
+  max: 1000,
   maxAge: 1000 * 60 * 10
 });
 
@@ -175,10 +175,10 @@ export async function banner(req, res) {
 export async function website(req, res) {
   const { collectiveSlug, tierSlug, backerType } = req.params;
 
-  let users = cache.get(queryString.stringify(req.params));
+  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
     users = await fetchMembers(req.params);
-    cache.set(queryString.stringify(req.params), users);
+    cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
   }
 
   const position = parseInt(req.params.position, 10);
@@ -218,10 +218,10 @@ export async function website(req, res) {
 export async function avatar(req, res) {
   const { tierSlug, backerType } = req.params;
   
-  let users = cache.get(queryString.stringify(req.params));
+  let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
     users = await fetchMembers(req.params);
-    cache.set(queryString.stringify(req.params), users);
+    cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
   }
 
   const position = parseInt(req.params.position, 10);
