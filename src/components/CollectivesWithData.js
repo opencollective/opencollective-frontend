@@ -124,7 +124,9 @@ query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: I
     stats {
       id
       yearlyBudget
-      backers
+      backers {
+        all
+      }
     }
   }
 }
