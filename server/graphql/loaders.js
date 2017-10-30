@@ -108,7 +108,7 @@ export const loaders = (req) => {
             'TierId',
             [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
           ],
-          where: { TierId: { $in: ids } },
+          where: { TierId: { $in: ids }, processedAt: { $ne: null } },
           group: ['TierId']
         })
         .then(results => sortResults(ids, results, 'TierId'))
