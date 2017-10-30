@@ -62,7 +62,7 @@
     "moment-timezone": "0.5.2",
     "morgan": "1.7.0",
     "multer": "0.1.8",
-    "newrelic": "^1.25.5",
+    "newrelic": "1.25.5",
     "node-slack": "0.0.7",
     "node-slug": "0.0.2",
     "node-uuid": "1.4.7",
