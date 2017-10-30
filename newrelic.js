@@ -9,11 +9,11 @@ export default {
     /**
      * Array of application names.
      */
-    app_name: ['OC API'],
+    app_name: ['opencollective-prod-api'],
     /**
      * Your New Relic license key.
      */
-    license_key: process.env.NEW_RELIC_LICENSE_KEY,
+    license_key: '375d52f6c10eab6a34202b07fdd302ec4e10da13',
     logging: {
       /**
        * Level at which to log. 'trace' is most useful to New Relic when diagnosing
