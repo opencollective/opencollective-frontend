@@ -20,5 +20,8 @@ exports.config = { // eslint-disable-line import/no-commonjs
      * production applications.
      */
     level: 'info'
+  },
+  transaction_tracer: {
+    enabled: true
   }
 }
