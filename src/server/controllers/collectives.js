@@ -216,7 +216,7 @@ export async function website(req, res) {
 }
 
 export async function avatar(req, res) {
-  const { tierSlug, backerType } = req.params;
+  const { collectiveSlug, tierSlug, backerType } = req.params;
   
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
