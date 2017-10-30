@@ -9,7 +9,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
     },
-    CollectiveId: 83
+    CollectiveId: 9805
   },
   // Open Collective Inc. host for meetups
   'other': {
@@ -28,7 +28,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVHMivgRjQng'
     },
-    CollectiveId: 207
+    CollectiveId: 9802
   },
   'wwcode': {
     service: 'stripe',
@@ -37,7 +37,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVxxxxxxxxxx'
     },
-    CollectiveId: 51
+    CollectiveId: 9804
   }
 }
 

@@ -333,7 +333,7 @@ export const defaultHostUser = (tag) => {
     if (tag === 'opensource') {
       return { id: 772, CollectiveId: 9805 }; // Open Source Host Collective
     } else {
-      return { id: 7944, CollectiveId: 8674 }; // Open Collective Host Collective
+      return { id: 7944, CollectiveId: 8674 }; // Non-open source Host Collective ('host-other')
     }
   }
   return { id: 1, CollectiveId: 1 };
