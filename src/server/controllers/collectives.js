@@ -29,7 +29,7 @@ export async function badge(req, res) {
     
     const stats = await fetchMembersStats(req.params);
 
-    const filename = `${stats.name}-${stats.count}-${color}.svg`;
+    const filename = `${stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
     const imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
 
     try {
