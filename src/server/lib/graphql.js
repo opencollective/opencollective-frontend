@@ -13,18 +13,22 @@ export async function fetchMembersStats(params) {
     query Collective($collectiveSlug: String!) {
       Collective(slug:$collectiveSlug) {
         stats {
-          backers
-          sponsors
+          backers {
+            all
+            users
+            organizations
+          }
         }
       }
     }
     `;
     processResult = (res) => {
+      const count = (backerType.match(/sponsor/)) ? res.Collective.stats.backers.organizations : res.Collective.stats.backers.users;
       return {
         name: backerType,
-        count: res.Collective.stats[backerType]
+        count
       }
-    };
+    }
   } else if (tierSlug) {
     query = `
     query Collective($collectiveSlug: String!, $tierSlug: String) {
