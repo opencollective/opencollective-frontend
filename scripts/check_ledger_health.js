@@ -112,7 +112,7 @@ const checkMembers = () => {
     }
   })
   .then(circularMembers => {
-    console.log('\t>>> Members with id = MemberCollectiveId: ', circularMembers.length)
+    console.log('\t>>> Members with CollectiveId = MemberCollectiveId: ', circularMembers.length)
     if (VERBOSE)
       console.log(circularMembers.map(cm => cm.id).join(', '))
   })
