@@ -27,8 +27,7 @@ module.exports = {
       },
       UserId: {
         type: DataTypes.INTEGER,
-        references: 'Users',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Users'},
         primaryKey: true,
         allowNull: false,
         onDelete: 'CASCADE',
@@ -36,15 +35,13 @@ module.exports = {
       },
       GroupId: {
         type: DataTypes.INTEGER,
-        references: 'Groups',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Groups' },
         primaryKey: true,
         allowNull: false
       },
       ExpenseId: {
         type: DataTypes.INTEGER,
-        references: 'Expenses',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Expenses'},
         primaryKey: true,
         allowNull: true
       },

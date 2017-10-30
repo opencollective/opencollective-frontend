@@ -36,8 +36,7 @@ module.exports = {
       },
       StripeManagedAccountId: {
         type: DataTypes.INTEGER,
-        references: 'StripeManagedAccounts',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'StripeManagedAccounts'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       }

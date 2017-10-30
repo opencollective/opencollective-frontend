@@ -34,16 +34,14 @@ module.exports = {
         
         UserId: {
           type: Sequelize.INTEGER,
-          references: 'Users',
-          referencesKey: 'id',
+          references: {key: 'id', model: 'Users'},
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         },
         
         GroupId: {
           type: Sequelize.INTEGER,
-          references: 'Groups',
-          referencesKey: 'id',
+          references: {key: 'id', model: 'Groups'},
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         }
