@@ -9,7 +9,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['OC Frontend'],
+  app_name: ['oc-prod-frontend'],
   /**
    * Your New Relic license key.
    */
