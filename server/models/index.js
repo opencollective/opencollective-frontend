@@ -106,6 +106,7 @@ export function setupModels(client) {
   m.Notification.belongsTo(m.Collective);
 
   // Transaction.
+  m.Collective.hasMany(m.Transaction, { foreignKey: 'CollectiveId' });
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Transaction.belongsTo(m.Collective, { foreignKey: 'FromCollectiveId', as: 'fromCollective' });
 

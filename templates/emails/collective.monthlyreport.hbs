@@ -100,7 +100,7 @@ th {
   <tr>
     <td valign="top">{{{moment createdAt format="MM/DD"}}}</td>
     <td align="right" valign="top" nowrap class="negative">{{{currency netAmountInCollectiveCurrency currency=currency}}}</td>
-    <td valign="top" width="100%"><a href="{{@root.config.host.app}}/collectives/{{@root.collective.id}}/expenses/{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{description}}</a></td>
+    <td valign="top" width="100%"><a href="{{@root.config.host.website}}/{{@root.collective.slug}}/expenses#{{id}}?utm_source=opencollective&utm_campaign=monthlyreport&utm_medium=email">{{description}}</a></td>
     <td valign="top" class="{{toLowerCase status}}">{{toLowerCase status}}</td>
   </tr>
 {{else}}

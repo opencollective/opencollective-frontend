@@ -402,27 +402,26 @@ export default function(Sequelize, DataTypes) {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
         return models.Order.findOne({
           attributes: [ 'TierId' ],
-          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id },
+          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { $ne: null } },
           include
         }).then(order => {
           if (!order) {
-            console.error("Collective.getTiersWithUsers: no order for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
-            return null;
-          }
-          if (!order.TierId) {
-            console.error("Collective.getTiersWithUsers: no order.TierId for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
+            debug("Collective.getTiersWithUsers: no order for a tier for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
             return null;
           }
           const TierId = order.TierId;
           tiersById[TierId] = tiersById[TierId] || order.Tier;
-          tiersById[TierId].users = tiersById[TierId].users || [];
+          tiersById[TierId].dataValues.users = tiersById[TierId].dataValues.users || [];
           if (options.active) {
             backerCollective.isActive = order.Subscription.isActive;
           }
-          tiersById[TierId].users.push(backerCollective.dataValues);
+          debug("adding to tier", TierId, "backer: ", backerCollective.dataValues.slug);
+          tiersById[TierId].dataValues.users.push(backerCollective.dataValues);
         })
       })
-      .then(() => Object.values(tiersById));
+      .then(() => {
+        return Object.values(tiersById)
+      });
   };
 
   /**
