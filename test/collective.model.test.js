@@ -107,6 +107,8 @@ describe('Collective model', () => {
     }))
     .then(g => opensourceCollective = g)
     .then(() => collective.addUserWithRole(user1, 'BACKER'))
+    .then(() => models.Expense.create({ description: 'pizza', amount: 1000, currency: 'USD', UserId: user1.id, lastEditedById: user1.id, incurredAt: transactions[0].createdAt, createdAt: transactions[0].createdAt, CollectiveId: collective.id }))
+    .then(() => models.Expense.create({ description: 'stickers', amount: 15000, currency: 'USD', UserId: user1.id, lastEditedById: user1.id, incurredAt: transactions[1].createdAt, createdAt: transactions[1].createdAt, CollectiveId: collective.id }))
     .then(() => Transaction.createManyDoubleEntry([transactions[2]], { CollectiveId: opensourceCollective.id, HostCollectiveId: host.CollectiveId }))
     .then(() => Transaction.createManyDoubleEntry(transactions, { CollectiveId: collective.id, HostCollectiveId: host.CollectiveId })));
 
@@ -188,6 +190,7 @@ describe('Collective model', () => {
       })
       .catch(e => {
         console.error('error', e, e.stack);
+        done(e);
       });
   });
 
