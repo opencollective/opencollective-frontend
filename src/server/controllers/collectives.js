@@ -13,7 +13,7 @@ const requestPromise = Promise.promisify(cachedRequest, { multiArgs: true });
 
 // Cache the list of members of a collective to avoid requesting it for every single /:collectiveSlug/backers/:position/avatar
 const cache = require('lru-cache')({
-  max: 1000,
+  max: 5000,
   maxAge: 1000 * 60 * 10
 });
 
@@ -218,6 +218,7 @@ export async function website(req, res) {
 export async function avatar(req, res) {
   const { collectiveSlug, tierSlug, backerType } = req.params;
   
+  console.log('>>> cache.itemCount', cache.itemCount);
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
     users = await fetchMembers(req.params);
