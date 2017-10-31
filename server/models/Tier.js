@@ -181,6 +181,10 @@ export default function(Sequelize, DataTypes) {
           where: { OrderId: order.id, CollectiveId: this.CollectiveId },
           order: [['createdAt', 'DESC']]
         }).then(transaction => {
+          if (!transaction) {
+            debug("No transaction found for order", order.dataValues);
+            return false;
+          }
           if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) return true;
           if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;    
           return false;

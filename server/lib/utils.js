@@ -230,7 +230,7 @@ export const getTiersStats = (tiers, startDate, endDate) => {
             stats.backers.lost++;
           }
 
-          debug("----------- ", backer.username, "----------");
+          debug("----------- ", backer.slug, "----------");
           debug("firstDonation", backer.firstDonation && backer.firstDonation.toISOString().substr(0,10));
           debug("totalDonations", backer.totalDonations/100);
           debug("active last month?", backer.activeLastMonth);

@@ -54,7 +54,8 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    where.username = {$in: ['xdamman','piamancini', 'aseem']};
+    where.id = {$in: [2, 30, 1391]}; // xdamman, pia, aseem
+  // where.id = {$in: [2]}; // xdamman
 
   Notification.findAll(query)
   .then(results => results.map(r => r.User))
@@ -78,12 +79,12 @@ const processEvents = (events) => {
 
   events.forEach(event => {
     event.stats = { confirmed: 0, interested: 0 };
-    event.Members.forEach(member => {
+    event.members.forEach(member => {
       if (member.role === roles.FOLLOWER) {
         event.stats.interested++;
       }
     });
-    event.Orders.forEach(order => {
+    event.orders.forEach(order => {
       if (order.processedAt !== null) {
         event.stats.confirmed++;
       }
@@ -103,7 +104,7 @@ const processCollective = (collective) => {
   if ( collectivesData[collective.slug]) return collectivesData[collective.slug];
 
   const promises = [
-    collective.getTiersWithUsers({ attributes: ['id','username','name', 'image','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    collective.getBackersStats(startDate, endDate),
     collective.getBalance(endDate),
     collective.getTotalTransactions(startDate, endDate, 'donation'),
     collective.getTotalTransactions(startDate, endDate, 'expense'),
@@ -118,7 +119,10 @@ const processCollective = (collective) => {
     collective.getEvents({
       where: { startsAt: { $gte: startDate } },
       order: [['startsAt', 'DESC']],
-      include: [ models.Member, models.Order ]
+      include: [
+        { model: models.Member, as: 'members' },
+        { model: models.Order, as: 'orders' }
+      ]
     })
   ];
 
@@ -127,8 +131,7 @@ const processCollective = (collective) => {
             console.log('***', collective.name, '***');
             const data = {};
             data.collective = _.pick(collective, ['id', 'name', 'slug', 'website', 'image', 'mission', 'currency','publicUrl', 'tags', 'backgroundImage', 'settings', 'totalDonations', 'contributorsCount']);
-            const res = getTiersStats(results[0], startDate, endDate);
-            data.collective.stats = res.stats;
+            data.collective.stats = results[0];
             data.collective.stats.balance = results[1];
             data.collective.stats.totalDonations = results[2];
             data.collective.stats.totalPaidExpenses = -results[3];
@@ -149,23 +152,22 @@ const processCollective = (collective) => {
 const processUser = (user) => {
 
 let subscriptions, tags;
-
  return user.getOrders({
    include: [
-     { model: Collective },
+     { model: Collective, as: 'collective' },
      { model: Subscription, where: { isActive: true } }
    ]
   })
-  .tap(orders => Promise.map(orders, s => processCollective(s.Collective)))
+  .tap(orders => Promise.map(orders, s => processCollective(s.collective)))
   .then(orders => orders.map(s => {
     const subscription = _.pick(s.Subscription, ['amount', 'interval', 'currency', 'createdAt']);
-    subscription.collective = collectivesData[s.Collective.slug];
-    tags = _.union(tags, subscription.collective.tags);
+    subscription.collective = collectivesData[s.collective.slug];
+    tags = _.union(tags, s.collective.tags);
     return subscription;
     })
   )
   .tap(s => subscriptions = s)
-  .then(() => Collective.getCollectivesSummaryByTag(tags, 3, null, 0, false, 'g."createdAt"', 'DESC'))
+  .then(() => Collective.getCollectivesSummaryByTag(tags, 3, null, 0, false, 'c."createdAt"', 'DESC'))
   .then(relatedCollectives => {
     return {
       config: { host: config.host },

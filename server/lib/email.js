@@ -24,13 +24,13 @@ const render = (template, data) => {
   if (data.user) {
     data.user.paypalEmail = data.user.paypalEmail || data.user.email;
   }
-
+  
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
-  const slug = data.collective && data.collective.slug || data.recipient && data.recipient.username || data.recipient && data.recipient.substr(0, data.recipient.indexOf('@'));
-
+  const recipient = _.get(data, 'recipient.dataValues') || data.recipient || {};
+  const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {

@@ -57,7 +57,7 @@ const init = () => {
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
-  // query.where = { slug: {$in: ['cyclejs']} };
+  // query.where = { slug: {$in: ['webpack']} };
 
   Collective.findAll(query)
   .tap(collectives => {
@@ -139,12 +139,13 @@ const processBacker = (backer, startDate, endDate, tags) => {
 const processCollective = (collective) => {
   const promises = [
     getTopBackers(startDate, endDate, collective.tags),
-    collective.getTiersWithUsers({ attributes: ['id','username','name', 'image','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    collective.getTiersWithUsers({ attributes: ['id', 'slug', 'name', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'tier'], until: endDate }),
     collective.getBalance(endDate),
     collective.getTotalTransactions(startDate, endDate, 'donation'),
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
-    collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC')
+    collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
+    collective.getBackersStats(startDate, endDate)    
   ];
 
   let emailData = {};
@@ -158,14 +159,13 @@ const processCollective = (collective) => {
               .then(res => {
                 data.collective = _.pick(collective, ['id', 'name', 'slug', 'currency','publicUrl']);
                 data.collective.tiers = res.tiers;
-                data.collective.stats = res.stats;
+                data.collective.stats = results[7];
                 data.collective.stats.balance = results[2];
                 data.collective.stats.totalDonations = results[3];
                 data.collective.stats.totalExpenses = results[4];
                 data.collective.expenses = results[5];
                 data.relatedCollectives = results[6];
                 emailData = data;
-                console.log(data.collective.stats);
                 return collective;
               });
           })

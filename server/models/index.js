@@ -126,6 +126,8 @@ export function setupModels(client) {
   m.Order.belongsTo(m.Collective, { foreignKey: 'CollectiveId', as: 'collective' });
   m.Order.belongsTo(m.Tier);
   // m.Collective.hasMany(m.Order); // makes the test `mocha test/graphql.transaction.test.js -g "insensitive" fail
+  m.Collective.hasMany(m.Member, { foreignKey: "CollectiveId", as: 'members'});
+  m.Collective.hasMany(m.Order, { foreignKey: "CollectiveId", as: 'orders'});
   m.Transaction.belongsTo(m.Order);
   m.Order.hasMany(m.Transaction);
   m.Tier.hasMany(m.Order);

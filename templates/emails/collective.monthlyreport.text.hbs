@@ -10,14 +10,6 @@ Balance: {{{currency collective.stats.balance currency=collective.currency}}} (+
 Don't forget to regularly send an email to backers@{{collective.slug}}.opencollective.com to keep your backers posted on your latest activities!
 
 
-🔗 New Related Collectives
-
-{{#each relatedCollectives}}
-{{publicUrl}}
-{{{capitalize mission}}}
-
-{{/each}}
-
 🗒 Expenses
 
 {{#each collective.expenses}}
@@ -37,6 +29,14 @@ Go to {{@root.collective.publicUrl}}/expenses to submit a new expense.
 {{/each}}
 {{/if}}
 
+
+🔗 New Related Collectives
+
+{{#each relatedCollectives}}
+{{publicUrl}}
+{{{capitalize mission}}}
+
+{{/each}}
 
 💡 Tips for raising more money
 We wrote this guide "Ten Steps to Successful Open Source Crowdfunding" with a bunch of tips to help you raise more money for your collective:
