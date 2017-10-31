@@ -27,7 +27,7 @@ app.prepare()
 
   server.use((req, res, next) => {
     const accept = accepts(req)
-    const locale = accept.language(languages)  || 'en-US';
+    const locale = accept.language(languages)  || 'en';
     console.log(">>> url", req.url);
     console.log(">>> locale", locale);
     req.locale = locale;
