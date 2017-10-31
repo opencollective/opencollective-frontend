@@ -49,7 +49,6 @@ class MembersWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-    console.log(">>> MembersWithData", data);
     if (!data.allMembers) {
       return (<div />);
     }
