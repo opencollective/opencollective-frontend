@@ -127,7 +127,6 @@ class Collective extends React.Component {
   }
 
   render() {
-    console.log("CollectivePage> this.collective", this.collective, "state", this.state);
     const { intl, LoggedInUser } = this.props;
 
     const actions = [
