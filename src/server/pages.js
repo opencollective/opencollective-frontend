@@ -17,7 +17,7 @@ pages
   .add('editTiers', '/:collectiveSlug/tiers/edit')
   .add('orderCollectiveTier', '/:collectiveSlug/order/:TierId/:amount?/:interval?', 'createOrder')
   .add('orderEventTier', '/:collectiveSlug/events/:eventSlug/order/:TierId', 'createOrder')
-  .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval?', 'createOrder')
+  .add('donate', '/:collectiveSlug/:verb(donate|pay|contribute)/:amount?/:interval(month|monthly|year|yearly)?/:description?', 'createOrder')
   .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('transactions', '/:collectiveSlug/transactions')
   .add('expenses', '/:collectiveSlug/expenses')
