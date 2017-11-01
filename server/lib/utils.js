@@ -279,7 +279,7 @@ export function exportToCSV(data, attributes, getColumnName = (attr) => attr, pr
   const getLine = (row) => {
     const cols = [];
     attributes.map(attr => {
-      cols.push(`${processValue(attr, row[attr])}`.replace(/\"/g,"\""));
+      cols.push(`${processValue(attr, get(row,attr) || '')}`.replace(/\"/g,"\""));
     });
     return `"${cols.join('","')}"`;
   }

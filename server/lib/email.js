@@ -1,5 +1,5 @@
 import config from 'config';
-import _ from 'lodash';
+import _, { isArray } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
@@ -162,13 +162,15 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Get the label to unsubscribe from the email notification
  * Shown in the footer of the email following "To unsubscribe from "
  */
-const getNotificationLabel = (template, recipient = '') => {
+const getNotificationLabel = (template, recipients) => {
+
+  if (!isArray(recipients)) recipients = [recipients];
 
   template = template.replace('.text', '');
 
   const notificationTypeLabels = {
     'email.approve': 'notifications of new emails pending approval',
-    'email.message': `the ${recipient.substr(0, recipient.indexOf('@'))} mailing list`,
+    'email.message': `the ${recipients[0].substr(0, recipients[0].indexOf('@'))} mailing list`,
     'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
     'collective.monthlyreport': 'monthly reports for collectives',

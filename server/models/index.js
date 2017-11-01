@@ -119,6 +119,7 @@ export function setupModels(client) {
   m.Expense.belongsTo(m.User);
   m.Expense.belongsTo(m.Collective);
   m.Transaction.belongsTo(m.Expense);
+  m.Transaction.belongsTo(m.Order);
 
   // Order.
   m.Order.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
