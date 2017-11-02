@@ -54,7 +54,8 @@ const init = () => {
 
   let previewCondition = '';
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    previewCondition = "AND c.id IN (9805, 9804)"; // open source collective host, wwcode host
+    previewCondition = "AND c.id IN (9805, 9804, 9802, 9801)"; // open source collective host, wwcode host, brusselstogether, changex
+    // previewCondition = "AND c.id IN (9802)"; // brusselstogether
 
   const query = `
   with "hosts" as (SELECT DISTINCT "HostCollectiveId" AS id FROM "Collectives" WHERE "deletedAt" IS NULL AND "isActive" IS TRUE AND "HostCollectiveId" IS NOT NULL)
@@ -68,7 +69,7 @@ const init = () => {
   .tap(hosts => {
       console.log(`Preparing the ${month} ${year} report for ${hosts.length} hosts`);
   })
-  .then(hosts => Promise.map(hosts, processHost))
+  .then(hosts => Promise.map(hosts, processHost, { concurrency: 1 }))
   .then(() => getPlatformStats())
   .then(platformStats => {
     const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
@@ -177,7 +178,7 @@ const processHost = (host) => {
         attributes: ['email'],
         where: { CollectiveId: admin.MemberCollectiveId }
       }).then(user => user.email)
-    })
+    }, { concurrency: 1 })
   };
 
   const processTransaction = (transaction) => {
@@ -233,7 +234,7 @@ const processHost = (host) => {
         throw new Error(`No transaction found`);
       }
     })
-    .then(transactions => Promise.map(transactions, processTransaction))
+    .then(transactions => Promise.map(transactions, processTransaction, { concurrency: 1 }))
     .tap(transactions => {
 
       const getColumnName = (attr) => {
@@ -322,12 +323,12 @@ const sendEmail = (recipients, data, attachments) => {
       attachments
     }
     if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
-      const recipient = recipients[0];
       attachments.map(attachment => {
         const filepath = path.resolve(`/tmp/${data.host.slug}-${attachment.filename}`);
         fs.writeFileSync(filepath, attachment.content);
         console.log(">>> preview attachment", filepath);
       })
+      recipients.push("ops+test@opencollective.com");
     }
 
     return emailLib.send('host.monthlyreport', recipients, data, options);

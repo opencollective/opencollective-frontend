@@ -382,6 +382,9 @@ export const isEmailInternal = (email) => {
   if (email.match(/(opencollective\.(com|org))$/i) !== -1 ) {
     return true;
   }
+  if (email.match(/^xdamman.*@gmail\.com$/)) {
+    return true;
+  }
   return false;
 };
 

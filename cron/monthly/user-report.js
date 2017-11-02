@@ -53,7 +53,7 @@ const init = () => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    where.id = {$in: [2, 30, 1391]}; // xdamman, pia, aseem
+    where.id = {$in: [2, 30, 1391, 2031, 8, 41]}; // xdamman, pia, aseem, aseem, aseem, aseem
   // where.id = {$in: [2]}; // xdamman
 
   Notification.findAll(query)

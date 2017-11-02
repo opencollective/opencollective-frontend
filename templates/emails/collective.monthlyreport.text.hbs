@@ -13,7 +13,7 @@ Don't forget to regularly send an email to backers@{{collective.slug}}.opencolle
 🗒 Expenses
 
 {{#each collective.expenses}}
-- {{{moment createdAt format="MM/DD"}}} {{{currency netAmountInCollectiveCurrency currency=currency}}} {{description}} [{{toLowerCase status}}]
+- {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=currency}}} {{description}} [{{toLowerCase status}}]
 {{else}}
 No expense submitted. 
 {{/each}}
