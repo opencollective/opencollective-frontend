@@ -10,7 +10,7 @@
       },
       "pool": {
         "min": 10,
-        "max": 25
+        "max": 50
       },
       "benchmark": true
     }

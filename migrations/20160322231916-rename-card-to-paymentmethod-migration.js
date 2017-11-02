@@ -11,8 +11,7 @@ module.exports = {
   down: function (queryInterface, DataTypes) {
     return queryInterface.addColumn('PaymentMethods', 'GroupId', {
         type: DataTypes.INTEGER,
-        references: 'Groups',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Groups' },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       })

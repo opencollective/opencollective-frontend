@@ -123,6 +123,11 @@ export default (Sequelize, DataTypes) => {
 
     data: DataTypes.JSON,
 
+    // Note: Not a foreign key, should have been lower case t, 'transactionGroup`
+    TransactionGroup: {
+      type: DataTypes.UUID,
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW

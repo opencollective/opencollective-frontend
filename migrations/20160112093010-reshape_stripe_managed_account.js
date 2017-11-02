@@ -36,8 +36,7 @@ module.exports = {
     .then(function() {
       return queryInterface.addColumn('UserGroups', 'StripeAccountId', {
         type: DataTypes.INTEGER,
-        references: 'StripeAccounts',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'StripeAccounts'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
@@ -77,8 +76,7 @@ module.exports = {
     .then(function() {
       return queryInterface.addColumn('Groups', 'StripeManagedAccountId', {
         type: DataTypes.INTEGER,
-        references: 'StripeManagedAccounts',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'StripeManagedAccounts'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });

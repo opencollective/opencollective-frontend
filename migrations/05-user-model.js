@@ -66,8 +66,7 @@ module.exports = {
 
       ApplicationId: {
         type: DataTypes.INTEGER,
-        references: 'Applications',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Applications'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       }
