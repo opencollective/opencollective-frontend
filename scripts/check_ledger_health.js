@@ -99,6 +99,25 @@ const checkUsersAndOrgs = () => {
     if (VERBOSE)
       console.log(collectives.map(c => Object.assign({slug: c.slug, HostCollectiveId: c.HostCollectiveId})))
   })
+  // TODO: Check that no non-USER Collective is directly linked to a USER
+  .then(() => models.User.findAll({
+    attributes: ['CollectiveId']
+  }))
+  .then(userCollectives => models.Collective.findAll({
+    where: {
+      id: {
+        $in: userCollectives.map(u => u.CollectiveId)
+      },
+      type: {
+        $ne: 'USER'
+      }
+    }
+  }))
+  .then(improperlyLinkedCollectives => {
+    console.log('\t>>> non-User collectives that are linked to a USER: ', improperlyLinkedCollectives.length);
+    if (VERBOSE)
+      console.log(improperlyLinkedCollectives.map(c => Object.assign({id: c.id, slug: c.slug})));
+  })
 }
 
 const checkMembers = () => {
@@ -262,6 +281,36 @@ const checkTransactions = () => {
   // TODO
 }
 
+const checkCollectiveBalance = () => {
+
+  const brokenCollectives = [];
+  console.log('>>> Checking balance of each (non-USER, non-ORG) collective');
+  return models.Collective.findAll({
+    where: {
+      $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}]
+    }
+  })
+  .then(collectives => {
+    console.log('\t>>> Collectives found:', collectives.length);
+    return collectives;
+  })
+  .each(collective => {
+    return collective.getBalance()
+      .then(balance => {
+        if (balance < 0) {
+          brokenCollectives.push(collective)
+        }
+        return Promise.resolve();
+      })
+  })
+  .then(() => {
+    console.log('\t>>> Collectives with negative balance: ', brokenCollectives.length);
+    if (VERBOSE)
+      console.log(brokenCollectives.map(c => Object.assign({id: c.id, slug: c.slug})))
+  })
+
+}
+
 const run = () => {
   
   return checkHostsUserOrOrg()
@@ -271,6 +320,7 @@ const run = () => {
   .then(() => checkMembers())
   .then(() => checkOrders())
   .then(() => checkTransactions())
+  .then(() => checkCollectiveBalance())
   .then(() => done())
   .catch(done)
 }
