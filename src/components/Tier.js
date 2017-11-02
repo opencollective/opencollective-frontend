@@ -196,7 +196,7 @@ class Tier extends React.Component {
           <div className="header">
             <div className="title" >{capitalize(name)}</div>
             { !this.presets &&
-              <div className="title" >
+              <div className="title amount" >
                 { !this.state.amount && !this.presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { this.state.amount > 0 && <Currency value={this.state.amount} currency={currency} /> }
                 { interval && '/' }
