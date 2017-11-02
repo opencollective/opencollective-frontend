@@ -7,21 +7,21 @@ describe("pages.loggedout", () => {
   beforeAll(() => browser = chromeless.init());
   afterAll(() => chromeless.close(browser));
 
-  test("goes to a custom donate URL", async () => {
+  test.only("goes to a custom donate URL", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
-      .goto(`${WEBSITE_URL}/webpack/donate/50/month`)
-      .wait('.presetBtn')
-      .scrollToElement('.presetBtn')
+      .goto(`${WEBSITE_URL}/webpack/donate/50/month/custom%20description`)
+      .wait('.tier')
+      .scrollToElement('.tier')
       .screenshot();
 
     download("donate", screenshot);
     
-    const middlePresetSelected = await browser.exists('.presetBtnGroup button:nth-child(2).btn-primary');
-    expect(middlePresetSelected).toBeTruthy();
+    const description = await browser.evaluate(() => document.querySelector('.tier .description').innerText);
+    expect(description).toEqual("custom description");
 
-    const monthlySelected = await browser.exists('.intervalBtnGroup button:nth-child(2).btn-primary');
-    expect(monthlySelected).toBeTruthy();
+    const amount = await browser.evaluate(() => document.querySelector('.tier .amount').innerText);
+    expect(amount).toEqual("$50/monthly");
   });
 
   test("loads the /events iframe", async () => {

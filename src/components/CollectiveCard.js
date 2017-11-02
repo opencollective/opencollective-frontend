@@ -208,12 +208,12 @@ class CollectiveCard extends React.Component {
           { collective.stats &&
             <div className="stats">
               <div className="backers">
-                <div className="value">{collective.stats.backers}</div>
+                <div className="value">{collective.stats.backers.all}</div>
                 <div className="label">
                   <FormattedMessage
-                    id="collective.stats.backers"
+                    id="collective.stats.backers.users"
                     defaultMessage="{n} {n, plural, one {backer} other {backers}}"
-                    values={{ n: collective.stats.backers }}
+                    values={{ n: collective.stats.backers.all }}
                     />
                 </div>
               </div>

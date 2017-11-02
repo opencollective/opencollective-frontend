@@ -33,12 +33,12 @@ module.exports = (server, app) => {
 
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/:backerType/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/tiers/:tierSlug.:format(png|jpg|svg)', controllers.collectives.banner);
   server.get('/:collectiveSlug/tiers/:tierSlug/badge.svg', controllers.collectives.badge);
-  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.avatar);
+  server.get('/:collectiveSlug/tiers/:tierSlug/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
   server.get('/:collectiveSlug/tiers/:tierSlug/:position/website(.:format(png|jpg|svg))?', mw.ga, controllers.collectives.website);
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {

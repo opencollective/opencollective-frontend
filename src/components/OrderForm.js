@@ -459,7 +459,7 @@ class OrderForm extends React.Component {
                   <InputField
                     className="horizontal"
                     {...field}
-                    defaultValue={this.state.order[field.name]}
+                    defaultValue={this.state.user[field.name]}
                     onChange={(value) => this.handleChange("user", field.name, value)}
                     />
                 </Col>

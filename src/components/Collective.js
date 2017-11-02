@@ -127,7 +127,6 @@ class Collective extends React.Component {
   }
 
   render() {
-    console.log("CollectivePage> this.collective", this.collective, "state", this.state);
     const { intl, LoggedInUser } = this.props;
 
     const actions = [
@@ -289,7 +288,6 @@ class Collective extends React.Component {
               { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
-                    { this.collective.stats.collectives } &nbsp;
                     <FormattedMessage
                       id="collective"
                       values={{ n: this.collective.stats.collectives }}
@@ -298,7 +296,7 @@ class Collective extends React.Component {
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
-                      HostCollectiveId={this.collective.id}
+                      ParentCollectiveId={this.collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
