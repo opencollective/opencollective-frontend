@@ -297,7 +297,7 @@ class Collective extends React.Component {
                   </h1>
                   <div className="cardsList">
                     <CollectivesWithData
-                      HostCollectiveId={this.collective.id}
+                      ParentCollectiveId={this.collective.id}
                       orderBy="balance"
                       orderDirection="DESC"
                       limit={20}
