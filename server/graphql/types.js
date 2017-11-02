@@ -19,7 +19,6 @@ import {
 
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
-import { pick } from 'lodash';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
