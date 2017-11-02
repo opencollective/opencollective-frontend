@@ -214,26 +214,26 @@ export const create = (req, res, next) => {
         }
       })
     })
-    .tap(collective => {
+    .tap(() => {
       return models.User.findOne({ where: { id: collectiveData.HostId || defaultHostUser().id }}).tap(h => {
         host = h;
-        collective.HostCollectiveId = h.CollectiveId;
-        collective.ParentCollectiveId = h.CollectiveId;
+        createdCollective.HostCollectiveId = h.CollectiveId;
+        createdCollective.ParentCollectiveId = h.CollectiveId;
         if (collectiveData.HostId) {
           models.Collective.findById(h.CollectiveId).then(host => {
-            collective.currency = host.currency;
-            collective.save();
+            createdCollective.currency = host.currency;
+            createdCollective.save();
           })
         } else {
-          collective.save();
+          createdCollective.save();
         }
-        _addUserToCollective(collective, h, { role: roles.HOST, remoteUser: creator })
+        _addUserToCollective(createdCollective, h, { role: roles.HOST, remoteUser: creator })
         return null;
       })
     })
     .then(() => {
       if (collectiveData.tiers) {
-        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: collectiveData.currency })
+        return models.Tier.createMany(collectiveData.tiers, { CollectiveId: createdCollective.id, currency: createdCollective.currency })
       }
       return null;
     })
@@ -323,6 +323,7 @@ export const createFromGithub = (req, res, next) => {
       }
       collectiveData.HostCollectiveId = defaultHostUser('opensource').CollectiveId;
       collectiveData.ParentCollectiveId = defaultHostUser('opensource').CollectiveId;
+      collectiveData.currency = 'USD';
       return Collective.create(Object.assign({}, collectiveData, { CreatedByUserId: creatorUser.id, LastEditedByUserId: creatorUser.id }));
     })
     .tap(g => debug("createdCollective", g && g.dataValues))
