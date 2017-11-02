@@ -10,7 +10,17 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
   debug("sortResults", attribute, results.length);
   const resultsById = {};
   results.forEach(r => {
-    const key = r.dataValues ? r.dataValues[attribute] : r[attribute];
+    let key;
+    const dataValues = r.dataValues || r;
+    if (attribute.indexOf(':') !== -1) {
+      const keyComponents = [];
+      attribute.split(':').forEach(attr => {
+        keyComponents.push(dataValues[attr]);
+      });
+      key = keyComponents.join(':');
+    } else {
+      key = dataValues[attribute];
+    }
     if (!key) {
       return;
     }
@@ -27,6 +37,14 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
 }
 
 export const loaders = (req) => {
+
+  const cache = {};
+  const createDataLoaderWithOptions = (batchFunction, options = {}) => {
+    const cacheKey = JSON.stringify(options);
+    cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
+    return cache[cacheKey];
+  }
+
   return {
     collective: {
       findById: new DataLoader(ids => models.Collective
@@ -114,7 +132,7 @@ export const loaders = (req) => {
         .then(results => sortResults(ids, results, 'TierId'))
         .map(result => get(result, 'dataValues.count') || 0)
       )
-  },
+    },
     paymentMethods: {
       findById: new DataLoader(ids => models.PaymentMethod
         .findAll({ where: { id: { $in: ids }}})
@@ -129,7 +147,37 @@ export const loaders = (req) => {
         .then(results => sortResults(CollectiveIds, results, 'CollectiveId', []))
       )
     },
+    orders: {
+      findByMembership: options => createDataLoaderWithOptions((combinedKeys, options = {}) => {
+        return models.Order
+          .findAll({
+            where: {
+              CollectiveId: { $in: combinedKeys.map(k => k.split(':')[0]) },
+              FromCollectiveId: { $in: combinedKeys.map(k => k.split(':')[1] )}
+            },
+            limit: options.limit || 10,
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))
+          .tap(results => {
+            console.log(">>> final results for ", combinedKeys, ":", results);
+          })
+        }, options)
+    },
     transactions: {
+      findByOrderId: options => createDataLoaderWithOptions((OrderIds, options) => {
+        return models.Transaction
+          .findAll({
+            where: {
+              OrderId: { $in: OrderIds },
+              ... options.where
+            },
+            limit: options.limit || 10,
+            offset: options.offset || 0,
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(OrderIds, results, 'OrderId', []))
+        }, options),
       totalAmountForOrderId: new DataLoader(keys => models.Transaction.findAll({
           attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
           where: { OrderId: { $in: keys } },

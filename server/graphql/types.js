@@ -13,8 +13,13 @@ import {
   CollectiveInterfaceType
 } from './CollectiveInterface';
 
+import {
+  TransactionInterfaceType
+} from './TransactionInterface';
+
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
+import { pick } from 'lodash';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -132,6 +137,16 @@ export const MemberType = new GraphQLObjectType({
             FromCollectiveId: member.MemberCollectiveId,
             CollectiveId: member.CollectiveId,
           });
+        }
+      },
+      orders: {
+        type: new GraphQLList(OrderType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(member, args, req) {
+          return req.loaders.orders.findByMembership(args).load(`${member.CollectiveId}:${member.MemberCollectiveId}`);
         }
       },
       collective: {
@@ -575,6 +590,27 @@ export const OrderType = new GraphQLObjectType({
         type: PaymentMethodType,
         resolve(order) {
           return order.getPaymentMethod();
+        }
+      },
+      transactions: {
+        description: 'transactions for this order ordered by createdAt DESC',
+        type: new GraphQLList(TransactionInterfaceType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          type: {
+            type: GraphQLString,
+            description: "type of transaction (DEBIT/CREDIT)"
+          }
+        },
+        resolve(order, args, req) {
+          const query = {
+            where: {},
+            limit: args.limit || 10,
+            offset: args.offset || 0
+          };
+          if (args.type) query.where.type = args.type;
+          return req.loaders.transactions.findByOrderId(query).load(order.id);
         }
       },
       createdAt: {

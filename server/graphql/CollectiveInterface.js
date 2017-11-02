@@ -295,7 +295,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
-          type: { type: GraphQLString },
+          type: {
+            type: GraphQLString,
+            description: "Type of User: USER/ORGANIZATION"
+          },
+          TierId: { type: GraphQLInt },
+          tierSlug: { type: GraphQLString },
           role: { type: GraphQLString },
           roles: { type: new GraphQLList(GraphQLString) }
         }
@@ -525,6 +530,8 @@ const CollectiveFields = () => {
         offset: { type: GraphQLInt },
         type: { type: GraphQLString },
         role: { type: GraphQLString },
+        TierId: { type: GraphQLInt },
+        tierSlug: { type: GraphQLString },
         roles: { type: new GraphQLList(GraphQLString) }
       },
       resolve(collective, args) {
@@ -534,6 +541,7 @@ const CollectiveFields = () => {
         };
 
         query.where = { CollectiveId: collective.id };
+        if (args.TierId) query.where.TierId = args.TierId;
         const roles = args.roles || args.role && [ args.role ];
 
         if (roles && roles.length > 0) {
@@ -554,6 +562,13 @@ const CollectiveFields = () => {
             where: conditionOnMemberCollective
           }
         ];
+
+        if (args.tierSlug) {
+          query.include.push({
+            model: models.Tier,
+            where: { slug: args.tierSlug }
+          });
+        }
 
         return models.Member.findAll(query);
       }
@@ -635,7 +650,10 @@ const CollectiveFields = () => {
     transactions: {
       type: new GraphQLList(TransactionInterfaceType),
       args: {
-        type: { type: GraphQLString },
+        type: {
+          type: GraphQLString,
+          description: "type of transaction (DEBIT/CREDIT)"
+        },
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt }
       },
