@@ -118,6 +118,48 @@ const checkMembers = () => {
   })
 }
 
+// Check orders
+
+const checkOrders = () => {
+
+  console.log('>>> Check orders');
+
+  // Check that FromCollectiveId on an Order matches all Transactions
+  const brokenOrders = [];
+
+  return sequelize.query(`
+    SELECT * from "Orders"
+    WHERE "deletedAt" is null AND "processedAt" is not null AND "CollectiveId" != 1
+    `, { type: sequelize.QueryTypes.SELECT
+    })
+    .then(orders => {
+      console.log('\t>>> orders found: ', orders.length);
+      return orders;
+    })
+    .each(order => {
+      return sequelize.query(`
+        SELECT distinct("FromCollectiveId") from "Transactions"
+        WHERE "OrderId" = :orderId AND type LIKE 'CREDIT' AND "deletedAt" is null
+        `, {
+          type: sequelize.QueryTypes.SELECT,
+          replacements: {
+            orderId: order.id
+          }
+        })
+        .then(FromCollectiveIds => {
+          if (FromCollectiveIds.length > 1) {
+            brokenOrders.push(order.id);
+          }
+          return Promise.resolve();
+        })
+    })
+    .then(() => {
+      console.log('\t>>> orders found with mismatched FromCollectiveId: ', brokenOrders.length);
+      if (VERBOSE)
+        console.log(brokenOrders)
+    })
+}
+
 
 // Check all transactions
 const checkTransactions = () => {
@@ -227,6 +269,7 @@ const run = () => {
   .then(() => checkHostStripeAccount())
   .then(() => checkUsersAndOrgs())
   .then(() => checkMembers())
+  .then(() => checkOrders())
   .then(() => checkTransactions())
   .then(() => done())
   .catch(done)
