@@ -60,7 +60,7 @@ export async function fetchMembersStats(params) {
   }
 }
 
-export async function fetchMembers({ collectiveSlug, tierSlug, backerType }) {
+export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, options) {
   let query, processResult, type;
   if (backerType) {
     type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
@@ -108,7 +108,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }) {
   }
   let result;
   try {
-    result = await client.request(query, { collectiveSlug, tierSlug, type });
+    result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type });
     const members = processResult(result);
     return members;
   } catch (e) {
