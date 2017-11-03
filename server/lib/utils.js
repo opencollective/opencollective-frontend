@@ -8,6 +8,7 @@ import pdf from 'html-pdf';
 import fs from 'fs';
 import path from 'path';
 import handlebars from './handlebars';
+import { get } from 'lodash';
 
 const debug = debugLib('utils');
 
@@ -146,6 +147,13 @@ export const paginateOffset = (page, perPage) => {
   }
 };
 
+/**
+ * Gives the number of days between two dates
+ */
+export const days = (d1, d2) => {
+  const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+  return Math.round(Math.abs((d1.getTime() - d2.getTime())/(oneDay)));
+}
 
 /**
  * Returns stats for each tier compared to previousMonth
@@ -163,7 +171,7 @@ export const paginateOffset = (page, perPage) => {
  */
 export const getTiersStats = (tiers, startDate, endDate) => {
 
-  const userids = {};
+  const backersIds = {};
   const stats = { backers: {} };
 
   const rank = (user) => {
@@ -178,71 +186,82 @@ export const getTiersStats = (tiers, startDate, endDate) => {
   stats.backers.lost = 0;
 
   // We only keep the tiers that have at least one user
-  tiers = tiers.filter(tier => tier.users.length > 0 && tier.name != 'host' && tier.name != 'core contributor');
+  tiers = tiers.filter(tier => {
+    if (get(tier, 'dataValues.users') && get(tier, 'dataValues.users').length > 0) {
+      return true;
+    } else {
+      debug("skipping tier", tier.dataValues, "because it has no users");
+      return false;
+    }
+  });
 
   // We sort tiers by number of users ASC
-  tiers.sort((a,b) => b.range[0] - a.range[0]);
+  tiers.sort((a,b) => b.amount - a.amount);
 
-  tiers = tiers.map(tier => {
+  return Promise.map(tiers, tier => {
 
+    const backers = get(tier, 'dataValues.users');
     let index = 0
-    debug("> processing tier ", tier.name);
+    debug("> processing tier ", tier.name, "total backers: ", backers.length, backers);
 
-    // We sort users by total donations DESC
-    tier.users.sort((a,b) => b.totalDonations - a.totalDonations );
+    // We sort backers by total donations DESC
+    backers.sort((a,b) => b.totalDonations - a.totalDonations );
 
-    tier.users = Promise.filter(tier.users, u => {
-      if (userids[u.id]) {
-        debug(">>> user ", u.username, "is a duplicate");
+    return Promise.filter(backers, backer => {
+      if (backersIds[backer.id]) {
+        debug(">>> backer ", backer.slug, "is a duplicate");
         return false;
       }
-      userids[u.id] = true;
+      backersIds[backer.id] = true;
 
-      u.index = index++;
-
-      return Promise.all([tier.isActive(u, endDate), tier.isActive(u, startDate)])
+      backer.index = index++;
+      return Promise.all([tier.isBackerActive(backer, endDate), tier.isBackerActive(backer, startDate)])
         .then(results => {
-          u.activeLastMonth = results[0];
-          u.activePreviousMonth = (u.firstDonation < startDate) && results[1];
-
+          backer.activeLastMonth = results[0];
+          backer.activePreviousMonth = (backer.firstDonation < startDate) && results[1];
           if (tier.name.match(/sponsor/i))
-            u.isSponsor = true;
-          if (u.firstDonation > startDate) {
-            u.isNew = true;
+            backer.isSponsor = true;
+          if (backer.firstDonation > startDate) {
+            backer.isNew = true;
             stats.backers.new++;
           }
-          if (u.activePreviousMonth && !u.activeLastMonth) {
-            u.isLost = true;
+          if (backer.activePreviousMonth && !backer.activeLastMonth) {
+            backer.isLost = true;
             stats.backers.lost++;
           }
 
-          debug("----------- ", u.username, "----------");
-          debug("firstDonation", u.firstDonation && u.firstDonation.toISOString().substr(0,10));
-          debug("totalDonations", u.totalDonations/100);
-          debug("active last month?", u.activeLastMonth);
-          debug("active previous month?", u.activePreviousMonth);
-          debug("is new?", u.isNew === true);
-          debug("is lost?", u.isLost === true);
-          if (u.activePreviousMonth)
+          debug("----------- ", backer.slug, "----------");
+          debug("firstDonation", backer.firstDonation && backer.firstDonation.toISOString().substr(0,10));
+          debug("totalDonations", backer.totalDonations/100);
+          debug("active last month?", backer.activeLastMonth);
+          debug("active previous month?", backer.activePreviousMonth);
+          debug("is new?", backer.isNew === true);
+          debug("is lost?", backer.isLost === true);
+          if (backer.activePreviousMonth)
             stats.backers.previousMonth++;
-          if (u.activeLastMonth) {
+          if (backer.activeLastMonth) {
             stats.backers.lastMonth++;
             return true;
-          } else if (u.isLost) {
+          } else if (backer.isLost) {
             return true;
           }
         });
-    });
+    })
+    .then(backers => {
+      backers.sort((a, b) => {
+        if (rank(a) > rank(b)) return 1;
+        if (rank(a) < rank(b)) return -1;
+        return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
+      });
 
-    tier.users.sort((a, b) => {
-      if (rank(a) > rank(b)) return 1;
-      if (rank(a) < rank(b)) return -1;
-      return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
+      tier.users = backers;
+      
+      return tier;
     });
-
-    return tier;
+  })
+  .then(tiers => {
+    return { stats, tiers};
   });
-  return { stats, tiers};
 }
 
 /**
@@ -260,7 +279,7 @@ export function exportToCSV(data, attributes, getColumnName = (attr) => attr, pr
   const getLine = (row) => {
     const cols = [];
     attributes.map(attr => {
-      cols.push(`${processValue(attr, row[attr])}`.replace(/\"/g,"\""));
+      cols.push(`${processValue(attr, get(row,attr) || '')}`.replace(/\"/g,"\""));
     });
     return `"${cols.join('","')}"`;
   }
@@ -361,6 +380,9 @@ export const isValidEmail = (email) => {
 export const isEmailInternal = (email) => {
   if (!email) return false;
   if (email.match(/(opencollective\.(com|org))$/i) !== -1 ) {
+    return true;
+  }
+  if (email.match(/^xdamman.*@gmail\.com$/)) {
     return true;
   }
   return false;

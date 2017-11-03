@@ -28,6 +28,17 @@ body {
   -webkit-flex-direction: column;
 }
 
+h1 {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+h2 {
+  font-size: 16px;
+  margin-top: 0px;
+  margin-bottom: 24px;
+}
+
 .footer {
   text-align: center;
   font-size: 9pt;
@@ -86,7 +97,8 @@ td.tdpadding {
  {{#each expensesPerPage}}
 
   <div class="page">
-    <h1>{{@root.month}} {{@root.year}} - {{@root.host.name}} expense receipts ({{{increment @index}}}/{{../expensesPerPage.length}})</h1>
+    <h1>{{@root.host.name}} expense receipts</h1>
+    <h2>{{@root.month}} {{@root.year}} - page {{{increment @index}}}/{{../expensesPerPage.length}}</h2>
 
     <table width="100%" border=0 class="small-table">
       <tr>
@@ -146,11 +158,11 @@ td.tdpadding {
           </tr>
           <tr><th nowrap>Net amount in {{@root.host.currency}}</th><td></td><td>{{{currency netAmountInHostCurrency currency=@root.host.currency precision=2}}}{{#if note}}*{{/if}}</td></tr>
           <tr><th nowrap>Payout method</th><td></td><td nowrap>{{Expense.payoutMethod}}</td></tr>
-          <tr><th>Recipient</th><td></td><td nowrap>{{User.name}} &lt;{{User.email}}&gt;</td></tr>
+          <tr><th>Recipient</th><td></td><td nowrap>{{createdByUser.firstName}} {{createdByUser.lastName}} &lt;{{createdByUser.email}}&gt;</td></tr>
         </table>
         <table class="expenseTitleDescription">
           <tr>
-            <th valign="top">Title</th>
+            <th valign="top">Description</th>
             <td class="tdpadding" width=30>&nbsp;&nbsp;</td>
             <td>{{Expense.description}}</td>
           </tr>

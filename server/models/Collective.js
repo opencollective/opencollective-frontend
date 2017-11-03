@@ -346,9 +346,47 @@ export default function(Sequelize, DataTypes) {
     .then(users => uniq(users, (user) => user.id));
   };
 
-  Collective.prototype.getEvents = function() {
-    return Collective.findAll({ where: { ParentCollectiveId: this.id, type: types.EVENT }});
+  Collective.prototype.getEvents = function(query = {}) {
+    return Collective.findAll({
+      ...query,
+      where: {
+        ...query.where,
+        ParentCollectiveId: this.id,
+        type: types.EVENT
+      }
+    });
   };
+
+  /**
+   * Return stats about backers
+   *  - stats.backers.lastMonth: number of backers by endDate
+   *  - stats.backers.previousMonth: number of backers by startDate
+   *  - stats.backers.new: the number of backers whose first donation was after startDate
+   */
+  Collective.prototype.getBackersStats = function(startDate, endDate) {
+
+    const getBackersUntil = (until) => models.Member.count({
+      where: {
+        CollectiveId: this.id,
+        role: roles.BACKER,
+        createdAt: { $lt: until }
+      }
+    });
+
+    return Promise.all([
+      getBackersUntil(startDate),
+      getBackersUntil(endDate)
+    ])
+    .then(results => {
+      return {
+        backers: {
+          lastMonth: results[1],
+          previousMonth: results[0],
+          new: results[1] - results[0]
+        }
+      }
+    });
+  }
 
   Collective.prototype.getIncomingOrders = function(options) {
     const query = deepmerge({
@@ -402,27 +440,26 @@ export default function(Sequelize, DataTypes) {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
         return models.Order.findOne({
           attributes: [ 'TierId' ],
-          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id },
+          where: { FromCollectiveId: backerCollective.id, CollectiveId: this.id, TierId: { $ne: null } },
           include
         }).then(order => {
           if (!order) {
-            console.error("Collective.getTiersWithUsers: no order for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
-            return null;
-          }
-          if (!order.TierId) {
-            console.error("Collective.getTiersWithUsers: no order.TierId for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
+            debug("Collective.getTiersWithUsers: no order for a tier for ", { FromCollectiveId: backerCollective.id, CollectiveId: this.id });
             return null;
           }
           const TierId = order.TierId;
           tiersById[TierId] = tiersById[TierId] || order.Tier;
-          tiersById[TierId].users = tiersById[TierId].users || [];
+          tiersById[TierId].dataValues.users = tiersById[TierId].dataValues.users || [];
           if (options.active) {
             backerCollective.isActive = order.Subscription.isActive;
           }
-          tiersById[TierId].users.push(backerCollective.dataValues);
+          debug("adding to tier", TierId, "backer: ", backerCollective.dataValues.slug);
+          tiersById[TierId].dataValues.users.push(backerCollective.dataValues);
         })
       })
-      .then(() => Object.values(tiersById));
+      .then(() => {
+        return Object.values(tiersById)
+      });
   };
 
   /**
@@ -607,17 +644,18 @@ export default function(Sequelize, DataTypes) {
     })
   };
 
-  Collective.prototype.getExpenses = function(status, startDate, endDate) {
-    endDate = endDate || new Date;
+  Collective.prototype.getExpenses = function(status, startDate, endDate = new Date) {
     const where = {
-      amount: { $lt: 0 },
       createdAt: { $lt: endDate },
       CollectiveId: this.id
     };
     if (status) where.status = status;
     if (startDate) where.createdAt.$gte = startDate;
 
-    return models.Transaction.findAll({ where, order: [['createdAt','DESC']] });
+    return models.Expense.findAll({
+      where,
+      order: [['createdAt','DESC']]
+    });
   };
 
   Collective.prototype.getBalance = function(until) {

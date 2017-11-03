@@ -129,7 +129,13 @@ export default (Sequelize, DataTypes) => {
 
       // Collective of type USER corresponding to this user
       userCollective() {
-        return models.Collective.findById(this.CollectiveId);
+        return models.Collective.findById(this.CollectiveId).then(userCollective => {
+          if (!userCollective) {
+            console.error(`No Collective attached to this user id ${this.id} (User.CollectiveId: ${this.CollectiveId})`);
+            return {};
+          }
+          return userCollective;
+        });
       },
 
       username() {

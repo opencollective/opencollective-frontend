@@ -80,7 +80,7 @@
     "request-as-curl": "0.1.0",
     "request-promise": "4.1.1",
     "sanitize-html": "1.14.1",
-    "sequelize": "4.14.0",
+    "sequelize": "4.22.0",
     "sequelize-cli": "3.0.0",
     "sequelize-temporal": "1.0.4",
     "slug": "0.9.1",

@@ -2,7 +2,7 @@
 
 // Only run on the first of the month
 const today = new Date();
-if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 3) { // TODO: change back to 1
   console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
@@ -50,7 +50,6 @@ const init = () => {
           'slug',
           'name',
           'currency',
-          'tiers',
           'tags'
       ],
       include: [ { model: models.Transaction, required: true }]
@@ -58,6 +57,7 @@ const init = () => {
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
     query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
+  // query.where = { slug: {$in: ['webpack']} };
 
   Collective.findAll(query)
   .tap(collectives => {
@@ -139,12 +139,13 @@ const processBacker = (backer, startDate, endDate, tags) => {
 const processCollective = (collective) => {
   const promises = [
     getTopBackers(startDate, endDate, collective.tags),
-    collective.getTiersWithUsers({ attributes: ['id','username','name', 'image','firstDonation','lastDonation','totalDonations','tier'], until: endDate }),
+    collective.getTiersWithUsers({ attributes: ['id', 'slug', 'name', 'image', 'firstDonation', 'lastDonation', 'totalDonations', 'tier'], until: endDate }),
     collective.getBalance(endDate),
     collective.getTotalTransactions(startDate, endDate, 'donation'),
     collective.getTotalTransactions(startDate, endDate, 'expense'),
     collective.getExpenses(null, startDate, endDate),
-    collective.getRelatedCollectives(3, 0, 'g."createdAt"', 'DESC')
+    collective.getRelatedCollectives(3, 0, 'c."createdAt"', 'DESC'),
+    collective.getBackersStats(startDate, endDate)    
   ];
 
   let emailData = {};
@@ -154,18 +155,19 @@ const processCollective = (collective) => {
             console.log('***', collective.name, '***');
             const data = { config: { host: config.host }, month, collective: {} };
             data.topBackers = _.filter(results[0], (backer) => (backer.donationsString.text.indexOf(collective.slug) === -1)); // we omit own backers
-            const res = getTiersStats(results[1], startDate, endDate);
-            data.collective = _.pick(collective, ['id', 'name', 'slug', 'currency','publicUrl']);
-            data.collective.tiers = res.tiers;
-            data.collective.stats = res.stats;
-            data.collective.stats.balance = results[2];
-            data.collective.stats.totalDonations = results[3];
-            data.collective.stats.totalExpenses = results[4];
-            data.collective.expenses = results[5];
-            data.relatedCollectives = results[6];
-            emailData = data;
-            console.log(data.collective.stats);
-            return collective;
+            return getTiersStats(results[1], startDate, endDate)
+              .then(res => {
+                data.collective = _.pick(collective, ['id', 'name', 'slug', 'currency','publicUrl']);
+                data.collective.tiers = res.tiers;
+                data.collective.stats = results[7];
+                data.collective.stats.balance = results[2];
+                data.collective.stats.totalDonations = results[3];
+                data.collective.stats.totalExpenses = results[4];
+                data.collective.expenses = results[5];
+                data.relatedCollectives = results[6];
+                emailData = data;
+                return collective;
+              });
           })
           .then(getRecipients)
           .then(recipients => sendEmail(recipients, emailData))

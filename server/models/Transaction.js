@@ -205,12 +205,8 @@ export default (Sequelize, DataTypes) => {
   };
 
   Transaction.prototype.getSource = function() {
-    switch (this.type) {
-      case 'DEBIT':
-        return this.getExpense();
-      case 'CREDIT':
-        return this.getOrder();
-    }        
+    if (this.OrderId) return this.getOrder();
+    if (this.ExpenseId) return this.getExpense();
   };
 
   /**

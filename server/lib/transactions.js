@@ -34,7 +34,7 @@ export function getTransactions(collectiveids, startDate = new Date("2015-01-01"
     order: [ ['createdAt', 'DESC' ]]
   };
   if (options.limit) query.limit = options.limit;
-  if (options.include) query.include = options.include.map(model => models[model]);
+  if (options.include) query.include = options.include;
   return models.Transaction.findAll(query);
 }
 
