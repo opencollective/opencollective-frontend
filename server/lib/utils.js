@@ -345,14 +345,14 @@ export function exportToPDF(template, data, options) {
 }
 
 /**
- * Default host id, set this for new collectives created through Github
+ * Default host id, set this for new collectives created through our flow
  */
-export const defaultHostUser = (tag) => {
+export const defaultHostCollective = (tag) => {
   if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV  === 'staging') {
     if (tag === 'opensource') {
-      return { id: 772, CollectiveId: 9805 }; // Open Source Host Collective
+      return { id: 772, CollectiveId: 9805, ParentCollectiveId: 83 }; // Open Source Host Collective
     } else {
-      return { id: 7944, CollectiveId: 8674 }; // Non-open source Host Collective ('host-other')
+      return { id: 7944, CollectiveId: 8674, ParentCollectiveId: 83 }; // Non-open source Host Collective ('host-other')
     }
   }
   return { id: 1, CollectiveId: 1 };
