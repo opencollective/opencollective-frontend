@@ -103,12 +103,12 @@ th {
         <img src={{resizeImage image height=48}} height="48" alt="{{name}}" border="0" />
       {{else}}
         {{#if isNew}}
-          <img height="48" src={{resizeImage image height=48 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:66C71A/e_trim/f_auto/"}} alt="{{name}}" border="0" />
+          <img height="48" width="48" src={{resizeImage image height=48 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:66C71A/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} alt="{{name}}" border="0" />
         {{else}}
           {{#if isLost}}
-            <img height="48" src={{resizeImage image height=96 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:FF0000/e_trim/f_auto/"}} alt="{{name}}" border="0" />
+            <img height="48" width="48" src={{resizeImage image height=96 query="/c_thumb,g_face,h_96,r_max,w_96,bo_4px_solid_white/c_thumb,h_96,r_max,w_96,bo_4px_solid_rgb:FF0000/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} alt="{{name}}" border="0" />
           {{else}}
-            <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve,e_grayscale/e_trim/f_auto/"}} height="36" alt="{{name}}" border="0" />
+            <img src={{resizeImage image height=48 query="/c_thumb,g_face,h_72,r_max,w_72,bo_2px_solid_white/c_thumb,h_72,r_max,w_72,bo_2px_solid_rgb:DDE1E4/e_improve,e_grayscale/e_trim/f_auto/" defaultImage="/static/images/avatar-01.svg"}} height="36" width="36" alt="{{name}}" border="0" />
           {{/if}}
         {{/if}}
       {{/if}}
