@@ -4,7 +4,7 @@ import roles from '../../server/constants/roles';
 
 // Only run on the first of the month
 const today = new Date();
-if (process.env.NODE_ENV === 'production' && today.getDate() !== 3) { // TODO: change back to 1
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 5) { // TODO: change back to 1
   console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
