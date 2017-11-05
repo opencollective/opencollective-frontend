@@ -174,7 +174,6 @@ describe('groups.routes.test.js', () => {
     describe('Successfully create a group and ', () => {
 
       const { ConnectedAccount } = models;
-      let githubUser;
 
       beforeEach(() => {
         const { User } = models;
@@ -190,7 +189,6 @@ describe('groups.routes.test.js', () => {
           preCA = ca;
           return User.createUserWithCollective({email: 'githubuser@gmail.com'});
         })
-        .tap(user => githubUser = user)
         .then(user => user.collective.addConnectedAccount(preCA));
       });
 
@@ -232,22 +230,11 @@ describe('groups.routes.test.js', () => {
           return ca.getCollective();
         })
         .then(userCollective => expect(userCollective).to.exist)
-        .then(() => ConnectedAccount.findOne({ where: { username: 'oc' } }))
-        .then(ca => {
-          expect(ca).to.have.property('service', 'github');
-          return ca.getCollective();
-        })
-        .tap(userCollective => expect(userCollective).to.exist)
-        .then(userCollective => models.User.findById(userCollective.CreatedByUserId))
-        .then(user => user.getCollectives({ paranoid: false })) // because we are setting deletedAt
-        .tap(groups => expect(groups).to.have.length(1))
-        .tap(groups => expect(groups[0].LastEditedByUserId).to.equal(githubUser.id)) // github user created above
         .then(() => models.Member.findAll())
         .then(Members => {
-          expect(Members).to.have.length(3);
+          expect(Members).to.have.length(2);
           expect(Members[0]).to.have.property('role', roles.ADMIN);
           expect(Members[1]).to.have.property('role', roles.HOST);
-          expect(Members[2]).to.have.property('role', roles.ADMIN);
           return null;
         }))
     });

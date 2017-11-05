@@ -99,6 +99,25 @@ const checkUsersAndOrgs = () => {
     if (VERBOSE)
       console.log(collectives.map(c => Object.assign({slug: c.slug, HostCollectiveId: c.HostCollectiveId})))
   })
+  // TODO: Check that no non-USER Collective is directly linked to a USER
+  .then(() => models.User.findAll({
+    attributes: ['CollectiveId']
+  }))
+  .then(userCollectives => models.Collective.findAll({
+    where: {
+      id: {
+        $in: userCollectives.map(u => u.CollectiveId)
+      },
+      type: {
+        $ne: 'USER'
+      }
+    }
+  }))
+  .then(improperlyLinkedCollectives => {
+    console.log('\t>>> non-User collectives that are linked to a USER: ', improperlyLinkedCollectives.length);
+    if (VERBOSE)
+      console.log(improperlyLinkedCollectives.map(c => Object.assign({id: c.id, slug: c.slug})));
+  })
 }
 
 const checkMembers = () => {
@@ -116,6 +135,48 @@ const checkMembers = () => {
     if (VERBOSE)
       console.log(circularMembers.map(cm => cm.id).join(', '))
   })
+}
+
+// Check orders
+
+const checkOrders = () => {
+
+  console.log('>>> Check orders');
+
+  // Check that FromCollectiveId on an Order matches all Transactions
+  const brokenOrders = [];
+
+  return sequelize.query(`
+    SELECT * from "Orders"
+    WHERE "deletedAt" is null AND "processedAt" is not null AND "CollectiveId" != 1
+    `, { type: sequelize.QueryTypes.SELECT
+    })
+    .then(orders => {
+      console.log('\t>>> orders found: ', orders.length);
+      return orders;
+    })
+    .each(order => {
+      return sequelize.query(`
+        SELECT distinct("FromCollectiveId") from "Transactions"
+        WHERE "OrderId" = :orderId AND type LIKE 'CREDIT' AND "deletedAt" is null
+        `, {
+          type: sequelize.QueryTypes.SELECT,
+          replacements: {
+            orderId: order.id
+          }
+        })
+        .then(FromCollectiveIds => {
+          if (FromCollectiveIds.length > 1) {
+            brokenOrders.push(order.id);
+          }
+          return Promise.resolve();
+        })
+    })
+    .then(() => {
+      console.log('\t>>> orders found with mismatched FromCollectiveId: ', brokenOrders.length);
+      if (VERBOSE)
+        console.log(brokenOrders)
+    })
 }
 
 
@@ -220,6 +281,36 @@ const checkTransactions = () => {
   // TODO
 }
 
+const checkCollectiveBalance = () => {
+
+  const brokenCollectives = [];
+  console.log('>>> Checking balance of each (non-USER, non-ORG) collective');
+  return models.Collective.findAll({
+    where: {
+      $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}]
+    }
+  })
+  .then(collectives => {
+    console.log('\t>>> Collectives found:', collectives.length);
+    return collectives;
+  })
+  .each(collective => {
+    return collective.getBalance()
+      .then(balance => {
+        if (balance < 0) {
+          brokenCollectives.push(collective)
+        }
+        return Promise.resolve();
+      })
+  })
+  .then(() => {
+    console.log('\t>>> Collectives with negative balance: ', brokenCollectives.length);
+    if (VERBOSE)
+      console.log(brokenCollectives.map(c => Object.assign({id: c.id, slug: c.slug})))
+  })
+
+}
+
 const run = () => {
   
   return checkHostsUserOrOrg()
@@ -227,7 +318,9 @@ const run = () => {
   .then(() => checkHostStripeAccount())
   .then(() => checkUsersAndOrgs())
   .then(() => checkMembers())
+  .then(() => checkOrders())
   .then(() => checkTransactions())
+  .then(() => checkCollectiveBalance())
   .then(() => done())
   .catch(done)
 }
