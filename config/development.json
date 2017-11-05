@@ -7,12 +7,7 @@
       "host": "127.0.0.1",
       "dialect": "postgres",
       "logging": false,
-      "benchmark": true,
-      "pool": {
-        "min": 10,
-        "max": 50,
-        "acquire": 20000
-      }
+      "benchmark": true
     }
   },
   "keys": {

@@ -163,7 +163,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Shown in the footer of the email following "To unsubscribe from "
  */
 const getNotificationLabel = (template, recipients) => {
-
+  
   if (!isArray(recipients)) recipients = [recipients];
 
   template = template.replace('.text', '');
@@ -252,6 +252,9 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
  * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
+  if (!recipient) {
+    return Promise.reject("No recipient");
+  }
   return generateEmailFromTemplate(template, recipient, data, options)
     .then(renderedTemplate => {
       const attributes = getTemplateAttributes(renderedTemplate.html);

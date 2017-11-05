@@ -8,11 +8,6 @@
       "dialectOptions": {
         "ssl": true
       },
-      "pool": {
-        "min": 10,
-        "max": 50,
-        "acquire": 20000
-      },
       "benchmark": true
     }
   },
