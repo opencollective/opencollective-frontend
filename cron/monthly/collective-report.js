@@ -36,7 +36,7 @@ const {
 } = models;
 
 const processCollectives = (collectives) => {
-    return Promise.map(collectives, processCollective);
+    return Promise.map(collectives, processCollective, { concurrency: 1 });
 };
 
 
@@ -52,12 +52,13 @@ const init = () => {
           'currency',
           'tags'
       ],
+      where: { type: 'COLLECTIVE'},
       include: [ { model: models.Transaction, required: true }]
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    query.where = { slug: {$in: ['webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox']} };
-  // query.where = { slug: {$in: ['webpack']} };
+    query.where.slug = { $in: ['vuejs', 'webpack', 'wwcodeaustin','railsgirlsatl','cyclejs','mochajs','chsf','freeridetovote','tipbox'] };
+  // query.where.slug = { $in: ['vuejs'] };
 
   Collective.findAll(query)
   .tap(collectives => {
@@ -189,6 +190,9 @@ const getRecipients = (collective) => {
 const sendEmail = (recipients, data) => {
   if (recipients.length === 0) return;
   return Promise.map(recipients, recipient => {
+    if (!recipient.email) {
+      return Promise.resolve();
+    }
     data.recipient = recipient;
     if (process.env.ONLY && recipient.email !== process.env.ONLY) {
       debug("Skipping ", recipient.email);

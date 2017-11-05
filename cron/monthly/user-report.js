@@ -61,7 +61,7 @@ const init = () => {
   .tap(users => {
       console.log(`Preparing the ${month} report for ${users.length} users`);
   })
-  .then(users => Promise.map(users, processUser))
+  .then(users => Promise.map(users, processUser, { concurrency: 1 }))
   .then(() => {
     const timeLapsed = Math.round((new Date - startTime)/1000);
     console.log(`Total run time: ${timeLapsed}s`);
