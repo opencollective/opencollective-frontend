@@ -61,7 +61,7 @@ export const _create = (user) => User.createUserWithCollective(user)
  * Check existence of a user based on email
  */
 export const exists = (req, res) => {
-  const email = req.query.email;
+  const email = req.query.email.toLowerCase();
   if (!isValidEmail(email)) {
     return res.send({ exists: false });
   }
