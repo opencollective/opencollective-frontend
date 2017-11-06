@@ -27,9 +27,8 @@ app.prepare()
 
   server.use((req, res, next) => {
     const accept = accepts(req)
-    const locale = accept.language(languages)  || 'en-US';
-    console.log(">>> url", req.url);
-    console.log(">>> locale", locale);
+    const locale = accept.language(languages)  || 'en';
+    console.log(">>> url", req.url, "locale", locale);
     req.locale = locale;
     req.localeDataScript = getLocaleDataScript(locale)
     req.messages = getMessages(locale)
