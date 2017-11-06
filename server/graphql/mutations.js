@@ -401,7 +401,10 @@ const mutations = {
         tier = t; // we may not have a tier
         paymentRequired = order.totalAmount > 0 || tier && tier.amount > 0;
         // interval of the tier can only be overridden if it is null (e.g. for custom donations)
-        interval = tier && tier.interval || order.interval;
+        // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers. 
+        // Need to reevalute with always respecting user choice.
+
+        interval = order.interval || tier && tier.interval;
       })
 
       // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)
