@@ -16,8 +16,7 @@ module.exports = {
       },
       GroupId: {
         type: DataTypes.INTEGER,
-        references: 'Groups',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Groups' },
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         allowNull: false,
@@ -25,8 +24,7 @@ module.exports = {
       },
       ApplicationId: {
         type: DataTypes.INTEGER,
-        references: 'Applications',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Applications'},
         allowNull: false,
         primaryKey: true,
       },

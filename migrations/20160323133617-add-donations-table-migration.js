@@ -12,16 +12,14 @@ module.exports = {
 
         UserId: {
           type: Sequelize.INTEGER,
-          references: 'Users',
-          referencesKey: 'id',
+          references: {key: 'id', model: 'Users' },
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         },
 
         GroupId: {
           type: Sequelize.INTEGER,
-          references: 'Groups',
-          referencesKey: 'id',
+          references: {key: 'id', model: 'Groups'},
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         },
@@ -41,8 +39,7 @@ module.exports = {
 
         SubscriptionId: {
           type: Sequelize.INTEGER,
-          references: 'Subscriptions',
-          referencesKey: 'id',
+          references: {key: 'id', model: 'Subscriptions'},
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE'
         },

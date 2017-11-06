@@ -30,8 +30,7 @@ module.exports = {
       },
       TransactionId: {
         type: DataTypes.INTEGER,
-        references: 'Transactions',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Transactions'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },

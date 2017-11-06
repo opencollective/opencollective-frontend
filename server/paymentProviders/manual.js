@@ -28,13 +28,10 @@ export default {
         paymentProcessorFeeInHostCurrency: 0,
       }
     }
+
+    console.log(payload)
     return collective
       .getHostCollectiveId()
-      .tap(HostCollectiveId => {
-        if (HostCollectiveId !== user.CollectiveId) {
-          throw new Error("Cannot manually add funds to a collective that you are not hosting");
-        }
-      })
       .then(HostCollectiveId => HostCollectiveId === order.FromCollectiveId)
       .tap(isHost => isFromCollectiveHost = isHost)
       .then(isFromCollectiveHost => {

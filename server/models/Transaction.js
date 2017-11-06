@@ -123,6 +123,11 @@ export default (Sequelize, DataTypes) => {
 
     data: DataTypes.JSON,
 
+    // Note: Not a foreign key, should have been lower case t, 'transactionGroup`
+    TransactionGroup: {
+      type: DataTypes.UUID,
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW
@@ -200,12 +205,8 @@ export default (Sequelize, DataTypes) => {
   };
 
   Transaction.prototype.getSource = function() {
-    switch (this.type) {
-      case 'DEBIT':
-        return this.getExpense();
-      case 'CREDIT':
-        return this.getOrder();
-    }        
+    if (this.OrderId) return this.getOrder();
+    if (this.ExpenseId) return this.getExpense();
   };
 
   /**

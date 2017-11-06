@@ -404,7 +404,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
       max(member."createdAt") as "createdAt",
       max(c.id) as id,
       max(c.type) as type,
-      max(c."HostCollectiveId") as "HosCollectiveId",
+      max(c."HostCollectiveId") as "HostCollectiveId",
       max(c.name) as name,
       max(u."firstName") as "firstName",
       max(u."lastName") as "lastName",
