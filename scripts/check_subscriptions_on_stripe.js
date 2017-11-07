@@ -35,13 +35,14 @@ function run() {
       },
       { model: models.Collective, as: 'collective'},
       { model: models.PaymentMethod, as: 'paymentMethod' }
-    ]
+    ],
+    order: ['id']
   })
   .tap(orders => console.log("Total Subscriptions found: ", orders.length))
   .each(order => {
     console.log(`Processing SubscriptionId: ${order.SubscriptionId}`);
     return order.collective.getHostStripeAccount()
-      .then(stripeAccount => retrieveSubscription(stripeAccount, order.paymentMethod.customerId, order.Subscription.stripeSubscriptionId))
+      .then(stripeAccount => retrieveSubscription(stripeAccount, order.Subscription.stripeSubscriptionId))
       .then(stripeSubscription => {
         if (!stripeSubscription) {
           console.log('Stripe Subscription not found');
@@ -51,10 +52,10 @@ function run() {
       })
       .catch(err => {
         if (err.type === 'StripeInvalidRequestError') {
-          console.log('Stripe Subscription not found');
+          console.log('Stripe Subscription not found - error thrown');
           inactiveSubscriptionCount +=1;
           if (order.currency === 'USD' || order.currency === 'EUR') {
-            sumAmount += order.amount;
+            sumAmount += order.totalAmount;
           }
           const subscription = order.Subscription;
           subscription.isActive = false;
