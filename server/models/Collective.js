@@ -478,6 +478,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.addUserWithRole = function(user, role, defaultAttributes) {
+
     const lists = {};
     lists[roles.BACKER] = 'backers';
     lists[roles.ADMIN] = 'admins';
@@ -489,7 +490,7 @@ export default function(Sequelize, DataTypes) {
       case roles.HOST:
         notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
-        this.update({ HostCollectiveId: user.CollectiveId, ParentCollectiveId: this.ParentCollectiveId || user.CollectiveId });
+        this.update({ HostCollectiveId: user.CollectiveId });
         break;
       case roles.ADMIN:
         notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
@@ -551,6 +552,29 @@ export default function(Sequelize, DataTypes) {
       } else {
         return Member;
       }
+    });
+  };
+
+  Collective.prototype.addHost = function(hostCollective, creatorUser) {
+    const notifications = [ { type:`mailinglist.host` } ];
+
+      notifications.push({ type:activities.COLLECTIVE_TRANSACTION_CREATED });
+      notifications.push({ type:activities.COLLECTIVE_EXPENSE_CREATED });
+      this.update({ HostCollectiveId: hostCollective.id });
+
+    const member = {
+      role: roles.HOST,
+      CreatedByUserId: creatorUser.id,
+      MemberCollectiveId: hostCollective.id,
+      CollectiveId: this.id,
+    };
+
+    return Promise.all([
+      models.Member.create(member),
+      models.Notification.createMany(notifications, { UserId: creatorUser.id, CollectiveId: this.id, channel: 'email' }),
+    ])
+    .then(results => {
+      return results[0];
     });
   };
 

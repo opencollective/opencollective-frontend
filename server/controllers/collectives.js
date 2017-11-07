@@ -164,6 +164,10 @@ export const create = (req, res, next) => {
 
   if (users.length < 1) throw new errors.ValidationFailed('Need at least one user to create a collective');
 
+  if (!collectiveData.hostId) {
+    collectiveData.hostId = defaultHostCollective().CollectiveId; // set it to our non-open-source host as default
+  } 
+
   const sendConfirmationEmail = (user, collective) => {
     const data = {
       collective,
@@ -189,10 +193,11 @@ export const create = (req, res, next) => {
     }
   ];
 
-  return Collective
-    .create(collectiveData)
+  // create collective
+  return Collective.create(collectiveData)
     .tap(g => createdCollective = g)
     .tap(g => {
+      // Setup each user with role
       return Promise.each(users, user => {
         if (user.email) {
           return User.findOne({ where: { email: user.email.toLowerCase() }})
@@ -200,10 +205,6 @@ export const create = (req, res, next) => {
           .then(u => {
             if (!creator) {
               creator = u;
-            }
-            if (user.role === roles.HOST && !collectiveData.HostId) {
-              collectiveData.HostId = u.id;
-              return;
             }
             return _addUserToCollective(g, u, { role: user.role, remoteUser: creator })
           })
@@ -214,20 +215,20 @@ export const create = (req, res, next) => {
       })
     })
     .tap(() => {
-      return models.User.findOne({ where: { id: collectiveData.HostId || defaultHostCollective().id }}).tap(h => {
-        host = h;
-        createdCollective.HostCollectiveId = h.CollectiveId;
-        createdCollective.ParentCollectiveId = h.CollectiveId;
-        if (collectiveData.HostId) {
-          models.Collective.findById(h.CollectiveId).then(host => {
-            createdCollective.currency = host.currency;
-            createdCollective.save();
-          })
-        } else {
-          createdCollective.save();
+      // find Host
+      return models.Collective.findById(collectiveData.hostId)
+      .then(h => {
+        if (!h) {
+          throw new Error('Host not found: ', collectiveData.hostId);
         }
-        _addUserToCollective(createdCollective, h, { role: roles.HOST, remoteUser: creator })
-        return null;
+        host = h;
+        createdCollective.HostCollectiveId = h.id;
+        createdCollective.ParentCollectiveId = h.id; // TODO: this should be updated when we fix parent relationships
+        createdCollective.currency = host.currency;
+        createdCollective.save();
+
+        // add host of collective in Members table (already setup above in Collective table)
+        return createdCollective.addHost(h, creator)
       })
     })
     .then(() => {
@@ -480,7 +481,10 @@ export const getOne = (req, res, next) => {
     collective.related = values[6];
     collective.superCollectiveData = values[7];
     collective.host = values[8] && values[8].info;
-    collective.host.admins = values[9];
+
+    if (collective.host) {
+      collective.host.admins = values[9];
+    }
     if (collective.superCollectiveData) {
       collective.collectivesCount = collective.superCollectiveData.length;
       collective.contributorsCount += aggregate(collective.superCollectiveData, 'contributorsCount');
