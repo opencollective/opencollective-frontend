@@ -60,7 +60,7 @@ export async function fetchMembersStats(params) {
   }
 }
 
-export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, options) {
+export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, options = {}) {
   let query, processResult, type;
   if (backerType) {
     type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
