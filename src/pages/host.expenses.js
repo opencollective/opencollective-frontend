@@ -14,7 +14,6 @@ import { FormattedMessage } from 'react-intl'
 import CollectivePicker from '../components/CollectivePickerWithData';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import ConnectPaypal from '../components/ConnectPaypal';
 
 class HostExpensesPage extends React.Component {
 
@@ -55,7 +54,8 @@ class HostExpensesPage extends React.Component {
 
     return (
       <div className="HostExpensesPage">
-
+        <style jsx>{`
+        `}</style>
         <Header
           title={collective.name}
           description={collective.description}
@@ -75,16 +75,12 @@ class HostExpensesPage extends React.Component {
             style={get(collective, 'settings.style.hero.cover')}
             />
 
+          <CollectivePicker
+            hostCollectiveSlug={this.props.collectiveSlug}
+            onChange={(CollectiveId => this.pickCollective(CollectiveId))}
+            />
+
           <div className="content" >
-
-            <ConnectPaypal
-              collective={collective}
-              />
-
-            <CollectivePicker
-              hostCollectiveSlug={this.props.collectiveSlug}
-              onChange={(CollectiveId => this.pickCollective(CollectiveId))}
-              />
 
             <ExpensesWithData
               collective={{ id: collectiveId }}
@@ -115,13 +111,6 @@ query Collective($collectiveSlug: String!) {
     settings
     image
     isHost
-    paymentMethods {
-      id
-      service
-      createdAt
-      balance
-      currency
-    }
   }
 }
 `;
