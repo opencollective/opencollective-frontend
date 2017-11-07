@@ -23,14 +23,24 @@ class ExportData extends React.Component {
     return (
       <div className="ExportData">
         <style global jsx>{`
-          .param {
+          table tr td {
             vertical-align: top;
+          }
+          .param {
+            font-weight: bold;
+            padding-right: 0.5rem;
+            font-family: 'Courrier';
+          }
+          .actions {
+            text-align: center;
           }
         `}</style>
 
         <h1><FormattedMessage id="export.csv.title" defaultMessage="Export in CSV" /></h1>
         <p><FormattedMessage id="export.csv.description" defaultMessage="Export all your members in CSV (comma separated values) that can be easily imported into any spreadsheet application" /></p>
-        <Button onClick={async () => await exportMembers(collective.slug)}><FormattedMessage id="export.all" defaultMessage="Export all members in CSV" /></Button>
+        <div className="actions">
+          <Button onClick={async () => await exportMembers(collective.slug)}><FormattedMessage id="export.all" defaultMessage="Export all members in CSV" /></Button>
+        </div>
 
         <h1><FormattedMessage id="export.json.title" defaultMessage="Export in JSON" /></h1>
         <p><FormattedMessage id="export.json.description" defaultMessage="Export all your members in JSON to integrate with other applications" /></p>
