@@ -19,6 +19,7 @@ export const getLoggedInUserQuery = gql`
         paymentMethods {
           id
           uuid
+          service
           name
           data
         }
@@ -44,41 +45,10 @@ export const getLoggedInUserQuery = gql`
             id
             uuid
             name
+            service
             data
             balance
           }
-        }
-      }
-    }
-  }
-`;
-
-export const getUserQuery = gql`
-  query User($username: String!) {
-    User(username: $username) {
-      id
-      username
-      firstName
-      lastName
-      twitterHandle
-      description
-      organization
-      website
-      email
-      image
-      collectives {
-        id
-        slug
-        name
-        role
-        memberSince
-        totalDonations
-        tier {
-          id
-          name
-          amount
-          currency
-          interval
         }
       }
     }
@@ -132,7 +102,9 @@ const getCollectiveToEditQuery = gql`
       stats {
         id
         yearlyBudget
-        backers
+        backers {
+          all
+        }
         totalAmountSent
       }
       tiers {
@@ -151,7 +123,9 @@ const getCollectiveToEditQuery = gql`
         id
         createdAt
         role
-        totalDonations
+        stats {
+          totalDonations
+        }
         tier {
           id
           name
@@ -167,7 +141,9 @@ const getCollectiveToEditQuery = gql`
           image
           stats {
             id
-            backers
+            backers {
+              all
+            }
             yearlyBudget
           }
         }
@@ -177,7 +153,9 @@ const getCollectiveToEditQuery = gql`
         createdAt
         role
         description
-        totalDonations
+        stats {
+          totalDonations
+        }
         tier {
           id
           name
@@ -235,8 +213,12 @@ const getCollectiveQuery = gql`
         id
         balance
         yearlyBudget
-        backers
-        sponsors
+        backers {
+          all
+          users
+          organizations
+          collectives
+        }
         collectives
         transactions
         expenses {
@@ -262,7 +244,7 @@ const getCollectiveQuery = gql`
           totalOrders
           availableQuantity
         }
-        orders(limit: 5) {
+        orders(limit: 30) {
           fromCollective {
             id
             slug
@@ -296,7 +278,9 @@ const getCollectiveQuery = gql`
           id
           role
           createdAt
-          totalDonations
+          stats {
+            totalDonations
+          }
           collective {
             id
             name
@@ -417,7 +401,6 @@ export const addCollectiveCoverData = graphql(getCollectiveCoverQuery);
 export const addCollectiveToEditData = graphql(getCollectiveToEditQuery);
 export const addEventCollectiveData = graphql(getEventCollectiveQuery);
 export const addTiersData = graphql(getTiersQuery);
-export const addUserData = graphql(getUserQuery);
 
 export const addGetLoggedInUserFunction = (component) => {
   const accessToken = typeof window !== 'undefined' && window.localStorage.getItem('accessToken');
@@ -445,6 +428,16 @@ export const addGetLoggedInUserFunction = (component) => {
                   roles[member.collective.slug].push(member.role);
                 });
                 LoggedInUser.roles = roles;
+
+                /**
+                 * CanEditCollective if LoggedInUser is
+                 * - creator of the collective
+                 * - is admin or host of the collective
+                 */
+                LoggedInUser.canEditCollective = (collective) => {
+                  return (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
+                  || intersection(LoggedInUser.roles[collective.slug], ['HOST','ADMIN']).length > 0;
+                }
 
                 /**
                  * CanEditExpense if LoggedInUser is:

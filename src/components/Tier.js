@@ -67,8 +67,13 @@ class Tier extends React.Component {
 
   handleChange(field, value) {
     const state = this.state;
+
+    // Make sure that the custom amount entered by the user is never under the minimum preset amount
+    if (field === 'amount' && this.tier.presets && this.tier.presets[0] >= value) {
+      value = this.tier.presets[0];
+    }
+
     state[field] = value;
-    console.log(">>> Tier.handleChange new state", state);
     this.setState(state);
     this.onChange(state);
   }
@@ -155,11 +160,11 @@ class Tier extends React.Component {
             margin: 0.5rem 0;
           }
           .tier :global(.inputAmount) {
-            width: 100px;
+            width: 12rem;
             margin: 0.5rem 0;
           }
           .tier :global(input[name=amount]) {
-            max-width: 60px;
+            max-width: 8rem;
           }
           .tier :global(.btn-group), .tier :global(.inputField), .tier :global(.form-group), .tier :global(.form-control) {
             border-radius: 3px;
@@ -191,7 +196,7 @@ class Tier extends React.Component {
           <div className="header">
             <div className="title" >{capitalize(name)}</div>
             { !this.presets &&
-              <div className="title" >
+              <div className="title amount" >
                 { !this.state.amount && !this.presets && <FormattedMessage id="amount.free" defaultMessage="free" /> }
                 { this.state.amount > 0 && <Currency value={this.state.amount} currency={currency} /> }
                 { interval && '/' }
@@ -221,6 +226,7 @@ class Tier extends React.Component {
                     <InputField
                       name='amount'
                       className="inputAmount"
+                      min={this.tier.presets && this.tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
                       type='currency'
                       value={this.state.amount}

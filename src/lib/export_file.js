@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { get } from './api';
 
 export function exportFile(mimeType, filename, text) {
   const element = document.createElement('a');
@@ -13,14 +13,12 @@ export function exportFile(mimeType, filename, text) {
 export function json2csv(json) {
   const lines = [`"${Object.keys(json[0]).join('","')}"`];
   json.forEach(row => {
-    lines.push(`"
-      ${Object.values(row).map(td => {
+    lines.push(`"${Object.values(row).map(td => {
         if (typeof td === 'string')
           return td.replace(/"/g,'""').replace(/\n/g,'  ');
         else
-          return td;
-      }).join('","')}
-    "`);
+          return (td || '') + '';
+      }).join('","')}"`);
   })
   return lines.join('\n');
 }
@@ -47,4 +45,23 @@ export async function exportRSVPs(event) {
   });
   const csv = json2csv(rows);
   return exportFile('text/plain;charset=utf-8', `${date.replace('-','')}-${event.parentCollective.slug}-${event.slug}.csv`, csv);
+}
+
+
+export async function exportMembers(collectiveSlug, tierSlug, options = { type: 'all' }) {
+  let path = `/${collectiveSlug}`;
+  path += tierSlug ? `/tiers/${tierSlug}/` : '/members/';
+
+  let selector;
+  if (options.type === 'USER') selector = 'users';
+  else if (options.type.match(/ORGANIZATION/)) selector = 'organizations';
+  else selector = 'all';
+
+  options.format = options.format || 'csv';
+  path += `${selector}.${options.format}`;
+
+  const csv = await get(path, options);
+  const date = formatDate(new Date);
+  return exportFile('text/plain;charset=utf-8', `${date.replace(/\-/g,'')}${path.replace(/\//g,'-')}`, csv);
+  
 }

@@ -26,7 +26,6 @@ class EditTiers extends React.Component {
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-
     this.defaultType = this.props.defaultType || 'TICKET';
 
     this.messages = defineMessages({
@@ -108,7 +107,6 @@ class EditTiers extends React.Component {
     if (value === 'onetime') {
       value = null;
     }
-    console.log("editTier", index, fieldname, value);
     tiers[index] = { ...tiers[index], type: tiers[index]['type'] || this.defaultType, [fieldname]:value} ;
     this.setState({tiers});
     this.onChange({tiers});
@@ -133,25 +131,28 @@ class EditTiers extends React.Component {
 
     const type = tier.type || this.defaultType;
     return (
-      <div className="tier" key={`tier-${index}`}>
+      <div className={`tier ${tier.slug}`} key={`tier-${index}`}>
         <div className="tierActions">
           <a className="removeTier" href="#" onClick={() => this.removeTier(index)}>{intl.formatMessage(this.messages[`${type}.remove`])}</a>
         </div>
         <Form horizontal>
-          {this.fields.map(field => (!field.when || field.when(tier)) && <InputField
-            className="horizontal"
-            key={field.name}
-            name={field.name}
-            label={field.label}
-            description={field.description}
-            type={field.type}
-            defaultValue={field.defaultValue}
-            value={tier[field.name]}
-            options={field.options}
-            pre={field.pre}
-            placeholder={field.placeholder}
-            onChange={(value) => this.editTier(index, field.name, value)}
-            />)}
+          { this.fields.map(field => (!field.when || field.when(tier)) &&
+            <InputField
+              className="horizontal"
+              key={field.name}
+              name={field.name}
+              label={field.label}
+              description={field.description}
+              type={field.type}
+              defaultValue={field.defaultValue}
+              value={tier[field.name]}
+              options={field.options}
+              pre={field.pre}
+              placeholder={field.placeholder}
+              onChange={(value) => this.editTier(index, field.name, value)}
+              />
+            )
+          }
         </Form>
       </div>
     );
@@ -184,7 +185,7 @@ class EditTiers extends React.Component {
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div className="editTiersActions">
-          <Button bsStyle="primary" onClick={() => this.addTier({})}>{intl.formatMessage(this.messages[`${defaultType}.add`])}</Button>
+          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>{intl.formatMessage(this.messages[`${defaultType}.add`])}</Button>
         </div>
 
       </div>

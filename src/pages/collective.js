@@ -41,11 +41,6 @@ class CollectivePage extends React.Component {
 
     const collective = data.Collective;
 
-    if (LoggedInUser) {
-      LoggedInUser.canEditCollective = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
-        || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length > 0;
-    }
-
     return (
       <div>
         {collective.type === 'COLLECTIVE' &&

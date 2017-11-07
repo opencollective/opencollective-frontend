@@ -127,27 +127,26 @@ class Collective extends React.Component {
   }
 
   render() {
-    console.log("CollectivePage> this.collective", this.collective, "state", this.state);
     const { intl, LoggedInUser } = this.props;
 
     const actions = [
       {
         className: 'whiteblue',
-        component: <HashLink to={`#sponsors`}>
-              { this.collective.stats.sponsors > 0 &&
+        component: <HashLink to={`#organizations`}>
+              <FormattedMessage
+                id="collective.stats.backers.users"
+                defaultMessage="{n} {n, plural, one {backer} other {backers}}"
+                values={{ n: this.collective.stats.backers.users }}
+                />
+              { this.collective.stats.backers.organizations > 0 &&
                 <div>
                   <FormattedMessage
-                    id="collective.stats.sponsors"
-                    defaultMessage="{n} {n, plural, one {sponsor} other {sponsors}}"
-                    values={{ n: this.collective.stats.sponsors}}
+                    id="collective.stats.backers.organizations"
+                    defaultMessage="{n} {n, plural, one {organization} other {organizations}}"
+                    values={{ n: this.collective.stats.backers.organizations}}
                     />
                 </div>
               }
-              <FormattedMessage
-                id="collective.stats.backers"
-                defaultMessage="{n} {n, plural, one {backer} other {backers}}"
-                values={{ n: this.collective.stats.backers }}
-                />
           </HashLink>
       },
       {
@@ -170,7 +169,7 @@ class Collective extends React.Component {
       }
     ];
 
-    if (LoggedInUser && LoggedInUser.canEditCollective) {
+    if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
       actions.push({
         className: 'whiteblue small',
         component: <a href={`/${this.collective.slug}/edit`}>EDIT COLLECTIVE</a>
@@ -289,7 +288,6 @@ class Collective extends React.Component {
               { this.collective.stats.collectives > 0 &&
                 <section id="hosting">
                   <h1>
-                    {this.collective.stats.collectives}&nbsp;
                     <FormattedMessage
                       id="collective"
                       values={{ n: this.collective.stats.collectives }}
@@ -307,35 +305,37 @@ class Collective extends React.Component {
                 </section>
               }
 
-              { this.collective.stats.sponsors > 0 &&
-                <section id="sponsors" className="tier">
+              { this.collective.stats.backers.organizations > 0 &&
+                <section id="organizations" className="tier">
                   <h1>
                     <FormattedMessage
-                      id="sponsor"
-                      values={{ n: this.collective.stats.sponsors }}
-                      defaultMessage={`{n} {n, plural, one {sponsor} other {sponsors}}`}
+                      id="collective.section.backers.organizations.title"
+                      values={{ n: this.collective.stats.backers.organizations, collective: this.collective.name }}
+                      defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
                       />
                   </h1>
                   <MembersWithData
                     collective={this.collective}
-                    type="ORGANIZATION,COLLECTIVE"
+                    type="ORGANIZATION"
+                    LoggedInUser={LoggedInUser}
                     role='BACKER'
                     limit={100}
                     />
                 </section>
               }
 
-              { this.collective.stats.backers > 0 &&
+              { this.collective.stats.backers.users > 0 &&
                 <section id="backers" className="tier">
                   <h1>
                     <FormattedMessage
-                      id="backer"
-                      values={{ n: this.collective.stats.backers }}
-                      defaultMessage={`{n} {n, plural, one {backer} other {backers}}`}
+                      id="collective.section.backers.users.title"
+                      values={{ n: this.collective.stats.backers.users, collective: this.collective.name }}
+                      defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
                       />
                   </h1>
                   <MembersWithData
                     collective={this.collective}
+                    LoggedInUser={LoggedInUser}
                     type="USER"
                     role='BACKER'
                     limit={100}

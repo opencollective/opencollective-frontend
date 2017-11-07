@@ -17,8 +17,8 @@ import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description } }) {
-    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb }
   }
 
   constructor(props) {
@@ -38,7 +38,9 @@ class CreateOrderPage extends React.Component {
       'donation.title': { id: 'tier.order.donation.title', defaultMessage: 'Contribute' },
       'order.success': { id: 'tier.order.success', defaultMessage: 'order processed with success' },
       'order.error': { id: 'tier.order.error', defaultMessage: '😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we\'ll figure things out.' },
-      'tier.name.donation': { id: 'tier.name.donation', defaultMessage: 'donation' },
+      'donation.title': { id: 'tier.name.donation', defaultMessage: 'donation' },
+      'contribution.title': { id: 'tier.name.contribution', defaultMessage: 'contribution' },
+      'payment.title': { id: 'tier.name.payment', defaultMessage: 'payment' },
       'tier.button.donation': { id: 'tier.button.donation', defaultMessage: 'donate' },
       'tier.description.donation': { id: 'tier.description.donation', defaultMessage: 'Thank you for your kind donation 🙏' }
     });
@@ -74,7 +76,8 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { intl, data } = this.props;
+    const { intl, data, interval, verb } = this.props;
+    const description = decodeURIComponent(this.props.description);
     const collective = data.Collective;
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);
@@ -85,17 +88,31 @@ class CreateOrderPage extends React.Component {
       tier = collective.tiers.find(t => t.id === TierId);
     }
 
+    let defaultType;
+    switch(verb) {
+      case 'pay':
+        defaultType = 'PAYMENT';
+        break;
+      case 'donate':
+        defaultType = 'DONATION';
+        break;
+      case 'contribute':
+        defaultType = 'CONTRIBUTION';
+        break;
+    }
+    
     tier = tier || {
-      name: intl.formatMessage(this.messages['tier.name.donation']),
-      presets: [1000, 5000, 10000],
-      type: 'DONATION',
+      name: intl.formatMessage(this.messages[`${defaultType.toLowerCase()}.title`]),
+      presets: !this.order.totalAmount && [1000, 5000, 10000], // we only offer to customize the contribution if it hasn't been specified in the URL
+      type: defaultType,
       currency: collective.currency,
       interval: this.order.interval,
       button: intl.formatMessage(this.messages['tier.button.donation']),
-      description: intl.formatMessage(this.messages['tier.description.donation'])
+      description: description || intl.formatMessage(this.messages['tier.description.donation'])
     };
 
     this.order.tier = tier;
+    this.order.description = description;
     const href = (collective.type === 'EVENT') ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`;
 
     return (

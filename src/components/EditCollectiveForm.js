@@ -5,6 +5,7 @@ import EditTiers from '../components/EditTiers';
 import EditMembers from '../components/EditMembers';
 import EditPaymentMethods from '../components/EditPaymentMethods';
 import EditConnectedAccounts from '../components/EditConnectedAccounts';
+import ExportData from '../components/ExportData';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
@@ -256,29 +257,34 @@ class EditCollectiveForm extends React.Component {
 
         <div className="menu">
           <ButtonGroup className="menuBtnGroup">
-            <Button className="menuBtn" bsStyle={this.state.section === 'info' ? 'primary' : 'default'} onClick={() => this.showSection('info')}>
+            <Button className="menuBtn info" bsStyle={this.state.section === 'info' ? 'primary' : 'default'} onClick={() => this.showSection('info')}>
               <FormattedMessage id='editCollective.menu.info' defaultMessage='info' />
             </Button>
-            <Button className="menuBtn" bsStyle={this.state.section === 'images' ? 'primary' : 'default'} onClick={() => this.showSection('images')}>
+            <Button className="menuBtn images" bsStyle={this.state.section === 'images' ? 'primary' : 'default'} onClick={() => this.showSection('images')}>
               <FormattedMessage id='editCollective.menu.' defaultMessage='images' />
             </Button>
             { this.showEditMembers &&
-              <Button className="menuBtn" bsStyle={this.state.section === 'members' ? 'primary' : 'default'} onClick={() => this.showSection('members')}>
+              <Button className="menuBtn members" bsStyle={this.state.section === 'members' ? 'primary' : 'default'} onClick={() => this.showSection('members')}>
                 <FormattedMessage id='editCollective.menu.members' defaultMessage='members' />
               </Button>
             }
             { this.showEditTiers &&
-              <Button className="menuBtn" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
+              <Button className="menuBtn tiers" bsStyle={this.state.section === 'tiers' ? 'primary' : 'default'} onClick={() => this.showSection('tiers')}>
                 <FormattedMessage id='editCollective.menu.tiers' defaultMessage='tiers' />
               </Button>
             }
-            <Button className="menuBtn" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
+            <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
               <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
             </Button>
-            {/* <Button className="menuBtn" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
+            {/* <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
               <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
             </Button> */}
-            <Button className="menuBtn" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
+            { collective.type === 'COLLECTIVE' &&
+            <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
+              <FormattedMessage id='editCollective.menu.export' defaultMessage='export' />
+            </Button>
+            }
+            <Button className="menuBtn advanced" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
               <FormattedMessage id='editCollective.menu.advanced' defaultMessage='advanced' />
             </Button>
           </ButtonGroup>
@@ -330,6 +336,11 @@ class EditCollectiveForm extends React.Component {
             <EditConnectedAccounts
               collective={collective}
               connectedAccounts={collective.connectedAccounts}
+              />
+          }
+          { this.state.section === 'export' &&
+            <ExportData
+              collective={collective}
               />
           }
         </div>

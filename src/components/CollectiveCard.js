@@ -208,12 +208,12 @@ class CollectiveCard extends React.Component {
           { collective.stats &&
             <div className="stats">
               <div className="backers">
-                <div className="value">{collective.stats.backers}</div>
+                <div className="value">{collective.stats.backers.all}</div>
                 <div className="label">
                   <FormattedMessage
-                    id="collective.stats.backers"
+                    id="collective.stats.backers.users"
                     defaultMessage="{n} {n, plural, one {backer} other {backers}}"
-                    values={{ n: collective.stats.backers }}
+                    values={{ n: collective.stats.backers.all }}
                     />
                 </div>
               </div>
@@ -236,10 +236,10 @@ class CollectiveCard extends React.Component {
               </div>
             </div>
           }
-          { membership && membership.role === 'BACKER' && membership.totalDonations > 0 &&
+          { membership && membership.role === 'BACKER' && membership.stats.totalDonations > 0 &&
             <div className="totalDonations">
               <div className="totalDonationsAmount">
-                <Currency value={membership.totalDonations} currency={currency} />
+                <Currency value={membership.stats.totalDonations} currency={currency} />
               </div>
               <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
             </div>

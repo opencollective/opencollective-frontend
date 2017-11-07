@@ -70,3 +70,16 @@ export function signin(user, redirect) {
   })
   .then(checkResponseStatus);
 }
+
+export function get(path, options) {
+  if (path.substr(0,1) !== '/') throw new Error("Can only get resources with a relative path");
+
+  return fetch(path, {
+    method: 'get',
+    headers: addAuthTokenToHeader()
+  })
+  .then(response => {
+    if (options.format === 'csv') return response.text();
+    return checkResponseStatus(response);
+  })
+}

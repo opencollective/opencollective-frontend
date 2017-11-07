@@ -21,9 +21,10 @@ class TierCard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.anchor = (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    this.anchor = get(props.tier, 'slug') || (get(props.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
     this.messages = defineMessages({
+      'contribution': { id: 'contribution', defaultMessage: '{n, plural, one {contribution} other {contributions}}' },
       'collective.types.organization': { id: 'collective.types.organization', defaultMessage: '{n, plural, one {organization} other {organizations}}'},
       'collective.types.user': { id: 'collective.types.user', defaultMessage: '{n, plural, one {people} other {people}}'},
       'collective.types.collective': { id: 'collective.types.collective', defaultMessage: '{n, plural, one {collective} other {collectives}}'},
@@ -34,26 +35,15 @@ class TierCard extends React.Component {
   }
 
   showLastOrders(fromCollectiveTypeArray, limit) {
-    const { tier, intl } = this.props;
+    const { tier } = this.props;
     const fromCollectives = tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1);
     if (fromCollectives.length === 0) return;
-    const additionalCollectives = fromCollectives.length - fromCollectives.slice(0, limit).length;
     return (
       <div>
         <style jsx>{`
           .fromCollectives {
             display: flex;
             flex-wrap: wrap;
-          }
-          .totalOrders {
-            width: 81px;
-            height: 14px;
-            font-family: Rubik;
-            font-size: 12px;
-            text-align: left;
-            color: #9ea2a6;
-            color: var(--cool-grey);
-            margin: 0 1rem;
           }
         `}</style>
         <div className={`fromCollectives ${fromCollectiveTypeArray[0].toLowerCase()}`}>
@@ -70,11 +60,6 @@ class TierCard extends React.Component {
             </div>
           ))}
         </div>
-        { additionalCollectives > 0 &&
-          <div className="totalOrders">
-            + {additionalCollectives} {intl.formatMessage(this.messages[`collective.types.${fromCollectiveTypeArray[0].toLowerCase()}`], { n: additionalCollectives })}
-          </div>
-        }
       </div>
     );
   }
@@ -83,6 +68,7 @@ class TierCard extends React.Component {
 
     const { collective, tier, intl } = this.props;
     const disabled = tier.amount > 0 && !collective.isActive;
+    const totalOrders = tier.stats.totalOrders;
     let errorMsg;
     if (!collective.host) {
       errorMsg = `hostMissing`;
@@ -213,6 +199,14 @@ class TierCard extends React.Component {
             background-color: var(--silver-four);
             cursor: not-allowed;
           }
+          .totalOrders {
+            height: 14px;
+            font-family: Rubik;
+            font-size: 12px;
+            text-align: left;
+            color: #9ea2a6;
+            color: var(--cool-grey);
+          }
         `}</style>
         <div className="title">
           {tier.name}
@@ -220,6 +214,9 @@ class TierCard extends React.Component {
         { tier.amount > 0 &&
           <div className="amount">
             <Currency value={tier.amount} currency={tier.currency || collective.currency} precision={0} />
+            { tier.presets &&
+            <span>+</span>
+            }
             { tier.interval &&
               <div className="interval">
                 <FormattedMessage
@@ -248,6 +245,11 @@ class TierCard extends React.Component {
             <div className="divider" />
             <div className="footer">
               <div className="lastOrders">
+              { totalOrders > 0 &&
+                <div className="totalOrders">
+                  {totalOrders} {intl.formatMessage(this.messages[`contribution`], { n: totalOrders })}
+                </div>
+              }
               {this.showLastOrders(['USER'], 10)}
               {this.showLastOrders(['ORGANIZATION', 'COLLECTIVE'], 10)}
               </div>

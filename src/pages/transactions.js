@@ -26,7 +26,6 @@ class TransactionsPage extends React.Component {
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
     const LoggedInUser = getLoggedInUser && await getLoggedInUser(this.props.collectiveSlug);
-    LoggedInUser.canEditCollective = LoggedInUser.membership && (['HOST', 'MEMBER'].indexOf(LoggedInUser.membership.role) !== -1);
     this.setState({LoggedInUser});
   }
 
