@@ -104,6 +104,47 @@ describe('graphql.tiers.test', () => {
 
   describe('graphql.tiers.test.js', () => {
 
+    describe('fetch tiers of a collective', () => {
+      beforeEach(() => collective1.createTier({ slug: 'bronze-sponsor', name: 'bronze sponsor'}));
+      beforeEach(() => collective1.createTier({ slug: 'gold-sponsor', name: 'gold sponsor'}));
+
+      const getTiersQuery = `
+      query Collective($collectiveSlug: String!, $tierSlug: String, $tierId: Int) {
+        Collective(slug: $collectiveSlug) {
+          tiers(slug: $tierSlug, id: $tierId) {
+            id
+            name
+          }
+        }
+      }`;
+
+      it("fetch all tiers", async () => {
+        const res = await utils.graphqlQuery(getTiersQuery, { collectiveSlug: collective1.slug});
+        res.errors && console.error(res.errors[0]);
+        expect(res.errors).to.not.exist;
+        const tiers = res.data.Collective.tiers;
+        expect(tiers).to.have.length(3);
+      });
+
+      it("filter tiers by slug", async () => {
+        const res = await utils.graphqlQuery(getTiersQuery, { collectiveSlug: collective1.slug, tierSlug: 'bronze-sponsor'});
+        res.errors && console.error(res.errors[0]);
+        expect(res.errors).to.not.exist;
+        const tiers = res.data.Collective.tiers;
+        expect(tiers).to.have.length(1);
+        expect(tiers[0].name).to.equal('bronze sponsor');
+      });
+
+      it("filter tiers by tierId", async () => {
+        const res = await utils.graphqlQuery(getTiersQuery, { collectiveSlug: collective1.slug, tierId: 1});
+        res.errors && console.error(res.errors[0]);
+        expect(res.errors).to.not.exist;
+        const tiers = res.data.Collective.tiers;
+        expect(tiers).to.have.length(1);
+        expect(tiers[0].id).to.equal(1);
+      });
+    })
+
     describe('payment methods', () => {
 
       const createOrderQuery = `

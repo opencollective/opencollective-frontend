@@ -2,7 +2,7 @@
 
 // Only run on the first of the month
 const today = new Date();
-if (process.env.NODE_ENV === 'production' && today.getDate() !== 1) {
+if (process.env.NODE_ENV === 'production' && today.getDate() !== 7) { // Need to change back to 1 when ready
   console.log('NODE_ENV is production and today is not the first of month, script aborted!');
   process.exit();
 }
@@ -54,14 +54,12 @@ const init = () => {
 
   let previewCondition = '';
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/))
-    previewCondition = "AND u.username IN ('ignitetalks', 'host-org', 'adminwwc')";
+    previewCondition = "AND c.id IN (9805, 9804, 9802, 9801)"; // open source collective host, wwcode host, brusselstogether, changex
+    // previewCondition = "AND c.id IN (9802)"; // brusselstogether
 
   const query = `
-    SELECT c.*, u.email
-    FROM "Users" u
-      LEFT JOIN "Collectives" c ON c.id = u."CollectiveId"
-      LEFT JOIN "Members" ug ON ug."MemberCollectiveId" = u."CollectiveId"
-    WHERE ug.role='HOST' AND ug."deletedAt" IS NULL and u."deletedAt" IS NULL ${previewCondition} GROUP BY c.id
+  with "hosts" as (SELECT DISTINCT "HostCollectiveId" AS id FROM "Collectives" WHERE "deletedAt" IS NULL AND "isActive" IS TRUE AND "HostCollectiveId" IS NOT NULL)
+  SELECT c.* FROM "Collectives" c WHERE c.id IN (SELECT h.id FROM hosts h) ${previewCondition}
   `;
 
   sequelize.query(query, {
@@ -71,7 +69,7 @@ const init = () => {
   .tap(hosts => {
       console.log(`Preparing the ${month} ${year} report for ${hosts.length} hosts`);
   })
-  .then(hosts => Promise.map(hosts, processHost))
+  .then(hosts => Promise.map(hosts, processHost, { concurrency: 1 }))
   .then(() => getPlatformStats())
   .then(platformStats => {
     const timeLapsed = Math.round((new Date - startTime)/1000); // in seconds
@@ -157,6 +155,7 @@ const processHost = (host) => {
   let currentPage = 0;
 
   data.host = host;
+  data.collective = host;
   data.reportDate = endDate;
   data.month = month;
   data.year = year;
@@ -168,11 +167,25 @@ const processHost = (host) => {
     numberPaidExpenses: 0
   };
 
+  const getHostAdminsEmails = (host) => {
+    return models.Member.findAll({
+      where: {
+        CollectiveId: host.id,
+        role: 'ADMIN',
+      }
+    }).map(admin => {
+      return models.User.findOne({
+        attributes: ['email'],
+        where: { CollectiveId: admin.MemberCollectiveId }
+      }).then(user => user.email)
+    }, { concurrency: 1 })
+  };
+
   const processTransaction = (transaction) => {
     const t = transaction;
     t.collective = collectivesById[t.CollectiveId].dataValues;
     t.collective.shortSlug = t.collective.slug.replace(/^wwcode-?(.)/, '$1');
-    t.notes = t.Expense && t.Expense.notes;
+    t.notes = t.Expense && t.Expense.privateMessage;
     if (t.data && t.data.fxrateSource) {
       t.notes = (t.notes) ? `${t.notes} (${note})` : note;
       data.notes = note;
@@ -182,7 +195,7 @@ const processHost = (host) => {
     if (t.type === 'DEBIT') {
       t.page = page++;
       data.stats.numberPaidExpenses++;
-      if (page - 1 % expensesPerPage === 0) {
+      if ((page - 1) % expensesPerPage === 0) {
         currentPage++;
         data.expensesPerPage[currentPage] = [];
       }
@@ -192,6 +205,10 @@ const processHost = (host) => {
     data.maxSlugSize = Math.max(data.maxSlugSize, t.collective.shortSlug.length + 1);
     if (!t.description) {
       return transaction.getSource().then(source => {
+        if (!source) {
+          console.log(">>> no source found for ", transaction);
+          return t;
+        }
           t.description = source.description
           return t;
         });
@@ -206,26 +223,41 @@ const processHost = (host) => {
       data.stats.totalCollectives = Object.keys(collectivesById).length;
       summary.totalCollectives += data.stats.totalCollectives;
     })
-    .then(() => getTransactions(Object.keys(collectivesById), startDate, endDate, { include: ['Expense', 'User'] }))
+    .then(() => getTransactions(Object.keys(collectivesById), startDate, endDate, {
+      include: [
+        { model: models.Expense },
+        { model: models.User, as: 'createdByUser' }
+      ]
+    }))
     .tap(transactions => {
       if (!transactions || transactions.length == 0) {
         throw new Error(`No transaction found`);
       }
     })
-    .then(transactions => Promise.map(transactions, processTransaction))
+    .then(transactions => Promise.map(transactions, processTransaction, { concurrency: 1 }))
     .tap(transactions => {
 
       const getColumnName = (attr) => {
         if (attr === 'CollectiveId') return "collective";
+        if (attr === 'Expense.privateMessage') return "private note";
         else return attr;
       }
 
       const processValue = (attr, value) => {
         if (attr === "CollectiveId") return collectivesById[value].slug;
-        else return value;
+        if (['amount', 'netAmountInCollectiveCurrency', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency'].indexOf(attr) !== -1) {
+          return value / 100; // converts cents          
+        }
+        return value;
       }
 
-      const csv = exportToCSV(transactions, ['id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate', 'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'note' ], getColumnName, processValue);
+      const csv = exportToCSV(transactions,
+        [
+          'id', 'createdAt', 'CollectiveId', 'amount', 'currency', 'description', 'netAmountInCollectiveCurrency', 'hostCurrency', 'hostCurrencyFxRate',
+          'paymentProcessorFeeInHostCurrency', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'netAmountInHostCurrency', 'Expense.privateMessage'
+        ],
+        getColumnName,
+        processValue);
   
       attachments.push({
         filename: csv_filename,
@@ -274,38 +306,32 @@ const processHost = (host) => {
       summary.numberPaidExpenses += data.stats.numberPaidExpenses;
       summary.totalAmountPaidExpenses += data.stats.totalAmountPaidExpenses;
     })
-    .then(() => sendEmail(host, data, attachments))
+    .then(() => getHostAdminsEmails(host))
+    .then((admins) => sendEmail(admins, data, attachments))
     .catch(e => {
-      console.error(`Error in processing host ${host.username}:`, e.message);
+      console.error(`Error in processing host ${host.slug}:`, e.message);
       debug(e);
     });
 };
 
-const sendEmail = (recipient, data, attachments) => {
-    debug("Sending email to ", recipient.dataValues);
+const sendEmail = (recipients, data, attachments) => {
+    debug("Sending email to ", recipients);
     // debug("email data transactions", data.transactions);
     debug("email data stats", data.stats);
     debug("email data stats.backers", data.stats.backers);
-    data.recipient = recipient;
-    if (process.env.ONLY && recipient.email !== process.env.ONLY) {
-      debug("Skipping ", recipient.email);
-      return Promise.resolve();
-    }
-    if (process.env.SEND_EMAIL_TO) {
-      recipient.email = process.env.SEND_EMAIL_TO;
-    }
     const options = {
       attachments
     }
     if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
       attachments.map(attachment => {
-        const filepath = path.resolve(`/tmp/${recipient.username}-${attachment.filename}`);
+        const filepath = path.resolve(`/tmp/${data.host.slug}-${attachment.filename}`);
         fs.writeFileSync(filepath, attachment.content);
         console.log(">>> preview attachment", filepath);
       })
+      recipients.push("ops+test@opencollective.com");
     }
 
-    return emailLib.send('host.monthlyreport', recipient.email, data, options);
+    return emailLib.send('host.monthlyreport', recipients, data, options);
 }
 
 init();

@@ -1,7 +1,6 @@
 import models from '../models';
 import errors from '../lib/errors';
 import { executeOrder } from '../lib/payments';
-import Promise from 'bluebird';
 
 /**
  * Create a manual donation (add funds)
@@ -18,29 +17,13 @@ export const manual = (req, res, next) => {
   }
 
   let user = remoteUser;
-  let promise = Promise.resolve();
 
-  // if donation is on someone else's behalf, find or create that user
-  if (order.email && order.email !== remoteUser.email) {
-    promise = models.User.findOrCreateByEmail(order.email, models.User.splitName(order.name))
-    .tap(u => user = u)
-  } else {
-    // if the donation is from the host, we need to add the funds first to the Host Collective
-    promise = models.Transaction.create({
-      type: 'CREDIT',
-      CreatedByUserId: req.remoteUser.id,
-      CollectiveId: req.remoteUser.CollectiveId,
-      HostCollectiveId: req.remoteUser.CollectiveId,
-      FromCollectiveId: null, // money doesn't come from a collective but from an external source (Host's bank account)
-      currency: collective.currency,
-      netAmountInCollectiveCurrency: totalAmount,
-      amountInHostCurrency: totalAmount,
-      hostFeeInTxnCurrency: null,
-      description
-    })
+  if (!order.email) {
+    order.email = remoteUser.email;
   }
 
-  return promise
+  return models.User.findOrCreateByEmail(order.email, models.User.splitName(order.name))
+    .then(u => user = u)
     .then(() => models.Order.create({
       CreatedByUserId: req.remoteUser.id,
       FromCollectiveId: user.CollectiveId,

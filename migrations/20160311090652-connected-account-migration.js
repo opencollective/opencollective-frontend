@@ -37,8 +37,7 @@ module.exports = {
      .then(() => {
       return queryInterface.addColumn('ConnectedAccounts', 'UserId', {
         type: DataTypes.INTEGER,
-        references: 'Users',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Users'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });

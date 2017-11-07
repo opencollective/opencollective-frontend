@@ -33,7 +33,7 @@ Past {{{pluralize "event" n=collective.events.past.length}}}:
 
 Latest {{{pluralize "expense" n=collective.expenses.length}}}:
   {{#each collective.expenses}}
-  - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{title}} {{status}}
+  - {{{moment createdAt format="MM/DD"}}} {{{currency amount currency=../currency}}} {{description}} {{status}}
   {{else}}
   (no expense filed)
   Submit an expense on https://opencollective.com/{{collective.slug}}/expenses/new

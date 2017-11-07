@@ -9,7 +9,17 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
     },
-    CollectiveId: 83
+    CollectiveId: 9805
+  },
+  // Open Collective Inc. host for meetups
+  'other': {
+    service: 'stripe',
+    username: 'acct_18KWlTLzdXg9xKNS',
+    token: 'sk_test_iDWQubtz4ixk0FQg1csgCi6p',
+    data: {
+      publishableKey: 'pk_test_l7H1cDlh2AekeETfq742VJbC'
+    },
+    CollectiveId: 8674
   },
   'brussesltogether': {
     service: 'stripe',
@@ -18,7 +28,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVHMivgRjQng'
     },
-    CollectiveId: 207
+    CollectiveId: 9802
   },
   'wwcode': {
     service: 'stripe',
@@ -27,7 +37,7 @@ const testStripeAccounts = {
     data: {
       publishableKey: 'pk_test_OSQ8IaRSyLe9FVxxxxxxxxxx'
     },
-    CollectiveId: 51
+    CollectiveId: 9804
   }
 }
 
@@ -51,6 +61,7 @@ const createConnectedAccount = (hostname) => {
 
 models.ConnectedAccount.destroy({ where: { service: 'stripe' }, force: true})
 .then(() => createConnectedAccount('opensource'))
+.then(() => createConnectedAccount('other'))
 .then(() => createConnectedAccount('brussesltogether'))
 .then(() => createConnectedAccount('wwcode'))
 .then(() => done())

@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
-import { capitalize, pluralize } from '../lib/utils';
+import { capitalize, pluralize, days } from '../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('tier');
 import CustomDataTypes from './DataTypes';
@@ -149,6 +149,49 @@ export default function(Sequelize, DataTypes) {
   /**
    * Instance Methods
    */
+
+  /**
+   * Check if a backer is active
+   * True if there is an entry in the Members table for this Backer/Collective/Tier couple created before `until`
+   * If this tier has an interval, returns true if the membership started within the month/year
+   * or if the last transaction happened wihtin the month/year
+   */
+  Tier.prototype.isBackerActive = function(backerCollective, until = new Date) {
+    return models.Member.findOne({
+      where: {
+        CollectiveId: this.CollectiveId,
+        MemberCollectiveId: backerCollective.id,
+        TierId: this.id,
+        createdAt: { $lte: until }
+      }
+    }).then(membership => {
+      if (!membership) return false;
+      if (!this.interval) return true;
+      if (this.interval === 'month' && days(membership.createdAt, until) <= 31) return true;
+      if (this.interval === 'year' && days(membership.createdAt, until) <= 365) return true;
+      return models.Order.findOne({
+        where: {
+          CollectiveId: this.CollectiveId,
+          FromCollectiveId: backerCollective.id,
+          TierId: this.id
+        }
+      }).then(order => {
+        if (!order) return false;
+        return models.Transaction.findOne({
+          where: { OrderId: order.id, CollectiveId: this.CollectiveId },
+          order: [['createdAt', 'DESC']]
+        }).then(transaction => {
+          if (!transaction) {
+            debug("No transaction found for order", order.dataValues);
+            return false;
+          }
+          if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) return true;
+          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;    
+          return false;
+        })
+      })
+    })
+  }
 
    // TODO: Check for maxQuantityPerUser
   Tier.prototype.availableQuantity = function() {

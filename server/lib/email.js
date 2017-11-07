@@ -1,5 +1,5 @@
 import config from 'config';
-import _ from 'lodash';
+import _, { isArray } from 'lodash';
 import Promise from 'bluebird';
 import juice from 'juice';
 import nodemailer from 'nodemailer';
@@ -24,13 +24,13 @@ const render = (template, data) => {
   if (data.user) {
     data.user.paypalEmail = data.user.paypalEmail || data.user.email;
   }
-
+  
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }
   const html = juice(templates[template](data));
-  const slug = data.collective && data.collective.slug || data.recipient && data.recipient.username || data.recipient && data.recipient.substr(0, data.recipient.indexOf('@'));
-
+  const recipient = _.get(data, 'recipient.dataValues') || data.recipient || {};
+  const slug = data.collective && data.collective.slug || recipient.slug || recipient.email && recipient.email.substr(0, recipient.email.indexOf('@')) || recipient.substr && recipient.substr(0, recipient.indexOf('@'));
 
   // When in preview mode, we export an HTML version of the email in `/tmp/:template.:slug.html`
   if (process.env.DEBUG && process.env.DEBUG.match(/preview/)) {
@@ -135,13 +135,14 @@ const sendMessage = (recipients, subject, html, options = {}) => {
         to = `emailbcc+${to.replace(/@/g, '-at-')}@opencollective.com`;
       }
       const from = options.from || config.email.from;
+      const cc = options.cc;
       const bcc = options.bcc;
       const text = options.text;
       const attachments = options.attachments;
       const headers = { 'o:tag': options.tag, 'X-Mailgun-Dkim': 'yes' };
       debug("mailgun> sending email to ", to,"bcc", bcc, "text", text);
 
-      mailgun.sendMail({ from, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      mailgun.sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
         if (err) {
           return reject(err);
         } else {
@@ -161,13 +162,15 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Get the label to unsubscribe from the email notification
  * Shown in the footer of the email following "To unsubscribe from "
  */
-const getNotificationLabel = (template, recipient = '') => {
+const getNotificationLabel = (template, recipients) => {
+  
+  if (!isArray(recipients)) recipients = [recipients];
 
   template = template.replace('.text', '');
 
   const notificationTypeLabels = {
     'email.approve': 'notifications of new emails pending approval',
-    'email.message': `the ${recipient.substr(0, recipient.indexOf('@'))} mailing list`,
+    'email.message': `the ${recipients[0].substr(0, recipients[0].indexOf('@'))} mailing list`,
     'collective.order.created': 'notifications of new donations for this collective',
     'collective.expense.created': 'notifications of new expenses submitted to this collective',
     'collective.monthlyreport': 'monthly reports for collectives',
@@ -249,6 +252,9 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
  * Deprecated. Should use sendMessageFromActivity() for sending new emails.
  */
 const generateEmailFromTemplateAndSend = (template, recipient, data, options = {}) => {
+  if (!recipient) {
+    return Promise.reject("No recipient");
+  }
   return generateEmailFromTemplate(template, recipient, data, options)
     .then(renderedTemplate => {
       const attributes = getTemplateAttributes(renderedTemplate.html);

@@ -2,7 +2,6 @@
  * This script tells us which Stripe subscriptions are inactive
  */
 
-const app = require('../server/index');
 import models from '../server/models';
 import { retrieveSubscription } from '../server/gateways/stripe';
 //const stripeGateway = require('../server/gateways').stripe;
@@ -35,14 +34,15 @@ function run() {
         }
       },
       { model: models.Collective, as: 'collective'},
-      { model: models.PaymentMethod }
-    ]
+      { model: models.PaymentMethod, as: 'paymentMethod' }
+    ],
+    order: ['id']
   })
   .tap(orders => console.log("Total Subscriptions found: ", orders.length))
   .each(order => {
     console.log(`Processing SubscriptionId: ${order.SubscriptionId}`);
-    return order.Collective.getStripeAccount()
-      .then(stripeAccount => retrieveSubscription(stripeAccount, order.PaymentMethod.customerId, order.Subscription.stripeSubscriptionId))
+    return order.collective.getHostStripeAccount()
+      .then(stripeAccount => retrieveSubscription(stripeAccount, order.Subscription.stripeSubscriptionId))
       .then(stripeSubscription => {
         if (!stripeSubscription) {
           console.log('Stripe Subscription not found');
@@ -52,10 +52,10 @@ function run() {
       })
       .catch(err => {
         if (err.type === 'StripeInvalidRequestError') {
-          console.log('Stripe Subscription not found');
+          console.log('Stripe Subscription not found - error thrown');
           inactiveSubscriptionCount +=1;
           if (order.currency === 'USD' || order.currency === 'EUR') {
-            sumAmount += order.amount;
+            sumAmount += order.totalAmount;
           }
           const subscription = order.Subscription;
           subscription.isActive = false;

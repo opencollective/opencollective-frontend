@@ -4,16 +4,14 @@ module.exports = {
   up: function (queryInterface, DataTypes) {
     return queryInterface.addColumn('Cards', 'UserId', {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {key: 'id', model: 'Users'},
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     })
     .then(function() {
       queryInterface.addColumn('Cards', 'GroupId', {
         type: DataTypes.INTEGER,
-        references: 'Groups',
-        referencesKey: 'id',
+        references: {key: 'id', model: 'Groups'},
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });

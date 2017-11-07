@@ -23,6 +23,7 @@ const templateNames = [
   'collective.order.created',
   'collective.monthlyreport',
   'collective.monthlyreport.text',
+  'collective.newmember',
   'host.monthlyreport',
   'host.monthlyreport.text',
   'host.monthlyreport.summary',

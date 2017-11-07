@@ -4,8 +4,7 @@ module.exports = {
   up: function (queryInterface, DataTypes) {
     return queryInterface.addColumn('Transactions', 'SubscriptionId', {
       type: DataTypes.INTEGER,
-      references: 'Subscriptions',
-      referencesKey: 'id',
+      references: {key: 'id', model: 'Subscriptions'},
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     })

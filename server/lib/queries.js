@@ -231,11 +231,17 @@ const getTopBackers = (since, until, tags, limit) => {
 /**
  * Get top collectives ordered by available balance
  */
-const getChildCollectivesWithBalance = (ParentCollectiveId, options) => {
+const getCollectivesWithBalance = (where = {}, options) => {
   const orderDirection = options.orderDirection || "DESC";
   const orderBy = options.orderBy || "balance";
   const limit = options.limit || 20;
   const offset = options.offset || 0;
+
+  let whereCondition = '';
+  Object.keys(where).forEach(key => {
+    whereCondition += `AND c."${key}"=:${key}`;
+  });
+
   return sequelize.query(`
     with "balance" AS (
       SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "balance"
@@ -244,19 +250,19 @@ const getChildCollectivesWithBalance = (ParentCollectiveId, options) => {
       WHERE
         c.type = 'COLLECTIVE'
         AND c."isActive" IS TRUE
-        AND c."ParentCollectiveId"=:ParentCollectiveId
+        ${whereCondition}
         AND c."deletedAt" IS NULL
         GROUP BY t."CollectiveId"
     )
     SELECT c.*, td.* FROM "Collectives" c
     LEFT JOIN "balance" td ON td."CollectiveId" = c.id
     WHERE c."isActive" IS TRUE
-    AND c."ParentCollectiveId"=:ParentCollectiveId
+    ${whereCondition}
     AND c."deletedAt" IS NULL
     ORDER BY ${orderBy} ${orderDirection} NULLS LAST LIMIT ${limit} OFFSET ${offset}
   `.replace(/\s\s+/g, ' '), // this is to remove the new lines and save log space.
   {
-    replacements: { ParentCollectiveId },
+    replacements: where,
     model: models.Collective
   });
 };
@@ -398,7 +404,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
       max(member."createdAt") as "createdAt",
       max(c.id) as id,
       max(c.type) as type,
-      max(c."HostCollectiveId") as "HosCollectiveId",
+      max(c."HostCollectiveId") as "HostCollectiveId",
       max(c.name) as name,
       max(u."firstName") as "firstName",
       max(u."lastName") as "lastName",
@@ -474,7 +480,7 @@ export default {
   getCollectivesByTag,
   getTotalNumberOfActiveCollectives,
   getTotalNumberOfDonors,
-  getChildCollectivesWithBalance,
+  getCollectivesWithBalance,
   getUniqueCollectiveTags
 };
 

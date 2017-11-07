@@ -61,7 +61,7 @@ export const _create = (user) => User.createUserWithCollective(user)
  * Check existence of a user based on email
  */
 export const exists = (req, res) => {
-  const email = req.query.email;
+  const email = req.query.email.toLowerCase();
   if (!isValidEmail(email)) {
     return res.send({ exists: false });
   }
@@ -152,16 +152,26 @@ export const sendNewTokenByEmail = (req, res, next) => {
  */
 export const signin = (req, res, next) => {
   const { user, redirect } = req.body;
-
+  let loginLink;
   return models.User.findOne({ where: { email: user.email }})
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       cache.set(u.email, true);
+      loginLink = u.generateLoginLink(redirect || '/');
       return emailLib.send('user.new.token', u.email, 
-        { loginLink: u.generateLoginLink(redirect || '/')}, 
+        { loginLink }, 
         { bcc: 'ops@opencollective.com'}); // allows us to log in as users to debug issue
     })
-    .then(() => res.send({ success: true }))
+    .then(() => {
+      const response = { success: true };
+
+      // For e2e testing, we enable testuser+(admin|member)@opencollective.com to automatically receive the login link
+      if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
+        response.redirect = loginLink;
+      }
+      return response;
+    })
+    .then(response => res.send(response))
     .catch(next);
 }
 
