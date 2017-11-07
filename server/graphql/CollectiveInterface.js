@@ -694,9 +694,6 @@ const CollectiveFields = () => {
             const getCollectiveIds = () => {
               // if is host, we get all the expenses across all the hosted collectives
               if (args.includeHostedCollectives) {
-                if (collective.HostCollectiveId !== collective.id) {
-                  throw new Error("This collective is not a host");
-                }
                 return models.Member.findAll({
                   where: {
                     MemberCollectiveId: collective.id,
