@@ -551,7 +551,7 @@ export const StatsOrderType = new GraphQLObjectType({
         description: 'total amount of all the transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
-          return req.loaders.orders.totalTransactions.load(order.id);
+          return req.loaders.orders.stats.totalTransactions.load(order.id);
         }
       }
     }
