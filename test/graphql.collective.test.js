@@ -209,12 +209,23 @@ describe('graphql.collective.test.js', () => {
     ]);
   })
 
-  it('gets the members by type', async () => {
+  it('gets the members by type with stats, transactions and orders', async () => {
     const query = `
     query Collective($slug: String!, $type: String) {
       Collective(slug: $slug) {
-        members(type: $type) {
+        members(type: $type, limit: 10, offset: 1) {
           id
+          stats {
+            totalDonations
+          }
+          transactions {
+            id
+            amount
+          }
+          orders {
+            id
+            totalAmount
+          }
           member {
             id
             type
@@ -230,9 +241,19 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       return result.data.Collective.members;
     }
-
-    expect(await fetchMembersByType('USER')).to.have.length(37);
-    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(3);
+    /**
+     * xdamman: note: members[0] has a transaction without an order.
+     * It's a transaction for a ticket and the order references the CollectiveId of the event
+     * but the transaction references the CollectiveId of the parent collective
+     * a bug from the v2 migration
+     */
+    const members = await fetchMembersByType('USER');
+    expect(members[2].transactions).to.have.length(4);
+    expect(members[2].transactions[0].amount).to.equal(1000);
+    expect(members[2].orders).to.have.length(1);
+    expect(members[2].stats.totalDonations).to.equal(4000);
+    expect(members).to.have.length(10);
+    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(2);
   });
 
   it('edits members', async () => {
