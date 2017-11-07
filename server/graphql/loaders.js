@@ -10,7 +10,17 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
   debug("sortResults", attribute, results.length);
   const resultsById = {};
   results.forEach(r => {
-    const key = r.dataValues ? r.dataValues[attribute] : r[attribute];
+    let key;
+    const dataValues = r.dataValues || r;
+    if (attribute.indexOf(':') !== -1) {
+      const keyComponents = [];
+      attribute.split(':').forEach(attr => {
+        keyComponents.push(dataValues[attr]);
+      });
+      key = keyComponents.join(':');
+    } else {
+      key = dataValues[attribute];
+    }
     if (!key) {
       return;
     }
@@ -27,6 +37,14 @@ const sortResults = (keys, results, attribute = 'id', defaultValue) => {
 }
 
 export const loaders = (req) => {
+
+  const cache = {};
+  const createDataLoaderWithOptions = (batchFunction, options = {}) => {
+    const cacheKey = JSON.stringify(options);
+    cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
+    return cache[cacheKey];
+  }
+
   return {
     collective: {
       findById: new DataLoader(ids => models.Collective
@@ -114,7 +132,7 @@ export const loaders = (req) => {
         .then(results => sortResults(ids, results, 'TierId'))
         .map(result => get(result, 'dataValues.count') || 0)
       )
-  },
+    },
     paymentMethods: {
       findById: new DataLoader(ids => models.PaymentMethod
         .findAll({ where: { id: { $in: ids }}})
@@ -129,15 +147,63 @@ export const loaders = (req) => {
         .then(results => sortResults(CollectiveIds, results, 'CollectiveId', []))
       )
     },
-    transactions: {
-      totalAmountForOrderId: new DataLoader(keys => models.Transaction.findAll({
-          attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
-          where: { OrderId: { $in: keys } },
-          group: ['OrderId']
-        })
-        .then(results => sortResults(keys, results, 'OrderId'))
-        .map(result => get(result, 'dataValues.totalAmount') || 0)
+    orders: {
+      findByMembership: new DataLoader(combinedKeys => models.Order
+          .findAll({
+            where: {
+              CollectiveId: { $in: combinedKeys.map(k => k.split(':')[0]) },
+              FromCollectiveId: { $in: combinedKeys.map(k => k.split(':')[1] )}
+            },
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))
       ),
+      stats: {
+        transactions: new DataLoader(ids => models.Transaction.findAll({
+            attributes: [
+              'OrderId',
+              [ sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count' ]
+            ],
+            where: { OrderId: { $in: ids } },
+            group: ['OrderId']
+          })
+          .then(results => sortResults(ids, results, 'OrderId'))
+          .map(result => get(result, 'dataValues.count') || 0)
+        ),
+        totalTransactions: new DataLoader(keys => models.Transaction.findAll({
+            attributes: ['OrderId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
+            where: { OrderId: { $in: keys } },
+            group: ['OrderId']
+          })
+          .then(results => sortResults(keys, results, 'OrderId'))
+          .map(result => get(result, 'dataValues.totalAmount') || 0)
+        )
+      }
+    },
+    members: {
+      transactions: new DataLoader(combinedKeys => models.Transaction
+          .findAll({
+            where: {
+              CollectiveId: { $in: combinedKeys.map(k => k.split(':')[0]) },
+              FromCollectiveId: { $in: combinedKeys.map(k => k.split(':')[1] )}
+            },
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(combinedKeys, results, 'CollectiveId:FromCollectiveId', []))          
+        )
+    },
+    transactions: {
+      findByOrderId: options => createDataLoaderWithOptions((OrderIds, options) => {
+        return models.Transaction
+          .findAll({
+            where: {
+              OrderId: { $in: OrderIds },
+              ... options.where
+            },
+            order: [['createdAt', 'DESC']]
+          })
+          .then(results => sortResults(OrderIds, results, 'OrderId', []))
+        }, options),
       totalAmountDonatedFromTo: new DataLoader(keys => models.Transaction.findAll({
         attributes: ['FromCollectiveId', 'CollectiveId', [sequelize.fn('SUM', sequelize.col('amount')), 'totalAmount'] ],
         where: {

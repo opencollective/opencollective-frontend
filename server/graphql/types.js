@@ -13,6 +13,10 @@ import {
   CollectiveInterfaceType
 } from './CollectiveInterface';
 
+import {
+  TransactionInterfaceType
+} from './TransactionInterface';
+
 import models from '../models';
 import dataloaderSequelize from 'dataloader-sequelize';
 
@@ -108,6 +112,34 @@ export const UserType = new GraphQLObjectType({
   }
 });
 
+
+export const StatsMemberType = new GraphQLObjectType({
+  name: 'StatsMemberType',
+  description: 'Stats about a membership',
+  fields: () => {
+    return {
+      // We always have to return an id for apollo's caching (key: __typename+id)
+      id: {
+        type: GraphQLInt,
+        resolve(member) {
+          return member.id;
+        }
+      },
+      totalDonations: {
+        type: GraphQLInt,
+        description: "total amount donated by this member",
+        resolve(member, args, req) {
+          return member.totalDonations || req.loaders.transactions.totalAmountDonatedFromTo.load({
+            FromCollectiveId: member.MemberCollectiveId,
+            CollectiveId: member.CollectiveId,
+          });
+        }
+      }
+    }
+  }
+});
+
+
 export const MemberType = new GraphQLObjectType({
   name: 'Member',
   description: 'This is a Member',
@@ -125,13 +157,47 @@ export const MemberType = new GraphQLObjectType({
           return member.createdAt;
         }
       },
-      totalDonations: {
-        type: GraphQLInt,
+      orders: {
+        type: new GraphQLList(OrderType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
         resolve(member, args, req) {
-          return member.totalDonations || req.loaders.transactions.totalAmountDonatedFromTo.load({
-            FromCollectiveId: member.MemberCollectiveId,
-            CollectiveId: member.CollectiveId,
-          });
+          return req.loaders.orders.findByMembership.load(`${member.CollectiveId}:${member.MemberCollectiveId}`)
+            .then(orders => {
+              const { limit, offset } = args;
+              if (limit) {
+                return orders.splice(offset || 0, limit);
+              } else {
+                return orders;
+              }
+            });
+      }
+      },
+      transactions: {
+        type: new GraphQLList(TransactionInterfaceType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt }
+        },
+        resolve(member, args, req) {
+          return req.loaders.members.transactions.load(`${member.CollectiveId}:${member.MemberCollectiveId}`)
+            .then(transactions => {
+              /**
+               * xdamman: note: we can't pass a limit to the loader
+               * because the limit would be applied to the entire result set
+               * that includes the transactions from other members
+               * Given that the number of transaction for a given member to a given collective
+               * is expected to always be < 100, the tradeoff is in favor of using the DataLoader
+               */
+              const { limit, offset } = args;
+              if (limit) {
+                return transactions.splice(offset || 0, limit);
+              } else {
+                return transactions;
+              }
+            });
         }
       },
       collective: {
@@ -162,6 +228,12 @@ export const MemberType = new GraphQLObjectType({
         type: TierType,
         resolve(member, args, req) {
           return member.TierId && req.loaders.tiers.findById.load(member.TierId);
+        }
+      },
+      stats: {
+        type: StatsMemberType,
+        resolve(member) {
+          return member;
         }
       }
     }
@@ -468,11 +540,18 @@ export const StatsOrderType = new GraphQLObjectType({
           return order.id;
         }
       },
-      totalTransactions: {
-        description: 'total of all the transactions for this order (includes past recurring transactions)',
+      transactions: {
+        description: 'number of transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
-          return req.loaders.transactions.totalAmountForOrderId.load(order.id);
+          return req.loaders.orders.stats.transactions.load(order.id);
+        }
+      },
+      totalTransactions: {
+        description: 'total amount of all the transactions for this order (includes past recurring transactions)',
+        type: GraphQLInt,
+        resolve(order, args, req) {
+          return req.loaders.orders.stats.totalTransactions.load(order.id);
         }
       }
     }
@@ -575,6 +654,27 @@ export const OrderType = new GraphQLObjectType({
         type: PaymentMethodType,
         resolve(order) {
           return order.getPaymentMethod();
+        }
+      },
+      transactions: {
+        description: 'transactions for this order ordered by createdAt DESC',
+        type: new GraphQLList(TransactionInterfaceType),
+        args: {
+          limit: { type: GraphQLInt },
+          offset: { type: GraphQLInt },
+          type: {
+            type: GraphQLString,
+            description: "type of transaction (DEBIT/CREDIT)"
+          }
+        },
+        resolve(order, args, req) {
+          const query = {
+            where: {},
+            limit: args.limit || 10,
+            offset: args.offset || 0
+          };
+          if (args.type) query.where.type = args.type;
+          return req.loaders.transactions.findByOrderId(query).load(order.id);
         }
       },
       createdAt: {

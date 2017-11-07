@@ -122,7 +122,7 @@ describe('graphql.collective.test.js', () => {
     expect(collective.tiers).to.have.length(2);
     expect(collective.stats).to.deep.equal({
       backers: { all: 26, users: 25, organizations: 1 },
-      yearlyBudget: 321042,
+      yearlyBudget: 320898,
       topExpenses: {"byCategory":[{"category":"Engineering","count":6,"totalExpenses":324729}],"byCollective":[{"slug":"tjholowaychuk","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/25254v3s400_acc93f90-0085-11e7-951e-491568b1a942.jpeg","name":"TJ Holowaychuk","totalExpenses":-280914}]},
       topFundingSources: {"byCollective":[{"slug":"pubnub","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/pubnublogopng_38ab9250-d2c4-11e6-8ba3-b7985935397d.png","name":"PubNub","totalDonations":147560},{"slug":"harlow_ward","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/168a47c0-d41d-11e6-b711-1589373fcf88.jpg","name":"Harlow Ward","totalDonations":38646},{"slug":"breck7","image":"https://opencollective-production.s3-us-west-1.amazonaws.com/bb14acd098624944ac160008b79fb9e5_30e998d0-619b-11e7-9eab-c17f21ef8eb7.png","name":"Breck Yunits","totalDonations":26040}],"byCollectiveType":[{"type":"USER","totalDonations":163077}]}
       });
@@ -209,12 +209,23 @@ describe('graphql.collective.test.js', () => {
     ]);
   })
 
-  it('gets the members by type', async () => {
+  it('gets the members by type with stats, transactions and orders', async () => {
     const query = `
     query Collective($slug: String!, $type: String) {
       Collective(slug: $slug) {
-        members(type: $type) {
+        members(type: $type, limit: 10, offset: 1) {
           id
+          stats {
+            totalDonations
+          }
+          transactions {
+            id
+            amount
+          }
+          orders {
+            id
+            totalAmount
+          }
           member {
             id
             type
@@ -230,9 +241,19 @@ describe('graphql.collective.test.js', () => {
       expect(result.errors).to.not.exist;
       return result.data.Collective.members;
     }
-
-    expect(await fetchMembersByType('USER')).to.have.length(37);
-    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(3);
+    /**
+     * xdamman: note: members[0] has a transaction without an order.
+     * It's a transaction for a ticket and the order references the CollectiveId of the event
+     * but the transaction references the CollectiveId of the parent collective
+     * a bug from the v2 migration
+     */
+    const members = await fetchMembersByType('USER');
+    expect(members[2].transactions).to.have.length(4);
+    expect(members[2].transactions[0].amount).to.equal(1000);
+    expect(members[2].orders).to.have.length(1);
+    expect(members[2].stats.totalDonations).to.equal(4000);
+    expect(members).to.have.length(10);
+    expect(await fetchMembersByType('ORGANIZATION')).to.have.length(2);
   });
 
   it('edits members', async () => {
