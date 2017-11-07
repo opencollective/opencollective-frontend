@@ -311,7 +311,7 @@ class Collective extends React.Component {
                     <FormattedMessage
                       id="collective.section.backers.organizations.title"
                       values={{ n: this.collective.stats.backers.organizations, collective: this.collective.name }}
-                      defaultMessage={`{n} {n, plural, one {organization} other {organizations}} are supporting {collective}`}
+                      defaultMessage={`{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}`}
                       />
                   </h1>
                   <MembersWithData
@@ -330,7 +330,7 @@ class Collective extends React.Component {
                     <FormattedMessage
                       id="collective.section.backers.users.title"
                       values={{ n: this.collective.stats.backers.users, collective: this.collective.name }}
-                      defaultMessage={`{n} people are supporting {collective}`}
+                      defaultMessage={`{n} {n, plural, one {person is} other {people are}} supporting {collective}`}
                       />
                   </h1>
                   <MembersWithData
