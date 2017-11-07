@@ -16,6 +16,14 @@ export function trimObject(obj) {
   return res;
 }
 
+/**
+ * Gives the number of days between two dates
+ */
+export const days = (d1, d2 = new Date) => {
+  const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+  return Math.round(Math.abs((d1.getTime() - d2.getTime())/(oneDay)));
+}
+
 export function filterCollection(array, cond, inverse) {
   if (!array || !cond) return array;
 
