@@ -5,6 +5,7 @@ import EditTiers from '../components/EditTiers';
 import EditMembers from '../components/EditMembers';
 import EditPaymentMethods from '../components/EditPaymentMethods';
 import EditConnectedAccounts from '../components/EditConnectedAccounts';
+import ExportData from '../components/ExportData';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { defaultBackgroundImage } from '../constants/collectives';
 import withIntl from '../lib/withIntl';
@@ -278,6 +279,11 @@ class EditCollectiveForm extends React.Component {
             {/* <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
               <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
             </Button> */}
+            { collective.type === 'COLLECTIVE' &&
+            <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
+              <FormattedMessage id='editCollective.menu.export' defaultMessage='export' />
+            </Button>
+            }
             <Button className="menuBtn advanced" bsStyle={this.state.section === 'advanced' ? 'primary' : 'default'} onClick={() => this.showSection('advanced')}>
               <FormattedMessage id='editCollective.menu.advanced' defaultMessage='advanced' />
             </Button>
@@ -330,6 +336,11 @@ class EditCollectiveForm extends React.Component {
             <EditConnectedAccounts
               collective={collective}
               connectedAccounts={collective.connectedAccounts}
+              />
+          }
+          { this.state.section === 'export' &&
+            <ExportData
+              collective={collective}
               />
           }
         </div>

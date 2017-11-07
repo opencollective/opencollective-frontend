@@ -39,11 +39,6 @@ class EditCollectivePage extends React.Component {
 
     window.OC = { collective };
     
-    if (LoggedInUser) {
-      LoggedInUser.canEditCollective = (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
-        || intersection(LoggedInUser.roles[slug], ['HOST','ADMIN']).length > 0
-    }
-
     return (
       <div>
         <EditCollective collective={collective} LoggedInUser={LoggedInUser} />

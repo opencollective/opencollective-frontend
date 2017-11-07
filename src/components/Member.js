@@ -51,7 +51,7 @@ class Member extends React.Component {
       memberSinceStr = capitalize(tierName);
     }
     memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], { createdAt: formatDate(membership.createdAt) })}`;
-    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.totalDonations, collective.currency)}`;
+    const totalDonationsStr = `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(membership.stats.totalDonations, collective.currency)}`;
     let title = member.name;
     if (member.description) {
       title += `
@@ -126,7 +126,7 @@ ${totalDonationsStr}`
                 <div className="meta since" style={{color: colors.darkgray}}>
                   {memberSinceStr}
                 </div>
-                { membership.totalDonations > 0 &&
+                { membership.stats.totalDonations > 0 &&
                   <div className="meta totalDonations" style={{color: colors.darkgray}}>
                     {totalDonationsStr}
                   </div>

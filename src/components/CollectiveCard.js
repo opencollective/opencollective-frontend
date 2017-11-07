@@ -236,10 +236,10 @@ class CollectiveCard extends React.Component {
               </div>
             </div>
           }
-          { membership && membership.role === 'BACKER' && membership.totalDonations > 0 &&
+          { membership && membership.role === 'BACKER' && membership.stats.totalDonations > 0 &&
             <div className="totalDonations">
               <div className="totalDonationsAmount">
-                <Currency value={membership.totalDonations} currency={currency} />
+                <Currency value={membership.stats.totalDonations} currency={currency} />
               </div>
               <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
             </div>

@@ -7,6 +7,8 @@ import gql from 'graphql-tag'
 import Member from './Member';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import { exportMembers } from '../lib/export_file';
+import { pluralize } from '../lib/utils';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -43,7 +45,12 @@ class MembersWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, tier, role, type } = this.props;
+    const { data, LoggedInUser, collective, tier, role, type } = this.props;
+
+    let emailGroup = (tier) ? tier.slug : 'all';
+    if (type) {
+      emailGroup = pluralize(type, 2).toLowerCase();
+    }
 
     if (data.error) {
       console.error("graphql error>>>", data.error.message);
@@ -57,7 +64,7 @@ class MembersWithData extends React.Component {
       return (<div />)
     }
 
-    members.sort((a, b) => b.totalDonations - a.totalDonations);
+    members.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
     const size = members.length > 50 ? "small" : "large";
     let viewMode = (type && type.split(',')[0]) || "USER";
     if (tier && tier.name.match(/sponsor/i)) {
@@ -117,7 +124,7 @@ class MembersWithData extends React.Component {
               key={member.id}
               member={member}
               className={`${this.props.className} ${size}`}
-              collective={this.props.collective}
+              collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}
               />
@@ -143,7 +150,9 @@ query Members($CollectiveId: Int!, $TierId: Int, $role: String, $type: String, $
     id
     role
     createdAt
-    totalDonations
+    stats {
+      totalDonations
+    }
     tier {
       id
       name

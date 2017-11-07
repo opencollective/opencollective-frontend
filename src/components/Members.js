@@ -12,7 +12,7 @@ class Members extends React.Component {
   render() {
     const { className, collective } = this.props;
     const members = [...this.props.members];
-    members.sort((a, b) => b.totalDonations - a.totalDonations);
+    members.sort((a, b) => b.stats.totalDonations - a.stats.totalDonations);
     if (!members || members.length === 0) return (<div />);
     const size = members.length > 50 ? 'small' : 'large';
     const viewMode = className && className.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';

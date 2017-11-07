@@ -57,7 +57,6 @@ class CollectivesWithData extends React.Component {
       return (<div />)
     }
 
-    collectives.sort((a, b) => b.totalDonations - a.totalDonations);
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
       <div className="CollectivesContainer">
