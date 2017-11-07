@@ -169,7 +169,7 @@ class Collective extends React.Component {
       }
     ];
 
-    if (LoggedInUser && LoggedInUser.canEditCollective) {
+    if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
       actions.push({
         className: 'whiteblue small',
         component: <a href={`/${this.collective.slug}/edit`}>EDIT COLLECTIVE</a>
@@ -316,7 +316,8 @@ class Collective extends React.Component {
                   </h1>
                   <MembersWithData
                     collective={this.collective}
-                    type="ORGANIZATION,COLLECTIVE"
+                    type="ORGANIZATION"
+                    LoggedInUser={LoggedInUser}
                     role='BACKER'
                     limit={100}
                     />
@@ -334,6 +335,7 @@ class Collective extends React.Component {
                   </h1>
                   <MembersWithData
                     collective={this.collective}
+                    LoggedInUser={LoggedInUser}
                     type="USER"
                     role='BACKER'
                     limit={100}

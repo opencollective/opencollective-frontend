@@ -79,7 +79,7 @@ class UserCollective extends React.Component {
       );
     });
 
-    if (LoggedInUser && LoggedInUser.canEditCollective) {
+    if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
       actions.push({
         className: 'whiteblue small allcaps',
         component: <Link route={`/${this.collective.slug}/edit`}><a>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</a></Link>

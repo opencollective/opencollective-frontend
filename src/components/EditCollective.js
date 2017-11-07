@@ -141,7 +141,7 @@ class EditCollective extends React.Component {
     const { LoggedInUser } = this.props;
 
     const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective;
+    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="EditCollective">

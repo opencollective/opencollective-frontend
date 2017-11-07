@@ -1,7 +1,7 @@
 import * as collectives from './collectives';
-import * as tiers from './tiers';
+import * as members from './members';
 
 export default {
   collectives,
-  tiers
+  members
 };
