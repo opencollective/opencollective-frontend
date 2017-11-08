@@ -1,4 +1,4 @@
-// import 'newrelic';
+import 'newrelic';
 import express from 'express';
 import next from 'next';
 import routes from './routes';

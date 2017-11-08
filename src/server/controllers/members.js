@@ -4,6 +4,7 @@ const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.A
 import { json2csv } from '../../lib/export_file';
 import moment from 'moment';
 import { get } from 'lodash';
+import { days } from '../../lib/utils';
 
 export async function list(req, res, next) {
 
@@ -57,6 +58,7 @@ export async function list(req, res, next) {
           }
         }
         tier {
+          interval
           name
         }
       }
@@ -80,12 +82,21 @@ export async function list(req, res, next) {
   const result = await client.request(query, vars);
   const members = result.Collective.members;
 
+  const isActive = (r) => {
+    if (!r.tier || !r.tier.interval) return true;
+    if (!r.transactions[0] || !r.transactions[0].createdAt) return false;
+    if (r.tier.interval === 'month' && days(new Date(r.transactions[0].createdAt)) <= 31) return true;
+    if (r.tier.interval === 'year' && days(new Date(r.transactions[0].createdAt)) <= 365) return true;
+    return false;
+  }
+
   const mapping = {
     'MemberId': 'id',
     'createdAt': r => moment(r.createdAt).format("YYYY-MM-DD HH:mm"),
     'type': 'member.type',
     'role': 'role',
     'tier': 'tier.name',
+    'isActive': isActive,
     'totalAmountDonated': (r) => (get(r, 'stats.totalDonations') || 0) / 100,
     'currency': 'transactions[0].currency',
     'lastTransactionAt': r => moment(r.transactions[0] && r.transactions[0].createdAt).format("YYYY-MM-DD HH:mm"),
