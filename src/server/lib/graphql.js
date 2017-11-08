@@ -106,12 +106,8 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
     `;
     processResult = (res) => uniqBy(res.Collective.tiers[0].orders.map(o => o.fromCollective), m => m.id);
   }
-  let result;
-  try {
-    result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type });
-    const members = processResult(result);
-    return members;
-  } catch (e) {
-    console.error(e);
-  }
+
+  const result = await (options.client || client).request(query, { collectiveSlug, tierSlug, type });
+  const members = processResult(result);
+  return members;
 }

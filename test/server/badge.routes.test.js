@@ -5,6 +5,11 @@ const WEBSITE_URL = process.env.WEBSITE_URL || "https://staging.opencollective.c
 describe("badge.routes.test.js", () => {
   describe("backerType (backers|sponsors)", () => {
 
+    test("returns a 404 if slug doesn't exist", async () => {
+      const res = await r2(`${WEBSITE_URL}/webpack222/backers/badge.svg`).response;
+      expect(res.status).toEqual(404);
+    });
+
     test("loads the backers badge", async () => {
       const res = await r2(`${WEBSITE_URL}/webpack/backers/badge.svg`).text;
       expect(res).toMatch(/backers<\/text>/);
@@ -13,6 +18,11 @@ describe("badge.routes.test.js", () => {
     test("loads the sponsors badge", async () => {
       const res = await r2(`${WEBSITE_URL}/webpack/sponsors/badge.svg`).text;
       expect(res).toMatch(/sponsors<\/text>/);
+    });
+
+    test("returns a 404 if slug doesn't exist", async () => {
+      const res = await r2(`${WEBSITE_URL}/webpack222/backers/0/avatar.svg`).response;
+      expect(res.status).toEqual(404);
     });
     
     test("loads the first backer avatar.svg", async () => {
