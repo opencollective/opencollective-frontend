@@ -32,13 +32,15 @@ describe("badge.routes.test.js", () => {
     
     test("loads the first sponsor avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/webpack/sponsors/0/avatar.svg`).text;
-      expect(res).toMatch(/<image width="[0-9]+" height="64"/);
+      expect(res).toMatch(/height="64"/);
     });
     
     test("redirects to the website of the second backer", async () => {
       const res = await r2(`${WEBSITE_URL}/webpack/backers/1/website`).response;
       expect(res.status).toEqual(200);
-      expect(res.url).toMatch(/utm_campaign=webpack&utm_medium=github&utm_source=opencollective/);
+      expect(res.url).toMatch(/utm_campaign=webpack/);
+      expect(res.url).toMatch(/utm_medium=github/);
+      expect(res.url).toMatch(/utm_source=opencollective/);
     });
   });
 
