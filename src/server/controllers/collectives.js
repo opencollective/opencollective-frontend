@@ -26,11 +26,15 @@ export async function badge(req, res) {
   try {
     const { style } = req.query;
     const color = req.query.color || 'brightgreen';
-    
-    const stats = await fetchMembersStats(req.params);
 
-    const filename = `${stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
-    const imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
+    let imageUrl;
+    try {
+      const stats = await fetchMembersStats(req.params);
+      const filename = `${stats.name}-${stats.count? stats.count : 0}-${color}.svg`;
+      imageUrl = `https://img.shields.io/badge/${filename}?style=${style}`;
+    } catch (e) {
+      return res.status(404).send('Not found');
+    }
 
     try {
       const imageRequest = await r2(imageUrl).text;
@@ -44,6 +48,7 @@ export async function badge(req, res) {
     }
   } catch (e) {
     console.error("Catching an error in controllers.collectives.badge", e);
+    return res.status(500).send(`Unable to generate badge for ${req.params.collectiveSlug}/${req.params.backerType}`);
   }
 }
 
@@ -58,8 +63,12 @@ export async function banner(req, res) {
   
   let users = cache.get(queryString.stringify(req.params));
   if (!users) {
-    users = await fetchMembers(req.params);
-    cache.set(queryString.stringify(req.params), users);
+    try {
+      users = await fetchMembers(req.params);
+      cache.set(queryString.stringify(req.params), users);
+    } catch (e) {
+      return res.status(404).send('Not found');
+    }
   }
 
   const count = Math.min(limit, users.length);
@@ -177,8 +186,12 @@ export async function website(req, res) {
 
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
-    users = await fetchMembers(req.params);
-    cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+    try {
+      users = await fetchMembers(req.params);
+      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+    } catch (e) {
+      return res.status(404).send('Not found');
+    }
   }
 
   const position = parseInt(req.params.position, 10);
@@ -215,14 +228,18 @@ export async function website(req, res) {
      
 }
 
-export async function avatar(req, res) {
+export async function avatar(req, res, next) {
   const { collectiveSlug, tierSlug, backerType } = req.params;
   
   console.log('>>> cache.itemCount', cache.itemCount);
   let users = cache.get(queryString.stringify({ collectiveSlug, tierSlug, backerType }));
   if (!users) {
-    users = await fetchMembers(req.params);
-    cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+    try {
+      users = await fetchMembers(req.params);
+      cache.set(queryString.stringify({ collectiveSlug, tierSlug, backerType }), users);
+    } catch (e) {
+      return res.status(404).send('Not found');
+    }
   }
 
   const position = parseInt(req.params.position, 10);
