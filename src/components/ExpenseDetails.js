@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import InputField from './InputField';
+import SmallButton from './SmallButton';
+import { getCurrencySymbol } from '../lib/utils';
 
 class ExpenseDetails extends React.Component {
 
@@ -11,18 +15,54 @@ class ExpenseDetails extends React.Component {
     collective: PropTypes.object,
     expense: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    mode: PropTypes.string // open or closed
+    onChange: PropTypes.func,
+    mode: PropTypes.string // summary, edit or details
   }
 
   constructor(props) {
     super(props);
+    this.getOptions = this.getOptions.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+
+    this.messages = defineMessages({
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail})' },
+      'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
+      'other': { id: 'expense.payoutMethod.other', defaultMessage: 'Other (give instructions)' }
+    });
+
+    this.state = { modified: false, expense: {} };
+
+    
+  }
+
+  getOptions(arr, intlVars) {
+    return arr.map(key => { 
+      const obj = {};
+      obj[key] = this.props.intl.formatMessage(this.messages[key], intlVars);
+      return obj;
+    })
+  }
+
+  handleChange(attr, value) {
+    const expense = {
+      ...this.state.expense,
+      [attr]: value
+    };
+    this.setState({ modified: true, expense })
+    this.props.onChange && this.props.onChange(expense);
   }
 
   render() {
-    const { expense } = this.props;
-    console.log(">>> expense", expense)
+    const { LoggedInUser, data } = this.props;
 
+    const expense = data.Expense || this.props.expense;
+
+    const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
+    const editMode = canEditExpense && this.props.mode === 'edit';
+    const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
+    const payoutMethods = this.getOptions(['paypal','other','manual'], { paypalEmail: expense.user && expense.user.paypalEmail });
+    
     return (
         <div className={`ExpenseDetails ${this.props.mode}`}>
         <style jsx>{`
@@ -30,9 +70,8 @@ class ExpenseDetails extends React.Component {
             font-size: 1.2rem;
             overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 15rem;
           }
-          .ExpenseDetails.closed {
+          .ExpenseDetails.summary {
             max-height: 0;
           }
           .ExpenseDetails .frame {
@@ -69,7 +108,19 @@ class ExpenseDetails extends React.Component {
             }
           }
         `}</style>
+        <style global jsx>{`
+          .ExpenseDetails .inputField {
+            margin: 0;
+          }
 
+          .ExpenseDetails .amountField {
+            max-width: 15rem;
+          }
+
+          .ExpenseDetails .inputField textarea {
+            font-size: 1.2rem;
+          }
+        `}</style>
         <div className="frame">
           {expense.attachment &&
             <a href={expense.attachment} target="_blank" title="Open receipt in a new window">
@@ -82,51 +133,90 @@ class ExpenseDetails extends React.Component {
         </div>
 
         <div className="col">
-          <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-          {capitalize(expense.payoutMethod)}
-        </div>
-
-        { expense.privateMessage &&
-          <div className="col">
-            <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
-            {capitalize(expense.privateMessage)}
-          </div>
-        }
-
-        <div className="col">
           <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
           <div className="amountDetails">
             <span className="amount">
-              <FormattedNumber
-                value={expense.amount / 100}
-                currency={expense.currency}
-                {...this.currencyStyle}
-                />
+              { editMode &&
+                <InputField
+                  value={expense.amount}
+                  pre={getCurrencySymbol(expense.currency)}
+                  type='currency'
+                  className="amountField"
+                  onChange={amount => this.handleChange('amount', amount)}
+                  />
+              }
+              { !editMode &&
+                <FormattedNumber
+                  value={expense.amount / 100}
+                  currency={expense.currency}
+                  {...this.currencyStyle}
+                  />
+              }
             </span>
           </div>
         </div>
+
+        <div className="col">
+          <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
+          { !editMode && capitalize(expense.payoutMethod)}
+          { editMode &&
+            <InputField
+              type="select"
+              options={payoutMethods}
+              value={expense.payoutMethod}
+              onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
+              />
+          }
+        </div>
+
+        { (expense.privateMessage || editMode) &&
+          <div className="col">
+            <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
+            { !editMode && capitalize(expense.privateMessage)}
+            { editMode &&
+              <InputField
+                type="textarea"
+                name="privateMessage"
+                onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
+                defaultValue={expense.privateMessage}
+                />
+            }
+          </div>
+        }
       </div>
     );
   }
 }
-
 
 const getExpenseQuery = gql`
 query Expense($id: Int!) {
   Expense(id: $id) {
     id
     description
-    privateMessage
     createdAt
     category
     amount
     currency
+    attachment
     payoutMethod
+    privateMessage
+    collective {
+      id
+      slug
+      host {
+        id
+        slug
+      }
+    }
+    fromCollective {
+      id
+    }
     user {
       id
       name
       username
       image
+      paypalEmail
     }
   }
 }
@@ -151,4 +241,4 @@ return graphql(getExpenseQuery, {
 }
 
 
-export default addGetExpense(injectIntl(ExpenseDetails));
+export default addGetExpense(withIntl(ExpenseDetails));

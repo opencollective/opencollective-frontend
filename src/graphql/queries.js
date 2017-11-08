@@ -446,6 +446,7 @@ export const addGetLoggedInUserFunction = (component) => {
                  * - admin or host of expense.collective.host
                  */
                 LoggedInUser.canEditExpense = (expense) => {
+                  if (!expense) return false;
                   if (expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id && expense.status === 'PENDING') return true;
                   if (expense.collective) {
                     if (intersection(roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;

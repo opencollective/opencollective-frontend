@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedNumber } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
 import { capitalize } from '../lib/utils';
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 import Avatar from './Avatar';
 import ExpenseDetails from './ExpenseDetails';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
 import { Link } from '../server/pages';
+import SmallButton from './SmallButton';
 
 class Expense extends React.Component {
 
@@ -20,14 +24,24 @@ class Expense extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { view: 'compact' };
+    this.state = {
+      modified: false,
+      mode: undefined,
+      expense: {},
+      mode: 'summary'
+    };
+    this.save = this.save.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
     this.messages = defineMessages({
       'pending': { id: 'expense.pending', defaultMessage: 'pending' },
       'paid': { id: 'expense.paid', defaultMessage: 'paid' },
       'approved': { id: 'expense.approved', defaultMessage: 'approved' },
       'rejected': { id: 'expense.rejected', defaultMessage: 'rejected' },
       'closeDetails': { id: 'expense.closeDetails', defaultMessage: 'Close Details' },
+      'edit': { id: 'expense.edit', defaultMessage: 'edit' },
+      'cancelEdit': { id: 'expense.cancelEdit', defaultMessage: 'cancel edit' },
       'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' }
     });
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
@@ -35,9 +49,35 @@ class Expense extends React.Component {
 
   toggleDetails() {
     this.setState({
-      loadDetails: true,
-      view: this.state.view === 'details' ? 'compact' : 'details'
-    })
+      mode: this.state.mode === 'details' ? 'summary' : 'details',
+    });
+  }
+
+  cancelEdit() {
+    this.setState({ modified: false, mode: 'details' });
+  }
+
+  edit() {
+    this.setState({ modified: false, mode: 'edit' });
+  }
+
+  toggleEdit() {
+    this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
+  }
+
+  handleChange(expense) {
+    console.log(">>> handleChange", expense);
+    this.setState({ modified: true, expense });
+  }
+
+  async save() {
+    const expense = {
+      id: this.props.expense.id,
+      ...this.state.expense
+    }
+    const res = await this.props.editExpense(expense);
+    this.setState({ modified: false, mode: 'details' });
+    console.log(">>> expense saved:", res);
   }
 
   render() {
@@ -53,7 +93,7 @@ class Expense extends React.Component {
     const status = expense.status.toLowerCase();
 
     return (
-      <div className={`expense ${status} ${this.state.view}View`}>
+      <div className={`expense ${status} ${this.state.mode}View`}>
         <style jsx>{`
           .expense {
             width: 100%;
@@ -65,7 +105,6 @@ class Expense extends React.Component {
           }
           .expense.detailsView {
             background-color: #fafafa;
-            max-height: 20rem;
           }
           a {
             cursor: pointer;
@@ -164,28 +203,37 @@ class Expense extends React.Component {
             }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
-            <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.view === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
+            { LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+              <span> | <a onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
+            }
+            { this.state.mode !== 'edit' &&
+              <span> | <a onClick={this.toggleDetails}>{intl.formatMessage(this.messages[`${this.state.mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}</a></span>
+            }
           </div>
-          { this.state.loadDetails && 
-            <ExpenseDetails
-              LoggedInUser={LoggedInUser}
-              expense={expense}
-              collective={collective}
-              mode={this.state.view === 'details' ? 'open' : 'closed'}
-              />
-          }
+
+          <ExpenseDetails
+            LoggedInUser={LoggedInUser}
+            expense={expense}
+            collective={collective}
+            onChange={this.handleChange}
+            mode={this.state.mode}
+            />
+
           <div className="actions">
-          { expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
-            <div>
-              <ApproveExpenseBtn id={expense.id} />
-              <RejectExpenseBtn id={expense.id} />
-            </div>
-          }
-          { expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
-            <div>
-              <PayExpenseBtn expense={expense} />
-            </div>
-          }
+            { this.state.mode === 'edit' && this.state.modified && 
+              <SmallButton className="primary" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+            }
+            { this.state.mode !== 'edit' && expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+              <div>
+                <ApproveExpenseBtn id={expense.id} />
+                <RejectExpenseBtn id={expense.id} />
+              </div>
+            }
+            { this.state.mode !== 'edit' && expense.status === 'APPROVED' && LoggedInUser && LoggedInUser.canPayExpense(expense) &&
+              <div>
+                <PayExpenseBtn expense={expense} />
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -193,4 +241,24 @@ class Expense extends React.Component {
   }
 }
 
-export default injectIntl(Expense);
+const editExpenseQuery = gql`
+mutation editExpense($expense: ExpenseInputType!) {
+  editExpense(expense: $expense) {
+    id
+    amount
+    privateMessage
+    payoutMethod
+    status
+  }
+}
+`;
+
+const addMutation = graphql(editExpenseQuery, {
+props: ( { mutate }) => ({
+  editExpense: async (expense) => {
+    return await mutate({ variables: { expense } })
+  }
+})
+});
+
+export default withIntl(addMutation(Expense));
