@@ -756,7 +756,13 @@ const CollectiveFields = () => {
       },
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
-        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id)
+          .then(paymentMethods => {
+            if (args.service) {
+              return paymentMethods.filter(pm => pm.service === args.service);
+            }
+            return paymentMethods;
+          });
       }
     },
     connectedAccounts: {
