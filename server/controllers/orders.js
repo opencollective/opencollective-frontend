@@ -21,12 +21,32 @@ export const manual = (req, res, next) => {
   if (!order.email) {
     order.email = remoteUser.email;
   }
+  let getFromCollectivePromise;
+  if (order.email) {
+    getFromCollectivePromise = models.User.findOrCreateByEmail(order.email, models.User.splitName(order.name))
+      .then(u => user = u)
+      .then(() => {
+        if (order.organization) {
+          return models.Collective.create({
+            name: order.organization,
+            website: order.website
+          }).then(org => {
+            org.addUserWithRole(user, 'ADMIN', { CreatedByUserId: req.remoteUser.id })
+            return org.id;
+          })
+        } else {
+          return user.CollectiveId
+        }
+      })
+  } else if (order.FromCollectiveId) {
+    getFromCollectivePromise = Promise.resolve(order.FromCollectiveId);
+  } else {
+    return next(new errors.BadRequest("The source is not defined. Need to provide an email to create a new account or specify FromCollectiveId"));
+  }
 
-  return models.User.findOrCreateByEmail(order.email, models.User.splitName(order.name))
-    .then(u => user = u)
-    .then(() => models.Order.create({
+  return getFromCollectivePromise.then(FromCollectiveId => models.Order.create({
       CreatedByUserId: req.remoteUser.id,
-      FromCollectiveId: user.CollectiveId,
+      FromCollectiveId,
       CollectiveId: collective.id,
       currency: collective.currency,
       totalAmount,
