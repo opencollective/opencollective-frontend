@@ -519,7 +519,7 @@ export default (Sequelize, DataTypes) => {
           twitterHandle: userData.twitterHandle,
           currency: userData.currency,
           isActive: true,
-          CreatedByUserId: user.id,
+          CreatedByUserId: userData.CreatedByUserId || user.id,
           data: { UserId: user.id }
         };
         return models.Collective.create(userCollective);

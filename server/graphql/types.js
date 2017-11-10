@@ -691,6 +691,12 @@ export const OrderType = new GraphQLObjectType({
           return req.loaders.transactions.findByOrderId(query).load(order.id);
         }
       },
+      currency: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.currency;
+        }
+      },
       createdAt: {
         type: GraphQLString,
         resolve(order) {

@@ -37,8 +37,12 @@ export default {
     .then(results => {
       let hostFeePercent = 0;
       if (!results.fromCollectiveHost) {
+
         // We only add the host fees when adding funds on behalf of another user/organization
-        hostFeePercent = order.collective.hostFeePercent;
+        if (order.fromCollective.id !== order.collective.HostCollectiveId) {
+          hostFeePercent = order.collective.hostFeePercent;
+        }
+
         // If the fromCollective has no Host (ie. when we add fund on behalf of a user/organization),
         // we check if the payment method belongs to the Host of the Order.collective (aka add funds)
         if (order.collective.HostCollectiveId !== order.paymentMethod.CollectiveId) {
@@ -60,7 +64,7 @@ export default {
       // we need to compute the equivalent using the fxrate of the day
       return getFxRate(order.currency, order.paymentMethod.currency)
       .then(fxrate => {
-        const totalAmountInPaymentMethodCurrency = this.totalAmount * fxrate;
+        const totalAmountInPaymentMethodCurrency = order.totalAmount * fxrate;
         const hostFeeInHostCurrency = hostFeePercent / 100 * order.totalAmount * fxrate;
         payload.transaction = {
           type: TransactionTypes.CREDIT,
@@ -68,6 +72,8 @@ export default {
           amount: order.totalAmount,
           currency: order.currency,
           hostCurrency: results.collectiveHost.currency,
+          hostCurrencyFxRate: 1/fxrate,
+          netAmountInCollectiveCurrency: order.totalAmount * (1 - hostFeePercent/100),
           amountInHostCurrency: totalAmountInPaymentMethodCurrency,
           hostFeeInHostCurrency,
           platformFeeInHostCurrency: 0,

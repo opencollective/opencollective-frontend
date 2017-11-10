@@ -1017,10 +1017,10 @@ export default function(Sequelize, DataTypes) {
   Collective.createOrganization = (collectiveData, adminUser) => {
     return Collective
       .create({
+        CreatedByUserId: adminUser.id,
         ...collectiveData,
         type: types.ORGANIZATION,
-        isActive: true,
-        CreatedByUserId: adminUser.id
+        isActive: true
       })
       .tap(collective => {
         return models.Member.create({

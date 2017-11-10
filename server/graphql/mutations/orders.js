@@ -78,11 +78,14 @@ export function createOrder(_, args, req) {
 
   // find or create user, check permissions to set `fromCollective`
   .then(() => {
+    if (order.user && order.user.email) return models.User.findOrCreateByEmail(order.user.email, { ...order.user, CreatedByUserId: req.remoteUser ? req.remoteUser.id : null });
     if (req.remoteUser) return req.remoteUser;
-    return models.User.findOrCreateByEmail(order.user.email, order.user);
   })
+
+  // returns the fromCollective
   .then(u => {
     user = u;
+
     if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
       return {
         id: user.CollectiveId,
@@ -108,6 +111,9 @@ export function createOrder(_, args, req) {
       });
     } else {
       // Create new organization collective
+      if (req.remoteUser) {
+        order.fromCollective.CreatedByUserId = req.remoteUser.id;
+      }
       return models.Collective.createOrganization(order.fromCollective, user)
     }
   })
@@ -131,7 +137,7 @@ export function createOrder(_, args, req) {
     }
 
     const orderData = {
-      CreatedByUserId: user.id,
+      CreatedByUserId: req.remoteUser ? req.remoteUser.id : user.id,
       FromCollectiveId: fromCollective.id,
       CollectiveId: collective.id,
       TierId: tier && tier.id,
@@ -158,7 +164,7 @@ export function createOrder(_, args, req) {
     if (paymentRequired) {
       return orderCreated
         .setPaymentMethod(order.paymentMethod)
-        .then(() => executeOrder(user, orderCreated));
+        .then(() => executeOrder(req.remoteUser || user, orderCreated));
     } else {
       // Free ticket
       const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
