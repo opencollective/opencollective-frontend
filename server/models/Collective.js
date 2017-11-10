@@ -514,8 +514,13 @@ export default function(Sequelize, DataTypes) {
       models.User.findById(user.id, { include: [ { model: models.Collective, as: 'collective' }] })
     ])
     .then(results => {
+      const member = results[0];
       const remoteUser = results[2];
       const recipient = results[3];
+      if ([roles.ADMIN, roles.MEMBER].indexOf(role) === -1) {
+        return member;
+      }
+      // We only send the notification for new member for role MEMBER and ADMIN
       emailLib.send('collective.newmember', recipient.email, {
         remoteUser: {
           email: remoteUser.email,
@@ -533,7 +538,7 @@ export default function(Sequelize, DataTypes) {
         },
         loginLink: results[3].generateLoginLink(`/${recipient.collective.slug}/edit`)
       }, { cc: remoteUser.email });
-      return results[0];
+      return member;
     });
   };
 

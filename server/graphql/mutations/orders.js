@@ -52,7 +52,7 @@ export function createOrder(_, args, req) {
     // TODO: using order.interval over Tiers will likely include donations that shouldn't be in tiers. 
     // Need to reevalute with always respecting user choice.
 
-    interval = order.interval || tier && tier.interval;
+    interval = order.interval;
   })
 
   // make sure that we have a payment method attached if this order requires a payment (totalAmount > 0)

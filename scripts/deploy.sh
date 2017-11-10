@@ -10,7 +10,8 @@ current_branch_name=${current_branch_name##refs/heads/}
 if [ $env = "staging" ]
 then
   branch_name="staging"
-  remote="https://git.heroku.com/opencollective-staging-api.git"
+  # adding -f to always force staging
+  remote="-f https://git.heroku.com/opencollective-staging-api.git"
   from_branch="master"
 elif [ $env = "production" ]
 then
