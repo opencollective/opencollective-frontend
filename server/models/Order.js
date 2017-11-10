@@ -177,10 +177,6 @@ export default function(Sequelize, DataTypes) {
    */
   Order.prototype.validatePaymentMethod = function(paymentMethod) {
     debug("validatePaymentMethod", paymentMethod.dataValues, "this.user", this.CreatedByUserId);
-    // If the payment method doesn't belong to the user, it can only be used to execute orders on behalf of the collective it is associated with
-    if (paymentMethod.CreatedByUserId !== this.CreatedByUserId && paymentMethod.CollectiveId !== this.FromCollectiveId) {
-      throw new Error(`This payment method can only be used to create orders on behalf of the collective id ${paymentMethod.CollectiveId}`);
-    }
 
     if (this.interval && !paymentMethod.features.recurring) {
       throw new Error("This payment method doesn't support recurring payments");

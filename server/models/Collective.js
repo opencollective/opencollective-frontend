@@ -938,6 +938,10 @@ export default function(Sequelize, DataTypes) {
       });
   };
 
+  Collective.prototype.isHost = function() {
+    return models.Collective.findOne({ where: { HostCollectiveId: this.id }}).then(r => Boolean(r));
+  }
+
   Collective.prototype.getRelatedCollectives = function(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
     return Collective.getCollectivesSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
   };

@@ -4,7 +4,6 @@ import GraphHTTP from 'express-graphql'
 import schema from './graphql/schema';
 import * as connectedAccounts from './controllers/connectedAccounts';
 import getDiscoverPage from './controllers/discover';
-import * as orders from './controllers/orders';
 import * as transactions from './controllers/transactions';
 import * as expenses from './controllers/expenses';
 import * as collectives from './controllers/collectives';
@@ -182,13 +181,6 @@ export default (app) => {
   app.post('/groups/:collectiveid/expenses/:expenseid/approve', auth.canEditCollective, required('approved'), expenses.setApprovalStatus); // Approve an expense.
   app.post('/groups/:collectiveid/expenses/:expenseid/pay', auth.mustHaveRole(roles.HOST), expenses.pay); // Pay an expense.
 
-  
-  /**
-   * Orders (backward compatible with old website for manual add funds)
-   */
-  app.post('/groups/:collectiveid/donations/manual', required('order'), auth.mustHaveRole(roles.HOST), orders.manual); // Create a manual order.
-  // app.post('/groups/:collectiveid/donations/paypal', required('payment'), orders.paypal); // Make a paypal order.
-  // app.get('/groups/:collectiveid/transactions/:paranoidtransactionid/callback', orders.paypalCallback); // Callback after a payment
 
   /**
    * Notifications.
