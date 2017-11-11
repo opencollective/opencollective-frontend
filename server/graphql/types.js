@@ -810,7 +810,7 @@ export const PaymentMethodType = new GraphQLObjectType({
         type: GraphQLInt,
         description: "Returns the balance in the currency of this paymentMethod",
         resolve(paymentMethod, args, req) {
-          return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => (balance === Infinity) ? 10000000 : balance);
+          return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
         }
       },
       currency: {
