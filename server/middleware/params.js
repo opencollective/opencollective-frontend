@@ -117,7 +117,7 @@ export function expenseid(req, res, next, expenseid) {
     .then(where => Expense.findOne({
       where: Object.assign({}, where, queryInCollective),
       include: [
-        { model: models.Collective },
+        { model: models.Collective, as: 'collective' },
         { model: models.User }
       ]
     }))
