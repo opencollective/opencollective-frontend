@@ -175,7 +175,7 @@ export default function(Sequelize, DataTypes) {
       .then(balance => {
 
         if (!this.monthlyLimitPerMember || user.isAdmin(this.CollectiveId)) {
-          return balance;
+          return { amount: balance, currency: this.currency };
         }
 
         const d = new Date;

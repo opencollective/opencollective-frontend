@@ -11,6 +11,7 @@ export default {
   getBalance: (paymentMethod) => {
     return paymentMethod.getCollective().then(collective => {
       // If the collective is a User or an Organization.
+      console.log(">>> getBalance for the opencollective payment method of ", collective.type, collective.slug);
       if (collective.type === 'ORGANIZATION' || collective.type === 'USER') {
         return 10000000;
       }

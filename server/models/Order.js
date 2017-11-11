@@ -195,7 +195,9 @@ export default function(Sequelize, DataTypes) {
         }
         return paymentMethod.getBalanceForUser(this.createdByUser, paymentMethod)
           .then(balance => {
+            debug("validatePaymentMethod", "balance", balance, "totalAmountInPaymentMethodCurrency:", totalAmountInPaymentMethodCurrency, "bool: ", totalAmountInPaymentMethodCurrency > balance.amount);
             if (balance && totalAmountInPaymentMethodCurrency > balance.amount) {
+              console.log(`>>> throwing error: You don't have enough funds available (${formatCurrency(balance.amount, balance.currency)} left) to execute this order (${orderAmountInfo})`);
               throw new Error(`You don't have enough funds available (${formatCurrency(balance.amount, balance.currency)} left) to execute this order (${orderAmountInfo})`)
             }
             return paymentMethod;

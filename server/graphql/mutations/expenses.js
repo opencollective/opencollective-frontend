@@ -54,16 +54,15 @@ export async function createExpense(remoteUser, expenseData) {
     if (!expenseData.user || !expenseData.user.email) {
       throw new errors.Unauthorized("Missing expense.user.email");
     }
-    console.log(">>> findOrCreateByEmail", expenseData.user.email);
     const user = await models.User.findOrCreateByEmail(expenseData.user.email);
     expenseData.UserId = user.id;
   }
 
-  if (expenseData.currency && expenseData.currency !== expense.collective.currency) {
-    throw new errors.ValidationFailed(`The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expense.collective.currency})`);
-  }
-
   const collective = await models.Collective.findById(expenseData.collective.id);
+
+  if (expenseData.currency && expenseData.currency !== collective.currency) {
+    throw new errors.ValidationFailed(`The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expenseData.collective.currency})`);
+  }
 
   if (!collective) {
     throw new errors.ValidationFailed("Collective not found");
