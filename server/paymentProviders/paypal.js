@@ -47,7 +47,7 @@ export default {
     paymentMethod: true // creates a payment method that can be used to pay up to $2,000 USD or equivalent
   },
 
-  fees: async (amount, currency) => {
+  fees: async (amount) => {
     return (0.29 * amount + 30);
   },
 
