@@ -116,6 +116,51 @@ describe('graphql.paymentMethods.test.js', () => {
       }
     }
     `;
+
+    it('fails to add funds if not logged in as an admin of the host', async () => {
+
+      order.fromCollective = {
+        id: host.id
+      };
+      const result = await utils.graphqlQuery(createOrderQuery, { order }, user);
+      result.errors && console.error(result.errors[0]);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(`You don't have sufficient permissions to create an order on behalf of the open source collective organization`);
+
+      order.user = {
+        email: 'admin@neworg.com',
+        name: 'Paul Newman'
+      };
+      order.fromCollective = {
+        name: "new org",
+        website: "http://neworg.com"
+      };
+      const result2 = await utils.graphqlQuery(createOrderQuery, { order }, user);
+      result2.errors && console.error(result2.errors[0]);
+      expect(result2.errors).to.exist;
+      expect(result2.errors[0].message).to.equal(`You don't have sufficient permissions to access this payment method`);
+    });
+
+    it('fails to add funds to a collective not hosted on the same host', async () => {
+
+      const collective2 = await models.Collective.create({
+        name: "wwcode austin",
+        type: "COLLECTIVE",
+        isActive: true,
+        currency: "USD",
+        hostFeePercent: 5,
+        HostCollectiveId: user.CollectiveId
+      });
+      order.collective = { id: collective2.id };
+      order.fromCollective = {
+        id: host.id
+      };
+
+      const result = await utils.graphqlQuery(createOrderQuery, { order }, admin);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(`You need to use the payment method of the host (${user.CollectiveId}) to add funds to this collective`);
+    });
+
     it('adds funds from the host (USD) to the collective (EUR)', async () => {
 
       nock('http://api.fixer.io:80', {"encodedQueryParams":true})
