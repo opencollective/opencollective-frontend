@@ -70,21 +70,20 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     it('should fail if not the logged-in user', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .get(`/connected-accounts/paypal/oauthUrl?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
-        .expect(403)
+        .expect(401)
         .end(done);
     });
 
     it('should get a preapproval key', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .get(`/connected-accounts/paypal/oauthUrl?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
-          expect(res.body).to.have.property('preapprovalKey', paypalMock.adaptive.preapproval.preapprovalKey);
-
+          expect(res.body.redirectUrl).to.contain("&preapprovalkey=PA-");
           models.PaymentMethod
             .findAndCountAll({ where: { service: 'paypal' }})
             .then((res) => {
@@ -109,7 +108,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     beforeEach('get preapproval key', (done) => {
       request(app)
-        .get(`/users/${user.id}/paypal/preapproval?api_key=${application.api_key}`)
+        .get(`/connected-accounts/paypal/oauthUrl?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
         .expect(200)
         .end(done);
@@ -128,7 +127,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should fail if not the logged-in user', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user2.jwt()}`)
           .expect(403)
           .end(done);
@@ -136,7 +135,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should fail with an unknown preapproval key', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/abc?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl/abc?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(404)
           .end(done);
@@ -145,7 +144,7 @@ describe('paypal.preapproval.routes.test.js', () => {
       it('should confirm the payment of a transaction', (done) => {
         const mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end((e, res) => {
@@ -182,7 +181,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if the preapproval is not completed', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(400)
           .end(done);
@@ -203,7 +202,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return an error if paypal returns one', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(500)
           .end(done);
@@ -223,7 +222,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should return the preapproval details', (done) => {
         request(app)
-          .get(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .get(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(done);
@@ -231,7 +230,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should not be able to check another user preapproval details', (done) => {
         request(app)
-          .get(`/users/${user2.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .get(`/users/${user2.id}/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(403)
           .end(done);
@@ -261,7 +260,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
       it('should delete all other paymentMethods entries in the database to clean up', (done) => {
         request(app)
-          .post(`/users/${user.id}/paypal/preapproval/${preapprovalkey}?api_key=${application.api_key}`)
+          .post(`/connected-accounts/paypal/oauthUrl?preapprovalkey=${preapprovalkey}&api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=${encodeURIComponent("https://localhost:3030/paypal/redirect")}`)
           .set('Authorization', `Bearer ${user.jwt()}`)
           .expect(200)
           .end(e => {

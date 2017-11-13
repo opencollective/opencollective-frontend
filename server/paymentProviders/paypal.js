@@ -119,7 +119,7 @@ export default {
       // TODO: The cancel URL doesn't work - no routes right now.
       const { redirect } = options;
       if (!redirect) {
-        throw new Error("Please provide a redirect url");
+        throw new Error("Please provide a redirect url as a query parameter (?redirect=)");
       }
       const expiryDate = moment().add(1, 'years');
       
@@ -212,7 +212,7 @@ export default {
     * Get preapproval key details
     */
     verify: (req, res, next) => {
-      const preapprovalKey = req.params.preapprovalkey;
+      const preapprovalKey = req.query.preapprovalkey;
       return getPreapprovalDetailsAndUpdatePaymentMethod(preapprovalKey, req.remoteUser.CollectiveId)
         .then(response => res.json(response))
         .catch(next);
