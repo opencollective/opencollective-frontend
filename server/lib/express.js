@@ -46,7 +46,7 @@ export default function(app) {
   app.use((req, res, next) => {
     req.startAt = new Date;
     const temp = res.end
-    res.end = function(str) {
+    res.end = function() {
       const timeElapsed = (new Date) - req.startAt;
       if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
         if (req.body && req.body.query) {
