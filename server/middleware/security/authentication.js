@@ -197,7 +197,9 @@ export const authenticateService = (req, res, next) => {
   
   return models.ConnectedAccount.findOne({ where: { service, CollectiveId: req.query.CollectiveId }})
   .then(ExistingStripeAccount => {
-    if (ExistingStripeAccount) throw new errors.ValidationFailed(null, ['CollectiveId'], `Collective already has a ${service} account connected`);
+    if (ExistingStripeAccount) {
+      throw new errors.ValidationFailed(null, ['CollectiveId'], `Collective already has a ${service} account connected`);
+    }
     return true;
   })
   .then(() => {
@@ -215,6 +217,7 @@ export const authenticateService = (req, res, next) => {
     console.log("authenticateService calling Passport with options", opts);
     return passport.authenticate(service, opts)(req, res, next);
   })
+  .catch(next);
 };
 
 export const authenticateServiceCallback = (req, res, next) => {

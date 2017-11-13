@@ -67,7 +67,7 @@ export default {
         state
       });
 
-      return `${AUTHORIZE_URI}?${params}`;
+      return Promise.resolve(`${AUTHORIZE_URI}?${params}`);
     },
 
     // callback called by Stripe after the user approves the connection
