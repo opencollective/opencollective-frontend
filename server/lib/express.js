@@ -51,7 +51,7 @@ export default function(app) {
       if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
         if (req.body && req.body.query) {
           console.log(">>> slow request", req.body.query.substr(0, req.body.query.indexOf(")")+1));
-          console.Logs(">>> variables: ", req.body.variables);
+          console.log(">>> variables: ", req.body.variables);
         }
       }
       temp.apply(this,arguments);
