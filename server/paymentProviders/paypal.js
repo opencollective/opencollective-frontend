@@ -164,46 +164,54 @@ export default {
       })
       .then(pm => {
         paymentMethod = pm;
+
         if (!pm) {
-          return next(new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`))
+          return next(new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`));
         }
+
         if (req.query.paypalApprovalStatus !== 'success') {
           pm.destroy();
           const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=User%20cancelled%20the%20request`;
           return res.redirect(redirect);
         }
-        return getPreapprovalDetailsAndUpdatePaymentMethod(pm);
-      })
-      .catch(e => {
-        console.error(">>> paypal callback error:", e);
-        const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=Error%20while%20contacting%20PayPal`;
-        return res.redirect(redirect)
-      })
-      .then(pm => {
-        return models.Activity.create({
-          type: 'user.paymentMethod.created',
-          UserId: paymentMethod.CreatedByUserId,
-          CollectiveId: paymentMethod.CollectiveId,
-          data: {
-            paymentMethod: pm.minimal
-          }
-        });
-      })
 
-      // clean any old payment methods attached to this host collective
-      .then(() => models.PaymentMethod.findAll({
-        where: {
-          service: 'paypal',
-          CollectiveId: paymentMethod.CollectiveId,
-          token: { $ne: req.query.preapprovalkey }
-        }
-      }))
-      // TODO: Call paypal to cancel preapproval keys before marking as deleted.
-      .then(oldPMs => oldPMs && oldPMs.map(pm => pm.destroy()))
-    
-      .then(() => {
-        const redirect = `${paymentMethod.data.redirect}?status=success&service=paypal`;
-        return res.redirect(redirect)
+        return getPreapprovalDetailsAndUpdatePaymentMethod(pm)
+          .catch(e => {
+            console.error(">>> paypal callback error:", e);
+            const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=Error%20while%20contacting%20PayPal`;
+            res.redirect(redirect);
+            throw e; // make sure we skip what follows until next catch()
+          })
+          .then(pm => {
+            if (!pm) {
+              throw new Error("No payment method found");
+            }
+            return models.Activity.create({
+              type: 'user.paymentMethod.created',
+              UserId: paymentMethod.CreatedByUserId,
+              CollectiveId: paymentMethod.CollectiveId,
+              data: {
+                paymentMethod: pm.minimal
+              }
+            });
+          })
+
+          // clean any old payment methods attached to this host collective
+          .then(() => models.PaymentMethod.findAll({
+            where: {
+              service: 'paypal',
+              CollectiveId: paymentMethod.CollectiveId,
+              token: { $ne: req.query.preapprovalkey }
+            }
+          }))
+
+          // TODO: Call paypal to cancel preapproval keys before marking as deleted.
+          .then(oldPMs => oldPMs && oldPMs.map(pm => pm.destroy()))
+        
+          .then(() => {
+            const redirect = `${paymentMethod.data.redirect}?status=success&service=paypal`;
+            return res.redirect(redirect)
+          })
       })
       .catch(next);
     },
@@ -212,7 +220,7 @@ export default {
     * Get preapproval key details
     */
     verify: (req, res, next) => {
-      const preapprovalKey = req.query.preapprovalkey;
+      const preapprovalKey = req.query.preapprovalKey;
       return getPreapprovalDetailsAndUpdatePaymentMethod(preapprovalKey, req.remoteUser.CollectiveId)
         .then(response => res.json(response))
         .catch(next);
