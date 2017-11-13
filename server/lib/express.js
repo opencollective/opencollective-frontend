@@ -42,6 +42,23 @@ export default function(app) {
     });
   }
 
+  // log the slow graphql queries
+  app.use((req, res, next) => {
+    req.startAt = new Date;
+    const temp = res.end
+    res.end = function() {
+      const timeElapsed = (new Date) - req.startAt;
+      if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
+        if (req.body && req.body.query) {
+          console.log(">>> slow request", req.body.query.substr(0, req.body.query.indexOf(")")+1));
+          console.Logs(">>> variables: ", req.body.variables);
+        }
+      }
+      temp.apply(this,arguments);
+    }
+    next();
+  });
+
   // Body parser.
   app.use(bodyParser.json({limit: '50mb'}));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
