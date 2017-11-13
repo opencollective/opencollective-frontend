@@ -141,12 +141,13 @@ describe('paypal.preapproval.routes.test.js', () => {
       it.only('should confirm the payment of a transaction', (done) => {
         const mock = paypalMock.adaptive.preapprovalDetails;
         request(app)
-          .get(`/connected-accounts/paypal/verify?preapprovalKey=${preapprovalkey}&paypalApprovalStatus=success`)
+          .get(`/connected-accounts/paypal/callback?preapprovalKey=${preapprovalkey}&paypalApprovalStatus=success`)
           .set('Authorization', `Bearer ${user.jwt()}`)
-          .expect(200)
+          // .expect(302)
           .end((e, res) => {
-            expect(e).to.not.exist;
+            console.log(">>> error", e);
             console.log(">>> res.body", res.body);
+            expect(e).to.not.exist;
             expect(res.body.token).to.equal(preapprovalkey);
 
             models.PaymentMethod.findAndCountAll({ where: { token: preapprovalkey } })
