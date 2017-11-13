@@ -19,13 +19,19 @@ const debug = debugLib('paypal');
  */
 const getPreapprovalDetailsAndUpdatePaymentMethod = function(paymentMethod) {
 
+  if (!paymentMethod) {
+    return Promise.reject(new Error("No payment method provided to getPreapprovalDetailsAndUpdatePaymentMethod"))
+  }
+
   let preapprovalDetailsResponse;
   
   return paypalAdaptive.preapprovalDetails(paymentMethod.token)
     .tap(response => preapprovalDetailsResponse = response)
-    .then(response => response.approved === 'false' ? 
-      Promise.reject(new errors.BadRequest('This preapprovalkey is not approved yet.')) : 
-      Promise.resolve())
+    .then(response => {
+      if (response.approved === 'false') {
+        throw new errors.BadRequest('This preapprovalkey is not approved yet.') 
+      }
+    })
     .then(() => paymentMethod.update({
         confirmedAt: new Date(),
         name: preapprovalDetailsResponse.senderEmail,
@@ -178,14 +184,12 @@ export default {
         return getPreapprovalDetailsAndUpdatePaymentMethod(pm)
           .catch(e => {
             console.error(">>> paypal callback error:", e);
-            const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=Error%20while%20contacting%20PayPal`;
+            const redirect = `${paymentMethod.data.redirect}?status=error&service=paypal&error=Error%20while%20contacting%20PayPal&errorMessage=${encodeURIComponent(e.message)}`;
+            console.log(">>> redirect", redirect);
             res.redirect(redirect);
             throw e; // make sure we skip what follows until next catch()
           })
           .then(pm => {
-            if (!pm) {
-              throw new Error("No payment method found");
-            }
             return models.Activity.create({
               type: 'user.paymentMethod.created',
               UserId: paymentMethod.CreatedByUserId,
@@ -220,9 +224,22 @@ export default {
     * Get preapproval key details
     */
     verify: (req, res, next) => {
-      const preapprovalKey = req.query.preapprovalKey;
-      return getPreapprovalDetailsAndUpdatePaymentMethod(preapprovalKey, req.remoteUser.CollectiveId)
-        .then(response => res.json(response))
+      return models.PaymentMethod.findOne({
+          where: {
+            service: 'paypal',
+            token: req.query.preapprovalKey
+          },
+          order: [['createdAt', 'DESC']]
+        })
+        .then(pm => {
+          if (!pm) {
+            return next(new errors.BadRequest(`No paymentMethod found with this preapproval key: ${req.query.preapprovalKey}`));
+          }
+          if (!req.remoteUser.isAdmin(pm.CollectiveId)) {
+            return next(new errors.Unauthorized("You are not authorized to verify a payment method of a collective that you are not an admin of"));
+          }
+          return getPreapprovalDetailsAndUpdatePaymentMethod(pm).then(pm => res.json(pm.info));
+        })
         .catch(next);
     }
   }
