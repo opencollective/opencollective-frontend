@@ -58,13 +58,30 @@ export function checkUserExistence(email) {
     .then(json => Boolean(json.exists));
 }
 
+/**
+ * Old api
+ * Expecting order = { name, email, totalAmount, description, privateMessage }
+ */
+export function addFunds(CollectiveId, order) {
+  return fetch(`/api/groups/${CollectiveId}/donations/manual`, {
+    method: 'POST',
+    headers: {
+      ...addAuthTokenToHeader(),
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ order })
+  })
+  .then(checkResponseStatus);
+}
+
 export function signin(user, redirect) {
   return fetch('/api/users/signin', {
     method: 'POST',
     headers: {
       ...addAuthTokenToHeader(),
       Accept: 'application/json',
-      'Content-Type': 'application/json'      
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ user, redirect })
   })

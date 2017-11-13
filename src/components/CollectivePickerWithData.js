@@ -2,12 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag'
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
 import Currency from '../components/Currency';
 import { FormattedMessage } from 'react-intl';
 import ConnectPaypal from '../components/ConnectPaypal';
+import AddFundsForm from '../components/AddFundsForm';
+import SmallButton from '../components/SmallButton';
+import { pick, cloneDeep } from 'lodash';
 
 class CollectivePickerWithData extends React.Component {
 
@@ -18,13 +21,69 @@ class CollectivePickerWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { CollectiveId: 0, connectingPaypal: false };
+    this.state = {
+      connectingPaypal: false,
+      loading: false,
+      showAddFunds: false
+    };
+    this.addFunds = this.addFunds.bind(this);
+    this.toggleAddFunds = this.toggleAddFunds.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
+  async addFunds(form) {
+    if (form.totalAmount === 0) {
+      return console.error("Total amount must be > 0");
+    }
+    this.setState({ loading: true });
+    const hostCollective = this.hostCollective;
+    const selectedCollective = cloneDeep(this.state.selectedCollective);
+    console.log(">>> addFunds", form, "host: ", hostCollective);
+    const order = pick(form, ['totalAmount', 'description']);
+    order.collective = {
+      id: selectedCollective.id
+    };
+    if (form.email) {
+      order.user = {
+        email: form.email,
+        name: form.name
+      }
+    }
+    if (form.organization) {
+      order.fromCollective = {
+        name: form.organization,
+        website: form.website
+      }
+    } else {
+      order.fromCollective = {
+        id: hostCollective.id
+      }
+    }
+    const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
+    if (!pm) {
+      return console.error("This host doesn't have an opencollective payment method");
+    }
+    order.paymentMethod = {
+      uuid: pm.uuid
+    }
+    console.log(">>> add funds order: ", order);
+    const res = await this.props.createOrder(order)
+    console.log(">>> res", res);
+    selectedCollective.stats.balance = res.data.createOrder.collective.stats.balance;
+    console.log(">>> selectedCollective", selectedCollective);
+    this.setState({ showAddFunds: false, loading: false, selectedCollective });
+  }
+
+  toggleAddFunds() {
+    this.setState({ showAddFunds: !this.state.showAddFunds });
+  }
+
   onChange(CollectiveId) {
-    this.setState({ CollectiveId });
-    this.props.onChange(CollectiveId);
+    const collectives = this.hostCollective.collectives;
+    const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
+    this.setState({ selectedCollective });
+    console.log(">>> CollectivePicker onChange", selectedCollective);
+    this.props.onChange(selectedCollective);
   }
 
   renderCollectiveMenuItem(collective, className) {
@@ -32,7 +91,7 @@ class CollectivePickerWithData extends React.Component {
       <style jsx>{`
         .MenuItem-Collective {
           display: flex;
-          width: 30rem;
+          width: 40rem;
           justify-content: space-between;
           align-items: center;
         }
@@ -62,7 +121,7 @@ class CollectivePickerWithData extends React.Component {
           <Currency value={collective.stats.balance} currency={collective.currency} />)
         </div>
       </div>
-      <Badge pullRight={true} >{collective.stats.expenses.pending}</Badge>
+      { collective.stats.expenses.pending > 0 && <Badge pullRight={true} >{collective.stats.expenses.pending}</Badge> }
     </div>);
   }
 
@@ -73,18 +132,26 @@ class CollectivePickerWithData extends React.Component {
       console.error("graphql error>>>", error.message);
       return (<Error message="GraphQL error" />)
     }
-    if (loading || !Collective) {
+
+    this.hostCollective = this.hostCollective || Collective;
+    if (loading || !this.hostCollective) {
       return (<div />);
     }
 
-    const collectives = Collective.collectives;
-    const selectedCollective = this.state.CollectiveId > 0 && collectives.find(c => c.id === this.state.CollectiveId);
+    const collectives = [...this.hostCollective.collectives].sort((a, b) => {
+      if (b.stats.expenses.pending > a.stats.expenses.pending) return 1;
+      if (b.stats.expenses.pending < a.stats.expenses.pending) return -1;
+      return (b.name.toUpperCase() < a.name.toUpperCase());
+    });
+    const selectedCollective = this.state.selectedCollective;
     const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
     return (
       <div className="CollectivesContainer">
         <style jsx>{`
-          .submenu {
+          .CollectivesContainer {
             background: #f2f4f5;
+          }
+          .submenu {
             width: 100%;
             height: 16rem;
             font-family: Rubik;
@@ -122,10 +189,16 @@ class CollectivePickerWithData extends React.Component {
             display: flex;
           }
 
+          .addFundsLink {
+            display: block;
+            font-size: 1.2rem;
+            padding: 0.8rem;
+          }
+
         `}</style>
         <style global>{`
           .CollectivesContainer .defaultTitle {
-            width: 30rem;
+            width: 40rem;
             float: left;
             text-align: left;
           }
@@ -149,20 +222,33 @@ class CollectivePickerWithData extends React.Component {
             { collectives.length > 0 &&
               <div className="collectivesFilter">
                 <DropdownButton bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
-                  { collectives.filter(c => c.stats.expenses.pending > 0).map(collective => (
+                  { collectives.map(collective => (
                     <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
                     { this.renderCollectiveMenuItem(collective) }
                     </MenuItem>
                   ))}
                 </DropdownButton>
+                { selectedCollective && !this.state.showAddFunds &&
+                  <a className="addFundsLink" onClick={this.toggleAddFunds}><FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /></a>
+                }
               </div>
             }
             </div>
             <div className="right">
               <ConnectPaypal
-                collective={Collective}
+                collective={this.hostCollective}
                 />
             </div>
+          </div>
+          <div>
+            { selectedCollective && this.state.showAddFunds &&
+              <AddFundsForm
+                collective={selectedCollective}
+                host={this.hostCollective}
+                onSubmit={this.addFunds}
+                onCancel={this.toggleAddFunds}
+                />
+            }
           </div>
       </div>
     );
@@ -173,8 +259,11 @@ const getCollectivesQuery = gql`
 query Collective($hostCollectiveSlug: String!) {
   Collective(slug: $hostCollectiveSlug) {
     id
+    slug
+    name
     paymentMethods {
       id
+      uuid
       service
       createdAt
       balance
@@ -185,6 +274,7 @@ query Collective($hostCollectiveSlug: String!) {
       slug
       name
       currency
+      hostFeePercent
       stats {
         id
         balance
@@ -237,4 +327,29 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
 });
 
 
-export default addCollectivesData(withIntl(CollectivePickerWithData));
+const createOrderQuery = gql`
+mutation createOrder($order: OrderInputType!) {
+  createOrder(order: $order) {
+    id
+    collective {
+      id
+      stats {
+        id
+        balance
+      }
+    }
+  }
+}
+`;
+
+const addMutation = graphql(createOrderQuery, {
+props: ( { mutate }) => ({
+  createOrder: async (order) => {
+    return await mutate({ variables: { order } })
+  }
+})
+});
+
+const addGraphQL = compose(addMutation, addCollectivesData);
+
+export default addGraphQL(withIntl(CollectivePickerWithData));

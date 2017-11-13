@@ -9,7 +9,7 @@ import ErrorPage from '../components/ErrorPage';
 import withData from '../lib/withData';
 import withIntl from '../lib/withIntl';
 import ExpensesWithData from '../components/ExpensesWithData';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl'
 import CollectivePicker from '../components/CollectivePickerWithData';
 import { graphql } from 'react-apollo'
@@ -24,7 +24,7 @@ class HostExpensesPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { CollectiveId: null };
+    this.state = { selectedCollective: null };
   }
 
   async componentDidMount() {
@@ -33,8 +33,8 @@ class HostExpensesPage extends React.Component {
     this.setState({ LoggedInUser });
   }
 
-  pickCollective(CollectiveId) {
-    this.setState({ CollectiveId });
+  pickCollective(selectedCollective) {
+    this.setState({ selectedCollective });
   }
 
   render() {
@@ -49,9 +49,9 @@ class HostExpensesPage extends React.Component {
     if (!data.Collective) return (<Loading />);
 
     const collective = data.Collective;
-    const collectiveId = this.state.CollectiveId || collective.id;
-    const includeHostedCollectives = (collectiveId === collective.id);
-
+    const selectedCollective = this.state.selectedCollective || collective;
+    const includeHostedCollectives = (selectedCollective.id === collective.id);
+    console.log(">>> host.expenses render selectedCollective", selectedCollective);
     return (
       <div className="HostExpensesPage">
         <style jsx>{`
@@ -77,13 +77,13 @@ class HostExpensesPage extends React.Component {
 
           <CollectivePicker
             hostCollectiveSlug={this.props.collectiveSlug}
-            onChange={(CollectiveId => this.pickCollective(CollectiveId))}
+            onChange={(selectedCollective => this.pickCollective(selectedCollective))}
             />
 
           <div className="content" >
 
             <ExpensesWithData
-              collective={{ id: collectiveId }}
+              collective={selectedCollective}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={this.state.LoggedInUser}
               />
@@ -116,5 +116,4 @@ query Collective($collectiveSlug: String!) {
 `;
 
 export const addData = graphql(getDataQuery);
-
 export default withData(addGetLoggedInUserFunction(addData(withIntl(HostExpensesPage))));

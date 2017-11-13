@@ -31,7 +31,7 @@ class ExpensesWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-
+    console.log(">>> ExpensesWithData render", data);
     const expenses = data.allExpenses;
 
     return (
