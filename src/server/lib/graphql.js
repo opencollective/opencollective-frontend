@@ -82,7 +82,7 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
       }
     }
     `;
-    processResult = (res) => res.Collective.members.map(m => m.member);
+    processResult = (res) => uniqBy(res.Collective.members.map(m => m.member), m => m.id);
   } else if (tierSlug) {
     query = `
     query Collective($collectiveSlug: String!, $tierSlug: String!) {
