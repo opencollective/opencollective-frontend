@@ -25,7 +25,7 @@ export default () => {
     if (req.body && req.body.query && req.body.query.indexOf('mutation') === -1) {
       // important to include the user login token for checksum, so different users don't clash
       const token = req.headers && req.headers.authorization;
-      const checksumString = `${req.body.query}${req.body.variables}${token}`;
+      const checksumString = `${JSON.stringify(req.body.query)}${JSON.stringify(req.body.variables)}${token}`;
       const checksum = hashCode(checksumString);
       req.checksum = checksum;
 
