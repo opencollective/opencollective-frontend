@@ -67,7 +67,7 @@ export default function(app) {
     next();
   });
 
-  app.use(lruCache())
+  app.use(lruCache());
 
   app.use(multer());
 
