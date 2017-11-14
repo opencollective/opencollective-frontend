@@ -1,5 +1,6 @@
 import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql'
+import curlify from 'request-as-curl';
 
 import schema from './graphql/schema';
 import * as connectedAccounts from './controllers/connectedAccounts';
@@ -59,6 +60,7 @@ export default (app) => {
       debug('params')("req.body", JSON.stringify(body, null, '  '));
       debug('params')("req.params", req.params);
       debug('headers')("req.headers", req.headers);
+      debug('curl')("curl", curlify(req, req.body))
       next();
     });
   }
