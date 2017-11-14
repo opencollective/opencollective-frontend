@@ -161,7 +161,15 @@ export const CollectiveStatsType = new GraphQLObjectType({
         description: "Number of collectives under this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Collective.count({ where: { ParentCollectiveId: collective.id, type: types.COLLECTIVE } });
+          return models.Collective.count({
+            where: {
+              $or: {
+                ParentCollectiveId: collective.id,
+                HostCollectiveId: collective.id
+              },
+              type: types.COLLECTIVE
+            }
+          });
         }
       },
       events: {
@@ -289,6 +297,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
+      canApply: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
@@ -515,7 +524,14 @@ const CollectiveFields = () => {
       description: 'Returns whether this collective can host other collectives (ie. has a Stripe Account connected)',
       type: GraphQLBoolean,
       resolve(collective) {
-        return (collective.HostCollectiveId === collective.id);
+        return collective.isHost();
+      }
+    },
+    canApply: {
+      description: 'Returns whether this host accepts applications for new collectives',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return Boolean(collective.data.apply);
       }
     },
     host: {
