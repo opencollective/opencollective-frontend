@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
-import { capitalize } from '../lib/utils';
+import { capitalize, formatCurrency } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Avatar from './Avatar';
@@ -162,6 +162,12 @@ class Expense extends React.Component {
             margin: 0.5rem 0;
           }
 
+          .actions .leftColumn {
+            width: 72px;
+            margin-right: 1rem;
+            float: left;
+          }
+
           @media(max-width: 600px) {
             .expense {
               max-height: 13rem;
@@ -199,7 +205,7 @@ class Expense extends React.Component {
           </div>
           <div className="meta">
             { includeHostedCollectives &&
-              <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> | </span>
+              <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
             }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
@@ -220,10 +226,15 @@ class Expense extends React.Component {
             />
 
           <div className="actions">
-            { this.state.mode === 'edit' && this.state.modified && 
-              <SmallButton className="primary" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+            { this.state.mode === 'edit' && this.state.modified &&
+              <div>
+                <div className="leftColumn"></div>
+                <div className="rightColumn">
+                  <SmallButton className="primary" onClick={this.save}><FormattedMessage id="expense.save" defaultMessage="save" /></SmallButton>
+                </div>
+              </div>
             }
-            { this.state.mode !== 'edit' && expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+            { this.state.mode !== 'edit' && expense.status === 'PENDING' && LoggedInUser && LoggedInUser.canApproveExpense(expense) &&
               <div>
                 <ApproveExpenseBtn id={expense.id} />
                 <RejectExpenseBtn id={expense.id} />
@@ -245,7 +256,10 @@ const editExpenseQuery = gql`
 mutation editExpense($expense: ExpenseInputType!) {
   editExpense(expense: $expense) {
     id
+    description
     amount
+    attachment
+    category
     privateMessage
     payoutMethod
     status

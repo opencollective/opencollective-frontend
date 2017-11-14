@@ -6,7 +6,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag'
 import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
 import Currency from '../components/Currency';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import ConnectPaypal from '../components/ConnectPaypal';
 import AddFundsForm from '../components/AddFundsForm';
 import SmallButton from '../components/SmallButton';
@@ -29,6 +29,9 @@ class CollectivePickerWithData extends React.Component {
     this.addFunds = this.addFunds.bind(this);
     this.toggleAddFunds = this.toggleAddFunds.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.messages = defineMessages({
+      'badge.tooltip': { id: 'expenses.badge.tooltip', defaultMessage: "{pending} {pending, plural, one {expense} other {expenses}} pending approval, {approved} ready to be paid"}
+    });
   }
 
   async addFunds(form) {
@@ -87,7 +90,9 @@ class CollectivePickerWithData extends React.Component {
   }
 
   renderCollectiveMenuItem(collective, className) {
-    return (<div className={`MenuItem-Collective ${className}`}>
+    const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
+    const tooltip = this.props.intl.formatMessage(this.messages['badge.tooltip'], collective.stats.expenses);
+    return (<div className={`MenuItem-Collective ${className}`} title={tooltip}>
       <style jsx>{`
         .MenuItem-Collective {
           display: flex;
@@ -121,7 +126,7 @@ class CollectivePickerWithData extends React.Component {
           <Currency value={collective.stats.balance} currency={collective.currency} />)
         </div>
       </div>
-      { collective.stats.expenses.pending > 0 && <Badge pullRight={true} >{collective.stats.expenses.pending}</Badge> }
+      { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
     </div>);
   }
 
@@ -139,8 +144,9 @@ class CollectivePickerWithData extends React.Component {
     }
 
     const collectives = [...this.hostCollective.collectives].sort((a, b) => {
-      if (b.stats.expenses.pending > a.stats.expenses.pending) return 1;
-      if (b.stats.expenses.pending < a.stats.expenses.pending) return -1;
+      const badgeCount = (c) => c.stats.expenses.pending + c.stats.expenses.approved;
+      if (badgeCount(b) > badgeCount(a)) return 1;
+      if (badgeCount(b) < badgeCount(a)) return -1;
       return (b.name.toUpperCase() < a.name.toUpperCase());
     });
     const selectedCollective = this.state.selectedCollective;

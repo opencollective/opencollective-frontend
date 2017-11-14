@@ -83,7 +83,7 @@ class InputTypeDropzone extends React.Component {
           .dropzone {
             border: 2px dashed transparent;
             position: relative;
-            min-height: 100px;
+            min-height: 80px;
           }
           .dropzone .placeholder {
             position:absolute;
