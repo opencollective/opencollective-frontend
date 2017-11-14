@@ -276,7 +276,7 @@ ${description}`
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>
             }
-            { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 &&
+            { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
               <div className="stats">
                 <div className="totalAmountSent value">
                   <Currency value={stats.totalAmountSent} currency={collective.currency} />

@@ -49,7 +49,7 @@ class UserCollective extends React.Component {
       'organization.collective.memberOf.member.title': { id: 'organization.collective.memberOf.member.title', defaultMessage: `We are a member of {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.backer.title': { id: 'organization.collective.memberOf.backer.title', defaultMessage: `We are backing {n, plural, one {this collective} other {these collectives}}`},
       'organization.collective.memberOf.follower.title': { id: 'organization.collective.memberOf.follower.title', defaultMessage: `We are following {n, plural, one {this collective} other {these collectives}}`},
-      'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
+      'user.collective.menu.host': { id: 'user.collective.menu.host', defaultMessage: `hosting {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.admin': { id: 'user.collective.menu.admin', defaultMessage: `contributing to {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.member': { id: 'user.collective.menu.member', defaultMessage: `member of {n} {n, plural, one {collective} other {collectives}}`},
       'user.collective.menu.backer': { id: 'user.collective.menu.backer', defaultMessage: `backing {n} {n, plural, one {collective} other {collectives}}`},
@@ -105,6 +105,26 @@ class UserCollective extends React.Component {
           }
           .message .editBtn {
             margin: 2rem;
+          }
+          .adminActions {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+          }
+          .adminActions ul {
+            overflow: hidden;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            list-style: none;
+          }
+          .adminActions ul li {
+            margin: 0 2rem;
           }
         `}</style>
 
@@ -192,7 +212,20 @@ class UserCollective extends React.Component {
               </div>
               { Object.keys(memberOf).map(role => (
                 <section id={role}>
-                    <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1> 
+                    <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
+                    { role === 'HOST' &&
+                      <div className="adminActions" id="adminActions">
+                        <ul>
+                          { this.collective.canApply &&
+                            <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective on {host}" values={{ host: this.collective.name }} /></a></Link></li>
+                          }
+                          { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
+                            <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
+                          }
+                        </ul>
+                      </div>
+                      }
+                    }
                     <Memberships
                       className={role}
                       memberships={memberOf[role]}

@@ -36,7 +36,11 @@ class CollectiveCard extends React.Component {
     const logo = collective.image || pickLogo(collective.id);
     let tierName = membership && membership.tier && membership.tier.name;
     if (!tierName) {
-      tierName = collective.type === 'ORGANIZATION' ? <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" /> : <FormattedMessage id="tier.name.backer" defaultMessage="backer" />;''
+      if (membership.role === 'HOST') {
+        tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
+      } else {
+        tierName = collective.type === 'ORGANIZATION' ? <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" /> : <FormattedMessage id="tier.name.backer" defaultMessage="backer" />;''
+      }
     }
 
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
