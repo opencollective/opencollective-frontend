@@ -10,11 +10,15 @@ export default {
   // Returns the balance in the currency of the paymentMethod (ie. currency of the Collective)
   getBalance: (paymentMethod) => {
     return paymentMethod.getCollective().then(collective => {
-      // If the collective is a User or an Organization.
-      console.log(">>> getBalance for the opencollective payment method of ", collective.type, collective.slug);
+
+      // If the collective is a host (USER or ORGANIZATION)
       if (collective.type === 'ORGANIZATION' || collective.type === 'USER') {
-        return 10000000;
+        return collective.isHost().then(isHost => {
+          if (!isHost) return 0;
+          else return 10000000; // GraphQL doesn't like Infinity
+        });
       }
+
       // Otherwise we compute the balance based on all previous transactions for this collective
       return models.Transaction.find({
         attributes: [

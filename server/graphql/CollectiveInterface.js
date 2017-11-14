@@ -357,7 +357,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
           status: { type: GraphQLString },
-          includeHostedCollectives: { type: GraphQLBoolean }          
+          includeHostedCollectives: { type: GraphQLBoolean }
         }
       },
       role: { type: GraphQLString },
@@ -685,7 +685,7 @@ const CollectiveFields = () => {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
         includeHostedCollectives: { type: GraphQLBoolean },
-        status: { type: GraphQLString }          
+        status: { type: GraphQLString }
       },
       resolve(collective, args, req) {
         const query = { where: {} };

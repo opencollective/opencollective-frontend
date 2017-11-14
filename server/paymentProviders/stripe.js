@@ -104,8 +104,7 @@ export default {
         .then(c => {
           collective = c;
           if (collective.type === 'COLLECTIVE') {
-            collective.HostCollectiveId = collective.id; // This collective becomes a HOST
-            collective.ParentCollectiveId = collective.id; // This collective becomes a HOST
+            collective.becomeHost();
             collective.save();
             models.Member.create({
               CreatedByUserId,

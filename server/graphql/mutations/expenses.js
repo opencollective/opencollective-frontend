@@ -7,6 +7,9 @@ import { formatCurrency } from '../../lib/utils';
 import paypalAdaptive from '../../gateways/paypalAdaptive';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../lib/transactions';
 
+/**
+ * Only admin of expense.collective or of expense.collective.host can approve/reject expenses
+ */
 function canUpdateExpenseStatus(remoteUser, expense) {
   if (remoteUser.hasRole([roles.HOST, roles.ADMIN], expense.CollectiveId)) {
     return true;
@@ -17,6 +20,9 @@ function canUpdateExpenseStatus(remoteUser, expense) {
   return false;
 }
 
+/**
+ * Only the author or an admin of the collective or collective.host can edit an expense
+ */
 function canEditExpense(remoteUser, expense) {
   if (remoteUser.id === expense.UserId) {
     return true;
@@ -100,6 +106,14 @@ export async function editExpense(remoteUser, expenseData) {
 
   if (expenseData.currency && expenseData.currency !== expense.collective.currency) {
     throw new errors.ValidationFailed(`The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expense.collective.currency})`);
+  }
+
+  // When updating amount, attachment or payoutMethod, we reset its status to PENDING
+  if (expenseData.amount !== expense.amount
+    || expenseData.payoutMethod !== expense.payoutMethod
+    || expenseData.attachment !== expense.attachment) {
+
+    expenseData.status = statuses.PENDING;
   }
 
   const res = await expense.update(expenseData);

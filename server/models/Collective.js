@@ -311,6 +311,10 @@ export default function(Sequelize, DataTypes) {
 
       },
       afterCreate: (instance) => {
+        // We only create an "opencollective" paymentMethod for collectives
+        if (instance.type !== 'COLLECTIVE') {
+          return null;
+        }
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
@@ -326,6 +330,23 @@ export default function(Sequelize, DataTypes) {
   /**
    * Instance Methods
    */
+
+  // run when attaching a Stripe Account to this user/organization collective
+  Collective.prototype.becomeHost = function() {
+    this.data = this.data || {};
+    return models.PaymentMethod.findOne({ where: { service: 'opencollective', CollectiveId: this.id }})
+      .then(pm => {
+        if (pm) return null;
+        return models.PaymentMethod.create({
+          CollectiveId: this.id,
+          service: 'opencollective',
+          name: `${capitalize(this.name)} Collective`,
+          primary: true,
+          currency: this.currency
+        });
+      })
+  };
+
   Collective.prototype.getUser = function() {
     if ([ types.USER, types.ORGANIZATION ].includes(this.type)) {
       return models.User.findOne({ where: { CollectiveId: this.id } });
@@ -944,7 +965,11 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
-    return models.Collective.findOne({ where: { HostCollectiveId: this.id }}).then(r => Boolean(r));
+    return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: this.id }}).then(r => Boolean(r));
+  }
+
+  Collective.prototype.isHostOf = function(CollectiveId) {
+    return models.Collective.findOne({ where: { id: CollectiveId, HostCollectiveId: this.id }}).then(r => Boolean(r));
   }
 
   Collective.prototype.getRelatedCollectives = function(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
