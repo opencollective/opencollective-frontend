@@ -118,7 +118,7 @@ describe('Query Tests', () => {
                 slug: 'scouts',
                 twitterHandle: 'scouts'
               }
-            }            
+            }
           }
         });
       });

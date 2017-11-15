@@ -311,6 +311,13 @@ export const ExpenseType = new GraphQLObjectType({
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.privateMessage;
           }
+          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+            if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
+              return expense.privateMessage;
+            } else {
+              return null;
+            }
+          })
         }
       },
       attachment: {
@@ -320,6 +327,13 @@ export const ExpenseType = new GraphQLObjectType({
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.attachment;
           }
+          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+            if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
+              return expense.attachment;
+            } else {
+              return null;
+            }
+          })
         }
       },
       user: {
@@ -677,6 +691,12 @@ export const OrderType = new GraphQLObjectType({
           return req.loaders.transactions.findByOrderId(query).load(order.id);
         }
       },
+      currency: {
+        type: GraphQLString,
+        resolve(order) {
+          return order.currency;
+        }
+      },
       createdAt: {
         type: GraphQLString,
         resolve(order) {
@@ -750,6 +770,12 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.uuid;
         }
       },
+      createdAt: {
+        type: GraphQLString,
+        resolve(paymentMethod) {
+          return paymentMethod.createdAt;
+        }
+      },
       service: {
         type: GraphQLString,
         resolve(paymentMethod) {
@@ -782,6 +808,7 @@ export const PaymentMethodType = new GraphQLObjectType({
       },
       balance: {
         type: GraphQLInt,
+        description: "Returns the balance in the currency of this paymentMethod",
         resolve(paymentMethod, args, req) {
           return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
         }

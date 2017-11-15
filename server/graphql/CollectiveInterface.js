@@ -153,15 +153,23 @@ export const CollectiveStatsType = new GraphQLObjectType({
       backers: {
         description: "Breakdown of all backers of this collective",
         type: BackersStatsType,
-        resolve(collective) {
-          return collective.getBackersCount({ group: ['fromCollective.type'] });
+        resolve(collective, args, req) {
+          return req.loaders.collective.stats.backers.load(collective.id);
         }
       },
       collectives: {
         description: "Number of collectives under this collective",
         type: GraphQLInt,
         resolve(collective) {
-          return models.Collective.count({ where: { ParentCollectiveId: collective.id, type: types.COLLECTIVE } });
+          return models.Collective.count({
+            where: {
+              $or: {
+                ParentCollectiveId: collective.id,
+                HostCollectiveId: collective.id
+              },
+              type: types.COLLECTIVE
+            }
+          });
         }
       },
       events: {
@@ -282,12 +290,14 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       endsAt: { type: GraphQLString },
       timezone: { type: GraphQLString },
       maxAmount: { type: GraphQLInt },
+      hostFeePercent: { type: GraphQLInt },
       currency: { type: GraphQLString },
       image: { type: GraphQLString },
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
       slug: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
+      canApply: { type: GraphQLBoolean },
       host: { type: CollectiveInterfaceType },
       members: {
         type: new GraphQLList(MemberType),
@@ -356,7 +366,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
           status: { type: GraphQLString },
-          includeHostedCollectives: { type: GraphQLBoolean }          
+          includeHostedCollectives: { type: GraphQLBoolean }
         }
       },
       role: { type: GraphQLString },
@@ -369,7 +379,12 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           offset: { type: GraphQLInt }
         }
       },
-      paymentMethods: { type: new GraphQLList(PaymentMethodType) },
+      paymentMethods: {
+        type: new GraphQLList(PaymentMethodType),
+        args: {
+          service: { type: GraphQLString }
+        }
+      },
       connectedAccounts: { type: new GraphQLList(ConnectedAccountType) }
     }
   }
@@ -469,6 +484,12 @@ const CollectiveFields = () => {
         return collective.maxAmount;
       }
     },
+    hostFeePercent: {
+      type: GraphQLInt,
+      resolve(collective) {
+        return collective.hostFeePercent;
+      }
+    },
     currency: {
       type: GraphQLString,
       resolve(collective) {
@@ -503,7 +524,14 @@ const CollectiveFields = () => {
       description: 'Returns whether this collective can host other collectives (ie. has a Stripe Account connected)',
       type: GraphQLBoolean,
       resolve(collective) {
-        return (collective.HostCollectiveId === collective.id);
+        return collective.isHost();
+      }
+    },
+    canApply: {
+      description: 'Returns whether this host accepts applications for new collectives',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return Boolean(collective.settings && collective.settings.apply);
       }
     },
     host: {
@@ -673,7 +701,7 @@ const CollectiveFields = () => {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
         includeHostedCollectives: { type: GraphQLBoolean },
-        status: { type: GraphQLString }          
+        status: { type: GraphQLString }
       },
       resolve(collective, args, req) {
         const query = { where: {} };
@@ -689,9 +717,6 @@ const CollectiveFields = () => {
             const getCollectiveIds = () => {
               // if is host, we get all the expenses across all the hosted collectives
               if (args.includeHostedCollectives) {
-                if (collective.HostCollectiveId !== collective.id) {
-                  throw new Error("This collective is not a host");
-                }
                 return models.Member.findAll({
                   where: {
                     MemberCollectiveId: collective.id,
@@ -742,9 +767,18 @@ const CollectiveFields = () => {
     },
     paymentMethods: {
       type: new GraphQLList(PaymentMethodType),
+      args: {
+        service: { type: GraphQLString }
+      },
       resolve(collective, args, req) {
         if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) return [];
-        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id);
+        return req.loaders.paymentMethods.findByCollectiveId.load(collective.id)
+          .then(paymentMethods => {
+            if (args.service) {
+              return paymentMethods.filter(pm => pm.service === args.service);
+            }
+            return paymentMethods;
+          });
       }
     },
     connectedAccounts: {

@@ -30,7 +30,7 @@ describe('stripe.routes.test.js', () => {
   describe('authorize', () => {
     it('should return an error if the user is not logged in', (done) => {
       request(app)
-        .get('/connected-accounts/stripe?api_key=${application.api_key}')
+        .get('/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}')
         .expect(401)
         .end(done);
     });
@@ -38,20 +38,22 @@ describe('stripe.routes.test.js', () => {
     it('should fail if the collective already has a stripeAccount', (done) => {
       models.ConnectedAccount.create({ service: 'stripe', CollectiveId: collective.id })
         .then(() => request(app)
-          .get(`/connected-accounts/stripe?api_key=${application.api_key}&CollectiveId=${collective.id}`)
+          .get(`/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}&CollectiveId=${collective.id}`)
           .set('Authorization', `Bearer ${host.jwt()}`)
           .then(response => {
-            expect(response.status).to.equal(400);
-            expect(response.body.error.type).to.equal('validation_failed');
+            const error = response.body.error;
+            expect(error.code).to.equal(400);
+            expect(error.type).to.equal('validation_failed');
+            expect(error.message).to.equal("Collective already has a stripe account connected");
             done();
           }));
     });
 
     it('should redirect to stripe', (done) => {
       request(app)
-        .get(`/connected-accounts/stripe?api_key=${application.api_key}&CollectiveId=${collective.id}`)
+        .get(`/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}&CollectiveId=${collective.id}`)
         .set('Authorization', `Bearer ${host.jwt()}`)
-        .expect(200) // redirect
+        .expect(200)
         .end((e, res) => {
           expect(e).to.not.exist;
           expect(res.body.redirectUrl).to.contain('https://connect.stripe.com/oauth/authorize')

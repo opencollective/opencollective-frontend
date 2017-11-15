@@ -311,6 +311,10 @@ export default function(Sequelize, DataTypes) {
 
       },
       afterCreate: (instance) => {
+        // We only create an "opencollective" paymentMethod for collectives
+        if (instance.type !== 'COLLECTIVE') {
+          return null;
+        }
         models.PaymentMethod.create({
           CollectiveId: instance.id,
           service: 'opencollective',
@@ -326,6 +330,23 @@ export default function(Sequelize, DataTypes) {
   /**
    * Instance Methods
    */
+
+  // run when attaching a Stripe Account to this user/organization collective
+  Collective.prototype.becomeHost = function() {
+    this.data = this.data || {};
+    return models.PaymentMethod.findOne({ where: { service: 'opencollective', CollectiveId: this.id }})
+      .then(pm => {
+        if (pm) return null;
+        return models.PaymentMethod.create({
+          CollectiveId: this.id,
+          service: 'opencollective',
+          name: `${capitalize(this.name)} Collective`,
+          primary: true,
+          currency: this.currency
+        });
+      })
+  };
+
   Collective.prototype.getUser = function() {
     if ([ types.USER, types.ORGANIZATION ].includes(this.type)) {
       return models.User.findOne({ where: { CollectiveId: this.id } });
@@ -687,6 +708,25 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  // Returns the last payment method that has been confirmed attached to this collective
+  Collective.prototype.getPaymentMethod = async function(where) {
+    return models.PaymentMethod.findOne({
+      where: {
+        ...where,
+        CollectiveId: this.id,
+        confirmedAt: { $ne: null }
+      },
+      order: [['confirmedAt', 'DESC']]
+    })
+    .tap(paymentMethod => {
+      if (!paymentMethod) {
+        throw new Error(`No payment method found`);
+      } else if (paymentMethod.endDate && (paymentMethod.endDate < new Date())) {
+        throw new Error('Payment method expired');
+      }
+    });    
+  }
+
   Collective.prototype.getBalance = function(until) {
     until = until || new Date();
     return models.Transaction.find({
@@ -924,6 +964,14 @@ export default function(Sequelize, DataTypes) {
       });
   };
 
+  Collective.prototype.isHost = function() {
+    return models.ConnectedAccount.findOne({ where: { service: 'stripe', CollectiveId: this.id }}).then(r => Boolean(r));
+  }
+
+  Collective.prototype.isHostOf = function(CollectiveId) {
+    return models.Collective.findOne({ where: { id: CollectiveId, HostCollectiveId: this.id }}).then(r => Boolean(r));
+  }
+
   Collective.prototype.getRelatedCollectives = function(limit=3, minTotalDonationInCents=10000, orderBy, orderDir) {
     return Collective.getCollectivesSummaryByTag(this.tags, limit, [this.id], minTotalDonationInCents, true, orderBy, orderDir);
   };
@@ -999,10 +1047,10 @@ export default function(Sequelize, DataTypes) {
   Collective.createOrganization = (collectiveData, adminUser) => {
     return Collective
       .create({
+        CreatedByUserId: adminUser.id,
         ...collectiveData,
         type: types.ORGANIZATION,
-        isActive: true,
-        CreatedByUserId: adminUser.id
+        isActive: true
       })
       .tap(collective => {
         return models.Member.create({

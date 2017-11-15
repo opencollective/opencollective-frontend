@@ -24,7 +24,12 @@ export const create = (req, res, next) => {
   });
   // TODO make sure that the payoutMethod is also properly stored in DB, then propagated to Transaction when paying
   models.Expense.create(attributes)
-    .then(expense => models.Expense.findById(expense.id, { include: [ models.Collective, models.User ]}))
+    .then(expense => models.Expense.findById(expense.id, {
+      include: [
+        { model: models.Collective, as: 'collective' },
+        models.User
+      ]
+    }))
     .tap(expense => createActivity(expense, activities.COLLECTIVE_EXPENSE_CREATED))
     .tap(expense => res.send(expense))
     .catch(next);
@@ -237,9 +242,9 @@ function createActivity(expense, type) {
     .then(userCollective => models.Activity.create({
     type,
     UserId: expense.User.id,
-    CollectiveId: expense.Collective.id,
+    CollectiveId: expense.collective.id,
     data: {
-      collective: expense.Collective.minimal,
+      collective: expense.collective.minimal,
       user: expense.User.minimal,
       fromCollective: userCollective.minimal,
       expense: expense.info

@@ -74,6 +74,45 @@ export const loaders = (req) => {
           .then(results => sortResults(ids, results, 'TierId'))
           .map(result => get(result, 'dataValues.count') || 0)
         ),
+        backers: new DataLoader(ids => {
+          const query = {
+            attributes: [
+              'CollectiveId',
+              [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FromCollectiveId'))), 'count']
+            ],
+            where: {
+              CollectiveId: { $in: ids },
+              type: 'CREDIT'
+            }
+          };
+          query.attributes.push('fromCollective.type');
+          query.include = [
+            {
+              model: models.Collective,
+              as: 'fromCollective',
+              attributes: [],
+              required: true
+            }
+          ];
+          query.raw = true; // need this otherwise it automatically also fetches Transaction.id which messes up everything
+          query.group = ['fromCollective.type', 'CollectiveId'];
+
+          return models.Transaction.findAll(query)
+          .then(results => sortResults(ids, results, 'CollectiveId', []))
+          .map(result => {
+            const stats = {};
+            let all = 0;
+            result.forEach(r => {
+              stats.id = r.CollectiveId;
+              stats[r.type] = r.count;
+              all += r.count;
+            })
+            stats.all = all;
+            return stats;
+          })
+        }
+
+        ),
         expenses: new DataLoader(ids => models.Expense.findAll({
           attributes: [
             'CollectiveId',

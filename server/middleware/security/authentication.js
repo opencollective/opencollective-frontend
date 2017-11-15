@@ -8,7 +8,7 @@ import { createOrUpdate as createOrUpdateConnectedAccount } from '../../controll
 import models from '../../models';
 import errors from '../../lib/errors';
 import debug from 'debug';
-import * as stripe from '../../controllers/stripe';
+import paymentProviders from '../../paymentProviders';
 
 const {
   User
@@ -175,34 +175,56 @@ export const _authenticateInternalUserById = (req, res, next) => {
 }
 
 export const authenticateService = (req, res, next) => {
-  const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
   const { service } = req.params;
+  const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
-  if ( service === 'stripe') {
-    return stripe.authorize(req, res, next);
+  if (service === 'github') {
+    // 'repo' gives us access to organizational repositories as well
+    // vs. 'public_repo' which requires the org to give separate access to app
+    opts.scope = [ 'user:email', 'repo' ]; 
+    console.log("authenticateService calling Passport with options", opts);
+    return passport.authenticate(service, opts)(req, res, next);
   }
-
-  switch (service) {
-    case 'github':
-      // 'repo' gives us access to organizational repositories as well
-      // vs. 'public_repo' which requires the org to give separate access to app
-      opts.scope = [ 'user:email', 'repo' ]; 
-      break;
-    case 'meetup':
+  
+  if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
+    return next(new errors.Unauthorized('You must be logged in as an admin of this collective to be able to connect it to an external account'));
+  }
+  
+  if (!req.query.CollectiveId) {
+    return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
+  }
+  
+  return models.ConnectedAccount.findOne({ where: { service, CollectiveId: req.query.CollectiveId }})
+  .then(ExistingStripeAccount => {
+    if (ExistingStripeAccount) {
+      throw new errors.ValidationFailed(null, ['CollectiveId'], `Collective already has a ${service} account connected`);
+    }
+    return true;
+  })
+  .then(() => {
+    
+    if (paymentProviders[service]) {
+      return paymentProviders[service].oauth.redirectUrl(req.remoteUser, req.query.CollectiveId, req.query)
+      .then(redirectUrl => res.send({ redirectUrl }))
+      .catch(next);
+    }
+    
+    if (service === 'meetup') {
       opts.scope = 'ageless';
-      break;
-  }
+    }
 
-  console.log("authenticateService calling Passport with options", opts);
-  passport.authenticate(service, opts)(req, res, next);
+    console.log("authenticateService calling Passport with options", opts);
+    return passport.authenticate(service, opts)(req, res, next);
+  })
+  .catch(next);
 };
 
 export const authenticateServiceCallback = (req, res, next) => {
   const { service } = req.params;
 
-  if (service === 'stripe') {
-    return stripe.callback(req, res, next);
+  if (get(paymentProviders, `${service}.oauth.callback`)) {
+    return paymentProviders[service].oauth.callback(req, res, next);
   }
 
   const opts = { callbackURL: getOAuthCallbackUrl(req) };

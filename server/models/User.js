@@ -405,7 +405,7 @@ export default (Sequelize, DataTypes) => {
 
   User.prototype.hasRole = function(roles, CollectiveId) {
     if (!CollectiveId) return false;
-    if (this.CollectiveId === CollectiveId) return true;
+    if (this.CollectiveId === Number(CollectiveId)) return true;
     if (!this.rolesByCollectiveId) {
       console.error(">>> User model error: User.rolesByCollectiveId hasn't been populated.", new Error().stack);
       return false;
@@ -413,14 +413,14 @@ export default (Sequelize, DataTypes) => {
     if (typeof roles === 'string') {
       roles = [roles];
     }
-    const result = intersection(this.rolesByCollectiveId[CollectiveId], roles).length > 0;
+    const result = intersection(this.rolesByCollectiveId[Number(CollectiveId)], roles).length > 0;
     debug("hasRole", "userid:", this.id, "has role", roles," in CollectiveId", CollectiveId, "?", result);    
     return result;
   }
 
   // Adding some sugars
   User.prototype.isAdmin = function(CollectiveId) {
-    const result = (this.CollectiveId === CollectiveId) || this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
+    const result = (this.CollectiveId === Number(CollectiveId)) || this.hasRole([roles.HOST, roles.ADMIN], CollectiveId);
     debug("isAdmin of CollectiveId", CollectiveId,"?", result);
     return result;
   }
@@ -517,8 +517,9 @@ export default (Sequelize, DataTypes) => {
           longDescription: userData.longDescription,
           website: userData.website,
           twitterHandle: userData.twitterHandle,
+          currency: userData.currency,
           isActive: true,
-          CreatedByUserId: user.id,
+          CreatedByUserId: userData.CreatedByUserId || user.id,
           data: { UserId: user.id }
         };
         return models.Collective.create(userCollective);

@@ -167,7 +167,7 @@ export default function(Sequelize, DataTypes) {
     if (paymentProvider && paymentProvider.getBalance) {
       getBalance = paymentProvider.getBalance;
     } else {
-      getBalance = () => Promise.resolve(Infinity);
+      getBalance = () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
     }
 
     return user.populateRoles()
@@ -175,7 +175,7 @@ export default function(Sequelize, DataTypes) {
       .then(balance => {
 
         if (!this.monthlyLimitPerMember || user.isAdmin(this.CollectiveId)) {
-          return balance;
+          return { amount: balance, currency: this.currency };
         }
 
         const d = new Date;

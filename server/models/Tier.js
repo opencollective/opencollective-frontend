@@ -208,7 +208,7 @@ export default function(Sequelize, DataTypes) {
         } else if (this.maxQuantity) {
           return this.maxQuantity;
         } else {
-          return Infinity;
+          return 10000000; // GraphQL doesn't like infinity
         }
       })
   };

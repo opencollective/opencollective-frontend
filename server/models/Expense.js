@@ -1,12 +1,11 @@
 import Temporal from 'sequelize-temporal';
-import {type} from '../constants/transactions';
+import { type } from '../constants/transactions';
 
 import status from '../constants/expense_status';
 const expenseType = type.DEBIT;
 import CustomDataTypes from '../models/DataTypes';
 
 export default function (Sequelize, DataTypes) {
-
 
   const Expense = Sequelize.define('Expense', {
     id: {
@@ -177,6 +176,10 @@ export default function (Sequelize, DataTypes) {
     this.lastEditedById = lastEditedById;
     return this.save();
   };
+
+  Expense.prototype.getPaypalEmail = function() {
+    return this.getUser().then(user => user.paypalEmail || user.email);
+  }
 
   Temporal(Expense, Sequelize);
   return Expense;

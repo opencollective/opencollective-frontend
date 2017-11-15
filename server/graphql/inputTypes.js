@@ -188,3 +188,25 @@ export const OrderInputType = new GraphQLInputObjectType({
     tier: { type: TierInputType }
   })
 });
+
+export const ExpenseInputType = new GraphQLInputObjectType({
+  name: 'ExpenseInputType',
+  description: 'Input type for ExpenseType',
+  fields: () => {
+    return {
+      id: { type: GraphQLInt },
+      amount: { type: GraphQLInt },
+      currency: { type: GraphQLString },
+      createdAt: { type: GraphQLString },
+      incurredAt: { type: GraphQLString },
+      description: { type: GraphQLString },
+      category: { type: GraphQLString },
+      status: { type: GraphQLString },
+      payoutMethod: { type: GraphQLString },
+      privateMessage: { type: GraphQLString },
+      attachment: { type: GraphQLString },
+      user: { type: UserInputType },
+      collective: { type: CollectiveAttributesInputType }
+    }
+  }
+});
