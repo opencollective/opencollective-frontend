@@ -4,7 +4,7 @@ import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag'
-import { Button } from 'react-bootstrap';
+import SmallButton from './SmallButton';
 
 class PayExpenseBtn extends React.Component {
 
@@ -14,18 +14,20 @@ class PayExpenseBtn extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { loading: false };
     this.onClick = this.onClick.bind(this);
   }
 
   async onClick() {
     const { expense } = this.props;
+    this.setState({ loading: true });
     try {
       await this.props.payExpense(expense.id);
+      this.setState({ loading: false });
     } catch (e) {
       console.log(">>> payExpense error: ", e);
       const error = e.message && e.message.replace(/GraphQL error:/, "");
-      this.setState({ error });
+      this.setState({ error, loading: false });
     }
   }
 
@@ -44,10 +46,10 @@ class PayExpenseBtn extends React.Component {
             padding-left: 1rem;
           }
         `}</style>
-        <Button bsStyle="primary" onClick={this.onClick}>
+        <SmallButton className="pay" onClick={this.onClick} disabled={this.state.loading}>
           { expense.payoutMethod === 'other' && <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />}
           { expense.payoutMethod !== 'other' && <FormattedMessage id="expense.pay.btn" defaultMessage="pay with {paymentMethod}" values={{ paymentMethod: expense.payoutMethod }} />}
-        </Button>
+        </SmallButton>
         <div className="error">{this.state.error}</div>
       </div>
     );

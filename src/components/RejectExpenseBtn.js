@@ -4,7 +4,7 @@ import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag'
-import { Button } from 'react-bootstrap';
+import SmallButton from './SmallButton';
 
 class RejectExpenseBtn extends React.Component {
 
@@ -25,7 +25,7 @@ class RejectExpenseBtn extends React.Component {
   render() {
     return (
       <div className="RejectExpenseBtn">
-        <Button bsStyle="danger" onClick={this.onClick}><FormattedMessage id="expense.reject.btn" defaultMessage="reject" /></Button>
+        <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}><FormattedMessage id="expense.reject.btn" defaultMessage="reject" /></SmallButton>
       </div>
     );
   }

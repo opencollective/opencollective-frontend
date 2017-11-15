@@ -66,7 +66,7 @@ class ActionBar extends React.Component {
             border-bottom: 1px solid #E6E6E6;
             border-right: none;
           }
-        }          
+        }
         `}
         </style>
         <div className="content">

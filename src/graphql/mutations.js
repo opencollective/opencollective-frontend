@@ -64,6 +64,26 @@ const editCollectiveQuery = gql`
       id
       type
       slug
+      name
+      image
+      backgroundImage
+      description
+      longDescription
+      website
+      twitterHandle
+      members {
+        id
+        role
+        description
+      }
+      tiers {
+        id
+        amount
+        description
+        interval
+        maxQuantity
+        type
+      }
     }
   }
 `;

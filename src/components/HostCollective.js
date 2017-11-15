@@ -7,7 +7,7 @@ import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import Tier from '../components/Tier';
 import NotificationBar from '../components/NotificationBar';
-import Memberships from '../components/Memberships';
+import CollectivesWithData from '../components/CollectivesWithData';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, groupBy } from 'lodash';
@@ -17,7 +17,7 @@ import MessageModal from './MessageModal';
 import { Button } from 'react-bootstrap';
 import { Router, Link } from '../server/pages';
 
-class UserCollective extends React.Component {
+class HostCollective extends React.Component {
 
   static propTypes = {
     event: PropTypes.object.isRequired,
@@ -72,16 +72,13 @@ class UserCollective extends React.Component {
     if (this.collective.canApply) {
       cta = <a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a>
     }
-    const memberOf = groupBy(this.collective.memberOf, 'role');
     const actions = [];
-    Object.keys(memberOf).map(role => {
-      actions.push(
-        {
-          className: 'whiteblue',
-          component: <HashLink to={`#${role}`}>{intl.formatMessage(this.messages[`user.collective.menu.${role.toLowerCase()}`], { n: memberOf[role].length })}</HashLink>
-        }
-      );
-    });
+    actions.push(
+      {
+        className: 'whiteblue',
+        component: <HashLink to={`#hosting`}>{intl.formatMessage(this.messages[`user.collective.menu.host`], { n: this.collective.stats.collectives })}</HashLink>
+      }
+    );
 
     if (LoggedInUser && LoggedInUser.canEditCollective(this.collective)) {
       actions.push({
@@ -90,12 +87,8 @@ class UserCollective extends React.Component {
       });
     }
 
-    if (query && query.CollectiveId) {
-      collectiveCreated = (this.collective.memberOf.find(m => m.collective.id === parseInt(query.CollectiveId)) || {}).collective || {};
-    }
-
     return (
-      <div className="UserCollectivePage">
+      <div className="HostCollectivePage">
 
         <style>{`
           h1 {
@@ -164,17 +157,6 @@ class UserCollective extends React.Component {
 
               <div className="content" >
                 <div className="message">
-                  { query && query.status === 'orderCreated' &&
-                    <div>
-                      <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
-                      <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
-                    </div>
-                  }
-                  { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
-                    <div>
-                      <FormattedMessage id="collective.user.emptyProfile" defaultMessage={"Your profile looks a bit empty ¯\_(ツ)_/¯"} />
-                    </div>
-                  }
                   { !LoggedInUser && (!this.collective.image || !this.collective.longDescription) &&
                     <div>
                       <FormattedMessage id="collective.user.loggedout.editProfile" defaultMessage="Please login to edit your profile" />
@@ -191,48 +173,32 @@ class UserCollective extends React.Component {
                     </div>
                   }
                 </div>
-                <div id="tiers">
-                  <style jsx>{`
-                    #tiers {
-                      overflow: hidden
-                      width: 100%;
-                      display: flex;
-                    }
-                    #tiers :global(.tier) {
-                      margin: 4rem auto;
-                      max-width: 300px;
-                      float: left;
-                    }
-                  `}</style>
-                  {this.collective.tiers.map((tier) =>
-                    <Tier
-                      key={tier.id}
-                      className="tier"
-                      tier={tier}
-                      onChange={(tier) => this.updateOrder(tier)}
-                      onClick={(tier) => this.handleOrderTier(tier)}
-                      />
-                  )}
-                </div>
               </div>
-              { Object.keys(memberOf).map(role => (
-                <section id={role}>
-                    <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                    { role === 'HOST' && LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                      <div className="adminActions" id="adminActions">
-                        <ul>
-                          <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
-                        </ul>
-                      </div>
-                      }
-                    }
-                    <Memberships
-                      className={role}
-                      memberships={memberOf[role]}
-                      />
-                </section>
-              ))}
 
+              { this.collective.stats.collectives > 0 &&
+                <section id="hosting">
+                  <h1>
+                    {intl.formatMessage(this.messages[`${type}.collective.memberOf.host.title`], { n: this.collective.stats.collectives })}
+                  </h1>
+                  { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
+                    <div className="adminActions" id="adminActions">
+                      <ul>
+                        <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
+                      </ul>
+                    </div>
+                    }
+                  }
+
+                  <div className="cardsList">
+                    <CollectivesWithData
+                      HostCollectiveId={this.collective.id}
+                      orderBy="balance"
+                      orderDirection="DESC"
+                      limit={20}
+                      />
+                  </div>
+                </section>
+                }
             </div>
           </div>
         </Body>
@@ -242,4 +208,4 @@ class UserCollective extends React.Component {
   }
 }
 
-export default withIntl(UserCollective);
+export default withIntl(HostCollective);

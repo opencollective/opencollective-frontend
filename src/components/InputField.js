@@ -41,12 +41,17 @@ function FieldGroup({ controlId, label, help, pre, button, className, ...props }
     return (
       <FormGroup controlId={controlId} validationState={validationState}>
         {label && <ControlLabel>{label}</ControlLabel>}
-        <InputGroup>
-        { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
-        <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
-        { validationState && <FormControl.Feedback /> }
-        { button && <InputGroup.Button>{button}</InputGroup.Button>}
-        </InputGroup>
+        { (pre || button) &&
+          <InputGroup>
+          { pre && <InputGroup.Addon>{pre}</InputGroup.Addon>}
+          <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+          { validationState && <FormControl.Feedback /> }
+          { button && <InputGroup.Button>{button}</InputGroup.Button>}
+          </InputGroup>
+        }
+        { !pre && !button &&
+          <FormControl {...inputProps} ref={inputRef => inputRef && props.focus && inputRef.focus()} />
+        }
         {help && <HelpBlock>{help}</HelpBlock>}
       </FormGroup>
     );
@@ -246,7 +251,8 @@ class InputField extends React.Component {
           help={field.description}
           placeholder={field.placeholder}
           className={field.className}
-          value={(this.state.value || field.defaultValue || 0)/100}
+          onFocus={(event) => event.target.select()}
+          value={this.state.value ? this.state.value / 100 : ''}
           defaultValue={(field.value || field.defaultValue || 0)/100}
         />
         )

@@ -289,7 +289,7 @@ class TopBarProfileMenu extends React.Component {
         <div className='LoginTopBarProfileButton-name desktopOnly'>{LoggedInUser.username}</div>
         <div className='LoginTopBarProfileButton-caret'></div>
         {showProfileMenu && this.renderProfileMenu()}
-      </div>      
+      </div>
     )
   }
 

@@ -254,6 +254,8 @@ const getCollectiveQuery = gql`
           }
         }
       }
+      isHost
+      canApply
       host {
         id
         slug
@@ -263,6 +265,7 @@ const getCollectiveQuery = gql`
       members {
         id
         role
+        createdAt
         description
         member {
           id
@@ -274,7 +277,7 @@ const getCollectiveQuery = gql`
         }
       }
       ... on User {
-        memberOf {
+        memberOf(limit: 50) {
           id
           role
           createdAt
@@ -440,19 +443,29 @@ export const addGetLoggedInUserFunction = (component) => {
                 }
 
                 /**
-                 * CanEditExpense if LoggedInUser is:
-                 * - author of the expense and expense.status === 'PENDING'
+                 * CanApproveExpense if LoggedInUser is:
                  * - admin or host of expense.collective
                  * - admin or host of expense.collective.host
                  */
-                LoggedInUser.canEditExpense = (expense) => {
-                  if (expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id && expense.status === 'PENDING') return true;
+                LoggedInUser.canApproveExpense = (expense) => {
+                  if (!expense) return false;
                   if (expense.collective) {
                     if (intersection(roles[expense.collective.slug], ['HOST', 'ADMIN']).length > 0) return true;
                     const hostSlug = get(expense, 'collective.host.slug');
                     if (intersection(roles[hostSlug], ['HOST', 'ADMIN']).length > 0) return true;
                   } 
                   return false;
+                }
+
+                /**
+                 * CanEditExpense if LoggedInUser is:
+                 * - author of the expense and expense.status === 'PENDING'
+                 * - can approve expense (admin or host of expense.collective or expense.collective.host)
+                 */
+                LoggedInUser.canEditExpense = (expense) => {
+                  if (!expense) return false;
+                  if (expense.fromCollective && expense.fromCollective.id === LoggedInUser.collective.id && expense.status === 'PENDING') return true;
+                  return LoggedInUser.canApproveExpense(expense);
                 }
 
                 /**

@@ -1,5 +1,13 @@
 import fetch from 'isomorphic-fetch';
 import { isValidEmail } from './utils';
+// Webpack error: Cannot find module 'webpack/lib/RequestShortener'
+// import queryString from 'query-string';
+
+const queryString = (params) => {
+  return Object.keys(params)
+  .map(k => `${k}=${encodeURIComponent(params[k])}`)
+  .join('&');  
+}
 
 /**
  * The Promise returned from fetch() won't reject on HTTP error status. We
@@ -29,8 +37,14 @@ function addAuthTokenToHeader(obj = {}) {
   };
 }
 
-export function fetchConnectedAccount(CollectiveId, service) {
-  return fetch(`/api/connected-accounts/${service}?CollectiveId=${CollectiveId}`, {
+export function connectAccount(CollectiveId, service) {
+
+  const params = {
+    redirect: window.location.href.replace(/\?.*/,''),
+    CollectiveId
+  };
+
+  return fetch(`/api/connected-accounts/${service}/oauthUrl?${queryString(params)}`, {
       method: 'get',
       headers: addAuthTokenToHeader()
     })
@@ -44,13 +58,30 @@ export function checkUserExistence(email) {
     .then(json => Boolean(json.exists));
 }
 
+/**
+ * Old api
+ * Expecting order = { name, email, totalAmount, description, privateMessage }
+ */
+export function addFunds(CollectiveId, order) {
+  return fetch(`/api/groups/${CollectiveId}/donations/manual`, {
+    method: 'POST',
+    headers: {
+      ...addAuthTokenToHeader(),
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ order })
+  })
+  .then(checkResponseStatus);
+}
+
 export function signin(user, redirect) {
   return fetch('/api/users/signin', {
     method: 'POST',
     headers: {
       ...addAuthTokenToHeader(),
       Accept: 'application/json',
-      'Content-Type': 'application/json'      
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ user, redirect })
   })

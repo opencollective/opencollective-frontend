@@ -31,7 +31,7 @@ class ExpensesWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-
+    console.log(">>> ExpensesWithData render", data);
     const expenses = data.allExpenses;
 
     return (
@@ -64,6 +64,8 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     amount
     currency
     payoutMethod
+    privateMessage
+    attachment
     collective {
       id
       slug

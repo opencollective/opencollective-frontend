@@ -8,7 +8,7 @@ describe("pages.loggedout", () => {
   beforeAll(() => browser = chromeless.init());
   afterAll(() => chromeless.close(browser));
 
-  test.only("goes to a custom donate URL", async () => {
+  test("goes to a custom donate URL", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
       .goto(`${WEBSITE_URL}/webpack/donate/50/month/custom%20description`)

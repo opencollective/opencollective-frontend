@@ -552,7 +552,7 @@ class OrderForm extends React.Component {
           <Row>
             <Col sm={12}>
               <div className="form-group">
-                <label className="col-sm-3 control-label">Contribution</label>
+                <label className="col-sm-3 control-label"><FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /></label>
                 <Col sm={9}>
                   <TierComponent
                     tier={this.props.order.tier}

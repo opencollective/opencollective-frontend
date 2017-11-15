@@ -129,7 +129,7 @@ class InputTypeCreditCard extends React.Component {
                   cvc: 'CCcvc', // optional — default "cvc"
                   name: 'CCname' // optional - default "name"
                 }
-              }                          
+              }
             >
               <div className="ccform">
                 <FormGroup validationState={(!this.state.number || Payment.fns.validateCardNumber(this.state.number)) ? null : 'error'} controlId="CCnumber">

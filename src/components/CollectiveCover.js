@@ -18,7 +18,7 @@ class CollectiveCover extends React.Component {
     collective: PropTypes.object.isRequired,
     href: PropTypes.string,
     cta: PropTypes.node,
-    title: PropTypes.string,
+    title: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
   }
 
@@ -66,7 +66,7 @@ ${description}`
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundPosition: (collective.type === 'USER' || collective.type === 'ORGANIZATION') ? 'center -40px' : 'center center',
+      backgroundPosition: 'center center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       ...customStyles
@@ -221,12 +221,14 @@ ${description}`
           margin: 1px;
         }
         .CollectiveCover :global(.ctabtn) {
+          width: auto;
+          min-width: 20rem;
+          padding: 0 2rem;
           margin: 2rem 0 0 0;
-          width: 25rem;
           font-family: Lato;
           text-transform: uppercase;
           background-color: #75cc1f;
-          font-size: 1.6rem;
+          font-size: 1.5rem;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -276,7 +278,7 @@ ${description}`
                 <FormattedMessage id="collective.stats.yearlyBudget.label" defaultMessage="Estimated annual budget based on current donations" />
               </div>
             }
-            { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 &&
+            { ['USER','ORGANIZATION'].indexOf(collective.type) !== -1 && stats && stats.totalAmountSent > 0 && !collective.isHost &&
               <div className="stats">
                 <div className="totalAmountSent value">
                   <Currency value={stats.totalAmountSent} currency={collective.currency} />

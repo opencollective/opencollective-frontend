@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, FormattedNumber, FormattedMessage } from 'react-intl';
+import withIntl from '../lib/withIntl';
+import { defineMessages, FormattedNumber, FormattedMessage } from 'react-intl';
 import { imagePreview, capitalize } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+import InputField from './InputField';
+import SmallButton from './SmallButton';
+import { getCurrencySymbol } from '../lib/utils';
+import categories from '../constants/categories';
 
 class ExpenseDetails extends React.Component {
 
@@ -11,17 +16,58 @@ class ExpenseDetails extends React.Component {
     collective: PropTypes.object,
     expense: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    mode: PropTypes.string // open or closed
+    onChange: PropTypes.func,
+    mode: PropTypes.string // summary, edit or details
   }
 
   constructor(props) {
     super(props);
+    this.getOptions = this.getOptions.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+
+    this.messages = defineMessages({
+      'paypal': { id: 'expense.payoutMethod.paypal', defaultMessage: 'PayPal ({paypalEmail})' },
+      // 'manual': { id: 'expense.payoutMethod.donation', defaultMessage: 'Consider as donation' },
+      'other': { id: 'expense.payoutMethod.manual', defaultMessage: 'Other (give instructions)' }
+    });
+
+    this.state = { modified: false, expense: {} };
+ 
+  }
+
+  getOptions(arr, intlVars) {
+    return arr.map(key => { 
+      const obj = {};
+      obj[key] = this.props.intl.formatMessage(this.messages[key], intlVars);
+      return obj;
+    })
+  }
+
+  handleChange(attr, value) {
+    const expense = {
+      ...this.state.expense,
+      [attr]: value
+    };
+    this.setState({ modified: true, expense })
+    this.props.onChange && this.props.onChange(expense);
   }
 
   render() {
-    const { expense } = this.props;
-    console.log(">>> expense", expense)
+    const { LoggedInUser, data } = this.props;
+
+    const expense = (data && data.Expense) || this.props.expense;
+
+    const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
+    const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
+    const canEditAmount = expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';
+    const editMode = canEditExpense && this.props.mode === 'edit';
+    const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
+    const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
+    const payoutMethods = this.getOptions(['paypal', 'other'], { paypalEmail: expense.user && expense.user.paypalEmail });
+    const categoriesOptions = categories(expense.collective.slug).map(category => {
+      return { [category]: category }
+    });
 
     return (
         <div className={`ExpenseDetails ${this.props.mode}`}>
@@ -30,9 +76,8 @@ class ExpenseDetails extends React.Component {
             font-size: 1.2rem;
             overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 15rem;
           }
-          .ExpenseDetails.closed {
+          .ExpenseDetails.summary {
             max-height: 0;
           }
           .ExpenseDetails .frame {
@@ -45,12 +90,25 @@ class ExpenseDetails extends React.Component {
           .ExpenseDetails img {
             width: 64px;
           }
+          .leftColumn, .rightColumn {
+            overflow: hidden;
+          }
+          .leftColumn {
+            float: left;
+          }
           .col {
             float: left;
             display: flex;
             flex-direction: column;
             margin-right: 1rem;
             margin-top: 1rem;
+          }
+          .row {
+            margin-left: 0;
+            margin-right: 0;
+          }
+          .row .col.large {
+            width: 100%;
           }
           label {
             text-transform: uppercase;
@@ -62,64 +120,188 @@ class ExpenseDetails extends React.Component {
           .netAmountInCollectiveCurrency {
             font-weight: bold;
           }
-
           @media(max-width: 600px) {
             .ExpenseDetails {
               max-height: 30rem;
             }
           }
         `}</style>
-
-        <div className="frame">
-          {expense.attachment &&
-            <a href={expense.attachment} target="_blank" title="Open receipt in a new window">
-              <img src={imagePreview(expense.attachment)} />
-            </a>
+        <style global jsx>{`
+          .ExpenseDetails .inputField {
+            margin: 0;
           }
-          {!expense.attachment &&
-            <img src={'/static/images/receipt.svg'} />
+
+          .ExpenseDetails .descriptionField {
+            width: 50rem;
+            max-width: 100%;
           }
-        </div>
 
-        <div className="col">
-          <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
-          {capitalize(expense.payoutMethod)}
-        </div>
+          .ExpenseDetails .amountField {
+            max-width: 15rem;
+          }
 
-        <div className="col">
-          <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
-          <div className="amountDetails">
-            <span className="amount">
-              <FormattedNumber
-                value={expense.amount / 100}
-                currency={expense.currency}
-                {...this.currencyStyle}
+          .ExpenseDetails .inputField textarea {
+            font-size: 1.2rem;
+          }
+
+          .ExpenseDetails .attachmentField {
+            width: 64px;
+          }
+
+          .ExpenseDetails .attachmentField .form-group {
+            margin: 0;
+          }
+
+          .ExpenseDetails textarea[name="privateMessage"] {
+            width: 50rem;
+            max-width: 100%;
+          }
+        `}</style>
+
+        <div className="leftColumn">
+          <div className="frame">
+            { editMode &&
+              <InputField
+                type="dropzone"
+                name="attachment"
+                className="attachmentField"
+                onChange={attachment => this.handleChange('attachment', attachment)}
+                value={previewAttachmentImage}
                 />
-            </span>
+            }
+            { !editMode && expense.attachment &&
+              <a href={expense.attachment} target="_blank" title="Open receipt in a new window">
+                <img src={previewAttachmentImage} />
+              </a>
+            }
+            { !editMode && !expense.attachment &&
+              <img src={previewAttachmentImage} />
+            }
           </div>
+        </div>
+
+        <div className="rightColumn">
+          { editMode &&
+            <div className="row">
+              <div className="col large">
+                <label><FormattedMessage id='expense.description' defaultMessage='description' /></label>
+                <div className="description">
+                  <span className="amount">
+                    <InputField
+                      type="text"
+                      value={expense.description}
+                      className="descriptionField"
+                      onChange={description => this.handleChange('description', description)}
+                      />
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+
+          { editMode &&
+            <div className="col">
+              <label><FormattedMessage id='expense.category' defaultMessage='category' /></label>
+              <div className="category">
+                <span className="amount">
+                  <InputField
+                    type="select"
+                    options={categoriesOptions}
+                    value={expense.category}
+                    className="categoryField"
+                    onChange={category => this.handleChange('category', category)}
+                    />
+                </span>
+              </div>
+            </div>
+          }
+
+          <div className="col">
+            <label><FormattedMessage id='expense.amount' defaultMessage='amount' /></label>
+            <div className="amountDetails">
+              <span className="amount">
+                { editMode && canEditAmount &&
+                  <InputField
+                    value={expense.amount}
+                    pre={getCurrencySymbol(expense.currency)}
+                    type='currency'
+                    className="amountField"
+                    onChange={amount => this.handleChange('amount', amount)}
+                    />
+                }
+                { !(editMode && canEditAmount) &&
+                  <FormattedNumber
+                    value={expense.amount / 100}
+                    currency={expense.currency}
+                    {...this.currencyStyle}
+                    />
+                }
+              </span>
+            </div>
+          </div>
+
+          <div className="col">
+            <label><FormattedMessage id='expense.payoutMethod' defaultMessage='payout method' /></label>
+            { !editMode && capitalize(expense.payoutMethod)}
+            { editMode &&
+              <InputField
+                type="select"
+                options={payoutMethods}
+                value={expense.payoutMethod}
+                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
+                />
+            }
+          </div>
+
+          { (expense.privateMessage || (isAuthor && payoutMethod === 'other')) &&
+            <div className="col">
+              <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
+              { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}
+              { editMode && isAuthor &&
+                <InputField
+                  type="textarea"
+                  name="privateMessage"
+                  onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
+                  defaultValue={expense.privateMessage}
+                  />
+              }
+            </div>
+          }
         </div>
       </div>
     );
   }
 }
 
-
 const getExpenseQuery = gql`
 query Expense($id: Int!) {
   Expense(id: $id) {
     id
     description
-    privateMessage
     createdAt
     category
     amount
     currency
+    attachment
     payoutMethod
+    privateMessage
+    collective {
+      id
+      slug
+      host {
+        id
+        slug
+      }
+    }
+    fromCollective {
+      id
+    }
     user {
       id
       name
       username
       image
+      paypalEmail
     }
   }
 }
@@ -144,4 +326,4 @@ return graphql(getExpenseQuery, {
 }
 
 
-export default addGetExpense(injectIntl(ExpenseDetails));
+export default addGetExpense(withIntl(ExpenseDetails));
