@@ -67,12 +67,12 @@ export default function(app) {
     next();
   });
 
+  // Cors.
+  app.use(cors());
+
   app.use(lruCache());
 
   app.use(multer());
-
-  // Cors.
-  app.use(cors());
 
   // Error handling.
   if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
