@@ -153,8 +153,8 @@ export const CollectiveStatsType = new GraphQLObjectType({
       backers: {
         description: "Breakdown of all backers of this collective",
         type: BackersStatsType,
-        resolve(collective) {
-          return collective.getBackersCount({ group: ['fromCollective.type'] });
+        resolve(collective, args, req) {
+          return req.loaders.collective.stats.backers.load(collective.id);
         }
       },
       collectives: {
