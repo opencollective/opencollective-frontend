@@ -239,7 +239,7 @@ describe('graphql.collective.test.js', () => {
         await addFunds(1000);
         const res = await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, host);
         expect(res.errors).to.exist;
-        expect(res.errors[0].message).to.equal("You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $3");
+        expect(res.errors[0].message).to.equal("You don't have enough funds to cover for the fees of this payment method. Current balance: $10, Expense amount: $10, Estimated paypal fees: $1");
       });
     })
   });

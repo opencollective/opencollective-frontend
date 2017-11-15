@@ -168,12 +168,17 @@ export async function payExpense(remoteUser, expenseId) {
     throw new errors.Unauthorized(`You don't have enough funds to pay this expense. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}`);
   }
 
-  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].fees(expense.amount, expense.collective.currency) : 0;
+  const host = await expense.collective.getHostCollective();
+
+  const paymentProcessFees = paymentProviders[expense.payoutMethod] ? await paymentProviders[expense.payoutMethod].fees({
+    amount: expense.amount,
+    currency: expense.collective.currency,
+    host
+  }) : 0;
   if ((expense.amount + paymentProcessFees) > balance) {
     throw new Error(`You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(balance, expense.collective.currency)}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${expense.payoutMethod} fees: ${formatCurrency(paymentProcessFees, expense.collective.currency)}`);
   }
 
-  const host = await expense.collective.getHostCollective();
   if (expense.payoutMethod === 'paypal') {
     const paypalEmail = await expense.getPaypalEmail();
     const paymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
