@@ -27,7 +27,12 @@ describe('graphql.paymentMethods.test.js', () => {
     name: 'open source collective',
     type: "ORGANIZATION",
     currency: 'USD'
-  }).tap(c => host = c));
+  }).tap(c => host = c).then(c => c.becomeHost()));
+
+  beforeEach(() => models.ConnectedAccount.create({
+    CollectiveId: host.id,
+    service: 'stripe'
+  }));
 
   beforeEach(() => models.Collective.create({
     name: "tipbox",
