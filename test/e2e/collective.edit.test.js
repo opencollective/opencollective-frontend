@@ -7,7 +7,7 @@ describe("collective.edit.test", () => {
   beforeAll(() => browser = chromeless.init());
   afterAll(() => chromeless.close(browser));
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     await browser
       .goto(`${WEBSITE_URL}/testcollective/edit`)
       .wait('.login .btn')
@@ -22,8 +22,8 @@ describe("collective.edit.test", () => {
   test("edit collective ", async () => {
     
     jest.setTimeout(30000);
-    const randomDescription = `Hello World ${Math.round(Math.random()*1000000)}`;
-    const randomLongDescription = `**Hello World** [anchor](https://google.com) ${Math.round(Math.random()*1000000)}`;
+    const randomDescription = `Hello World ${Math.round(Math.random()*100000)}`;
+    const randomLongDescription = `**Hello World** [anchor](https://google.com) ${Math.round(Math.random()*100000)}`;
 
     const screenshot = await browser
       .wait("input[name='description']")
@@ -41,7 +41,7 @@ describe("collective.edit.test", () => {
     expect(username).toEqual("test-admin-user");
 
     const screenshot2 = await browser
-      .goto(`${WEBSITE_URL}/testcollective?cacheburst=${Math.round(Math.random()*10000)}`)
+      .goto(`${WEBSITE_URL}/testcollective?cacheburst=${Math.round(Math.random()*100000)}`)
       .wait('section#about')
       .wait('.longDescription a[href="https://google.com"]')
       .screenshot();
@@ -82,14 +82,13 @@ describe("collective.edit.test", () => {
       .focus("button[type='submit']")
       .click("button[type='submit']")
       .wait(1000)
-      .goto(`${WEBSITE_URL}/testcollective`)
+      .goto(`${WEBSITE_URL}/testcollective?cacheburst=${Math.round(Math.random()*100000)}`)
       .wait('.CollectiveCover')
       .wait('.TierCard#new-tier .amount')
       .screenshot();
 
     download("collective_tiers_edited", screenshot);
     const amount = await browser.evaluate(() => document.querySelector('.TierCard#new-tier .amount').innerText);
-    console.log(">>> amount", amount);
     expect(amount).toEqual(`$2`);
     
     const screenshot2 = await browser
@@ -100,8 +99,9 @@ describe("collective.edit.test", () => {
       .wait(500)
       .scrollToElement("button[type='submit']")
       .click("button[type='submit']")
-      .wait(1000)
-      .goto(`${WEBSITE_URL}/testcollective`)
+      .wait(3000)
+      .goto(`${WEBSITE_URL}/testcollective?cacheburst2=${Math.round(Math.random()*100000)}`)
+      .wait(5000)
       .wait('.CollectiveCover')
       .screenshot();
       

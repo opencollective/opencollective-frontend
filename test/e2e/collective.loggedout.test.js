@@ -14,7 +14,7 @@ describe("collective.loggedout.test", () => {
 
     const screenshot = await browser
       .goto(`${WEBSITE_URL}/webpack`)
-      .wait('section#sponsors', 2000)
+      .wait('section#organizations', 2000)
       .wait('section#backers', 2000)
       .wait('section#budget', 2000)
       .screenshot();
@@ -51,7 +51,7 @@ describe("collective.loggedout.test", () => {
       .scrollToElement('.SubmitExpenseBtn')
       .wait(800)
       .click('.SubmitExpenseBtn')
-      .wait(1000)
+      .wait(2000)
       .screenshot();
 
     download("new_expense", screenshot);

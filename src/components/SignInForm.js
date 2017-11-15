@@ -11,8 +11,7 @@ class LoginForm extends React.Component {
 
   static propTypes = {
     signin: PropTypes.bool,
-    next: PropTypes.string,
-    onChange: PropTypes.func.isRequired
+    next: PropTypes.string
   }
 
   constructor(props) {
