@@ -115,6 +115,21 @@ class CollectivePickerWithData extends React.Component {
           margin-right: 0.2rem;
         }
 
+        .NameBalance {
+          display: flex;
+          align-items: baseline;
+        }
+
+        .balance {
+          margin-left: 0.5rem;
+          color: #919599;
+          font-size: 1.2rem;
+        }
+
+        .balance label {
+          font-weight: 300;
+        }
+
         .MenuItem-Collective label {
           margin-right: 0.2rem;
         }
@@ -122,8 +137,8 @@ class CollectivePickerWithData extends React.Component {
       <div className="NameBalance">
         <div className="collectiveName">{collective.name}</div>
         <div className="balance">
-          (<label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
-          <Currency value={collective.stats.balance} currency={collective.currency} />)
+          <label><FormattedMessage id="expenses.balance.label" defaultMessage="balance:" /></label>
+          <Currency value={collective.stats.balance} currency={collective.currency} />
         </div>
       </div>
       { badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge> }
@@ -131,7 +146,7 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const { data: { loading, error, Collective } } = this.props;
+    const { LoggedInUser, data: { loading, error, Collective } } = this.props;
 
     if (error) {
       console.error("graphql error>>>", error.message);
@@ -157,6 +172,7 @@ class CollectivePickerWithData extends React.Component {
           .CollectivesContainer {
             background: #f2f4f5;
           }
+
           .submenu {
             width: 100%;
             height: 16rem;
@@ -164,7 +180,7 @@ class CollectivePickerWithData extends React.Component {
             padding: 2rem 2rem 2rem 6rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
           }
 
           .submenu .title {
@@ -241,9 +257,11 @@ class CollectivePickerWithData extends React.Component {
             }
             </div>
             <div className="right">
-              <ConnectPaypal
-                collective={this.hostCollective}
-                />
+              { LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective) &&
+                <ConnectPaypal
+                  collective={this.hostCollective}
+                  />
+              }
             </div>
           </div>
           <div>

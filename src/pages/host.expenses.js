@@ -76,6 +76,7 @@ class HostExpensesPage extends React.Component {
 
           <CollectivePicker
             hostCollectiveSlug={this.props.collectiveSlug}
+            LoggedInUser={LoggedInUser}
             onChange={(selectedCollective => this.pickCollective(selectedCollective))}
             />
 
