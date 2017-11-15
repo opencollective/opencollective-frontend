@@ -252,7 +252,7 @@ class InputField extends React.Component {
           placeholder={field.placeholder}
           className={field.className}
           onFocus={(event) => event.target.select()}
-          value={(this.state.value || field.defaultValue || 0)/100}
+          value={this.state.value ? this.state.value / 100 : ''}
           defaultValue={(field.value || field.defaultValue || 0)/100}
         />
         )
