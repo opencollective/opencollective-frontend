@@ -46,7 +46,7 @@ const generateNewCode = (prefix) => {
   const letters = randomString(3, 'ACEFHJKLMNPRSTUVWXY');
 
   // generate three digit number 
-  const numbers = Math.floor(Math.random() * 900 + 100); // three random numbers between 100 and 1000;
+  const numbers = randomString(3, '123456789');
 
   // generate verification number
   const code = `${prefix}${letters}${numbers}`;
