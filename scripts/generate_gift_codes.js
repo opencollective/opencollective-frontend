@@ -5,7 +5,7 @@
 import models from '../server/models';
 import Promise from 'bluebird';
 
-const VERIFICATION_MODULO = 45790; // don't change
+const VERIFICATION_MODULO = 45797; // don't change
 
 const NAME = 'Bloomberg Beta Gift Card';
 const SERVICE = 'prepaid';
