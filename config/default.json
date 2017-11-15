@@ -8,7 +8,7 @@
       "dialect": "postgres",
       "pool": {
         "min": 10,
-        "max": 50,
+        "max": 20,
         "acquire": 60000
       },
       "logging": false
