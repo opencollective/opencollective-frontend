@@ -35,8 +35,9 @@ class UserCollective extends React.Component {
     };
 
     this.messages = defineMessages({
-      'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing since {year}`},
-      'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing since {year}`},
+      'organization.collective.since': { id: 'organization.collective.since', defaultMessage: `Contributing Since {year}`},
+      'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing Since {year}`},
+      'host.collective.since': { id: 'host.collective.since', defaultMessage: `Hosting Collectives Since {year}`},
       'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `edit organization`},
       'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `edit profile`},
       'user.collective.memberOf.host.title': { id: 'user.collective.memberOf.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
@@ -67,7 +68,10 @@ class UserCollective extends React.Component {
     const { intl, LoggedInUser, query } = this.props;
 
     const type = this.collective.type.toLowerCase();
-
+    let cta;
+    if (this.collective.canApply) {
+      cta = <a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a>
+    }
     const memberOf = groupBy(this.collective.memberOf, 'role');
     const actions = [];
     Object.keys(memberOf).map(role => {
@@ -148,10 +152,11 @@ class UserCollective extends React.Component {
 
             <CollectiveCover
               collective={this.collective}
+              cta={cta}
               />
 
             <MenuBar
-              info={intl.formatMessage(this.messages[`${type}.collective.since`], { year: (new Date(this.collective.createdAt)).getFullYear() })}
+              info={intl.formatMessage(this.messages[`${this.collective.isHost ? 'host' : type}.collective.since`], { year: (new Date(this.collective.createdAt)).getFullYear() })}
               actions={actions}
               />
 
@@ -213,15 +218,10 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => (
                 <section id={role}>
                     <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                    { role === 'HOST' &&
+                    { role === 'HOST' && LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
                       <div className="adminActions" id="adminActions">
                         <ul>
-                          { this.collective.canApply &&
-                            <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective on {host}" values={{ host: this.collective.name }} /></a></Link></li>
-                          }
-                          { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                            <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
-                          }
+                          <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                         </ul>
                       </div>
                       }

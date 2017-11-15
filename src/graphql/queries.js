@@ -293,6 +293,13 @@ const getCollectiveQuery = gql`
             image
             description
             backgroundImage
+            stats {
+              id
+              yearlyBudget
+              backers {
+                all
+              }
+            }
           }
         }
       }

@@ -66,7 +66,7 @@ ${description}`
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundPosition: (collective.type === 'USER' || collective.type === 'ORGANIZATION') ? 'center -40px' : 'center center',
+      backgroundPosition: 'center center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       ...customStyles
@@ -221,12 +221,14 @@ ${description}`
           margin: 1px;
         }
         .CollectiveCover :global(.ctabtn) {
+          width: auto;
+          min-width: 20rem;
+          padding: 0 2rem;
           margin: 2rem 0 0 0;
-          width: 25rem;
           font-family: Lato;
           text-transform: uppercase;
           background-color: #75cc1f;
-          font-size: 1.6rem;
+          font-size: 1.5rem;
           display: flex;
           justify-content: center;
           align-items: center;
