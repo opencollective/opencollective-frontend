@@ -67,7 +67,7 @@ class ConnectPaypal extends React.Component {
             margin: 0.5rem 0;
           }
 
-          .connectedAt, label {
+          .description, label {
             font-family: Rubik;
             font-size: 1.4rem;
             line-height: 1.5;
@@ -76,8 +76,8 @@ class ConnectPaypal extends React.Component {
             font-weight: normal;
           }
 
-          .connectedAt {
-            width: 20rem;
+          .description {
+            width: 22rem;
             margin: 0.5rem 0;
             font-size: 1.1rem;
           }
@@ -99,16 +99,21 @@ class ConnectPaypal extends React.Component {
                 </SmallButton>
               </div>
             </div>
-            <div className="connectedAt">
+            <div className="description">
               <FormattedMessage id="collective.connectedAccounts.paypal.connected" defaultMessage="Paypal account connected on {createdAt, date, short}" values={{ createdAt: new Date(paypalPaymentMethod.createdAt) }} />
             </div>
           </div>
         }
         { !paypalPaymentMethod &&
-          <SmallButton className="primary" bsStyle="primary" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
-            { this.state.connectingPaypal && "Connecting..."}
-            { !this.state.connectingPaypal && "Connect Paypal"}
-          </SmallButton>
+          <div>
+            <SmallButton className="primary" bsStyle="primary" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
+              { this.state.connectingPaypal && "Connecting..."}
+              { !this.state.connectingPaypal && "Connect Paypal"}
+            </SmallButton>
+            <div className="description">
+              <FormattedMessage id="collective.connectedAccounts.paypal.description" defaultMessage="Connect a PayPal account to reimburse approved expenses in one click" />
+            </div>
+          </div>
         }
         </div>
       </div>
