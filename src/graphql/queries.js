@@ -277,7 +277,7 @@ const getCollectiveQuery = gql`
         }
       }
       ... on User {
-        memberOf {
+        memberOf(limit: 50) {
           id
           role
           createdAt
@@ -293,13 +293,6 @@ const getCollectiveQuery = gql`
             image
             description
             backgroundImage
-            stats {
-              id
-              yearlyBudget
-              backers {
-                all
-              }
-            }
           }
         }
       }

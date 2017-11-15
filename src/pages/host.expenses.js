@@ -51,7 +51,7 @@ class HostExpensesPage extends React.Component {
     const collective = data.Collective;
     const selectedCollective = this.state.selectedCollective || collective;
     const includeHostedCollectives = (selectedCollective.id === collective.id);
-    console.log(">>> host.expenses render selectedCollective", selectedCollective);
+
     return (
       <div className="HostExpensesPage">
         <style jsx>{`
@@ -70,7 +70,6 @@ class HostExpensesPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={`/${collective.slug}`}
-            title={<FormattedMessage id="collective.Expenses.title" defaultMessage="{n, plural, one {Latest Expense} other {Latest Expenses}}" values={{n: 2 }} />}
             className="small"
             style={get(collective, 'settings.style.hero.cover')}
             />

@@ -90,12 +90,22 @@ class ExpenseDetails extends React.Component {
           .ExpenseDetails img {
             width: 64px;
           }
+          .leftColumn, .rightColumn {
+            overflow: hidden;
+          }
+          .leftColumn {
+            float: left;
+          }
           .col {
             float: left;
             display: flex;
             flex-direction: column;
             margin-right: 1rem;
             margin-top: 1rem;
+          }
+          .row {
+            margin-left: 0;
+            margin-right: 0;
           }
           .row .col.large {
             width: 100%;
@@ -121,6 +131,11 @@ class ExpenseDetails extends React.Component {
             margin: 0;
           }
 
+          .ExpenseDetails .descriptionField {
+            width: 50rem;
+            max-width: 100%;
+          }
+
           .ExpenseDetails .amountField {
             max-width: 15rem;
           }
@@ -135,6 +150,11 @@ class ExpenseDetails extends React.Component {
 
           .ExpenseDetails .attachmentField .form-group {
             margin: 0;
+          }
+
+          .ExpenseDetails textarea[name="privateMessage"] {
+            width: 50rem;
+            max-width: 100%;
           }
         `}</style>
 
@@ -233,7 +253,7 @@ class ExpenseDetails extends React.Component {
             }
           </div>
 
-          { (expense.privateMessage || isAuthor) &&
+          { (expense.privateMessage || (isAuthor && payoutMethod === 'other')) &&
             <div className="col">
               <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
               { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}

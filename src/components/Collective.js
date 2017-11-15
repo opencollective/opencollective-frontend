@@ -285,26 +285,6 @@ class Collective extends React.Component {
                 </div>
               </section>
 
-              { this.collective.stats.collectives > 0 &&
-                <section id="hosting">
-                  <h1>
-                    <FormattedMessage
-                      id="collective"
-                      values={{ n: this.collective.stats.collectives }}
-                      defaultMessage={`{n} {n, plural, one {collective} other {collectives}}`}
-                      />
-                  </h1>
-                  <div className="cardsList">
-                    <CollectivesWithData
-                      ParentCollectiveId={this.collective.id}
-                      orderBy="balance"
-                      orderDirection="DESC"
-                      limit={20}
-                      />
-                  </div>
-                </section>
-              }
-
               { this.collective.stats.backers.organizations > 0 &&
                 <section id="organizations" className="tier">
                   <h1>
