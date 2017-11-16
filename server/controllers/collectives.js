@@ -333,6 +333,7 @@ export const createFromGithub = (req, res, next) => {
       }
       return null;
     })
+    .then(() => createdCollective.update({isActive: true}))
     .tap((host) => Activity.create({
       type: activities.COLLECTIVE_CREATED,
       UserId: creatorUser.id,
