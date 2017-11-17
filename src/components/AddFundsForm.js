@@ -14,7 +14,8 @@ class AddFundsForm extends React.Component {
     collective: PropTypes.object.isRequired,
     host: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired
+    onCancel: PropTypes.func.isRequired,
+    loading: PropTypes.bool
   }
 
   constructor(props) {
@@ -22,7 +23,6 @@ class AddFundsForm extends React.Component {
     const { intl } = props;
 
     this.state = {
-      loading: false,
       hostFeePercent: 0,
       form: { totalAmount: 0 },
       result: {}
@@ -119,20 +119,20 @@ class AddFundsForm extends React.Component {
   }
 
   handleSubmit(e) {
-    this.setState({ loading: true });
     e && e.preventDefault();
     this.props.onSubmit(this.state.form);
     return false;
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, loading } = this.props;
 
     return (
       <div className="AddFundsForm">
         <style jsx>{`
         h2 {
           margin: 3rem 0 3rem 0;
+          font-size: 2rem;
         }
         .AddFundsForm {
           max-width: 700px;
@@ -188,7 +188,7 @@ class AddFundsForm extends React.Component {
           margin-right: 0.5rem;
         }
         `}</style>
-        <div className="content">
+        <div>
           <Form horizontal onSubmit={this.handleSubmit}>
             <div className="userDetailsForm">
               <h2><FormattedMessage id="addfunds.title" defaultMessage="Add Funds to {collective}" values={{ collective: this.props.collective.name }} /></h2>
@@ -238,9 +238,9 @@ class AddFundsForm extends React.Component {
                 <Row>
                   <Col sm={3}></Col>
                   <Col sm={9} className="actions">
-                    <Button bsStyle="primary" onClick={() => this.handleSubmit()} disabled={this.state.loading}>
-                      { this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
-                      { !this.state.loading && <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /> }
+                    <Button bsStyle="primary" onClick={() => this.handleSubmit()} disabled={loading}>
+                      { loading && <FormattedMessage id="form.processing" defaultMessage="processing" /> }
+                      { !loading && <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" /> }
                     </Button>
                     <Button bsStyle="default" onClick={() => this.props.onCancel()}>
                       <FormattedMessage id="form.cancel" defaultMessage="cancel" />
