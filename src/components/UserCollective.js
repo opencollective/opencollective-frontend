@@ -39,6 +39,7 @@ class UserCollective extends React.Component {
       'user.collective.since': { id: 'user.collective.since', defaultMessage: `Contributing Since {year}`},
       'organization.collective.edit': { id: 'organization.collective.edit', defaultMessage: `edit organization`},
       'user.collective.edit': { id: 'user.collective.edit', defaultMessage: `edit profile`},
+      'user.collective.memberOf.host.title': { id: 'user.collective.memberOf.host.title', defaultMessage: `I'm hosting {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.admin.title': { id: 'user.collective.memberOf.admin.title', defaultMessage: `I'm a core contributor of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.member.title': { id: 'user.collective.memberOf.member.title', defaultMessage: `I'm a member of {n, plural, one {this collective} other {these collectives}}`},
       'user.collective.memberOf.backer.title': { id: 'user.collective.memberOf.backer.title', defaultMessage: `I'm backing {n, plural, one {this collective} other {these collectives}}`},
