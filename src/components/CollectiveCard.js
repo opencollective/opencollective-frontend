@@ -33,7 +33,7 @@ class CollectiveCard extends React.Component {
     } else {
       currency = collective.currency;
     }
-    const logo = imagePreview(collective.image, pickLogo(collective.id));
+    const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
     let tierName = membership && membership.tier && membership.tier.name;
     if (!tierName) {
       if (membership && membership.role === 'HOST') {
