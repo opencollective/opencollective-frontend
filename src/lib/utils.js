@@ -57,8 +57,21 @@ export function getCurrencySymbol(currency) {
  return r.replace(/0$/,'');
 }
 
+export function resizeImage(imageUrl, { width, height, query }) {
+  if (!imageUrl) return null;
+  if (!query && imageUrl.match(/\.svg$/)) return imageUrl; // if we don't need to transform the image, no need to proxy it.
+  let queryurl = '';
+  if (query) {
+    queryurl = encodeURIComponent(query);
+  } else {
+    if (width) queryurl += `&width=${width}`;
+    if (height) queryurl += `&height=${height}`;
+  }
+  return `/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
+}
+
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
-  if (src) return `https://res.cloudinary.com/opencollective/image/fetch/w_${options.width},f_jpg/${src}`;
+  if (src) return resizeImage(src, options);
   return defaultImage;
 }
 
