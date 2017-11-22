@@ -2,7 +2,7 @@ import { pickAvatar } from '../lib/collective.lib';
 import { imagePreview } from '../lib/utils';
 
 export default ({src, radius, key, title}) => {
-  const image = imagePreview(src, { width: radius });
+  const image = imagePreview(src, null, { width: radius });
   return (
     <div className="Avatar" style={{ width: radius, height: radius, backgroundImage: `url(${pickAvatar(key || title || src)})` }}>
       <style jsx>{`

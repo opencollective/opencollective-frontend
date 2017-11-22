@@ -5,6 +5,7 @@ import pdf from 'html-pdf';
 import moment from 'moment';
 import pages from './pages';
 import { translateApiUrl } from '../lib/utils';
+import { getCloudinaryUrl } from './lib/utils';
 import request from 'request';
 import controllers from './controllers';
 import * as mw from './middlewares';
@@ -26,6 +27,25 @@ module.exports = (server, app) => {
       .pipe(request(translateApiUrl(req.url), { followRedirect: false }))
       .on('error', (e) => {
         console.error("error calling api", translateApiUrl(req.url), e);
+        res.status(500).send(e);
+      })
+      .pipe(res);
+  });
+
+  /**
+   * Proxy all images so that we can serve them from the opencollective.com domain
+   * and we can cache them at cloudflare level (to reduce bandwidth at cloudinary level)
+   * Format: /proxy/images?src=:encoded_url&width=:width
+   */
+  server.get('/proxy/images', (req, res) => {
+    const { src, width, height, query } = req.query;
+
+    const url = getCloudinaryUrl(src, { width, height, query });
+
+    req
+      .pipe(request(url, { followRedirect: false }))
+      .on('error', (e) => {
+        console.error("error proxying ", url, e);
         res.status(500).send(e);
       })
       .pipe(res);
