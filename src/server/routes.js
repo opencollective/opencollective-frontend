@@ -4,7 +4,8 @@ import fs from 'fs';
 import pdf from 'html-pdf';
 import moment from 'moment';
 import pages from './pages';
-import { translateApiUrl, getCloudinaryUrl } from '../lib/utils';
+import { translateApiUrl } from '../lib/utils';
+import { getCloudinaryUrl } from './lib/utils';
 import request from 'request';
 import controllers from './controllers';
 import * as mw from './middlewares';
@@ -36,12 +37,10 @@ module.exports = (server, app) => {
    * and we can cache them at cloudflare level (to reduce bandwidth at cloudinary level)
    * Format: /proxy/images?src=:encoded_url&width=:width
    */
-  app.get('/proxy/images', (req, res) => {
-    const width = req.query.width;
-    const height = req.query.height;
-    const query = req.query.query;
+  server.get('/proxy/images', (req, res) => {
+    const { src, width, height, query } = req.query;
 
-    const url = getCloudinaryUrl(req.query.src, { width, height, query });
+    const url = getCloudinaryUrl(src, { width, height, query });
 
     req
       .pipe(request(url, { followRedirect: false }))
