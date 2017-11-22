@@ -25,6 +25,7 @@ class EditPaymentMethod extends React.Component {
     this.messages = defineMessages({
       'paymentMethod.edit': { id: 'paymentMethod.edit', defaultMessage: 'edit' },
       'paymentMethod.remove': { id: 'paymentMethod.remove', defaultMessage: 'remove' },
+      'paymentMethod.editSubscriptions': { id: 'paymentMethod.editSubscriptions', defaultMessage: 'edit subscriptions' },
       'paymentMethod.monthlyLimitPerMember.label': { id: 'paymentMethod.monthlyLimitPerMember.label', defaultMessage: 'Monthly limit per member' },
       'paymentMethod.monthlyLimitPerMember.description': { id: 'paymentMethod.monthlyLimitPerMember.description', defaultMessage: 'You can set a monthly limit to allow the other members of your organization to use this credit card. If set to zero, only you and the other administrators of this organization will be able to use this card.' }
     });
@@ -71,9 +72,17 @@ class EditPaymentMethod extends React.Component {
                   <label className="col-sm-3 control-label">Credit Card</label>
                   <Col sm={9}>
                     <div className="name col">{label}</div>
-                    <div className="actions">
-                      <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>
-                    </div>
+                      { paymentMethod.orders.length > 0 &&
+                        <div className="actions">
+                          <FormattedMessage id="paymentMethod.activeSubscriptions" defaultMessage="{n} active {n, plural, one {subscription} other {subscriptions}}" values={{ n: paymentMethod.orders.length }} />&nbsp; 
+                          <Button bsStyle="default" bsSize="xsmall" href="/subscriptions">{intl.formatMessage(this.messages[`paymentMethod.editSubscriptions`])}</Button>
+                        </div>
+                      }
+                      { paymentMethod.orders.length === 0 &&
+                          <div className="actions">
+                            <Button bsStyle="default" bsSize="xsmall" onClick={() => this.removePaymentMethod({})}>{intl.formatMessage(this.messages[`paymentMethod.remove`])}</Button>
+                          </div>
+                      }
                   </Col>
                 </div>
               </Col>

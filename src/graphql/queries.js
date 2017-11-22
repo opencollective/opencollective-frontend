@@ -178,6 +178,9 @@ const getCollectiveToEditQuery = gql`
         name
         data
         monthlyLimitPerMember
+        orders(hasActiveSubscription: true) {
+          id
+        }
       }
       connectedAccounts {
         id
