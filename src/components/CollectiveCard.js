@@ -5,7 +5,7 @@ import Currency from './Currency';
 import { pickLogo } from '../lib/collective.lib';
 import { get } from 'lodash';
 import { Router } from '../server/pages';
-import { firstSentence } from '../lib/utils';
+import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
 
 class CollectiveCard extends React.Component {
@@ -33,7 +33,7 @@ class CollectiveCard extends React.Component {
     } else {
       currency = collective.currency;
     }
-    const logo = collective.image || pickLogo(collective.id);
+    const logo = imagePreview(collective.image, pickLogo(collective.id));
     let tierName = membership && membership.tier && membership.tier.name;
     if (!tierName) {
       if (membership && membership.role === 'HOST') {
