@@ -813,6 +813,24 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.getBalanceForUser(req.remoteUser).then(balance => balance.amount);
         }
       },
+      orders: {
+        type: new GraphQLList(OrderType),
+        args: {
+          hasActiveSubscription: {
+            type: GraphQLBoolean,
+            description: "Only returns orders that have an active subscription (monthly/yearly)"
+          }
+        },
+        resolve(paymentMethod, args) {
+          const query = {};
+          if (args.hasActiveSubscription) {
+            query.include = [
+              { model: models.Subscription, where: { isActive: true }, required: true }
+            ]
+          }
+          return paymentMethod.getOrders(query);
+        }
+      },
       currency: {
         type: GraphQLString,
         resolve(paymentMethod) {
