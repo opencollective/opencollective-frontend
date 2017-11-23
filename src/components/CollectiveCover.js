@@ -4,7 +4,7 @@ import withIntl from '../lib/withIntl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 import { union, get } from 'lodash';
-import { prettyUrl, formatCurrency } from '../lib/utils';
+import { prettyUrl, formatCurrency, imagePreview } from '../lib/utils';
 import { Router } from '../server/pages';
 import Currency from './Currency';
 import Avatar from './Avatar';
@@ -62,7 +62,7 @@ ${description}`
     } = collective;
 
     const formattedYearlyIncome = stats && stats.yearlyBudget > 0 && formatCurrency(stats.yearlyBudget, collective.currency);
-    const backgroundImage = collective.backgroundImage || get(collective,'parentCollective.backgroundImage') || defaultBackgroundImage[collective.type];
+    const backgroundImage = imagePreview(collective.backgroundImage || get(collective,'parentCollective.backgroundImage'), defaultBackgroundImage[collective.type], { height: 500 });
     const customStyles = get(collective, 'settings.style.hero.cover') || get(collective.parentCollective, 'settings.style.hero.cover');
     const style = {
       backgroundImage: `url('${backgroundImage}')`,
