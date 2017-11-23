@@ -186,19 +186,15 @@ export const authenticateService = (req, res, next) => {
     console.log("authenticateService calling Passport with options", opts);
     return passport.authenticate(service, opts)(req, res, next);
   }
-  
-  if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
-    return next(new errors.Unauthorized('You must be logged in as an admin of this collective to be able to connect it to an external account'));
-  }
-  
+
   if (!req.query.CollectiveId) {
     return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
   }
   
   return models.ConnectedAccount.findOne({ where: { service, CollectiveId: req.query.CollectiveId }})
-  .then(ExistingStripeAccount => {
-    if (ExistingStripeAccount) {
-      throw new errors.ValidationFailed(null, ['CollectiveId'], `Collective already has a ${service} account connected`);
+  .then(existingAccount => {
+    if (existingAccount && (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId))) {
+      throw new errors.ValidationFailed(null, ['CollectiveId'], `This collective already has a ${service} account connected. Please login as an admin of this collective to reconnect this service.`);
     }
     return true;
   })
@@ -253,9 +249,8 @@ export const authenticateServiceCallback = (req, res, next) => {
 };
 
 function getOAuthCallbackUrl(req) {
-  const { utm_source } = req.query;
-  const { CollectiveId } = req.query;
-  const params = qs.stringify({ utm_source, CollectiveId });
+  const { utm_source, CollectiveId, access_token, redirect } = req.query;
+  const params = qs.stringify({ utm_source, CollectiveId, access_token, redirect });
   const { service } = req.params;
   return `${config.host.website}/api/connected-accounts/${service}/callback?${params}`;
 }

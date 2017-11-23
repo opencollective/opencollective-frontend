@@ -62,6 +62,11 @@ export const loaders = (req) => {
         .then(results => sortResults(ids, results, 'CollectiveId'))
         .map(result => get(result, 'dataValues.balance') || 0)
       ),
+      connectedAccounts: new DataLoader(ids => models.ConnectedAccount.findAll({
+          where: { CollectiveId: { $in: ids } }
+        })
+        .then(results => sortResults(ids, results, 'CollectiveId', []))
+      ),
       stats: {
         collectives: new DataLoader(ids => models.Collective.findAll({
             attributes: [

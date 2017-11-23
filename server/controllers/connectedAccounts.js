@@ -26,59 +26,94 @@ export const list = (req, res, next) => {
 };
 
 export const createOrUpdate = (req, res, next, accessToken, data, emails) => {
-  const service = req.params.service;
-  const redirect = `${config.host.website}/${req.query.slug}/edit#connectedAccounts`;
+  const { utm_source, redirect } = req.query;
+  const { service } = req.params;
+  const attrs = { service };
 
   switch (service) {
+
     case 'github': {
-      const attrs = { service };
-      let caId, user;
-      const utmSource = req.query.utm_source;
+      let fetchUserPromise, caId, user, userCollective;
+      const profile = data.profile._json;
       const image = `https://images.githubusercontent.com/${data.profile.username}`;
       // TODO should simplify using findOrCreate but need to upgrade Sequelize to have this fix:
       // https://github.com/sequelize/sequelize/issues/4631
-      return User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) } } })
+      if (req.remoteUser) {
+        fetchUserPromise = Promise.resolve(req.remoteUser);
+      } else {
+        fetchUserPromise = User.findOne({ where: { email: { $in: emails.map(email => email.toLowerCase()) } } })
         .then(u => u || User.createUserWithCollective({
-          name: data.profile.displayName || data.profile.username,
+          name: profile.name || profile.login,
           image,
           email: emails[0],
         }))
-        .tap(u => user = u)
-        .tap(user => attrs.CollectiveId = user.CollectiveId)
+      }
+      return fetchUserPromise
+        .then(u => {
+          user = u;
+          attrs.CollectiveId = user.CollectiveId;
+          attrs.clientId = profile.id;
+          attrs.data = profile;
+          attrs.CreatedByUserId = user.id;
+          return models.Collective.findById(user.CollectiveId);
+        })
+        .then(c => {
+          userCollective = c;
+          userCollective.description = userCollective.description || profile.bio;
+          userCollective.locationName = userCollective.locationName || profile.location;
+          userCollective.website = userCollective.website || profile.blog || profile.html_url;
+          userCollective.image = userCollective.image || image;
+          userCollective.save();
+        })
         .then(() => ConnectedAccount.findOne({ where: { service, CollectiveId: user.CollectiveId} }))
-        .then(ca => ca || ConnectedAccount.create({ ...attrs, CreatedByUserId: user.id }))
+        .then(ca => ca || ConnectedAccount.create(attrs))
         .then(ca => {
           caId = ca.id;
           return ca.update({ username: data.profile.username, token: accessToken });
         })
         .then(() => {
           const token = user.generateConnectedAccountVerifiedToken(caId, data.profile.username);
-          res.redirect(`${config.host.website}/github/apply/${token}?utm_source=${utmSource}`);
+          res.redirect(redirect || `${config.host.website}/github/apply/${token}?utm_source=${utm_source}`);
         })
         .catch(next);
     }
+
     case 'meetup':
-      createConnectedAccountForCollective(req.query.CollectiveId, service)
+      return createConnectedAccountForCollective(req.query.CollectiveId, service)
         .then(ca => ca.update({
           clientId: accessToken,
           token: data.tokenSecret,
           CreatedByUserId: req.remoteUser.id
         }))
-        .then(() => res.redirect(redirect))
+        .then(() => res.redirect(redirect || `${config.host.website}/${req.query.slug}/edit#connectedAccounts`))
         .catch(next);
-      break;
 
-    case 'twitter':
-      createConnectedAccountForCollective(req.query.CollectiveId, service)
+    case 'twitter': {
+      let collective;
+      const profile = data.profile._json;
+
+      return models.Collective.findById(req.query.CollectiveId)
+        .then(c => {
+          collective = c; 
+          collective.image = collective.image || profile.profile_image_url_https ? profile.profile_image_url_https.replace(/_normal/, '') : null;
+          collective.description = collective.description || profile.description;
+          collective.backgroundImage = collective.backgroundImage || profile.profile_banner_url ? `${profile.profile_banner_url}/1500x500` : null;
+          collective.website = collective.website || profile.url;
+          collective.locationName = collective.locationName || profile.location;
+          collective.twitterHandle = profile.screen_name;
+          collective.save();
+        })
+        .then(() => createConnectedAccountForCollective(req.query.CollectiveId, service))
         .then(ca => ca.update({
           username: data.profile.username,
           clientId: accessToken,
           token: data.tokenSecret,
+          data: data.profile._json,
           CreatedByUserId: req.remoteUser.id
         }))
-        .then(() => res.redirect(redirect))
+        .then(() => res.redirect(redirect || `${config.host.website}/${collective.slug}/edit#connectedAccounts`))
         .catch(next);
-      break;
+    }
 
     default:
       return next(new errors.BadRequest(`unsupported service ${service}`));
@@ -132,7 +167,7 @@ export const fetchAllRepositories = (req, res, next) => {
 function createConnectedAccountForCollective(CollectiveId, service) {
   const attrs = { service };
   return models.Collective.findById(CollectiveId)
-    .tap(collective => attrs.CollectiveId = collective.id)
+    .then(collective => attrs.CollectiveId = collective.id)
     .then(() => ConnectedAccount.findOne({ where: attrs }))
     .then(ca => ca || ConnectedAccount.create(attrs));
 }
