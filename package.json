@@ -46,7 +46,7 @@
     "net": "1.0.2",
     "newrelic": "2.3.1",
     "next": "3.2.2",
-    "next-routes": "1.0.40",
+    "next-routes": "^1.1.0",
     "node-sass": "4.5.0",
     "path-match": "1.2.4",
     "payment": "2.1.4",
