@@ -1,20 +1,34 @@
 /*
  * This script runs through a few checks and lets us know if something is off
- * Note, best to run this script on a prod_snapshot locally, until we create a read-only follower
  */
-import models, { sequelize } from '../server/models';
+
+import models, { sequelize } from '../../server/models';
+import emailLib from '../../server/lib/email';
+
 
 const VERBOSE = true;
+let result = '';
+let start;
 
 const done = (err) => {
-  if (err) console.log('err', err);
-  console.log('done!');
-  process.exit();
+  if (err) result = result.concat('err', err);
+  result = result.concat("\n\nTotal time taken: ", new Date() - start, "ms")
+  console.log('\ndone!\n');
+  console.log(result);
+  return emailLib.sendMessage(
+    'ops@opencollective.com', 
+    'Daily ledger health report', 
+    '', {
+      bcc: ' ',
+      text: result
+    })
+    .then(process.exit)
+    .catch(console.error)
 }
 
 const checkHostsUserOrOrg = () => {
 
-  console.log('\n>>> Checking Hosts to be USER or ORG...')
+  result = result.concat('\n>>> Checking Hosts to be USER or ORG...\n')
 
   const hostErrors = [];
 
@@ -26,7 +40,7 @@ const checkHostsUserOrOrg = () => {
     WHERE id IN (SELECT * FROM hosts);
     `, { type: sequelize.QueryTypes.SELECT})
     .then(hostCollectives => {
-      console.log('\t>>> Hosts found: ', hostCollectives.length);
+      result = result.concat('\n\t>>> Hosts found: ', hostCollectives.length);
       return hostCollectives
     })
     .each(hostCollective => {
@@ -35,16 +49,16 @@ const checkHostsUserOrOrg = () => {
       }
     })
     .then(() => {
-      console.log('\t>>> Hosts found with incorrect type: ', hostErrors.length)
+      result = result.concat('\n\t>>> Hosts found with incorrect type: ', hostErrors.length)
       if (VERBOSE)
-        console.log(hostErrors && hostErrors.map(h => Object.assign({slug: h.slug, type: h.type})));
+        result = result.concat(hostErrors && JSON.stringify(hostErrors.map(h => Object.assign({slug: h.slug, type: h.type}))));
     });
 } 
 
 // Ensure all Collectives are setup properly
 const checkHostCollectives = () => {
 
-  console.log('\n>>> Checking Host Collectives...')
+  result = result.concat('\n>>> Checking Host Collectives...\n')
 
   // Check that a collective is not setup to host itself or be it's own parentCollectiveId
   return models.Collective.findAll({
@@ -55,9 +69,9 @@ const checkHostCollectives = () => {
     }
   })
   .then(selfReferencingHosts => {
-    console.log('\t>>> Self-referencing Hosts found: ', selfReferencingHosts.length)
+    result = result.concat('\n\t>>> Self-referencing Hosts found: ', selfReferencingHosts.length)
     if (VERBOSE)
-      console.log(selfReferencingHosts && selfReferencingHosts.map(h => Object.assign({slug: h.slug, id: h.id})))
+      result = result.concat(selfReferencingHosts && JSON.stringify(selfReferencingHosts.map(h => Object.assign({slug: h.slug, id: h.id}))))
   })
 }
 
@@ -73,15 +87,15 @@ const checkHostStripeAccount = () => {
   WHERE ca."CollectiveId" IS NULL
     `, { type: sequelize.QueryTypes.SELECT})
   .then(hostsWithoutStripe => {
-    console.log('\t>>> Hosts without Stripe: ', hostsWithoutStripe.length)
+    result = result.concat('\n\t>>> Hosts without Stripe: ', hostsWithoutStripe.length)
     if (VERBOSE)
-      console.log(hostsWithoutStripe.map(h => h.id).join(', '));
+      result = result.concat(hostsWithoutStripe && JSON.stringify(hostsWithoutStripe.map(h => h.id).join(', ')).concat('\n'));
   })
 }
 
 const checkUsersAndOrgs = () => {
 
-  console.log('\n>>> Checking USER and ORG Collectives')
+  result = result.concat('\n>>> Checking USER and ORG Collectives\n')
 
   // Check that no User or ORG has a HostCollectiveId or ParentCollectiveId
   return models.Collective.findAll({
@@ -95,9 +109,9 @@ const checkUsersAndOrgs = () => {
     }
   })
   .then(collectives => {
-    console.log('\t>>> USER or ORGs found with HostCollectiveId: ', collectives.length)
+    result = result.concat('\n\t>>> USER or ORGs found with HostCollectiveId: ', collectives.length)
     if (VERBOSE)
-      console.log(collectives.map(c => Object.assign({slug: c.slug, HostCollectiveId: c.HostCollectiveId})))
+      result = result.concat(JSON.stringify(collectives.map(c => Object.assign({slug: c.slug, HostCollectiveId: c.HostCollectiveId}))))
   })
   // TODO: Check that no non-USER Collective is directly linked to a USER
   .then(() => models.User.findAll({
@@ -114,14 +128,14 @@ const checkUsersAndOrgs = () => {
     }
   }))
   .then(improperlyLinkedCollectives => {
-    console.log('\t>>> non-User collectives that are linked to a USER: ', improperlyLinkedCollectives.length);
+    result = result.concat('\n\t>>> non-User collectives that are linked to a USER: ', improperlyLinkedCollectives.length);
     if (VERBOSE)
-      console.log(improperlyLinkedCollectives.map(c => Object.assign({id: c.id, slug: c.slug})));
+      result = result.concat(JSON.stringify(improperlyLinkedCollectives.map(c => Object.assign({id: c.id, slug: c.slug}))));
   })
 }
 
 const checkMembers = () => {
-  console.log('\n>>> Checking Members table');
+  result = result.concat('\n\n>>> Checking Members table\n');
 
   return models.Member.findAll({
     where: {
@@ -131,17 +145,17 @@ const checkMembers = () => {
     }
   })
   .then(circularMembers => {
-    console.log('\t>>> Members with CollectiveId = MemberCollectiveId: ', circularMembers.length)
+    result = result.concat('\n\t>>> Members with CollectiveId = MemberCollectiveId: ', circularMembers.length)
     if (VERBOSE)
-      console.log(circularMembers.map(cm => cm.id).join(', '))
+      result = result.concat(JSON.stringify(circularMembers.map(cm => cm.id).join(', '))).concat('\n')
   })
 }
 
+// TODO: may need to disalbe this check if production sees impact
 // Check orders
-
 const checkOrders = () => {
 
-  console.log('>>> Check orders');
+  result = result.concat('\n>>> Check orders\n');
 
   // Check that FromCollectiveId on an Order matches all Transactions
   const brokenOrders = [];
@@ -152,7 +166,7 @@ const checkOrders = () => {
     `, { type: sequelize.QueryTypes.SELECT
     })
     .then(orders => {
-      console.log('\t>>> orders found: ', orders.length);
+      result = result.concat('\n\t>>> orders found: ', orders.length);
       return orders;
     })
     .each(order => {
@@ -173,17 +187,40 @@ const checkOrders = () => {
         })
     })
     .then(() => {
-      console.log('\t>>> orders found with mismatched FromCollectiveId: ', brokenOrders.length);
+      result = result.concat('\n\t>>> orders found with mismatched FromCollectiveId: ', brokenOrders.length, 
+        '\n');
       if (VERBOSE)
-        console.log(brokenOrders)
+        result = result.concat(JSON.stringify(brokenOrders))
     })
 }
 
+// Check expenses
+const checkExpenses = () => {
+
+  result = result.concat('\n\n>>> Check expenses\n');
+
+  // Check that there are no expenses marked as "PAID" and without transaction entries
+  return sequelize.query(`
+    SELECT 
+      e.id AS id
+    FROM "Expenses" e
+    LEFT JOIN "Transactions" t ON t."ExpenseId" = e.id
+    WHERE e.status ILIKE 'paid' AND t.id IS NULL AND  e."deletedAt" IS NULL
+    ORDER BY "ExpenseId" DESC, e."updatedAt"
+    `, { type: sequelize.QueryTypes.SELECT
+    })
+    .then(expenses => {
+      result = result.concat('\n\t>>> Paid expenses found without transactions: ', expenses.length);
+      if (VERBOSE)
+        result = result.concat('\n');
+        result = result.concat(expenses && JSON.stringify(expenses.map(e => Object.assign({id: e.id}))))
+    })
+}
 
 // Check all transactions
 const checkTransactions = () => {
 
-  console.log('\n>>> Checking Transactions...')
+  result = result.concat('\n\n>>> Checking Transactions...\n')
 
   // Check every transaction has a "FromCollectiveId"
   return models.Transaction.count({
@@ -194,7 +231,7 @@ const checkTransactions = () => {
     }
   })
   .then(txsWithoutFromCollectiveId => {
-    console.log('\t>>> Transactions without `FromCollectiveId`:', txsWithoutFromCollectiveId);
+    result = result.concat('\n\t>>> Transactions without `FromCollectiveId`:', txsWithoutFromCollectiveId);
   })
 
   // Check no transaction has same "FromCollectiveId" and "CollectiveId"
@@ -206,9 +243,9 @@ const checkTransactions = () => {
     }
   }))
   .then(circularTxs => {
-    console.log('\t>>> Transactions with same source and destination: ', circularTxs.length)
+    result = result.concat('\n\t>>> Transactions with same source and destination: ', circularTxs.length)
     if (VERBOSE) 
-      console.log(circularTxs.map(t => Object.assign({id: t.id})))
+      result = result.concat(JSON.stringify(circularTxs.map(t => Object.assign({id: t.id}))))
   })
 
   // check no transactions without TransactionGroup
@@ -220,7 +257,7 @@ const checkTransactions = () => {
     }
   }))
   .then(txnsWithoutTransactionGroup => {
-    console.log('\t>>> Transactions without `TransactionGroup`: ', txnsWithoutTransactionGroup)
+    result = result.concat('\n\t>>> Transactions without `TransactionGroup`: ', txnsWithoutTransactionGroup)
   })
 
   // Check every Order has even number of entries
@@ -231,7 +268,7 @@ const checkTransactions = () => {
           HAVING COUNT(*) % 2 != 0 
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddOrderIds => {
-    console.log('\t>>> Orders with odd (not multiple of 2) number of transactions: ', oddOrderIds.length)
+    result = result.concat('\n\t>>> Orders with odd (not multiple of 2) number of transactions: ', oddOrderIds.length)
   })
 
   // Check every Expense has a double Entry
@@ -242,9 +279,9 @@ const checkTransactions = () => {
           HAVING COUNT(*) != 2 
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddExpenseIds => {
-    console.log('\t>>> Expenses with less than or more than 2 transactions: ', oddExpenseIds.length)
+    result = result.concat('\n\t>>> Expenses with less than or more than 2 transactions: ', oddExpenseIds.length, '\n')
     if (VERBOSE)
-      console.log(oddExpenseIds)
+      result = result.concat(JSON.stringify(oddExpenseIds))
   })
 
   // Check all TransactionGroups have two entries, one CREDIT and one DEBIT
@@ -255,9 +292,9 @@ const checkTransactions = () => {
           HAVING COUNT(*) != 2 
     `, {type: sequelize.QueryTypes.SELECT}))
   .then(oddTxnGroups => {
-    console.log('\t>>> Transaction groups that are not pairs: ', oddTxnGroups.length)
+    result = result.concat('\n\t>>> Transaction groups that are not pairs: ', oddTxnGroups.length)
     if (VERBOSE) 
-      console.log(oddTxnGroups);
+      result = result.concat(oddTxnGroups);
   })
 
   // Check no transactions without either an Expense or Order
@@ -272,9 +309,10 @@ const checkTransactions = () => {
     }
   }))
   .then(txnsWithoutOrderOrExpenses => {
-    console.log('\t>>> Transactions without OrderId or ExpenseId: ', txnsWithoutOrderOrExpenses.length)
-    if (VERBOSE)
-      txnsWithoutOrderOrExpenses.map(t => Object.assign({id: t.id}));
+    result = result.concat('\n\t>>> Transactions without OrderId or ExpenseId: ', txnsWithoutOrderOrExpenses.length)
+    // TODO: reenable when this count is lower than 600
+    // if (VERBOSE)
+    //  txnsWithoutOrderOrExpenses.map(t => Object.assign({id: t.id}));
   })
 
   // Check that various fees and amounts add up
@@ -284,14 +322,14 @@ const checkTransactions = () => {
 const checkCollectiveBalance = () => {
 
   const brokenCollectives = [];
-  console.log('>>> Checking balance of each (non-USER, non-ORG) collective');
+  result = result.concat('\n\n>>> Checking balance of each (non-USER, non-ORG) collective\n');
   return models.Collective.findAll({
     where: {
       $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}]
     }
   })
   .then(collectives => {
-    console.log('\t>>> Collectives found:', collectives.length);
+    result = result.concat('\n\t>>> Collectives found:', collectives.length);
     return collectives;
   })
   .each(collective => {
@@ -304,14 +342,16 @@ const checkCollectiveBalance = () => {
       })
   })
   .then(() => {
-    console.log('\t>>> Collectives with negative balance: ', brokenCollectives.length);
+    result = result.concat('\n\t>>> Collectives with negative balance: ', brokenCollectives.length, '\n');
     if (VERBOSE)
-      console.log(brokenCollectives.map(c => Object.assign({id: c.id, slug: c.slug})))
+      result = result.concat(JSON.stringify(brokenCollectives.map(c => Object.assign({id: c.id, slug: c.slug}))))
   })
 
 }
 
 const run = () => {
+  console.log('\nStarting check_ledger_health script...')
+  start = new Date();
   
   return checkHostsUserOrOrg()
   .then(() => checkHostCollectives())
@@ -319,6 +359,7 @@ const run = () => {
   .then(() => checkUsersAndOrgs())
   .then(() => checkMembers())
   .then(() => checkOrders())
+  .then(() => checkExpenses())
   .then(() => checkTransactions())
   .then(() => checkCollectiveBalance())
   .then(() => done())
