@@ -123,6 +123,9 @@ class HostCollective extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
+          .cardsList {
+            margin: 0 2rem;
+          }
         `}</style>
 
         <Header
@@ -186,7 +189,6 @@ class HostCollective extends React.Component {
                         <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                       </ul>
                     </div>
-                    }
                   }
 
                   <div className="cardsList">
