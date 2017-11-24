@@ -49,6 +49,7 @@ export default function(Sequelize, DataTypes) {
     slug: {
       type: DataTypes.STRING,
       unique: true,
+      allowNull: false,
       set(slug) {
         if (slug && slug.toLowerCase) {
           this.setDataValue('slug', slug.toLowerCase().replace(/ /g, '-').replace(/\./g, ''));
@@ -291,7 +292,7 @@ export default function(Sequelize, DataTypes) {
     },
 
     hooks: {
-      beforeCreate: (instance) => {
+      beforeValidate: (instance) => {
         if (instance.slug) return Promise.resolve();
 
         const potentialSlugs = [
