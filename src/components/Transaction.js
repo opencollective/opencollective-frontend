@@ -27,7 +27,7 @@ class Transaction extends React.Component {
       'closeDetails': { id: 'transaction.closeDetails', defaultMessage: 'Close Details' },
       'viewDetails': { id: 'transaction.viewDetails', defaultMessage: 'View Details' }
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
   }
 
   toggleDetails() {

@@ -44,7 +44,7 @@ class Expense extends React.Component {
       'cancelEdit': { id: 'expense.cancelEdit', defaultMessage: 'cancel edit' },
       'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' }
     });
-    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
+    this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
   }
 
   toggleDetails() {
