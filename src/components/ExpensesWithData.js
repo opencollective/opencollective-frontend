@@ -60,6 +60,7 @@ query Expenses($CollectiveId: Int!, $status: String, $limit: Int, $offset: Int, 
     description
     status
     createdAt
+    incurredAt
     category
     amount
     currency

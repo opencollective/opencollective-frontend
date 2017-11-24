@@ -181,10 +181,12 @@ class CollectivePickerWithData extends React.Component {
       const badgeCount = (c) => c.stats.expenses.pending + c.stats.expenses.approved;
       if (badgeCount(b) > badgeCount(a)) return 1;
       if (badgeCount(b) < badgeCount(a)) return -1;
-      return (b.name.toUpperCase() < a.name.toUpperCase());
+      return (b.name.toUpperCase() < a.name.toUpperCase()) ? 1 : -1;
     });
+
     const selectedCollective = this.state.selectedCollective;
     const selectedTitle = selectedCollective ? this.renderCollectiveMenuItem(selectedCollective, 'selected') : <div className="defaultTitle"><FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" /></div>;
+
     return (
       <div className="CollectivesContainer">
         <style jsx>{`
@@ -194,7 +196,7 @@ class CollectivePickerWithData extends React.Component {
 
           .submenu {
             width: 100%;
-            height: 16rem;
+            min-height: 16rem;
             font-family: Rubik;
             padding: 2rem 2rem 2rem 6rem;
             display: flex;
