@@ -183,37 +183,29 @@ export const authenticateService = (req, res, next) => {
     // 'repo' gives us access to organizational repositories as well
     // vs. 'public_repo' which requires the org to give separate access to app
     opts.scope = [ 'user:email', 'repo' ]; 
-    console.log("authenticateService calling Passport with options", opts);
     return passport.authenticate(service, opts)(req, res, next);
   }
 
   if (!req.query.CollectiveId) {
     return next(new errors.ValidationFailed(`Please provide a CollectiveId as a query parameter`));
   }
-  
-  return models.ConnectedAccount.findOne({ where: { service, CollectiveId: req.query.CollectiveId }})
-  .then(existingAccount => {
-    if (existingAccount && (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId))) {
-      throw new errors.ValidationFailed(null, ['CollectiveId'], `This collective already has a ${service} account connected. Please login as an admin of this collective to reconnect this service.`);
-    }
-    return true;
-  })
-  .then(() => {
-    
-    if (paymentProviders[service]) {
-      return paymentProviders[service].oauth.redirectUrl(req.remoteUser, req.query.CollectiveId, req.query)
+
+  if (!req.remoteUser || !req.remoteUser.isAdmin(req.query.CollectiveId)) {
+    throw new errors.Unauthorized("Please login as an admin of this collective to add a connected account");
+  }
+
+  if (paymentProviders[service]) {
+    return paymentProviders[service].oauth.redirectUrl(req.remoteUser, req.query.CollectiveId, req.query)
       .then(redirectUrl => res.send({ redirectUrl }))
       .catch(next);
-    }
-    
-    if (service === 'meetup') {
-      opts.scope = 'ageless';
-    }
+  }
 
-    console.log("authenticateService calling Passport with options", opts);
-    return passport.authenticate(service, opts)(req, res, next);
-  })
-  .catch(next);
+  if (service === 'meetup') {
+    opts.scope = 'ageless';
+  }
+
+  return passport.authenticate(service, opts)(req, res, next);
+
 };
 
 export const authenticateServiceCallback = (req, res, next) => {
@@ -224,7 +216,7 @@ export const authenticateServiceCallback = (req, res, next) => {
   }
 
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
-  console.log("authenticateServiceCallback calling Passport with options", opts);
+
   passport.authenticate(service, opts, (err, accessToken, data) => {
     if (err) {
       return next(err);
