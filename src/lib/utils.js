@@ -71,6 +71,14 @@ export function resizeImage(imageUrl, { width, height, query }) {
 }
 
 export function imagePreview(src, defaultImage, options = { width: 640 }) {
+
+  if (typeof options.width === 'string') {
+    options.width = Number(options.width.replace(/rem/,'')) * 10;
+  }
+  if (typeof options.height === 'string') {
+    options.height = Number(options.height.replace(/rem/,'')) * 10;
+  }
+
   if (src) return resizeImage(src, options);
   return defaultImage;
 }
