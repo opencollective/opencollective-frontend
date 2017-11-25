@@ -15,9 +15,10 @@ const done = (err) => {
   result = result.concat("\n\nTotal time taken: ", new Date() - start, "ms")
   console.log('\ndone!\n');
   console.log(result);
+  const subject = `Daily ledger health report - ${(new Date()).toLocaleDateString()}`;
   return emailLib.sendMessage(
     'ops@opencollective.com', 
-    'Daily ledger health report', 
+    subject, 
     '', {
       bcc: ' ',
       text: result
