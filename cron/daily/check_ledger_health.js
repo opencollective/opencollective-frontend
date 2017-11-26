@@ -338,6 +338,7 @@ const checkCollectiveBalance = () => {
   const brokenCollectives = [];
   header('Checking balance of each (non-USER, non-ORG) collective');
   return models.Collective.findAll({
+    attributes: [ 'id' ],
     where: {
       $or: [{type: 'COLLECTIVE'}, {type: 'EVENT'}]
     }
