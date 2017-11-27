@@ -62,27 +62,50 @@ export async function fetchMembersStats(params) {
 
 export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, options = {}) {
   let query, processResult, type;
-  if (backerType) {
+  if (backerType === 'contributors') {
+    query = `
+    query Collective($collectiveSlug: String!) {
+      Collective(slug:$collectiveSlug) {
+        id
+        data
+      }
+    }
+    `;
+    processResult = (res) => {
+      const users = res.Collective.data.githubContributors;
+      return Object.keys(users).map(username => {
+        const commits = users[username]
+        return {
+          slug: username,
+          type: 'USER',
+          image: `https://avatars.githubusercontent.com/${username}?s=96`,
+          website: `https://github.com/${username}`,
+          stats: { c: commits }
+        }
+      });
+    }
+  } else if (backerType) {
     type = backerType.match(/sponsor/i) ? 'ORGANIZATION' : 'USER';
     query = `
-    query Collective($collectiveSlug: String!, $type: String!) {
-      Collective(slug:$collectiveSlug) {
-        members(type: $type) {
+    query allMembers($collectiveSlug: String!, $type: String!) {
+      allMembers(collectiveSlug: $collectiveSlug, type: $type, orderBy: "totalDonations") {
+        id
+        createdAt
+        stats {
+          totalDonations
+        }
+        member {
           id
-          createdAt
-          member {
-            id
-            type
-            slug
-            image
-            website
-            twitterHandle
-          }
+          type
+          slug
+          image
+          website
+          twitterHandle
         }
       }
     }
     `;
-    processResult = (res) => uniqBy(res.Collective.members.map(m => m.member), m => m.id);
+    processResult = (res) => uniqBy(res.allMembers.map(m => m.member), m => m.id);
   } else if (tierSlug) {
     query = `
     query Collective($collectiveSlug: String!, $tierSlug: String!) {

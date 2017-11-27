@@ -49,11 +49,22 @@ describe("badge.routes.test.js", () => {
       const res = await r2(`${WEBSITE_URL}/gulpjs/tiers/individual/badge.svg`).text;
       expect(res).toMatch(/Individual<\/text>/);
     });
-        
+
     test("loads the first member avatar.svg", async () => {
       const res = await r2(`${WEBSITE_URL}/gulpjs/tiers/individual/0/avatar.svg`).text;
       expect(res).toMatch(/<image width="64" height="64"/);
     });
     
+  });
+
+  describe("contributors.svg", () => {
+    test("loads the mosaic", async () => {
+      const res = await r2(`${WEBSITE_URL}/tipbox/contributors.svg?width=500`).response;
+      expect(res.status).toEqual(200);
+      expect(Number(res.headers.get('content-length'))).toBeGreaterThan(97000);
+      expect(res.headers.get('content-type')).toEqual('image/svg+xml; charset=utf-8');
+      expect(res.headers.get('cache-control')).toEqual('public, max-age=300');
+    });
   })
+
 });
