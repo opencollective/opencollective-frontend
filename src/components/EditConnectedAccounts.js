@@ -19,7 +19,7 @@ class EditConnectedAccounts extends React.Component {
     super(props);
     const { intl, collective } = props;
 
-    this.state = { editMode: props.editMode || false };
+    this.state = { services: ['twitter'], editMode: props.editMode || false };
 
     this.messages = defineMessages({
       'collective.connectedAccounts.stripe.button': { id: 'collective.connectedAccounts.stripe.button', defaultMessage: 'Connect Stripe' },
@@ -27,12 +27,17 @@ class EditConnectedAccounts extends React.Component {
     });
     this.connectedAccounts = groupBy(props.connectedAccounts, 'service');
 
-    this.services = ['twitter'];
     if (collective.type === 'USER') {
-      this.services.push('github');
+      this.state.services.push('github');
     }
-    if (collective.type === 'USER' || collective.type === 'ORGANIZATION') {
-      this.services.push('stripe');
+  }
+
+  componentDidMount() {
+    const { collective } = this.props;
+    if (window.location.href.match(/service=stripe/) && (collective.type === 'USER' || collective.type === 'ORGANIZATION')) {
+      const { services } = this.state;
+      services.push('stripe');
+      this.setState({ services });
     }
   }
 
@@ -44,7 +49,7 @@ class EditConnectedAccounts extends React.Component {
         <style global jsx>{`
         `}</style>
 
-      { this.services.map(service =>
+      { this.state.services.map(service =>
         <div>
           <h2>{capitalize(service)}</h2>
           <EditConnectedAccount collective={collective} service={service} connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]} />
