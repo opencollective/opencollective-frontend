@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedNumber, FormattedDate } from 'react-intl';
 import { capitalize, formatCurrency } from '../lib/utils';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -24,12 +24,13 @@ class Expense extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       modified: false,
-      mode: undefined,
       expense: {},
       mode: 'summary'
     };
+
     this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
@@ -45,6 +46,24 @@ class Expense extends React.Component {
       'viewDetails': { id: 'expense.viewDetails', defaultMessage: 'View Details' }
     });
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 2, maximumFractionDigits: 2};
+  }
+
+  componentWillReceiveProps(newProps) {
+    const { LoggedInUser } = newProps;
+    const { expense } = this.props;
+    if (LoggedInUser && this.state.mode === 'summary') {
+      let mode = 'summary';
+      if (LoggedInUser) {
+        if (expense.status === 'PENDING' && LoggedInUser.canApproveExpense(expense)) {
+          mode = 'details';
+        }
+        if (expense.status === 'APPROVED' && LoggedInUser.canPayExpense(expense)) {
+          mode = 'details';
+        }
+      }
+
+      this.setState({ mode });
+    }
   }
 
   toggleDetails() {
@@ -130,7 +149,6 @@ class Expense extends React.Component {
           }
           .meta .collective {
             margin-right: 0.2rem;
-            float: left;
           }
           .amount .balance {
             font-size: 1.2rem;
@@ -204,6 +222,7 @@ class Expense extends React.Component {
             </a>
           </div>
           <div className="meta">
+            <span className="incurredAt"><FormattedDate value={expense.incurredAt} day="numeric" month="numeric" /></span> |&nbsp;
             { includeHostedCollectives &&
               <span className="collective"><Link route={`/${expense.collective.slug}`}><a>{expense.collective.slug}</a></Link> (balance: {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}) | </span>
             }
