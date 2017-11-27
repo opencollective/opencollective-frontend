@@ -91,9 +91,6 @@ export async function fetchMembers({ collectiveSlug, tierSlug, backerType }, opt
       allMembers(collectiveSlug: $collectiveSlug, type: $type, orderBy: "totalDonations") {
         id
         createdAt
-        stats {
-          totalDonations
-        }
         member {
           id
           type
