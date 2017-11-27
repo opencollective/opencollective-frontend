@@ -77,7 +77,7 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { intl, data, interval, verb } = this.props;
-    const description = decodeURIComponent(this.props.description);
+    const description = decodeURIComponent(this.props.description || "");
     const collective = data.Collective;
     if (data.loading) return (<Loading />);
     if (!data.Collective) return (<NotFound />);

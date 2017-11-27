@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withIntl from '../lib/withIntl';
 import EditConnectedAccount from '../components/EditConnectedAccount';
 import { groupBy } from 'lodash';
+import { capitalize } from '../lib/utils';
 
 class EditConnectedAccounts extends React.Component {
 
@@ -16,7 +17,7 @@ class EditConnectedAccounts extends React.Component {
 
   constructor(props) {
     super(props);
-    const { intl } = props;
+    const { intl, collective } = props;
 
     this.state = { editMode: props.editMode || false };
 
@@ -26,10 +27,13 @@ class EditConnectedAccounts extends React.Component {
     });
     this.connectedAccounts = groupBy(props.connectedAccounts, 'service');
 
-    // We can't handle Twitter and Github since they are using node-passport which returns a 302 redirect
-    // We should move node-passport to the frontend
-    this.services = ['stripe'];
-    console.log(">>> connectedAccounts", this.connectedAccounts,props.connectedAccounts)
+    this.services = ['twitter'];
+    if (collective.type === 'USER') {
+      this.services.push('github');
+    }
+    if (collective.type === 'USER' || collective.type === 'ORGANIZATION') {
+      this.services.push('stripe');
+    }
   }
 
   render() {
@@ -40,7 +44,12 @@ class EditConnectedAccounts extends React.Component {
         <style global jsx>{`
         `}</style>
 
-      { this.services.map(service => <EditConnectedAccount collective={collective} service={service} connectedAccount={this.connectedAccounts[service]} />) }
+      { this.services.map(service =>
+        <div>
+          <h2>{capitalize(service)}</h2>
+          <EditConnectedAccount collective={collective} service={service} connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]} />
+        </div>
+        ) }
 
       </div>
     );

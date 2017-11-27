@@ -276,9 +276,9 @@ class EditCollectiveForm extends React.Component {
             <Button className="menuBtn paymentMethods" bsStyle={this.state.section === 'paymentMethods' ? 'primary' : 'default'} onClick={() => this.showSection('paymentMethods')}>
               <FormattedMessage id='editCollective.menu.paymentMethods' defaultMessage='Payment Methods' />
             </Button>
-            {/* <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
+            <Button className="menuBtn connectedAccounts" bsStyle={this.state.section === 'connectedAccounts' ? 'primary' : 'default'} onClick={() => this.showSection('connectedAccounts')}>
               <FormattedMessage id='editCollective.menu.connectedAccounts' defaultMessage='Connected Accounts' />
-            </Button> */}
+            </Button>
             { collective.type === 'COLLECTIVE' &&
             <Button className="menuBtn export" bsStyle={this.state.section === 'export' ? 'primary' : 'default'} onClick={() => this.showSection('export')}>
               <FormattedMessage id='editCollective.menu.export' defaultMessage='export' />

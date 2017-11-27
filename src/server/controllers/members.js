@@ -13,7 +13,18 @@ export async function list(req, res, next) {
     tierSlug
   } = req.params;
 
-  const backerType = req.params.backerType !== 'all' && (req.params.backerType === 'users' ? 'USER' : 'ORGANIZATION');
+  let backerType;
+  switch (req.params.backerType) {
+    case 'users':
+      backerType = 'USER';
+      break;
+    case 'organizations':
+      backerType = 'ORGANIZATION';
+      break;
+    default:
+      backerType = null;
+      break;
+  }
 
   const headers = {};
   if (req.headers.authorization) {
@@ -53,6 +64,11 @@ export async function list(req, res, next) {
           image
           website
           twitterHandle
+          connectedAccounts {
+            id
+            service
+            username
+          }
           ... on User {
             email
           }
@@ -106,7 +122,13 @@ export async function list(req, res, next) {
     'description': 'member.description',
     'image': 'member.image',
     'email': 'member.email',
-    'twitterHandle': 'member.twitterHandle',
+    'twitter': (r) => {
+      return r.member.twitterHandle ? `https://twitter.com/${r.member.twitterHandle}` : null;
+    },
+    'github': (r) => {
+      const githubAccount = r.member.connectedAccounts.find(c => c.service === 'github');
+      return githubAccount ? `https://github.com/${githubAccount.username}` : null;
+    },
     'website': 'member.website'
   }
 

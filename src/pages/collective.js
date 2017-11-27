@@ -8,7 +8,6 @@ import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import Collective from '../components/Collective';
 import UserCollective from '../components/UserCollective';
-import HostCollective from '../components/HostCollective';
 import { intersection } from 'lodash';
 
 class CollectivePage extends React.Component {
@@ -41,24 +40,16 @@ class CollectivePage extends React.Component {
     }
 
     const collective = data.Collective;
-    let type = collective.isHost ? 'HOST' : collective.type;
     return (
       <div>
-        { type === 'COLLECTIVE' &&
+        { collective.type === 'COLLECTIVE' &&
           <Collective
             collective={collective}
             LoggedInUser={LoggedInUser}
             query={query}
             />
         }
-        { type === 'HOST' &&
-          <HostCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            query={query}
-            />
-        }
-        { ['USER', 'ORGANIZATION'].includes(type) &&
+        { ['USER', 'ORGANIZATION'].includes(collective.type) &&
           <UserCollective
             collective={collective}
             LoggedInUser={LoggedInUser}
