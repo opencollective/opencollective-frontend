@@ -413,7 +413,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
       max(c.website) as website,
       max(u.email) as email,
       max(c."twitterHandle") as "twitterHandle",
-      max(s."totalDonations") as "totalDonations",
+      COALESCE(max(s."totalDonations"), 0) as "totalDonations",
       max(s."firstDonation") as "firstDonation",
       max(s."lastDonation") as "lastDonation"
     FROM "Collectives" c
