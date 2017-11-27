@@ -204,7 +204,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
       template = 'thankyou.brusselstogether';
     if (data.collective.slug === 'sustainoss')
       template = 'thankyou.sustainoss';
-    if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire'], data.collective.slug)) {
+    if (_.contains(['lesbarbares', 'nuitdebout', 'laprimaire', 'enmarchebe'], data.collective.slug)) {
       template += '.fr';
 
       if (data.collective.slug === 'laprimaire')
