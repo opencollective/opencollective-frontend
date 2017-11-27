@@ -120,10 +120,6 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   } else if (options.hasOwnProperty('precision')) {
     minimumFractionDigits = options.precision;
     maximumFractionDigits = options.precision;
-  } 
-
-  if (options.precision || options.minimumFractionDigits) {
-    minimumFractionDigits: options.precision || options.minimumFractionDigits
   }
 
   return amount.toLocaleString(getLocaleFromCurrency(currency), {
