@@ -223,13 +223,16 @@ class UserCollective extends React.Component {
                   <h1>
                     {intl.formatMessage(this.messages[`${type}.collective.memberOf.host.title`], { n: this.collective.stats.collectives })}
                   </h1>
-                  { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                    <div className="adminActions" id="adminActions">
-                      <ul>
+                  <div className="adminActions" id="adminActions">
+                    <ul>
+                      { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
                         <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
-                      </ul>
-                    </div>
-                  }
+                      }
+                      { this.collective.settings.apply &&
+                        <li><Link><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></Link></li>
+                      }
+                    </ul>
+                  </div>
 
                   <div className="cardsList">
                     <CollectivesWithData
