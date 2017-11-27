@@ -128,6 +128,9 @@ class UserCollective extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
+          .cardsList {
+            margin: 0 2rem;
+          }
         `}</style>
 
         <Header
@@ -183,12 +186,12 @@ class UserCollective extends React.Component {
                       <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
                     </div>
                   }
-                  { this.collective.longDescription &&
-                    <div className="collectiveDescription" >
-                      <Markdown source={this.collective.longDescription} />
-                    </div>
-                  }
                 </div>
+                { this.collective.longDescription &&
+                  <div className="collectiveDescription" >
+                    <Markdown source={this.collective.longDescription} />
+                  </div>
+                }
                 <div id="tiers">
                   <style jsx>{`
                     #tiers {

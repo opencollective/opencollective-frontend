@@ -123,6 +123,9 @@ class HostCollective extends React.Component {
           .adminActions ul li {
             margin: 0 2rem;
           }
+          .cardsList {
+            margin: 0 2rem;
+          }
         `}</style>
 
         <Header
@@ -167,12 +170,12 @@ class HostCollective extends React.Component {
                       <Button onClick={() => Router.pushRoute(`/${this.collective.slug}/edit`)}>{intl.formatMessage(this.messages[`${type}.collective.edit`])}</Button>
                     </div>
                   }
-                  { this.collective.longDescription &&
-                    <div className="collectiveDescription" >
-                      <Markdown source={this.collective.longDescription} />
-                    </div>
-                  }
                 </div>
+                { this.collective.longDescription &&
+                  <div className="collectiveDescription" >
+                    <Markdown source={this.collective.longDescription} />
+                  </div>
+                }
               </div>
 
               { this.collective.stats.collectives > 0 &&
@@ -186,7 +189,6 @@ class HostCollective extends React.Component {
                         <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                       </ul>
                     </div>
-                    }
                   }
 
                   <div className="cardsList">
