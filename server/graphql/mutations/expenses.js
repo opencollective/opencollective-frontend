@@ -197,7 +197,8 @@ export async function payExpense(remoteUser, expenseId) {
     }
   }
 
-  if (expense.payoutMethod === 'manual') {
+  // note: we need to check for manual and other for legacy reasons
+  if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
     await createTransactionFromPaidExpense(host, null, expense, null, null, expense.UserId);
   }
 
