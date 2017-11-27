@@ -111,11 +111,22 @@ export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
 
 export function formatCurrency(amount, currency = 'USD', options = {}) {
   amount = amount / 100;
+
+  let minimumFractionDigits = 2;
+  let maximumFractionDigits = 2;
+
+  if (options.hasOwnProperty('minimumFractionDigits')) {
+    minimumFractionDigits = options.minimumFractionDigits
+  } else if (options.hasOwnProperty('precision')) {
+    minimumFractionDigits = options.precision;
+    maximumFractionDigits = options.precision;
+  }
+
   return amount.toLocaleString(getLocaleFromCurrency(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits : options.minimumFractionDigits || options.precision || 2,
-    maximumFractionDigits : options.precision || 2
+    minimumFractionDigits : minimumFractionDigits,
+    maximumFractionDigits : maximumFractionDigits
   })
 };
 
