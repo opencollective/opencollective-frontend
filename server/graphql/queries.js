@@ -191,7 +191,8 @@ const queries = {
   allMembers: {
     type: new GraphQLList(MemberType),
     args: {
-      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      CollectiveId: { type: GraphQLInt },
+      collectiveSlug: { type: GraphQLString },
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
       type: { type: GraphQLString },
@@ -201,31 +202,52 @@ const queries = {
       offset: { type: GraphQLInt }
     },
     resolve(_, args) {
+      if (!args.CollectiveId && !args.collectiveSlug) {
+        throw new Error("Please provide a CollectiveId or a collectiveSlug");
+      }
+
       if (args.orderBy === 'totalDonations') {
-        return rawQueries.getBackersOfCollectiveWithTotalDonations(args.CollectiveId, args).map(collective => {
-          return {
-            id: collective.dataValues.MemberId,
-            role: collective.dataValues.role,
-            createdAt: collective.dataValues.createdAt,
-            totalDonations: collective.dataValues.totalDonations,
-            MemberCollectiveId: collective.dataValues.MemberCollectiveId,
-            memberCollective: collective
-          }
-        });
+
+        const getCollectiveId = args.CollectiveId ? Promise.resolve(args.CollectiveId) : models.Collective.findOne({
+          attributes: ['id'],
+          where: { slug: args.collectiveSlug }
+        }).then(c => c.id);
+
+        return getCollectiveId
+          .then(CollectiveId => rawQueries.getBackersOfCollectiveWithTotalDonations(CollectiveId, args))
+          .map(collective => {
+            return {
+              id: collective.dataValues.MemberId,
+              role: collective.dataValues.role,
+              createdAt: collective.dataValues.createdAt,
+              totalDonations: collective.dataValues.totalDonations,
+              MemberCollectiveId: collective.dataValues.MemberCollectiveId,
+              memberCollective: collective
+            }
+          });
       } else {
-        const query = { where: { CollectiveId: args.CollectiveId } }
+        const query = { where: {}, include: [] };
+        if (args.CollectiveId) query.where.CollectiveId = args.CollectiveId;
+        if (args.collectiveSlug) {
+          query.include.push({
+            model: models.Collective,
+            as: 'collective',
+            required: true,
+            where: { slug: args.collectiveSlug }
+          })
+        }
         if (args.TierId) query.where.TierId = args.TierId;
         if (args.role) query.where.role = args.role;
         if (args.type) {
           const types = args.type.split(',');
-          query.include = [
+          query.include.push(
             {
               model: models.Collective,
               as: 'memberCollective',
               required: true,
               where: { type: { $in: types } }
             }
-          ]
+          );
         }
         if (args.limit) query.limit = args.limit;
         if (args.offset) query.offset = args.offset;

@@ -295,6 +295,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       image: { type: GraphQLString },
       backgroundImage: { type: GraphQLString },
       settings: { type: GraphQLJSON },
+      data: { type: GraphQLJSON },
       slug: { type: GraphQLString },
       isHost: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
@@ -512,6 +513,12 @@ const CollectiveFields = () => {
       type: GraphQLJSON,
       resolve(collective) {
         return collective.settings || {};
+      }
+    },
+    data: {
+      type: GraphQLJSON,
+      resolve(collective) {
+        return collective.data || {};
       }
     },
     slug: {
