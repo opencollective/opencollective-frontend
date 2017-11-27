@@ -783,9 +783,8 @@ const CollectiveFields = () => {
     },
     connectedAccounts: {
       type: new GraphQLList(ConnectedAccountType),
-      resolve(collective) {
-        // For some weird reason, Sequelize function collective.getConnectedAccounts() doesn't return a Promise with .map() ¯\_(ツ)_/¯ 
-        return collective.getConnectedAccounts().then(cas => cas.map(ca => ca.info));
+      resolve(collective, args, req) {
+        return req.loaders.collective.connectedAccounts.load(collective.id);
       }
     },
     stats: {

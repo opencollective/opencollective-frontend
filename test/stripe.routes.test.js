@@ -35,16 +35,16 @@ describe('stripe.routes.test.js', () => {
         .end(done);
     });
 
-    it('should fail if the collective already has a stripeAccount', (done) => {
+    it('should fail if not logged in as an admin of the collective', (done) => {
       models.ConnectedAccount.create({ service: 'stripe', CollectiveId: collective.id })
         .then(() => request(app)
           .get(`/connected-accounts/stripe/oauthUrl?api_key=${application.api_key}&CollectiveId=${collective.id}`)
-          .set('Authorization', `Bearer ${host.jwt()}`)
+          .set('Authorization', `Bearer ${user.jwt()}`)
           .then(response => {
             const error = response.body.error;
-            expect(error.code).to.equal(400);
-            expect(error.type).to.equal('validation_failed');
-            expect(error.message).to.equal("Collective already has a stripe account connected");
+            expect(error.code).to.equal(401);
+            expect(error.type).to.equal('unauthorized');
+            expect(error.message).to.equal("Please login as an admin of this collective to add a connected account");
             done();
           }));
     });

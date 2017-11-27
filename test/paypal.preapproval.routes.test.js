@@ -70,7 +70,7 @@ describe('paypal.preapproval.routes.test.js', () => {
 
     it('should fail if not the logged-in user', (done) => {
       request(app)
-        .get(`/connected-accounts/paypal/oauthUrl?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}`)
+        .get(`/connected-accounts/paypal/oauthUrl?api_key=${application.api_key}&CollectiveId=${user.CollectiveId}&redirect=https://`)
         .set('Authorization', `Bearer ${user2.jwt()}`)
         .expect(401)
         .end(done);
