@@ -114,8 +114,8 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   return amount.toLocaleString(getLocaleFromCurrency(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits : options.minimumFractionDigits || options.precision || 0,
-    maximumFractionDigits : options.precision || 0
+    minimumFractionDigits : options.minimumFractionDigits || options.precision || 2,
+    maximumFractionDigits : options.precision || 2
   })
 };
 
