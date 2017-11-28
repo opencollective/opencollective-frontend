@@ -1,20 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withIntl from '../lib/withIntl';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import Tier from '../components/Tier';
-import NotificationBar from '../components/NotificationBar';
-import Memberships from '../components/Memberships';
-import CollectivesWithData from '../components/CollectivesWithData';
+import Header from './Header';
+import Body from './Body';
+import Footer from './Footer';
+import CollectiveCover from './CollectiveCover';
+import Tier from './Tier';
+import NotificationBar from './NotificationBar';
+import Memberships from './Memberships';
+import CollectivesWithData from './CollectivesWithData';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { get, groupBy } from 'lodash';
 import HashLink from 'react-scrollchor';
 import MenuBar from './MenuBar';
 import MessageModal from './MessageModal';
+import CollectiveCard from './CollectiveCard';
 import { Button } from 'react-bootstrap';
 import { Router, Link } from '../server/pages';
 
@@ -110,6 +111,10 @@ class UserCollective extends React.Component {
           .message .editBtn {
             margin: 2rem;
           }
+          .orderCreated .collectiveCard {
+            display: flex;
+            justify-content: center;
+          }
           .adminActions {
             text-align: center;
             text-transform: uppercase;
@@ -168,9 +173,14 @@ class UserCollective extends React.Component {
               <div className="content" >
                 <div className="message">
                   { query && query.status === 'orderCreated' &&
-                    <div>
+                    <div className="orderCreated">
                       <p className="thankyou"><FormattedMessage id="collective.user.orderCreated.thankyou" defaultMessage="Thank you for your donation! 🙏" /></p>
                       <p><FormattedMessage id="collective.user.orderCreated.message" defaultMessage="We have added {collective} to your profile" values={{ collective: collectiveCreated.name }} /></p>
+                      { memberOf['BACKER'] && memberOf['BACKER'].length > 10 &&
+                        <div className="collectiveCard">
+                          <CollectiveCard collective={collectiveCreated} />
+                        </div>
+                      }
                     </div>
                   }
                   { query && query.status === 'orderCreated' && (!this.collective.image || !this.collective.longDescription) &&
@@ -247,7 +257,6 @@ class UserCollective extends React.Component {
               { Object.keys(memberOf).map(role => role !== 'HOST' && (
                 <section id={role}>
                   <h1>{intl.formatMessage(this.messages[`${type}.collective.memberOf.${role.toLowerCase()}.title`], { n: memberOf[role].length })}</h1>
-                  }
                   <Memberships
                     className={role}
                     memberships={memberOf[role]}
