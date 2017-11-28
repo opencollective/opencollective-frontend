@@ -327,7 +327,7 @@
   "transactions.empty": "Aucune transaction",
   "UserCard.since": "depuis",
   "collective.user.orderCreated.thankyou": "Merci pour votre donation! 🙏",
-  "collective.user.orderCreated.message": "On a ajouté {collectif} à votre profil",
+  "collective.user.orderCreated.message": "On a ajouté {collective} à votre profil",
   "collective.user.emptyProfile": "Votre profil est un peu vide ¯_(ツ)_/¯",
   "utils.free": "gratuit",
   "tier.order.donation.title": "Contribue",
