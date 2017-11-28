@@ -3,7 +3,7 @@
   "version": "2.0.0-beta1",
   "private": true,
   "engines": {
-    "node": "6.11.0"
+    "node": "6.11.5"
   },
   "dependencies": {
     "accepts": "1.3.3",
@@ -30,14 +30,14 @@
     "fs": "0.0.1-security",
     "glob": "7.1.1",
     "global": "4.3.1",
-    "gm": "^1.23.0",
+    "gm": "1.23.0",
     "graphql": "0.9.1",
     "graphql-request": "1.4.0",
     "graphql-tag": "1.2.3",
     "graphql-tools": "0.10.0",
     "html-pdf": "chriskinsman/node-html-pdf#6d8b3e4",
     "image-size": "0.6.1",
-    "image-to-ascii": "^3.0.9",
+    "image-to-ascii": "3.0.5",
     "intl": "1.2.5",
     "isomorphic-fetch": "2.2.1",
     "lodash": "4.17.2",
