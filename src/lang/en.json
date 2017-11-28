@@ -29,7 +29,7 @@
   "collective.menu.member": "member of {n} {n, plural, one {collective} other {collectives}}",
   "collective.menu.backer": "backing {n} {n, plural, one {collective} other {collectives}}",
   "collective.menu.follower": "following {n} {n, plural, one {collective} other {collectives}}",
-  "collective.stats.backers.users": "{n} {n, plural, one {backer} other {backers}}",
+  "collective.stats.backers.users": "{n, plural, one {backer} other {backers}}",
   "collective.stats.backers.organizations": "{n} {n, plural, one {organization} other {organizations}}",
   "collective.budget": "budget",
   "collective.donate": "donate",
