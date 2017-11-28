@@ -226,7 +226,7 @@ class UserCollective extends React.Component {
                   <div className="adminActions" id="adminActions">
                     <ul>
                       { LoggedInUser && LoggedInUser.canEditCollective(this.collective) &&
-                        <li><Link><a href={`/${this.collective.slug}/collectives/expenses`}><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
+                        <li><Link route={`/${this.collective.slug}/collectives/expenses`}><a><FormattedMessage id="host.collectives.manage" defaultMessage="Manage expenses" /></a></Link></li>
                       }
                       { this.collective.settings.apply &&
                         <li><Link><a href={`/${this.collective.slug}/apply`}><FormattedMessage id="host.apply" defaultMessage="Apply to create a collective" /></a></Link></li>
