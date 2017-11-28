@@ -50,7 +50,6 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
     const parts = header.split(' ');
     const scheme = parts[0];
     token = parts[1];
-
     if (!/^Bearer$/i.test(scheme) || !token) {
       return next(new BadRequest('Format is Authorization: Bearer [token]'));
     }
@@ -129,14 +128,14 @@ export function authenticateUser(req, res, next) {
   parseJwtNoExpiryCheck(req, res, (e) => {
     // If a token was submitted but is invalid, we continue without authenticating the user
     if (e) {
-      console.error(e);
+      debug('auth')(">>> checkJwtExpiry invalid error", e);
       return next();
     }
 
     checkJwtExpiry(req, res, (e) => {
       // If a token was submitted and is expired, we continue without authenticating the user
       if (e) {
-        console.error(e);
+        debug('auth')(">>> checkJwtExpiry expiry error", e);
         return next();
       }
       _authenticateUserByJwt(req, res, next);
@@ -149,14 +148,17 @@ export function authenticateInternalUserByJwt() {
   return (req, res, next) => {
     parseJwtNoExpiryCheck(req, res, (e) => {
       if (e) {
+        debug('auth')(">>> parseJwtNoExpiryCheck error", e);
         return next(e);
       }
       checkJwtExpiry(req, res, (e) => {
         if (e) {
+          debug('auth')(">>> checkJwtExpiry error", e);
           return next(e);
         }
         _authenticateUserByJwt(req, res, (e) => {
           if (e) {
+            debug('auth')(">>> _authenticateUserByJwt error", e);
             return next(e);
           }
           _authenticateInternalUserById(req, res, next);
