@@ -9,6 +9,7 @@ import { getCloudinaryUrl } from './lib/utils';
 import request from 'request';
 import controllers from './controllers';
 import * as mw from './middlewares';
+import express from 'express';
 
 module.exports = (server, app) => {
 
@@ -51,11 +52,14 @@ module.exports = (server, app) => {
       .pipe(res);
   });
 
+  
   /**
    * For backward compatibility.
    * Ideally we should consolidate those routes under:
    * `/:collectiveSlug/members/:backerType(all|users|organizations)`
    */
+  server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));  
+
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
   server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);
