@@ -4,6 +4,7 @@ import paypalAdaptive from '../gateways/paypalAdaptive';
 import moment from 'moment';
 import config from 'config';
 import uuid from 'node-uuid';
+import { convertToCurrency } from '../lib/currency';
 import { formatCurrency } from '../lib/utils';
 import debugLib from 'debug';
 const debug = debugLib('paypal');
@@ -132,25 +133,33 @@ export default {
         throw new Error("Please provide a redirect url as a query parameter (?redirect=)");
       }
       const expiryDate = moment().add(1, 'years');
-      
-      const payload = {
-        currencyCode: 'USD', // TODO: figure out if there is a reliable way to specify correct currency for a HOST.
-        startingDate: new Date().toISOString(),
-        endingDate: expiryDate.toISOString(),
-        returnUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
-        cancelUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
-        displayMaxTotalAmount: false,
-        feesPayer: 'SENDER',
-        maxAmountPerPayment: 2000.00, // PayPal claims this can go up to $10k without needing additional permissions from them.
-        maxTotalAmountOfAllPayments: 2000.00, // PayPal claims this isn't needed but Live errors out if we don't send it.
-        clientDetails: CollectiveId
-      };
-    
+
       let response;
-    
-      return paypalAdaptive.preapproval(payload)
-        .tap(r => response = r)
-        .then(response => models.PaymentMethod.create({
+
+      return models.Collective.findById(CollectiveId)
+      .then(collective => {
+          return convertToCurrency(2000, 'USD', collective.currency)
+            .then(limit => {
+              // We can request a paykey for up to $2,000 equivalent
+              const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.99 * limit);
+              console.log(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
+              return {
+                currencyCode: collective.currency,
+                startingDate: new Date().toISOString(),
+                endingDate: expiryDate.toISOString(),
+                returnUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=success&preapprovalKey=\${preapprovalKey}`,
+                cancelUrl: `${config.host.api}/connected-accounts/paypal/callback?paypalApprovalStatus=error&preapprovalKey=\${preapprovalKey}`,
+                displayMaxTotalAmount: false,
+                feesPayer: 'SENDER',
+                maxAmountPerPayment: lowerLimit, // PayPal claims this can go up to $10k without needing additional permissions from them.
+                maxTotalAmountOfAllPayments: lowerLimit, // PayPal claims this isn't needed but Live errors out if we don't send it.
+                clientDetails: CollectiveId
+              };
+            });
+        })
+        .then(payload => paypalAdaptive.preapproval(payload))
+        .then(r => response = r)
+        .then(() => models.PaymentMethod.create({
           CreatedByUserId: remoteUser.id,
           service: 'paypal',
           CollectiveId,
