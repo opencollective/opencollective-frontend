@@ -140,8 +140,8 @@ export default {
       .then(collective => {
           return convertToCurrency(2000, 'USD', collective.currency)
             .then(limit => {
-              // We can request a paykey for up to $2,000 equivalent
-              const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.99 * limit);
+              // We can request a paykey for up to $2,000 equivalent (minus 5%)
+              const lowerLimit = collective.currency === 'USD' ? 2000 : Math.floor(0.95 * limit);
               console.log(">>> requesting a paykey for ", formatCurrency(lowerLimit*100, collective.currency));
               return {
                 currencyCode: collective.currency,
