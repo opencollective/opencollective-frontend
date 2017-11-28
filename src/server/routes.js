@@ -60,6 +60,7 @@ module.exports = (server, app) => {
    */
   server.use('/public', express.static(path.join(__dirname, `../public`), { maxAge: '1d' }));  
 
+  server.get('/:collectiveSlug/:image(avatar|logo).:format(txt|png|jpg|gif|svg)', mw.maxAge(300), controllers.collectives.logo);
   server.get('/:collectiveSlug/:backerType.svg', controllers.collectives.banner);
   server.get('/:collectiveSlug/:backerType/badge.svg', controllers.collectives.badge);
   server.get('/:collectiveSlug/:backerType/:position/avatar(.:format(png|jpg|svg))?', mw.maxAge(300), mw.ga, controllers.collectives.avatar);

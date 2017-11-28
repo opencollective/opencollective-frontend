@@ -4,6 +4,20 @@ const graphqlServerUrl = `${process.env.API_URL}/graphql?api_key=${process.env.A
 console.log(">>> connecting to ", graphqlServerUrl);
 const client = new GraphQLClient(graphqlServerUrl, { headers: {} })
 
+export async function fetchCollective(collectiveSlug) {
+  const query = `
+  query Collective($collectiveSlug: String!) {
+    Collective(slug:$collectiveSlug) {
+      id
+      image
+    }
+  }
+  `;  
+
+  const result = await client.request(query, { collectiveSlug });    
+  return result.Collective;
+}
+
 export async function fetchMembersStats(params) {
   const { backerType, tierSlug } = params;
   let query, processResult;

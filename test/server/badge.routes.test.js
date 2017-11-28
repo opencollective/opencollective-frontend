@@ -69,4 +69,16 @@ describe("badge.routes.test.js", () => {
     });
   })
 
+  describe("collective logo", () => {
+    test("loads the logo in ascii", async () => {
+      const res = await fetch(`${WEBSITE_URL}/webpack/logo.txt`);
+      expect(res.status).toEqual(200);
+      expect(res.headers.get('content-type')).toEqual('text/plain; charset=utf-8');
+      expect(res.headers.get('cache-control')).toMatch(/public, max-age=[1-9][0-9]{3,7}/);
+      const text = await res.text();
+      expect(text.length).toBeGreaterThan(600);
+      expect(text.length).toBeLessThan(1000);
+    });
+  })
+
 });

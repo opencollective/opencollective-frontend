@@ -6,6 +6,7 @@ import svg_to_png from 'svg-to-png';
 import cachedRequestLib from 'cached-request';
 import request from 'request';
 import { getCloudinaryUrl } from '../lib/utils';
+import imageToAscii from 'image-to-ascii';
 
 const WEBSITE_URL = process.env.WEBSITE_URL || "https://opencollective.com";
 
@@ -14,6 +15,36 @@ cachedRequest.setCacheDirectory('/tmp');
 
 const requestPromise = Promise.promisify(cachedRequest, { multiArgs: true });
 const readFile = Promise.promisify(fs.readFile);
+
+export function generateAsciiFromImage(imgsrc, options) {
+
+  const variants = {
+    solid : '█'.split(''),
+    variant1 : ' .,:;i1tfLCG08@'.split(''),
+    variant2 : '@%#*+=-:. '.split('').reverse(),
+    variant3 : '#¥¥®®ØØ$$ø0oo°++=-,.    '.split('').reverse(),
+    variant4 : '#WMBRXVYIti+=;:,. '.split('').reverse(),
+    'ultra-wide' : ('MMMMMMM@@@@@@@WWWWWWWWWBBBBBBBB000000008888888ZZZZZZZZZaZaaaaaa2222222SSS'
+        +'SSSSXXXXXXXXXXX7777777rrrrrrr;;;;;;;;iiiiiiiii:::::::,:,,,,,,.........    ').split('').reverse(),
+    wide : '@@@@@@@######MMMBBHHHAAAA&&GGhh9933XXX222255SSSiiiissssrrrrrrr;;;;;;;;:::::::,,,,,,,........        '.split(''),
+    hatching : '##XXxxx+++===---;;,,...    '.split('').reverse(),
+    bits : '# '.split('').reverse(),
+    binary : '01 '.split('').reverse(),
+    greyscale : ' ▤▦▩█'.split(''),
+    blocks : ' ▖▚▜█'.split('')
+  };
+
+  return new Promise((resolve, reject) => {
+    options.pixels = variants[options.variant || 'wide'];
+    imageToAscii(imgsrc, options, (err, ascii) => {
+      if (err) return reject(err);
+      if (options.trim) {
+        ascii = ascii.replace(/\n^\s*$/gm, '');
+      }
+      return resolve(ascii);
+    });
+  });
+}
 
 /**
  * Converts an svg string into a PNG data blob
