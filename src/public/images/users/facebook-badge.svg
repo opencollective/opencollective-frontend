@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 3.6.1 (26313) - http://www.bohemiancoding.com/sketch -->
+    <title>4FE9AB4B-8B80-4478-8BD1-A43EC4C53247</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <path id="path-1" d="M10,20 C15.5228475,20 20,15.5228475 20,10 C20,4.4771525 15.5228475,0 10,0 C4.4771525,0 0,4.4771525 0,10 C0,15.5228475 4.4771525,20 10,20 Z"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Donation" transform="translate(-636.000000, -980.000000)">
+            <g id="::-avatar-options-(paginated)" transform="translate(446.000000, 927.000000)">
+                <g id="::-facebook" transform="translate(168.000000, 0.000000)">
+                    <g id="badge" transform="translate(22.000000, 53.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="badge-container" fill="#FFFFFF" xlink:href="#path-1"></use>
+                        <path d="M13,6.27212875 L11.5486467,6.27212875 C11.2611558,6.27212875 10.9707388,6.57278713 10.9707388,6.79590344 L10.9707388,8.28822238 L12.9970739,8.28822238 C12.9158742,9.43233358 12.7490856,10.4791514 12.7490856,10.4791514 L10.961229,10.4791514 L10.961229,16.9656181 L8.2962692,16.9656181 L8.2962692,10.4791514 L7,10.4791514 L7,8.2962692 L8.2962692,8.2962692 L8.2962692,6.5113387 C8.2962692,6.18434528 8.2304316,4 11.026335,4 L13,4 L13,6.27212875 L13,6.27212875 Z" id="Path" fill="#3B5998" mask="url(#mask-2)"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
