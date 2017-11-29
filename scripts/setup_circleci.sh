@@ -18,4 +18,4 @@ fi;
 sudo dpkg -i ./google-chrome*.deb
 sudo apt-get install -f
 
-# sudo apt-get install GraphicsMagick
+sudo apt-get install GraphicsMagick
