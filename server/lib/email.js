@@ -194,7 +194,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   }
 
   if (template === 'thankyou') {
-    if (data.collective.name.match(/WWCode/i))
+    if (data.collective.slug.match(/wwcode/))
       template += '.wwcode';
     if (data.collective.name.match(/ispcwa/i))
       template += '.ispcwa';
