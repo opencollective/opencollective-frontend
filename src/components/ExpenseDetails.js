@@ -253,11 +253,11 @@ class ExpenseDetails extends React.Component {
             }
           </div>
 
-          { (expense.privateMessage || (isAuthor && payoutMethod === 'other')) &&
+          { (expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) &&
             <div className="col">
               <label><FormattedMessage id='expense.privateMessage' defaultMessage='private note' /></label>
               { (!editMode || !isAuthor) && capitalize(expense.privateMessage)}
-              { editMode && isAuthor &&
+              { editMode && (isAuthor || canEditExpense) &&
                 <InputField
                   type="textarea"
                   name="privateMessage"
