@@ -295,6 +295,7 @@ const getCollectiveQuery = gql`
             type
             image
             description
+            longDescription
             backgroundImage
           }
         }
@@ -398,6 +399,18 @@ const getCollectiveCoverQuery = gql`
       settings
       image
       isHost
+    }
+  }
+`;
+
+export const getPrepaidCardBalanceQuery = gql`
+  query checkPrepaidPaymentMethod($token: String!) {
+    prepaidPaymentMethod(token: $token) {
+      id,
+      name,
+      currency,
+      balance,
+      uuid
     }
   }
 `;

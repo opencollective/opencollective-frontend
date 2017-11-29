@@ -160,7 +160,7 @@ class Collective extends React.Component {
       },
       {
         className: 'blue',
-        component: <Link route={`/${this.collective.slug}/donate`}><a>
+        component: <Link route={'donate'} params={{ collectiveSlug: this.collective.slug, verb: 'donate'}}><a>
             <FormattedMessage
               id="collective.donate"
               defaultMessage={`donate`}

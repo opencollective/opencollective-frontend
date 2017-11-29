@@ -17,8 +17,8 @@ import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb } }) {
-    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb, redeem } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb, redeem }
   }
 
   constructor(props) {
@@ -61,11 +61,9 @@ class CreateOrderPage extends React.Component {
     if (this.state.LoggedInUser) {
       delete order.user;
     }
-    console.log(">>> createOrder", order);
     try {
       this.setState({ loading: true});
       const res = await this.props.createOrder(order);
-      console.log(">>> createOrder response", res);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
       Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}&TierId=${order.tier && order.tier.id}&type=${data.Collective.type}&totalAmount=${order.totalAmount}`);
@@ -148,6 +146,7 @@ class CreateOrderPage extends React.Component {
               order={this.order}
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
+              redeemFlow={this.props.redeem}
               />
             <div className="result">
               <div className="success">{this.state.result.success}</div>

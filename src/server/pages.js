@@ -6,6 +6,7 @@ pages
   .add('widgets', '/widgets')
   .add('tos', '/tos')
   .add('privacypolicy', '/privacypolicy')
+  .add('redeem', '/redeem')
   .add('signin', '/signin/:token?')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')

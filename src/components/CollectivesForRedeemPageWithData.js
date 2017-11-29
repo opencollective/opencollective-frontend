@@ -4,18 +4,18 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import CollectiveCard from './CollectiveCard';
+import CollectiveCardWithRedeem from './CollectiveCardWithRedeem';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
-class CollectivesWithData extends React.Component {
+class CollectivesForRedeemPageWithData extends React.Component {
 
   static propTypes = {
     HostCollectiveId: PropTypes.number,
     ParentCollectiveId: PropTypes.number,
-    limit: PropTypes.number
+    limit: PropTypes.number,
   }
 
   constructor(props) {
@@ -87,20 +87,19 @@ class CollectivesWithData extends React.Component {
 
         <div className="Collectives cardsList">
           { collectives.map((collective) =>
-            <CollectiveCard
+            <CollectiveCardWithRedeem
               key={collective.id}
               collective={collective}
+              showRedeemPrompt={true}
             />
           )}
         </div>
-        { collectives.length % 10 === 0 && collectives.length >= limit &&
-          <div className="loadMoreBtn">
-            <Button bsStyle='default' onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-              {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
-            </Button>
-          </div>
-        }
+        <div className="loadMoreBtn">
+          <Button onClick={this.fetchMore}>
+            {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
+            {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -124,7 +123,8 @@ query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: I
       id
       yearlyBudget
       backers {
-        all
+        users
+        organizations
       }
     }
   }
@@ -167,4 +167,4 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
 });
 
 
-export default addCollectivesData(withIntl(CollectivesWithData));
+export default addCollectivesData(withIntl(CollectivesForRedeemPageWithData));

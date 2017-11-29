@@ -7,12 +7,14 @@ import { get } from 'lodash';
 import { Router, Link } from '../server/pages';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../constants/collectives';
+import colors from '../constants/colors';
+import Button from './Button';
+import InputField from './InputField';
 
-class CollectiveCard extends React.Component {
+class CollectiveCardWithRedeem extends React.Component {
 
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    membership: PropTypes.object
   }
 
   constructor(props) {
@@ -21,23 +23,9 @@ class CollectiveCard extends React.Component {
 
 
   render() {
-    const { collective, membership } = this.props;
-    let currency;
-
-    if (membership) {
-      currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
-    } else {
-      currency = collective.currency;
-    }
+    const { collective, onClick } = this.props;
+    const currency = collective.currency;
     const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
-    let tierName = membership && membership.tier && membership.tier.name;
-    if (!tierName) {
-      if (membership && membership.role === 'HOST') {
-        tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
-      } else {
-        tierName = collective.type === 'ORGANIZATION' ? <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" /> : <FormattedMessage id="tier.name.backer" defaultMessage="backer" />;''
-      }
-    }
 
     const coverStyle = { ...get(collective, 'settings.style.hero.cover')};
     const backgroundImage = imagePreview(collective.backgroundImage, collective.type === 'COLLECTIVE' && defaultBackgroundImage[collective.type], { width: 400 });
@@ -47,11 +35,10 @@ class CollectiveCard extends React.Component {
       coverStyle.backgroundPosition = 'center center';
     }
 
-   const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
+    const description = (collective.description && firstSentence(collective.description, 64)) ||(collective.longDescription && firstSentence(collective.longDescription, 64))
 
     return (
-      <Link route={'collective'} params={{ slug: this.props.collective.slug}}>
-        <a className={`CollectiveCard ${collective.type}`} >
+        <div className={`CollectiveCard ${collective.type}`} >
           <style jsx>{`
           .CollectiveCard {
             display: flex;
@@ -62,12 +49,12 @@ class CollectiveCard extends React.Component {
             position: relative;
             box-sizing: border-box;
             width: 200px;
-            border-radius: 5px;
+            border-radius: 10px;
             background-color: #ffffff;
             box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
             overflow: hidden;
             text-decoration: none !important;
-            margin: 1rem 1rem 1rem 0;
+            margin: 1rem 2rem 1rem 0;
           }
 
           .head {
@@ -116,7 +103,7 @@ class CollectiveCard extends React.Component {
             min-height: 20px;
             font-size: 14px;
             margin: 5px;
-            font-family: lato, Montserrat;
+            font-family: lato;
             font-weight: 300;
             text-align: center;
             color: #303233;
@@ -140,7 +127,7 @@ class CollectiveCard extends React.Component {
             text-align: center;
           }
 
-          .membership, .stats, .totalDonations {
+          .stats, .redeem {
             border-top: 1px solid #f2f2f2;
             padding: 1rem;
             color: #303233;
@@ -151,19 +138,6 @@ class CollectiveCard extends React.Component {
             width: 100%;
             height: 6rem;
             justify-content: space-around;
-          }
-
-          .totalDonationsAmount {
-            font-size: 2rem;
-          }
-
-          .role {
-            min-height: 13px;
-            font-family: Lato;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #75cc1f;
-            text-transform: uppercase;
           }
 
           .value, .label {
@@ -189,7 +163,7 @@ class CollectiveCard extends React.Component {
             text-transform: uppercase;
           }
 
-          .since {
+          .redeem {
             min-height: 18px;
             font-family: Lato;
             font-size: 12px;
@@ -198,60 +172,62 @@ class CollectiveCard extends React.Component {
             text-align: center;
             color: #aab0b3;
             text-transform: capitalize;
+            padding: 10px 0px;
           }
           `}</style>
-          <div className='head'>
-            <div className='background' style={coverStyle}></div>
-            <div className='image' style={{backgroundImage: `url(${logo})`}}></div>
-          </div>
-          <div className='body'>
-            <div className='name'>{collective.name}</div>
-            <div className='description'>{description}</div>
-          </div>
-          <div className='footer'>
-            { collective.stats &&
-              <div className="stats">
-                <div className="backers">
-                  <div className="value">{collective.stats.backers.all}</div>
-                  <div className="label">
-                    <FormattedMessage
-                      id="collective.stats.backers.users"
-                      values={{ n: collective.stats.backers.all }}
-                      />
+        
+        <Link 
+          route={'donate'}
+          params={{ 
+            collectiveSlug: this.props.collective.slug,
+            verb: 'donate',
+            description: 'Gift card',
+            amount: 50,
+            redeem: true
+            }}
+          >
+          <div>
+
+            <div className='head'>
+              <div className='background' style={coverStyle}></div>
+              <div className='image' style={{backgroundImage: `url(${logo})`}}></div>
+            </div>
+            <div className='body'>
+              <div className='name'>{collective.name}</div>
+              <div className='description'>{description}</div>
+            </div>
+            <div className='footer'>
+              { collective.stats &&
+                <div className="stats">
+                  <div className="backers">
+                    <div className="value">{collective.stats.backers.users}</div>
+                    <div className="label">
+                      <FormattedMessage
+                        id="collective.stats.backers.users"
+                        values={{ n: collective.stats.backers.users }}
+                        />
+                    </div>
+                  </div>
+                  <div className="organizations">
+                    <div className="value">{collective.stats.backers.organizations}</div>
+                    <div className="label">
+                      <FormattedMessage
+                        id="collective.stats.backers.organizations"
+                        values={{ n: collective.stats.backers.organizations }}
+                        />
+                    </div>
                   </div>
                 </div>
-                <div className="yearlyBudget">
-                  <div className="value">
-                    <Currency value={collective.stats.yearlyBudget} currency={currency} />
-                  </div>
-                  <div className="label">
-                    <FormattedMessage id='collective.stats.yearlyBudget' defaultMessage={`yearly budget`} />
-                  </div>
-                </div>
-              </div>
-            }
-            { membership &&
-              <div className="membership">
-                <div className='role'>{tierName}</div>
-                <div className='since'>
-                  <FormattedMessage id='membership.since' defaultMessage={`since`} />&nbsp;
-                  <FormattedDate value={membership.createdAt} month='long' year='numeric' />
-                </div>
-              </div>
-            }
-            { membership && membership.role === 'BACKER' && membership.stats.totalDonations > 0 &&
-              <div className="totalDonations">
-                <div className="totalDonationsAmount">
-                  <Currency value={membership.stats.totalDonations} currency={currency} />
-                </div>
-                <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
-              </div>
-            }
+              }
+            </div>
+            <div className='redeem'>
+              <Button className='redeem-button blue' style={{width: '150px', height: '3rem', textAlign: 'center', letterSpacing: '0px', textTransform: 'none', borderRadius: '16px'}} >Support us!</Button>
+            </div>
           </div>
-        </a>
-      </Link>
+        </Link>
+      </div>
       );
   }
 }
 
-export default CollectiveCard;
+export default CollectiveCardWithRedeem;
