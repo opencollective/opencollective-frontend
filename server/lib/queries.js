@@ -374,9 +374,10 @@ const getMembersOfCollectiveWithRole = (CollectiveIds) => {
 /**
  * Returns all the users of a collective with their `totalDonations` and `role` (HOST/ADMIN/BACKER)
  */
-const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) => {
+const getMembersWithTotalDonations = (where, options = {}) => {
   const { until } = options;
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
+  const roleCond = (where.role) ? `AND member.role = "${where.role}` : '';
 
   let types, filterByMemberollectiveType = '';
   if (options.type) {
@@ -384,20 +385,31 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
     filterByMemberollectiveType = `AND c.type IN (:types)`
   }
 
-  const collectiveids = (typeof CollectiveIds === 'number') ? [CollectiveIds] : CollectiveIds;
-  return sequelize.query(`
+  let memberCondAttribute, transactionType, groupBy;
+  if (where.CollectiveId) {
+    memberCondAttribute = "CollectiveId";
+    transactionType = 'CREDIT';
+    groupBy = 'MemberCollectiveId';
+  } else if (where.MemberCollectiveId) {
+    memberCondAttribute = "MemberCollectiveId";
+    transactionType = 'DEBIT';
+    groupBy = 'CollectiveId';
+  }
+  const collectiveids = (typeof where[memberCondAttribute] === 'number') ? [where[memberCondAttribute]] : where[memberCondAttribute];
+  const selector = `member."${groupBy}" as "${groupBy}", max(member."${memberCondAttribute}") as "${memberCondAttribute}"`;
+  const query = `
     WITH stats AS (
       SELECT
         max("FromCollectiveId") as "FromCollectiveId",
-        SUM("amountInHostCurrency") as "totalDonations",
+        SUM("amountInHostCurrency") ${transactionType === 'DEBIT' ? '* -1' : ''} as "totalDonations",
         max("createdAt") as "lastDonation",
         min("createdAt") as "firstDonation"
       FROM "Transactions" t
-      WHERE t."CollectiveId" IN (:collectiveids) AND t.amount >= 0 ${untilCondition('t')}
+      WHERE t."CollectiveId" IN (:collectiveids) AND t.amount ${transactionType === 'CREDIT' ? '>=' : '<='} 0 ${untilCondition('t')}
       GROUP BY t."FromCollectiveId"
     )
     SELECT
-      member."MemberCollectiveId",
+      ${selector},
       member.role,
       max(member.id) as "MemberId",
       max(member."TierId") as "TierId",
@@ -411,6 +423,7 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
       max(c.slug) as slug,
       max(c.image) as image,
       max(c.website) as website,
+      max(c.currency) as currency,
       max(u.email) as email,
       max(c."twitterHandle") as "twitterHandle",
       COALESCE(max(s."totalDonations"), 0) as "totalDonations",
@@ -418,20 +431,21 @@ const getBackersOfCollectiveWithTotalDonations = (CollectiveIds, options = {}) =
       max(s."lastDonation") as "lastDonation"
     FROM "Collectives" c
     LEFT JOIN stats s ON c.id = s."FromCollectiveId"
-    LEFT JOIN "Members" member ON c.id = member."MemberCollectiveId"
+    LEFT JOIN "Members" member ON c.id = member."${groupBy}"
     LEFT JOIN "Users" u ON c.id = u."CollectiveId"
-    WHERE member."CollectiveId" IN (:collectiveids)
-    AND member.role = :role
+    WHERE member."${memberCondAttribute}" IN (:collectiveids)
+    ${roleCond}
     AND member."deletedAt" IS NULL ${untilCondition('member')}
     ${filterByMemberollectiveType}
-    GROUP BY member.role, member."MemberCollectiveId"
+    GROUP BY member.role, member."${groupBy}"
     ORDER BY "totalDonations" DESC, "createdAt" ASC
     LIMIT :limit OFFSET :offset
-  `.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
+  `;
+
+  return sequelize.query(query.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
   {
     replacements: {
       collectiveids,
-      role: options.role || 'BACKER',
       limit: options.limit || 100000, // we should reduce this to 100 by default but right now Webpack depends on it
       offset: options.offset || 0,
       types
@@ -474,7 +488,7 @@ export default {
   getTotalDonations,
   getTotalAnnualBudget,
   getMembersOfCollectiveWithRole,
-  getBackersOfCollectiveWithTotalDonations,
+  getMembersWithTotalDonations,
   getTopSponsors,
   getTopBackers,
   getCollectivesByTag,

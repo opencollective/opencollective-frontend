@@ -15,7 +15,7 @@ const {
  * Fetch backers of a collective by tier
  */
 export const fetchUsers = (req, res, next) => {
-  queries.getBackersOfCollectiveWithTotalDonations(req.collective.id)
+  queries.getMembersWithTotalDonations({ CollectiveId: req.collective.id, role: 'BACKER' })
     .then(backerCollectives => models.Tier.appendTier(req.collective, backerCollectives))
     .then(backerCollectives => {
       req.users = backerCollectives;

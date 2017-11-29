@@ -256,6 +256,61 @@ describe('graphql.collective.test.js', () => {
     expect(await fetchMembersByType('ORGANIZATION')).to.have.length(2);
   });
 
+  describe("allMembers query", () => {
+
+    const allMembersQuery = `
+    query allMembers($collectiveSlug: String, $memberCollectiveSlug: String, $orderBy: String, $role: String) {
+      allMembers(collectiveSlug: $collectiveSlug, memberCollectiveSlug: $memberCollectiveSlug, role: $role, limit: 10, offset: 1, orderBy: $orderBy) {
+        id
+        role
+        stats {
+          totalDonations
+        }
+        collective {
+          id
+          slug
+        }
+        member {
+          id
+          slug
+        }
+      }
+    }
+    `;
+
+    it('gets the members by collectiveSlug', async () => {
+      const result = await utils.graphqlQuery(allMembersQuery, { collectiveSlug: "brusselstogether" });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      expect(members).to.have.length(10);
+      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].member.slug).to.equal('anisbedda');
+    });
+
+    it('gets the members by memberCollectiveSlug by role', async () => {
+      const result = await utils.graphqlQuery(allMembersQuery, { memberCollectiveSlug: "xdamman", role: "ADMIN" });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].collective.role).to.equal('ADMIN');
+      expect(members[0].member.slug).to.equal('xdamman');
+      expect(members).to.have.length(1);
+    });
+
+    it('gets the members by memberCollectiveSlug sorted by totalDonations', async () => {
+      const result = await utils.graphqlQuery(allMembersQuery, { memberCollectiveSlug: "xdamman", orderBy: "totalDonations" });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      expect(members[0].collective.slug).to.equal('brusselstogether');
+      expect(members[0].member.slug).to.equal('xdamman');
+      expect(members).to.have.length(3);
+    });
+
+  });
+
   it('edits members', async () => {
 
     const collective = {
