@@ -16,7 +16,7 @@ class Tier extends React.Component {
   static propTypes = {
     tier: PropTypes.object.isRequired,
     className: PropTypes.string,
-    values: PropTypes.object,
+    values: PropTypes.object, // overriding values {quantity, amount, interval}
     onChange: PropTypes.func, // onChange({ id, quantity, amount, interval })
     onClick: PropTypes.func // onClick({ id, quantity, amount, interval })
   }
@@ -26,7 +26,22 @@ class Tier extends React.Component {
 
     this.onChange = this.props.onChange || function() {}; 
     this.handleChange = this.handleChange.bind(this);
+    
+    /*this.tier = props.tier;
+    this.defaultValue = props.defaultValue || {};
+    this.defaultValue.quantity = this.defaultValue.quantity || 1;
+    this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : this.defaultValue.amount;
+    this.state = { ...this.defaultValue, id: props.tier.id };
+    if (this.tier.presets) {
+      this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
+      this.state.interval = this.defaultValue.interval || null;
+      if (!this.state.amount) {
+        this.handleChange('amount', this.presets[Math.floor(this.presets.length / 2)]);
+      }
+    }
 
+    // this.anchor = (get(this.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
+    */
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({
@@ -39,38 +54,76 @@ class Tier extends React.Component {
 
   }
 
-  handleTicketsChange(quantity) {
-    const { tier } = this.props;
+  // since this is a pure component, we don't want to store state
+  // But, we still need a way to construct the current values of 
+  // quantity, amount and interval
+  calcCurrentValues() {
 
-    const newTier = {...tier, quantity, id: tier.id};
+    const { values, tier } = this.props;
 
-    this.onChange(newTier);
+    let quantity, amount, interval, presets;
+
+    // Case 1: handle presets. Both interval and amount are changeable
+    if (tier.presets) {
+      presets = tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
+      interval = (values && values.interval) || null;
+      amount = (values && values.amount) || presets[Math.floor(presets.length / 2)];
+      quantity = 1
+    } else if (tier.type === 'TICKET') {
+      // Case 2: handle quantity. Can't be active at same time as presets
+      quantity = (values && values.quantity) || 1;
+      amount = tier.amount * quantity;
+    } else if (values && values.interval) {
+      // Case 3: nothing is changeable
+      interval = values.interval || tier.interval; // might not need values.interval here
+      amount = values.amount || tier.amount; // might not need values.amount here
+      quantity = 1;
+    }
+    return { interval, amount, quantity, presets }
   }
 
+
+  handleTicketsChange(quantity) {
+    const currentValues = this.calcCurrentValues();
+
+    const response = {
+      ...this.props.tier,
+      quantity
+    };
+    if (currentValues.interval) {
+      response.interval = currentValues.interval;
+    }
+    this.onChange(response);
+  }
+
+
   handleChange(field, value) {
-    const tier = this.props.tier;
-    const newTier = {...tier};
+    const { tier } = this.props;
+
+    const currentValues = this.calcCurrentValues();
+
+    const response = Object.assign({}, tier, { 
+      amount: currentValues.amount,
+      interval: currentValues.interval,
+      quantity: currentValues.quantity
+    });
 
     // Make sure that the custom amount entered by the user is never under the minimum preset amount
     if (field === 'amount' && tier.presets && tier.presets[0] >= value) {
       value = tier.presets[0];
     }
 
-    newTier[field] = value;
-    this.onChange(newTier);
+    response[field] = value;
+    this.onChange(response);
   }
 
   render() {
-    const { intl, tier, values } = this.props;
-    const { type, name, description, currency, tierInterval } = tier;
+    const { intl, values, tier } = this.props;
+    const { type, name, description, currency } = this.props.tier;
 
     const intervals = [ null, 'month', 'year'];
-
-    const presets = tier.presets && tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
-
-    const quantity = values.quantity || 1;
-    const interval = values.interval || null;
-    const amount = values.amount || (presets && presets[Math.floor(presets.length / 2)]);
+    const currentValues = this.calcCurrentValues();
+    const { quantity, amount, interval, presets } = currentValues;
 
     const anchor = (get(tier, 'name') || "").toLowerCase().replace(/ /g,'-');
 
@@ -175,7 +228,7 @@ class Tier extends React.Component {
             color: #494b4d;
           }
           .tier:global(.btn-default) {
-            font-family: lato, montserralight, Montserrat;
+            font-family: montserralight, Montserrat;
             font-size: 1.2rem;
             color: #494b4d;
             background-color: transparent;
@@ -204,7 +257,7 @@ class Tier extends React.Component {
                   <div className="presets">
                     <ButtonGroup className="presetBtnGroup">
                       { presets.map(preset => !isNaN(preset) && (
-                        <Button key={preset} className="presetBtn" bsStyle={amount === preset ? 'primary' : 'default'} onClick={() => this.handleChange('amount', preset)}>
+                        <Button className="presetBtn" bsStyle={amount === preset ? 'primary' : 'default'} onClick={() => this.handleChange('amount', preset)}>
                           <FormattedNumber
                             value={preset / 100}
                             currency={currency}
@@ -216,7 +269,7 @@ class Tier extends React.Component {
                     <InputField
                       name='amount'
                       className="inputAmount"
-                      min={presets && presets[0]}
+                      min={tier.presets && tier.presets[0]}
                       pre={getCurrencySymbol(currency)}
                       type='currency'
                       value={amount}
@@ -227,7 +280,7 @@ class Tier extends React.Component {
                   <label><FormattedMessage id="tier.interval.select" defaultMessage="Select frequency" /></label>
                   <ButtonGroup className="intervalBtnGroup">
                     { intervals.map(i => (
-                      <Button key={i} className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
+                      <Button className="intervalBtn" bsStyle={interval === i ? 'primary' : 'default'} onClick={() => this.handleChange('interval', i)}>
                         {intl.formatMessage(this.messages[`interval.${i || 'onetime'}`])}
                       </Button>
                     ))}
@@ -238,8 +291,8 @@ class Tier extends React.Component {
           </div>
           { type === 'TICKET' &&
             <div id="actions" className="actions">
-              <TicketController defaultValue={quantity} onChange={(value) => this.handleTicketsChange(value)} />
-              {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity: quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick(this.state)} />}
+              <TicketController value={quantity} onChange={(value) => this.handleTicketsChange(value)} />
+              {this.props.onClick && <CTAButton className="ctabtn blue" label={(<FormattedMessage id='tier.GetTicket' values={{ quantity }} defaultMessage={`{quantity, plural, one {get ticket} other {get tickets}}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />}
             </div>
           }
           { type !== 'TICKET' && this.props.onClick && 

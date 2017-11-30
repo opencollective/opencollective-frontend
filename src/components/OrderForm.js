@@ -50,7 +50,8 @@ class OrderForm extends React.Component {
       result: {}
     };
     
-    this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
+    // TODO: shouldn't be in the constructor
+    // this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
 
     this.paymentMethodsOptions = [];
 
@@ -251,6 +252,9 @@ class OrderForm extends React.Component {
 
     if (attr === 'tier') {
       newState.order.totalAmount = newState.order.tier.amount * (newState.order.tier.quantity || 1);
+      if (newState.order.tier.quantity) {
+        newState.order.quantity = newState.order.tier.quantity;
+      }
     }
 
     if (attr === 'email') {
@@ -655,9 +659,9 @@ class OrderForm extends React.Component {
                   <TierComponent
                     tier={order.tier}
                     values={{
-                      quantity: order.quantity,
+                      quantity: order.tier.quantity || order.quantity, // TODO: confusing, need to fix
                       interval: order.interval || order.tier.interval,
-                      amount: order.totalAmount / order.quantity,
+                      amount: order.totalAmount,
                     }}
                     onChange={(tier) => this.handleChange('order', 'tier', tier)}
                     />
