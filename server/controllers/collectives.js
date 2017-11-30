@@ -64,7 +64,7 @@ const _getUsersData = (collective, tier) => {
   return collective.getSuperCollectiveCollectivesIds()
     .then(ids => {
       if (tier === 'backers') {
-        return queries.getBackersOfCollectiveWithTotalDonations(ids).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives))
+        return queries.getMembersWithTotalDonations({ CollectiveId: ids, role: 'BACKER' }).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives))
       } else {
         return queries.getMembersOfCollectiveWithRole(ids).then(backerCollectives => models.Tier.appendTier(collective, backerCollectives));
       }

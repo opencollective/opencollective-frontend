@@ -25,6 +25,7 @@ import {
 
 import models from '../models';
 import rawQueries from '../lib/queries';
+import { fetchCollectiveId } from '../lib/cache';
 
 const queries = {
   Collective: {
@@ -161,23 +162,61 @@ const queries = {
         description: "COLLECTIVE (default), USER, ORGANIZATION, EVENT"
       },
       HostCollectiveId: { type: GraphQLInt },
-      ParentCollectiveId: { type: GraphQLInt },
+      hostCollectiveSlug: {
+        type: GraphQLString,
+        description: "Fetch all collectives hosted by hostCollectiveSlug"
+      },
+      memberOfCollectiveSlug: {
+        type: GraphQLString,
+        description: "Fetch all collectives that `memberOfCollectiveSlug` is a member of"
+      },
+      role: {
+        type: GraphQLString,
+        description: "Only fetch the collectives where `memberOfCollectiveSlug` has the specified role"
+      },
+      ParentCollectiveId: {
+        type: GraphQLInt,
+        description: "Fetch all collectives that are a child of `ParentCollectiveId`. Used for \"SuperCollectives\""
+      },
       orderBy: { type: GraphQLString },
       orderDirection: { type: GraphQLString },
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
-    resolve(_, args) {
+    async resolve(_, args) {
       const query = {
         where: {},
-        limit: args.limit || 10
+        limit: args.limit || 10,
+        include: []
       };
+
+      if (args.hostCollectiveSlug) {
+        args.HostCollectiveId = await fetchCollectiveId(args.hostCollectiveSlug);
+      }
+
+      if (args.memberOfCollectiveSlug) {
+        args.memberOfCollectiveId = await fetchCollectiveId(args.memberOfCollectiveSlug);
+      }
+
+      if (args.memberOfCollectiveId) {
+        const memberCond = {
+          model: models.Member,
+          required: true,
+          where: {
+            MemberCollectiveId: args.memberOfCollectiveId
+          }
+        };
+        if (args.role) memberCond.where.role = args.role.toUpperCase();
+        query.include.push(memberCond);
+      }
 
       if (args.HostCollectiveId) query.where.HostCollectiveId = args.HostCollectiveId;
       if (args.ParentCollectiveId) query.where.ParentCollectiveId = args.ParentCollectiveId;
 
       if (args.orderBy === 'balance' && (args.ParentCollectiveId || args.HostCollectiveId)) {
         return rawQueries.getCollectivesWithBalance(query.where, args);
+      } else {
+        query.order = [['name', 'ASC']];
       }
 
       if (args.tags) query.where.tags = { $overlap: args.tags };
@@ -188,13 +227,14 @@ const queries = {
   },
 
   /*
-   * Given a collective slug, returns all members
+   * Given a collective slug, returns all members/memberships
    */
   allMembers: {
     type: new GraphQLList(MemberType),
     args: {
       CollectiveId: { type: GraphQLInt },
       collectiveSlug: { type: GraphQLString },
+      memberCollectiveSlug: { type: GraphQLString },
       TierId: { type: GraphQLInt },
       role: { type: GraphQLString },
       type: { type: GraphQLString },
@@ -203,41 +243,48 @@ const queries = {
       limit: { type: GraphQLInt },
       offset: { type: GraphQLInt }
     },
-    resolve(_, args) {
-      if (!args.CollectiveId && !args.collectiveSlug) {
-        throw new Error("Please provide a CollectiveId or a collectiveSlug");
+    async resolve(_, args) {
+      if (!args.CollectiveId && !args.collectiveSlug && !args.memberCollectiveSlug) {
+        throw new Error("Please provide a CollectiveId, a collectiveSlug or a memberCollectiveSlug");
       }
 
-      if (args.orderBy === 'totalDonations') {
+      if (args.collectiveSlug) {
+        args.CollectiveId = await fetchCollectiveId(args.collectiveSlug);
+      }
 
-        const getCollectiveId = args.CollectiveId ? Promise.resolve(args.CollectiveId) : models.Collective.findOne({
-          attributes: ['id'],
-          where: { slug: args.collectiveSlug }
-        }).then(c => c.id);
+      if (args.memberCollectiveSlug) {
+        args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
+      }
 
-        return getCollectiveId
-          .then(CollectiveId => rawQueries.getBackersOfCollectiveWithTotalDonations(CollectiveId, args))
+      const attr = args.CollectiveId ? 'CollectiveId' : 'MemberCollectiveId';
+      const where = { [attr]: args[attr] };
+      if (args.role) where.role = args.role.toUpperCase();
+      if (where.role === 'HOST') {
+        where.HostCollectiveId = args.MemberCollectiveId;
+      }
+      if (["totalDonations", "balance"].indexOf(args.orderBy) !== -1) {
+        const queryName = (args.orderBy === 'totalDonations') ? "getMembersWithTotalDonations" : "getMembersWithBalance";
+        return rawQueries[queryName](where, args)
           .map(collective => {
-            return {
+            const res = {
               id: collective.dataValues.MemberId,
               role: collective.dataValues.role,
               createdAt: collective.dataValues.createdAt,
-              totalDonations: collective.dataValues.totalDonations,
+              CollectiveId: collective.dataValues.CollectiveId,
               MemberCollectiveId: collective.dataValues.MemberCollectiveId,
-              memberCollective: collective
+              totalDonations: collective.dataValues.totalDonations
             }
+            if (attr === 'CollectiveId') {
+              res.memberCollective = collective;
+            } else {
+              res.collective = collective;
+            }
+            return res;
           });
       } else {
         const query = { where: {}, include: [] };
         if (args.CollectiveId) query.where.CollectiveId = args.CollectiveId;
-        if (args.collectiveSlug) {
-          query.include.push({
-            model: models.Collective,
-            as: 'collective',
-            required: true,
-            where: { slug: args.collectiveSlug }
-          })
-        }
+        if (args.MemberCollectiveId) query.where.MemberCollectiveId = args.MemberCollectiveId;
         if (args.TierId) query.where.TierId = args.TierId;
         if (args.role) query.where.role = args.role;
         if (args.type) {
