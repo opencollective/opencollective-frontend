@@ -59,8 +59,9 @@ class Transaction extends React.Component {
             padding: 0.5em;
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
-            max-height: 6.3rem;
+            max-height: 7rem;
             position: relative;
+            display: flex;
           }
           .transaction.detailsView {
             background-color: #fafafa;
@@ -80,7 +81,6 @@ class Transaction extends React.Component {
           .description {
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 85%;
             overflow: hidden;
             display: block;
           }
@@ -90,13 +90,11 @@ class Transaction extends React.Component {
           }
           .amount {
             width: 10rem;
+            margin-left: 0.5rem;
             text-align: right;
             font-family: montserratlight, arial;
             font-size: 1.5rem;
             font-weight: 300;
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
           }
           .debit .amount {
             color: #e21a60;
@@ -117,13 +115,6 @@ class Transaction extends React.Component {
             }
           }
         `}</style>
-        <div className="amount">
-          <FormattedNumber
-            value={transaction.amount / 100}
-            currency={transaction.currency}
-            {...this.currencyStyle}
-            />
-        </div>
         <div className="fromCollective">
           <a href={`/${transaction.fromCollective.slug}`} title={transaction.fromCollective.name}>
             <Avatar src={transaction.fromCollective.image} key={transaction.fromCollective.id} radius={40} />
@@ -146,6 +137,13 @@ class Transaction extends React.Component {
               collective={collective}
               mode={this.state.view === 'details' ? 'open' : 'closed'}
               />}
+        </div>
+        <div className="amount">
+          <FormattedNumber
+            value={transaction.amount / 100}
+            currency={transaction.currency}
+            {...this.currencyStyle}
+            />
         </div>
       </div>
     );

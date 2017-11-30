@@ -18,6 +18,7 @@ class Expense extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     expense: PropTypes.object,
+    editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
@@ -105,7 +106,8 @@ class Expense extends React.Component {
       collective,
       expense,
       includeHostedCollectives,
-      LoggedInUser
+      LoggedInUser,
+      editable
     } = this.props;
 
     const title = expense.description;
@@ -121,6 +123,7 @@ class Expense extends React.Component {
             transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
             position: relative;
+            display: flex;
           }
           .expense.detailsView {
             background-color: #fafafa;
@@ -139,7 +142,6 @@ class Expense extends React.Component {
           .description {
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 85%;
             overflow: hidden;
             display: block;
           }
@@ -156,13 +158,11 @@ class Expense extends React.Component {
           }
           .amount {
             width: 10rem;
+            margin-left: 0.5rem;
             text-align: right;
             font-family: montserratlight, arial;
             font-size: 1.5rem;
             font-weight: 300;
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
           }
           .rejected .status {
             color: #e21a60;
@@ -203,13 +203,6 @@ class Expense extends React.Component {
             margin-right: 0.5rem;
           }
         `}</style>
-        <div className="amount">
-          <FormattedNumber
-            value={expense.amount / 100}
-            currency={expense.currency}
-            {...this.currencyStyle}
-            />
-        </div>
         <div className="fromCollective">
           <a href={`/${expense.fromCollective.slug}`} title={expense.fromCollective.name}>
             <Avatar src={expense.fromCollective.image} key={expense.fromCollective.id} radius={40} />
@@ -228,7 +221,7 @@ class Expense extends React.Component {
             }
             <span className="status">{intl.formatMessage(this.messages[status])}</span> | 
             {` ${capitalize(expense.category)}`}
-            { LoggedInUser && LoggedInUser.canEditExpense(expense) &&
+            { editable && LoggedInUser && LoggedInUser.canEditExpense(expense) &&
               <span> | <a onClick={this.toggleEdit}>{intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}</a></span>
             }
             { this.state.mode !== 'edit' &&
@@ -265,6 +258,13 @@ class Expense extends React.Component {
               </div>
             }
           </div>
+        </div>
+        <div className="amount">
+          <FormattedNumber
+            value={expense.amount / 100}
+            currency={expense.currency}
+            {...this.currencyStyle}
+            />
         </div>
       </div>
     );

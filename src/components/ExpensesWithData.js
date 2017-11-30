@@ -11,6 +11,7 @@ class ExpensesWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     limit: PropTypes.number,
+    editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
@@ -24,6 +25,7 @@ class ExpensesWithData extends React.Component {
       data,
       LoggedInUser,
       collective,
+      editable,
       includeHostedCollectives
     } = this.props;
 
@@ -41,6 +43,7 @@ class ExpensesWithData extends React.Component {
           collective={collective}
           expenses={expenses}
           refetch={data.refetch}
+          editables={editable}
           fetchMore={data.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
