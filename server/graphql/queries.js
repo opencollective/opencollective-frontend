@@ -227,7 +227,7 @@ const queries = {
   },
 
   /*
-   * Given a collective slug, returns all members
+   * Given a collective slug, returns all members/memberships
    */
   allMembers: {
     type: new GraphQLList(MemberType),

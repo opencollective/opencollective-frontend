@@ -401,7 +401,7 @@ const getMembersWithTotalDonations = (where, options = {}) => {
     WITH stats AS (
       SELECT
         max("FromCollectiveId") as "FromCollectiveId",
-        SUM("amountInHostCurrency") ${transactionType === 'DEBIT' ? '* -1' : ''} as "totalDonations",
+        SUM("${transactionType === 'DEBIT' ? 'netAmountInCollectiveCurrency' : 'amount'}") ${transactionType === 'DEBIT' ? '* -1' : ''} as "totalDonations",
         max("createdAt") as "lastDonation",
         min("createdAt") as "firstDonation"
       FROM "Transactions" t
