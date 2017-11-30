@@ -172,7 +172,7 @@ const getCollectiveToEditQuery = gql`
           }
         }
       }
-      paymentMethods {
+      paymentMethods(service: "stripe") {
         id
         uuid
         name
