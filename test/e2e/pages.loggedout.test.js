@@ -28,13 +28,25 @@ describe("pages.loggedout", () => {
   test("loads the /events iframe", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
-      .goto(`${WEBSITE_URL}/brusselstogether/events/iframe`)
+      .goto(`${WEBSITE_URL}/brusselstogether/events.html`)
       .wait('.pastEvents li')
       .screenshot();
 
     download("events.iframe", screenshot);
     const numberOfPastEvents = await browser.evaluate(() => document.querySelectorAll('.pastEvents li').length);
     expect(numberOfPastEvents).toBeGreaterThanOrEqual(3);
+  });
+
+  test("loads the /collectives iframe", async () => {
+    jest.setTimeout(10000);
+    const screenshot = await browser
+      .goto(`${WEBSITE_URL}/brusselstogether/collectives.html?role=host&limit=5`)
+      .wait('.CollectiveCard')
+      .screenshot();
+
+    download("collectives.iframe", screenshot);
+    const numberOfCollectives = await browser.evaluate(() => document.querySelectorAll('.CollectiveCard').length);
+    expect(numberOfCollectives).toEqual(5);
   });
 
 });

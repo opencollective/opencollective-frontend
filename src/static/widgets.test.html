@@ -1,0 +1,33 @@
+<html>
+<head>
+  <style>
+    .widgetContainer {
+      width: 500px;
+      border: 1px dashed grey;
+      padding: 2rem;
+      margin: 2rem;
+    }
+    .collectives {
+      width: 90%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="events widgetContainer">
+    <h2>Events widget</h2>
+    <script src="http://localhost:3000/brusselstogether/events.js"></script>
+  </div>
+  
+  <div class="collectives widgetContainer">
+    <h2>User widget for xdamman</h2>
+    <script src="http://localhost:3000/xdamman/widget.js"></script>
+  </div>
+
+  <div class="collectives widgetContainer">
+    <h2>Collectives widget for host brusselstogether</h2>
+    <script src="http://localhost:3000/brusselstogether/collectives.js?role=host"></script>
+  </div>
+
+</body>
+</html>

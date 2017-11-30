@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import EventsWithData from '../components/EventsWithData';
+import MembershipsWithData from '../components/MembershipsWithData';
 import withData from '../lib/withData'
 import withIntl from '../lib/withIntl'
 
@@ -12,8 +12,8 @@ class Events extends React.Component {
     this.onChange = this.onChange.bind(this);
   }
 
-  static getInitialProps ({ query: { collectiveSlug, id } }) {
-    return { collectiveSlug, id }
+  static getInitialProps ({ query: { collectiveSlug, id, role, orderBy, limit } }) {
+    return { collectiveSlug, id, role, orderBy, limit }
   }
 
   sendMessageToParentWindow() {
@@ -30,12 +30,14 @@ class Events extends React.Component {
   }
 
   render() {
+    const { collectiveSlug, role, limit } = this.props;
+    const orderBy = this.props.orderBy || (role === 'HOST') ? "balance" : "totalDonations";
     return (
       <div>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
-          <title>{`${this.props.collectiveSlug} events`}</title>
+          <title>{`${this.props.collectiveSlug} collectives`}</title>
         </Head>
 
         <style jsx global>{`
@@ -93,12 +95,6 @@ class Events extends React.Component {
           padding: 0;
         }
 
-        .events {
-          padding: 10px;
-        }
-        .createEvent {
-          text-align: center;
-        }
         .btn {
           display: inline-block;
           padding: 6px 12px;
@@ -130,10 +126,14 @@ class Events extends React.Component {
         }
         `}
         </style>
-        <EventsWithData
-          collectiveSlug={this.props.collectiveSlug}
+        <MembershipsWithData
           onChange={this.onChange}
-          />
+          memberCollectiveSlug={collectiveSlug}
+          role={role}
+          orderBy={orderBy}
+          orderDirection="DESC"
+          limit={limit || 20}
+        />
       </div>
     );
   }
