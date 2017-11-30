@@ -37,4 +37,16 @@ describe("pages.loggedout", () => {
     expect(numberOfPastEvents).toBeGreaterThanOrEqual(3);
   });
 
+  test("loads the /collectives iframe", async () => {
+    jest.setTimeout(10000);
+    const screenshot = await browser
+      .goto(`${WEBSITE_URL}/brusselstogether/collectives.html?role=host&limit=5`)
+      .wait('.CollectiveCard')
+      .screenshot();
+
+    download("collectives.iframe", screenshot);
+    const numberOfCollectives = await browser.evaluate(() => document.querySelectorAll('.CollectiveCard').length);
+    expect(numberOfCollectives).toEqual(5);
+  });
+
 });

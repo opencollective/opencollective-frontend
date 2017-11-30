@@ -14,7 +14,11 @@ class CollectivesWithData extends React.Component {
 
   static propTypes = {
     HostCollectiveId: PropTypes.number,
+    hostCollectiveSlug: PropTypes.string,
+    memberOfCollectiveSlug: PropTypes.string,
+    role: PropTypes.string,
     ParentCollectiveId: PropTypes.number,
+    onChange: PropTypes.func,
     limit: PropTypes.number
   }
 
@@ -28,11 +32,18 @@ class CollectivesWithData extends React.Component {
     };
   }
 
+  componentDidMount() {
+    const { onChange } = this.props; 
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
+  }
+
   fetchMore(e) {
+    const { onChange } = this.props; 
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
       this.setState({ loading: false });
+      onChange && onChange({ height: this.node.offsetHeight });
     });
   }
 
@@ -59,7 +70,7 @@ class CollectivesWithData extends React.Component {
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="CollectivesContainer">
+      <div className="CollectivesContainer" ref={(node) => this.node = node}>
         <style jsx>{`
           :global(.loadMoreBtn) {
             margin: 1rem;
@@ -109,8 +120,8 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
-  allCollectives(HostCollectiveId: $HostCollectiveId, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
+query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $memberOfCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+  allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
     createdAt
@@ -137,6 +148,9 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
       variables: {
         ParentCollectiveId: props.ParentCollectiveId,
         HostCollectiveId: props.HostCollectiveId,
+        hostCollectiveSlug: props.hostCollectiveSlug,
+        memberOfCollectiveSlug: props.memberOfCollectiveSlug,
+        role: props.role,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,

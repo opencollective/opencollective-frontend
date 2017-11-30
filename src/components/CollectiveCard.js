@@ -22,20 +22,25 @@ class CollectiveCard extends React.Component {
 
   render() {
     const { collective, membership } = this.props;
-    let currency;
 
-    if (membership) {
-      currency = (membership.tier && membership.tier.currency) ? membership.tier.currency : membership.collective.currency;
-    } else {
-      currency = collective.currency;
-    }
     const logo = imagePreview(collective.image, pickLogo(collective.id), { height: 128 });
-    let tierName = membership && membership.tier && membership.tier.name;
+
+    let tierName = get(membership, 'tier.name');
+    const role = get(membership, 'role');
     if (!tierName) {
-      if (membership && membership.role === 'HOST') {
-        tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
-      } else {
-        tierName = collective.type === 'ORGANIZATION' ? <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" /> : <FormattedMessage id="tier.name.backer" defaultMessage="backer" />;''
+      switch (role) {
+        case 'HOST':
+          tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
+          break;
+        case 'ADMIN':
+          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Core Contributor" />;
+          break;
+        case 'MEMBER':
+          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Contributor" />;
+          break;
+        default:
+          tierName = collective.type === 'ORGANIZATION' ? <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" /> : <FormattedMessage id="tier.name.backer" defaultMessage="backer" />;
+          break;
       }
     }
 
@@ -220,7 +225,7 @@ class CollectiveCard extends React.Component {
                 </div>
                 <div className="yearlyBudget">
                   <div className="value">
-                    <Currency value={collective.stats.yearlyBudget} currency={currency} />
+                    <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
                   </div>
                   <div className="label">
                     <FormattedMessage id='collective.stats.yearlyBudget' defaultMessage={`yearly budget`} />
@@ -240,7 +245,7 @@ class CollectiveCard extends React.Component {
             { membership && membership.role === 'BACKER' && membership.stats.totalDonations > 0 &&
               <div className="totalDonations">
                 <div className="totalDonationsAmount">
-                  <Currency value={membership.stats.totalDonations} currency={currency} />
+                  <Currency value={membership.stats.totalDonations} currency={collective.currency} />
                 </div>
                 <FormattedMessage id='membership.totalDonations.title' defaultMessage={`amount contributed`} />
               </div>
