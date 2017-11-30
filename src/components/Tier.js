@@ -73,10 +73,10 @@ class Tier extends React.Component {
       // Case 2: handle quantity. Can't be active at same time as presets
       quantity = (values && values.quantity) || 1;
       amount = tier.amount * quantity;
-    } else if (values && values.interval) {
-      // Case 3: nothing is changeable
-      interval = values.interval || tier.interval; // might not need values.interval here
-      amount = values.amount || tier.amount; // might not need values.amount here
+    } else if (tier.amount) {
+      // Case 3: nothing is changeable, comes with amount (and interval optional)
+      interval = tier.interval; 
+      amount = tier.amount;
       quantity = 1;
     }
     return { interval, amount, quantity, presets }
@@ -297,7 +297,7 @@ class Tier extends React.Component {
           }
           { type !== 'TICKET' && this.props.onClick && 
             <div id="actions" className="actions">
-              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick(this.state)} />
+              <CTAButton className="ctabtn blue" label={tier.button || (<FormattedMessage id='tier.GetTier' values={{name}} defaultMessage={`become a {name}`} />)} onClick={() => this.props.onClick({id: tier.id, amount, quantity, interval})} />
             </div>
           }
         </div>

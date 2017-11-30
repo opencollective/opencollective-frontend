@@ -29,7 +29,6 @@ class OrderForm extends React.Component {
 
     const tier = { ...order.tier };
 
-
     this.state = {
       isNewUser: true,
       loginSent: false,
@@ -50,8 +49,7 @@ class OrderForm extends React.Component {
       result: {}
     };
     
-    // TODO: shouldn't be in the constructor
-    // this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
+    this.state.order.totalAmount = this.state.order.totalAmount || tier.amount * (tier.quantity || 1);
 
     this.paymentMethodsOptions = [];
 
@@ -75,6 +73,7 @@ class OrderForm extends React.Component {
       'creditcard.label': { id: 'creditcard.label', defaultMessage: 'Credit Card' },
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
+      'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
       'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
       'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
       'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
@@ -82,7 +81,7 @@ class OrderForm extends React.Component {
       'prepaidcard.loading': {id: 'prepaidcard.loading', defaultMessage: 'Please wait...'},
       'prepaidcard.amountremaining': {id: 'prepaidcard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
       'prepaidcard.amounterror': {id: 'prepaidcard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
-      'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Mmmm... 🤔 looks like an invalid code.' },
+
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'sponsor.title': { id: 'tier.order.sponsor.title', defaultMessage: 'Become a {name}' },
@@ -437,7 +436,9 @@ class OrderForm extends React.Component {
     const inputPrepaidcard = {
       type: 'text',
       name: 'prepaidcard',
+      id: 'prepaidcard',
       button: <Button 
+        name='prepaidapply'
         disabled={prepaidcard.loading}
         onClick={() => this.applyPrepaidCardBalance()}>
         {intl.formatMessage(this.messages['prepaidcard.apply'])}

@@ -51,26 +51,22 @@ describe("Tier component", () => {
         }
 
       const onClick = (tier) => {
-        console.log(">>> onClick", tier);
         expect(tier).toEqual({
+          id: undefined,
           quantity: 1,
-          amount: 10000,
+          amount: 5000,
           interval: 'year'
         })
         done();
       }
 
-      const component = mountComponent({ tier: donorTier, onClick })
+      const component = mountComponent({ tier: donorTier, values: {amount: 5000, interval: 'year', quantity: 1}, onClick })
 
       expect(component.find('.presetBtn').length).toEqual(3);
       expect(component.find('.presetBtn').at(1).text()).toEqual('$50');
       expect(component.find('input[name="amount"]').node.value).toEqual('50');
-      component.find('.presetBtn').last().simulate('click');
-      // click on "yearly"
-      component.find('.intervalBtn').last().simulate('click');
       expect(component.find('.ctabtn').text()).toEqual('donate');
       component.find('.ctabtn').simulate('click');
-      console.log(">>> state", component.state());
     });
   })
 
@@ -92,7 +88,8 @@ describe("Tier component", () => {
         expect(tier).toEqual({
           quantity: 1,
           id: 1,
-          amount: 1000
+          amount: 1000,
+          interval: 'month'
         })
         done();
       }
@@ -101,7 +98,6 @@ describe("Tier component", () => {
 
       expect(component.find('.ctabtn').text()).toEqual('become a backer');
       component.find('.ctabtn').simulate('click');
-      console.log(">>> state", component.state());
     });
   })
 
@@ -127,11 +123,9 @@ describe("Tier component", () => {
         done();
       }
 
-      const component = mountComponent({ tier: ticket, onClick })
+      const component = mountComponent({ tier: ticket, values: {quantity: 2}, onClick })
 
-      console.log(component.html());
       expect(component.find('.title').first().text()).toEqual(capitalize(ticket.name));
-      component.find('.increase').simulate('click');
       expect(component.find('.ctabtn').text()).toEqual('get tickets');
       component.find('.ctabtn').simulate('click');
       console.log(">>> state", component.state());

@@ -1,4 +1,4 @@
-
+import { ApolloProvider } from 'react-apollo'
 import { mount } from 'enzyme';
 import React from 'react';
 import OrderForm from '../OrderForm';
@@ -21,6 +21,7 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
 })
 
 const checkUserExistenceStub = sinon.stub(api, 'checkUserExistence', () => Promise.resolve(false));
+
 
 describe("OrderForm component", () => {
 
@@ -59,9 +60,11 @@ describe("OrderForm component", () => {
   }
 
   const mountComponent = (props) => mount(
-    <IntlProvider locale="en">
-      <OrderForm {...props} />
+    <ApolloProvider client={{}} >
+      <IntlProvider locale="en">
+        <OrderForm {...props} />
       </IntlProvider>
+    </ApolloProvider>
   );
 
   describe('error messages', () => {
@@ -72,7 +75,7 @@ describe("OrderForm component", () => {
         component.find('.submit button').simulate('click');
         expect(component.find('.result .error').text()).toEqual("Invalid credit card");
         done()
-      }, 500);
+      }, 1000);
     });
 
     it('creditcard.error', (done) => {
@@ -229,5 +232,4 @@ describe("OrderForm component", () => {
       }, 2000);
     });
   });
-
 });
