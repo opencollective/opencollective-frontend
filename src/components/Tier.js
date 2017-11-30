@@ -26,22 +26,7 @@ class Tier extends React.Component {
 
     this.onChange = this.props.onChange || function() {}; 
     this.handleChange = this.handleChange.bind(this);
-    
-    /*this.tier = props.tier;
-    this.defaultValue = props.defaultValue || {};
-    this.defaultValue.quantity = this.defaultValue.quantity || 1;
-    this.defaultValue.amount = (props.tier.amount > 0) ? this.defaultValue.quantity * props.tier.amount : this.defaultValue.amount;
-    this.state = { ...this.defaultValue, id: props.tier.id };
-    if (this.tier.presets) {
-      this.presets = this.tier.presets.filter(p => !isNaN(p)).map(p => parseInt(p, 10));
-      this.state.interval = this.defaultValue.interval || null;
-      if (!this.state.amount) {
-        this.handleChange('amount', this.presets[Math.floor(this.presets.length / 2)]);
-      }
-    }
 
-    // this.anchor = (get(this.tier, 'name') || "").toLowerCase().replace(/ /g,'-');
-    */
     this.currencyStyle = { style: 'currency', currencyDisplay: 'symbol', minimumFractionDigits: 0, maximumFractionDigits: 2};
 
     this.messages = defineMessages({

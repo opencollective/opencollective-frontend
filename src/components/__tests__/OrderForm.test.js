@@ -22,7 +22,6 @@ const getStripeToken = sinon.stub(stripe, 'getStripeToken', () => {
 
 const checkUserExistenceStub = sinon.stub(api, 'checkUserExistence', () => Promise.resolve(false));
 
-
 describe("OrderForm component", () => {
 
   const tiers = {
@@ -59,17 +58,27 @@ describe("OrderForm component", () => {
     component.find({ name: field }).simulate('change', { target: { value } });
   }
 
-  const mountComponent = (props) => mount(
-    <ApolloProvider client={{}} >
+  const mountComponent = (props, queryStub) => mount(
+    <ApolloProvider client={{
+      query: queryStub || Promise.resolve
+    }} >
       <IntlProvider locale="en">
         <OrderForm {...props} />
       </IntlProvider>
     </ApolloProvider>
   );
 
+  let component;
+
+  afterEach(() => {
+    if (component) {
+      component.unmount();
+    }
+  })
+
   describe('error messages', () => {
     it('creditcard.missing', (done) => {
-      const component = mountComponent({ collective, order })
+      component = mountComponent({ collective, order })
       fillValue(component, 'email', 'testuser@email.com');
       setTimeout(() => {
         component.find('.submit button').simulate('click');
@@ -79,7 +88,7 @@ describe("OrderForm component", () => {
     });
 
     it('creditcard.error', (done) => {
-      const component = mountComponent({ collective, order })
+      component = mountComponent({ collective, order })
 
       const card = {
         CCnumber: '424242424242424',
@@ -138,7 +147,7 @@ describe("OrderForm component", () => {
         CCcvc: 111
       };
 
-      const component = mountComponent({ collective, order, onSubmit })
+      component = mountComponent({ collective, order, onSubmit })
 
       expect(component.find('input[type="email"]').exists()).toBeTrue;
       for (const prop in LoggedInUser) {
@@ -149,7 +158,6 @@ describe("OrderForm component", () => {
       for (const prop in card) {
         fillValue(component, prop, card[prop]);
       }
-
       component.find('.presetBtn').last().simulate('click');
       setTimeout(() => {
         component.find('.submit button').simulate('click');
@@ -211,7 +219,7 @@ describe("OrderForm component", () => {
         done();
       }
 
-      const component = mountComponent({ collective, order, onSubmit, LoggedInUser })
+      component = mountComponent({ collective, order, onSubmit, LoggedInUser })
       component.setProps({ LoggedInUser });
 
       expect(component.find('input[type="email"]').exists()).toBeFalse;
@@ -232,4 +240,43 @@ describe("OrderForm component", () => {
       }, 2000);
     });
   });
+
+  describe('gift card', () => {
+
+    it('gives invalid error', (done) => {
+
+      component = mountComponent({ collective, order }, () => Promise.resolve({ data: null}));
+
+      fillValue(component, 'prepaidcard', 'BB-FTC1900');
+
+      component.find('.prepaidapply.btn').simulate('click');
+
+      setTimeout(() => {
+        expect(component.find('.inputField .prepaidcard').html()).toContain('Invalid code');
+        done();
+      }, 1000);
+    });
+
+    it('gives correct amount on success', (done) => {
+
+      component = mountComponent({ collective, order }, () => Promise.resolve({ data: {
+          prepaidPaymentMethod: {
+            balance: 5000,
+            valid: true,
+            currency: 'USD'
+          }
+      }}));
+
+      fillValue(component, 'prepaidcard', 'BB-FTC1900');
+
+      component.find('.prepaidapply.btn').simulate('click');
+
+      setTimeout(() => {
+        expect(component.find('.inputField .prepaidcard').html()).toContain('Valid code. Amount available: $50.00');
+        done();
+      }, 1000);
+    })
+
+  });
 });
+

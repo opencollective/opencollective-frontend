@@ -436,9 +436,8 @@ class OrderForm extends React.Component {
     const inputPrepaidcard = {
       type: 'text',
       name: 'prepaidcard',
-      id: 'prepaidcard',
       button: <Button 
-        name='prepaidapply'
+        className='prepaidapply'
         disabled={prepaidcard.loading}
         onClick={() => this.applyPrepaidCardBalance()}>
         {intl.formatMessage(this.messages['prepaidcard.apply'])}
