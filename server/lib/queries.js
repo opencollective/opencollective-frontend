@@ -1,6 +1,7 @@
 import models, {sequelize} from '../models';
 import currencies from '../constants/currencies'
 import config from 'config';
+import { pick } from 'lodash';
 
 /*
 * Hacky way to do currency conversion
@@ -239,7 +240,7 @@ const getCollectivesWithBalance = (where = {}, options) => {
 
   let whereCondition = '';
   Object.keys(where).forEach(key => {
-    whereCondition += `AND c."${key}"=:${key}`;
+    whereCondition += `AND c."${key}"=:${key} `;
   });
 
   return sequelize.query(`
@@ -379,10 +380,10 @@ const getMembersWithTotalDonations = (where, options = {}) => {
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
   const roleCond = (where.role) ? `AND member.role = '${where.role}'` : '';
 
-  let types, filterByMemberollectiveType = '';
+  let types, filterByMemberCollectiveType = '';
   if (options.type) {
     types = (typeof options.type === 'string') ? options.type.split(',') : options.type;
-    filterByMemberollectiveType = `AND c.type IN (:types)`
+    filterByMemberCollectiveType = `AND c.type IN (:types)`
   }
 
   let memberCondAttribute, transactionType, groupBy;
@@ -436,7 +437,7 @@ const getMembersWithTotalDonations = (where, options = {}) => {
     WHERE member."${memberCondAttribute}" IN (:collectiveids)
     ${roleCond}
     AND member."deletedAt" IS NULL ${untilCondition('member')}
-    ${filterByMemberollectiveType}
+    ${filterByMemberCollectiveType}
     GROUP BY member.role, member."${groupBy}"
     ORDER BY "totalDonations" DESC, "createdAt" ASC
     LIMIT :limit OFFSET :offset
@@ -450,6 +451,96 @@ const getMembersWithTotalDonations = (where, options = {}) => {
       offset: options.offset || 0,
       types
     },
+    type: sequelize.QueryTypes.SELECT,
+    model: models.Collective
+  });
+};
+
+const getMembersWithBalance = (where, options = {}) => {
+  const { until } = options;
+  const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
+  const roleCond = (where.role) ? `AND member.role = '${where.role}'` : '';
+
+  let types, filterByMemberCollectiveType = '';
+  if (options.type) {
+    types = (typeof options.type === 'string') ? options.type.split(',') : options.type;
+    filterByMemberCollectiveType = `AND c.type IN (:types)`
+  }
+
+  let whereCondition = '';
+  Object.keys(pick(where, ['HostCollectiveId', 'ParentCollectiveId'])).forEach(key => {
+    whereCondition += `AND c."${key}"=:${key} `;
+  });
+
+  let memberCondAttribute, groupBy;
+  if (where.CollectiveId) {
+    memberCondAttribute = "CollectiveId";
+    groupBy = 'MemberCollectiveId';
+  } else if (where.MemberCollectiveId) {
+    memberCondAttribute = "MemberCollectiveId";
+    groupBy = 'CollectiveId';
+  }
+  const collectiveids = (typeof where[memberCondAttribute] === 'number') ? [where[memberCondAttribute]] : where[memberCondAttribute];
+  const selector = `member."${groupBy}" as "${groupBy}", max(member."${memberCondAttribute}") as "${memberCondAttribute}"`;
+
+  // xdamman: this query can be optimized by first computing all the memberships
+  // and only computing the balance for the member.collective selected #TODO
+  const query = `
+    with "balance" AS (
+      SELECT t."CollectiveId", SUM("netAmountInCollectiveCurrency") as "balance"
+      FROM "Collectives" c
+      LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
+      WHERE
+        c.type = 'COLLECTIVE'
+        AND c."isActive" IS TRUE
+        ${whereCondition}
+        AND c."deletedAt" IS NULL
+        GROUP BY t."CollectiveId"
+    )
+    SELECT
+      ${selector},
+      member.role,
+      max(member.id) as "MemberId",
+      max(member."TierId") as "TierId",
+      max(member."createdAt") as "createdAt",
+      max(c.id) as id,
+      max(c.type) as type,
+      max(c."HostCollectiveId") as "HostCollectiveId",
+      max(c.name) as name,
+      max(u."firstName") as "firstName",
+      max(u."lastName") as "lastName",
+      max(c.slug) as slug,
+      max(c.image) as image,
+      max(c.website) as website,
+      max(c.currency) as currency,
+      max(u.email) as email,
+      max(c."twitterHandle") as "twitterHandle",
+      COALESCE(max(b."balance"), 0) as "balance"
+    FROM "Collectives" c
+    LEFT JOIN balance b ON c.id = b."CollectiveId"
+    LEFT JOIN "Members" member ON c.id = member."${groupBy}"
+    LEFT JOIN "Users" u ON c.id = u."CollectiveId"
+    WHERE member."${memberCondAttribute}" IN (:collectiveids)
+    ${roleCond}
+    ${whereCondition}
+    AND member."deletedAt" IS NULL ${untilCondition('member')}
+    ${filterByMemberCollectiveType}
+    GROUP BY member.role, member."${groupBy}"
+    ORDER BY "balance" DESC, "createdAt" ASC
+    LIMIT :limit OFFSET :offset
+  `;
+
+  const replacements = {
+    ...where,
+    collectiveids,
+    limit: options.limit || 100000, // we should reduce this to 100 by default but right now Webpack depends on it
+    offset: options.offset || 0,
+    types
+  };
+
+  return sequelize.query(query.replace(/\s\s+/g,' '), // this is to remove the new lines and save log space.
+  {
+    replacements,
     type: sequelize.QueryTypes.SELECT,
     model: models.Collective
   });
@@ -489,6 +580,7 @@ export default {
   getTotalAnnualBudget,
   getMembersOfCollectiveWithRole,
   getMembersWithTotalDonations,
+  getMembersWithBalance,
   getTopSponsors,
   getTopBackers,
   getCollectivesByTag,

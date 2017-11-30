@@ -309,6 +309,17 @@ describe('graphql.collective.test.js', () => {
       expect(members).to.have.length(3);
     });
 
+    it('gets the members by memberCollectiveSlug sorted by balance', async () => {
+      const result = await utils.graphqlQuery(allMembersQuery, { memberCollectiveSlug: "piamancini", orderBy: "balance" });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const members = result.data.allMembers;
+      console.log(members);
+      expect(members[0].collective.slug).to.equal('opensource');
+      expect(members[0].member.slug).to.equal('piamancini');
+      expect(members).to.have.length(2);
+    });
+
   });
 
   it('edits members', async () => {

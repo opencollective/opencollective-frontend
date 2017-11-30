@@ -256,11 +256,15 @@ const queries = {
         args.MemberCollectiveId = await fetchCollectiveId(args.memberCollectiveSlug);
       }
 
-      if (args.orderBy === 'totalDonations') {
-        const attr = args.CollectiveId ? 'CollectiveId' : 'MemberCollectiveId';
-        const where = { [attr]: args[attr] };
-        if (args.role) where.role = args.role;
-        return rawQueries.getMembersWithTotalDonations(where, args)
+      const attr = args.CollectiveId ? 'CollectiveId' : 'MemberCollectiveId';
+      const where = { [attr]: args[attr] };
+      if (args.role) where.role = args.role.toUpperCase();
+      if (where.role === 'HOST') {
+        where.HostCollectiveId = args.MemberCollectiveId;
+      }
+      if (["totalDonations", "balance"].indexOf(args.orderBy) !== -1) {
+        const queryName = (args.orderBy === 'totalDonations') ? "getMembersWithTotalDonations" : "getMembersWithBalance";
+        return rawQueries[queryName](where, args)
           .map(collective => {
             const res = {
               id: collective.dataValues.MemberId,
