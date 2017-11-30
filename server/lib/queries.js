@@ -377,7 +377,7 @@ const getMembersOfCollectiveWithRole = (CollectiveIds) => {
 const getMembersWithTotalDonations = (where, options = {}) => {
   const { until } = options;
   const untilCondition = (table) => until ? `AND ${table}."createdAt" < '${until.toISOString().toString().substr(0,10)}'` : '';
-  const roleCond = (where.role) ? `AND member.role = "${where.role}` : '';
+  const roleCond = (where.role) ? `AND member.role = '${where.role}'` : '';
 
   let types, filterByMemberollectiveType = '';
   if (options.type) {
