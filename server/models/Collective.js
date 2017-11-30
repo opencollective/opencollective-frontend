@@ -675,7 +675,9 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.editPaymentMethods = function(paymentMethods, defaultAttributes = {}) {
     if (!paymentMethods) return Promise.resolve();
-    return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null } }})
+    // We only allow editing of Stripe Payment Methods for the moment
+    // (to avoid marking other types as archived see issue #698)
+    return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null }, service: { $eq: 'stripe' } }})
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
       const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
