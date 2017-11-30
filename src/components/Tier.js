@@ -64,7 +64,6 @@ class Tier extends React.Component {
       amount = tier.amount || values.amount;
       quantity = 1;
     }
-    console.log("calcCurrentValues", { interval, amount, quantity, presets } )
     return { interval, amount, quantity, presets }
   }
 

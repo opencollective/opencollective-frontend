@@ -36,7 +36,7 @@ class CreateOrderPage extends React.Component {
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'tier.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'donation.title': { id: 'tier.order.donation.title', defaultMessage: 'Contribute' },
-      'order.success': { id: 'tier.order.success', defaultMessage: 'order processed with success' },
+      'order.success': { id: 'tier.order.success', defaultMessage: 'order processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: '😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we\'ll figure things out.' },
       'donation.title': { id: 'tier.name.donation', defaultMessage: 'donation' },
       'contribution.title': { id: 'tier.name.contribution', defaultMessage: 'contribution' },
@@ -66,7 +66,14 @@ class CreateOrderPage extends React.Component {
       const res = await this.props.createOrder(order);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute('collective', {slug: orderCreated.fromCollective.slug});
+      Router.pushRoute('collective', { 
+        slug: orderCreated.fromCollective.slug,
+        status: 'orderCreated',
+        CollectiveId: order.collective.id,
+        TierId: order.tier && order.tier.id,
+        type: data.Collective.type,
+        totalAmount:order.totalAmount
+      });
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
