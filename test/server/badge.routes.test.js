@@ -57,17 +57,17 @@ describe("badge.routes.test.js", () => {
       const res = await r2(`${WEBSITE_URL}/gulpjs/tiers/individual/0/avatar.svg${cacheBurst}`).text;
       expect(res).toMatch(/<image width="64" height="64"/);
     });
-    
+
   });
 
   describe("contributors.svg", () => {
     test("loads the mosaic", async () => {
-      const res = await fetch(`${WEBSITE_URL}/tipbox/contributors.svg?width=500&43${cacheBurst}`);
+      const res = await fetch(`${WEBSITE_URL}/webpack/contributors.svg?width=500${cacheBurst}`);
       expect(res.status).toEqual(200);
       expect(res.headers.get('content-type')).toEqual('image/svg+xml; charset=utf-8');
       expect(res.headers.get('cache-control')).toMatch(/public, max-age=[1-9][0-9]{2,5}/);
       const text = await res.text();
-      expect(text.length).toBeGreaterThan(97000);
+      expect(text.length).toBeGreaterThan(2420000);
     });
   })
 
