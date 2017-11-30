@@ -28,7 +28,7 @@ describe("pages.loggedout", () => {
   test("loads the /events iframe", async () => {
     jest.setTimeout(10000);
     const screenshot = await browser
-      .goto(`${WEBSITE_URL}/brusselstogether/events/iframe`)
+      .goto(`${WEBSITE_URL}/veganizerbxl/events.html`)
       .wait('.pastEvents li')
       .screenshot();
 

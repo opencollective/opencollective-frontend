@@ -12,6 +12,7 @@ class Expenses extends React.Component {
     expenses: PropTypes.array,
     refetch: PropTypes.func,
     fetchMore: PropTypes.func,
+    editable: PropTypes.bool,
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object
   }
@@ -43,6 +44,7 @@ class Expenses extends React.Component {
       collective,
       expenses,
       LoggedInUser,
+      editable,
       includeHostedCollectives
     } = this.props;
 
@@ -126,6 +128,7 @@ class Expenses extends React.Component {
               key={expense.id}
               collective={collective}
               expense={expense}
+              editable={editable}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={LoggedInUser}
               />
