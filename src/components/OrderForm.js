@@ -254,6 +254,9 @@ class OrderForm extends React.Component {
       if (newState.order.tier.quantity) {
         newState.order.quantity = newState.order.tier.quantity;
       }
+      if (newState.order.tier.hasOwnProperty('interval')) {
+        newState.order.interval = newState.order.tier.interval;
+      }
     }
 
     if (attr === 'email') {
@@ -281,7 +284,7 @@ class OrderForm extends React.Component {
       fromCollective,
       publicMessage: order.publicMessage,
       quantity,
-      interval: tier.interval,
+      interval: order.interval || tier.interval,
       totalAmount: (quantity * tier.amount) || order.totalAmount,
       paymentMethod: sanitizedCard
     };
@@ -305,7 +308,6 @@ class OrderForm extends React.Component {
     const { intl } = this.props;
     const { order, user, creditcard, prepaidcard } = this.state;
     const newState = {...this.state};
-
     // validate email
     if (this.state.isNewUser && !isValidEmail(user.email)) {
       this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) }});
@@ -443,7 +445,6 @@ class OrderForm extends React.Component {
         {intl.formatMessage(this.messages['prepaidcard.apply'])}
         </Button>,
       required: true,
-      focus: true,
       label: intl.formatMessage(this.messages['prepaidcard.label']),
       defaultValue: prepaidcard['token'],
       onChange: (value) => this.handleChange("prepaidcard", "token", value)
@@ -705,11 +706,11 @@ class OrderForm extends React.Component {
                     {
                       hostname: collective.host.name,
                       amount: formatCurrency(order.totalAmount, currency),
-                      interval: order.tier.interval,
+                      interval: order.interval || order.tier.interval,
                       collective: collective.name
                     }
                   } />
-                  { order.tier.interval &&
+                  { (order.interval || order.tier.interval) &&
                     <div>
                       <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
                     </div>

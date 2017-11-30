@@ -58,12 +58,13 @@ class Tier extends React.Component {
       // Case 2: handle quantity. Can't be active at same time as presets
       quantity = (values && values.quantity) || 1;
       amount = tier.amount * quantity;
-    } else if (tier.amount) {
+    } else if (tier.amount || values.amount) {
       // Case 3: nothing is changeable, comes with amount (and interval optional)
-      interval = tier.interval; 
-      amount = tier.amount;
+      interval = tier.interval || values.interval; 
+      amount = tier.amount || values.amount;
       quantity = 1;
     }
+    console.log("calcCurrentValues", { interval, amount, quantity, presets } )
     return { interval, amount, quantity, presets }
   }
 
