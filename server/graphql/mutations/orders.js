@@ -164,16 +164,17 @@ export function createOrder(_, args, req) {
     if (paymentRequired) {
       return orderCreated
         .setPaymentMethod(order.paymentMethod)
-        .then(() => executeOrder(req.remoteUser || user, orderCreated));
+        .then(() => executeOrder(req.remoteUser || user, orderCreated)); // also adds the user as a BACKER of collective
     } else {
-      // Free ticket
+      // Free ticket, add user as an ATTENDEE
       const email = (req.remoteUser) ? req.remoteUser.email : args.order.user.email;
-      return emailLib.send('ticket.confirmed', email, {
+      return collective.addUserWithRole(user, roles.ATTENDEE)
+        .then(() => emailLib.send('ticket.confirmed', email, {
         recipient: { name: fromCollective.name },
         collective: collective.info,
         order: orderCreated.info,
         tier: tier && tier.info
-      });
+      }));
     }
   })
   // make sure we return the latest version of the Order Instance
