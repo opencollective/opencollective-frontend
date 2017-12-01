@@ -212,7 +212,7 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
-    it.only('cancels the subscription', (done) => {
+    it('cancels the subscription', (done) => {
        request(app)
         .post(`/subscriptions/${order.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
