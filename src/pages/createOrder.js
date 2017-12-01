@@ -120,6 +120,10 @@ class CreateOrderPage extends React.Component {
     this.order.description = description;
     const href = (collective.type === 'EVENT') ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`;
 
+    // Tier names are inconsistent - singular or plural
+    // To avoid header like "Become a backers", this hack removes the last character if it's an 's'
+    const headerName = tier.name.charAt(tier.name.length-1) === 's' ? tier.name.slice(0, -1) : tier.name;
+
     return (
       <div>
         <style jsx>{`
@@ -143,7 +147,7 @@ class CreateOrderPage extends React.Component {
           <CollectiveCover
             collective={collective}
             href={href}
-            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], { name: tier.name })}
+            title={intl.formatMessage(this.messages[`${tier.type.toLowerCase()}.title`], { name: headerName })}
             className="small"
             />
 
