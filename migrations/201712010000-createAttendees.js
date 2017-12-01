@@ -12,6 +12,7 @@ const membersCreated = [];
 let eventsProcessed = 0;
 
 const insert = (sequelize, table, entry) => {
+  entry.createdAt = new Date;
   if (DRY_RUN) {
     console.log(">>> insert into ", table, JSON.stringify(entry));
     return Promise.resolve();
