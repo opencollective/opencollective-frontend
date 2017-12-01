@@ -8,7 +8,8 @@ import { Router } from '../server/pages';
 class EventsWithData extends React.Component {
 
   static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired
+    collectiveSlug: PropTypes.string.isRequired,
+    onChange: PropTypes.func
   }
 
   constructor(props) {
@@ -19,7 +20,9 @@ class EventsWithData extends React.Component {
   }
 
   componentDidMount() {
+    const { onChange } = this.props; 
     this.isIframe = window.self !== window.top;
+    onChange && this.node && onChange({ height: this.node.offsetHeight });
   }
 
   createEvent(e) {
@@ -62,7 +65,7 @@ class EventsWithData extends React.Component {
     pastEvents.reverse();
 
     return (
-      <div className="Events">
+      <div className="Events" ref={(node) => this.node = node}>
         <style jsx>{`
         .Events {
           font-size: 1.4rem;
@@ -97,7 +100,7 @@ class EventsWithData extends React.Component {
         }
         `}
         </style>
-        <div className="events" ref="events">
+        <div className="events">
           {futureEvents.length === 0 && pastEvents.length === 0 &&
             <div className="createEvent">
               <p><FormattedMessage id='events.widget.noEventScheduled' defaultMessage={`No event has been scheduled yet.`} /></p>

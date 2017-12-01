@@ -57,7 +57,10 @@ Example:
 
 To show the list of collectives that you are backing on your website, just add this script:
 
-    <script src="https://opencollective.com/:username/widget.js"></script>
+    <script src="https://opencollective.com/:username/collectives.js?role=backer"></script>
+
+You can replace `backer` by `admin` (core contributor), `member` (contributor) or `host`.
+Leave it empty or remove it to show all the collectives that you are a member of irrespective of the role.
 
 E.g. http://polycode.co.uk
 

@@ -362,6 +362,7 @@ class Collective extends React.Component {
                     <ExpensesWithData
                       collective={this.collective}
                       LoggedInUser={LoggedInUser}
+                      editable={false}
                       limit={5}
                       />
                     <div className="actions">

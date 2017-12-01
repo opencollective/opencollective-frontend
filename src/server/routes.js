@@ -115,14 +115,15 @@ module.exports = (server, app) => {
     }))
   });
 
-  server.get('/:collectiveSlug/events.js', (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname,'../templates/events.js'), 'utf8');
+  server.get('/:collectiveSlug/:widget(widget|events|collectives).js', (req, res) => {
+    const content = fs.readFileSync(path.join(__dirname,'../templates/widget.js'), 'utf8');
     _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
     const compiled = _.template(content);
     res.setHeader('content-type', 'application/javascript');
     res.send(compiled({
+      ...req.query,
       collectiveSlug: req.params.collectiveSlug,
-      id: req.query.id,
+      widget: req.params.widget,
       host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`
     }))
   });
