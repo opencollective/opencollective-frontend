@@ -250,6 +250,7 @@ const getCollectivesWithBalance = (where = {}, options) => {
       LEFT JOIN "Transactions" t ON t."CollectiveId" = c.id
       WHERE
         c.type = 'COLLECTIVE'
+        AND t."deletedAt" IS NULL
         AND c."isActive" IS TRUE
         ${whereCondition}
         AND c."deletedAt" IS NULL

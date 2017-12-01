@@ -10,7 +10,8 @@ export function createOrder(_, args, req) {
   let tier, collective, fromCollective, paymentRequired, interval, orderCreated, user;
   const order = args.order;
 
-  if (order.paymentMethod && order.paymentMethod.uuid && !req.remoteUser) {
+
+  if (order.paymentMethod && order.paymentMethod.service === 'stripe' && order.paymentMethod.uuid && !req.remoteUser) {
     throw new Error("You need to be logged in to be able to use a payment method on file");
   }
 

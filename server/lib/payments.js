@@ -50,8 +50,13 @@ export const executeOrder = (user, order) => {
       return paymentProviders[paymentProvider].processOrder(order); // eslint-disable-line import/namespace
     })
     .then(transaction => {
-      order.transaction = transaction;
-      sendConfirmationEmail(order); // async
+      // for gift cards
+      if (!transaction && order.paymentMethod.service === 'prepaid') {
+        sendProcessingEmail(order); // async
+      } else {
+        order.transaction = transaction;
+        sendConfirmationEmail(order); // async
+      }
       return null;
     });
 }
@@ -108,4 +113,25 @@ const sendConfirmationEmail = (order) => {
       }
     ));
   }
+}
+
+// Needed for Gift cards when users donate to a non-open source host
+// Assumes one-time payments
+const sendProcessingEmail = (order) => {
+    const { collective, fromCollective } = order;
+  const user = order.createdByUser;
+
+  return emailLib.send(
+      'processing',
+      user.email,
+      { order: order.info,
+        transaction: pick(order.transaction, ['createdAt', 'uuid']),
+        user: user.info,
+        collective: collective.info,
+        fromCollective: fromCollective.minimal,
+        subscriptionsLink: user.generateLoginLink('/subscriptions')
+      }, {
+        from: `${collective.name} <hello@${collective.slug}.opencollective.com>`
+      })
+    .then(() => emailLib.sendMessage('support@opencollective.com', 'Gift card order needs manual attention', null, { text: `Order Id: ${order.id} by userId: ${user.id}`}));
 }
