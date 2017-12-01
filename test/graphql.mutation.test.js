@@ -143,6 +143,16 @@ describe('Mutation Tests', () => {
         event.slug = 'newslug';
         event.tiers = createdEvent.tiers;
 
+        // Make sure the creator of the event has been added as an ADMIN
+        const members = await models.Member.findAll({ where: {
+          CollectiveId: event.id
+        }});
+
+        expect(members).to.have.length(1);
+        expect(members[0].CollectiveId).to.equal(event.id);
+        expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
+        expect(members[0].role).to.equal(roles.ADMIN);
+
         // We remove the first tier
         event.tiers.shift();
 
@@ -563,6 +573,15 @@ describe('Mutation Tests', () => {
               }
             }
           });
+
+          // Make sure we have added the user as an ATTENDEE
+          const members = await models.Member.findAll({
+            where: {
+              CollectiveId: event1.id,
+              role: roles.ATTENDEE
+            }
+          });
+          expect(members).to.have.length(1);
         });
 
         it('from a new user', async () => {
@@ -615,6 +634,15 @@ describe('Mutation Tests', () => {
             }
           }
         });
+
+        // Make sure we have added the user as an ATTENDEE
+        const members = await models.Member.findAll({
+          where: {
+            CollectiveId: event1.id,
+            role: roles.ATTENDEE
+          }
+        });
+        expect(members).to.have.length(1);
         });
       });
 
@@ -681,7 +709,7 @@ describe('Mutation Tests', () => {
                 "id": 3
               },
               "collective": {
-                "id": 5,
+                "id": event1.id,
                 "slug": "jan-meetup"
               }
             }

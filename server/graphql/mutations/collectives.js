@@ -76,7 +76,7 @@ export function createCollective(_, args, req) {
   .then(() => models.Collective.create(collectiveData))
   .then(c => collective = c)
   .then(() => collective.editTiers(args.collective.tiers))
-  .then(() => collective.editMembers(args.collective.members, { CreatedByUserId: req.remoteUser.id }))
+  .then(() => collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }))
   .then(() => collective.editPaymentMethods(args.collective.paymentMethods, { CreatedByUserId: req.remoteUser.id }))
   .then(() => collective)
   .catch(e => {
