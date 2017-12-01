@@ -466,6 +466,11 @@ class OrderForm extends React.Component {
 
     return (
       <div className="OrderForm">
+        <style jsx global>{`
+          .prepaidcard span {
+            max-width: 350px;
+          }
+        `}</style>
         <style jsx>{`
         h2 {
           margin: 3rem 0 3rem 0;
