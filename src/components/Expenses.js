@@ -21,7 +21,7 @@ class Expenses extends React.Component {
     super(props);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false };
+    this.state = { loading: false, isPayActionLocked: false };
   }
 
   fetchMore(e) {
@@ -37,6 +37,10 @@ class Expenses extends React.Component {
     this.props.refetch({status}).then(() => {
       this.setState({ loading: false });
     });
+  }
+
+  setPayActionLock(val) {
+    this.setState({ isPayActionLocked: val})
   }
   
   render() {
@@ -131,6 +135,9 @@ class Expenses extends React.Component {
               editable={editable}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={LoggedInUser}
+              allowPayAction={processingExpensePayAction}
+              lockPayAction={() => this.setPayActionLock.bind(this, true)}
+              unlockPayAction={() => this.setPayActionLock.bind(this, false)}
               />
           )}
           { expenses.length === 0 &&

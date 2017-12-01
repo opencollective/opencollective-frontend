@@ -9,7 +9,10 @@ import SmallButton from './SmallButton';
 class PayExpenseBtn extends React.Component {
 
   static propTypes = {
-    expense: PropTypes.object.isRequired
+    expense: PropTypes.object.isRequired,
+    disabled: PropTypes.bool,
+    lock: PropTypes.func,
+    unlock: PropTypes.func
   }
 
   constructor(props) {
@@ -19,15 +22,18 @@ class PayExpenseBtn extends React.Component {
   }
 
   async onClick() {
-    const { expense } = this.props;
+    const { expense, lock, unlock } = this.props;
+    lock();
     this.setState({ loading: true });
     try {
       await this.props.payExpense(expense.id);
       this.setState({ loading: false });
+      unlock();
     } catch (e) {
       console.log(">>> payExpense error: ", e);
       const error = e.message && e.message.replace(/GraphQL error:/, "");
       this.setState({ error, loading: false });
+      unlock();
     }
   }
 
@@ -46,7 +52,7 @@ class PayExpenseBtn extends React.Component {
             padding-left: 1rem;
           }
         `}</style>
-        <SmallButton className="pay" onClick={this.onClick} disabled={this.state.loading}>
+        <SmallButton className="pay" onClick={this.onClick} disabled={this.state.loading || this.props.disabled}>
           { expense.payoutMethod === 'other' && <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />}
           { expense.payoutMethod !== 'other' && <FormattedMessage id="expense.pay.btn" defaultMessage="pay with {paymentMethod}" values={{ paymentMethod: expense.payoutMethod }} />}
         </SmallButton>
