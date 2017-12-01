@@ -22,7 +22,7 @@ class EventPage extends React.Component {
 
   async componentDidMount() {
     const { getLoggedInUser } = this.props;
-    const LoggedInUser = null; // || getLoggedInUser && await getLoggedInUser();
+    const LoggedInUser = getLoggedInUser && await getLoggedInUser();
     this.setState({ LoggedInUser });
   }
 
