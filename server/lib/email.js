@@ -292,7 +292,7 @@ const sendMessageFromActivity = (activity, notification) => {
       return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
 
     case activities.SUBSCRIPTION_CANCELED:
-      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data);
+      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data, { cc: `info@${data.collective.slug}.opencollective.com` });
 
     default:
       return Promise.resolve();
