@@ -237,7 +237,9 @@ class OrderForm extends React.Component {
 
   handleChange(obj, attr, value) {
     this.resetError();
-    const newState = { ... this.state };
+    const newTier = { ...this.state.order.tier }
+    const newOrder = { ...this.state.order };
+    const newState = Object.assign({}, this.state, {order: newOrder, tier: newTier});
     if (value === 'null') {
       value = null;
     }
@@ -258,7 +260,6 @@ class OrderForm extends React.Component {
         newState.order.interval = newState.order.tier.interval;
       }
     }
-
     if (attr === 'email') {
       checkUserExistence(value).then(exists => {
         this.setState({ isNewUser: !exists });

@@ -39,6 +39,15 @@ class Tier extends React.Component {
 
   }
 
+  componentDidMount() {
+    const currentValues = this.calcCurrentValues();
+
+    // handle the initial condition of starting without an amount
+    if (currentValues.amount && !this.props.values.amount) {
+      this.handleChange('amount', currentValues.amount);
+    }
+  }
+
   // since this is a pure component, we don't want to store state
   // But, we still need a way to construct the current values of 
   // quantity, amount and interval
