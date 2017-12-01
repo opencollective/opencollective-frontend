@@ -17,8 +17,8 @@ import NotFound from '../components/NotFound';
 
 class CreateOrderPage extends React.Component {
 
-  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb } }) {
-    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb }
+  static getInitialProps ({ query: { collectiveSlug, eventSlug, TierId, amount, quantity, totalAmount, interval, description, verb, redeem } }) {
+    return { slug: eventSlug || collectiveSlug, TierId, quantity, totalAmount: totalAmount || amount * 100, interval, description, verb, redeem }
   }
 
   constructor(props) {
@@ -36,7 +36,7 @@ class CreateOrderPage extends React.Component {
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'tier.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'donation.title': { id: 'tier.order.donation.title', defaultMessage: 'Contribute' },
-      'order.success': { id: 'tier.order.success', defaultMessage: 'order processed with success' },
+      'order.success': { id: 'tier.order.success', defaultMessage: 'order processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: '😱 Oh crap! An error occured. Try again, or shoot a quick email to support@opencollective.com and we\'ll figure things out.' },
       'donation.title': { id: 'tier.name.donation', defaultMessage: 'donation' },
       'contribution.title': { id: 'tier.name.contribution', defaultMessage: 'contribution' },
@@ -61,14 +61,19 @@ class CreateOrderPage extends React.Component {
     if (this.state.LoggedInUser) {
       delete order.user;
     }
-    console.log(">>> createOrder", order);
     try {
       this.setState({ loading: true});
       const res = await this.props.createOrder(order);
-      console.log(">>> createOrder response", res);
       const orderCreated = res.data.createOrder;
       this.setState({ loading: false, order, result: { success: intl.formatMessage(this.messages['order.success']) } });
-      Router.pushRoute(`/${orderCreated.fromCollective.slug}?status=orderCreated&CollectiveId=${order.collective.id}&TierId=${order.tier && order.tier.id}&type=${data.Collective.type}&totalAmount=${order.totalAmount}`);
+      Router.pushRoute('collective', { 
+        slug: orderCreated.fromCollective.slug,
+        status: 'orderCreated',
+        CollectiveId: order.collective.id,
+        TierId: order.tier && order.tier.id,
+        type: data.Collective.type,
+        totalAmount:order.totalAmount
+      });
     } catch (e) {
       console.error(">>> createOrder error: ", e);
       this.setState({ loading: false, result: { error: `${intl.formatMessage(this.messages['order.error'])}: ${e}` } });
@@ -148,6 +153,7 @@ class CreateOrderPage extends React.Component {
               order={this.order}
               LoggedInUser={this.state.LoggedInUser}
               onSubmit={this.createOrder}
+              redeemFlow={this.props.redeem}
               />
             <div className="result">
               <div className="success">{this.state.result.success}</div>

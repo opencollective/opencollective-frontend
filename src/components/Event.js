@@ -60,6 +60,7 @@ class Event extends React.Component {
       view: 'default',
       showInterestedForm: false,
       order: { tier: {} },
+      tierInfo: {},
       api: { status: 'idle' },
       event: this.props.event
     }
@@ -229,16 +230,15 @@ class Event extends React.Component {
   }
 
   updateOrder(tier) {
+    const tierInfo = Object.assign({}, {...this.state.tierInfo});
     const order = {
       tier: { id: tier.id },
       quantity: tier.quantity,
       totalAmount: (tier.quantity || 1) * tier.amount,
       interval: tier.interval
     }
-    this.setState({ order });
-    // if (typeof window !== "undefined") {
-    //   window.state = this.state;
-    // }
+    tierInfo[tier.id] = tier;
+    this.setState({ order, tierInfo });
   }
 
   handleOrderTier(tier) {
@@ -397,6 +397,7 @@ class Event extends React.Component {
                           key={tier.id}
                           className="tier"
                           tier={tier}
+                          values={this.state.tierInfo[tier.id] || {}}
                           onChange={(response) => this.updateOrder(response)}
                           onClick={(response) => this.handleOrderTier(response)}
                           />

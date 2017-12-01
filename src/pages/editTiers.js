@@ -38,7 +38,7 @@ class EditTiers extends React.Component {
       await this.props.editTiers(Collective.slug, TiersInputType );
       const tiersUrl = `${window.location.protocol}//${window.location.host}/${Collective.slug}/tiers`;
       window.location.replace(tiersUrl);
-      this.setState({ result: { success: `Tiers edited with success. (redirecting...)` }});
+      this.setState({ result: { success: `Tiers edited successfully. (redirecting...)` }});
     } catch (err) {
       console.error(">>> editTiers error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;

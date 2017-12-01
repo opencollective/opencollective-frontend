@@ -30,7 +30,7 @@
   "collective.menu.backer": "apoyando {n} {n, plural, one {colectivo} other {colectivos}}",
   "collective.menu.follower": "siguiendo {n} {n, plural, one {colectivo} other {colectivos}}",
   "collective.stats.backers.users": "{n, plural, one {backer} other {backers}}",
-  "collective.stats.backers.organizations": "{n} {n, plural, one {organization} other {organizations}}",
+  "collective.stats.backers.organizations": "{n, plural, one {organization} other {organizations}}",
   "collective.budget": "presupuesto",
   "collective.donate": "donar",
   "collective.contribute": "contribuye",

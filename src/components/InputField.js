@@ -20,7 +20,7 @@ function FieldGroup({ controlId, label, help, pre, button, className, ...props }
   const inputProps = { ... props };
   delete inputProps.controlId;
 
-  if (className == 'horizontal') {
+  if (className === 'horizontal') {
     return (
       <FormGroup controlId={controlId} validationState={validationState}>
         <Col componentClass={ControlLabel} sm={3}>

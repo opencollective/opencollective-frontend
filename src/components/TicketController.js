@@ -5,19 +5,17 @@ import colors from '../constants/colors';
 class TicketController extends React.Component {
 
   static propTypes = {
-    defaultValue: PropTypes.number,
+    value: PropTypes.number,
     className: PropTypes.object,
     onChange: PropTypes.func
   }
 
   constructor(props) {
     super(props);
-    this.state = { value: props.defaultValue || 1 };
   }
 
   changeValue(delta) {
-    const newValue = Math.max(this.state.value + delta, 1);
-    this.setState({ value: newValue });
+    const newValue = Math.max(this.props.value + delta, 1);
     this.props.onChange(newValue);
   }
 
@@ -58,7 +56,7 @@ class TicketController extends React.Component {
         `}</style>
         <div className={this.props.className}>
           <div className="btn decrease" onClick={() => this.changeValue(-1)}>-</div>
-          {this.state.value} ticket{this.state.value > 1 ? 's' : ''}
+          {this.props.value} ticket{this.props.value > 1 ? 's' : ''}
           <div className="btn increase" onClick={() => this.changeValue(1)}>+</div>
         </div>
       </div>

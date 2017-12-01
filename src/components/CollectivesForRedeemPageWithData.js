@@ -4,22 +4,18 @@ import Error from '../components/Error';
 import withIntl from '../lib/withIntl';
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
-import CollectiveCard from './CollectiveCard';
+import CollectiveCardWithRedeem from './CollectiveCardWithRedeem';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
-class CollectivesWithData extends React.Component {
+class CollectivesForRedeemPageWithData extends React.Component {
 
   static propTypes = {
     HostCollectiveId: PropTypes.number,
-    hostCollectiveSlug: PropTypes.string,
-    memberOfCollectiveSlug: PropTypes.string,
-    role: PropTypes.string,
     ParentCollectiveId: PropTypes.number,
-    onChange: PropTypes.func,
-    limit: PropTypes.number
+    limit: PropTypes.number,
   }
 
   constructor(props) {
@@ -32,18 +28,11 @@ class CollectivesWithData extends React.Component {
     };
   }
 
-  componentDidMount() {
-    const { onChange } = this.props; 
-    onChange && this.node && onChange({ height: this.node.offsetHeight });
-  }
-
   fetchMore(e) {
-    const { onChange } = this.props; 
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
       this.setState({ loading: false });
-      onChange && onChange({ height: this.node.offsetHeight });
     });
   }
 
@@ -69,7 +58,7 @@ class CollectivesWithData extends React.Component {
 
     const limit = this.props.limit || COLLECTIVE_CARDS_PER_PAGE * 2;
     return (
-      <div className="CollectivesContainer" ref={(node) => this.node = node}>
+      <div className="CollectivesContainer">
         <style jsx>{`
           :global(.loadMoreBtn) {
             margin: 1rem;
@@ -98,20 +87,19 @@ class CollectivesWithData extends React.Component {
 
         <div className="Collectives cardsList">
           { collectives.map((collective) =>
-            <CollectiveCard
+            <CollectiveCardWithRedeem
               key={collective.id}
               collective={collective}
+              showRedeemPrompt={true}
             />
           )}
         </div>
-        { collectives.length % 10 === 0 && collectives.length >= limit &&
-          <div className="loadMoreBtn">
-            <Button bsStyle='default' onClick={this.fetchMore}>
-              {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
-              {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
-            </Button>
-          </div>
-        }
+        <div className="loadMoreBtn">
+          <Button onClick={this.fetchMore}>
+            {this.state.loading && <FormattedMessage id='loading' defaultMessage='loading' />}
+            {!this.state.loading && <FormattedMessage id='loadMore' defaultMessage='load more' />}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -119,8 +107,8 @@ class CollectivesWithData extends React.Component {
 }
 
 const getCollectivesQuery = gql`
-query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $ParentCollectiveId: Int, $memberOfCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
-  allCollectives(HostCollectiveId: $HostCollectiveId, hostCollectiveSlug: $hostCollectiveSlug, memberOfCollectiveSlug: $memberOfCollectiveSlug, role: $role, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
+query allCollectives($HostCollectiveId: Int, $ParentCollectiveId: Int, $limit: Int, $offset: Int, $orderBy: String, $orderDirection: String) {
+  allCollectives(HostCollectiveId: $HostCollectiveId, ParentCollectiveId: $ParentCollectiveId, limit: $limit, offset: $offset, orderBy: $orderBy, orderDirection: $orderDirection) {
     id
     type
     createdAt
@@ -135,7 +123,8 @@ query allCollectives($HostCollectiveId: Int, $hostCollectiveSlug: String, $Paren
       id
       yearlyBudget
       backers {
-        all
+        users
+        organizations
       }
     }
   }
@@ -148,9 +137,6 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
       variables: {
         ParentCollectiveId: props.ParentCollectiveId,
         HostCollectiveId: props.HostCollectiveId,
-        hostCollectiveSlug: props.hostCollectiveSlug,
-        memberOfCollectiveSlug: props.memberOfCollectiveSlug,
-        role: props.role,
         orderBy: props.orderBy,
         orderDirection: props.orderDirection,
         offset: 0,
@@ -181,4 +167,4 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
 });
 
 
-export default addCollectivesData(withIntl(CollectivesWithData));
+export default addCollectivesData(withIntl(CollectivesForRedeemPageWithData));

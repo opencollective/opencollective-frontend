@@ -1,15 +1,17 @@
 import React from 'react';
+import { withApollo } from 'react-apollo';
 import PropTypes from 'prop-types';
 import TierComponent from '../components/Tier';
 import InputField from '../components/InputField';
 import ActionButton from '../components/Button';
-import { Button, Row, Col, Form } from 'react-bootstrap';
+import { Button, Row, Col, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { capitalize, formatCurrency, isValidEmail } from '../lib/utils';
 import { getStripeToken, isValidCard } from '../lib/stripe';
 import { pick } from 'lodash';
 import withIntl from '../lib/withIntl';
 import { checkUserExistence, signin } from '../lib/api';
+import { getPrepaidCardBalanceQuery } from '../graphql/queries';
 
 class OrderForm extends React.Component {
 
@@ -17,7 +19,8 @@ class OrderForm extends React.Component {
     order: PropTypes.object.isRequired, // { tier: {}, quantity: Int, interval: String, totalAmount: Int }
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
-    onSubmit: PropTypes.func.isRequired
+    onSubmit: PropTypes.func.isRequired,
+    redeemFlow: PropTypes.bool
   }
 
   constructor(props) {
@@ -25,17 +28,24 @@ class OrderForm extends React.Component {
     const { intl, order } = props;
 
     const tier = { ...order.tier };
-    tier.amount = tier.amount || order.totalAmount;
-    tier.interval = tier.interval || order.interval;
 
     this.state = {
       isNewUser: true,
       loginSent: false,
       user: {},
       fromCollective: {},
-      creditcard: { save: true },
+      creditcard: { 
+        show: !this.props.redeemFlow,
+        save: true,
+      },
+      prepaidcard: {
+        applySent: false,
+        loading: false,
+      },
+      orgDetails: {
+        show: !this.props.redeemFlow
+      },
       order: order || {},
-      tier,
       result: {}
     };
     
@@ -52,7 +62,7 @@ class OrderForm extends React.Component {
 
     this.messages = defineMessages({
       'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
-      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
+      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
@@ -64,6 +74,14 @@ class OrderForm extends React.Component {
       'creditcard.save': { id: 'creditcard.save', defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}' },
       'creditcard.missing': { id: 'creditcard.missing', defaultMessage: 'Mmmm... 🤔 looks like you forgot to provide your credit card details.' },
       'creditcard.error': { id: 'creditcard.error', defaultMessage: 'Invalid credit card' },
+      'prepaidcard.label': {id: 'prepaidcard.label', defaultMessage: 'Gift Card'},
+      'prepaidcard.apply': {id: 'prepaidcard.apply', defaultMessage: 'Apply'},
+      'prepaidcard.invalid': {id: 'prepaidcard.invalid', defaultMessage: 'Invalid code'},
+      'prepaidcard.expired': {id: 'prepaidcard.expired', defaultMessage: 'Expired code'},
+      'prepaidcard.loading': {id: 'prepaidcard.loading', defaultMessage: 'Please wait...'},
+      'prepaidcard.amountremaining': {id: 'prepaidcard.amountremaining', defaultMessage: 'Valid code. Amount available: '},
+      'prepaidcard.amounterror': {id: 'prepaidcard.amounterror', defaultMessage: 'You can only contribute up to the amount available on your gift card.'},
+
       'ticket.title': { id: 'tier.order.ticket.title', defaultMessage: 'RSVP' },
       'backer.title': { id: 'tier.order.backer.title', defaultMessage: 'Become a {name}' },
       'sponsor.title': { id: 'tier.order.sponsor.title', defaultMessage: 'Become a {name}' },
@@ -202,7 +220,10 @@ class OrderForm extends React.Component {
     const newState = {
       ...this.state,
       isNewUser: false,
-      fromCollective
+      fromCollective,
+      orgDetails: {
+        show: Boolean(fromCollective)
+      }
     };
     this.populatePaymentMethods(CollectiveId);
     if (this.paymentMethods.length > 0) {
@@ -219,7 +240,9 @@ class OrderForm extends React.Component {
 
   handleChange(obj, attr, value) {
     this.resetError();
-    const newState = { ... this.state };
+    const newTier = { ...this.state.order.tier }
+    const newOrder = { ...this.state.order };
+    const newState = Object.assign({}, this.state, {order: newOrder, tier: newTier});
     if (value === 'null') {
       value = null;
     }
@@ -231,10 +254,15 @@ class OrderForm extends React.Component {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
-    if (obj === 'tier') {
-      newState['order']['totalAmount'] = newState['tier']['amount'] * newState['tier']['quantity'];
+    if (attr === 'tier') {
+      newState.order.totalAmount = newState.order.tier.amount * (newState.order.tier.quantity || 1);
+      if (newState.order.tier.quantity) {
+        newState.order.quantity = newState.order.tier.quantity;
+      }
+      if (newState.order.tier.hasOwnProperty('interval')) {
+        newState.order.interval = newState.order.tier.interval;
+      }
     }
-
     if (attr === 'email') {
       checkUserExistence(value).then(exists => {
         this.setState({ isNewUser: !exists });
@@ -248,11 +276,11 @@ class OrderForm extends React.Component {
   }
 
   async handleSubmit() {
-    console.log(">>> handleSubmit", this.state)
     if (! await this.validate()) return false;
     this.setState({ loading: true });
 
-    const { sanitizedCard, order, tier, fromCollective, user } = this.state;
+    const { sanitizedCard, order, fromCollective, user } = this.state;
+    const tier = order.tier;
 
     const quantity = tier.quantity || 1;
     const OrderInputType = {
@@ -260,7 +288,7 @@ class OrderForm extends React.Component {
       fromCollective,
       publicMessage: order.publicMessage,
       quantity,
-      interval: tier.interval,
+      interval: order.interval || tier.interval,
       totalAmount: (quantity * tier.amount) || order.totalAmount,
       paymentMethod: sanitizedCard
     };
@@ -268,7 +296,6 @@ class OrderForm extends React.Component {
     if (tier.id) {
       OrderInputType.tier = { id: tier.id, amount: tier.amount };
     }
-    console.log("OrderForm", "onSubmit", OrderInputType);
     await this.props.onSubmit(OrderInputType);
     this.setState({ loading: false });
   }
@@ -283,42 +310,53 @@ class OrderForm extends React.Component {
 
   async validate() {
     const { intl } = this.props;
-    if (this.state.isNewUser && !isValidEmail(this.state.user.email)) {
+    const { order, user, creditcard, prepaidcard } = this.state;
+    const newState = {...this.state};
+    // validate email
+    if (this.state.isNewUser && !isValidEmail(user.email)) {
       this.setState({ result: { error: intl.formatMessage(this.messages['error.email.invalid']) }});
       return false;
     }
-    if (this.state.order.totalAmount > 0) {
-      const card = this.state.creditcard;
-      if (!card) {
-        this.setState({ result: { error: intl.formatMessage(this.messages['creditcard.missing']) }})
-        return false;
-      }
-      const newState = {...this.state};
-      if (card.uuid && card.uuid.length === 36) {
-        newState.sanitizedCard = { uuid: card.uuid };
+
+    // validate payment method
+    if (order.totalAmount > 0) {
+
+      // favors prepaidcard over credit card
+      if (prepaidcard.valid) {
+        if (prepaidcard.balance < order.totalAmount) {
+          this.setState({ result: { error: intl.formatMessage(this.messages['prepaidcard.amounterror'])}});
+          return false;
+        }
+        newState.sanitizedCard = { token: prepaidcard.token,  service: 'prepaid', uuid: prepaidcard.uuid };
         this.setState(newState);
         return true;
-      } else if (isValidCard(card)) {
+
+      } else if (creditcard.uuid && creditcard.uuid.length === 36) {
+        newState.sanitizedCard = { uuid: creditcard.uuid };
+        this.setState(newState);
+        return true;
+      } else if (isValidCard(creditcard)) {
         let res;
         try {
-          res = await getStripeToken(card);
+          res = await getStripeToken(creditcard);
         } catch (e) {
           this.setState({ result: { error: e }})
           return false;
         }
-        const last4 = card.number.replace(/ /g, '').substr(-4);
+        const last4 = creditcard.number.replace(/ /g, '').substr(-4);
         const sanitizedCard = {
           name: last4,
           token: res.token,
+          service: 'stripe',
           data: {
-            fullName: card.full_name,
-            expMonth: card.exp_month,
-            expYear: card.exp_year,
+            fullName: creditcard.full_name,
+            expMonth: creditcard.exp_month,
+            expYear: creditcard.exp_year,
             brand: res.card.brand,
             country: res.card.country,
             funding: res.card.funding,
           },
-          save: card.save
+          save: creditcard.save
         };
         newState.sanitizedCard = sanitizedCard;
         this.setState(newState);
@@ -327,9 +365,8 @@ class OrderForm extends React.Component {
         this.setState({ result: { error: intl.formatMessage(this.messages['creditcard.error']) }})
         return false;
       }
-    } else {
-      return true;
-    }
+    } 
+    return true;
   }
 
   resetOrder() {
@@ -342,10 +379,45 @@ class OrderForm extends React.Component {
     })
   }
 
+  async applyPrepaidCardBalance() {
+    const { prepaidcard, creditcard, order } = this.state;
+
+    this.setState({
+      prepaidcard: Object.assign(prepaidcard, { applySent: true, loading: true })});
+    const { token } = prepaidcard;
+    const result = await this.props.client.query({
+      query: getPrepaidCardBalanceQuery,
+      variables: { token }
+    })
+    this.setState({ prepaidcard: Object.assign(prepaidcard, { loading: false})})
+
+    if (result.data && result.data.prepaidPaymentMethod) {
+
+      // force a tier of the whole amount with null interval
+      const tier = {
+        interval: null,
+        amount: result.data.prepaidPaymentMethod.balance,
+        currency: result.data.prepaidPaymentMethod.currency,
+        description: "Thank you 🙏",
+        name: "Gift Card"
+      }
+      
+      this.setState({ 
+        prepaidcard: Object.assign(prepaidcard, 
+          {...result.data.prepaidPaymentMethod, valid: true }),
+        creditcard: Object.assign(creditcard,
+          { show: false }),
+        order: Object.assign(order, {interval: null, totalAmount: result.data.prepaidPaymentMethod.balance, tier})
+      });
+    }
+  }
+
   render() {
     const { intl, collective, LoggedInUser } = this.props;
-    const currency = this.state.tier.currency || collective.currency;
-    const showNewCreditCardForm = !this.state.creditcard.uuid || this.state.creditcard.uuid === 'other';
+    const { order, prepaidcard, creditcard, fromCollective } = this.state;
+    const currency = order.tier.currency || collective.currency;
+
+    const showNewCreditCardForm = !prepaidcard.show && creditcard.show && (!creditcard.uuid || creditcard.uuid === 'other');
 
     const inputEmail = {
       type: 'email',
@@ -354,7 +426,7 @@ class OrderForm extends React.Component {
       focus: true,
       label: `${intl.formatMessage(this.messages['email.label'])}*`,
       description: intl.formatMessage(this.messages['email.description']),
-      defaultValue: this.state.order['email'],
+      defaultValue: order['email'],
       onChange: (value) => this.handleChange("user", "email", value)
     };
     if (!this.state.isNewUser) {
@@ -367,8 +439,38 @@ class OrderForm extends React.Component {
       }
     }
 
+    const inputPrepaidcard = {
+      type: 'text',
+      name: 'prepaidcard',
+      button: <Button 
+        className='prepaidapply'
+        disabled={prepaidcard.loading}
+        onClick={() => this.applyPrepaidCardBalance()}>
+        {intl.formatMessage(this.messages['prepaidcard.apply'])}
+        </Button>,
+      required: true,
+      label: intl.formatMessage(this.messages['prepaidcard.label']),
+      defaultValue: prepaidcard['token'],
+      onChange: (value) => this.handleChange("prepaidcard", "token", value)
+    };
+
+    if (prepaidcard.applySent) {
+      if (prepaidcard.loading) {   
+        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.loading']);
+      } else if (prepaidcard.valid) {
+        inputPrepaidcard.description = `${intl.formatMessage(this.messages['prepaidcard.amountremaining'])} ${formatCurrency(prepaidcard.balance, prepaidcard.currency)}`;
+      } else {
+        inputPrepaidcard.description = intl.formatMessage(this.messages['prepaidcard.invalid'])
+      }
+    }
+
     return (
       <div className="OrderForm">
+        <style jsx global>{`
+          .prepaidcard span {
+            max-width: 350px;
+          }
+        `}</style>
         <style jsx>{`
         h2 {
           margin: 3rem 0 3rem 0;
@@ -466,7 +568,7 @@ class OrderForm extends React.Component {
               </Row>
             ))}
         </div>
-        { !this.state.fromCollective.id &&
+        { !fromCollective.id && this.state.orgDetails.show &&
           <div className="organizationDetailsForm">
             <h2><FormattedMessage id="tier.order.organizationDetails" defaultMessage="Organization details" /></h2>
             <p><FormattedMessage id="tier.order.organizationDetails.description" defaultMessage="If you wish to contribute as an organization, please enter the information below. Otherwise you can leave this empty." /></p>
@@ -507,7 +609,7 @@ class OrderForm extends React.Component {
             </Row>
           </div>
         }
-        { this.state.order.totalAmount > 0 &&
+        { order.totalAmount > 0 &&
           <div className="paymentDetails">
             <h2><FormattedMessage id="tier.order.paymentDetails" defaultMessage="Payment details" /></h2>
             <Row>
@@ -533,7 +635,7 @@ class OrderForm extends React.Component {
                       onChange={(creditcardObject) => this.handleChange("creditcard", creditcardObject)}
                       />
                     <InputField
-                      description={intl.formatMessage(this.messages['creditcard.save'], { type: this.state.fromCollective.type && this.state.fromCollective.type.toLowerCase() || 'user' })}
+                      description={intl.formatMessage(this.messages['creditcard.save'], { type: fromCollective.type && fromCollective.type.toLowerCase() || 'user' })}
                       className="horizontal"
                       name="saveCreditCard"
                       type="checkbox"
@@ -542,6 +644,16 @@ class OrderForm extends React.Component {
                       />
                   </div>
                 }
+                <div>
+                  <Row key={`prepaidcard.input`}>
+                    <Col sm={12}>
+                      <InputField
+                        className="horizontal"
+                        {...inputPrepaidcard}
+                        />
+                    </Col>
+                  </Row>
+                </div>
               </Col>
             </Row>
           </div>
@@ -555,13 +667,13 @@ class OrderForm extends React.Component {
                 <label className="col-sm-3 control-label"><FormattedMessage id="tier.order.contribution" defaultMessage="Contribution" /></label>
                 <Col sm={9}>
                   <TierComponent
-                    tier={this.props.order.tier}
-                    defaultValue={{
-                      quantity: this.props.order.quantity,
-                      interval: this.props.order.tier.interval,
-                      amount: this.props.order.totalAmount / this.props.order.quantity
+                    tier={order.tier}
+                    values={{
+                      quantity: order.tier.quantity || order.quantity, // TODO: confusing, need to fix
+                      interval: order.interval || order.tier.interval,
+                      amount: order.totalAmount,
                     }}
-                    onChange={(tier) => this.handleChange("tier", tier)}
+                    onChange={(tier) => this.handleChange('order', 'tier', tier)}
                     />
                 </Col>
               </div>
@@ -575,26 +687,26 @@ class OrderForm extends React.Component {
               name="publicMessage"
               className="horizontal"
               placeholder={intl.formatMessage(this.messages['order.publicMessage.placeholder'])}
-              defaultValue={this.state.order.publicMessage}
+              defaultValue={order.publicMessage}
               onChange={(value) => this.handleChange("order", "publicMessage", value)}
               />
             </Col>
           </Row>
         </div>
 
-        { this.state.order.totalAmount > 0 && !collective.host &&
+        { order.totalAmount > 0 && !collective.host &&
           <div className="error">
             <FormattedMessage id="order.error.hostRequired" defaultMessage="This collective doesn't have a host that can receive money on their behalf" />
           </div>
         }
-        { (collective.host || this.state.order.totalAmount === 0) &&
+        { (collective.host || order.totalAmount === 0) &&
           <div className="actions">
             <div className="submit">
               <ActionButton className="blue" ref="submit" onClick={this.handleSubmit} disabled={this.state.loading}>
-                {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : this.state.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
+                {this.state.loading ? <FormattedMessage id='loading' defaultMessage='loading' /> : order.tier.button || capitalize(intl.formatMessage(this.messages['order.button']))}
               </ActionButton>
             </div>
-            { this.state.order.totalAmount > 0 &&
+            { order.totalAmount > 0 &&
               <div className="disclaimer">
                 <FormattedMessage
                   id="collective.host.disclaimer"
@@ -602,12 +714,12 @@ class OrderForm extends React.Component {
                   values={
                     {
                       hostname: collective.host.name,
-                      amount: formatCurrency(this.state.order.totalAmount, currency),
-                      interval: this.state.tier.interval,
+                      amount: formatCurrency(order.totalAmount, currency),
+                      interval: order.interval || order.tier.interval,
                       collective: collective.name
                     }
                   } />
-                  { this.state.tier.interval &&
+                  { (order.interval || order.tier.interval) &&
                     <div>
                       <FormattedMessage id="collective.host.cancelanytime" defaultMessage="You can cancel anytime." />
                     </div>
@@ -637,4 +749,4 @@ class OrderForm extends React.Component {
   }
 }
 
-export default withIntl(OrderForm);
+export default withIntl(withApollo(OrderForm));
