@@ -212,7 +212,7 @@ describe('subscriptions.routes.test.js', () => {
         .end(done);
     });
 
-    it('cancels the subscription', (done) => {
+    it.only('cancels the subscription', (done) => {
        request(app)
         .post(`/subscriptions/${order.SubscriptionId}/cancel?api_key=${application.api_key}`)
         .set('Authorization', `Bearer ${user.jwt()}`)
@@ -239,10 +239,11 @@ describe('subscriptions.routes.test.js', () => {
               expect(activity.data.user.id).to.be.equal(user.id);
             })
             .then(() => {
-              const subject = nm.sendMail.lastCall.args[0].subject;
-              const html = nm.sendMail.lastCall.args[0].html;
+              const { subject, html, cc } = nm.sendMail.lastCall.args[0];
+
               expect(subject).to.contain('Subscription canceled to Scouts');
               expect(html).to.contain('20/month has been canceled');
+              expect(cc).to.equal(`info@${collective.slug}.opencollective.com`);
               done();
             })
             .catch(done);
