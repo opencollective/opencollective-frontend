@@ -32,7 +32,7 @@ class EditEvent extends React.Component {
       const event = res.data.editCollective;
       const eventRoute = `/${this.props.event.parentCollective.slug}/events/${event.slug}`;
       Router.pushRoute(eventRoute);
-      this.setState({ result: { success: `Event edited with success` }});
+      this.setState({ result: { success: `Event edited successfully` }});
     } catch (err) {
       console.error(">>> editEvent error: ", JSON.stringify(err));
       const errorMsg = (err.graphQLErrors && err.graphQLErrors[0]) ? err.graphQLErrors[0].message : err.message;
@@ -46,7 +46,7 @@ class EditEvent extends React.Component {
       this.setState( { status: 'loading' });
       try {
         await this.props.deleteCollective(this.props.event.id);
-        this.setState({ status: 'idle', result: { success: `Event deleted with success` }});
+        this.setState({ status: 'idle', result: { success: `Event deleted successfully` }});
         const collectiveRoute = `/${this.props.event.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {

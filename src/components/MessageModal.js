@@ -14,7 +14,7 @@ class MessageModal extends React.Component {
     this.state = { show: true };
     this.close = this.close.bind(this);
     this.messages = defineMessages({
-      'StripeAccountConnected': { id: 'collective.messages.StripeAccountConnected', defaultMessage: 'Stripe account connected with success' }
+      'StripeAccountConnected': { id: 'collective.messages.StripeAccountConnected', defaultMessage: 'Stripe account connected successfully' }
     })
   }
 

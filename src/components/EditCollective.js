@@ -120,7 +120,7 @@ class EditCollective extends React.Component {
       this.setState( { status: 'loading' });
       try {
         await this.props.deleteCollective(this.props.collective.id);
-        this.setState({ status: 'idle', result: { success: `Collective deleted with success` }});
+        this.setState({ status: 'idle', result: { success: `Collective deleted successfully` }});
         const collectiveRoute = `/${this.props.collective.parentCollective.slug}`;
         Router.pushRoute(collectiveRoute);
       } catch (err) {

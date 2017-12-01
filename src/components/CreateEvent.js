@@ -49,7 +49,7 @@ class CreateEvent extends React.Component {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;
       const eventUrl = `${window.location.protocol}//${window.location.host}/${parentCollective.slug}/events/${event.slug}`;
-      this.setState({ status: 'idle', result: { success: `Event created with success: ${eventUrl}` }});
+      this.setState({ status: 'idle', result: { success: `Event created successfully: ${eventUrl}` }});
       window.location.replace(eventUrl);
     } catch (err) {
       console.error(">>> createEvent error: ", JSON.stringify(err));

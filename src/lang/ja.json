@@ -230,7 +230,7 @@
   "members.paid": "支援者",
   "collective.messages.StripeAccountConnected": "Stripeアカウントの連携に成功しました",
   "tier.order.profile": "プロフィール",
-  "tier.order.success": "🎉 Your order has been processed with success",
+  "tier.order.success": "🎉 Your order has been processed successfully",
   "tier.order.error": "An error occured 😳. The order didn't go through. Please try again in a few.",
   "tier.order.button": "注文する",
   "tier.order.organization.create": "コミュニティを作る",

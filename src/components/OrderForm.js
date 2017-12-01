@@ -62,7 +62,7 @@ class OrderForm extends React.Component {
 
     this.messages = defineMessages({
       'order.profile': { id: 'tier.order.profile', defaultMessage: `Profile` },
-      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed with success' },
+      'order.success': { id: 'tier.order.success', defaultMessage: '🎉 Your order has been processed successfully' },
       'order.error': { id: 'tier.order.error', defaultMessage: `An error occured 😳. The order didn't go through. Please try again in a few.` },
       'order.button': { id: 'tier.order.button', defaultMessage: 'place order' },
       'order.organization.create': { id: 'tier.order.organization.create', defaultMessage: `create an organization` },
@@ -220,7 +220,10 @@ class OrderForm extends React.Component {
     const newState = {
       ...this.state,
       isNewUser: false,
-      fromCollective
+      fromCollective,
+      orgDetails: {
+        show: Boolean(fromCollective)
+      }
     };
     this.populatePaymentMethods(CollectiveId);
     if (this.paymentMethods.length > 0) {
