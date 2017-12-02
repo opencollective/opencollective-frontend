@@ -2,9 +2,12 @@
 import path from 'path';
 import glob from 'glob';
 import webpack from 'webpack';
-
 module.exports = {
-  webpack: (config, { dev }) => {
+    onDemandEntries: {
+      // Make sure entries are not getting disposed.
+      maxInactiveAge: 1000 * 60 * 60
+    },
+    webpack: (config, { dev }) => {
     config.plugins.push(
       new webpack.IgnorePlugin(/react\/addons/),
       new webpack.IgnorePlugin(/react\/lib\/ExecutionEnvironment/),
