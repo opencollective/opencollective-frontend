@@ -86,6 +86,7 @@ class HostExpensesPage extends React.Component {
               collective={selectedCollective}
               includeHostedCollectives={includeHostedCollectives}
               LoggedInUser={this.state.LoggedInUser}
+              editable={true}
               />
 
           </div>

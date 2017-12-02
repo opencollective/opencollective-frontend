@@ -77,6 +77,7 @@ class Transaction extends React.Component {
           .body {
             overflow: hidden;
             font-size: 1.5rem;
+            width: 100%;
           }
           .description {
             text-overflow: ellipsis;

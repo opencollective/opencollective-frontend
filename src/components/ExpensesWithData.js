@@ -33,7 +33,7 @@ class ExpensesWithData extends React.Component {
       console.error("graphql error>>>", data.error.message);
       return (<Error message="GraphQL error" />)
     }
-    console.log(">>> ExpensesWithData render", data);
+
     const expenses = data.allExpenses;
 
     return (
@@ -43,7 +43,7 @@ class ExpensesWithData extends React.Component {
           collective={collective}
           expenses={expenses}
           refetch={data.refetch}
-          editables={editable}
+          editable={editable}
           fetchMore={data.fetchMore}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}

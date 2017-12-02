@@ -69,6 +69,7 @@ class ExpensesPage extends React.Component {
             <ExpensesWithData
               collective={collective}
               includeHostedCollectives={collective.isHost}
+              editable={true}
               LoggedInUser={this.state.LoggedInUser}
               />
 

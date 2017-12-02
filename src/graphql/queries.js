@@ -454,6 +454,7 @@ export const addGetLoggedInUserFunction = (component) => {
                  * - is admin or host of the collective
                  */
                 LoggedInUser.canEditCollective = (collective) => {
+                  if (!collective) return false;
                   return (collective.createdByUser && collective.createdByUser.id === LoggedInUser.id) 
                   || intersection(LoggedInUser.roles[collective.slug], ['HOST','ADMIN']).length > 0;
                 }

@@ -86,7 +86,6 @@ class Expense extends React.Component {
   }
 
   handleChange(expense) {
-    console.log(">>> handleChange", expense);
     this.setState({ modified: true, expense });
   }
 
@@ -97,7 +96,6 @@ class Expense extends React.Component {
     }
     const res = await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
-    console.log(">>> expense saved:", res);
   }
 
   render() {
@@ -138,6 +136,7 @@ class Expense extends React.Component {
           .body {
             overflow: hidden;
             font-size: 1.5rem;
+            width: 100%;
           }
           .description {
             text-overflow: ellipsis;
