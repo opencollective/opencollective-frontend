@@ -187,7 +187,7 @@ describe('graphql.tiers.test', () => {
 
       it("fails to use a payment method on file if not logged in", async () => {
         const order = generateOrder(user1);
-        order.paymentMethod = { uuid: paymentMethod1.uuid };
+        order.paymentMethod = { uuid: paymentMethod1.uuid, service: 'stripe' };
 
         const result = await utils.graphqlQuery(createOrderQuery, { order });
         expect(result.errors).to.exist;

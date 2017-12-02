@@ -194,7 +194,7 @@ const generateEmailFromTemplate = (template, recipient, data, options = {}) => {
   }
 
   if (template === 'thankyou') {
-    if (data.collective.name.match(/WWCode/i))
+    if (data.collective.slug.match(/wwcode/))
       template += '.wwcode';
     if (data.collective.name.match(/ispcwa/i))
       template += '.ispcwa';
@@ -292,7 +292,7 @@ const sendMessageFromActivity = (activity, notification) => {
       return generateEmailFromTemplateAndSend('collective.created', userEmail, data);
 
     case activities.SUBSCRIPTION_CANCELED:
-      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data);
+      return generateEmailFromTemplateAndSend('subscription.canceled', userEmail, data, { cc: `info@${data.collective.slug}.opencollective.com` });
 
     default:
       return Promise.resolve();

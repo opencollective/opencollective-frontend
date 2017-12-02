@@ -27,6 +27,7 @@ const templateNames = [
   'host.monthlyreport',
   'host.monthlyreport.text',
   'host.monthlyreport.summary',
+  'processing',
   'subscription.canceled',
   'ticket.confirmed',
   'ticket.confirmed.sustainoss',

@@ -310,11 +310,10 @@ export default (Sequelize, DataTypes) => {
     return models.Collective.findById(CollectiveId)
       .then(c => c.getHostCollectiveId())
       .then(HostCollectiveId => {
-        if (!HostCollectiveId) {
+        if (!HostCollectiveId && !transaction.HostCollectiveId) {
           throw new Error(`Cannot create a transaction: collective id ${CollectiveId} doesn't have a host`);
         }
-
-        transaction.HostCollectiveId = HostCollectiveId;
+        transaction.HostCollectiveId = HostCollectiveId || transaction.HostCollectiveId;
         // attach other objects manually. Needed for afterCreate hook to work properly
         transaction.CreatedByUserId = CreatedByUserId;
         transaction.FromCollectiveId = FromCollectiveId;

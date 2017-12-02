@@ -9,14 +9,31 @@ export default {
   },
   // Returns the balance in the currency of the paymentMethod (ie. currency of the Collective)
   getBalance: (paymentMethod) => {
-    return paymentMethod.getCollective().then(collective => {
+    return paymentMethod.getCollective()
+    .then(collective => {
+
+      // For gift cards turned into opencollective credit
+      // overloaded 'monthlyLimitPerMember' to use as a one-time limit
+      if (paymentMethod.monthlyLimitPerMember) {
+        return models.Transaction.find({
+          attributes: [
+            [ sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('netAmountInCollectiveCurrency')), 0), 'amount' ]
+          ],
+          where: {
+            PaymentMethodId: paymentMethod.Id,
+            FromCollectiveId: paymentMethod.CollectiveId
+          }
+        })
+        .then(result => Promise.resolve(paymentMethod.monthlyLimitPerMember - result.dataValues.amount))
+      }
 
       // If the collective is a host (USER or ORGANIZATION)
       if (collective.type === 'ORGANIZATION' || collective.type === 'USER') {
-        return collective.isHost().then(isHost => {
-          if (!isHost) return 0;
-          else return 10000000; // GraphQL doesn't like Infinity
-        });
+        return collective.isHost()
+          .then(isHost => {
+            if (!isHost) return 0;
+            else return 10000000; // GraphQL doesn't like Infinity
+          });
       }
 
       // Otherwise we compute the balance based on all previous transactions for this collective

@@ -11,7 +11,7 @@ export default function(Sequelize, DataTypes) {
 
   const { models } = Sequelize;
 
-  const payoutMethods = ['paypal', 'stripe', 'opencollective'];
+  const payoutMethods = ['paypal', 'stripe', 'opencollective', 'prepaid'];
   
   const PaymentMethod = Sequelize.define('PaymentMethod', {
     id: {
@@ -160,15 +160,21 @@ export default function(Sequelize, DataTypes) {
    * - the available balance on the paykey for PayPal (not implemented yet)
    */
   PaymentMethod.prototype.getBalanceForUser = function(user) {
-    if (!user) return {};
     const paymentProvider = paymentProviders[this.service]; // eslint-disable-line import/namespace
     let getBalance;
-    debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
     if (paymentProvider && paymentProvider.getBalance) {
       getBalance = paymentProvider.getBalance;
     } else {
       getBalance = () => Promise.resolve(10000000); // GraphQL doesn't like Infinity
     }
+
+    // needed because prepaid payment method can be accessed without logged in
+    if (this.service === 'prepaid') {
+      return paymentProvider.getBalance(this);
+    }
+
+    if (!user) return Promise.resolve({});
+    debug("getBalanceForUser", user.dataValues, "paymentProvider:", this.service);
 
     return user.populateRoles()
       .then(() => getBalance(this))
@@ -225,6 +231,22 @@ export default function(Sequelize, DataTypes) {
       };
       debug("PaymentMethod.create", paymentMethodData);
       return models.PaymentMethod.create(paymentMethodData);
+    } else if (paymentMethod.uuid && paymentMethod.service === 'prepaid') {
+
+      return PaymentMethod.findOne({ 
+        where: { 
+          uuid: paymentMethod.uuid, 
+          token: paymentMethod.token.toUpperCase(),
+          archivedAt: null
+        }
+      })
+      .then(pm => {
+        if (!pm) {
+          throw new Error(`Your gift card code doesn't exist`);
+        } else {
+          return pm;
+        }
+      })
     } else {
       // if the user is trying to reuse an existing payment method,
       // we make sure it belongs to the logged in user or to a collective that the user is an admin of

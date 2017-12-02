@@ -456,7 +456,7 @@ export default function(Sequelize, DataTypes) {
       .then(tiers => tiers.map(t => {
         tiersById[t.id] = t;
       }))
-      .then(() => queries.getBackersOfCollectiveWithTotalDonations(this.id, options))
+      .then(() => queries.getMembersWithTotalDonations({ CollectiveId: this.id, role: 'BACKER' }, options))
       // Map the users to their respective tier
       .map(backerCollective => {
         const include = options.active ? [ { model: models.Subscription, attributes: ['isActive'] } ] : [];
@@ -675,7 +675,9 @@ export default function(Sequelize, DataTypes) {
 
   Collective.prototype.editPaymentMethods = function(paymentMethods, defaultAttributes = {}) {
     if (!paymentMethods) return Promise.resolve();
-    return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null } }})
+    // We only allow editing of Stripe Payment Methods for the moment
+    // (to avoid marking other types as archived see issue #698)
+    return models.PaymentMethod.findAll({ where: { CollectiveId: this.id, archivedAt: { $eq: null }, service: { $eq: 'stripe' } }})
     .then(oldPaymentMethods => {
       // remove the paymentMethods that are not present anymore in the updated collective
       const diff = difference(oldPaymentMethods.map(t => t.id), paymentMethods.map(t => t.id));
@@ -1128,7 +1130,7 @@ export default function(Sequelize, DataTypes) {
           return Promise.all([
               collective.getYearlyIncome(),
               queries
-                .getBackersOfCollectiveWithTotalDonations(collective.id)
+                .getMembersWithTotalDonations({ CollectiveId: collective.id }, { role: 'BACKER' })
                 .then(users => models.Tier.appendTier(collective, users))
             ])
             .then(results => {
