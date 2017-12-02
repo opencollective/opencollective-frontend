@@ -95,7 +95,7 @@ describe('user.models.test.js', () => {
             setTimeout(resolve, 10);
           })
         })
-        .then(user => models.Notification.findAll({ where: { UserId: user.id, channel: "email" }, order: [['type','ASC']]}).then(notifications => {
+        .then(user => models.Notification.findAll({ where: { UserId: user.id, channel: "email", active: true }, order: [['type','ASC']]}).then(notifications => {
           expect(notifications.length).to.equal(2);
           expect(notifications[0].type).to.equal('user.monthlyreport');
           expect(notifications[1].type).to.equal('user.yearlyreport');

@@ -160,7 +160,8 @@ const getRecipients = () => {
   return models.Notification.findAll({
     where: {
       channel: 'email',
-      type: 'user.yearlyreport'
+      type: 'user.yearlyreport',
+      active: true
     },
     include: [{ model: models.User, where }]
   }).then(results => results.map(r => r.User.dataValues));

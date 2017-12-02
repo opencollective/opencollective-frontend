@@ -181,7 +181,8 @@ const getRecipients = (collective) => {
   return Notification.findAll({
     where: {
       CollectiveId: collective.id,
-      type: 'collective.monthlyreport'
+      type: 'collective.monthlyreport',
+      active: true
     },
     include: [{ model: User }]
   }).then(results => results.map(r => r.User.dataValues));

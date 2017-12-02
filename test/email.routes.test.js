@@ -281,7 +281,8 @@ describe("email.routes.test", () => {
       const where = {
         UserId: users[0].id,
         CollectiveId: collective.id,
-        type: 'mailinglist.admins'
+        type: 'mailinglist.admins',
+        active: true
       };
 
       return request(app)

@@ -397,7 +397,8 @@ function putThankDonationOptInIntoNotifTable(CollectiveId, collectiveSettings) {
   const attrs = {
     channel: 'twitter',
     type: activities.COLLECTIVE_TRANSACTION_CREATED,
-    CollectiveId
+    CollectiveId,
+    active: true
   };
 
   const thankDonationEnabled = twitterSettings.thankDonationEnabled;
