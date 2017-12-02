@@ -58,7 +58,8 @@ describe("notification.model.test.js", () => {
           where: {
             UserId: user.id,
             CollectiveId: collective.id,
-            type: 'collective.transaction.approved'
+            type: 'collective.transaction.approved',
+            active: true
           }
         });
       })
@@ -74,7 +75,8 @@ describe("notification.model.test.js", () => {
         Notification.findAndCountAll({where: {
           UserId: user.id,
           CollectiveId: collective.id,
-          type: notificationData.type
+          type: notificationData.type,
+          active: true
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
@@ -90,7 +92,8 @@ describe("notification.model.test.js", () => {
           where: {
             UserId: user.id,
             CollectiveId: collective.id,
-            type: notificationData.type
+            type: notificationData.type,
+            active: true
           }
         });
       })
@@ -105,7 +108,8 @@ describe("notification.model.test.js", () => {
       .then(() => Notification.findAndCountAll({where: {
           UserId: user.id,
           CollectiveId: collective2.id,
-          type: notificationData.type
+          type: notificationData.type,
+          active: true
         }}))
       .tap(res => expect(res.count).to.equal(0)));
 
@@ -121,7 +125,8 @@ describe("notification.model.test.js", () => {
       })
       .expect(200)
       .then(res => Notification.findAndCountAll({where: {
-          CollectiveId: res.body.id
+          CollectiveId: res.body.id,
+          active: true
         }}))
       .tap(res => {
         const notifications = res.rows;

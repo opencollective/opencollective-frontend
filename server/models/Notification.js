@@ -30,10 +30,6 @@ export default function(Sequelize, DataTypes) {
       type: DataTypes.STRING
     }
   }, {
-    defaultScope: {
-      where: { active: true }
-    },
-
     indexes: [{
       fields: ['type', 'CollectiveId', 'UserId'],
       type: 'unique'
@@ -57,7 +53,8 @@ export default function(Sequelize, DataTypes) {
           {
             where: {
               channel: 'email',
-              type: `mailinglist.${mailinglist}`
+              type: `mailinglist.${mailinglist}`,
+              active: true
             },
             include: [
               { model: models.User },

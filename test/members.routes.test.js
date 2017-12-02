@@ -188,7 +188,8 @@ describe('members.routes.test.js', () => {
       models.Notification.findOne({where: {
         CollectiveId: collective.id,
         UserId: users[2].id,
-        type: 'mailinglist.admins'
+        type: 'mailinglist.admins',
+        active: true
       }}).then(notification => {
         expect(notification).to.not.exist;
       })
@@ -208,7 +209,8 @@ describe('members.routes.test.js', () => {
             models.Notification.findOne({where: {
               CollectiveId: collective.id,
               UserId: users[2].id,
-              type: 'mailinglist.admins'
+              type: 'mailinglist.admins',
+              active: true
             }}).then(notification => {
               expect(notification.type).to.equal('mailinglist.admins');
               expect(notification.channel).to.equal('email');
